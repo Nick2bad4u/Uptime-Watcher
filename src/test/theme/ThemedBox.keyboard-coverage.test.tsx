@@ -14,7 +14,17 @@ const renderWithTheme = (component: React.ReactElement) =>
 
 describe("ThemedBox - Keyboard Interaction Coverage", () => {
     describe("onKeyDown handler coverage (lines 111-113)", () => {
-        it("should handle Enter key for interactive div", () => {
+        it("should handle Enter key for interactive div", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockOnClick = vi.fn();
 
             renderWithTheme(
@@ -34,7 +44,17 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(mockOnClick).toHaveBeenCalledTimes(2);
         });
 
-        it("should not trigger onClick for non-Enter/Space keys", () => {
+        it("should not trigger onClick for non-Enter/Space keys", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockOnClick = vi.fn();
 
             renderWithTheme(
@@ -53,7 +73,17 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(mockOnClick).not.toHaveBeenCalled();
         });
 
-        it("should handle preventDefault for Enter and Space keys", () => {
+        it("should handle preventDefault for Enter and Space keys", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             const mockOnClick = vi.fn();
 
             renderWithTheme(
@@ -77,7 +107,17 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(mockOnClick).toHaveBeenCalledTimes(2); // Still 2, not 3
         });
 
-        it("should not handle keyboard events when not interactive", () => {
+        it("should not handle keyboard events when not interactive", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             const mockOnClick = vi.fn();
 
             renderWithTheme(<ThemedBox>Non-interactive content</ThemedBox>);
@@ -91,7 +131,17 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(mockOnClick).not.toHaveBeenCalled();
         });
 
-        it("should not add keyboard handlers for button elements", () => {
+        it("should not add keyboard handlers for button elements", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockOnClick = vi.fn();
 
             renderWithTheme(
@@ -111,7 +161,17 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(mockOnClick).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle edge cases in keyboard interaction", () => {
+        it("should handle edge cases in keyboard interaction", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockOnClick = vi.fn();
 
             renderWithTheme(
@@ -137,7 +197,17 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(mockOnClick).toHaveBeenCalledTimes(2);
         });
 
-        it("should handle case where onClick is not provided", () => {
+        it("should handle case where onClick is not provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             renderWithTheme(
                 <ThemedBox as="div">
                     Non-clickable interactive content
@@ -155,7 +225,17 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
     });
 
     describe("Additional ThemedBox edge cases for complete coverage", () => {
-        it("should handle custom aria-label and role", () => {
+        it("should handle custom aria-label and role", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             renderWithTheme(
                 <ThemedBox
                     onClick={vi.fn()}
@@ -171,7 +251,17 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(box).toHaveAttribute("aria-label", "Custom label");
         });
 
-        it("should handle custom tabIndex", () => {
+        it("should handle custom tabIndex", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             renderWithTheme(
                 <ThemedBox onClick={vi.fn()} as="div" tabIndex={5}>
                     Content
@@ -182,7 +272,17 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(box).toHaveAttribute("tabIndex", "5");
         });
 
-        it("should default role and tabIndex for interactive div", () => {
+        it("should default role and tabIndex for interactive div", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             renderWithTheme(
                 <ThemedBox onClick={vi.fn()} as="div">
                     Content

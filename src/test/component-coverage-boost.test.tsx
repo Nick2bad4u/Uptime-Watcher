@@ -10,7 +10,17 @@ import React from "react";
 
 describe("Component Coverage Boost", () => {
     describe("SiteList Component Coverage", () => {
-        it("should handle SiteList empty state logic", () => {
+        it("should handle SiteList empty state logic", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test SiteList.tsx functionality (lines 35-49)
             interface SiteListProps {
                 sites: { id: string; name: string; status: string }[];
@@ -59,7 +69,17 @@ describe("Component Coverage Boost", () => {
             ).toBe(true);
         });
 
-        it("should handle site list rendering scenarios", () => {
+        it("should handle site list rendering scenarios", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockSites = [
                 { id: "1", name: "Site 1", status: "up" },
                 { id: "2", name: "Site 2", status: "down" },
@@ -87,7 +107,17 @@ describe("Component Coverage Boost", () => {
     });
 
     describe("SiteDetails Component Coverage", () => {
-        it("should handle SiteDetails navigation logic", () => {
+        it("should handle SiteDetails navigation logic", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test SiteDetails.tsx functionality (lines 88-389)
             interface SiteDetailsState {
                 currentTab: string;
@@ -149,7 +179,17 @@ describe("Component Coverage Boost", () => {
             expect(invalidState.currentTab).toBe("overview");
         });
 
-        it("should handle SiteDetailsHeader logic", () => {
+        it("should handle SiteDetailsHeader logic", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test SiteDetailsHeader.tsx functionality (lines 50-175)
             // Removed unused interface to fix TS6196
 
@@ -191,7 +231,17 @@ describe("Component Coverage Boost", () => {
             );
         });
 
-        it("should handle SiteDetailsNavigation logic", () => {
+        it("should handle SiteDetailsNavigation logic", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test SiteDetailsNavigation.tsx functionality (lines 74-222)
             interface NavigationItem {
                 key: string;
@@ -263,7 +313,17 @@ describe("Component Coverage Boost", () => {
     });
 
     describe("SiteCardHistory Component Coverage", () => {
-        it("should handle SiteCardHistory memo comparison logic", () => {
+        it("should handle SiteCardHistory memo comparison logic", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test SiteCardHistory.tsx areHistoryPropsEqual function (lines 36-65)
             interface SiteCardHistoryProps {
                 filteredHistory: { timestamp: number; status: string }[];
@@ -445,7 +505,17 @@ describe("Component Coverage Boost", () => {
             expect(areHistoryPropsEqual(props13, props14)).toBe(false);
         });
 
-        it("should handle SiteCardHistory title generation logic", () => {
+        it("should handle SiteCardHistory title generation logic", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test title generation logic (lines 102-122)
             interface Monitor {
                 id: string;
@@ -541,7 +611,17 @@ describe("Component Coverage Boost", () => {
     });
 
     describe("ActionButtonGroup Component Coverage", () => {
-        it("should handle ActionButtonGroup event handlers", () => {
+        it("should handle ActionButtonGroup event handlers", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             // Test ActionButtonGroup.tsx functionality (lines 85-95, conditional logic)
             interface ActionButtonGroupProps {
                 allMonitorsRunning: boolean;
@@ -658,7 +738,17 @@ describe("Component Coverage Boost", () => {
             expect(baseProps.onStopMonitoring).toHaveBeenCalled();
         });
 
-        it("should handle all monitors running scenarios", () => {
+        it("should handle all monitors running scenarios", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             interface ActionButtonGroupProps {
                 allMonitorsRunning: boolean;
                 disabled: boolean;
@@ -729,7 +819,17 @@ describe("Component Coverage Boost", () => {
     });
 
     describe("AddSiteForm Component Coverage", () => {
-        it("should handle AddSiteForm validation logic", () => {
+        it("should handle AddSiteForm validation logic", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Validation", "type");
+
             // Test AddSiteForm.tsx uncovered lines
             interface FormData {
                 siteName: string;
@@ -820,7 +920,17 @@ describe("Component Coverage Boost", () => {
             expect(errors).toHaveLength(3);
         });
 
-        it("should handle DynamicMonitorFields logic", () => {
+        it("should handle DynamicMonitorFields logic", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             // Test DynamicMonitorFields.tsx functionality (lines 140,175,182-186,194,236)
             interface MonitorFieldConfig {
                 type: string;
@@ -898,7 +1008,17 @@ describe("Component Coverage Boost", () => {
     });
 
     describe("MonitorUI Components Coverage", () => {
-        it("should handle MonitorUiComponents logic", () => {
+        it("should handle MonitorUiComponents logic", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             // Test MonitorUiComponents.tsx functionality (lines 43-114)
             interface MonitorUIComponent {
                 type: "status" | "action" | "metric" | "chart";
@@ -992,7 +1112,17 @@ describe("Component Coverage Boost", () => {
             expect(visible).toHaveLength(3); // deleteButton is not visible
         });
 
-        it("should handle StatusBadge edge cases", () => {
+        it("should handle StatusBadge edge cases", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test StatusBadge.tsx uncovered lines (68-72,79)
             interface StatusBadgeProps {
                 status: string;
@@ -1047,7 +1177,17 @@ describe("Component Coverage Boost", () => {
     });
 
     describe("Chart Components Coverage", () => {
-        it("should handle ChartComponents logic", () => {
+        it("should handle ChartComponents logic", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test ChartComponents.tsx functionality (lines 29-67)
             interface ChartData {
                 labels: string[];
@@ -1127,7 +1267,17 @@ describe("Component Coverage Boost", () => {
             expect(chartLogic.calculateTrend([100])).toBe("insufficient-data");
         });
 
-        it("should handle HistoryChart edge cases", () => {
+        it("should handle HistoryChart edge cases", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test HistoryChart.tsx uncovered lines (57-68)
             interface HistoryChartProps {
                 data: {
@@ -1218,7 +1368,17 @@ describe("Component Coverage Boost", () => {
     });
 
     describe("Site Analytics Coverage", () => {
-        it("should handle useSiteAnalytics edge cases", () => {
+        it("should handle useSiteAnalytics edge cases", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: component-coverage-boost", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test useSiteAnalytics.ts uncovered lines (260,270)
             interface AnalyticsData {
                 uptime: number;

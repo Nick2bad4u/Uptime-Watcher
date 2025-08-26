@@ -29,12 +29,32 @@ describe("Theme Components - Basic Functionality", () => {
     });
 
     describe("ThemedBox", () => {
-        it("should render with content", () => {
+        it("should render with content", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedBox>Test Content</ThemedBox>);
             expect(screen.getByText("Test Content")).toBeInTheDocument();
         });
 
-        it("should handle click events", () => {
+        it("should handle click events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             render(<ThemedBox onClick={mockOnClick}>Clickable</ThemedBox>);
             fireEvent.click(screen.getByRole("button"));
             expect(mockOnClick).toHaveBeenCalled();
@@ -42,14 +62,34 @@ describe("Theme Components - Basic Functionality", () => {
     });
 
     describe("ThemedButton", () => {
-        it("should render with text", () => {
+        it("should render with text", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedButton>Click Me</ThemedButton>);
             expect(
                 screen.getByRole("button", { name: "Click Me" })
             ).toBeInTheDocument();
         });
 
-        it("should handle click events", () => {
+        it("should handle click events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             render(<ThemedButton onClick={mockOnClick}>Click Me</ThemedButton>);
             fireEvent.click(screen.getByRole("button"));
             expect(mockOnClick).toHaveBeenCalled();
@@ -57,12 +97,32 @@ describe("Theme Components - Basic Functionality", () => {
     });
 
     describe("ThemedInput", () => {
-        it("should render input field", () => {
+        it("should render input field", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedInput />);
             expect(screen.getByRole("textbox")).toBeInTheDocument();
         });
 
-        it("should handle change events", () => {
+        it("should handle change events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             render(<ThemedInput onChange={mockOnChange} />);
             fireEvent.change(screen.getByRole("textbox"), {
                 target: { value: "test" },
@@ -72,19 +132,49 @@ describe("Theme Components - Basic Functionality", () => {
     });
 
     describe("ThemedText", () => {
-        it("should render text content", () => {
+        it("should render text content", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedText>Sample Text</ThemedText>);
             expect(screen.getByText("Sample Text")).toBeInTheDocument();
         });
     });
 
     describe("ThemedCheckbox", () => {
-        it("should render checkbox", () => {
+        it("should render checkbox", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedCheckbox />);
             expect(screen.getByRole("checkbox")).toBeInTheDocument();
         });
 
-        it("should handle change events", () => {
+        it("should handle change events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             render(<ThemedCheckbox onChange={mockOnChange} />);
             fireEvent.click(screen.getByRole("checkbox"));
             expect(mockOnChange).toHaveBeenCalled();
@@ -92,7 +182,17 @@ describe("Theme Components - Basic Functionality", () => {
     });
 
     describe("ThemedSelect", () => {
-        it("should render select with options", () => {
+        it("should render select with options", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedSelect onChange={mockOnChange}>
                     <option value="1">Option 1</option>
@@ -104,12 +204,32 @@ describe("Theme Components - Basic Functionality", () => {
     });
 
     describe("ThemedCard", () => {
-        it("should render card content", () => {
+        it("should render card content", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedCard>Card Content</ThemedCard>);
             expect(screen.getByText("Card Content")).toBeInTheDocument();
         });
 
-        it("should handle click when clickable", () => {
+        it("should handle click when clickable", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedCard clickable onClick={mockOnClick}>
                     Clickable Card
@@ -121,18 +241,48 @@ describe("Theme Components - Basic Functionality", () => {
     });
 
     describe("ThemedBadge", () => {
-        it("should render badge content", () => {
+        it("should render badge content", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedBadge>Badge Text</ThemedBadge>);
             expect(screen.getByText("Badge Text")).toBeInTheDocument();
         });
     });
 
     describe("StatusIndicator", () => {
-        it("should render status indicator", () => {
+        it("should render status indicator", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(() => render(<StatusIndicator status="up" />)).not.toThrow();
         });
 
-        it("should show text when enabled", () => {
+        it("should show text when enabled", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<StatusIndicator status="up" showText />);
             expect(screen.getByText("Up")).toBeInTheDocument();
         });

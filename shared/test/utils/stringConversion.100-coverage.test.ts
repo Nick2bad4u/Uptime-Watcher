@@ -8,12 +8,32 @@ import { safeStringify } from "../../utils/stringConversion.js";
 
 describe("String Conversion - 100% Coverage Tests", () => {
     describe("Targeting Lines 86-89 (undefined and default cases)", () => {
-        test("should handle explicit undefined value (line 86-87)", () => {
+        test("should handle explicit undefined value (line 86-87)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion.100-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion.100-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             const result = safeStringify(undefined);
             expect(result).toBe("");
         });
 
-        test("should handle the default case for unknown types (line 89-90)", () => {
+        test("should handle the default case for unknown types (line 89-90)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion.100-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion.100-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Create an object with a modified toString to test the default case
             const weirdObject = Object.create(null);
             Object.defineProperty(weirdObject, Symbol.toStringTag, {
@@ -29,7 +49,17 @@ describe("String Conversion - 100% Coverage Tests", () => {
             expect(typeof result).toBe("string");
         });
 
-        test("should ensure all typeof results are covered", () => {
+        test("should ensure all typeof results are covered", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion.100-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion.100-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test all the cases we can reasonably test
             expect(safeStringify(null)).toBe("");
             expect(safeStringify(undefined)).toBe("");
@@ -42,7 +72,17 @@ describe("String Conversion - 100% Coverage Tests", () => {
             expect(safeStringify({})).toBe("{}");
         });
 
-        test("should attempt to reach the default case through type manipulation", () => {
+        test("should attempt to reach the default case through type manipulation", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion.100-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion.100-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Try to create a value that might trigger the default case
             // This is challenging because JavaScript's typeof is quite comprehensive
             const testCases = [

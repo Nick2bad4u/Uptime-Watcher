@@ -181,7 +181,17 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Error Display Branches", () => {
-        it("should render error alert when lastError is present", () => {
+        it("should render error alert when lastError is present", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             vi.mocked(useErrorStore).mockReturnValue({
                 ...mockErrorStore,
                 lastError: "Test error message",
@@ -192,7 +202,17 @@ describe("Settings - Branch Coverage Tests", () => {
             expect(screen.getByText("Test error message")).toBeInTheDocument();
         });
 
-        it("should not render error alert when lastError is null", () => {
+        it("should not render error alert when lastError is null", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             vi.mocked(useErrorStore).mockReturnValue({
                 ...mockErrorStore,
                 lastError: null,
@@ -205,7 +225,17 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Sync Success Display Branches", () => {
-        it("should render sync success message when syncSuccess is true and no error", async () => {
+        it("should render sync success message when syncSuccess is true and no error", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
                 fullSyncFromBackend: vi.fn().mockResolvedValue(undefined),
@@ -224,7 +254,17 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should not render sync success when error is present", () => {
+        it("should not render sync success when error is present", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             vi.mocked(useErrorStore).mockReturnValue({
                 ...mockErrorStore,
                 lastError: "Error message",
@@ -240,7 +280,17 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Settings Validation Branches", () => {
-        it("should update allowed settings keys", () => {
+        it("should update allowed settings keys", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
             render(<Settings onClose={mockOnClose} />);
 
             const notificationsCheckbox = screen.getByLabelText(
@@ -253,7 +303,17 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should reject invalid settings keys and warn", () => {
+        it("should reject invalid settings keys and warn", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<Settings onClose={mockOnClose} />);
 
             const soundAlertsCheckbox = screen.getByLabelText(
@@ -267,7 +327,17 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Loading State Branches", () => {
-        it("should disable inputs when loading is true", () => {
+        it("should disable inputs when loading is true", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             vi.mocked(useErrorStore).mockReturnValue({
                 ...mockErrorStore,
                 isLoading: true,
@@ -286,7 +356,17 @@ describe("Settings - Branch Coverage Tests", () => {
             expect(screen.getByText("🔄 Sync Data")).toBeDisabled();
         });
 
-        it("should enable inputs when loading is false", () => {
+        it("should enable inputs when loading is false", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             vi.mocked(useErrorStore).mockReturnValue({
                 ...mockErrorStore,
                 isLoading: false,
@@ -307,7 +387,17 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Async Error Handling Branches", () => {
-        it("should handle sync errors and set error state", async () => {
+        it("should handle sync errors and set error state", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const syncError = new Error("Sync failed");
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
@@ -326,7 +416,17 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle backup download errors", async () => {
+        it("should handle backup download errors", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const backupError = new Error("Backup failed");
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
@@ -345,7 +445,17 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle history limit update errors", async () => {
+        it("should handle history limit update errors", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const user = userEvent.setup();
             const historyError = new Error("History update failed");
             const mockUpdateHistoryLimit = vi
@@ -371,7 +481,17 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("User Confirmation Branches", () => {
-        it("should reset settings when user confirms", () => {
+        it("should reset settings when user confirms", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockConfirm.mockReturnValue(true);
 
             render(<Settings onClose={mockOnClose} />);
@@ -386,7 +506,17 @@ describe("Settings - Branch Coverage Tests", () => {
             expect(mockErrorStore.clearError).toHaveBeenCalled();
         });
 
-        it("should not reset settings when user cancels", () => {
+        it("should not reset settings when user cancels", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockConfirm.mockReturnValue(false);
 
             render(<Settings onClose={mockOnClose} />);
@@ -403,7 +533,17 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Theme Selection Branches", () => {
-        it("should handle theme change with multiple available themes", () => {
+        it("should handle theme change with multiple available themes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<Settings onClose={mockOnClose} />);
 
             const themeSelect = screen.getByLabelText(
@@ -414,7 +554,17 @@ describe("Settings - Branch Coverage Tests", () => {
             expect(mockTheme.setTheme).toHaveBeenCalledWith("dark");
         });
 
-        it("should render all available themes in select options", () => {
+        it("should render all available themes in select options", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<Settings onClose={mockOnClose} />);
 
             expect(screen.getByDisplayValue("Light")).toBeInTheDocument();
@@ -428,7 +578,17 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Error Object Property Access Branches", () => {
-        it("should handle error objects with message property", async () => {
+        it("should handle error objects with message property", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const errorWithMessage = { message: "Detailed error message" };
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
@@ -449,7 +609,17 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle error objects without message property", async () => {
+        it("should handle error objects without message property", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const errorWithoutMessage = { code: "ERROR_CODE" };
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
@@ -470,7 +640,17 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle primitive error values", async () => {
+        it("should handle primitive error values", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const primitiveError = "Simple string error";
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
@@ -491,7 +671,17 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Event Handler Branches", () => {
-        it("should handle all checkbox change events", () => {
+        it("should handle all checkbox change events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
             render(<Settings onClose={mockOnClose} />);
 
             // Test all checkbox handlers
@@ -520,7 +710,17 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle history limit select change", () => {
+        it("should handle history limit select change", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Configuration", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Configuration", "type");
+
             render(<Settings onClose={mockOnClose} />);
 
             const historySelect = screen.getByLabelText(
@@ -533,7 +733,17 @@ describe("Settings - Branch Coverage Tests", () => {
             ).toHaveBeenCalledWith(200);
         });
 
-        it("should handle close button clicks", async () => {
+        it("should handle close button clicks", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<Settings onClose={mockOnClose} />);
 
@@ -547,7 +757,17 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Successful Operation Branches", () => {
-        it("should handle successful sync operation", async () => {
+        it("should handle successful sync operation", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             const mockFullSync = vi.fn().mockResolvedValue(undefined);
 
@@ -566,7 +786,17 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle successful backup download", async () => {
+        it("should handle successful backup download", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Backup Operation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Backup Operation", "type");
+
             const user = userEvent.setup();
             const mockDownloadBackup = vi.fn().mockResolvedValue(undefined);
 

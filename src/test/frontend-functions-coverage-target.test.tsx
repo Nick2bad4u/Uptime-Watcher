@@ -63,7 +63,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Error Boundary Functions", () => {
-        it("should exercise DefaultErrorFallback component functions", () => {
+        it("should exercise DefaultErrorFallback component functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
             const error = new Error("Test error");
             const onRetry = vi.fn();
 
@@ -81,7 +91,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             expect(onRetry).toHaveBeenCalled();
         });
 
-        it("should exercise withErrorBoundary HOC functions", () => {
+        it("should exercise withErrorBoundary HOC functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
             const TestComponent = () => <div>Test Component</div>;
             const WrappedComponent = withErrorBoundary(TestComponent);
 
@@ -89,7 +109,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             expect(screen.getByText("Test Component")).toBeInTheDocument();
         });
 
-        it("should exercise error store functions", () => {
+        it("should exercise error store functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() => useErrorStore());
 
             act(() => {
@@ -107,7 +137,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Store Functions Coverage", () => {
-        it("should exercise settings store functions", () => {
+        it("should exercise settings store functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             // Test available functions
@@ -129,7 +169,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             expect(result.current).toBeDefined();
         });
 
-        it("should exercise UI store functions", () => {
+        it("should exercise UI store functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -153,7 +203,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Component Lifecycle Functions", () => {
-        it("should exercise component mount and unmount functions", () => {
+        it("should exercise component mount and unmount functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const mountEffect = vi.fn();
             const unmountEffect = vi.fn();
 
@@ -174,7 +234,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             expect(unmountEffect).toHaveBeenCalled();
         });
 
-        it("should exercise useState functions", () => {
+        it("should exercise useState functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const TestComponent = () => {
                 const [count, setCount] = useState(0);
                 const [text, setText] = useState("");
@@ -207,7 +277,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Event Handler Functions", () => {
-        it("should exercise various event handlers", () => {
+        it("should exercise various event handlers", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             const clickHandler = vi.fn();
             const changeHandler = vi.fn();
             const focusHandler = vi.fn();
@@ -249,7 +329,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Async Function Coverage", () => {
-        it("should exercise async component functions", async () => {
+        it("should exercise async component functions", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const asyncEffect = vi.fn().mockResolvedValue("success");
 
             const AsyncComponent = () => {
@@ -282,7 +372,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             expect(asyncEffect).toHaveBeenCalled();
         });
 
-        it("should exercise error handling in async functions", async () => {
+        it("should exercise error handling in async functions", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
             const failingAsyncEffect = vi
                 .fn()
                 .mockRejectedValue(new Error("Async error"));
@@ -320,7 +420,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Conditional Rendering Functions", () => {
-        it("should exercise conditional rendering branches", () => {
+        it("should exercise conditional rendering branches", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const ConditionalComponent = ({
                 condition,
             }: {
@@ -342,7 +452,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             expect(screen.getByText("Condition is false")).toBeInTheDocument();
         });
 
-        it("should exercise ternary operator functions", () => {
+        it("should exercise ternary operator functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const TernaryComponent = ({ show }: { show: boolean }) => (
                 <div>{show ? <span>Visible</span> : <span>Hidden</span>}</div>
             );
@@ -356,7 +476,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Custom Hook Functions", () => {
-        it("should exercise custom hook with multiple functions", () => {
+        it("should exercise custom hook with multiple functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const useCounter = (initialValue = 0) => {
                 const [count, setCount] = useState(initialValue);
 
@@ -389,7 +519,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Class Component Functions", () => {
-        it("should exercise class component lifecycle methods", () => {
+        it("should exercise class component lifecycle methods", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const componentDidMount = vi.fn();
             const componentWillUnmount = vi.fn();
 
@@ -434,7 +574,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Function Coverage Completion", () => {
-        it("should verify comprehensive function coverage patterns", () => {
+        it("should verify comprehensive function coverage patterns", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: frontend-functions-coverage-target", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // This test ensures we've exercised various function patterns
             // that commonly contribute to function coverage metrics
 

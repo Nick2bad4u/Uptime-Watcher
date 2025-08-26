@@ -28,7 +28,17 @@ describe("Theme Components - Complete Coverage", () => {
     });
 
     describe("ThemedBox Component", () => {
-        it("should render with default props", () => {
+        it("should render with default props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedBox>Content</ThemedBox>);
 
             const box = screen.getByText("Content");
@@ -36,7 +46,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(box).toHaveTextContent("Content");
         });
 
-        it("should apply all surface variants", () => {
+        it("should apply all surface variants", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const surfaces = [
                 "base",
                 "elevated",
@@ -56,7 +76,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should apply all padding variants", () => {
+        it("should apply all padding variants", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const paddings = [
                 "xs",
                 "sm",
@@ -78,7 +108,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should handle click events", () => {
+        it("should handle click events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             render(<ThemedBox onClick={mockOnClick}>Clickable box</ThemedBox>);
 
             const box = screen.getByText("Clickable box");
@@ -86,7 +126,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(mockOnClick).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle different element types", () => {
+        it("should handle different element types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const elements = [
                 "div",
                 "section",
@@ -107,7 +157,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should handle variant prop", () => {
+        it("should handle variant prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const variants = [
                 "primary",
                 "secondary",
@@ -126,7 +186,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should handle rounded prop", () => {
+        it("should handle rounded prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const roundedOptions = [
                 "none",
                 "sm",
@@ -147,7 +217,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should handle shadow prop", () => {
+        it("should handle shadow prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const shadowOptions = [
                 "sm",
                 "md",
@@ -168,14 +248,34 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should handle border prop", () => {
+        it("should handle border prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedBox border>Bordered box</ThemedBox>);
 
             const box = screen.getByText("Bordered box");
             expect(box).toBeInTheDocument();
         });
 
-        it("should handle mouse events", () => {
+        it("should handle mouse events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             const mockMouseEnter = vi.fn();
             const mockMouseLeave = vi.fn();
 
@@ -198,7 +298,17 @@ describe("Theme Components - Complete Coverage", () => {
     });
 
     describe("ThemedButton Component", () => {
-        it("should render with default props", () => {
+        it("should render with default props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedButton onClick={mockOnClick}>
                     Default Button
@@ -211,7 +321,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(button).toBeInTheDocument();
         });
 
-        it("should apply all variant styles", () => {
+        it("should apply all variant styles", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const variants = [
                 "primary",
                 "secondary",
@@ -239,7 +359,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should apply all size variants", () => {
+        it("should apply all size variants", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const sizes = [
                 "xs",
                 "sm",
@@ -264,7 +394,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should handle disabled state", () => {
+        it("should handle disabled state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedButton disabled onClick={mockOnClick}>
                     Disabled Button
@@ -277,7 +417,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(button).toBeDisabled();
         });
 
-        it("should handle loading state", () => {
+        it("should handle loading state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Loading", "type");
+
             render(
                 <ThemedButton loading onClick={mockOnClick}>
                     Loading Button
@@ -290,7 +440,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(button).toBeDisabled();
         });
 
-        it("should handle fullWidth prop", () => {
+        it("should handle fullWidth prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedButton fullWidth onClick={mockOnClick}>
                     Full Width Button
@@ -303,7 +463,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(button).toBeInTheDocument();
         });
 
-        it("should handle icon prop", () => {
+        it("should handle icon prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedButton icon={<span>🚀</span>} onClick={mockOnClick}>
                     Icon Button
@@ -317,7 +487,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(screen.getByText("🚀")).toBeInTheDocument();
         });
 
-        it("should handle iconPosition prop", () => {
+        it("should handle iconPosition prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedButton
                     icon={<span>🚀</span>}
@@ -334,7 +514,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(button).toBeInTheDocument();
         });
 
-        it("should handle iconColor prop", () => {
+        it("should handle iconColor prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedButton
                     icon={<span>🚀</span>}
@@ -351,7 +541,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(button).toBeInTheDocument();
         });
 
-        it("should handle different button types", () => {
+        it("should handle different button types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const types = [
                 "button",
                 "submit",
@@ -376,7 +576,17 @@ describe("Theme Components - Complete Coverage", () => {
     });
 
     describe("ThemedInput Component", () => {
-        it("should render with default props", () => {
+        it("should render with default props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedInput />);
 
             const input = screen.getByRole("textbox");
@@ -384,7 +594,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(input).toHaveAttribute("type", "text");
         });
 
-        it("should handle different input types", () => {
+        it("should handle different input types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const types = [
                 "text",
                 "email",
@@ -404,21 +624,51 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should handle number input type", () => {
+        it("should handle number input type", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedInput type="number" placeholder="number input" />);
 
             const input = screen.getByPlaceholderText("number input");
             expect(input).toHaveAttribute("type", "number");
         });
 
-        it("should handle disabled state", () => {
+        it("should handle disabled state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedInput disabled placeholder="disabled input" />);
 
             const input = screen.getByPlaceholderText("disabled input");
             expect(input).toBeDisabled();
         });
 
-        it("should handle value and onChange", () => {
+        it("should handle value and onChange", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedInput
                     value="test value"
@@ -436,7 +686,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(mockOnChange).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle placeholder and required", () => {
+        it("should handle placeholder and required", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedInput placeholder="Enter text" required />);
 
             const input = screen.getByPlaceholderText("Enter text");
@@ -444,7 +704,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(input).toHaveAttribute("required");
         });
 
-        it("should handle min/max for number inputs", () => {
+        it("should handle min/max for number inputs", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedInput
                     type="number"
@@ -461,7 +731,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(input).toHaveAttribute("step", "0.1");
         });
 
-        it("should handle aria attributes", () => {
+        it("should handle aria attributes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedInput
                     aria-label="Search"
@@ -476,14 +756,34 @@ describe("Theme Components - Complete Coverage", () => {
     });
 
     describe("ThemedText Component", () => {
-        it("should render with default props", () => {
+        it("should render with default props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedText>Default text</ThemedText>);
 
             const text = screen.getByText("Default text");
             expect(text).toBeInTheDocument();
         });
 
-        it("should apply all size variants", () => {
+        it("should apply all size variants", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const sizes = [
                 "xs",
                 "sm",
@@ -508,7 +808,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should apply all weight variants", () => {
+        it("should apply all weight variants", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const weights = [
                 "normal",
                 "medium",
@@ -528,7 +838,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should apply all variant colors", () => {
+        it("should apply all variant colors", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const variants = [
                 "primary",
                 "secondary",
@@ -553,7 +873,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should apply all text alignment", () => {
+        it("should apply all text alignment", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const alignments = [
                 "left",
                 "center",
@@ -573,7 +903,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should handle style prop", () => {
+        it("should handle style prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedText style={{ color: "red", fontSize: "20px" }}>
                     Styled text
@@ -587,7 +927,17 @@ describe("Theme Components - Complete Coverage", () => {
     });
 
     describe("ThemedCheckbox Component", () => {
-        it("should render with default props", () => {
+        it("should render with default props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedCheckbox onChange={mockOnChange} />);
 
             const checkbox = screen.getByRole("checkbox");
@@ -595,28 +945,68 @@ describe("Theme Components - Complete Coverage", () => {
             expect(checkbox).toHaveAttribute("type", "checkbox");
         });
 
-        it("should handle checked state", () => {
+        it("should handle checked state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedCheckbox checked onChange={mockOnChange} />);
 
             const checkbox = screen.getByRole("checkbox") as HTMLInputElement;
             expect(checkbox.checked).toBe(true);
         });
 
-        it("should handle disabled state", () => {
+        it("should handle disabled state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedCheckbox disabled onChange={mockOnChange} />);
 
             const checkbox = screen.getByRole("checkbox");
             expect(checkbox).toBeDisabled();
         });
 
-        it("should handle required prop", () => {
+        it("should handle required prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedCheckbox required onChange={mockOnChange} />);
 
             const checkbox = screen.getByRole("checkbox");
             expect(checkbox).toHaveAttribute("required");
         });
 
-        it("should apply accessibility props", () => {
+        it("should apply accessibility props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedCheckbox
                     onChange={mockOnChange}
@@ -628,7 +1018,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(checkbox).toHaveAttribute("aria-label", "Accept terms");
         });
 
-        it("should handle change events", () => {
+        it("should handle change events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             render(<ThemedCheckbox onChange={mockOnChange} />);
 
             const checkbox = screen.getByRole("checkbox");
@@ -639,7 +1039,17 @@ describe("Theme Components - Complete Coverage", () => {
     });
 
     describe("ThemedSelect Component", () => {
-        it("should render with children", () => {
+        it("should render with children", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedSelect onChange={mockOnChange}>
                     <option value="option1">Option 1</option>
@@ -655,7 +1065,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(options).toHaveLength(3);
         });
 
-        it("should handle disabled state", () => {
+        it("should handle disabled state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedSelect disabled onChange={mockOnChange}>
                     <option value="test">Test</option>
@@ -666,7 +1086,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(select).toBeDisabled();
         });
 
-        it("should handle value and onChange", () => {
+        it("should handle value and onChange", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedSelect value="option2" onChange={mockOnChange}>
                     <option value="option1">Option 1</option>
@@ -682,7 +1112,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(mockOnChange).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle required prop", () => {
+        it("should handle required prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedSelect required onChange={mockOnChange}>
                     <option value="test">Test</option>
@@ -693,7 +1133,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(select).toHaveAttribute("required");
         });
 
-        it("should handle click and mouse events", () => {
+        it("should handle click and mouse events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             const mockClick = vi.fn();
             const mockMouseDown = vi.fn();
 
@@ -715,7 +1165,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(mockMouseDown).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle aria attributes", () => {
+        it("should handle aria attributes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedSelect
                     aria-label="Choose option"
@@ -733,7 +1193,17 @@ describe("Theme Components - Complete Coverage", () => {
     });
 
     describe("ThemedCard Component", () => {
-        it("should render with default props", () => {
+        it("should render with default props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedCard>Card content</ThemedCard>);
 
             const card = screen.getByText("Card content").closest("div");
@@ -741,7 +1211,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(card).toHaveTextContent("Card content");
         });
 
-        it("should handle title and subtitle", () => {
+        it("should handle title and subtitle", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedCard title="Card Title" subtitle="Card Subtitle">
                     Card content
@@ -754,7 +1234,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(subtitle).toBeInTheDocument();
         });
 
-        it("should handle clickable state", () => {
+        it("should handle clickable state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedCard clickable onClick={mockOnClick}>
                     Clickable card
@@ -766,14 +1256,34 @@ describe("Theme Components - Complete Coverage", () => {
             expect(mockOnClick).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle hoverable state", () => {
+        it("should handle hoverable state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedCard hoverable>Hoverable card</ThemedCard>);
 
             const card = screen.getByText("Hoverable card").closest("div");
             expect(card).toBeInTheDocument();
         });
 
-        it("should handle icon prop", () => {
+        it("should handle icon prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedCard icon={<span>📦</span>} iconColor="blue">
                     Card with icon
@@ -785,7 +1295,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(screen.getByText("Card with icon")).toBeInTheDocument();
         });
 
-        it("should handle all variants", () => {
+        it("should handle all variants", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const variants = [
                 "primary",
                 "secondary",
@@ -804,7 +1324,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should handle mouse events", () => {
+        it("should handle mouse events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             const mockMouseEnter = vi.fn();
             const mockMouseLeave = vi.fn();
 
@@ -827,14 +1357,34 @@ describe("Theme Components - Complete Coverage", () => {
     });
 
     describe("ThemedBadge Component", () => {
-        it("should render with default props", () => {
+        it("should render with default props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedBadge>Default Badge</ThemedBadge>);
 
             const badge = screen.getByText("Default Badge");
             expect(badge).toBeInTheDocument();
         });
 
-        it("should apply all variant styles", () => {
+        it("should apply all variant styles", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const variants = [
                 "primary",
                 "secondary",
@@ -856,7 +1406,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should apply all size variants", () => {
+        it("should apply all size variants", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const sizes = [
                 "xs",
                 "sm",
@@ -876,7 +1436,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should handle icon prop", () => {
+        it("should handle icon prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedBadge icon={<span>⭐</span>} iconColor="gold">
                     Badge with icon
@@ -890,7 +1460,17 @@ describe("Theme Components - Complete Coverage", () => {
     });
 
     describe("StatusIndicator Component", () => {
-        it("should render with status", () => {
+        it("should render with status", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<StatusIndicator status="up" />);
 
             // StatusIndicator renders as a div with themed-status-indicator class
@@ -900,7 +1480,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(indicator).toBeInTheDocument();
         });
 
-        it("should handle different sizes", () => {
+        it("should handle different sizes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const sizes = [
                 "sm",
                 "md",
@@ -921,14 +1511,34 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should handle showText prop", () => {
+        it("should handle showText prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<StatusIndicator status="up" showText />);
 
             const textElement = screen.getByText("Up");
             expect(textElement).toBeInTheDocument();
         });
 
-        it("should handle different status values", () => {
+        it("should handle different status values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const statuses = [
                 "up",
                 "down",
@@ -949,7 +1559,17 @@ describe("Theme Components - Complete Coverage", () => {
     });
 
     describe("MiniChartBar Component", () => {
-        it("should render with status and timestamp", () => {
+        it("should render with status and timestamp", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<MiniChartBar status="up" timestamp={new Date()} />);
 
             // MiniChartBar renders as a simple div, not with presentation role
@@ -957,7 +1577,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(bar).toBeInTheDocument();
         });
 
-        it("should handle responseTime prop", () => {
+        it("should handle responseTime prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <MiniChartBar
                     status="up"
@@ -970,7 +1600,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(bar).toBeInTheDocument();
         });
 
-        it("should handle different status values", () => {
+        it("should handle different status values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const statuses = [
                 "up",
                 "down",
@@ -989,7 +1629,17 @@ describe("Theme Components - Complete Coverage", () => {
             }
         });
 
-        it("should handle string timestamp", () => {
+        it("should handle string timestamp", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <MiniChartBar status="up" timestamp="2024-01-01T00:00:00Z" />
             );
@@ -998,7 +1648,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(bar).toBeInTheDocument();
         });
 
-        it("should handle number timestamp", () => {
+        it("should handle number timestamp", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<MiniChartBar status="up" timestamp={Date.now()} />);
 
             const bar = document.querySelector(".themed-mini-chart-bar");
@@ -1007,7 +1667,17 @@ describe("Theme Components - Complete Coverage", () => {
     });
 
     describe("Edge Cases and Integration", () => {
-        it("should handle all components together", () => {
+        it("should handle all components together", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
             render(
                 <ThemedBox surface="elevated" padding="lg">
                     <ThemedText size="lg" weight="bold">
@@ -1033,7 +1703,17 @@ describe("Theme Components - Complete Coverage", () => {
             expect(screen.getByText("Success")).toBeInTheDocument();
         });
 
-        it("should handle components with custom className", () => {
+        it("should handle components with custom className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <div>
                     <ThemedBox className="custom-box">Box</ThemedBox>

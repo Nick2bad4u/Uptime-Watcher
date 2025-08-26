@@ -122,7 +122,17 @@ describe("SiteList", () => {
     });
 
     describe("Empty State Rendering", () => {
-        it("should render EmptyState when no sites are available", () => {
+        it("should render EmptyState when no sites are available", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: [] });
             mockUseTheme.mockReturnValue(createMockTheme(false));
@@ -135,7 +145,17 @@ describe("SiteList", () => {
             expect(screen.queryByTestId(/site-card-/)).not.toBeInTheDocument();
         });
 
-        it("should render EmptyState when sites array is empty - dark theme", () => {
+        it("should render EmptyState when sites array is empty - dark theme", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: [] });
             mockUseTheme.mockReturnValue(createMockTheme(true));
@@ -150,7 +170,17 @@ describe("SiteList", () => {
     });
 
     describe("Site List Rendering", () => {
-        it("should render SiteCard components for each site", () => {
+        it("should render SiteCard components for each site", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: mockSites });
             mockUseTheme.mockReturnValue(createMockTheme(false));
@@ -165,7 +195,17 @@ describe("SiteList", () => {
             expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
         });
 
-        it("should render with correct container className in light theme", () => {
+        it("should render with correct container className in light theme", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: mockSites });
             mockUseTheme.mockReturnValue(createMockTheme(false));
@@ -179,7 +219,17 @@ describe("SiteList", () => {
             expect(containerDiv).not.toHaveClass("dark");
         });
 
-        it("should render with correct container className in dark theme", () => {
+        it("should render with correct container className in dark theme", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: mockSites });
             mockUseTheme.mockReturnValue(createMockTheme(true));
@@ -193,7 +243,17 @@ describe("SiteList", () => {
             expect(containerDiv).toHaveClass("dark");
         });
 
-        it("should render single site correctly", () => {
+        it("should render single site correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             const singleSite = [mockSites[0]];
             mockUseSitesStore.mockReturnValue({ sites: singleSite });
@@ -212,7 +272,17 @@ describe("SiteList", () => {
     });
 
     describe("Hook Integration", () => {
-        it("should call useSitesStore hook", () => {
+        it("should call useSitesStore hook", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: [] });
             mockUseTheme.mockReturnValue(createMockTheme(false));
@@ -224,7 +294,17 @@ describe("SiteList", () => {
             expect(mockUseSitesStore).toHaveBeenCalledTimes(1);
         });
 
-        it("should call useTheme hook", () => {
+        it("should call useTheme hook", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: [] });
             mockUseTheme.mockReturnValue(createMockTheme(false));
@@ -236,7 +316,17 @@ describe("SiteList", () => {
             expect(mockUseTheme).toHaveBeenCalledTimes(1);
         });
 
-        it("should properly destructure sites from useSitesStore", () => {
+        it("should properly destructure sites from useSitesStore", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             const mockStore = { sites: mockSites, otherProperty: "test" };
             mockUseSitesStore.mockReturnValue(mockStore);
@@ -249,7 +339,17 @@ describe("SiteList", () => {
             expect(screen.getByTestId("site-card-site-1")).toBeInTheDocument();
         });
 
-        it("should properly destructure isDark from useTheme", () => {
+        it("should properly destructure isDark from useTheme", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             const mockTheme = {
                 ...createMockTheme(true),
@@ -268,7 +368,17 @@ describe("SiteList", () => {
     });
 
     describe("Key Prop Handling", () => {
-        it("should use site.identifier as key for each SiteCard", () => {
+        it("should use site.identifier as key for each SiteCard", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: mockSites });
             mockUseTheme.mockReturnValue(createMockTheme(false));
@@ -284,7 +394,17 @@ describe("SiteList", () => {
             }
         });
 
-        it("should handle sites with special characters in identifiers", () => {
+        it("should handle sites with special characters in identifiers", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             const specialSites: Site[] = [
                 createMockSite({
@@ -315,7 +435,17 @@ describe("SiteList", () => {
     });
 
     describe("Conditional Logic Coverage", () => {
-        it("should handle isDark: false condition", () => {
+        it("should handle isDark: false condition", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: mockSites });
             mockUseTheme.mockReturnValue(createMockTheme(false));
@@ -328,7 +458,17 @@ describe("SiteList", () => {
             expect(containerDiv.className).toBe("divider-y");
         });
 
-        it("should handle isDark: true condition", () => {
+        it("should handle isDark: true condition", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: mockSites });
             mockUseTheme.mockReturnValue(createMockTheme(true));
@@ -341,7 +481,17 @@ describe("SiteList", () => {
             expect(containerDiv.className).toBe("divider-y dark");
         });
 
-        it("should handle sites.length === 0 condition", () => {
+        it("should handle sites.length === 0 condition", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: [] });
             mockUseTheme.mockReturnValue(createMockTheme(false));
@@ -353,7 +503,17 @@ describe("SiteList", () => {
             expect(screen.getByTestId("empty-state")).toBeInTheDocument();
         });
 
-        it("should handle sites.length > 0 condition", () => {
+        it("should handle sites.length > 0 condition", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: mockSites });
             mockUseTheme.mockReturnValue(createMockTheme(false));
@@ -368,7 +528,17 @@ describe("SiteList", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle undefined sites gracefully", () => {
+        it("should handle undefined sites gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: undefined as any });
             mockUseTheme.mockReturnValue(createMockTheme(false));
@@ -377,7 +547,17 @@ describe("SiteList", () => {
             expect(() => render(<SiteList />)).toThrow();
         });
 
-        it("should handle malformed site objects", () => {
+        it("should handle malformed site objects", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             const malformedSites = [
                 { identifier: "site-1" }, // Missing required properties
@@ -392,7 +572,17 @@ describe("SiteList", () => {
             expect(screen.getByTestId("site-card-site-1")).toBeInTheDocument();
         });
 
-        it("should handle very large number of sites", () => {
+        it("should handle very large number of sites", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             const manySites = Array.from({ length: 100 }, (_, i) => ({
                 ...mockSites[0],
@@ -412,7 +602,17 @@ describe("SiteList", () => {
     });
 
     describe("Component Integration", () => {
-        it("should call SiteCard component for each site", () => {
+        it("should call SiteCard component for each site", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue({ sites: mockSites });
             mockUseTheme.mockReturnValue(createMockTheme(false));
@@ -427,7 +627,17 @@ describe("SiteList", () => {
             expect(screen.getByTestId("site-card-site-3")).toBeInTheDocument();
         });
 
-        it("should call EmptyState component when no sites", async () => {
+        it("should call EmptyState component when no sites", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteList", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Arrange
             const { EmptyState: mockEmptyState } = await import(
                 "../../../../components/Dashboard/SiteList/EmptyState"

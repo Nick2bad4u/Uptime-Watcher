@@ -66,7 +66,17 @@ describe("HistoryChart - Complete Coverage", () => {
     });
 
     describe("Basic Rendering", () => {
-        it("should render with required props", () => {
+        it("should render with required props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", Date.now(), 150),
                 createStatusHistory("down", Date.now() - 60_000, 0),
@@ -82,7 +92,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(screen.getAllByTestId("mini-chart-bar")).toHaveLength(2);
         });
 
-        it("should render with custom className", () => {
+        it("should render with custom className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", Date.now(), 150),
             ];
@@ -99,7 +119,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(chartContainer).toHaveClass("custom-chart-class");
         });
 
-        it("should render with default className when not provided", () => {
+        it("should render with default className when not provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", Date.now(), 150),
             ];
@@ -112,7 +142,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(chartContainer).toBeInTheDocument();
         });
 
-        it("should apply proper CSS classes for layout", () => {
+        it("should apply proper CSS classes for layout", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", Date.now(), 150),
             ];
@@ -136,7 +176,17 @@ describe("HistoryChart - Complete Coverage", () => {
     });
 
     describe("Data Handling", () => {
-        it("should display history items in chronological order (oldest first)", () => {
+        it("should display history items in chronological order (oldest first)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", 3000, 150), // newest (index 0)
                 createStatusHistory("down", 2000, 0), // middle
@@ -156,7 +206,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars[2]).toHaveAttribute("data-timestamp", "3000");
         });
 
-        it("should handle maximum items limit (default 120)", () => {
+        it("should handle maximum items limit (default 120)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Configuration", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Configuration", "type");
+
             // Create 150 history items
             const history: StatusHistory[] = Array.from(
                 { length: 150 },
@@ -171,7 +231,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars).toHaveLength(120); // Should be limited to default maxItems
         });
 
-        it("should handle custom maximum items limit", () => {
+        it("should handle custom maximum items limit", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Configuration", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Configuration", "type");
+
             // Create 50 history items
             const history: StatusHistory[] = Array.from(
                 { length: 50 },
@@ -190,7 +260,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars).toHaveLength(30); // Should be limited to custom maxItems
         });
 
-        it("should handle maxItems greater than history length", () => {
+        it("should handle maxItems greater than history length", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", 1000, 150),
                 createStatusHistory("down", 2000, 0),
@@ -208,7 +288,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars).toHaveLength(2); // Should show all available items
         });
 
-        it("should pass correct props to MiniChartBar components", () => {
+        it("should pass correct props to MiniChartBar components", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", 1_234_567_891, 250, "Success"), // newer first in input
                 createStatusHistory("down", 1_234_567_890, 0, "Timeout"), // older second in input
@@ -235,7 +325,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars[1]).toHaveAttribute("data-timestamp", "1234567891");
         });
 
-        it("should generate unique keys for each MiniChartBar", () => {
+        it("should generate unique keys for each MiniChartBar", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", 2000, 150), // newest first
                 createStatusHistory("up", 1000, 151), // middle
@@ -258,7 +358,17 @@ describe("HistoryChart - Complete Coverage", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should return null for empty history array", () => {
+        it("should return null for empty history array", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { container } = renderWithTheme(
                 <HistoryChart title="Empty Chart" history={[]} />
             );
@@ -266,7 +376,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(container.firstChild).toBeNull();
         });
 
-        it("should handle single history item", () => {
+        it("should handle single history item", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", Date.now(), 123),
             ];
@@ -281,7 +401,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(screen.getAllByTestId("mini-chart-bar")).toHaveLength(1);
         });
 
-        it("should handle maxItems of 0", () => {
+        it("should handle maxItems of 0", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", Date.now(), 150),
                 createStatusHistory("down", Date.now() - 1000, 0),
@@ -299,7 +429,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars).toHaveLength(0); // No bars should be displayed
         });
 
-        it("should handle maxItems of 1", () => {
+        it("should handle maxItems of 1", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", 2000, 150),
                 createStatusHistory("down", 1000, 0),
@@ -319,7 +459,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars[0]).toHaveAttribute("data-timestamp", "2000");
         });
 
-        it("should handle very large responseTime values", () => {
+        it("should handle very large responseTime values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", Date.now(), 999_999),
             ];
@@ -332,7 +482,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bar).toHaveAttribute("data-response-time", "999999");
         });
 
-        it("should handle zero responseTime", () => {
+        it("should handle zero responseTime", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("down", Date.now(), 0),
             ];
@@ -346,7 +506,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bar).toHaveAttribute("data-status", "down");
         });
 
-        it("should handle negative responseTime", () => {
+        it("should handle negative responseTime", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("down", Date.now(), -1),
             ];
@@ -362,7 +532,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bar).toHaveAttribute("data-response-time", "-1");
         });
 
-        it("should handle very old timestamps", () => {
+        it("should handle very old timestamps", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", 1, 150), // January 1, 1970
             ];
@@ -375,7 +555,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bar).toHaveAttribute("data-timestamp", "1");
         });
 
-        it("should handle future timestamps", () => {
+        it("should handle future timestamps", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const futureTimestamp = Date.now() + 365 * 24 * 60 * 60 * 1000; // 1 year from now
             const history: StatusHistory[] = [
                 createStatusHistory("up", futureTimestamp, 150),
@@ -394,7 +584,17 @@ describe("HistoryChart - Complete Coverage", () => {
     });
 
     describe("Title Rendering", () => {
-        it("should render title with correct themed text props", () => {
+        it("should render title with correct themed text props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", Date.now(), 150),
             ];
@@ -409,7 +609,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(titleElement).toHaveAttribute("data-variant", "secondary");
         });
 
-        it("should handle empty title string", () => {
+        it("should handle empty title string", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", Date.now(), 150),
             ];
@@ -420,7 +630,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(titleElement).toHaveTextContent("");
         });
 
-        it("should handle title with special characters", () => {
+        it("should handle title with special characters", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", Date.now(), 150),
             ];
@@ -438,7 +658,17 @@ describe("HistoryChart - Complete Coverage", () => {
             );
         });
 
-        it("should handle very long title", () => {
+        it("should handle very long title", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const longTitle = "A".repeat(200);
             const history: StatusHistory[] = [
                 createStatusHistory("up", Date.now(), 150),
@@ -454,14 +684,34 @@ describe("HistoryChart - Complete Coverage", () => {
     });
 
     describe("React.memo Performance", () => {
-        it("should be a memoized component", () => {
+        it("should be a memoized component", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeof HistoryChart).toBe("object");
             expect(HistoryChart).toBeDefined();
             // Check that it's a React.memo component
             expect(HistoryChart.$$typeof).toBe(Symbol.for("react.memo"));
         });
 
-        it("should have proper component structure", () => {
+        it("should have proper component structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // React.memo components don't automatically have displayName
             expect(HistoryChart).toBeDefined();
             expect(typeof HistoryChart).toBe("object");
@@ -469,7 +719,17 @@ describe("HistoryChart - Complete Coverage", () => {
     });
 
     describe("Array Methods", () => {
-        it("should handle toReversed() method correctly", () => {
+        it("should handle toReversed() method correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", 3000, 150),
                 createStatusHistory("down", 2000, 0),
@@ -490,7 +750,17 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars[2]).toHaveAttribute("data-timestamp", "3000");
         });
 
-        it("should handle slice() with maxItems correctly", () => {
+        it("should handle slice() with maxItems correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryChart.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 createStatusHistory("up", 5000, 150),
                 createStatusHistory("down", 4000, 0),

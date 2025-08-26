@@ -14,7 +14,17 @@ import type {
 
 describe("Monitor Forms - 100% Coverage Tests", () => {
     describe("Targeting Line 166 (satisfies DnsMonitorFields)", () => {
-        test("should return valid DNS monitor fields structure", () => {
+        test("should return valid DNS monitor fields structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: monitor-forms.100-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: monitor-forms.100-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const dnsFields = getDefaultMonitorFields(
                 "dns"
             ) as DnsMonitorFields;
@@ -36,7 +46,17 @@ describe("Monitor Forms - 100% Coverage Tests", () => {
             expect(dnsFields.timeout).toBe(10_000);
         });
 
-        test("should return valid HTTP monitor fields structure", () => {
+        test("should return valid HTTP monitor fields structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: monitor-forms.100-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: monitor-forms.100-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const httpFields = getDefaultMonitorFields(
                 "http"
             ) as HttpMonitorFields;
@@ -61,7 +81,17 @@ describe("Monitor Forms - 100% Coverage Tests", () => {
             expect(httpFields.method).toBe("GET");
         });
 
-        test("should return valid port monitor fields structure", () => {
+        test("should return valid port monitor fields structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: monitor-forms.100-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: monitor-forms.100-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const portFields = getDefaultMonitorFields(
                 "port"
             ) as PortMonitorFields;
@@ -83,7 +113,17 @@ describe("Monitor Forms - 100% Coverage Tests", () => {
             expect(portFields.timeout).toBe(10_000);
         });
 
-        test("should return valid ping monitor fields structure", () => {
+        test("should return valid ping monitor fields structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: monitor-forms.100-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: monitor-forms.100-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const pingFields = getDefaultMonitorFields(
                 "ping"
             ) as PingMonitorFields;
@@ -101,7 +141,17 @@ describe("Monitor Forms - 100% Coverage Tests", () => {
             expect(pingFields.timeout).toBe(10_000);
         });
 
-        test("should handle all monitor types consistently", () => {
+        test("should handle all monitor types consistently", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: monitor-forms.100-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: monitor-forms.100-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitorTypes = [
                 "dns",
                 "http",
@@ -124,7 +174,17 @@ describe("Monitor Forms - 100% Coverage Tests", () => {
             }
         });
 
-        test("should handle unknown monitor type with HTTP fallback", () => {
+        test("should handle unknown monitor type with HTTP fallback", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: monitor-forms.100-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: monitor-forms.100-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const fallbackFields = getDefaultMonitorFields(
                 "unknown" as any
             ) as HttpMonitorFields;

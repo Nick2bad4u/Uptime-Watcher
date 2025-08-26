@@ -117,12 +117,32 @@ describe("Theme Components - Comprehensive Coverage", () => {
             children: "Button Text",
         };
 
-        it("should render with default props", () => {
+        it("should render with default props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedButton {...defaultProps} />);
             expect(screen.getByRole("button")).toBeInTheDocument();
         });
 
-        it("should render all size variants", () => {
+        it("should render all size variants", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const sizes = [
                 "xs",
                 "sm",
@@ -140,7 +160,17 @@ describe("Theme Components - Comprehensive Coverage", () => {
             }
         });
 
-        it("should render all variant types", () => {
+        it("should render all variant types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const variants = [
                 "primary",
                 "secondary",
@@ -161,7 +191,17 @@ describe("Theme Components - Comprehensive Coverage", () => {
             }
         });
 
-        it("should render all button types", () => {
+        it("should render all button types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const types = [
                 "button",
                 "submit",
@@ -180,17 +220,47 @@ describe("Theme Components - Comprehensive Coverage", () => {
             }
         });
 
-        it("should handle disabled state", () => {
+        it("should handle disabled state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedButton {...defaultProps} disabled={true} />);
             expect(screen.getByRole("button")).toBeDisabled();
         });
 
-        it("should handle loading state", () => {
+        it("should handle loading state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Loading", "type");
+
             render(<ThemedButton {...defaultProps} loading={true} />);
             expect(screen.getByRole("button")).toBeInTheDocument();
         });
 
-        it("should render with icon in different positions", () => {
+        it("should render with icon in different positions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const icon = <span data-testid="button-icon">Icon</span>;
 
             for (const position of ["left", "right"]) {
@@ -206,12 +276,32 @@ describe("Theme Components - Comprehensive Coverage", () => {
             }
         });
 
-        it("should handle fullWidth prop", () => {
+        it("should handle fullWidth prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedButton {...defaultProps} fullWidth={true} />);
             expect(screen.getByRole("button")).toBeInTheDocument();
         });
 
-        it("should handle click events", () => {
+        it("should handle click events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             const onClick = vi.fn();
             render(<ThemedButton {...defaultProps} onClick={onClick} />);
 
@@ -219,7 +309,17 @@ describe("Theme Components - Comprehensive Coverage", () => {
             expect(onClick).toHaveBeenCalledTimes(1);
         });
 
-        it("should apply all accessibility and style props", () => {
+        it("should apply all accessibility and style props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const style = { backgroundColor: "blue" };
             render(
                 <ThemedButton
@@ -244,12 +344,32 @@ describe("Theme Components - Comprehensive Coverage", () => {
             children: "Card Content",
         };
 
-        it("should render with default props", () => {
+        it("should render with default props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedCard {...defaultProps} />);
             expect(screen.getByText("Card Content")).toBeInTheDocument();
         });
 
-        it("should render with title and subtitle", () => {
+        it("should render with title and subtitle", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedCard
                     {...defaultProps}
@@ -262,7 +382,17 @@ describe("Theme Components - Comprehensive Coverage", () => {
             expect(screen.getByText("Card Subtitle")).toBeInTheDocument();
         });
 
-        it("should handle clickable state", () => {
+        it("should handle clickable state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const onClick = vi.fn();
             render(
                 <ThemedCard
@@ -276,7 +406,17 @@ describe("Theme Components - Comprehensive Coverage", () => {
             expect(onClick).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle hoverable state", () => {
+        it("should handle hoverable state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const onMouseEnter = vi.fn();
             const onMouseLeave = vi.fn();
 
@@ -297,7 +437,17 @@ describe("Theme Components - Comprehensive Coverage", () => {
             expect(onMouseLeave).toHaveBeenCalledTimes(1);
         });
 
-        it("should render with icon", () => {
+        it("should render with icon", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const icon = <span data-testid="card-icon">Icon</span>;
             render(
                 <ThemedCard {...defaultProps} icon={icon} iconColor="#00ff00" />
@@ -306,7 +456,17 @@ describe("Theme Components - Comprehensive Coverage", () => {
             expect(screen.getByTestId("card-icon")).toBeInTheDocument();
         });
 
-        it("should apply all style props", () => {
+        it("should apply all style props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedCard
                     {...defaultProps}
@@ -327,27 +487,77 @@ describe("Theme Components - Comprehensive Coverage", () => {
             checked: false,
         };
 
-        it("should render with default props", () => {
+        it("should render with default props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedCheckbox {...defaultProps} />);
             expect(screen.getByRole("checkbox")).toBeInTheDocument();
         });
 
-        it("should handle checked state", () => {
+        it("should handle checked state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedCheckbox {...defaultProps} checked={true} />);
             expect(screen.getByRole("checkbox")).toBeChecked();
         });
 
-        it("should handle disabled state", () => {
+        it("should handle disabled state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedCheckbox {...defaultProps} disabled={true} />);
             expect(screen.getByRole("checkbox")).toBeDisabled();
         });
 
-        it("should handle required prop", () => {
+        it("should handle required prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedCheckbox {...defaultProps} required={true} />);
             expect(screen.getByRole("checkbox")).toBeRequired();
         });
 
-        it("should handle change events", () => {
+        it("should handle change events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             const onChange = vi.fn();
             render(<ThemedCheckbox {...defaultProps} onChange={onChange} />);
 
@@ -355,7 +565,17 @@ describe("Theme Components - Comprehensive Coverage", () => {
             expect(onChange).toHaveBeenCalledTimes(1);
         });
 
-        it("should apply accessibility props", () => {
+        it("should apply accessibility props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedCheckbox
                     {...defaultProps}
@@ -375,13 +595,33 @@ describe("Theme Components - Comprehensive Coverage", () => {
             icon: <span data-testid="icon-button-icon">Icon</span>,
         };
 
-        it("should render with default props", () => {
+        it("should render with default props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedIconButton {...defaultProps} />);
             expect(screen.getByRole("button")).toBeInTheDocument();
             expect(screen.getByTestId("icon-button-icon")).toBeInTheDocument();
         });
 
-        it("should render all size variants", () => {
+        it("should render all size variants", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const sizes = [
                 "xs",
                 "sm",
@@ -399,7 +639,17 @@ describe("Theme Components - Comprehensive Coverage", () => {
             }
         });
 
-        it("should render all variant types", () => {
+        it("should render all variant types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const variants = [
                 "primary",
                 "secondary",
@@ -420,17 +670,47 @@ describe("Theme Components - Comprehensive Coverage", () => {
             }
         });
 
-        it("should handle disabled state", () => {
+        it("should handle disabled state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedIconButton {...defaultProps} disabled={true} />);
             expect(screen.getByRole("button")).toBeDisabled();
         });
 
-        it("should handle loading state", () => {
+        it("should handle loading state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Loading", "type");
+
             render(<ThemedIconButton {...defaultProps} loading={true} />);
             expect(screen.getByRole("button")).toBeInTheDocument();
         });
 
-        it("should handle click events", () => {
+        it("should handle click events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             const onClick = vi.fn();
             render(<ThemedIconButton {...defaultProps} onClick={onClick} />);
 
@@ -438,7 +718,17 @@ describe("Theme Components - Comprehensive Coverage", () => {
             expect(onClick).toHaveBeenCalledTimes(1);
         });
 
-        it("should apply all style props", () => {
+        it("should apply all style props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedIconButton
                     {...defaultProps}
@@ -455,7 +745,17 @@ describe("Theme Components - Comprehensive Coverage", () => {
     });
 
     describe("ThemeProvider Component", () => {
-        it("should render children", () => {
+        it("should render children", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemeProvider>
                     <div>Theme Provider Content</div>
@@ -467,7 +767,17 @@ describe("Theme Components - Comprehensive Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle multiple children", () => {
+        it("should handle multiple children", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemeProvider>
                     <div>Child 1</div>
@@ -481,13 +791,33 @@ describe("Theme Components - Comprehensive Coverage", () => {
     });
 
     describe("Edge Cases and Error Boundaries", () => {
-        it("should handle components with undefined children", () => {
+        it("should handle components with undefined children", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(() => {
                 render(<ThemedBox children={undefined as any} />);
             }).not.toThrow();
         });
 
-        it("should handle invalid enum values gracefully", () => {
+        it("should handle invalid enum values gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test components with invalid enum values to ensure default cases work
             expect(() => {
                 render(
@@ -498,7 +828,17 @@ describe("Theme Components - Comprehensive Coverage", () => {
     });
 
     describe("Interface Coverage", () => {
-        it("should cover all interface properties", () => {
+        it("should cover all interface properties", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // This test ensures all interface properties are used in other tests
             const allProps = {
                 // MiniChartBarProperties

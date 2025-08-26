@@ -33,7 +33,17 @@ describe("Remaining Coverage Tests", () => {
     });
 
     describe("components.tsx - Line 622 (ThemedIconButton large size)", () => {
-        it("should return 48px for large size", () => {
+        it("should return 48px for large size", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: remainingCoverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: remainingCoverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedIconButton icon="🔧" size="lg" onClick={() => {}} />);
 
             const button = screen.getByRole("button");

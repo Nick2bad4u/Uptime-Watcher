@@ -239,7 +239,17 @@ describe("AnalyticsTab", () => {
     };
 
     describe("Basic Rendering", () => {
-        it("should render analytics tab with all main sections", () => {
+        it("should render analytics tab with all main sections", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps();
             render(<AnalyticsTab {...props} />);
 
@@ -255,7 +265,17 @@ describe("AnalyticsTab", () => {
             expect(screen.getByText("Downtime")).toBeInTheDocument();
         });
 
-        it("should display all chart components", () => {
+        it("should display all chart components", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps();
             render(<AnalyticsTab {...props} />);
 
@@ -266,7 +286,17 @@ describe("AnalyticsTab", () => {
             expect(screen.getByTestId("uptime-chart")).toBeInTheDocument();
         });
 
-        it("should show time range selector with all options", () => {
+        it("should show time range selector with all options", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps();
             render(<AnalyticsTab {...props} />);
 
@@ -283,7 +313,17 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Key Performance Metrics", () => {
-        it("should display uptime percentage and description", () => {
+        it("should display uptime percentage and description", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 uptime: "99.5",
                 getAvailabilityDescription: vi.fn(() => "Excellent"),
@@ -302,7 +342,17 @@ describe("AnalyticsTab", () => {
             expect(props.getAvailabilityDescription).toHaveBeenCalledWith(99.5);
         });
 
-        it("should display response time metrics", () => {
+        it("should display response time metrics", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 avgResponseTime: 150,
                 formatResponseTime: vi.fn((time) => `${time}ms`),
@@ -319,7 +369,17 @@ describe("AnalyticsTab", () => {
             expect(screen.getByText("150ms")).toBeInTheDocument();
         });
 
-        it("should display check statistics", () => {
+        it("should display check statistics", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 totalChecks: 100,
                 upCount: 95,
@@ -333,7 +393,17 @@ describe("AnalyticsTab", () => {
             expect(screen.getByText("100 checks")).toBeInTheDocument();
         });
 
-        it("should display MTTR with correct formatting when advanced metrics enabled", () => {
+        it("should display MTTR with correct formatting when advanced metrics enabled", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 mttr: 300_000,
                 formatDuration: vi.fn(() => "5m"),
@@ -354,7 +424,17 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Advanced Metrics", () => {
-        it("should toggle advanced metrics when button is clicked", async () => {
+        it("should toggle advanced metrics when button is clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const setShowAdvancedMetrics = vi.fn();
             const props = createMockProps({
                 showAdvancedMetrics: false,
@@ -369,7 +449,17 @@ describe("AnalyticsTab", () => {
             expect(setShowAdvancedMetrics).toHaveBeenCalledWith(true);
         });
 
-        it("should display advanced metrics when enabled", () => {
+        it("should display advanced metrics when enabled", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 showAdvancedMetrics: true,
                 p50: 120,
@@ -386,7 +476,17 @@ describe("AnalyticsTab", () => {
             expect(screen.getByText("P99")).toBeInTheDocument();
         });
 
-        it("should hide advanced metrics when disabled", () => {
+        it("should hide advanced metrics when disabled", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 showAdvancedMetrics: false,
             });
@@ -404,7 +504,17 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Downtime Analysis", () => {
-        it("should display downtime information", () => {
+        it("should display downtime information", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 downtimePeriods: [
                     {
@@ -422,7 +532,17 @@ describe("AnalyticsTab", () => {
             expect(screen.getByText("1 incidents")).toBeInTheDocument();
         });
 
-        it("should show no incidents when no downtime", () => {
+        it("should show no incidents when no downtime", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 downtimePeriods: [],
             });
@@ -433,7 +553,17 @@ describe("AnalyticsTab", () => {
             expect(screen.getByText("0 incidents")).toBeInTheDocument();
         });
 
-        it("should display downtime duration", () => {
+        it("should display downtime duration", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 totalDowntime: 780_000,
                 formatDuration: vi.fn(() => "13m"),
@@ -447,7 +577,17 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Time Range Selection", () => {
-        it("should call setSiteDetailsChartTimeRange when time range is changed", () => {
+        it("should call setSiteDetailsChartTimeRange when time range is changed", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const setSiteDetailsChartTimeRange = vi.fn();
             const props = createMockProps({
                 setSiteDetailsChartTimeRange,
@@ -462,7 +602,17 @@ describe("AnalyticsTab", () => {
             expect(setSiteDetailsChartTimeRange).toHaveBeenCalledWith("7d");
         });
 
-        it("should highlight current time range", () => {
+        it("should highlight current time range", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 siteDetailsChartTimeRange: "7d",
             });
@@ -476,7 +626,17 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Response Time Color Coding", () => {
-        it("should use green color for excellent response times (≤100ms)", () => {
+        it("should use green color for excellent response times (≤100ms)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 avgResponseTime: 80,
             });
@@ -486,7 +646,17 @@ describe("AnalyticsTab", () => {
             expect(screen.getByTestId("analytics-tab")).toBeInTheDocument();
         });
 
-        it("should use yellow color for good response times (≤500ms)", () => {
+        it("should use yellow color for good response times (≤500ms)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 avgResponseTime: 300,
             });
@@ -495,7 +665,17 @@ describe("AnalyticsTab", () => {
             expect(screen.getByTestId("analytics-tab")).toBeInTheDocument();
         });
 
-        it("should use red color for poor response times (>500ms)", () => {
+        it("should use red color for poor response times (>500ms)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 avgResponseTime: 800,
             });
@@ -506,7 +686,17 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle zero MTTR correctly", () => {
+        it("should handle zero MTTR correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 mttr: 0,
                 formatDuration: vi.fn(() => "0s"),
@@ -516,7 +706,17 @@ describe("AnalyticsTab", () => {
             expect(screen.getByText("0s")).toBeInTheDocument();
         });
 
-        it("should handle zero downtime periods", () => {
+        it("should handle zero downtime periods", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 downtimePeriods: [],
                 totalDowntime: 0,
@@ -528,7 +728,17 @@ describe("AnalyticsTab", () => {
             expect(screen.getByText("0 incidents")).toBeInTheDocument();
         });
 
-        it("should handle perfect uptime (100%)", () => {
+        it("should handle perfect uptime (100%)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 uptime: "100",
                 downCount: 0,
@@ -545,7 +755,17 @@ describe("AnalyticsTab", () => {
             expect(badgeElement).toBeInTheDocument();
         });
 
-        it("should handle invalid uptime values", () => {
+        it("should handle invalid uptime values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps({
                 uptime: "invalid",
             });
@@ -557,7 +777,17 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Chart Integration", () => {
-        it("should pass correct data to chart components", () => {
+        it("should pass correct data to chart components", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const props = createMockProps();
             render(<AnalyticsTab {...props} />);
 
@@ -569,7 +799,17 @@ describe("AnalyticsTab", () => {
             expect(screen.getByTestId("uptime-chart")).toBeInTheDocument();
         });
 
-        it("should handle empty chart data gracefully", () => {
+        it("should handle empty chart data gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const emptyLineChartData: ResponseTimeChartData = {
                 labels: [],
                 datasets: [],
@@ -587,7 +827,17 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Monitor Type Variations", () => {
-        it("should handle different monitor types", () => {
+        it("should handle different monitor types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const pingProps = createMockProps({
                 monitorType: "ping",
             });
@@ -603,7 +853,17 @@ describe("AnalyticsTab", () => {
             }
         });
 
-        it("should handle port monitor type", () => {
+        it("should handle port monitor type", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const portProps = createMockProps({
                 monitorType: "port",
             });
@@ -621,7 +881,17 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Function Calls and Formatting", () => {
-        it("should call formatting functions with correct parameters", () => {
+        it("should call formatting functions with correct parameters", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const formatDuration = vi.fn(() => "5m");
             const formatResponseTime = vi.fn(() => "150ms");
             const getAvailabilityDescription = vi.fn(() => "Good");
@@ -648,7 +918,17 @@ describe("AnalyticsTab", () => {
             expect(formatResponseTime).toHaveBeenCalledWith(150); // avgResponseTime
         });
 
-        it("should handle function errors gracefully", () => {
+        it("should handle function errors gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AnalyticsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const props = createMockProps({
                 formatDuration: vi.fn(() => {
                     throw new Error("Format error");

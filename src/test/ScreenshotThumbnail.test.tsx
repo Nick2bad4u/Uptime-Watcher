@@ -134,7 +134,17 @@ describe("ScreenshotThumbnail", () => {
     });
 
     describe("Basic Rendering", () => {
-        it("should render thumbnail link and image", () => {
+        it("should render thumbnail link and image", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ScreenshotThumbnail {...defaultProps} />);
 
             const link = screen.getByRole("link", {
@@ -152,7 +162,17 @@ describe("ScreenshotThumbnail", () => {
             expect(caption).toBeInTheDocument();
         });
 
-        it("should generate correct Microlink API URL", () => {
+        it("should generate correct Microlink API URL", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ScreenshotThumbnail {...defaultProps} />);
 
             const image = screen.getByAltText("Screenshot of Example Site");
@@ -162,7 +182,17 @@ describe("ScreenshotThumbnail", () => {
             expect(image).toHaveAttribute("src", expectedUrl);
         });
 
-        it("should handle special characters in URL encoding", () => {
+        it("should handle special characters in URL encoding", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const propsWithSpecialChars = {
                 siteName: "Test Site",
                 url: "https://example.com/path?query=test&value=123",
@@ -178,7 +208,17 @@ describe("ScreenshotThumbnail", () => {
     });
 
     describe("Click Handling", () => {
-        it("should call electronAPI.openExternal when available", async () => {
+        it("should call electronAPI.openExternal when available", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Mock electronAPI with openExternal method
             Object.defineProperty(globalThis, "electronAPI", {
                 value: mockElectronAPI,
@@ -205,7 +245,17 @@ describe("ScreenshotThumbnail", () => {
             expect(mockWindowOpen).not.toHaveBeenCalled();
         });
 
-        it("should prevent default link behavior", () => {
+        it("should prevent default link behavior", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             render(<ScreenshotThumbnail {...defaultProps} />);
 
             const link = screen.getByRole("link");
@@ -224,7 +274,17 @@ describe("ScreenshotThumbnail", () => {
             expect(preventDefaultSpy).toHaveBeenCalled();
         });
 
-        it("should handle electronAPI without openExternal method", () => {
+        it("should handle electronAPI without openExternal method", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Mock electronAPI without system.openExternal that throws an error
             Object.defineProperty(globalThis, "electronAPI", {
                 value: {
@@ -265,7 +325,17 @@ describe("ScreenshotThumbnail", () => {
     });
 
     describe("Hover Interactions", () => {
-        it("should show overlay on hover", async () => {
+        it("should show overlay on hover", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Render our component with hover tracking enabled
             render(<ScreenshotThumbnail {...defaultProps} />);
 
@@ -293,7 +363,17 @@ describe("ScreenshotThumbnail", () => {
             );
         });
 
-        it("should hide overlay on unhover", async () => {
+        it("should hide overlay on unhover", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
 
@@ -320,7 +400,17 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should show overlay on focus", async () => {
+        it("should show overlay on focus", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ScreenshotThumbnail {...defaultProps} />);
 
             const link = screen.getByRole("link");
@@ -334,7 +424,17 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should hide overlay on blur", async () => {
+        it("should hide overlay on blur", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ScreenshotThumbnail {...defaultProps} />);
 
             const link = screen.getByRole("link");
@@ -360,7 +460,17 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should apply correct theme class to overlay", async () => {
+        it("should apply correct theme class to overlay", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
 
@@ -375,7 +485,17 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should handle rapid hover/unhover cycles without leaving stray portals", async () => {
+        it("should handle rapid hover/unhover cycles without leaving stray portals", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
 
@@ -396,7 +516,17 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should handle rapid focus/blur cycles without leaving stray portals", async () => {
+        it("should handle rapid focus/blur cycles without leaving stray portals", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ScreenshotThumbnail {...defaultProps} />);
 
             const link = screen.getByRole("link");
@@ -416,7 +546,17 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should handle mixed hover and focus events without creating multiple portals", async () => {
+        it("should handle mixed hover and focus events without creating multiple portals", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
 
@@ -437,7 +577,17 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should maintain only one portal when multiple hover events occur", async () => {
+        it("should maintain only one portal when multiple hover events occur", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
 
@@ -466,7 +616,17 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should handle immediate hover/unhover without race conditions", async () => {
+        it("should handle immediate hover/unhover without race conditions", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup({ delay: null }); // No delay for immediate interactions
             render(<ScreenshotThumbnail {...defaultProps} />);
 
@@ -485,7 +645,17 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should clean up portal when component unmounts during hover", async () => {
+        it("should clean up portal when component unmounts during hover", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             const { unmount } = render(
                 <ScreenshotThumbnail {...defaultProps} />
@@ -514,7 +684,17 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should handle window resize during hover without breaking portal", async () => {
+        it("should handle window resize during hover without breaking portal", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
 
@@ -562,7 +742,17 @@ describe("ScreenshotThumbnail", () => {
         const createDelay = (ms: number) =>
             new Promise((resolve) => setTimeout(resolve, ms));
 
-        it("should debounce mouse leave to prevent flickering", async () => {
+        it("should debounce mouse leave to prevent flickering", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             const user = userEvent.setup({ delay: null });
             render(<ScreenshotThumbnail {...defaultProps} />);
 
@@ -603,7 +793,17 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should clean up portal when URL prop changes during hover", async () => {
+        it("should clean up portal when URL prop changes during hover", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             const { rerender } = render(
                 <ScreenshotThumbnail {...defaultProps} />
@@ -640,7 +840,17 @@ describe("ScreenshotThumbnail", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle empty siteName", () => {
+        it("should handle empty siteName", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const propsWithEmptyName = {
                 siteName: "",
                 url: "https://example.com",
@@ -656,7 +866,17 @@ describe("ScreenshotThumbnail", () => {
             expect(caption).toBeInTheDocument();
         });
 
-        it("should handle empty URL", () => {
+        it("should handle empty URL", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const propsWithEmptyUrl = {
                 siteName: "Test Site",
                 url: "",
@@ -671,7 +891,17 @@ describe("ScreenshotThumbnail", () => {
     });
 
     describe("Accessibility", () => {
-        it("should have proper aria-label", () => {
+        it("should have proper aria-label", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ScreenshotThumbnail {...defaultProps} />);
 
             const link = screen.getByRole("link");
@@ -681,14 +911,34 @@ describe("ScreenshotThumbnail", () => {
             );
         });
 
-        it("should be focusable", () => {
+        it("should be focusable", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ScreenshotThumbnail {...defaultProps} />);
 
             const link = screen.getByRole("link");
             expect(link).toHaveAttribute("tabIndex", "0");
         });
 
-        it("should have alt text for images", async () => {
+        it("should have alt text for images", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
 
@@ -714,7 +964,17 @@ describe("ScreenshotThumbnail", () => {
     });
 
     describe("Type Guard Functionality", () => {
-        it("should use electronAPI when openExternal is available", () => {
+        it("should use electronAPI when openExternal is available", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const apiWithOpenExternal = {
                 system: {
                     openExternal: vi.fn(),
@@ -740,7 +1000,17 @@ describe("ScreenshotThumbnail", () => {
             ).toHaveBeenCalledWith("https://example.com");
         });
 
-        it("should fallback to window.open when openExternal is not available", () => {
+        it("should fallback to window.open when openExternal is not available", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const apiWithoutOpenExternal = {
                 system: {
                     openExternal: vi.fn().mockImplementation(() => {
@@ -773,7 +1043,17 @@ describe("ScreenshotThumbnail", () => {
     });
 
     describe("Cleanup Edge Cases", () => {
-        it("should clean up timeout on component unmount", () => {
+        it("should clean up timeout on component unmount", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
@@ -807,7 +1087,17 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should clear timeout on mouse leave after mouse enter", () => {
+        it("should clear timeout on mouse leave after mouse enter", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
@@ -837,7 +1127,17 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should clear timeout on focus after timeout creation", () => {
+        it("should clear timeout on focus after timeout creation", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
@@ -866,7 +1166,17 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should clear timeout on blur after timeout creation", () => {
+        it("should clear timeout on blur after timeout creation", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
@@ -895,7 +1205,17 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should specifically cover timeout clearance in handleMouseLeave (line 132-133)", () => {
+        it("should specifically cover timeout clearance in handleMouseLeave (line 132-133)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
@@ -927,7 +1247,17 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should test useEffect cleanup behavior (lines 59-60, 65-66)", () => {
+        it("should test useEffect cleanup behavior (lines 59-60, 65-66)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // This test verifies that the useEffect cleanup function exists and can handle
             // the case where timeout and portal refs have values during cleanup
             const { unmount } = render(
@@ -958,7 +1288,17 @@ describe("ScreenshotThumbnail", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should test handleMouseEnter timeout clearing when timeout exists", () => {
+        it("should test handleMouseEnter timeout clearing when timeout exists", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
@@ -989,7 +1329,17 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should test handleFocus timeout clearing when timeout exists", () => {
+        it("should test handleFocus timeout clearing when timeout exists", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
@@ -1019,7 +1369,17 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should test handleBlur timeout clearing when timeout exists", () => {
+        it("should test handleBlur timeout clearing when timeout exists", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
@@ -1049,7 +1409,17 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should test timeout cleanup in handleMouseLeave with rapid events", () => {
+        it("should test timeout cleanup in handleMouseLeave with rapid events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
@@ -1081,7 +1451,17 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should test overlay positioning with various edge cases", () => {
+        it("should test overlay positioning with various edge cases", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test case 1: Element near top-left corner
             const mockRect1 = {
                 bottom: 60,
@@ -1167,7 +1547,17 @@ describe("ScreenshotThumbnail", () => {
             );
         });
 
-        it("should handle all event combinations that can clear timeouts", () => {
+        it("should handle all event combinations that can clear timeouts", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
@@ -1213,7 +1603,17 @@ describe("ScreenshotThumbnail", () => {
     });
 
     describe("Closure Issues", () => {
-        it("should demonstrate useEffect closure issue with cleanup (lines 59-60, 65-66)", () => {
+        it("should demonstrate useEffect closure issue with cleanup (lines 59-60, 65-66)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // This test demonstrates that the current useEffect implementation has a closure issue
             // The cleanup function captures the initial undefined values of the refs,
             // not their current values at cleanup time

@@ -11,7 +11,17 @@ import * as stringConversion from "../../utils/stringConversion";
 
 describe("Simple Function Coverage Tests", () => {
     describe("objectSafety functions", () => {
-        test("safeObjectAccess function exists and works", () => {
+        test("safeObjectAccess function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(objectSafety.safeObjectAccess).toBeDefined();
             expect(typeof objectSafety.safeObjectAccess).toBe("function");
 
@@ -21,7 +31,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(result).toBe(1);
         });
 
-        test("safeObjectIteration function exists and works", () => {
+        test("safeObjectIteration function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(objectSafety.safeObjectIteration).toBeDefined();
             expect(typeof objectSafety.safeObjectIteration).toBe("function");
 
@@ -34,7 +54,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(count).toBe(2);
         });
 
-        test("safeObjectOmit function exists and works", () => {
+        test("safeObjectOmit function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(objectSafety.safeObjectOmit).toBeDefined();
             expect(typeof objectSafety.safeObjectOmit).toBe("function");
 
@@ -44,7 +74,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(result).toEqual({ a: 1, c: 3 });
         });
 
-        test("safeObjectPick function exists and works", () => {
+        test("safeObjectPick function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(objectSafety.safeObjectPick).toBeDefined();
             expect(typeof objectSafety.safeObjectPick).toBe("function");
 
@@ -54,7 +94,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(result).toEqual({ a: 1, c: 3 });
         });
 
-        test("typedObjectEntries function exists and works", () => {
+        test("typedObjectEntries function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(objectSafety.typedObjectEntries).toBeDefined();
             expect(typeof objectSafety.typedObjectEntries).toBe("function");
 
@@ -64,7 +114,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(entries).toHaveLength(2);
         });
 
-        test("typedObjectKeys function exists and works", () => {
+        test("typedObjectKeys function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(objectSafety.typedObjectKeys).toBeDefined();
             expect(typeof objectSafety.typedObjectKeys).toBe("function");
 
@@ -74,7 +134,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(keys).toEqual(["a", "b"]);
         });
 
-        test("typedObjectValues function exists and works", () => {
+        test("typedObjectValues function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(objectSafety.typedObjectValues).toBeDefined();
             expect(typeof objectSafety.typedObjectValues).toBe("function");
 
@@ -86,7 +156,17 @@ describe("Simple Function Coverage Tests", () => {
     });
 
     describe("typeGuards functions", () => {
-        test("isObject function exists and works", () => {
+        test("isObject function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.isObject).toBeDefined();
             expect(typeof typeGuards.isObject).toBe("function");
 
@@ -94,7 +174,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isObject(null)).toBe(false);
         });
 
-        test("isNumber function exists and works", () => {
+        test("isNumber function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.isNumber).toBeDefined();
             expect(typeof typeGuards.isNumber).toBe("function");
 
@@ -102,7 +192,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isNumber("123")).toBe(false);
         });
 
-        test("hasProperties function exists and works", () => {
+        test("hasProperties function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.hasProperties).toBeDefined();
             expect(typeof typeGuards.hasProperties).toBe("function");
 
@@ -111,7 +211,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.hasProperties(obj, ["c"])).toBe(false);
         });
 
-        test("hasProperty function exists and works", () => {
+        test("hasProperty function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.hasProperty).toBeDefined();
             expect(typeof typeGuards.hasProperty).toBe("function");
 
@@ -120,7 +230,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.hasProperty(obj, "b")).toBe(false);
         });
 
-        test("isArray function exists and works", () => {
+        test("isArray function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.isArray).toBeDefined();
             expect(typeof typeGuards.isArray).toBe("function");
 
@@ -128,7 +248,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isArray({})).toBe(false);
         });
 
-        test("isBoolean function exists and works", () => {
+        test("isBoolean function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.isBoolean).toBeDefined();
             expect(typeof typeGuards.isBoolean).toBe("function");
 
@@ -136,7 +266,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isBoolean(1)).toBe(false);
         });
 
-        test("isDate function exists and works", () => {
+        test("isDate function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.isDate).toBeDefined();
             expect(typeof typeGuards.isDate).toBe("function");
 
@@ -144,7 +284,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isDate("2023-01-01")).toBe(false);
         });
 
-        test("isError function exists and works", () => {
+        test("isError function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Error Handling", "type");
+
             expect(typeGuards.isError).toBeDefined();
             expect(typeof typeGuards.isError).toBe("function");
 
@@ -152,7 +302,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isError("error")).toBe(false);
         });
 
-        test("isFiniteNumber function exists and works", () => {
+        test("isFiniteNumber function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Initialization", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Initialization", "type");
+
             expect(typeGuards.isFiniteNumber).toBeDefined();
             expect(typeof typeGuards.isFiniteNumber).toBe("function");
 
@@ -160,7 +320,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isFiniteNumber(Infinity)).toBe(false);
         });
 
-        test("isFunction function exists and works", () => {
+        test("isFunction function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.isFunction).toBeDefined();
             expect(typeof typeGuards.isFunction).toBe("function");
 
@@ -168,7 +338,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isFunction("function")).toBe(false);
         });
 
-        test("isNonNegativeNumber function exists and works", () => {
+        test("isNonNegativeNumber function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.isNonNegativeNumber).toBeDefined();
             expect(typeof typeGuards.isNonNegativeNumber).toBe("function");
 
@@ -176,7 +356,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isNonNegativeNumber(-1)).toBe(false);
         });
 
-        test("isNonNullObject function exists and works", () => {
+        test("isNonNullObject function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.isNonNullObject).toBeDefined();
             expect(typeof typeGuards.isNonNullObject).toBe("function");
 
@@ -184,7 +374,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isNonNullObject(null)).toBe(false);
         });
 
-        test("isPositiveNumber function exists and works", () => {
+        test("isPositiveNumber function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.isPositiveNumber).toBeDefined();
             expect(typeof typeGuards.isPositiveNumber).toBe("function");
 
@@ -192,7 +392,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isPositiveNumber(0)).toBe(false);
         });
 
-        test("isString function exists and works", () => {
+        test("isString function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.isString).toBeDefined();
             expect(typeof typeGuards.isString).toBe("function");
 
@@ -200,7 +410,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isString(123)).toBe(false);
         });
 
-        test("isValidPort function exists and works", () => {
+        test("isValidPort function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.isValidPort).toBeDefined();
             expect(typeof typeGuards.isValidPort).toBe("function");
 
@@ -208,7 +428,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isValidPort(0)).toBe(false);
         });
 
-        test("isValidTimestamp function exists and works", () => {
+        test("isValidTimestamp function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.isValidTimestamp).toBeDefined();
             expect(typeof typeGuards.isValidTimestamp).toBe("function");
 
@@ -218,7 +448,17 @@ describe("Simple Function Coverage Tests", () => {
     });
 
     describe("validation functions", () => {
-        test("validateMonitorType function exists and works", () => {
+        test("validateMonitorType function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Validation", "type");
+
             expect(validation.validateMonitorType).toBeDefined();
             expect(typeof validation.validateMonitorType).toBe("function");
 
@@ -226,7 +466,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(validation.validateMonitorType("invalid")).toBe(false);
         });
 
-        test("getMonitorValidationErrors function exists and works", () => {
+        test("getMonitorValidationErrors function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Error Handling", "type");
+
             expect(validation.getMonitorValidationErrors).toBeDefined();
             expect(typeof validation.getMonitorValidationErrors).toBe(
                 "function"
@@ -244,7 +494,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(Array.isArray(errors)).toBe(true);
         });
 
-        test("validateSite function exists and works", () => {
+        test("validateSite function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Validation", "type");
+
             expect(validation.validateSite).toBeDefined();
             expect(typeof validation.validateSite).toBe("function");
 
@@ -262,7 +522,17 @@ describe("Simple Function Coverage Tests", () => {
     });
 
     describe("siteStatus functions", () => {
-        test("calculateSiteMonitoringStatus function exists and works", () => {
+        test("calculateSiteMonitoringStatus function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Monitoring", "type");
+
             expect(siteStatus.calculateSiteMonitoringStatus).toBeDefined();
             expect(typeof siteStatus.calculateSiteMonitoringStatus).toBe(
                 "function"
@@ -274,7 +544,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof result).toBe("string");
         });
 
-        test("calculateSiteStatus function exists and works", () => {
+        test("calculateSiteStatus function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(siteStatus.calculateSiteStatus).toBeDefined();
             expect(typeof siteStatus.calculateSiteStatus).toBe("function");
 
@@ -289,7 +569,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof status).toBe("string");
         });
 
-        test("getSiteDisplayStatus function exists and works", () => {
+        test("getSiteDisplayStatus function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Data Retrieval", "type");
+
             expect(siteStatus.getSiteDisplayStatus).toBeDefined();
             expect(typeof siteStatus.getSiteDisplayStatus).toBe("function");
 
@@ -304,7 +594,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof status).toBe("string");
         });
 
-        test("getSiteStatusDescription function exists and works", () => {
+        test("getSiteStatusDescription function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Data Retrieval", "type");
+
             expect(siteStatus.getSiteStatusDescription).toBeDefined();
             expect(typeof siteStatus.getSiteStatusDescription).toBe("function");
 
@@ -319,7 +619,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof description).toBe("string");
         });
 
-        test("getSiteStatusVariant function exists and works", () => {
+        test("getSiteStatusVariant function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Data Retrieval", "type");
+
             expect(siteStatus.getSiteStatusVariant).toBeDefined();
             expect(typeof siteStatus.getSiteStatusVariant).toBe("function");
 
@@ -329,7 +639,17 @@ describe("Simple Function Coverage Tests", () => {
     });
 
     describe("errorCatalog functions", () => {
-        test("formatErrorMessage function exists and works", () => {
+        test("formatErrorMessage function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Error Handling", "type");
+
             expect(errorCatalog.formatErrorMessage).toBeDefined();
             expect(typeof errorCatalog.formatErrorMessage).toBe("function");
 
@@ -340,7 +660,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof formatted).toBe("string");
         });
 
-        test("isKnownErrorMessage function exists and works", () => {
+        test("isKnownErrorMessage function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Error Handling", "type");
+
             expect(errorCatalog.isKnownErrorMessage).toBeDefined();
             expect(typeof errorCatalog.isKnownErrorMessage).toBe("function");
 
@@ -351,7 +681,17 @@ describe("Simple Function Coverage Tests", () => {
     });
 
     describe("environment functions", () => {
-        test("getEnvVar function exists and works", () => {
+        test("getEnvVar function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Data Retrieval", "type");
+
             expect(environment.getEnvVar).toBeDefined();
             expect(typeof environment.getEnvVar).toBe("function");
 
@@ -359,7 +699,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof nodeEnv).toBe("string");
         });
 
-        test("getEnvironment function exists and works", () => {
+        test("getEnvironment function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Data Retrieval", "type");
+
             expect(environment.getEnvironment).toBeDefined();
             expect(typeof environment.getEnvironment).toBe("function");
 
@@ -367,7 +717,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof env).toBe("string");
         });
 
-        test("getNodeEnv function exists and works", () => {
+        test("getNodeEnv function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Data Retrieval", "type");
+
             expect(environment.getNodeEnv).toBeDefined();
             expect(typeof environment.getNodeEnv).toBe("function");
 
@@ -375,7 +735,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof nodeEnv).toBe("string");
         });
 
-        test("isBrowserEnvironment function exists and works", () => {
+        test("isBrowserEnvironment function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(environment.isBrowserEnvironment).toBeDefined();
             expect(typeof environment.isBrowserEnvironment).toBe("function");
 
@@ -383,7 +753,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof isBrowser).toBe("boolean");
         });
 
-        test("isDevelopment function exists and works", () => {
+        test("isDevelopment function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(environment.isDevelopment).toBeDefined();
             expect(typeof environment.isDevelopment).toBe("function");
 
@@ -391,7 +771,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof isDev).toBe("boolean");
         });
 
-        test("isNodeEnvironment function exists and works", () => {
+        test("isNodeEnvironment function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(environment.isNodeEnvironment).toBeDefined();
             expect(typeof environment.isNodeEnvironment).toBe("function");
 
@@ -399,7 +789,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof isNode).toBe("boolean");
         });
 
-        test("isProduction function exists and works", () => {
+        test("isProduction function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(environment.isProduction).toBeDefined();
             expect(typeof environment.isProduction).toBe("function");
 
@@ -407,7 +807,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof isProd).toBe("boolean");
         });
 
-        test("isTest function exists and works", () => {
+        test("isTest function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(environment.isTest).toBeDefined();
             expect(typeof environment.isTest).toBe("function");
 
@@ -417,7 +827,17 @@ describe("Simple Function Coverage Tests", () => {
     });
 
     describe("safeConversions functions", () => {
-        test("safeNumberConversion function exists and works", () => {
+        test("safeNumberConversion function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(safeConversions.safeNumberConversion).toBeDefined();
             expect(typeof safeConversions.safeNumberConversion).toBe(
                 "function"
@@ -426,7 +846,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(safeConversions.safeNumberConversion("123")).toBe(123);
         });
 
-        test("safeParseCheckInterval function exists and works", () => {
+        test("safeParseCheckInterval function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(safeConversions.safeParseCheckInterval).toBeDefined();
             expect(typeof safeConversions.safeParseCheckInterval).toBe(
                 "function"
@@ -437,21 +867,51 @@ describe("Simple Function Coverage Tests", () => {
             );
         });
 
-        test("safeParseFloat function exists and works", () => {
+        test("safeParseFloat function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(safeConversions.safeParseFloat).toBeDefined();
             expect(typeof safeConversions.safeParseFloat).toBe("function");
 
             expect(safeConversions.safeParseFloat("3.14")).toBe(3.14);
         });
 
-        test("safeParseInt function exists and works", () => {
+        test("safeParseInt function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(safeConversions.safeParseInt).toBeDefined();
             expect(typeof safeConversions.safeParseInt).toBe("function");
 
             expect(safeConversions.safeParseInt("123")).toBe(123);
         });
 
-        test("safeParsePercentage function exists and works", () => {
+        test("safeParsePercentage function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(safeConversions.safeParsePercentage).toBeDefined();
             expect(typeof safeConversions.safeParsePercentage).toBe("function");
 
@@ -460,14 +920,34 @@ describe("Simple Function Coverage Tests", () => {
             );
         });
 
-        test("safeParsePort function exists and works", () => {
+        test("safeParsePort function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(safeConversions.safeParsePort).toBeDefined();
             expect(typeof safeConversions.safeParsePort).toBe("function");
 
             expect(safeConversions.safeParsePort("3000")).toBe(3000);
         });
 
-        test("safeParsePositiveInt function exists and works", () => {
+        test("safeParsePositiveInt function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(safeConversions.safeParsePositiveInt).toBeDefined();
             expect(typeof safeConversions.safeParsePositiveInt).toBe(
                 "function"
@@ -478,7 +958,17 @@ describe("Simple Function Coverage Tests", () => {
             );
         });
 
-        test("safeParseRetryAttempts function exists and works", () => {
+        test("safeParseRetryAttempts function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(safeConversions.safeParseRetryAttempts).toBeDefined();
             expect(typeof safeConversions.safeParseRetryAttempts).toBe(
                 "function"
@@ -489,7 +979,17 @@ describe("Simple Function Coverage Tests", () => {
             );
         });
 
-        test("safeParseTimeout function exists and works", () => {
+        test("safeParseTimeout function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(safeConversions.safeParseTimeout).toBeDefined();
             expect(typeof safeConversions.safeParseTimeout).toBe("function");
 
@@ -498,7 +998,17 @@ describe("Simple Function Coverage Tests", () => {
             );
         });
 
-        test("safeParseTimestamp function exists and works", () => {
+        test("safeParseTimestamp function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(safeConversions.safeParseTimestamp).toBeDefined();
             expect(typeof safeConversions.safeParseTimestamp).toBe("function");
 
@@ -509,7 +1019,17 @@ describe("Simple Function Coverage Tests", () => {
     });
 
     describe("typeHelpers functions", () => {
-        test("castIpcResponse function exists and works", () => {
+        test("castIpcResponse function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeHelpers.castIpcResponse).toBeDefined();
             expect(typeof typeHelpers.castIpcResponse).toBe("function");
 
@@ -518,7 +1038,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(casted).toEqual(response);
         });
 
-        test("isArray function exists and works", () => {
+        test("isArray function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeHelpers.isArray).toBeDefined();
             expect(typeof typeHelpers.isArray).toBe("function");
 
@@ -526,7 +1056,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeHelpers.isArray({})).toBe(false);
         });
 
-        test("isRecord function exists and works", () => {
+        test("isRecord function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeHelpers.isRecord).toBeDefined();
             expect(typeof typeHelpers.isRecord).toBe("function");
 
@@ -534,7 +1074,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeHelpers.isRecord([])).toBe(false);
         });
 
-        test("safePropertyAccess function exists and works", () => {
+        test("safePropertyAccess function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeHelpers.safePropertyAccess).toBeDefined();
             expect(typeof typeHelpers.safePropertyAccess).toBe("function");
 
@@ -542,7 +1092,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeHelpers.safePropertyAccess(obj, "a")).toBe(1);
         });
 
-        test("validateAndConvert function exists and works", () => {
+        test("validateAndConvert function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Validation", "type");
+
             expect(typeHelpers.validateAndConvert).toBeDefined();
             expect(typeof typeHelpers.validateAndConvert).toBe("function");
 
@@ -553,7 +1113,17 @@ describe("Simple Function Coverage Tests", () => {
     });
 
     describe("jsonSafety functions", () => {
-        test("safeJsonParse function exists and works", () => {
+        test("safeJsonParse function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(jsonSafety.safeJsonParse).toBeDefined();
             expect(typeof jsonSafety.safeJsonParse).toBe("function");
 
@@ -565,7 +1135,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(result).toBeDefined();
         });
 
-        test("safeJsonParseArray function exists and works", () => {
+        test("safeJsonParseArray function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(jsonSafety.safeJsonParseArray).toBeDefined();
             expect(typeof jsonSafety.safeJsonParseArray).toBe("function");
 
@@ -574,7 +1154,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(result).toBeDefined();
         });
 
-        test("safeJsonParseWithFallback function exists and works", () => {
+        test("safeJsonParseWithFallback function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(jsonSafety.safeJsonParseWithFallback).toBeDefined();
             expect(typeof jsonSafety.safeJsonParseWithFallback).toBe(
                 "function"
@@ -590,7 +1180,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(result).toBeDefined();
         });
 
-        test("safeJsonStringify function exists and works", () => {
+        test("safeJsonStringify function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(jsonSafety.safeJsonStringify).toBeDefined();
             expect(typeof jsonSafety.safeJsonStringify).toBe("function");
 
@@ -598,7 +1198,17 @@ describe("Simple Function Coverage Tests", () => {
             expect(result).toBeDefined();
         });
 
-        test("safeJsonStringifyWithFallback function exists and works", () => {
+        test("safeJsonStringifyWithFallback function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(jsonSafety.safeJsonStringifyWithFallback).toBeDefined();
             expect(typeof jsonSafety.safeJsonStringifyWithFallback).toBe(
                 "function"
@@ -613,7 +1223,17 @@ describe("Simple Function Coverage Tests", () => {
     });
 
     describe("stringConversion functions", () => {
-        test("safeStringify function exists and works", () => {
+        test("safeStringify function exists and works", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: simple-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(stringConversion.safeStringify).toBeDefined();
             expect(typeof stringConversion.safeStringify).toBe("function");
 

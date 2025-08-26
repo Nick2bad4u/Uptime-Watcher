@@ -42,7 +42,17 @@ describe("MonitorUiComponents", () => {
             fallback: <div data-testid="fallback">No response time</div>,
         };
 
-        it("should show fallback during loading", () => {
+        it("should show fallback during loading", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             // Mock a promise that never resolves to simulate loading
             vi.mocked(supportsResponseTime).mockImplementation(
                 () => new Promise(() => {})
@@ -54,7 +64,17 @@ describe("MonitorUiComponents", () => {
             expect(screen.queryByTestId("children")).not.toBeInTheDocument();
         });
 
-        it("should show children when response time is supported", async () => {
+        it("should show children when response time is supported", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.mocked(supportsResponseTime).mockResolvedValue(true);
 
             render(<ConditionalResponseTime {...defaultProps} />);
@@ -66,7 +86,17 @@ describe("MonitorUiComponents", () => {
             expect(screen.queryByTestId("fallback")).not.toBeInTheDocument();
         });
 
-        it("should show fallback when response time is not supported", async () => {
+        it("should show fallback when response time is not supported", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.mocked(supportsResponseTime).mockResolvedValue(false);
 
             render(<ConditionalResponseTime {...defaultProps} />);
@@ -78,7 +108,17 @@ describe("MonitorUiComponents", () => {
             expect(screen.queryByTestId("children")).not.toBeInTheDocument();
         });
 
-        it("should show fallback when supportsResponseTime throws error", async () => {
+        it("should show fallback when supportsResponseTime throws error", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const mockError = new Error("Failed to check support");
             vi.mocked(supportsResponseTime).mockRejectedValue(mockError);
 
@@ -95,7 +135,17 @@ describe("MonitorUiComponents", () => {
             );
         });
 
-        it("should handle different monitor types", async () => {
+        it("should handle different monitor types", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             vi.mocked(supportsResponseTime).mockResolvedValue(true);
 
             const { rerender } = render(
@@ -114,7 +164,17 @@ describe("MonitorUiComponents", () => {
             expect(supportsResponseTime).toHaveBeenCalledWith("port");
         });
 
-        it("should handle component unmounting during async operation", async () => {
+        it("should handle component unmounting during async operation", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             let resolvePromise: (value: boolean) => void;
             const promise = new Promise<boolean>((resolve) => {
                 resolvePromise = resolve;
@@ -138,7 +198,17 @@ describe("MonitorUiComponents", () => {
             expect(supportsResponseTime).toHaveBeenCalled();
         });
 
-        it("should handle fallback prop being undefined", async () => {
+        it("should handle fallback prop being undefined", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.mocked(supportsResponseTime).mockResolvedValue(false);
 
             render(
@@ -157,7 +227,17 @@ describe("MonitorUiComponents", () => {
             // Should render nothing when no fallback and not supported
         });
 
-        it("should work with port monitor type", async () => {
+        it("should work with port monitor type", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             vi.mocked(supportsResponseTime).mockResolvedValue(false);
 
             render(
@@ -169,7 +249,17 @@ describe("MonitorUiComponents", () => {
             });
         });
 
-        it("should work with ping monitor type", async () => {
+        it("should work with ping monitor type", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             vi.mocked(supportsResponseTime).mockResolvedValue(false);
 
             render(
@@ -189,7 +279,17 @@ describe("MonitorUiComponents", () => {
             fallback: "Unknown host",
         };
 
-        it("should display fallback initially then formatted label", async () => {
+        it("should display fallback initially then formatted label", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Initialization", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Initialization", "type");
+
             vi.mocked(formatMonitorDetail).mockResolvedValue(
                 "https://example.com"
             );
@@ -209,7 +309,17 @@ describe("MonitorUiComponents", () => {
             expect(screen.queryByText("Unknown host")).not.toBeInTheDocument();
         });
 
-        it("should use details as fallback when no fallback prop provided", async () => {
+        it("should use details as fallback when no fallback prop provided", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.mocked(formatMonitorDetail).mockResolvedValue(
                 "formatted result"
             );
@@ -227,7 +337,17 @@ describe("MonitorUiComponents", () => {
             });
         });
 
-        it("should show fallback when formatMonitorDetail throws error", async () => {
+        it("should show fallback when formatMonitorDetail throws error", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const mockError = new Error("Failed to format");
             vi.mocked(formatMonitorDetail).mockRejectedValue(mockError);
 
@@ -243,7 +363,17 @@ describe("MonitorUiComponents", () => {
             );
         });
 
-        it("should handle different monitor types", async () => {
+        it("should handle different monitor types", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             vi.mocked(formatMonitorDetail).mockResolvedValue("port:80");
 
             render(<DetailLabel {...defaultProps} monitorType="port" />);
@@ -256,7 +386,17 @@ describe("MonitorUiComponents", () => {
             });
         });
 
-        it("should handle component unmounting during async operation", async () => {
+        it("should handle component unmounting during async operation", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             let resolvePromise: (value: string) => void;
             const promise = new Promise<string>((resolve) => {
                 resolvePromise = resolve;
@@ -278,7 +418,17 @@ describe("MonitorUiComponents", () => {
             expect(formatMonitorDetail).toHaveBeenCalled();
         });
 
-        it("should handle prop changes", async () => {
+        it("should handle prop changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.mocked(formatMonitorDetail)
                 .mockResolvedValueOnce("first result")
                 .mockResolvedValueOnce("second result");
@@ -300,7 +450,17 @@ describe("MonitorUiComponents", () => {
             });
         });
 
-        it("should handle empty details", async () => {
+        it("should handle empty details", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.mocked(formatMonitorDetail).mockResolvedValue("");
 
             render(
@@ -312,7 +472,17 @@ describe("MonitorUiComponents", () => {
             });
         });
 
-        it("should update when monitorType changes", async () => {
+        it("should update when monitorType changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
             vi.mocked(formatMonitorDetail)
                 .mockResolvedValueOnce("http formatted")
                 .mockResolvedValueOnce("port formatted");
@@ -338,7 +508,17 @@ describe("MonitorUiComponents", () => {
             });
         });
 
-        it("should handle very long details string", async () => {
+        it("should handle very long details string", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorUiComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const longDetails = "a".repeat(1000);
             vi.mocked(formatMonitorDetail).mockResolvedValue(
                 "formatted long string"

@@ -41,7 +41,17 @@ describe("main.tsx - Application Entry Point", () => {
     });
 
     describe("Basic Functionality", () => {
-        it("should use getElementById for root element lookup", async () => {
+        it("should use getElementById for root element lookup", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
             const getElementByIdSpy = vi.spyOn(document, "getElementById");
 
             // Import main.tsx which triggers initialization
@@ -52,7 +62,17 @@ describe("main.tsx - Application Entry Point", () => {
             getElementByIdSpy.mockRestore();
         });
 
-        it("should handle missing root element gracefully", async () => {
+        it("should handle missing root element gracefully", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Remove root element
             document.body.innerHTML = "";
 
@@ -66,7 +86,17 @@ describe("main.tsx - Application Entry Point", () => {
             );
         });
 
-        it("should log initialization errors to console", async () => {
+        it("should log initialization errors to console", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Initialization", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Initialization", "type");
+
             // Remove root element to trigger error
             document.body.innerHTML = "";
 
@@ -83,7 +113,17 @@ describe("main.tsx - Application Entry Point", () => {
     });
 
     describe("Performance Optimizations", () => {
-        it("should use getElementById instead of querySelector for performance", async () => {
+        it("should use getElementById instead of querySelector for performance", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
             const getElementByIdSpy = vi.spyOn(document, "getElementById");
             const querySelectorSpy = vi.spyOn(document, "querySelector");
 
@@ -103,7 +143,17 @@ describe("main.tsx - Application Entry Point", () => {
     });
 
     describe("Error Handling Coverage", () => {
-        it("should cover the try-catch block with error", async () => {
+        it("should cover the try-catch block with error", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
             // Remove root to trigger error path
             document.body.innerHTML = "";
 
@@ -117,7 +167,17 @@ describe("main.tsx - Application Entry Point", () => {
             );
         });
 
-        it("should handle successful initialization without errors", async () => {
+        it("should handle successful initialization without errors", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Initialization", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Initialization", "type");
+
             // Ensure root element exists
 
             document.body.innerHTML = '<div id="root"></div>';

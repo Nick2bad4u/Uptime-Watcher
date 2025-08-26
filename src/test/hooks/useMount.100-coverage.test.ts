@@ -23,7 +23,17 @@ const mockLogger = vi.mocked(logger);
 
 describe("useMount - 100% Coverage Tests", () => {
     describe("Targeting Lines 97,113", () => {
-        test("should handle strict mode duplicate mount (line 97)", () => {
+        test("should handle strict mode duplicate mount (line 97)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: useMount.100-coverage", "component");
+            annotate("Category: Hook", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: useMount.100-coverage", "component");
+            annotate("Category: Hook", "category");
+            annotate("Type: Business Logic", "type");
+
             const mountCallback = vi.fn();
             const unmountCallback = vi.fn();
 
@@ -42,7 +52,17 @@ describe("useMount - 100% Coverage Tests", () => {
             expect(mountCallback).toHaveBeenCalledTimes(1);
         });
 
-        test("should handle async mount callback errors (line 113)", async () => {
+        test("should handle async mount callback errors (line 113)", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: useMount.100-coverage", "component");
+            annotate("Category: Hook", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: useMount.100-coverage", "component");
+            annotate("Category: Hook", "category");
+            annotate("Type: Error Handling", "type");
+
             const errorMessage = "Mount callback error";
             const asyncMountCallback = vi
                 .fn()
@@ -66,7 +86,17 @@ describe("useMount - 100% Coverage Tests", () => {
             unmount();
         });
 
-        test("should handle promise-returning mount callback", async () => {
+        test("should handle promise-returning mount callback", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: useMount.100-coverage", "component");
+            annotate("Category: Hook", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: useMount.100-coverage", "component");
+            annotate("Category: Hook", "category");
+            annotate("Type: Business Logic", "type");
+
             const promiseMountCallback = vi.fn().mockResolvedValue("success");
             const unmountCallback = vi.fn();
 
@@ -78,7 +108,17 @@ describe("useMount - 100% Coverage Tests", () => {
             expect(promiseMountCallback).toHaveBeenCalledTimes(1);
         });
 
-        test("should handle unmount callback execution", () => {
+        test("should handle unmount callback execution", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: useMount.100-coverage", "component");
+            annotate("Category: Hook", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: useMount.100-coverage", "component");
+            annotate("Category: Hook", "category");
+            annotate("Type: Business Logic", "type");
+
             const mountCallback = vi.fn();
             const unmountCallback = vi.fn();
 
@@ -94,7 +134,17 @@ describe("useMount - 100% Coverage Tests", () => {
             expect(unmountCallback).toHaveBeenCalledTimes(1);
         });
 
-        test("should handle synchronous mount callback", () => {
+        test("should handle synchronous mount callback", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: useMount.100-coverage", "component");
+            annotate("Category: Hook", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: useMount.100-coverage", "component");
+            annotate("Category: Hook", "category");
+            annotate("Type: Business Logic", "type");
+
             const syncMountCallback = vi.fn(() => {
                 // Synchronous callback that returns void
             });

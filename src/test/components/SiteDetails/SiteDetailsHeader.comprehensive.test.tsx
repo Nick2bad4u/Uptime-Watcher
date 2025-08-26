@@ -129,12 +129,32 @@ describe("SiteDetailsHeader", () => {
     });
 
     describe("Basic Rendering", () => {
-        it("should render site name", () => {
+        it("should render site name", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SiteDetailsHeader site={mockSite} />);
             expect(screen.getByText("Test Site")).toBeInTheDocument();
         });
 
-        it("should render status indicator", () => {
+        it("should render status indicator", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <SiteDetailsHeader
                     site={mockSite}
@@ -147,14 +167,34 @@ describe("SiteDetailsHeader", () => {
             expect(statusIndicator).toBeInTheDocument();
         });
 
-        it("should render header with proper structure", () => {
+        it("should render header with proper structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SiteDetailsHeader site={mockSite} />);
             expect(screen.getByText("Test Site")).toBeInTheDocument();
         });
     });
 
     describe("Collapsed State", () => {
-        it("should not render screenshot thumbnail when collapsed", () => {
+        it("should not render screenshot thumbnail when collapsed", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <SiteDetailsHeader
                     site={mockSite}
@@ -167,7 +207,17 @@ describe("SiteDetailsHeader", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should not render URL link when collapsed", () => {
+        it("should not render URL link when collapsed", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <SiteDetailsHeader
                     site={mockSite}
@@ -178,7 +228,17 @@ describe("SiteDetailsHeader", () => {
             expect(screen.queryByRole("link")).not.toBeInTheDocument();
         });
 
-        it("should not render monitoring status display when collapsed", () => {
+        it("should not render monitoring status display when collapsed", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const siteWithMonitors = {
                 ...mockSite,
                 monitors: [mockHttpMonitor],
@@ -193,7 +253,17 @@ describe("SiteDetailsHeader", () => {
             ).toBeInTheDocument();
         });
 
-        it("should show expand icon when collapsed", () => {
+        it("should show expand icon when collapsed", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const onToggleCollapse = vi.fn();
             render(
                 <SiteDetailsHeader
@@ -207,7 +277,17 @@ describe("SiteDetailsHeader", () => {
     });
 
     describe("Expanded State", () => {
-        it("should render screenshot thumbnail when expanded with HTTP monitor", () => {
+        it("should render screenshot thumbnail when expanded with HTTP monitor", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             render(
                 <SiteDetailsHeader
                     site={mockSite}
@@ -224,7 +304,17 @@ describe("SiteDetailsHeader", () => {
             );
         });
 
-        it("should show collapse icon when expanded", () => {
+        it("should show collapse icon when expanded", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const onToggleCollapse = vi.fn();
             render(
                 <SiteDetailsHeader
@@ -236,7 +326,17 @@ describe("SiteDetailsHeader", () => {
             expect(screen.getByTestId("expand-less-icon")).toBeInTheDocument();
         });
 
-        it("should render monitoring status display when expanded", () => {
+        it("should render monitoring status display when expanded", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const siteWithMonitors = {
                 ...mockSite,
                 monitors: [mockHttpMonitor],
@@ -255,7 +355,17 @@ describe("SiteDetailsHeader", () => {
     });
 
     describe("HTTP Monitor Handling", () => {
-        it("should render clickable URL for HTTP monitor", () => {
+        it("should render clickable URL for HTTP monitor", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             render(
                 <SiteDetailsHeader
                     site={mockSite}
@@ -269,7 +379,17 @@ describe("SiteDetailsHeader", () => {
             expect(link).toHaveTextContent("https://example.com");
         });
 
-        it("should call openExternal when URL is clicked", async () => {
+        it("should call openExternal when URL is clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(
                 <SiteDetailsHeader
@@ -292,7 +412,17 @@ describe("SiteDetailsHeader", () => {
             );
         });
 
-        it("should not render URL for HTTP monitor without URL", () => {
+        it("should not render URL for HTTP monitor without URL", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const { url, ...monitorWithoutUrl } = mockHttpMonitor;
             render(
                 <SiteDetailsHeader
@@ -304,7 +434,17 @@ describe("SiteDetailsHeader", () => {
             expect(screen.queryByRole("link")).not.toBeInTheDocument();
         });
 
-        it("should render empty screenshot URL for HTTP monitor without URL", () => {
+        it("should render empty screenshot URL for HTTP monitor without URL", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const { url, ...monitorWithoutUrl } = mockHttpMonitor;
             render(
                 <SiteDetailsHeader
@@ -319,7 +459,17 @@ describe("SiteDetailsHeader", () => {
     });
 
     describe("Non-HTTP Monitors", () => {
-        it("should not render URL for ping monitor", () => {
+        it("should not render URL for ping monitor", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             render(
                 <SiteDetailsHeader
                     site={mockSite}
@@ -330,7 +480,17 @@ describe("SiteDetailsHeader", () => {
             expect(screen.queryByRole("link")).not.toBeInTheDocument();
         });
 
-        it("should not render URL for port monitor", () => {
+        it("should not render URL for port monitor", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             render(
                 <SiteDetailsHeader
                     site={mockSite}
@@ -341,7 +501,17 @@ describe("SiteDetailsHeader", () => {
             expect(screen.queryByRole("link")).not.toBeInTheDocument();
         });
 
-        it("should render empty screenshot URL for non-HTTP monitors", () => {
+        it("should render empty screenshot URL for non-HTTP monitors", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             render(
                 <SiteDetailsHeader
                     site={mockSite}
@@ -355,14 +525,34 @@ describe("SiteDetailsHeader", () => {
     });
 
     describe("No Monitor State", () => {
-        it("should show no monitor warning when no monitor is selected", () => {
+        it("should show no monitor warning when no monitor is selected", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             render(<SiteDetailsHeader site={mockSite} isCollapsed={false} />);
             expect(
                 screen.getByText("No monitor data available for this site.")
             ).toBeInTheDocument();
         });
 
-        it("should not show no monitor warning when collapsed", () => {
+        it("should not show no monitor warning when collapsed", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             render(<SiteDetailsHeader site={mockSite} isCollapsed={true} />);
             expect(
                 screen.queryByText("No monitor data available for this site.")
@@ -371,7 +561,17 @@ describe("SiteDetailsHeader", () => {
     });
 
     describe("Collapse Toggle", () => {
-        it("should call onToggleCollapse when collapse button is clicked", async () => {
+        it("should call onToggleCollapse when collapse button is clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             const onToggleCollapse = vi.fn();
 
@@ -391,12 +591,32 @@ describe("SiteDetailsHeader", () => {
             expect(onToggleCollapse).toHaveBeenCalledOnce();
         });
 
-        it("should not render collapse button when onToggleCollapse is not provided", () => {
+        it("should not render collapse button when onToggleCollapse is not provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SiteDetailsHeader site={mockSite} isCollapsed={false} />);
             expect(screen.queryByRole("button")).not.toBeInTheDocument();
         });
 
-        it("should have correct aria-label when collapsed", () => {
+        it("should have correct aria-label when collapsed", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const onToggleCollapse = vi.fn();
             render(
                 <SiteDetailsHeader
@@ -410,7 +630,17 @@ describe("SiteDetailsHeader", () => {
             expect(button).toHaveAttribute("title", "Expand header");
         });
 
-        it("should have correct aria-label when expanded", () => {
+        it("should have correct aria-label when expanded", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const onToggleCollapse = vi.fn();
             render(
                 <SiteDetailsHeader
@@ -433,7 +663,17 @@ describe("SiteDetailsHeader", () => {
             ).toBeInTheDocument();
         });
 
-        it("should show active monitor count", () => {
+        it("should show active monitor count", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const siteWithMonitors = {
                 ...mockSite,
                 monitors: [
@@ -451,7 +691,17 @@ describe("SiteDetailsHeader", () => {
             expect(screen.getByText("2/3 active")).toBeInTheDocument();
         });
 
-        it("should display individual monitor statuses", () => {
+        it("should display individual monitor statuses", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const siteWithMonitors = {
                 ...mockSite,
                 monitors: [mockHttpMonitor, mockPortMonitor],
@@ -471,7 +721,17 @@ describe("SiteDetailsHeader", () => {
             ).toBeInTheDocument();
         });
 
-        it("should show HTTP monitor with hostname", () => {
+        it("should show HTTP monitor with hostname", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const siteWithMonitors = {
                 ...mockSite,
                 monitors: [mockHttpMonitor],
@@ -485,7 +745,17 @@ describe("SiteDetailsHeader", () => {
             expect(screen.getByText("HTTP")).toBeInTheDocument();
         });
 
-        it("should show port monitor with host:port", () => {
+        it("should show port monitor with host:port", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const siteWithMonitors = {
                 ...mockSite,
                 monitors: [mockPortMonitor],
@@ -502,7 +772,17 @@ describe("SiteDetailsHeader", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle invalid URL in HTTP monitor", () => {
+        it("should handle invalid URL in HTTP monitor", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const invalidUrlMonitor = {
                 ...mockHttpMonitor,
                 url: "invalid-url",
@@ -518,7 +798,17 @@ describe("SiteDetailsHeader", () => {
             expect(thumbnail).toHaveAttribute("data-url", "");
         });
 
-        it("should handle undefined monitor status", () => {
+        it("should handle undefined monitor status", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const { status, ...monitorWithoutStatus } = mockHttpMonitor;
             render(
                 <SiteDetailsHeader
@@ -536,7 +826,17 @@ describe("SiteDetailsHeader", () => {
             expect(statusIndicator).toBeInTheDocument();
         });
 
-        it("should handle port monitor without host or port", () => {
+        it("should handle port monitor without host or port", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const { host, port, ...monitorWithoutHostPort } = mockPortMonitor;
             const incompletePortMonitor = monitorWithoutHostPort;
             const siteWithMonitors = {
@@ -554,7 +854,17 @@ describe("SiteDetailsHeader", () => {
     });
 
     describe("Accessibility", () => {
-        it("should have proper aria-label for external URL", () => {
+        it("should have proper aria-label for external URL", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <SiteDetailsHeader
                     site={mockSite}
@@ -569,7 +879,17 @@ describe("SiteDetailsHeader", () => {
             );
         });
 
-        it("should have proper rel and target attributes for external URL", () => {
+        it("should have proper rel and target attributes for external URL", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Retrieval", "type");
+
             render(
                 <SiteDetailsHeader
                     site={mockSite}

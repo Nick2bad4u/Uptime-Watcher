@@ -66,7 +66,17 @@ describe("FormErrorAlert", () => {
     });
 
     describe("Rendering", () => {
-        it("should render error message when error is provided", () => {
+        it("should render error message when error is provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(<FormErrorAlert {...defaultProps} />);
 
             expect(screen.getByTestId("themed-text")).toHaveTextContent(
@@ -82,7 +92,17 @@ describe("FormErrorAlert", () => {
             );
         });
 
-        it("should render close button with correct symbol", () => {
+        it("should render close button with correct symbol", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormErrorAlert {...defaultProps} />);
 
             const closeButton = screen.getByTestId("themed-button");
@@ -91,7 +111,17 @@ describe("FormErrorAlert", () => {
             expect(closeButton).toHaveAttribute("data-variant", "secondary");
         });
 
-        it("should render ThemedBox with correct variant", () => {
+        it("should render ThemedBox with correct variant", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormErrorAlert {...defaultProps} />);
 
             expect(screen.getByTestId("themed-box")).toHaveAttribute(
@@ -100,7 +130,17 @@ describe("FormErrorAlert", () => {
             );
         });
 
-        it("should render content container", () => {
+        it("should render content container", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormErrorAlert {...defaultProps} />);
 
             const contentDiv = screen
@@ -109,7 +149,17 @@ describe("FormErrorAlert", () => {
             expect(contentDiv).toBeInTheDocument();
         });
 
-        it("should not render when error is null", () => {
+        it("should not render when error is null", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(<FormErrorAlert {...defaultProps} error={null} />);
 
             expect(screen.queryByTestId("themed-box")).not.toBeInTheDocument();
@@ -119,7 +169,17 @@ describe("FormErrorAlert", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should not render when error is empty string", () => {
+        it("should not render when error is empty string", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(<FormErrorAlert {...defaultProps} error="" />);
 
             expect(screen.queryByTestId("themed-box")).not.toBeInTheDocument();
@@ -131,7 +191,17 @@ describe("FormErrorAlert", () => {
     });
 
     describe("Theme Support", () => {
-        it("should apply light theme classes by default", () => {
+        it("should apply light theme classes by default", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormErrorAlert {...defaultProps} />);
 
             const themedBox = screen.getByTestId("themed-box");
@@ -143,7 +213,17 @@ describe("FormErrorAlert", () => {
             expect(closeButton).not.toHaveClass("dark");
         });
 
-        it("should apply dark theme classes when isDark is true", () => {
+        it("should apply dark theme classes when isDark is true", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormErrorAlert {...defaultProps} isDark={true} />);
 
             const themedBox = screen.getByTestId("themed-box");
@@ -153,7 +233,17 @@ describe("FormErrorAlert", () => {
             expect(closeButton).toHaveClass("error-alert__close", "dark");
         });
 
-        it("should apply light theme classes when isDark is false", () => {
+        it("should apply light theme classes when isDark is false", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormErrorAlert {...defaultProps} isDark={false} />);
 
             const themedBox = screen.getByTestId("themed-box");
@@ -167,7 +257,17 @@ describe("FormErrorAlert", () => {
     });
 
     describe("Custom Classes", () => {
-        it("should apply custom className", () => {
+        it("should apply custom className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <FormErrorAlert {...defaultProps} className="custom-error" />
             );
@@ -178,7 +278,17 @@ describe("FormErrorAlert", () => {
             );
         });
 
-        it("should apply custom className with dark theme", () => {
+        it("should apply custom className with dark theme", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <FormErrorAlert
                     {...defaultProps}
@@ -194,7 +304,17 @@ describe("FormErrorAlert", () => {
             );
         });
 
-        it("should handle empty className", () => {
+        it("should handle empty className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormErrorAlert {...defaultProps} className="" />);
 
             const themedBox = screen.getByTestId("themed-box");
@@ -203,13 +323,33 @@ describe("FormErrorAlert", () => {
             expect(themedBox.className.split(" ")).toEqual(["error-alert"]);
         });
 
-        it("should handle undefined className", () => {
+        it("should handle undefined className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormErrorAlert {...defaultProps} />);
 
             expect(screen.getByTestId("themed-box")).toHaveClass("error-alert");
         });
 
-        it("should trim whitespace from className", () => {
+        it("should trim whitespace from className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <FormErrorAlert {...defaultProps} className="custom-error" />
             );
@@ -221,7 +361,17 @@ describe("FormErrorAlert", () => {
     });
 
     describe("Error Messages", () => {
-        it("should handle long error messages", () => {
+        it("should handle long error messages", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const longError =
                 "This is a very long error message that contains multiple sentences and should be displayed properly in the error alert component without any issues.";
             render(<FormErrorAlert {...defaultProps} error={longError} />);
@@ -231,7 +381,17 @@ describe("FormErrorAlert", () => {
             );
         });
 
-        it("should handle error messages with special characters", () => {
+        it("should handle error messages with special characters", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const specialError =
                 "Error: Cannot connect to 'localhost:3000' - Connection refused!";
             render(<FormErrorAlert {...defaultProps} error={specialError} />);
@@ -241,7 +401,17 @@ describe("FormErrorAlert", () => {
             );
         });
 
-        it("should handle error messages with HTML entities", () => {
+        it("should handle error messages with HTML entities", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const htmlError = "Error: Value must be > 0 & < 100";
             render(<FormErrorAlert {...defaultProps} error={htmlError} />);
 
@@ -250,7 +420,17 @@ describe("FormErrorAlert", () => {
             );
         });
 
-        it("should handle error messages with unicode characters", () => {
+        it("should handle error messages with unicode characters", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const unicodeError = "错误：无法连接到服务器 🚫";
             render(<FormErrorAlert {...defaultProps} error={unicodeError} />);
 
@@ -259,7 +439,17 @@ describe("FormErrorAlert", () => {
             );
         });
 
-        it("should handle multiline error messages", () => {
+        it("should handle multiline error messages", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const multilineError =
                 "Error on line 1\nError on line 2\nError on line 3";
             render(<FormErrorAlert {...defaultProps} error={multilineError} />);
@@ -273,7 +463,17 @@ describe("FormErrorAlert", () => {
     });
 
     describe("User Interactions", () => {
-        it("should call onClearError when close button is clicked", async () => {
+        it("should call onClearError when close button is clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const user = userEvent.setup();
             const mockOnClearError = vi.fn();
 
@@ -291,7 +491,17 @@ describe("FormErrorAlert", () => {
             // The mock receives event argument, so don't check exact args
         });
 
-        it("should call onClearError multiple times on multiple clicks", async () => {
+        it("should call onClearError multiple times on multiple clicks", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const user = userEvent.setup();
             const mockOnClearError = vi.fn();
 
@@ -310,7 +520,17 @@ describe("FormErrorAlert", () => {
             expect(mockOnClearError).toHaveBeenCalledTimes(3);
         });
 
-        it("should support keyboard navigation", async () => {
+        it("should support keyboard navigation", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             const mockOnClearError = vi.fn();
 
@@ -328,7 +548,17 @@ describe("FormErrorAlert", () => {
             expect(mockOnClearError).toHaveBeenCalledTimes(1);
         });
 
-        it("should support space key activation", async () => {
+        it("should support space key activation", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             const mockOnClearError = vi.fn();
 
@@ -351,7 +581,17 @@ describe("FormErrorAlert", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle rapid state changes", () => {
+        it("should handle rapid state changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = render(
                 <FormErrorAlert {...defaultProps} error={null} />
             );
@@ -372,7 +612,17 @@ describe("FormErrorAlert", () => {
             expect(screen.queryByTestId("themed-box")).not.toBeInTheDocument();
         });
 
-        it("should handle theme changes during error display", () => {
+        it("should handle theme changes during error display", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const { rerender } = render(
                 <FormErrorAlert {...defaultProps} isDark={false} />
             );
@@ -386,7 +636,17 @@ describe("FormErrorAlert", () => {
             expect(screen.getByTestId("themed-box")).not.toHaveClass("dark");
         });
 
-        it("should handle className changes", () => {
+        it("should handle className changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = render(
                 <FormErrorAlert {...defaultProps} className="class1" />
             );
@@ -398,7 +658,17 @@ describe("FormErrorAlert", () => {
             expect(screen.getByTestId("themed-box")).not.toHaveClass("class1");
         });
 
-        it("should handle callback changes", async () => {
+        it("should handle callback changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             const mockCallback1 = vi.fn();
             const mockCallback2 = vi.fn();
@@ -428,7 +698,17 @@ describe("FormErrorAlert", () => {
     });
 
     describe("Accessibility", () => {
-        it("should provide accessible structure", () => {
+        it("should provide accessible structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormErrorAlert {...defaultProps} />);
 
             const themedBox = screen.getByTestId("themed-box");
@@ -440,7 +720,17 @@ describe("FormErrorAlert", () => {
             expect(closeButton).toBeInTheDocument();
         });
 
-        it("should allow close button to be focusable", () => {
+        it("should allow close button to be focusable", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormErrorAlert {...defaultProps} />);
 
             const closeButton = screen.getByTestId("themed-button");
@@ -449,7 +739,17 @@ describe("FormErrorAlert", () => {
             expect(closeButton).toHaveFocus();
         });
 
-        it("should provide proper error text styling", () => {
+        it("should provide proper error text styling", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(<FormErrorAlert {...defaultProps} />);
 
             const errorText = screen.getByTestId("themed-text");
@@ -457,7 +757,17 @@ describe("FormErrorAlert", () => {
             expect(errorText).toHaveAttribute("data-size", "sm");
         });
 
-        it("should have proper semantic structure", () => {
+        it("should have proper semantic structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormErrorAlert {...defaultProps} />);
 
             const contentDiv = screen
@@ -468,7 +778,17 @@ describe("FormErrorAlert", () => {
     });
 
     describe("Integration scenarios", () => {
-        it("should work with all props combinations", async () => {
+        it("should work with all props combinations", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             const mockOnClearError = vi.fn();
 
@@ -497,7 +817,17 @@ describe("FormErrorAlert", () => {
             expect(mockOnClearError).toHaveBeenCalledTimes(1);
         });
 
-        it("should work with minimal props", () => {
+        it("should work with minimal props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormErrorAlert", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockOnClearError = vi.fn();
 
             render(

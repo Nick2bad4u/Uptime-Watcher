@@ -92,7 +92,17 @@ const TestFormField = ({
 };
 
 describe("FormFields - Uncovered Lines Coverage", () => {
-    it("should handle getAriaDescribedBy returning undefined (lines 31-32)", () => {
+    it("should handle getAriaDescribedBy returning undefined (lines 31-32)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields.uncovered", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields.uncovered", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
         render(
             <TestFormField
                 id="test-field"
@@ -105,7 +115,17 @@ describe("FormFields - Uncovered Lines Coverage", () => {
         expect(input).not.toHaveAttribute("aria-describedby");
     });
 
-    it("should handle getAriaDescribedBy with error", () => {
+    it("should handle getAriaDescribedBy with error", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields.uncovered", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields.uncovered", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
         render(
             <TestFormField
                 id="test-field"
@@ -119,7 +139,17 @@ describe("FormFields - Uncovered Lines Coverage", () => {
         expect(screen.getByText("Test error")).toBeInTheDocument();
     });
 
-    it("should handle getAriaDescribedBy with helpText", () => {
+    it("should handle getAriaDescribedBy with helpText", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields.uncovered", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields.uncovered", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
         render(
             <TestFormField
                 id="test-field"
@@ -133,7 +163,17 @@ describe("FormFields - Uncovered Lines Coverage", () => {
         expect(screen.getByText("Test help text")).toBeInTheDocument();
     });
 
-    it("should show helpText only when no error present (lines 79-83)", () => {
+    it("should show helpText only when no error present (lines 79-83)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields.uncovered", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields.uncovered", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
         // Test with helpText but no error - should show helpText
         const { rerender } = render(
             <TestFormField
@@ -161,7 +201,17 @@ describe("FormFields - Uncovered Lines Coverage", () => {
         ).not.toBeInTheDocument();
     });
 
-    it("should handle edge cases for aria-describedby logic", () => {
+    it("should handle edge cases for aria-describedby logic", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields.uncovered", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields.uncovered", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
         // Test with empty strings - these should NOT trigger error/helpText paths
         render(
             <TestFormField

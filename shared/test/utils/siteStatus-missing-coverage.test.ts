@@ -2,7 +2,17 @@ import { getSiteStatusDescription } from "../../utils/siteStatus";
 
 describe("SiteStatus - Missing Coverage", () => {
     describe("getSiteStatusDescription default case", () => {
-        test("should handle unknown status values (lines 199-200)", () => {
+        test("should handle unknown status values (lines 199-200)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: siteStatus-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: siteStatus-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test the default case in getSiteStatusDescription
             // This should hit lines 199-200 where we return "Unknown status"
 
@@ -32,7 +42,17 @@ describe("SiteStatus - Missing Coverage", () => {
             expect(description).toBe("Unknown status");
         });
 
-        test("should handle various invalid status values", () => {
+        test("should handle various invalid status values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: siteStatus-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: siteStatus-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test multiple invalid status values to ensure we hit the default case
             const invalidStatuses = [
                 "invalid",
@@ -75,7 +95,17 @@ describe("SiteStatus - Missing Coverage", () => {
             });
         });
 
-        test("should hit default case with mixed invalid statuses", () => {
+        test("should hit default case with mixed invalid statuses", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: siteStatus-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: siteStatus-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test a site with multiple monitors having invalid statuses
             const siteWithMixedInvalidStatuses = {
                 id: "1",
@@ -120,7 +150,17 @@ describe("SiteStatus - Missing Coverage", () => {
             expect(description).toBe("Mixed status (2/2 monitoring active)");
         });
 
-        test("should verify the switch statement default behavior", () => {
+        test("should verify the switch statement default behavior", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: siteStatus-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: siteStatus-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Explicitly test the switch statement default case
             // by providing a status that doesn't match any known cases
 

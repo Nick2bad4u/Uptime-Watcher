@@ -16,7 +16,17 @@ import type { UpdateStatus } from "../stores/types";
 
 describe("Types Module", () => {
     describe("Type Definitions", () => {
-        it("should export UpdateStatus type", () => {
+        it("should export UpdateStatus type", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Export Operation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Export Operation", "type");
+
             const updateStatuses: UpdateStatus[] = [
                 "idle",
                 "checking",
@@ -32,7 +42,17 @@ describe("Types Module", () => {
             }
         });
 
-        it("should export MonitorType type", () => {
+        it("should export MonitorType type", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Export Operation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Export Operation", "type");
+
             const monitorTypes: MonitorType[] = ["http", "port"];
 
             for (const type of monitorTypes) {
@@ -42,7 +62,17 @@ describe("Types Module", () => {
     });
 
     describe("Monitor Interface", () => {
-        it("should create valid Monitor object", () => {
+        it("should create valid Monitor object", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const monitor: Monitor = {
                 id: "test-monitor-id",
                 type: "http",
@@ -70,7 +100,17 @@ describe("Types Module", () => {
             expect(monitor.retryAttempts).toBe(3);
         });
 
-        it("should create valid HTTP Monitor with minimal fields", () => {
+        it("should create valid HTTP Monitor with minimal fields", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const monitor: Monitor = {
                 id: "http-monitor",
                 type: "http",
@@ -91,7 +131,17 @@ describe("Types Module", () => {
             expect(monitor.port).toBeUndefined();
         });
 
-        it("should create valid Port Monitor", () => {
+        it("should create valid Port Monitor", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const monitor: Monitor = {
                 id: "port-monitor",
                 type: "port",
@@ -114,7 +164,17 @@ describe("Types Module", () => {
             expect(monitor.responseTime).toBe(100);
         });
 
-        it("should support all status values", () => {
+        it("should support all status values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const statuses: ("up" | "down" | "pending")[] = [
                 "up",
                 "down",
@@ -140,7 +200,17 @@ describe("Types Module", () => {
     });
 
     describe("Site Interface", () => {
-        it("should create valid Site object", () => {
+        it("should create valid Site object", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const site: Site = {
                 identifier: "site-123",
                 name: "Test Site",
@@ -154,7 +224,17 @@ describe("Types Module", () => {
             expect(site.monitoring).toBe(true);
         });
 
-        it("should create Site with multiple monitors", () => {
+        it("should create Site with multiple monitors", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const httpMonitor: Monitor = {
                 id: "http-1",
                 type: "http",
@@ -194,7 +274,17 @@ describe("Types Module", () => {
             expect(site.monitors[1]?.type).toBe("port");
         });
 
-        it("should create Site with minimal fields", () => {
+        it("should create Site with minimal fields", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const site: Site = {
                 identifier: "minimal-site",
                 monitors: [],
@@ -210,7 +300,17 @@ describe("Types Module", () => {
     });
 
     describe("StatusHistory Interface", () => {
-        it("should create valid StatusHistory object", () => {
+        it("should create valid StatusHistory object", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const history: StatusHistory = {
                 timestamp: 1_640_995_200_000,
                 status: "up",
@@ -222,7 +322,17 @@ describe("Types Module", () => {
             expect(history.responseTime).toBe(250);
         });
 
-        it("should support all status values", () => {
+        it("should support all status values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const statuses: ("up" | "down")[] = ["up", "down"];
 
             for (const status of statuses) {
@@ -236,7 +346,17 @@ describe("Types Module", () => {
             }
         });
 
-        it("should handle zero response time", () => {
+        it("should handle zero response time", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const history: StatusHistory = {
                 timestamp: Date.now(),
                 status: "down",
@@ -248,7 +368,17 @@ describe("Types Module", () => {
     });
 
     describe("StatusUpdate Interface", () => {
-        it("should create valid StatusUpdate object", () => {
+        it("should create valid StatusUpdate object", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const site: Site = {
                 identifier: "update-site",
                 monitors: [],
@@ -269,7 +399,17 @@ describe("Types Module", () => {
             expect(statusUpdate.previousStatus).toBe("down");
         });
 
-        it("should create StatusUpdate without previous status", () => {
+        it("should create StatusUpdate without previous status", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const site: Site = {
                 identifier: "new-site",
                 monitors: [],
@@ -289,7 +429,17 @@ describe("Types Module", () => {
             expect(statusUpdate.previousStatus).toBeUndefined();
         });
 
-        it("should support all previous status values", () => {
+        it("should support all previous status values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const statuses: ("up" | "down" | "pending")[] = [
                 "up",
                 "down",
@@ -318,7 +468,17 @@ describe("Types Module", () => {
     });
 
     describe("Window Electron API", () => {
-        it("should have electronAPI structure defined", () => {
+        it("should have electronAPI structure defined", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test that the global type is defined properly
             // This validates the interface structure without needing actual implementation
             const mockAPI = {
@@ -423,7 +583,17 @@ describe("Types Module", () => {
     });
 
     describe("Type Compatibility", () => {
-        it("should allow Monitor in Site monitors array", () => {
+        it("should allow Monitor in Site monitors array", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor: Monitor = {
                 id: "test",
                 type: "http",
@@ -446,7 +616,17 @@ describe("Types Module", () => {
             expect(site.monitors[0]).toBe(monitor);
         });
 
-        it("should allow StatusHistory in Monitor history array", () => {
+        it("should allow StatusHistory in Monitor history array", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const history: StatusHistory = {
                 timestamp: Date.now(),
                 status: "up",
@@ -468,7 +648,17 @@ describe("Types Module", () => {
             expect(monitor.history[0]).toBe(history);
         });
 
-        it("should allow Site in StatusUpdate", () => {
+        it("should allow Site in StatusUpdate", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Update", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Update", "type");
+
             const site: Site = {
                 identifier: "test",
                 monitors: [],
@@ -489,7 +679,17 @@ describe("Types Module", () => {
     });
 
     describe("Optional Fields", () => {
-        it("should handle optional Monitor fields", () => {
+        it("should handle optional Monitor fields", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const minimalMonitor: Monitor = {
                 id: "minimal",
                 type: "http",
@@ -514,7 +714,17 @@ describe("Types Module", () => {
             expect(minimalMonitor.retryAttempts).toBe(0);
         });
 
-        it("should handle optional Site fields", () => {
+        it("should handle optional Site fields", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const minimalSite: Site = {
                 identifier: "minimal",
                 monitors: [],
@@ -526,7 +736,17 @@ describe("Types Module", () => {
             expect(minimalSite.monitoring).toBe(false);
         });
 
-        it("should handle optional StatusUpdate fields", () => {
+        it("should handle optional StatusUpdate fields", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Update", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: types", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Update", "type");
+
             const site: Site = {
                 identifier: "test",
                 monitors: [],

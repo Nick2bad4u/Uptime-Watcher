@@ -49,7 +49,17 @@ vi.mock("@/stores/sites/useSiteSync", () => ({
 
 describe("AddSiteForm - 100% Coverage Tests", () => {
     describe("Targeting Lines 187-196 (dynamic field change handlers)", () => {
-        test("should handle expectedValue field change", () => {
+        test("should handle expectedValue field change", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.100-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.100-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockOnSuccess = vi.fn();
 
             render(<AddSiteForm onSuccess={mockOnSuccess} />);
@@ -82,7 +92,17 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
             }
         });
 
-        test("should handle host field change", () => {
+        test("should handle host field change", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.100-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.100-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockOnSuccess = vi.fn();
 
             render(<AddSiteForm onSuccess={mockOnSuccess} />);
@@ -111,7 +131,17 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
             }
         });
 
-        test("should handle port field change", () => {
+        test("should handle port field change", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.100-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.100-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockOnSuccess = vi.fn();
 
             render(<AddSiteForm onSuccess={mockOnSuccess} />);
@@ -138,7 +168,17 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
             }
         });
 
-        test("should handle recordType field change", () => {
+        test("should handle recordType field change", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.100-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.100-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockOnSuccess = vi.fn();
 
             render(<AddSiteForm onSuccess={mockOnSuccess} />);
@@ -168,7 +208,17 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
             }
         });
 
-        test("should handle url field change", () => {
+        test("should handle url field change", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.100-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.100-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockOnSuccess = vi.fn();
 
             render(<AddSiteForm onSuccess={mockOnSuccess} />);
@@ -197,7 +247,17 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
             }
         });
 
-        test("should convert numeric values to strings in field handlers", () => {
+        test("should convert numeric values to strings in field handlers", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.100-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.100-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockOnSuccess = vi.fn();
 
             render(<AddSiteForm onSuccess={mockOnSuccess} />);

@@ -10,7 +10,17 @@ import * as stringConversion from "../../utils/stringConversion";
 
 describe("Corrected Function Coverage Tests", () => {
     describe("objectSafety functions", () => {
-        test("safeObjectAccess function exists", () => {
+        test("safeObjectAccess function exists", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(objectSafety.safeObjectAccess).toBeDefined();
             expect(typeof objectSafety.safeObjectAccess).toBe("function");
 
@@ -24,7 +34,17 @@ describe("Corrected Function Coverage Tests", () => {
             ).toBe("default");
         });
 
-        test("safeObjectIteration function exists", () => {
+        test("safeObjectIteration function exists", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(objectSafety.safeObjectIteration).toBeDefined();
             expect(typeof objectSafety.safeObjectIteration).toBe("function");
 
@@ -37,7 +57,17 @@ describe("Corrected Function Coverage Tests", () => {
             expect(results).toHaveLength(2);
         });
 
-        test("typedObjectEntries function exists", () => {
+        test("typedObjectEntries function exists", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(objectSafety.typedObjectEntries).toBeDefined();
             expect(typeof objectSafety.typedObjectEntries).toBe("function");
 
@@ -49,7 +79,17 @@ describe("Corrected Function Coverage Tests", () => {
     });
 
     describe("typeGuards functions", () => {
-        test("basic typeGuards functions exist", () => {
+        test("basic typeGuards functions exist", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeGuards.isObject).toBeDefined();
             expect(typeGuards.isString).toBeDefined();
             expect(typeGuards.isNumber).toBeDefined();
@@ -62,7 +102,17 @@ describe("Corrected Function Coverage Tests", () => {
     });
 
     describe("validation functions", () => {
-        test("validation functions exist", () => {
+        test("validation functions exist", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Validation", "type");
+
             expect(validation.validateMonitorType).toBeDefined();
             expect(validation.getMonitorValidationErrors).toBeDefined();
             expect(validation.validateSite).toBeDefined();
@@ -70,7 +120,17 @@ describe("Corrected Function Coverage Tests", () => {
     });
 
     describe("siteStatus functions", () => {
-        test("siteStatus functions exist", () => {
+        test("siteStatus functions exist", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(siteStatus.calculateSiteMonitoringStatus).toBeDefined();
             expect(siteStatus.calculateSiteStatus).toBeDefined();
             expect(siteStatus.getSiteDisplayStatus).toBeDefined();
@@ -80,26 +140,66 @@ describe("Corrected Function Coverage Tests", () => {
     });
 
     describe("errorCatalog functions", () => {
-        test("errorCatalog functions exist", () => {
+        test("errorCatalog functions exist", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Error Handling", "type");
+
             expect(errorCatalog.formatErrorMessage).toBeDefined();
             expect(errorCatalog.isKnownErrorMessage).toBeDefined();
         });
     });
 
     describe("environment functions", () => {
-        test("environment module is importable", () => {
+        test("environment module is importable", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Import Operation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Import Operation", "type");
+
             expect(environment).toBeDefined();
         });
     });
 
     describe("safeConversions functions", () => {
-        test("safeConversions module is importable", () => {
+        test("safeConversions module is importable", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Import Operation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Import Operation", "type");
+
             expect(safeConversions).toBeDefined();
         });
     });
 
     describe("stringConversion functions", () => {
-        test("stringConversion module is importable", () => {
+        test("stringConversion module is importable", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Import Operation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: corrected-function-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Import Operation", "type");
+
             expect(stringConversion).toBeDefined();
         });
     });

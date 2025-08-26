@@ -13,7 +13,17 @@ import ThemeProvider from "../../theme/components/ThemeProvider";
 import type { StatusBadgeProperties } from "../../components/common/StatusBadge";
 
 describe("StatusBadge - Additional Coverage", () => {
-    it("should handle the default case in getIndicatorSize switch statement", () => {
+    it("should handle the default case in getIndicatorSize switch statement", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Retrieval", "type");
+
         // This test is designed to cover line 126 - the default case in the getIndicatorSize function
         // We need to create a situation where an unexpected size value is passed
 
@@ -42,7 +52,17 @@ describe("StatusBadge - Additional Coverage", () => {
         expect(screen.getByText("Test: up")).toBeInTheDocument();
     });
 
-    it("should handle edge cases for size mapping completeness", () => {
+    it("should handle edge cases for size mapping completeness", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         // Test all documented sizes to ensure complete coverage
         const sizes: NonNullable<StatusBadgeProperties["size"]>[] = [
             "2xl",
@@ -74,7 +94,17 @@ describe("StatusBadge - Additional Coverage", () => {
         }
     });
 
-    it("should handle missing size prop (undefined case)", () => {
+    it("should handle missing size prop (undefined case)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         // Test when size is undefined - should use default "sm"
         render(
             <ThemeProvider>
@@ -91,7 +121,17 @@ describe("StatusBadge - Additional Coverage", () => {
         ).toBeInTheDocument();
     });
 
-    it("should test the switch statement branch coverage completely", () => {
+    it("should test the switch statement branch coverage completely", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         // This is an integration test to ensure the getIndicatorSize function
         // handles all possible code paths including the default case
 
@@ -140,7 +180,17 @@ describe("StatusBadge - Additional Coverage", () => {
         }
     });
 
-    it("should handle all formatter edge cases", () => {
+    it("should handle all formatter edge cases", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         // Test custom formatter function
         const customFormatter = (label: string, status: string) =>
             `${label.toUpperCase()}: ${status.toUpperCase()}`;
@@ -159,7 +209,17 @@ describe("StatusBadge - Additional Coverage", () => {
         expect(screen.getByText("CUSTOM: PAUSED")).toBeInTheDocument();
     });
 
-    it("should handle showIcon false case", () => {
+    it("should handle showIcon false case", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(
             <ThemeProvider>
                 <StatusBadge
@@ -173,7 +233,17 @@ describe("StatusBadge - Additional Coverage", () => {
         expect(screen.getByText("No Icon Test: up")).toBeInTheDocument();
     });
 
-    it("should handle className prop", () => {
+    it("should handle className prop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: StatusBadge.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(
             <ThemeProvider>
                 <StatusBadge

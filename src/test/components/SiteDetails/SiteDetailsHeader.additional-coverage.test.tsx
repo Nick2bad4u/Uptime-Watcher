@@ -102,7 +102,17 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
     };
 
     describe("URL Click Handler Coverage (Line 72)", () => {
-        it("should call openExternal with proper parameters when URL link is clicked", async () => {
+        it("should call openExternal with proper parameters when URL link is clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
 
             // Clear any previous calls
@@ -131,7 +141,17 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             );
         });
 
-        it("should call openExternal with empty URL when monitor has no URL", async () => {
+        it("should call openExternal with empty URL when monitor has no URL", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             // Create a monitor with empty URL (edge case coverage)
             const httpMonitorNoUrl: Monitor = {
                 id: "coverage-monitor-no-url",
@@ -171,7 +191,17 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             // This is the correct behavior - no link means no accidental external opens
         });
 
-        it("should call openExternal when clicking link with different site names", async () => {
+        it("should call openExternal when clicking link with different site names", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
 
             // Test with a site that has special characters in name

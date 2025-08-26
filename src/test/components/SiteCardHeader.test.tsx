@@ -37,7 +37,17 @@ describe("SiteCardHeader", () => {
         },
     };
 
-    it("should render without crashing", () => {
+    it("should render without crashing", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         expect(() => {
             // Just test that it doesn't throw
             const mockComponent = () => "SiteCardHeader mock";
@@ -46,14 +56,34 @@ describe("SiteCardHeader", () => {
         }).not.toThrow();
     });
 
-    it("should handle basic props", () => {
+    it("should handle basic props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         const props = { ...defaultProps };
         expect(props.site.site.name).toBe("Test Site");
         expect(props.display.isLoading).toBe(false);
         expect(props.monitoring.isMonitoring).toBe(false);
     });
 
-    it("should handle different site states", () => {
+    it("should handle different site states", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         const states = [
             { isLoading: true, isMonitoring: false },
             { isLoading: false, isMonitoring: true },

@@ -82,7 +82,17 @@ describe("Header Component", () => {
     });
 
     describe("Monitor Count Calculations", () => {
-        it("should display correct counts with no sites", () => {
+        it("should display correct counts with no sites", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [],
             } as any);
@@ -94,7 +104,17 @@ describe("Header Component", () => {
             expect(screen.queryByText("Total")).not.toBeInTheDocument();
         });
 
-        it("should display correct counts with sites having no monitors", () => {
+        it("should display correct counts with sites having no monitors", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     { id: "1", name: "Site 1", monitors: [] },
@@ -142,7 +162,17 @@ describe("Header Component", () => {
             expect(screen.getByText("Total")).toBeInTheDocument();
         });
 
-        it("should correctly count monitors with mixed statuses", () => {
+        it("should correctly count monitors with mixed statuses", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -168,7 +198,17 @@ describe("Header Component", () => {
             expect(screen.getByText("4")).toBeInTheDocument(); // Total count
         });
 
-        it("should handle large numbers of monitors correctly", () => {
+        it("should handle large numbers of monitors correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitors = Array.from({ length: 100 }, (_, i) => ({
                 id: `${i}`,
                 status: i < 75 ? "up" : "down",
@@ -194,7 +234,17 @@ describe("Header Component", () => {
     });
 
     describe("Uptime Percentage Calculation", () => {
-        it("should calculate 0% when no monitors are up", () => {
+        it("should calculate 0% when no monitors are up", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -213,7 +263,17 @@ describe("Header Component", () => {
             expect(screen.getByText("0%")).toBeInTheDocument();
         });
 
-        it("should calculate 100% when all monitors are up", () => {
+        it("should calculate 100% when all monitors are up", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -232,7 +292,17 @@ describe("Header Component", () => {
             expect(screen.getByText("100%")).toBeInTheDocument();
         });
 
-        it("should round percentage correctly", () => {
+        it("should round percentage correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -254,7 +324,17 @@ describe("Header Component", () => {
     });
 
     describe("Theme Toggle", () => {
-        it("should display moon icon when in light mode", () => {
+        it("should display moon icon when in light mode", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             render(<Header />);
@@ -263,7 +343,17 @@ describe("Header Component", () => {
             expect(themeButton).toHaveTextContent("🌙");
         });
 
-        it("should display sun icon when in dark mode", () => {
+        it("should display sun icon when in dark mode", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseTheme.mockReturnValue(createMockTheme(true));
 
             render(<Header />);
@@ -272,7 +362,17 @@ describe("Header Component", () => {
             expect(themeButton).toHaveTextContent("☀️");
         });
 
-        it("should call toggleTheme when theme button is clicked", () => {
+        it("should call toggleTheme when theme button is clicked", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockTheme = createMockTheme();
             mockUseTheme.mockReturnValue(mockTheme);
 
@@ -286,7 +386,17 @@ describe("Header Component", () => {
     });
 
     describe("Settings Modal", () => {
-        it("should call setShowSettings when settings button is clicked", () => {
+        it("should call setShowSettings when settings button is clicked", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<Header />);
 
             const settingsButton = screen.getByLabelText("Settings");
@@ -295,7 +405,17 @@ describe("Header Component", () => {
             expect(mockSetShowSettings).toHaveBeenCalledWith(true);
         });
 
-        it("should display settings icon", () => {
+        it("should display settings icon", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<Header />);
 
             const settingsButton = screen.getByLabelText("Settings");
@@ -304,7 +424,17 @@ describe("Header Component", () => {
     });
 
     describe("Status Indicators", () => {
-        it("should display all status types when present", () => {
+        it("should display all status types when present", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -328,7 +458,17 @@ describe("Header Component", () => {
             expect(screen.getByText("Paused")).toBeInTheDocument();
         });
 
-        it("should handle monitors with unknown status", () => {
+        it("should handle monitors with unknown status", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -353,14 +493,34 @@ describe("Header Component", () => {
     });
 
     describe("Accessibility", () => {
-        it("should have proper aria labels for buttons", () => {
+        it("should have proper aria labels for buttons", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<Header />);
 
             expect(screen.getByLabelText("Toggle theme")).toBeInTheDocument();
             expect(screen.getByLabelText("Settings")).toBeInTheDocument();
         });
 
-        it("should have proper heading structure", () => {
+        it("should have proper heading structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<Header />);
 
             expect(screen.getByText("Uptime Watcher")).toBeInTheDocument();
@@ -368,7 +528,17 @@ describe("Header Component", () => {
     });
 
     describe("Availability Color Integration", () => {
-        it("should call getAvailabilityColor with correct percentage", () => {
+        it("should call getAvailabilityColor with correct percentage", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Retrieval", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -387,7 +557,17 @@ describe("Header Component", () => {
             expect(mockGetAvailabilityColor).toHaveBeenCalledWith(50); // 1 up out of 2 = 50%
         });
 
-        it("should handle 0% uptime correctly", () => {
+        it("should handle 0% uptime correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -403,7 +583,17 @@ describe("Header Component", () => {
             expect(mockGetAvailabilityColor).toHaveBeenCalledWith(0);
         });
 
-        it("should handle 100% uptime correctly", () => {
+        it("should handle 100% uptime correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -421,14 +611,34 @@ describe("Header Component", () => {
     });
 
     describe("Component Structure", () => {
-        it("should render the main title", () => {
+        it("should render the main title", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<Header />);
 
             expect(screen.getByText("Uptime Watcher")).toBeInTheDocument();
             expect(screen.getByText("📊")).toBeInTheDocument();
         });
 
-        it("should have proper CSS classes for styling", () => {
+        it("should have proper CSS classes for styling", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<Header />);
 
             // Header renders as a ThemedBox, not as a banner role
@@ -439,7 +649,17 @@ describe("Header Component", () => {
     });
 
     describe("Memoization", () => {
-        it("should recalculate monitor counts when sites change", () => {
+        it("should recalculate monitor counts when sites change", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const { rerender } = render(<Header />);
 
             // Initial state
@@ -476,7 +696,17 @@ describe("Header Component", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle empty monitor arrays", () => {
+        it("should handle empty monitor arrays", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -493,7 +723,17 @@ describe("Header Component", () => {
             expect(screen.queryByText("Total")).not.toBeInTheDocument();
         });
 
-        it("should handle monitors without status", () => {
+        it("should handle monitors without status", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -513,7 +753,17 @@ describe("Header Component", () => {
             expect(screen.getByText("50%")).toBeInTheDocument(); // 1 up out of 2 total
         });
 
-        it("should handle sites with null/undefined monitors", () => {
+        it("should handle sites with null/undefined monitors", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Header", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {

@@ -2,21 +2,51 @@ import { safeObjectOmit } from "../../utils/objectSafety";
 
 describe("ObjectSafety - Missing Coverage", () => {
     describe("safeObjectOmit null/undefined handling", () => {
-        test("should handle null object input (lines 125-126)", () => {
+        test("should handle null object input (lines 125-126)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: objectSafety-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: objectSafety-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // This should hit lines 125-126 where we handle null objects
             // Need to bypass TypeScript checking to test the runtime null check
             const result = safeObjectOmit(null as any, ["someKey"]);
             expect(result).toEqual({});
         });
 
-        test("should handle undefined object input (lines 125-126)", () => {
+        test("should handle undefined object input (lines 125-126)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: objectSafety-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: objectSafety-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // This should hit lines 125-126 where we handle undefined objects
             // Need to bypass TypeScript checking to test the runtime undefined check
             const result = safeObjectOmit(undefined as any, ["someKey"]);
             expect(result).toEqual({});
         });
 
-        test("should handle various falsy and edge case inputs", () => {
+        test("should handle various falsy and edge case inputs", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: objectSafety-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: objectSafety-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test different edge cases that might hit the uncovered lines
 
             // Null input - this tests the defensive null check
@@ -32,7 +62,17 @@ describe("ObjectSafety - Missing Coverage", () => {
             expect(safeObjectOmit(undefined as any, [] as const)).toEqual({});
         });
 
-        test("should properly handle the null/undefined defensive check", () => {
+        test("should properly handle the null/undefined defensive check", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: objectSafety-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: objectSafety-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test the defensive programming check at the start of the function
             // These tests specifically target lines 125-126
 
@@ -54,7 +94,17 @@ describe("ObjectSafety - Missing Coverage", () => {
             expect(typeof undefinedResult).toBe("object");
         });
 
-        test("should handle edge cases that might bypass null/undefined check", () => {
+        test("should handle edge cases that might bypass null/undefined check", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: objectSafety-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: objectSafety-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test various inputs to ensure we're hitting the right code paths
 
             // These should NOT hit the null/undefined branch
@@ -71,7 +121,17 @@ describe("ObjectSafety - Missing Coverage", () => {
             });
         });
 
-        test("should verify the exact conditional logic for null/undefined", () => {
+        test("should verify the exact conditional logic for null/undefined", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: objectSafety-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: objectSafety-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Explicitly test the condition: obj === null || obj === undefined
 
             // Test null case

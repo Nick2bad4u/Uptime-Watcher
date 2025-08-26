@@ -13,7 +13,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
     });
 
     describe("Utility Function Tests", () => {
-        it("should handle string manipulation", () => {
+        it("should handle string manipulation", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const capitalize = (str: string) =>
                 str.charAt(0).toUpperCase() + str.slice(1);
             const truncate = (str: string, length: number) =>
@@ -24,7 +34,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(truncate("Hi", 5)).toBe("Hi");
         });
 
-        it("should handle array operations", () => {
+        it("should handle array operations", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const unique = (arr: any[]): any[] => [...new Set(arr)];
             const chunk = (arr: any[], size: number): any[][] => {
                 const result: any[][] = [];
@@ -66,7 +86,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             ]);
         });
 
-        it("should handle object operations", () => {
+        it("should handle object operations", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const pick = (obj: any, keys: string[]): any => {
                 const result: any = {};
                 for (const key of keys) {
@@ -89,7 +119,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(omit(testObj, ["b"])).toEqual({ a: 1, c: 3 });
         });
 
-        it("should handle type guards", () => {
+        it("should handle type guards", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const isString = (value: unknown): value is string =>
                 typeof value === "string";
             const isNumber = (value: unknown): value is number =>
@@ -105,7 +145,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(isArray("hello")).toBe(false);
         });
 
-        it("should handle formatters", () => {
+        it("should handle formatters", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const formatBytes = (bytes: number) => {
                 if (bytes === 0) return "0 Bytes";
                 const k = 1024;
@@ -133,7 +183,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(formatTime(3661)).toBe("1:01:01");
         });
 
-        it("should handle debounce and throttle", () => {
+        it("should handle debounce and throttle", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const debounce = (fn: Function, delay: number) => {
                 let timeoutId: number;
                 return (...args: any[]) => {
@@ -168,7 +228,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(mockFn).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle event emitter", () => {
+        it("should handle event emitter", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             class EventTargetWrapper extends EventTarget {
                 emit(eventType: string, data: any) {
                     this.dispatchEvent(
@@ -205,7 +275,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(callback).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle async queue", async () => {
+        it("should handle async queue", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             class AsyncQueue {
                 private readonly queue: (() => Promise<any>)[] = [];
                 private running = false;
@@ -264,7 +344,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             ]);
         });
 
-        it("should handle cache with expiration", () => {
+        it("should handle cache with expiration", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Caching", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Caching", "type");
+
             class Cache {
                 private readonly cache = new Map<
                     string,
@@ -312,7 +402,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(cache.has("key")).toBe(false);
         });
 
-        it("should handle URL parsing", () => {
+        it("should handle URL parsing", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const parseUrl = (url: string) => {
                 try {
                     const parsed = new URL(url);
@@ -344,7 +444,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(parseUrl("invalid-url")).toBeNull();
         });
 
-        it("should handle deep cloning", () => {
+        it("should handle deep cloning", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const deepClone = (obj: any): any => {
                 if (obj === null || typeof obj !== "object") {
                     return obj;
@@ -390,14 +500,34 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
     });
 
     describe("Component Edge Cases", () => {
-        it("should handle component with no props", () => {
+        it("should handle component with no props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const SimpleComponent = () => <div>Simple</div>;
 
             render(<SimpleComponent />);
             expect(screen.getByText("Simple")).toBeInTheDocument();
         });
 
-        it("should handle component with optional props", () => {
+        it("should handle component with optional props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             interface Props {
                 title?: string;
                 onClick?: () => void;
@@ -415,7 +545,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(screen.getByText("Custom")).toBeInTheDocument();
         });
 
-        it("should handle component with children", () => {
+        it("should handle component with children", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const WrapperComponent = ({
                 children,
             }: {
@@ -431,7 +571,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(screen.getByText("Child content")).toBeInTheDocument();
         });
 
-        it("should handle conditional rendering", () => {
+        it("should handle conditional rendering", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const ConditionalComponent = ({ show }: { show: boolean }) => (
                 <div>{show ? <span>Visible</span> : <span>Hidden</span>}</div>
             );
@@ -443,7 +593,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(screen.getByText("Hidden")).toBeInTheDocument();
         });
 
-        it("should handle list rendering", () => {
+        it("should handle list rendering", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const ListComponent = ({ items }: { items: string[] }) => (
                 <ul>
                     {items.map((item, index) => (
@@ -466,7 +626,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(screen.getByText("Item 3")).toBeInTheDocument();
         });
 
-        it("should handle event handling", () => {
+        it("should handle event handling", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Event Processing", "type");
+
             const EventComponent = () => {
                 const [count, setCount] = React.useState(0);
 
@@ -487,7 +657,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(screen.getByTestId("count")).toHaveTextContent("1");
         });
 
-        it("should handle form inputs", () => {
+        it("should handle form inputs", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const FormComponent = () => {
                 const [value, setValue] = React.useState("");
 
@@ -511,7 +691,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(screen.getByTestId("value")).toHaveTextContent("test");
         });
 
-        it("should handle component lifecycle", () => {
+        it("should handle component lifecycle", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const lifecycleEvents: string[] = [];
 
             const LifecycleComponent = () => {
@@ -534,7 +724,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
     });
 
     describe("Performance Tests", () => {
-        it("should handle performance measurement", () => {
+        it("should handle performance measurement", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const measure = (fn: () => void) => {
                 const start = performance.now();
                 fn();
@@ -554,7 +754,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(duration).toBeGreaterThan(0);
         });
 
-        it("should handle memoization", () => {
+        it("should handle memoization", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const memoize = (fn: any) => {
                 const cache = new Map();
                 return (...args: any[]) => {
@@ -585,7 +795,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(expensive).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle lazy evaluation", () => {
+        it("should handle lazy evaluation", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const lazy = (fn: () => any) => {
                 let value: any;
                 let computed = false;
@@ -613,7 +833,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(result2).toBe("computed");
         });
 
-        it("should handle memory management", () => {
+        it("should handle memory management", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const createResource = () => {
                 let isDestroyed = false;
                 return {
@@ -638,7 +868,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             expect(() => resource.use()).toThrow("Resource is destroyed");
         });
 
-        it("should handle concurrent operations", async () => {
+        it("should handle concurrent operations", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const operation1 = async () => "result1";
             const operation2 = async () => "result2";
             const operation3 = async () => "result3";
@@ -656,7 +896,17 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             ]);
         });
 
-        it("should handle race conditions", async () => {
+        it("should handle race conditions", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: final.coverage.enhancement.simplified", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const fastOperation = async () => {
                 await new Promise((resolve) => setTimeout(resolve, 1));
                 return "fast";

@@ -28,7 +28,17 @@ describe("DefaultErrorFallback", () => {
     });
 
     describe("Basic Rendering", () => {
-        it("should render error fallback with default message when no error provided", () => {
+        it("should render error fallback with default message when no error provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(<DefaultErrorFallback onRetry={mockOnRetry} />);
 
             expect(
@@ -43,7 +53,17 @@ describe("DefaultErrorFallback", () => {
             expect(screen.getByText("Reload Page")).toBeInTheDocument();
         });
 
-        it("should render error message when error is provided", () => {
+        it("should render error message when error is provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const error = new Error("Custom error message");
             render(
                 <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
@@ -59,7 +79,17 @@ describe("DefaultErrorFallback", () => {
             expect(screen.getByText("Reload Page")).toBeInTheDocument();
         });
 
-        it("should display default message when error message is empty", () => {
+        it("should display default message when error message is empty", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             // eslint-disable-next-line unicorn/error-message -- testing empty error message
             const error = new Error("");
             render(
@@ -76,7 +106,17 @@ describe("DefaultErrorFallback", () => {
             ).toBeInTheDocument();
         });
 
-        it("should display default message when error message is only whitespace", () => {
+        it("should display default message when error message is only whitespace", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const error = new Error("   \t\n   ");
             render(
                 <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
@@ -92,7 +132,17 @@ describe("DefaultErrorFallback", () => {
             ).toBeInTheDocument();
         });
 
-        it("should trim error message whitespace", () => {
+        it("should trim error message whitespace", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const error = new Error("  Error with whitespace  ");
             render(
                 <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
@@ -105,7 +155,17 @@ describe("DefaultErrorFallback", () => {
     });
 
     describe("Button Interactions", () => {
-        it("should call onRetry when Try Again button is clicked", async () => {
+        it("should call onRetry when Try Again button is clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<DefaultErrorFallback onRetry={mockOnRetry} />);
 
@@ -115,7 +175,17 @@ describe("DefaultErrorFallback", () => {
             expect(mockOnRetry).toHaveBeenCalledTimes(1);
         });
 
-        it("should call window.location.reload when Reload Page button is clicked", async () => {
+        it("should call window.location.reload when Reload Page button is clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             const user = userEvent.setup();
             render(<DefaultErrorFallback onRetry={mockOnRetry} />);
 
@@ -125,7 +195,17 @@ describe("DefaultErrorFallback", () => {
             expect(mockReload).toHaveBeenCalledTimes(1);
         });
 
-        it("should have correct button types", () => {
+        it("should have correct button types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<DefaultErrorFallback onRetry={mockOnRetry} />);
 
             const tryAgainButton = screen.getByText("Try Again");
@@ -137,7 +217,17 @@ describe("DefaultErrorFallback", () => {
     });
 
     describe("CSS Classes and Styling", () => {
-        it("should have correct CSS classes for layout and styling", () => {
+        it("should have correct CSS classes for layout and styling", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { container } = render(
                 <DefaultErrorFallback onRetry={mockOnRetry} />
             );
@@ -156,7 +246,17 @@ describe("DefaultErrorFallback", () => {
             );
         });
 
-        it("should have correct button styling", () => {
+        it("should have correct button styling", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<DefaultErrorFallback onRetry={mockOnRetry} />);
 
             const tryAgainButton = screen.getByText("Try Again");
@@ -189,14 +289,34 @@ describe("DefaultErrorFallback", () => {
     });
 
     describe("Accessibility", () => {
-        it("should have proper heading structure", () => {
+        it("should have proper heading structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<DefaultErrorFallback onRetry={mockOnRetry} />);
 
             const heading = screen.getByRole("heading", { level: 2 });
             expect(heading).toHaveTextContent("Something went wrong");
         });
 
-        it("should have clickable buttons", () => {
+        it("should have clickable buttons", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<DefaultErrorFallback onRetry={mockOnRetry} />);
 
             const tryAgainButton = screen.getByRole("button", {
@@ -212,7 +332,17 @@ describe("DefaultErrorFallback", () => {
     });
 
     describe("Error Object Variations", () => {
-        it("should handle error with non-string message property", () => {
+        it("should handle error with non-string message property", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const error = { message: 123 } as any;
             render(
                 <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
@@ -224,7 +354,17 @@ describe("DefaultErrorFallback", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle error without message property", () => {
+        it("should handle error without message property", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const error = {} as Error;
             render(
                 <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
@@ -240,7 +380,17 @@ describe("DefaultErrorFallback", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle very long error messages", () => {
+        it("should handle very long error messages", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const longMessage = "A".repeat(1000);
             const error = new Error(longMessage);
             render(
@@ -250,7 +400,17 @@ describe("DefaultErrorFallback", () => {
             expect(screen.getByText(longMessage)).toBeInTheDocument();
         });
 
-        it("should handle error messages with special characters", () => {
+        it("should handle error messages with special characters", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const specialMessage = "Error with special chars: <>&\"'";
             const error = new Error(specialMessage);
             render(
@@ -262,7 +422,17 @@ describe("DefaultErrorFallback", () => {
     });
 
     describe("Multiple Interactions", () => {
-        it("should handle multiple retry clicks", async () => {
+        it("should handle multiple retry clicks", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<DefaultErrorFallback onRetry={mockOnRetry} />);
 
@@ -275,7 +445,17 @@ describe("DefaultErrorFallback", () => {
             expect(mockOnRetry).toHaveBeenCalledTimes(3);
         });
 
-        it("should handle rapid button clicks", async () => {
+        it("should handle rapid button clicks", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<DefaultErrorFallback onRetry={mockOnRetry} />);
 

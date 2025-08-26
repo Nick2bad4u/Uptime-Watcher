@@ -87,7 +87,17 @@ vi.mock("react", async () => {
 });
 
 describe("AddSiteForm Module Tests", () => {
-    it("should import the component without errors", async () => {
+    it("should import the component without errors", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.module", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.module", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
         // Just importing the module exercises the component
         const { AddSiteForm } = await import(
             "../../../components/AddSiteForm/AddSiteForm"
@@ -97,7 +107,17 @@ describe("AddSiteForm Module Tests", () => {
         expect(AddSiteForm).toBeDefined();
     });
 
-    it("should validate add modes correctly", async () => {
+    it("should validate add modes correctly", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.module", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.module", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Validation", "type");
+
         // Test basic component functionality
         const { AddSiteForm } = await import(
             "../../../components/AddSiteForm/AddSiteForm"
@@ -105,7 +125,17 @@ describe("AddSiteForm Module Tests", () => {
         expect(AddSiteForm).toBeDefined();
     });
 
-    it("should validate monitor types correctly", async () => {
+    it("should validate monitor types correctly", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.module", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.module", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Validation", "type");
+
         // Test basic component functionality
         const { AddSiteForm } = await import(
             "../../../components/AddSiteForm/AddSiteForm"
@@ -113,7 +143,17 @@ describe("AddSiteForm Module Tests", () => {
         expect(AddSiteForm).toBeDefined();
     });
 
-    it("should export AddSiteForm component", async () => {
+    it("should export AddSiteForm component", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.module", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Export Operation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.module", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Export Operation", "type");
+
         const { AddSiteForm } = await import(
             "../../../components/AddSiteForm/AddSiteForm"
         );

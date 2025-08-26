@@ -91,7 +91,17 @@ describe("SiteCard Component - Complete Coverage", () => {
         vi.clearAllMocks();
     });
 
-    it("should render expanded card by default", () => {
+    it("should render expanded card by default", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard.maximal-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard.maximal-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<SiteCard site={mockSite} />);
 
         expect(screen.getByTestId("site-card-header")).toBeInTheDocument();
@@ -101,7 +111,17 @@ describe("SiteCard Component - Complete Coverage", () => {
         expect(screen.getByTestId("site-card-footer")).toBeInTheDocument();
     });
 
-    it("should handle card interactions", async () => {
+    it("should handle card interactions", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard.maximal-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard.maximal-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<SiteCard site={mockSite} />);
 
         const header = screen.getByTestId("site-card-header");
@@ -111,14 +131,34 @@ describe("SiteCard Component - Complete Coverage", () => {
         expect(header).toHaveTextContent("Test Site");
     });
 
-    it("should handle different site states", () => {
+    it("should handle different site states", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard.maximal-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard.maximal-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         const inactiveSite = { ...mockSite, monitoring: false };
         render(<SiteCard site={inactiveSite} />);
 
         expect(screen.getByTestId("site-card-header")).toBeInTheDocument();
     });
 
-    it("should pass correct data to all child components", () => {
+    it("should pass correct data to all child components", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard.maximal-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard.maximal-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<SiteCard site={mockSite} />);
 
         expect(screen.getByTestId("site-card-header")).toHaveTextContent(

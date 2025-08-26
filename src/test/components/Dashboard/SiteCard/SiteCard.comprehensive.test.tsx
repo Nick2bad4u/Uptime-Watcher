@@ -138,7 +138,17 @@ describe("SiteCard Component", () => {
         vi.clearAllMocks();
     });
 
-    it("should render without crashing", () => {
+    it("should render without crashing", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<SiteCard site={mockSite} />);
 
         // Check for site name instead of generic themed-box
@@ -152,7 +162,17 @@ describe("SiteCard Component", () => {
         expect(screen.getByText("Uptime")).toBeInTheDocument();
     });
 
-    it("should handle site with no monitors", () => {
+    it("should handle site with no monitors", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
         const siteWithoutMonitors = {
             ...mockSite,
             monitors: [],
@@ -163,7 +183,17 @@ describe("SiteCard Component", () => {
         expect(screen.getByText("Test Site")).toBeInTheDocument();
     });
 
-    it("should handle site with multiple monitors", () => {
+    it("should handle site with multiple monitors", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCard", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
         const siteWithMultipleMonitors = createMockSite({
             ...mockSite,
             monitors: [

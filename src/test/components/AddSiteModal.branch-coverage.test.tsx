@@ -216,7 +216,17 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
     });
 
     describe("Modal Visibility Branches", () => {
-        it("should render nothing when showAddSiteModal is false", () => {
+        it("should render nothing when showAddSiteModal is false", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseUIStore.mockReturnValue({
                 showAddSiteModal: false,
                 setShowAddSiteModal: mockSetShowAddSiteModal,
@@ -235,7 +245,17 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             expect(container.firstChild).toBeNull();
         });
 
-        it("should render modal when showAddSiteModal is true", () => {
+        it("should render modal when showAddSiteModal is true", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseUIStore.mockReturnValue({
                 showAddSiteModal: true,
                 setShowAddSiteModal: mockSetShowAddSiteModal,
@@ -257,7 +277,17 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
     });
 
     describe("Theme State Branches", () => {
-        it("should apply dark theme classes when isDark is true", () => {
+        it("should apply dark theme classes when isDark is true", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseTheme.mockReturnValue({
                 isDark: true,
                 currentTheme: {} as any,
@@ -291,7 +321,17 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             expect(backdrop).toHaveClass("dark");
         });
 
-        it("should not apply dark theme classes when isDark is false", () => {
+        it("should not apply dark theme classes when isDark is false", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseTheme.mockReturnValue({
                 isDark: false,
                 currentTheme: {} as any,
@@ -344,7 +384,17 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             });
         });
 
-        it("should call setShowAddSiteModal(false) when close button is clicked", async () => {
+        it("should call setShowAddSiteModal(false) when close button is clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteModal />);
 
             const closeButton = screen.getByRole("button", {
@@ -355,7 +405,17 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             expect(mockSetShowAddSiteModal).toHaveBeenCalledWith(false);
         });
 
-        it("should call setShowAddSiteModal(false) when backdrop is clicked", async () => {
+        it("should call setShowAddSiteModal(false) when backdrop is clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteModal />);
 
             // Get the backdrop by testing the event directly
@@ -365,7 +425,17 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             expect(mockSetShowAddSiteModal).toHaveBeenCalledWith(false);
         });
 
-        it("should not close modal when clicking inside the modal content", async () => {
+        it("should not close modal when clicking inside the modal content", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteModal />);
 
             const modalContent = screen.getByTestId("modal-outer-box");
@@ -374,7 +444,17 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             expect(mockSetShowAddSiteModal).not.toHaveBeenCalled();
         });
 
-        it("should close modal when form success callback is called", async () => {
+        it("should close modal when form success callback is called", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteModal />);
 
             const successButton = screen.getByTestId("mock-success-button");
@@ -401,7 +481,17 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             });
         });
 
-        it("should close modal when Escape key is pressed and modal is visible", async () => {
+        it("should close modal when Escape key is pressed and modal is visible", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteModal />);
 
             fireEvent.keyDown(document, { key: "Escape" });
@@ -411,7 +501,17 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             });
         });
 
-        it("should not close modal when other keys are pressed", async () => {
+        it("should not close modal when other keys are pressed", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteModal />);
 
             fireEvent.keyDown(document, { key: "Enter" });
@@ -421,7 +521,17 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             expect(mockSetShowAddSiteModal).not.toHaveBeenCalled();
         });
 
-        it("should not respond to Escape when modal is not visible", async () => {
+        it("should not respond to Escape when modal is not visible", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // First render with modal hidden
             mockUseUIStore.mockReturnValue({
                 showAddSiteModal: false,
@@ -446,7 +556,17 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
     });
 
     describe("Event Cleanup Branches", () => {
-        it("should add and remove event listeners based on modal visibility", () => {
+        it("should add and remove event listeners based on modal visibility", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Deletion", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Deletion", "type");
+
             const addEventListenerSpy = vi.spyOn(document, "addEventListener");
             const removeEventListenerSpy = vi.spyOn(
                 document,

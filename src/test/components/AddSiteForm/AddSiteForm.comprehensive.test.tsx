@@ -170,14 +170,34 @@ describe("AddSiteForm Component", () => {
     });
 
     describe("Basic Rendering", () => {
-        it("should render the form without errors", () => {
+        it("should render the form without errors", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(<AddSiteForm />);
 
             expect(document.querySelector(".themed-box")).toBeInTheDocument();
             expect(screen.getByRole("radiogroup")).toBeInTheDocument();
         });
 
-        it("should render all required form elements", () => {
+        it("should render all required form elements", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             // Check for main form elements
@@ -190,7 +210,17 @@ describe("AddSiteForm Component", () => {
             ).toBeInTheDocument();
         });
 
-        it("should render submit button", () => {
+        it("should render submit button", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             const submitButton = document.querySelector(".themed-button");
@@ -199,7 +229,17 @@ describe("AddSiteForm Component", () => {
     });
 
     describe("Form Interaction", () => {
-        it("should handle form field changes", () => {
+        it("should handle form field changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             const selectFields = screen.getAllByRole("combobox");
@@ -209,14 +249,34 @@ describe("AddSiteForm Component", () => {
             expect(selectFields[0]!).toBeInTheDocument();
         });
 
-        it("should handle monitor type changes", () => {
+        it("should handle monitor type changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             render(<AddSiteForm />);
 
             const dynamicFields = screen.getByTestId("dynamic-monitor-fields");
             expect(dynamicFields).toHaveTextContent("Dynamic fields");
         });
 
-        it("should handle form submission", async () => {
+        it("should handle form submission", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const onSuccess = vi.fn();
             render(<AddSiteForm onSuccess={onSuccess} />);
 
@@ -231,14 +291,34 @@ describe("AddSiteForm Component", () => {
     });
 
     describe("Props and Configuration", () => {
-        it("should handle onSuccess callback", () => {
+        it("should handle onSuccess callback", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const onSuccess = vi.fn();
             render(<AddSiteForm onSuccess={onSuccess} />);
 
             expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
 
-        it("should work without onSuccess callback", () => {
+        it("should work without onSuccess callback", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             expect(document.querySelector(".themed-box")).toBeInTheDocument();
@@ -246,21 +326,51 @@ describe("AddSiteForm Component", () => {
     });
 
     describe("State Management Integration", () => {
-        it("should integrate with error store", () => {
+        it("should integrate with error store", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(<AddSiteForm />);
 
             // Test that error store integration works
             expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
 
-        it("should integrate with sites store", () => {
+        it("should integrate with sites store", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             // Test that sites store integration works
             expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
 
-        it("should integrate with form hooks", () => {
+        it("should integrate with form hooks", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             // Test that form hooks integration works
@@ -269,7 +379,17 @@ describe("AddSiteForm Component", () => {
     });
 
     describe("Theme Integration", () => {
-        it("should apply theme styling", () => {
+        it("should apply theme styling", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             const themedBox = document.querySelector(".themed-box");
@@ -279,7 +399,17 @@ describe("AddSiteForm Component", () => {
             expect(themedButton).toBeInTheDocument();
         });
 
-        it("should handle theme changes", () => {
+        it("should handle theme changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             // Test theme integration
@@ -290,14 +420,34 @@ describe("AddSiteForm Component", () => {
     });
 
     describe("Error Handling", () => {
-        it("should handle component errors gracefully", () => {
+        it("should handle component errors gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             // Test error boundaries and error handling
             render(<AddSiteForm />);
 
             expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
 
-        it("should display validation errors", () => {
+        it("should display validation errors", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(<AddSiteForm />);
 
             // Test validation error display
@@ -306,7 +456,17 @@ describe("AddSiteForm Component", () => {
     });
 
     describe("Accessibility", () => {
-        it("should have proper form labels", () => {
+        it("should have proper form labels", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             // Check for accessibility labels
@@ -316,7 +476,17 @@ describe("AddSiteForm Component", () => {
             ).toBeInTheDocument();
         });
 
-        it("should support keyboard navigation", () => {
+        it("should support keyboard navigation", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             const submitButton = document.querySelector(".themed-button");
@@ -325,13 +495,33 @@ describe("AddSiteForm Component", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle empty form data", () => {
+        it("should handle empty form data", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
 
-        it("should handle missing monitor types", () => {
+        it("should handle missing monitor types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             render(<AddSiteForm />);
 
             expect(
@@ -339,7 +529,17 @@ describe("AddSiteForm Component", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle loading states", () => {
+        it("should handle loading states", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             render(<AddSiteForm />);
 
             expect(document.querySelector(".themed-box")).toBeInTheDocument();

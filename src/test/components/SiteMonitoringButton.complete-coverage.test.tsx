@@ -56,7 +56,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     });
 
     describe("Basic Rendering", () => {
-        it("should render start button when monitors are not running", () => {
+        it("should render start button when monitors are not running", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -76,7 +86,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(screen.getByText("Start All")).toBeInTheDocument();
         });
 
-        it("should render stop button when monitors are running", () => {
+        it("should render stop button when monitors are running", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -93,7 +113,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(screen.getByText("Stop All")).toBeInTheDocument();
         });
 
-        it("should apply custom className", () => {
+        it("should apply custom className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -110,7 +140,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             );
         });
 
-        it("should apply default className when none provided", () => {
+        it("should apply default className when none provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderWithTheme(<SiteMonitoringButton {...defaultProps} />);
 
             const button = screen.getByTestId("themed-button");
@@ -119,7 +159,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     });
 
     describe("Compact Mode", () => {
-        it("should hide text in compact mode for start button", () => {
+        it("should hide text in compact mode for start button", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -132,7 +182,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(screen.queryByText("Start All")).not.toBeInTheDocument();
         });
 
-        it("should hide text in compact mode for stop button", () => {
+        it("should hide text in compact mode for stop button", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -145,7 +205,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(screen.queryByText("Stop All")).not.toBeInTheDocument();
         });
 
-        it("should show text when compact is false", () => {
+        it("should show text when compact is false", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -157,7 +227,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(screen.getByText("Start All")).toBeInTheDocument();
         });
 
-        it("should show text when compact is undefined (default)", () => {
+        it("should show text when compact is undefined (default)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -170,7 +250,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     });
 
     describe("Loading State", () => {
-        it("should disable start button when loading", () => {
+        it("should disable start button when loading", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -183,7 +273,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(button).toBeDisabled();
         });
 
-        it("should disable stop button when loading", () => {
+        it("should disable stop button when loading", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -196,7 +296,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(button).toBeDisabled();
         });
 
-        it("should enable button when not loading", () => {
+        it("should enable button when not loading", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             renderWithTheme(
                 <SiteMonitoringButton {...defaultProps} isLoading={false} />
             );
@@ -207,7 +317,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     });
 
     describe("Click Handlers", () => {
-        it("should call onStartSiteMonitoring when start button is clicked", async () => {
+        it("should call onStartSiteMonitoring when start button is clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const mockStart = vi.fn();
             const user = userEvent.setup();
 
@@ -225,7 +345,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(mockStart).toHaveBeenCalledTimes(1);
         });
 
-        it("should call onStopSiteMonitoring when stop button is clicked", async () => {
+        it("should call onStopSiteMonitoring when stop button is clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const mockStop = vi.fn();
             const user = userEvent.setup();
 
@@ -243,7 +373,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(mockStop).toHaveBeenCalledTimes(1);
         });
 
-        it("should not call handlers when button is disabled", async () => {
+        it("should not call handlers when button is disabled", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockStart = vi.fn();
             const mockStop = vi.fn();
             const user = userEvent.setup();
@@ -275,7 +415,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(mockStop).not.toHaveBeenCalled();
         });
 
-        it("should handle multiple clicks correctly", async () => {
+        it("should handle multiple clicks correctly", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockStart = vi.fn();
             const user = userEvent.setup();
 
@@ -297,7 +447,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     });
 
     describe("Event Propagation", () => {
-        it("should stop propagation when start button is clicked", () => {
+        it("should stop propagation when start button is clicked", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockStart = vi.fn();
             const mockParentClick = vi.fn();
 
@@ -318,7 +478,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(mockParentClick).not.toHaveBeenCalled();
         });
 
-        it("should stop propagation when stop button is clicked", () => {
+        it("should stop propagation when stop button is clicked", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockStop = vi.fn();
             const mockParentClick = vi.fn();
 
@@ -339,7 +509,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(mockParentClick).not.toHaveBeenCalled();
         });
 
-        it("should handle click events without event object", () => {
+        it("should handle click events without event object", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
             const mockStart = vi.fn();
 
             renderWithTheme(
@@ -359,7 +539,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     });
 
     describe("State Transitions", () => {
-        it("should switch from start to stop when allMonitorsRunning changes", () => {
+        it("should switch from start to stop when allMonitorsRunning changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const { rerender } = renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -381,7 +571,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(screen.getByText("⏹️")).toBeInTheDocument();
         });
 
-        it("should maintain button attributes during state transitions", () => {
+        it("should maintain button attributes during state transitions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -409,7 +609,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     });
 
     describe("Accessibility", () => {
-        it("should have proper aria-label for start button", () => {
+        it("should have proper aria-label for start button", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -424,7 +634,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             );
         });
 
-        it("should have proper aria-label for stop button", () => {
+        it("should have proper aria-label for stop button", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -436,7 +656,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(button).toHaveAttribute("aria-label", "Stop All Monitoring");
         });
 
-        it("should be keyboard accessible", async () => {
+        it("should be keyboard accessible", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockStart = vi.fn();
             const user = userEvent.setup();
 
@@ -459,7 +689,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(mockStart).toHaveBeenCalledTimes(1);
         });
 
-        it("should be activatable with Space key", async () => {
+        it("should be activatable with Space key", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockStart = vi.fn();
             const user = userEvent.setup();
 
@@ -480,7 +720,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     });
 
     describe("React.memo Performance", () => {
-        it("should be a memoized component", () => {
+        it("should be a memoized component", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(typeof SiteMonitoringButton).toBe("object");
             expect(SiteMonitoringButton).toBeDefined();
             // Check that it's a React.memo component
@@ -489,7 +739,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             );
         });
 
-        it("should have proper display name", () => {
+        it("should have proper display name", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // React.memo with function name preserves displayName (may have number suffix in testing)
             const displayName =
                 SiteMonitoringButton.displayName ||
@@ -497,7 +757,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(displayName).toMatch(/^SiteMonitoringButton\d*$/);
         });
 
-        it("should maintain stable callback references", () => {
+        it("should maintain stable callback references", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockStart = vi.fn();
             const mockStop = vi.fn();
 
@@ -530,7 +800,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     });
 
     describe("useCallback Implementation", () => {
-        it("should maintain handler reference stability across re-renders", () => {
+        it("should maintain handler reference stability across re-renders", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockStart = vi.fn();
             const mockStop = vi.fn();
 
@@ -561,7 +841,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(firstStartButton).not.toBe(stopButton); // Different button instances
         });
 
-        it("should handle callback dependency changes", () => {
+        it("should handle callback dependency changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockStart1 = vi.fn();
             const mockStart2 = vi.fn();
 
@@ -592,7 +882,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle undefined event in click handlers", () => {
+        it("should handle undefined event in click handlers", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
             const mockStart = vi.fn();
 
             renderWithTheme(
@@ -610,7 +910,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(mockStart).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle null event in click handlers", () => {
+        it("should handle null event in click handlers", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
             const mockStop = vi.fn();
 
             renderWithTheme(
@@ -628,7 +938,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(mockStop).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle rapid state changes", () => {
+        it("should handle rapid state changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
@@ -650,7 +970,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(screen.getByText("Start All")).toBeInTheDocument();
         });
 
-        it("should handle empty className gracefully", () => {
+        it("should handle empty className gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderWithTheme(
                 <SiteMonitoringButton {...defaultProps} className="" />
             );
@@ -661,7 +991,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     });
 
     describe("Component Integration", () => {
-        it("should work with all prop combinations", () => {
+        it("should work with all prop combinations", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockStart = vi.fn();
             const mockStop = vi.fn();
 
@@ -684,7 +1024,17 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(screen.queryByText("Start All")).not.toBeInTheDocument(); // compact mode
         });
 
-        it("should maintain consistency across theme changes", () => {
+        it("should maintain consistency across theme changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteMonitoringButton.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = renderWithTheme(
                 <SiteMonitoringButton {...defaultProps} />
             );

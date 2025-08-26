@@ -118,7 +118,17 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
     });
 
     describe("Coverage for Lines 109-122 (ping and port monitor types)", () => {
-        it("should handle ping monitor type submission (lines 109-114)", async () => {
+        it("should handle ping monitor type submission (lines 109-114)", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const mockEvent = { preventDefault: vi.fn() } as any;
             const properties = createMockProperties({
                 monitorType: "ping",
@@ -143,7 +153,17 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             expect(properties.createSite).toHaveBeenCalled();
         });
 
-        it("should handle port monitor type submission (lines 115-120)", async () => {
+        it("should handle port monitor type submission (lines 115-120)", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const mockEvent = { preventDefault: vi.fn() } as any;
             const properties = createMockProperties({
                 monitorType: "port",
@@ -169,7 +189,17 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             expect(properties.createSite).toHaveBeenCalled();
         });
 
-        it("should handle unknown monitor type with default case (lines 121-122)", async () => {
+        it("should handle unknown monitor type with default case (lines 121-122)", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const mockEvent = { preventDefault: vi.fn() } as any;
             const properties = createMockProperties({
                 monitorType: "unknown" as any,
@@ -192,7 +222,17 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
     });
 
     describe("Coverage for Line 176 (existing site validation)", () => {
-        it("should validate selectedExistingSite when in existing mode (line 176)", async () => {
+        it("should validate selectedExistingSite when in existing mode (line 176)", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Validation", "type");
+
             const mockEvent = { preventDefault: vi.fn() } as any;
             const properties = createMockProperties({
                 addMode: "existing",
@@ -220,7 +260,17 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
     });
 
     describe("Coverage for Lines 298-307 (type-specific field assignment in existing mode)", () => {
-        it("should handle ping monitor in existing mode field assignment (lines 298-301)", async () => {
+        it("should handle ping monitor in existing mode field assignment (lines 298-301)", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const mockEvent = { preventDefault: vi.fn() } as any;
             const properties = createMockProperties({
                 addMode: "existing",
@@ -247,7 +297,17 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             expect(properties.addMonitorToSite).toHaveBeenCalled();
         });
 
-        it("should handle port monitor in existing mode field assignment (lines 302-306)", async () => {
+        it("should handle port monitor in existing mode field assignment (lines 302-306)", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const mockEvent = { preventDefault: vi.fn() } as any;
             const properties = createMockProperties({
                 addMode: "existing",
@@ -275,7 +335,17 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             expect(properties.addMonitorToSite).toHaveBeenCalled();
         });
 
-        it("should handle unsupported monitor type with error (line 307)", async () => {
+        it("should handle unsupported monitor type with error (line 307)", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const mockEvent = { preventDefault: vi.fn() } as any;
             const properties = createMockProperties({
                 addMode: "existing",
@@ -300,7 +370,17 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
     });
 
     describe("Coverage for Line 422 (result falsy handling)", () => {
-        it("should handle when createSite returns no result (line 422)", async () => {
+        it("should handle when createSite returns no result (line 422)", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Constructor", "type");
+
             const mockEvent = { preventDefault: vi.fn() } as any;
             const properties = createMockProperties({
                 createSite: vi.fn().mockResolvedValue(undefined), // Returns undefined

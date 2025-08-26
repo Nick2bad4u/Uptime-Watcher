@@ -140,7 +140,17 @@ describe("Theme Components - Missing Coverage", () => {
     });
 
     describe("StatusIndicator Component", () => {
-        it("should render with default props", () => {
+        it("should render with default props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<StatusIndicator status="up" />);
 
             const indicator = document.querySelector(
@@ -149,7 +159,17 @@ describe("Theme Components - Missing Coverage", () => {
             expect(indicator).toBeInTheDocument();
         });
 
-        it("should render with custom className", () => {
+        it("should render with custom className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<StatusIndicator status="down" className="custom-class" />);
 
             const indicator = document.querySelector(
@@ -158,7 +178,17 @@ describe("Theme Components - Missing Coverage", () => {
             expect(indicator).toHaveClass("custom-class");
         });
 
-        it("should render without text by default", () => {
+        it("should render without text by default", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<StatusIndicator status="up" />);
 
             const text = document.querySelector(
@@ -167,7 +197,17 @@ describe("Theme Components - Missing Coverage", () => {
             expect(text).not.toBeInTheDocument();
         });
 
-        it("should render with text when showText is true", () => {
+        it("should render with text when showText is true", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<StatusIndicator status="up" showText />);
 
             const text = document.querySelector(
@@ -177,7 +217,17 @@ describe("Theme Components - Missing Coverage", () => {
             expect(text).toHaveTextContent("Up");
         });
 
-        it("should render with different status values", () => {
+        it("should render with different status values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const statuses = [
                 "up",
                 "down",
@@ -199,7 +249,17 @@ describe("Theme Components - Missing Coverage", () => {
             }
         });
 
-        it("should show text and status together", () => {
+        it("should show text and status together", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
             render(<StatusIndicator status="pending" showText />);
 
             const indicator = document.querySelector(
@@ -214,7 +274,17 @@ describe("Theme Components - Missing Coverage", () => {
             expect(text).toHaveTextContent("Pending");
         });
 
-        it("should render with different size variants", () => {
+        it("should render with different size variants", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const sizes = [
                 "sm",
                 "md",
@@ -235,7 +305,17 @@ describe("Theme Components - Missing Coverage", () => {
     });
 
     describe("Edge Cases and Conditional Branches", () => {
-        it("should handle empty string className", () => {
+        it("should handle empty string className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<StatusIndicator status="up" className="" />);
 
             const indicator = document.querySelector(
@@ -246,7 +326,17 @@ describe("Theme Components - Missing Coverage", () => {
     });
 
     describe("ThemedBadge - Additional Coverage", () => {
-        it("should render with all size variants", () => {
+        it("should render with all size variants", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const sizes = [
                 "xs",
                 "sm",
@@ -264,7 +354,17 @@ describe("Theme Components - Missing Coverage", () => {
             }
         });
 
-        it("should render with all variant types", () => {
+        it("should render with all variant types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const variants = [
                 "primary",
                 "secondary",
@@ -286,7 +386,17 @@ describe("Theme Components - Missing Coverage", () => {
     });
 
     describe("ThemedInput - Additional Coverage", () => {
-        it("should render with different types", () => {
+        it("should render with different types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const types = [
                 "text",
                 "email",
@@ -303,14 +413,34 @@ describe("Theme Components - Missing Coverage", () => {
             }
         });
 
-        it("should handle disabled state", () => {
+        it("should handle disabled state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedInput disabled />);
 
             const input = document.querySelector("input");
             expect(input).toBeDisabled();
         });
 
-        it("should handle required state", () => {
+        it("should handle required state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedInput required />);
 
             const input = document.querySelector("input");
@@ -319,7 +449,17 @@ describe("Theme Components - Missing Coverage", () => {
     });
 
     describe("Complex Input Combinations and Props", () => {
-        it("should handle various boolean prop combinations", () => {
+        it("should handle various boolean prop combinations", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const combinations = [
                 { disabled: true, required: true },
                 { disabled: false, required: true },
@@ -336,28 +476,68 @@ describe("Theme Components - Missing Coverage", () => {
     });
 
     describe("ThemedProgress - Coverage", () => {
-        it("should render with default props", () => {
+        it("should render with default props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedProgress value={50} />);
 
             const progress = document.querySelector(".themed-progress");
             expect(progress).toBeInTheDocument();
         });
 
-        it("should render with custom className", () => {
+        it("should render with custom className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedProgress value={75} className="custom-progress" />);
 
             const progress = document.querySelector(".themed-progress");
             expect(progress).toHaveClass("custom-progress");
         });
 
-        it("should handle edge values", () => {
+        it("should handle edge values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedProgress value={0} />);
 
             const progress = document.querySelector(".themed-progress");
             expect(progress).toBeInTheDocument();
         });
 
-        it("should handle max value", () => {
+        it("should handle max value", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedProgress value={100} max={100} />);
 
             const progress = document.querySelector(".themed-progress");
@@ -366,7 +546,17 @@ describe("Theme Components - Missing Coverage", () => {
     });
 
     describe("ThemedSelect - Coverage", () => {
-        it("should render with options", () => {
+        it("should render with options", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedSelect>
                     <option value="1">Option 1</option>
@@ -378,7 +568,17 @@ describe("Theme Components - Missing Coverage", () => {
             expect(select).toBeInTheDocument();
         });
 
-        it("should handle disabled state", () => {
+        it("should handle disabled state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedSelect disabled>
                     <option value="1">Option 1</option>
@@ -389,7 +589,17 @@ describe("Theme Components - Missing Coverage", () => {
             expect(select).toBeDisabled();
         });
 
-        it("should handle required state", () => {
+        it("should handle required state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.additional-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedSelect required>
                     <option value="1">Option 1</option>

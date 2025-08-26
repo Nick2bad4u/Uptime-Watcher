@@ -79,7 +79,17 @@ describe("AddSiteForm Component", () => {
         vi.clearAllMocks();
     });
 
-    it("should render the form with basic elements", () => {
+    it("should render the form with basic elements", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<AddSiteForm />);
 
         // Check for the presence of key elements
@@ -87,7 +97,17 @@ describe("AddSiteForm Component", () => {
         expect(screen.getByText(/monitor type/i)).toBeInTheDocument();
     });
 
-    it("should display different mode options", () => {
+    it("should display different mode options", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<AddSiteForm />);
 
         // Look for radio buttons or mode selection elements
@@ -95,7 +115,17 @@ describe("AddSiteForm Component", () => {
         expect(radioButtons.length).toBeGreaterThan(0);
     });
 
-    it("should show monitor type selection", () => {
+    it("should show monitor type selection", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
         render(<AddSiteForm />);
 
         // Check for monitor type select element specifically

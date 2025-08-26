@@ -16,7 +16,17 @@ vi.mock("../components/Dashboard/SiteCard/components/MetricCard", () => ({
 }));
 
 describe("SiteCardMetrics", () => {
-    it("renders all metrics with correct values", () => {
+    it("renders all metrics with correct values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardMetrics", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardMetrics", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
         render(
             <SiteCardMetrics
                 status="up"
@@ -56,7 +66,17 @@ describe("SiteCardMetrics", () => {
         ).toHaveAttribute("data-value", "UNKNOWN");
     });
 
-    it("renders correct number of metric cards", () => {
+    it("renders correct number of metric cards", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardMetrics", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardMetrics", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
         render(
             <SiteCardMetrics
                 status="up"
@@ -68,7 +88,17 @@ describe("SiteCardMetrics", () => {
         expect(screen.getAllByTestId("metric-card")).toHaveLength(4);
     });
 
-    it("renders uptime with percent sign", () => {
+    it("renders uptime with percent sign", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardMetrics", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardMetrics", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
         render(
             <SiteCardMetrics
                 status="up"

@@ -60,24 +60,64 @@ describe("Main Entry Point", () => {
         vi.resetModules();
     });
 
-    it("should have React available", async () => {
+    it("should have React available", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
         const React = await import("react");
         expect(React).toBeDefined();
         expect(React.StrictMode).toBeDefined();
     });
 
-    it("should have ReactDOM available", async () => {
+    it("should have ReactDOM available", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
         const ReactDOM = await import("react-dom/client");
         expect(ReactDOM).toBeDefined();
         expect(ReactDOM.default.createRoot).toBeDefined();
     });
 
-    it("should have App component available", async () => {
+    it("should have App component available", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
         const AppModule = await import("../App");
         expect(AppModule.default).toBeDefined();
     });
 
-    it("should initialize app when root element exists", async () => {
+    it("should initialize app when root element exists", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Initialization", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Initialization", "type");
+
         (document.getElementById as any).mockReturnValue(mockElement);
 
         // Dynamically import main.tsx to trigger initialization
@@ -88,7 +128,17 @@ describe("Main Entry Point", () => {
         expect(mockRender).toHaveBeenCalled();
     });
 
-    it("should handle error when root element not found", async () => {
+    it("should handle error when root element not found", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
         const consoleErrorSpy = vi
             .spyOn(console, "error")
             .mockImplementation(() => {});
@@ -105,7 +155,17 @@ describe("Main Entry Point", () => {
         consoleErrorSpy.mockRestore();
     });
 
-    it("should use getElementById for root element lookup", async () => {
+    it("should use getElementById for root element lookup", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
         (document.getElementById as any).mockReturnValue(mockElement);
 
         await import("../main");
@@ -114,7 +174,17 @@ describe("Main Entry Point", () => {
         expect(document.getElementById).toHaveBeenCalledTimes(1);
     });
 
-    it("should render App component within React.StrictMode", async () => {
+    it("should render App component within React.StrictMode", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: main", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
         (document.getElementById as any).mockReturnValue(mockElement);
 
         await import("../main");
