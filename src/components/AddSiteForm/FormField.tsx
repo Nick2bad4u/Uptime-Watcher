@@ -37,6 +37,8 @@
  * @public
  */
 
+import type { FormFieldBaseProperties } from "@shared/types/componentProps";
+
 import React from "react";
 
 import ThemedText from "../../theme/components/ThemedText";
@@ -46,19 +48,9 @@ import ThemedText from "../../theme/components/ThemedText";
  *
  * @public
  */
-export interface FormFieldProperties {
+export interface FormFieldProperties extends FormFieldBaseProperties {
     /** Form input element(s) to wrap */
     readonly children: React.ReactNode;
-    /** Error message to display below the field */
-    readonly error?: string;
-    /** Help text to show below the field when no error is present */
-    readonly helpText?: string;
-    /** Unique identifier for the form field, used for accessibility */
-    readonly id: string;
-    /** Label text to display above the field */
-    readonly label: string;
-    /** Whether the field is required (shows asterisk in label) */
-    readonly required?: boolean;
 }
 
 /**

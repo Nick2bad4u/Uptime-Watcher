@@ -100,13 +100,15 @@ export interface StateProperties {
 }
 
 /**
- * Form field properties for input components.
+ * Base form field properties for input components.
  *
  * @remarks
  * These props provide the essential form field functionality including
- * labeling, validation, and help text support.
+ * labeling, validation, and help text support. This serves as a base
+ * interface that can be extended by components requiring additional
+ * properties like children.
  */
-export interface FormFieldProperties {
+export interface FormFieldBaseProperties {
     /** Unique identifier for the field (required for accessibility) */
     readonly id: string;
     /** Label text to display for the field */
@@ -214,7 +216,7 @@ export interface StandardButtonProperties
 export interface StandardInputProperties
     extends CoreComponentProperties,
         AccessibilityProperties,
-        FormFieldProperties {
+        FormFieldBaseProperties {
     /** Current input value */
     readonly value: string;
     /** Value change handler */
@@ -239,7 +241,7 @@ export interface StandardInputProperties
 export interface StandardSelectProperties
     extends CoreComponentProperties,
         AccessibilityProperties,
-        FormFieldProperties {
+        FormFieldBaseProperties {
     /** Currently selected value */
     readonly value: string;
     /** Selection change handler */
@@ -405,7 +407,7 @@ export type RequireProperties<T, K extends keyof T> = T & Required<Pick<T, K>>;
  *
  * ```typescript
  * type OptionalLabelProps = OptionalProperties<
- *     FormFieldProperties,
+ *     FormFieldBaseProperties,
  *     "label"
  * >;
  * ```

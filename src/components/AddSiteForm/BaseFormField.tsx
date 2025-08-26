@@ -29,6 +29,7 @@
  * ```
  */
 
+import type { FormFieldBaseProperties } from "@shared/types/componentProps";
 import type { ReactElement, ReactNode } from "react";
 
 import { createAriaLabel, getAriaDescribedBy } from "./form-utils";
@@ -51,19 +52,9 @@ export interface AriaProperties {
  *
  * @public
  */
-export interface BaseFormFieldProperties {
+export interface BaseFormFieldProperties extends FormFieldBaseProperties {
     /** Render function that receives ARIA properties */
     readonly children: (ariaProps: AriaProperties) => ReactNode;
-    /** Error message to display below the field */
-    readonly error?: string;
-    /** Help text to show below the field when no error is present */
-    readonly helpText?: string;
-    /** Unique identifier for the field */
-    readonly id: string;
-    /** Label text to display above the field */
-    readonly label: string;
-    /** Whether the field is required */
-    readonly required?: boolean;
 }
 
 /**
