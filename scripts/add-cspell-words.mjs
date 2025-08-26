@@ -244,7 +244,9 @@ function isValidWord(word, config) {
 
     // Check against exclusion patterns
     for (const pattern of config.excludePatterns) {
-        if (new RegExp(pattern, "i").test(word)) {
+        // Use case-insensitive matching for domain patterns, but case-sensitive for caps constants
+        const flags = pattern.includes('(com|org|net|edu|gov)') || pattern.includes('(http|https|ftp|ssh)') ? "i" : "";
+        if (new RegExp(pattern, flags).test(word)) {
             return false;
         }
     }
@@ -326,7 +328,7 @@ async function runCSpell(config, logger) {
         "cspell",
         `"${config.filePatterns.join(",")}"`,
         "--gitignore",
-        "--config .cspell.json",
+        "--config cspell.json",
         "--words-only",
         "--unique",
         "--no-progress",
@@ -549,6 +551,6 @@ async function main() {
 }
 
 // Run the script if executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
     main().catch(console.error);
 }

@@ -59,30 +59,30 @@ jobs:
               shell: pwsh
               run: |
                   echo "Generating changelogs with git-cliff..."
-                  npx git-cliff --config cliff.toml --verbose --output CHANGELOG.md
+                  npx git-cliff --config config/tools/cliff.toml --verbose --output CHANGELOG.md
                   Get-ChildItem -Name
                   Push-Location .
-                  npx git-cliff --config ../cliff.toml --verbose --output CHANGELOG.md
+                  npx git-cliff --config ../config/tools/cliff.toml --verbose --output CHANGELOG.md
                   Get-ChildItem -Name
                   Pop-Location
                   Push-Location .icons
-                  npx git-cliff --config ../../cliff.toml --verbose --output CHANGELOG.md
+                  npx git-cliff --config ../../config/tools/cliff.toml --verbose --output CHANGELOG.md
                   Get-ChildItem -Name
                   Pop-Location
                   Push-Location .libs
-                  npx git-cliff --config ../../cliff.toml --verbose --output CHANGELOG.md
+                  npx git-cliff --config ../../config/tools/cliff.toml --verbose --output CHANGELOG.md
                   Get-ChildItem -Name
                   Pop-Location
                   Push-Location .screenshots
-                  npx git-cliff --config ../../cliff.toml --verbose --output CHANGELOG.md
+                  npx git-cliff --config ../../config/tools/cliff.toml --verbose --output CHANGELOG.md
                   Get-ChildItem -Name
                   Pop-Location
                   Push-Location .tests
-                  npx git-cliff --config ../../cliff.toml --verbose --output CHANGELOG.md
+                  npx git-cliff --config ../../config/tools/cliff.toml --verbose --output CHANGELOG.md
                   Get-ChildItem -Name
                   Pop-Location
                   Push-Location .utils
-                  npx git-cliff --config ../../cliff.toml --verbose --output CHANGELOG.md
+                  npx git-cliff --config ../../config/tools/cliff.toml --verbose --output CHANGELOG.md
                   Get-ChildItem -Name
                   Pop-Location
 

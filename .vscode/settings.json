@@ -84,6 +84,8 @@
         "**/report/**": true,
         "**/docs/docusaurus/docs/**": true,
         "**/docs/docusaurus/build/**": true,
+        "**/docs/docusaurus/node_modules/**": true,
+        "**/docs/docusaurus/.docusaurus/**": true,
         "**/dist-bench/**": true
     },
     "files.watcherExclude": {
@@ -97,15 +99,17 @@
         "**/dist-shared/**": true,
         "**/html/**": true,
         "**/report/**": true,
-        "**/docs/Packages/**": true,
-        "**/docs/Archive/**": true,
         "**/docs/docusaurus/docs/**": true,
-        "**/docs/docusaurus/build/**": true
+        "**/docs/docusaurus/build/**": true,
+        "**/docs/docusaurus/node_modules/**": true,
+        "**/docs/docusaurus/.docusaurus/**": true
     },
     "search.exclude": {
         "**/docs/Packages/**": true,
         "**/docs/Archive/**": true,
         "**/docs/docusaurus/docs/**": true,
+        "**/docs/docusaurus/node_modules/**": true,
+        "**/docs/docusaurus/.docusaurus/**": true,
         "**/.husky/**": true,
         "**/coverage/**": true,
         "**/dist-electron/**": true,
@@ -144,13 +148,5 @@
         "css",
         "postcss",
         "scss"
-    ],
-    "typescript.check.npmIsInstalled": true,
-    "typescript.disableAutomaticTypeAcquisition": false,
-    "typescript.preferences.includeCompletionsForImportStatements": false,
-    "typescript.preferences.includeCompletionsForModuleExports": false,
-    "typescript.preferences.includeCompletionsWithLowerCaseLetters": false,
-    "typescript.preferences.includePackageJsonAutoImports": "true",
-    "typescript.preferences.includeProjectReferencesForAutoImports": "on",
-    "typescript.suggest.autoImports": true
+    ]
 }

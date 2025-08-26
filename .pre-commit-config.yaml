@@ -119,7 +119,7 @@ repos:
       rev: 0.7.21
     # Markdown linting
     - hooks:
-          - args: ["--style", ".markdownlint.yml"]
+          - args: ["--style", "config/linting/markdownlint.json"]
             exclude: |
                 (?x)^(
                     CHANGELOG\.md$|

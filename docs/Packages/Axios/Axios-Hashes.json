@@ -1,16 +1,16 @@
 {
+  "Axios-handling-errors.md": "21c2c4eb3eeb13a50ae303ea686184cee63f9ebdc9eb58e13811cf1e9c9ddd4a",
+  "Axios-intro.md": "e936fcc8363e8ddae977ac8afe81ac5b28d277fcf45e3d741d5575bf9396222e",
   "Axios-example.md": "89996eb8df779ee4fce98f2165e462390e1ce346341da9995ea18ce5e007efbc",
-  "Axios-res-schema.md": "44b43db2423c88c67d689a8cb0356a7dc4dfaedab9ad2655eae9a868f06f2c23",
-  "Axios-api-intro.md": "ca1fcaa063a606d4f7ff1104a5b6ec31e290502c20d41821b69b2c3f44190177",
-  "Axios-intro.md": "c399423e65771ec96f78620bc1fbf287ecf9a6d9aea371b32b654d59f9693fc4",
   "Axios-interceptors.md": "a03e8528c9a2a9bec42d277c40c21013fe9fb37e22b0120c7653584bfecf125f",
   "Axios-instance.md": "6cb65d5107a7e73b4cd2e43581e3b2d207be6343c77d53f5d455c17b8e60b6ac",
-  "Axios-post-example.md": "94afca6a129cac6ccd1d280fe0f1d0357a227f68fee49c1d8e0289ee19cd491a",
-  "Axios-cancellation.md": "31149a20343abcded144516a808da8d16da9654493ef143a4db28390c83b2e9c",
-  "Axios-handling-errors.md": "21c2c4eb3eeb13a50ae303ea686184cee63f9ebdc9eb58e13811cf1e9c9ddd4a",
+  "Axios-config-defaults.md": "b6735b9806a56c1d9b2348cd2f73fcf7b32586a89c45f485bc68f426ae04b694",
+  "Axios-res-schema.md": "44b43db2423c88c67d689a8cb0356a7dc4dfaedab9ad2655eae9a868f06f2c23",
   "Axios-req-config.md": "c0a4c61dc22eb05c45e2e4c1fc25683dee6c46e751a89c7db60a6e0fb539cb80",
-  "Axios-notes.md": "838f18a95c41c827479b3d3d15d04edf2feb7965c237a29c8799a47480a8fd94",
-  "Axios-multipart.md": "f84936519b80b96a9f33d6e51566c5965b8b7721847137cff7967a53a6231bef",
+  "Axios-post-example.md": "94afca6a129cac6ccd1d280fe0f1d0357a227f68fee49c1d8e0289ee19cd491a",
+  "Axios-api-intro.md": "ca1fcaa063a606d4f7ff1104a5b6ec31e290502c20d41821b69b2c3f44190177",
   "Axios-urlencoded.md": "c10f042429f700827b8fbce6637bcd0efce23117cd0c902fab2159b70b007c89",
-  "Axios-config-defaults.md": "8f937d1f78b9d3fd4a31d062f20285f14220ed6e9321d12ccda60a7464a164ef"
+  "Axios-cancellation.md": "31149a20343abcded144516a808da8d16da9654493ef143a4db28390c83b2e9c",
+  "Axios-notes.md": "838f18a95c41c827479b3d3d15d04edf2feb7965c237a29c8799a47480a8fd94",
+  "Axios-multipart.md": "f84936519b80b96a9f33d6e51566c5965b8b7721847137cff7967a53a6231bef"
 }

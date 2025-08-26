@@ -1,0 +1,15 @@
+# Biome ignore file - moved from root with config reorganization
+# Standard ignore patterns
+node_modules/
+dist/
+dist-electron/
+coverage/
+release/
+.git/
+.cache/
+html/
+report/
+docs/
+assets/
+icons/
+benchmarks/

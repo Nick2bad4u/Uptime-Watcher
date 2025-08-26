@@ -7,7 +7,7 @@ node_modules/
 release/
 dist-electron/
 docs/Validator.md
-.markdownlintignore
+config/linting/markdownlintignore
 .github/prompts/*.md
 .github/prompts/ConsistencyCheck.prompt.md
 LICENSE

@@ -97,7 +97,7 @@ export interface BadButtonProperties {
 
 ```typescript
 // ✅ Form Components (high-level, value-focused)
-export interface FormFieldProperties {
+export interface FormFieldBaseProperties {
  readonly onChange: (value: string) => void;
 }
 
@@ -153,7 +153,7 @@ export interface AccessibilityProperties {
 #### **Form Props**
 
 ```typescript
-export interface FormFieldProperties {
+export interface FormFieldBaseProperties {
  /** Unique identifier for the field */
  readonly id: string;
  /** Field label text */
@@ -418,7 +418,7 @@ export default ComponentName;
 import React, { useCallback } from "react";
 
 export interface FormComponentProperties
- extends FormFieldProperties,
+ extends FormFieldBaseProperties,
   CoreComponentProperties {
  /** Current value */
  readonly value: string;
@@ -530,7 +530,7 @@ export default FormComponent;
    interface ButtonProps {
     onClick?: () => void;
    }
-   
+
    // After
    interface ButtonProperties {
     readonly onClick?: () => void;
@@ -542,7 +542,7 @@ export default FormComponent;
    ```typescript
    // Before
    readonly onClick?: (e?: React.MouseEvent) => void;
-   
+
    // After
    readonly onClick?: () => void;
    // OR (if event needed)
@@ -557,7 +557,7 @@ export default FormComponent;
     title: string;
     disabled?: boolean;
    }
-   
+
    // After
    interface ComponentProperties {
     readonly title: string;

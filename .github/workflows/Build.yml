@@ -818,32 +818,28 @@ jobs:
                   echo "Available files: $(ls -la)"
 
                   echo "Generating root CHANGELOG.md..."
-                  npx git-cliff --config cliff.toml --output CHANGELOG.md --verbose
+                  npx git-cliff --config config/tools/cliff.toml --output CHANGELOG.md --verbose
                   echo "Root CHANGELOG.md generated, size: $(stat -c%s CHANGELOG.md 2>/dev/null || echo 'file not found')"
 
-                  echo "Generating . CHANGELOG.md..."
-                  cd . && npx git-cliff --config ../cliff.toml --output CHANGELOG.md --verbose && cd ..
-                  echo ". CHANGELOG.md generated, size: $(stat -c%s .CHANGELOG.md 2>/dev/null || echo 'file not found')"
+                  echo "Generating src CHANGELOG.md..."
+                  cd src && npx git-cliff --config ../config/tools/cliff.toml --output CHANGELOG.md --verbose && cd ..
+                  echo "src CHANGELOG.md generated, size: $(stat -c%s src/CHANGELOG.md 2>/dev/null || echo 'file not found')"
 
-                  echo "Generating .icons CHANGELOG.md..."
-                  cd .icons && npx git-cliff --config ../../cliff.toml --output CHANGELOG.md --verbose && cd ../..
-                  echo "icons CHANGELOG.md generated, size: $(stat -c%s .icons/CHANGELOG.md 2>/dev/null || echo 'file not found')"
+                  echo "Generating shared CHANGELOG.md..."
+                  cd shared && npx git-cliff --config ../config/tools/cliff.toml --output CHANGELOG.md --verbose && cd ..
+                  echo "shared CHANGELOG.md generated, size: $(stat -c%s shared/CHANGELOG.md 2>/dev/null || echo 'file not found')"
 
-                  echo "Generating .libs CHANGELOG.md..."
-                  cd .libs && npx git-cliff --config ../../cliff.toml --output CHANGELOG.md --verbose && cd ../..
-                  echo "libs CHANGELOG.md generated, size: $(stat -c%s .libs/CHANGELOG.md 2>/dev/null || echo 'file not found')"
+                  echo "Generating docs CHANGELOG.md..."
+                  cd docs && npx git-cliff --config ../config/tools/cliff.toml --output CHANGELOG.md --verbose && cd ..
+                  echo "docs CHANGELOG.md generated, size: $(stat -c%s docs/CHANGELOG.md 2>/dev/null || echo 'file not found')"
 
-                  echo "Generating .screenshots CHANGELOG.md..."
-                  cd .screenshots && npx git-cliff --config ../../cliff.toml --output CHANGELOG.md --verbose && cd ../..
-                  echo "screenshots CHANGELOG.md generated, size: $(stat -c%s .screenshots/CHANGELOG.md 2>/dev/null || echo 'file not found')"
+                  echo "Generating config CHANGELOG.md..."
+                  cd config && npx git-cliff --config ../../config/tools/cliff.toml --output CHANGELOG.md --verbose && cd ..
+                  echo "screenshots CHANGELOG.md generated, size: $(stat -c%s config/CHANGELOG.md 2>/dev/null || echo 'file not found')"
 
-                  echo "Generating .tests CHANGELOG.md..."
-                  cd .tests && npx git-cliff --config ../../cliff.toml --output CHANGELOG.md --verbose && cd ../..
-                  echo "tests CHANGELOG.md generated, size: $(stat -c%s .tests/CHANGELOG.md 2>/dev/null || echo 'file not found')"
-
-                  echo "Generating .utils CHANGELOG.md..."
-                  cd .utils && npx git-cliff --config ../../cliff.toml --output CHANGELOG.md --verbose && cd ../..
-                  echo "utils CHANGELOG.md generated, size: $(stat -c%s .utils/CHANGELOG.md 2>/dev/null || echo 'file not found')"
+                  echo "Generating electron CHANGELOG.md..."
+                  cd electron && npx git-cliff --config ../../config/tools/cliff.toml --output CHANGELOG.md --verbose && cd ..
+                  echo "utils CHANGELOG.md generated, size: $(stat -c%s electron/CHANGELOG.md 2>/dev/null || echo 'file not found')"
 
                   echo "All changelog generation completed."
                   echo "Final directory listing:"
@@ -915,7 +911,7 @@ jobs:
                     echo "- \`/.CHANGELOG.md\`"
                     echo "- \`/.icons/CHANGELOG.md\`"
                     echo "- \`/.libs/CHANGELOG.md\`"
-                    echo "- \`/.screenshots/CHANGELOG.md\`"
-                    echo "- \`/.tests/CHANGELOG.md\`"
-                    echo "- \`/.utils/CHANGELOG.md\`"
+                    echo "- \`/config/CHANGELOG.md\`"
+                    echo "- \`/docs/CHANGELOG.md\`"
+                    echo "- \`/electron/CHANGELOG.md\`"
                   } >> "$GITHUB_STEP_SUMMARY"
