@@ -26,6 +26,8 @@
  * @public
  */
 
+import type { CoreComponentProperties } from "@shared/types/componentProps";
+
 import React, { useCallback } from "react";
 
 import ThemedButton from "../../../theme/components/ThemedButton";
@@ -40,11 +42,10 @@ import ThemedButton from "../../../theme/components/ThemedButton";
  *
  * @public
  */
-export interface SiteMonitoringButtonProperties {
+export interface SiteMonitoringButtonProperties
+    extends CoreComponentProperties {
     /** Whether all monitors are currently running - determines button state */
     readonly allMonitorsRunning: boolean;
-    /** Additional CSS classes to apply to the button */
-    readonly className?: string;
     /** Whether to show compact text (for smaller spaces) */
     readonly compact?: boolean;
     /** Whether any operation is currently loading - disables button */

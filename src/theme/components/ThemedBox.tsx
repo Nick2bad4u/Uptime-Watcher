@@ -9,7 +9,11 @@
  * accessibility attributes when used as an interactive control.
  */
 
-import type { EventHandlers } from "@shared/types/componentProps";
+import type {
+    AccessibilityProperties,
+    CoreComponentProperties,
+    EventHandlers,
+} from "@shared/types/componentProps";
 
 import React from "react";
 
@@ -34,17 +38,9 @@ import { CSS_CLASSES } from "./types";
  *
  * @public
  */
-export interface ThemedBoxProperties {
-    /**
-     * Accessible label forwarded to the rendered element.
-     *
-     * @remarks
-     * This maps the HTML attribute `aria-label` to a JavaScript-safe name in
-     * JSX consumers. It is used automatically when the component is interactive
-     * (when `onClick` is provided).
-     */
-    readonly "aria-label"?: string;
-
+export interface ThemedBoxProperties
+    extends AccessibilityProperties,
+        CoreComponentProperties {
     /**
      * Element type to render (for example `div`, `button`, `section`).
      *
@@ -58,16 +54,6 @@ export interface ThemedBoxProperties {
      * @defaultValue false
      */
     readonly border?: boolean;
-
-    /**
-     * Child nodes to render inside the box.
-     */
-    readonly children: React.ReactNode;
-
-    /**
-     * Additional CSS class names appended to the component's generated classes.
-     */
-    readonly className?: string;
 
     /**
      * Click handler for interactive usage.

@@ -43,6 +43,8 @@
  * @public
  */
 
+import type { FormFieldBaseProperties } from "@shared/types/componentProps";
+
 import React, { useCallback } from "react";
 
 import ThemedText from "../../theme/components/ThemedText";
@@ -53,25 +55,15 @@ import { BaseFormField } from "./BaseFormField";
  *
  * @public
  */
-export interface RadioGroupProperties {
+export interface RadioGroupProperties extends FormFieldBaseProperties {
     /** Whether the radio group is disabled */
     readonly disabled?: boolean;
-    /** Error message to display below the radio group */
-    readonly error?: string;
-    /** Help text to show below the field when no error is present */
-    readonly helpText?: string;
-    /** Unique identifier for the radio group, used for accessibility */
-    readonly id: string;
-    /** Label text to display above the radio group */
-    readonly label: string;
     /** Name attribute for radio inputs (should be unique within the form) */
     readonly name: string;
     /** Callback function triggered when selection changes */
     readonly onChange: (value: string) => void;
     /** Array of radio options to display */
     readonly options: RadioOption[];
-    /** Whether a selection is required */
-    readonly required?: boolean;
     /** Currently selected value */
     readonly value: string;
 }

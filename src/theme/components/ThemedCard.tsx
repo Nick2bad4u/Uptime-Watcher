@@ -54,7 +54,10 @@
  * @public
  */
 
-import type { EventHandlers } from "@shared/types/componentProps";
+import type {
+    CoreComponentProperties,
+    EventHandlers,
+} from "@shared/types/componentProps";
 
 import React from "react";
 
@@ -71,11 +74,7 @@ import ThemedText from "./ThemedText";
  *
  * @public
  */
-export interface ThemedCardProperties {
-    /** Content to be rendered inside the card */
-    readonly children: React.ReactNode;
-    /** Additional CSS classes to apply to the card */
-    readonly className?: string;
+export interface ThemedCardProperties extends CoreComponentProperties {
     /** Whether the card should have clickable styling and cursor pointer */
     readonly clickable?: boolean;
     /** Whether the card should have hover effects */

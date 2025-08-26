@@ -1,4 +1,7 @@
-import type { EventHandlers } from "@shared/types/componentProps";
+import type {
+    CoreComponentProperties,
+    EventHandlers,
+} from "@shared/types/componentProps";
 
 import React from "react";
 
@@ -11,11 +14,7 @@ import ThemedButton from "./ThemedButton";
  *
  * @public
  */
-export interface ThemedIconButtonProperties {
-    /** Additional CSS classes to apply to the component */
-    readonly className?: string;
-    /** Whether the button is disabled */
-    readonly disabled?: boolean;
+export interface ThemedIconButtonProperties extends CoreComponentProperties {
     /** Icon element to display in the button */
     readonly icon: React.ReactNode;
     /** Custom color for the icon */

@@ -43,6 +43,7 @@
  */
 
 import type { MonitorStatus } from "@shared/types";
+import type { CoreComponentProperties } from "@shared/types/componentProps";
 
 import React from "react";
 
@@ -54,9 +55,7 @@ import ThemedText from "../../theme/components/ThemedText";
  *
  * @public
  */
-export interface StatusBadgeProperties {
-    /** Additional CSS classes */
-    readonly className?: string;
+export interface StatusBadgeProperties extends CoreComponentProperties {
     /** Optional custom formatter for label and status display */
     readonly formatter?: (label: string, status: MonitorStatus) => string;
     /**

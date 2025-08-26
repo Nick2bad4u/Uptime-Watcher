@@ -4,6 +4,7 @@
  */
 
 import type { SiteStatus } from "@shared/types";
+import type { CoreComponentProperties } from "@shared/types/componentProps";
 import type { JSX } from "react/jsx-runtime";
 
 import React, { useMemo } from "react";
@@ -16,9 +17,7 @@ import { useTheme } from "../useTheme";
  *
  * @public
  */
-export interface StatusIndicatorProperties {
-    /** Additional CSS classes to apply to the component */
-    readonly className?: string;
+export interface StatusIndicatorProperties extends CoreComponentProperties {
     /** Whether to display status text alongside the indicator */
     readonly showText?: boolean;
     /** Size variant for the status indicator */

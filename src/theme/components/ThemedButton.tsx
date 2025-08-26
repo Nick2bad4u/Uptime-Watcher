@@ -51,7 +51,11 @@
  * @public
  */
 
-import type { EventHandlers } from "@shared/types/componentProps";
+import type {
+    ComponentProperties,
+    EventHandlers,
+    StandardButtonProperties,
+} from "@shared/types/componentProps";
 
 import React, { useCallback } from "react";
 
@@ -65,41 +69,17 @@ import { CSS_CLASSES } from "./types";
  *
  * @public
  */
-export interface ThemedButtonProperties {
-    /**
-     * Accessible label for screen readers (especially useful for icon-only
-     * buttons)
-     */
-    readonly "aria-label"?: string;
-    /** Button content (text, elements, or other components) */
-    readonly children?: React.ReactNode;
-    /** Additional CSS classes to apply to the button */
-    readonly className?: string;
-    /** Whether the button is disabled and non-interactive */
-    readonly disabled?: boolean;
-    /** Whether the button should expand to full width of its container */
-    readonly fullWidth?: boolean;
-    /** Icon element to display alongside or instead of text */
-    readonly icon?: React.ReactNode;
-    /** Color theme for the icon (uses theme color names) */
-    readonly iconColor?: string;
-    /** Position of the icon relative to the text content */
-    readonly iconPosition?: "left" | "right";
-    /** Whether the button is in a loading state (shows spinner) */
-    readonly loading?: boolean;
-    /** Click handler for the button */
-    readonly onClick?: EventHandlers.ClickWithEvent<HTMLButtonElement>;
-    /** Size variant for the button */
-    readonly size?: ButtonSize;
-    /** Inline styles to apply to the button */
-    readonly style?: React.CSSProperties;
-    /** Tooltip text that appears on hover */
-    readonly title?: string;
-    /** HTML button type attribute */
-    readonly type?: "button" | "reset" | "submit";
-    /** Visual variant for the button styling */
-    readonly variant?: ButtonVariant;
-}
+export type ThemedButtonProperties = ComponentProperties<
+    StandardButtonProperties,
+    {
+        /** Click handler for the button */
+        readonly onClick?: EventHandlers.ClickWithEvent<HTMLButtonElement>;
+        /** Size variant for the button */
+        readonly size?: ButtonSize;
+        /** Visual variant for the button styling */
+        readonly variant?: ButtonVariant;
+    }
+>;
 
 // Default styles object to prevent infinite render loops
 const DEFAULT_THEMED_BOX_STYLE = {};

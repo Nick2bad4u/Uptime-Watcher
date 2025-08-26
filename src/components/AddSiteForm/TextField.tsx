@@ -54,6 +54,8 @@
  * @public
  */
 
+import type { FormFieldBaseProperties } from "@shared/types/componentProps";
+
 import React, { useCallback } from "react";
 
 import ThemedInput from "../../theme/components/ThemedInput";
@@ -64,17 +66,9 @@ import { BaseFormField } from "./BaseFormField";
  *
  * @public
  */
-export interface TextFieldProperties {
+export interface TextFieldProperties extends FormFieldBaseProperties {
     /** Whether the field is disabled */
     readonly disabled?: boolean;
-    /** Error message to display below the input field */
-    readonly error?: string;
-    /** Help text to show below the field when no error is present */
-    readonly helpText?: string;
-    /** Unique identifier for the input field, used for accessibility */
-    readonly id: string;
-    /** Label text to display above the input field */
-    readonly label: string;
     /** Maximum value for number inputs (ignored for text/url types) */
     readonly max?: number;
     /** Minimum value for number inputs (ignored for text/url types) */
@@ -83,8 +77,6 @@ export interface TextFieldProperties {
     readonly onChange: (value: string) => void;
     /** Placeholder text displayed when input is empty */
     readonly placeholder?: string;
-    /** Whether the field is required */
-    readonly required?: boolean;
     /** Input type - text, url, or number */
     readonly type?: "number" | "text" | "url";
     /** Current field value */

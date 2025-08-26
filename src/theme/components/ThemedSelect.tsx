@@ -44,7 +44,11 @@
  * @public
  */
 
-import type { EventHandlers } from "@shared/types/componentProps";
+import type {
+    AccessibilityProperties,
+    CoreComponentProperties,
+    EventHandlers,
+} from "@shared/types/componentProps";
 
 import React from "react";
 
@@ -56,19 +60,9 @@ import { useTheme, useThemeClasses } from "../useTheme";
  *
  * @public
  */
-export interface ThemedSelectProperties {
-    /**
-     * ID of element that describes this select (for error messages, help text)
-     */
-    readonly "aria-describedby"?: string;
-    /** Accessible label for screen readers */
-    readonly "aria-label"?: string;
-    /** Option elements to be displayed in the dropdown */
-    readonly children: React.ReactNode;
-    /** Additional CSS classes to apply to the select */
-    readonly className?: string;
-    /** Whether the select is disabled and non-interactive */
-    readonly disabled?: boolean;
+export interface ThemedSelectProperties
+    extends AccessibilityProperties,
+        CoreComponentProperties {
     /** Unique identifier for the select element */
     readonly id?: string;
     /** Change handler for selection updates */

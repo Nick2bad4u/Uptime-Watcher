@@ -36,6 +36,8 @@
  * @public
  */
 
+import type { CoreComponentProperties } from "@shared/types/componentProps";
+
 import React from "react";
 
 import type { TextAlign, TextSize, TextVariant, TextWeight } from "./types";
@@ -45,13 +47,9 @@ import type { TextAlign, TextSize, TextVariant, TextWeight } from "./types";
  *
  * @public
  */
-export interface ThemedTextProperties {
+export interface ThemedTextProperties extends CoreComponentProperties {
     /** Text alignment within the container */
     readonly align?: TextAlign;
-    /** Text content to be displayed */
-    readonly children: React.ReactNode;
-    /** Additional CSS classes to apply to the text element */
-    readonly className?: string;
     /** Font size variant for the text */
     readonly size?: TextSize;
     /** Inline styles to apply to the text element */

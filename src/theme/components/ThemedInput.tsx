@@ -54,7 +54,11 @@
  * @public
  */
 
-import type { EventHandlers } from "@shared/types/componentProps";
+import type {
+    AccessibilityProperties,
+    CoreComponentProperties,
+    EventHandlers,
+} from "@shared/types/componentProps";
 
 import React from "react";
 
@@ -66,17 +70,9 @@ import { useTheme, useThemeClasses } from "../useTheme";
  *
  * @public
  */
-export interface ThemedInputProperties {
-    /**
-     * ID of element that describes this input (for error messages, help text)
-     */
-    readonly "aria-describedby"?: string;
-    /** Accessible label for screen readers */
-    readonly "aria-label"?: string;
-    /** Additional CSS classes to apply to the input */
-    readonly className?: string;
-    /** Whether the input is disabled and non-interactive */
-    readonly disabled?: boolean;
+export interface ThemedInputProperties
+    extends AccessibilityProperties,
+        CoreComponentProperties {
     /** Unique identifier for the input element */
     readonly id?: string;
     /** Maximum value (for number inputs) or maximum length (for text inputs) */

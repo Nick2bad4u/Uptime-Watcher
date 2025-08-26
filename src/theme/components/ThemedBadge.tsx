@@ -36,6 +36,7 @@
  * @public
  */
 
+import type { CoreComponentProperties } from "@shared/types/componentProps";
 import type React from "react";
 
 import type { BadgeSize, BadgeVariant } from "./types";
@@ -47,11 +48,7 @@ import { useTheme } from "../useTheme";
  *
  * @public
  */
-export interface ThemedBadgeProperties {
-    /** Content to be displayed inside the badge (text, numbers, or elements) */
-    readonly children: React.ReactNode;
-    /** Additional CSS classes to apply to the badge */
-    readonly className?: string;
+export interface ThemedBadgeProperties extends CoreComponentProperties {
     /** Icon element to display alongside the badge content */
     readonly icon?: React.ReactNode;
     /** Color theme for the icon (uses theme color names) */

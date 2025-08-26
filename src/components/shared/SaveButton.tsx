@@ -6,6 +6,8 @@
  * accessibility support. Used throughout forms and settings interfaces.
  */
 
+import type { CoreComponentProperties } from "@shared/types/componentProps";
+
 import React, { useMemo } from "react";
 import { FiSave } from "react-icons/fi";
 
@@ -14,13 +16,9 @@ import ThemedButton from "../../theme/components/ThemedButton";
 /**
  * Props for the SaveButton component
  */
-export interface SaveButtonProps {
+export interface SaveButtonProps extends CoreComponentProperties {
     /** Accessibility label */
     readonly "aria-label"?: string;
-    /** Additional CSS classes */
-    readonly className?: string;
-    /** Whether the button should be disabled */
-    readonly disabled?: boolean;
     /** Whether the save operation is loading */
     readonly isLoading?: boolean;
     /** Click handler for the save action */

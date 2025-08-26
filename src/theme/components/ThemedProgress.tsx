@@ -1,3 +1,5 @@
+import type { CoreComponentProperties } from "@shared/types/componentProps";
+
 import React from "react";
 
 import { useTheme } from "../useTheme";
@@ -8,9 +10,7 @@ import ThemedText from "./ThemedText";
  *
  * @public
  */
-export interface ThemedProgressProperties {
-    /** Additional CSS classes to apply to the component */
-    readonly className?: string;
+export interface ThemedProgressProperties extends CoreComponentProperties {
     /** Optional label text to display with progress */
     readonly label?: string;
     /** Maximum value for progress calculation */

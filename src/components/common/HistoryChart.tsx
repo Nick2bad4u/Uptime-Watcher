@@ -7,6 +7,7 @@
  */
 
 import type { StatusHistory } from "@shared/types";
+import type { CoreComponentProperties } from "@shared/types/componentProps";
 
 import React from "react";
 
@@ -18,9 +19,7 @@ import ThemedText from "../../theme/components/ThemedText";
  *
  * @public
  */
-export interface HistoryChartProps {
-    /** Additional CSS classes */
-    readonly className?: string;
+export interface HistoryChartProps extends CoreComponentProperties {
     /** Array of historical status records to display */
     readonly history: StatusHistory[];
     /** Maximum number of items to display (default: 120) */

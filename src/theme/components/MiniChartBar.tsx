@@ -3,6 +3,7 @@
  */
 
 import type { MonitorStatus, SiteStatus } from "@shared/types";
+import type { CoreComponentProperties } from "@shared/types/componentProps";
 import type { JSX } from "react/jsx-runtime";
 
 import React, { useMemo } from "react";
@@ -15,9 +16,7 @@ import { useTheme } from "../useTheme";
  *
  * @public
  */
-export interface MiniChartBarProperties {
-    /** Additional CSS classes to apply to the component */
-    readonly className?: string;
+export interface MiniChartBarProperties extends CoreComponentProperties {
     /** Response time in milliseconds for the status check */
     readonly responseTime?: number;
     /** Current status of the monitor or site */

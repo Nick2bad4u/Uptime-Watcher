@@ -24,6 +24,7 @@
  * @public
  */
 
+import type { CoreComponentProperties } from "@shared/types/componentProps";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback } from "react";
@@ -34,9 +35,7 @@ import { FiAlertCircle, FiAlertTriangle, FiInfo, FiX } from "react-icons/fi";
  *
  * @public
  */
-export interface ErrorAlertProperties {
-    /** Optional custom className for additional styling */
-    readonly className?: string;
+export interface ErrorAlertProperties extends CoreComponentProperties {
     /** The error message to display */
     readonly message: string;
     /** Optional callback when the error is dismissed */

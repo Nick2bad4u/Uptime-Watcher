@@ -42,6 +42,8 @@
  * @public
  */
 
+import type { FormFieldBaseProperties } from "@shared/types/componentProps";
+
 import React, { useCallback } from "react";
 
 import ThemedSelect from "../../theme/components/ThemedSelect";
@@ -52,25 +54,15 @@ import { BaseFormField } from "./BaseFormField";
  *
  * @public
  */
-export interface SelectFieldProperties {
+export interface SelectFieldProperties extends FormFieldBaseProperties {
     /** Whether the field is disabled */
     readonly disabled?: boolean;
-    /** Error message to display below the select field */
-    readonly error?: string;
-    /** Help text to show below the field when no error is present */
-    readonly helpText?: string;
-    /** Unique identifier for the select field, used for accessibility */
-    readonly id: string;
-    /** Label text to display above the select field */
-    readonly label: string;
     /** Callback function triggered when selection changes */
     readonly onChange: (value: string) => void;
     /** Array of options to display in the dropdown */
     readonly options: SelectOption[];
     /** Placeholder text shown when no option is selected */
     readonly placeholder?: string;
-    /** Whether the field is required */
-    readonly required?: boolean;
     /** Current selected value (string or number) */
     readonly value: number | string;
 }

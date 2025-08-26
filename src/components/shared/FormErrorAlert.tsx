@@ -2,6 +2,8 @@
  * FormErrorAlert component for consistent error display
  */
 
+import type { CoreComponentProperties } from "@shared/types/componentProps";
+
 import React from "react";
 
 import ThemedBox from "../../theme/components/ThemedBox";
@@ -11,9 +13,7 @@ import ThemedText from "../../theme/components/ThemedText";
 /**
  * Props for the FormErrorAlert component
  */
-export interface FormErrorAlertProps {
-    /** Additional CSS classes */
-    readonly className?: string;
+export interface FormErrorAlertProps extends CoreComponentProperties {
     /** Error message to display */
     readonly error: null | string;
     /** Whether dark theme is active */
