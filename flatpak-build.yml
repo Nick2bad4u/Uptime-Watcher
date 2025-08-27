@@ -1,3 +1,4 @@
+# eslint-disable yml/sort-keys -- messes up build
 # Flatpak Application Manifest for Uptime Watcher
 # Modern configuration with enhanced security, sandboxing, and 2025 best practices
 
@@ -9,7 +10,7 @@ runtime-version: "24.08"
 sdk: org.freedesktop.Sdk//24.08
 
 # Electron BaseApp for optimized Electron applications
-base: org.electronjs.Electron2.BaseApp
+base: org.electronjs.Electron2.BaseApp3333333333333333333333333333
 base-version: "24.08"
 
 # Node.js SDK extension for build-time dependencies
