@@ -7,14 +7,68 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[11b13a0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/11b13a0f4f8627f760ccc46be696f63679848dad)...
-[11b13a0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/11b13a0f4f8627f760ccc46be696f63679848dad)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/11b13a0f4f8627f760ccc46be696f63679848dad...11b13a0f4f8627f760ccc46be696f63679848dad))
+[[08bcd12](https://github.com/Nick2bad4u/Uptime-Watcher/commit/08bcd124abd75d9a238ccab5b7ad416567965307)...
+[08bcd12](https://github.com/Nick2bad4u/Uptime-Watcher/commit/08bcd124abd75d9a238ccab5b7ad416567965307)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/08bcd124abd75d9a238ccab5b7ad416567965307...08bcd124abd75d9a238ccab5b7ad416567965307))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 12.9.0 [`(08bcd12)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/08bcd124abd75d9a238ccab5b7ad416567965307)
+
+
+
+
+
+
+## [12.9.0] - 2025-08-26
+
+
+[[3ef6c9d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3ef6c9d834d6341653a114821c866d8d84cdd7bc)...
+[3ab485b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3ab485ba29ad1521ca26d29dadef062d04bfd2bb)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3ef6c9d834d6341653a114821c866d8d84cdd7bc...3ab485ba29ad1521ca26d29dadef062d04bfd2bb))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update actions/ai-inference (#53) [`(19758f1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/19758f12aa5962347f84a841c61f47d9506a8445)
+
+
 - [dependency] Update version 12.8.0 [`(11b13a0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/11b13a0f4f8627f760ccc46be696f63679848dad)
+
+
+
+### 🛠️ Other Changes
+
+- Update copilot-instructions.md [`(e8d367f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e8d367f00e8d742ce719e977fd80e6fe2f9b721a)
+
+
+- Create copilot-instructions.md [`(119ade9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/119ade9b149dca05511fcddbe150a98a4c4cabe3)
+
+
+- +++++++++++++++
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3ef6c9d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3ef6c9d834d6341653a114821c866d8d84cdd7bc)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Migrate shared tests to Vitest globals and update setup
+
+- Replaces legacy Jest context and fail function usage with Vitest's built-in globals in shared and frontend tests.
+- Adds Vitest setup files for test context injection and updates test environment configuration for improved consistency.
+- Removes obsolete Jest types and dependencies from configs and lockfile for leaner dev tooling.
+- Updates TypeScript and ESLint package versions for compatibility with latest Vitest and lint rules.
+- Fixes test reliability by mocking Date.now in timestamp tests for deterministic results.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e12e07b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e12e07ba24a984719bd998388d22a537d05e6199)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v12.8.0 [skip ci] [`(d64f436)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d64f436c8ae2014229e914fa94ac04bc6a524af9)
 
 
 
