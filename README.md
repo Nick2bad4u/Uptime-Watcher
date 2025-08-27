@@ -55,7 +55,7 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 <div align="center">
 
 | 🌐 <strong>Multi-Protocol Monitoring</strong> | 📊 <strong>Real-Time Analytics</strong> | 🔔 <strong>Smart Notifications</strong> |
-|-----------------------------------------------|-----------------------------------------|-----------------------------------------|
+| --------------------------------------------- | --------------------------------------- | --------------------------------------- |
 | HTTP/HTTPS websites &amp; APIs                | Live status updates                     | Desktop alerts for outages              |
 | TCP port connectivity                         | Response time tracking                  | Sound notifications                     |
 | ICMP ping monitoring                          | Historical data visualization           | Custom alert thresholds                 |
@@ -75,7 +75,7 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 ## 📋 **Monitor Types**
 
 | Type           | Purpose                   | Features                                                                              |
-|----------------|---------------------------|---------------------------------------------------------------------------------------|
+| -------------- | ------------------------- | ------------------------------------------------------------------------------------- |
 | **HTTP/HTTPS** | Website & API monitoring  | Status codes, redirects, custom headers, SSL validation                               |
 | **TCP Port**   | Port connectivity testing | Socket connection validation, timeout handling                                        |
 | **ICMP Ping**  | Network reachability      | Packet loss monitoring, latency measurement                                           |
@@ -209,7 +209,7 @@ npm run dist
 <div align="center">
 
 | Requirement              | Version                         | Download                                    |
-|--------------------------|---------------------------------|---------------------------------------------|
+| ------------------------ | ------------------------------- | ------------------------------------------- |
 | <strong>Node.js</strong> | 22.0+ (recommended)             | <a href="https://nodejs.org/">Download</a>  |
 | <strong>npm</strong>     | 11.5.2+ (included with Node.js) | <a href="https://www.npmjs.com/">Docs</a>   |
 | <strong>Git</strong>     | Latest version                  | <a href="https://git-scm.com/">Download</a> |

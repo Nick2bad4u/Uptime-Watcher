@@ -3,8 +3,8 @@
  * components.
  */
 
-import { vi, type Mock } from 'vitest';
-import '@testing-library/jest-dom';
+import { vi, type Mock } from "vitest";
+import "@testing-library/jest-dom";
 
 // Mock ResizeObserver for Chart.js testing
 globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({

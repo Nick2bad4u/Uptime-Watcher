@@ -22,21 +22,25 @@ This script automates the conversion of TypeScript files from `.ts` to `.mts` ex
 ## Usage
 
 ### Basic Migration
+
 ```bash
 node scripts/migrate-to-mts-simple.mjs path/to/file.ts
 ```
 
 ### Preview Changes (Dry Run)
+
 ```bash
 node scripts/migrate-to-mts-simple.mjs path/to/file.ts --dry-run
 ```
 
 ### Skip Backup Creation
+
 ```bash
 node scripts/migrate-to-mts-simple.mjs path/to/file.ts --no-backup
 ```
 
 ### Help
+
 ```bash
 node scripts/migrate-to-mts-simple.mjs --help
 ```
@@ -44,17 +48,20 @@ node scripts/migrate-to-mts-simple.mjs --help
 ## What It Changes
 
 ### ✅ Local Imports (Updated)
+
 - `'./service'` → `'./service.mjs'`
 - `'../types/config.ts'` → `'../types/config.mjs'`
 - `'@shared/utils'` → `'@shared/utils.mjs'`
 - `'@electron/main'` → `'@electron/main.mjs'`
 
 ### ❌ External Imports (Unchanged)
-- `'react'` → `'react'` *(npm package)*
-- `'node:fs'` → `'node:fs'` *(Node.js built-in)*
-- `'lodash'` → `'lodash'` *(npm package)*
+
+- `'react'` → `'react'` _(npm package)_
+- `'node:fs'` → `'node:fs'` _(Node.js built-in)_
+- `'lodash'` → `'lodash'` _(npm package)_
 
 ### Supported Import Syntaxes
+
 ```typescript
 // Standard imports
 import { Service } from './service';           → './service.mjs'
@@ -75,25 +82,27 @@ import config from `./config`;               → `./config.mjs`
 ## Example Migration
 
 **Before (`sample.ts`):**
-```typescript
-import { DatabaseService } from './database/DatabaseService';
-import type { SiteConfig } from '../types/site';
-import { logger } from '@shared/utils/logger';
-import React from 'react';
 
-const helper = await import('./utils/helper');
-export { Type } from './types/common';
+```typescript
+import { DatabaseService } from "./database/DatabaseService";
+import type { SiteConfig } from "../types/site";
+import { logger } from "@shared/utils/logger";
+import React from "react";
+
+const helper = await import("./utils/helper");
+export { Type } from "./types/common";
 ```
 
 **After (`sample.mts`):**
-```typescript
-import { DatabaseService } from './database/DatabaseService.mjs';
-import type { SiteConfig } from '../types/site.mjs';
-import { logger } from '@shared/utils/logger.mjs';
-import React from 'react';
 
-const helper = await import('./utils/helper.mjs');
-export { Type } from './types/common.mjs';
+```typescript
+import { DatabaseService } from "./database/DatabaseService.mjs";
+import type { SiteConfig } from "../types/site.mjs";
+import { logger } from "@shared/utils/logger.mjs";
+import React from "react";
+
+const helper = await import("./utils/helper.mjs");
+export { Type } from "./types/common.mjs";
 ```
 
 ## Safety Features
@@ -107,6 +116,7 @@ export { Type } from './types/common.mjs';
 ## Batch Migration Example
 
 To migrate multiple files:
+
 ```bash
 # Create a simple batch script
 for file in electron/*.ts; do
@@ -117,36 +127,39 @@ done
 ## Next Steps After Migration
 
 1. **Update TypeScript config** to handle `.mts` files:
+
    ```json
    {
-     "compilerOptions": {
-       "allowImportingTsExtensions": true,
-       "noEmit": false
-     },
-     "include": ["**/*.mts", "**/*.ts"]
+    "compilerOptions": {
+     "allowImportingTsExtensions": true,
+     "noEmit": false
+    },
+    "include": ["**/*.mts", "**/*.ts"]
    }
    ```
 
 2. **Update build scripts** to output `.mjs`:
+
    ```json
    {
-     "scripts": {
-       "build": "tsc --outExt .mjs"
-     }
+    "scripts": {
+     "build": "tsc --outExt .mjs"
+    }
    }
    ```
 
 3. **Update package.json** main entry:
    ```json
    {
-     "main": "dist-electron/electron/main.mjs",
-     "type": "module"
+    "main": "dist-electron/electron/main.mjs",
+    "type": "module"
    }
    ```
 
 ## Testing
 
 The script has been thoroughly tested with:
+
 - ✅ Various import syntaxes
 - ✅ Different quote styles
 - ✅ Path aliases
@@ -163,6 +176,7 @@ The script has been thoroughly tested with:
 ## Why This Script?
 
 This script solves the publint warnings about ESM files being interpreted as CJS by:
+
 1. Using `.mts` extension for source files (explicit ESM)
 2. Updating imports to use `.mjs` for compiled output
 3. Maintaining compatibility with your existing architecture

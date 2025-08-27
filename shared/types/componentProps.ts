@@ -104,9 +104,9 @@ export interface StateProperties {
  *
  * @remarks
  * These props provide the essential form field functionality including
- * labeling, validation, and help text support. This serves as a base
- * interface that can be extended by components requiring additional
- * properties like children.
+ * labeling, validation, and help text support. This serves as a base interface
+ * that can be extended by components requiring additional properties like
+ * children.
  */
 export interface FormFieldBaseProperties {
     /** Unique identifier for the field (required for accessibility) */

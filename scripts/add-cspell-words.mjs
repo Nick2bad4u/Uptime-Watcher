@@ -245,7 +245,11 @@ function isValidWord(word, config) {
     // Check against exclusion patterns
     for (const pattern of config.excludePatterns) {
         // Use case-insensitive matching for domain patterns, but case-sensitive for caps constants
-        const flags = pattern.includes('(com|org|net|edu|gov)') || pattern.includes('(http|https|ftp|ssh)') ? "i" : "";
+        const flags =
+            pattern.includes("(com|org|net|edu|gov)") ||
+            pattern.includes("(http|https|ftp|ssh)")
+                ? "i"
+                : "";
         if (new RegExp(pattern, flags).test(word)) {
             return false;
         }

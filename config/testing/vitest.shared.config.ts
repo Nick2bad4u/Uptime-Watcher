@@ -95,9 +95,7 @@ const vitestConfig = defineConfig({
             requireAssertions: true,
         },
         globals: true, // Enable global test functions
-        setupFiles: [
-            "../../shared/test/setup.ts"
-        ], // Setup files for custom context injection
+        setupFiles: ["../../shared/test/setup.ts"], // Setup files for custom context injection
         include: [
             "../../shared/**/*.test.ts", // Include shared tests only
             "../../shared/**/*.test.mts", // Include MTS tests
