@@ -114,6 +114,7 @@ interface LogTransports {
  *
  * @returns Transport object or undefined if not available
  */
+/* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Logger transport access with known structure */
 function getLogTransport<K extends keyof LogTransports>(
     transportName: K
 ): LogTransports[K] | undefined {
@@ -125,6 +126,7 @@ function getLogTransport<K extends keyof LogTransports>(
 
     return undefined;
 }
+/* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
 // Configure electron-log for renderer process
 // The /renderer import is specifically chosen because:

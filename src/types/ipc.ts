@@ -100,6 +100,7 @@ export function extractIpcData<T>(response: unknown): T {
         );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type T is provided by caller who knows the expected response data type
     return response.data as T;
 }
 

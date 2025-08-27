@@ -69,6 +69,7 @@ function isImportData(
     return (
         typeof obj === "object" &&
         obj !== null &&
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Type guard with runtime validation following
         Array.isArray((obj as Record<string, unknown>)["sites"])
     );
 }

@@ -219,6 +219,7 @@ function filterHistoryByTimeRange(
 ): StatusHistory[] {
     const now = Date.now();
     // Sanitize timeRange to prevent object injection
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Object.keys() with known typed object structure
     const allowedTimeRanges = Object.keys(TIME_PERIOD_LABELS) as TimePeriod[];
     const safeTimeRange = allowedTimeRanges.includes(timeRange)
         ? timeRange

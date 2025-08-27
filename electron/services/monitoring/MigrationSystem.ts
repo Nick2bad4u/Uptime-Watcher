@@ -722,6 +722,7 @@ export const exampleMigrations = {
         transform: (data: Record<string, unknown>) =>
             Promise.resolve({
                 ...data,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Migration data extraction with runtime fallback
                 timeout: (data["timeout"] as number | undefined) ?? 30_000, // Default 30 seconds
             }),
     } as MigrationRule,

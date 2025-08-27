@@ -178,6 +178,7 @@ export const AnalyticsTab = ({
     const uptimeValue = parseUptimeValue(uptime);
 
     // Error-safe wrapper functions to handle formatter errors gracefully
+    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Error type casting in catch blocks for logging */
     const safeDurationFormat = (ms: number): string => {
         try {
             return formatDuration(ms);
@@ -209,6 +210,7 @@ export const AnalyticsTab = ({
             return "Poor"; // Fallback descriptions
         }
     };
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
     // Icon colors configuration
     const getIconColors = (): {

@@ -27,10 +27,12 @@ import {
  * Validates and returns a monitor type or default
  */
 function validateMonitorType(type: unknown): MonitorType {
+    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Type validation with runtime checks ensures safe assertions */
     return typeof type === "string" &&
         BASE_MONITOR_TYPES.includes(type as MonitorType)
         ? (type as MonitorType)
         : BASE_MONITOR_TYPES[0];
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 }
 
 /**
@@ -215,6 +217,7 @@ function validateMonitorInput(monitor: Partial<Monitor>): void {
  *
  * @public
  */
+/* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Dynamic property access with runtime validation after filtering */
 export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
     // Validate input data
     validateMonitorInput(monitor);
@@ -290,6 +293,7 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
             }),
     };
 }
+/* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
 /**
  * Removes a monitor from a site

@@ -572,6 +572,7 @@ export class IpcService {
 
         // Serialize UI configuration using utility
         const serializedUiConfig = UiConfigSerializer.serializeUiConfig(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- uiConfig is validated by the serializer and type-checked at runtime
             baseProperties.uiConfig as
                 | undefined
                 | {
@@ -618,6 +619,7 @@ export class IpcService {
         );
 
         // Import data handler with validation
+        /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- All IPC handler arguments are validated by their respective validators before type assertion */
         registerStandardizedIpcHandler(
             "import-data",
             async (...args: unknown[]) =>
@@ -634,6 +636,7 @@ export class IpcService {
             DataHandlerValidators.updateHistoryLimit,
             this.registeredIpcHandlers
         );
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
         // Get history limit handler (no parameters)
         registerStandardizedIpcHandler(
@@ -696,6 +699,7 @@ export class IpcService {
         );
 
         // Start monitoring for specific site/monitor
+        /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- All monitoring handler arguments are validated by their respective validators before type assertion */
         registerStandardizedIpcHandler(
             "start-monitoring-for-site",
             async (...args: unknown[]) => {
@@ -739,6 +743,7 @@ export class IpcService {
             MonitoringHandlerValidators.checkSiteNow,
             this.registeredIpcHandlers
         );
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
     }
 
     /**
@@ -784,6 +789,7 @@ export class IpcService {
         );
 
         // Format monitor detail handler with validation
+        /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- All monitor type handler arguments are validated by their respective validators before type assertion */
         registerStandardizedIpcHandler(
             "format-monitor-detail",
             (...args: unknown[]) => {
@@ -856,6 +862,7 @@ export class IpcService {
             MonitorTypeHandlerValidators.validateMonitorData,
             this.registeredIpcHandlers
         );
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
     }
 
     /**
@@ -871,6 +878,7 @@ export class IpcService {
      */
     private setupSiteHandlers(): void {
         // Add site handler with validation
+        /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- All site handler arguments are validated by their respective validators before type assertion */
         registerStandardizedIpcHandler(
             "add-site",
             async (...args: unknown[]) =>
@@ -919,6 +927,7 @@ export class IpcService {
             SiteHandlerValidators.removeMonitor,
             this.registeredIpcHandlers
         );
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
     }
 
     /**

@@ -46,6 +46,7 @@ export const createBaseStore = <T extends BaseStore>(
     "clearError" | "isLoading" | "lastError" | "setError" | "setLoading"
 > => ({
     clearError: (): void => {
+        /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Generic store utility with known type Structure */
         set({ lastError: undefined } as Partial<T>);
     },
     isLoading: false,
@@ -55,11 +56,9 @@ export const createBaseStore = <T extends BaseStore>(
     },
     setLoading: (loading: boolean): void => {
         set({ isLoading: loading } as Partial<T>);
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
     },
 });
-
-// Import withErrorHandling directly from "@shared/utils/errorHandling" if
-// needed
 
 /**
  * Creates a persistence configuration for Zustand store persistence.

@@ -223,6 +223,7 @@ const validateFormFields = (
     for (const field of currentFields) {
         if (field.required) {
             const value =
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Dynamic field access with known form field keys
                 fieldValues[field.name as keyof typeof fieldValues] || "";
             if (!value.trim()) {
                 return false;

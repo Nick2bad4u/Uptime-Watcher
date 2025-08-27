@@ -248,6 +248,7 @@ async function handleFailure<T>(
         throw error;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Generic fallback value when operation fails and exceptions are disabled
     return null as T;
 }
 

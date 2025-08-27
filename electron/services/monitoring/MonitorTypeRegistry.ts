@@ -234,6 +234,7 @@ function validateMonitorTypeInternal(type: unknown): {
 
     return {
         success: true,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Type validated by isValidMonitorType check above
         value: type as MonitorType,
     };
 }

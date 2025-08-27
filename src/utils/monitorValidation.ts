@@ -355,6 +355,7 @@ const validateMonitorFormDataByType = (
     const errors: string[] = [];
 
     // Validate type-specific required fields only
+    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe type narrowing within switch statement, each case guarantees the correct form data type */
     switch (type) {
         case "dns": {
             errors.push(
@@ -385,6 +386,7 @@ const validateMonitorFormDataByType = (
             break;
         }
     }
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Turn on again after switch statement */
 
     return errors;
 };

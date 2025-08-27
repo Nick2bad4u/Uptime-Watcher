@@ -82,6 +82,7 @@ function isValidAddMode(value: string): value is AddMode {
  * @returns True if the value is a valid {@link MonitorType}, otherwise false.
  */
 function isValidMonitorType(value: string): value is MonitorType {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Type guard validation against known monitor types
     return BASE_MONITOR_TYPES.includes(value as MonitorType);
 }
 

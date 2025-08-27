@@ -127,6 +127,7 @@ export class ThemeManager {
      * @returns Array of available theme names including system
      */
     public getAvailableThemes(): ThemeName[] {
+        /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Object.keys of themes returns the exact keys that match ThemeName type */
         const themeNames = Object.keys(themes) as ThemeName[];
         return [...themeNames, "system"];
     }
@@ -166,6 +167,7 @@ export class ThemeManager {
             return themes[systemPreference];
         }
 
+        /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- name is validated as ThemeName, safe to use as themes key */
         return themes[name as keyof typeof themes];
     }
 
@@ -173,6 +175,7 @@ export class ThemeManager {
      * Validate if theme name is valid
      */
     public isValidThemeName(name: string): name is ThemeName {
+        /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion needed for includes check, result determines type guard */
         return this.getAvailableThemes().includes(name as ThemeName);
     }
 
@@ -225,6 +228,7 @@ export class ThemeManager {
      */
     private addColorVariables(theme: Theme, variables: string[]): void {
         if (typeof theme.colors === "object" && theme.colors !== null) {
+            /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe navigation through theme color object structure with runtime type checks */
             for (const [category, colors] of Object.entries(theme.colors)) {
                 if (typeof colors === "object" && colors !== null) {
                     // Type-safe access to color values - colors are either
@@ -240,6 +244,7 @@ export class ThemeManager {
                     variables.push(`  --color-${category}: ${colors};`);
                 }
             }
+            /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
         }
     }
 
@@ -357,6 +362,7 @@ export class ThemeManager {
             // Batch all style changes to prevent multiple repaints
             const properties: Array<[string, string]> = [];
 
+            /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe navigation through theme color object structure with runtime type checks */
             for (const [category, colorValue] of Object.entries(colors)) {
                 if (typeof colorValue === "object" && colorValue !== null) {
                     // Type-safe access to color values - colorValue is a
@@ -373,6 +379,7 @@ export class ThemeManager {
                     ]);
                 }
             }
+            /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
             // Apply all properties at once to prevent flickering
             for (const [property, value] of properties) {

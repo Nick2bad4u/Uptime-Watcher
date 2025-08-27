@@ -494,6 +494,7 @@ export class StatusUpdateManager {
             return false;
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Type guard with runtime validation following
         const record = data as Record<string, unknown>;
         return (
             "monitorId" in data &&

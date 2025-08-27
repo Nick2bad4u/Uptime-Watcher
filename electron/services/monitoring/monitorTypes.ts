@@ -64,5 +64,6 @@ export function getBaseMonitorTypes(): MonitorType[] {
  * @see {@link MonitorTypeRegistry.isValidType} for complete type checking
  */
 export function isBaseMonitorType(type: string): type is MonitorType {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Type guard validation against known base monitor types
     return BASE_MONITOR_TYPES.includes(type as MonitorType);
 }

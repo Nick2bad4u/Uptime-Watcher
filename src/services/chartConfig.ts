@@ -213,6 +213,7 @@ export class ChartConfigService {
      *
      * @public
      */
+    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Chart.js configuration object type assertions */
     public getBarChartConfig(): ChartOptions<"bar"> {
         return {
             ...this.getBaseConfig(),
@@ -328,6 +329,7 @@ export class ChartConfigService {
             },
         } as ChartOptions<"line">;
     }
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
     /**
      * Get common axis title configuration

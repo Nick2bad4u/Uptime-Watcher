@@ -243,6 +243,7 @@ export function useTheme(): UseThemeReturn {
                     typeof value === "object" &&
                     Object.hasOwn(value, key)
                 ) {
+                    /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe property navigation with runtime object checks */
                     value = (value as Record<string, unknown>)[key];
                 } else {
                     value = undefined;

@@ -729,9 +729,12 @@ export function createValidationMiddleware<T extends Record<string, unknown>>(
             // 1. We've verified the validator exists for this event name
             // 2. The validator is designed to handle T[K] for some specific K
             // 3. TypeScript can't statically prove which K, but runtime
-            // guarantees it's correct 4. The validator will perform its own
-            // runtime validation anyway
+            //    guarantees it's correct
+            // 4. The validator will perform its own runtime validation anyway
+            // 5. instanceof narrowing is not applicable here since T[keyof T]
+            //    can be primitives or plain objects, not just class instances
 
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe due to immediate validation by validator function
             const result = validator(data as T[keyof T]);
 
             if (typeof result === "boolean") {

@@ -1,28 +1,48 @@
 # 📊 Uptime Watcher
 
-<div align="center">
+<div align="center"><a href="https://github.com/Nick2bad4u/Uptime-Watcher/releases">
+  <img src="https://img.shields.io/badge/version-12.9.0-blue.svg" alt="Version">
+</a>
+<a href="LICENSE">
+  <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License">
+</a>
+<a href="https://www.electronjs.org/">
+  <img src="https://img.shields.io/badge/Electron-v37.3.1-47848F?logo=electron" alt="Electron">
+</a>
+<a href="https://reactjs.org/">
+  <img src="https://img.shields.io/badge/React-v19.1.1-61DAFB?logo=react" alt="React">
+</a>
+<a href="https://www.typescriptlang.org/">
+  <img src="https://img.shields.io/badge/TypeScript-v5.9+-3178C6?logo=typescript" alt="TypeScript">
+</a>
 
-[![Version](https://img.shields.io/badge/version-12.8.0-blue.svg)](https://github.com/Nick2bad4u/Uptime-Watcher/releases)
-[![License](https://img.shields.io/badge/license-Unlicense-green.svg)](LICENSE)
-[![Electron](https://img.shields.io/badge/Electron-v37.3.1-47848F?logo=electron)](https://www.electronjs.org/)
-[![React](https://img.shields.io/badge/React-v19.1.1-61DAFB?logo=react)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-v5.6+-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+<a href="https://github.com/Nick2bad4u/Uptime-Watcher/actions">
+  <img src="https://img.shields.io/github/actions/workflow/status/Nick2bad4u/Uptime-Watcher/Build.yml?branch=main&amp;logo=github" alt="Build Status">
+</a>
+<a href="https://sonarcloud.io/summary/new_code?id=Nick2bad4u_Uptime-Watcher">
+  <img src="https://img.shields.io/sonar/quality_gate/Nick2bad4u_Uptime-Watcher?server=https%3A%2F%2Fsonarcloud.io" alt="Quality Gate">
+</a>
+<a href="https://codecov.io/gh/Nick2bad4u/Uptime-Watcher">
+  <img src="https://img.shields.io/codecov/c/github/Nick2bad4u/Uptime-Watcher?logo=codecov" alt="Coverage">
+</a>
+<a href="https://github.com/Nick2bad4u/Uptime-Watcher/releases">
+  <img src="https://img.shields.io/github/downloads/Nick2bad4u/Uptime-Watcher/total?logo=github" alt="Downloads">
+</a>
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/Nick2bad4u/Uptime-Watcher/Build.yml?branch=main&logo=github)](https://github.com/Nick2bad4u/Uptime-Watcher/actions)
-[![Quality Gate](https://img.shields.io/sonar/quality_gate/Nick2bad4u_Uptime-Watcher?server=https%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/summary/new_code?id=Nick2bad4u_Uptime-Watcher)
-[![Coverage](https://img.shields.io/codecov/c/github/Nick2bad4u/Uptime-Watcher?logo=codecov)](https://codecov.io/gh/Nick2bad4u/Uptime-Watcher)
-[![Downloads](https://img.shields.io/github/downloads/Nick2bad4u/Uptime-Watcher/total?logo=github)](https://github.com/Nick2bad4u/Uptime-Watcher/releases)
+<a href="https://github.com/Nick2bad4u/Uptime-Watcher">
+  <img src="https://visitor-badge.laobi.icu/badge?page_id=Nick2bad4u.Uptime-Watcher&amp;left_color=gray&amp;right_color=blue" alt="Visitor Count">
+</a>
+<a href="https://github.com/Nick2bad4u/Uptime-Watcher/stargazers">
+  <img src="https://img.shields.io/github/stars/Nick2bad4u/Uptime-Watcher?style=social" alt="GitHub Stars">
+</a>
+<a href="https://github.com/Nick2bad4u/Uptime-Watcher/network/members">
+  <img src="https://img.shields.io/github/forks/Nick2bad4u/Uptime-Watcher?style=social" alt="GitHub Forks">
+</a>
 
-[![Visitor Count](https://visitor-badge.laobi.icu/badge?page_id=Nick2bad4u.Uptime-Watcher&left_color=gray&right_color=blue)](https://github.com/Nick2bad4u/Uptime-Watcher)
-[![GitHub Stars](https://img.shields.io/github/stars/Nick2bad4u/Uptime-Watcher?style=social)](https://github.com/Nick2bad4u/Uptime-Watcher/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/Nick2bad4u/Uptime-Watcher?style=social)](https://github.com/Nick2bad4u/Uptime-Watcher/network/members)
+<strong>A Electron desktop application for uptime monitoring</strong>
+<em>Track multiple services simultaneously with real-time updates, response time analytics, and historical data visualization</em>
 
-**A sophisticated Electron desktop application for comprehensive uptime monitoring**
-_Track multiple services simultaneously with real-time updates, response time analytics, and historical data visualization_
-
-![Application Preview WIP](./docs/assets/app-preview.png)
-
-</div>
+<img src="./docs/assets/app-preview.png" alt="Application Preview WIP"></div>
 
 ---
 
@@ -34,75 +54,81 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 
 <div align="center">
 
-| 🌐 **Multi-Protocol Monitoring** |  📊 **Real-Time Analytics**   | 🔔 **Smart Notifications** |
-| :------------------------------: | :---------------------------: | :------------------------: |
-|    HTTP/HTTPS websites & APIs    |      Live status updates      | Desktop alerts for outages |
-|      TCP port connectivity       |    Response time tracking     |    Sound notifications     |
-|       ICMP ping monitoring       | Historical data visualization |  Custom alert thresholds   |
-|      DNS record validation       |      Performance metrics      |  Status change detection   |
+| 🌐 <strong>Multi-Protocol Monitoring</strong> | 📊 <strong>Real-Time Analytics</strong> | 🔔 <strong>Smart Notifications</strong> |
+|-----------------------------------------------|-----------------------------------------|-----------------------------------------|
+| HTTP/HTTPS websites &amp; APIs                | Live status updates                     | Desktop alerts for outages              |
+| TCP port connectivity                         | Response time tracking                  | Sound notifications                     |
+| ICMP ping monitoring                          | Historical data visualization           | Custom alert thresholds                 |
+| DNS record validation                         | Performance metrics                     | Status change detection                 |
 
 </div>
 
-### � **Core Capabilities**
+## 🛠️ **Core Capabilities**
 
 - **🎯 Multi-Service Monitoring**: Supports HTTP/HTTPS, TCP ports, ICMP ping, and DNS monitoring
 - **⚡ Real-Time Updates**: Live status changes with sub-second responsiveness
 - **📈 Performance Analytics**: Response time tracking with trend analysis
-- **� Historical Data**: Comprehensive uptime history with SQLite storage
-- **🔔 Smart Notifications**: Desktop notifications with configurable settings
-- **🌓 Modern UI**: Dark/light theme support with responsive design
+- **📜 Historical Data**: Comprehensive uptime history with SQLite storage
 - **⚙️ Flexible Configuration**: Customizable check intervals from 30 seconds to 30 minutes
 - **💾 Data Persistence**: Local SQLite database with backup/restore functionality
-- **🔄 Auto-Updates**: Built-in update mechanism with seamless restart coordination
-- **🏗️ Service Architecture**: Modular design with dependency injection and event-driven communication
 
-### 📋 **Monitor Types**
+## 📋 **Monitor Types**
 
-| Type           | Purpose                   | Features                                                |
-| -------------- | ------------------------- | ------------------------------------------------------- |
-| **HTTP/HTTPS** | Website & API monitoring  | Status codes, redirects, custom headers, SSL validation |
-| **TCP Port**   | Port connectivity testing | Socket connection validation, timeout handling          |
-| **ICMP Ping**  | Network reachability      | Packet loss monitoring, latency measurement             |
-| **DNS**        | DNS resolution monitoring | Support for A, AAAA, CNAME, MX, TXT, NS, SRV records    |
+| Type           | Purpose                   | Features                                                                              |
+|----------------|---------------------------|---------------------------------------------------------------------------------------|
+| **HTTP/HTTPS** | Website & API monitoring  | Status codes, redirects, custom headers, SSL validation                               |
+| **TCP Port**   | Port connectivity testing | Socket connection validation, timeout handling                                        |
+| **ICMP Ping**  | Network reachability      | Packet loss monitoring, latency measurement                                           |
+| **DNS**        | DNS resolution monitoring | Support for A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR, NAPTR, SOA, TLSA, ANY records |
 
 ## 🛠️ **Technology Stack**
 
 <div align="center">
 
-### **Frontend Architecture**
+### <strong>Frontend Architecture</strong>
 
-[![React](https://img.shields.io/badge/React-19.1.1-61DAFB?logo=react&logoColor=white)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6+-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Vite](https://img.shields.io/badge/Vite-5.4+-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+<a href="https://reactjs.org/">
+  <img src="https://img.shields.io/badge/React-19.1.1-61DAFB?logo=react&amp;logoColor=white" alt="React">
+</a>
+<a href="https://www.typescriptlang.org/">
+  <img src="https://img.shields.io/badge/TypeScript-5.9+-3178C6?logo=typescript&amp;logoColor=white" alt="TypeScript">
+</a>
+<a href="https://tailwindcss.com/">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&amp;logoColor=white" alt="Tailwind CSS">
+</a>
+<a href="https://vitejs.dev/">
+  <img src="https://img.shields.io/badge/Vite-5.4+-646CFF?logo=vite&amp;logoColor=white" alt="Vite">
+</a>
 
-### **Desktop Framework**
+### <strong>Desktop Framework</strong>
 
-[![Electron](https://img.shields.io/badge/Electron-37.3.1-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+<a href="https://www.electronjs.org/">
+  <img src="https://img.shields.io/badge/Electron-37.3.1-47848F?logo=electron&amp;logoColor=white" alt="Electron">
+</a>
+<a href="https://nodejs.org/">
+  <img src="https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&amp;logoColor=white" alt="Node.js">
+</a>
 
-### **State & Data Management**
+### <strong>State &amp; Data Management</strong>
 
-[![Zustand](https://img.shields.io/badge/Zustand-State_Management-FF6B6B)](https://github.com/pmndrs/zustand)
-[![SQLite](https://img.shields.io/badge/SQLite-node--sqlite3--wasm-003B57?logo=sqlite&logoColor=white)](https://sqlite.org/)
+<a href="https://github.com/pmndrs/zustand">
+  <img src="https://img.shields.io/badge/Zustand-State_Management-FF6B6B" alt="Zustand">
+</a>
+<a href="https://sqlite.org/">
+  <img src="https://img.shields.io/badge/SQLite-node--sqlite3--wasm-003B57?logo=sqlite&amp;logoColor=white" alt="SQLite">
+</a>
 
-### **Development & Quality**
+### <strong>Development &amp; Quality</strong>
 
-[![Vitest](https://img.shields.io/badge/Vitest-Testing-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev/)
-[![ESLint](https://img.shields.io/badge/ESLint-Code_Quality-4B32C3?logo=eslint&logoColor=white)](https://eslint.org/)
-[![Prettier](https://img.shields.io/badge/Prettier-Code_Formatting-F7B93E?logo=prettier&logoColor=white)](https://prettier.io/)
-
-</div>
-
-### **Architecture Highlights**
-
-- **🏗️ Service-Oriented Architecture**: Modular design with dependency injection
-- **🔒 Type-Safe IPC**: Secure communication via Electron contextBridge
-- **📡 Event-Driven System**: TypedEventBus with middleware and correlation IDs
-- **🗃️ Repository Pattern**: Transactional database operations with SQLite
-- **⚡ Real-Time Updates**: Live monitoring with race condition prevention
-- **🧪 Comprehensive Testing**: Dual Vitest configuration for frontend + backend
-- **📦 Modern Build System**: Vite + TypeScript + Electron Builder
+<a href="https://vitest.dev/">
+  <img src="https://img.shields.io/badge/Vitest-Testing-6E9F18?logo=vitest&amp;logoColor=white" alt="Vitest">
+</a>
+<a href="https://eslint.org/">
+  <img src="https://img.shields.io/badge/ESLint-Code_Quality-4B32C3?logo=eslint&amp;logoColor=white" alt="ESLint">
+</a>
+<a href="https://prettier.io/">
+  <img src="https://img.shields.io/badge/Prettier-Code_Formatting-F7B93E?logo=prettier&amp;logoColor=white" alt="Prettier">
+</a></div>
 
 ## 🚀 **Quick Start**
 
@@ -131,54 +157,29 @@ npm install
 npm run electron-dev
 ```
 
-## 📖 **How to Use**
-
-<div align="center">
-
-```mermaid
-graph LR
-    A[Add Site] --> B[Configure Monitor]
-    B --> C[Start Monitoring]
-    C --> D[View Real-time Status]
-    D --> E[Receive Notifications]
-    E --> F[Analyze History]
-```
-
-</div>
-
-### **Advanced Features**
-
-- **🔄 Auto-Updates**: Automatic application updates with restart coordination
-- **📁 Data Management**: Export/import monitoring configurations
-- **🎨 Theme Support**: Dark/light mode with system preference detection
-- **⚡ Performance**: Optimized for minimal resource usage
-- **🔒 Privacy**: All data stored locally, no cloud dependencies
-
 ## 🖼️ **Screenshots & Demo**
 
 <div align="center">
 
-### **Main Dashboard**
+### <strong>Main Dashboard</strong>
 
-![Main Dashboard](./docs/assets/dashboard-screenshot.png)
-_Real-time monitoring dashboard with multiple service status overview_
+<img src="./docs/assets/dashboard-screenshot.png" alt="Main Dashboard">
+<em>Real-time monitoring dashboard with multiple service status overview</em>
 
-### **Monitor Configuration**
+### <strong>Monitor Configuration</strong>
 
-![Monitor Setup](./docs/assets/monitor-config-screenshot.png)
-_Easy-to-use monitor configuration with multiple protocol support_
+<img src="./docs/assets/monitor-config-screenshot.png" alt="Monitor Setup">
+<em>Easy-to-use monitor configuration with multiple protocol support</em>
 
-### **Historical Analytics**
+### <strong>Historical Analytics</strong>
 
-![Analytics View](./docs/assets/analytics-screenshot.png)
-_Comprehensive analytics with response time graphs and uptime statistics_
+<img src="./docs/assets/analytics-screenshot.png" alt="Analytics View">
+<em>Comprehensive analytics with response time graphs and uptime statistics</em>
 
-### **Notification System**
+### <strong>Notification System</strong>
 
-![Notifications](./docs/assets/notifications-screenshot.png)
-_Smart desktop notifications with customizable alert preferences_
-
-</div>
+<img src="./docs/assets/notifications-screenshot.png" alt="Notifications">
+<em>Smart desktop notifications with customizable alert preferences</em></div>
 
 ---
 
@@ -207,67 +208,21 @@ npm run dist
 
 <div align="center">
 
-| Requirement | Version                      | Download                         |
-| ----------- | ---------------------------- | -------------------------------- |
-| **Node.js** | 18.0+ (LTS recommended)      | [Download](https://nodejs.org/)  |
-| **npm**     | 9.0+ (included with Node.js) | [Docs](https://www.npmjs.com/)   |
-| **Git**     | Latest version               | [Download](https://git-scm.com/) |
+| Requirement              | Version                         | Download                                    |
+|--------------------------|---------------------------------|---------------------------------------------|
+| <strong>Node.js</strong> | 22.0+ (recommended)             | <a href="https://nodejs.org/">Download</a>  |
+| <strong>npm</strong>     | 11.5.2+ (included with Node.js) | <a href="https://www.npmjs.com/">Docs</a>   |
+| <strong>Git</strong>     | Latest version                  | <a href="https://git-scm.com/">Download</a> |
 
-> **💡 Tip**: Check out the [Developer Quick Start Guide](./docs/Guides/DEVELOPER-QUICK-START.md) for detailed setup instructions and architecture overview.
-
-</div>
-
-### **Project Structure**
-
-```text
-uptime-watcher/
-├── 📁 electron/           # Main process (Node.js backend)
-│   ├── 📄 main.ts         # Application entry point
-│   ├── 📁 services/       # Service-oriented architecture
-│   │   ├── 📁 database/   # Repository pattern with SQLite
-│   │   ├── 📁 ipc/        # Type-safe IPC handlers
-│   │   └── 📁 monitoring/ # Monitor services (HTTP, Ping, Port, DNS)
-│   └── 📁 managers/       # Business logic orchestrators
-├── 📁 src/               # Renderer process (React frontend)
-│   ├── 📁 components/    # React components with TypeScript
-│   ├── 📁 stores/        # Zustand state management
-│   └── 📁 services/      # Frontend service layer
-├── 📁 shared/            # Common code (types, validation, utilities)
-└── 📁 docs/              # Comprehensive documentation
-```
-
-## 🏗️ **Architecture Overview**
-
-<div align="center">
-
-```mermaid
-graph TB
-    subgraph "Renderer Process (React)"
-        A[React Components] --> B[Zustand Stores]
-        B --> C[Frontend Services]
-    end
-
-    subgraph "Main Process (Electron)"
-        D[UptimeOrchestrator] --> E[Managers Layer]
-        E --> F[Services Layer]
-        F --> G[Database Layer]
-    end
-
-    subgraph "Communication"
-        H[Type-Safe IPC] --> I[EventBus System]
-    end
-
-    A <--> H
-    D <--> H
-```
+&gt; <strong>💡 Tip</strong>: Check out the <a href="./docs/Guides/DEVELOPER-QUICK-START.md">Developer Quick Start Guide</a> for detailed setup instructions and architecture overview.
 
 </div>
 
-### **Architectural Principles**
+## **Architectural Principles**
 
 The application follows a **service-oriented architecture** with clear separation of concerns:
 
-#### **🔧 Core Components**
+### **🔧 Core Components**
 
 - **🖥️ Main Process (Electron)**: Service container with dependency injection
 - **🎨 Renderer Process (React)**: Component-based UI with Zustand state management
@@ -276,24 +231,13 @@ The application follows a **service-oriented architecture** with clear separatio
 - **📡 Event System**: TypedEventBus for cross-service communication
 - **📊 Monitoring System**: Enhanced monitoring with operation correlation
 
-#### **🎯 Key Design Features**
+### **🎯 Key Design Features**
 
 - **🏗️ Service-Oriented Architecture**: Modular, testable service design
 - **🔒 Type Safety**: Strict TypeScript with comprehensive interfaces
 - **📊 Enhanced Monitoring**: Race condition prevention and operation correlation
 - **🗃️ Repository Pattern**: Transactional database operations
 - **🎯 Event-Driven**: Reactive communication between services
-- **📚 Comprehensive Documentation**: ADRs, guides, and code templates
-
-#### **🔄 Data Flow**
-
-1. **User Interaction** → React Components trigger actions
-2. **State Management** → Zustand stores manage UI state
-3. **IPC Communication** → Type-safe messages to main process
-4. **Business Logic** → Managers orchestrate operations
-5. **Data Persistence** → Repository pattern with SQLite
-6. **Event Propagation** → Real-time updates via EventBus
-7. **UI Updates** → React components re-render with new data
 
 ## 🤝 **Contributing**
 
@@ -302,9 +246,9 @@ We welcome contributions from the community! Here's how you can help:
 ### **🎯 Ways to Contribute**
 
 - 🐛 **Bug Reports**: Found an issue? [Open an issue](https://github.com/Nick2bad4u/Uptime-Watcher/issues/new)
-- 💡 **Feature Requests**: Have an idea? [Start a discussion](https://github.com/Nick2bad4u/Uptime-Watcher/discussions)
+- 💡 **Feature Requests**: Have an idea? [Start a discussion](https://github.com/Nick2bad4u/Uptime-Watcher/issues/new)
 - 🔧 **Code Contributions**: Submit pull requests with improvements
-- � **Documentation**: Help improve our docs and guides
+- 📚 **Documentation**: Help improve our docs and guides
 - 🧪 **Testing**: Help test new features and report issues
 
 ### **📋 Development Guidelines**
@@ -317,44 +261,24 @@ We welcome contributions from the community! Here's how you can help:
 
 ---
 
-## 📄 **License & Legal**
+## 📄 **License**
 
-<div align="center">
+<div align="center"><a href="LICENSE">
+  <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License">
+</a>
 
-[![License](https://img.shields.io/badge/license-Unlicense-green.svg)](LICENSE)
+<strong>This project is released under the <a href="LICENSE">Unlicense</a> - Public Domain</strong>
 
-**This project is released under the [Unlicense](LICENSE) - Public Domain**
-
-_You are free to use, modify, and distribute this software for any purpose, commercial or non-commercial, without any restrictions. Credit is appreciated but not required._
-
-</div>
+<em>You are free to use, modify, and distribute this software for any purpose, commercial or non-commercial, without any restrictions. Credit is appreciated but not required.</em></div>
 
 ---
 
-## 🌟 **Support & Community**
+## **💬 Get Help**
 
-<div align="center">
-
-### **💬 Get Help**
-
-[![GitHub Issues](https://img.shields.io/badge/Issues-GitHub-blue?logo=github)](https://github.com/Nick2bad4u/Uptime-Watcher/issues)
-[![GitHub Discussions](https://img.shields.io/badge/Discussions-GitHub-blue?logo=github)](https://github.com/Nick2bad4u/Uptime-Watcher/discussions)
-[![Documentation](https://img.shields.io/badge/Docs-Available-brightgreen)](./docs/)
-
-</div>
+[![GitHub Issues](https://img.shields.io/badge/Issues-GitHub-blue?logo=github)](https://github.com/Nick2bad4u/Uptime-Watcher/issues) [![Documentation](https://img.shields.io/badge/Docs-Available-brightgreen)](./docs/)
 
 ---
 
-<div align="center">
+<div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 
-**Made with ❤️ by [Nick2bad4u](https://github.com/Nick2bad4u)**
-
-_Monitoring made simple, reliable, and powerful._
-
-[![GitHub Stats](https://github-readme-stats.vercel.app/api/pin/?username=Nick2bad4u&repo=Uptime-Watcher&theme=default)](https://github.com/Nick2bad4u/Uptime-Watcher)
-
----
-
-_Last updated: August 2025 • Version 12.8.0_
-
-</div>
+<em>Last updated: August 2025 • Version 12.9.0</em></div>

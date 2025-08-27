@@ -248,6 +248,7 @@ export function safeGetFormProperty<T>(
     defaultValue: T
 ): T {
     if (property in data && data[property] !== undefined) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Caller provides type T and default value as contract for expected property type
         return data[property] as T;
     }
     return defaultValue;

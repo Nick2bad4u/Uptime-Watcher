@@ -63,6 +63,7 @@ export interface MonitorHelpTexts {
  * Type guard to check if a cache value is a MonitorTypeConfig
  */
 function isMonitorTypeConfig(value: unknown): value is MonitorTypeConfig {
+    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Type guard requires assertions to check object properties */
     return (
         value !== null &&
         typeof value === "object" &&
@@ -70,6 +71,7 @@ function isMonitorTypeConfig(value: unknown): value is MonitorTypeConfig {
         typeof (value as MonitorTypeConfig).displayName === "string" &&
         Array.isArray((value as MonitorTypeConfig).fields)
     );
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 }
 
 import { withUtilityErrorHandling } from "./errorHandling";
@@ -358,6 +360,7 @@ export async function getTypesWithFeature(
                         : config.uiConfig?.supportsAdvancedAnalytics;
 
                 if (supports) {
+                    /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- config.type is guaranteed to be MonitorType from getAvailableMonitorTypes */
                     supportedTypes.push(config.type as MonitorType);
                 }
             }

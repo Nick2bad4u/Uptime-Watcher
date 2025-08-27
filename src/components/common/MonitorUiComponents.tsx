@@ -57,6 +57,7 @@ export interface DetailLabelProps {
  *
  * @public
  */
+/* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Error type casting in catch blocks for logging */
 export function ConditionalResponseTime({
     children,
     fallback,
@@ -177,3 +178,4 @@ export const DetailLabel = ({
 
     return <span>{formattedLabel}</span>;
 };
+/* eslint-enable @typescript-eslint/no-unsafe-type-assertion */

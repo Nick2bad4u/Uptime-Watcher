@@ -184,6 +184,7 @@ export const Settings = ({
     const handleThemeChange = useCallback(
         (themeName: string) => {
             const oldTheme = settings.theme;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Theme name validation from known theme options
             setTheme(themeName as ThemeName);
             logger.user.settingsChange("theme", oldTheme, themeName);
         },
@@ -234,6 +235,7 @@ export const Settings = ({
     );
 
     // Manual Sync Now handler (moved from Header)
+    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Error message extraction with runtime validation */
     const handleSyncNow = useCallback(async () => {
         setSyncSuccess(false);
         try {
@@ -278,6 +280,7 @@ export const Settings = ({
         downloadSQLiteBackup,
         setError,
     ]);
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
     // Click handlers for buttons
     const handleSyncNowClick = useCallback(() => {

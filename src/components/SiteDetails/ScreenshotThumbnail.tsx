@@ -156,7 +156,7 @@ export const ScreenshotThumbnail = ({
             if (top + overlayH > viewportH - 8) {
                 top = viewportH - overlayH - 8;
             }
-
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: CSS custom properties object for React CSSProperties
             setOverlayVariables({
                 "--overlay-height": `${overlayH}px`,
                 "--overlay-left": `${left}px`,
@@ -273,23 +273,3 @@ export const ScreenshotThumbnail = ({
         </>
     );
 };
-
-/**
- * Screenshot thumbnail component with hover preview overlay.
- *
- * Generates a thumbnail using Microlink API and displays a larger preview when
- * hovered. Handles external URL opening and proper positioning of the preview
- * overlay within viewport bounds.
- *
- * @param props - Component props
- *
- * @returns JSX element containing the thumbnail and optional preview overlay
- */
-
-/**
- * Type guard to check if the window.electronAPI has openExternal method
- *
- * @param api - The API object to check
- *
- * @returns True if the API has openExternal method
- */

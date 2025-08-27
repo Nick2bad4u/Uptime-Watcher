@@ -28,6 +28,7 @@ export function getScaleConfig(
         return undefined;
     }
 
+    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe navigation through Chart.js config object structure */
     const scales = config.scales as Record<string, unknown>;
     if (axis in scales) {
         const scale = scales[axis];
@@ -35,6 +36,7 @@ export function getScaleConfig(
             ? (scale as Record<string, unknown>)
             : undefined;
     }
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
     return undefined;
 }
@@ -61,6 +63,7 @@ export function getNestedScaleProperty(
     const pathParts = path.split(".");
     let current: unknown = scale;
 
+    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe navigation through nested chart config properties */
     for (const part of pathParts) {
         if (
             typeof current !== "object" ||
@@ -72,6 +75,7 @@ export function getNestedScaleProperty(
 
         current = (current as Record<string, unknown>)[part];
     }
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
     return current;
 }
