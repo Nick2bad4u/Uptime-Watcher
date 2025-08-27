@@ -7,14 +7,98 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[08bcd12](https://github.com/Nick2bad4u/Uptime-Watcher/commit/08bcd124abd75d9a238ccab5b7ad416567965307)...
-[08bcd12](https://github.com/Nick2bad4u/Uptime-Watcher/commit/08bcd124abd75d9a238ccab5b7ad416567965307)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/08bcd124abd75d9a238ccab5b7ad416567965307...08bcd124abd75d9a238ccab5b7ad416567965307))
+[[f42f976](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f42f9765bb0e64fa1a3f22be45b24ae27f0cc35f)...
+[f42f976](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f42f9765bb0e64fa1a3f22be45b24ae27f0cc35f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f42f9765bb0e64fa1a3f22be45b24ae27f0cc35f...f42f9765bb0e64fa1a3f22be45b24ae27f0cc35f))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 13.0.0 [`(f42f976)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f42f9765bb0e64fa1a3f22be45b24ae27f0cc35f)
+
+
+
+
+
+
+## [13.0.0] - 2025-08-27
+
+
+[[79bbe68](https://github.com/Nick2bad4u/Uptime-Watcher/commit/79bbe683eea9a05673a3c3b88f9c5d657a6faf74)...
+[74648a6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/74648a6f1aec96517db6ebaac56f12566ef639e5)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/79bbe683eea9a05673a3c3b88f9c5d657a6faf74...74648a6f1aec96517db6ebaac56f12566ef639e5))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 12.9.0 [`(08bcd12)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/08bcd124abd75d9a238ccab5b7ad416567965307)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Centralizes config files under config directory
+
+Moves various tool and linter configuration files into organized subfolders within a unified config directory for improved maintainability and discoverability.
+
+Updates scripts, CI workflows, ignore lists, and references to use new config paths, ensuring consistency and reducing file clutter at the project root.
+
+Upgrades ESLint plugin dependency and corrects related script invocations for better alignment with dependency management.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(48531dd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/48531ddf14e7f0a9415de1f7acb2489c2b1a2eb9)
+
+
+- 🚜 [refactor] Unifies core component props via shared interfaces
+
+- Refactors component prop interfaces to extend standardized shared property types, reducing duplication and improving consistency for className, accessibility, and common attributes.
+- Enhances maintainability and simplifies future changes by centralizing common props in shared types.
+- Facilitates better type safety and IDE support across all UI components.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6db3f11)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6db3f11c3b392ab1fadd37e83405f4c156f3bacc)
+
+
+- 🚜 [refactor] Centralize form field base props in shared types
+
+- Unifies core form field properties into a shared base interface to improve code reuse and maintain consistency across input components.
+- Reduces duplication by extending the shared base type in component-specific prop interfaces, simplifying future updates and ensuring alignment of accessibility, labeling, and validation features.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(27a857a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/27a857a3d38b51a316cd1eba20d14ddb97635731)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Revamps README with enhanced feature overview and project details
+
+- Improves documentation clarity and visual appeal with detailed feature tables, architecture diagrams, badges, and screenshots
+- Expands sections on technology stack, core capabilities, monitor types, and contribution guidelines
+- Adds quick start instructions, development setup, and comprehensive architecture explanation to aid onboarding
+- Relocates Flatpak build configuration for organizational consistency
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3a3ec7c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a3ec7c3caffb931a923ff33fe87f295da6a2343)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v12.9.0 [skip ci] [`(65d5750)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/65d57509ffc03a17a93bf8812cd7f453aa56ad26)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Centralizes lint/config files and updates related scripts
+
+- Moves and reorganizes linting and tool configuration files into dedicated subfolders to improve maintainability and project structure.
+- Updates scripts, workflow commands, ignore lists, and npm tasks to reference new config paths, ensuring consistency across tooling.
+- Refines changelog generation targets in CI workflows to match updated repository layout.
+- Cleans up redundant VS Code settings and improves file exclusion patterns for better performance.
+- Enhances script logic for cspell word management and increases custom dictionary coverage.
+- Improves documentation by syncing Axios files and standardizing interface naming.
+
+Relates to repository tooling stability and developer experience improvements.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(79bbe68)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/79bbe683eea9a05673a3c3b88f9c5d657a6faf74)
 
 
 
