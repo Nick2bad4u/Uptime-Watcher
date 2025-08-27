@@ -267,6 +267,7 @@ export function pruneHistoryForMonitor(
 
     try {
         // Get entries to delete (keep only the most recent 'limit' entries)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Query result structure is known and controlled by our SQL
         const excess = db.all(
             HISTORY_MANIPULATION_QUERIES.SELECT_EXCESS_ENTRIES,
             [monitorId, limit]

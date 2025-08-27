@@ -59,7 +59,7 @@ import type {
     EventHandlers,
 } from "@shared/types/componentProps";
 
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 
 import type { BoxPadding, BoxRounded, BoxShadow, BoxVariant } from "./types";
 
@@ -152,13 +152,48 @@ const ThemedCard = ({
 }: ThemedCardProperties): React.JSX.Element => {
     const { currentTheme } = useTheme();
 
-    // eslint-disable-next-line @arthurgeron/react-usememo/require-usememo
-    const cardStyles: React.CSSProperties = {
-        cursor: clickable ? "pointer" : "default",
-        overflow: "hidden",
-        position: "relative",
-        transition: TRANSITION_ALL,
-    };
+    const cardStyles = useMemo(
+        (): React.CSSProperties => ({
+            cursor: clickable ? "pointer" : "default",
+            overflow: "hidden",
+            position: "relative",
+            transition: TRANSITION_ALL,
+        }),
+        [clickable]
+    );
+
+    const handleClick = useCallback((): void => {
+        if (onClick) {
+            onClick();
+        }
+    }, [onClick]);
+
+    const headerStyle = useMemo(
+        () => ({
+            alignItems: "center",
+            display: "flex",
+            gap: currentTheme.spacing.md,
+            marginBottom: currentTheme.spacing.md,
+        }),
+        [currentTheme.spacing.md]
+    );
+
+    const iconStyle = useMemo(
+        () => ({
+            alignItems: "center",
+            display: "flex",
+            fontSize: "1.5em",
+            lineHeight: "1",
+        }),
+        []
+    );
+
+    const titleContainerStyle = useMemo(
+        () => ({
+            flex: 1,
+        }),
+        []
+    );
 
     return (
         <ThemedBox
@@ -169,38 +204,18 @@ const ThemedCard = ({
             style={cardStyles}
             surface="elevated"
             variant={variant}
-            {...(clickable &&
-                onClick && {
-                    onClick: (): void => {
-                        onClick();
-                    },
-                })}
+            {...(clickable && onClick && { onClick: handleClick })}
             {...(onMouseEnter && { onMouseEnter })}
             {...(onMouseLeave && { onMouseLeave })}
         >
             {(title ?? subtitle ?? icon) ? (
-                <div
-                    className="themed-card__header"
-                    style={{
-                        alignItems: "center",
-                        display: "flex",
-                        gap: currentTheme.spacing.md,
-                        marginBottom: currentTheme.spacing.md,
-                    }}
-                >
+                <div className="themed-card__header" style={headerStyle}>
                     {icon ? (
-                        <span
-                            style={{
-                                alignItems: "center",
-                                display: "flex",
-                                fontSize: "1.5em",
-                                lineHeight: "1",
-                            }}
-                        >
+                        <span style={iconStyle}>
                             {renderColoredIcon(icon, iconColor ?? "primary")}
                         </span>
                     ) : null}
-                    <div style={{ flex: 1 }}>
+                    <div style={titleContainerStyle}>
                         {title ? (
                             <ThemedText
                                 size="lg"

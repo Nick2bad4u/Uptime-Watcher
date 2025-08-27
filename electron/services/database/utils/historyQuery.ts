@@ -104,6 +104,7 @@ export function findHistoryByMonitorId(
  */
 export function getHistoryCount(db: Database, monitorId: string): number {
     try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Database query result has known structure from controlled SQL statement
         const result = db.get(HISTORY_QUERY_QUERIES.SELECT_COUNT_BY_MONITOR, [
             monitorId,
         ]) as undefined | { count: number };
@@ -142,6 +143,7 @@ export function getLatestHistoryEntry(
     monitorId: string
 ): StatusHistory | undefined {
     try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Database query result has known structure from controlled SQL statement
         const row = db.get(HISTORY_QUERY_QUERIES.SELECT_LATEST_BY_MONITOR, [
             monitorId,
         ]) as DatabaseHistoryRow | undefined;

@@ -604,6 +604,7 @@ export function generateSqlParameters(): SqlParameters {
  * @returns Database row object suitable for SQL operations.
  */
 export function mapMonitorToRow(monitor: Monitor): MonitorRow {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Monitor object is converted to generic record for dynamic field access
     const monitorRecord = monitor as unknown as Record<string, unknown>;
     const row: Record<string, unknown> = {};
 
@@ -651,6 +652,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
     })();
 
     // Create the base monitor object with proper type safety
+    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Type assertions are safe for database row to monitor object conversion with known schema */
     const monitor: Monitor = {
         activeOperations,
         checkInterval: row.check_interval ?? 300_000,
@@ -699,6 +701,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
         // Return the monitor with type assertion back to Monitor interface
         return mutableMonitor as unknown as Monitor;
     }
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
     // Log warning if monitor type config is missing to prevent silent field loss
     console.warn(

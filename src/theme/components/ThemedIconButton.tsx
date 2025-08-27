@@ -3,7 +3,7 @@ import type {
     EventHandlers,
 } from "@shared/types/componentProps";
 
-import React from "react";
+import React, { useMemo } from "react";
 
 import type { ButtonSize, ButtonVariant } from "./types";
 
@@ -77,6 +77,16 @@ const ThemedIconButton = ({
 
     const buttonSize = getSize();
 
+    const buttonStyle = useMemo(
+        () => ({
+            height: buttonSize,
+            minWidth: "unset",
+            padding: "0",
+            width: buttonSize,
+        }),
+        [buttonSize]
+    );
+
     return (
         <ThemedButton
             className={`themed-icon-button ${className}`}
@@ -87,13 +97,7 @@ const ThemedIconButton = ({
             {...(onClick && { onClick })}
             icon={icon}
             {...(iconColor && { iconColor })}
-            // eslint-disable-next-line @arthurgeron/react-usememo/require-usememo
-            style={{
-                height: buttonSize,
-                minWidth: "unset",
-                padding: "0",
-                width: buttonSize,
-            }}
+            style={buttonStyle}
             {...(tooltip && { title: tooltip })}
         />
     );

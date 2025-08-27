@@ -395,7 +395,7 @@ export class HistoryRepository {
                 await this.databaseService.executeTransaction((db) => {
                     // Type assertion is safe: SQL query "SELECT id FROM
                     // monitors" guarantees { id: number } structure
-
+                    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Database queries return known structures from controlled SQL */
                     const monitors = db.all(
                         HISTORY_QUERIES.SELECT_MONITOR_IDS
                     ) as Array<{ id: number }>;
@@ -407,6 +407,7 @@ export class HistoryRepository {
                             HISTORY_QUERIES.SELECT_EXCESS_ENTRIES,
                             [String(monitor.id), limit]
                         ) as Array<{ id: number }>;
+                        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
                         if (excessEntries.length > 0) {
                             // Convert numeric IDs to ensure type safety and
                             // validate they are numbers
@@ -575,7 +576,7 @@ export class HistoryRepository {
         // Get all monitor IDs
         // Type assertion is safe: SQL query "SELECT id FROM monitors"
         // guarantees { id: number } structure
-
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Database query returns known structure from controlled SQL
         const monitorRows = db.all(
             HISTORY_QUERIES.SELECT_MONITOR_IDS
         ) as Array<{

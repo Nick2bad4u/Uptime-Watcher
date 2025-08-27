@@ -322,6 +322,7 @@ export class SiteRepository {
                 const db = this.getDb();
 
                 try {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Database query returns known structure from controlled SQL
                     const siteRow = db.get(SITE_QUERIES.SELECT_BY_ID, [
                         identifier,
                     ]) as DatabaseSiteRow | undefined;

@@ -1,5 +1,28 @@
 import type React from "react";
 
+// Cache for color styles to prevent object recreation
+const colorStylesCache = new Map<string, React.CSSProperties>();
+
+/**
+ * Get or create a cached color style object
+ *
+ * @param color - The color value
+ *
+ * @returns Cached color style object
+ *
+ * @internal
+ */
+function getColorStyle(color: string): React.CSSProperties {
+    let style = colorStylesCache.get(color);
+    if (!style) {
+        style = {
+            color,
+        };
+        colorStylesCache.set(color, style);
+    }
+    return style;
+}
+
 /**
  * Get the CSS class for an icon color
  *
@@ -63,7 +86,8 @@ export function renderColoredIcon(
         return <span className={colorClass}>{icon}</span>;
     }
     if (color) {
-        return <span style={{ color }}>{icon}</span>;
+        const colorStyle = getColorStyle(color);
+        return <span style={colorStyle}>{icon}</span>;
     }
     return icon;
 }

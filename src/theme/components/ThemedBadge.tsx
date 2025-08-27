@@ -39,6 +39,8 @@
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 import type React from "react";
 
+import { useMemo } from "react";
+
 import type { BadgeSize, BadgeVariant } from "./types";
 
 import { useTheme } from "../useTheme";
@@ -99,97 +101,117 @@ const ThemedBadge = ({
 }: ThemedBadgeProperties): React.JSX.Element => {
     const { currentTheme } = useTheme();
 
-    const badgeStyle: React.CSSProperties = {
-        alignItems: "center",
-        border: "1px solid",
-        borderRadius: currentTheme.borderRadius.full,
-        cursor: "default",
-        display: "inline-flex",
-        fontFamily: currentTheme.typography.fontFamily.sans.join(", "),
-        fontWeight: currentTheme.typography.fontWeight.medium,
-        gap: currentTheme.spacing.xs,
-        justifyContent: "center",
-        lineHeight: currentTheme.typography.lineHeight.tight,
-        transition: "all 150ms ease-in-out",
-        userSelect: "none",
-        whiteSpace: "nowrap",
-    };
+    const combinedStyle = useMemo(() => {
+        const badgeStyle: React.CSSProperties = {
+            alignItems: "center",
+            border: "1px solid",
+            borderRadius: currentTheme.borderRadius.full,
+            cursor: "default",
+            display: "inline-flex",
+            fontFamily: currentTheme.typography.fontFamily.sans.join(", "),
+            fontWeight: currentTheme.typography.fontWeight.medium,
+            gap: currentTheme.spacing.xs,
+            justifyContent: "center",
+            lineHeight: currentTheme.typography.lineHeight.tight,
+            transition: "all 150ms ease-in-out",
+            userSelect: "none",
+            whiteSpace: "nowrap",
+        };
 
-    // Size-specific styles
-    const sizeStyles = {
-        lg: {
-            fontSize: currentTheme.typography.fontSize.base,
-            padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.lg}`,
-        },
-        md: {
-            fontSize: currentTheme.typography.fontSize.sm,
-            padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
-        },
-        sm: {
-            fontSize: currentTheme.typography.fontSize.sm,
-            padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
-        },
-        xs: {
-            fontSize: currentTheme.typography.fontSize.xs,
-            padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
-        },
-    };
+        const sizeStyles = {
+            lg: {
+                fontSize: currentTheme.typography.fontSize.base,
+                padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.lg}`,
+            },
+            md: {
+                fontSize: currentTheme.typography.fontSize.sm,
+                padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
+            },
+            sm: {
+                fontSize: currentTheme.typography.fontSize.sm,
+                padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
+            },
+            xs: {
+                fontSize: currentTheme.typography.fontSize.xs,
+                padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
+            },
+        };
 
-    // Variant-specific styles
-    const variantStyles = {
-        error: {
-            backgroundColor: `${currentTheme.colors.error}20`,
-            borderColor: `${currentTheme.colors.error}40`,
-            color: currentTheme.colors.error,
-        },
-        info: {
-            backgroundColor: `${currentTheme.colors.primary[500]}20`,
-            borderColor: `${currentTheme.colors.primary[500]}40`,
-            color: currentTheme.colors.primary[600],
-        },
-        primary: {
-            backgroundColor: currentTheme.colors.primary[100],
-            borderColor: currentTheme.colors.primary[200],
-            color: currentTheme.colors.primary[700],
-        },
-        secondary: {
-            backgroundColor: currentTheme.colors.background.secondary,
-            borderColor: currentTheme.colors.border.secondary,
-            color: currentTheme.colors.text.secondary,
-        },
-        success: {
-            backgroundColor: `${currentTheme.colors.success}20`,
-            borderColor: `${currentTheme.colors.success}40`,
-            color: currentTheme.colors.success,
-        },
-        warning: {
-            backgroundColor: `${currentTheme.colors.warning}20`,
-            borderColor: `${currentTheme.colors.warning}40`,
-            color: currentTheme.colors.warning,
-        },
-    };
+        const variantStyles = {
+            error: {
+                backgroundColor: `${currentTheme.colors.error}20`,
+                borderColor: `${currentTheme.colors.error}40`,
+                color: currentTheme.colors.error,
+            },
+            info: {
+                backgroundColor: `${currentTheme.colors.primary[500]}20`,
+                borderColor: `${currentTheme.colors.primary[500]}40`,
+                color: currentTheme.colors.primary[600],
+            },
+            primary: {
+                backgroundColor: currentTheme.colors.primary[100],
+                borderColor: currentTheme.colors.primary[200],
+                color: currentTheme.colors.primary[700],
+            },
+            secondary: {
+                backgroundColor: currentTheme.colors.background.secondary,
+                borderColor: currentTheme.colors.border.secondary,
+                color: currentTheme.colors.text.secondary,
+            },
+            success: {
+                backgroundColor: `${currentTheme.colors.success}20`,
+                borderColor: `${currentTheme.colors.success}40`,
+                color: currentTheme.colors.success,
+            },
+            warning: {
+                backgroundColor: `${currentTheme.colors.warning}20`,
+                borderColor: `${currentTheme.colors.warning}40`,
+                color: currentTheme.colors.warning,
+            },
+        };
 
-    const combinedStyle = {
-        ...badgeStyle,
-        ...sizeStyles[size],
-        ...variantStyles[variant],
-    };
+        return {
+            ...badgeStyle,
+            ...sizeStyles[size],
+            ...variantStyles[variant],
+        };
+    }, [
+        currentTheme.borderRadius.full,
+        currentTheme.colors.background.secondary,
+        currentTheme.colors.border.secondary,
+        currentTheme.colors.error,
+        currentTheme.colors.primary,
+        currentTheme.colors.success,
+        currentTheme.colors.text.secondary,
+        currentTheme.colors.warning,
+        currentTheme.spacing.lg,
+        currentTheme.spacing.md,
+        currentTheme.spacing.sm,
+        currentTheme.spacing.xs,
+        currentTheme.typography.fontFamily.sans,
+        currentTheme.typography.fontSize.base,
+        currentTheme.typography.fontSize.sm,
+        currentTheme.typography.fontSize.xs,
+        currentTheme.typography.fontWeight.medium,
+        currentTheme.typography.lineHeight.tight,
+        size,
+        variant,
+    ]);
+
+    const iconStyle = useMemo(
+        () => ({
+            color: iconColor ?? combinedStyle.color,
+            fontSize: "inherit",
+        }),
+        [combinedStyle.color, iconColor]
+    );
 
     return (
         <span
             className={`themed-badge themed-badge--${variant} themed-badge--${size} ${className}`}
             style={combinedStyle}
         >
-            {icon ? (
-                <span
-                    style={{
-                        color: iconColor ?? combinedStyle.color,
-                        fontSize: "inherit",
-                    }}
-                >
-                    {icon}
-                </span>
-            ) : null}
+            {icon ? <span style={iconStyle}>{icon}</span> : null}
             {children}
         </span>
     );

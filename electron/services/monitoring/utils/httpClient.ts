@@ -96,6 +96,7 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
         },
         (error) => {
             // Also calculate timing for error responses
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Axios error object structure is stable and well-documented for metadata access
             const err = error as {
                 config?: { metadata?: { startTime?: number } };
                 responseTime?: number;

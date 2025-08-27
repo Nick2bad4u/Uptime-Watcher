@@ -48,6 +48,7 @@ export function insertWithReturning(
     if (!result) {
         throw new Error("INSERT with RETURNING failed: no result returned");
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion is safe as we control the SQL structure and know the return type
     return result as unknown as Record<string, unknown>;
 }
 
@@ -68,6 +69,7 @@ export function queryForCount(
     sql: string,
     params?: DbValue[]
 ): CountResult | undefined {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion is safe as we control the SQL structure and know the return type
     return db.get(sql, params) as unknown as CountResult | undefined;
 }
 
@@ -91,6 +93,7 @@ export function queryForIds(
     sql: string,
     params?: DbValue[]
 ): IdOnlyResult[] {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion is safe as we control the SQL structure and know the return type
     return db.all(sql, params) as unknown as IdOnlyResult[];
 }
 
@@ -111,6 +114,7 @@ export function queryForRecords<
     // eslint-disable-next-line etc/no-misused-generics -- Type parameter can be omitted for flexible usage
     T extends Record<string, unknown> = Record<string, unknown>,
 >(db: Database, sql: string, params?: DbValue[]): T[] {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion is safe as we control the SQL structure and know the return type
     return db.all(sql, params) as unknown as T[];
 }
 
@@ -133,6 +137,7 @@ export function queryForSingleRecord(
     sql: string,
     params?: DbValue[]
 ): Record<string, unknown> | undefined {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion is safe as we control the SQL structure and know the return type
     return db.get(sql, params) as unknown as
         | Record<string, unknown>
         | undefined;

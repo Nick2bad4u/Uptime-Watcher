@@ -51,12 +51,23 @@ export const updateMonitorAndSave = async (
     updates: Partial<Site["monitors"][0]>,
     deps: SiteOperationsDependencies
 ): Promise<void> => {
-    const site = getSiteById(siteId, deps);
-
-    const updatedSite = updateMonitorInSite(site, monitorId, updates);
-    await window.electronAPI.sites.updateSite(siteId, {
-        monitors: updatedSite.monitors,
-    });
+    try {
+        const site = getSiteById(siteId, deps);
+        const updatedSite = updateMonitorInSite(site, monitorId, updates);
+        await window.electronAPI.sites.updateSite(siteId, {
+            monitors: updatedSite.monitors,
+        });
+    } catch (error) {
+        if (
+            error instanceof Error &&
+            error.message.includes(ERROR_CATALOG.sites.NOT_FOUND as string)
+        ) {
+            console.error(`Failed to find site with ID ${siteId}:`, error);
+            throw new Error(`Site not found: ${siteId}`);
+        }
+        // Re-throw other errors
+        throw error;
+    }
 };
 
 /**

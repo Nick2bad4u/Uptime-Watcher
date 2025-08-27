@@ -222,6 +222,7 @@ export class SettingsRepository {
     public async get(key: string): Promise<string | undefined> {
         return withDatabaseOperation(() => {
             const db = this.getDb();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Database query returns known structure from controlled SQL
             const result = db.get(SETTINGS_QUERIES.SELECT_VALUE_BY_KEY, [
                 key,
             ]) as DatabaseSettingsRow | undefined;

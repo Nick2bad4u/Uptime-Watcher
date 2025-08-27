@@ -58,12 +58,14 @@ function copyDynamicFields(
     ]);
 
     // Copy monitor-type specific fields
+    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Dynamic monitor field assignment requires type assertions for extensible monitor type system */
     for (const [key, value] of Object.entries(dynamicMonitor)) {
         if (!excludedFields.has(key)) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment -- Dynamic field assignment required for monitor type system. Key is validated from dynamicMonitor which comes from typed database mapping.
             (monitor as any)[key] = value;
         }
     }
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 }
 
 /**
@@ -194,7 +196,7 @@ export function buildMonitorParameters(
         const { columns } = generateSqlParameters();
 
         // Return values in the same order as columns
-        // eslint-disable-next-line sonarjs/function-return-type -- Returns DbValue which can be different types
+        /* eslint-disable @typescript-eslint/no-unsafe-type-assertion, sonarjs/function-return-type -- Safe internal type conversions for database mapping. Row structure guaranteed by dynamic schema system. */
         return columns.map((column): DbValue => {
             const value = (row as unknown as Record<string, unknown>)[column];
             if (value === undefined || value === null) {
@@ -202,6 +204,7 @@ export function buildMonitorParameters(
             }
             return value as DbValue;
         });
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion, sonarjs/function-return-type */
     } catch (error) {
         logger.error(LOG_TEMPLATES.errors.MONITOR_MAPPER_FAILED, {
             error,

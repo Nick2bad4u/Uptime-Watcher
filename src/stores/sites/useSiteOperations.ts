@@ -88,7 +88,21 @@ export const createSiteOperationsActions = (
                                   type: "http" as MonitorType,
                               },
                           ]
-                ).map((monitor) => normalizeMonitor(monitor));
+                ).map((monitor) => {
+                    try {
+                        return normalizeMonitor(monitor);
+                    } catch (error) {
+                        logger.error(
+                            "Failed to normalize monitor",
+                            error instanceof Error
+                                ? error
+                                : new Error(String(error))
+                        );
+                        throw new Error(
+                            `Monitor normalization failed: ${error instanceof Error ? error.message : "Unknown error"}`
+                        );
+                    }
+                });
 
                 // Construct a complete Site object
                 const completeSite: Site = {
@@ -150,6 +164,7 @@ export const createSiteOperationsActions = (
         await withSiteOperation(
             "downloadSQLiteBackup",
             async () => {
+                /* eslint-disable-next-line ex/no-unhandled -- Exception is handled by the try-catch block */
                 await handleSQLiteBackupDownload(async () => {
                     try {
                         const response =

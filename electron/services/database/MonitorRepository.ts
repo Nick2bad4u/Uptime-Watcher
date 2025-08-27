@@ -105,8 +105,8 @@ const MONITOR_QUERIES = {
     DELETE_BY_ID: "DELETE FROM monitors WHERE id = ?",
     DELETE_BY_SITE: "DELETE FROM monitors WHERE site_identifier = ?",
     DELETE_HISTORY_BY_MONITOR: "DELETE FROM history WHERE monitor_id = ?",
-    INSERT_WITH_RETURNING: `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked) 
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+    INSERT_WITH_RETURNING: `INSERT INTO monitors (site_identifier, type, url, host, port, checkInterval, timeout, retryAttempts, monitoring, status, responseTime, lastChecked)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                            RETURNING id`,
     SELECT_ALL_IDS: "SELECT id FROM monitors",
     SELECT_BY_ID: "SELECT * FROM monitors WHERE id = ?",
@@ -567,6 +567,7 @@ export class MonitorRepository {
         // field for INSERT operations
         const parameters = buildMonitorParameters(
             siteIdentifier,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Monitor object is compatible with Site monitor structure for parameter building
             monitor as Site["monitors"][0]
         );
 
@@ -691,6 +692,7 @@ export class MonitorRepository {
         }
 
         // Use dynamic row mapping to convert camelCase to snake_case
+        /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Monitor row mapping requires type assertions for dynamic field conversion */
         const row = mapMonitorToRow(monitor as Monitor);
 
         if (isDev()) {
@@ -701,6 +703,7 @@ export class MonitorRepository {
             row as unknown as Record<string, unknown>,
             monitor
         );
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
         if (updateFields.length === 0) {
             if (isDev()) {

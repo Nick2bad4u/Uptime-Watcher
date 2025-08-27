@@ -50,7 +50,7 @@ import type {
     EventHandlers,
 } from "@shared/types/componentProps";
 
-import React from "react";
+import React, { useMemo } from "react";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../../constants";
 import { useTheme, useThemeClasses } from "../useTheme";
@@ -131,18 +131,29 @@ const ThemedSelect = ({
     // warnings
     const selectValue = value ?? "";
 
-    const styles: React.CSSProperties = {
-        ...getBackgroundClass("primary"),
-        ...getTextClass("primary"),
-        ...getBorderClass("primary"),
-        borderRadius: currentTheme.borderRadius.md,
-        borderStyle: "solid",
-        borderWidth: "1px",
-        fontSize: currentTheme.typography.fontSize.sm,
-        padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
-        transition: TRANSITION_ALL,
-        width: "100%",
-    };
+    const styles = useMemo(
+        (): React.CSSProperties => ({
+            ...getBackgroundClass("primary"),
+            ...getTextClass("primary"),
+            ...getBorderClass("primary"),
+            borderRadius: currentTheme.borderRadius.md,
+            borderStyle: "solid",
+            borderWidth: "1px",
+            fontSize: currentTheme.typography.fontSize.sm,
+            padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
+            transition: TRANSITION_ALL,
+            width: "100%",
+        }),
+        [
+            currentTheme.borderRadius.md,
+            currentTheme.spacing.md,
+            currentTheme.spacing.sm,
+            currentTheme.typography.fontSize.sm,
+            getBackgroundClass,
+            getBorderClass,
+            getTextClass,
+        ]
+    );
     return (
         <select
             aria-describedby={ariaDescribedBy}

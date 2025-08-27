@@ -891,6 +891,7 @@ export class ServiceContainer {
                         try {
                             await mainOrchestrator.emitTyped(
                                 eventType,
+                                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Event data is validated by the typed event system and matches the event type
                                 data as UptimeEvents[typeof eventType]
                             );
                         } catch (error) {

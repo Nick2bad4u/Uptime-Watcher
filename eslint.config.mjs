@@ -7079,112 +7079,13 @@ export default [
         },
     },
 
-    // Strategic overrides for @typescript-eslint/no-unsafe-type-assertion
-    // These files/patterns require type assertions due to their nature
-    {
-        files: [
-            // Database utilities: handle SQLite's untyped results
-            "electron/services/database/utils/typedQueries.ts",
-
-            // Type utilities: centralized type manipulation helpers
-            "shared/utils/typeHelpers.ts",
-
-            // Database repositories: controlled SQL with known structure
-            "electron/services/database/*Repository.ts",
-
-            // Database utilities: type mapping and conversion
-            "electron/services/database/utils/*.ts",
-
-            // Validation utilities: runtime type checking
-            "shared/validation/*.ts",
-
-            // IPC layer: Electron boundary type assertions
-            "electron/preload.ts",
-            "electron/services/ipc/*.ts",
-
-            // Event system core: generic type manipulation
-            "electron/events/TypedEventBus.ts",
-            "electron/events/middleware.ts",
-
-            // Service containers and dependency injection
-            "electron/services/ServiceContainer.ts",
-
-            // Shared type utilities and safety helpers
-            "shared/utils/*.ts",
-            "shared/types/*.ts",
-
-            // Theme and configuration types
-            "src/theme/*.ts",
-            "src/types/*.ts",
-
-            // Chart and UI utilities with third-party integrations
-            "src/services/chartConfig.ts",
-            "src/utils/*.ts",
-
-            // Store utilities for state management
-            "src/stores/utils.ts",
-            "src/stores/**/utils/*.ts",
-
-            // Component utilities and form handling
-            "src/components/**/use*.ts",
-            "src/hooks/**/*.ts",
-
-            // Monitor and system utilities with complex type assertions
-            "electron/services/monitoring/*.ts",
-            "electron/utils/*.ts",
-
-            // React components with complex third-party integrations
-            "src/components/**/*.tsx",
-            "src/components/**/*.ts",
-
-            // Additional utility files with necessary type assertions
-            "electron/services/monitoring/utils/httpClient.ts",
-            "electron/utils/database/DataImportExportService.ts",
-            "src/services/logger.ts",
-        ],
-        rules: {
-            // Allow type assertions in these contexts where they're necessary and well-documented
-            "@typescript-eslint/no-unsafe-type-assertion": "off",
-        },
-    },
-
-    // Store-specific overrides to handle false positives
-    {
-        files: [
-            "src/stores/**/*.ts",
-            "src/stores/**/*.tsx",
-            "src/stores/**/*.cts",
-            "src/stores/**/*.mts",
-        ],
-        rules: {
-            // Disable ex/no-unhandled for stores due to false positives with variable access
-            // The rule incorrectly flags simple parameter/variable access as potential exceptions
-            "ex/no-unhandled": "off",
-        },
-    },
-
     // Strict Test files (Frontend)
     {
         files: [
             "shared/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "src/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "electron/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
         ],
-        plugins: {
-            vitest: vitest,
-        },
-        rules: {
-            ...vitest.configs.all.rules,
-        },
-        settings: {
-            vitest: {
-                typecheck: true,
-            },
-        },
-    },
-
-    // Strict Test files (Backend)
-    {
-        files: ["electron/test/StrictTests/*.{ts,tsx,cts,mts}"],
         plugins: {
             vitest: vitest,
         },
@@ -7203,7 +7104,7 @@ export default [
         files: ["src/theme/**/*.{ts,tsx,cts,mts}"],
         rules: {
             // Theme components legitimately need inline styles for dynamic theming
-            "react-perf/jsx-no-new-object-as-prop": "off",
+            "react-perf/jsx-no-new-object-as-prop": "warn",
         },
     },
 

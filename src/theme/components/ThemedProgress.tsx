@@ -1,6 +1,6 @@
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 
 import { useTheme } from "../useTheme";
 import ThemedText from "./ThemedText";
@@ -47,7 +47,7 @@ const ThemedProgress = ({
 
     const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
 
-    const getVariantColor = (): string => {
+    const getVariantColor = useCallback((): string => {
         switch (variant) {
             case "error": {
                 return currentTheme.colors.error;
@@ -65,9 +65,15 @@ const ThemedProgress = ({
                 return currentTheme.colors.primary[500];
             }
         }
-    };
+    }, [
+        currentTheme.colors.error,
+        currentTheme.colors.primary,
+        currentTheme.colors.success,
+        currentTheme.colors.warning,
+        variant,
+    ]);
 
-    const getHeight = (): string => {
+    const getHeight = useCallback((): string => {
         switch (size) {
             case "lg": {
                 return "12px";
@@ -85,36 +91,62 @@ const ThemedProgress = ({
                 return "8px";
             }
         }
-    };
+    }, [size]);
 
-    const containerStyles: React.CSSProperties = {
-        backgroundColor: currentTheme.colors.background.secondary,
-        borderRadius: currentTheme.borderRadius.full,
-        height: getHeight(),
-        overflow: "hidden",
-        position: "relative",
-        width: "100%",
-    };
+    const containerStyles = useMemo(
+        (): React.CSSProperties => ({
+            backgroundColor: currentTheme.colors.background.secondary,
+            borderRadius: currentTheme.borderRadius.full,
+            height: getHeight(),
+            overflow: "hidden",
+            position: "relative",
+            width: "100%",
+        }),
+        [
+            currentTheme.borderRadius.full,
+            currentTheme.colors.background.secondary,
+            getHeight,
+        ]
+    );
 
-    const progressStyles: React.CSSProperties = {
-        backgroundColor: getVariantColor(),
-        borderRadius: currentTheme.borderRadius.full,
-        height: "100%",
-        transition: "width 0.3s ease-in-out",
-        width: `${percentage}%`,
-    };
+    const progressStyles = useMemo(
+        (): React.CSSProperties => ({
+            backgroundColor: getVariantColor(),
+            borderRadius: currentTheme.borderRadius.full,
+            height: "100%",
+            transition: "width 0.3s ease-in-out",
+            width: `${percentage}%`,
+        }),
+        [
+            currentTheme.borderRadius.full,
+            getVariantColor,
+            percentage,
+        ]
+    );
+
+    const labelContainerStyle = useMemo(
+        () => ({
+            alignItems: "center",
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: currentTheme.spacing.xs,
+        }),
+        [currentTheme.spacing.xs]
+    );
+
+    const hiddenProgressStyle = useMemo(
+        (): React.CSSProperties => ({
+            left: "-9999px",
+            position: "absolute" as const,
+            top: "-9999px",
+        }),
+        []
+    );
 
     return (
         <div className={`themed-progress ${className}`}>
             {showLabel || label ? (
-                <div
-                    style={{
-                        alignItems: "center",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: currentTheme.spacing.xs,
-                    }}
-                >
+                <div style={labelContainerStyle}>
                     {label ? (
                         <ThemedText size="sm" variant="secondary">
                             {label}
@@ -127,15 +159,7 @@ const ThemedProgress = ({
                     ) : null}
                 </div>
             ) : null}
-            <progress
-                max={max}
-                style={{
-                    left: "-9999px",
-                    position: "absolute",
-                    top: "-9999px",
-                }}
-                value={value}
-            />
+            <progress max={max} style={hiddenProgressStyle} value={value} />
             <div aria-hidden="true" style={containerStyles}>
                 <div style={progressStyles} />
             </div>

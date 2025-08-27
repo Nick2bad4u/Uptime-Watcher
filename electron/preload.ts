@@ -177,7 +177,7 @@ const dataAPI = {
         // type 2. This is an internal API call with a well-defined contract 3.
         // The main process handler guarantees this specific return type
         // structure
-
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- IPC handler contract guarantees this return type structure
         ipcRenderer.invoke("download-sqlite-backup") as Promise<{
             buffer: ArrayBuffer;
             fileName: string;
