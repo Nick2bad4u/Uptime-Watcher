@@ -27,7 +27,7 @@ vi.mock("../../utils/correlation", () => ({
 }));
 
 // Define comprehensive test event types
-interface TestEvents extends Record<string, unknown> {
+interface TestEvents {
     "string-event": string;
     "number-event": number;
     "object-event": { data: string; nested: { value: number } };
@@ -40,6 +40,8 @@ interface TestEvents extends Record<string, unknown> {
     "primitive-boolean": boolean;
     "null-event": null;
     "undefined-event": undefined;
+    [key: string]: unknown;
+    [key: symbol]: unknown;
 }
 
 describe("TypedEventBus - Comprehensive Coverage", () => {

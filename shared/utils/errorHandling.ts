@@ -118,9 +118,9 @@ async function handleBackendOperation<T>(
     operation: () => Promise<T>,
     context: ErrorHandlingBackendContext
 ): Promise<T> {
-    // Safely destructure context with defaults
-    const safeContext = context || {};
-    const { logger, operationName } = safeContext;
+    // Extract properties safely
+    const logger = context.logger;
+    const operationName = context.operationName;
 
     try {
         return await operation();

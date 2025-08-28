@@ -505,7 +505,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             );
 
             // Arrange
-            interface SiteRecord extends Record<string, unknown> {
+            interface SiteRecord extends Record<string | symbol, unknown> {
                 id: number;
                 name: string;
                 url: string;
@@ -559,7 +559,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             );
 
             // Arrange
-            interface MonitorRecord extends Record<string, unknown> {
+            interface MonitorRecord extends Record<string | symbol, unknown> {
                 id: number;
                 url: string;
                 status: string;
@@ -619,7 +619,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             );
 
             // Arrange
-            interface JoinedRecord extends Record<string, unknown> {
+            interface JoinedRecord extends Record<string | symbol, unknown> {
                 site_id: number;
                 site_name: string;
                 monitor_id: number;

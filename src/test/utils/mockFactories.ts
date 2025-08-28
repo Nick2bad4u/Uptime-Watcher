@@ -40,7 +40,7 @@
 
 import type { PartialDeep, SetOptional } from "type-fest";
 
-import type { MonitorStatus, MonitorType } from "@shared/types";
+import type { MonitorStatus, MonitorType, StatusHistory } from "@shared/types";
 
 /**
  * Complete site interface for testing purposes.
@@ -79,16 +79,7 @@ export interface CompleteMonitor {
     /** Interval between checks in milliseconds */
     checkInterval: number;
     /** History of monitoring check results */
-    history: {
-        /** Additional details about the check result */
-        details?: string;
-        /** Response time for the check in milliseconds */
-        responseTime: number;
-        /** Status result of the check */
-        status: MonitorStatus;
-        /** Timestamp when the check was performed */
-        timestamp: number;
-    }[];
+    history: StatusHistory[];
     /** Host address for port-based monitors */
     host?: string;
     /** Unique identifier for the monitor */

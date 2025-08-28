@@ -19,9 +19,11 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { TypedEventBus } from "../../events/TypedEventBus";
 
 // Create a simple test event map
-interface TestEvents extends Record<string, unknown> {
+interface TestEvents {
     "test-event": { data: string };
     "another-event": { value: number };
+    [key: string]: unknown;
+    [key: symbol]: unknown;
 }
 
 describe("TypedEventBus", () => {

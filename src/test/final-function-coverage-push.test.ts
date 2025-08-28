@@ -69,7 +69,7 @@ describe("Final Function Coverage Push", () => {
 
         // Test getMonitorValidationErrors
         const validMonitor = {
-            type: "http",
+            type: "http" as const,
             url: "https://example.com",
             checkInterval: 30_000,
             timeout: 5000,
@@ -79,7 +79,7 @@ describe("Final Function Coverage Push", () => {
         expect(Array.isArray(errors1)).toBe(true);
 
         const invalidMonitor = {
-            type: "invalid",
+            type: "invalid" as any, // Invalid type for testing validation
             checkInterval: -1,
             timeout: -1,
             retryAttempts: -1,
@@ -230,8 +230,8 @@ describe("Final Function Coverage Push", () => {
                 try {
                     fn();
                     fn('{"test": true}');
-                    fn('{"test": true}', (x: any) => true);
-                    fn("[1,2,3]", (x: any) => true);
+                    fn('{"test": true}', () => true);
+                    fn("[1,2,3]", () => true);
                     fn({ test: true }, "fallback");
                 } catch (error) {
                     // Function called, coverage counts
@@ -250,7 +250,7 @@ describe("Final Function Coverage Push", () => {
                     fn({ a: 1, b: 2 });
                     fn({ a: 1, b: 2 }, "a");
                     fn({ a: 1, b: 2 }, ["a"]);
-                    fn({ a: 1, b: 2 }, (obj: any) => {});
+                    fn({ a: 1, b: 2 }, () => {});
                 } catch (error) {
                     // Function called, coverage counts
                 }
