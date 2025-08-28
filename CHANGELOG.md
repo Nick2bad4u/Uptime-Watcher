@@ -7,14 +7,98 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[732407b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/732407bbdebf24bf86734fb6075934db6efb2cf6)...
+[732407b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/732407bbdebf24bf86734fb6075934db6efb2cf6)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/732407bbdebf24bf86734fb6075934db6efb2cf6...732407bbdebf24bf86734fb6075934db6efb2cf6))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 13.1.0 [`(732407b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/732407bbdebf24bf86734fb6075934db6efb2cf6)
+
+
+
+
+
+
+## [13.1.0] - 2025-08-27
+
+
 [[f42f976](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f42f9765bb0e64fa1a3f22be45b24ae27f0cc35f)...
-[f42f976](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f42f9765bb0e64fa1a3f22be45b24ae27f0cc35f)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f42f9765bb0e64fa1a3f22be45b24ae27f0cc35f...f42f9765bb0e64fa1a3f22be45b24ae27f0cc35f))
+[66902c6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66902c61900ca257b94ca76866a8499f28ef3821)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f42f9765bb0e64fa1a3f22be45b24ae27f0cc35f...66902c61900ca257b94ca76866a8499f28ef3821))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 13.0.0 [`(f42f976)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f42f9765bb0e64fa1a3f22be45b24ae27f0cc35f)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Standardizes code formatting and improves docs clarity
+
+- Updates code and markdown files to use consistent quote styles, indentation, and table layouts for improved readability.
+- Refines documentation for migration scripts, providing clearer usage instructions and migration examples.
+- Adjusts comments and line breaks for better maintainability across test setups, type declarations, and configuration.
+- Enhances import processing logic for migration automation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0cfe753)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0cfe753e48b21c2040176298c7abd80ec83ecd63)
+
+
+- 🎨 [style] Optimize React performance and clarify type assertions
+
+- Refactors multiple UI components to use `useMemo` and `useCallback` for style and handler computations, improving render efficiency and reducing object recreation.
+- Adds caching for icon color styles to further boost performance.
+- Enhances error handling in several site operations and monitor update helpers for better robustness.
+- Replaces broad ESLint rule overrides with targeted inline disables and enables, providing explicit justification for necessary type assertions and maintaining stricter code quality elsewhere.
+- Updates some comments for clarity and maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3d244cc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3d244cc989bd6cb7aaea45e66f100d215e8d42d8)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add comprehensive tests to achieve 90%+ function coverage
+
+- Introduces systematic and exhaustive test suites targeting all exported functions across shared and utility modules with previously low coverage.
+- Calls functions with varied and edge case arguments to trigger all code paths and validation logic, boosting overall coverage above the 90% threshold.
+- Addresses prior gaps in function coverage to improve reliability and future maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(df49925)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/df49925b4ce599a3b2155a686255fd67d1ab1156)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Annotate safe type assertions and clean project docs
+
+- Adds explicit ESLint comments to document safe use of TypeScript type assertions throughout the codebase, improving clarity and future maintainability.
+- Switches lint rule for unsafe type assertions from 'off' to 'warn' to encourage best practices without blocking necessary cases.
+- Removes internal Copilot and Codacy instruction files no longer needed for project guidance.
+- Refactors README for improved visuals, structure, and accuracy, clarifying technology stack, requirements, contribution process, and license information.
+- Enhances code documentation and disables redundant comments.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e39ed3d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e39ed3d709c55a7a87ce09366b07832eaf659b06)
+
+
+- Update changelogs for v13.0.0 [skip ci] [`(e00598e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e00598ee919d4312061a0891f4493c2cc601064c)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update Flatpak build paths and ESLint config structure
+
+- Streamlines Flatpak build workflow by relocating manifest and updating references for improved maintainability.
+- Adds detailed section headers in ESLint config to clarify rules scope and organization.
+- Expands boundaries settings with fine-grained type capture for better code architecture enforcement.
+- Adjusts plugin and rule usage to reduce noise and enhance clarity in linting, including tweaks for test and config files.
+- Temporarily disables YAML key sorting in manifest to prevent build issues.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(66902c6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66902c61900ca257b94ca76866a8499f28ef3821)
 
 
 
