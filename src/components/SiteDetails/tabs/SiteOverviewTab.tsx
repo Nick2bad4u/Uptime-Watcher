@@ -128,7 +128,8 @@ export const SiteOverviewTab = ({
         percentage: number
     ): "error" | "success" | "warning" => {
         const variant = getAvailabilityVariant(percentage);
-        return variant === "danger" ? "error" : variant;
+        if (variant === "danger") return "error";
+        return variant; // "success" | "warning"
     };
 
     /**

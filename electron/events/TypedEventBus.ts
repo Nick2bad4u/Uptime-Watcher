@@ -36,6 +36,8 @@
  * @packageDocumentation
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import {
     createTemplateLogger,
     LOG_TEMPLATES,
@@ -146,7 +148,7 @@ export type EventMiddleware<T = unknown> = (
  * @public
  */
 export class TypedEventBus<
-    EventMap extends Record<string, unknown>,
+    EventMap extends UnknownRecord,
     // eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
 > extends EventEmitter {
     /**
@@ -694,7 +696,7 @@ export class TypedEventBus<
  * @returns A new {@link TypedEventBus} instance.
  */
 // eslint-disable-next-line etc/no-misused-generics -- EventMap must be explicitly provided for type safety
-export function createTypedEventBus<EventMap extends Record<string, unknown>>(
+export function createTypedEventBus<EventMap extends UnknownRecord>(
     name?: string,
     options?: { maxMiddleware?: number }
 ): TypedEventBus<EventMap> {

@@ -9,6 +9,8 @@
  * @packageDocumentation
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { isDevelopment } from "@shared/utils/environment";
 
 import type { EventMiddleware } from "./TypedEventBus";
@@ -180,7 +182,7 @@ type ValidatorFunction<TData = unknown> = (data: TData) => ValidationResult;
  *
  * @typeParam T - Record type defining event names and their data types
  */
-type ValidatorMap<T extends Record<string, unknown>> = Partial<{
+type ValidatorMap<T extends UnknownRecord> = Partial<{
     [K in keyof T]: ValidatorFunction<T[K]>;
 }>;
 
@@ -701,7 +703,7 @@ export function createRateLimitMiddleware(options: {
  * @returns EventMiddleware function that validates event data before
  *   processing.
  */
-export function createValidationMiddleware<T extends Record<string, unknown>>(
+export function createValidationMiddleware<T extends UnknownRecord>(
     validators: ValidatorMap<T>
 ): EventMiddleware {
     return async (

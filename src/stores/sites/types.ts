@@ -7,6 +7,7 @@
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type { Simplify } from "type-fest";
 
 /**
  * Sites store actions interface for managing site operations.
@@ -136,9 +137,9 @@ export interface SitesState {
 
 /**
  * Combined interface for Sites store actions and state. Provides a complete
- * interface for site management functionality.
+ * interface for site management functionality with flattened type display.
  */
-export type SitesStore = SitesActions & SitesState;
+export type SitesStore = Simplify<SitesActions & SitesState>;
 
 /**
  * Dependencies interface for site operations. Defines the minimal interface

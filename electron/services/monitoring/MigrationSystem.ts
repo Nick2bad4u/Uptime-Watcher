@@ -10,6 +10,8 @@
  * @public
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -84,9 +86,7 @@ export interface MigrationRule {
      *
      * @throws Throws if transformation fails or data is invalid.
      */
-    transform: (
-        data: Record<string, unknown>
-    ) => Promise<Record<string, unknown>>;
+    transform: (data: UnknownRecord) => Promise<UnknownRecord>;
 }
 
 /**
@@ -170,12 +170,12 @@ class MigrationOrchestrator {
      */
     public async migrateMonitorData(
         monitorType: string,
-        data: Record<string, unknown>,
+        data: UnknownRecord,
         fromVersion: string,
         toVersion: string
     ): Promise<{
         appliedMigrations: string[];
-        data?: Record<string, unknown>;
+        data?: UnknownRecord;
         errors: string[];
         success: boolean;
         warnings: string[];
@@ -719,7 +719,7 @@ export const exampleMigrations = {
         fromVersion: "1.0.0",
         isBreaking: false,
         toVersion: "1.1.0",
-        transform: (data: Record<string, unknown>) =>
+        transform: (data: UnknownRecord) =>
             Promise.resolve({
                 ...data,
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Migration data extraction with runtime fallback
@@ -752,7 +752,7 @@ export const exampleMigrations = {
         fromVersion: "1.0.0",
         isBreaking: false,
         toVersion: "1.1.0",
-        transform: (data: Record<string, unknown>) => {
+        transform: (data: UnknownRecord) => {
             const portValue = data["port"];
 
             // Handle different port value types

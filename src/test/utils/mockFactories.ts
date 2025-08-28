@@ -38,6 +38,10 @@
  * @packageDocumentation
  */
 
+import type { PartialDeep, SetOptional } from "type-fest";
+
+import type { MonitorStatus, MonitorType } from "@shared/types";
+
 /**
  * Complete site interface for testing purposes.
  *
@@ -81,7 +85,7 @@ export interface CompleteMonitor {
         /** Response time for the check in milliseconds */
         responseTime: number;
         /** Status result of the check */
-        status: "down" | "up";
+        status: MonitorStatus;
         /** Timestamp when the check was performed */
         timestamp: number;
     }[];
@@ -100,39 +104,75 @@ export interface CompleteMonitor {
     /** Number of retry attempts before marking as failed */
     retryAttempts: number;
     /** Current status of the monitor */
-    status: "up" | "down" | "pending" | "paused";
+    status: MonitorStatus;
     /** Timeout for checks in milliseconds */
     timeout: number;
     /** Type of monitor (determines monitoring strategy) */
-    type: "http" | "port";
+    type: MonitorType;
     /** URL for HTTP-based monitors */
     url?: string;
 }
 
 /**
- * Creates a mock monitor object with default values.
+ * Creates a mock monitor object with default values using deep partial type safety.
  *
  * @remarks
- * Generates a monitor object with sensible defaults for testing purposes. All
- * properties can be overridden by providing a partial object with the desired
- * values.
+ * Enhanced version of createMockMonitor that supports deep partial overrides
+ * for nested objects, providing better type safety for complex test scenarios.
  *
  * @example
  *
  * ```typescript
- * // Create with defaults
- * const monitor = createMockMonitor();
- *
- * // Create with custom status
- * const downMonitor = createMockMonitor({ status: "down" });
+ * // Create with deep partial overrides
+ * const monitor = createMockMonitorDeep({
+ *     history: [{
+ *         responseTime: 200
+ *     }]
+ * });
  * ```
  *
- * @param overrides - Partial monitor object to override default values
+ * @param overrides - Deep partial monitor object to override default values
  *
  * @returns Complete monitor object suitable for testing
  *
  * @public
  */
+export const createMockMonitorDeep = (
+    overrides: PartialDeep<CompleteMonitor> = {}
+): CompleteMonitor => {
+    const base = createMockMonitor();
+    return Object.assign(base, overrides) as CompleteMonitor;
+};
+
+/**
+ * Creates a mock monitor object with optional fields made truly optional.
+ *
+ * @remarks
+ * Creates a monitor where normally required fields can be omitted for testing
+ * invalid/incomplete data scenarios.
+ *
+ * @example
+ *
+ * ```typescript
+ * // Create monitor without required fields for testing validation
+ * const incompleteMonitor = createMockMonitorOptional({
+ *     // id and type are optional, allowing testing of validation logic
+ *     url: "https://example.com"
+ * });
+ * ```
+ *
+ * @param overrides - Monitor data with some fields optional
+ *
+ * @returns Monitor object with optional fields
+ *
+ * @public
+ */
+export const createMockMonitorOptional = (
+    overrides: Partial<SetOptional<CompleteMonitor, "id" | "type">> = {}
+): SetOptional<CompleteMonitor, "id" | "type"> => {
+    const base = createMockMonitor();
+    return { ...base, ...overrides };
+};
 export const createMockMonitor = (
     overrides: Partial<CompleteMonitor> = {}
 ): CompleteMonitor => ({

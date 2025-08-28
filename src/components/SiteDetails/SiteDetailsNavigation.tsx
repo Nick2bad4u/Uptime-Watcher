@@ -6,6 +6,7 @@
 
 import type { Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
+import type { UnknownRecord } from "type-fest";
 
 import React, { useCallback } from "react";
 
@@ -80,7 +81,7 @@ export const SiteDetailsNavigation = ({
      * @param additionalData - Optional additional data to include in the log
      */
     const logTabChange = useCallback(
-        (tab: string, additionalData?: Record<string, unknown>) => {
+        (tab: string, additionalData?: UnknownRecord) => {
             logger.user.action("Site details tab changed", {
                 siteId: currentSite.identifier,
                 tab,

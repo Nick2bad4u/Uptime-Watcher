@@ -119,7 +119,8 @@ export const OverviewTab = ({
         availability: number
     ): "error" | "success" | "warning" => {
         const variant = getAvailabilityVariant(availability);
-        return variant === "danger" ? "error" : variant;
+        if (variant === "danger") return "error";
+        return variant; // "success" | "warning"
     };
 
     const uptimeValue = parseUptimeValue(uptime);

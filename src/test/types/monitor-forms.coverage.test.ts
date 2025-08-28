@@ -3,6 +3,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+import type { UnknownRecord } from "type-fest";
 
 describe("Monitor Forms Types Coverage Tests", () => {
     describe("BaseMonitorFields Interface", () => {
@@ -160,7 +161,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
                     expect(typeof fieldName).toBe("string");
                     expect(typeof value).toBe("number");
                 },
-                object: (fieldName: string, value: Record<string, unknown>) => {
+                object: (fieldName: string, value: UnknownRecord) => {
                     expect(typeof fieldName).toBe("string");
                     expect(typeof value).toBe("object");
                 },
@@ -241,7 +242,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
 
             const objectHandler = (
                 fieldName: string,
-                value: Record<string, unknown>
+                value: UnknownRecord
             ) => ({ fieldName, value, type: "object" });
 
             const headers = { "Content-Type": "application/json" };

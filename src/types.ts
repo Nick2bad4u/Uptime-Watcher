@@ -18,6 +18,7 @@ import type {
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
+import type { UnknownRecord } from "type-fest";
 
 /**
  * Re-export monitor form-specific types for UI components.
@@ -279,7 +280,7 @@ declare global {
                 ) => Promise<{
                     data?: string;
                     error?: string;
-                    metadata?: Record<string, unknown>;
+                    metadata?: UnknownRecord;
                     success: boolean;
                     warnings?: string[];
                 }>;
@@ -299,7 +300,7 @@ declare global {
                 ) => Promise<{
                     data?: string;
                     error?: string;
-                    metadata?: Record<string, unknown>;
+                    metadata?: UnknownRecord;
                     success: boolean;
                     warnings?: string[];
                 }>;
@@ -322,13 +323,13 @@ declare global {
                             name: string;
                             placeholder?: string;
                             required: boolean;
-                            type: "number" | "text" | "url";
+                            type: string;
                         }>;
                         type: string;
                         version: string;
                     }>;
                     error?: string;
-                    metadata?: Record<string, unknown>;
+                    metadata?: UnknownRecord;
                     success: boolean;
                     warnings?: string[];
                 }>;
@@ -347,7 +348,7 @@ declare global {
                 ) => Promise<{
                     data?: unknown;
                     errors: string[];
-                    metadata?: Record<string, unknown>;
+                    metadata?: UnknownRecord;
                     success: boolean;
                     warnings?: string[];
                 }>;
@@ -368,7 +369,7 @@ declare global {
                 getHistoryLimit: () => Promise<{
                     data?: number;
                     error?: string;
-                    metadata?: Record<string, unknown>;
+                    metadata?: UnknownRecord;
                     success: boolean;
                     warnings?: string[];
                 }>;

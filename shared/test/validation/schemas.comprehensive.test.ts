@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
+import type { UnknownRecord } from "type-fest";
 import {
     validateMonitorData,
     validateMonitorField,
@@ -1626,7 +1627,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 fieldName: string,
                 monitorType: string
             ): unknown {
-                const validValues: Record<string, unknown> = {
+                const validValues: UnknownRecord = {
                     id: "test-id",
                     type: monitorType,
                     checkInterval: 30_000,

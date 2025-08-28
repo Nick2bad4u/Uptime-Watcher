@@ -4,6 +4,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { Simplify } from "type-fest";
 
 import { logStoreAction } from "../utils";
 
@@ -56,11 +57,12 @@ export interface SitesStateActions {
  *
  * @remarks
  * Provides a complete interface for site state management combining both the
- * state structure and the action methods.
+ * state structure and the action methods. Uses Simplify to flatten the
+ * intersection type for better IntelliSense and cleaner type display.
  *
  * @public
  */
-export type SitesStateStore = SitesState & SitesStateActions;
+export type SitesStateStore = Simplify<SitesState & SitesStateActions>;
 
 /**
  * Creates state management actions for the sites store.

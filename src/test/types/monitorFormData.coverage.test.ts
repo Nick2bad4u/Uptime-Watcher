@@ -3,6 +3,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+import type { UnknownRecord } from "type-fest";
 
 describe("Monitor Form Data Types Coverage Tests", () => {
     describe("BaseFormData Interface", () => {
@@ -111,7 +112,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const dynamicData: Record<string, unknown> = {
+            const dynamicData: UnknownRecord = {
                 knownField: "known",
                 unknownField: { nested: "object" },
                 arrayField: [

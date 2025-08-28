@@ -20,6 +20,16 @@
 export type MonitorStatus = "down" | "paused" | "pending" | "up";
 
 /**
+ * HTTP method types supported by the application.
+ *
+ * @remarks
+ * Used for HTTP monitor configurations and requests.
+ *
+ * @public
+ */
+export type HttpMethod = "DELETE" | "GET" | "HEAD" | "POST" | "PUT";
+
+/**
  * Base monitor types - source of truth for type safety.
  *
  * @remarks

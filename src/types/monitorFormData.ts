@@ -1,7 +1,9 @@
 /**
- * Type definitions for monitor form data. Provides type-safe interfaces for
- * form handling and validation.
+ * Type definitions for monitor form data interfaces.
  *
+ * @remarks
+ * Provides type-safe interfaces for form handling and validation. form handling
+ * and validation.
  * @remarks
  * These interfaces define the structure of form data used throughout the
  * application for creating and editing monitors. They help avoid index
@@ -9,6 +11,8 @@
  *
  * @packageDocumentation
  */
+
+import type { SetOptional, Simplify, UnknownRecord } from "type-fest";
 
 /**
  * Base form data interface with common properties.
@@ -22,7 +26,7 @@ export interface BaseFormData {
     retryAttempts?: number;
     /** Request timeout in milliseconds */
     timeout?: number;
-    /** Monitor type identifier */
+    /** Monitor type identifier with autocomplete for known types */
     type?: string;
 }
 
@@ -30,7 +34,7 @@ export interface BaseFormData {
  * Dynamic form data for extensible monitor types. Used when monitor type is not
  * known at compile time.
  */
-export interface DynamicFormData extends Record<string, unknown> {
+export interface DynamicFormData extends UnknownRecord {
     /** Monitor check interval in milliseconds */
     checkInterval?: number;
     /** Whether monitoring is enabled */
@@ -39,7 +43,7 @@ export interface DynamicFormData extends Record<string, unknown> {
     retryAttempts?: number;
     /** Request timeout in milliseconds */
     timeout?: number;
-    /** Monitor type identifier */
+    /** Monitor type identifier with autocomplete for known types */
     type?: string;
 }
 
@@ -86,13 +90,12 @@ export interface DnsFormData extends BaseFormData {
 }
 
 /**
- * Union type for all supported monitor form data types.
+ * Union type for all supported monitor form data types. Simplified for better
+ * IntelliSense display.
  */
-export type MonitorFormData =
-    | DnsFormData
-    | HttpFormData
-    | PingFormData
-    | PortFormData;
+export type MonitorFormData = Simplify<
+    DnsFormData | HttpFormData | PingFormData | PortFormData
+>;
 
 /**
  * Create default form data for a specific monitor type.
@@ -102,11 +105,21 @@ export type MonitorFormData =
  * @returns Default form data for the specified type
  */
 /* eslint-disable no-redeclare -- Function overloads are legitimate TypeScript pattern */
-export function createDefaultFormData(type: "dns"): Partial<DnsFormData>;
-export function createDefaultFormData(type: "http"): Partial<HttpFormData>;
-export function createDefaultFormData(type: "ping"): Partial<PingFormData>;
-export function createDefaultFormData(type: "port"): Partial<PortFormData>;
-export function createDefaultFormData(type: string): Partial<BaseFormData> {
+export function createDefaultFormData(
+    type: "dns"
+): SetOptional<DnsFormData, "host" | "recordType">;
+export function createDefaultFormData(
+    type: "http"
+): SetOptional<HttpFormData, "url">;
+export function createDefaultFormData(
+    type: "ping"
+): SetOptional<PingFormData, "host">;
+export function createDefaultFormData(
+    type: "port"
+): SetOptional<PortFormData, "host" | "port">;
+export function createDefaultFormData(
+    type: string
+): SetOptional<BaseFormData, never> {
     /* eslint-enable no-redeclare */
     return {
         checkInterval: 300_000, // 5 minutes
@@ -219,11 +232,13 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
         return false;
     }
 
-    // Use index signature to avoid TypeScript compiler warnings
+    // Use type-safe access with proper typing
     const validator = (
-        FORM_DATA_VALIDATORS as Record<
-            string,
-            ((data: Partial<MonitorFormData>) => boolean) | undefined
+        FORM_DATA_VALIDATORS as Simplify<
+            Record<
+                string,
+                ((data: Partial<MonitorFormData>) => boolean) | undefined
+            >
         >
     )[formData.type];
     if (!validator) {

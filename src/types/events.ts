@@ -4,6 +4,7 @@
  */
 
 import type { Monitor, Site } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
 /**
  * Event data for cache invalidation
@@ -12,7 +13,7 @@ export interface CacheInvalidatedEventData {
     /** Specific identifier affected (optional for global invalidation) */
     identifier?: string;
     /** Reason for invalidation */
-    reason: string;
+    reason: "delete" | "expiry" | "manual" | "update";
     /** Type of cache invalidation */
     type: "all" | "monitor" | "site";
 }
@@ -64,7 +65,7 @@ export interface MonitorUpEventData {
  */
 export interface TestEventData {
     /** Test data payload */
-    data: Record<string, unknown>;
+    data: UnknownRecord;
     /** Test identifier */
     testId: string;
     /** Timestamp */

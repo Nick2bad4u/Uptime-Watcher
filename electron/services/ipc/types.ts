@@ -4,6 +4,7 @@
  */
 
 import type { ValidationResult } from "@shared/types/validation";
+import type { UnknownRecord } from "type-fest";
 
 /**
  * Parameters for IPC handler wrapper configuration.
@@ -52,7 +53,7 @@ export interface IpcResponse<T = unknown> {
     /** Error message when operation fails */
     error?: string;
     /** Additional metadata about the operation */
-    metadata?: Record<string, unknown>;
+    metadata?: UnknownRecord;
     /** Indicates if the operation was successful */
     success: boolean;
     /** Non-critical warnings about the operation */

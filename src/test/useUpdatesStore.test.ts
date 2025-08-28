@@ -5,6 +5,7 @@
 
 import { act, renderHook } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import type { UnknownRecord } from "type-fest";
 
 import type { UpdateStatus } from "../stores/types";
 
@@ -21,7 +22,7 @@ const mockQuitAndInstall = vi.fn();
 // Helper to setup electronAPI mock
 const setupElectronAPIMock = (mockAPI: unknown) => {
     // Use a different approach to avoid property redefinition
-    const win = globalThis as unknown as Record<string, unknown>;
+    const win = globalThis as unknown as UnknownRecord;
     win["electronAPI"] = mockAPI;
 };
 

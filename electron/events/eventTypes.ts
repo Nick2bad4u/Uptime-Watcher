@@ -14,6 +14,7 @@
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
 /**
  * Comprehensive event map for the Uptime Watcher application.
@@ -34,7 +35,7 @@ import type { Monitor, Site, StatusUpdate } from "@shared/types";
  * @see {@link EventSource}
  * @see {@link EventTriggerType}
  */
-export interface UptimeEvents extends Record<string, unknown> {
+export interface UptimeEvents extends UnknownRecord {
     // Site events
 
     /**

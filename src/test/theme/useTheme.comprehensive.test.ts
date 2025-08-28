@@ -17,6 +17,7 @@
 
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { UnknownRecord } from "type-fest";
 
 import {
     useAvailabilityColors,
@@ -176,7 +177,7 @@ vi.mock("../../theme/ThemeManager", () => ({
 
 // Mock UI_DELAYS
 vi.mock("../../constants", async (importOriginal) => {
-    const actual = (await importOriginal()) as Record<string, unknown>;
+    const actual = (await importOriginal()) as UnknownRecord;
     return {
         ...actual,
         UI_DELAYS: {

@@ -10,6 +10,8 @@
  * @packageDocumentation
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 
@@ -441,7 +443,7 @@ export class StandardizedCache<T> {
     /**
      * Emit cache event if event emitter is configured.
      */
-    private emitEvent(eventType: string, data: Record<string, unknown>): void {
+    private emitEvent(eventType: string, data: UnknownRecord): void {
         if (this.config.eventEmitter) {
             this.config.eventEmitter.emit(eventType, {
                 cacheName: this.config.name,

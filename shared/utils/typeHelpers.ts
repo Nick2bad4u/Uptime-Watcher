@@ -9,6 +9,8 @@
  * @packageDocumentation
  */
 
+import type { UnknownRecord } from "type-fest";
+
 /**
  * Safely casts IPC response to expected type with basic validation.
  *
@@ -55,14 +57,14 @@ export function isArray(value: unknown): value is unknown[] {
  * Safely checks if an unknown value is a record (object with string keys).
  *
  * @remarks
- * Type guard function for `Record<string, unknown>` types. Use this to validate
+ * Type guard function for `UnknownRecord` types. Use this to validate
  * objects before accessing their properties.
  *
  * @param value - Value to check
  *
  * @returns True if value is a record, false otherwise
  */
-export function isRecord(value: unknown): value is Record<string, unknown> {
+export function isRecord(value: unknown): value is UnknownRecord {
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 

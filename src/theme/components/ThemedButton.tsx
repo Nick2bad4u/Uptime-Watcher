@@ -82,7 +82,7 @@ export type ThemedButtonProperties = ComponentProperties<
 >;
 
 // Default styles object to prevent infinite render loops
-const DEFAULT_THEMED_BOX_STYLE = {};
+const DEFAULT_THEMED_BOX_STYLE: React.CSSProperties = {};
 
 /**
  * Themed button component with comprehensive styling and state management.

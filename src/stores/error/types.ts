@@ -9,6 +9,8 @@
  * @packageDocumentation
  */
 
+import type { Simplify } from "type-fest";
+
 /**
  * Error management actions for the error store.
  *
@@ -64,8 +66,9 @@ export interface ErrorState {
  *
  * @remarks
  * Merges error state and actions into a single interface for the Zustand store.
- * Provides complete error management functionality for the application.
+ * Provides complete error management functionality for the application with
+ * flattened type display for better developer experience.
  *
  * @public
  */
-export type ErrorStore = ErrorActions & ErrorState;
+export type ErrorStore = Simplify<ErrorActions & ErrorState>;

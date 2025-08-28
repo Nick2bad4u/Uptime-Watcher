@@ -12,6 +12,7 @@ import type {
     MonitorFieldDefinition,
     MonitorType,
 } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 import type * as z from "zod";
 
 import { MONITOR_STATUS } from "@shared/types";
@@ -558,10 +559,10 @@ versionManager.setVersion("port", "1.0.0");
  */
 export function createMonitorWithTypeGuards(
     type: string,
-    data: Record<string, unknown>
+    data: UnknownRecord
 ): {
     errors: string[];
-    monitor?: Record<string, unknown>;
+    monitor?: UnknownRecord;
     success: boolean;
 } {
     // Use internal type validation to avoid circular dependency
@@ -576,7 +577,7 @@ export function createMonitorWithTypeGuards(
     const validMonitorType = validationResult.value;
 
     // Create monitor object with proper validation
-    const monitor: Record<string, unknown> = {
+    const monitor: UnknownRecord = {
         history: [],
         monitoring: true,
         responseTime: -1,
@@ -649,10 +650,10 @@ export async function migrateMonitorType(
     monitorType: MonitorType,
     fromVersion: string,
     toVersion: string,
-    data?: Record<string, unknown>
+    data?: UnknownRecord
 ): Promise<{
     appliedMigrations: string[];
-    data?: Record<string, unknown>;
+    data?: UnknownRecord;
     errors: string[];
     success: boolean;
 }> {

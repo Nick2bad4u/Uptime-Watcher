@@ -9,6 +9,7 @@
  * @packageDocumentation
  */
 
+import type { Simplify, UnknownRecord } from "type-fest";
 import type { MonitorConfig } from "./monitorConfig";
 import type { MonitorTypeConfig } from "./monitorTypes";
 import type { BaseValidationResult } from "./validation";
@@ -22,7 +23,7 @@ export interface ErrorInfo {
     /** Error code */
     code?: string;
     /** Additional error context */
-    context?: Record<string, unknown>;
+    context?: UnknownRecord;
     /** Error message */
     message: string;
     /** Error timestamp */
@@ -48,8 +49,8 @@ export interface KnownConfigValues {
     notificationsEnabled: boolean;
     /** Auto-refresh interval in milliseconds */
     refreshInterval: number;
-    /** Application theme (dark/light) */
-    theme: "dark" | "light";
+    /** Application theme (dark/light/high-contrast) */
+    theme: "dark" | "light" | "high-contrast";
 }
 
 /**
@@ -89,11 +90,11 @@ export interface MonitorData {
  */
 export interface UIState {
     /** UI component state */
-    componentState?: Record<string, unknown>;
+    componentState?: UnknownRecord;
     /** User preferences */
     preferences?: Record<string, ConfigValue>;
     /** View state */
-    viewState?: Record<string, unknown>;
+    viewState?: UnknownRecord;
 }
 
 /**
@@ -103,11 +104,11 @@ export interface UIState {
  * Provides better typing for cached values based on their usage domain.
  * Includes support for MonitorTypeConfig and arrays of monitor configurations.
  * All unknown types have been replaced with specific type unions for type
- * safety.
+ * safety. Simplified for better IntelliSense and readability.
  *
  * @public
  */
-export type CacheValue =
+export type CacheValue = Simplify<
     | BaseValidationResult
     | ConfigValue
     | ErrorInfo
@@ -115,7 +116,8 @@ export type CacheValue =
     | MonitorTypeConfig
     | MonitorTypeConfigArray
     | UIState
-    | ValidationResultArray;
+    | ValidationResultArray
+>;
 
 /**
  * Union type representing all possible configuration values.
@@ -133,7 +135,7 @@ export type CacheValue =
 export type ConfigValue = boolean | null | number | string | string[];
 
 /**
- * Monitor status information.
+ * Monitor status information with support for specific status values.
  *
  * @public
  */

@@ -7,6 +7,7 @@
  * and validation.
  */
 import type { Monitor, Site } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { validateMonitorData } from "@shared/validation/schemas";
@@ -116,7 +117,7 @@ const ConfigPropertyValidator = {
             uiConfig: unknown;
             version: string;
         };
-        unexpectedProperties: Record<string, unknown>;
+        unexpectedProperties: UnknownRecord;
     } {
         // Extract serializable properties, excluding non-serializable ones
         const { description, displayName, fields, type, uiConfig, version } =
@@ -167,7 +168,7 @@ const ConfigPropertyValidator = {
      * @internal
      */
     validateAndLogUnexpectedProperties(
-        unexpectedProperties: Record<string, unknown>,
+        unexpectedProperties: UnknownRecord,
         monitorType: string
     ): void {
         if (Object.keys(unexpectedProperties).length > 0) {
@@ -856,7 +857,7 @@ export class IpcService {
                     result.success,
                     result.errors,
                     result.warnings,
-                    result.metadata
+                    result.metadata as undefined | UnknownRecord
                 );
             },
             MonitorTypeHandlerValidators.validateMonitorData,

@@ -6,6 +6,8 @@
  * ensuring consistent structure and type checking for all database operations.
  */
 
+import type { UnknownRecord } from "type-fest";
+
 /**
  * Base interface for all database row types.
  *
@@ -183,7 +185,7 @@ export const RowValidationUtils = {
     /**
      * Validates that a value is a non-null object.
      */
-    isValidObject: (obj: unknown): obj is Record<string, unknown> =>
+    isValidObject: (obj: unknown): obj is UnknownRecord =>
         typeof obj === "object" && obj !== null && !Array.isArray(obj),
 
     /**
@@ -285,7 +287,7 @@ export function isValidSettingsRow(obj: unknown): obj is SettingsRow {
         return false;
     }
 
-    const row = obj as Record<string, unknown>;
+    const row = obj as UnknownRecord;
     return (
         "key" in row &&
         row["key"] !== undefined &&
@@ -311,7 +313,7 @@ export function isValidSiteRow(obj: unknown): obj is SiteRow {
         return false;
     }
 
-    const row = obj as Record<string, unknown>;
+    const row = obj as UnknownRecord;
     return (
         "identifier" in row &&
         row["identifier"] !== undefined &&
@@ -344,7 +346,7 @@ export function isValidSiteRow(obj: unknown): obj is SiteRow {
  * @returns The property value if present; otherwise, the default value.
  */
 export function safeGetRowProperty<T>(
-    row: Record<string, unknown>,
+    row: UnknownRecord,
     property: string,
     defaultValue: T
 ): T {

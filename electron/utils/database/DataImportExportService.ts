@@ -8,6 +8,7 @@
 
 import type { Site, StatusHistory } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
+import type { UnknownRecord } from "type-fest";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import {
@@ -70,7 +71,7 @@ function isImportData(
         typeof obj === "object" &&
         obj !== null &&
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Type guard with runtime validation following
-        Array.isArray((obj as Record<string, unknown>)["sites"])
+        Array.isArray((obj as UnknownRecord)["sites"])
     );
 }
 

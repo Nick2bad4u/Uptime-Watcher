@@ -10,6 +10,7 @@
  * @packageDocumentation
  */
 
+import type { Simplify } from "type-fest";
 import type { MonitorType } from "@shared/types";
 
 /**
@@ -253,14 +254,15 @@ export interface PortMonitorConfig extends BaseMonitorConfig {
  * @remarks
  * Use this type when you need to handle configuration for any monitor type.
  * TypeScript will ensure type safety through discriminated unions based on the
- * `type` field.
+ * `type` field. Uses Simplify to provide better IntelliSense and type display.
  *
  * @public
  */
-export type MonitorConfig =
+export type MonitorConfig = Simplify<
     | HttpMonitorConfig
     | PingMonitorConfig
-    | PortMonitorConfig;
+    | PortMonitorConfig
+>;
 
 /**
  * Type guard to check if configuration is for HTTP monitors.

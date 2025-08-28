@@ -43,6 +43,7 @@
  */
 
 import type { Monitor } from "@shared/types";
+import type { ReadonlyDeep } from "type-fest";
 
 import logger from "../services/logger";
 import { ensureError, withUtilityErrorHandling } from "./errorHandling";
@@ -108,13 +109,32 @@ export function withSyncErrorHandling<T>(
 }
 
 /**
- * Default values for UI components and user interface elements.
+ * Default values for UI components and user interface elements with deep
+ * immutability.
  *
  * @remarks
  * Centralized defaults that ensure consistent behavior across the application
- * when data is missing or components need fallback values.
+ * when data is missing or components need fallback values. Uses ReadonlyDeep to
+ * guarantee immutability of the configuration object.
  */
-export const UiDefaults = {
+export const UiDefaults: ReadonlyDeep<{
+    /** Default chart time period for data visualization */
+    chartPeriod: "24h";
+    /** Default number of data points to display in charts */
+    chartPoints: number;
+    /** Default error message label */
+    errorLabel: string;
+    /** Delay in milliseconds before showing loading spinner */
+    loadingDelay: number;
+    /** Default loading state text */
+    loadingLabel: string;
+    /** Default text when data is not available */
+    notAvailableLabel: string;
+    /** Default page size for paginated lists */
+    pageSize: number;
+    /** Default text for unknown/unspecified values */
+    unknownLabel: string;
+}> = {
     // Chart defaults
     /** Default chart time period for data visualization */
     chartPeriod: "24h" as const,
@@ -153,13 +173,25 @@ export function withFallback<T>(value: null | T | undefined, fallback: T): T {
 }
 
 /**
- * Monitor-specific default values.
+ * Monitor-specific default values with deep immutability.
  *
  * @remarks
  * Standard defaults for monitor configuration to ensure consistent behavior
- * when monitors are created or when values are missing.
+ * when monitors are created or when values are missing. Uses ReadonlyDeep to
+ * guarantee immutability of the configuration object.
  */
-export const MonitorDefaults = {
+export const MonitorDefaults: ReadonlyDeep<{
+    /** Default check interval in milliseconds (5 minutes) */
+    checkInterval: number;
+    /** Sentinel value indicating monitor has never been checked */
+    responseTime: number;
+    /** Default number of retry attempts on failure */
+    retryAttempts: number;
+    /** Default status for new monitors */
+    status: "pending";
+    /** Default request timeout in milliseconds (10 seconds) */
+    timeout: number;
+}> = {
     /** Default check interval in milliseconds (5 minutes) */
     checkInterval: 300_000, // 5 minutes
     /** Sentinel value indicating monitor has never been checked */

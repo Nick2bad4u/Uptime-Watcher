@@ -137,7 +137,7 @@ export interface ThemedBoxProperties
  *
  * @internal
  */
-const DEFAULT_THEMED_BOX_STYLE = {};
+const DEFAULT_THEMED_BOX_STYLE: React.CSSProperties = {};
 
 /**
  * Themed box component for container layout and visual consistency.

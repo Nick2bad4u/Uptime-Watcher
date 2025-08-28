@@ -3,6 +3,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { withErrorHandling } from "@shared/utils/errorHandling";
@@ -86,7 +87,7 @@ export const updateMonitorAndSave = async (
 export const withSiteOperation = async (
     operationName: string,
     operation: () => Promise<void>,
-    params: Record<string, unknown>,
+    params: UnknownRecord,
     deps: SiteOperationsDependencies,
     syncAfter = true
 ): Promise<void> => {
@@ -118,7 +119,7 @@ export const withSiteOperation = async (
 export const withSiteOperationReturning = async <T>(
     operationName: string,
     operation: () => Promise<T>,
-    params: Record<string, unknown>,
+    params: UnknownRecord,
     deps: SiteOperationsDependencies,
     syncAfter = true
 ): Promise<T> => {

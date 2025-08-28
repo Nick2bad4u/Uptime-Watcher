@@ -9,6 +9,8 @@
  * @packageDocumentation
  */
 
+import type { SetOptional, UnknownRecord, Merge, PartialDeep } from "type-fest";
+
 /**
  * Animation configuration interface.
  *
@@ -468,6 +470,35 @@ export interface ThemeOverride {
 }
 
 /**
+ * Deep partial theme configuration using type-fest's PartialDeep utility.
+ *
+ * @remarks
+ * Creates a type where all properties and nested properties are optional.
+ * This is useful for complex theme customization where you want to override
+ * deeply nested properties without having to specify entire sections.
+ *
+ * @example Deep theme customization:
+ *
+ * ```typescript
+ * const deepCustomTheme: DeepThemeOverride = {
+ *     colors: {
+ *         text: {
+ *             primary: '#333333'  // Only override this specific nested property
+ *         }
+ *     },
+ *     typography: {
+ *         fontSize: {
+ *             h1: '36px'  // Only override this specific nested property
+ *         }
+ *     }
+ * };
+ * ```
+ *
+ * @public
+ */
+export type DeepThemeOverride = PartialDeep<ThemeConfig>;
+
+/**
  * Theme validation result interface.
  *
  * @remarks
@@ -542,7 +573,7 @@ export function isColorPalette(obj: unknown): obj is ColorPalette {
         return false;
     }
 
-    const palette = obj as Record<string, unknown>;
+    const palette = obj as UnknownRecord;
     const requiredColors = [
         "error",
         "info",
@@ -572,7 +603,7 @@ export function isThemeConfig(obj: unknown): obj is ThemeConfig {
         return false;
     }
 
-    const theme = obj as Record<string, unknown>;
+    const theme = obj as UnknownRecord;
     const requiredProps = [
         "animation",
         "borderRadius",
@@ -698,3 +729,154 @@ export const DEFAULT_THEME_CONFIG: DefaultThemeConfig = {
         },
     } satisfies TypographyConfig,
 } as const;
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
+
+/**
+ * Creates a theme configuration factory with optional theme sections.
+ *
+ * @remarks
+ * Uses SetOptional to create type-safe theme configuration functions where
+ * specific sections can be omitted when defaults are provided. This
+ * demonstrates practical usage of type-fest SetOptional for API design.
+ *
+ * @example
+ *
+ * ```typescript
+ * // Create minimal theme with just colors, other sections use defaults
+ * const minimalTheme = createThemeConfig({
+ *     colors: {
+ *         primary: { 50: '#f0f9ff', 500: '#3b82f6', 900: '#1e3a8a' }
+ *     }
+ * });
+ *
+ * // Create full custom theme
+ * const fullTheme = createThemeConfig({
+ *     colors: customColors,
+ *     typography: customTypography,
+ *     spacing: customSpacing
+ * });
+ * ```
+ *
+ * @param config - Partial theme configuration with at least colors required
+ *
+ * @returns Complete theme configuration with defaults applied
+ *
+ * @public
+ */
+export function createThemeConfig(
+    config: SetOptional<
+        ThemeConfig,
+        "animation" | "borderRadius" | "components" | "shadows" | "spacing" | "typography"
+    >
+): ThemeConfig {
+    return {
+        animation: config.animation ?? DEFAULT_THEME_CONFIG.animation,
+        borderRadius: config.borderRadius ?? DEFAULT_THEME_CONFIG.borderRadius,
+        colors: config.colors,
+        components: config.components ?? DEFAULT_THEME_CONFIG.components,
+        shadows: config.shadows ?? DEFAULT_THEME_CONFIG.shadows,
+        spacing: config.spacing ?? DEFAULT_THEME_CONFIG.spacing,
+        typography: config.typography ?? DEFAULT_THEME_CONFIG.typography,
+    };
+}
+
+/**
+ * Merges theme overrides with base theme configuration using type-safe merging.
+ *
+ * @remarks
+ * Uses type-fest's Merge utility to combine theme configurations with proper
+ * type safety. This provides better type inference than manual object spreading
+ * and ensures all properties are handled correctly.
+ *
+ * @example Basic theme merging:
+ *
+ * ```typescript
+ * const baseTheme: ThemeConfig = getBaseTheme();
+ * const overrides: ThemeOverride = {
+ *     colors: { text: { primary: '#007bff' } },
+ *     spacing: { lg: '20px' }
+ * };
+ *
+ * const mergedTheme = mergeThemeConfig(baseTheme, overrides);
+ * // Result is fully typed with merged properties
+ * ```
+ *
+ * @param baseTheme - Base theme configuration
+ * @param overrides - Theme overrides to apply
+ *
+ * @returns Merged theme configuration with type-safe property resolution
+ *
+ * @public
+ */
+export function mergeThemeConfig<T extends ThemeConfig, U extends ThemeOverride>(
+    baseTheme: T,
+    overrides: U
+): Merge<T, U> {
+    return {
+        ...baseTheme,
+        ...overrides,
+        // Deep merge for nested objects
+        animation: { ...baseTheme.animation, ...overrides.animation },
+        borderRadius: { ...baseTheme.borderRadius, ...overrides.borderRadius },
+        colors: { ...baseTheme.colors, ...overrides.colors },
+        components: { ...baseTheme.components, ...overrides.components },
+        shadows: { ...baseTheme.shadows, ...overrides.shadows },
+        spacing: { ...baseTheme.spacing, ...overrides.spacing },
+        typography: { ...baseTheme.typography, ...overrides.typography },
+    } as Merge<T, U>;
+}
+
+/**
+ * Creates a deeply customized theme using PartialDeep pattern for maximum flexibility.
+ *
+ * @remarks
+ * Uses type-fest's PartialDeep to allow modification of any nested property
+ * without requiring complete object structures. This is ideal for fine-grained
+ * theme customization where only specific values need to be changed.
+ *
+ * @example Fine-grained theme customization:
+ *
+ * ```typescript
+ * const customTheme = createDeepThemeOverride(baseTheme, {
+ *     colors: {
+ *         text: { primary: '#1a1a1a' },  // Only change text primary color
+ *         background: { primary: '#ffffff' }  // Only change background primary
+ *     },
+ *     typography: {
+ *         fontSize: { h1: '40px' }  // Only change h1 font size
+ *     }
+ * });
+ * ```
+ *
+ * @param baseTheme - Base theme configuration
+ * @param deepOverrides - Deep partial overrides using PartialDeep pattern
+ *
+ * @returns Theme configuration with deeply merged overrides
+ *
+ * @public
+ */
+export function createDeepThemeOverride(
+    baseTheme: ThemeConfig,
+    deepOverrides: DeepThemeOverride
+): ThemeConfig {
+    // Deep merge implementation - in production, consider using a library like lodash.merge
+    const deepMerge = (target: any, source: any): any => {
+        if (source === null || source === undefined) return target;
+        if (typeof source !== 'object') return source;
+
+        const result = { ...target };
+        for (const key in source) {
+            if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                result[key] = deepMerge(target[key] || {}, source[key]);
+            } else if (source[key] !== undefined) {
+                result[key] = source[key];
+            }
+        }
+        return result;
+    };
+
+    return deepMerge(baseTheme, deepOverrides);
+}

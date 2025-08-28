@@ -42,6 +42,7 @@
  */
 
 import type { MonitorType } from "@shared/types";
+import type { Simplify } from "type-fest";
 
 import { useCallback, useState } from "react";
 
@@ -131,6 +132,13 @@ export interface AddSiteFormState {
  * Form operation mode type.
  */
 export type FormMode = "existing" | "new";
+
+/**
+ * Complete form hook return type combining actions and state.
+ */
+export type UseAddSiteFormReturn = Simplify<
+    AddSiteFormActions & AddSiteFormState
+>;
 
 // Helper functions for add site form logic (reduces function length by
 // composition)
@@ -223,8 +231,10 @@ const validateFormFields = (
     for (const field of currentFields) {
         if (field.required) {
             const value =
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Dynamic field access with known form field keys
-                fieldValues[field.name as keyof typeof fieldValues] || "";
+                field.name in fieldValues
+                    ? /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Runtime check confirms field.name exists in fieldValues */
+                      fieldValues[field.name as keyof typeof fieldValues] || ""
+                    : "";
             if (!value.trim()) {
                 return false;
             }
@@ -247,7 +257,7 @@ const validateFormFields = (
  *   validation state, and manipulation functions for managing the add site
  *   form
  */
-export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
+export function useAddSiteForm(): UseAddSiteFormReturn {
     // Form field state
     const [url, setUrl] = useState("");
     const [host, setHost] = useState("");

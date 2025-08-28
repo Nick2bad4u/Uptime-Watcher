@@ -61,7 +61,7 @@ export interface ThemedTextProperties extends CoreComponentProperties {
 }
 
 // Default styles object to prevent infinite render loops
-const DEFAULT_THEMED_BOX_STYLE = {};
+const DEFAULT_THEMED_BOX_STYLE: React.CSSProperties = {};
 
 /**
  * Themed text component with comprehensive typography styling options.

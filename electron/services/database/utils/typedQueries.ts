@@ -11,6 +11,7 @@
  */
 
 import type { Database } from "node-sqlite3-wasm";
+import type { UnknownRecord } from "type-fest";
 
 import type { DbValue } from "./valueConverters";
 
@@ -43,13 +44,13 @@ export function insertWithReturning(
     db: Database,
     sql: string,
     params?: DbValue[]
-): Record<string, unknown> {
+): UnknownRecord {
     const result = db.get(sql, params);
     if (!result) {
         throw new Error("INSERT with RETURNING failed: no result returned");
     }
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion is safe as we control the SQL structure and know the return type
-    return result as unknown as Record<string, unknown>;
+    return result as unknown as UnknownRecord;
 }
 
 /**
@@ -112,7 +113,7 @@ export function queryForIds(
  */
 export function queryForRecords<
     // eslint-disable-next-line etc/no-misused-generics -- Type parameter can be omitted for flexible usage
-    T extends Record<string, unknown> = Record<string, unknown>,
+    T extends UnknownRecord = UnknownRecord,
 >(db: Database, sql: string, params?: DbValue[]): T[] {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion is safe as we control the SQL structure and know the return type
     return db.all(sql, params) as unknown as T[];
@@ -136,9 +137,7 @@ export function queryForSingleRecord(
     db: Database,
     sql: string,
     params?: DbValue[]
-): Record<string, unknown> | undefined {
+): undefined | UnknownRecord {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion is safe as we control the SQL structure and know the return type
-    return db.get(sql, params) as unknown as
-        | Record<string, unknown>
-        | undefined;
+    return db.get(sql, params) as unknown as undefined | UnknownRecord;
 }

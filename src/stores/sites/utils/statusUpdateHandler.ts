@@ -11,6 +11,7 @@
  */
 
 import type { Monitor, MonitorStatus, Site, StatusUpdate } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
 import { isDevelopment } from "@shared/utils/environment";
 
@@ -495,7 +496,7 @@ export class StatusUpdateManager {
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Type guard with runtime validation following
-        const record = data as Record<string, unknown>;
+        const record = data as UnknownRecord;
         return (
             "monitorId" in data &&
             "newStatus" in data &&

@@ -11,11 +11,12 @@
 
 import type { Monitor, MonitorStatus, MonitorType } from "@shared/types";
 import type { MonitorRow } from "@shared/types/database";
+import type { Simplify, UnknownRecord } from "type-fest";
 
-import { safeGetRowProperty } from "@shared/types/database";
 import { safeStringify } from "@shared/utils/stringConversion";
 import { isValidIdentifierArray } from "@shared/validation/validatorUtils";
 
+import { dbLogger } from "../../../utils/logger";
 import { getAllMonitorTypeConfigs } from "../../monitoring/MonitorTypeRegistry";
 
 /**
@@ -32,8 +33,22 @@ interface FieldMapping {
     /** Monitor object field name */
     sourceField: string;
     /** Optional transformation function */
-    transform?: (value: unknown, monitor: Record<string, unknown>) => unknown;
+    transform?: (value: unknown, monitor: UnknownRecord) => unknown;
 }
+
+/**
+ * Enhanced field mapping result type using Simplify for better type inference.
+ *
+ * @internal
+ */
+type FieldMappingResult = Simplify<{
+    /** Database column name for the field */
+    dbField: string;
+    /** Whether the value was successfully processed */
+    success: boolean;
+    /** Processed value ready for database insertion */
+    value: unknown;
+}>;
 
 /**
  * Interface for SQL parameters generation result.
@@ -65,7 +80,7 @@ function convertLastCheckedField(lastChecked: unknown): null | number {
     }
     // Log warning when discarding invalid data to help debugging
     if (lastChecked !== null && lastChecked !== undefined) {
-        console.warn(
+        dbLogger.warn(
             `Invalid lastChecked value discarded: ${safeStringify(lastChecked)} (type: ${typeof lastChecked})`
         );
     }
@@ -218,7 +233,7 @@ export interface DatabaseFieldDefinition {
  *
  * @internal
  */
-function convertEnabledField(monitor: Record<string, unknown>): number {
+function convertEnabledField(monitor: UnknownRecord): number {
     const { enabled, monitoring } = monitor;
     return monitoring === true || enabled === true ? 1 : 0;
 }
@@ -245,7 +260,7 @@ function convertSqlValue(
             const numValue = Number(value);
             // Prevent NaN corruption in database
             if (Number.isNaN(numValue)) {
-                console.warn(
+                dbLogger.warn(
                     `Invalid numeric value for INTEGER conversion: ${String(value)}, using 0 as fallback`
                 );
                 return 0;
@@ -258,6 +273,51 @@ function convertSqlValue(
         default: {
             return defaultStrategy === "raw" ? value : safeStringify(value);
         }
+    }
+}
+
+/**
+ * Safely processes a field mapping with enhanced error handling.
+ *
+ * @param mapping - Field mapping configuration
+ * @param monitor - Source monitor object
+ *
+ * @returns Processing result with type information
+ *
+ * @internal
+ */
+function processFieldMapping(
+    mapping: FieldMapping,
+    monitor: UnknownRecord
+): FieldMappingResult {
+    try {
+        const sourceValue = monitor[mapping.sourceField];
+        if (sourceValue === undefined) {
+            return {
+                dbField: mapping.dbField,
+                success: true,
+                value: mapping.defaultValue,
+            };
+        }
+
+        const processedValue = mapping.transform
+            ? mapping.transform(sourceValue, monitor)
+            : sourceValue;
+
+        return {
+            dbField: mapping.dbField,
+            success: true,
+            value: processedValue,
+        };
+    } catch (error) {
+        dbLogger.warn(
+            `Field mapping failed for ${mapping.dbField}: ${safeStringify(error)}`
+        );
+        return {
+            dbField: mapping.dbField,
+            success: false,
+            value: mapping.defaultValue,
+        };
     }
 }
 
@@ -439,10 +499,7 @@ export function generateDatabaseFieldDefinitions(): DatabaseFieldDefinition[] {
  *
  * @internal
  */
-function mapDynamicFields(
-    monitor: Record<string, unknown>,
-    row: Record<string, unknown>
-): void {
+function mapDynamicFields(monitor: UnknownRecord, row: UnknownRecord): void {
     const fieldDefs = generateDatabaseFieldDefinitions();
     for (const fieldDef of fieldDefs) {
         if (monitor[fieldDef.sourceField] !== undefined) {
@@ -459,17 +516,14 @@ function mapDynamicFields(
  *
  * @remarks
  * Uses a configuration-driven approach to map fields, reducing complexity and
- * improving maintainability.
+ * improving maintainability. Now enhanced with type-safe field processing.
  *
  * @param monitor - Monitor object to map.
  * @param row - Database row object to populate.
  *
  * @internal
  */
-function mapStandardFields(
-    monitor: Record<string, unknown>,
-    row: Record<string, unknown>
-): void {
+function mapStandardFields(monitor: UnknownRecord, row: UnknownRecord): void {
     // Handle enabled/monitoring fields specially since they map to the same db
     // field
     if (
@@ -479,18 +533,19 @@ function mapStandardFields(
         row["enabled"] = convertEnabledField(monitor);
     }
 
-    // Process all other standard field mappings
+    // Process all other standard field mappings with enhanced error handling
     for (const mapping of STANDARD_FIELD_MAPPINGS) {
         if (monitor[mapping.sourceField] !== undefined) {
-            const value = mapping.transform
-                ? mapping.transform(monitor[mapping.sourceField], monitor)
-                : safeGetRowProperty(
-                      monitor,
-                      mapping.sourceField,
-                      mapping.defaultValue
-                  );
-
-            row[mapping.dbField] = value;
+            const result = processFieldMapping(mapping, monitor);
+            if (result.success) {
+                row[result.dbField] = result.value;
+            } else {
+                // Log warning and use default value on processing failure
+                dbLogger.warn(
+                    `Using default value for field ${result.dbField} due to processing failure`
+                );
+                row[result.dbField] = mapping.defaultValue;
+            }
         }
     }
 }
@@ -605,8 +660,8 @@ export function generateSqlParameters(): SqlParameters {
  */
 export function mapMonitorToRow(monitor: Monitor): MonitorRow {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Monitor object is converted to generic record for dynamic field access
-    const monitorRecord = monitor as unknown as Record<string, unknown>;
-    const row: Record<string, unknown> = {};
+    const monitorRecord = monitor as unknown as UnknownRecord;
+    const row: UnknownRecord = {};
 
     // Map standard fields first
     mapStandardFields(monitorRecord, row);
@@ -680,7 +735,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
 
     if (monitorTypeConfig) {
         // Create a mutable version for dynamic field assignment
-        const mutableMonitor = monitor as unknown as Record<string, unknown>;
+        const mutableMonitor = monitor as unknown as UnknownRecord;
 
         // Only add fields that are specifically defined for this monitor type
         for (const field of monitorTypeConfig.fields) {
@@ -704,7 +759,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
     /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
     // Log warning if monitor type config is missing to prevent silent field loss
-    console.warn(
+    dbLogger.warn(
         `Monitor type configuration not found for type '${monitor.type}', dynamic fields may be lost`
     );
 

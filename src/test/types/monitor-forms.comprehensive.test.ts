@@ -79,9 +79,12 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 checkInterval: 300_000,
                 retryAttempts: 3,
                 timeout: 10_000,
-                connectionType: "tcp",
                 host: "",
                 port: 80,
+                ipVersion: "ipv4",
+                protocol: {
+                    useTls: false,
+                },
             });
         });
 
@@ -203,7 +206,10 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 timeout: 10_000,
                 host: "example.com",
                 port: 80,
-                connectionType: "tcp",
+                ipVersion: "ipv4",
+                protocol: {
+                    useTls: false,
+                },
             };
 
             expect(isHttpMonitorFields(portFields)).toBe(false);
@@ -302,7 +308,10 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 timeout: 10_000,
                 host: "example.com",
                 port: 80,
-                connectionType: "tcp",
+                ipVersion: "ipv4",
+                protocol: {
+                    useTls: false,
+                },
             };
 
             expect(isPingMonitorFields(portFields)).toBe(false);
@@ -369,7 +378,10 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 timeout: 10_000,
                 host: "example.com",
                 port: 80,
-                connectionType: "tcp",
+                ipVersion: "ipv4",
+                protocol: {
+                    useTls: false,
+                },
             };
 
             expect(isPortMonitorFields(portFields)).toBe(true);

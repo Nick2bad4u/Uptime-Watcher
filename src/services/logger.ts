@@ -15,6 +15,7 @@
  */
 
 import type { RendererLogger } from "electron-log";
+import type { UnknownRecord } from "type-fest";
 
 import log from "electron-log/renderer";
 
@@ -118,7 +119,7 @@ interface LogTransports {
 function getLogTransport<K extends keyof LogTransports>(
     transportName: K
 ): LogTransports[K] | undefined {
-    const transports = log.transports as unknown as Record<string, unknown>;
+    const transports = log.transports as unknown as UnknownRecord;
 
     if (transportName in transports) {
         return transports[transportName] as LogTransports[K];

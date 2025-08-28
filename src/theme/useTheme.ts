@@ -7,6 +7,8 @@
  * persistence.
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import {
     isSiteStatus,
     type MonitorStatus,
@@ -14,6 +16,7 @@ import {
 } from "@shared/types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import type { SystemThemePreference } from "./components/types";
 import type { Theme, ThemeName } from "./types";
 
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
@@ -81,7 +84,7 @@ interface UseThemeReturn {
     /** Change active theme */
     setTheme: (themeName: ThemeName) => void;
     /** Current system theme preference */
-    systemTheme: "dark" | "light";
+    systemTheme: SystemThemePreference;
     /** ThemeManager instance for advanced operations */
     themeManager: ThemeManager;
     /** Current theme name */
@@ -121,7 +124,7 @@ interface UseThemeReturn {
  */
 export function useTheme(): UseThemeReturn {
     const { settings, updateSettings } = useSettingsStore();
-    const [systemTheme, setSystemTheme] = useState<"dark" | "light">(
+    const [systemTheme, setSystemTheme] = useState<SystemThemePreference>(
         // Initialize with actual system preference to avoid flashing
         () => themeManager.getSystemThemePreference()
     );
@@ -154,7 +157,7 @@ export function useTheme(): UseThemeReturn {
     );
 
     const updateSystemTheme = useCallback(
-        (newSystemTheme: "dark" | "light") => {
+        (newSystemTheme: SystemThemePreference) => {
             // Only update if the theme actually changed to prevent unnecessary re-renders
             setSystemTheme((prev) =>
                 prev === newSystemTheme ? prev : newSystemTheme
@@ -244,7 +247,7 @@ export function useTheme(): UseThemeReturn {
                     Object.hasOwn(value, key)
                 ) {
                     /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe property navigation with runtime object checks */
-                    value = (value as Record<string, unknown>)[key];
+                    value = (value as UnknownRecord)[key];
                 } else {
                     value = undefined;
                     break;

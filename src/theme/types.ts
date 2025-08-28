@@ -6,6 +6,8 @@
  * including colors, typography, spacing, and visual effects.
  */
 
+import type { SystemThemePreference } from "./components/types";
+
 /**
  * Complete theme interface containing all theme properties. Represents a
  * complete theme configuration with all styling properties.
@@ -224,7 +226,7 @@ export interface ThemeState {
     /** Custom user-defined themes */
     customThemes: Record<string, Theme>;
     /** System theme preference (light/dark) */
-    systemThemePreference: "dark" | "light";
+    systemThemePreference: SystemThemePreference;
 }
 
 /**

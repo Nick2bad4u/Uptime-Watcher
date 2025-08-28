@@ -87,7 +87,7 @@ describe('Ultimate Function Coverage Boost', () => {
     let functionsCallCount = 0;
 
     // Iterate through each module
-    modules.forEach(({ name, module: mod }) => {
+    modules.forEach(({ module: mod }) => {
       const exportedKeys = Object.keys(mod);
 
       exportedKeys.forEach(key => {

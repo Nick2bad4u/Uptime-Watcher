@@ -9,6 +9,8 @@
  * @packageDocumentation
  */
 
+import type { UnknownRecord } from "type-fest";
+
 /**
  * Determines if a value is an object (excluding `null` and arrays).
  *
@@ -17,7 +19,7 @@
  * @returns True if `value` is an object and not null or an array; otherwise,
  *   false.
  */
-export function isObject(value: unknown): value is Record<string, unknown> {
+export function isObject(value: unknown): value is UnknownRecord {
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
@@ -225,7 +227,7 @@ export function isNonNegativeNumber(value: unknown): value is number {
  */
 export function isNonNullObject(
     value: unknown
-): value is Record<string, unknown> {
+): value is UnknownRecord {
     return isObject(value);
 }
 

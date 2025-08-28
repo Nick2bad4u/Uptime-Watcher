@@ -36,6 +36,8 @@
  * @packageDocumentation
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 
 /**
@@ -51,7 +53,7 @@ export interface IpcResponse<T> {
     /** Error message when operation fails */
     error?: string;
     /** Additional operation metadata */
-    metadata?: Record<string, unknown>;
+    metadata?: UnknownRecord;
     /** Indicates whether the operation was successful */
     success: boolean;
     /** Non-critical warnings */

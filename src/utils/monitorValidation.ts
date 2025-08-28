@@ -5,6 +5,7 @@
 
 import type { Monitor, MonitorType } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
+import type { Simplify, UnknownRecord } from "type-fest";
 
 // Import shared validation functions for client-side validation
 import {
@@ -27,6 +28,18 @@ import { withUtilityErrorHandling } from "./errorHandling";
 // @shared/types/validation
 
 /**
+ * Enhanced validation result with additional type information using Simplify.
+ */
+type EnhancedValidationResult = Simplify<
+    ValidationResult & {
+        /** Field that was validated (if applicable) */
+        fieldName?: string;
+        /** Type information about the validation */
+        validationType: "field" | "full" | "partial";
+    }
+>;
+
+/**
  * Required fields for monitor creation, ensuring type safety. Prevents runtime
  * errors by guaranteeing essential properties are present.
  */
@@ -41,9 +54,7 @@ export interface MonitorCreationData
             | "timeout"
             | "type"
         >,
-        Record<string, unknown> {}
-
-/**
+        UnknownRecord {} /**
  * Create monitor object with proper field mapping and type safety.
  *
  * @param type - Monitor type
@@ -130,6 +141,65 @@ export async function validateMonitorDataClientSide(
 }
 
 /**
+ * Enhanced field validation with type information and better error handling.
+ *
+ * @param type - Monitor type
+ * @param fieldName - Field name to validate
+ * @param value - Field value
+ *
+ * @returns Promise resolving to enhanced validation result
+ */
+export async function validateMonitorFieldEnhanced(
+    type: MonitorType,
+    fieldName: string,
+    value: unknown
+): Promise<EnhancedValidationResult> {
+    return withUtilityErrorHandling(
+        async () => {
+            // Use the shared validation for consistent results
+            const data: UnknownRecord = {
+                [fieldName]: value,
+                type,
+            };
+            const result = await validateMonitorData(type, data);
+
+            // Filter errors to include only field-specific ones
+            const filteredErrors = result.errors.filter((error) =>
+                error.toLowerCase().includes(fieldName.toLowerCase())
+            );
+
+            // If we had errors but filtering removed them all, and validation failed,
+            // return a field-specific error message
+            const finalErrors =
+                result.errors.length > 0 &&
+                filteredErrors.length === 0 &&
+                !result.success
+                    ? [`Failed to validate field: ${fieldName}`]
+                    : filteredErrors;
+
+            return {
+                errors: finalErrors,
+                fieldName,
+                success: result.success,
+                validationType: "field" as const,
+                warnings:
+                    result.warnings?.filter((warning) =>
+                        warning.toLowerCase().includes(fieldName.toLowerCase())
+                    ) ?? [],
+            };
+        },
+        "Enhanced field validation",
+        {
+            errors: [`Failed to validate field: ${fieldName}`],
+            fieldName,
+            success: false,
+            validationType: "field" as const,
+            warnings: [],
+        }
+    );
+}
+
+/**
  * Validate individual monitor field with improved error filtering.
  *
  * @param type - Monitor type
@@ -145,40 +215,16 @@ export async function validateMonitorField(
 ): Promise<string[]> {
     return withUtilityErrorHandling(
         async () => {
-            // Use the full validation and extract errors for this field
-            const data: Record<string, unknown> = {
-                [fieldName]: value,
+            // Use the enhanced validation for better error handling
+            const result = await validateMonitorFieldEnhanced(
                 type,
-            };
-            const result = await validateMonitorData(type, data);
-
-            if (result.success) {
-                return [];
-            }
-
-            // Improved error filtering: look for field-specific errors more
-            // robustly
-            const fieldErrors = result.errors.filter((error) => {
-                const errorLower = error.toLowerCase();
-                const fieldLower = fieldName.toLowerCase();
-
-                // Check if error message contains the field name or common
-                // field error patterns
-                return (
-                    errorLower.includes(fieldLower) ||
-                    errorLower.includes(`"${fieldLower}"`) ||
-                    errorLower.includes(`'${fieldLower}'`) ||
-                    errorLower.includes(`${fieldLower}:`) ||
-                    errorLower.includes(`${fieldLower} `)
-                );
-            });
-
-            // If no field-specific errors found but validation failed, return
-            // all errors This prevents losing important validation information
-            return fieldErrors.length > 0 ? fieldErrors : result.errors;
+                fieldName,
+                value
+            );
+            return result.errors;
         },
-        `Monitor field validation for ${fieldName}`,
-        [`Failed to validate ${fieldName}`]
+        "Field validation",
+        [`Failed to validate field: ${fieldName}`]
     );
 }
 

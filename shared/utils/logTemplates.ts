@@ -26,15 +26,41 @@
  * @packageDocumentation
  */
 
+import type { UnknownRecord } from "type-fest";
+
 /**
- * Logger interface for type safety.
+ * Logger interface for type safety with enhanced type utilities.
  */
 interface Logger {
-    debug: (message: string, context?: Record<string, unknown>) => void;
-    error: (message: string, context?: Record<string, unknown>) => void;
-    info: (message: string, context?: Record<string, unknown>) => void;
-    warn: (message: string, context?: Record<string, unknown>) => void;
+    debug: (message: string, context?: UnknownRecord) => void;
+    error: (message: string, context?: UnknownRecord) => void;
+    info: (message: string, context?: UnknownRecord) => void;
+    warn: (message: string, context?: UnknownRecord) => void;
 }
+
+/**
+ * Common template variable names for better autocomplete while allowing
+ * custom variables.
+ */
+type TemplateVariableName =
+    | "busId"
+    | "correlationId"
+    | "count"
+    | "eventName"
+    | "fromVersion"
+    | "maxMiddleware"
+    | "monitorType"
+    | "toVersion"
+    | string;
+
+/**
+ * Template variable values for log interpolation.
+ * Uses Partial to make all variables optional.
+ */
+type TemplateVariables = Partial<Record<TemplateVariableName, number | string>>;
+
+// Export enhanced types for external use
+export type { TemplateVariableName, TemplateVariables };
 
 /**
  * Service-related log message templates.
@@ -413,7 +439,7 @@ export type LogTemplate =
  */
 export function interpolateLogTemplate(
     template: string,
-    variables: Record<string, number | string>
+    variables: TemplateVariables
 ): string {
     return template.replaceAll(
         // eslint-disable-next-line regexp/strict, regexp/require-unicode-sets-regexp -- Conflicting rules: strict wants escaped braces, require-unicode-sets wants v flag
@@ -447,25 +473,25 @@ export function interpolateLogTemplate(
 export function createTemplateLogger(baseLogger: Logger): {
     debug: (
         message: string,
-        variables?: Record<string, number | string>
+        variables?: TemplateVariables
     ) => void;
     error: (
         message: string,
-        variables?: Record<string, number | string>
+        variables?: TemplateVariables
     ) => void;
     info: (
         message: string,
-        variables?: Record<string, number | string>
+        variables?: TemplateVariables
     ) => void;
     warn: (
         message: string,
-        variables?: Record<string, number | string>
+        variables?: TemplateVariables
     ) => void;
 } {
     return {
         debug: (
             message: string,
-            variables?: Record<string, number | string>
+            variables?: TemplateVariables
         ): void => {
             const interpolated = variables
                 ? interpolateLogTemplate(message, variables)
@@ -474,7 +500,7 @@ export function createTemplateLogger(baseLogger: Logger): {
         },
         error: (
             message: string,
-            variables?: Record<string, number | string>
+            variables?: TemplateVariables
         ): void => {
             const interpolated = variables
                 ? interpolateLogTemplate(message, variables)
@@ -483,7 +509,7 @@ export function createTemplateLogger(baseLogger: Logger): {
         },
         info: (
             message: string,
-            variables?: Record<string, number | string>
+            variables?: TemplateVariables
         ): void => {
             const interpolated = variables
                 ? interpolateLogTemplate(message, variables)
@@ -492,7 +518,7 @@ export function createTemplateLogger(baseLogger: Logger): {
         },
         warn: (
             message: string,
-            variables?: Record<string, number | string>
+            variables?: TemplateVariables
         ): void => {
             const interpolated = variables
                 ? interpolateLogTemplate(message, variables)

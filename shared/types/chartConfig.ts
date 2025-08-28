@@ -9,6 +9,109 @@
  * @packageDocumentation
  */
 
+import type { UnknownRecord } from "type-fest";
+
+/**
+ * Chart.js animation easing function values.
+ *
+ * @public
+ */
+export type ChartEasing =
+    | "linear"
+    | "easeInQuad"
+    | "easeOutQuad"
+    | "easeInOutQuad"
+    | "easeInCubic"
+    | "easeOutCubic"
+    | "easeInOutCubic"
+    | "easeInQuart"
+    | "easeOutQuart"
+    | "easeInOutQuart"
+    | "easeInQuint"
+    | "easeOutQuint"
+    | "easeInOutQuint"
+    | "easeInSine"
+    | "easeOutSine"
+    | "easeInOutSine"
+    | "easeInExpo"
+    | "easeOutExpo"
+    | "easeInOutExpo"
+    | "easeInCirc"
+    | "easeOutCirc"
+    | "easeInOutCirc"
+    | "easeInElastic"
+    | "easeOutElastic"
+    | "easeInOutElastic"
+    | "easeInBack"
+    | "easeOutBack"
+    | "easeInOutBack"
+    | "easeInBounce"
+    | "easeOutBounce"
+    | "easeInOutBounce";
+
+/**
+ * Chart.js position values for legends, titles, and axes.
+ *
+ * @public
+ */
+export type ChartPosition = "top" | "left" | "bottom" | "right";
+
+/**
+ * Chart.js legend position values (extends ChartPosition with chartArea).
+ *
+ * @public
+ */
+export type ChartLegendPosition = ChartPosition | "chartArea";
+
+/**
+ * Chart.js scale position values (extends ChartPosition with center).
+ *
+ * @public
+ */
+export type ChartScalePosition = ChartPosition | "center";
+
+/**
+ * Chart.js scale type values.
+ *
+ * @public
+ */
+export type ChartScaleType = "linear" | "logarithmic" | "category" | "time" | "timeseries";
+
+/**
+ * Chart.js alignment values for titles and legends.
+ *
+ * @public
+ */
+export type ChartAlignment = "start" | "center" | "end";
+
+/**
+ * CSS font-style values for Chart.js font configurations.
+ *
+ * @public
+ */
+export type ChartFontStyle = "normal" | "italic" | "oblique" | "initial" | "inherit";
+
+/**
+ * CSS font-weight values for Chart.js font configurations.
+ *
+ * @public
+ */
+export type ChartFontWeight = "normal" | "bold" | "lighter" | "bolder" | number;
+
+/**
+ * Chart.js alignment values.
+ *
+ * @public
+ */
+export type ChartAlign = "start" | "center" | "end";
+
+/**
+ * Chart.js chart type values.
+ *
+ * @public
+ */
+export type ChartType = "area" | "bar" | "bubble" | "doughnut" | "line" | "mixed" | "pie" | "polarArea" | "radar" | "scatter";
+
 /**
  * Chart configuration interface.
  *
@@ -21,7 +124,7 @@ export interface ChartConfig {
     /** Animation configuration */
     animation?: {
         duration?: number;
-        easing?: string;
+        easing?: ChartEasing;
     };
     /** Interaction configuration */
     interaction?: {
@@ -63,7 +166,7 @@ export interface ChartData {
  */
 export interface ChartDataPoint {
     /** Additional data for tooltips or processing */
-    data?: Record<string, unknown>;
+    data?: UnknownRecord;
     /** X-axis value */
     x: number | string;
     /** Y-axis value */
@@ -120,14 +223,14 @@ export interface ChartLegendConfig {
         font?: {
             family?: string;
             size?: number;
-            style?: "italic" | "normal";
-            weight?: "bold" | "normal";
+            style?: ChartFontStyle;
+            weight?: ChartFontWeight;
         };
         padding?: number;
         usePointStyle?: boolean;
     };
     /** Legend position */
-    position?: "bottom" | "chartArea" | "left" | "right" | "top";
+    position?: ChartLegendPosition;
 }
 
 /**
@@ -169,7 +272,7 @@ export interface ChartScaleConfig {
     /** Minimum value for the scale */
     min?: number;
     /** Position of the scale */
-    position?: "bottom" | "left" | "right" | "top";
+    position?: ChartScalePosition;
     /** Stacking configuration */
     stacked?: boolean;
     /** Ticks configuration */
@@ -179,8 +282,8 @@ export interface ChartScaleConfig {
         font?: {
             family?: string;
             size?: number;
-            style?: "italic" | "normal";
-            weight?: "bold" | "normal";
+            style?: ChartFontStyle;
+            weight?: ChartFontWeight;
         };
         max?: number;
         min?: number;
@@ -194,14 +297,14 @@ export interface ChartScaleConfig {
         font?: {
             family?: string;
             size?: number;
-            style?: "italic" | "normal";
-            weight?: "bold" | "normal";
+            style?: ChartFontStyle;
+            weight?: ChartFontWeight;
         };
         padding?: number;
         text?: string;
     };
     /** Scale type */
-    type?: "category" | "linear" | "logarithmic" | "time";
+    type?: ChartScaleType;
 }
 
 /**
@@ -254,7 +357,7 @@ export interface ChartThemeConfig {
  */
 export interface ChartTitleConfig {
     /** Title text alignment */
-    align?: "center" | "end" | "start";
+    align?: ChartAlign;
     /** Title color */
     color?: string;
     /** Whether to display the title */
@@ -264,13 +367,13 @@ export interface ChartTitleConfig {
         family?: string;
         lineHeight?: number;
         size?: number;
-        style?: "italic" | "normal";
-        weight?: "bold" | "normal";
+        style?: ChartFontStyle;
+        weight?: ChartFontWeight;
     };
     /** Title padding */
     padding?: number;
     /** Title position */
-    position?: "bottom" | "left" | "right" | "top";
+    position?: ChartAlignment;
     /** Title text */
     text?: string | string[];
 }
@@ -292,8 +395,8 @@ export interface ChartTooltipConfig {
     bodyFont?: {
         family?: string;
         size?: number;
-        style?: "italic" | "normal";
-        weight?: "bold" | "normal";
+        style?: ChartFontStyle;
+        weight?: ChartFontWeight;
     };
     /** Border color */
     borderColor?: string;
@@ -311,8 +414,8 @@ export interface ChartTooltipConfig {
     titleFont?: {
         family?: string;
         size?: number;
-        style?: "italic" | "normal";
-        weight?: "bold" | "normal";
+        style?: ChartFontStyle;
+        weight?: ChartFontWeight;
     };
 }
 
@@ -330,7 +433,7 @@ export interface CompleteChartConfig {
     /** Chart options */
     options?: ChartConfig;
     /** Chart type */
-    type: "bar" | "doughnut" | "line" | "pie" | "scatter";
+    type: ChartType;
 }
 
 /**
@@ -379,8 +482,8 @@ export function hasPlugins(
         typeof config === "object" &&
         config !== null &&
         "plugins" in config &&
-        typeof (config as Record<string, unknown>)["plugins"] === "object" &&
-        (config as Record<string, unknown>)["plugins"] !== null
+        typeof (config as UnknownRecord)["plugins"] === "object" &&
+        (config as UnknownRecord)["plugins"] !== null
     );
 }
 
@@ -400,8 +503,8 @@ export function hasScales(
         typeof config === "object" &&
         config !== null &&
         "scales" in config &&
-        typeof (config as Record<string, unknown>)["scales"] === "object" &&
-        (config as Record<string, unknown>)["scales"] !== null
+        typeof (config as UnknownRecord)["scales"] === "object" &&
+        (config as UnknownRecord)["scales"] !== null
     );
 }
 

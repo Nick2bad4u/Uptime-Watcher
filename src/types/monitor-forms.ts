@@ -3,7 +3,8 @@
  * `Record<string, unknown>` patterns.
  */
 
-import type { MonitorType } from "@shared/types";
+import type { HttpMethod, MonitorType } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
 /**
  * Base monitor fields common to all monitor types
@@ -30,7 +31,7 @@ export interface HttpMonitorFields extends BaseMonitorFields {
     /** Request headers */
     headers?: Record<string, string>;
     /** HTTP method */
-    method?: "DELETE" | "GET" | "HEAD" | "POST" | "PUT";
+    method?: HttpMethod;
     /** URL to monitor */
     url: string;
 }
@@ -44,7 +45,7 @@ export interface MonitorFieldChangeHandlers {
     /** Handler for number fields */
     number: (fieldName: string, value: number) => void;
     /** Handler for object fields */
-    object: (fieldName: string, value: Record<string, unknown>) => void;
+    object: (fieldName: string, value: UnknownRecord) => void;
     /** Handler for string fields */
     string: (fieldName: string, value: string) => void;
 }
@@ -58,7 +59,7 @@ export interface MonitorFieldValues {
     /** Number field values */
     numbers: Record<string, number>;
     /** Object field values */
-    objects: Record<string, Record<string, unknown>>;
+    objects: Record<string, UnknownRecord>;
     /** String field values */
     strings: Record<string, string>;
 }
@@ -125,12 +126,17 @@ export interface DnsMonitorFields extends BaseMonitorFields {
  * Port monitor specific fields
  */
 export interface PortMonitorFields extends BaseMonitorFields {
-    /** Connection type */
-    connectionType?: "tcp" | "udp";
     /** Host to monitor */
     host: string;
+    /** Internet Protocol version to use */
+    ipVersion?: "ipv4" | "ipv6";
     /** Port number */
     port: number;
+    /** Protocol-specific configuration */
+    protocol?: {
+        /** Whether to use TLS/SSL encryption */
+        useTls?: boolean;
+    };
 }
 
 /**
@@ -189,9 +195,12 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
         case "port": {
             return {
                 ...baseFields,
-                connectionType: "tcp",
                 host: "",
+                ipVersion: "ipv4",
                 port: 80,
+                protocol: {
+                    useTls: false,
+                },
             } satisfies PortMonitorFields;
         }
         default: {

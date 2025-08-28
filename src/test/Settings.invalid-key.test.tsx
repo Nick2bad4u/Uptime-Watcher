@@ -10,6 +10,7 @@
 import { render, screen, act } from "@testing-library/react";
 import React from "react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import type { UnknownRecord } from "type-fest";
 
 import { Settings } from "../components/Settings/Settings";
 import logger from "../services/logger";
@@ -233,7 +234,7 @@ vi.mock("../theme/components", () => ({
             filteredProps["data-loading"] = loading.toString();
         return React.createElement("button", filteredProps, children);
     },
-    ThemedCheckbox: (props: Record<string, unknown>) =>
+    ThemedCheckbox: (props: UnknownRecord) =>
         React.createElement("input", { type: "checkbox", ...props }),
     ThemedSelect: ({
         children,

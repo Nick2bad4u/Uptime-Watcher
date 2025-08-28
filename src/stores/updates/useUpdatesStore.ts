@@ -36,6 +36,8 @@
  * @public
  */
 
+import type { Merge } from "type-fest";
+
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -48,26 +50,12 @@ import { logStoreAction } from "../utils";
  * Interface for the updates store with persistence capabilities.
  */
 type UpdatesStoreWithPersist = UseBoundStore<
-    Omit<StoreApi<UpdatesStore>, "persist"> & {
-        persist: {
-            clearStorage: () => void;
-            getOptions: () => Partial<
-                PersistOptions<
-                    UpdatesStore,
-                    {
-                        updateInfo: undefined | UpdateInfo;
-                        updateStatus: UpdateStatus;
-                    }
-                >
-            >;
-            hasHydrated: () => boolean;
-            onFinishHydration: (
-                fn: (state: UpdatesStore) => void
-            ) => () => void;
-            onHydrate: (fn: (state: UpdatesStore) => void) => () => void;
-            rehydrate: () => Promise<void> | void;
-            setOptions: (
-                options: Partial<
+    Merge<
+        Omit<StoreApi<UpdatesStore>, "persist">,
+        {
+            persist: {
+                clearStorage: () => void;
+                getOptions: () => Partial<
                     PersistOptions<
                         UpdatesStore,
                         {
@@ -75,10 +63,27 @@ type UpdatesStoreWithPersist = UseBoundStore<
                             updateStatus: UpdateStatus;
                         }
                     >
-                >
-            ) => void;
-        };
-    }
+                >;
+                hasHydrated: () => boolean;
+                onFinishHydration: (
+                    fn: (state: UpdatesStore) => void
+                ) => () => void;
+                onHydrate: (fn: (state: UpdatesStore) => void) => () => void;
+                rehydrate: () => Promise<void> | void;
+                setOptions: (
+                    options: Partial<
+                        PersistOptions<
+                            UpdatesStore,
+                            {
+                                updateInfo: undefined | UpdateInfo;
+                                updateStatus: UpdateStatus;
+                            }
+                        >
+                    >
+                ) => void;
+            };
+        }
+    >
 >;
 
 /**

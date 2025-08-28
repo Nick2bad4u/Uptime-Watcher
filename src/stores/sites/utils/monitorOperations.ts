@@ -6,6 +6,8 @@
  * including creation, validation, and manipulation of monitor objects.
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import {
     BASE_MONITOR_TYPES,
     DEFAULT_MONITOR_STATUS,
@@ -174,10 +176,10 @@ function filterMonitorFieldsByType(
 
     // Only include fields that are allowed for this monitor type
     // Use type assertion to safely access monitor properties
-    const monitorRecord = monitor as Record<string, unknown>;
+    const monitorRecord = monitor as UnknownRecord;
     for (const [key, value] of Object.entries(monitorRecord)) {
         if (allowedFields.has(key)) {
-            (filtered as Record<string, unknown>)[key] = value;
+            (filtered as UnknownRecord)[key] = value;
         }
     }
 
@@ -223,14 +225,14 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
     validateMonitorInput(monitor);
 
     // Cast to unknown first to avoid strict type issues with Partial<Monitor>
-    const monitorData = monitor as unknown as Record<string, unknown>;
+    const monitorData = monitor as unknown as UnknownRecord;
     const finalizedType = validateMonitorType(monitorData["type"]);
 
     // Filter the monitor data to only include fields appropriate for this type
     const filteredMonitor = filterMonitorFieldsByType(monitor, finalizedType);
 
     // Cast filtered monitor for safe access
-    const filteredData = filteredMonitor as unknown as Record<string, unknown>;
+    const filteredData = filteredMonitor as unknown as UnknownRecord;
 
     return {
         activeOperations: Array.isArray(filteredData["activeOperations"])

@@ -13,6 +13,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison */
 // Defensive programming for test edge cases and cross-environment compatibility
 
+import type { SystemThemePreference } from "./components/types";
 import type { Theme, ThemeName } from "./types";
 
 import { themes } from "./themes";
@@ -143,7 +144,7 @@ export class ThemeManager {
      *
      * @returns Dark if user prefers dark mode, "light" otherwise
      */
-    public getSystemThemePreference(): "dark" | "light" {
+    public getSystemThemePreference(): SystemThemePreference {
         if (typeof window !== "undefined" && window.matchMedia) {
             return window.matchMedia("(prefers-color-scheme: dark)").matches
                 ? "dark"

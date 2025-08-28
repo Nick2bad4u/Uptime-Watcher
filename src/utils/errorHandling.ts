@@ -6,7 +6,44 @@
  * store management. Focused on pure utility error handling patterns.
  */
 
+import type { Simplify } from "type-fest";
+
 import logger from "../services/logger";
+
+/**
+ * Type-safe error conversion result with enhanced type information.
+ */
+type ErrorConversionResult = Simplify<{
+    /** The resulting Error instance */
+    error: Error;
+    /** The original input type information */
+    originalType: string;
+    /** Whether the input was already an Error instance */
+    wasError: boolean;
+}>;
+
+/**
+ * Enhanced error conversion that provides detailed type information.
+ *
+ * @param error - Unknown error value from catch blocks
+ *
+ * @returns Detailed error conversion result
+ */
+export function convertError(error: unknown): ErrorConversionResult {
+    if (error instanceof Error) {
+        return {
+            error,
+            originalType: "Error",
+            wasError: true,
+        };
+    }
+
+    return {
+        error: new Error(String(error)),
+        originalType: typeof error,
+        wasError: false,
+    };
+}
 
 /**
  * Ensures an error object is properly typed and formatted. Converts unknown
@@ -17,7 +54,7 @@ import logger from "../services/logger";
  * @returns Properly typed Error instance
  */
 export function ensureError(error: unknown): Error {
-    return error instanceof Error ? error : new Error(String(error));
+    return convertError(error).error;
 }
 
 /**

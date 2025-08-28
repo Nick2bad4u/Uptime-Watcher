@@ -14,6 +14,7 @@
  */
 
 import type { AxiosInstance } from "axios";
+import type { UnknownRecord } from "type-fest";
 
 import axios from "axios";
 import * as http from "node:http";
@@ -150,7 +151,7 @@ export function createHttpClient(config: MonitorConfig): AxiosInstance {
         headers["User-Agent"] = config.userAgent;
     }
 
-    const createConfig: Record<string, unknown> = {
+    const createConfig: UnknownRecord = {
         headers,
         // Connection pooling for better performance
         httpAgent: new http.Agent({ keepAlive: true }),

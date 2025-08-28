@@ -43,6 +43,7 @@
 import type { Monitor, MonitorType } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
+import type { Simplify } from "type-fest";
 
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
@@ -210,9 +211,9 @@ export interface MonitorTypesState {
 /**
  * Combined interface for Monitor Types store.
  */
-export type MonitorTypesStore = BaseStore &
-    MonitorTypesActions &
-    MonitorTypesState;
+export type MonitorTypesStore = Simplify<
+    BaseStore & MonitorTypesActions & MonitorTypesState
+>;
 
 /**
  * Monitor Types store for managing monitor type configurations and operations.

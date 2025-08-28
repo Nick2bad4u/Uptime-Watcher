@@ -11,6 +11,7 @@
 
 import type { Monitor, Site } from "@shared/types";
 import type { MonitorRow as DatabaseMonitorRow } from "@shared/types/database";
+import type { UnknownRecord } from "type-fest";
 
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import {
@@ -198,7 +199,7 @@ export function buildMonitorParameters(
         // Return values in the same order as columns
         /* eslint-disable @typescript-eslint/no-unsafe-type-assertion, sonarjs/function-return-type -- Safe internal type conversions for database mapping. Row structure guaranteed by dynamic schema system. */
         return columns.map((column): DbValue => {
-            const value = (row as unknown as Record<string, unknown>)[column];
+            const value = (row as unknown as UnknownRecord)[column];
             if (value === undefined || value === null) {
                 return null;
             }
@@ -235,7 +236,7 @@ export function buildMonitorParameters(
  *
  * @public
  */
-export function isValidMonitorRow(row: Record<string, unknown>): boolean {
+export function isValidMonitorRow(row: UnknownRecord): boolean {
     return (
         row["id"] !== undefined &&
         row["site_identifier"] !== undefined &&

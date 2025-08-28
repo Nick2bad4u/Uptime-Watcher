@@ -11,6 +11,7 @@
  * @packageDocumentation
  */
 
+import type { UnknownRecord } from "type-fest";
 import type {
     BaseMonitorSchemaType,
     DnsMonitorSchemaType,
@@ -376,7 +377,7 @@ function validateFieldWithSchema(
     type: string,
     fieldName: string,
     value: unknown
-): Record<string, unknown> {
+): UnknownRecord {
     const testData = {
         [fieldName]: value,
     };

@@ -553,3 +553,6 @@ repomix-output.xml
 
 # Allow custom OhMyPosh theme
 !.vscode/OhMyPosh-Atomic-Custom.json
+
+# Instructions for Copilot
+.github/instructions/

@@ -58,6 +58,8 @@
  * @packageDocumentation
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
 
@@ -77,7 +79,7 @@ export interface OperationalHooksConfig<T = unknown> {
     /**
      * Context data to include in events.
      */
-    context?: Record<string, unknown>;
+    context?: UnknownRecord;
 
     /**
      * Whether to emit events for this operation.
@@ -173,7 +175,7 @@ async function emitStartEvent(
     eventEmitter: TypedEventBus<UptimeEvents>,
     operationName: string,
     startTime: number,
-    context: Record<string, unknown>
+    context: UnknownRecord
 ): Promise<void> {
     try {
         await eventEmitter.emitTyped("database:transaction-completed", {
@@ -475,7 +477,7 @@ export async function withDatabaseOperation<T>(
     operation: () => Promise<T>,
     operationName: string,
     eventEmitter?: TypedEventBus<UptimeEvents>,
-    context?: Record<string, unknown>
+    context?: UnknownRecord
 ): Promise<T> {
     return withOperationalHooks(operation, {
         backoff: "exponential",

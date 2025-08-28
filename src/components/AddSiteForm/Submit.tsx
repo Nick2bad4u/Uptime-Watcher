@@ -11,6 +11,7 @@
 
 import type { Monitor, MonitorType } from "@shared/types";
 import type { FormEvent } from "react";
+import type { Simplify, UnknownRecord } from "type-fest";
 
 import type { Logger } from "../../services/logger";
 import type {
@@ -65,16 +66,18 @@ export interface StoreActions {
  *
  * @public
  */
-export type FormSubmitProperties = AddSiteFormState &
-    Pick<AddSiteFormActions, "setFormError"> &
-    StoreActions & {
-        /** UUID generator function for creating unique identifiers */
-        generateUuid: () => string;
-        /** Logger instance for debugging and error tracking */
-        logger: Logger;
-        /** Optional callback executed after successful submission */
-        onSuccess?: () => void;
-    };
+export type FormSubmitProperties = Simplify<
+    AddSiteFormState &
+        Pick<AddSiteFormActions, "setFormError"> &
+        StoreActions & {
+            /** UUID generator function for creating unique identifiers */
+            generateUuid: () => string;
+            /** Logger instance for debugging and error tracking */
+            logger: Logger;
+            /** Optional callback executed after successful submission */
+            onSuccess?: () => void;
+        }
+>;
 
 /**
  * Builds monitor data object dynamically based on monitor type configuration.
@@ -326,7 +329,7 @@ async function validateMonitorType(
     expectedValue: string
 ): Promise<string[]> {
     // Build form data object with only the relevant fields
-    const formData: Record<string, unknown> = {
+    const formData: UnknownRecord = {
         type: monitorType,
     };
 

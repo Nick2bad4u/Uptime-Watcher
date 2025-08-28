@@ -2,6 +2,8 @@ import type { CoreComponentProperties } from "@shared/types/componentProps";
 
 import React, { useCallback, useMemo } from "react";
 
+import type { ProgressSize, ProgressVariant } from "./types";
+
 import { useTheme } from "../useTheme";
 import ThemedText from "./ThemedText";
 
@@ -18,11 +20,11 @@ export interface ThemedProgressProperties extends CoreComponentProperties {
     /** Whether to display the label text */
     readonly showLabel?: boolean;
     /** Size variant for the progress bar */
-    readonly size?: "lg" | "md" | "sm" | "xs";
+    readonly size?: ProgressSize;
     /** Current progress value */
     readonly value: number;
     /** Color variant for the progress bar */
-    readonly variant?: "error" | "primary" | "success" | "warning";
+    readonly variant?: ProgressVariant;
 }
 
 /**

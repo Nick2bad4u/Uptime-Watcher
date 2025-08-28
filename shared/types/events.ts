@@ -9,6 +9,7 @@
  */
 
 import type { Monitor, Site } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
 /**
  * Base interface for all event data payloads.
@@ -368,4 +369,4 @@ export type DatabaseOperation =
  * };
  * ```
  */
-export type TestEventData = Record<string, unknown>;
+export type TestEventData = UnknownRecord;

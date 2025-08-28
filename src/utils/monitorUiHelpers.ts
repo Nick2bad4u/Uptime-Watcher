@@ -23,6 +23,7 @@
 
 import type { Monitor, MonitorType } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { UnknownRecord } from "type-fest";
 
 import { CacheKeys } from "@shared/utils/cacheKeys";
 
@@ -67,9 +68,9 @@ function isMonitorTypeConfig(value: unknown): value is MonitorTypeConfig {
     return (
         value !== null &&
         typeof value === "object" &&
-        typeof (value as MonitorTypeConfig).type === "string" &&
-        typeof (value as MonitorTypeConfig).displayName === "string" &&
-        Array.isArray((value as MonitorTypeConfig).fields)
+        typeof (value as UnknownRecord)["type"] === "string" &&
+        typeof (value as UnknownRecord)["displayName"] === "string" &&
+        Array.isArray((value as UnknownRecord)["fields"])
     );
     /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 }

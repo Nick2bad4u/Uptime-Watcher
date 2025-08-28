@@ -8,10 +8,11 @@
  *
  * @author AI Agent
  *
- * @since 2024
+ * @since 2024-01-01
  */
 
 import { describe, expect, it } from "vitest";
+import type { UnknownRecord } from "type-fest";
 import * as jsonSafetyModule from "@shared/utils/jsonSafety";
 
 describe("shared/utils/jsonSafety Function Coverage Validation", () => {
@@ -28,7 +29,7 @@ describe("shared/utils/jsonSafety Function Coverage Validation", () => {
             // Type guard for validation
             const isRecord = (
                 value: unknown
-            ): value is Record<string, unknown> =>
+            ): value is UnknownRecord =>
                 typeof value === "object" &&
                 value !== null &&
                 !Array.isArray(value);

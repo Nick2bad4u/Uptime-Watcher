@@ -52,6 +52,7 @@
 import type { Monitor, Site } from "@shared/types";
 import type { MonitorRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
+import type { UnknownRecord } from "type-fest";
 
 import type { DatabaseService } from "./DatabaseService";
 import type { DbValue } from "./utils/valueConverters";
@@ -700,7 +701,7 @@ export class MonitorRepository {
         }
 
         const { updateFields, updateValues } = this.buildUpdateFieldsAndValues(
-            row as unknown as Record<string, unknown>,
+            row as unknown as UnknownRecord,
             monitor
         );
         /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
@@ -731,7 +732,7 @@ export class MonitorRepository {
      *   (DB values).
      */
     private buildUpdateFieldsAndValues(
-        row: Record<string, unknown>,
+        row: UnknownRecord,
         monitor: Partial<Site["monitors"][0]>
     ): { updateFields: string[]; updateValues: DbValue[] } {
         const updateFields: string[] = [];

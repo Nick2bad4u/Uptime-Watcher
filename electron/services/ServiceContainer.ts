@@ -15,6 +15,7 @@
  * @public
  */
 import type { Site } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { IMonitoringOperations } from "../managers/SiteManager";
@@ -462,7 +463,7 @@ export class ServiceContainer {
      */
     public getInitializedServices(): ServiceInfo[] {
         const services: ServiceInfo[] = [];
-        const serviceMap: Record<string, unknown> = {
+        const serviceMap: UnknownRecord = {
             AutoUpdaterService: this.autoUpdaterService,
             ConfigurationManager: this.configurationManager,
             DatabaseManager: this.databaseManager,

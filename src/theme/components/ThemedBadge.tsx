@@ -135,7 +135,7 @@ const ThemedBadge = ({
                 fontSize: currentTheme.typography.fontSize.xs,
                 padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
             },
-        };
+        } as const;
 
         const variantStyles = {
             error: {
@@ -168,12 +168,29 @@ const ThemedBadge = ({
                 borderColor: `${currentTheme.colors.warning}40`,
                 color: currentTheme.colors.warning,
             },
+        } as const;
+
+        // Type-safe style lookup with fallbacks for custom values
+        const getSizeStyle = (sizeKey: BadgeSize): React.CSSProperties => {
+            if (sizeKey in sizeStyles) {
+                return sizeStyles[sizeKey as keyof typeof sizeStyles];
+            }
+            return sizeStyles.md;
+        };
+
+        const getVariantStyle = (
+            variantKey: BadgeVariant
+        ): React.CSSProperties => {
+            if (variantKey in variantStyles) {
+                return variantStyles[variantKey as keyof typeof variantStyles];
+            }
+            return variantStyles.primary;
         };
 
         return {
             ...badgeStyle,
-            ...sizeStyles[size],
-            ...variantStyles[variant],
+            ...getSizeStyle(size),
+            ...getVariantStyle(variant),
         };
     }, [
         currentTheme.borderRadius.full,

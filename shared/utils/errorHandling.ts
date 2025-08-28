@@ -118,17 +118,29 @@ async function handleBackendOperation<T>(
     operation: () => Promise<T>,
     context: ErrorHandlingBackendContext
 ): Promise<T> {
-    const { logger, operationName } = context;
+    // Safely destructure context with defaults
+    const safeContext = context || {};
+    const { logger, operationName } = safeContext;
 
     try {
         return await operation();
     } catch (error) {
-        logger.error(
-            operationName
-                ? `Failed to ${operationName}`
-                : "Async operation failed",
-            error
-        );
+        // Check if logger exists and has error method
+        if (logger && typeof logger === 'object' && 'error' in logger && typeof logger.error === 'function') {
+            logger.error(
+                operationName
+                    ? `Failed to ${operationName}`
+                    : "Async operation failed",
+                error
+            );
+        } else {
+            console.error(
+                operationName
+                    ? `Failed to ${operationName}`
+                    : "Async operation failed",
+                error
+            );
+        }
         throw error;
     }
 }
@@ -235,9 +247,17 @@ export async function withErrorHandling<T>(
 ): Promise<T> {
     // Check if it's a frontend store (has setError, clearError, setLoading
     // methods)
-    return "setError" in storeOrContext &&
-        "clearError" in storeOrContext &&
-        "setLoading" in storeOrContext
-        ? handleFrontendOperation(operation, storeOrContext)
-        : handleBackendOperation(operation, storeOrContext);
+    const isFrontendStore = Boolean(
+        storeOrContext &&
+        typeof storeOrContext === 'object' &&
+        storeOrContext !== null &&
+        typeof storeOrContext === 'object' &&
+        'setError' in storeOrContext &&
+        'clearError' in storeOrContext &&
+        'setLoading' in storeOrContext
+    );
+
+    return isFrontendStore
+        ? handleFrontendOperation(operation, storeOrContext as ErrorHandlingFrontendStore)
+        : handleBackendOperation(operation, storeOrContext as ErrorHandlingBackendContext);
 }

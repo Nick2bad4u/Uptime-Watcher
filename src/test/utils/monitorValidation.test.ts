@@ -604,7 +604,7 @@ describe("Monitor Validation Utilities", () => {
             await annotate("Type: Error Handling", "type");
 
             mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue({
-                errors: ["General validation error", "Another error"],
+                errors: ["URL validation error", "URL is invalid"],
                 success: false,
                 warnings: [],
             });
@@ -616,8 +616,8 @@ describe("Monitor Validation Utilities", () => {
             );
 
             expect(result).toEqual([
-                "General validation error",
-                "Another error",
+                "URL validation error",
+                "URL is invalid",
             ]);
         });
 
@@ -641,7 +641,7 @@ describe("Monitor Validation Utilities", () => {
             );
 
             expect(result).toEqual([
-                "Validation failed - unable to connect to backend",
+                "Failed to validate field: url",
             ]);
         });
 

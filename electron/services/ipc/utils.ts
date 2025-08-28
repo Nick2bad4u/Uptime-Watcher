@@ -4,6 +4,8 @@
  * type-safe, consistent IPC handlers.
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { isNonEmptyString } from "@shared/validation/validatorUtils";
 import { ipcMain } from "electron";
 
@@ -100,7 +102,7 @@ export const IpcValidators = {
 // eslint-disable-next-line etc/no-misused-generics -- Type parameter can be omitted for flexible usage
 export function createErrorResponse<T = void>(
     error: string,
-    metadata?: Record<string, unknown>
+    metadata?: UnknownRecord
 ): IpcResponse<T> {
     const response: IpcResponse<T> = {
         error,
@@ -127,7 +129,7 @@ export function createErrorResponse<T = void>(
  */
 export function createSuccessResponse<T>(
     data?: T,
-    metadata?: Record<string, unknown>,
+    metadata?: UnknownRecord,
     warnings?: string[]
 ): IpcResponse<T> {
     const response: IpcResponse<T> = {
@@ -165,7 +167,7 @@ export function createValidationResponse(
     success: boolean,
     errors: string[] = [],
     warnings: string[] = [],
-    metadata: Record<string, unknown> = {}
+    metadata: UnknownRecord = {}
 ): IpcValidationResponse {
     return {
         errors,
