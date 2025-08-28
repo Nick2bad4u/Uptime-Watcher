@@ -111,12 +111,14 @@ describe("Monitor Forms - 100% Coverage Tests", () => {
             expect(portFields).toHaveProperty("checkInterval");
             expect(portFields).toHaveProperty("retryAttempts");
             expect(portFields).toHaveProperty("timeout");
-            expect(portFields).toHaveProperty("connectionType");
+            expect(portFields).toHaveProperty("ipVersion");
+            expect(portFields).toHaveProperty("protocol");
 
             // Verify default values
             expect(portFields.host).toBe("");
             expect(portFields.port).toBe(80);
-            expect(portFields.connectionType).toBe("tcp");
+            expect(portFields.ipVersion).toBe("ipv4");
+            expect(portFields.protocol).toEqual({ useTls: false });
             expect(portFields.checkInterval).toBe(300_000);
             expect(portFields.retryAttempts).toBe(3);
             expect(portFields.timeout).toBe(10_000);

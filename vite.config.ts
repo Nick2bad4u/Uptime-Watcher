@@ -38,8 +38,10 @@ const dirname = import.meta.dirname;
 export default defineConfig(({}) => {
     const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
     return {
+        appType: "spa", // Single Page Application
         base: "./", // Ensures relative asset paths for Electron
         build: {
+            assetsDir: "assets",
             // Increase chunk size warning limit to account for intentional larger vendor chunks
             chunkSizeWarningLimit: 1000, // Increase from default 500KB to 1MB for vendor chunks
             copyPublicDir: true, // Copy public assets to dist
@@ -48,6 +50,7 @@ export default defineConfig(({}) => {
                 polyfill: false, // Modern browsers don't need polyfill
             },
             outDir: "dist",
+            reportCompressedSize: true, // Report gzip/brotli sizes
             rollupOptions: {
                 output: {
                     // Manual chunk splitting to optimize bundle sizes and improve caching
@@ -83,7 +86,6 @@ export default defineConfig(({}) => {
                 },
             },
             sourcemap: true, // Recommended for Electron debugging
-
             target: "es2024", // Updated from es2024 for CSS Modules compatibility
         },
         cache: true,
@@ -111,6 +113,10 @@ export default defineConfig(({}) => {
             // More aggressive transformation to help coverage parsing
             keepNames: true, // Preserve function names for better coverage reports
             target: "es2024", // Updated to match build target for CSS Modules compatibility
+        },
+        json: {
+            namedExports: true,
+            stringify: true,
         },
         plugins: [
             // CSS Modules patch to fix Vite's CSS Modules handling
@@ -393,8 +399,8 @@ export default defineConfig(({}) => {
                                         `    🎯 Compression potential: ${((1 - contents.length / (contents.length * 1.5)) * 100).toFixed(1)}% savings possible`
                                     );
 
-                                    // TODO: In production, could add compression or other optimizations here
-                                    // For now, preserve integrity and pass through with validation
+                                    // Production approach: Preserve SQLite WASM integrity
+                                    // Any modification could break database functionality - validation only
                                     return contents;
                                 } catch (error) {
                                     console.error(
@@ -435,10 +441,27 @@ export default defineConfig(({}) => {
                 telemetry: false, // Disable telemetry for faster builds
             }),
         ],
+        preview: {
+            open: false, // Don't auto-open browser (Electron only)
+            port: 6174, // Different from dev server port to avoid conflicts
+            strictPort: true, // Fail if port is taken (prevents silent port changes)
+        },
+        publicDir: "public",
         resolve: {
             alias: {
                 "@shared": normalizePath(path.resolve(dirname, "shared")),
             },
+            extensions: [
+                ".mjs",
+                ".js",
+                ".mts",
+                ".ts",
+                ".jsx",
+                ".tsx",
+                ".json",
+                ".cjs",
+                ".cts",
+            ],
         },
         server: {
             hmr: {
@@ -488,7 +511,6 @@ export default defineConfig(({}) => {
                 ],
             },
         },
-
         test: {
             attachmentsDir: "./.cache/.vitest-attachments",
             bail: 100, // Stop after 100 failures to avoid excessive output
@@ -554,6 +576,7 @@ export default defineConfig(({}) => {
                 },
             },
             css: {
+                devSourcemap: true,
                 exclude: [],
                 include: [/.+/],
                 modules: {
