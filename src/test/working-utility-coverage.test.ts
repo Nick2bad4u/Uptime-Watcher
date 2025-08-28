@@ -48,7 +48,20 @@ import {
 
 describe("Working Utility Coverage Tests", () => {
     describe("Environment Utilities", () => {
-        it("should test all environment detection functions", () => {
+        it("should test all environment detection functions", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test getEnvironment
             const env = getEnvironment();
             expect(typeof env).toBe("string");
@@ -67,7 +80,17 @@ describe("Working Utility Coverage Tests", () => {
     });
 
     describe("Type Guard Utilities", () => {
-        it("should test all type guard functions", () => {
+        it("should test all type guard functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const testObj = { test: "value" };
             const testArray = [
                 1,
@@ -115,7 +138,17 @@ describe("Working Utility Coverage Tests", () => {
     });
 
     describe("JSON Safety Utilities", () => {
-        it("should test all JSON safety functions", () => {
+        it("should test all JSON safety functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test safeJsonParse
             const validator = (data: unknown): data is { test: string } =>
                 typeof data === "object" && data !== null && "test" in data;
@@ -154,7 +187,17 @@ describe("Working Utility Coverage Tests", () => {
     });
 
     describe("Validation Utilities", () => {
-        it("should test validation functions", () => {
+        it("should test validation functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Validation", "type");
+
             // Test validateMonitorType
             expect(validateMonitorType("http")).toBe(true);
             expect(validateMonitorType("port")).toBe(true);
@@ -165,7 +208,17 @@ describe("Working Utility Coverage Tests", () => {
     });
 
     describe("Error Handling Utilities", () => {
-        it("should test error handling functions", () => {
+        it("should test error handling functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Error Handling", "type");
+
             // Test withErrorHandling with mock context
             const mockContext = {
                 logger: {
@@ -183,7 +236,17 @@ describe("Working Utility Coverage Tests", () => {
     });
 
     describe("String Conversion Utilities", () => {
-        it("should test string conversion functions", () => {
+        it("should test string conversion functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test safeStringify
             expect(typeof safeStringify("test")).toBe("string");
             expect(typeof safeStringify(42)).toBe("string");
@@ -195,7 +258,17 @@ describe("Working Utility Coverage Tests", () => {
     });
 
     describe("Site Status Utilities", () => {
-        it("should test site status functions", () => {
+        it("should test site status functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: working-utility-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockSite = {
                 monitors: [
                     { monitoring: true, status: "up" as const },

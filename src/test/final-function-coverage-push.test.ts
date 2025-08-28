@@ -8,7 +8,20 @@
 import { describe, expect, it } from "vitest";
 
 describe("Final Function Coverage Push", () => {
-    it("should comprehensively test all shared/types.ts functions", async () => {
+    it("should comprehensively test all shared/types.ts functions", async ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-function-coverage-push", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-function-coverage-push", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
+
         const types = await import("../../shared/types");
 
         // Test isComputedSiteStatus
@@ -56,7 +69,20 @@ describe("Final Function Coverage Push", () => {
         expect(types.validateMonitor(undefined as any)).toBe(false);
     });
 
-    it("should comprehensively test all shared/utils/validation.ts functions", async () => {
+    it("should comprehensively test all shared/utils/validation.ts functions", async ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-function-coverage-push", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Validation", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-function-coverage-push", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Validation", "type");
+
         const validation = await import("../../shared/utils/validation");
 
         // Test validateMonitorType
@@ -105,7 +131,20 @@ describe("Final Function Coverage Push", () => {
         ).toBe(true);
     });
 
-    it("should comprehensively test all shared/utils/typeGuards.ts functions", async () => {
+    it("should comprehensively test all shared/utils/typeGuards.ts functions", async ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-function-coverage-push", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-function-coverage-push", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
+
         // eslint-disable-next-line unicorn/no-keyword-prefix
         const typeGuards = await import("../../shared/utils/typeGuards");
 
@@ -189,7 +228,20 @@ describe("Final Function Coverage Push", () => {
         expect(typeGuards.isValidTimestamp(-1)).toBe(false);
     });
 
-    it("should comprehensively test all shared/utils functions", async () => {
+    it("should comprehensively test all shared/utils functions", async ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-function-coverage-push", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-function-coverage-push", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
+
         // Test environment functions
         const environment = await import("../../shared/utils/environment");
         for (const key of Object.keys(environment)) {

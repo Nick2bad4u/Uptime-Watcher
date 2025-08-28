@@ -10,7 +10,17 @@ import {
 } from "../../shared/utils/typeGuards";
 
 describe("TypeGuard Utility Coverage Test", () => {
-    it("should test typeguard functions", () => {
+    it("should test typeguard functions", ({ task, annotate }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: typeguard-utility-test", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: typeguard-utility-test", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
+
         const testObj = { test: "value" };
         const testArray = [
             1,

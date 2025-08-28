@@ -28,7 +28,20 @@ import * as validationUtils from "../utils/validation";
 import * as validatorUtilsModule from "../validation/validatorUtils";
 
 describe("Ultimate Function Coverage Boost", () => {
-    it("should call every exported function from all low-coverage modules", () => {
+    it("should call every exported function from all low-coverage modules", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
         // List of modules to test
         const modules = [
             { name: "types", module: types },
@@ -137,7 +150,20 @@ describe("Ultimate Function Coverage Boost", () => {
         );
     });
 
-    it("should specifically test known functions from types module", () => {
+    it("should specifically test known functions from types module", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Business Logic", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Business Logic", "type");
+
         // Test specific functions we know exist
         expect(types.isComputedSiteStatus("mixed")).toBe(true);
         expect(types.isComputedSiteStatus("unknown")).toBe(true);
@@ -168,7 +194,20 @@ describe("Ultimate Function Coverage Boost", () => {
         expect(types.validateMonitor({})).toBe(false);
     });
 
-    it("should specifically test errorCatalog exports", () => {
+    it("should specifically test errorCatalog exports", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Error Handling", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Error Handling", "type");
+
         // Test the constants that are exported
         expect(errorCatalog.SITE_ERRORS).toBeDefined();
         expect(errorCatalog.MONITOR_ERRORS).toBeDefined();
@@ -184,7 +223,20 @@ describe("Ultimate Function Coverage Boost", () => {
         expect(errorCatalog.isKnownErrorMessage("test")).toBeDefined();
     });
 
-    it("should specifically test safeConversions exports", () => {
+    it("should specifically test safeConversions exports", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
         // Test the actual functions that exist
         expect(safeConversions.safeNumberConversion("123")).toBe(123);
         expect(safeConversions.safeParseCheckInterval("30000")).toBeDefined();
@@ -198,14 +250,34 @@ describe("Ultimate Function Coverage Boost", () => {
         expect(safeConversions.safeParseTimestamp("1234567890")).toBeDefined();
     });
 
-    it("should specifically test validation exports", () => {
+    it("should specifically test validation exports", ({ task, annotate }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Validation", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Validation", "type");
+
         // Test the actual functions that exist
         expect(validationUtils.validateMonitorType("http")).toBe(true);
         expect(validationUtils.getMonitorValidationErrors({})).toBeDefined();
         expect(validationUtils.validateSite({})).toBeDefined();
     });
 
-    it("should specifically test jsonSafety exports", () => {
+    it("should specifically test jsonSafety exports", ({ task, annotate }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
         // Test jsonSafety functions with proper arguments
         expect(
             jsonSafety.safeJsonParse('{"test": true}', typeGuards.isObject)
@@ -218,7 +290,20 @@ describe("Ultimate Function Coverage Boost", () => {
         ).toBeDefined();
     });
 
-    it("should ensure comprehensive function coverage across all modules", () => {
+    it("should ensure comprehensive function coverage across all modules", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Business Logic", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ultimate-function-coverage-boost", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Business Logic", "type");
+
         // This final test ensures we've touched every possible function
         const allModules = [
             types,

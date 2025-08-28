@@ -29,7 +29,20 @@ import * as schemas from "../validation/schemas";
 import * as validatorUtilsModule from "../validation/validatorUtils";
 
 describe("Final 90% Function Coverage Push", () => {
-    it("should call ALL exported functions from shared/types.ts", () => {
+    it("should call ALL exported functions from shared/types.ts", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
         // Call every function from sharedTypes
         const functions = Object.keys(sharedTypes).filter(
             (key) => typeof (sharedTypes as any)[key] === "function"
@@ -83,7 +96,20 @@ describe("Final 90% Function Coverage Push", () => {
         expect(true).toBe(true);
     });
 
-    it("should call ALL exported functions from chartConfig", () => {
+    it("should call ALL exported functions from chartConfig", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
         const functions = Object.keys(chartConfig).filter(
             (key) => typeof (chartConfig as any)[key] === "function"
         );
@@ -107,7 +133,20 @@ describe("Final 90% Function Coverage Push", () => {
         expect(true).toBe(true);
     });
 
-    it("should call ALL exported functions from formData", () => {
+    it("should call ALL exported functions from formData", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
         const functions = Object.keys(formData).filter(
             (key) => typeof (formData as any)[key] === "function"
         );
@@ -131,7 +170,20 @@ describe("Final 90% Function Coverage Push", () => {
         expect(true).toBe(true);
     });
 
-    it("should call ALL exported functions from monitorConfig", () => {
+    it("should call ALL exported functions from monitorConfig", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
         const functions = Object.keys(monitorConfig).filter(
             (key) => typeof (monitorConfig as any)[key] === "function"
         );
@@ -155,7 +207,20 @@ describe("Final 90% Function Coverage Push", () => {
         expect(true).toBe(true);
     });
 
-    it("should call ALL exported functions from themeConfig", () => {
+    it("should call ALL exported functions from themeConfig", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
         const functions = Object.keys(themeConfig).filter(
             (key) => typeof (themeConfig as any)[key] === "function"
         );
@@ -179,7 +244,20 @@ describe("Final 90% Function Coverage Push", () => {
         expect(true).toBe(true);
     });
 
-    it("should call ALL exported functions from validation types", () => {
+    it("should call ALL exported functions from validation types", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Validation", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Validation", "type");
+
         const functions = Object.keys(validation).filter(
             (key) => typeof (validation as any)[key] === "function"
         );
@@ -227,7 +305,20 @@ describe("Final 90% Function Coverage Push", () => {
         expect(true).toBe(true);
     });
 
-    it("should call ALL exported functions from utility modules", () => {
+    it("should call ALL exported functions from utility modules", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Export Operation", "type");
+
         // cacheKeys
         const cacheKeysFunctions = Object.keys(cacheKeys).filter(
             (key) => typeof (cacheKeys as any)[key] === "function"
@@ -405,7 +496,20 @@ describe("Final 90% Function Coverage Push", () => {
         expect(true).toBe(true);
     });
 
-    it("should call ALL exported functions from validation modules", () => {
+    it("should call ALL exported functions from validation modules", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Validation", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Validation", "type");
+
         // schemas
         const schemasFunctions = Object.keys(schemas).filter(
             (key) => typeof (schemas as any)[key] === "function"
@@ -444,7 +548,20 @@ describe("Final 90% Function Coverage Push", () => {
         expect(true).toBe(true);
     });
 
-    it("should call remaining utility functions systematically", () => {
+    it("should call remaining utility functions systematically", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Business Logic", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Business Logic", "type");
+
         // errorHandling
         const errorHandlingFunctions = Object.keys(errorHandling).filter(
             (key) => typeof (errorHandling as any)[key] === "function"
@@ -452,20 +569,31 @@ describe("Final 90% Function Coverage Push", () => {
         errorHandlingFunctions.forEach((funcName) => {
             try {
                 const func = (errorHandling as any)[funcName];
-                if (funcName === 'withErrorHandling' || funcName === 'handleBackendOperation') {
+                if (
+                    funcName === "withErrorHandling" ||
+                    funcName === "handleBackendOperation"
+                ) {
                     // These functions need proper context
                     const mockContext = {
-                        logger: { debug: () => {}, info: () => {}, warn: () => {}, error: () => {} },
-                        operationName: 'test',
+                        logger: {
+                            debug: () => {},
+                            info: () => {},
+                            warn: () => {},
+                            error: () => {},
+                        },
+                        operationName: "test",
                         setLoading: () => {},
-                        setError: () => {}
+                        setError: () => {},
                     };
                     func(() => Promise.resolve(), mockContext).catch(() => {});
                 } else {
                     func(() => {});
                     func(async () => {});
                     func(() => {}, { setLoading: () => {} });
-                    func(() => {}, { setLoading: () => {}, setError: () => {} });
+                    func(() => {}, {
+                        setLoading: () => {},
+                        setError: () => {},
+                    });
                 }
             } catch (error) {
                 // Expected
@@ -508,7 +636,20 @@ describe("Final 90% Function Coverage Push", () => {
         expect(true).toBe(true);
     });
 
-    it("should ensure complete function coverage with edge cases", async () => {
+    it("should ensure complete function coverage with edge cases", async ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Business Logic", "type");
+
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: final-90-percent-function-coverage", "component");
+        annotate("Category: Shared", "category");
+        annotate("Type: Business Logic", "type");
+
         // Test with various edge case arguments to ensure all code paths are hit
         const allModules = [
             sharedTypes,
