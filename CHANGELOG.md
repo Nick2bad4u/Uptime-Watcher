@@ -7,14 +7,68 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[62f6a19](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62f6a19b581fdf63b8a6ce9a82ce6dd78a2f3d9e)...
+[62f6a19](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62f6a19b581fdf63b8a6ce9a82ce6dd78a2f3d9e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/62f6a19b581fdf63b8a6ce9a82ce6dd78a2f3d9e...62f6a19b581fdf63b8a6ce9a82ce6dd78a2f3d9e))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 13.2.0 [`(62f6a19)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62f6a19b581fdf63b8a6ce9a82ce6dd78a2f3d9e)
+
+
+
+
+
+
+## [13.2.0] - 2025-08-28
+
+
 [[732407b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/732407bbdebf24bf86734fb6075934db6efb2cf6)...
-[732407b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/732407bbdebf24bf86734fb6075934db6efb2cf6)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/732407bbdebf24bf86734fb6075934db6efb2cf6...732407bbdebf24bf86734fb6075934db6efb2cf6))
+[cde5b97](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cde5b9712d7ea65e1cf815292184e33f00877ed8)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/732407bbdebf24bf86734fb6075934db6efb2cf6...cde5b9712d7ea65e1cf815292184e33f00877ed8))
+
+
+### ✨ Features
+
+- ✨ [feat] Integrates type-fest for deep type safety and improves config, validation, and UI typing
+
+- Replaces most usages of generic record/object types with type-fest utilities (UnknownRecord, PartialDeep, Simplify, SetOptional, Merge, CamelCase, Except, ReadonlyDeep) for stronger type guarantees across config, validation, theme, forms, IPC, and test utilities
+- Refactors monitor, form, theme, chart, and store types to be more expressive, flattening intersection types for developer ergonomics and using type-fest for deep partials and merging
+- Adds new utilities for test data creation leveraging type-fest, enabling type-safe mocks and partial objects for robust test scenarios
+- Refactors monitor field definitions and validation to provide more granular and type-safe error results, improving error handling and code coverage
+- Improves default values and UI fallback logic using ReadonlyDeep for immutability, and introduces deep theme override mechanisms
+- Enhances chart, status, and log template utilities with type-fest-powered string/record typing, including CamelCase identifiers and merged config results
+- Cleans up code by centralizing type imports and updating test cases to ensure comprehensive type coverage and edge-case handling
+- Updates dependencies in package manifests to include type-fest and picocolors
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d11aa22)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d11aa22e8b1c6266df5a93dbd32fa3ab53c59e4c)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 13.1.0 [`(732407b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/732407bbdebf24bf86734fb6075934db6efb2cf6)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Document type-fest patterns; update build, lint, and test configs
+
+- Adds detailed documentation for consistent type-fest utility integration, promoting enterprise-grade type safety and improved DX.
+- Updates testing and build configs for better cache management, chunk splitting, coverage, and typecheck reliability.
+- Refines ESLint, Vite, and Vitest configs to support modern workflows, explicit aliasing, and coverage thresholds.
+- Improves agent instructions for clarity, quality standards, and architecture practices.
+- Removes outdated tool documentation and enables stricter linting for improved maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(40606e2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/40606e28afba0e02dc44578299ca8c4b4b704d3b)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v13.1.0 [skip ci] [`(6df4b70)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6df4b7038be0f8763117b734957c53360a0f05c5)
 
 
 
