@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable regexp/require-unicode-sets-regexp, array-func/from-map  */
 /**
  * Vite configuration for the Uptime Watcher Electron application. Configures
  * React frontend build and Electron main/preload process compilation.
@@ -6,7 +8,8 @@
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import reactScan from "@react-scan/vite-plugin-react-scan";
 import react from "@vitejs/plugin-react";
-import path from "path";
+import path from "node:path";
+import pc from "picocolors";
 import { visualizer } from "rollup-plugin-visualizer";
 import {
     defineConfig,
@@ -22,22 +25,23 @@ import { ViteMcp } from "vite-plugin-mcp";
 import packageVersion from "vite-plugin-package-version";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 
-import { fileURLToPath } from "url";
-
 import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const dirname = import.meta.dirname;
 
 /**
  * Vite configuration object. Sets up build settings for both renderer (React)
  * and main/preload processes.
  */
 
+// eslint-disable-next-line no-empty-pattern
 export default defineConfig(({}) => {
     const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
     return {
         base: "./", // Ensures relative asset paths for Electron
         build: {
+            // Increase chunk size warning limit to account for intentional larger vendor chunks
+            chunkSizeWarningLimit: 1000, // Increase from default 500KB to 1MB for vendor chunks
             copyPublicDir: true, // Copy public assets to dist
             emptyOutDir: true, // Clean output before build
             modulePreload: {
@@ -48,9 +52,6 @@ export default defineConfig(({}) => {
                 output: {
                     // Manual chunk splitting to optimize bundle sizes and improve caching
                     manualChunks: {
-                        // React ecosystem - separate chunk for framework code (changes less frequently)
-                        "react-vendor": ["react", "react-dom"],
-
                         // Chart.js ecosystem - separate chunk for charting (large but stable)
                         "chart-vendor": [
                             "chart.js",
@@ -58,6 +59,15 @@ export default defineConfig(({}) => {
                             "chartjs-adapter-date-fns",
                             "chartjs-plugin-zoom",
                         ],
+
+                        // Electron-specific libraries - separate chunk for desktop functionality
+                        "electron-vendor": ["electron-log", "electron-updater"],
+
+                        // Monitoring tools - separate chunk for uptime monitoring logic
+                        "monitor-vendor": ["is-port-reachable", "ping"],
+
+                        // React ecosystem - separate chunk for framework code (changes less frequently)
+                        "react-vendor": ["react", "react-dom"],
 
                         // UI and icon libraries - separate chunk for visual components
                         "ui-vendor": ["react-icons"],
@@ -69,21 +79,15 @@ export default defineConfig(({}) => {
                             "zod",
                             "zustand",
                         ],
-
-                        // Electron-specific libraries - separate chunk for desktop functionality
-                        "electron-vendor": ["electron-log", "electron-updater"],
-
-                        // Monitoring tools - separate chunk for uptime monitoring logic
-                        "monitor-vendor": ["is-port-reachable", "ping"],
                     },
                 },
             },
             sourcemap: true, // Recommended for Electron debugging
-            target: "es2024", // Updated from es2024 for CSS Modules compatibility
 
-            // Increase chunk size warning limit to account for intentional larger vendor chunks
-            chunkSizeWarningLimit: 1000, // Increase from default 500KB to 1MB for vendor chunks
+            target: "es2024", // Updated from es2024 for CSS Modules compatibility
         },
+        cache: true,
+        cacheDir: "./.cache/.vitest",
         css: {
             modules: {
                 generateScopedName: "[name]__[local]___[hash:base64:5]", // Custom scoped name pattern
@@ -147,14 +151,14 @@ export default defineConfig(({}) => {
                         },
                         resolve: {
                             alias: {
-                                "@shared": normalizePath(
-                                    path.resolve(__dirname, "shared")
+                                "@app": normalizePath(
+                                    path.resolve(dirname, "src")
                                 ),
                                 "@electron": normalizePath(
-                                    path.resolve(__dirname, "electron")
+                                    path.resolve(dirname, "electron")
                                 ),
-                                "@app": normalizePath(
-                                    path.resolve(__dirname, "src")
+                                "@shared": normalizePath(
+                                    path.resolve(dirname, "shared")
                                 ),
                             },
                         },
@@ -183,7 +187,7 @@ export default defineConfig(({}) => {
                         resolve: {
                             alias: {
                                 "@shared": normalizePath(
-                                    path.resolve(__dirname, "shared")
+                                    path.resolve(dirname, "shared")
                                 ),
                             },
                         },
@@ -262,7 +266,7 @@ export default defineConfig(({}) => {
                     { file: "**/*.cjs" },
                 ],
                 open: false,
-                projectRoot: normalizePath(path.resolve(__dirname)),
+                projectRoot: normalizePath(path.resolve(dirname)),
                 sourcemap: true,
                 template: "treemap",
                 title: "Electron React Bundle Stats",
@@ -278,16 +282,21 @@ export default defineConfig(({}) => {
                 summary: true, // Show summary in console
             }),
             viteStaticCopy({
+                // Use writeBundle hook for better integration with build process
+                hook: "writeBundle",
+                silent: false, // Show copy operations for transparency
+                // Enhanced static copy options for WASM optimization
+                structured: false, // Flatten structure for Electron
                 targets: [
                     {
-                        dest: "../dist-electron", // Copies to dist-electron/
-                        src: "assets/node-sqlite3-wasm.wasm",
-                        // Preserve file timestamps for better caching
-                        preserveTimestamps: true,
                         // Enable symlink dereferencing for reliability
                         dereference: true,
+                        dest: "../dist-electron", // Copies to dist-electron/
                         // Overwrite existing files
                         overwrite: true,
+                        // Preserve file timestamps for better caching
+                        preserveTimestamps: true,
+                        src: "assets/node-sqlite3-wasm.wasm",
                         transform: {
                             encoding: "buffer" as const, // Use buffer encoding for binary WASM files
                             handler(contents: Buffer, filename: string) {
@@ -401,27 +410,22 @@ export default defineConfig(({}) => {
                         },
                     },
                 ],
-                // Enhanced static copy options for WASM optimization
-                structured: false, // Flatten structure for Electron
-                silent: false, // Show copy operations for transparency
                 // Add file watching for development hot-reload
                 watch: {
-                    // Watch WASM files for changes during development
-                    reloadPageOnChange: false, // Don't reload entire page for WASM changes
                     options: {
+                        awaitWriteFinish: {
+                            pollInterval: 100,
+                            stabilityThreshold: 500,
+                        },
+                        depth: 2,
+                        followSymlinks: true,
                         // Watch options for chokidar
                         ignoreInitial: true,
                         persistent: true,
-                        followSymlinks: true,
-                        depth: 2,
-                        awaitWriteFinish: {
-                            stabilityThreshold: 500,
-                            pollInterval: 100,
-                        },
                     },
+                    // Watch WASM files for changes during development
+                    reloadPageOnChange: false, // Don't reload entire page for WASM changes
                 },
-                // Use writeBundle hook for better integration with build process
-                hook: "writeBundle",
             }),
             // Put the Codecov vite plugin after all other plugins
             codecovVitePlugin({
@@ -433,7 +437,7 @@ export default defineConfig(({}) => {
         ],
         resolve: {
             alias: {
-                "@shared": normalizePath(path.resolve(__dirname, "shared")),
+                "@shared": normalizePath(path.resolve(dirname, "shared")),
             },
         },
         server: {
@@ -484,7 +488,10 @@ export default defineConfig(({}) => {
                 ],
             },
         },
+
         test: {
+            attachmentsDir: "./.cache/.vitest-attachments",
+            bail: 100, // Stop after 100 failures to avoid excessive output
             benchmark: {
                 exclude: ["**/node_modules/**", "**/dist/**"],
                 include: [
@@ -493,6 +500,12 @@ export default defineConfig(({}) => {
                 outputJson: "./coverage/bench-results.json",
                 reporters: ["default", "verbose"],
             },
+            chaiConfig: {
+                includeStack: false,
+                showDiff: true,
+                truncateThreshold: 40,
+            },
+            // Enable detailed code coverage analysis
             coverage: {
                 all: true, // Include all source files in coverage
                 exclude: [
@@ -519,10 +532,10 @@ export default defineConfig(({}) => {
                     "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
                     "**/*.bench.{js,mjs,cjs,ts,mts,cts,jsx,tsx}", // Exclude benchmark files
                 ],
-                // V8 Provider Configuration (Recommended since Vitest v3.2.0)
-                provider: "v8" as const, // Switch to V8 for better TypeScript support
                 experimentalAstAwareRemapping: true, // Enable AST-aware remapping for accurate coverage
                 ignoreEmptyLines: true, // Ignore empty lines, comments, and TypeScript interfaces
+                // V8 Provider Configuration (Recommended since Vitest v3.2.0)
+                provider: "v8" as const, // Switch to V8 for better TypeScript support
                 reporter: [
                     "text",
                     "json",
@@ -540,13 +553,36 @@ export default defineConfig(({}) => {
                     statements: 90, // Minimum 90% statement coverage per prompt requirements
                 },
             },
+            css: {
+                exclude: [],
+                include: [/.+/],
+                modules: {
+                    classNameStrategy: "stable",
+                },
+            },
+            dangerouslyIgnoreUnhandledErrors: false,
             deps: {
                 optimizer: {
                     web: { enabled: true },
                 },
             },
+            diff: {
+                aIndicator: pc.red(pc.bold("--")),
+                bIndicator: pc.green(pc.bold("++")),
+                expand: true,
+                maxDepth: 20,
+                omitAnnotationLines: true,
+                printBasicPrototype: false,
+                truncateAnnotation: pc.cyan(
+                    pc.bold("... Diff result is truncated")
+                ),
+                truncateThreshold: 250,
+            },
+            env: {
+                NODE_ENV: "test",
+                PACKAGE_VERSION: process.env["PACKAGE_VERSION"] ?? "unknown",
+            },
             environment: "jsdom", // Default for React components
-
             // Test file patterns - exclude electron tests as they have their own config
             exclude: [
                 "**/node_modules/**",
@@ -557,13 +593,25 @@ export default defineConfig(({}) => {
                 "**/coverage/**",
             ],
             expect: {
+                poll: { interval: 50, timeout: 1000 },
                 requireAssertions: true,
             },
+            fakeTimers: {
+                advanceTimeDelta: 20,
+                loopLimit: 10_000,
+                now: Date.now(),
+                shouldAdvanceTime: false,
+                shouldClearNativeTimers: true,
+            },
+            fileParallelism: true,
             globals: true, // Enable global test functions (describe, it, expect)
             include: [
                 "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
                 // Shared tests now have their own dedicated config (vitest.shared.config.ts)
             ],
+            includeTaskLocations: true,
+            isolate: true,
+            logHeapUsage: true,
             name: {
                 color: "cyan",
                 label: "Frontend", // Simplified label to match vitest.config.ts
@@ -582,10 +630,11 @@ export default defineConfig(({}) => {
                     useAtomics: true,
                 },
             },
+            printConsoleTrace: false, // Disable stack trace printing for cleaner output
             projects: [
                 "vitest.config.ts",
-                "config\\testing\\vitest.electron.config.ts",
-                "config\\testing\\vitest.shared.config.ts",
+                String.raw`config\testing\vitest.electron.config.ts`,
+                String.raw`config\testing\vitest.shared.config.ts`,
             ],
             // Improve test output
             reporters: [
@@ -599,9 +648,30 @@ export default defineConfig(({}) => {
                 // "junit",
                 "html",
             ],
+            retry: 0, // No retries to surface issues immediately
+            sequence: {
+                groupOrder: 0,
+                setupFiles: "parallel",
+            },
             setupFiles: ["./src/test/setup.ts"], // Setup file for testing
+            slowTestThreshold: 300,
             testTimeout: 15_000, // Set Vitest timeout to 15 seconds
-            typecheck: { enabled: true, tsconfig: "./tsconfig.json" },
+            typecheck: {
+                allowJs: false,
+                checker: "tsc",
+                enabled: true,
+                exclude: [
+                    "**/node_modules/**",
+                    "**/dist/**",
+                    "**/cypress/**",
+                    "**/.{idea,git,cache,output,temp}/**",
+                ],
+                ignoreSourceErrors: false,
+                include: ["**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
+                only: false,
+                spawnTimeout: 10_000,
+                tsconfig: "./tsconfig.json",
+            },
         },
     };
 }) satisfies UserConfigFnObject as UserConfigFnObject;

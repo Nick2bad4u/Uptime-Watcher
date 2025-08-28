@@ -259,9 +259,7 @@ export interface PortMonitorConfig extends BaseMonitorConfig {
  * @public
  */
 export type MonitorConfig = Simplify<
-    | HttpMonitorConfig
-    | PingMonitorConfig
-    | PortMonitorConfig
+    HttpMonitorConfig | PingMonitorConfig | PortMonitorConfig
 >;
 
 /**

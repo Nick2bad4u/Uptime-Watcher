@@ -27,9 +27,7 @@ describe("shared/utils/jsonSafety Function Coverage Validation", () => {
             await annotate("Type: Export Operation", "type");
 
             // Type guard for validation
-            const isRecord = (
-                value: unknown
-            ): value is UnknownRecord =>
+            const isRecord = (value: unknown): value is UnknownRecord =>
                 typeof value === "object" &&
                 value !== null &&
                 !Array.isArray(value);

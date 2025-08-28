@@ -2,15 +2,15 @@
  * Simple utility coverage test with environment imports.
  */
 
-import { describe, expect, it } from 'vitest';
-import { getEnvironment, getNodeEnv } from '../../shared/utils/environment';
+import { describe, expect, it } from "vitest";
+import { getEnvironment, getNodeEnv } from "../../shared/utils/environment";
 
-describe('Environment Utility Coverage Test', () => {
-    it('should test environment functions', () => {
+describe("Environment Utility Coverage Test", () => {
+    it("should test environment functions", () => {
         const env = getEnvironment();
-        expect(typeof env).toBe('string');
+        expect(typeof env).toBe("string");
 
         const nodeEnv = getNodeEnv();
-        expect(typeof nodeEnv).toBe('string');
+        expect(typeof nodeEnv).toBe("string");
     });
 });

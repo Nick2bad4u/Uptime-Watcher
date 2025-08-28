@@ -132,22 +132,6 @@ A tool for dynamic and reflective problem-solving through thoughts, with intelli
 `previous_steps` (array, optional): Steps already recommended
 `remaining_steps` (array, optional): High-level descriptions of upcoming steps
 
-## MCP Tool: Memory
-
-`create_entities`: Add entities (`name`, `entityType`, `observations[]`). Ignores existing names.
-`create_relations`: Link entities (`from`, `to`, `relationType`). Skips duplicates.
-`add_observations`: Add observations to entities (`entityName`, `contents[]`). Fails if entity missing.
-`delete_entities`: Remove entities and their relations (`entityNames[]`). Silent if missing.
-`delete_observations`: Remove observations (`entityName`, `observations[]`). Silent if missing.
-`delete_relations`: Remove relations (`from`, `to`, `relationType`). Silent if missing.
-`read_graph`: Get full graph structure.
-`search_nodes`: Search by query (names, types, observations). Returns matches and relations.
-`open_nodes`: Get entities/relations by name (`names[]`). Skips missing.
-
-Use a standard naming convention for entities and relations to ensure clarity and consistency.
-For example, use the filename as the entity name, and add observations about the file and code to the entity. If you have an issue in the future, you can search for the entity by filename and find all relevant information about it. Use the filename without the extension. For example, if the file is `index.ts`, use `index` as the entity name.
-
-
 Time constraint setting: `unlimited`
 Compute Resource setting: `unlimited`
 Compute Constraint setting: `unlimited`

@@ -39,8 +39,8 @@ interface Logger {
 }
 
 /**
- * Common template variable names for better autocomplete while allowing
- * custom variables.
+ * Common template variable names for better autocomplete while allowing custom
+ * variables.
  */
 type TemplateVariableName =
     | "busId"
@@ -54,8 +54,8 @@ type TemplateVariableName =
     | string;
 
 /**
- * Template variable values for log interpolation.
- * Uses Partial to make all variables optional.
+ * Template variable values for log interpolation. Uses Partial to make all
+ * variables optional.
  */
 type TemplateVariables = Partial<Record<TemplateVariableName, number | string>>;
 
@@ -471,55 +471,31 @@ export function interpolateLogTemplate(
  * ```
  */
 export function createTemplateLogger(baseLogger: Logger): {
-    debug: (
-        message: string,
-        variables?: TemplateVariables
-    ) => void;
-    error: (
-        message: string,
-        variables?: TemplateVariables
-    ) => void;
-    info: (
-        message: string,
-        variables?: TemplateVariables
-    ) => void;
-    warn: (
-        message: string,
-        variables?: TemplateVariables
-    ) => void;
+    debug: (message: string, variables?: TemplateVariables) => void;
+    error: (message: string, variables?: TemplateVariables) => void;
+    info: (message: string, variables?: TemplateVariables) => void;
+    warn: (message: string, variables?: TemplateVariables) => void;
 } {
     return {
-        debug: (
-            message: string,
-            variables?: TemplateVariables
-        ): void => {
+        debug: (message: string, variables?: TemplateVariables): void => {
             const interpolated = variables
                 ? interpolateLogTemplate(message, variables)
                 : message;
             baseLogger.debug(interpolated, variables);
         },
-        error: (
-            message: string,
-            variables?: TemplateVariables
-        ): void => {
+        error: (message: string, variables?: TemplateVariables): void => {
             const interpolated = variables
                 ? interpolateLogTemplate(message, variables)
                 : message;
             baseLogger.error(interpolated, variables);
         },
-        info: (
-            message: string,
-            variables?: TemplateVariables
-        ): void => {
+        info: (message: string, variables?: TemplateVariables): void => {
             const interpolated = variables
                 ? interpolateLogTemplate(message, variables)
                 : message;
             baseLogger.info(interpolated, variables);
         },
-        warn: (
-            message: string,
-            variables?: TemplateVariables
-        ): void => {
+        warn: (message: string, variables?: TemplateVariables): void => {
             const interpolated = variables
                 ? interpolateLogTemplate(message, variables)
                 : message;

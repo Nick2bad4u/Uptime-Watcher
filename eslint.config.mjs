@@ -210,10 +210,10 @@ export default [
             "**/shared/**",
             "**/node_modules/**",
             "**/release/**",
-            "vite.config.ts", // Ignore vite config due to parsing issues
-            "vitest.config.ts", // Ignore vitest config due to parsing issues
-            "config/testing/vitest.electron.config.ts", // Ignore vitest electron config
-            "config/testing/vitest.shared.config.ts", // Ignore vitest shared config
+            // "vite.config.ts", // Ignore vite config due to parsing issues
+            // "vitest.config.ts", // Ignore vitest config due to parsing issues
+            // "config/testing/vitest.electron.config.ts", // Ignore vitest electron config
+            // "config/testing/vitest.shared.config.ts", // Ignore vitest shared config
             "Coverage/",
             "coverage/",
             "dist-electron/",
@@ -232,6 +232,7 @@ export default [
             "html/**",
             "report/**",
             "**/package-lock.json",
+            "**/.cache",
         ],
     },
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -698,14 +699,46 @@ export default [
                 { pattern: "src/index.css", type: "styles" },
                 { pattern: "src/constants.ts", type: "constants" },
                 { pattern: "src/types.ts", type: "types" },
-                { capture: ["elementName"], pattern: "src/components/**/*", type: "components" },
-                { capture: ["elementName"], pattern: "src/hooks/**/*", type: "hooks" },
-                { capture: ["elementName"], pattern: "src/services/**/*", type: "services" },
-                { capture: ["elementName"], pattern: "src/stores/**/*", type: "stores" },
-                { capture: ["elementName"], pattern: "src/theme/**/*", type: "theme" },
-                { capture: ["elementName"], pattern: "src/utils/**/*", type: "utils" },
-                { capture: ["elementName"], pattern: "src/types/**/*", type: "types" },
-                { capture: ["elementName"], pattern: "src/test/**/*", type: "test" },
+                {
+                    capture: ["elementName"],
+                    pattern: "src/components/**/*",
+                    type: "components",
+                },
+                {
+                    capture: ["elementName"],
+                    pattern: "src/hooks/**/*",
+                    type: "hooks",
+                },
+                {
+                    capture: ["elementName"],
+                    pattern: "src/services/**/*",
+                    type: "services",
+                },
+                {
+                    capture: ["elementName"],
+                    pattern: "src/stores/**/*",
+                    type: "stores",
+                },
+                {
+                    capture: ["elementName"],
+                    pattern: "src/theme/**/*",
+                    type: "theme",
+                },
+                {
+                    capture: ["elementName"],
+                    pattern: "src/utils/**/*",
+                    type: "utils",
+                },
+                {
+                    capture: ["elementName"],
+                    pattern: "src/types/**/*",
+                    type: "types",
+                },
+                {
+                    capture: ["elementName"],
+                    pattern: "src/test/**/*",
+                    type: "test",
+                },
             ],
             react: { version: "19" },
             tailwindcss: {
@@ -771,6 +804,7 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -1206,12 +1240,18 @@ export default [
                             from: "stores",
                         },
                         {
-                            allow: ["types", "constants"],
+                            allow: [
+                                "types",
+                                "constants",
+                            ],
                             from: "theme",
                         },
                         { allow: ["constants"], from: "types" },
                         {
-                            allow: ["types", "constants"],
+                            allow: [
+                                "types",
+                                "constants",
+                            ],
                             from: "utils",
                         },
                         {
@@ -1895,6 +1935,7 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -3115,13 +3156,37 @@ export default [
             "boundaries/elements": [
                 { capture: ["app"], pattern: "src/App.tsx", type: "app" },
                 { capture: ["main"], pattern: "src/main.tsx", type: "main" },
-                { capture: ["styles"], pattern: "src/index.css", type: "styles" },
-                { capture: ["constants"], pattern: "src/constants.ts", type: "constants" },
-                { capture: ["component"], pattern: "src/components/**/*", type: "components" },
-                { capture: ["store"], pattern: "src/stores/**/*", type: "stores" },
+                {
+                    capture: ["styles"],
+                    pattern: "src/index.css",
+                    type: "styles",
+                },
+                {
+                    capture: ["constants"],
+                    pattern: "src/constants.ts",
+                    type: "constants",
+                },
+                {
+                    capture: ["component"],
+                    pattern: "src/components/**/*",
+                    type: "components",
+                },
+                {
+                    capture: ["store"],
+                    pattern: "src/stores/**/*",
+                    type: "stores",
+                },
                 { capture: ["hook"], pattern: "src/hooks/**/*", type: "hooks" },
-                { capture: ["service"], pattern: "src/services/**/*", type: "services" },
-                { capture: ["theme"], pattern: "src/theme/**/*", type: "theme" },
+                {
+                    capture: ["service"],
+                    pattern: "src/services/**/*",
+                    type: "services",
+                },
+                {
+                    capture: ["theme"],
+                    pattern: "src/theme/**/*",
+                    type: "theme",
+                },
                 { capture: ["util"], pattern: "src/utils/**/*", type: "utils" },
                 { capture: ["type"], pattern: "src/types/**/*", type: "types" },
                 { capture: ["type"], pattern: "src/types.ts", type: "types" },
@@ -3214,6 +3279,7 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -4159,17 +4225,61 @@ export default [
         },
         settings: {
             "boundaries/elements": [
-                { capture: ["main"], pattern: "electron/main.ts", type: "main" },
-                { capture: ["preload"], pattern: "electron/preload.ts", type: "preload" },
-                { capture: ["constants"], pattern: "electron/constants.ts", type: "constants" },
-                { capture: ["electronUtils"], pattern: "electron/electronUtils.ts", type: "utils" },
-                { capture: ["orchestrator"], pattern: "electron/UptimeOrchestrator.ts", type: "orchestrator" },
-                { capture: ["manager"], pattern: "electron/managers/**/*", type: "managers" },
-                { capture: ["service"], pattern: "electron/services/**/*", type: "services" },
-                { capture: ["util"], pattern: "electron/utils/**/*", type: "utils" },
-                { capture: ["event"], pattern: "electron/events/**/*", type: "events" },
-                { capture: ["type"], pattern: "electron/types.ts", type: "types" },
-                { capture: ["test"], pattern: "electron/test/**/*", type: "test" },
+                {
+                    capture: ["main"],
+                    pattern: "electron/main.ts",
+                    type: "main",
+                },
+                {
+                    capture: ["preload"],
+                    pattern: "electron/preload.ts",
+                    type: "preload",
+                },
+                {
+                    capture: ["constants"],
+                    pattern: "electron/constants.ts",
+                    type: "constants",
+                },
+                {
+                    capture: ["electronUtils"],
+                    pattern: "electron/electronUtils.ts",
+                    type: "utils",
+                },
+                {
+                    capture: ["orchestrator"],
+                    pattern: "electron/UptimeOrchestrator.ts",
+                    type: "orchestrator",
+                },
+                {
+                    capture: ["manager"],
+                    pattern: "electron/managers/**/*",
+                    type: "managers",
+                },
+                {
+                    capture: ["service"],
+                    pattern: "electron/services/**/*",
+                    type: "services",
+                },
+                {
+                    capture: ["util"],
+                    pattern: "electron/utils/**/*",
+                    type: "utils",
+                },
+                {
+                    capture: ["event"],
+                    pattern: "electron/events/**/*",
+                    type: "events",
+                },
+                {
+                    capture: ["type"],
+                    pattern: "electron/types.ts",
+                    type: "types",
+                },
+                {
+                    capture: ["test"],
+                    pattern: "electron/test/**/*",
+                    type: "test",
+                },
             ],
             "import-x/resolver": {
                 node: true,
@@ -4253,6 +4363,7 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -5471,12 +5582,36 @@ export default [
         },
         settings: {
             "boundaries/elements": [
-                { capture: ["constant"], pattern: "shared/constants/**/*", type: "constants" },
-                { capture: ["type"], pattern: "shared/types/**/*", type: "types" },
-                { capture: ["type"], pattern: "shared/types.ts", type: "types" },
-                { capture: ["util"], pattern: "shared/utils/**/*", type: "utils" },
-                { capture: ["validation"], pattern: "shared/validation/**/*", type: "validation" },
-                { capture: ["test"], pattern: "shared/test/**/*", type: "test" },
+                {
+                    capture: ["constant"],
+                    pattern: "shared/constants/**/*",
+                    type: "constants",
+                },
+                {
+                    capture: ["type"],
+                    pattern: "shared/types/**/*",
+                    type: "types",
+                },
+                {
+                    capture: ["type"],
+                    pattern: "shared/types.ts",
+                    type: "types",
+                },
+                {
+                    capture: ["util"],
+                    pattern: "shared/utils/**/*",
+                    type: "utils",
+                },
+                {
+                    capture: ["validation"],
+                    pattern: "shared/validation/**/*",
+                    type: "validation",
+                },
+                {
+                    capture: ["test"],
+                    pattern: "shared/test/**/*",
+                    type: "test",
+                },
             ],
             "import-x/resolver": {
                 node: true,
@@ -6679,17 +6814,61 @@ export default [
         },
         settings: {
             "boundaries/elements": [
-                { capture: ["main"], pattern: "electron/main.ts", type: "main" },
-                { capture: ["preload"], pattern: "electron/preload.ts", type: "preload" },
-                { capture: ["constants"], pattern: "electron/constants.ts", type: "constants" },
-                { capture: ["electronUtils"], pattern: "electron/electronUtils.ts", type: "utils" },
-                { capture: ["orchestrator"], pattern: "electron/UptimeOrchestrator.ts", type: "orchestrator" },
-                { capture: ["manager"], pattern: "electron/managers/**/*", type: "managers" },
-                { capture: ["service"], pattern: "electron/services/**/*", type: "services" },
-                { capture: ["util"], pattern: "electron/utils/**/*", type: "utils" },
-                { capture: ["event"], pattern: "electron/events/**/*", type: "events" },
-                { capture: ["type"], pattern: "electron/types.ts", type: "types" },
-                { capture: ["test"], pattern: "electron/test/**/*", type: "test" },
+                {
+                    capture: ["main"],
+                    pattern: "electron/main.ts",
+                    type: "main",
+                },
+                {
+                    capture: ["preload"],
+                    pattern: "electron/preload.ts",
+                    type: "preload",
+                },
+                {
+                    capture: ["constants"],
+                    pattern: "electron/constants.ts",
+                    type: "constants",
+                },
+                {
+                    capture: ["electronUtils"],
+                    pattern: "electron/electronUtils.ts",
+                    type: "utils",
+                },
+                {
+                    capture: ["orchestrator"],
+                    pattern: "electron/UptimeOrchestrator.ts",
+                    type: "orchestrator",
+                },
+                {
+                    capture: ["manager"],
+                    pattern: "electron/managers/**/*",
+                    type: "managers",
+                },
+                {
+                    capture: ["service"],
+                    pattern: "electron/services/**/*",
+                    type: "services",
+                },
+                {
+                    capture: ["util"],
+                    pattern: "electron/utils/**/*",
+                    type: "utils",
+                },
+                {
+                    capture: ["event"],
+                    pattern: "electron/events/**/*",
+                    type: "events",
+                },
+                {
+                    capture: ["type"],
+                    pattern: "electron/types.ts",
+                    type: "types",
+                },
+                {
+                    capture: ["test"],
+                    pattern: "electron/test/**/*",
+                    type: "test",
+                },
             ],
             "import-x/resolver": {
                 node: true,

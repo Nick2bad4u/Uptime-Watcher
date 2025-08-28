@@ -126,7 +126,12 @@ async function handleBackendOperation<T>(
         return await operation();
     } catch (error) {
         // Check if logger exists and has error method
-        if (logger && typeof logger === 'object' && 'error' in logger && typeof logger.error === 'function') {
+        if (
+            logger &&
+            typeof logger === "object" &&
+            "error" in logger &&
+            typeof logger.error === "function"
+        ) {
             logger.error(
                 operationName
                     ? `Failed to ${operationName}`
@@ -249,15 +254,21 @@ export async function withErrorHandling<T>(
     // methods)
     const isFrontendStore = Boolean(
         storeOrContext &&
-        typeof storeOrContext === 'object' &&
-        storeOrContext !== null &&
-        typeof storeOrContext === 'object' &&
-        'setError' in storeOrContext &&
-        'clearError' in storeOrContext &&
-        'setLoading' in storeOrContext
+            typeof storeOrContext === "object" &&
+            storeOrContext !== null &&
+            typeof storeOrContext === "object" &&
+            "setError" in storeOrContext &&
+            "clearError" in storeOrContext &&
+            "setLoading" in storeOrContext
     );
 
     return isFrontendStore
-        ? handleFrontendOperation(operation, storeOrContext as ErrorHandlingFrontendStore)
-        : handleBackendOperation(operation, storeOrContext as ErrorHandlingBackendContext);
+        ? handleFrontendOperation(
+              operation,
+              storeOrContext as ErrorHandlingFrontendStore
+          )
+        : handleBackendOperation(
+              operation,
+              storeOrContext as ErrorHandlingBackendContext
+          );
 }

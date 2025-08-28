@@ -13,11 +13,11 @@ import { defineConfig } from "vitest/config";
 const vitestConfig = defineConfig({
     resolve: {
         alias: {
-            "@shared": normalizePath(path.resolve(__dirname, "../../shared")),
+            "@app": normalizePath(path.resolve(__dirname, "../../src")),
             "@electron": normalizePath(
                 path.resolve(__dirname, "../../electron")
             ),
-            "@app": normalizePath(path.resolve(__dirname, "../../src")),
+            "@shared": normalizePath(path.resolve(__dirname, "../../shared")),
         },
     },
     test: {

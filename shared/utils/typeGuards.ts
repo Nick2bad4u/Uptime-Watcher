@@ -225,9 +225,7 @@ export function isNonNegativeNumber(value: unknown): value is number {
  *
  * @returns True if `value` is a non-null object; otherwise, false.
  */
-export function isNonNullObject(
-    value: unknown
-): value is UnknownRecord {
+export function isNonNullObject(value: unknown): value is UnknownRecord {
     return isObject(value);
 }
 

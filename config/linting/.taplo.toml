@@ -1,0 +1,55 @@
+# ~/.taplo.toml
+
+[formatting]
+# Match Prettier's 4-space indent / spaces, not tabs
+indent_string = "    "
+use_tabs = false
+
+# Keep inline tables expanded (avoid “compaction” look)
+compact_inline_tables = false
+
+# Wrap lines at ~Prettier's printWidth of 80
+column_width = 80
+
+# Arrays: prefer multi-line for longer content; allow trailing commas
+array_auto_collapse = false
+array_trailing_comma = true
+
+# Always insert a final newline
+newline_at_eof = true
+
+# Don't reorder keys (stay close to Prettier’s unsorted JSON stance)
+reorder_keys = false
+
+# Rules to emulate your Prettier overrides
+
+[[rule]]
+include = [
+ "*.css",
+"*.user.css"
+]
+
+[rule.formatting]
+column_width = 80
+# Encourage multi-line when arrays get long (closest analogue to threshold=1)
+array_auto_collapse = false
+
+[[rule]]
+include = [ "eslint.config.mjs" ]
+
+[rule.formatting]
+array_auto_collapse = false
+
+[[rule]]
+include = [ "*.html" ]
+
+[rule.formatting]
+column_width = 80
+compact_inline_tables = false
+
+[[rule]]
+include = [ "*.md" ]
+
+[rule.formatting]
+# Prettier tabWidth: 1
+indent_string = " "

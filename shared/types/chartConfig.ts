@@ -75,7 +75,12 @@ export type ChartScalePosition = ChartPosition | "center";
  *
  * @public
  */
-export type ChartScaleType = "linear" | "logarithmic" | "category" | "time" | "timeseries";
+export type ChartScaleType =
+    | "linear"
+    | "logarithmic"
+    | "category"
+    | "time"
+    | "timeseries";
 
 /**
  * Chart.js alignment values for titles and legends.
@@ -89,7 +94,12 @@ export type ChartAlignment = "start" | "center" | "end";
  *
  * @public
  */
-export type ChartFontStyle = "normal" | "italic" | "oblique" | "initial" | "inherit";
+export type ChartFontStyle =
+    | "normal"
+    | "italic"
+    | "oblique"
+    | "initial"
+    | "inherit";
 
 /**
  * CSS font-weight values for Chart.js font configurations.
@@ -110,7 +120,17 @@ export type ChartAlign = "start" | "center" | "end";
  *
  * @public
  */
-export type ChartType = "area" | "bar" | "bubble" | "doughnut" | "line" | "mixed" | "pie" | "polarArea" | "radar" | "scatter";
+export type ChartType =
+    | "area"
+    | "bar"
+    | "bubble"
+    | "doughnut"
+    | "line"
+    | "mixed"
+    | "pie"
+    | "polarArea"
+    | "radar"
+    | "scatter";
 
 /**
  * Chart configuration interface.

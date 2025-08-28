@@ -114,7 +114,8 @@ export interface CompleteMonitor {
 }
 
 /**
- * Creates a mock monitor object with default values using deep partial type safety.
+ * Creates a mock monitor object with default values using deep partial type
+ * safety.
  *
  * @remarks
  * Enhanced version of createMockMonitor that supports deep partial overrides
@@ -125,9 +126,11 @@ export interface CompleteMonitor {
  * ```typescript
  * // Create with deep partial overrides
  * const monitor = createMockMonitorDeep({
- *     history: [{
- *         responseTime: 200
- *     }]
+ *     history: [
+ *         {
+ *             responseTime: 200,
+ *         },
+ *     ],
  * });
  * ```
  *
@@ -157,7 +160,7 @@ export const createMockMonitorDeep = (
  * // Create monitor without required fields for testing validation
  * const incompleteMonitor = createMockMonitorOptional({
  *     // id and type are optional, allowing testing of validation logic
- *     url: "https://example.com"
+ *     url: "https://example.com",
  * });
  * ```
  *

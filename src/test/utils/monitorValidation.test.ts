@@ -615,10 +615,7 @@ describe("Monitor Validation Utilities", () => {
                 "https://example.com"
             );
 
-            expect(result).toEqual([
-                "URL validation error",
-                "URL is invalid",
-            ]);
+            expect(result).toEqual(["URL validation error", "URL is invalid"]);
         });
 
         it("should handle validation errors with fallback", async ({
@@ -640,9 +637,7 @@ describe("Monitor Validation Utilities", () => {
                 "https://example.com"
             );
 
-            expect(result).toEqual([
-                "Failed to validate field: url",
-            ]);
+            expect(result).toEqual(["Failed to validate field: url"]);
         });
 
         it("should handle case insensitive field matching", async ({

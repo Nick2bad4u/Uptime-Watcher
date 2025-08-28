@@ -95,7 +95,6 @@ const vitestConfig = defineConfig({
             requireAssertions: true,
         },
         globals: true, // Enable global test functions
-        setupFiles: ["../../shared/test/setup.ts"], // Setup files for custom context injection
         include: [
             "../../shared/**/*.test.ts", // Include shared tests only
             "../../shared/**/*.test.mts", // Include MTS tests
@@ -128,6 +127,7 @@ const vitestConfig = defineConfig({
             "verbose",
             "hanging-process",
         ],
+        setupFiles: ["../../shared/test/setup.ts"], // Setup files for custom context injection
         testTimeout: 10_000, // 10 second timeout for shared tests
         typecheck: {
             enabled: true,

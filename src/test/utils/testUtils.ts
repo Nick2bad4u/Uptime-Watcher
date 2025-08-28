@@ -2,9 +2,9 @@
  * Type-safe testing utilities using type-fest for better test type safety.
  *
  * @remarks
- * Provides utilities for creating test objects with better type safety than
- * 'as any' patterns. Uses type-fest utilities to create partial objects,
- * mock data, and invalid data for testing scenarios.
+ * Provides utilities for creating test objects with better type safety than 'as
+ * any' patterns. Uses type-fest utilities to create partial objects, mock data,
+ * and invalid data for testing scenarios.
  */
 
 import type { PartialDeep, SetOptional, Except } from "type-fest";
@@ -16,9 +16,7 @@ import type { PartialDeep, SetOptional, Except } from "type-fest";
  *
  * @returns Type-safe partial object
  */
-export function createPartialTestData<T>(
-    data: PartialDeep<T>
-): PartialDeep<T> {
+export function createPartialTestData<T>(data: PartialDeep<T>): PartialDeep<T> {
     return data;
 }
 

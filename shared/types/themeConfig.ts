@@ -473,9 +473,9 @@ export interface ThemeOverride {
  * Deep partial theme configuration using type-fest's PartialDeep utility.
  *
  * @remarks
- * Creates a type where all properties and nested properties are optional.
- * This is useful for complex theme customization where you want to override
- * deeply nested properties without having to specify entire sections.
+ * Creates a type where all properties and nested properties are optional. This
+ * is useful for complex theme customization where you want to override deeply
+ * nested properties without having to specify entire sections.
  *
  * @example Deep theme customization:
  *
@@ -483,14 +483,14 @@ export interface ThemeOverride {
  * const deepCustomTheme: DeepThemeOverride = {
  *     colors: {
  *         text: {
- *             primary: '#333333'  // Only override this specific nested property
- *         }
+ *             primary: "#333333", // Only override this specific nested property
+ *         },
  *     },
  *     typography: {
  *         fontSize: {
- *             h1: '36px'  // Only override this specific nested property
- *         }
- *     }
+ *             h1: "36px", // Only override this specific nested property
+ *         },
+ *     },
  * };
  * ```
  *
@@ -748,15 +748,15 @@ export const DEFAULT_THEME_CONFIG: DefaultThemeConfig = {
  * // Create minimal theme with just colors, other sections use defaults
  * const minimalTheme = createThemeConfig({
  *     colors: {
- *         primary: { 50: '#f0f9ff', 500: '#3b82f6', 900: '#1e3a8a' }
- *     }
+ *         primary: { 50: "#f0f9ff", 500: "#3b82f6", 900: "#1e3a8a" },
+ *     },
  * });
  *
  * // Create full custom theme
  * const fullTheme = createThemeConfig({
  *     colors: customColors,
  *     typography: customTypography,
- *     spacing: customSpacing
+ *     spacing: customSpacing,
  * });
  * ```
  *
@@ -769,7 +769,12 @@ export const DEFAULT_THEME_CONFIG: DefaultThemeConfig = {
 export function createThemeConfig(
     config: SetOptional<
         ThemeConfig,
-        "animation" | "borderRadius" | "components" | "shadows" | "spacing" | "typography"
+        | "animation"
+        | "borderRadius"
+        | "components"
+        | "shadows"
+        | "spacing"
+        | "typography"
     >
 ): ThemeConfig {
     return {
@@ -796,8 +801,8 @@ export function createThemeConfig(
  * ```typescript
  * const baseTheme: ThemeConfig = getBaseTheme();
  * const overrides: ThemeOverride = {
- *     colors: { text: { primary: '#007bff' } },
- *     spacing: { lg: '20px' }
+ *     colors: { text: { primary: "#007bff" } },
+ *     spacing: { lg: "20px" },
  * };
  *
  * const mergedTheme = mergeThemeConfig(baseTheme, overrides);
@@ -811,10 +816,10 @@ export function createThemeConfig(
  *
  * @public
  */
-export function mergeThemeConfig<T extends ThemeConfig, U extends ThemeOverride>(
-    baseTheme: T,
-    overrides: U
-): Merge<T, U> {
+export function mergeThemeConfig<
+    T extends ThemeConfig,
+    U extends ThemeOverride,
+>(baseTheme: T, overrides: U): Merge<T, U> {
     return {
         ...baseTheme,
         ...overrides,
@@ -830,7 +835,8 @@ export function mergeThemeConfig<T extends ThemeConfig, U extends ThemeOverride>
 }
 
 /**
- * Creates a deeply customized theme using PartialDeep pattern for maximum flexibility.
+ * Creates a deeply customized theme using PartialDeep pattern for maximum
+ * flexibility.
  *
  * @remarks
  * Uses type-fest's PartialDeep to allow modification of any nested property
@@ -842,12 +848,12 @@ export function mergeThemeConfig<T extends ThemeConfig, U extends ThemeOverride>
  * ```typescript
  * const customTheme = createDeepThemeOverride(baseTheme, {
  *     colors: {
- *         text: { primary: '#1a1a1a' },  // Only change text primary color
- *         background: { primary: '#ffffff' }  // Only change background primary
+ *         text: { primary: "#1a1a1a" }, // Only change text primary color
+ *         background: { primary: "#ffffff" }, // Only change background primary
  *     },
  *     typography: {
- *         fontSize: { h1: '40px' }  // Only change h1 font size
- *     }
+ *         fontSize: { h1: "40px" }, // Only change h1 font size
+ *     },
  * });
  * ```
  *
@@ -865,11 +871,15 @@ export function createDeepThemeOverride(
     // Deep merge implementation - in production, consider using a library like lodash.merge
     const deepMerge = (target: any, source: any): any => {
         if (source === null || source === undefined) return target;
-        if (typeof source !== 'object') return source;
+        if (typeof source !== "object") return source;
 
         const result = { ...target };
         for (const key in source) {
-            if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+            if (
+                source[key] !== null &&
+                typeof source[key] === "object" &&
+                !Array.isArray(source[key])
+            ) {
                 result[key] = deepMerge(target[key] || {}, source[key]);
             } else if (source[key] !== undefined) {
                 result[key] = source[key];
