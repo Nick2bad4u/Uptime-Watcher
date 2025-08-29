@@ -80,9 +80,9 @@ vi.mock("react", async () => {
         ...actual,
         default: actual,
         memo: vi.fn((component) => ({
-            $$typeof: Symbol.for('react.memo'),
+            $$typeof: Symbol.for("react.memo"),
             type: component,
-            compare: null
+            compare: null,
         })),
         useCallback: vi.fn((fn) => fn),
         useEffect: vi.fn(),

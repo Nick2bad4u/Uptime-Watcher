@@ -1331,7 +1331,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             expect(isValidTimestamp(3.14)).toBe(true); // Decimal numbers are still valid
             expect(isValidTimestamp(currentTime + dayInMs - 1000)).toBe(true); // Well under limit
-            expect(isValidTimestamp(currentTime + dayInMs + 10_000)).toBe(false); // Well over limit
+            expect(isValidTimestamp(currentTime + dayInMs + 10_000)).toBe(
+                false
+            ); // Well over limit
         });
     });
 

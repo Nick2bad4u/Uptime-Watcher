@@ -47,7 +47,9 @@ vi.mock("../../../../theme/components/ThemedButton", () => ({
 }));
 
 vi.mock("../../../../theme/components/ThemedCard", () => ({
-    ThemedCard: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    ThemedCard: ({ children, ...props }: any) => (
+        <div {...props}>{children}</div>
+    ),
 }));
 
 vi.mock("../../../../theme/components/ThemedSelect", () => ({

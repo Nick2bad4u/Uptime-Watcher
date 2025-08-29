@@ -1,24 +1,32 @@
 /**
- * Hybrid Chart.js type definitions combining official Chart.js v4.5.0 types with custom business logic.
+ * Hybrid Chart.js type definitions combining official Chart.js v4.5.0 types
+ * with custom business logic.
  *
  * @remarks
- * This file creates a hybrid approach where we use Chart.js official types as the foundation
- * but extend them with our custom business logic types where the official types lack specificity.
+ * This file creates a hybrid approach where we use Chart.js official types as
+ * the foundation but extend them with our custom business logic types where the
+ * official types lack specificity.
  *
  * **Strategy:**
- * - Use official `ChartOptions<TType>`, `ChartData<TType>` for service layer integrations
- * - Use custom `ChartScalesConfig`, `ChartPluginsConfig` for business logic and utilities
+ *
+ * - Use official `ChartOptions<TType>`, `ChartData<TType>` for service layer
+ *   integrations
+ * - Use custom `ChartScalesConfig`, `ChartPluginsConfig` for business logic and
+ *   utilities
  * - Provide hybrid types that combine both for complete type safety
  *
  * **When to use which:**
- * - `ChartOptions<'line' | 'bar' | 'doughnut'>`: Service layer, Chart.js instantiation
+ *
+ * - `ChartOptions<'line' | 'bar' | 'doughnut'>`: Service layer, Chart.js
+ *   instantiation
  * - `ChartScalesConfig`: Utils, business logic, theme integration
  * - `ChartPluginsConfig`: Plugin configuration, custom styling
- * - `UptimeChartOptions<TType>`: Hybrid type for complete Uptime Watcher chart config
- *
- * @see {@link docs/Packages/Chart.js/hybrid-type-system.md} for comprehensive documentation
+ * - `UptimeChartOptions<TType>`: Hybrid type for complete Uptime Watcher chart
+ *   config
  *
  * @packageDocumentation
+ *
+ * @see {@link docs/Packages/Chart.js/hybrid-type-system.md} for comprehensive documentation
  */
 
 // Import official Chart.js types
@@ -34,12 +42,13 @@ import type {
 } from "./chartConfig.js";
 
 /**
- * Enhanced Chart.js options that combine official types with custom business logic.
+ * Enhanced Chart.js options that combine official types with custom business
+ * logic.
  *
  * @remarks
- * This type extends Chart.js official `ChartOptions<TType>` with our custom scale and plugin
- * configurations for Uptime Watcher business logic while maintaining compatibility with
- * Chart.js APIs.
+ * This type extends Chart.js official `ChartOptions<TType>` with our custom
+ * scale and plugin configurations for Uptime Watcher business logic while
+ * maintaining compatibility with Chart.js APIs.
  *
  * @template TType - Chart type ('line' | 'bar' | 'doughnut' | etc.)
  *
@@ -74,23 +83,25 @@ export interface UptimeChartOptions {
  * Chart type registry mapping for TypeScript inference.
  *
  * @remarks
- * Maps our custom chart types to Chart.js official chart types for proper type inference.
+ * Maps our custom chart types to Chart.js official chart types for proper type
+ * inference.
  *
  * @public
  */
 export interface ChartTypeRegistry {
-    line: 'line';
-    bar: 'bar';
-    doughnut: 'doughnut';
-    pie: 'pie';
-    scatter: 'scatter';
-    bubble: 'bubble';
-    polarArea: 'polarArea';
-    radar: 'radar';
+    line: "line";
+    bar: "bar";
+    doughnut: "doughnut";
+    pie: "pie";
+    scatter: "scatter";
+    bubble: "bubble";
+    polarArea: "polarArea";
+    radar: "radar";
 }
 
 /**
- * Enhanced Chart.js data structure combining official types with custom dataset configuration.
+ * Enhanced Chart.js data structure combining official types with custom dataset
+ * configuration.
  *
  * @remarks
  * Provides enhanced chart data structure with our custom dataset configuration
@@ -116,7 +127,9 @@ export interface UptimeChartData {
  *
  * @public
  */
-export interface UptimeChartConfig<TType extends keyof ChartTypeRegistry = 'line'> {
+export interface UptimeChartConfig<
+    TType extends keyof ChartTypeRegistry = "line",
+> {
     /** Chart type */
     type: ChartTypeRegistry[TType];
     /** Enhanced chart data */
@@ -129,8 +142,9 @@ export interface UptimeChartConfig<TType extends keyof ChartTypeRegistry = 'line
  * Theme-aware chart configuration factory interface.
  *
  * @remarks
- * Interface for creating chart configurations that automatically apply theme-specific
- * styling using both official Chart.js types and custom theme logic.
+ * Interface for creating chart configurations that automatically apply
+ * theme-specific styling using both official Chart.js types and custom theme
+ * logic.
  *
  * @public
  */
@@ -140,36 +154,39 @@ export interface ThemeAwareChartFactory {
      *
      * @param data - Chart data
      * @param themeConfig - Theme configuration
+     *
      * @returns Complete chart configuration
      */
     createLineChart(
         data: UptimeChartData,
         themeConfig: ChartThemeConfig
-    ): UptimeChartConfig<'line'>;
+    ): UptimeChartConfig<"line">;
 
     /**
      * Create a bar chart configuration with theme integration.
      *
      * @param data - Chart data
      * @param themeConfig - Theme configuration
+     *
      * @returns Complete chart configuration
      */
     createBarChart(
         data: UptimeChartData,
         themeConfig: ChartThemeConfig
-    ): UptimeChartConfig<'bar'>;
+    ): UptimeChartConfig<"bar">;
 
     /**
      * Create a doughnut chart configuration with theme integration.
      *
      * @param data - Chart data
      * @param themeConfig - Theme configuration
+     *
      * @returns Complete chart configuration
      */
     createDoughnutChart(
         data: UptimeChartData,
         themeConfig: ChartThemeConfig
-    ): UptimeChartConfig<'doughnut'>;
+    ): UptimeChartConfig<"doughnut">;
 }
 
 /**
@@ -187,6 +204,7 @@ export interface ChartUtilities {
      *
      * @param options - Chart options (hybrid or official)
      * @param scaleId - Scale identifier
+     *
      * @returns Scale configuration or undefined
      */
     getScaleConfig(
@@ -199,6 +217,7 @@ export interface ChartUtilities {
      *
      * @param options - Chart options (hybrid or official)
      * @param pluginId - Plugin identifier
+     *
      * @returns Plugin configuration or undefined
      */
     getPluginConfig(
@@ -210,6 +229,7 @@ export interface ChartUtilities {
      * Convert hybrid chart configuration to Chart.js official format.
      *
      * @param config - Hybrid chart configuration
+     *
      * @returns Chart.js compatible configuration
      */
     toChartJsConfig<TType extends keyof ChartTypeRegistry>(
@@ -233,7 +253,7 @@ export interface UptimeChartDataPoint extends ChartDataPoint {
     /** Timestamp for the data point */
     timestamp?: Date | string | number;
     /** Status information for uptime monitoring */
-    status?: 'up' | 'down' | 'warning' | 'unknown';
+    status?: "up" | "down" | "warning" | "unknown";
     /** Response time in milliseconds */
     responseTime?: number;
     /** Additional metadata for business logic */
@@ -266,6 +286,7 @@ export type { ChartOptions, ChartData } from "chart.js";
  * Type guard to check if chart options use our hybrid format.
  *
  * @param options - Chart options to check
+ *
  * @returns True if options use hybrid format
  *
  * @public
@@ -274,9 +295,9 @@ export function isUptimeChartOptions(
     options: unknown
 ): options is UptimeChartOptions {
     return (
-        typeof options === 'object' &&
+        typeof options === "object" &&
         options !== null &&
-        ('scales' in options || 'plugins' in options)
+        ("scales" in options || "plugins" in options)
     );
 }
 
@@ -284,17 +305,16 @@ export function isUptimeChartOptions(
  * Type guard to check if chart data uses our hybrid format.
  *
  * @param data - Chart data to check
+ *
  * @returns True if data uses hybrid format
  *
  * @public
  */
-export function isUptimeChartData(
-    data: unknown
-): data is UptimeChartData {
+export function isUptimeChartData(data: unknown): data is UptimeChartData {
     return (
-        typeof data === 'object' &&
+        typeof data === "object" &&
         data !== null &&
-        'datasets' in data &&
+        "datasets" in data &&
         Array.isArray((data as { datasets: unknown }).datasets)
     );
 }

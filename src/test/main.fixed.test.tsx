@@ -18,8 +18,7 @@ vi.mock("react-dom/client", () => ({
 
 // Mock App component
 vi.mock("../App", () => ({
-    App: () =>
-        createElement("div", { "data-testid": "app" }, "Mocked App"),
+    App: () => createElement("div", { "data-testid": "app" }, "Mocked App"),
 }));
 
 // Mock CSS import

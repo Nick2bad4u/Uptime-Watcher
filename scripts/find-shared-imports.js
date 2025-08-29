@@ -1,22 +1,28 @@
 #!/usr/bin/env node
 /**
- * Script to find and report @shared imports that need to be converted to relative imports
- * This helps identify files causing Rollup parser issues in coverage analysis
+ * Script to find and report @shared imports that need to be converted to
+ * relative imports This helps identify files causing Rollup parser issues in
+ * coverage analysis
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 // Configuration
 const CONFIG = {
     // Directories to scan for @shared imports
-    scanDirs: ['src', 'shared'],
+    scanDirs: ["src", "shared"],
     // File extensions to check
-    fileExtensions: ['.ts', '.tsx', '.js', '.jsx'],
+    fileExtensions: [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+    ],
     // Pattern to match @shared imports
     importPattern: /from\s+["']@shared([^"']*)["']/g,
     // Output format options
-    outputFormat: 'detailed', // 'simple', 'detailed', 'json'
+    outputFormat: "detailed", // 'simple', 'detailed', 'json'
 };
 
 /**
@@ -34,7 +40,15 @@ function getFilesRecursively(dir, extensions) {
 
             if (stat.isDirectory()) {
                 // Skip node_modules and other common ignore directories
-                if (!['node_modules', '.git', 'dist', 'coverage', 'build'].includes(item)) {
+                if (
+                    ![
+                        "node_modules",
+                        ".git",
+                        "dist",
+                        "coverage",
+                        "build",
+                    ].includes(item)
+                ) {
                     traverse(fullPath);
                 }
             } else if (stat.isFile()) {
@@ -58,7 +72,7 @@ function calculateRelativePath(fromFile, toPath) {
     const relativePath = path.relative(fromDir, toPath);
 
     // Convert Windows paths to Unix-style for imports
-    return relativePath.replace(/\\/g, '/');
+    return relativePath.replace(/\\/g, "/");
 }
 
 /**
@@ -66,17 +80,17 @@ function calculateRelativePath(fromFile, toPath) {
  */
 function suggestRelativePath(filePath, sharedPath) {
     const workspaceRoot = process.cwd();
-    const sharedDir = path.join(workspaceRoot, 'shared');
+    const sharedDir = path.join(workspaceRoot, "shared");
 
     // Remove @shared/ prefix and construct full path
-    const targetPath = path.join(sharedDir, sharedPath.replace(/^\//, ''));
+    const targetPath = path.join(sharedDir, sharedPath.replace(/^\//, ""));
 
     // Calculate relative path
     const relativePath = calculateRelativePath(filePath, targetPath);
 
     // Ensure it starts with ./ or ../
-    if (!relativePath.startsWith('.')) {
-        return './' + relativePath;
+    if (!relativePath.startsWith(".")) {
+        return "./" + relativePath;
     }
 
     return relativePath;
@@ -87,7 +101,7 @@ function suggestRelativePath(filePath, sharedPath) {
  */
 function findSharedImports(filePath) {
     try {
-        const content = fs.readFileSync(filePath, 'utf8');
+        const content = fs.readFileSync(filePath, "utf8");
         const imports = [];
         let match;
 
@@ -97,10 +111,12 @@ function findSharedImports(filePath) {
         while ((match = CONFIG.importPattern.exec(content)) !== null) {
             const fullMatch = match[0];
             const sharedPath = match[1];
-            const lineNumber = content.substring(0, match.index).split('\n').length;
+            const lineNumber = content
+                .substring(0, match.index)
+                .split("\n").length;
 
             // Get the line content for context
-            const lines = content.split('\n');
+            const lines = content.split("\n");
             const lineContent = lines[lineNumber - 1];
 
             imports.push({
@@ -124,11 +140,11 @@ function findSharedImports(filePath) {
  */
 function formatOutput(results) {
     switch (CONFIG.outputFormat) {
-        case 'simple':
+        case "simple":
             return formatSimple(results);
-        case 'json':
+        case "json":
             return JSON.stringify(results, null, 2);
-        case 'detailed':
+        case "detailed":
         default:
             return formatDetailed(results);
     }
@@ -138,26 +154,29 @@ function formatOutput(results) {
  * Format simple output (just file paths)
  */
 function formatSimple(results) {
-    const files = results.filter(r => r.imports.length > 0).map(r => r.filePath);
-    return files.join('\n');
+    const files = results
+        .filter((r) => r.imports.length > 0)
+        .map((r) => r.filePath);
+    return files.join("\n");
 }
 
 /**
  * Format detailed output with import suggestions
  */
 function formatDetailed(results) {
-    let output = '';
+    let output = "";
     let totalFiles = 0;
     let totalImports = 0;
 
-    output += '='.repeat(80) + '\n';
-    output += 'SHARED IMPORT ANALYSIS REPORT\n';
-    output += '='.repeat(80) + '\n\n';
+    output += "=".repeat(80) + "\n";
+    output += "SHARED IMPORT ANALYSIS REPORT\n";
+    output += "=".repeat(80) + "\n\n";
 
-    const filesWithImports = results.filter(r => r.imports.length > 0);
+    const filesWithImports = results.filter((r) => r.imports.length > 0);
 
     if (filesWithImports.length === 0) {
-        output += '✅ No @shared imports found! All imports are using relative paths.\n';
+        output +=
+            "✅ No @shared imports found! All imports are using relative paths.\n";
         return output;
     }
 
@@ -175,17 +194,18 @@ function formatDetailed(results) {
             output += `   With:    from "${imp.suggestedPath}"\n\n`;
         }
 
-        output += '-'.repeat(80) + '\n\n';
+        output += "-".repeat(80) + "\n\n";
     }
 
     output += `📊 SUMMARY:\n`;
     output += `   Files with @shared imports: ${totalFiles}\n`;
     output += `   Total @shared imports: ${totalImports}\n\n`;
 
-    output += '💡 NEXT STEPS:\n';
-    output += '   1. Replace @shared imports with suggested relative paths\n';
-    output += '   2. Run this script again to verify all imports are fixed\n';
-    output += '   3. Run coverage analysis to check if Rollup parser issues are resolved\n\n';
+    output += "💡 NEXT STEPS:\n";
+    output += "   1. Replace @shared imports with suggested relative paths\n";
+    output += "   2. Run this script again to verify all imports are fixed\n";
+    output +=
+        "   3. Run coverage analysis to check if Rollup parser issues are resolved\n\n";
 
     return output;
 }
@@ -194,7 +214,7 @@ function formatDetailed(results) {
  * Main execution function
  */
 function main() {
-    console.log('🔍 Scanning for @shared imports...\n');
+    console.log("🔍 Scanning for @shared imports...\n");
 
     const results = [];
 
@@ -228,21 +248,21 @@ function main() {
     console.log(output);
 
     // Optionally save to file
-    if (process.argv.includes('--save')) {
-        const outputFile = 'shared-imports-report.txt';
+    if (process.argv.includes("--save")) {
+        const outputFile = "shared-imports-report.txt";
         fs.writeFileSync(outputFile, output);
         console.log(`📄 Report saved to ${outputFile}`);
     }
 
     // Exit with error code if imports found (useful for CI)
-    const hasImports = results.some(r => r.imports.length > 0);
-    if (hasImports && process.argv.includes('--fail')) {
+    const hasImports = results.some((r) => r.imports.length > 0);
+    if (hasImports && process.argv.includes("--fail")) {
         process.exit(1);
     }
 }
 
 // Handle command line arguments
-if (process.argv.includes('--help') || process.argv.includes('-h')) {
+if (process.argv.includes("--help") || process.argv.includes("-h")) {
     console.log(`
 Usage: node scripts/find-shared-imports.js [options]
 
@@ -261,9 +281,9 @@ Examples:
 }
 
 // Handle format option
-const formatArg = process.argv.find(arg => arg.startsWith('--format='));
+const formatArg = process.argv.find((arg) => arg.startsWith("--format="));
 if (formatArg) {
-    CONFIG.outputFormat = formatArg.split('=')[1];
+    CONFIG.outputFormat = formatArg.split("=")[1];
 }
 
 // Run the script

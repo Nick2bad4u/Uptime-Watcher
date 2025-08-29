@@ -331,7 +331,7 @@ describe("App Component - Comprehensive Coverage", () => {
             render(<App />);
 
             // Wait a moment to ensure any potential loading overlay would have appeared
-            await new Promise(resolve => setTimeout(resolve, 150));
+            await new Promise((resolve) => setTimeout(resolve, 150));
 
             // Loading overlay should not be present
             expect(

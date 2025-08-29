@@ -1057,7 +1057,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
         const oneDayInMs = 86_400_000;
 
         beforeEach(() => {
-            vi.spyOn(Date, 'now').mockReturnValue(mockTime);
+            vi.spyOn(Date, "now").mockReturnValue(mockTime);
         });
 
         afterEach(() => {
