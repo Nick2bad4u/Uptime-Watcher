@@ -38,9 +38,8 @@
  */
 
 import type { FormFieldBaseProperties } from "@shared/types/componentProps";
-import type { NamedExoticComponent } from "react";
 
-import React, { memo } from "react";
+import { memo, type NamedExoticComponent, type ReactNode } from "react";
 
 import { ThemedText } from "../../theme/components/ThemedText";
 
@@ -51,7 +50,7 @@ import { ThemedText } from "../../theme/components/ThemedText";
  */
 export interface FormFieldProperties extends FormFieldBaseProperties {
     /** Form input element(s) to wrap */
-    readonly children: React.ReactNode;
+    readonly children: ReactNode;
 }
 
 /**

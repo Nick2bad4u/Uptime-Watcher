@@ -7,7 +7,7 @@
 import type { MonitorType } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
-import React, { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { logger } from "../../services/logger";
 import {
@@ -22,9 +22,9 @@ import {
  */
 export interface ConditionalResponseTimeProperties {
     /** React node to render when response time is supported */
-    readonly children: React.ReactNode;
+    readonly children: ReactNode;
     /** React node to render when response time is not supported or while loading */
-    readonly fallback?: React.ReactNode;
+    readonly fallback?: ReactNode;
     /** Type of monitor to check for response time support */
     readonly monitorType: MonitorType;
 }
@@ -62,7 +62,7 @@ export function ConditionalResponseTime({
     children,
     fallback,
     monitorType,
-}: ConditionalResponseTimeProperties): React.ReactNode {
+}: ConditionalResponseTimeProperties): ReactNode {
     const [supportsResponseTime, setSupportsResponseTime] =
         useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);

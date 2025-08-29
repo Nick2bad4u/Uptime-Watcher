@@ -212,7 +212,7 @@ export async function validateMonitorField(
     type: MonitorType,
     fieldName: string,
     value: unknown
-): Promise<string[]> {
+): Promise<readonly string[]> {
     return withUtilityErrorHandling(
         async () => {
             // Use the enhanced validation for better error handling

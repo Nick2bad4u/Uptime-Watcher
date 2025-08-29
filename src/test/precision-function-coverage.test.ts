@@ -413,7 +413,7 @@ describe("Precision Function Coverage - Targeted Functions", () => {
             for (let attempt = 1; attempt <= maxAttempts; attempt++) {
                 try {
                     return await fn();
-                } catch (error) {
+                } catch (error: unknown) {
                     lastError = error as Error;
                     if (attempt === maxAttempts) {
                         throw lastError;

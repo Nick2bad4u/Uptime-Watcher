@@ -509,7 +509,7 @@ describe("Ultimate Function Coverage - Site Status Utilities", () => {
                 partial: "Partial Outage",
                 unknown: "Unknown",
             };
-            return statusMap[status] || "Unknown";
+            return statusMap[status] ?? "Unknown";
         };
 
         const getSiteStatusDescription = (

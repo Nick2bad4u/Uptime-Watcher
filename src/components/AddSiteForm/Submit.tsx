@@ -292,7 +292,9 @@ async function performSubmission(
  *
  * @returns Promise resolving to array of validation error messages
  */
-async function validateCheckInterval(checkInterval: number): Promise<string[]> {
+async function validateCheckInterval(
+    checkInterval: number
+): Promise<readonly string[]> {
     return withUtilityErrorHandling(
         async () => {
             const validationResult = await validateMonitorFieldClientSide(
@@ -327,7 +329,7 @@ async function validateMonitorType(
     port: string,
     recordType: string,
     expectedValue: string
-): Promise<string[]> {
+): Promise<readonly string[]> {
     // Build form data object with only the relevant fields
     const formData: UnknownRecord = {
         type: monitorType,

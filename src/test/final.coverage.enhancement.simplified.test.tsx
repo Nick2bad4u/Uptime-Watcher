@@ -344,7 +344,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                             try {
                                 const result = await fn();
                                 resolve(result);
-                            } catch (error) {
+                            } catch (error: unknown) {
                                 reject(error);
                             }
                         });

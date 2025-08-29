@@ -301,7 +301,7 @@ describe("Fallback Utilities", () => {
                     status: "ok",
                 };
                 const operation = vi.fn().mockReturnValue(complexResult);
-                const fallback = { data: [], status: "error" };
+                const fallback = { data: [], status: "error" } as const;
 
                 const result = withSyncErrorHandling(
                     operation,

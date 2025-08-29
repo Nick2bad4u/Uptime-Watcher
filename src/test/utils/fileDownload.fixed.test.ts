@@ -54,7 +54,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
         globalThis.Blob = vi.fn().mockImplementation((parts, options) => ({
             parts,
             options,
-            type: options?.type || "",
+            type: options?.type ?? "",
             size: 100,
         })) as any;
     });

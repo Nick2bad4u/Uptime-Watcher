@@ -221,7 +221,7 @@ describe("Function Coverage Boost Tests", () => {
                         expect(typeof exportedValue).toBe("function");
                     }
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 // If module doesn't exist or can't be imported, that's fine
                 console.log("Cache module not available for testing:", error);
             }
@@ -255,7 +255,7 @@ describe("Function Coverage Boost Tests", () => {
                     const result = envModule.isTest();
                     expect(typeof result).toBe("boolean");
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 console.log(
                     "Environment module not available for testing:",
                     error
@@ -300,7 +300,7 @@ describe("Function Coverage Boost Tests", () => {
                         }
                     }
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 console.log(
                     "Object safety module not available for testing:",
                     error
@@ -326,7 +326,7 @@ describe("Function Coverage Boost Tests", () => {
                         expect(typeof exportedValue).toBe("function");
                     }
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 console.log(
                     "Type helpers module not available for testing:",
                     error
@@ -369,7 +369,7 @@ describe("Function Coverage Boost Tests", () => {
                         }
                     }
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 console.log(
                     "Type guards module not available for testing:",
                     error
@@ -414,7 +414,7 @@ describe("Function Coverage Boost Tests", () => {
                         expect(typeof exportedValue).toBe("function");
                     }
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 console.log(
                     "Monitor UI helpers module not available for testing:",
                     error
@@ -474,7 +474,7 @@ describe("Function Coverage Boost Tests", () => {
                         expect(typeof exportedValue).toBe("function");
                     }
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 console.log(
                     "Fallbacks module not available for testing:",
                     error
@@ -521,7 +521,7 @@ describe("Function Coverage Boost Tests", () => {
                         }
                     }
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 console.log(
                     "Monitor validation module not available for testing:",
                     error

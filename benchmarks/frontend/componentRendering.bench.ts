@@ -4,7 +4,7 @@
  */
 
 import { bench, describe } from "vitest";
-import React from "react";
+import { type CSSProperties, type ReactNode } from "react";
 
 // Interface definitions for component props and state
 interface ComponentProps {
@@ -13,9 +13,9 @@ interface ComponentProps {
     data: any[];
     isVisible: boolean;
     className?: string;
-    style?: React.CSSProperties;
+    style?: CSSProperties;
     onClick?: () => void;
-    children?: React.ReactNode;
+    children?: ReactNode;
 }
 
 interface ComponentState {

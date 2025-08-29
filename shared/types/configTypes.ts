@@ -21,13 +21,13 @@ import type { BaseValidationResult } from "./validation";
  */
 export interface ErrorInfo {
     /** Error code */
-    code?: string;
+    readonly code?: string;
     /** Additional error context */
-    context?: UnknownRecord;
+    readonly context?: UnknownRecord;
     /** Error message */
-    message: string;
+    readonly message: string;
     /** Error timestamp */
-    timestamp: number;
+    readonly timestamp: number;
 }
 
 /**

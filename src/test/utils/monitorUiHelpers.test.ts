@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import * as monitorUiHelpers from "../../utils/monitorUiHelpers";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import { AppCaches } from "../../utils/cache";
 import { getMonitorTypeConfig } from "../../utils/monitorTypeHelper";
 
@@ -30,7 +31,7 @@ vi.mock("../../utils/monitorTypeHelper", () => ({
 }));
 
 // Helper function to create complete MonitorTypeConfig objects
-function createMockConfig(overrides: any = {}) {
+function createMockConfig(overrides: Partial<MonitorTypeConfig> = {}) {
     return {
         type: "http",
         displayName: "HTTP Monitor",

@@ -9,9 +9,12 @@
  * @packageDocumentation
  */
 
-import type React from "react";
-
-import { memo, type NamedExoticComponent } from "react";
+import {
+    memo,
+    type NamedExoticComponent,
+    type ReactElement,
+    type ReactNode,
+} from "react";
 
 import { useTheme } from "../useTheme";
 
@@ -22,7 +25,7 @@ import { useTheme } from "../useTheme";
  */
 export interface ThemeProviderProperties {
     /** Child components to render within the theme context */
-    readonly children: React.ReactNode;
+    readonly children: ReactNode;
 }
 
 /**
@@ -36,7 +39,7 @@ export interface ThemeProviderProperties {
  */
 const ThemeProviderComponent = ({
     children,
-}: ThemeProviderProperties): React.ReactElement => {
+}: ThemeProviderProperties): ReactElement => {
     // Initialize theme system on mount to ensure theme context is available
     useTheme();
 

@@ -139,7 +139,7 @@ export function clearConfigCache(): void {
  * @returns Default monitor ID (first valid ID in array) or empty string if
  *   array is empty or contains no valid IDs
  */
-export function getDefaultMonitorId(monitorIds: string[]): string {
+export function getDefaultMonitorId(monitorIds: readonly string[]): string {
     return monitorIds[0] ?? "";
 }
 

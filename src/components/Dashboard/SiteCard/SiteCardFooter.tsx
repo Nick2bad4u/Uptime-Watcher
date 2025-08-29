@@ -3,7 +3,7 @@
  * navigation.
  */
 
-import React from "react";
+import { memo, type NamedExoticComponent } from "react";
 
 import { ThemedText } from "../../../theme/components/ThemedText";
 
@@ -31,7 +31,7 @@ import { ThemedText } from "../../../theme/components/ThemedText";
  * @returns JSX.Element containing the footer with interaction hint (no props
  *   required)
  */
-export const SiteCardFooter: React.NamedExoticComponent<object> = React.memo(
+export const SiteCardFooter: NamedExoticComponent<object> = memo(
     function SiteCardFooter() {
         return (
             <div className="mt-2 border-t pt-2">

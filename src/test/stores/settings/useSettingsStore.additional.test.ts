@@ -37,7 +37,7 @@ vi.mock("../utils", () => ({
                 }
                 return result;
             });
-        } catch (error) {
+        } catch (error: unknown) {
             if (errorHandling?.setError) {
                 errorHandling.setError(
                     error instanceof Error ? error.message : String(error)

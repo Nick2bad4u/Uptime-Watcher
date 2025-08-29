@@ -165,8 +165,8 @@ export function createSuccessResponse<T>(
  */
 export function createValidationResponse(
     success: boolean,
-    errors: string[] = [],
-    warnings: string[] = [],
+    errors: readonly string[] = [],
+    warnings: readonly string[] = [],
     metadata: UnknownRecord = {}
 ): IpcValidationResponse {
     return {

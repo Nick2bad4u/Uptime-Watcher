@@ -3,8 +3,7 @@
 /* eslint-disable react/require-default-props */
 
 import Heading from "@theme/Heading";
-import type { ReactNode } from "react";
-import React from "react";
+import type { CSSProperties, FC, ReactNode } from "react";
 import clsx from "clsx";
 import styles from "./styles.module.css";
 
@@ -15,15 +14,10 @@ interface FeatureItem {
 }
 
 interface FeatureProps extends FeatureItem {
-    style?: React.CSSProperties;
+    style?: CSSProperties;
 }
 
-const Feature: React.FC<FeatureProps> = ({
-    description,
-    icon,
-    style,
-    title,
-}) => (
+const Feature: FC<FeatureProps> = ({ description, icon, style, title }) => (
     <div className={clsx("col col--4")} style={style}>
         {/* eslint-disable-next-line tailwind/no-custom-classname */}
         <div className={clsx("text--center", styles["featureCard"])}>

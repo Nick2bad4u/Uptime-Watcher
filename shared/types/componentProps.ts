@@ -11,7 +11,15 @@
  * @packageDocumentation
  */
 
-import type { ReactNode } from "react";
+import type {
+    ChangeEvent,
+    CSSProperties,
+    FocusEvent,
+    FormEvent,
+    KeyboardEvent,
+    MouseEvent,
+    ReactNode,
+} from "react";
 
 /**
  * Core properties that most components should support.
@@ -80,7 +88,7 @@ export interface StylingProperties {
     /** Whether component should take full width of its container */
     readonly fullWidth?: boolean;
     /** Inline styles to apply (use sparingly) */
-    readonly style?: React.CSSProperties;
+    readonly style?: CSSProperties;
 }
 
 /**
@@ -148,12 +156,12 @@ export namespace EventHandlers {
 
     /** Click handler with event object when event details are needed */
     export type ClickWithEvent<TElement extends HTMLElement = HTMLElement> = (
-        event: React.MouseEvent<TElement>
+        event: MouseEvent<TElement>
     ) => void;
 
     /** Flexible click handler supporting both event and no-event patterns */
     export type ClickFlexible<TElement extends HTMLElement = HTMLElement> =
-        | ((event: React.MouseEvent<TElement>) => void)
+        | ((event: MouseEvent<TElement>) => void)
         | (() => void);
 
     /** Value-based change handler for form components */
@@ -164,24 +172,24 @@ export namespace EventHandlers {
         TElement extends
             | HTMLInputElement
             | HTMLSelectElement = HTMLInputElement,
-    > = (event: React.ChangeEvent<TElement>) => void;
+    > = (event: ChangeEvent<TElement>) => void;
 
     /** Form submission handler */
-    export type Submit = (event: React.FormEvent<HTMLFormElement>) => void;
+    export type Submit = (event: FormEvent<HTMLFormElement>) => void;
 
     /** Focus handler for input components */
     export type Focus<TElement extends HTMLElement = HTMLElement> = (
-        event: React.FocusEvent<TElement>
+        event: FocusEvent<TElement>
     ) => void;
 
     /** Blur handler for input components */
     export type Blur<TElement extends HTMLElement = HTMLElement> = (
-        event: React.FocusEvent<TElement>
+        event: FocusEvent<TElement>
     ) => void;
 
     /** Key press handler for keyboard interactions */
     export type KeyPress<TElement extends HTMLElement = HTMLElement> = (
-        event: React.KeyboardEvent<TElement>
+        event: KeyboardEvent<TElement>
     ) => void;
 }
 

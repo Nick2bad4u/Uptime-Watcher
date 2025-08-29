@@ -11,7 +11,7 @@ import type {
     Site,
     StatusHistory,
     StatusUpdate,
-} from "@shared/types";
+} from "../../shared/types";
 import type { UpdateStatus } from "../stores/types";
 
 describe("Types Module", () => {
@@ -53,7 +53,7 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Export Operation", "type");
 
-            const monitorTypes: MonitorType[] = ["http", "port"];
+            const monitorTypes: MonitorType[] = ["http", "port"] as const;
 
             for (const type of monitorTypes) {
                 expect(typeof type).toBe("string");
@@ -339,7 +339,7 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            const statuses: ("up" | "down")[] = ["up", "down"];
+            const statuses: ("up" | "down")[] = ["up", "down"] as const;
 
             for (const status of statuses) {
                 const history: StatusHistory = {

@@ -4,7 +4,7 @@
 
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
-import { type ReactNode } from "react";
+import { type FC, type ReactNode } from "react";
 
 import { ThemedText } from "../../theme/components/ThemedText";
 
@@ -44,7 +44,7 @@ export interface SettingItemProperties extends CoreComponentProperties {
  *
  * @returns Setting item component with consistent layout
  */
-export const SettingItem: React.FC<SettingItemProperties> = ({
+export const SettingItem: FC<SettingItemProperties> = ({
     className = "",
     control,
     description,

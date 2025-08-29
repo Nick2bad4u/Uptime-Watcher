@@ -1,7 +1,7 @@
-import type React from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 // Cache for color styles to prevent object recreation
-const colorStylesCache = new Map<string, React.CSSProperties>();
+const colorStylesCache = new Map<string, CSSProperties>();
 
 /**
  * Get or create a cached color style object
@@ -12,7 +12,7 @@ const colorStylesCache = new Map<string, React.CSSProperties>();
  *
  * @internal
  */
-function getColorStyle(color: string): React.CSSProperties {
+function getColorStyle(color: string): CSSProperties {
     let style = colorStylesCache.get(color);
     if (!style) {
         style = {
@@ -74,10 +74,7 @@ export function getIconColorClass(color?: string): string | undefined {
  *
  * @internal
  */
-export function renderColoredIcon(
-    icon: React.ReactNode,
-    color?: string
-): React.ReactNode {
+export function renderColoredIcon(icon: ReactNode, color?: string): ReactNode {
     if (!icon) {
         return icon;
     }

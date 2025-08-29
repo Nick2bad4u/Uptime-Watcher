@@ -5,7 +5,7 @@
 
 import type { MonitorStatus } from "@shared/types";
 
-import React from "react";
+import { memo, type NamedExoticComponent } from "react";
 
 import { StatusBadge } from "../../common/StatusBadge";
 
@@ -43,8 +43,8 @@ export interface SiteCardStatusProperties {
  *
  * @see StatusBadge For the underlying status display component
  */
-export const SiteCardStatus: React.NamedExoticComponent<SiteCardStatusProperties> =
-    React.memo(function SiteCardStatus({
+export const SiteCardStatus: NamedExoticComponent<SiteCardStatusProperties> =
+    memo(function SiteCardStatus({
         selectedMonitorId,
         status,
     }: SiteCardStatusProperties) {

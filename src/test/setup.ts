@@ -537,6 +537,6 @@ import "./vitest-context-setup";
 // Provide global fail function if not already defined
 if ((globalThis as any).fail === undefined) {
     (globalThis as any).fail = (message?: string): never => {
-        throw new Error(message || "Test failed");
+        throw new Error(message ?? "Test failed");
     };
 }

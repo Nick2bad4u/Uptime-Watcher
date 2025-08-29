@@ -13,11 +13,8 @@ describe("Debug Theme Structure", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Business Logic", "type");
 
-        console.log(
-            "Light Theme Typography:",
-            JSON.stringify(lightTheme.typography, null, 2)
-        );
         expect(lightTheme).toBeDefined();
+        expect(lightTheme.typography).toBeDefined();
     });
 
     it("should log actual dark theme structure", async ({ task, annotate }) => {
@@ -26,11 +23,8 @@ describe("Debug Theme Structure", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Business Logic", "type");
 
-        console.log(
-            "Dark Theme Status Colors:",
-            JSON.stringify(darkTheme.colors.status, null, 2)
-        );
         expect(darkTheme).toBeDefined();
+        expect(darkTheme.colors.status).toBeDefined();
     });
 
     it("should log useTheme hook currentTheme structure", async ({
@@ -43,10 +37,7 @@ describe("Debug Theme Structure", () => {
         await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useTheme());
-        console.log(
-            "Hook currentTheme Typography:",
-            JSON.stringify(result.current.currentTheme.typography, null, 2)
-        );
         expect(result.current.currentTheme).toBeDefined();
+        expect(result.current.currentTheme.typography).toBeDefined();
     });
 });

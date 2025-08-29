@@ -24,7 +24,7 @@ vi.mock("@shared/utils/errorHandling", () => ({
             store.clearError();
             store.setLoading(true);
             return await operation();
-        } catch (error) {
+        } catch (error: unknown) {
             const errorMessage =
                 error instanceof Error ? error.message : String(error);
             store.setError(errorMessage);
@@ -469,7 +469,7 @@ describe("useMonitorTypesStore", () => {
             await act(async () => {
                 try {
                     await result.current.validateMonitorData("http", {});
-                } catch (error) {
+                } catch (error: unknown) {
                     expect(error).toBeInstanceOf(Error);
                 }
             });

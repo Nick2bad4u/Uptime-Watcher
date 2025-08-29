@@ -91,12 +91,12 @@ describe("Working Utility Coverage Tests", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            const testObj = { test: "value" };
+            const testObj = { test: "value" } as const;
             const testArray = [
                 1,
                 2,
                 3,
-            ];
+            ] as const;
             const testDate = new Date();
             const testError = new Error("test");
             const testFunc = () => {};

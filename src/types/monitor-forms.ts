@@ -73,7 +73,7 @@ export interface MonitorFieldValues {
  */
 export interface MonitorValidationResult {
     /** Array of error messages */
-    errors: string[];
+    errors: readonly string[];
     /** Additional validation metadata */
     metadata: {
         /** Monitor type being validated */
@@ -81,12 +81,12 @@ export interface MonitorValidationResult {
         /** Validation timestamp */
         timestamp: number;
         /** Fields that were validated */
-        validatedFields: string[];
+        validatedFields: readonly string[];
     };
     /** Whether validation passed */
     success: boolean;
     /** Array of warning messages */
-    warnings: string[];
+    warnings: readonly string[];
 }
 
 /**

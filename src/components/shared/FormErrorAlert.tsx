@@ -4,6 +4,8 @@
 
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
+import { type FC } from "react";
+
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
@@ -37,7 +39,7 @@ export interface FormErrorAlertProperties extends CoreComponentProperties {
  *
  * @returns Themed error alert component
  */
-export const FormErrorAlert: React.FC<FormErrorAlertProperties> = ({
+export const FormErrorAlert: FC<FormErrorAlertProperties> = ({
     className = "",
     error,
     isDark = false,

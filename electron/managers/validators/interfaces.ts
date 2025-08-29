@@ -29,7 +29,7 @@
 // if needed
 export interface ValidationResult {
     /** Array of error messages describing validation failures */
-    errors: string[];
+    errors: readonly string[];
     /** Boolean indicating whether validation was successful */
     success: boolean;
 }

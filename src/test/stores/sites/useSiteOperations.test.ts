@@ -34,7 +34,7 @@ vi.mock("../../../stores/utils", () => ({
                 handlers.setLoading?.(false);
                 return result;
             });
-        } catch (error) {
+        } catch (error: unknown) {
             handlers.setError?.(error);
             handlers.setLoading?.(false);
             throw error;

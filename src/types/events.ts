@@ -11,11 +11,11 @@ import type { UnknownRecord } from "type-fest";
  */
 export interface CacheInvalidatedEventData {
     /** Specific identifier affected (optional for global invalidation) */
-    identifier?: string;
+    readonly identifier?: string;
     /** Reason for invalidation */
-    reason: "delete" | "expiry" | "manual" | "update";
+    readonly reason: "delete" | "expiry" | "manual" | "update";
     /** Type of cache invalidation */
-    type: "all" | "monitor" | "site";
+    readonly type: "all" | "monitor" | "site";
 }
 
 /**
@@ -23,15 +23,15 @@ export interface CacheInvalidatedEventData {
  */
 export interface MonitorDownEventData {
     /** Error message if available */
-    error?: string;
+    readonly error?: string;
     /** Monitor that went down */
-    monitor: Monitor;
+    readonly monitor: Monitor;
     /** Site containing the monitor */
-    site: Site;
+    readonly site: Site;
     /** Site identifier */
-    siteId: string;
+    readonly siteId: string;
     /** Timestamp when the event occurred */
-    timestamp: number;
+    readonly timestamp: number;
 }
 
 /**
@@ -39,9 +39,9 @@ export interface MonitorDownEventData {
  */
 export interface MonitoringControlEventData {
     /** Monitor identifier */
-    monitorId: string;
+    readonly monitorId: string;
     /** Site identifier */
-    siteId: string;
+    readonly siteId: string;
 }
 
 /**
@@ -49,15 +49,15 @@ export interface MonitoringControlEventData {
  */
 export interface MonitorUpEventData {
     /** Monitor that came back up */
-    monitor: Monitor;
+    readonly monitor: Monitor;
     /** Response time in milliseconds */
-    responseTime?: number;
+    readonly responseTime?: number;
     /** Site containing the monitor */
-    site: Site;
+    readonly site: Site;
     /** Site identifier */
-    siteId: string;
+    readonly siteId: string;
     /** Timestamp when the event occurred */
-    timestamp: number;
+    readonly timestamp: number;
 }
 
 /**
@@ -65,11 +65,11 @@ export interface MonitorUpEventData {
  */
 export interface TestEventData {
     /** Test data payload */
-    data: UnknownRecord;
+    readonly data: UnknownRecord;
     /** Test identifier */
-    testId: string;
+    readonly testId: string;
     /** Timestamp */
-    timestamp: number;
+    readonly timestamp: number;
 }
 
 /**
@@ -78,13 +78,13 @@ export interface TestEventData {
  */
 export interface UpdateReleaseInfo {
     /** Release date timestamp or formatted string */
-    releaseDate: string;
+    readonly releaseDate: string;
     /** Human-readable release name */
-    releaseName: string;
+    readonly releaseName: string;
     /** Detailed release notes in markdown format */
-    releaseNotes: string;
+    readonly releaseNotes: string;
     /** Semantic version number */
-    version: string;
+    readonly version: string;
 }
 
 /**
@@ -92,13 +92,13 @@ export interface UpdateReleaseInfo {
  */
 export interface UpdateStatusEventData {
     /** Error message if status is error */
-    error?: string;
+    readonly error?: string;
     /** Update information if available */
-    info?: UpdateReleaseInfo;
+    readonly info?: UpdateReleaseInfo;
     /** Progress percentage (0-100) */
-    progress?: number;
+    readonly progress?: number;
     /** Current update status */
-    status:
+    readonly status:
         | "available"
         | "checking"
         | "downloaded"

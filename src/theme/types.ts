@@ -237,9 +237,9 @@ export interface ThemeTypography {
     /** Font family definitions */
     fontFamily: {
         /** Monospace font stack */
-        mono: string[];
+        mono: readonly string[];
         /** Sans-serif font stack */
-        sans: string[];
+        sans: readonly string[];
     };
     /** Font size scale */
     fontSize: {

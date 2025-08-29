@@ -119,8 +119,8 @@ describe("Final 90% Function Coverage Push", () => {
 
             // Test validation logic
             const isNameValid =
-                formData.name && formData.name.trim().length > 0;
-            const isUrlValid = formData.url && formData.url.startsWith("http");
+                formData.name?.trim().length > 0;
+            const isUrlValid = formData.url?.startsWith("http");
             const isIntervalValid =
                 formData.checkInterval && formData.checkInterval >= 1000;
 

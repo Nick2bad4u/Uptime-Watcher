@@ -362,7 +362,7 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                         try {
                             const result = await asyncEffect();
                             setData(result);
-                        } catch (error) {
+                        } catch (error: unknown) {
                             setData("error");
                         }
                     };

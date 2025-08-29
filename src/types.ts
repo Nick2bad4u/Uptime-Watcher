@@ -347,10 +347,10 @@ declare global {
                     data: unknown
                 ) => Promise<{
                     data?: unknown;
-                    errors: string[];
+                    errors: readonly string[];
                     metadata?: UnknownRecord;
                     success: boolean;
-                    warnings?: string[];
+                    warnings?: readonly string[];
                 }>;
             };
 

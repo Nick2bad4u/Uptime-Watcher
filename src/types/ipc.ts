@@ -57,7 +57,7 @@ export interface IpcResponse<T> {
     /** Indicates whether the operation was successful */
     success: boolean;
     /** Non-critical warnings */
-    warnings?: string[];
+    warnings?: readonly string[];
 }
 
 /**

@@ -99,7 +99,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                     handlers?.setLoading?.(true);
                     handlers?.clearError?.();
                     return await fn();
-                } catch (error) {
+                } catch (error: unknown) {
                     handlers?.setLoading?.(false);
                     handlers?.setError?.(error);
                     throw error;

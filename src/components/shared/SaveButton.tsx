@@ -8,7 +8,7 @@
 
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
-import { useMemo } from "react";
+import { type FC, useMemo } from "react";
 import { FiSave } from "react-icons/fi";
 
 import { ThemedButton } from "../../theme/components/ThemedButton";
@@ -40,7 +40,7 @@ export interface SaveButtonProperties extends CoreComponentProperties {
  *
  * @returns Themed save button component
  */
-export const SaveButton: React.FC<SaveButtonProperties> = ({
+export const SaveButton: FC<SaveButtonProperties> = ({
     "aria-label": ariaLabel = "Save changes",
     className = "",
     disabled = false,

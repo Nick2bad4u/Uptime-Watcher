@@ -172,7 +172,7 @@ export function getMonitorTypeConfig(
  *
  * @public
  */
-export function getRegisteredMonitorTypes(): string[] {
+export function getRegisteredMonitorTypes(): readonly string[] {
     return Array.from(monitorTypes.keys());
 }
 

@@ -15,31 +15,14 @@ describe("Debug Availability Description", () => {
 
         const { result } = renderHook(() => useAvailabilityColors());
 
-        console.log(
-            "Testing 99.5%:",
-            result.current.getAvailabilityDescription(99.5)
-        );
-        console.log(
-            "Testing -10:",
-            result.current.getAvailabilityDescription(-10)
-        );
-        console.log("Testing 0:", result.current.getAvailabilityDescription(0));
-        console.log(
-            "Testing 49:",
-            result.current.getAvailabilityDescription(49)
-        );
-        console.log(
-            "Testing 50:",
-            result.current.getAvailabilityDescription(50)
-        );
-        console.log(
-            "Testing 79:",
-            result.current.getAvailabilityDescription(79)
-        );
-        console.log(
-            "Testing 80:",
-            result.current.getAvailabilityDescription(80)
-        );
+        // Test various edge cases
+        expect(result.current.getAvailabilityDescription(99.5)).toBeDefined();
+        expect(result.current.getAvailabilityDescription(-10)).toBeDefined();
+        expect(result.current.getAvailabilityDescription(0)).toBeDefined();
+        expect(result.current.getAvailabilityDescription(49)).toBeDefined();
+        expect(result.current.getAvailabilityDescription(50)).toBeDefined();
+        expect(result.current.getAvailabilityDescription(79)).toBeDefined();
+        expect(result.current.getAvailabilityDescription(80)).toBeDefined();
 
         // Just to pass the test
         expect(true).toBe(true);

@@ -28,7 +28,12 @@
 
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
-import React, { useCallback } from "react";
+import {
+    memo,
+    type MouseEvent,
+    type NamedExoticComponent,
+    useCallback,
+} from "react";
 
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 
@@ -101,8 +106,8 @@ export interface SiteMonitoringButtonProperties
  *
  * @returns JSX element containing the themed monitoring button
  */
-export const SiteMonitoringButton: React.NamedExoticComponent<SiteMonitoringButtonProperties> =
-    React.memo(function SiteMonitoringButton({
+export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProperties> =
+    memo(function SiteMonitoringButton({
         allMonitorsRunning,
         className = "",
         compact = false,
@@ -112,7 +117,7 @@ export const SiteMonitoringButton: React.NamedExoticComponent<SiteMonitoringButt
     }: SiteMonitoringButtonProperties) {
         // useCallback handlers for jsx-no-bind compliance
         const handleStopClick = useCallback(
-            (event?: React.MouseEvent<HTMLButtonElement>) => {
+            (event?: MouseEvent<HTMLButtonElement>) => {
                 event?.stopPropagation();
                 onStopSiteMonitoring();
             },
@@ -120,7 +125,7 @@ export const SiteMonitoringButton: React.NamedExoticComponent<SiteMonitoringButt
         );
 
         const handleStartClick = useCallback(
-            (event?: React.MouseEvent<HTMLButtonElement>) => {
+            (event?: MouseEvent<HTMLButtonElement>) => {
                 event?.stopPropagation();
                 onStartSiteMonitoring();
             },

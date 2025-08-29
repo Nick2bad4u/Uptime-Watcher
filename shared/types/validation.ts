@@ -19,11 +19,11 @@
  */
 export interface BaseValidationResult {
     /** Array of validation error messages */
-    errors: string[];
+    errors: readonly string[];
     /** Whether validation passed (no errors) */
     success: boolean;
     /** Optional warning messages that don't prevent validation success */
-    warnings?: string[];
+    warnings?: readonly string[];
 }
 
 /**

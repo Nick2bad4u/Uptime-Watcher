@@ -968,7 +968,9 @@ export class SiteManager {
      *
      * @internal
      */
-    private formatValidationErrors(errors: string[] | undefined): string {
+    private formatValidationErrors(
+        errors: readonly string[] | undefined
+    ): string {
         if (!errors || errors.length === 0) {
             return "";
         }

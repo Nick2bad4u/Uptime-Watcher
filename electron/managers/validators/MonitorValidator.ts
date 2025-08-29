@@ -134,7 +134,7 @@ export class MonitorValidator {
      */
     private validateMonitorTypeSpecific(
         monitor: Site["monitors"][0]
-    ): string[] {
+    ): readonly string[] {
         // Validate monitor type using registry
         if (!isValidMonitorType(monitor.type)) {
             const availableTypes = getRegisteredMonitorTypes().join(", ");

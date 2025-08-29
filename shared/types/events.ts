@@ -54,14 +54,14 @@ export interface CacheInvalidatedEventData extends BaseEventData {
      * @remarks
      * If omitted, the invalidation is considered global.
      */
-    identifier?: string;
+    readonly identifier?: string;
     /**
      * The reason for invalidation.
      *
      * @remarks
      * Can be 'delete', 'expiry', 'manual', or 'update'.
      */
-    reason: "delete" | "expiry" | "manual" | "update";
+    readonly reason: "delete" | "expiry" | "manual" | "update";
     /**
      * The type of cache invalidation.
      *
@@ -69,7 +69,7 @@ export interface CacheInvalidatedEventData extends BaseEventData {
      * 'all' for global, 'monitor' for a specific monitor, 'site' for a specific
      * site.
      */
-    type: "all" | "monitor" | "site";
+    readonly type: "all" | "monitor" | "site";
 }
 
 /**
@@ -209,15 +209,15 @@ export interface MonitorDownEventData extends BaseEventData {
     /**
      * The monitor that went down.
      */
-    monitor: Monitor;
+    readonly monitor: Monitor;
     /**
      * The site containing the monitor.
      */
-    site: Site;
+    readonly site: Site;
     /**
      * The unique identifier of the site.
      */
-    siteId: string;
+    readonly siteId: string;
 }
 
 /**
@@ -248,22 +248,22 @@ export interface MonitoringControlEventData extends BaseEventData {
     /**
      * Number of active monitors (for stopped events).
      */
-    activeMonitors?: number;
+    readonly activeMonitors?: number;
     /**
      * Number of monitors involved in the operation.
      */
-    monitorCount?: number;
+    readonly monitorCount?: number;
     /**
      * Reason for stopping (for stopped events).
      *
      * @remarks
      * Can be 'error', 'shutdown', or 'user'.
      */
-    reason?: "error" | "shutdown" | "user";
+    readonly reason?: "error" | "shutdown" | "user";
     /**
      * Number of sites involved in the operation.
      */
-    siteCount?: number;
+    readonly siteCount?: number;
 }
 
 /**
@@ -292,15 +292,15 @@ export interface MonitorUpEventData extends BaseEventData {
     /**
      * The monitor that came back up.
      */
-    monitor: Monitor;
+    readonly monitor: Monitor;
     /**
      * The site containing the monitor.
      */
-    site: Site;
+    readonly site: Site;
     /**
      * The unique identifier of the site.
      */
-    siteId: string;
+    readonly siteId: string;
 }
 
 /**
@@ -324,7 +324,7 @@ export interface UpdateStatusEventData {
     /**
      * Error message if status is 'error'.
      */
-    error?: string;
+    readonly error?: string;
     /**
      * The current update status.
      *
@@ -332,7 +332,7 @@ export interface UpdateStatusEventData {
      * Can be 'available', 'checking', 'downloaded', 'downloading', 'error', or
      * 'idle'.
      */
-    status:
+    readonly status:
         | "available"
         | "checking"
         | "downloaded"

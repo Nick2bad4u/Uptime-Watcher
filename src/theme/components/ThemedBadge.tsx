@@ -37,9 +37,15 @@
  */
 
 import type { CoreComponentProperties } from "@shared/types/componentProps";
-import type React from "react";
 
-import { memo, type NamedExoticComponent, useMemo } from "react";
+import {
+    type CSSProperties,
+    type JSX,
+    memo,
+    type NamedExoticComponent,
+    type ReactNode,
+    useMemo,
+} from "react";
 
 import type { BadgeSize, BadgeVariant } from "./types";
 
@@ -52,7 +58,7 @@ import { useTheme } from "../useTheme";
  */
 export interface ThemedBadgeProperties extends CoreComponentProperties {
     /** Icon element to display alongside the badge content */
-    readonly icon?: React.ReactNode;
+    readonly icon?: ReactNode;
     /** Color theme for the icon (uses theme color names) */
     readonly iconColor?: string;
     /** Size variant for the badge */
@@ -99,11 +105,11 @@ export const ThemedBadge: NamedExoticComponent<ThemedBadgeProperties> = memo(
         iconColor,
         size = "md",
         variant = "primary",
-    }: ThemedBadgeProperties): React.JSX.Element {
+    }: ThemedBadgeProperties): JSX.Element {
         const { currentTheme } = useTheme();
 
         const combinedStyle = useMemo(() => {
-            const badgeStyle: React.CSSProperties = {
+            const badgeStyle: CSSProperties = {
                 alignItems: "center",
                 border: "1px solid",
                 borderRadius: currentTheme.borderRadius.full,
@@ -172,7 +178,7 @@ export const ThemedBadge: NamedExoticComponent<ThemedBadgeProperties> = memo(
             } as const;
 
             // Type-safe style lookup with fallbacks for custom values
-            const getSizeStyle = (sizeKey: BadgeSize): React.CSSProperties => {
+            const getSizeStyle = (sizeKey: BadgeSize): CSSProperties => {
                 if (sizeKey in sizeStyles) {
                     return sizeStyles[sizeKey as keyof typeof sizeStyles];
                 }
@@ -181,7 +187,7 @@ export const ThemedBadge: NamedExoticComponent<ThemedBadgeProperties> = memo(
 
             const getVariantStyle = (
                 variantKey: BadgeVariant
-            ): React.CSSProperties => {
+            ): CSSProperties => {
                 if (variantKey in variantStyles) {
                     return variantStyles[
                         variantKey as keyof typeof variantStyles

@@ -1,8 +1,13 @@
 /**
- * Targeted tests for useSettingsStore uncovered lines (75, 207-228). Focuses
- * specifically on error scenarios and edge cases.
+ * Targeted tests for useSettingsStore uncovered lines (75, 207-228).
+ * Focuses specifically on error scenarios and edge cases.
+ *
+ * Verifies:
+ * - Rehydration sync error handling
+ * - syncFromBackend success and failure paths
+ * - Data extraction failures
+ * - Concurrency behavior
  */
-
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { act } from "@testing-library/react";
 
@@ -87,7 +92,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             async (asyncFn, errorHandler) => {
                 try {
                     return await asyncFn();
-                } catch (error) {
+                } catch (error: unknown) {
                     if (errorHandler && "setError" in errorHandler) {
                         errorHandler.setError(String(error));
                     }

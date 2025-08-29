@@ -252,7 +252,7 @@ describe("Final Function Coverage Push", () => {
                     fn("test");
                     fn(true);
                     fn(123);
-                } catch (error) {
+                } catch (error: unknown) {
                     // Function called, coverage counts
                 }
             }
@@ -268,7 +268,7 @@ describe("Final Function Coverage Push", () => {
                     fn("test");
                     fn("test", {});
                     fn("test", {}, "extra");
-                } catch (error) {
+                } catch (error: unknown) {
                     // Function called, coverage counts
                 }
             }

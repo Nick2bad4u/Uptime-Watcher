@@ -57,7 +57,7 @@ export interface IpcResponse<T = unknown> {
     /** Indicates if the operation was successful */
     success: boolean;
     /** Non-critical warnings about the operation */
-    warnings?: string[];
+    warnings?: readonly string[];
 }
 
 /**
@@ -71,7 +71,7 @@ export interface IpcResponse<T = unknown> {
  */
 export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
     /** List of validation errors (required for validation responses) */
-    errors: string[];
+    errors: readonly string[];
     /** Whether validation passed (required for validation responses) */
     success: boolean;
 }

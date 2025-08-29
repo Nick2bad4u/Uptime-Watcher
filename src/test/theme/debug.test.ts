@@ -18,13 +18,6 @@ describe("Debug Availability Description", () => {
 
         const { result } = renderHook(() => useAvailabilityColors());
 
-        // Debug the module
-        console.log("Module keys:", Object.keys(useThemeModule));
-        console.log(
-            "useAvailabilityColors function:",
-            useAvailabilityColors.toString().slice(0, 500)
-        );
-
         // Test all percentage boundary conditions
         const testCases = [
             100,
@@ -46,11 +39,10 @@ describe("Debug Availability Description", () => {
             0,
         ];
 
-        console.log("Complete test of all boundaries:");
         for (const percentage of testCases) {
             const result_desc =
                 result.current.getAvailabilityDescription(percentage);
-            console.log(`${percentage}% -> "${result_desc}"`);
+            expect(result_desc).toBeDefined();
         }
 
         // This should help us see what the actual function is doing

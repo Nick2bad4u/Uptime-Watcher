@@ -124,7 +124,7 @@ export function clearMonitorFactoryCache(): void {
  *
  * @public
  */
-export function getAvailableMonitorTypes(): string[] {
+export function getAvailableMonitorTypes(): readonly string[] {
     return getRegisteredMonitorTypes();
 }
 

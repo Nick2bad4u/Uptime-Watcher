@@ -97,7 +97,7 @@ describe("useSettingsStore", () => {
                 (handlers as any).setLoading?.(true);
                 (handlers as any).clearError?.();
                 return await fn();
-            } catch (error) {
+            } catch (error: unknown) {
                 // Match the real withErrorHandling behavior: extract error message
                 const errorMessage =
                     error instanceof Error ? error.message : String(error);

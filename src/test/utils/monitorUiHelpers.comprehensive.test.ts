@@ -59,7 +59,7 @@ const getAvailableMonitorTypes = mockGetAvailableMonitorTypes;
 const getMonitorTypeConfig = mockGetMonitorTypeConfig;
 
 describe("Monitor UI Helpers", () => {
-    let originalWindow: any;
+    let originalWindow: Window | undefined;
 
     // Helper function to create mock Monitor objects
     const createMockMonitor = (partial: Partial<Monitor> = {}): Monitor => ({
@@ -82,14 +82,16 @@ describe("Monitor UI Helpers", () => {
         // Mock window.electronAPI
         globalThis.window = {
             electronAPI: mockElectronAPI,
-        } as any;
+        } as unknown as Window & typeof globalThis;
 
         // Clear all mocks
         vi.clearAllMocks();
     });
 
     afterEach(() => {
-        globalThis.window = originalWindow;
+        if (originalWindow) {
+            globalThis.window = originalWindow as Window & typeof globalThis;
+        }
     });
 
     describe("allSupportsAdvancedAnalytics", () => {

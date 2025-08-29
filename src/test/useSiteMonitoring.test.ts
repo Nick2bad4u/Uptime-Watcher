@@ -93,7 +93,7 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await act(async () => {
             try {
                 await mockSitesStore.startSiteMonitoring("test-site-id");
-            } catch (error) {
+            } catch (error: unknown) {
                 expect(error).toBeInstanceOf(Error);
             }
         });
@@ -138,7 +138,7 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await act(async () => {
             try {
                 await mockSitesStore.stopSiteMonitoring("test-site-id");
-            } catch (error) {
+            } catch (error: unknown) {
                 expect(error).toBeInstanceOf(Error);
             }
         });
@@ -192,7 +192,7 @@ describe("useSitesStore - Site Monitoring Functions", () => {
                     "test-site-id",
                     "test-monitor-id"
                 );
-            } catch (error) {
+            } catch (error: unknown) {
                 expect(error).toBeInstanceOf(Error);
             }
         });
@@ -247,7 +247,7 @@ describe("useSitesStore - Site Monitoring Functions", () => {
                     "test-site-id",
                     "test-monitor-id"
                 );
-            } catch (error) {
+            } catch (error: unknown) {
                 expect(error).toBeInstanceOf(Error);
             }
         });

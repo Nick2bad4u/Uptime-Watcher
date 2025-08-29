@@ -25,7 +25,7 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn(async (operation) => {
         try {
             return await operation();
-        } catch (error) {
+        } catch (error: unknown) {
             console.warn("Mocked error in withErrorHandling:", error);
             throw error;
         }
@@ -457,7 +457,7 @@ describe("useSiteSync", () => {
             try {
                 await syncActions.syncSitesFromBackend();
                 // The function should handle errors internally and not throw
-            } catch (error_) {
+            } catch (error_: unknown) {
                 // If it does throw, that's also acceptable behavior
                 expect(error_).toBeDefined();
             }

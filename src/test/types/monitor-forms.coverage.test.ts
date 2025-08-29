@@ -263,7 +263,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Monitoring", "type");
 
-            const monitorTypes = ["http", "port"];
+            const monitorTypes = ["http", "port"] as const;
 
             for (const type of monitorTypes) {
                 expect(typeof type).toBe("string");
@@ -364,7 +364,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
-            const requiredFields = ["url"];
+            const requiredFields = ["url"] as const;
             const _optionalFields = [
                 "name",
                 "timeout",

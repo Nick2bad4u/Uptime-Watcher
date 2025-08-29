@@ -471,7 +471,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
             const handleActionWithErrorCatch = async () => {
                 try {
                     await mockAction();
-                } catch (error) {
+                } catch (error: unknown) {
                     mockLogger.site.error(site.identifier, error);
                 }
             };

@@ -3,7 +3,7 @@
  * displaying key performance metrics.
  */
 
-import React from "react";
+import { memo, type NamedExoticComponent } from "react";
 
 import { ThemedText } from "../../../../theme/components/ThemedText";
 
@@ -50,8 +50,8 @@ export interface MetricCardProperties {
  *
  * @returns JSX.Element containing the metric display
  */
-export const MetricCard: React.NamedExoticComponent<MetricCardProperties> =
-    React.memo(function MetricCard({
+export const MetricCard: NamedExoticComponent<MetricCardProperties> = memo(
+    function MetricCard({
         className = "",
         label,
         value,
@@ -72,4 +72,5 @@ export const MetricCard: React.NamedExoticComponent<MetricCardProperties> =
                 </ThemedText>
             </div>
         );
-    });
+    }
+);
