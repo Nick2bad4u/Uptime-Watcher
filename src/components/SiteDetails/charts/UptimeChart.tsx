@@ -43,9 +43,8 @@
  */
 
 import type { ChartOptions } from "chart.js";
-import type { JSX } from "react/jsx-runtime";
 
-import { memo, type MemoExoticComponent } from "react";
+import { memo, type NamedExoticComponent } from "react";
 import { Doughnut } from "react-chartjs-2";
 
 import type { UptimeChartData } from "../../../services/chartConfig";
@@ -77,25 +76,18 @@ import "../../../services/chartSetup";
  *
  * @public
  */
-const UptimeChart: MemoExoticComponent<
-    ({
-        data,
-        options,
-    }: {
-        data: UptimeChartData;
-        options: ChartOptions<"doughnut">;
-    }) => JSX.Element
-> = memo(
-    ({
-        data,
-        options,
-    }: {
-        readonly data: UptimeChartData;
-        readonly options: ChartOptions<"doughnut">;
-    }) => <Doughnut data={data} options={options} />
-);
+export const UptimeChart: NamedExoticComponent<{
+    readonly data: UptimeChartData;
+    readonly options: ChartOptions<"doughnut">;
+}> = memo(function UptimeChart({
+    data,
+    options,
+}: {
+    readonly data: UptimeChartData;
+    readonly options: ChartOptions<"doughnut">;
+}) {
+    return <Doughnut data={data} options={options} />;
+});
 
-// Set display name for better debugging and React DevTools experience
+// Set displayName explicitly for debugging
 UptimeChart.displayName = "UptimeChart";
-
-export default UptimeChart;

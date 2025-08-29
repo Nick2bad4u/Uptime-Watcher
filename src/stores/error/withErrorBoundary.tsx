@@ -9,11 +9,10 @@
  * Sets a display name for easier debugging in React DevTools.
  */
 
+import type { ComponentType, ReactElement } from "react";
 import type { JSX } from "react/jsx-runtime";
 
-import React from "react";
-
-import ErrorBoundary from "./ErrorBoundary";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 /**
  * Interface for the wrapped component returned by withErrorBoundary.
@@ -52,11 +51,11 @@ interface WrappedErrorBoundaryComponent<P extends object> {
  *
  * @public
  */
-const withErrorBoundary = <P extends object>(
-    Component: React.ComponentType<P>,
-    fallback?: React.ComponentType<{ error?: Error; onRetry: () => void }>
+export const withErrorBoundary = <P extends object>(
+    Component: ComponentType<P>,
+    fallback?: ComponentType<{ error?: Error; onRetry: () => void }>
 ): WrappedErrorBoundaryComponent<P> => {
-    const WrappedComponent = (properties: P): React.ReactElement => (
+    const WrappedComponent = (properties: P): ReactElement => (
         <ErrorBoundary {...(fallback ? { fallback } : {})}>
             <Component {...properties} />
         </ErrorBoundary>
@@ -68,5 +67,3 @@ const withErrorBoundary = <P extends object>(
 
     return WrappedComponent;
 };
-
-export default withErrorBoundary;

@@ -30,10 +30,12 @@
  */
 
 import type { FormFieldBaseProperties } from "@shared/types/componentProps";
-import type { ReactElement, ReactNode } from "react";
+import type { NamedExoticComponent, ReactElement, ReactNode } from "react";
+
+import { memo } from "react";
 
 import { createAriaLabel, getAriaDescribedBy } from "./form-utils";
-import FormField from "./FormField";
+import { FormField } from "./FormField";
 
 /**
  * ARIA properties that are automatically generated for form inputs.
@@ -66,34 +68,33 @@ export interface BaseFormFieldProperties extends FormFieldBaseProperties {
  *
  * @public
  */
-export const BaseFormField = ({
-    children,
-    error,
-    helpText,
-    id,
-    label,
-    required = false,
-}: BaseFormFieldProperties): ReactElement => {
-    // Generate ARIA properties
-    const ariaLabel = createAriaLabel(label, required);
-    const ariaDescribedBy = getAriaDescribedBy(id, error, helpText);
+export const BaseFormField: NamedExoticComponent<BaseFormFieldProperties> =
+    memo(function BaseFormField({
+        children,
+        error,
+        helpText,
+        id,
+        label,
+        required = false,
+    }: BaseFormFieldProperties): ReactElement {
+        // Generate ARIA properties
+        const ariaLabel = createAriaLabel(label, required);
+        const ariaDescribedBy = getAriaDescribedBy(id, error, helpText);
 
-    const ariaProps: AriaProperties = {
-        "aria-label": ariaLabel,
-        ...(ariaDescribedBy && { "aria-describedby": ariaDescribedBy }),
-    };
+        const ariaProps: AriaProperties = {
+            "aria-label": ariaLabel,
+            ...(ariaDescribedBy && { "aria-describedby": ariaDescribedBy }),
+        };
 
-    return (
-        <FormField
-            {...(error !== undefined && { error })}
-            {...(helpText !== undefined && { helpText })}
-            id={id}
-            label={label}
-            required={required}
-        >
-            {children(ariaProps)}
-        </FormField>
-    );
-};
-
-export default BaseFormField;
+        return (
+            <FormField
+                {...(error !== undefined && { error })}
+                {...(helpText !== undefined && { helpText })}
+                id={id}
+                label={label}
+                required={required}
+            >
+                {children(ariaProps)}
+            </FormField>
+        );
+    });

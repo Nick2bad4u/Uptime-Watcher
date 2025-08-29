@@ -38,8 +38,8 @@
 
 import type { JSX } from "react/jsx-runtime";
 
-import ThemedBox from "../../../theme/components/ThemedBox";
-import ThemedText from "../../../theme/components/ThemedText";
+import { ThemedBox } from "../../../theme/components/ThemedBox";
+import { ThemedText } from "../../../theme/components/ThemedText";
 
 /**
  * Empty state component for displaying when no sites are configured.

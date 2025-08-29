@@ -4,16 +4,14 @@
 
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
-import React from "react";
-
-import ThemedBox from "../../theme/components/ThemedBox";
-import ThemedButton from "../../theme/components/ThemedButton";
-import ThemedText from "../../theme/components/ThemedText";
+import { ThemedBox } from "../../theme/components/ThemedBox";
+import { ThemedButton } from "../../theme/components/ThemedButton";
+import { ThemedText } from "../../theme/components/ThemedText";
 
 /**
  * Props for the FormErrorAlert component
  */
-export interface FormErrorAlertProps extends CoreComponentProperties {
+export interface FormErrorAlertProperties extends CoreComponentProperties {
     /** Error message to display */
     readonly error: null | string;
     /** Whether dark theme is active */
@@ -39,7 +37,7 @@ export interface FormErrorAlertProps extends CoreComponentProperties {
  *
  * @returns Themed error alert component
  */
-export const FormErrorAlert: React.FC<FormErrorAlertProps> = ({
+export const FormErrorAlert: React.FC<FormErrorAlertProperties> = ({
     className = "",
     error,
     isDark = false,

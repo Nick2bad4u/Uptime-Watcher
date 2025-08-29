@@ -3,7 +3,7 @@ import type { MonitorStatus } from "../../../../../../shared/types/configTypes";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import ThemeProvider from "../../../../../theme/components/ThemeProvider";
+import { ThemeProvider } from "../../../../../theme/components/ThemeProvider";
 import { createValidMonitor } from "../../../../../../shared/test/testHelpers";
 
 import {

@@ -5,7 +5,7 @@ import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
 // Mock logger service with inline functions
 vi.mock("../../../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),
@@ -14,7 +14,7 @@ vi.mock("../../../services/logger", () => ({
 }));
 
 // Import the mocked logger to access the spies
-import logger from "../../../services/logger";
+import { logger } from "../../../services/logger";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 
 // Mock the handleSubmit function
@@ -138,7 +138,7 @@ vi.mock("../../../hooks/useDynamicHelpText", () => ({
 
 // Mock the component fields to intercept user interactions
 vi.mock("../../../components/AddSiteForm/SelectField", () => ({
-    default: ({ onChange, options, id }: any) => (
+    SelectField: ({ onChange, options, id }: any) => (
         <select data-testid={id} onChange={(e) => onChange?.(e.target.value)}>
             {options?.map((option: any) => (
                 <option key={option.value} value={option.value}>
@@ -154,7 +154,7 @@ vi.mock("../../../components/AddSiteForm/SelectField", () => ({
 }));
 
 vi.mock("../../../components/AddSiteForm/RadioGroup", () => ({
-    default: ({ onChange, options, id }: any) => (
+    RadioGroup: ({ onChange, options, id }: any) => (
         <div data-testid={id}>
             {options?.map((option: any) => (
                 <label key={option.value}>
@@ -180,7 +180,7 @@ vi.mock("../../../components/AddSiteForm/RadioGroup", () => ({
 }));
 
 vi.mock("../../../components/AddSiteForm/TextField", () => ({
-    default: ({ onChange, id, type }: any) => (
+    TextField: ({ onChange, id, type }: any) => (
         <input
             data-testid={id}
             type={type || "text"}
@@ -190,7 +190,7 @@ vi.mock("../../../components/AddSiteForm/TextField", () => ({
 }));
 
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
-    default: ({ monitorType: _monitorType }: any) => (
+    DynamicMonitorFields: ({ monitorType: _monitorType }: any) => (
         <div data-testid="dynamic-monitor-fields">
             <input data-testid="host" />
             <input data-testid="port" type="number" />
@@ -239,13 +239,13 @@ vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
 }));
 
 vi.mock("../../theme/components/ThemedBox", () => ({
-    default: ({ children }: any) => (
+    ThemedBox: ({ children }: any) => (
         <div className="themed-box">{children}</div>
     ),
 }));
 
 vi.mock("../../theme/components/ThemedButton", () => ({
-    default: ({ children, onClick, type }: any) => (
+    ThemedButton: ({ children, onClick, type }: any) => (
         <button className="themed-button" onClick={onClick} type={type}>
             {children}
         </button>
@@ -253,7 +253,7 @@ vi.mock("../../theme/components/ThemedButton", () => ({
 }));
 
 vi.mock("../../theme/components/ThemedText", () => ({
-    default: ({ children }: any) => (
+    ThemedText: ({ children }: any) => (
         <span className="themed-text">{children}</span>
     ),
 }));

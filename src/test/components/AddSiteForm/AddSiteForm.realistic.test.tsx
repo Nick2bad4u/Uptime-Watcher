@@ -74,7 +74,7 @@ vi.mock("../../../constants", () => ({
 
 // Mock other components
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
-    default: ({ monitorType }: { monitorType: string }) => {
+    DynamicMonitorFields: ({ monitorType }: { monitorType: string }) => {
         if (monitorType === "http") {
             return (
                 <div className="flex flex-col gap-2">

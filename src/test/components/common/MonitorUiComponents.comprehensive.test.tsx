@@ -20,7 +20,7 @@ vi.mock("../../../utils/monitorUiHelpers", () => ({
     formatMonitorDetail: vi.fn(),
 }));
 
-import logger from "../../../services/logger";
+import { logger } from "../../../services/logger";
 import {
     supportsResponseTime,
     formatMonitorDetail,

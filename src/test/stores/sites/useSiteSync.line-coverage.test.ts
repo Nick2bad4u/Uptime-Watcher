@@ -43,7 +43,7 @@ vi.mock("../../../types/ipc", () => ({
 }));
 
 vi.mock("../../../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
         warn: vi.fn(),
         info: vi.fn(),
@@ -76,7 +76,7 @@ import { SiteService } from "../../../stores/sites/services/SiteService";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { withErrorHandling } from "../../../../shared/utils/errorHandling";
 import { logStoreAction } from "../../../stores/utils";
-import logger from "../../../services/logger";
+import { logger } from "../../../services/logger";
 
 describe("useSiteSync - Line Coverage Completion", () => {
     let mockDeps: any;

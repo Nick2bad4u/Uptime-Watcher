@@ -34,9 +34,9 @@ const dirname = import.meta.dirname;
  * and main/preload processes.
  */
 
-// eslint-disable-next-line no-empty-pattern
-export default defineConfig(({}) => {
+export default defineConfig(() => {
     const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
+    const isTestMode = process.env["NODE_ENV"] === "test";
     return {
         appType: "spa", // Single Page Application
         base: "./", // Ensures relative asset paths for Electron
@@ -117,6 +117,30 @@ export default defineConfig(({}) => {
         json: {
             namedExports: true,
             stringify: true,
+        },
+        optimizeDeps: {
+            // Force dependency optimization to handle large chunks better
+            esbuildOptions: {
+                // Enable code splitting for dependencies to reduce chunk sizes
+                splitting: true,
+                target: "es2024",
+            },
+            // Explicitly include large dependencies for better chunking
+            include: isTestMode
+                ? [
+                      // Exclude react-dom/client in test mode to avoid mocking issues
+                      "react-dom",
+                      "react",
+                      "chart.js",
+                      "react-chartjs-2",
+                  ]
+                : [
+                      "react-dom/client",
+                      "react-dom",
+                      "react",
+                      "chart.js",
+                      "react-chartjs-2",
+                  ],
         },
         plugins: [
             // CSS Modules patch to fix Vite's CSS Modules handling
@@ -552,7 +576,7 @@ export default defineConfig(({}) => {
                     "benchmarks/**", // Exclude all benchmark files from coverage
                     "html/**", // Exclude generated HTML files
                     "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-                    "**/*.bench.{js,mjs,cjs,ts,mts,cts,jsx,tsx}", // Exclude benchmark files
+                    "**/*.bench.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}", // Exclude benchmark files
                 ],
                 experimentalAstAwareRemapping: true, // Enable AST-aware remapping for accurate coverage
                 ignoreEmptyLines: true, // Ignore empty lines, comments, and TypeScript interfaces
@@ -630,7 +654,6 @@ export default defineConfig(({}) => {
             globals: true, // Enable global test functions (describe, it, expect)
             include: [
                 "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-                // Shared tests now have their own dedicated config (vitest.shared.config.ts)
             ],
             includeTaskLocations: true,
             isolate: true,

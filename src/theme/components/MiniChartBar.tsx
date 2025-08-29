@@ -4,9 +4,9 @@
 
 import type { MonitorStatus, SiteStatus } from "@shared/types";
 import type { CoreComponentProperties } from "@shared/types/componentProps";
-import type { JSX } from "react/jsx-runtime";
+import type { CSSProperties, JSX, NamedExoticComponent } from "react";
 
-import React, { useMemo } from "react";
+import { memo, useMemo } from "react";
 
 import { formatResponseTime } from "../../utils/time";
 import { useTheme } from "../useTheme";
@@ -25,34 +25,34 @@ export interface MiniChartBarProperties extends CoreComponentProperties {
     readonly timestamp: Date | number | string;
 }
 
-const MiniChartBar = ({
-    className = "",
-    responseTime,
-    status,
-    timestamp,
-}: MiniChartBarProperties): JSX.Element => {
-    const { currentTheme, getStatusColor } = useTheme();
+export const MiniChartBar: NamedExoticComponent<MiniChartBarProperties> = memo(
+    function MiniChartBar({
+        className = "",
+        responseTime,
+        status,
+        timestamp,
+    }: MiniChartBarProperties): JSX.Element {
+        const { currentTheme, getStatusColor } = useTheme();
 
-    const styles = useMemo(
-        (): React.CSSProperties => ({
-            backgroundColor: getStatusColor(status),
-            borderRadius: currentTheme.borderRadius.sm,
-            height: "32px",
-            width: "8px",
-        }),
-        [
-            currentTheme.borderRadius.sm,
-            getStatusColor,
-            status,
-        ]
-    );
-    return (
-        <div
-            className={`themed-mini-chart-bar ${className}`}
-            style={styles}
-            title={`${status} - ${formatResponseTime(responseTime)} at ${new Date(timestamp).toLocaleString()}`}
-        />
-    );
-};
-
-export default MiniChartBar;
+        const styles = useMemo(
+            (): CSSProperties => ({
+                backgroundColor: getStatusColor(status),
+                borderRadius: currentTheme.borderRadius.sm,
+                height: "32px",
+                width: "8px",
+            }),
+            [
+                currentTheme.borderRadius.sm,
+                getStatusColor,
+                status,
+            ]
+        );
+        return (
+            <div
+                className={`themed-mini-chart-bar ${className}`}
+                style={styles}
+                title={`${status} - ${formatResponseTime(responseTime)} at ${new Date(timestamp).toLocaleString()}`}
+            />
+        );
+    }
+);

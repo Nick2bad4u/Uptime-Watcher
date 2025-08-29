@@ -6,9 +6,9 @@
 
 import type { Site } from "@shared/types";
 
-import React from "react";
+import { type ChangeEvent, memo, type NamedExoticComponent } from "react";
 
-import ThemedText from "../../../theme/components/ThemedText";
+import { ThemedText } from "../../../theme/components/ThemedText";
 import { ActionButtonGroup } from "./components/ActionButtonGroup";
 import { MonitorSelector } from "./components/MonitorSelector";
 
@@ -31,7 +31,7 @@ export interface InteractionHandlers {
     /** Handler for immediate check button */
     onCheckNow: () => void;
     /** Handler for monitor selection changes */
-    onMonitorIdChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+    onMonitorIdChange: (event: ChangeEvent<HTMLSelectElement>) => void;
     /** Handler for start monitoring button */
     onStartMonitoring: () => void;
     /** Handler for start site monitoring button */
@@ -63,7 +63,7 @@ export interface MonitoringConfig {
  *
  * @public
  */
-export interface SiteCardHeaderProps {
+export interface SiteCardHeaderProperties {
     /** Display and UI options */
     readonly display: DisplayOptions;
     /** User interaction handlers */
@@ -102,13 +102,13 @@ export interface SiteInfo {
  *
  * @returns JSX.Element containing site header with controls
  */
-export const SiteCardHeader: React.NamedExoticComponent<SiteCardHeaderProps> =
-    React.memo(function SiteCardHeader({
+export const SiteCardHeader: NamedExoticComponent<SiteCardHeaderProperties> =
+    memo(function SiteCardHeader({
         display,
         interactions,
         monitoring,
         site,
-    }: SiteCardHeaderProps) {
+    }: SiteCardHeaderProperties) {
         // Alias interaction handlers to satisfy react/jsx-handler-names rule
         const {
             onCheckNow: handleCheckNow,

@@ -10,10 +10,10 @@
  *   DOM.
  */
 
-import React from "react";
-import ReactDOM from "react-dom/client";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 
-import App from "./App";
+import { App } from "./App";
 import "./index.css";
 
 /**
@@ -23,7 +23,7 @@ import "./index.css";
  * - Locates the root DOM element by ID ("root").
  * - Throws an error if the root element is missing.
  * - Creates a React root and renders the {@link App} component inside
- *   {@link React.StrictMode}.
+ *   {@link StrictMode}.
  *
  * @example
  *
@@ -41,10 +41,10 @@ function initializeApp(): void {
         throw new Error("Root element not found");
     }
 
-    ReactDOM.createRoot(rootElement).render(
-        <React.StrictMode>
+    createRoot(rootElement).render(
+        <StrictMode>
             <App />
-        </React.StrictMode>
+        </StrictMode>
     );
 }
 

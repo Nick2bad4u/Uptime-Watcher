@@ -1,6 +1,6 @@
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
-import React from "react";
+import { type JSX, memo, type NamedExoticComponent } from "react";
 
 /**
  * Props for the ThemedTooltip component
@@ -21,14 +21,15 @@ export interface ThemedTooltipProperties extends CoreComponentProperties {
  *
  * @public
  */
-const ThemedTooltip = ({
+const ThemedTooltipComponent = ({
     children,
     className = "",
     content,
-}: ThemedTooltipProperties): React.JSX.Element => (
+}: ThemedTooltipProperties): JSX.Element => (
     <div className={`themed-tooltip ${className}`} title={content}>
         {children}
     </div>
 );
 
-export default ThemedTooltip;
+export const ThemedTooltip: NamedExoticComponent<ThemedTooltipProperties> =
+    memo(ThemedTooltipComponent);

@@ -6,12 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Simple mocks without complex implementations
 vi.mock("react-dom/client", () => ({
-    default: {
-        createRoot: vi.fn(() => ({
-            render: vi.fn(),
-            unmount: vi.fn(),
-        })),
-    },
+    createRoot: vi.fn(() => ({
+        render: vi.fn(),
+        unmount: vi.fn(),
+    })),
 }));
 
 vi.mock("../App", () => ({

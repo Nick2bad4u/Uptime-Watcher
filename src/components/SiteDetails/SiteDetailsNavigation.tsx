@@ -10,11 +10,11 @@ import type { UnknownRecord } from "type-fest";
 
 import React, { useCallback } from "react";
 
-import logger from "../../services/logger";
-import ThemedBox from "../../theme/components/ThemedBox";
-import ThemedButton from "../../theme/components/ThemedButton";
-import ThemedSelect from "../../theme/components/ThemedSelect";
-import ThemedText from "../../theme/components/ThemedText";
+import { logger } from "../../services/logger";
+import { ThemedBox } from "../../theme/components/ThemedBox";
+import { ThemedButton } from "../../theme/components/ThemedButton";
+import { ThemedSelect } from "../../theme/components/ThemedSelect";
+import { ThemedText } from "../../theme/components/ThemedText";
 import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
 
 /**

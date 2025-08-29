@@ -5,12 +5,12 @@
 
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
-import React from "react";
-import ThemedBox from "../../theme/components/ThemedBox";
-import ThemeProvider from "../../theme/components/ThemeProvider";
+import { createElement, type ReactElement } from "react";
+import { ThemedBox } from "../../theme/components/ThemedBox";
+import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
-const renderWithTheme = (component: React.ReactElement) =>
-    render(<ThemeProvider>{component}</ThemeProvider>);
+const renderWithTheme = (component: ReactElement) =>
+    render(createElement(ThemeProvider, { children: component }));
 
 describe("ThemedBox - Keyboard Interaction Coverage", () => {
     describe("onKeyDown handler coverage (lines 111-113)", () => {

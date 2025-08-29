@@ -6,9 +6,9 @@
  * React portals for the overlay positioning.
  */
 
-import type { JSX } from "react/jsx-runtime";
+import type { CSSProperties, JSX, MouseEvent } from "react";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { UI_DELAYS } from "../../constants";
@@ -46,8 +46,7 @@ export const ScreenshotThumbnail = ({
     url,
 }: ScreenshotThumbnailProperties): JSX.Element => {
     const [hovered, setHovered] = useState(false);
-    const [overlayVariables, setOverlayVariables] =
-        useState<React.CSSProperties>({});
+    const [overlayVariables, setOverlayVariables] = useState<CSSProperties>({});
     const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(
         null
     );
@@ -117,7 +116,7 @@ export const ScreenshotThumbnail = ({
     );
 
     const handleClick = useCallback(
-        (event: React.MouseEvent) => {
+        (event: MouseEvent) => {
             event.preventDefault();
             openExternal(url, { siteName });
         },
@@ -162,7 +161,7 @@ export const ScreenshotThumbnail = ({
                 "--overlay-left": `${left}px`,
                 "--overlay-top": `${top}px`,
                 "--overlay-width": `${overlayW}px`,
-            } as React.CSSProperties);
+            } as CSSProperties);
         }
     }, [hovered]);
 

@@ -7,11 +7,11 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ActionButtonGroup } from "../../components/Dashboard/SiteCard/components/ActionButtonGroup";
-import ThemeProvider from "../../theme/components/ThemeProvider";
+import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
 // Mock ThemedButton
 vi.mock("../../theme/components/ThemedButton", () => ({
-    default: ({
+    ThemedButton: ({
         children,
         onClick,
         disabled,

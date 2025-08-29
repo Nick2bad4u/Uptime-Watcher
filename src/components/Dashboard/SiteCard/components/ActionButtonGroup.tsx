@@ -6,9 +6,14 @@
  * with consistent theming and accessibility support.
  */
 
-import React, { useCallback } from "react";
+import {
+    memo,
+    type MouseEvent,
+    type NamedExoticComponent,
+    useCallback,
+} from "react";
 
-import ThemedButton from "../../../../theme/components/ThemedButton";
+import { ThemedButton } from "../../../../theme/components/ThemedButton";
 import { SiteMonitoringButton } from "../../../common/SiteMonitoringButton/SiteMonitoringButton";
 
 /**
@@ -70,8 +75,8 @@ export interface ActionButtonGroupProperties {
  *
  * @returns JSX element containing action buttons
  */
-export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProperties> =
-    React.memo(function ActionButtonGroup({
+export const ActionButtonGroup: NamedExoticComponent<ActionButtonGroupProperties> =
+    memo(function ActionButtonGroup({
         allMonitorsRunning,
         disabled,
         isLoading,
@@ -85,7 +90,7 @@ export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProp
         // Create individual wrapped handlers for each button with event
         // propagation control
         const handleCheckNowClick = useCallback(
-            (event?: React.MouseEvent<HTMLButtonElement>) => {
+            (event?: MouseEvent<HTMLButtonElement>) => {
                 event?.stopPropagation();
                 onCheckNow();
             },
@@ -93,7 +98,7 @@ export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProp
         );
 
         const handleStartMonitoringClick = useCallback(
-            (event?: React.MouseEvent<HTMLButtonElement>) => {
+            (event?: MouseEvent<HTMLButtonElement>) => {
                 event?.stopPropagation();
                 onStartMonitoring();
             },
@@ -101,7 +106,7 @@ export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProp
         );
 
         const handleStopMonitoringClick = useCallback(
-            (event?: React.MouseEvent<HTMLButtonElement>) => {
+            (event?: MouseEvent<HTMLButtonElement>) => {
                 event?.stopPropagation();
                 onStopMonitoring();
             },

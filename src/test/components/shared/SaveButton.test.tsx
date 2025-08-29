@@ -9,12 +9,12 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
     SaveButton,
-    type SaveButtonProps,
+    type SaveButtonProperties,
 } from "../../../components/shared/SaveButton";
 
 // Mock themed components and react-icons
 vi.mock("../../../theme/components/ThemedButton", () => ({
-    default: ({
+    ThemedButton: ({
         children,
         className,
         disabled,
@@ -46,7 +46,7 @@ vi.mock("react-icons/fi", () => ({
 }));
 
 describe("SaveButton", () => {
-    const defaultProps: SaveButtonProps = {
+    const defaultProps: SaveButtonProperties = {
         onClick: vi.fn(),
     };
 

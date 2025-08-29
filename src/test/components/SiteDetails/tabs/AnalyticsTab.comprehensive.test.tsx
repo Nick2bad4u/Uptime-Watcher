@@ -15,13 +15,25 @@ import type {
 
 // Mock all external dependencies
 vi.mock("../../../../services/logger", () => ({
-    default: {
+    logger: {
         debug: vi.fn(),
         error: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),
+        app: {
+            started: vi.fn(),
+            error: vi.fn(),
+        },
+        site: {
+            error: vi.fn(),
+            info: vi.fn(),
+        },
         user: {
             action: vi.fn(),
+        },
+        system: {
+            error: vi.fn(),
+            info: vi.fn(),
         },
     },
 }));
@@ -109,7 +121,7 @@ vi.mock("../../../../utils/monitorUiHelpers", () => ({
 }));
 
 vi.mock("../../../../components/SiteDetails/charts/ResponseTimeChart", () => ({
-    default: () => (
+    ResponseTimeChart: () => (
         <div data-testid="response-time-chart" data-chart-type="line">
             Line Chart
         </div>
@@ -117,7 +129,7 @@ vi.mock("../../../../components/SiteDetails/charts/ResponseTimeChart", () => ({
 }));
 
 vi.mock("../../../../components/SiteDetails/charts/StatusChart", () => ({
-    default: () => (
+    StatusChart: () => (
         <div data-testid="status-chart" data-chart-type="bar">
             Bar Chart
         </div>
@@ -125,7 +137,7 @@ vi.mock("../../../../components/SiteDetails/charts/StatusChart", () => ({
 }));
 
 vi.mock("../../../../components/SiteDetails/charts/UptimeChart", () => ({
-    default: () => (
+    UptimeChart: () => (
         <div data-testid="uptime-chart" data-chart-type="doughnut">
             Doughnut Chart
         </div>

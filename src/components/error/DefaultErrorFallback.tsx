@@ -2,12 +2,12 @@
  * Default fallback component for error boundaries
  */
 
-import React, { useCallback } from "react";
+import { type FC, useCallback } from "react";
 
 /**
  * Default fallback component for error boundary
  */
-export const DefaultErrorFallback: React.FC<{
+export const DefaultErrorFallback: FC<{
     /** Error object containing details about what went wrong */
     readonly error?: Error;
     /** Callback function to retry the failed operation */

@@ -45,10 +45,10 @@
 import type { MonitorStatus } from "@shared/types";
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
-import React from "react";
+import { memo, type NamedExoticComponent } from "react";
 
-import StatusIndicator from "../../theme/components/StatusIndicator";
-import ThemedText from "../../theme/components/ThemedText";
+import { StatusIndicator } from "../../theme/components/StatusIndicator";
+import { ThemedText } from "../../theme/components/ThemedText";
 
 /**
  * Props for the StatusBadge component
@@ -86,8 +86,8 @@ export interface StatusBadgeProperties extends CoreComponentProperties {
  *
  * @returns JSX element containing status indicator and text
  */
-export const StatusBadge: React.NamedExoticComponent<StatusBadgeProperties> =
-    React.memo(function StatusBadge({
+export const StatusBadge: NamedExoticComponent<StatusBadgeProperties> = memo(
+    function StatusBadge({
         className = "",
         formatter,
         label,
@@ -145,4 +145,5 @@ export const StatusBadge: React.NamedExoticComponent<StatusBadgeProperties> =
                 </ThemedText>
             </div>
         );
-    });
+    }
+);

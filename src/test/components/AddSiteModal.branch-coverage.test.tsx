@@ -50,7 +50,7 @@ vi.mock("../../components/AddSiteForm/AddSiteForm", () => ({
 
 // Mock themed components with unique test-ids
 vi.mock("../../theme/components/ThemedBox", () => ({
-    default: ({ children, className, ...props }: any) => (
+    ThemedBox: ({ children, className, ...props }: any) => (
         <div
             data-testid={
                 className?.includes("max-w-2xl")
@@ -66,7 +66,7 @@ vi.mock("../../theme/components/ThemedBox", () => ({
 }));
 
 vi.mock("../../theme/components/ThemedButton", () => ({
-    default: ({ children, onClick, ...props }: any) => (
+    ThemedButton: ({ children, onClick, ...props }: any) => (
         <button data-testid="themed-button" onClick={onClick} {...props}>
             {children}
         </button>
@@ -74,7 +74,7 @@ vi.mock("../../theme/components/ThemedButton", () => ({
 }));
 
 vi.mock("../../theme/components/ThemedText", () => ({
-    default: ({ children, ...props }: any) => (
+    ThemedText: ({ children, ...props }: any) => (
         <span data-testid="themed-text" {...props}>
             {children}
         </span>

@@ -8,12 +8,12 @@ import { describe, expect, it, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
 
 // Import components and utilities needing branch coverage
-import RadioGroup from "../components/AddSiteForm/RadioGroup";
+import { RadioGroup } from "../components/AddSiteForm/RadioGroup";
 import { SettingItem } from "../components/shared/SettingItem";
-import ThemedBox from "../theme/components/ThemedBox";
-import ThemedProgress from "../theme/components/ThemedProgress";
+import { ThemedBox } from "../theme/components/ThemedBox";
+import { ThemedProgress } from "../theme/components/ThemedProgress";
 import { getIconColorClass } from "../theme/components/iconUtils";
-import ThemeProvider from "../theme/components/ThemeProvider";
+import { ThemeProvider } from "../theme/components/ThemeProvider";
 
 describe("Additional Branch Coverage Tests", () => {
     describe("RadioGroup Component", () => {

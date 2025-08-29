@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import React from "react";
+import { type ReactNode } from "react";
 
 // Mock ReactDOM before importing main
 const mockRender = vi.fn();
@@ -13,22 +13,20 @@ const mockCreateRoot = vi.fn(() => ({
 }));
 
 vi.mock("react-dom/client", () => ({
-    default: {
-        createRoot: mockCreateRoot,
-    },
+    createRoot: mockCreateRoot,
 }));
 
 // Mock React
 vi.mock("react", () => ({
     default: {
-        StrictMode: ({ children }: { children: React.ReactNode }) => children,
+        StrictMode: ({ children }: { children: ReactNode }) => children,
     },
-    StrictMode: ({ children }: { children: React.ReactNode }) => children,
+    StrictMode: ({ children }: { children: ReactNode }) => children,
 }));
 
 // Mock App component
 vi.mock("../App", () => ({
-    default: () => "MockedApp",
+    App: () => "MockedApp",
 }));
 
 // Mock CSS imports
@@ -82,14 +80,9 @@ describe("Main Entry Point", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: main", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
         const ReactDOM = await import("react-dom/client");
         expect(ReactDOM).toBeDefined();
-        expect(ReactDOM.default.createRoot).toBeDefined();
+        expect(ReactDOM.createRoot).toBeDefined();
     });
 
     it("should have App component available", async ({ task, annotate }) => {
@@ -104,7 +97,7 @@ describe("Main Entry Point", () => {
         annotate("Type: Business Logic", "type");
 
         const AppModule = await import("../App");
-        expect(AppModule.default).toBeDefined();
+        expect(AppModule.App).toBeDefined();
     });
 
     it("should initialize app when root element exists", async ({

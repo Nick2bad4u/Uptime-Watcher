@@ -95,7 +95,7 @@ vi.mock("../../../components/AddSiteForm/FormFields", () => ({
 }));
 
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
-    default: () => (
+    DynamicMonitorFields: () => (
         <div data-testid="dynamic-monitor-fields">Dynamic fields</div>
     ),
 }));

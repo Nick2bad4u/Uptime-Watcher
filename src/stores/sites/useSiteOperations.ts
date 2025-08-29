@@ -14,7 +14,7 @@ import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
 
-import logger from "../../services/logger";
+import { logger } from "../../services/logger";
 import { safeExtractIpcData } from "../../types/ipc";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
 import { normalizeMonitor } from "./utils/monitorOperations";

@@ -5,7 +5,7 @@
  * for browser-based file downloads.
  */
 
-import logger from "../../../services/logger";
+import { logger } from "../../../services/logger";
 
 /**
  * Options for downloading a file in the browser.

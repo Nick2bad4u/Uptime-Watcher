@@ -14,7 +14,7 @@ import { isDevelopment } from "@shared/utils/environment";
 
 import type { BaseStore } from "./types";
 
-import logger from "../services/logger";
+import { logger } from "../services/logger";
 
 /**
  * Creates a base store slice with common error handling functionality.

@@ -1,11 +1,18 @@
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
-import React, { useCallback, useMemo } from "react";
+import {
+    type CSSProperties,
+    type JSX,
+    memo,
+    type NamedExoticComponent,
+    useCallback,
+    useMemo,
+} from "react";
 
 import type { ProgressSize, ProgressVariant } from "./types";
 
 import { useTheme } from "../useTheme";
-import ThemedText from "./ThemedText";
+import { ThemedText } from "./ThemedText";
 
 /**
  * Props for the ThemedProgress component
@@ -36,7 +43,7 @@ export interface ThemedProgressProperties extends CoreComponentProperties {
  *
  * @public
  */
-const ThemedProgress = ({
+const ThemedProgressComponent = ({
     className = "",
     label,
     max = 100,
@@ -44,7 +51,7 @@ const ThemedProgress = ({
     size = "md",
     value,
     variant = "primary",
-}: ThemedProgressProperties): React.JSX.Element => {
+}: ThemedProgressProperties): JSX.Element => {
     const { currentTheme } = useTheme();
 
     const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
@@ -54,8 +61,14 @@ const ThemedProgress = ({
             case "error": {
                 return currentTheme.colors.error;
             }
+            case "info": {
+                return currentTheme.colors.primary[300];
+            }
             case "primary": {
                 return currentTheme.colors.primary[500];
+            }
+            case "secondary": {
+                return currentTheme.colors.primary[400];
             }
             case "success": {
                 return currentTheme.colors.success;
@@ -86,6 +99,9 @@ const ThemedProgress = ({
             case "sm": {
                 return "6px";
             }
+            case "xl": {
+                return "16px";
+            }
             case "xs": {
                 return "4px";
             }
@@ -96,7 +112,7 @@ const ThemedProgress = ({
     }, [size]);
 
     const containerStyles = useMemo(
-        (): React.CSSProperties => ({
+        (): CSSProperties => ({
             backgroundColor: currentTheme.colors.background.secondary,
             borderRadius: currentTheme.borderRadius.full,
             height: getHeight(),
@@ -112,7 +128,7 @@ const ThemedProgress = ({
     );
 
     const progressStyles = useMemo(
-        (): React.CSSProperties => ({
+        (): CSSProperties => ({
             backgroundColor: getVariantColor(),
             borderRadius: currentTheme.borderRadius.full,
             height: "100%",
@@ -137,7 +153,7 @@ const ThemedProgress = ({
     );
 
     const hiddenProgressStyle = useMemo(
-        (): React.CSSProperties => ({
+        (): CSSProperties => ({
             left: "-9999px",
             position: "absolute" as const,
             top: "-9999px",
@@ -169,4 +185,5 @@ const ThemedProgress = ({
     );
 };
 
-export default ThemedProgress;
+export const ThemedProgress: NamedExoticComponent<ThemedProgressProperties> =
+    memo(ThemedProgressComponent);

@@ -30,7 +30,7 @@ import type { CoreComponentProperties } from "@shared/types/componentProps";
 
 import React, { useCallback } from "react";
 
-import ThemedButton from "../../../theme/components/ThemedButton";
+import { ThemedButton } from "../../../theme/components/ThemedButton";
 
 /**
  * Props for the SiteMonitoringButton component.

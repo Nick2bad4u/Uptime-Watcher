@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import React from "react";
+import { type ReactNode } from "react";
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
 // Mock external dependencies
@@ -115,7 +115,7 @@ vi.mock("../../../components/AddSiteForm/FormFields", () => ({
         children,
     }: {
         label: string;
-        children: React.ReactNode;
+        children: ReactNode;
     }) => (
         <div data-testid="radio-group">
             <label>{label}</label>
@@ -157,7 +157,7 @@ vi.mock("../../../components/AddSiteForm/FormFields", () => ({
 }));
 
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
-    default: ({ monitorType }: { monitorType: string }) => (
+    DynamicMonitorFields: ({ monitorType }: { monitorType: string }) => (
         <div data-testid="dynamic-monitor-fields">
             Dynamic fields for {monitorType}
         </div>

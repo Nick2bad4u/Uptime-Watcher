@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import logger from "../../services/logger";
+import { logger } from "../../services/logger";
 
 describe("Logger Service - Basic Tests", () => {
     it("should have logger instance available", async ({ task, annotate }) => {

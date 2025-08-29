@@ -9,12 +9,12 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
     FormErrorAlert,
-    type FormErrorAlertProps,
+    type FormErrorAlertProperties,
 } from "../../../components/shared/FormErrorAlert";
 
 // Mock themed components
 vi.mock("../../../theme/components/ThemedBox", () => ({
-    default: ({ children, className, variant }: any) => (
+    ThemedBox: ({ children, className, variant }: any) => (
         <div
             data-testid="themed-box"
             className={className}
@@ -26,7 +26,7 @@ vi.mock("../../../theme/components/ThemedBox", () => ({
 }));
 
 vi.mock("../../../theme/components/ThemedText", () => ({
-    default: ({ children, size, variant }: any) => (
+    ThemedText: ({ children, size, variant }: any) => (
         <span data-testid="themed-text" data-size={size} data-variant={variant}>
             {children}
         </span>
@@ -34,7 +34,7 @@ vi.mock("../../../theme/components/ThemedText", () => ({
 }));
 
 vi.mock("../../../theme/components/ThemedButton", () => ({
-    default: ({
+    ThemedButton: ({
         children,
         className,
         onClick,
@@ -56,7 +56,7 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
 }));
 
 describe("FormErrorAlert", () => {
-    const defaultProps: FormErrorAlertProps = {
+    const defaultProps: FormErrorAlertProperties = {
         error: "Test error message",
         onClearError: vi.fn(),
     };

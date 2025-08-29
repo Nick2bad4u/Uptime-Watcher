@@ -41,7 +41,7 @@ Object.defineProperty(globalThis, "confirm", {
 
 // Mock logger
 vi.mock("../../../services/logger", () => ({
-    default: {
+    logger: {
         warn: vi.fn(),
         error: vi.fn(),
         user: {

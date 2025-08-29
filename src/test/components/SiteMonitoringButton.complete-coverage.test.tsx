@@ -8,11 +8,11 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 import { SiteMonitoringButton } from "../../components/common/SiteMonitoringButton/SiteMonitoringButton";
-import ThemeProvider from "../../theme/components/ThemeProvider";
+import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
 // Mock ThemedButton component
 vi.mock("../../theme/components/ThemedButton", () => ({
-    default: ({
+    ThemedButton: ({
         children,
         onClick,
         disabled,

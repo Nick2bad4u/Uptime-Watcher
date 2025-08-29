@@ -59,15 +59,23 @@ import type {
     EventHandlers,
 } from "@shared/types/componentProps";
 
-import React, { useCallback, useMemo } from "react";
+import {
+    type CSSProperties,
+    type JSX,
+    memo,
+    type NamedExoticComponent,
+    type ReactNode,
+    useCallback,
+    useMemo,
+} from "react";
 
 import type { BoxPadding, BoxRounded, BoxShadow, BoxVariant } from "./types";
 
 import { TRANSITION_ALL } from "../../constants";
 import { useTheme } from "../useTheme";
 import { renderColoredIcon } from "./iconUtils";
-import ThemedBox from "./ThemedBox";
-import ThemedText from "./ThemedText";
+import { ThemedBox } from "./ThemedBox";
+import { ThemedText } from "./ThemedText";
 
 /**
  * Properties for the ThemedCard component.
@@ -80,7 +88,7 @@ export interface ThemedCardProperties extends CoreComponentProperties {
     /** Whether the card should have hover effects */
     readonly hoverable?: boolean;
     /** Icon element to display in the card header */
-    readonly icon?: React.ReactNode;
+    readonly icon?: ReactNode;
     /** Color theme for the icon (uses theme color names) */
     readonly iconColor?: string;
     /** Click handler for the card */
@@ -133,7 +141,7 @@ export interface ThemedCardProperties extends CoreComponentProperties {
  * @public
  */
 // eslint-disable-next-line complexity -- UI component with many optional props requires conditional logic for flexibility
-const ThemedCard = ({
+const ThemedCardComponent = ({
     children,
     className = "",
     clickable = false,
@@ -149,11 +157,11 @@ const ThemedCard = ({
     subtitle,
     title,
     variant = "primary",
-}: ThemedCardProperties): React.JSX.Element => {
+}: ThemedCardProperties): JSX.Element => {
     const { currentTheme } = useTheme();
 
     const cardStyles = useMemo(
-        (): React.CSSProperties => ({
+        (): CSSProperties => ({
             cursor: clickable ? "pointer" : "default",
             overflow: "hidden",
             position: "relative",
@@ -238,4 +246,11 @@ const ThemedCard = ({
     );
 };
 
-export default ThemedCard;
+/**
+ * Themed card component for content containers with optional headers, icons,
+ * and interactive features.
+ *
+ * @public
+ */
+export const ThemedCard: NamedExoticComponent<ThemedCardProperties> =
+    memo(ThemedCardComponent);

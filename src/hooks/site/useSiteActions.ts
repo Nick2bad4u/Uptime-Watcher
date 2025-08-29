@@ -11,7 +11,7 @@ import type { Monitor, Site } from "@shared/types";
 
 import { useCallback } from "react";
 
-import logger from "../../services/logger";
+import { logger } from "../../services/logger";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { ensureError } from "../../utils/errorHandling";

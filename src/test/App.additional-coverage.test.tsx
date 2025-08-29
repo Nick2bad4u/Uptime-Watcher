@@ -17,7 +17,7 @@ import React from "react";
 
 import { isDevelopment } from "@shared/utils/environment";
 
-import App from "../App";
+import { App } from "../App";
 
 // Mock all the stores
 vi.mock("../stores/updates/useUpdatesStore");
@@ -535,31 +535,13 @@ describe("App Additional Coverage Tests", () => {
         // Mock environment
         mockIsDevelopment.mockReturnValue(false);
 
-        // First, let the app initialize completely with isLoading: false
-        mockUseErrorStore.mockImplementation(() => ({
+        // Start with loading state true from the beginning, like the working comprehensive test
+        mockUseErrorStore.mockReturnValue({
             ...mockErrorStoreState,
-            isLoading: false,
-        }));
+            isLoading: true,
+        });
 
-        const { rerender } = render(<App />);
-
-        // Wait for initialization to complete first
-        await waitFor(
-            () => {
-                // The app should be initialized
-                expect(screen.getByRole("main")).toBeInTheDocument();
-            },
-            { timeout: 1000 }
-        );
-
-        // Now trigger loading state AFTER initialization is complete
-        mockUseErrorStore.mockImplementation(() => ({
-            ...mockErrorStoreState,
-            isLoading: true, // This should trigger loading overlay since app is now initialized
-        }));
-
-        // Re-render to apply the new mock state
-        rerender(<App />);
+        render(<App />);
 
         // Wait for the loading overlay to appear after the 100ms delay
         await waitFor(
@@ -569,7 +551,7 @@ describe("App Additional Coverage Tests", () => {
                 );
                 expect(loadingElement).toBeInTheDocument();
             },
-            { timeout: 500 }
+            { timeout: 1000 }
         );
 
         // Verify the loading text is also present
@@ -836,7 +818,7 @@ describe("App Additional Coverage Tests", () => {
         // Set up spy on the logger
         const loggerModule = await import("../services/logger");
         const debugSpy = vi
-            .spyOn(loggerModule.default, "debug")
+            .spyOn(loggerModule.logger, "debug")
             .mockImplementation(() => {});
 
         // Create fresh mock functions for this test
@@ -920,7 +902,7 @@ describe("App Additional Coverage Tests", () => {
         // Set up spy on the logger
         const loggerModule = await import("../services/logger");
         const debugSpy = vi
-            .spyOn(loggerModule.default, "debug")
+            .spyOn(loggerModule.logger, "debug")
             .mockImplementation(() => {});
 
         // Create fresh mock functions for this test

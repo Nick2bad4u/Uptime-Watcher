@@ -21,7 +21,7 @@ vi.mock("../../../../stores/settings/useSettingsStore", () => ({
 }));
 
 vi.mock("../../../../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
         warn: vi.fn(),
         info: vi.fn(),
@@ -33,7 +33,7 @@ vi.mock("../../../../services/logger", () => ({
 }));
 
 vi.mock("../../../../theme/components/StatusIndicator", () => ({
-    default: ({ children, ...props }: any) => (
+    StatusIndicator: ({ children, ...props }: any) => (
         <div data-testid="status-indicator" {...props}>
             {children}
         </div>
@@ -41,23 +41,23 @@ vi.mock("../../../../theme/components/StatusIndicator", () => ({
 }));
 
 vi.mock("../../../../theme/components/ThemedButton", () => ({
-    default: ({ children, ...props }: any) => (
+    ThemedButton: ({ children, ...props }: any) => (
         <button {...props}>{children}</button>
     ),
 }));
 
 vi.mock("../../../../theme/components/ThemedCard", () => ({
-    default: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    ThemedCard: ({ children, ...props }: any) => <div {...props}>{children}</div>,
 }));
 
 vi.mock("../../../../theme/components/ThemedSelect", () => ({
-    default: ({ children, ...props }: any) => (
+    ThemedSelect: ({ children, ...props }: any) => (
         <select {...props}>{children}</select>
     ),
 }));
 
 vi.mock("../../../../theme/components/ThemedText", () => ({
-    default: ({ children, ...props }: any) => (
+    ThemedText: ({ children, ...props }: any) => (
         <span {...props}>{children}</span>
     ),
 }));

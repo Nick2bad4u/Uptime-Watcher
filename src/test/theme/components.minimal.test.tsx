@@ -5,15 +5,15 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import StatusIndicator from "../../theme/components/StatusIndicator";
-import ThemedBadge from "../../theme/components/ThemedBadge";
-import ThemedBox from "../../theme/components/ThemedBox";
-import ThemedButton from "../../theme/components/ThemedButton";
-import ThemedCard from "../../theme/components/ThemedCard";
-import ThemedCheckbox from "../../theme/components/ThemedCheckbox";
-import ThemedInput from "../../theme/components/ThemedInput";
-import ThemedSelect from "../../theme/components/ThemedSelect";
-import ThemedText from "../../theme/components/ThemedText";
+import { StatusIndicator } from "../../theme/components/StatusIndicator";
+import { ThemedBadge } from "../../theme/components/ThemedBadge";
+import { ThemedBox } from "../../theme/components/ThemedBox";
+import { ThemedButton } from "../../theme/components/ThemedButton";
+import { ThemedCard } from "../../theme/components/ThemedCard";
+import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
+import { ThemedInput } from "../../theme/components/ThemedInput";
+import { ThemedSelect } from "../../theme/components/ThemedSelect";
+import { ThemedText } from "../../theme/components/ThemedText";
 
 describe("Theme Components - Basic Functionality", () => {
     let mockOnClick: ReturnType<typeof vi.fn>;

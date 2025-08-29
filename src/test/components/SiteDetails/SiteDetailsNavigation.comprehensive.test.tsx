@@ -15,7 +15,7 @@ const MockBrowserRouter = ({ children }: { children: React.ReactNode }) => (
 
 // Mock the logger
 vi.mock("../../../services/logger", () => ({
-    default: {
+    logger: {
         user: {
             action: vi.fn(),
         },

@@ -6,7 +6,7 @@ import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { validateMonitorFieldClientSide } from "../../../utils/monitorValidation";
 import { useSelectedSite } from "../../../hooks/useSelectedSite";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
-import logger from "../../../services/logger";
+import { logger } from "../../../services/logger";
 
 // Mock all dependencies
 vi.mock("../../../hooks/useSelectedSite");

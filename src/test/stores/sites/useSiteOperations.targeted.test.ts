@@ -10,7 +10,7 @@ import { ERROR_CATALOG } from "../../../../shared/utils/errorCatalog";
 
 import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperations";
 import type { SiteOperationsDependencies } from "../../../stores/sites/types";
-import logger from "../../../services/logger";
+import { logger } from "../../../services/logger";
 import { isDevelopment } from "../../../../shared/utils/environment";
 
 // Get mock reference after import
@@ -18,7 +18,7 @@ const mockIsDevelopment = vi.mocked(isDevelopment);
 
 // Mock logger to control development mode checks
 vi.mock("../../../services/logger", () => ({
-    default: {
+    logger: {
         warn: vi.fn(),
         error: vi.fn(),
         info: vi.fn(),

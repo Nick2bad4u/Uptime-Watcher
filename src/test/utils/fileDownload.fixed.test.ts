@@ -12,7 +12,7 @@ import {
 
 // Mock the logger service
 vi.mock("../../../services/logger", () => ({
-    default: {
+    logger: {
         warn: vi.fn(),
         error: vi.fn(),
     },
@@ -658,3 +658,4 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
         });
     });
 });
+

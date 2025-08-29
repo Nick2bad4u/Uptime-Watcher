@@ -4,7 +4,7 @@ import type {
     EventHandlers,
 } from "@shared/types/componentProps";
 
-import React from "react";
+import { type JSX, memo, type NamedExoticComponent } from "react";
 
 import { ARIA_LABEL } from "../../constants";
 
@@ -33,14 +33,14 @@ export interface ThemedCheckboxProperties
  *
  * @public
  */
-const ThemedCheckbox = ({
+const ThemedCheckboxComponent = ({
     [ARIA_LABEL]: ariaLabel,
     checked,
     className = "",
     disabled = false,
     onChange,
     required = false,
-}: ThemedCheckboxProperties): React.JSX.Element => (
+}: ThemedCheckboxProperties): JSX.Element => (
     <input
         type="checkbox"
         {...(checked === undefined ? {} : { checked })}
@@ -52,4 +52,5 @@ const ThemedCheckbox = ({
     />
 );
 
-export default ThemedCheckbox;
+export const ThemedCheckbox: NamedExoticComponent<ThemedCheckboxProperties> =
+    memo(ThemedCheckboxComponent);

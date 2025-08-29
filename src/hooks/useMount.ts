@@ -58,7 +58,7 @@
 
 import { useEffect, useRef } from "react";
 
-import logger from "../services/logger";
+import { logger } from "../services/logger";
 import { ensureError } from "../utils/errorHandling";
 
 /**

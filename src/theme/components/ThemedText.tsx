@@ -37,8 +37,9 @@
  */
 
 import type { CoreComponentProperties } from "@shared/types/componentProps";
+import type { CSSProperties, JSX, NamedExoticComponent } from "react";
 
-import React from "react";
+import { memo } from "react";
 
 import type { TextAlign, TextSize, TextVariant, TextWeight } from "./types";
 
@@ -53,7 +54,7 @@ export interface ThemedTextProperties extends CoreComponentProperties {
     /** Font size variant for the text */
     readonly size?: TextSize;
     /** Inline styles to apply to the text element */
-    readonly style?: React.CSSProperties;
+    readonly style?: CSSProperties;
     /** Color and semantic variant for the text */
     readonly variant?: TextVariant;
     /** Font weight for the text */
@@ -61,7 +62,7 @@ export interface ThemedTextProperties extends CoreComponentProperties {
 }
 
 // Default styles object to prevent infinite render loops
-const DEFAULT_THEMED_BOX_STYLE: React.CSSProperties = {};
+const DEFAULT_THEMED_BOX_STYLE: CSSProperties = {};
 
 /**
  * Themed text component with comprehensive typography styling options.
@@ -86,31 +87,31 @@ const DEFAULT_THEMED_BOX_STYLE: React.CSSProperties = {};
  *
  * @public
  */
-const ThemedText = ({
-    align = "left",
-    children,
-    className = "",
-    size = "base",
-    style = DEFAULT_THEMED_BOX_STYLE,
-    variant = "primary",
-    weight = "normal",
-}: ThemedTextProperties): React.JSX.Element => {
-    const classNames = [
-        "themed-text",
-        `themed-text--${variant}`,
-        `themed-text--size-${size}`,
-        `themed-text--weight-${weight}`,
-        `themed-text--align-${align}`,
-        className,
-    ]
-        .filter(Boolean)
-        .join(" ");
+export const ThemedText: NamedExoticComponent<ThemedTextProperties> = memo(
+    function ThemedText({
+        align = "left",
+        children,
+        className = "",
+        size = "base",
+        style = DEFAULT_THEMED_BOX_STYLE,
+        variant = "primary",
+        weight = "normal",
+    }: ThemedTextProperties): JSX.Element {
+        const classNames = [
+            "themed-text",
+            `themed-text--${variant}`,
+            `themed-text--size-${size}`,
+            `themed-text--weight-${weight}`,
+            `themed-text--align-${align}`,
+            className,
+        ]
+            .filter(Boolean)
+            .join(" ");
 
-    return (
-        <span className={classNames} style={style}>
-            {children}
-        </span>
-    );
-};
-
-export default ThemedText;
+        return (
+            <span className={classNames} style={style}>
+                {children}
+            </span>
+        );
+    }
+);

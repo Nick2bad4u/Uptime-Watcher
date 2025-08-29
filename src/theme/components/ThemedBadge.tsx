@@ -39,7 +39,7 @@
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 import type React from "react";
 
-import { useMemo } from "react";
+import { memo, type NamedExoticComponent, useMemo } from "react";
 
 import type { BadgeSize, BadgeVariant } from "./types";
 
@@ -91,147 +91,149 @@ export interface ThemedBadgeProperties extends CoreComponentProperties {
  *
  * @public
  */
-const ThemedBadge = ({
-    children,
-    className = "",
-    icon,
-    iconColor,
-    size = "md",
-    variant = "primary",
-}: ThemedBadgeProperties): React.JSX.Element => {
-    const { currentTheme } = useTheme();
+export const ThemedBadge: NamedExoticComponent<ThemedBadgeProperties> = memo(
+    function ThemedBadge({
+        children,
+        className = "",
+        icon,
+        iconColor,
+        size = "md",
+        variant = "primary",
+    }: ThemedBadgeProperties): React.JSX.Element {
+        const { currentTheme } = useTheme();
 
-    const combinedStyle = useMemo(() => {
-        const badgeStyle: React.CSSProperties = {
-            alignItems: "center",
-            border: "1px solid",
-            borderRadius: currentTheme.borderRadius.full,
-            cursor: "default",
-            display: "inline-flex",
-            fontFamily: currentTheme.typography.fontFamily.sans.join(", "),
-            fontWeight: currentTheme.typography.fontWeight.medium,
-            gap: currentTheme.spacing.xs,
-            justifyContent: "center",
-            lineHeight: currentTheme.typography.lineHeight.tight,
-            transition: "all 150ms ease-in-out",
-            userSelect: "none",
-            whiteSpace: "nowrap",
-        };
+        const combinedStyle = useMemo(() => {
+            const badgeStyle: React.CSSProperties = {
+                alignItems: "center",
+                border: "1px solid",
+                borderRadius: currentTheme.borderRadius.full,
+                cursor: "default",
+                display: "inline-flex",
+                fontFamily: currentTheme.typography.fontFamily.sans.join(", "),
+                fontWeight: currentTheme.typography.fontWeight.medium,
+                gap: currentTheme.spacing.xs,
+                justifyContent: "center",
+                lineHeight: currentTheme.typography.lineHeight.tight,
+                transition: "all 150ms ease-in-out",
+                userSelect: "none",
+                whiteSpace: "nowrap",
+            };
 
-        const sizeStyles = {
-            lg: {
-                fontSize: currentTheme.typography.fontSize.base,
-                padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.lg}`,
-            },
-            md: {
-                fontSize: currentTheme.typography.fontSize.sm,
-                padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
-            },
-            sm: {
-                fontSize: currentTheme.typography.fontSize.sm,
-                padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
-            },
-            xs: {
-                fontSize: currentTheme.typography.fontSize.xs,
-                padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
-            },
-        } as const;
+            const sizeStyles = {
+                lg: {
+                    fontSize: currentTheme.typography.fontSize.base,
+                    padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.lg}`,
+                },
+                md: {
+                    fontSize: currentTheme.typography.fontSize.sm,
+                    padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
+                },
+                sm: {
+                    fontSize: currentTheme.typography.fontSize.sm,
+                    padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
+                },
+                xs: {
+                    fontSize: currentTheme.typography.fontSize.xs,
+                    padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
+                },
+            } as const;
 
-        const variantStyles = {
-            error: {
-                backgroundColor: `${currentTheme.colors.error}20`,
-                borderColor: `${currentTheme.colors.error}40`,
-                color: currentTheme.colors.error,
-            },
-            info: {
-                backgroundColor: `${currentTheme.colors.primary[500]}20`,
-                borderColor: `${currentTheme.colors.primary[500]}40`,
-                color: currentTheme.colors.primary[600],
-            },
-            primary: {
-                backgroundColor: currentTheme.colors.primary[100],
-                borderColor: currentTheme.colors.primary[200],
-                color: currentTheme.colors.primary[700],
-            },
-            secondary: {
-                backgroundColor: currentTheme.colors.background.secondary,
-                borderColor: currentTheme.colors.border.secondary,
-                color: currentTheme.colors.text.secondary,
-            },
-            success: {
-                backgroundColor: `${currentTheme.colors.success}20`,
-                borderColor: `${currentTheme.colors.success}40`,
-                color: currentTheme.colors.success,
-            },
-            warning: {
-                backgroundColor: `${currentTheme.colors.warning}20`,
-                borderColor: `${currentTheme.colors.warning}40`,
-                color: currentTheme.colors.warning,
-            },
-        } as const;
+            const variantStyles = {
+                error: {
+                    backgroundColor: `${currentTheme.colors.error}20`,
+                    borderColor: `${currentTheme.colors.error}40`,
+                    color: currentTheme.colors.error,
+                },
+                info: {
+                    backgroundColor: `${currentTheme.colors.primary[500]}20`,
+                    borderColor: `${currentTheme.colors.primary[500]}40`,
+                    color: currentTheme.colors.primary[600],
+                },
+                primary: {
+                    backgroundColor: currentTheme.colors.primary[100],
+                    borderColor: currentTheme.colors.primary[200],
+                    color: currentTheme.colors.primary[700],
+                },
+                secondary: {
+                    backgroundColor: currentTheme.colors.background.secondary,
+                    borderColor: currentTheme.colors.border.secondary,
+                    color: currentTheme.colors.text.secondary,
+                },
+                success: {
+                    backgroundColor: `${currentTheme.colors.success}20`,
+                    borderColor: `${currentTheme.colors.success}40`,
+                    color: currentTheme.colors.success,
+                },
+                warning: {
+                    backgroundColor: `${currentTheme.colors.warning}20`,
+                    borderColor: `${currentTheme.colors.warning}40`,
+                    color: currentTheme.colors.warning,
+                },
+            } as const;
 
-        // Type-safe style lookup with fallbacks for custom values
-        const getSizeStyle = (sizeKey: BadgeSize): React.CSSProperties => {
-            if (sizeKey in sizeStyles) {
-                return sizeStyles[sizeKey as keyof typeof sizeStyles];
-            }
-            return sizeStyles.md;
-        };
+            // Type-safe style lookup with fallbacks for custom values
+            const getSizeStyle = (sizeKey: BadgeSize): React.CSSProperties => {
+                if (sizeKey in sizeStyles) {
+                    return sizeStyles[sizeKey as keyof typeof sizeStyles];
+                }
+                return sizeStyles.md;
+            };
 
-        const getVariantStyle = (
-            variantKey: BadgeVariant
-        ): React.CSSProperties => {
-            if (variantKey in variantStyles) {
-                return variantStyles[variantKey as keyof typeof variantStyles];
-            }
-            return variantStyles.primary;
-        };
+            const getVariantStyle = (
+                variantKey: BadgeVariant
+            ): React.CSSProperties => {
+                if (variantKey in variantStyles) {
+                    return variantStyles[
+                        variantKey as keyof typeof variantStyles
+                    ];
+                }
+                return variantStyles.primary;
+            };
 
-        return {
-            ...badgeStyle,
-            ...getSizeStyle(size),
-            ...getVariantStyle(variant),
-        };
-    }, [
-        currentTheme.borderRadius.full,
-        currentTheme.colors.background.secondary,
-        currentTheme.colors.border.secondary,
-        currentTheme.colors.error,
-        currentTheme.colors.primary,
-        currentTheme.colors.success,
-        currentTheme.colors.text.secondary,
-        currentTheme.colors.warning,
-        currentTheme.spacing.lg,
-        currentTheme.spacing.md,
-        currentTheme.spacing.sm,
-        currentTheme.spacing.xs,
-        currentTheme.typography.fontFamily.sans,
-        currentTheme.typography.fontSize.base,
-        currentTheme.typography.fontSize.sm,
-        currentTheme.typography.fontSize.xs,
-        currentTheme.typography.fontWeight.medium,
-        currentTheme.typography.lineHeight.tight,
-        size,
-        variant,
-    ]);
+            return {
+                ...badgeStyle,
+                ...getSizeStyle(size),
+                ...getVariantStyle(variant),
+            };
+        }, [
+            currentTheme.borderRadius.full,
+            currentTheme.colors.background.secondary,
+            currentTheme.colors.border.secondary,
+            currentTheme.colors.error,
+            currentTheme.colors.primary,
+            currentTheme.colors.success,
+            currentTheme.colors.text.secondary,
+            currentTheme.colors.warning,
+            currentTheme.spacing.lg,
+            currentTheme.spacing.md,
+            currentTheme.spacing.sm,
+            currentTheme.spacing.xs,
+            currentTheme.typography.fontFamily.sans,
+            currentTheme.typography.fontSize.base,
+            currentTheme.typography.fontSize.sm,
+            currentTheme.typography.fontSize.xs,
+            currentTheme.typography.fontWeight.medium,
+            currentTheme.typography.lineHeight.tight,
+            size,
+            variant,
+        ]);
 
-    const iconStyle = useMemo(
-        () => ({
-            color: iconColor ?? combinedStyle.color,
-            fontSize: "inherit",
-        }),
-        [combinedStyle.color, iconColor]
-    );
+        const iconStyle = useMemo(
+            () => ({
+                color: iconColor ?? combinedStyle.color,
+                fontSize: "inherit",
+            }),
+            [combinedStyle.color, iconColor]
+        );
 
-    return (
-        <span
-            className={`themed-badge themed-badge--${variant} themed-badge--${size} ${className}`}
-            style={combinedStyle}
-        >
-            {icon ? <span style={iconStyle}>{icon}</span> : null}
-            {children}
-        </span>
-    );
-};
-
-export default ThemedBadge;
+        return (
+            <span
+                className={`themed-badge themed-badge--${variant} themed-badge--${size} ${className}`}
+                style={combinedStyle}
+            >
+                {icon ? <span style={iconStyle}>{icon}</span> : null}
+                {children}
+            </span>
+        );
+    }
+);

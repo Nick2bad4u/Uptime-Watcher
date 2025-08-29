@@ -15,7 +15,7 @@ import { getMonitorHelpTexts } from "../../utils/monitorUiHelpers";
 
 // Mock the logger module
 vi.mock("../../services/logger", () => ({
-    default: {
+    logger: {
         warn: vi.fn(),
     },
 }));

@@ -15,7 +15,14 @@ import type {
     EventHandlers,
 } from "@shared/types/componentProps";
 
-import React from "react";
+import {
+    createElement,
+    type CSSProperties,
+    type KeyboardEvent,
+    memo,
+    type NamedExoticComponent,
+    type ReactElement,
+} from "react";
 
 import type {
     BoxElement,
@@ -103,7 +110,7 @@ export interface ThemedBoxProperties
      *
      * @defaultValue \{ \} (internal singleton)
      */
-    readonly style?: React.CSSProperties;
+    readonly style?: CSSProperties;
 
     /**
      * Surface variant used to select contextual surface styles.
@@ -137,7 +144,7 @@ export interface ThemedBoxProperties
  *
  * @internal
  */
-const DEFAULT_THEMED_BOX_STYLE: React.CSSProperties = {};
+const DEFAULT_THEMED_BOX_STYLE: CSSProperties = {};
 
 /**
  * Themed box component for container layout and visual consistency.
@@ -180,7 +187,7 @@ const DEFAULT_THEMED_BOX_STYLE: React.CSSProperties = {};
  *
  * @public
  */
-const ThemedBox = ({
+const ThemedBoxComponent = ({
     "aria-label": ariaLabel,
     as: Component = "div",
     border = false,
@@ -197,7 +204,7 @@ const ThemedBox = ({
     surface = "base",
     tabIndex,
     variant = "primary",
-}: ThemedBoxProperties): React.ReactElement => {
+}: ThemedBoxProperties): ReactElement => {
     const classNames = [
         CSS_CLASSES.THEMED_BOX,
         `themed-box--background-${variant}`,
@@ -214,7 +221,7 @@ const ThemedBox = ({
     const isInteractive = Boolean(onClick);
 
     // Handle keyboard interactions for interactive divs
-    const handleKeyDown = (e: React.KeyboardEvent): void => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
         if ((e.key === "Enter" || e.key === " ") && onClick) {
             e.preventDefault();
 
@@ -252,7 +259,13 @@ const ThemedBox = ({
         ...interactiveProps,
     };
 
-    return React.createElement(Component, allProps, children);
+    return createElement(Component, allProps, children);
 };
 
-export default ThemedBox;
+/**
+ * Themed box component for consistent container layouts and styling.
+ *
+ * @public
+ */
+export const ThemedBox: NamedExoticComponent<ThemedBoxProperties> =
+    memo(ThemedBoxComponent);

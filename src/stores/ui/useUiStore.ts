@@ -38,7 +38,7 @@ import { persist, type PersistOptions } from "zustand/middleware";
 import type { ChartTimeRange } from "../types";
 import type { UIStore } from "./types";
 
-import logger from "../../services/logger";
+import { logger } from "../../services/logger";
 import { logStoreAction } from "../utils";
 
 /**

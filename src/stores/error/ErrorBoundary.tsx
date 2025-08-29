@@ -41,12 +41,12 @@
  * @public
  */
 
-import type { JSX } from "react/jsx-runtime";
+import type { ComponentType, ErrorInfo, JSX, ReactNode } from "react";
 
-import React from "react";
+import { Component } from "react";
 
 import { DefaultErrorFallback } from "../../components/error/DefaultErrorFallback";
-import logger from "../../services/logger";
+import { logger } from "../../services/logger";
 
 /**
  * Props for the {@link ErrorBoundary} component.
@@ -59,16 +59,16 @@ import logger from "../../services/logger";
  */
 export interface ErrorBoundaryProperties {
     /** React children to be rendered within the error boundary */
-    readonly children: React.ReactNode;
+    readonly children: ReactNode;
     /** Optional custom fallback component to render when an error occurs */
-    readonly fallback?: React.ComponentType<{
+    readonly fallback?: ComponentType<{
         /** Error object that was caught by the boundary */
         error?: Error;
         /** Function to retry rendering by resetting the error state */
         onRetry: () => void;
     }>;
     /** Optional callback function called when an error is caught */
-    readonly onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+    readonly onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
 /**
@@ -109,7 +109,7 @@ export interface ErrorBoundaryState {
  */
 /* eslint-disable react-prefer-function-component/react-prefer-function-component -- Error boundaries must be class components */
 // eslint-disable-next-line react/require-optimization -- ErrorBoundary should always re-render on error state changes
-class ErrorBoundary extends React.Component<
+class ErrorBoundaryBase extends Component<
     ErrorBoundaryProperties,
     ErrorBoundaryState
 > {
@@ -144,7 +144,7 @@ class ErrorBoundary extends React.Component<
 
     public override componentDidCatch(
         error: Error,
-        errorInfo: React.ErrorInfo
+        errorInfo: ErrorInfo
     ): void {
         logger.error("Store Error Boundary caught an error", error);
 
@@ -177,4 +177,14 @@ class ErrorBoundary extends React.Component<
     }
 }
 
-export default ErrorBoundary;
+/**
+ * Error boundary component with consistent export pattern.
+ *
+ * @remarks
+ * Standardized export following the application's component export conventions.
+ * This ensures consistent import patterns and proper TypeScript support
+ * throughout the codebase.
+ *
+ * @public
+ */
+export { ErrorBoundaryBase as ErrorBoundary };

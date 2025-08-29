@@ -149,20 +149,22 @@ if (fileTransport && typeof window !== "undefined") {
 }
 
 // Create logger with app context
-const logger: LoggerInterface = {
+const loggerInstance: LoggerInterface = {
     // Log application lifecycle events
     app: {
         error: (context: string, error: Error): void => {
-            logger.error(`Application error in ${context}`, error);
+            loggerInstance.error(`Application error in ${context}`, error);
         },
         performance: (operation: string, duration: number): void => {
-            logger.debug(`Performance: ${operation} took ${duration}ms`);
+            loggerInstance.debug(
+                `Performance: ${operation} took ${duration}ms`
+            );
         },
         started: (): void => {
-            logger.info("Application started");
+            loggerInstance.info("Application started");
         },
         stopped: (): void => {
-            logger.info("Application stopped");
+            loggerInstance.info("Application stopped");
         },
     },
     // Debug level - for development debugging
@@ -228,7 +230,7 @@ const logger: LoggerInterface = {
     // Log site monitoring events
     site: {
         added: (identifier: string): void => {
-            logger.info(`Site added: ${identifier}`);
+            loggerInstance.info(`Site added: ${identifier}`);
         },
         check: (
             identifier: string,
@@ -236,26 +238,28 @@ const logger: LoggerInterface = {
             responseTime?: number
         ): void => {
             const timeInfo = responseTime ? ` (${responseTime}ms)` : "";
-            logger.info(
+            loggerInstance.info(
                 `Site check: ${identifier} - Status: ${status}${timeInfo}`
             );
         },
         error: (identifier: string, error: Error | string): void => {
             if (typeof error === "string") {
-                logger.error(`Site check error: ${identifier} - ${error}`);
+                loggerInstance.error(
+                    `Site check error: ${identifier} - ${error}`
+                );
             } else {
-                logger.error(`Site check error: ${identifier}`, error);
+                loggerInstance.error(`Site check error: ${identifier}`, error);
             }
         },
         removed: (identifier: string): void => {
-            logger.info(`Site removed: ${identifier}`);
+            loggerInstance.info(`Site removed: ${identifier}`);
         },
         statusChange: (
             identifier: string,
             oldStatus: string,
             newStatus: string
         ): void => {
-            logger.info(
+            loggerInstance.info(
                 `Site status change: ${identifier} - ${oldStatus} -> ${newStatus}`
             );
         },
@@ -263,27 +267,27 @@ const logger: LoggerInterface = {
     // Log system/electron events
     system: {
         notification: (title: string, body: string): void => {
-            logger.debug(`Notification sent: ${title} - ${body}`);
+            loggerInstance.debug(`Notification sent: ${title} - ${body}`);
         },
         tray: (action: string): void => {
-            logger.debug(`Tray action: ${action}`);
+            loggerInstance.debug(`Tray action: ${action}`);
         },
         window: (action: string, windowName?: string): void => {
             const nameInfo = windowName ? ` (${windowName})` : "";
-            logger.debug(`Window ${action}${nameInfo}`);
+            loggerInstance.debug(`Window ${action}${nameInfo}`);
         },
     },
     // Log user actions
     user: {
         action: (action: string, details?: unknown): void => {
-            logger.info(`User action: ${action}`, details ?? "");
+            loggerInstance.info(`User action: ${action}`, details ?? "");
         },
         settingsChange: (
             setting: string,
             oldValue: unknown,
             newValue: unknown
         ): void => {
-            logger.info(
+            loggerInstance.info(
                 `Settings change: ${setting} - ${String(oldValue)} -> ${String(newValue)}`
             );
         },
@@ -306,7 +310,27 @@ const logger: LoggerInterface = {
     },
 };
 
-export default logger;
+/**
+ * Main logger instance for general frontend logging operations.
+ *
+ * @remarks
+ * Provides structured logging functionality with domain-specific methods for
+ * app, site, system, and user events. Uses electron-log/renderer for proper
+ * renderer process logging that forwards to main process.
+ *
+ * @example
+ *
+ * ```typescript
+ * import { logger } from "./services/logger";
+ *
+ * logger.info("Application starting");
+ * logger.site.added("example.com");
+ * logger.error("Something went wrong", error);
+ * ```
+ *
+ * @public
+ */
+export const logger: LoggerInterface = loggerInstance;
 
 /**
  * TypeScript interface for the logger instance.

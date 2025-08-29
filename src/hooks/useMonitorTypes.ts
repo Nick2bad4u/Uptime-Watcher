@@ -41,7 +41,7 @@
 import { useCallback, useState } from "react";
 
 import { FALLBACK_MONITOR_TYPE_OPTIONS } from "../constants";
-import logger from "../services/logger";
+import { logger } from "../services/logger";
 import { getMonitorTypeOptions } from "../utils/monitorTypeHelper";
 import { useMount } from "./useMount";
 

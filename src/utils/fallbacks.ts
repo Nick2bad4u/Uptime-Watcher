@@ -45,7 +45,7 @@
 import type { Monitor } from "@shared/types";
 import type { ReadonlyDeep } from "type-fest";
 
-import logger from "../services/logger";
+import { logger } from "../services/logger";
 import { ensureError, withUtilityErrorHandling } from "./errorHandling";
 
 /**

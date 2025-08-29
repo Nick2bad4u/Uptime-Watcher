@@ -4,7 +4,7 @@
  * cases.
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import {
     hasProperties,
@@ -1053,8 +1053,16 @@ describe("TypeGuards - Complete Function Coverage", () => {
     });
 
     describe("isValidTimestamp", () => {
-        const now = Date.now();
+        const mockTime = 1672531200000; // Fixed time: 2023-01-01 00:00:00 UTC
         const oneDayInMs = 86_400_000;
+
+        beforeEach(() => {
+            vi.spyOn(Date, 'now').mockReturnValue(mockTime);
+        });
+
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
 
         it("should return true for valid timestamps", async ({
             task,
@@ -1068,9 +1076,9 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidTimestamp(now)).toBe(true);
-            expect(isValidTimestamp(now - 1000)).toBe(true);
-            expect(isValidTimestamp(now + 3600000)).toBe(true); // 1 hour in future
+            expect(isValidTimestamp(mockTime)).toBe(true);
+            expect(isValidTimestamp(mockTime - 1000)).toBe(true);
+            expect(isValidTimestamp(mockTime + 3600000)).toBe(true); // 1 hour in future
             expect(isValidTimestamp(1672531200000)).toBe(true); // Jan 1, 2023
         });
 
@@ -1086,8 +1094,8 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidTimestamp(now + oneDayInMs)).toBe(true);
-            expect(isValidTimestamp(now + oneDayInMs - 1000)).toBe(true);
+            expect(isValidTimestamp(mockTime + oneDayInMs)).toBe(true);
+            expect(isValidTimestamp(mockTime + oneDayInMs - 1000)).toBe(true);
         });
 
         it("should return false for timestamps too far in future", async ({
@@ -1102,8 +1110,8 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidTimestamp(now + oneDayInMs + 1000)).toBe(false);
-            expect(isValidTimestamp(now + 2 * oneDayInMs)).toBe(false);
+            expect(isValidTimestamp(mockTime + oneDayInMs + 1000)).toBe(false);
+            expect(isValidTimestamp(mockTime + 2 * oneDayInMs)).toBe(false);
         });
 
         it("should return false for zero or negative timestamps", async ({

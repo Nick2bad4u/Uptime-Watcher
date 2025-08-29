@@ -57,7 +57,16 @@ import type {
     StandardButtonProperties,
 } from "@shared/types/componentProps";
 
-import React, { useCallback } from "react";
+import {
+    type CSSProperties,
+    isValidElement,
+    type JSX,
+    memo,
+    type MouseEvent,
+    type NamedExoticComponent,
+    type ReactNode,
+    useCallback,
+} from "react";
 
 import type { ButtonSize, ButtonVariant } from "./types";
 
@@ -82,7 +91,7 @@ export type ThemedButtonProperties = ComponentProperties<
 >;
 
 // Default styles object to prevent infinite render loops
-const DEFAULT_THEMED_BOX_STYLE: React.CSSProperties = {};
+const DEFAULT_THEMED_BOX_STYLE: CSSProperties = {};
 
 /**
  * Themed button component with comprehensive styling and state management.
@@ -112,7 +121,7 @@ const DEFAULT_THEMED_BOX_STYLE: React.CSSProperties = {};
  *
  * @public
  */
-const ThemedButton = ({
+const ThemedButtonComponent = ({
     "aria-label": ariaLabel,
     children,
     className = "",
@@ -128,7 +137,7 @@ const ThemedButton = ({
     title,
     type = "button",
     variant = "primary",
-}: ThemedButtonProperties): React.JSX.Element => {
+}: ThemedButtonProperties): JSX.Element => {
     const classNames = [
         CSS_CLASSES.THEMED_BUTTON,
         `themed-button--${variant}`,
@@ -142,14 +151,14 @@ const ThemedButton = ({
 
     // useCallback handler for jsx-no-bind compliance
     const handleClick = useCallback(
-        (e: React.MouseEvent<HTMLButtonElement>) => {
+        (e: MouseEvent<HTMLButtonElement>) => {
             onClick?.(e);
         },
         [onClick]
     );
 
     // eslint-disable-next-line sonarjs/function-return-type -- React rendering function legitimately returns different node types (JSX elements, loading spinner, text content)
-    const renderContent = (): React.ReactNode => {
+    const renderContent = (): ReactNode => {
         if (loading) {
             return (
                 <div className="themed-button__loading">
@@ -160,8 +169,8 @@ const ThemedButton = ({
         }
         if (icon) {
             // eslint-disable-next-line no-useless-assignment -- Variable initialized to satisfy init-declarations rule, even though immediately reassigned
-            let iconElement: React.ReactNode = null;
-            if (React.isValidElement(icon) && iconColor) {
+            let iconElement: ReactNode = null;
+            if (isValidElement(icon) && iconColor) {
                 iconElement = renderColoredIcon(icon, iconColor);
             } else if (iconColor) {
                 iconElement = renderColoredIcon(icon, iconColor);
@@ -202,4 +211,11 @@ const ThemedButton = ({
     );
 };
 
-export default ThemedButton;
+/**
+ * Themed button component with comprehensive styling and state management.
+ *
+ * @public
+ */
+export const ThemedButton: NamedExoticComponent<ThemedButtonProperties> = memo(
+    ThemedButtonComponent
+);

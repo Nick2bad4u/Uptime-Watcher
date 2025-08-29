@@ -8,7 +8,7 @@ import { renderHook } from "@testing-library/react";
 
 // Mock the logger at module level
 vi.mock("../../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
         warn: vi.fn(),
         info: vi.fn(),
@@ -16,7 +16,7 @@ vi.mock("../../services/logger", () => ({
     },
 }));
 
-import logger from "../../services/logger";
+import { logger } from "../../services/logger";
 import { useMount } from "../../hooks/useMount";
 
 const mockLogger = vi.mocked(logger);

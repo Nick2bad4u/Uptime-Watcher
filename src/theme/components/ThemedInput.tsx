@@ -60,7 +60,13 @@ import type {
     EventHandlers,
 } from "@shared/types/componentProps";
 
-import React, { useMemo } from "react";
+import {
+    type CSSProperties,
+    type JSX,
+    memo,
+    type NamedExoticComponent,
+    useMemo,
+} from "react";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../../constants";
 import { useTheme, useThemeClasses } from "../useTheme";
@@ -120,7 +126,7 @@ export interface ThemedInputProperties
  *
  * @public
  */
-const ThemedInput = ({
+const ThemedInputComponent = ({
     "aria-describedby": ariaDescribedBy,
     [ARIA_LABEL]: ariaLabel,
     className = "",
@@ -134,7 +140,7 @@ const ThemedInput = ({
     step,
     type = "text",
     value,
-}: ThemedInputProperties): React.JSX.Element => {
+}: ThemedInputProperties): JSX.Element => {
     const { currentTheme } = useTheme();
     const { getBackgroundClass, getBorderClass, getTextClass } =
         useThemeClasses();
@@ -144,7 +150,7 @@ const ThemedInput = ({
     const inputValue = value ?? "";
 
     const styles = useMemo(
-        (): React.CSSProperties => ({
+        (): CSSProperties => ({
             ...getBackgroundClass("primary"),
             ...getTextClass("primary"),
             ...getBorderClass("primary"),
@@ -186,4 +192,5 @@ const ThemedInput = ({
     );
 };
 
-export default ThemedInput;
+export const ThemedInput: NamedExoticComponent<ThemedInputProperties> =
+    memo(ThemedInputComponent);

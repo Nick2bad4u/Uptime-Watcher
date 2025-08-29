@@ -9,10 +9,10 @@
 import type { StatusHistory } from "@shared/types";
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
-import React from "react";
+import { memo, type NamedExoticComponent } from "react";
 
-import MiniChartBar from "../../theme/components/MiniChartBar";
-import ThemedText from "../../theme/components/ThemedText";
+import { MiniChartBar } from "../../theme/components/MiniChartBar";
+import { ThemedText } from "../../theme/components/ThemedText";
 
 /**
  * Props for the HistoryChart component
@@ -44,8 +44,8 @@ export interface HistoryChartProps extends CoreComponentProperties {
  * @returns JSX element containing the history chart, or null if no data
  *   (following React conventions for conditional rendering)
  */
-export const HistoryChart: React.NamedExoticComponent<HistoryChartProps> =
-    React.memo(function HistoryChart({
+export const HistoryChart: NamedExoticComponent<HistoryChartProps> = memo(
+    function HistoryChart({
         className = "",
         history,
         maxItems = 120,
@@ -88,4 +88,5 @@ export const HistoryChart: React.NamedExoticComponent<HistoryChartProps> =
                 </div>
             </section>
         );
-    });
+    }
+);

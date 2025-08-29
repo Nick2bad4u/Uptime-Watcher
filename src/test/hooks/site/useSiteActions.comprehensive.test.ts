@@ -23,7 +23,7 @@ vi.mock("../../../stores/ui/useUiStore", () => ({
 }));
 
 vi.mock("../../../services/logger", () => ({
-    default: {
+    logger: {
         site: {
             error: vi.fn(),
         },

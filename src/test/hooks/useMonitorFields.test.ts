@@ -27,7 +27,7 @@ vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
 
 // Mock the logger module
 vi.mock("../../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
     },
 }));

@@ -47,7 +47,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import "../../services/chartSetup";
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ChartConfigService } from "../../services/chartConfig";
-import ThemedBox from "../../theme/components/ThemedBox";
+import { ThemedBox } from "../../theme/components/ThemedBox";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
 import { formatStatusWithIcon } from "../../utils/status";
@@ -57,7 +57,7 @@ import {
     formatFullTimestamp,
     formatResponseTime,
 } from "../../utils/time";
-import SiteDetailsHeader from "./SiteDetailsHeader";
+import { SiteDetailsHeader } from "./SiteDetailsHeader";
 import { SiteDetailsNavigation } from "./SiteDetailsNavigation";
 import { AnalyticsTab } from "./tabs/AnalyticsTab";
 import { HistoryTab } from "./tabs/HistoryTab";

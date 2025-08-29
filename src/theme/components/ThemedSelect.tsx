@@ -50,7 +50,13 @@ import type {
     EventHandlers,
 } from "@shared/types/componentProps";
 
-import React, { useMemo } from "react";
+import {
+    type CSSProperties,
+    type JSX,
+    memo,
+    type NamedExoticComponent,
+    useMemo,
+} from "react";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../../constants";
 import { useTheme, useThemeClasses } from "../useTheme";
@@ -109,7 +115,7 @@ export interface ThemedSelectProperties
  *
  * @public
  */
-const ThemedSelect = ({
+const ThemedSelectComponent = ({
     "aria-describedby": ariaDescribedBy,
     [ARIA_LABEL]: ariaLabel,
     children,
@@ -122,7 +128,7 @@ const ThemedSelect = ({
     required = false,
     title,
     value,
-}: ThemedSelectProperties): React.JSX.Element => {
+}: ThemedSelectProperties): JSX.Element => {
     const { currentTheme } = useTheme();
     const { getBackgroundClass, getBorderClass, getTextClass } =
         useThemeClasses();
@@ -132,7 +138,7 @@ const ThemedSelect = ({
     const selectValue = value ?? "";
 
     const styles = useMemo(
-        (): React.CSSProperties => ({
+        (): CSSProperties => ({
             ...getBackgroundClass("primary"),
             ...getTextClass("primary"),
             ...getBorderClass("primary"),
@@ -174,4 +180,6 @@ const ThemedSelect = ({
     );
 };
 
-export default ThemedSelect;
+export const ThemedSelect: NamedExoticComponent<ThemedSelectProperties> = memo(
+    ThemedSelectComponent
+);

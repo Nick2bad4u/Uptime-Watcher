@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
-import logger from "../../../services/logger";
+import { logger } from "../../../services/logger";
 
 // Mock the logger
 vi.mock("../../../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
         warn: vi.fn(),
         info: vi.fn(),

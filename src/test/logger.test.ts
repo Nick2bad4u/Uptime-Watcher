@@ -37,7 +37,7 @@ describe("Frontend Logger Service", () => {
     });
 
     beforeEach(async () => {
-        logger = (await import("../services/logger")).default;
+        logger = (await import("../services/logger")).logger;
     });
 
     describe("Basic logging methods", () => {
@@ -449,7 +449,7 @@ describe("Frontend Logger Service", () => {
 
             const loggerModule = await import("../services/logger");
             // Type exports exist only at compile time, not runtime
-            expect(loggerModule.default).toBeDefined();
+            expect(loggerModule.logger).toBeDefined();
         });
     });
 

@@ -3,7 +3,7 @@
  * site monitoring statistics.
  */
 
-import React, { useMemo } from "react";
+import { memo, type NamedExoticComponent, useMemo } from "react";
 
 import { MetricCard } from "./components/MetricCard";
 
@@ -49,8 +49,8 @@ export interface SiteCardMetricsProperties {
  *
  * @returns JSX.Element containing the metrics grid
  */
-export const SiteCardMetrics: React.NamedExoticComponent<SiteCardMetricsProperties> =
-    React.memo(function SiteCardMetrics({
+export const SiteCardMetrics: NamedExoticComponent<SiteCardMetricsProperties> =
+    memo(function SiteCardMetrics({
         checkCount,
         responseTime,
         status,

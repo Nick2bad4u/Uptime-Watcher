@@ -9,7 +9,7 @@ import type { JSX } from "react/jsx-runtime";
 
 import React, { useEffect, useState } from "react";
 
-import logger from "../../services/logger";
+import { logger } from "../../services/logger";
 import {
     supportsResponseTime as checkSupportsResponseTime,
     formatMonitorDetail,
@@ -20,7 +20,7 @@ import {
  *
  * @public
  */
-export interface ConditionalResponseTimeProps {
+export interface ConditionalResponseTimeProperties {
     /** React node to render when response time is supported */
     readonly children: React.ReactNode;
     /** React node to render when response time is not supported or while loading */
@@ -35,7 +35,7 @@ export interface ConditionalResponseTimeProps {
  *
  * @public
  */
-export interface DetailLabelProps {
+export interface DetailLabelProperties {
     /** Raw details string to format */
     readonly details: string;
     /** Fallback text to display if formatting fails */
@@ -62,7 +62,7 @@ export function ConditionalResponseTime({
     children,
     fallback,
     monitorType,
-}: ConditionalResponseTimeProps): React.ReactNode {
+}: ConditionalResponseTimeProperties): React.ReactNode {
     const [supportsResponseTime, setSupportsResponseTime] =
         useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -130,7 +130,7 @@ export const DetailLabel = ({
     details,
     fallback = details,
     monitorType,
-}: DetailLabelProps): JSX.Element => {
+}: DetailLabelProperties): JSX.Element => {
     const [formattedLabel, setFormattedLabel] = useState<string>(fallback);
 
     useEffect(

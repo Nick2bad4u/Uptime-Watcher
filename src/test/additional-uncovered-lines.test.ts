@@ -23,7 +23,7 @@ vi.mock("../hooks/site/useSiteAnalytics", () => ({
 }));
 
 vi.mock("../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
         site: { error: vi.fn() },
         user: { action: vi.fn() },

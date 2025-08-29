@@ -43,9 +43,8 @@
  */
 
 import type { ChartOptions } from "chart.js";
-import type { JSX } from "react/jsx-runtime";
 
-import { memo, type MemoExoticComponent } from "react";
+import { memo, type NamedExoticComponent } from "react";
 import { Bar } from "react-chartjs-2";
 
 import type { StatusBarChartData } from "../../../services/chartConfig";
@@ -77,25 +76,18 @@ import "../../../services/chartSetup";
  *
  * @public
  */
-const StatusChart: MemoExoticComponent<
-    ({
-        data,
-        options,
-    }: {
-        data: StatusBarChartData;
-        options: ChartOptions<"bar">;
-    }) => JSX.Element
-> = memo(
-    ({
-        data,
-        options,
-    }: {
-        readonly data: StatusBarChartData;
-        readonly options: ChartOptions<"bar">;
-    }) => <Bar data={data} options={options} />
-);
+export const StatusChart: NamedExoticComponent<{
+    readonly data: StatusBarChartData;
+    readonly options: ChartOptions<"bar">;
+}> = memo(function StatusChart({
+    data,
+    options,
+}: {
+    readonly data: StatusBarChartData;
+    readonly options: ChartOptions<"bar">;
+}) {
+    return <Bar data={data} options={options} />;
+});
 
-// Set display name for better debugging and React DevTools experience
+// Set displayName explicitly for debugging
 StatusChart.displayName = "StatusChart";
-
-export default StatusChart;

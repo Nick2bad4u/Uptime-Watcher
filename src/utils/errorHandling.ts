@@ -8,7 +8,7 @@
 
 import type { Simplify } from "type-fest";
 
-import logger from "../services/logger";
+import { logger } from "../services/logger";
 
 /**
  * Type-safe error conversion result with enhanced type information.

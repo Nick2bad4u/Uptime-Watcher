@@ -44,9 +44,8 @@
  */
 
 import type { ChartOptions } from "chart.js";
-import type { JSX } from "react/jsx-runtime";
 
-import { memo, type MemoExoticComponent } from "react";
+import { memo, type NamedExoticComponent } from "react";
 import { Line } from "react-chartjs-2";
 
 import type { ResponseTimeChartData } from "../../../services/chartConfig";
@@ -78,25 +77,18 @@ import "../../../services/chartSetup";
  *
  * @public
  */
-const ResponseTimeChart: MemoExoticComponent<
-    ({
-        data,
-        options,
-    }: {
-        data: ResponseTimeChartData;
-        options: ChartOptions<"line">;
-    }) => JSX.Element
-> = memo(
-    ({
-        data,
-        options,
-    }: {
-        readonly data: ResponseTimeChartData;
-        readonly options: ChartOptions<"line">;
-    }) => <Line data={data} options={options} />
-);
+export const ResponseTimeChart: NamedExoticComponent<{
+    readonly data: ResponseTimeChartData;
+    readonly options: ChartOptions<"line">;
+}> = memo(function ResponseTimeChart({
+    data,
+    options,
+}: {
+    readonly data: ResponseTimeChartData;
+    readonly options: ChartOptions<"line">;
+}) {
+    return <Line data={data} options={options} />;
+});
 
-// Set display name for better debugging and React DevTools experience
+// Set displayName explicitly for debugging
 ResponseTimeChart.displayName = "ResponseTimeChart";
-
-export default ResponseTimeChart;

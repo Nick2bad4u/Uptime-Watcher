@@ -6,8 +6,26 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock the logger
 vi.mock("../../../services/logger", () => ({
-    default: {
+    logger: {
         info: vi.fn(),
+        error: vi.fn(),
+        debug: vi.fn(),
+        warn: vi.fn(),
+        app: {
+            started: vi.fn(),
+            error: vi.fn(),
+        },
+        site: {
+            error: vi.fn(),
+            info: vi.fn(),
+        },
+        user: {
+            action: vi.fn(),
+        },
+        system: {
+            error: vi.fn(),
+            info: vi.fn(),
+        },
     },
 }));
 
@@ -18,7 +36,7 @@ vi.mock("../../../../shared/utils/environment", () => ({
 
 import { logStoreAction } from "../../../stores/utils";
 import { isDevelopment } from "../../../../shared/utils/environment";
-import logger from "../../../services/logger";
+import { logger } from "../../../services/logger";
 
 // Get the mocked versions
 const mockIsDevelopment = vi.mocked(isDevelopment);

@@ -4,7 +4,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import logger from "../../services/logger";
+import { logger } from "../../services/logger";
 import { ensureError } from "../../utils/errorHandling";
 import { clearMonitorTypeCache } from "../../utils/monitorTypeHelper";
 import { setupCacheSync } from "../../utils/cacheSync";

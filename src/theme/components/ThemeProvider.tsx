@@ -11,6 +11,8 @@
 
 import type React from "react";
 
+import { memo, type NamedExoticComponent } from "react";
+
 import { useTheme } from "../useTheme";
 
 /**
@@ -32,12 +34,15 @@ export interface ThemeProviderProperties {
  *
  * @public
  */
-
-export default function ThemeProvider({
+const ThemeProviderComponent = ({
     children,
-}: ThemeProviderProperties): React.ReactNode {
+}: ThemeProviderProperties): React.ReactElement => {
     // Initialize theme system on mount to ensure theme context is available
     useTheme();
 
-    return children;
-}
+    // eslint-disable-next-line react/jsx-no-useless-fragment
+    return <>{children}</>;
+};
+
+export const ThemeProvider: NamedExoticComponent<ThemeProviderProperties> =
+    memo(ThemeProviderComponent);

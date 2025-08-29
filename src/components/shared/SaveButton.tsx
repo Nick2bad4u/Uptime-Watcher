@@ -8,15 +8,15 @@
 
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { FiSave } from "react-icons/fi";
 
-import ThemedButton from "../../theme/components/ThemedButton";
+import { ThemedButton } from "../../theme/components/ThemedButton";
 
 /**
  * Props for the SaveButton component
  */
-export interface SaveButtonProps extends CoreComponentProperties {
+export interface SaveButtonProperties extends CoreComponentProperties {
     /** Accessibility label */
     readonly "aria-label"?: string;
     /** Whether the save operation is loading */
@@ -40,7 +40,7 @@ export interface SaveButtonProps extends CoreComponentProperties {
  *
  * @returns Themed save button component
  */
-export const SaveButton: React.FC<SaveButtonProps> = ({
+export const SaveButton: React.FC<SaveButtonProperties> = ({
     "aria-label": ariaLabel = "Save changes",
     className = "",
     disabled = false,

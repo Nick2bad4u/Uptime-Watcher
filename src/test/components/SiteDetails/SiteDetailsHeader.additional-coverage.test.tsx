@@ -8,7 +8,7 @@ import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import SiteDetailsHeader from "../../../components/SiteDetails/SiteDetailsHeader";
+import { SiteDetailsHeader } from "../../../components/SiteDetails/SiteDetailsHeader";
 import type { Monitor, Site } from "../../../../shared/types";
 
 // Mock the UI store
@@ -73,7 +73,7 @@ vi.mock("../../../theme/components", () => ({
 
 // Mock MonitoringStatusDisplay
 vi.mock("../../../components/SiteDetails/MonitoringStatusDisplay", () => ({
-    default: ({ monitors }: any) => (
+    MonitoringStatusDisplay: ({ monitors }: any) => (
         <div data-testid="monitoring-status-display">
             Monitoring {monitors.length} monitors
         </div>

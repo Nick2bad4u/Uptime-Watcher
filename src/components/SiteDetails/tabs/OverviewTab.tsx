@@ -18,15 +18,15 @@ import {
 } from "react-icons/md";
 
 import { CHECK_INTERVALS, TIMEOUT_CONSTRAINTS } from "../../../constants";
-import logger from "../../../services/logger";
-import StatusIndicator from "../../../theme/components/StatusIndicator";
-import ThemedBadge from "../../../theme/components/ThemedBadge";
-import ThemedButton from "../../../theme/components/ThemedButton";
-import ThemedCard from "../../../theme/components/ThemedCard";
-import ThemedInput from "../../../theme/components/ThemedInput";
-import ThemedProgress from "../../../theme/components/ThemedProgress";
-import ThemedSelect from "../../../theme/components/ThemedSelect";
-import ThemedText from "../../../theme/components/ThemedText";
+import { logger } from "../../../services/logger";
+import { StatusIndicator } from "../../../theme/components/StatusIndicator";
+import { ThemedBadge } from "../../../theme/components/ThemedBadge";
+import { ThemedButton } from "../../../theme/components/ThemedButton";
+import { ThemedCard } from "../../../theme/components/ThemedCard";
+import { ThemedInput } from "../../../theme/components/ThemedInput";
+import { ThemedProgress } from "../../../theme/components/ThemedProgress";
+import { ThemedSelect } from "../../../theme/components/ThemedSelect";
+import { ThemedText } from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 import { getIntervalLabel } from "../../../utils/time";

@@ -297,12 +297,22 @@ describe("Final Function Coverage Push", () => {
             const fn = (objectSafety as any)[key];
             if (typeof fn === "function") {
                 try {
-                    fn();
-                    fn({});
-                    fn({ a: 1, b: 2 });
-                    fn({ a: 1, b: 2 }, "a");
-                    fn({ a: 1, b: 2 }, ["a"]);
-                    fn({ a: 1, b: 2 }, () => {});
+                    if (key === "safeObjectIteration") {
+                        // safeObjectIteration requires a callback function
+                        fn({}, () => {}, "test context");
+                        fn({ a: 1, b: 2 }, (_k: string, _v: any) => {}, "test");
+                        fn(null, () => {}, "null test");
+                        fn(undefined, () => {}, "undefined test");
+                        fn("string", () => {}, "string test");
+                        fn(123, () => {}, "number test");
+                    } else {
+                        fn();
+                        fn({});
+                        fn({ a: 1, b: 2 });
+                        fn({ a: 1, b: 2 }, "a");
+                        fn({ a: 1, b: 2 }, ["a"]);
+                        fn({ a: 1, b: 2 }, () => {});
+                    }
                 } catch (error) {
                     // Function called, coverage counts
                 }

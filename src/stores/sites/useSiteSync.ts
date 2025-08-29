@@ -19,7 +19,7 @@ import type { Site, StatusUpdate } from "@shared/types";
 
 import { withErrorHandling } from "@shared/utils/errorHandling";
 
-import logger from "../../services/logger";
+import { logger } from "../../services/logger";
 import { safeExtractIpcData } from "../../types/ipc";
 import { ensureError } from "../../utils/errorHandling";
 import { logStoreAction } from "../utils";

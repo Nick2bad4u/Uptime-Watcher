@@ -8,12 +8,12 @@
  */
 
 import { render, screen, act } from "@testing-library/react";
-import React from "react";
+import { createElement, type ReactNode } from "react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import type { UnknownRecord } from "type-fest";
 
 import { Settings } from "../components/Settings/Settings";
-import logger from "../services/logger";
+import { logger } from "../services/logger";
 import { ThemeName } from "../theme/types";
 
 // Mock constants
@@ -37,7 +37,7 @@ vi.mock("../constants", () => ({
 
 // Mock logger
 vi.mock("../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
         user: {
             action: vi.fn(),
@@ -194,16 +194,16 @@ vi.mock("../theme/components", () => ({
         children,
         ...props
     }: {
-        children?: React.ReactNode;
+        children?: ReactNode;
         [key: string]: unknown;
-    }) => React.createElement("div", props, children),
+    }) => createElement("div", props, children),
     ThemedBox: ({
         border,
         children,
         loading,
         ...props
     }: {
-        children?: React.ReactNode;
+        children?: ReactNode;
         border?: boolean;
         loading?: boolean;
         [key: string]: unknown;
@@ -216,14 +216,14 @@ vi.mock("../theme/components", () => ({
             filteredProps["data-border"] = border.toString();
         if (loading !== undefined)
             filteredProps["data-loading"] = loading.toString();
-        return React.createElement("div", filteredProps, children);
+        return createElement("div", filteredProps, children);
     },
     ThemedButton: ({
         children,
         loading,
         ...props
     }: {
-        children?: React.ReactNode;
+        children?: ReactNode;
         loading?: boolean;
         [key: string]: unknown;
     }) => {
@@ -232,24 +232,24 @@ vi.mock("../theme/components", () => ({
         delete filteredProps["loading"];
         if (loading !== undefined)
             filteredProps["data-loading"] = loading.toString();
-        return React.createElement("button", filteredProps, children);
+        return createElement("button", filteredProps, children);
     },
     ThemedCheckbox: (props: UnknownRecord) =>
-        React.createElement("input", { type: "checkbox", ...props }),
+        createElement("input", { type: "checkbox", ...props }),
     ThemedSelect: ({
         children,
         ...props
     }: {
-        children?: React.ReactNode;
+        children?: ReactNode;
         [key: string]: unknown;
-    }) => React.createElement("select", props, children),
+    }) => createElement("select", props, children),
     ThemedText: ({
         children,
         ...props
     }: {
-        children?: React.ReactNode;
+        children?: ReactNode;
         [key: string]: unknown;
-    }) => React.createElement("span", props, children),
+    }) => createElement("span", props, children),
 }));
 
 // Mock the stores

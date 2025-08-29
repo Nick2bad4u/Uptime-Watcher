@@ -22,7 +22,7 @@ import { Component, useState, useEffect } from "react";
 
 // Import components that may have uncovered functions
 import { DefaultErrorFallback } from "../components/error/DefaultErrorFallback";
-import withErrorBoundary from "../stores/error/withErrorBoundary";
+import { withErrorBoundary } from "../stores/error/withErrorBoundary";
 
 // Import stores
 import { useErrorStore } from "../stores/error/useErrorStore";

@@ -8,8 +8,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
 
 import { isDevelopment, isProduction } from "@shared/utils/environment";
-import App from "../App";
-import logger from "../services/logger";
+import { App } from "../App";
+import { logger } from "../services/logger";
 import { useErrorStore } from "../stores/error/useErrorStore";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { useSitesStore } from "../stores/sites/useSitesStore";

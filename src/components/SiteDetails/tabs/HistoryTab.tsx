@@ -32,13 +32,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiFilter, FiInbox } from "react-icons/fi";
 import { MdHistory } from "react-icons/md";
 
-import logger from "../../../services/logger";
+import { logger } from "../../../services/logger";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
-import StatusIndicator from "../../../theme/components/StatusIndicator";
-import ThemedButton from "../../../theme/components/ThemedButton";
-import ThemedCard from "../../../theme/components/ThemedCard";
-import ThemedSelect from "../../../theme/components/ThemedSelect";
-import ThemedText from "../../../theme/components/ThemedText";
+import { StatusIndicator } from "../../../theme/components/StatusIndicator";
+import { ThemedButton } from "../../../theme/components/ThemedButton";
+import { ThemedCard } from "../../../theme/components/ThemedCard";
+import { ThemedSelect } from "../../../theme/components/ThemedSelect";
+import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
 import { DetailLabel } from "../../common/MonitorUiComponents";
 

@@ -6,9 +6,14 @@
 import type { Monitor } from "@shared/types";
 import type { EventHandlers } from "@shared/types/componentProps";
 
-import React, { useCallback } from "react";
+import {
+    memo,
+    type MouseEvent,
+    type NamedExoticComponent,
+    useCallback,
+} from "react";
 
-import ThemedSelect from "../../../../theme/components/ThemedSelect";
+import { ThemedSelect } from "../../../../theme/components/ThemedSelect";
 
 /**
  * Props for the MonitorSelector component.
@@ -52,19 +57,19 @@ export interface MonitorSelectorProperties {
  *
  * @returns JSX.Element containing the monitor selector dropdown
  */
-export const MonitorSelector: React.NamedExoticComponent<MonitorSelectorProperties> =
-    React.memo(function MonitorSelector({
+export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
+    memo(function MonitorSelector({
         className = "min-w-20",
         monitors,
         onChange,
         selectedMonitorId,
     }: MonitorSelectorProperties) {
         // Memoize event handlers to prevent recreation on every render
-        const handleClick = useCallback((event: React.MouseEvent) => {
+        const handleClick = useCallback((event: MouseEvent) => {
             event.stopPropagation();
         }, []);
 
-        const handleMouseDown = useCallback((event: React.MouseEvent) => {
+        const handleMouseDown = useCallback((event: MouseEvent) => {
             event.stopPropagation();
         }, []);
 

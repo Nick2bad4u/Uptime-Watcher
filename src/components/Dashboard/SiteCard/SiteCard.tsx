@@ -19,10 +19,10 @@
 
 import type { Site } from "@shared/types";
 
-import React, { useMemo } from "react";
+import { memo, type NamedExoticComponent, useMemo } from "react";
 
 import { useSite } from "../../../hooks/site/useSite";
-import ThemedBox from "../../../theme/components/ThemedBox";
+import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { SiteCardFooter } from "./SiteCardFooter";
 import { SiteCardHeader } from "./SiteCardHeader";
 import { SiteCardHistory } from "./SiteCardHistory";
@@ -69,8 +69,8 @@ export interface SiteCardProperties {
  *
  * @returns JSX.Element containing the complete site monitoring card
  */
-export const SiteCard: React.NamedExoticComponent<SiteCardProperties> =
-    React.memo(function SiteCard({ site }: SiteCardProperties) {
+export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
+    function SiteCard({ site }: SiteCardProperties) {
         // Use our custom hook to get all the data and functionality we need
         const {
             checkCount,
@@ -174,4 +174,5 @@ export const SiteCard: React.NamedExoticComponent<SiteCardProperties> =
                 <SiteCardFooter />
             </ThemedBox>
         );
-    });
+    }
+);

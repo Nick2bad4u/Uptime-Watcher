@@ -13,7 +13,7 @@ import {
 
 // Mock the logger module
 vi.mock("../../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
     },
 }));
@@ -360,7 +360,7 @@ describe("Error Handling Utilities", () => {
                     )
                 ).rejects.toThrow("Test error");
 
-                expect(logger.default.error).toHaveBeenCalledWith(
+                expect(logger.logger.error).toHaveBeenCalledWith(
                     "logging test failed",
                     originalError
                 );
@@ -434,7 +434,7 @@ describe("Error Handling Utilities", () => {
                 );
 
                 expect(result).toBe("fallback");
-                expect(logger.default.error).toHaveBeenCalledWith(
+                expect(logger.logger.error).toHaveBeenCalledWith(
                     "fallback test failed",
                     originalError
                 );
@@ -579,7 +579,7 @@ describe("Error Handling Utilities", () => {
                     "logging original failed and no fallback value provided"
                 );
 
-                expect(logger.default.error).toHaveBeenCalledWith(
+                expect(logger.logger.error).toHaveBeenCalledWith(
                     "logging original failed",
                     originalError
                 );
@@ -788,3 +788,4 @@ describe("Error Handling Utilities", () => {
         });
     });
 });
+

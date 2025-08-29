@@ -17,7 +17,7 @@ vi.mock("../../../hooks/useMonitorTypes", () => ({
 }));
 
 vi.mock("../../../services/logger", () => ({
-    default: { error: vi.fn() },
+    logger: { error: vi.fn() },
 }));
 
 vi.mock("../../../stores/error/useErrorStore", () => ({
@@ -79,7 +79,11 @@ vi.mock("react", async () => {
     return {
         ...actual,
         default: actual,
-        memo: vi.fn((component) => component),
+        memo: vi.fn((component) => ({
+            $$typeof: Symbol.for('react.memo'),
+            type: component,
+            compare: null
+        })),
         useCallback: vi.fn((fn) => fn),
         useEffect: vi.fn(),
         useState: vi.fn(() => [false, vi.fn()]),

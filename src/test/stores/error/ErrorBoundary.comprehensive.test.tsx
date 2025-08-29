@@ -8,8 +8,8 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
 
-import ErrorBoundary from "../../../stores/error/ErrorBoundary";
-import withErrorBoundary from "../../../stores/error/withErrorBoundary";
+import { ErrorBoundary } from "../../../stores/error/ErrorBoundary";
+import { withErrorBoundary } from "../../../stores/error/withErrorBoundary";
 
 // Create a component that throws errors for testing
 const ThrowingComponent = ({ shouldThrow }: { shouldThrow?: boolean }) => {
@@ -37,7 +37,7 @@ const CustomFallback = ({
 
 // Mock logger to avoid console output during tests
 vi.mock("../../../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
     },
 }));

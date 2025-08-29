@@ -4,14 +4,14 @@
 
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
-import React, { type ReactNode } from "react";
+import { type ReactNode } from "react";
 
-import ThemedText from "../../theme/components/ThemedText";
+import { ThemedText } from "../../theme/components/ThemedText";
 
 /**
  * Props for the SettingItem component
  */
-export interface SettingItemProps extends CoreComponentProperties {
+export interface SettingItemProperties extends CoreComponentProperties {
     /** Control component (input, select, checkbox, etc.) */
     readonly control: ReactNode;
     /** Description of the setting */
@@ -44,7 +44,7 @@ export interface SettingItemProps extends CoreComponentProperties {
  *
  * @returns Setting item component with consistent layout
  */
-export const SettingItem: React.FC<SettingItemProps> = ({
+export const SettingItem: React.FC<SettingItemProperties> = ({
     className = "",
     control,
     description,

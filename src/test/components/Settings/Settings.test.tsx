@@ -28,7 +28,7 @@ vi.mock("../../../theme/useTheme", () => ({
 }));
 
 vi.mock("../../../services/logger", () => ({
-    default: {
+    logger: {
         warn: vi.fn(),
         error: vi.fn(),
         user: {

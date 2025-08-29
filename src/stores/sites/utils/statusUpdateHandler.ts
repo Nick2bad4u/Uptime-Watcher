@@ -15,7 +15,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { isDevelopment } from "@shared/utils/environment";
 
-import logger from "../../../services/logger";
+import { logger } from "../../../services/logger";
 import {
     ensureError,
     withUtilityErrorHandling,

@@ -7,20 +7,55 @@
  */
 
 import path from "node:path";
+import pc from "picocolors";
 import { normalizePath } from "vite";
+import { type UserConfig } from "vite";
 import { defineConfig } from "vitest/config";
 
+const dirname = import.meta.dirname;
+
 const vitestConfig = defineConfig({
+    cacheDir: "./.cache/.vitest-backend",
+    esbuild: {
+        include: [
+            "**/*.js",
+            "**/*.mjs",
+            "**/*.cjs",
+            "**/*.ts",
+            "**/*.mts",
+            "**/*.cts",
+        ],
+        keepNames: true,
+        target: "es2024",
+    },
+    // Parity: json handling consistent (important if backend loads JSON fixtures)
+    json: {
+        namedExports: true,
+        stringify: true,
+    },
     resolve: {
         alias: {
-            "@app": normalizePath(path.resolve(__dirname, "../../src")),
-            "@electron": normalizePath(
-                path.resolve(__dirname, "../../electron")
-            ),
-            "@shared": normalizePath(path.resolve(__dirname, "../../shared")),
+            "@app": normalizePath(path.resolve(dirname, "../../src")),
+            "@electron": normalizePath(path.resolve(dirname, "../../electron")),
+            "@shared": normalizePath(path.resolve(dirname, "../../shared")),
         },
     },
     test: {
+        attachmentsDir: "./.cache/.vitest-attachments-electron",
+        bail: 100,
+        benchmark: {
+            exclude: ["**/node_modules/**", "**/dist/**"],
+            include: [
+                "../../electron/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}",
+            ],
+            outputJson: "./coverage/electron/bench-results.json",
+            reporters: ["default", "verbose"],
+        },
+        chaiConfig: {
+            includeStack: false,
+            showDiff: true,
+            truncateThreshold: 40,
+        },
         clearMocks: true,
         coverage: {
             all: false, // Disable all file coverage, only test loaded files
@@ -46,14 +81,11 @@ const vitestConfig = defineConfig({
                 "../../report/**", // Exclude report files
                 "../../**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
             ],
+            experimentalAstAwareRemapping: true,
+            ignoreEmptyLines: true,
             include: [
-                "../../electron/**/*.ts", // Include all electron source files only
-                "../../electron/**/*.mts", // Include MTS files
-                "../../electron/**/*.cts", // Include CTS files
-                "../../electron/**/*.mjs", // Include MJS files
-                // Shared files now have their own dedicated coverage config
+                "../../electron/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
             ],
-
             provider: "v8" as const,
             reporter: [
                 "text",
@@ -63,42 +95,66 @@ const vitestConfig = defineConfig({
             ],
             reportOnFailure: true,
             reportsDirectory: "./coverage/electron",
-            skipFull: false, // Don't skip full coverage collection
+            skipFull: false,
             thresholds: {
                 autoUpdate: false,
-                branches: 80, // Minimum 80% branch coverage for backend
+                // Parity: elevate branches to 90 to match frontend thresholds
+                branches: 90,
                 functions: 90, // Minimum 90% function coverage for backend
                 lines: 90, // Minimum 90% line coverage for backend
                 statements: 90, // Minimum 90% statement coverage for backend
             },
         },
+        dangerouslyIgnoreUnhandledErrors: false,
         deps: {
             optimizer: {
                 ssr: { enabled: true },
             },
+        },
+        diff: {
+            aIndicator: pc.red(pc.bold("--")),
+            bIndicator: pc.green(pc.bold("++")),
+            expand: true,
+            maxDepth: 20,
+            omitAnnotationLines: true,
+            printBasicPrototype: false,
+            truncateAnnotation: pc.cyan(
+                pc.bold("... Diff result is truncated")
+            ),
+            truncateThreshold: 250,
+        },
+        env: {
+            NODE_ENV: "test",
+            PACKAGE_VERSION: process.env["PACKAGE_VERSION"] ?? "unknown",
         },
         environment: "node",
         exclude: [
             "**/node_modules/**",
             "**/dist/**",
             "**/dist-electron/**",
-            "**/src/**", // Explicitly exclude all src files
+            "**/src/**",
             "**/coverage/**",
             "**/docs/**",
         ],
         expect: {
+            poll: { interval: 50, timeout: 1000 },
             requireAssertions: true,
         },
+        fakeTimers: {
+            advanceTimeDelta: 20,
+            loopLimit: 10_000,
+            now: Date.now(),
+            shouldAdvanceTime: false,
+            shouldClearNativeTimers: true,
+        },
+        fileParallelism: true,
         globals: true, // Enable global test functions (describe, it, expect)
         include: [
-            "../../electron/**/*.test.ts",
-            "../../electron/**/*.test.mts",
-            "../../electron/**/*.test.cts",
-            "../../electron/**/*.spec.ts",
-            "../../electron/**/*.spec.mts",
-            "../../electron/**/*.spec.cts",
-            // Shared tests now have their own dedicated config (vitest.shared.config.ts)
+            "../../electron/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
         ],
+        includeTaskLocation: true,
+        isolate: true,
+        logHeapUsage: true,
         name: {
             color: "magenta",
             label: "Backend",
@@ -116,6 +172,7 @@ const vitestConfig = defineConfig({
                 useAtomics: true,
             },
         },
+        printConsoleTrace: false,
         reporters: [
             "default",
             "json",
@@ -128,10 +185,31 @@ const vitestConfig = defineConfig({
             "html",
         ],
         restoreMocks: true,
+        retry: 0,
+        sequence: {
+            groupOrder: 0,
+            setupFiles: "parallel",
+        },
         setupFiles: ["../../electron/test/setup.ts"],
+        slowTestThreshold: 300,
         testTimeout: 15_000, // Set Vitest timeout to 15 seconds
-        typecheck: { enabled: true, tsconfig: "./tsconfig.electron.json" },
+        typecheck: {
+            allowJs: false,
+            checker: "tsc",
+            enabled: true,
+            exclude: [
+                "**/node_modules/**",
+                "**/dist/**",
+                "**/cypress/**",
+                "**/.{idea,git,cache,output,temp}/**",
+            ],
+            ignoreSourceErrors: false,
+            include: ["**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
+            only: false,
+            spawnTimeout: 10_000,
+            tsconfig: "./config/testing/tsconfig.electron.test.json",
+        },
     },
-});
+}) satisfies UserConfig as UserConfig;
 
-export default vitestConfig as ReturnType<typeof defineConfig>;
+export default vitestConfig as UserConfig;

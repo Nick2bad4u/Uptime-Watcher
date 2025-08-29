@@ -8,11 +8,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 import { HistoryChart } from "../../components/common/HistoryChart";
 import type { StatusHistory } from "../../../shared/types";
-import ThemeProvider from "../../theme/components/ThemeProvider";
+import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
 // Mock MiniChartBar component
 vi.mock("../../theme/components/MiniChartBar", () => ({
-    default: ({ status, responseTime, timestamp, className }: any) => (
+    MiniChartBar: ({ status, responseTime, timestamp, className }: any) => (
         <div
             data-testid="mini-chart-bar"
             data-status={status}
@@ -26,7 +26,7 @@ vi.mock("../../theme/components/MiniChartBar", () => ({
 
 // Mock ThemedText component
 vi.mock("../../theme/components/ThemedText", () => ({
-    default: ({ children, size, variant, className, ...props }: any) => (
+    ThemedText: ({ children, size, variant, className, ...props }: any) => (
         <span
             data-testid="themed-text"
             data-size={size}

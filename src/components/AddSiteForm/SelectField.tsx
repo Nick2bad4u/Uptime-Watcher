@@ -44,9 +44,14 @@
 
 import type { FormFieldBaseProperties } from "@shared/types/componentProps";
 
-import React, { useCallback } from "react";
+import {
+    type ChangeEvent,
+    memo,
+    type NamedExoticComponent,
+    useCallback,
+} from "react";
 
-import ThemedSelect from "../../theme/components/ThemedSelect";
+import { ThemedSelect } from "../../theme/components/ThemedSelect";
 import { BaseFormField } from "./BaseFormField";
 
 /**
@@ -111,8 +116,8 @@ export interface SelectOption {
  *
  * @public
  */
-const SelectField: React.NamedExoticComponent<SelectFieldProperties> =
-    React.memo(function SelectField({
+export const SelectField: NamedExoticComponent<SelectFieldProperties> = memo(
+    function SelectField({
         disabled = false,
         error,
         helpText,
@@ -125,7 +130,7 @@ const SelectField: React.NamedExoticComponent<SelectFieldProperties> =
         value,
     }: SelectFieldProperties) {
         const handleChange = useCallback(
-            (event: React.ChangeEvent<HTMLSelectElement>) => {
+            (event: ChangeEvent<HTMLSelectElement>) => {
                 onChange(event.target.value);
             },
             [onChange]
@@ -161,6 +166,5 @@ const SelectField: React.NamedExoticComponent<SelectFieldProperties> =
                 )}
             </BaseFormField>
         );
-    });
-
-export default SelectField;
+    }
+);

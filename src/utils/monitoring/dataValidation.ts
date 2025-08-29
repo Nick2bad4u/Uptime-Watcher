@@ -33,7 +33,7 @@
  * @packageDocumentation
  */
 
-import logger from "../../services/logger";
+import { logger } from "../../services/logger";
 
 /**
  * Parse and validate uptime string to number. Handles strings with percent

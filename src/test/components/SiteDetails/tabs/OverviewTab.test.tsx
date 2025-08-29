@@ -23,7 +23,7 @@ vi.mock("../../../../constants", () => ({
 }));
 
 vi.mock("../../../../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
         warn: vi.fn(),
         info: vi.fn(),

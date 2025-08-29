@@ -12,7 +12,7 @@ import React from "react";
 // Import components with low branch coverage
 import { StatusBadge } from "../components/common/StatusBadge";
 import { SiteCardHistory } from "../components/Dashboard/SiteCard/SiteCardHistory";
-import ThemeProvider from "../theme/components/ThemeProvider";
+import { ThemeProvider } from "../theme/components/ThemeProvider";
 import { createValidMonitor } from "../../shared/test/testHelpers";
 
 // Mock dependencies

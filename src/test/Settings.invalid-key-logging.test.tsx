@@ -2,11 +2,11 @@ import { render, screen } from "@testing-library/react";
 import React from "react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 
-import logger from "../services/logger";
+import { logger } from "../services/logger";
 
 // Mock the logger
 vi.mock("../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
         info: vi.fn(),
         user: {

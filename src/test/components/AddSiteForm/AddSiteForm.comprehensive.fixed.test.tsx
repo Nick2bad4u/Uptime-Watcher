@@ -154,7 +154,7 @@ vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
 }));
 
 vi.mock("../../../theme/components/ThemedText", () => ({
-    default: ({
+    ThemedText: ({
         children,
         className,
     }: {
@@ -168,7 +168,7 @@ vi.mock("../../../utils/data/generateUuid", () => ({
 }));
 
 vi.mock("../DynamicMonitorFields", () => ({
-    default: ({ monitorType }: { monitorType: string }) => (
+    DynamicMonitorFields: ({ monitorType }: { monitorType: string }) => (
         <div data-testid="dynamic-monitor-fields">
             Dynamic fields for {monitorType}
         </div>

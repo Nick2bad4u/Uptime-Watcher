@@ -3,12 +3,22 @@
  *
  * @remarks
  * Provides type guards and safe access to Chart.js configuration properties
- * with proper TypeScript support.
+ * with proper TypeScript support using hybrid Chart.js types.
+ *
+ * This module uses the hybrid Chart.js type system to provide:
+ *
+ * - Type-safe access to scale configurations
+ * - Safe nested property navigation
+ * - Business logic type integration
+ * - Chart.js API compatibility
  *
  * @packageDocumentation
+ *
+ * @see hybrid-type-system.md for hybrid type strategy
  */
 
-import type { Simplify, UnknownRecord } from "type-fest";
+import type { ChartScalesConfig } from "@shared/types/chartHybrid";
+import type { Simplify } from "type-fest";
 
 import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
 
@@ -17,7 +27,9 @@ import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
  */
 type ScaleConfigResult = Simplify<{
     /** The scale configuration object */
-    config: UnknownRecord;
+    config:
+        | ChartScalesConfig[keyof ChartScalesConfig]
+        | Record<string, unknown>;
     /** Whether the scale exists */
     exists: boolean;
 }>;
@@ -41,17 +53,19 @@ export function getScaleConfigSafe(
         };
     }
 
-    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe navigation through Chart.js config object structure */
-    const scales = config.scales as UnknownRecord;
-    if (axis in scales) {
+    const chartConfig = config as { scales: Record<string, unknown> };
+    const { scales } = chartConfig;
+
+    if (axis in scales && scales[axis] !== undefined) {
         const scale = scales[axis];
-        const isValidScale = typeof scale === "object" && scale !== null;
-        return {
-            config: isValidScale ? (scale as UnknownRecord) : {},
-            exists: isValidScale,
-        };
+        // Validate that the scale is actually an object (handle runtime type safety)
+        if (typeof scale === "object" && scale !== null) {
+            return {
+                config: scale as ChartScalesConfig[keyof ChartScalesConfig],
+                exists: true,
+            };
+        }
     }
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
     return {
         config: {},
@@ -72,7 +86,7 @@ export function getScaleConfigSafe(
 export function getScaleConfig(
     config: unknown,
     axis: "x" | "y"
-): undefined | UnknownRecord {
+): ChartScalesConfig[keyof ChartScalesConfig] | undefined {
     const result = getScaleConfigSafe(config, axis);
     return result.exists ? result.config : undefined;
 }
@@ -116,12 +130,12 @@ export function getNestedScalePropertySafe(
     let current: unknown = scaleResult.config;
     const validPath: string[] = [];
 
-    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe navigation through nested chart config properties */
     for (const part of pathParts) {
         if (
             typeof current !== "object" ||
             current === null ||
-            !(part in (current as UnknownRecord))
+            // eslint-disable-next-line prefer-object-has-own
+            !Object.prototype.hasOwnProperty.call(current, part)
         ) {
             return {
                 exists: false,
@@ -131,9 +145,9 @@ export function getNestedScalePropertySafe(
         }
 
         validPath.push(part);
-        current = (current as UnknownRecord)[part];
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        current = (current as Record<string, unknown>)[part];
     }
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
 
     return {
         exists: true,
@@ -175,9 +189,17 @@ export function getScaleProperty(
     property: string
 ): unknown {
     const scale = getScaleConfig(config, axis);
-    if (!scale || !(property in scale)) {
+    if (!scale) {
         return undefined;
     }
 
-    return scale[property];
+    // Check if property exists safely
+    // eslint-disable-next-line prefer-object-has-own
+    if (!Object.prototype.hasOwnProperty.call(scale, property)) {
+        return undefined;
+    }
+
+    // Scale is guaranteed to be an object here, safe to access property
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    return (scale as Record<string, unknown>)[property];
 }

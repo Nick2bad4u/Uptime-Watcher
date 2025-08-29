@@ -5,11 +5,11 @@
 
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-import logger from "../services/logger";
+import { logger } from "../services/logger";
 
 // Mock logger
 vi.mock("../services/logger", () => ({
-    default: {
+    logger: {
         warn: vi.fn(),
     },
 }));

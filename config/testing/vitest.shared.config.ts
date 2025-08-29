@@ -1,24 +1,62 @@
+/* eslint-disable eslint-comments/disable-enable-pair -- needed for standalone config*/
+
 /**
  * Vitest configuration for shared utility tests. Standalone config file that
- * specifically targets shared utilities that are used by both frontend and
- * backend. This ensures shared code gets its own coverage flag in Codecov.
+ * specifically targets shared utilities used by both frontend and backend.
+ * Parity adjustments added to align with backend/electron vitest config where
+ * appropriate.
  */
 
 import path from "node:path";
+import pc from "picocolors";
 import { normalizePath } from "vite";
+import { type UserConfig } from "vite";
 import { defineConfig } from "vitest/config";
 
+const dirname = import.meta.dirname;
+
 const vitestConfig = defineConfig({
+    cacheDir: "./.cache/.vitest-shared",
+    esbuild: {
+        include: [
+            "**/*.js",
+            "**/*.mjs",
+            "**/*.cjs",
+            "**/*.ts",
+            "**/*.mts",
+            "**/*.cts",
+        ],
+        keepNames: true,
+        target: "es2024",
+    },
+    // Parity: json handling
+    json: {
+        namedExports: true,
+        stringify: true,
+    },
     resolve: {
         alias: {
-            "@app": normalizePath(path.resolve(__dirname, "../../src")),
-            "@electron": normalizePath(
-                path.resolve(__dirname, "../../electron")
-            ),
-            "@shared": normalizePath(path.resolve(__dirname, "../../shared")),
+            "@app": normalizePath(path.resolve(dirname, "../../src")),
+            "@electron": normalizePath(path.resolve(dirname, "../../electron")),
+            "@shared": normalizePath(path.resolve(dirname, "../../shared")),
         },
     },
     test: {
+        attachmentsDir: "./.cache/.vitest-attachments-shared",
+        bail: 100,
+        benchmark: {
+            exclude: ["**/node_modules/**", "**/dist/**"],
+            include: [
+                "../../shared/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}",
+            ],
+            outputJson: "./coverage/shared/bench-results.json",
+            reporters: ["default", "verbose"],
+        },
+        chaiConfig: {
+            includeStack: false,
+            showDiff: true,
+            truncateThreshold: 40,
+        },
         clearMocks: true,
         coverage: {
             all: false, // Only test loaded files, not all files
@@ -31,9 +69,9 @@ const vitestConfig = defineConfig({
                 "../../**/index.ts", // Exclude barrel export files
                 "../../**/index.tsx",
                 "../../**/node_modules/**",
-                // NOTE: Don't exclude all types.ts files since shared/types.ts contains actual functions
-                "../../src/**/types.ts", // Only exclude frontend type definition files
-                "../../electron/**/types.ts", // Only exclude electron type definition files
+                // Intentional selective exclusion vs backend parity:
+                "../../src/**/types.ts",
+                "../../electron/**/types.ts",
                 "../../**/types.tsx",
                 "../../coverage/**",
                 "../../dist-electron/**",
@@ -53,17 +91,15 @@ const vitestConfig = defineConfig({
                 "../../shared/**/*.spec.cts", // Exclude CTS spec files from coverage
                 "../../shared/test/**", // Exclude test directory
             ],
-            include: [
-                "../../shared/**/*.ts", // Only include shared source files
-                "../../shared/**/*.mts", // Include MTS source files
-                "../../shared/**/*.cts", // Include CTS source files
-            ],
+            experimentalAstAwareRemapping: true,
+            ignoreEmptyLines: true,
+            include: ["../../shared/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}"],
             provider: "v8" as const, // Use V8 provider for consistency
             reporter: [
-                "../../text",
-                "../../json",
-                "../../lcov",
-                "../../html",
+                "text",
+                "json",
+                "lcov",
+                "html",
             ],
             reportOnFailure: true,
             reportsDirectory: "./coverage/shared",
@@ -76,34 +112,57 @@ const vitestConfig = defineConfig({
                 statements: 95, // Very high statement coverage for shared code
             },
         },
+        dangerouslyIgnoreUnhandledErrors: false,
         deps: {
             optimizer: {
                 ssr: { enabled: true },
             },
         },
-        environment: "node", // Node environment for shared utilities
+        diff: {
+            aIndicator: pc.red(pc.bold("--")),
+            bIndicator: pc.green(pc.bold("++")),
+            expand: true,
+            maxDepth: 20,
+            omitAnnotationLines: true,
+            printBasicPrototype: false,
+            truncateAnnotation: pc.cyan(
+                pc.bold("... Diff result is truncated")
+            ),
+            truncateThreshold: 250,
+        },
+        env: {
+            NODE_ENV: "test",
+            PACKAGE_VERSION: process.env["PACKAGE_VERSION"] ?? "unknown",
+        },
+        environment: "node",
         exclude: [
             "**/node_modules/**",
             "**/dist/**",
             "**/dist-electron/**",
-            "**/src/**", // Explicitly exclude frontend files
-            "**/electron/**", // Explicitly exclude electron files
+            "**/src/**",
+            "**/electron/**",
             "**/coverage/**",
             "**/docs/**",
         ],
         expect: {
+            poll: { interval: 50, timeout: 1000 },
             requireAssertions: true,
         },
+        fakeTimers: {
+            advanceTimeDelta: 20,
+            loopLimit: 10_000,
+            now: Date.now(),
+            shouldAdvanceTime: false,
+            shouldClearNativeTimers: true,
+        },
+        fileParallelism: true,
         globals: true, // Enable global test functions
         include: [
-            "../../shared/**/*.test.ts", // Include shared tests only
-            "../../shared/**/*.test.mts", // Include MTS tests
-            "../../shared/**/*.test.cts", // Include CTS tests
-            "../../shared/**/*.spec.ts", // Include shared specs only
-            "../../shared/**/*.spec.mts", // Include MTS specs
-            "../../shared/**/*.spec.cts", // Include CTS specs
-            "../../shared/**/*.test.mjs", // Include MJS tests
+            "../../shared/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
         ],
+        includeTaskLocation: true, // Parity: enable task location annotations
+        isolate: true,
+        logHeapUsage: true,
         name: {
             color: "yellow",
             label: "Shared",
@@ -115,25 +174,50 @@ const vitestConfig = defineConfig({
         poolOptions: {
             threads: {
                 isolate: true,
-                maxThreads: 24, // Lower thread count for shared tests
+                maxThreads: 24,
                 minThreads: 1,
                 singleThread: false,
                 useAtomics: true,
             },
         },
+        printConsoleTrace: false,
         reporters: [
             "default",
             "json",
             "verbose",
             "hanging-process",
+            "dot",
+            // "tap",
+            // "tap-flat",
+            // "junit",
+            "html",
         ],
+        restoreMocks: true,
+        retry: 0,
+        sequence: {
+            groupOrder: 0,
+            setupFiles: "parallel",
+        },
         setupFiles: ["../../shared/test/setup.ts"], // Setup files for custom context injection
+        slowTestThreshold: 300,
         testTimeout: 10_000, // 10 second timeout for shared tests
         typecheck: {
+            allowJs: false,
+            checker: "tsc",
             enabled: true,
+            exclude: [
+                "**/node_modules/**",
+                "**/dist/**",
+                "**/cypress/**",
+                "**/.{idea,git,cache,output,temp}/**",
+            ],
+            ignoreSourceErrors: false,
+            include: ["**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
+            only: false,
+            spawnTimeout: 10_000,
             tsconfig: "./config/testing/tsconfig.shared.test.json",
         },
     },
-});
+}) satisfies UserConfig as UserConfig;
 
-export default vitestConfig as ReturnType<typeof defineConfig>;
+export default vitestConfig as UserConfig;

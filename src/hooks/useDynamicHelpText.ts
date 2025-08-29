@@ -37,7 +37,7 @@ import type { MonitorType } from "@shared/types";
 
 import { useEffect, useMemo, useState } from "react";
 
-import logger from "../services/logger";
+import { logger } from "../services/logger";
 import { getMonitorHelpTexts } from "../utils/monitorUiHelpers";
 
 /**

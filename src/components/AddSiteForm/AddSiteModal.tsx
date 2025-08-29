@@ -10,12 +10,18 @@
  * @packageDocumentation
  */
 
-import React, { useCallback, useEffect } from "react";
+import {
+    memo,
+    type MouseEvent,
+    type NamedExoticComponent,
+    useCallback,
+    useEffect,
+} from "react";
 
 import { useUIStore } from "../../stores/ui/useUiStore";
-import ThemedBox from "../../theme/components/ThemedBox";
-import ThemedButton from "../../theme/components/ThemedButton";
-import ThemedText from "../../theme/components/ThemedText";
+import { ThemedBox } from "../../theme/components/ThemedBox";
+import { ThemedButton } from "../../theme/components/ThemedButton";
+import { ThemedText } from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
 import { AddSiteForm } from "./AddSiteForm";
 
@@ -28,7 +34,7 @@ import { AddSiteForm } from "./AddSiteForm";
  *
  * @returns JSX element containing the modal dialog with AddSiteForm
  */
-export const AddSiteModal: React.NamedExoticComponent<object> = React.memo(
+export const AddSiteModal: NamedExoticComponent<object> = memo(
     function AddSiteModal() {
         const { isDark } = useTheme();
         const { setShowAddSiteModal, showAddSiteModal } = useUIStore();
@@ -38,7 +44,7 @@ export const AddSiteModal: React.NamedExoticComponent<object> = React.memo(
         }, [setShowAddSiteModal]);
 
         const handleBackdropClick = useCallback(
-            (event: React.MouseEvent) => {
+            (event: MouseEvent) => {
                 if (event.target === event.currentTarget) {
                     handleClose();
                 }

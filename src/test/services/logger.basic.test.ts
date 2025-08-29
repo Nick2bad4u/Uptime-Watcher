@@ -42,7 +42,7 @@ describe("Logger Service - Basic Coverage", () => {
     });
 
     beforeEach(async () => {
-        logger = (await import("../../services/logger")).default;
+        logger = (await import("../../services/logger")).logger;
     });
 
     describe("Basic Logging Methods", () => {
@@ -721,7 +721,7 @@ describe("Logger Service - Basic Coverage", () => {
 
             // Re-import logger to test configuration with missing file transport
             const loggerWithoutFile = (await import("../../services/logger"))
-                .default;
+                .logger;
 
             // Verify logger still works without file transport
             expect(loggerWithoutFile).toBeDefined();

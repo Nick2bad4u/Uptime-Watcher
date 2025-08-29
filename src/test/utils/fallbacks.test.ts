@@ -22,7 +22,7 @@ import type { Monitor } from "../../../shared/types";
 
 // Mock the logger module
 vi.mock("../../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
     },
 }));
@@ -366,7 +366,7 @@ describe("Fallback Utilities", () => {
 
                 expect(result).toBe(fallback);
                 expect(operation).toHaveBeenCalledOnce();
-                expect(logger.default.error).toHaveBeenCalled();
+                expect(logger.logger.error).toHaveBeenCalled();
             });
 
             it("should handle different error types", async ({
@@ -391,7 +391,7 @@ describe("Fallback Utilities", () => {
                 );
 
                 expect(result).toBe(fallback);
-                expect(logger.default.error).toHaveBeenCalled();
+                expect(logger.logger.error).toHaveBeenCalled();
             });
 
             it("should log the error with operation name", async ({
@@ -415,7 +415,7 @@ describe("Fallback Utilities", () => {
                     "fallback"
                 );
 
-                expect(logger.default.error).toHaveBeenCalledWith(
+                expect(logger.logger.error).toHaveBeenCalledWith(
                     "specific operation failed",
                     error
                 );
@@ -1291,3 +1291,4 @@ describe("Fallback Utilities", () => {
         });
     });
 });
+

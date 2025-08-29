@@ -5,7 +5,7 @@
 
 import type { Monitor, StatusHistory } from "@shared/types";
 
-import React, { useMemo } from "react";
+import { memo, type NamedExoticComponent, useMemo } from "react";
 
 import { useMonitorTypes } from "../../../hooks/useMonitorTypes";
 import { formatTitleSuffix } from "../../../utils/monitorTitleFormatters";
@@ -96,8 +96,8 @@ function areHistoryPropsEqual(
  *
  * @returns JSX element containing the history chart
  */
-export const SiteCardHistory: React.NamedExoticComponent<SiteCardHistoryProperties> =
-    React.memo(
+export const SiteCardHistory: NamedExoticComponent<SiteCardHistoryProperties> =
+    memo(
         function SiteCardHistory({
             filteredHistory,
             monitor,

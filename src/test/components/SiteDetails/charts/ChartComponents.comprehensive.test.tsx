@@ -5,9 +5,9 @@ import type { ChartOptions } from "chart.js";
 // Import setup first to ensure Chart.js registration
 import "../../../../services/chartSetup";
 
-import ResponseTimeChart from "../../../../components/SiteDetails/charts/ResponseTimeChart";
-import StatusChart from "../../../../components/SiteDetails/charts/StatusChart";
-import UptimeChart from "../../../../components/SiteDetails/charts/UptimeChart";
+import { ResponseTimeChart } from "../../../../components/SiteDetails/charts/ResponseTimeChart";
+import { StatusChart } from "../../../../components/SiteDetails/charts/StatusChart";
+import { UptimeChart } from "../../../../components/SiteDetails/charts/UptimeChart";
 import type {
     ResponseTimeChartData,
     StatusBarChartData,

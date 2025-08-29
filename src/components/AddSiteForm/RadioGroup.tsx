@@ -45,9 +45,9 @@
 
 import type { FormFieldBaseProperties } from "@shared/types/componentProps";
 
-import React, { useCallback } from "react";
+import { memo, type NamedExoticComponent, useCallback } from "react";
 
-import ThemedText from "../../theme/components/ThemedText";
+import { ThemedText } from "../../theme/components/ThemedText";
 import { BaseFormField } from "./BaseFormField";
 
 /**
@@ -115,7 +115,7 @@ export interface RadioOption {
  *
  * @public
  */
-const RadioGroup: React.NamedExoticComponent<RadioGroupProperties> = React.memo(
+export const RadioGroup: NamedExoticComponent<RadioGroupProperties> = memo(
     function RadioGroup({
         disabled = false,
         error,
@@ -171,5 +171,3 @@ const RadioGroup: React.NamedExoticComponent<RadioGroupProperties> = React.memo(
         );
     }
 );
-
-export default RadioGroup;

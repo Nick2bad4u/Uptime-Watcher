@@ -10,7 +10,14 @@
 import type { JSX } from "react/jsx-runtime";
 
 import { isDevelopment, isProduction } from "@shared/utils/environment";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+    memo,
+    type NamedExoticComponent,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
 import { ErrorAlert } from "./components/common/ErrorAlert/ErrorAlert";
@@ -22,17 +29,17 @@ import { UI_DELAYS } from "./constants";
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 import { useMount } from "./hooks/useMount";
 import { useSelectedSite } from "./hooks/useSelectedSite";
-import logger from "./services/logger";
-import ErrorBoundary from "./stores/error/ErrorBoundary";
+import { logger } from "./services/logger";
+import { ErrorBoundary } from "./stores/error/ErrorBoundary";
 import { useErrorStore } from "./stores/error/useErrorStore";
 import { useSettingsStore } from "./stores/settings/useSettingsStore";
 import { useSitesStore } from "./stores/sites/useSitesStore";
 import { useUIStore } from "./stores/ui/useUiStore";
 import { useUpdatesStore } from "./stores/updates/useUpdatesStore";
-import ThemedBox from "./theme/components/ThemedBox";
-import ThemedButton from "./theme/components/ThemedButton";
-import ThemedText from "./theme/components/ThemedText";
-import ThemeProvider from "./theme/components/ThemeProvider";
+import { ThemedBox } from "./theme/components/ThemedBox";
+import { ThemedButton } from "./theme/components/ThemedButton";
+import { ThemedText } from "./theme/components/ThemedText";
+import { ThemeProvider } from "./theme/components/ThemeProvider";
 import { useTheme } from "./theme/useTheme";
 import { setupCacheSync } from "./utils/cacheSync";
 
@@ -84,7 +91,7 @@ const UI_MESSAGES = {
  * @see {@link useTheme} for theme management
  * @see {@link useSitesStore} for site state management
  */
-const App = (): JSX.Element => {
+export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // Error store
     const { clearError, isLoading, lastError } = useErrorStore();
 
@@ -454,6 +461,4 @@ const App = (): JSX.Element => {
             </ThemeProvider>
         </ErrorBoundary>
     );
-};
-
-export default App;
+});

@@ -3,11 +3,17 @@ import type {
     EventHandlers,
 } from "@shared/types/componentProps";
 
-import React, { useMemo } from "react";
+import {
+    type JSX,
+    memo,
+    type NamedExoticComponent,
+    type ReactNode,
+    useMemo,
+} from "react";
 
 import type { ButtonSize, ButtonVariant } from "./types";
 
-import ThemedButton from "./ThemedButton";
+import { ThemedButton } from "./ThemedButton";
 
 /**
  * Props for the ThemedIconButton component
@@ -16,7 +22,7 @@ import ThemedButton from "./ThemedButton";
  */
 export interface ThemedIconButtonProperties extends CoreComponentProperties {
     /** Icon element to display in the button */
-    readonly icon: React.ReactNode;
+    readonly icon: ReactNode;
     /** Custom color for the icon */
     readonly iconColor?: string;
     /** Whether the button is in a loading state */
@@ -40,7 +46,7 @@ export interface ThemedIconButtonProperties extends CoreComponentProperties {
  *
  * @public
  */
-const ThemedIconButton = ({
+const ThemedIconButtonComponent = ({
     className = "",
     disabled = false,
     icon,
@@ -50,7 +56,7 @@ const ThemedIconButton = ({
     size = "md",
     tooltip,
     variant = "ghost",
-}: ThemedIconButtonProperties): React.JSX.Element => {
+}: ThemedIconButtonProperties): JSX.Element => {
     const getSize = (): string => {
         switch (size) {
             case "lg": {
@@ -103,4 +109,5 @@ const ThemedIconButton = ({
     );
 };
 
-export default ThemedIconButton;
+export const ThemedIconButton: NamedExoticComponent<ThemedIconButtonProperties> =
+    memo(ThemedIconButtonComponent);

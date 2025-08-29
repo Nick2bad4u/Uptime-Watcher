@@ -14,20 +14,20 @@
 
 import type { JSX } from "react/jsx-runtime";
 
-import { useCallback, useEffect } from "react";
+import { memo, type NamedExoticComponent, useCallback, useEffect } from "react";
 
-import logger from "../../services/logger";
+import { logger } from "../../services/logger";
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
-import ThemedText from "../../theme/components/ThemedText";
+import { ThemedText } from "../../theme/components/ThemedText";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
-import DynamicField from "./DynamicField";
+import { DynamicField } from "./DynamicField";
 
 /**
  * Props for the {@link DynamicMonitorFields} component.
  *
  * @public
  */
-export interface DynamicMonitorFieldsProps {
+export interface DynamicMonitorFieldsProperties {
     /**
      * Whether the form is in a loading state.
      */
@@ -67,104 +67,107 @@ export interface DynamicMonitorFieldsProps {
  * />;
  * ```
  *
- * @param props - {@link DynamicMonitorFieldsProps}
+ * @param props - {@link DynamicMonitorFieldsProperties}
  *
  * @returns The rendered dynamic monitor fields as a React element.
  *
  * @throws If monitor type configuration fails to load, displays an error
  *   message.
  */
-const DynamicMonitorFields = ({
-    isLoading = false,
-    monitorType,
-    onChange,
-    values,
-}: DynamicMonitorFieldsProps): JSX.Element => {
-    const { isLoaded, lastError, loadMonitorTypes, monitorTypes } =
-        useMonitorTypesStore();
+export const DynamicMonitorFields: NamedExoticComponent<DynamicMonitorFieldsProperties> =
+    memo(function DynamicMonitorFields({
+        isLoading = false,
+        monitorType,
+        onChange,
+        values,
+    }: DynamicMonitorFieldsProperties): JSX.Element {
+        const { isLoaded, lastError, loadMonitorTypes, monitorTypes } =
+            useMonitorTypesStore();
 
-    // Find the config for the current monitor type
-    const config = monitorTypes.find((type) => type.type === monitorType);
+        // Find the config for the current monitor type
+        const config = monitorTypes.find((type) => type.type === monitorType);
 
-    // Load monitor types when component mounts
-    useEffect(
-        function loadMonitorTypesOnMount() {
-            if (!isLoaded && !lastError) {
-                void loadMonitorTypes();
-            }
-        },
-        [
-            isLoaded,
-            lastError,
-            loadMonitorTypes,
-        ]
-    );
-
-    // Memoized default onChange handler to prevent new function creation on
-    // each render
-    const defaultOnChange = useCallback(
-        (fieldName: string) => (): void => {
-            logger.warn(`No onChange handler provided for field: ${fieldName}`);
-        },
-        []
-    );
-
-    if (!isLoaded) {
-        return (
-            <ThemedText variant="secondary">
-                Loading monitor fields...
-            </ThemedText>
-        );
-    }
-
-    if (lastError) {
-        return (
-            <ErrorAlert
-                message={`Error loading monitor fields: ${lastError}`}
-                variant="error"
-            />
-        );
-    }
-
-    if (!config) {
-        return (
-            <ErrorAlert
-                message={`Unknown monitor type: ${monitorType}`}
-                variant="error"
-            />
-        );
-    }
-
-    return (
-        <div className="flex flex-col gap-2">
-            {config.fields.map((field) => {
-                const fieldOnChange = onChange[field.name];
-                if (!fieldOnChange) {
-                    logger.error(
-                        `Missing onChange handler for field: ${field.name}`
-                    );
+        // Load monitor types when component mounts
+        useEffect(
+            function loadMonitorTypesOnMount() {
+                if (!isLoaded && !lastError) {
+                    void loadMonitorTypes();
                 }
+            },
+            [
+                isLoaded,
+                lastError,
+                loadMonitorTypes,
+            ]
+        );
 
-                const fieldValue = values[field.name];
-                const defaultValue = field.type === "number" ? 0 : "";
-
-                const isDnsExpectedValueDisabled =
-                    monitorType === "dns" &&
-                    field.name === "expectedValue" &&
-                    String(values["recordType"]) === "ANY";
-
-                return (
-                    <DynamicField
-                        disabled={isLoading || isDnsExpectedValueDisabled}
-                        field={field}
-                        key={field.name}
-                        onChange={fieldOnChange ?? defaultOnChange(field.name)}
-                        value={fieldValue ?? defaultValue}
-                    />
+        // Memoized default onChange handler to prevent new function creation on
+        // each render
+        const defaultOnChange = useCallback(
+            (fieldName: string) => (): void => {
+                logger.warn(
+                    `No onChange handler provided for field: ${fieldName}`
                 );
-            })}
-        </div>
-    );
-};
+            },
+            []
+        );
 
-export default DynamicMonitorFields;
+        if (!isLoaded) {
+            return (
+                <ThemedText variant="secondary">
+                    Loading monitor fields...
+                </ThemedText>
+            );
+        }
+
+        if (lastError) {
+            return (
+                <ErrorAlert
+                    message={`Error loading monitor fields: ${lastError}`}
+                    variant="error"
+                />
+            );
+        }
+
+        if (!config) {
+            return (
+                <ErrorAlert
+                    message={`Unknown monitor type: ${monitorType}`}
+                    variant="error"
+                />
+            );
+        }
+
+        return (
+            <div className="flex flex-col gap-2">
+                {config.fields.map((field) => {
+                    const fieldOnChange = onChange[field.name];
+                    if (!fieldOnChange) {
+                        logger.error(
+                            `Missing onChange handler for field: ${field.name}`
+                        );
+                    }
+
+                    const fieldValue = values[field.name];
+                    const defaultValue = field.type === "number" ? 0 : "";
+
+                    const isDnsExpectedValueDisabled =
+                        monitorType === "dns" &&
+                        field.name === "expectedValue" &&
+                        String(values["recordType"]) === "ANY";
+
+                    return (
+                        <DynamicField
+                            disabled={isLoading || isDnsExpectedValueDisabled}
+                            field={field}
+                            key={field.name}
+                            onChange={
+                                fieldOnChange ?? defaultOnChange(field.name)
+                            }
+                            value={fieldValue ?? defaultValue}
+                        />
+                    );
+                })}
+            </div>
+        );
+    });

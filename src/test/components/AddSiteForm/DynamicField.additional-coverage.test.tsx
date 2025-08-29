@@ -14,13 +14,13 @@ import React from "react";
 
 import type { MonitorFieldDefinition } from "../../../../shared/types";
 
-import logger from "../../../services/logger";
-import ThemeProvider from "../../../theme/components/ThemeProvider";
-import DynamicField from "../../../components/AddSiteForm/DynamicField";
+import { logger } from "../../../services/logger";
+import { ThemeProvider } from "../../../theme/components/ThemeProvider";
+import { DynamicField } from "../../../components/AddSiteForm/DynamicField";
 
 // Mock the logger
 vi.mock("../../../services/logger", () => ({
-    default: {
+    logger: {
         error: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),

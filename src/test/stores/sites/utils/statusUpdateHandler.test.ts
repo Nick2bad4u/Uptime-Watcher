@@ -15,7 +15,7 @@ vi.mock("../../../../utils/errorHandling", () => ({
 
 // Mock the logger
 vi.mock("../../../../services/logger", () => ({
-    default: {
+    logger: {
         warn: vi.fn(),
         error: vi.fn(),
         info: vi.fn(),
@@ -763,7 +763,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(logger.default.debug).toHaveBeenCalledWith(
+            expect(logger.logger.debug).toHaveBeenCalledWith(
                 expect.stringContaining(
                     "Site nonexistent-site not found in store"
                 )
@@ -792,7 +792,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(logger.default.debug).toHaveBeenCalledWith(
+            expect(logger.logger.debug).toHaveBeenCalledWith(
                 expect.stringContaining("Monitor nonexistent-monitor not found")
             );
         });
@@ -819,7 +819,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(logger.default.debug).toHaveBeenCalledWith(
+            expect(logger.logger.debug).toHaveBeenCalledWith(
                 expect.stringContaining("Applied incremental status update")
             );
         });
@@ -840,7 +840,7 @@ describe("StatusUpdateHandler", () => {
 
             const invalidData = { invalid: "data" };
             await statusChangedCallback(invalidData);
-            expect(logger.default.warn).toHaveBeenCalledWith(
+            expect(logger.logger.warn).toHaveBeenCalledWith(
                 expect.stringContaining(
                     "Invalid monitor status changed event data"
                 ),
@@ -872,7 +872,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(logger.default.debug).not.toHaveBeenCalled();
+            expect(logger.logger.debug).not.toHaveBeenCalled();
         });
     });
 
@@ -1162,7 +1162,7 @@ describe("StatusUpdateHandler", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
 
             // Should have logged warning in development mode
-            expect(logger.default.warn).toHaveBeenCalledWith(
+            expect(logger.logger.warn).toHaveBeenCalledWith(
                 expect.stringContaining(
                     "Invalid monitor status changed event data"
                 ),
@@ -1192,7 +1192,7 @@ describe("StatusUpdateHandler", () => {
 
             // Should still trigger full sync but without warning
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
-            expect(logger.default.warn).not.toHaveBeenCalled();
+            expect(logger.logger.warn).not.toHaveBeenCalled();
         });
 
         it("should cover development mode debug log for successful update", async ({
@@ -1219,7 +1219,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(validEvent);
 
             // Should have logged successful update in development mode
-            expect(logger.default.debug).toHaveBeenCalledWith(
+            expect(logger.logger.debug).toHaveBeenCalledWith(
                 expect.stringContaining("Applied incremental status update")
             );
         });
@@ -1351,7 +1351,7 @@ describe("StatusUpdateHandler", () => {
 
             // Should trigger full sync but not log debug messages
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
-            expect(logger.default.debug).not.toHaveBeenCalled();
+            expect(logger.logger.debug).not.toHaveBeenCalled();
         });
 
         it("should test onUpdate callback conditional execution based on updated site presence", async ({
@@ -1421,7 +1421,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(validEvent);
 
             // Should not log debug messages in production
-            expect(logger.default.debug).not.toHaveBeenCalled();
+            expect(logger.logger.debug).not.toHaveBeenCalled();
         });
     });
 });

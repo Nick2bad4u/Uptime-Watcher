@@ -15,26 +15,32 @@
  */
 
 import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
-import React, { useCallback, useMemo } from "react";
+import {
+    type FormEvent,
+    memo,
+    type NamedExoticComponent,
+    useCallback,
+    useMemo,
+} from "react";
 
 import { CHECK_INTERVALS } from "../../constants";
 import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
 import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
 import { useMonitorTypes } from "../../hooks/useMonitorTypes";
-import logger from "../../services/logger";
+import { logger } from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
-import ThemedBox from "../../theme/components/ThemedBox";
-import ThemedButton from "../../theme/components/ThemedButton";
-import ThemedText from "../../theme/components/ThemedText";
+import { ThemedBox } from "../../theme/components/ThemedBox";
+import { ThemedButton } from "../../theme/components/ThemedButton";
+import { ThemedText } from "../../theme/components/ThemedText";
 import { generateUuid } from "../../utils/data/generateUuid";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { useAddSiteForm } from "../SiteDetails/useAddSiteForm";
-import DynamicMonitorFields from "./DynamicMonitorFields";
-import RadioGroup from "./RadioGroup";
-import SelectField from "./SelectField";
+import { DynamicMonitorFields } from "./DynamicMonitorFields";
+import { RadioGroup } from "./RadioGroup";
+import { SelectField } from "./SelectField";
 import { handleSubmit } from "./Submit";
-import TextField from "./TextField";
+import { TextField } from "./TextField";
 
 /**
  * Props for the AddSiteForm component.
@@ -107,8 +113,8 @@ function isValidMonitorType(value: string): value is MonitorType {
  *
  * @returns The rendered AddSiteForm JSX element.
  */
-export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
-    React.memo(function AddSiteForm({ onSuccess }: AddSiteFormProperties) {
+export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
+    function AddSiteForm({ onSuccess }: AddSiteFormProperties) {
         // Combine store calls to avoid duplicates and improve performance
         const { clearError, isLoading, lastError } = useErrorStore();
         const { addMonitorToSite, createSite, sites } = useSitesStore();
@@ -240,7 +246,7 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
          * @param event - The form submission event.
          */
         const onSubmit = useCallback(
-            async (event: React.FormEvent) => {
+            async (event: FormEvent) => {
                 try {
                     await handleSubmit(event, {
                         addMode,
@@ -295,7 +301,7 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
          * @param e - The form submission event
          */
         const handleFormSubmit = useCallback(
-            (e: React.FormEvent) => {
+            (e: FormEvent) => {
                 e.preventDefault();
                 void onSubmit(e);
             },
@@ -319,7 +325,7 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
         );
 
         // Memoized options arrays to prevent unnecessary re-renders
-        const addModeOptions = React.useMemo(
+        const addModeOptions = useMemo(
             () => [
                 { label: "Create New Site", value: "new" },
                 { label: "Add to Existing Site", value: "existing" },
@@ -327,7 +333,7 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
             []
         );
 
-        const checkIntervalOptions = React.useMemo(
+        const checkIntervalOptions = useMemo(
             () =>
                 CHECK_INTERVALS.map((interval) => ({
                     label: interval.label,
@@ -471,4 +477,5 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
                 </form>
             </ThemedBox>
         );
-    });
+    }
+);

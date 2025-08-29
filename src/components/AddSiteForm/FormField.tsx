@@ -38,10 +38,11 @@
  */
 
 import type { FormFieldBaseProperties } from "@shared/types/componentProps";
+import type { NamedExoticComponent } from "react";
 
-import React from "react";
+import React, { memo } from "react";
 
-import ThemedText from "../../theme/components/ThemedText";
+import { ThemedText } from "../../theme/components/ThemedText";
 
 /**
  * Properties for the FormField component.
@@ -82,7 +83,7 @@ export interface FormFieldProperties extends FormFieldBaseProperties {
  *
  * @public
  */
-const FormField: React.NamedExoticComponent<FormFieldProperties> = React.memo(
+export const FormField: NamedExoticComponent<FormFieldProperties> = memo(
     function FormField({
         children,
         error,
@@ -121,5 +122,3 @@ const FormField: React.NamedExoticComponent<FormFieldProperties> = React.memo(
         );
     }
 );
-
-export default FormField;

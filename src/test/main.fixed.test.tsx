@@ -3,7 +3,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import React from "react";
+import { createElement, StrictMode } from "react";
 
 // Mock ReactDOM.createRoot properly
 const mockRender = vi.fn();
@@ -13,15 +13,13 @@ const mockCreateRoot = vi.fn(() => ({
 }));
 
 vi.mock("react-dom/client", () => ({
-    default: {
-        createRoot: mockCreateRoot,
-    },
+    createRoot: mockCreateRoot,
 }));
 
 // Mock App component
 vi.mock("../App", () => ({
-    default: () =>
-        React.createElement("div", { "data-testid": "app" }, "Mocked App"),
+    App: () =>
+        createElement("div", { "data-testid": "app" }, "Mocked App"),
 }));
 
 // Mock CSS import
@@ -179,7 +177,7 @@ describe("main.tsx - Application Entry Point", () => {
 
             expect(mockRender).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    type: React.StrictMode,
+                    type: StrictMode,
                     props: {
                         children: expect.objectContaining({
                             type: expect.any(Function), // App component
@@ -351,7 +349,7 @@ describe("main.tsx - Application Entry Point", () => {
             // Verify render was called with StrictMode
             expect(mockRender).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    type: React.StrictMode,
+                    type: StrictMode,
                 })
             );
         });

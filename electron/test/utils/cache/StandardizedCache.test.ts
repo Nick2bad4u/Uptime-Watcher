@@ -108,11 +108,15 @@ describe("StandardizedCache", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
+            // Mock both timers and Date.now()
+            vi.useFakeTimers();
+            const startTime = Date.now();
+
             cache.set("key1", "value1", 100); // 100ms TTL
             expect(cache.get("key1")).toBe("value1");
 
-            // Mock time passage
-            vi.useFakeTimers();
+            // Advance time by 150ms
+            vi.setSystemTime(startTime + 150);
             vi.advanceTimersByTime(150);
 
             expect(cache.get("key1")).toBeUndefined(); // Should be expired

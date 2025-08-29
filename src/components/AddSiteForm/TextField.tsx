@@ -56,9 +56,14 @@
 
 import type { FormFieldBaseProperties } from "@shared/types/componentProps";
 
-import React, { useCallback } from "react";
+import {
+    type ChangeEvent,
+    memo,
+    type NamedExoticComponent,
+    useCallback,
+} from "react";
 
-import ThemedInput from "../../theme/components/ThemedInput";
+import { ThemedInput } from "../../theme/components/ThemedInput";
 import { BaseFormField } from "./BaseFormField";
 
 /**
@@ -112,7 +117,7 @@ export interface TextFieldProperties extends FormFieldBaseProperties {
  *
  * @public
  */
-const TextField: React.NamedExoticComponent<TextFieldProperties> = React.memo(
+export const TextField: NamedExoticComponent<TextFieldProperties> = memo(
     function TextField({
         disabled = false,
         error,
@@ -128,7 +133,7 @@ const TextField: React.NamedExoticComponent<TextFieldProperties> = React.memo(
         value,
     }: TextFieldProperties) {
         const handleChange = useCallback(
-            (event: React.ChangeEvent<HTMLInputElement>) => {
+            (event: ChangeEvent<HTMLInputElement>) => {
                 onChange(event.target.value);
             },
             [onChange]
@@ -160,5 +165,3 @@ const TextField: React.NamedExoticComponent<TextFieldProperties> = React.memo(
         );
     }
 );
-
-export default TextField;
