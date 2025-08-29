@@ -7,14 +7,112 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[62f6a19](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62f6a19b581fdf63b8a6ce9a82ce6dd78a2f3d9e)...
-[62f6a19](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62f6a19b581fdf63b8a6ce9a82ce6dd78a2f3d9e)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/62f6a19b581fdf63b8a6ce9a82ce6dd78a2f3d9e...62f6a19b581fdf63b8a6ce9a82ce6dd78a2f3d9e))
+[[b0b0256](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0b0256998efcbcf76329ca61001ed90077b574f)...
+[b0b0256](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0b0256998efcbcf76329ca61001ed90077b574f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b0b0256998efcbcf76329ca61001ed90077b574f...b0b0256998efcbcf76329ca61001ed90077b574f))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 13.3.0 [`(b0b0256)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0b0256998efcbcf76329ca61001ed90077b574f)
+
+
+
+
+
+
+## [13.3.0] - 2025-08-29
+
+
+[[c204812](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c204812637708ac8a386c55204631b874d4f2e50)...
+[d32ee24](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d32ee244a9ea649eebd9877b1f28482b832bb348)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c204812637708ac8a386c55204631b874d4f2e50...d32ee244a9ea649eebd9877b1f28482b832bb348))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update dependency group (#58) [`(108dc7e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/108dc7e4cb32a3a55d9510abef3adadf4a98586c)
+
+
 - [dependency] Update version 13.2.0 [`(62f6a19)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62f6a19b581fdf63b8a6ce9a82ce6dd78a2f3d9e)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Convert all React default imports to named imports
+
+- Standardizes React imports throughout the codebase by replacing default imports with named imports and type-only imports.
+- Refactors all component, hook, and test files to use named exports and imports for React, improving tree-shaking and bundle size.
+- Updates logger service to use named export for better mocking and explicit imports in tests and main app.
+- Refactors theme and shared components to use explicit named exports, eliminating ambiguity and easing test mocking.
+- Cleans up test mocks and usage patterns to align with new named import conventions for React and internal modules.
+- Updates hybrid Chart.js type system documentation and implementation, promoting type safety and maintainability.
+- Improves type-safe utility function signatures and test coverage for all frontend components.
+- Updates build and test configs to optimize dependency chunking and ensure compatibility with named imports in Vite and Vitest.
+- Provides scripts and documentation for fixing legacy logger mocks and finding problematic shared imports.
+- Ensures full architecture compliance and validates the change with comprehensive test and type/lint passes.
+
+Relates to tree-shaking optimization and modern React patterns.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3b32a21)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3b32a211babfe6619907908d2eeef41e1f619517)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add standardized annotation to all test cases
+
+- Adds consistent metadata annotation to every test case for improved categorization, reporting, and traceability.
+- Facilitates future test analytics and integration with external tooling by embedding functional, component, category, and type tags.
+- Enhances maintainability and clarity for test suite organization and review.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d4edb44)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d4edb44332bba276156d9bf30d2c7a8b67aa4629)
+
+
+- 🧪 [test] Improve typings and coverage in tests and mocks
+
+- Updates event and record interfaces to support symbol keys, improving type safety and flexibility in tests.
+- Refines test coverage for error handling functions, ensuring proper context is passed and edge cases are exercised.
+- Enhances timestamp parsing tests for clarity and reliability.
+- Adjusts type assertions and callback signatures in final function coverage tests to reduce type errors and better reflect intended usage.
+- Refactors mock monitor history to use a centralized type definition for consistency and maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c910bd6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c910bd6b5fe944795ce5ce37d63c90b0c3cc0f47)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Improve code consistency and formatting across tests and types
+
+- Enhances codebase readability by standardizing quotation styles, argument formatting, and multi-line function calls
+- Updates documentation comments for clarity and completeness in type definition files
+- Refactors several test files to maintain consistent mock and callback syntax
+- Removes unnecessary trailing blank lines for cleaner diffs
+- Facilitates easier future maintenance and onboarding by enforcing style uniformity
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d32ee24)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d32ee244a9ea649eebd9877b1f28482b832bb348)
+
+
+- Update changelogs for v13.2.0 [skip ci] [`(90d5082)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/90d5082bb0ea4d25894a0db8f3d067e840281a2e)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies and enhance Vite config
+
+- Updates various dependencies to latest versions, improving stability and compatibility.
+- Adds new dev dependency for sequential thinking server support.
+- Refines Vite configuration: declares SPA app type, configures asset directory, enables compressed size reporting, sets up json handling, preview server, and file extensions.
+- Improves build and test settings for debugging, coverage, and CSS sourcemaps.
+- Adjusts linting script paths for consistency.
+- Updates unit test to align with new form field defaults and validations.
+
+These changes streamline development workflows, enhance build outputs, and ensure up-to-date dependency management.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c204812)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c204812637708ac8a386c55204631b874d4f2e50)
 
 
 
