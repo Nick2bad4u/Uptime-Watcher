@@ -77,7 +77,7 @@ export const AddSiteModal: NamedExoticComponent<object> = memo(
         }
 
         return (
-            /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- Modal backdrop requires click handler for UX; keyboard support provided by modal focus management
             <div
                 className={`modal-overlay fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm ${
                     isDark ? "dark" : ""

@@ -196,7 +196,8 @@ describe("safeConversions - Complete Function Coverage", () => {
             const dateObject = new Date(now);
             expect(safeParseTimestamp(now)).toBe(now);
             expect(safeParseTimestamp(now.toString())).toBe(now);
-            expect(safeParseTimestamp(dateObject)).toBe(dateObject.getTime());
+            // Use the same timestamp value for comparison to avoid timing issues
+            expect(safeParseTimestamp(dateObject)).toBe(now);
             expect(safeParseTimestamp(-1) > 0).toBe(true); // negative returns current time
             expect(safeParseTimestamp("invalid", now)).toBe(now);
             expect(safeParseTimestamp(null) > 0).toBe(true); // null returns current time

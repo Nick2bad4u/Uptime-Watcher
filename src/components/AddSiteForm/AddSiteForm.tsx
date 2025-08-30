@@ -349,7 +349,11 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 rounded="lg"
                 surface="base"
             >
-                <form className="space-y-4" onSubmit={handleFormSubmit}>
+                <form
+                    aria-label="Add Site Form"
+                    className="space-y-4"
+                    onSubmit={handleFormSubmit}
+                >
                     {/* Add mode toggle */}
                     <RadioGroup
                         disabled={isLoading}

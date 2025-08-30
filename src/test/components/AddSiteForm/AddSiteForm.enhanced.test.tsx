@@ -269,8 +269,7 @@ const renderAddSiteForm = (
     return {
         ...view,
         getForm: () => {
-            // eslint-disable-next-line testing-library/no-container
-            const form = view.container.querySelector("form");
+            const form = screen.getByRole("form");
             if (!form) throw new Error("Form element not found");
             return form;
         },
@@ -1973,14 +1972,13 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            const { rerender } = renderAddSiteForm();
+            const { rerender, getForm } = renderAddSiteForm();
 
             // Simulate multiple re-renders with different props
             for (let i = 0; i < 10; i++) {
                 rerender(<AddSiteForm {...defaultProps} />);
             }
 
-            const { getForm } = renderAddSiteForm();
             expect(getForm()).toBeInTheDocument();
         });
 

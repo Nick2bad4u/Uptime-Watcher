@@ -134,8 +134,7 @@ export function getNestedScalePropertySafe(
         if (
             typeof current !== "object" ||
             current === null ||
-            // eslint-disable-next-line prefer-object-has-own
-            !Object.prototype.hasOwnProperty.call(current, part)
+            !Object.hasOwn(current, part)
         ) {
             return {
                 exists: false,
@@ -145,7 +144,7 @@ export function getNestedScalePropertySafe(
         }
 
         validPath.push(part);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: current is validated as object above, accessing known property
         current = (current as Record<string, unknown>)[part];
     }
 
@@ -194,12 +193,11 @@ export function getScaleProperty(
     }
 
     // Check if property exists safely
-    // eslint-disable-next-line prefer-object-has-own
-    if (!Object.prototype.hasOwnProperty.call(scale, property)) {
+    if (!Object.hasOwn(scale, property)) {
         return undefined;
     }
 
     // Scale is guaranteed to be an object here, safe to access property
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: scale validated as object with hasOwn check above
     return (scale as Record<string, unknown>)[property];
 }
