@@ -550,6 +550,76 @@ function cleanContent(content, config, logger) {
 }
 
 /**
+ * Convert TypeScript definition file content to proper markdown format
+ *
+ * @param {string} content - Raw TypeScript content
+ * @param {string} filename - Original filename for context
+ *
+ * @returns {string} Properly formatted markdown content
+ */
+function convertTypeScriptToMarkdown(content, filename) {
+    // Extract JSDoc comments and code separately
+    const lines = content.split('\n');
+    const result = [];
+    let inComment = false;
+    let commentBuffer = [];
+    let codeBuffer = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmedLine = line.trim();
+
+        // Handle multi-line JSDoc comments
+        if (trimmedLine.startsWith('/**')) {
+            inComment = true;
+            commentBuffer = [line];
+            continue;
+        }
+
+        if (inComment) {
+            commentBuffer.push(line);
+            if (trimmedLine.endsWith('*/')) {
+                inComment = false;
+                // Process comment buffer - remove /** */ and * prefixes
+                const processedComment = commentBuffer
+                    .map(l => l.replace(/^\s*\/?\*+\/?/, '').replace(/^\s*\*\s?/, ''))
+                    .filter(l => l.trim() !== '')
+                    .join('\n');
+
+                if (processedComment.trim()) {
+                    result.push(processedComment.trim());
+                    result.push(''); // Empty line after comment
+                }
+                commentBuffer = [];
+                continue;
+            }
+            continue;
+        }
+
+        // Handle TypeScript code
+        if (trimmedLine && !trimmedLine.startsWith('//')) {
+            codeBuffer.push(line);
+        } else if (codeBuffer.length > 0) {
+            // End of code block, wrap it
+            result.push('```typescript');
+            result.push(...codeBuffer);
+            result.push('```');
+            result.push(''); // Empty line after code block
+            codeBuffer = [];
+        }
+    }
+
+    // Handle any remaining code
+    if (codeBuffer.length > 0) {
+        result.push('```typescript');
+        result.push(...codeBuffer);
+        result.push('```');
+    }
+
+    return result.join('\n');
+}
+
+/**
  * Download a single file with retry logic
  *
  * @param {Object} task - Download task
@@ -569,68 +639,140 @@ async function downloadFile(task, config, logger, paths) {
                 `Downloading ${page} (attempt ${attempt}/${config.maxRetries})`
             );
 
-            // Create pandoc command
-            const cmd = [
-                "pandoc",
-                "--wrap=preserve",
-                url,
-                "-f",
-                config.inputFormat,
-                "-t",
-                config.outputFormat,
-                "-o",
-                outputPath,
-            ];
-
             // Ensure output directory exists
             await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
-            // Execute pandoc
-            await execFileAsync("pandoc", cmd.slice(1), {
-                timeout: config.timeout,
-                maxBuffer: 1024 * 1024 * 10, // 10MB buffer
-            });
+            // For TypeScript files, download raw content and preprocess
+            if (page.endsWith('.d.ts')) {
+                // Download raw content using fetch with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), config.timeout);
 
-            // Verify file was created
-            if (!fsSync.existsSync(outputPath)) {
-                throw new Error(`Output file not created: ${outputPath}`);
+                try {
+                    const response = await fetch(url, {
+                        signal: controller.signal,
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const rawContent = await response.text();
+
+                    if (!rawContent || rawContent.trim().length === 0) {
+                        throw new Error(`Downloaded file is empty: ${page}`);
+                    }
+
+                    // Convert TypeScript to proper markdown
+                    const markdownContent = convertTypeScriptToMarkdown(rawContent, page);
+
+                    // Create a temporary file with the markdown content
+                    const tempFile = outputPath.replace('.md', '.temp.md');
+                    await fs.writeFile(tempFile, markdownContent, 'utf8');
+
+                    // Use pandoc to process the proper markdown
+                    const cmd = [
+                        "pandoc",
+                        "--wrap=preserve",
+                        tempFile,
+                        "-f",
+                        "gfm", // Now using actual markdown as input
+                        "-t",
+                        config.outputFormat,
+                        "-o",
+                        outputPath,
+                    ];
+
+                    await execFileAsync("pandoc", cmd.slice(1), {
+                        timeout: config.timeout,
+                        maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+                    });
+
+                    // Clean up temp file
+                    await fs.unlink(tempFile).catch(() => {}); // Ignore cleanup errors
+
+                    // Read the processed content
+                    let content = await fs.readFile(outputPath, "utf8");
+
+                    // Additional processing
+                    content = rewriteLinks(content, config.baseUrl, logger);
+                    content = cleanContent(content, config, logger);
+
+                    // Write final content
+                    await fs.writeFile(outputPath, content, "utf8");
+
+                    const hash = crypto.createHash("sha256").update(content).digest("hex");
+                    logger.success(`Downloaded and processed TypeScript file: ${page}`);
+
+                    return {
+                        page,
+                        outputPath,
+                        success: true,
+                        hash,
+                        size: content.length,
+                        attempts: attempt,
+                    };
+                } catch (fetchError) {
+                    clearTimeout(timeoutId);
+                    throw fetchError;
+                }
+            } else {
+                // For non-TypeScript files, use original pandoc method
+                const cmd = [
+                    "pandoc",
+                    "--wrap=preserve",
+                    url,
+                    "-f",
+                    config.inputFormat,
+                    "-t",
+                    config.outputFormat,
+                    "-o",
+                    outputPath,
+                ];
+
+                await execFileAsync("pandoc", cmd.slice(1), {
+                    timeout: config.timeout,
+                    maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+                });
+
+                // Verify file was created
+                if (!fsSync.existsSync(outputPath)) {
+                    throw new Error(`Output file not created: ${outputPath}`);
+                }
+
+                // Read and process content
+                let content = await fs.readFile(outputPath, "utf8");
+
+                if (!content || content.trim().length === 0) {
+                    throw new Error(`Downloaded file is empty: ${outputPath}`);
+                }
+
+                // Validate content
+                if (!validateContent(content, config, logger)) {
+                    throw new Error(`Content validation failed for: ${page}`);
+                }
+
+                // Process content
+                content = rewriteLinks(content, config.baseUrl, logger);
+                content = cleanContent(content, config, logger);
+
+                // Write processed content
+                await fs.writeFile(outputPath, content, "utf8");
+
+                const hash = crypto.createHash("sha256").update(content).digest("hex");
+                logger.success(`Downloaded: ${page}`);
+
+                return {
+                    page,
+                    outputPath,
+                    success: true,
+                    hash,
+                    size: content.length,
+                    attempts: attempt,
+                };
             }
-
-            // Read and process content
-            let content = await fs.readFile(outputPath, "utf8");
-
-            if (!content || content.trim().length === 0) {
-                throw new Error(`Downloaded file is empty: ${outputPath}`);
-            }
-
-            // Validate content
-            if (!validateContent(content, config, logger)) {
-                throw new Error(`Content validation failed for: ${page}`);
-            }
-
-            // Process content
-            content = rewriteLinks(content, config.baseUrl, logger);
-            content = cleanContent(content, config, logger);
-
-            // Write processed content
-            await fs.writeFile(outputPath, content, "utf8");
-
-            // Calculate hash for change detection
-            const hash = crypto
-                .createHash("sha256")
-                .update(content)
-                .digest("hex");
-
-            logger.success(`Downloaded: ${page}`);
-
-            return {
-                page,
-                outputPath,
-                success: true,
-                hash,
-                size: content.length,
-                attempts: attempt,
-            };
         } catch (error) {
             lastError = error;
             logger.warn(

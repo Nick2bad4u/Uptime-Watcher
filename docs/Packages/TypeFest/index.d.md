@@ -1,11 +1,12 @@
-// Basic
-export type \* from './source/primitive.d.ts';
-export type \* from './source/typed-array.d.ts';
-export type \* from './source/basic.d.ts';
-export type \* from './source/json-value.d.ts';
-export type \* from './source/characters.d.ts';
+``` typescript
+export type * from './source/primitive.d.ts';
+export type * from './source/typed-array.d.ts';
+export type * from './source/basic.d.ts';
+export type * from './source/json-value.d.ts';
+export type * from './source/characters.d.ts';
+```
 
-// Utilities
+``` typescript
 export type {KeysOfUnion} from './source/keys-of-union.d.ts';
 export type {DistributedOmit} from './source/distributed-omit.d.ts';
 export type {DistributedPick} from './source/distributed-pick.d.ts';
@@ -76,17 +77,17 @@ export type {Schema, SchemaOptions} from './source/schema.d.ts';
 export type {LiteralToPrimitive} from './source/literal-to-primitive.d.ts';
 export type {LiteralToPrimitiveDeep} from './source/literal-to-primitive-deep.d.ts';
 export type {
-PositiveInfinity,
-NegativeInfinity,
-Finite,
-Integer,
-Float,
-NegativeFloat,
-Negative,
-NonNegative,
-NegativeInteger,
-NonNegativeInteger,
-IsNegative,
+    PositiveInfinity,
+    NegativeInfinity,
+    Finite,
+    Integer,
+    Float,
+    NegativeFloat,
+    Negative,
+    NonNegative,
+    NegativeInteger,
+    NonNegativeInteger,
+    IsNegative,
 } from './source/numeric.d.ts';
 export type {GreaterThan} from './source/greater-than.d.ts';
 export type {GreaterThanOrEqual} from './source/greater-than-or-equal.d.ts';
@@ -120,11 +121,11 @@ export type {IntRange} from './source/int-range.d.ts';
 export type {IntClosedRange} from './source/int-closed-range.d.ts';
 export type {IsEqual} from './source/is-equal.d.ts';
 export type {
-IsLiteral,
-IsStringLiteral,
-IsNumericLiteral,
-IsBooleanLiteral,
-IsSymbolLiteral,
+    IsLiteral,
+    IsStringLiteral,
+    IsNumericLiteral,
+    IsBooleanLiteral,
+    IsSymbolLiteral,
 } from './source/is-literal.d.ts';
 export type {IsAny} from './source/is-any.d.ts';
 export type {IfAny} from './source/if-any.d.ts';
@@ -156,8 +157,9 @@ export type {IsLowercase} from './source/is-lowercase.d.ts';
 export type {IsUppercase} from './source/is-uppercase.d.ts';
 export type {IsOptional} from './source/is-optional.d.ts';
 export type {IsNullable} from './source/is-nullable.d.ts';
+```
 
-// Template literal types
+``` typescript
 export type {CamelCase} from './source/camel-case.d.ts';
 export type {CamelCasedProperties} from './source/camel-cased-properties.d.ts';
 export type {CamelCasedPropertiesDeep} from './source/camel-cased-properties-deep.d.ts';
@@ -186,13 +188,16 @@ export type {LastArrayElement} from './source/last-array-element.d.ts';
 export type {ConditionalSimplify} from './source/conditional-simplify.d.ts';
 export type {ConditionalSimplifyDeep} from './source/conditional-simplify-deep.d.ts';
 export type {RemovePrefix} from './source/remove-prefix.d.ts';
+```
 
-// Miscellaneous
+``` typescript
 export type {GlobalThis} from './source/global-this.d.ts';
 export type {PackageJson} from './source/package-json.d.ts';
 export type {TsConfigJson} from './source/tsconfig-json.d.ts';
+```
 
-// Improved built-in
+``` typescript
 export type {ExtendsStrict} from './source/extends-strict.d.ts';
 export type {ExtractStrict} from './source/extract-strict.d.ts';
 export type {ExcludeStrict} from './source/exclude-strict.d.ts';
+```
