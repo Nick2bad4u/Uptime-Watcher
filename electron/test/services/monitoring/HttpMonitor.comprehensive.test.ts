@@ -492,7 +492,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 "https://example.com",
                 expect.objectContaining({
                     timeout: 5000,
-                    signal: expect.any(AbortSignal)
+                    signal: expect.any(AbortSignal),
                 })
             );
             expect(determineMonitorStatus).toHaveBeenCalledWith(200);

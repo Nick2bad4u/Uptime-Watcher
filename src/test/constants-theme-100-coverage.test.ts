@@ -16,7 +16,7 @@ import {
     FONT_FAMILY_MONO,
     FONT_FAMILY_SANS,
     type MonitorTypeOption,
-    type IntervalOption
+    type IntervalOption,
 } from "../constants";
 
 // Mock any external dependencies
@@ -43,8 +43,8 @@ describe("Constants and Configuration 100% Coverage", () => {
         it("should be usable in CSS context", () => {
             const element = {
                 style: {
-                    transition: TRANSITION_ALL
-                }
+                    transition: TRANSITION_ALL,
+                },
             };
 
             expect(element.style.transition).toBe("all 0.2s ease-in-out");
@@ -74,7 +74,9 @@ describe("Constants and Configuration 100% Coverage", () => {
         });
 
         it("should contain expected monitor types", () => {
-            const values = FALLBACK_MONITOR_TYPE_OPTIONS.map(option => option.value);
+            const values = FALLBACK_MONITOR_TYPE_OPTIONS.map(
+                (option) => option.value
+            );
 
             // Should contain the three basic monitor types
             expect(values).toContain("http");
@@ -84,14 +86,18 @@ describe("Constants and Configuration 100% Coverage", () => {
         });
 
         it("should have unique values", () => {
-            const values = FALLBACK_MONITOR_TYPE_OPTIONS.map(option => option.value);
+            const values = FALLBACK_MONITOR_TYPE_OPTIONS.map(
+                (option) => option.value
+            );
             const uniqueValues = [...new Set(values)];
 
             expect(values.length).toBe(uniqueValues.length);
         });
 
         it("should have unique labels", () => {
-            const labels = FALLBACK_MONITOR_TYPE_OPTIONS.map(option => option.label);
+            const labels = FALLBACK_MONITOR_TYPE_OPTIONS.map(
+                (option) => option.label
+            );
             const uniqueLabels = [...new Set(labels)];
 
             expect(labels.length).toBe(uniqueLabels.length);
@@ -117,22 +123,24 @@ describe("Constants and Configuration 100% Coverage", () => {
         });
 
         it("should contain expected interval types", () => {
-            const labels = CHECK_INTERVALS.map(i => i.label);
+            const labels = CHECK_INTERVALS.map((i) => i.label);
 
             // Should contain seconds, minutes, and hours
-            expect(labels.some(l => l.includes("second"))).toBe(true);
-            expect(labels.some(l => l.includes("minute"))).toBe(true);
-            expect(labels.some(l => l.includes("hour"))).toBe(true);
+            expect(labels.some((l) => l.includes("second"))).toBe(true);
+            expect(labels.some((l) => l.includes("minute"))).toBe(true);
+            expect(labels.some((l) => l.includes("hour"))).toBe(true);
         });
 
         it("should have ascending values", () => {
             for (let i = 1; i < CHECK_INTERVALS.length; i++) {
-                expect(CHECK_INTERVALS[i].value).toBeGreaterThan(CHECK_INTERVALS[i - 1].value);
+                expect(CHECK_INTERVALS[i].value).toBeGreaterThan(
+                    CHECK_INTERVALS[i - 1].value
+                );
             }
         });
 
         it("should have reasonable interval ranges", () => {
-            const values = CHECK_INTERVALS.map(i => i.value);
+            const values = CHECK_INTERVALS.map((i) => i.value);
             const minValue = Math.min(...values);
             const maxValue = Math.max(...values);
 
@@ -176,11 +184,11 @@ describe("Constants and Configuration 100% Coverage", () => {
 
         it("should be usable in CSS context", () => {
             const monoStyle = {
-                fontFamily: FONT_FAMILY_MONO.join(", ")
+                fontFamily: FONT_FAMILY_MONO.join(", "),
             };
 
             const sansStyle = {
-                fontFamily: FONT_FAMILY_SANS.join(", ")
+                fontFamily: FONT_FAMILY_SANS.join(", "),
             };
 
             expect(monoStyle.fontFamily).toContain("monospace");
@@ -193,7 +201,7 @@ describe("Constants and Configuration 100% Coverage", () => {
             const animations = [
                 { transition: TRANSITION_ALL },
                 { WebkitTransition: TRANSITION_ALL },
-                { MozTransition: TRANSITION_ALL }
+                { MozTransition: TRANSITION_ALL },
             ];
 
             for (const animation of animations) {
@@ -204,25 +212,27 @@ describe("Constants and Configuration 100% Coverage", () => {
         });
 
         it("should handle monitor type options as dropdown data", () => {
-            const selectOptions = FALLBACK_MONITOR_TYPE_OPTIONS.map(option => ({
-                text: option.label,
-                value: option.value,
-                selected: option.value === "http"
-            }));
+            const selectOptions = FALLBACK_MONITOR_TYPE_OPTIONS.map(
+                (option) => ({
+                    text: option.label,
+                    value: option.value,
+                    selected: option.value === "http",
+                })
+            );
 
             expect(selectOptions.length).toBe(3);
-            expect(selectOptions.some(opt => opt.selected)).toBe(true);
+            expect(selectOptions.some((opt) => opt.selected)).toBe(true);
         });
 
         it("should handle interval options in form contexts", () => {
-            const formOptions = CHECK_INTERVALS.map(interval => ({
+            const formOptions = CHECK_INTERVALS.map((interval) => ({
                 display: interval.label,
                 milliseconds: interval.value,
-                selected: interval.value === 300_000 // 5 minutes
+                selected: interval.value === 300_000, // 5 minutes
             }));
 
             expect(formOptions.length).toBeGreaterThan(0);
-            expect(formOptions.some(opt => opt.selected)).toBe(true);
+            expect(formOptions.some((opt) => opt.selected)).toBe(true);
         });
     });
 
@@ -304,7 +314,7 @@ describe("Constants and Configuration 100% Coverage", () => {
         it("should handle constant usage in type contexts", () => {
             // Test usage in type-safe contexts
             const style: { transition: string } = {
-                transition: TRANSITION_ALL
+                transition: TRANSITION_ALL,
             };
 
             expect(style.transition).toBe(TRANSITION_ALL);
@@ -352,7 +362,7 @@ describe("Constants and Configuration 100% Coverage", () => {
                 options: FALLBACK_MONITOR_TYPE_OPTIONS,
                 intervals: CHECK_INTERVALS,
                 monoFonts: FONT_FAMILY_MONO,
-                sansFonts: FONT_FAMILY_SANS
+                sansFonts: FONT_FAMILY_SANS,
             });
 
             const parsed = JSON.parse(serialized);
@@ -366,24 +376,34 @@ describe("Constants and Configuration 100% Coverage", () => {
 
         it("should work with Object methods", () => {
             // Test monitor options
-            const monitorKeys = FALLBACK_MONITOR_TYPE_OPTIONS.map(o => o.value);
-            const monitorLabels = FALLBACK_MONITOR_TYPE_OPTIONS.map(o => o.label);
+            const monitorKeys = FALLBACK_MONITOR_TYPE_OPTIONS.map(
+                (o) => o.value
+            );
+            const monitorLabels = FALLBACK_MONITOR_TYPE_OPTIONS.map(
+                (o) => o.label
+            );
 
             expect(monitorKeys.length).toBe(3);
             expect(monitorLabels.length).toBe(3);
 
             // Test intervals
-            const intervalValues = CHECK_INTERVALS.map(i => i.value);
-            const intervalLabels = CHECK_INTERVALS.map(i => i.label);
+            const intervalValues = CHECK_INTERVALS.map((i) => i.value);
+            const intervalLabels = CHECK_INTERVALS.map((i) => i.label);
 
             expect(intervalValues.length).toBeGreaterThan(0);
             expect(intervalLabels.length).toBe(intervalValues.length);
         });
 
         it("should work with array methods", () => {
-            const mapped = FALLBACK_MONITOR_TYPE_OPTIONS.map(opt => opt.value);
-            const filtered = FALLBACK_MONITOR_TYPE_OPTIONS.filter(opt => opt.value.length > 0);
-            const found = FALLBACK_MONITOR_TYPE_OPTIONS.find(opt => opt.value === "http");
+            const mapped = FALLBACK_MONITOR_TYPE_OPTIONS.map(
+                (opt) => opt.value
+            );
+            const filtered = FALLBACK_MONITOR_TYPE_OPTIONS.filter(
+                (opt) => opt.value.length > 0
+            );
+            const found = FALLBACK_MONITOR_TYPE_OPTIONS.find(
+                (opt) => opt.value === "http"
+            );
 
             expect(mapped.length).toBe(FALLBACK_MONITOR_TYPE_OPTIONS.length);
             expect(filtered.length).toBe(FALLBACK_MONITOR_TYPE_OPTIONS.length);
@@ -393,12 +413,17 @@ describe("Constants and Configuration 100% Coverage", () => {
 
         it("should handle complex array operations", () => {
             // Test reduce operations
-            const totalIntervalTime = CHECK_INTERVALS.reduce((sum, interval) => sum + interval.value, 0);
+            const totalIntervalTime = CHECK_INTERVALS.reduce(
+                (sum, interval) => sum + interval.value,
+                0
+            );
             expect(totalIntervalTime).toBeGreaterThan(0);
 
             // Test some/every operations
-            const allPositive = CHECK_INTERVALS.every(i => i.value > 0);
-            const hasMinutes = CHECK_INTERVALS.some(i => i.label.includes("minute"));
+            const allPositive = CHECK_INTERVALS.every((i) => i.value > 0);
+            const hasMinutes = CHECK_INTERVALS.some((i) =>
+                i.label.includes("minute")
+            );
 
             expect(allPositive).toBe(true);
             expect(hasMinutes).toBe(true);

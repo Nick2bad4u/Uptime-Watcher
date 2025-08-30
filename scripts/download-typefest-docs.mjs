@@ -559,7 +559,7 @@ function cleanContent(content, config, logger) {
  */
 function convertTypeScriptToMarkdown(content, filename) {
     // Extract JSDoc comments and code separately
-    const lines = content.split('\n');
+    const lines = content.split("\n");
     const result = [];
     let inComment = false;
     let commentBuffer = [];
@@ -570,7 +570,7 @@ function convertTypeScriptToMarkdown(content, filename) {
         const trimmedLine = line.trim();
 
         // Handle multi-line JSDoc comments
-        if (trimmedLine.startsWith('/**')) {
+        if (trimmedLine.startsWith("/**")) {
             inComment = true;
             commentBuffer = [line];
             continue;
@@ -578,17 +578,19 @@ function convertTypeScriptToMarkdown(content, filename) {
 
         if (inComment) {
             commentBuffer.push(line);
-            if (trimmedLine.endsWith('*/')) {
+            if (trimmedLine.endsWith("*/")) {
                 inComment = false;
                 // Process comment buffer - remove /** */ and * prefixes
                 const processedComment = commentBuffer
-                    .map(l => l.replace(/^\s*\/?\*+\/?/, '').replace(/^\s*\*\s?/, ''))
-                    .filter(l => l.trim() !== '')
-                    .join('\n');
+                    .map((l) =>
+                        l.replace(/^\s*\/?\*+\/?/, "").replace(/^\s*\*\s?/, "")
+                    )
+                    .filter((l) => l.trim() !== "")
+                    .join("\n");
 
                 if (processedComment.trim()) {
                     result.push(processedComment.trim());
-                    result.push(''); // Empty line after comment
+                    result.push(""); // Empty line after comment
                 }
                 commentBuffer = [];
                 continue;
@@ -597,26 +599,26 @@ function convertTypeScriptToMarkdown(content, filename) {
         }
 
         // Handle TypeScript code
-        if (trimmedLine && !trimmedLine.startsWith('//')) {
+        if (trimmedLine && !trimmedLine.startsWith("//")) {
             codeBuffer.push(line);
         } else if (codeBuffer.length > 0) {
             // End of code block, wrap it
-            result.push('```typescript');
+            result.push("```typescript");
             result.push(...codeBuffer);
-            result.push('```');
-            result.push(''); // Empty line after code block
+            result.push("```");
+            result.push(""); // Empty line after code block
             codeBuffer = [];
         }
     }
 
     // Handle any remaining code
     if (codeBuffer.length > 0) {
-        result.push('```typescript');
+        result.push("```typescript");
         result.push(...codeBuffer);
-        result.push('```');
+        result.push("```");
     }
 
-    return result.join('\n');
+    return result.join("\n");
 }
 
 /**
@@ -643,10 +645,13 @@ async function downloadFile(task, config, logger, paths) {
             await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
             // For TypeScript files, download raw content and preprocess
-            if (page.endsWith('.d.ts')) {
+            if (page.endsWith(".d.ts")) {
                 // Download raw content using fetch with timeout
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), config.timeout);
+                const timeoutId = setTimeout(
+                    () => controller.abort(),
+                    config.timeout
+                );
 
                 try {
                     const response = await fetch(url, {
@@ -656,7 +661,9 @@ async function downloadFile(task, config, logger, paths) {
                     clearTimeout(timeoutId);
 
                     if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        throw new Error(
+                            `HTTP ${response.status}: ${response.statusText}`
+                        );
                     }
 
                     const rawContent = await response.text();
@@ -666,11 +673,14 @@ async function downloadFile(task, config, logger, paths) {
                     }
 
                     // Convert TypeScript to proper markdown
-                    const markdownContent = convertTypeScriptToMarkdown(rawContent, page);
+                    const markdownContent = convertTypeScriptToMarkdown(
+                        rawContent,
+                        page
+                    );
 
                     // Create a temporary file with the markdown content
-                    const tempFile = outputPath.replace('.md', '.temp.md');
-                    await fs.writeFile(tempFile, markdownContent, 'utf8');
+                    const tempFile = outputPath.replace(".md", ".temp.md");
+                    await fs.writeFile(tempFile, markdownContent, "utf8");
 
                     // Use pandoc to process the proper markdown
                     const cmd = [
@@ -703,8 +713,13 @@ async function downloadFile(task, config, logger, paths) {
                     // Write final content
                     await fs.writeFile(outputPath, content, "utf8");
 
-                    const hash = crypto.createHash("sha256").update(content).digest("hex");
-                    logger.success(`Downloaded and processed TypeScript file: ${page}`);
+                    const hash = crypto
+                        .createHash("sha256")
+                        .update(content)
+                        .digest("hex");
+                    logger.success(
+                        `Downloaded and processed TypeScript file: ${page}`
+                    );
 
                     return {
                         page,
@@ -761,7 +776,10 @@ async function downloadFile(task, config, logger, paths) {
                 // Write processed content
                 await fs.writeFile(outputPath, content, "utf8");
 
-                const hash = crypto.createHash("sha256").update(content).digest("hex");
+                const hash = crypto
+                    .createHash("sha256")
+                    .update(content)
+                    .digest("hex");
                 logger.success(`Downloaded: ${page}`);
 
                 return {
@@ -1014,7 +1032,7 @@ function getOutputPath(page, config, paths) {
 }
 
 // Execute main function if this is the main module
-import { pathToFileURL } from 'url';
+import { pathToFileURL } from "url";
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     main().catch(console.error);

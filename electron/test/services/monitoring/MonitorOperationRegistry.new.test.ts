@@ -543,8 +543,12 @@ describe("MonitorOperationRegistry", () => {
             expect(activeOps.size).toBe(2);
             expect(activeOps.has(result1.operationId)).toBe(true);
             expect(activeOps.has(result2.operationId)).toBe(true);
-            expect(activeOps.get(result1.operationId)?.monitorId).toBe(mockMonitorId);
-            expect(activeOps.get(result2.operationId)?.monitorId).toBe("monitor-456");
+            expect(activeOps.get(result1.operationId)?.monitorId).toBe(
+                mockMonitorId
+            );
+            expect(activeOps.get(result2.operationId)?.monitorId).toBe(
+                "monitor-456"
+            );
         });
 
         it("should return defensive copy of internal map", async ({
@@ -605,7 +609,9 @@ describe("MonitorOperationRegistry", () => {
 
             const activeOps = registry.getActiveOperations();
             expect(activeOps.size).toBe(1);
-            expect(activeOps.get(result.operationId)?.signal.aborted).toBe(true);
+            expect(activeOps.get(result.operationId)?.signal.aborted).toBe(
+                true
+            );
         });
     });
 
@@ -666,7 +672,8 @@ describe("MonitorOperationRegistry", () => {
                 "monitor-2",
                 "monitor-3",
             ];
-            const operations: { operationId: string; signal: AbortSignal }[] = [];
+            const operations: { operationId: string; signal: AbortSignal }[] =
+                [];
 
             // Create 2 operations for each monitor
             for (const monitorId of monitors) {
@@ -777,7 +784,9 @@ describe("MonitorOperationRegistry", () => {
             expect(typedOperation.id).toBe(result.operationId);
             expect(typedOperation.monitorId).toBe(mockMonitorId);
             expect(typedOperation.initiatedAt).toBeInstanceOf(Date);
-            expect(typedOperation.abortController).toBeInstanceOf(AbortController);
+            expect(typedOperation.abortController).toBeInstanceOf(
+                AbortController
+            );
             expect(typedOperation.signal).toBeInstanceOf(AbortSignal);
         });
 

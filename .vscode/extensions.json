@@ -1,0 +1,31 @@
+{
+    "recommendations": [
+        "slevesque.vscode-zipexplorer",
+        "vscode-icons-team.vscode-icons",
+        "flyfly6.terminal-in-status-bar",
+        "randomfractalsinc.snippets-viewer",
+        "tobysmith568.run-in-powershell",
+        "mechatroner.rainbow-csv",
+        "esbenp.prettier-vscode",
+        "christian-kohler.path-intellisense",
+        "ziyasal.vscode-open-in-github",
+        "bierner.markdown-preview-github-styles",
+        "visualstudioexptteam.vscodeintellicode",
+        "visualstudioexptteam.vscodeintellicode-completions",
+        "visualstudioexptteam.vscodeintellicode-insiders",
+        "eamodio.gitlens",
+        "henriquebruno.github-repository-manager",
+        "github.copilot-chat",
+        "github.vscode-github-actions",
+        "donjayamanne.githistory",
+        "mhutchie.git-graph",
+        "miguelsolorio.fluent-icons",
+        "dbaeumer.vscode-eslint",
+        "leonardssh.vscord",
+        "streetsidesoftware.code-spell-checker",
+        "chunsen.bracket-select",
+        "michaelcurrin.auto-commit-msg",
+        "rendinjast.amoled-black",
+        "piotrpalarz.vscode-gitignore-generator"
+    ]
+}

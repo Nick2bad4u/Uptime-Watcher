@@ -224,7 +224,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
     });
 
     describe("downloadSQLiteBackup Error Handling (Lines 147-151)", () => {
-    it("should handle and rethrow errors when SQLite backup download fails", async ({
+        it("should handle and rethrow errors when SQLite backup download fails", async ({
             task,
             annotate,
         }) => {

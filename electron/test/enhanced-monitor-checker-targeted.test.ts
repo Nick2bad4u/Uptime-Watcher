@@ -19,7 +19,10 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
                 findById: vi.fn().mockResolvedValue(null),
             },
             operationRegistry: {
-                initiateCheck: vi.fn().mockReturnValue({ operationId: "test-operation-id", signal: new AbortController().signal }),
+                initiateCheck: vi.fn().mockReturnValue({
+                    operationId: "test-operation-id",
+                    signal: new AbortController().signal,
+                }),
                 completeOperation: vi.fn(),
                 validateOperation: vi.fn().mockReturnValue(true),
             },

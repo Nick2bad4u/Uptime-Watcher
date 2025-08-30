@@ -2,9 +2,9 @@
  * AbortController utilities for enhanced operation cancellation management.
  *
  * @remarks
- * Provides utilities for combining abort signals, creating timeout signals,
- * and managing operation cancellation in a composable way. These utilities
- * replace manual cancellation patterns and provide standardized error handling.
+ * Provides utilities for combining abort signals, creating timeout signals, and
+ * managing operation cancellation in a composable way. These utilities replace
+ * manual cancellation patterns and provide standardized error handling.
  *
  * @packageDocumentation
  */
@@ -56,7 +56,7 @@ export interface RetryWithAbortOptions {
  * const combinedSignal = combineAbortSignals({
  *     timeoutMs: 5000,
  *     additionalSignals: [controller.signal],
- *     reason: "Operation timeout or user cancellation"
+ *     reason: "Operation timeout or user cancellation",
  * });
  *
  * // Use in fetch request
@@ -102,9 +102,9 @@ export function combineAbortSignals(
  * Creates an operation that can be aborted and provides cleanup.
  *
  * @remarks
- * Wraps an async operation with abort support and automatic cleanup.
- * The operation function receives an AbortSignal and should check it
- * periodically for cancellation.
+ * Wraps an async operation with abort support and automatic cleanup. The
+ * operation function receives an AbortSignal and should check it periodically
+ * for cancellation.
  *
  * @example
  *
@@ -116,7 +116,7 @@ export function combineAbortSignals(
  *     },
  *     {
  *         timeoutMs: 10000,
- *         cleanup: () => console.log("Operation cleaned up")
+ *         cleanup: () => console.log("Operation cleaned up"),
  *     }
  * );
  * ```
@@ -150,8 +150,8 @@ export async function createAbortableOperation<T>(
  * Implements retry logic with abort signal support.
  *
  * @remarks
- * Provides exponential backoff retry logic that respects abort signals.
- * Will stop retrying immediately if the signal is aborted.
+ * Provides exponential backoff retry logic that respects abort signals. Will
+ * stop retrying immediately if the signal is aborted.
  *
  * @example
  *
@@ -161,13 +161,13 @@ export async function createAbortableOperation<T>(
  * const result = await retryWithAbort(
  *     async () => {
  *         const response = await fetch(url);
- *         if (!response.ok) throw new Error('Request failed');
+ *         if (!response.ok) throw new Error("Request failed");
  *         return response.json();
  *     },
  *     {
  *         maxRetries: 3,
  *         initialDelay: 1000,
- *         signal: controller.signal
+ *         signal: controller.signal,
  *     }
  * );
  * ```
@@ -205,7 +205,8 @@ export async function retryWithAbort<T>(
         try {
             return await operation();
         } catch (error) {
-            lastError = error instanceof Error ? error : new Error(String(error));
+            lastError =
+                error instanceof Error ? error : new Error(String(error));
 
             // Don't delay after the last attempt
             if (attempt === maxRetries) {
@@ -225,8 +226,8 @@ export async function retryWithAbort<T>(
  * Promise-based sleep function with abort support.
  *
  * @remarks
- * Creates a cancelable delay that can be aborted via AbortSignal.
- * Throws when the signal is aborted during the delay.
+ * Creates a cancelable delay that can be aborted via AbortSignal. Throws when
+ * the signal is aborted during the delay.
  *
  * @example
  *
@@ -275,8 +276,8 @@ export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
  * Checks if an error is an AbortError.
  *
  * @remarks
- * Utility function to identify abort-related errors consistently.
- * Handles different abort error patterns from various APIs.
+ * Utility function to identify abort-related errors consistently. Handles
+ * different abort error patterns from various APIs.
  *
  * @example
  *
@@ -314,8 +315,8 @@ export function isAbortError(error: unknown): boolean {
  * Creates a race condition between an operation and an abort signal.
  *
  * @remarks
- * Useful for operations that don't natively support AbortSignal.
- * The operation will be raced against the abort signal.
+ * Useful for operations that don't natively support AbortSignal. The operation
+ * will be raced against the abort signal.
  *
  * @example
  *
@@ -346,9 +347,13 @@ export async function raceWithAbort<T>(
     return Promise.race([
         operation,
         new Promise<never>((_, reject) => {
-            signal.addEventListener("abort", () => {
-                reject(new Error("Operation was aborted"));
-            }, { once: true });
+            signal.addEventListener(
+                "abort",
+                () => {
+                    reject(new Error("Operation was aborted"));
+                },
+                { once: true }
+            );
         }),
     ]);
 }

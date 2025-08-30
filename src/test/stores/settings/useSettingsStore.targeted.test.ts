@@ -1,10 +1,11 @@
 /**
- * Targeted tests for useSettingsStore uncovered lines (75, 207-228).
- * Focuses specifically on error scenarios and edge cases.
+ * Targeted tests for useSettingsStore uncovered lines (75, 207-228). Focuses
+ * specifically on error scenarios and edge cases.
  *
  * Verifies:
+ *
  * - Rehydration sync error handling
- * - syncFromBackend success and failure paths
+ * - SyncFromBackend success and failure paths
  * - Data extraction failures
  * - Concurrency behavior
  */

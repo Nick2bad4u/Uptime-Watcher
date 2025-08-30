@@ -1,9 +1,10 @@
 /**
- * Comprehensive edge case tests for 100% coverage of critical utility functions.
+ * Comprehensive edge case tests for 100% coverage of critical utility
+ * functions.
  *
  * @remarks
- * This test suite focuses on edge cases and error paths that might be missed
- * in regular unit tests to achieve complete code coverage.
+ * This test suite focuses on edge cases and error paths that might be missed in
+ * regular unit tests to achieve complete code coverage.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -148,7 +149,11 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle array errors", () => {
-            const error = [1, 2, 3];
+            const error = [
+                1,
+                2,
+                3,
+            ];
             const result = ensureError(error);
             expect(result).toBeInstanceOf(Error);
             expect(result.message).toBe("1,2,3");
@@ -169,7 +174,9 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle async operation failure with fallback", async () => {
-            const operation = vi.fn().mockRejectedValue(new Error("Async error"));
+            const operation = vi
+                .fn()
+                .mockRejectedValue(new Error("Async error"));
             const { logger } = await import("../services/logger");
 
             const result = await withUtilityErrorHandling(
@@ -187,17 +194,28 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle async operation failure with throw", async () => {
-            const operation = vi.fn().mockRejectedValue(new Error("Async error"));
+            const operation = vi
+                .fn()
+                .mockRejectedValue(new Error("Async error"));
             await expect(
-                withUtilityErrorHandling(operation, "test-operation", undefined, true)
+                withUtilityErrorHandling(
+                    operation,
+                    "test-operation",
+                    undefined,
+                    true
+                )
             ).rejects.toThrow("Async error");
         });
 
         it("should handle async operation failure without fallback", async () => {
-            const operation = vi.fn().mockRejectedValue(new Error("Async error"));
+            const operation = vi
+                .fn()
+                .mockRejectedValue(new Error("Async error"));
             await expect(
                 withUtilityErrorHandling(operation, "test-operation")
-            ).rejects.toThrow("test-operation failed and no fallback value provided");
+            ).rejects.toThrow(
+                "test-operation failed and no fallback value provided"
+            );
         });
 
         it("should handle non-Error rejection", async () => {
@@ -289,7 +307,7 @@ describe("100% Coverage Edge Cases", () => {
             expect(() => wrapper()).not.toThrow();
 
             // Wait for async operation to complete
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await new Promise((resolve) => setTimeout(resolve, 10));
             expect(asyncOp).toHaveBeenCalled();
         });
 
@@ -307,7 +325,14 @@ describe("100% Coverage Edge Cases", () => {
 
     describe("Type Guard Edge Cases", () => {
         it("should handle various falsy values", () => {
-            const falsyValues = [null, undefined, false, 0, "", Number.NaN];
+            const falsyValues = [
+                null,
+                undefined,
+                false,
+                0,
+                "",
+                Number.NaN,
+            ];
 
             for (const value of falsyValues) {
                 if (value === null || value === undefined) {
@@ -319,7 +344,14 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle various truthy values", () => {
-            const truthyValues = [true, 1, "test", [], {}, Symbol("test")];
+            const truthyValues = [
+                true,
+                1,
+                "test",
+                [],
+                {},
+                Symbol("test"),
+            ];
 
             for (const value of truthyValues) {
                 expect(isNullOrUndefined(value)).toBe(false);
@@ -332,11 +364,15 @@ describe("100% Coverage Edge Cases", () => {
             const complexObject = {
                 nested: {
                     deep: {
-                        error: "deeply nested error"
-                    }
+                        error: "deeply nested error",
+                    },
                 },
-                array: [1, 2, 3],
-                toString: () => "Custom toString"
+                array: [
+                    1,
+                    2,
+                    3,
+                ],
+                toString: () => "Custom toString",
             };
 
             const result = ensureError(complexObject);
@@ -374,10 +410,10 @@ describe("100% Coverage Edge Cases", () => {
                 null,
                 undefined,
                 { custom: "object" },
-                new Error("actual error")
+                new Error("actual error"),
             ];
 
-            const results = errors.map(error => ensureError(error));
+            const results = errors.map((error) => ensureError(error));
 
             for (const result of results) {
                 expect(result).toBeInstanceOf(Error);
@@ -394,7 +430,12 @@ describe("100% Coverage Edge Cases", () => {
             );
 
             const promises = operations.map((op, i) =>
-                withUtilityErrorHandling(op, `operation-${i}`, `fallback-${i}`, false)
+                withUtilityErrorHandling(
+                    op,
+                    `operation-${i}`,
+                    `fallback-${i}`,
+                    false
+                )
             );
 
             const results = await Promise.all(promises);
@@ -413,7 +454,12 @@ describe("100% Coverage Edge Cases", () => {
             ];
 
             const promises = operations.map((op, i) =>
-                withUtilityErrorHandling(op, `operation-${i}`, `fallback-${i}`, false)
+                withUtilityErrorHandling(
+                    op,
+                    `operation-${i}`,
+                    `fallback-${i}`,
+                    false
+                )
             );
 
             const results = await Promise.all(promises);

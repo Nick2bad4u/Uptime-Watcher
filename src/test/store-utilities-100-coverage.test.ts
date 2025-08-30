@@ -83,7 +83,9 @@ describe("Store Utilities 100% Coverage", () => {
 
             baseStore.setError("Test error message");
 
-            expect(setState).toHaveBeenCalledWith({ lastError: "Test error message" });
+            expect(setState).toHaveBeenCalledWith({
+                lastError: "Test error message",
+            });
         });
 
         it("should handle undefined in setError", () => {
@@ -194,15 +196,21 @@ describe("Store Utilities 100% Coverage", () => {
             debouncedFunction("arg1", "arg2", "arg3", 123, true);
             vi.advanceTimersByTime(50);
 
-            expect(mockFunction).toHaveBeenCalledWith("arg1", "arg2", "arg3", 123, true);
+            expect(mockFunction).toHaveBeenCalledWith(
+                "arg1",
+                "arg2",
+                "arg3",
+                123,
+                true
+            );
         });
 
         it("should preserve this context", () => {
             const obj = {
                 value: "test",
-                method: vi.fn(function(this: any) {
+                method: vi.fn(function (this: any) {
                     return this.value;
-                })
+                }),
             };
 
             const debouncedMethod = debounce(obj.method.bind(obj), 50);
@@ -223,10 +231,9 @@ describe("Store Utilities 100% Coverage", () => {
 
             logStoreAction("TestStore", "testAction", { data: "test" });
 
-            expect(logger.info).toHaveBeenCalledWith(
-                "[TestStore] testAction",
-                { data: "test" }
-            );
+            expect(logger.info).toHaveBeenCalledWith("[TestStore] testAction", {
+                data: "test",
+            });
         });
 
         it("should not log store action in production", async () => {
@@ -248,9 +255,7 @@ describe("Store Utilities 100% Coverage", () => {
 
             logStoreAction("TestStore", "testAction");
 
-            expect(logger.info).toHaveBeenCalledWith(
-                "[TestStore] testAction"
-            );
+            expect(logger.info).toHaveBeenCalledWith("[TestStore] testAction");
         });
 
         it("should handle null payload", async () => {
@@ -266,219 +271,236 @@ describe("Store Utilities 100% Coverage", () => {
                 null
             );
         });
-        });
+    });
 
-        it("should handle complex payload objects", async () => {
-            const { isDevelopment } = await import("@shared/utils/environment");
-            const { logger } = await import("../services/logger");
+    it("should handle complex payload objects", async () => {
+        const { isDevelopment } = await import("@shared/utils/environment");
+        const { logger } = await import("../services/logger");
 
-            vi.mocked(isDevelopment).mockReturnValue(true);
+        vi.mocked(isDevelopment).mockReturnValue(true);
 
-            const complexPayload = {
-                nested: {
-                    deep: {
-                        value: "test"
-                    }
+        const complexPayload = {
+            nested: {
+                deep: {
+                    value: "test",
                 },
-                array: [1, 2, 3],
-                boolean: true,
-                number: 42,
-                nullValue: null,
-                undefinedValue: undefined
-            };
+            },
+            array: [
+                1,
+                2,
+                3,
+            ],
+            boolean: true,
+            number: 42,
+            nullValue: null,
+            undefinedValue: undefined,
+        };
 
-            logStoreAction("TestStore", "testAction", complexPayload);
+        logStoreAction("TestStore", "testAction", complexPayload);
 
-            expect(logger.info).toHaveBeenCalledWith(
-                "[TestStore] testAction",
-                complexPayload
-            );
-        });
+        expect(logger.info).toHaveBeenCalledWith(
+            "[TestStore] testAction",
+            complexPayload
+        );
+    });
 
-        it("should handle empty string action names", async () => {
-            const { isDevelopment } = await import("@shared/utils/environment");
-            const { logger } = await import("../services/logger");
+    it("should handle empty string action names", async () => {
+        const { isDevelopment } = await import("@shared/utils/environment");
+        const { logger } = await import("../services/logger");
 
-            vi.mocked(isDevelopment).mockReturnValue(true);
+        vi.mocked(isDevelopment).mockReturnValue(true);
 
-            logStoreAction("TestStore", "", { data: "test" });
+        logStoreAction("TestStore", "", { data: "test" });
 
-            expect(logger.info).toHaveBeenCalledWith(
-                "[TestStore] ",
-                { data: "test" }
-            );
-        });
-
-        it("should handle empty string store names", async () => {
-            const { isDevelopment } = await import("@shared/utils/environment");
-            const { logger } = await import("../services/logger");
-
-            vi.mocked(isDevelopment).mockReturnValue(true);
-
-            logStoreAction("", "testAction", { data: "test" });
-
-            expect(logger.info).toHaveBeenCalledWith(
-                "[] testAction",
-                { data: "test" }
-            );
+        expect(logger.info).toHaveBeenCalledWith("[TestStore] ", {
+            data: "test",
         });
     });
 
-    describe("Constants", () => {
-        it("should export TRANSITION_ALL constant", () => {
-            expect(TRANSITION_ALL).toBe("all 0.2s ease-in-out");
-            expect(typeof TRANSITION_ALL).toBe("string");
+    it("should handle empty string store names", async () => {
+        const { isDevelopment } = await import("@shared/utils/environment");
+        const { logger } = await import("../services/logger");
+
+        vi.mocked(isDevelopment).mockReturnValue(true);
+
+        logStoreAction("", "testAction", { data: "test" });
+
+        expect(logger.info).toHaveBeenCalledWith("[] testAction", {
+            data: "test",
         });
+    });
+});
 
-        it("should use TRANSITION_ALL in CSS-like context", () => {
-            const style = {
-                transition: TRANSITION_ALL,
-                opacity: 1
-            };
+describe("Constants", () => {
+    it("should export TRANSITION_ALL constant", () => {
+        expect(TRANSITION_ALL).toBe("all 0.2s ease-in-out");
+        expect(typeof TRANSITION_ALL).toBe("string");
+    });
 
-            expect(style.transition).toBe("all 0.2s ease-in-out");
+    it("should use TRANSITION_ALL in CSS-like context", () => {
+        const style = {
+            transition: TRANSITION_ALL,
+            opacity: 1,
+        };
+
+        expect(style.transition).toBe("all 0.2s ease-in-out");
+    });
+});
+
+describe("Integration Tests", () => {
+    it("should work with createBaseStore and debounce together", () => {
+        vi.useFakeTimers();
+        const setState = vi.fn();
+        const baseStore = createBaseStore(setState);
+
+        const debouncedSetError = debounce(baseStore.setError, 100);
+
+        debouncedSetError("error1");
+        debouncedSetError("error2");
+        debouncedSetError("error3");
+
+        expect(setState).not.toHaveBeenCalled();
+
+        vi.advanceTimersByTime(100);
+
+        // Each unique error message creates a separate debounced call
+        expect(setState).toHaveBeenCalledTimes(3);
+        expect(setState).toHaveBeenNthCalledWith(1, { lastError: "error1" });
+        expect(setState).toHaveBeenNthCalledWith(2, { lastError: "error2" });
+        expect(setState).toHaveBeenNthCalledWith(3, { lastError: "error3" });
+        vi.useRealTimers();
+    });
+
+    it("should handle rapid store actions with logging", async () => {
+        const { isDevelopment } = await import("@shared/utils/environment");
+        const { logger } = await import("../services/logger");
+
+        vi.mocked(isDevelopment).mockReturnValue(true);
+        vi.mocked(logger.info).mockClear(); // Clear any previous calls
+
+        const actions = [
+            { store: "Store1", action: "action1", payload: { id: 1 } },
+            { store: "Store2", action: "action2", payload: { id: 2 } },
+            { store: "Store1", action: "action3", payload: { id: 3 } },
+        ];
+
+        for (const { store, action, payload } of actions) {
+            logStoreAction(store, action, payload);
+        }
+
+        expect(logger.info).toHaveBeenCalledTimes(3);
+        expect(logger.info).toHaveBeenNthCalledWith(1, "[Store1] action1", {
+            id: 1,
+        });
+        expect(logger.info).toHaveBeenNthCalledWith(2, "[Store2] action2", {
+            id: 2,
+        });
+        expect(logger.info).toHaveBeenNthCalledWith(3, "[Store1] action3", {
+            id: 3,
         });
     });
 
-    describe("Integration Tests", () => {
-        it("should work with createBaseStore and debounce together", () => {
-            vi.useFakeTimers();
-            const setState = vi.fn();
-            const baseStore = createBaseStore(setState);
+    it("should handle debounced logging", async () => {
+        vi.useFakeTimers();
+        const { isDevelopment } = await import("@shared/utils/environment");
+        const { logger } = await import("../services/logger");
 
-            const debouncedSetError = debounce(baseStore.setError, 100);
+        vi.mocked(isDevelopment).mockReturnValue(true);
+        vi.mocked(logger.info).mockClear(); // Clear any previous calls
 
-            debouncedSetError("error1");
-            debouncedSetError("error2");
-            debouncedSetError("error3");
-
-            expect(setState).not.toHaveBeenCalled();
-
-            vi.advanceTimersByTime(100);
-
-            // Each unique error message creates a separate debounced call
-            expect(setState).toHaveBeenCalledTimes(3);
-            expect(setState).toHaveBeenNthCalledWith(1, { lastError: "error1" });
-            expect(setState).toHaveBeenNthCalledWith(2, { lastError: "error2" });
-            expect(setState).toHaveBeenNthCalledWith(3, { lastError: "error3" });
-            vi.useRealTimers();
-        });
-
-        it("should handle rapid store actions with logging", async () => {
-            const { isDevelopment } = await import("@shared/utils/environment");
-            const { logger } = await import("../services/logger");
-
-            vi.mocked(isDevelopment).mockReturnValue(true);
-            vi.mocked(logger.info).mockClear(); // Clear any previous calls
-
-            const actions = [
-                { store: "Store1", action: "action1", payload: { id: 1 } },
-                { store: "Store2", action: "action2", payload: { id: 2 } },
-                { store: "Store1", action: "action3", payload: { id: 3 } },
-            ];
-
-            for (const { store, action, payload } of actions) {
+        const debouncedLog = debounce(
+            (store: string, action: string, payload: any) => {
                 logStoreAction(store, action, payload);
-            }
+            },
+            50
+        );
 
-            expect(logger.info).toHaveBeenCalledTimes(3);
-            expect(logger.info).toHaveBeenNthCalledWith(1, "[Store1] action1", { id: 1 });
-            expect(logger.info).toHaveBeenNthCalledWith(2, "[Store2] action2", { id: 2 });
-            expect(logger.info).toHaveBeenNthCalledWith(3, "[Store1] action3", { id: 3 });
+        debouncedLog("TestStore", "action1", { id: 1 });
+        debouncedLog("TestStore", "action2", { id: 2 });
+        debouncedLog("TestStore", "action3", { id: 3 });
+
+        expect(logger.info).not.toHaveBeenCalled();
+
+        vi.advanceTimersByTime(50);
+
+        // Each unique argument set creates a separate debounced call
+        expect(logger.info).toHaveBeenCalledTimes(3);
+        expect(logger.info).toHaveBeenNthCalledWith(1, "[TestStore] action1", {
+            id: 1,
         });
-
-        it("should handle debounced logging", async () => {
-            vi.useFakeTimers();
-            const { isDevelopment } = await import("@shared/utils/environment");
-            const { logger } = await import("../services/logger");
-
-            vi.mocked(isDevelopment).mockReturnValue(true);
-            vi.mocked(logger.info).mockClear(); // Clear any previous calls
-
-            const debouncedLog = debounce((store: string, action: string, payload: any) => {
-                logStoreAction(store, action, payload);
-            }, 50);
-
-            debouncedLog("TestStore", "action1", { id: 1 });
-            debouncedLog("TestStore", "action2", { id: 2 });
-            debouncedLog("TestStore", "action3", { id: 3 });
-
-            expect(logger.info).not.toHaveBeenCalled();
-
-            vi.advanceTimersByTime(50);
-
-            // Each unique argument set creates a separate debounced call
-            expect(logger.info).toHaveBeenCalledTimes(3);
-            expect(logger.info).toHaveBeenNthCalledWith(1, "[TestStore] action1", { id: 1 });
-            expect(logger.info).toHaveBeenNthCalledWith(2, "[TestStore] action2", { id: 2 });
-            expect(logger.info).toHaveBeenNthCalledWith(3, "[TestStore] action3", { id: 3 });
-            vi.useRealTimers();
+        expect(logger.info).toHaveBeenNthCalledWith(2, "[TestStore] action2", {
+            id: 2,
         });
+        expect(logger.info).toHaveBeenNthCalledWith(3, "[TestStore] action3", {
+            id: 3,
+        });
+        vi.useRealTimers();
+    });
+});
+
+describe("Edge Cases and Error Conditions", () => {
+    it("should handle createBaseStore with null setState", () => {
+        // The function doesn't validate input, so it won't throw
+        // @ts-expect-error Testing error condition
+        const result = createBaseStore(null);
+        expect(result).toHaveProperty("clearError");
+        expect(result).toHaveProperty("setError");
+        expect(result).toHaveProperty("setLoading");
     });
 
-    describe("Edge Cases and Error Conditions", () => {
-        it("should handle createBaseStore with null setState", () => {
-            // The function doesn't validate input, so it won't throw
-            // @ts-expect-error Testing error condition
-            const result = createBaseStore(null);
-            expect(result).toHaveProperty('clearError');
-            expect(result).toHaveProperty('setError');
-            expect(result).toHaveProperty('setLoading');
+    it("should handle debounce with null function", () => {
+        // The function doesn't validate input, so it won't throw immediately
+        // @ts-expect-error Testing error condition
+        const result = debounce(null, 100);
+        expect(typeof result).toBe("function");
+    });
+
+    it("should handle very large debounce delays", () => {
+        vi.useFakeTimers();
+        const mockFunction = vi.fn();
+        const debouncedFunction = debounce(mockFunction, 999_999);
+
+        debouncedFunction("test");
+        vi.advanceTimersByTime(999_999);
+
+        expect(mockFunction).toHaveBeenCalledWith("test");
+        vi.useRealTimers();
+    });
+
+    it("should handle rapid successive debounce calls", () => {
+        vi.useFakeTimers();
+        const mockFunction = vi.fn();
+        const debouncedFunction = debounce(mockFunction, 100);
+
+        // Call 1000 times rapidly
+        for (let i = 0; i < 1000; i++) {
+            debouncedFunction(`call-${i}`);
+        }
+
+        vi.advanceTimersByTime(100);
+
+        expect(mockFunction).toHaveBeenCalledTimes(1000);
+        expect(mockFunction).toHaveBeenNthCalledWith(1000, "call-999");
+        vi.useRealTimers();
+    });
+
+    it("should handle store actions with special characters", async () => {
+        const { isDevelopment } = await import("@shared/utils/environment");
+        const { logger } = await import("../services/logger");
+
+        vi.mocked(isDevelopment).mockReturnValue(true);
+
+        logStoreAction("Store@#$%", "action!@#$%^&*()", {
+            "key with spaces": "value",
+            "unicode-🚀": "rocket",
         });
 
-        it("should handle debounce with null function", () => {
-            // The function doesn't validate input, so it won't throw immediately
-            // @ts-expect-error Testing error condition
-            const result = debounce(null, 100);
-            expect(typeof result).toBe('function');
-        });
-
-        it("should handle very large debounce delays", () => {
-            vi.useFakeTimers();
-            const mockFunction = vi.fn();
-            const debouncedFunction = debounce(mockFunction, 999_999);
-
-            debouncedFunction("test");
-            vi.advanceTimersByTime(999_999);
-
-            expect(mockFunction).toHaveBeenCalledWith("test");
-            vi.useRealTimers();
-        });
-
-        it("should handle rapid successive debounce calls", () => {
-            vi.useFakeTimers();
-            const mockFunction = vi.fn();
-            const debouncedFunction = debounce(mockFunction, 100);
-
-            // Call 1000 times rapidly
-            for (let i = 0; i < 1000; i++) {
-                debouncedFunction(`call-${i}`);
-            }
-
-            vi.advanceTimersByTime(100);
-
-            expect(mockFunction).toHaveBeenCalledTimes(1000);
-            expect(mockFunction).toHaveBeenNthCalledWith(1000, "call-999");
-            vi.useRealTimers();
-        });
-
-        it("should handle store actions with special characters", async () => {
-            const { isDevelopment } = await import("@shared/utils/environment");
-            const { logger } = await import("../services/logger");
-
-            vi.mocked(isDevelopment).mockReturnValue(true);
-
-            logStoreAction("Store@#$%", "action!@#$%^&*()", {
+        expect(logger.info).toHaveBeenCalledWith(
+            "[Store@#$%] action!@#$%^&*()",
+            {
                 "key with spaces": "value",
-                "unicode-🚀": "rocket"
-            });
-
-            expect(logger.info).toHaveBeenCalledWith(
-                "[Store@#$%] action!@#$%^&*()",
-                {
-                    "key with spaces": "value",
-                    "unicode-🚀": "rocket"
-                }
-            );
-        });
+                "unicode-🚀": "rocket",
+            }
+        );
     });
+});

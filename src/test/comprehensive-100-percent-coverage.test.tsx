@@ -178,7 +178,9 @@ vi.mock("../theme/components/ThemedButton", () => ({
 }));
 
 vi.mock("../theme/components/ThemedText", () => ({
-    ThemedText: ({ children }: { children: ReactNode }) => <span>{children}</span>,
+    ThemedText: ({ children }: { children: ReactNode }) => (
+        <span>{children}</span>
+    ),
 }));
 
 vi.mock("../components/AddSiteForm/Submit", () => ({
@@ -293,7 +295,9 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle async operation failure with fallback", async () => {
-            const operation = vi.fn().mockRejectedValue(new Error("Async error"));
+            const operation = vi
+                .fn()
+                .mockRejectedValue(new Error("Async error"));
             const result = await withUtilityErrorHandling(
                 operation,
                 "test-operation",
@@ -308,17 +312,28 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle async operation failure with throw", async () => {
-            const operation = vi.fn().mockRejectedValue(new Error("Async error"));
+            const operation = vi
+                .fn()
+                .mockRejectedValue(new Error("Async error"));
             await expect(
-                withUtilityErrorHandling(operation, "test-operation", undefined, true)
+                withUtilityErrorHandling(
+                    operation,
+                    "test-operation",
+                    undefined,
+                    true
+                )
             ).rejects.toThrow("Async error");
         });
 
         it("should handle async operation failure without fallback", async () => {
-            const operation = vi.fn().mockRejectedValue(new Error("Async error"));
+            const operation = vi
+                .fn()
+                .mockRejectedValue(new Error("Async error"));
             await expect(
                 withUtilityErrorHandling(operation, "test-operation")
-            ).rejects.toThrow("test-operation failed and no fallback value provided");
+            ).rejects.toThrow(
+                "test-operation failed and no fallback value provided"
+            );
         });
     });
 
@@ -418,7 +433,9 @@ describe("100% Coverage Edge Cases", () => {
 
             expect(select).toBeInTheDocument();
             expect(select).toHaveAttribute("data-testid", "monitorType");
-            expect(() => fireEvent.change(select, { target: { value: "port" } })).not.toThrow();
+            expect(() =>
+                fireEvent.change(select, { target: { value: "port" } })
+            ).not.toThrow();
         });
 
         it("should handle text field changes", () => {
@@ -427,13 +444,15 @@ describe("100% Coverage Edge Cases", () => {
 
             expect(input).toBeInTheDocument();
             expect(input).toHaveAttribute("data-testid", "siteName");
-            expect(() => fireEvent.change(input, { target: { value: "New Site" } })).not.toThrow();
+            expect(() =>
+                fireEvent.change(input, { target: { value: "New Site" } })
+            ).not.toThrow();
         });
     });
 
     describe("Error Display Edge Cases", () => {
         it("should show error alert when error exists", () => {
-            const mockUseErrorStore = vi.mocked(useErrorStore);  // Updated: Removed require() and used direct import
+            const mockUseErrorStore = vi.mocked(useErrorStore); // Updated: Removed require() and used direct import
             mockUseErrorStore.mockReturnValue({
                 clearError: vi.fn(),
                 setError: vi.fn(),
@@ -448,7 +467,7 @@ describe("100% Coverage Edge Cases", () => {
 
         it("should handle error dismissal", () => {
             const clearError = vi.fn();
-            const mockUseErrorStore = vi.mocked(useErrorStore);  // Updated: Removed require() and used direct import
+            const mockUseErrorStore = vi.mocked(useErrorStore); // Updated: Removed require() and used direct import
             mockUseErrorStore.mockReturnValue({
                 clearError,
                 setError: vi.fn(),
@@ -465,7 +484,7 @@ describe("100% Coverage Edge Cases", () => {
 
     describe("Loading State Edge Cases", () => {
         it("should handle loading state", () => {
-            const mockUseErrorStore = vi.mocked(useErrorStore);  // Updated: Removed require() and used direct import
+            const mockUseErrorStore = vi.mocked(useErrorStore); // Updated: Removed require() and used direct import
             mockUseErrorStore.mockReturnValue({
                 clearError: vi.fn(),
                 setError: vi.fn(),
@@ -479,14 +498,14 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle monitor types loading", () => {
-            const mockUseMonitorTypes = vi.mocked(useMonitorTypes);  // Updated: Removed require() and used direct import
+            const mockUseMonitorTypes = vi.mocked(useMonitorTypes); // Updated: Removed require() and used direct import
             mockUseMonitorTypes.mockReturnValue({
                 options: [],
                 isLoading: true,
                 error: undefined,
                 refresh: function (): Promise<void> {
                     throw new Error("Function not implemented.");
-                }
+                },
             });
 
             render(<AddSiteForm />);
@@ -498,7 +517,7 @@ describe("100% Coverage Edge Cases", () => {
 
     describe("Dynamic Content Edge Cases", () => {
         it("should render existing site mode", () => {
-            const mockUseAddSiteForm = vi.mocked(useAddSiteForm);  // Updated: Removed require() and used direct import
+            const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "existing",
                 checkInterval: 60_000,
@@ -529,10 +548,10 @@ describe("100% Coverage Edge Cases", () => {
                 },
                 setSiteId: function (value: string): void {
                     throw new Error("Function not implemented.");
-                }
+                },
             });
 
-            const mockUseSitesStore = vi.mocked(useSitesStore);  // Updated: Removed require() and used direct import
+            const mockUseSitesStore = vi.mocked(useSitesStore); // Updated: Removed require() and used direct import
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     { identifier: "site1", name: "Site 1" },
@@ -547,7 +566,7 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle monitor type validation", () => {
-            const mockUseAddSiteForm = vi.mocked(useAddSiteForm);  // Updated: Removed require() and used direct import
+            const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             const setMonitorType = vi.fn();
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "new",
@@ -579,7 +598,7 @@ describe("100% Coverage Edge Cases", () => {
                 },
                 setSiteId: function (value: string): void {
                     throw new Error("Function not implemented.");
-                }
+                },
             });
 
             render(<AddSiteForm />);
@@ -597,7 +616,7 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle check interval validation", () => {
-            const mockUseAddSiteForm = vi.mocked(useAddSiteForm);  // Updated: Removed require() and used direct import
+            const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             const setCheckInterval = vi.fn();
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "new",
@@ -629,7 +648,7 @@ describe("100% Coverage Edge Cases", () => {
                 },
                 setSiteId: function (value: string): void {
                     throw new Error("Function not implemented.");
-                }
+                },
             });
 
             render(<AddSiteForm />);
@@ -645,7 +664,7 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle add mode validation", () => {
-            const mockUseAddSiteForm = vi.mocked(useAddSiteForm);  // Updated: Removed require() and used direct import
+            const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             const setAddMode = vi.fn();
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "new",
@@ -677,7 +696,7 @@ describe("100% Coverage Edge Cases", () => {
                 },
                 setSiteId: function (value: string): void {
                     throw new Error("Function not implemented.");
-                }
+                },
             });
 
             render(<AddSiteForm />);
@@ -705,36 +724,42 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle help text rendering", () => {
-            const mockUseDynamicHelpText = vi.mocked(useDynamicHelpText);  // Updated: Removed require() and used direct import
+            const mockUseDynamicHelpText = vi.mocked(useDynamicHelpText); // Updated: Removed require() and used direct import
             mockUseDynamicHelpText.mockReturnValue({
                 primary: "Primary help text",
                 secondary: "Secondary help text",
-                isLoading: false
+                isLoading: false,
             });
 
             render(<AddSiteForm />);
             expect(screen.getByText("• Primary help text")).toBeInTheDocument();
-            expect(screen.getByText("• Secondary help text")).toBeInTheDocument();
+            expect(
+                screen.getByText("• Secondary help text")
+            ).toBeInTheDocument();
         });
 
         it("should handle empty help text", () => {
-            const mockUseDynamicHelpText = vi.mocked(useDynamicHelpText);  // Updated: Removed require() and used direct import
+            const mockUseDynamicHelpText = vi.mocked(useDynamicHelpText); // Updated: Removed require() and used direct import
             mockUseDynamicHelpText.mockReturnValue({
                 primary: undefined,
                 secondary: undefined,
-                isLoading: false
+                isLoading: false,
             });
 
             render(<AddSiteForm />);
             // Should only show the default help text items
-            expect(screen.queryByText("• Primary help text")).not.toBeInTheDocument();
-            expect(screen.queryByText("• Secondary help text")).not.toBeInTheDocument();
+            expect(
+                screen.queryByText("• Primary help text")
+            ).not.toBeInTheDocument();
+            expect(
+                screen.queryByText("• Secondary help text")
+            ).not.toBeInTheDocument();
         });
     });
 
     describe("Form Error Edge Cases", () => {
         it("should display form error when present", () => {
-            const mockUseAddSiteForm = vi.mocked(useAddSiteForm);  // Updated: Removed require() and used direct import
+            const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "new",
                 checkInterval: 60_000,
@@ -765,15 +790,17 @@ describe("100% Coverage Edge Cases", () => {
                 },
                 setSiteId: function (value: string): void {
                     throw new Error("Function not implemented.");
-                }
+                },
             });
 
             render(<AddSiteForm />);
-            expect(screen.getByText("Form validation error")).toBeInTheDocument();
+            expect(
+                screen.getByText("Form validation error")
+            ).toBeInTheDocument();
         });
 
         it("should prioritize form error over store error", () => {
-            const mockUseErrorStore = vi.mocked(useErrorStore);  // Updated: Removed require() and used direct import
+            const mockUseErrorStore = vi.mocked(useErrorStore); // Updated: Removed require() and used direct import
             mockUseErrorStore.mockReturnValue({
                 clearError: vi.fn(),
                 setError: vi.fn(),
@@ -781,7 +808,7 @@ describe("100% Coverage Edge Cases", () => {
                 isLoading: false,
             });
 
-            const mockUseAddSiteForm = vi.mocked(useAddSiteForm);  // Updated: Removed require() and used direct import
+            const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "new",
                 checkInterval: 60_000,
@@ -812,7 +839,7 @@ describe("100% Coverage Edge Cases", () => {
                 },
                 setSiteId: function (value: string): void {
                     throw new Error("Function not implemented.");
-                }
+                },
             });
 
             render(<AddSiteForm />);

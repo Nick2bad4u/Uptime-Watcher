@@ -103,7 +103,7 @@ describe("HTTP Client Utils", () => {
                 validateStatus: expect.any(Function),
             });
         });
-    it("should configure validateStatus to be strict by default (2xx-3xx)", async ({
+        it("should configure validateStatus to be strict by default (2xx-3xx)", async ({
             task,
             annotate,
         }) => {
@@ -127,7 +127,10 @@ describe("HTTP Client Utils", () => {
             expect(axiosConfig?.validateStatus!(404)).toBe(false);
             expect(axiosConfig?.validateStatus!(500)).toBe(false);
         });
-        it("should allow lenient mode when UW_HTTP_STRICT_STATUS=false", async ({ task, annotate }) => {
+        it("should allow lenient mode when UW_HTTP_STRICT_STATUS=false", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: types", "component");
 

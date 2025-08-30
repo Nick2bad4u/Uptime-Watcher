@@ -529,21 +529,27 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
                     id: "op-1",
                     monitorId: "monitor-1",
                     abortController: new AbortController(),
-                    get signal() { return this.abortController.signal; },
+                    get signal() {
+                        return this.abortController.signal;
+                    },
                     initiatedAt: new Date(),
                 },
                 {
                     id: "op-2",
                     monitorId: "monitor-2",
                     abortController: new AbortController(),
-                    get signal() { return this.abortController.signal; },
+                    get signal() {
+                        return this.abortController.signal;
+                    },
                     initiatedAt: new Date(),
                 },
                 {
                     id: "op-3",
                     monitorId: "monitor-3",
                     abortController: new AbortController(),
-                    get signal() { return this.abortController.signal; },
+                    get signal() {
+                        return this.abortController.signal;
+                    },
                     initiatedAt: new Date(),
                 },
             ];

@@ -543,8 +543,12 @@ describe("MonitorOperationRegistry", () => {
             expect(activeOps.size).toBe(2);
             expect(activeOps.has(result1.operationId)).toBe(true);
             expect(activeOps.has(result2.operationId)).toBe(true);
-            expect(activeOps.get(result1.operationId)?.monitorId).toBe(mockMonitorId);
-            expect(activeOps.get(result2.operationId)?.monitorId).toBe("monitor-456");
+            expect(activeOps.get(result1.operationId)?.monitorId).toBe(
+                mockMonitorId
+            );
+            expect(activeOps.get(result2.operationId)?.monitorId).toBe(
+                "monitor-456"
+            );
         });
 
         it("should return defensive copy of internal map", async ({
@@ -605,7 +609,9 @@ describe("MonitorOperationRegistry", () => {
 
             const activeOps = registry.getActiveOperations();
             expect(activeOps.size).toBe(1);
-            expect(activeOps.get(result.operationId)?.signal.aborted).toBe(true);
+            expect(activeOps.get(result.operationId)?.signal.aborted).toBe(
+                true
+            );
         });
     });
 
@@ -666,7 +672,8 @@ describe("MonitorOperationRegistry", () => {
                 "monitor-2",
                 "monitor-3",
             ];
-            const operations: { operationId: string; signal: AbortSignal }[] = [];
+            const operations: { operationId: string; signal: AbortSignal }[] =
+                [];
 
             // Create 2 operations for each monitor
             for (const monitorId of monitors) {
@@ -748,11 +755,11 @@ describe("MonitorOperationRegistry", () => {
 
             // Test that the singleton pattern works
             expect(operationRegistry).toBe(operationRegistry);
-            
+
             // Test that multiple calls return the same instance
             const result1 = operationRegistry.initiateCheck("test-1");
             const result2 = operationRegistry.initiateCheck("test-2");
-            
+
             expect(operationRegistry.getActiveOperations().size).toBe(2);
         });
     });
@@ -771,13 +778,15 @@ describe("MonitorOperationRegistry", () => {
             const operation = registry.getOperation(result.operationId);
 
             expect(operation).toBeDefined();
-            
+
             // Verify the structure matches the interface
             const typedOperation: MonitorCheckOperation = operation!;
             expect(typedOperation.id).toBe(result.operationId);
             expect(typedOperation.monitorId).toBe(mockMonitorId);
             expect(typedOperation.initiatedAt).toBeInstanceOf(Date);
-            expect(typedOperation.abortController).toBeInstanceOf(AbortController);
+            expect(typedOperation.abortController).toBeInstanceOf(
+                AbortController
+            );
             expect(typedOperation.signal).toBeInstanceOf(AbortSignal);
         });
 
@@ -816,17 +825,17 @@ describe("MonitorOperationRegistry", () => {
             await annotate("Type: AbortController", "type");
 
             const result = registry.initiateCheck(mockMonitorId);
-            
+
             expect(result.signal.aborted).toBe(false);
-            
+
             // Add event listener to test abort event
             let abortEventFired = false;
             result.signal.addEventListener("abort", () => {
                 abortEventFired = true;
             });
-            
+
             registry.cancelOperations(mockMonitorId);
-            
+
             expect(result.signal.aborted).toBe(true);
             expect(abortEventFired).toBe(true);
         });
@@ -845,12 +854,12 @@ describe("MonitorOperationRegistry", () => {
                 timeoutMs: 10_000, // Long timeout
                 additionalSignals: [externalController.signal],
             });
-            
+
             expect(result.signal.aborted).toBe(false);
-            
+
             // External signal should trigger abort
             externalController.abort();
-            
+
             expect(result.signal.aborted).toBe(true);
         });
     });

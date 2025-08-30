@@ -36,7 +36,10 @@ if (!fs.existsSync(scriptsDir)) {
 
 // Expected SHA256 of the WASM (update when upstream changes). Allow override via env to facilitate controlled updates.
 // Placeholder hash (all zeros) forces explicit update until verified.
-const EXPECTED_SHA256 = (process.env.SQLITE3_WASM_SHA256 || "0000000000000000000000000000000000000000000000000000000000000000").toLowerCase();
+const EXPECTED_SHA256 = (
+    process.env.SQLITE3_WASM_SHA256 ||
+    "0000000000000000000000000000000000000000000000000000000000000000"
+).toLowerCase();
 
 const MAX_REDIRECTS = 3;
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB safety cap
@@ -61,7 +64,13 @@ function download(urlToFetch, destPath, redirectCount = 0) {
     const req = https.get(urlToFetch, (res) => {
         if (
             res.statusCode &&
-            [301, 302, 303, 307, 308].includes(res.statusCode)
+            [
+                301,
+                302,
+                303,
+                307,
+                308,
+            ].includes(res.statusCode)
         ) {
             const location = res.headers.location;
             if (!location) {
