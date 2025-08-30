@@ -347,6 +347,42 @@ export class WindowService {
             width: 1200,
         });
 
+        // Enhance security headers for all responses loaded in the window
+        // Only apply security headers in production to avoid DevTools conflicts
+        const isProduction = !isDev();
+        if (isProduction) {
+            try {
+                const sess = this.mainWindow.webContents.session;
+                sess.webRequest.onHeadersReceived((details, callback) => {
+                    const headers = {
+                        ...details.responseHeaders,
+                    } as Record<string, string | string[]>;
+
+                    // Apply strict security headers in production
+                    headers["X-Content-Type-Options"] = ["nosniff"];
+                    headers["X-Frame-Options"] = ["DENY"];
+                    headers["Referrer-Policy"] = ["no-referrer"];
+                    headers["Permissions-Policy"] = [
+                        "camera=(), microphone=(), geolocation=(), fullscreen=()",
+                    ];
+
+                    callback({
+                        cancel: false,
+                        responseHeaders: headers,
+                    });
+                });
+            } catch (error) {
+                logger.warn(
+                    "[WindowService] Failed to attach security header middleware",
+                    { error }
+                );
+            }
+        } else {
+            logger.debug(
+                "[WindowService] Skipping security headers in development mode for DevTools compatibility"
+            );
+        }
+
         this.loadContent();
         this.setupWindowEvents();
 

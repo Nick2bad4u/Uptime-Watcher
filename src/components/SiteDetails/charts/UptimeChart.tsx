@@ -4,10 +4,10 @@
  *
  * @remarks
  * This component displays uptime vs downtime distribution using a doughnut
- * chart visualization. It leverages Chart.js through the chartSetup service for
- * rendering and integrates with the ChartConfigService for theming. The
- * component is memoized to prevent unnecessary re-renders when parent component
- * updates, optimizing performance for frequent data updates.
+ * chart visualization. It uses selective Chart.js component registration for
+ * optimal bundle size and integrates with the ChartConfigService for theming.
+ * The component is memoized to prevent unnecessary re-renders when parent
+ * component updates, optimizing performance for frequent data updates.
  *
  * @example Basic uptime chart with data and options:
  *
@@ -44,14 +44,14 @@
 
 import type { ChartOptions } from "chart.js";
 
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
 import { memo, type NamedExoticComponent } from "react";
 import { Doughnut } from "react-chartjs-2";
 
 import type { UptimeChartData } from "../../../services/chartConfig";
 
-// Ensure Chart.js registration happens
-// eslint-disable-next-line import-x/no-unassigned-import
-import "../../../services/chartSetup";
+// Register only Chart.js components needed for doughnut charts (controller auto-registered by Doughnut component)
+ChartJS.register(ArcElement, Legend, Tooltip);
 
 /**
  * Memoized uptime distribution doughnut chart component for site monitoring

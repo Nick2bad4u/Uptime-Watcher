@@ -16,6 +16,7 @@ import type { SiteOperationsDependencies } from "./types";
 
 import { logger } from "../../services/logger";
 import { safeExtractIpcData } from "../../types/ipc";
+import { ensureError } from "../../utils/errorHandling";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
 import { normalizeMonitor } from "./utils/monitorOperations";
 import {
@@ -174,9 +175,9 @@ export const createSiteOperationsActions = (
                         });
                         return new Uint8Array(result.buffer);
                     } catch (error) {
-                        console.error(
+                        logger.error(
                             "Failed to download SQLite backup:",
-                            error
+                            ensureError(error)
                         );
                         throw error;
                     }

@@ -18,15 +18,17 @@ const vitestConfig = defineConfig({
     cacheDir: "./.cache/.vitest-backend",
     esbuild: {
         include: [
-            "**/*.js",
-            "**/*.mjs",
             "**/*.cjs",
-            "**/*.ts",
-            "**/*.mts",
             "**/*.cts",
+            "**/*.js",
+            "**/*.jsx",
+            "**/*.mjs",
+            "**/*.mts",
+            "**/*.ts",
+            "**/*.tsx",
         ],
         keepNames: true,
-        target: "es2024",
+        target: "esnext",
     },
     // Parity: json handling consistent (important if backend loads JSON fixtures)
     json: {

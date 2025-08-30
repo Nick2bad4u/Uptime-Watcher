@@ -246,11 +246,13 @@ describe("useDynamicHelpText Hook", () => {
             expect(vi.mocked(getMonitorHelpTexts)).toHaveBeenCalledTimes(2);
             expect(vi.mocked(getMonitorHelpTexts)).toHaveBeenNthCalledWith(
                 1,
-                "http"
+                "http",
+                expect.any(AbortSignal)
             );
             expect(vi.mocked(getMonitorHelpTexts)).toHaveBeenNthCalledWith(
                 2,
-                "ping"
+                "ping",
+                expect.any(AbortSignal)
             );
         });
 
@@ -415,7 +417,8 @@ describe("useDynamicHelpText Hook", () => {
                 expect(result.current.primary).toBe(expectedHelp.primary);
                 expect(result.current.secondary).toBe(expectedHelp.secondary);
                 expect(vi.mocked(getMonitorHelpTexts)).toHaveBeenCalledWith(
-                    monitorType
+                    monitorType,
+                    expect.any(AbortSignal)
                 );
             }
         );

@@ -89,19 +89,30 @@ import {
  * fetches from the backend and caches the result for future use.
  *
  * @param monitorType - The monitor type to get configuration for
+ * @param signal - Optional AbortSignal for cancellation
  *
  * @returns Promise resolving to the monitor type configuration or undefined if
  *   not found
  */
 async function getConfig(
-    monitorType: MonitorType
+    monitorType: MonitorType,
+    signal?: AbortSignal
 ): Promise<MonitorTypeConfig | undefined> {
+    if (signal?.aborted) {
+        throw new Error("Operation aborted");
+    }
+
     const cacheKey = CacheKeys.config.byName(`monitor-config-${monitorType}`);
 
     // Try to get from cache first
     const cached = AppCaches.uiHelpers.get(cacheKey);
     if (cached && isMonitorTypeConfig(cached)) {
         return cached;
+    }
+
+    // Check abort signal again before backend call
+    if (signal?.aborted) {
+        throw new Error("Operation aborted");
     }
 
     // Get from backend and cache
@@ -323,15 +334,21 @@ export async function getAnalyticsLabel(
  * Get help text for monitor type form fields.
  *
  * @param monitorType - Type of monitor
+ * @param signal - Optional AbortSignal for cancellation
  *
  * @returns Object containing primary and secondary help texts
  */
 export async function getMonitorHelpTexts(
-    monitorType: MonitorType
+    monitorType: MonitorType,
+    signal?: AbortSignal
 ): Promise<MonitorHelpTexts> {
     return withUtilityErrorHandling(
         async () => {
-            const config = await getConfig(monitorType);
+            if (signal?.aborted) {
+                throw new Error("Operation aborted");
+            }
+
+            const config = await getConfig(monitorType, signal);
             return config?.uiConfig?.helpTexts ?? {};
         },
         `Get help texts for ${monitorType}`,

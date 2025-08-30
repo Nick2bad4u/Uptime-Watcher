@@ -49,6 +49,7 @@ import type { Site } from "@shared/types";
  * @remarks
  * All monitor implementations must implement this interface to provide
  * consistent behavior across different monitoring types (HTTP, port, etc.).
+ * Supports AbortSignal for operation cancellation.
  *
  * @public
  */
@@ -59,17 +60,21 @@ export interface IMonitorService {
      * @remarks
      * Implementations should handle timeouts, retries, and error conditions
      * gracefully. Failed checks should return a result with `status: "down"`
-     * rather than throwing, unless the monitor configuration itself is
-     * invalid.
+     * rather than throwing, unless the monitor configuration itself is invalid.
+     * Supports optional AbortSignal for operation cancellation.
      *
      * @param monitor - The monitor configuration to check
+     * @param signal - Optional AbortSignal for operation cancellation
      *
      * @returns Promise resolving to the check result
      *
      * @throws {@link Error} When monitor configuration is invalid or check
      *   fails catastrophically
      */
-    check: (monitor: Site["monitors"][0]) => Promise<MonitorCheckResult>;
+    check: (
+        monitor: Site["monitors"][0],
+        signal?: AbortSignal
+    ) => Promise<MonitorCheckResult>;
 
     /**
      * Get the type of monitor this service handles.

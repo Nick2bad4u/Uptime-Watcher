@@ -490,7 +490,10 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
 
             expect(mockAxiosInstance.get).toHaveBeenCalledWith(
                 "https://example.com",
-                { timeout: 5000 }
+                expect.objectContaining({
+                    timeout: 5000,
+                    signal: expect.any(AbortSignal)
+                })
             );
             expect(determineMonitorStatus).toHaveBeenCalledWith(200);
             expect(result).toEqual({

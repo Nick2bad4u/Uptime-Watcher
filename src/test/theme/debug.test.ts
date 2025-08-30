@@ -6,9 +6,6 @@ import { describe, expect, it } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { useAvailabilityColors } from "../../theme/useTheme";
 
-// Let's also import the module directly to debug
-import * as useThemeModule from "../../theme/useTheme";
-
 describe("Debug Availability Description", () => {
     it("should debug the implementation logic", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");

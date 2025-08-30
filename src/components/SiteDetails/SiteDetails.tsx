@@ -43,8 +43,6 @@ import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-// eslint-disable-next-line import-x/no-unassigned-import -- Chart.js initialization
-import "../../services/chartSetup";
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ChartConfigService } from "../../services/chartConfig";
 import { ThemedBox } from "../../theme/components/ThemedBox";

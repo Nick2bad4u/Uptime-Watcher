@@ -4,8 +4,8 @@
  *
  * @remarks
  * This component displays response time trends over time using a line chart
- * visualization. It leverages Chart.js through the chartSetup service for
- * rendering and integrates with the ChartConfigService for theming and
+ * visualization. It uses selective Chart.js component registration for optimal
+ * bundle size and integrates with the ChartConfigService for theming and
  * configuration. The component is memoized to prevent unnecessary re-renders
  * when parent component updates, optimizing performance for real-time
  * monitoring data updates.
@@ -45,14 +45,38 @@
 
 import type { ChartOptions } from "chart.js";
 
+import {
+    CategoryScale,
+    Chart as ChartJS,
+    Filler,
+    Legend,
+    LinearScale,
+    LineElement,
+    PointElement,
+    TimeScale,
+    Title,
+    Tooltip,
+} from "chart.js";
+import Zoom from "chartjs-plugin-zoom";
+import "chartjs-adapter-date-fns";
 import { memo, type NamedExoticComponent } from "react";
 import { Line } from "react-chartjs-2";
 
 import type { ResponseTimeChartData } from "../../../services/chartConfig";
 
-// Ensure Chart.js registration happens
-// eslint-disable-next-line import-x/no-unassigned-import
-import "../../../services/chartSetup";
+// Register only Chart.js components needed for line charts with zoom (controller auto-registered by Line component)
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    TimeScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler,
+    Zoom
+);
 
 /**
  * Memoized response time line chart component for monitoring performance

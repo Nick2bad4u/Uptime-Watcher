@@ -1,10 +1,20 @@
 /**
- * Centralized Chart.js setup and registration module.
- *
  * @remarks
- * This file provides centralized registration of Chart.js components and
- * plugins to avoid duplication across components and ensure consistent chart
- * configuration. All Chart.js registrations should happen here.
+ * This centralized registration approach has been replaced with per-component
+ * registration for better tree-shaking and bundle size optimization. Each chart
+ * component now registers only the Chart.js components it actually needs.
+ *
+ * New approach: - UptimeChart: Registers ArcElement, DoughnutController,
+ * Legend, Tooltip - ResponseTimeChart: Registers CategoryScale, LinearScale,
+ * TimeScale, PointElement, LineElement, LineController, Title, Tooltip, Legend,
+ * Filler, Zoom, plus date adapter - StatusChart: Registers CategoryScale,
+ * LinearScale, BarElement, BarController, Title, Tooltip, Legend
+ *
+ * This file is maintained for compatibility with existing tests but should not
+ * be imported in new code. Components should register their own Chart.js
+ * requirements.
+ *
+ * @deprecated Chart.js setup and registration module - DEPRECATED
  *
  * @packageDocumentation
  */

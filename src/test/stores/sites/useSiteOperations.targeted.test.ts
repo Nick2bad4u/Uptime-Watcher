@@ -224,7 +224,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
     });
 
     describe("downloadSQLiteBackup Error Handling (Lines 147-151)", () => {
-        it("should handle and rethrow errors when SQLite backup download fails", async ({
+    it("should handle and rethrow errors when SQLite backup download fails", async ({
             task,
             annotate,
         }) => {
@@ -238,22 +238,18 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 downloadError
             );
 
-            // Console.error should be called and error should be rethrown
-            const consoleSpy = vi
-                .spyOn(console, "error")
-                .mockImplementation(() => {});
+            // logger.error should be called and error should be rethrown
+            (logger.error as any).mockClear?.();
 
             await expect(actions.downloadSQLiteBackup()).rejects.toThrow(
                 "Backup download failed"
             );
 
-            // Verify console.error was called (line 147-148)
-            expect(consoleSpy).toHaveBeenCalledWith(
+            // Verify logger.error was called (lines 147-148)
+            expect(logger.error).toHaveBeenCalledWith(
                 "Failed to download SQLite backup:",
                 downloadError
             );
-
-            consoleSpy.mockRestore();
         });
 
         it("should handle successful backup download", async ({

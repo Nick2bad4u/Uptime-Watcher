@@ -4,7 +4,7 @@
  * cases.
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeAll, afterAll } from "vitest";
 
 import {
     hasProperties,
@@ -1055,6 +1055,15 @@ describe("TypeGuards - Complete Function Coverage", () => {
     describe("isValidTimestamp", () => {
         const now = Date.now();
         const oneDayInMs = 86_400_000;
+
+        beforeAll(() => {
+            // Mock Date.now to ensure consistent test results
+            vi.spyOn(Date, "now").mockReturnValue(now);
+        });
+
+        afterAll(() => {
+            vi.restoreAllMocks();
+        });
 
         it("should return true for valid timestamps", async ({
             task,

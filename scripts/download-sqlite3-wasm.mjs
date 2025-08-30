@@ -9,12 +9,15 @@
 import * as fs from "fs";
 import https from "https";
 import path from "path";
+import crypto from "crypto";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Source URL for WASM. Allow override (e.g., for air‑gapped or pinned artifact mirrors)
 const url =
+    process.env.SQLITE3_WASM_URL ||
     "https://github.com/tndrle/node-sqlite3-wasm/raw/refs/heads/main/dist/node-sqlite3-wasm.wasm";
 const destDir = path.resolve(__dirname, "../dist-electron");
 const dest = path.join(destDir, "node-sqlite3-wasm.wasm");
@@ -31,57 +34,98 @@ if (!fs.existsSync(scriptsDir)) {
     fs.mkdirSync(scriptsDir, { recursive: true });
 }
 
-function download(url, dest, redirectCount = 0) {
-    if (redirectCount > 5) {
-        console.error("Too many redirects");
-        process.exit(1);
-    }
-    const req = https.get(url, (res) => {
-        if (res.statusCode === 302 || res.statusCode === 301) {
-            // Follow redirect if location header is present
-            if (res.headers.location) {
-                download(res.headers.location, dest, redirectCount + 1);
-            } else {
-                console.error("Redirect response missing 'location' header.");
-                process.exit(1);
-            }
-            return;
-        }
-        if (res.statusCode !== 200) {
-            console.error("Failed to download WASM:", res.statusCode);
-            process.exit(1);
-        }
-        const file = fs.createWriteStream(dest);
+// Expected SHA256 of the WASM (update when upstream changes). Allow override via env to facilitate controlled updates.
+// Placeholder hash (all zeros) forces explicit update until verified.
+const EXPECTED_SHA256 = (process.env.SQLITE3_WASM_SHA256 || "0000000000000000000000000000000000000000000000000000000000000000").toLowerCase();
 
-        // Handle disk write errors before piping
-        file.on("error", (err) => {
-            console.error("File write error:", err);
-            process.exit(1);
+const MAX_REDIRECTS = 3;
+const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB safety cap
+
+function failAndExit(message) {
+    console.error(`[wasm-download] ERROR: ${message}`);
+    process.exit(1);
+}
+
+function verifyNonPlaceholderHash() {
+    if (/^0{64}$/.test(EXPECTED_SHA256)) {
+        failAndExit(
+            "Expected SHA256 hash placeholder in script. Set SQLITE3_WASM_SHA256 env var with verified hash before distribution."
+        );
+    }
+}
+
+function download(urlToFetch, destPath, redirectCount = 0) {
+    if (redirectCount > MAX_REDIRECTS) {
+        failAndExit(`Too many redirects (> ${MAX_REDIRECTS})`);
+    }
+    const req = https.get(urlToFetch, (res) => {
+        if (
+            res.statusCode &&
+            [301, 302, 303, 307, 308].includes(res.statusCode)
+        ) {
+            const location = res.headers.location;
+            if (!location) {
+                failAndExit("Redirect response missing 'location' header");
+            }
+            return download(location, destPath, redirectCount + 1);
+        }
+
+        if (res.statusCode !== 200) {
+            failAndExit(`Unexpected status code: ${res.statusCode}`);
+        }
+
+        const hash = crypto.createHash("sha256");
+        let received = 0;
+        const tempPath = `${destPath}.download`;
+        const file = fs.createWriteStream(tempPath, { flags: "w" });
+
+        file.on("error", (err) => failAndExit(`File write error: ${err}`));
+
+        res.on("data", (chunk) => {
+            received += chunk.length;
+            if (received > MAX_SIZE_BYTES) {
+                res.destroy();
+                failAndExit(
+                    `Download exceeded maximum allowed size (${MAX_SIZE_BYTES} bytes)`
+                );
+            }
+            hash.update(chunk);
         });
 
         res.pipe(file);
 
-        file.on("finish", () => {
-            file.close();
-            console.log("Downloaded:", dest);
-
-            // Also copy to scripts directory
-            fs.copyFile(dest, scriptsDest, (err) => {
-                if (err) {
-                    console.error("Failed to copy to scripts directory:", err);
-                    process.exit(1);
-                } else {
-                    console.log("Copied to scripts directory:", scriptsDest);
-                    process.exit(0); // Explicitly exit with success
+        res.on("end", () => {
+            file.close(() => {
+                const actual = hash.digest("hex").toLowerCase();
+                if (actual !== EXPECTED_SHA256) {
+                    try {
+                        fs.unlinkSync(tempPath);
+                    } catch {}
+                    failAndExit(
+                        `Integrity check failed. Expected ${EXPECTED_SHA256} got ${actual}`
+                    );
                 }
+                fs.renameSync(tempPath, destPath);
+                console.log(
+                    `[wasm-download] Verified SHA256 (${actual}) and saved to ${destPath}`
+                );
+                // Copy to assets
+                fs.copyFile(destPath, scriptsDest, (err) => {
+                    if (err) {
+                        failAndExit(
+                            `Failed to copy to scripts directory: ${err}`
+                        );
+                    }
+                    console.log(
+                        `[wasm-download] Copied to scripts directory: ${scriptsDest}`
+                    );
+                    process.exit(0);
+                });
             });
         });
     });
 
-    req.on("error", (err) => {
-        console.error("Network error while downloading WASM:", err);
-        process.exit(1);
-    });
+    req.on("error", (err) => failAndExit(`Network error: ${err}`));
 }
 
 if (fs.existsSync(dest)) {
@@ -96,5 +140,8 @@ if (fs.existsSync(dest)) {
     process.exit(0); // Explicitly exit with success
 }
 
-console.log("Downloading node-sqlite3-wasm.wasm...");
+verifyNonPlaceholderHash();
+console.log(
+    `[wasm-download] Downloading node-sqlite3-wasm.wasm from ${url} (max ${MAX_SIZE_BYTES} bytes)`
+);
 download(url, dest);

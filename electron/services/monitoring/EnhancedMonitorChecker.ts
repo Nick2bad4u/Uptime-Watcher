@@ -519,11 +519,15 @@ export class EnhancedMonitorChecker {
      */
     private async executeMonitorCheck(
         monitor: Monitor,
-        operationId: string
+        operationId: string,
+        signal?: AbortSignal
     ): Promise<StatusUpdateMonitorCheckResult> {
         try {
-            // Perform the check based on monitor type - now returns full result
-            const serviceResult = await this.performTypeSpecificCheck(monitor);
+            // Perform the check based on monitor type with abort signal - now returns full result
+            const serviceResult = await this.performTypeSpecificCheck(
+                monitor,
+                signal
+            );
 
             return {
                 details:
@@ -631,13 +635,15 @@ export class EnhancedMonitorChecker {
         monitor: Site["monitors"][0],
         monitorId: string
     ): Promise<StatusUpdate | undefined> {
-        const operationId = await this.setupOperationCorrelation(
+        const operationResult = await this.setupOperationCorrelation(
             monitor,
             monitorId
         );
-        if (!operationId) {
+        if (!operationResult) {
             return undefined;
         }
+
+        const { operationId, signal } = operationResult;
 
         logger.info(
             interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_CHECK_START, {
@@ -648,10 +654,11 @@ export class EnhancedMonitorChecker {
         );
 
         try {
-            // Perform the actual check
+            // Perform the actual check with abort signal
             const checkResult = await this.executeMonitorCheck(
                 monitor,
-                operationId
+                operationId,
+                signal
             );
 
             // Save history entry before updating status
@@ -806,10 +813,11 @@ export class EnhancedMonitorChecker {
      */
     private async performMonitorCheck(
         monitorService: IMonitorService,
-        monitor: Monitor
+        monitor: Monitor,
+        signal?: AbortSignal
     ): Promise<ServiceMonitorCheckResult> {
         try {
-            return await monitorService.check(monitor);
+            return await monitorService.check(monitor, signal);
         } catch (error) {
             logger.error(`Monitor check failed for ${monitor.id}`, error);
             return {
@@ -831,20 +839,37 @@ export class EnhancedMonitorChecker {
      * @returns Promise resolving to monitor check result with details
      */
     private async performTypeSpecificCheck(
-        monitor: Monitor
+        monitor: Monitor,
+        signal?: AbortSignal
     ): Promise<ServiceMonitorCheckResult> {
         switch (monitor.type) {
             case "dns": {
-                return this.performMonitorCheck(this.dnsMonitor, monitor);
+                return this.performMonitorCheck(
+                    this.dnsMonitor,
+                    monitor,
+                    signal
+                );
             }
             case "http": {
-                return this.performMonitorCheck(this.httpMonitor, monitor);
+                return this.performMonitorCheck(
+                    this.httpMonitor,
+                    monitor,
+                    signal
+                );
             }
             case "ping": {
-                return this.performMonitorCheck(this.pingMonitor, monitor);
+                return this.performMonitorCheck(
+                    this.pingMonitor,
+                    monitor,
+                    signal
+                );
             }
             case "port": {
-                return this.performMonitorCheck(this.portMonitor, monitor);
+                return this.performMonitorCheck(
+                    this.portMonitor,
+                    monitor,
+                    signal
+                );
             }
             default: {
                 logger.warn(
@@ -940,40 +965,57 @@ export class EnhancedMonitorChecker {
      * @param monitor - Monitor being checked
      * @param monitorId - Monitor ID
      *
-     * @returns Operation ID if successful, undefined if failed
+     * @returns Operation result with ID and signal if successful, undefined if
+     *   failed
      */
     private async setupOperationCorrelation(
         monitor: Monitor,
         monitorId: string
-    ): Promise<string | undefined> {
-        // Create operation correlation
-        const operationId =
-            this.config.operationRegistry.initiateCheck(monitorId);
-
-        // Calculate operation timeout with buffer for cleanup
+    ): Promise<undefined | { operationId: string; signal: AbortSignal }> {
+        // Calculate operation timeout
         const monitorTimeoutMs =
             monitor.timeout ||
             DEFAULT_MONITOR_TIMEOUT_SECONDS * SECONDS_TO_MS_MULTIPLIER;
         const timeoutMs = monitorTimeoutMs + MONITOR_TIMEOUT_BUFFER_MS;
-        this.config.timeoutManager.scheduleTimeout(operationId, timeoutMs);
+
+        // Create operation correlation with timeout
+        const operationResult = this.config.operationRegistry.initiateCheck(
+            monitorId,
+            {
+                timeoutMs,
+            }
+        );
+
+        // Schedule additional timeout for cleanup (the AbortSignal.timeout handles the primary timeout)
+        this.config.timeoutManager.scheduleTimeout(
+            operationResult.operationId,
+            timeoutMs
+        );
 
         // Add operation to monitor's active operations
         try {
             const updatedActiveOperations = [
                 ...(monitor.activeOperations ?? []),
-                operationId,
+                operationResult.operationId,
             ];
             await this.config.monitorRepository.update(monitorId, {
                 activeOperations: updatedActiveOperations,
             });
-            return operationId;
+            return {
+                operationId: operationResult.operationId,
+                signal: operationResult.signal,
+            };
         } catch (error) {
             logger.error(
-                `Failed to add operation ${operationId} to monitor ${monitorId}`,
+                `Failed to add operation ${operationResult.operationId} to monitor ${monitorId}`,
                 error
             );
-            this.config.operationRegistry.completeOperation(operationId);
-            this.config.timeoutManager.clearTimeout(operationId);
+            this.config.operationRegistry.completeOperation(
+                operationResult.operationId
+            );
+            this.config.timeoutManager.clearTimeout(
+                operationResult.operationId
+            );
             return undefined;
         }
     }

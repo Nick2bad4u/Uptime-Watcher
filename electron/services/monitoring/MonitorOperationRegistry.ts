@@ -1,11 +1,12 @@
 /**
- * Monitor operation registry for tracking and correlating monitoring
- * operations.
+ * Monitor operation registry for tracking and correlating monitoring operations
+ * using AbortController.
  *
  * @remarks
  * This service provides operation correlation to prevent race conditions
  * between monitor state changes and delayed check operations. Each monitoring
- * operation is assigned a unique ID and tracked throughout its lifecycle.
+ * operation is assigned a unique ID and tracked throughout its lifecycle using
+ * native AbortController for cancellation.
  *
  * @packageDocumentation
  */
@@ -22,19 +23,21 @@ import { monitorLogger as logger } from "../../utils/logger";
  *
  * @remarks
  * Represents a single monitoring check operation with correlation ID and
- * cancellation support.
+ * AbortController-based cancellation support.
  *
  * @public
  */
 export interface MonitorCheckOperation {
-    /** Cancellation flag */
-    cancelled: boolean;
+    /** AbortController for this operation */
+    abortController: AbortController;
     /** Unique operation ID */
     id: string;
     /** When operation started */
     initiatedAt: Date;
     /** Monitor being checked */
     monitorId: string;
+    /** AbortSignal for easy access */
+    signal: AbortSignal;
 }
 
 /**
@@ -62,8 +65,9 @@ export interface MonitorCheckResult {
  * Registry for tracking active monitoring operations.
  *
  * @remarks
- * Provides operation correlation and cancellation capabilities to prevent race
- * conditions between monitor state changes and check operations.
+ * Provides operation correlation and AbortController-based cancellation
+ * capabilities to prevent race conditions between monitor state changes and
+ * check operations.
  *
  * @public
  */
@@ -81,8 +85,11 @@ export class MonitorOperationRegistry {
     public cancelOperations(monitorId: string): void {
         let cancelledCount = 0;
         for (const [, operation] of this.activeOperations) {
-            if (operation.monitorId === monitorId) {
-                operation.cancelled = true;
+            if (
+                operation.monitorId === monitorId &&
+                !operation.signal.aborted
+            ) {
+                operation.abortController.abort("Monitor cancelled");
                 cancelledCount++;
             }
         }
@@ -105,6 +112,10 @@ export class MonitorOperationRegistry {
     public completeOperation(operationId: string): void {
         const operation = this.activeOperations.get(operationId);
         if (operation) {
+            // Abort the operation if it's still running
+            if (!operation.signal.aborted) {
+                operation.abortController.abort("Operation completed");
+            }
             this.activeOperations.delete(operationId);
             logger.debug(
                 interpolateLogTemplate(
@@ -119,12 +130,17 @@ export class MonitorOperationRegistry {
     }
 
     /**
-     * Get all active operations (for cleanup purposes).
+     * Get all active operations (for cleanup/inspection purposes).
      *
-     * @returns Map of all active operations
+     * @remarks
+     * Returns a defensive copy so callers cannot mutate internal registry
+     * state. Use {@link completeOperation} / {@link cancelOperations} for
+     * lifecycle changes.
+     *
+     * @returns Map clone containing all active operations
      */
     public getActiveOperations(): Map<string, MonitorCheckOperation> {
-        return this.activeOperations;
+        return new Map(this.activeOperations);
     }
 
     /**
@@ -144,10 +160,19 @@ export class MonitorOperationRegistry {
      * Initiate a new check operation for a monitor.
      *
      * @param monitorId - ID of monitor to check
+     * @param options - Optional configuration for the operation
      *
-     * @returns Unique operation ID
+     * @returns Object containing operation ID and abort signal
      */
-    public initiateCheck(monitorId: string): string {
+    public initiateCheck(
+        monitorId: string,
+        options?: {
+            /** Additional signals to combine with operation signal */
+            additionalSignals?: AbortSignal[];
+            /** Timeout in milliseconds */
+            timeoutMs?: number;
+        }
+    ): { operationId: string; signal: AbortSignal } {
         // eslint-disable-next-line no-useless-assignment -- Variable initialized to satisfy init-declarations rule, even though immediately reassigned
         let operationId = "";
         let attempts = 0;
@@ -163,30 +188,51 @@ export class MonitorOperationRegistry {
             );
         }
 
+        const abortController = new AbortController();
+        const { signal: baseSignal } = abortController;
+
+        // Create combined signal if additional signals or timeout provided
+        let signal = baseSignal;
+        if (options?.additionalSignals?.length ?? options?.timeoutMs) {
+            const signals = [signal];
+
+            if (options.additionalSignals?.length) {
+                signals.push(...options.additionalSignals);
+            }
+
+            if (options.timeoutMs) {
+                signals.push(AbortSignal.timeout(options.timeoutMs));
+            }
+
+            signal = AbortSignal.any(signals);
+        }
+
         const operation: MonitorCheckOperation = {
-            cancelled: false,
+            abortController,
             id: operationId,
             initiatedAt: new Date(),
             monitorId,
+            signal,
         };
 
         this.activeOperations.set(operationId, operation);
         logger.debug(
             `Initiated operation ${operationId} for monitor ${monitorId}`
         );
-        return operationId;
+
+        return { operationId, signal };
     }
 
     /**
-     * Validate that an operation is still active and not cancelled.
+     * Validate that an operation is still active and not aborted.
      *
      * @param operationId - ID of operation to validate
      *
-     * @returns True if operation is valid and not cancelled
+     * @returns True if operation is valid and not aborted
      */
     public validateOperation(operationId: string): boolean {
         const operation = this.activeOperations.get(operationId);
-        return Boolean(operation && !operation.cancelled);
+        return Boolean(operation && !operation.signal.aborted);
     }
 }
 

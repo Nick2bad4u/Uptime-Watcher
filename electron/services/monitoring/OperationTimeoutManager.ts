@@ -84,7 +84,7 @@ export class OperationTimeoutManager {
      */
     private handleTimeout(operationId: string): void {
         const operation = this.operationRegistry.getOperation(operationId);
-        if (operation && !operation.cancelled) {
+        if (operation && !operation.signal.aborted) {
             logger.warn(
                 interpolateLogTemplate(
                     LOG_TEMPLATES.warnings.OPERATION_TIMEOUT,

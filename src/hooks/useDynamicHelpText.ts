@@ -61,7 +61,8 @@ export interface DynamicHelpTextResult {
  *
  * @remarks
  * Provides monitor-specific help text with automatic loading state management.
- * Handles cancellation of pending requests on unmount or monitor type changes.
+ * Handles cancellation of pending requests on unmount or monitor type changes
+ * using AbortController for proper cleanup.
  *
  * @param monitorType - The monitor type to load help text for
  *
@@ -81,44 +82,52 @@ export function useDynamicHelpText(
 
     useEffect(
         function loadDynamicHelpText() {
-            let isCancelled = false;
+            const controller = new AbortController();
 
             const loadHelpTexts = async (): Promise<void> => {
                 try {
                     setIsLoading(true);
                     setError(undefined);
-                    const texts = await getMonitorHelpTexts(monitorType);
-                    if (!isCancelled) {
+                    const texts = await getMonitorHelpTexts(
+                        monitorType,
+                        controller.signal
+                    );
+
+                    // Check if operation was aborted before updating state
+                    if (!controller.signal.aborted) {
                         setHelpTexts(texts);
                         setIsLoading(false);
                     }
                 } catch (caughtError) {
+                    // Don't log or update state if operation was aborted
+                    if (controller.signal.aborted) {
+                        return;
+                    }
+
                     logger.warn(
                         "Failed to load help texts",
                         caughtError instanceof Error
                             ? caughtError
                             : new Error(String(caughtError))
                     );
-                    if (!isCancelled) {
-                        const errorMessage =
-                            caughtError instanceof Error
-                                ? caughtError.message
-                                : "Help text unavailable";
-                        setError(errorMessage);
-                        setHelpTexts({
-                            primary: "Help text could not be loaded",
-                            secondary:
-                                "Please check your connection and try again",
-                        });
-                        setIsLoading(false);
-                    }
+
+                    const errorMessage =
+                        caughtError instanceof Error
+                            ? caughtError.message
+                            : "Help text unavailable";
+                    setError(errorMessage);
+                    setHelpTexts({
+                        primary: "Help text could not be loaded",
+                        secondary: "Please check your connection and try again",
+                    });
+                    setIsLoading(false);
                 }
             };
 
             void loadHelpTexts();
 
             return (): void => {
-                isCancelled = true;
+                controller.abort("Component unmounted or monitor type changed");
             };
         },
         [monitorType]

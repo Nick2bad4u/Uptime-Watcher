@@ -25,9 +25,10 @@ const vitestConfig = defineConfig({
             "**/*.ts",
             "**/*.mts",
             "**/*.cts",
+            "**/*.tsx",
         ],
         keepNames: true,
-        target: "es2024",
+        target: "esnext",
     },
     // Parity: json handling
     json: {

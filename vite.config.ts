@@ -34,9 +34,11 @@ const dirname = import.meta.dirname;
  * and main/preload processes.
  */
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
+    // Prefer Vite's provided mode over raw NODE_ENV for consistency.
     const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
-    const isTestMode = process.env["NODE_ENV"] === "test";
+    const isTestMode = mode === "test";
+    const isDev = mode === "development";
     return {
         appType: "spa", // Single Page Application
         base: "./", // Ensures relative asset paths for Electron
@@ -45,6 +47,7 @@ export default defineConfig(() => {
             // Increase chunk size warning limit to account for intentional larger vendor chunks
             chunkSizeWarningLimit: 1000, // Increase from default 500KB to 1MB for vendor chunks
             copyPublicDir: true, // Copy public assets to dist
+            cssCodeSplit: true, // Enable CSS code splitting
             emptyOutDir: true, // Clean output before build
             modulePreload: {
                 polyfill: false, // Modern browsers don't need polyfill
@@ -55,26 +58,10 @@ export default defineConfig(() => {
                 output: {
                     // Manual chunk splitting to optimize bundle sizes and improve caching
                     manualChunks: {
-                        // Chart.js ecosystem - separate chunk for charting (large but stable)
-                        "chart-vendor": [
-                            "chart.js",
-                            "react-chartjs-2",
-                            "chartjs-adapter-date-fns",
-                            "chartjs-plugin-zoom",
-                        ],
-
-                        // Electron-specific libraries - separate chunk for desktop functionality
-                        "electron-vendor": ["electron-log", "electron-updater"],
-
-                        // Monitoring tools - separate chunk for uptime monitoring logic
-                        "monitor-vendor": ["is-port-reachable", "ping"],
-
-                        // React ecosystem - separate chunk for framework code (changes less frequently)
+                        // React core ecosystem kept together to avoid empty single-module chunks
                         "react-vendor": ["react", "react-dom"],
-
                         // UI and icon libraries - separate chunk for visual components
                         "ui-vendor": ["react-icons"],
-
                         // Utility libraries - separate chunk for utilities and validation
                         "utils-vendor": [
                             "axios",
@@ -86,33 +73,36 @@ export default defineConfig(() => {
                 },
             },
             sourcemap: true, // Recommended for Electron debugging
-            target: "es2024", // Updated from es2024 for CSS Modules compatibility
+            target: "esnext", // Updated to esnext for CSS Modules compatibility
         },
         cache: true,
-        cacheDir: "./.cache/.vitest",
+        cacheDir: "./.cache/.vite", // Separate cache to avoid conflicts
         css: {
+            devSourcemap: true, // Enable source maps for CSS in development
             modules: {
                 generateScopedName: "[name]__[local]___[hash:base64:5]", // Custom scoped name pattern
                 // CSS Modules configuration
                 localsConvention: "camelCase" as const, // Convert kebab-case to camelCase for named exports
             },
+            transformer: "postcss", // Use PostCSS for transformations
         },
         esbuild: {
             // Transpile all files with ESBuild to remove comments from code coverage.
             // Required for `test.coverage.ignoreEmptyLines` to work:
             include: [
+                "**/*.cjs",
+                "**/*.cts",
                 "**/*.js",
                 "**/*.jsx",
                 "**/*.mjs",
+                "**/*.mts",
                 "**/*.ts",
                 "**/*.tsx",
-                "**/*.mts",
-                "**/*.cts",
             ],
 
             // More aggressive transformation to help coverage parsing
             keepNames: true, // Preserve function names for better coverage reports
-            target: "es2024", // Updated to match build target for CSS Modules compatibility
+            target: "esnext", // Updated to match build target for CSS Modules compatibility
         },
         json: {
             namedExports: true,
@@ -121,10 +111,11 @@ export default defineConfig(() => {
         optimizeDeps: {
             // Force dependency optimization to handle large chunks better
             esbuildOptions: {
-                // Enable code splitting for dependencies to reduce chunk sizes
-                splitting: true,
-                target: "es2024",
+                target: "esnext", // Use latest JS features for smaller output
+                // Note: splitting, format, and treeShaking are handled by Vite itself
+                // and should not be configured here to avoid conflicts
             },
+            holdUntilCrawlEnd: true, // Wait for full dependency crawl to avoid partial optimizations
             // Explicitly include large dependencies for better chunking
             include: isTestMode
                 ? [
@@ -257,7 +248,7 @@ export default defineConfig(() => {
             // }),
             ViteMcp(),
             // Only include react-scan in development mode to avoid sourcemap warnings in production
-            ...(process.env["NODE_ENV"] === "development"
+            ...(isDev
                 ? [
                       reactScan({
                           autoDisplayNames: true,
@@ -489,7 +480,9 @@ export default defineConfig(() => {
         },
         server: {
             hmr: {
+                overlay: true, // Show full-screen overlay on errors
                 port: 5174, // Use different port for HMR to avoid conflicts
+                protocol: "ws", // Use WebSocket for HMR
             },
             open: false, // Don't auto-open browser (Electron only)
             port: 5173,
@@ -534,6 +527,18 @@ export default defineConfig(() => {
                     "./shared/utils/environment.ts",
                 ],
             },
+            watch: {
+                awaitWriteFinish: {
+                    pollInterval: 100,
+                    stabilityThreshold: 500,
+                },
+                followSymlinks: true,
+                // Watch options for chokidar
+                ignoreInitial: true,
+                persistent: true,
+                // Watch WASM files for changes during development
+                useFsEvents: true, // Use native file system events for better performance
+            },
         },
         test: {
             attachmentsDir: "./.cache/.vitest-attachments",
@@ -543,6 +548,7 @@ export default defineConfig(() => {
                 include: [
                     "benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
                 ],
+                includeSamples: true,
                 outputJson: "./coverage/bench-results.json",
                 reporters: ["default", "verbose"],
             },
@@ -554,6 +560,7 @@ export default defineConfig(() => {
             // Enable detailed code coverage analysis
             coverage: {
                 all: true, // Include all source files in coverage
+                clean: true, // Clean coverage directory before each run
                 exclude: [
                     "**/*.config.*",
                     "**/*.d.ts",
@@ -578,6 +585,7 @@ export default defineConfig(() => {
                     "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
                     "**/*.bench.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}", // Exclude benchmark files
                 ],
+                excludeAfterRemap: true, // Exclude files after remapping for accuracy
                 experimentalAstAwareRemapping: true, // Enable AST-aware remapping for accurate coverage
                 ignoreEmptyLines: true, // Ignore empty lines, comments, and TypeScript interfaces
                 // V8 Provider Configuration (Recommended since Vitest v3.2.0)
@@ -600,7 +608,6 @@ export default defineConfig(() => {
                 },
             },
             css: {
-                devSourcemap: true,
                 exclude: [],
                 include: [/.+/],
                 modules: {

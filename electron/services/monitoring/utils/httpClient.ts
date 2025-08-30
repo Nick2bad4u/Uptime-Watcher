@@ -131,11 +131,14 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
  *     timeout: 5000,
  *     userAgent: "UptimeWatcher/1.0",
  * });
- * const response = await client.get("https://example.com");
+ * const response = await client.get("https://example.com", {
+ *     signal: AbortSignal.timeout(3000),
+ * });
  * ```
  *
  * @param config - The {@link MonitorConfig} containing timeout, userAgent, and
  *   other HTTP options.
+ * @param signal - Optional AbortSignal for request cancellation.
  *
  * @returns A configured {@link AxiosInstance} with timing interceptors and
  *   connection pooling.
@@ -145,7 +148,27 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
  * @see {@link MonitorConfig}
  * @see {@link setupTimingInterceptors}
  */
+// Security / performance tunables (can be overridden via env for emergency mitigation)
+// Centralized accessor to satisfy lint rules about environment usage
+function getEnv(name: string, fallback: string): string {
+    // eslint-disable-next-line n/no-process-env -- Controlled, centralized access
+    const val = process.env[name];
+    return val === undefined || val === "" ? fallback : val;
+}
+
+const DEFAULT_MAX_REDIRECTS =
+    Number.parseInt(getEnv("UW_HTTP_MAX_REDIRECTS", "3"), 10) || 3;
+const DEFAULT_MAX_CONTENT_LENGTH =
+    Number.parseInt(
+        getEnv("UW_HTTP_MAX_CONTENT_LENGTH", `${1 * 1024 * 1024}`),
+        10
+    ) || 1 * 1024 * 1024; // 1MB
+const DEFAULT_MAX_BODY_LENGTH =
+    Number.parseInt(getEnv("UW_HTTP_MAX_BODY_LENGTH", `${8 * 1024}`), 10) ||
+    8 * 1024; // 8KB request body cap
 export function createHttpClient(config: MonitorConfig): AxiosInstance {
+    const forceStrictStatus =
+        getEnv("UW_HTTP_STRICT_STATUS", "true").toLowerCase() === "true";
     const headers: Record<string, string> = {};
     if (config.userAgent !== undefined) {
         headers["User-Agent"] = config.userAgent;
@@ -156,24 +179,25 @@ export function createHttpClient(config: MonitorConfig): AxiosInstance {
         // Connection pooling for better performance
         httpAgent: new http.Agent({ keepAlive: true }),
         httpsAgent: new https.Agent({ keepAlive: true }),
-        maxBodyLength: 10 * 1024, // 10KB request limit - sufficient for monitoring data
-        maxContentLength: 10 * 1024 * 1024, // 10MB response limit for larger pages
-        maxRedirects: 5,
+        maxBodyLength: DEFAULT_MAX_BODY_LENGTH, // bounded request size
+        maxContentLength: DEFAULT_MAX_CONTENT_LENGTH, // bounded response size
+        maxRedirects: DEFAULT_MAX_REDIRECTS,
         // Text response minimizes parsing overhead; status codes are
         // sufficient for monitoring
         responseType: "text",
         /**
-         * Custom status validation for monitoring logic.
+         * Status validation strategy.
          *
-         * @remarks
-         * Always treats responses as successful so we get response data in
-         * success path rather than error path. This allows manual status code
-         * evaluation in monitoring logic where 404, 500, etc. are legitimate
-         * results to track, not errors.
+         * - Strict mode (default): Only status codes 200-399 are treated as
+         *   success.
+         * - Lenient mode (opt-out): All responses treated as success and
+         *   interpreted by upstream logic.
          *
-         * @returns Always true to treat all HTTP responses as "successful".
+         * Controlled via UW_HTTP_STRICT_STATUS environment variable.
          */
-        validateStatus: () => true,
+        validateStatus: forceStrictStatus
+            ? (status: number): boolean => status >= 200 && status < 400
+            : (): true => true,
     };
 
     if (config.timeout !== undefined) {

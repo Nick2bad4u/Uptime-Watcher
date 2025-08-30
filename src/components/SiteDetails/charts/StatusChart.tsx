@@ -4,8 +4,8 @@
  *
  * @remarks
  * This component displays status distribution (up/down/pending) using a bar
- * chart visualization. It leverages Chart.js through the chartSetup service for
- * rendering and integrates with the ChartConfigService for theming and
+ * visualization. It uses selective Chart.js component registration for optimal
+ * bundle size and integrates with the ChartConfigService for theming and
  * configuration. The component is memoized to prevent unnecessary re-renders
  * when parent component updates, optimizing performance for frequent status
  * updates in monitoring scenarios.
@@ -44,14 +44,29 @@
 
 import type { ChartOptions } from "chart.js";
 
+import {
+    BarElement,
+    CategoryScale,
+    Chart as ChartJS,
+    Legend,
+    LinearScale,
+    Title,
+    Tooltip,
+} from "chart.js";
 import { memo, type NamedExoticComponent } from "react";
 import { Bar } from "react-chartjs-2";
 
 import type { StatusBarChartData } from "../../../services/chartConfig";
 
-// Ensure Chart.js registration happens
-// eslint-disable-next-line import-x/no-unassigned-import
-import "../../../services/chartSetup";
+// Register only Chart.js components needed for bar charts (controller auto-registered by Bar component)
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+);
 
 /**
  * Memoized status distribution bar chart component for monitoring status

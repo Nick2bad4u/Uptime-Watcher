@@ -64,6 +64,65 @@ import { createHttpClient } from "./utils/httpClient";
 import { determineMonitorStatus } from "./utils/httpStatusUtils";
 
 /**
+ * Lightweight in-memory rate limiter for HTTP monitor requests.
+ *
+ * @remarks
+ * Provides coarse-grained protection against flooding a single host with
+ * requests. Not persisted; resets per process start. Intentionally simple to
+ * avoid introducing heavy dependencies.
+ */
+class SimpleRateLimiter {
+    private readonly lastInvocation = new Map<string, number>();
+
+    private active = 0;
+
+    private readonly maxConcurrent: number;
+
+    private readonly minIntervalMs: number;
+
+    public async schedule<T>(url: string, fn: () => Promise<T>): Promise<T> {
+        const key = this.getKey(url);
+        const sleep = async (ms: number): Promise<void> =>
+            new Promise((resolve) => {
+                setTimeout(resolve, ms);
+            });
+        for (;;) {
+            const now = Date.now();
+            const last = this.lastInvocation.get(key) ?? 0;
+            const since = now - last;
+            const needDelay = since < this.minIntervalMs;
+            if (this.active < this.maxConcurrent && !needDelay) {
+                break;
+            }
+            const waitFor = needDelay ? this.minIntervalMs - since : 25;
+            // eslint-disable-next-line no-await-in-loop
+            await sleep(waitFor);
+        }
+        this.active += 1;
+        this.lastInvocation.set(key, Date.now());
+        try {
+            return await fn();
+        } finally {
+            this.active -= 1;
+        }
+    }
+
+    public constructor(maxConcurrent: number, minIntervalMs: number) {
+        this.maxConcurrent = maxConcurrent;
+        this.minIntervalMs = minIntervalMs;
+    }
+
+    private getKey(url: string): string {
+        try {
+            const u = new URL(url);
+            return `${u.protocol}//${u.host}`;
+        } catch {
+            return "global";
+        }
+    }
+}
+
+/**
  * Extends Axios types to support timing metadata for monitoring.
  *
  * @remarks
@@ -129,6 +188,26 @@ declare module "axios" {
  * @public
  */
 export class HttpMonitor implements IMonitorService {
+    private static readonly rateLimiter = new SimpleRateLimiter(
+        Number.parseInt(
+            HttpMonitor.getEnv("UW_HTTP_MAX_CONCURRENT", "8"),
+            10
+        ) || 8,
+        Number.parseInt(
+            HttpMonitor.getEnv("UW_HTTP_MIN_INTERVAL_MS", "200"),
+            10
+        ) || 200
+    );
+
+    private axiosInstance: AxiosInstance;
+
+    private config: MonitorConfig;
+
+    private static getEnv(name: string, fallback: string): string {
+        // eslint-disable-next-line n/no-process-env -- centralized access
+        const val = process.env[name];
+        return val === undefined || val === "" ? fallback : val;
+    }
     /**
      * Axios instance configured for monitoring.
      *
@@ -138,18 +217,13 @@ export class HttpMonitor implements IMonitorService {
      *
      * @internal
      */
-    private axiosInstance: AxiosInstance;
-
     /**
      * Configuration for HTTP monitoring.
      *
      * @remarks
      * Includes timeout, user agent, and other settings. Used for all requests
      * unless overridden per-monitor.
-     *
-     * @internal
      */
-    private config: MonitorConfig;
 
     /**
      * Performs an HTTP health check for the given monitor configuration.
@@ -158,10 +232,7 @@ export class HttpMonitor implements IMonitorService {
      * Uses per-monitor timeout and retryAttempts if provided, otherwise falls
      * back to defaults. All requests use retry logic and exponential backoff
      * via {@link withOperationalHooks}. Returns a standardized result for all
-     * error cases.
-     *
-     * Now uses type guards to safely handle potentially undefined configuration
-     * values.
+     * error cases. Now supports AbortSignal for operation cancellation.
      *
      * @example
      *
@@ -173,6 +244,7 @@ export class HttpMonitor implements IMonitorService {
      * ```
      *
      * @param monitor - Monitor configuration object (must be type "http").
+     * @param signal - Optional AbortSignal for operation cancellation.
      *
      * @returns Promise resolving to {@link MonitorCheckResult} with status and
      *   timing.
@@ -182,12 +254,18 @@ export class HttpMonitor implements IMonitorService {
      * @public
      */
     public async check(
-        monitor: Site["monitors"][0]
+        monitor: Site["monitors"][0],
+        signal?: AbortSignal
     ): Promise<MonitorCheckResult> {
         if (monitor.type !== "http") {
             throw new Error(
                 `HttpMonitor cannot handle monitor type: ${monitor.type}`
             );
+        }
+
+        // Check if operation is already aborted
+        if (signal?.aborted) {
+            throw new Error("Operation was aborted before starting");
         }
 
         // Validate URL using shared helper
@@ -202,10 +280,14 @@ export class HttpMonitor implements IMonitorService {
             this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
         );
 
-        return this.performHealthCheckWithRetry(
-            monitor.url ?? "",
-            timeout,
-            retryAttempts
+        const url = monitor.url ?? "";
+        return HttpMonitor.rateLimiter.schedule(url, () =>
+            this.performHealthCheckWithRetry(
+                url,
+                timeout,
+                retryAttempts,
+                signal
+            )
         );
     }
 
@@ -213,12 +295,13 @@ export class HttpMonitor implements IMonitorService {
      * Makes an HTTP GET request using Axios with timing interceptors.
      *
      * @remarks
-     * Uses the configured Axios instance with per-request timeout. Timing
-     * metadata is injected by interceptors. Throws if the request fails at the
-     * network or protocol level.
+     * Uses the configured Axios instance with per-request timeout and optional
+     * AbortSignal. Timing metadata is injected by interceptors. Throws if the
+     * request fails at the network or protocol level.
      *
      * @param url - The URL to request.
      * @param timeout - Request timeout in milliseconds.
+     * @param signal - Optional AbortSignal for request cancellation.
      *
      * @returns Promise resolving to {@link AxiosResponse} with timing metadata.
      *
@@ -228,10 +311,17 @@ export class HttpMonitor implements IMonitorService {
      */
     private async makeRequest(
         url: string,
-        timeout: number
+        timeout: number,
+        signal?: AbortSignal
     ): Promise<AxiosResponse> {
-        // Use our configured Axios instance with specific timeout override
+        // Combine timeout with AbortSignal for comprehensive cancellation
+        const signals = [AbortSignal.timeout(timeout)];
+        if (signal) {
+            signals.push(signal);
+        }
+
         return this.axiosInstance.get(url, {
+            signal: AbortSignal.any(signals),
             timeout,
         });
     }
@@ -242,12 +332,13 @@ export class HttpMonitor implements IMonitorService {
      * @remarks
      * Uses {@link withOperationalHooks} for retry logic. Development mode
      * enables debug logging on retries. Returns a standardized error result if
-     * all attempts fail.
+     * all attempts fail. Supports AbortSignal for operation cancellation.
      *
      * @param url - The URL to health check.
      * @param timeout - Request timeout in milliseconds.
      * @param maxRetries - Number of additional retry attempts after the initial
      *   attempt.
+     * @param signal - Optional AbortSignal for operation cancellation.
      *
      * @returns Promise resolving to {@link MonitorCheckResult}.
      *
@@ -256,9 +347,15 @@ export class HttpMonitor implements IMonitorService {
     private async performHealthCheckWithRetry(
         url: string,
         timeout: number,
-        maxRetries: number
+        maxRetries: number,
+        signal?: AbortSignal
     ): Promise<MonitorCheckResult> {
         try {
+            // Check if operation is already aborted
+            if (signal?.aborted) {
+                throw new Error("Operation was aborted");
+            }
+
             // maxRetries parameter is "additional retries after first attempt"
             // withOperationalHooks expects "total attempts"
             // So if maxRetries=3, we want 4 total attempts (1 initial + 3
@@ -266,7 +363,7 @@ export class HttpMonitor implements IMonitorService {
             const totalAttempts = maxRetries + 1;
 
             return await withOperationalHooks(
-                () => this.performSingleHealthCheck(url, timeout),
+                () => this.performSingleHealthCheck(url, timeout, signal),
                 {
                     initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
                     maxRetries: totalAttempts,
@@ -295,10 +392,11 @@ export class HttpMonitor implements IMonitorService {
      * @remarks
      * Uses timing metadata from Axios interceptors for accurate response time.
      * Status is determined from HTTP status code. Throws if the request fails
-     * at the network or protocol level.
+     * at the network or protocol level. Supports AbortSignal for cancellation.
      *
      * @param url - The URL to health check.
      * @param timeout - Request timeout in milliseconds.
+     * @param signal - Optional AbortSignal for request cancellation.
      *
      * @returns Promise resolving to {@link MonitorCheckResult}.
      *
@@ -308,7 +406,8 @@ export class HttpMonitor implements IMonitorService {
      */
     private async performSingleHealthCheck(
         url: string,
-        timeout: number
+        timeout: number,
+        signal?: AbortSignal
     ): Promise<MonitorCheckResult> {
         if (isDev()) {
             logger.debug(
@@ -316,7 +415,7 @@ export class HttpMonitor implements IMonitorService {
             );
         }
 
-        const response = await this.makeRequest(url, timeout);
+        const response = await this.makeRequest(url, timeout, signal);
         const responseTime = response.responseTime ?? 0;
 
         if (isDev()) {

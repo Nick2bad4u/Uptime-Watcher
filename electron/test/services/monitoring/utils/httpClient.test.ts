@@ -69,9 +69,9 @@ describe("HTTP Client Utils", () => {
                 },
                 httpAgent: expect.any(Object),
                 httpsAgent: expect.any(Object),
-                maxBodyLength: 10_240,
-                maxContentLength: 10 * 1024 * 1024,
-                maxRedirects: 5,
+                maxBodyLength: 8 * 1024, // 8KB default
+                maxContentLength: 1 * 1024 * 1024, // 1MB default
+                maxRedirects: 3, // tightened default
                 responseType: "text",
                 timeout: 5000,
                 validateStatus: expect.any(Function),
@@ -96,14 +96,14 @@ describe("HTTP Client Utils", () => {
                 headers: {},
                 httpAgent: expect.any(Object),
                 httpsAgent: expect.any(Object),
-                maxBodyLength: 10_240,
-                maxContentLength: 10 * 1024 * 1024,
-                maxRedirects: 5,
+                maxBodyLength: 8 * 1024,
+                maxContentLength: 1 * 1024 * 1024,
+                maxRedirects: 3,
                 responseType: "text",
                 validateStatus: expect.any(Function),
             });
         });
-        it("should configure validateStatus to always return true", async ({
+    it("should configure validateStatus to be strict by default (2xx-3xx)", async ({
             task,
             annotate,
         }) => {
@@ -123,8 +123,32 @@ describe("HTTP Client Utils", () => {
             expect(axiosConfig).toBeDefined();
             expect(axiosConfig?.validateStatus).toBeDefined();
             expect(axiosConfig?.validateStatus!(200)).toBe(true);
-            expect(axiosConfig?.validateStatus!(404)).toBe(true);
-            expect(axiosConfig?.validateStatus!(500)).toBe(true);
+            expect(axiosConfig?.validateStatus!(302)).toBe(true);
+            expect(axiosConfig?.validateStatus!(404)).toBe(false);
+            expect(axiosConfig?.validateStatus!(500)).toBe(false);
+        });
+        it("should allow lenient mode when UW_HTTP_STRICT_STATUS=false", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+
+            const original = process.env.UW_HTTP_STRICT_STATUS;
+            process.env.UW_HTTP_STRICT_STATUS = "false";
+
+            try {
+                createHttpClient({});
+                const axiosConfig = mockAxiosCreate.mock.calls[0]?.[0];
+                expect(axiosConfig?.validateStatus).toBeDefined();
+                expect(axiosConfig?.validateStatus!(200)).toBe(true);
+                expect(axiosConfig?.validateStatus!(302)).toBe(true);
+                expect(axiosConfig?.validateStatus!(404)).toBe(true);
+                expect(axiosConfig?.validateStatus!(500)).toBe(true);
+            } finally {
+                if (original === undefined) {
+                    delete process.env.UW_HTTP_STRICT_STATUS;
+                } else {
+                    process.env.UW_HTTP_STRICT_STATUS = original;
+                }
+            }
         });
         it("should setup timing interceptors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

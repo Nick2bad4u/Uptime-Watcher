@@ -748,11 +748,11 @@ describe("MonitorOperationRegistry", () => {
 
             // Test that the singleton pattern works
             expect(operationRegistry).toBe(operationRegistry);
-            
+
             // Test that multiple calls return the same instance
             const result1 = operationRegistry.initiateCheck("test-1");
             const result2 = operationRegistry.initiateCheck("test-2");
-            
+
             expect(operationRegistry.getActiveOperations().size).toBe(2);
         });
     });
@@ -771,7 +771,7 @@ describe("MonitorOperationRegistry", () => {
             const operation = registry.getOperation(result.operationId);
 
             expect(operation).toBeDefined();
-            
+
             // Verify the structure matches the interface
             const typedOperation: MonitorCheckOperation = operation!;
             expect(typedOperation.id).toBe(result.operationId);
@@ -816,17 +816,17 @@ describe("MonitorOperationRegistry", () => {
             await annotate("Type: AbortController", "type");
 
             const result = registry.initiateCheck(mockMonitorId);
-            
+
             expect(result.signal.aborted).toBe(false);
-            
+
             // Add event listener to test abort event
             let abortEventFired = false;
             result.signal.addEventListener("abort", () => {
                 abortEventFired = true;
             });
-            
+
             registry.cancelOperations(mockMonitorId);
-            
+
             expect(result.signal.aborted).toBe(true);
             expect(abortEventFired).toBe(true);
         });
@@ -845,12 +845,12 @@ describe("MonitorOperationRegistry", () => {
                 timeoutMs: 10_000, // Long timeout
                 additionalSignals: [externalController.signal],
             });
-            
+
             expect(result.signal.aborted).toBe(false);
-            
+
             // External signal should trigger abort
             externalController.abort();
-            
+
             expect(result.signal.aborted).toBe(true);
         });
     });

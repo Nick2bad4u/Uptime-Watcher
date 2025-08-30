@@ -265,10 +265,12 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             const monitorId = "monitor-123";
 
             // Mock active operation
+            const abortController = new AbortController();
             const mockOperation: MonitorCheckOperation = {
                 id: operationId,
                 monitorId,
-                cancelled: false,
+                abortController,
+                signal: abortController.signal,
                 initiatedAt: new Date(),
             };
 
@@ -313,10 +315,13 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             const monitorId = "monitor-456";
 
             // Mock cancelled operation
+            const abortControllerCancelled = new AbortController();
+            abortControllerCancelled.abort(); // Make it aborted
             const mockOperation: MonitorCheckOperation = {
                 id: operationId,
                 monitorId,
-                cancelled: true,
+                abortController: abortControllerCancelled,
+                signal: abortControllerCancelled.signal,
                 initiatedAt: new Date(),
             };
 
@@ -386,10 +391,12 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             const operationId = "op-clear-after";
 
             // Mock operation
+            const abortController2 = new AbortController();
             const mockOperation: MonitorCheckOperation = {
                 id: operationId,
                 monitorId: "monitor-789",
-                cancelled: false,
+                abortController: abortController2,
+                signal: abortController2.signal,
                 initiatedAt: new Date(),
             };
 
@@ -521,19 +528,22 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
                 {
                     id: "op-1",
                     monitorId: "monitor-1",
-                    cancelled: false,
+                    abortController: new AbortController(),
+                    get signal() { return this.abortController.signal; },
                     initiatedAt: new Date(),
                 },
                 {
                     id: "op-2",
                     monitorId: "monitor-2",
-                    cancelled: false,
+                    abortController: new AbortController(),
+                    get signal() { return this.abortController.signal; },
                     initiatedAt: new Date(),
                 },
                 {
                     id: "op-3",
                     monitorId: "monitor-3",
-                    cancelled: false,
+                    abortController: new AbortController(),
+                    get signal() { return this.abortController.signal; },
                     initiatedAt: new Date(),
                 },
             ];
@@ -588,10 +598,12 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             const operationId = "op-clear-before-expire";
 
             // Mock operation
+            const abortController3 = new AbortController();
             const mockOperation: MonitorCheckOperation = {
                 id: operationId,
                 monitorId: "monitor-clear",
-                cancelled: false,
+                abortController: abortController3,
+                signal: abortController3.signal,
                 initiatedAt: new Date(),
             };
 
