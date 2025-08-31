@@ -457,7 +457,10 @@ function processTestFile(filePath) {
                             );
                         }
                     } catch (error) {
-                        const errorMessage = error instanceof Error ? error.message : String(error);
+                        const errorMessage =
+                            error instanceof Error
+                                ? error.message
+                                : String(error);
                         console.error(
                             `Validation failed for ${filePath}: ${errorMessage}`
                         );
@@ -541,7 +544,8 @@ function findTestFiles(dir, pattern, projectRoot) {
             }
         }
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         console.error(`Error reading directory ${dir}:`, errorMessage);
     }
 
@@ -604,7 +608,8 @@ function main() {
             }
         } catch (error) {
             errors++;
-            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorMessage =
+                error instanceof Error ? error.message : String(error);
             console.error(`Error processing ${filePath}: ${errorMessage}`);
             if (!options.verbose) {
                 console.error(`❌ Error processing ${path.basename(filePath)}`);

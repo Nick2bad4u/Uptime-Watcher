@@ -171,7 +171,8 @@ function migrateFile(filePath, isDryRun = false) {
             );
         }
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         log.error(`Failed to migrate ${filePath}: ${errorMessage}`);
         throw error;
     }
@@ -220,7 +221,8 @@ Examples:
         migrateFile(resolvedPath, isDryRun);
         log.success("Migration completed!");
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         log.error(errorMessage);
         process.exit(1);
     }

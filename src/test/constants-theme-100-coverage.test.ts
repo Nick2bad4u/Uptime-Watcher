@@ -135,9 +135,7 @@ describe("Constants and Configuration 100% Coverage", () => {
             for (let i = 1; i < CHECK_INTERVALS.length; i++) {
                 const current = CHECK_INTERVALS[i];
                 const previous = CHECK_INTERVALS[i - 1];
-                expect(current?.value).toBeGreaterThan(
-                    previous?.value ?? 0
-                );
+                expect(current?.value).toBeGreaterThan(previous?.value ?? 0);
             }
         });
 

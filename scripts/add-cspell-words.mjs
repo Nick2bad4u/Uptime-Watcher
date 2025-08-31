@@ -308,7 +308,8 @@ async function createBackup(filePath, logger) {
         logger.debug(`Created backup: ${backupPath}`);
         return backupPath;
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         logger.warn(`Failed to create backup: ${errorMessage}`);
         throw error;
     }
@@ -338,7 +339,8 @@ async function readCurrentWords(filePath, logger) {
             );
         }
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         logger.error(`Failed to read custom words file: ${errorMessage}`);
         throw error;
     }
@@ -403,7 +405,8 @@ async function runCSpell(config, logger) {
         ) {
             logger.error(`CSpell stderr: ${String(error.stderr)}`);
         }
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         throw new Error(`CSpell execution failed: ${errorMessage}`);
     }
 }
@@ -570,7 +573,8 @@ async function main() {
             `Dictionary now contains ${currentWords.size + newWords.size} words`
         );
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         logger.error(`Script failed: ${errorMessage}`);
         if (config.verbose && error instanceof Error) {
             logger.error(error.stack || "No stack trace available");

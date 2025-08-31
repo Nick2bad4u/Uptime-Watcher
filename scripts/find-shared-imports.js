@@ -154,7 +154,8 @@ function findSharedImports(filePath) {
 
         return imports;
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         console.error(`Error reading file ${filePath}:`, errorMessage);
         return [];
     }
