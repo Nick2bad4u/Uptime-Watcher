@@ -55,16 +55,19 @@ constructor(
 ### Enhanced System Features (Now Standard)
 
 1. **Operation Correlation**
+
    - Race condition prevention through operation IDs
    - Safe concurrent monitoring operations
    - Automatic cleanup on operation completion
 
 2. **Advanced Timeout Management**
+
    - Buffer-based timeout handling
    - Graceful cleanup on timeout
    - Resource leak prevention
 
 3. **Robust Status Updates**
+
    - Operation-aware status updates
    - Safe concurrent status changes
    - Validation against operation state
@@ -77,11 +80,13 @@ constructor(
 ### Architecture Improvements
 
 1. **Simplified Code Paths**
+
    - Single system to maintain
    - Linear execution flow
    - Easier debugging and testing
 
 2. **Improved Reliability**
+
    - No system switching logic
    - Consistent behavior across all operations
    - Reduced surface area for bugs

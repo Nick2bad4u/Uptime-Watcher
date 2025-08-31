@@ -166,6 +166,7 @@ npm run docs:build
 ### 2. Generation Steps
 
 1. **TypeDoc Generation**:
+
    - Parses TypeScript source files
    - Processes project documents from markdown files
    - Generates unified documentation in `docs/` directory
