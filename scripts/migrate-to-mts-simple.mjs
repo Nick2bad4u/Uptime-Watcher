@@ -171,7 +171,8 @@ function migrateFile(filePath, isDryRun = false) {
             );
         }
     } catch (error) {
-        log.error(`Failed to migrate ${filePath}: ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        log.error(`Failed to migrate ${filePath}: ${errorMessage}`);
         throw error;
     }
 }
@@ -219,13 +220,14 @@ Examples:
         migrateFile(resolvedPath, isDryRun);
         log.success("Migration completed!");
     } catch (error) {
-        log.error(error.message);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        log.error(errorMessage);
         process.exit(1);
     }
 }
 
 // Run if called directly
-if (process.argv[1].endsWith("migrate-to-mts-simple.mjs")) {
+if (process.argv[1]?.endsWith("migrate-to-mts-simple.mjs")) {
     main();
 }
 

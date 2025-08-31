@@ -490,7 +490,7 @@ try {
         "An error occurred while running the find-empty-dirs script:",
         error
     );
-    if (error && error.stack) {
+    if (error && error instanceof Error && error.stack) {
         console.error("Stack trace:", error.stack);
     }
     process.exit(1);

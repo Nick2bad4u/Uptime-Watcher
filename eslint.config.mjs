@@ -173,7 +173,7 @@ import yamlEslintParser from "yaml-eslint-parser";
 // const __filename = fileURLToPath(import.meta.url);
 // const gitignorePath = path.resolve(__dirname, ".gitignore");
 
-const dirname = import.meta.dirname;
+const ROOT_DIR = import.meta.dirname;
 
 export default [
     // GLobal Configs and Rules
@@ -745,7 +745,7 @@ export default [
             ],
             react: { version: "19" },
             tailwindcss: {
-                config: `${dirname}/src/index.css`,
+                config: `${ROOT_DIR}/src/index.css`,
             },
         },
     },

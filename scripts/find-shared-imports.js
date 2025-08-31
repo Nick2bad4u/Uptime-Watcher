@@ -145,16 +145,17 @@ function findSharedImports(filePath) {
 
             imports.push({
                 line: lineNumber,
-                content: lineContent.trim(),
+                content: lineContent?.trim() || "",
                 originalImport: fullMatch,
-                sharedPath: sharedPath,
-                suggestedPath: suggestRelativePath(filePath, sharedPath),
+                sharedPath: sharedPath || "",
+                suggestedPath: suggestRelativePath(filePath, sharedPath || ""),
             });
         }
 
         return imports;
     } catch (error) {
-        console.error(`Error reading file ${filePath}:`, error.message);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error(`Error reading file ${filePath}:`, errorMessage);
         return [];
     }
 }
@@ -331,7 +332,10 @@ Examples:
 // Handle format option
 const formatArg = process.argv.find((arg) => arg.startsWith("--format="));
 if (formatArg) {
-    CONFIG.outputFormat = formatArg.split("=")[1];
+    const format = formatArg.split("=")[1];
+    if (format) {
+        CONFIG.outputFormat = format;
+    }
 }
 
 // Run the script

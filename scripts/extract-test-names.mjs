@@ -36,15 +36,15 @@ function extractTestNames(filePath) {
 
         // Extract describe blocks
         while ((match = describeRegex.exec(content)) !== null) {
-            if (match.groups?.name) {
-                testStructure.describes.push(match.groups.name);
+            if (match.groups?.["name"]) {
+                testStructure.describes.push(match.groups["name"]);
             }
         }
 
         // Extract it/test blocks
         while ((match = itRegex.exec(content)) !== null) {
-            if (match.groups?.name) {
-                testStructure.tests.push(match.groups.name);
+            if (match.groups?.["name"]) {
+                testStructure.tests.push(match.groups["name"]);
             }
         }
 
@@ -54,7 +54,12 @@ function extractTestNames(filePath) {
             `Error reading file ${filePath}:`,
             error instanceof Error ? error.message : String(error)
         );
-        return null;
+        return {
+            file: path.basename(filePath),
+            path: filePath,
+            describes: [],
+            tests: [],
+        };
     }
 }
 
@@ -62,7 +67,7 @@ function extractTestNames(filePath) {
  * Find all test files in the project
  *
  * @param {string} dirPath - Directory to search
- * @param {Array} testFiles - Array to collect test file paths
+ * @param {string[]} testFiles - Array to collect test file paths
  */
 function findTestFiles(dirPath, testFiles = []) {
     try {
@@ -114,7 +119,7 @@ function findTestFiles(dirPath, testFiles = []) {
 /**
  * Format test names for different output formats
  *
- * @param {Array} testStructures - Array of test structures
+ * @param {Object[]} testStructures - Array of test structures
  * @param {string} format - Output format ('list', 'json', 'tree', 'flat')
  */
 function formatTestNames(testStructures, format = "list") {
@@ -125,18 +130,18 @@ function formatTestNames(testStructures, format = "list") {
 
         case "tree": {
             let treeOutput = "";
-            testStructures.forEach((structure) => {
+            testStructures.forEach((/** @type {any} */ structure) => {
                 if (
                     structure.describes.length > 0 ||
                     structure.tests.length > 0
                 ) {
                     treeOutput += `\n📁 ${structure.file}\n`;
 
-                    structure.describes.forEach((describe) => {
+                    structure.describes.forEach((/** @type {any} */ describe) => {
                         treeOutput += `  📝 ${describe}\n`;
                     });
 
-                    structure.tests.forEach((test) => {
+                    structure.tests.forEach((/** @type {any} */ test) => {
                         treeOutput += `  ✅ ${test}\n`;
                     });
                 }
@@ -145,9 +150,10 @@ function formatTestNames(testStructures, format = "list") {
         }
 
         case "flat": {
+            /** @type {string[]} */
             const allTests = [];
-            testStructures.forEach((structure) => {
-                structure.tests.forEach((test) => {
+            testStructures.forEach((/** @type {any} */ structure) => {
+                structure.tests.forEach((/** @type {any} */ test) => {
                     allTests.push(test);
                 });
             });
@@ -156,7 +162,7 @@ function formatTestNames(testStructures, format = "list") {
 
         default: {
             let listOutput = "";
-            testStructures.forEach((structure) => {
+            testStructures.forEach((/** @type {any} */ structure) => {
                 if (
                     structure.describes.length > 0 ||
                     structure.tests.length > 0
@@ -165,14 +171,14 @@ function formatTestNames(testStructures, format = "list") {
 
                     if (structure.describes.length > 0) {
                         listOutput += "\nDescribe blocks:\n";
-                        structure.describes.forEach((describe) => {
+                        structure.describes.forEach((/** @type {any} */ describe) => {
                             listOutput += `  - ${describe}\n`;
                         });
                     }
 
                     if (structure.tests.length > 0) {
                         listOutput += "\nTest cases:\n";
-                        structure.tests.forEach((test) => {
+                        structure.tests.forEach((/** @type {any} */ test) => {
                             listOutput += `  - ${test}\n`;
                         });
                     }
@@ -210,6 +216,7 @@ function main() {
         console.log(`Found ${testFiles.length} test files\n`);
 
         // Extract test names from all files
+        /** @type {Object[]} */
         const testStructures = [];
         testFiles.forEach((filePath) => {
             const structure = extractTestNames(filePath);

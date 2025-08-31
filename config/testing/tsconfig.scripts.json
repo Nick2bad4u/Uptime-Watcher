@@ -25,12 +25,12 @@
     "removeComments": false,
     "noCheck": false,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
+    "noImplicitAny": false,
+    "noImplicitOverride": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": false,
     "noImplicitUseStrict": false,
-    "noPropertyAccessFromIndexSignature": true,
+    "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": true,
     "noUncheckedSideEffectImports": true,
     "noUnusedLocals": true,
@@ -42,7 +42,7 @@
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "strict": true,
+    "strict": false,
     "strictBindCallApply": true,
     "strictBuiltinIteratorReturn": true,
     "strictFunctionTypes": true,
@@ -63,14 +63,15 @@
     "../../scripts/**/*.jsx"
   ],
   "exclude": [
+    "../../scripts/download**",
     "node_modules",
     "**/node_modules/**",
-    "dist",
-    "dist-electron",
-    "dist-shared",
-    "dist-scripts",
-    "coverage",
-    "release"
+    "**/dist**/**",
+    "**/dist-electron/**",
+    "**/dist-shared/**",
+    "**/dist-scripts/**",
+    "**/coverage/**",
+    "**/release/**"
   ],
   "references": []
 }

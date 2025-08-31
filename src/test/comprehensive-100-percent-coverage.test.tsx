@@ -8,7 +8,7 @@
  */
 
 import "@testing-library/jest-dom";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ReactNode } from "react";
 
@@ -22,7 +22,6 @@ import { useErrorStore } from "../stores/error/useErrorStore";
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { useMonitorTypes } from "../hooks/useMonitorTypes";
 import { useDynamicHelpText } from "../hooks/useDynamicHelpText";
-import { useDelayedButtonLoading } from "../hooks/useDelayedButtonLoading";
 import { useAddSiteForm } from "../components/SiteDetails/useAddSiteForm";
 
 // Mock all external dependencies
@@ -546,7 +545,7 @@ describe("100% Coverage Edge Cases", () => {
                 isFormValid: function (): boolean {
                     throw new Error("Function not implemented.");
                 },
-                setSiteId: function (value: string): void {
+                setSiteId: function (_value: string): void {
                     throw new Error("Function not implemented.");
                 },
             });
@@ -596,7 +595,7 @@ describe("100% Coverage Edge Cases", () => {
                 isFormValid: function (): boolean {
                     throw new Error("Function not implemented.");
                 },
-                setSiteId: function (value: string): void {
+                setSiteId: function (_value: string): void {
                     throw new Error("Function not implemented.");
                 },
             });
@@ -646,7 +645,7 @@ describe("100% Coverage Edge Cases", () => {
                 isFormValid: function (): boolean {
                     throw new Error("Function not implemented.");
                 },
-                setSiteId: function (value: string): void {
+                setSiteId: function (_value: string): void {
                     throw new Error("Function not implemented.");
                 },
             });
@@ -694,7 +693,7 @@ describe("100% Coverage Edge Cases", () => {
                 isFormValid: function (): boolean {
                     throw new Error("Function not implemented.");
                 },
-                setSiteId: function (value: string): void {
+                setSiteId: function (_value: string): void {
                     throw new Error("Function not implemented.");
                 },
             });
@@ -741,8 +740,8 @@ describe("100% Coverage Edge Cases", () => {
         it("should handle empty help text", () => {
             const mockUseDynamicHelpText = vi.mocked(useDynamicHelpText); // Updated: Removed require() and used direct import
             mockUseDynamicHelpText.mockReturnValue({
-                primary: undefined,
-                secondary: undefined,
+                primary: "",
+                secondary: "",
                 isLoading: false,
             });
 
@@ -788,7 +787,7 @@ describe("100% Coverage Edge Cases", () => {
                 isFormValid: function (): boolean {
                     throw new Error("Function not implemented.");
                 },
-                setSiteId: function (value: string): void {
+                setSiteId: function (_value: string): void {
                     throw new Error("Function not implemented.");
                 },
             });
@@ -837,7 +836,7 @@ describe("100% Coverage Edge Cases", () => {
                 isFormValid: function (): boolean {
                     throw new Error("Function not implemented.");
                 },
-                setSiteId: function (value: string): void {
+                setSiteId: function (_value: string): void {
                     throw new Error("Function not implemented.");
                 },
             });

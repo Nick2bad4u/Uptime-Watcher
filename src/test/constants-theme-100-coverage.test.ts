@@ -133,8 +133,10 @@ describe("Constants and Configuration 100% Coverage", () => {
 
         it("should have ascending values", () => {
             for (let i = 1; i < CHECK_INTERVALS.length; i++) {
-                expect(CHECK_INTERVALS[i].value).toBeGreaterThan(
-                    CHECK_INTERVALS[i - 1].value
+                const current = CHECK_INTERVALS[i];
+                const previous = CHECK_INTERVALS[i - 1];
+                expect(current?.value).toBeGreaterThan(
+                    previous?.value ?? 0
                 );
             }
         });
@@ -341,11 +343,11 @@ describe("Constants and Configuration 100% Coverage", () => {
 
             // Access constants many times
             for (let i = 0; i < 10_000; i++) {
-                const _ = TRANSITION_ALL;
-                const __ = FALLBACK_MONITOR_TYPE_OPTIONS;
-                const ___ = CHECK_INTERVALS;
-                const ____ = FONT_FAMILY_MONO;
-                const _____ = FONT_FAMILY_SANS;
+                void TRANSITION_ALL;
+                void FALLBACK_MONITOR_TYPE_OPTIONS;
+                void CHECK_INTERVALS;
+                void FONT_FAMILY_MONO;
+                void FONT_FAMILY_SANS;
             }
 
             const end = performance.now();

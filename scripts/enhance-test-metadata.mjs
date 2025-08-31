@@ -47,7 +47,7 @@ const options = {
     verbose:
         args.includes("--verbose") ||
         args.includes("-v") ||
-        process.env.DEBUG === "1",
+        process.env["DEBUG"] === "1",
     validate: args.includes("--validate"),
     backup: args.includes("--backup"),
     parallel: args.includes("--parallel"),
@@ -127,10 +127,13 @@ const perfCounters = {
     filesProcessed: 0,
     bytesProcessed: 0,
     totalProcessingTime: 0,
+    processingTimeMs: 0,
     cacheHits: 0,
     cacheMisses: 0,
     retryOperations: 0,
     backupsCreated: 0,
+    errors: 0,
+    warnings: 0,
     startTime: performance.now(),
 };
 
@@ -201,7 +204,7 @@ function timeOperation(operation, operationName) {
     try {
         const duration = performance.now() - start;
         perfCounters.processingTimeMs += duration;
-        if (process.env.DEBUG) {
+        if (process.env["DEBUG"]) {
             console.log(`⏱️  ${operationName}: ${duration.toFixed(2)}ms`);
         }
         return operation();
@@ -454,9 +457,9 @@ function processTestFile(filePath) {
                             );
                         }
                     } catch (error) {
-                        logger.error(
-                            `Validation failed for ${filePath}`,
-                            error
+                        const errorMessage = error instanceof Error ? error.message : String(error);
+                        console.error(
+                            `Validation failed for ${filePath}: ${errorMessage}`
                         );
                         return false;
                     }
@@ -538,7 +541,8 @@ function findTestFiles(dir, pattern, projectRoot) {
             }
         }
     } catch (error) {
-        console.error(`Error reading directory ${dir}:`, error.message);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error(`Error reading directory ${dir}:`, errorMessage);
     }
 
     return files;
@@ -600,7 +604,8 @@ function main() {
             }
         } catch (error) {
             errors++;
-            logger.error(`Error processing ${filePath}`, error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error(`Error processing ${filePath}: ${errorMessage}`);
             if (!options.verbose) {
                 console.error(`❌ Error processing ${path.basename(filePath)}`);
             }

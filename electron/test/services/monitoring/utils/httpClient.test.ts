@@ -134,8 +134,8 @@ describe("HTTP Client Utils", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: types", "component");
 
-            const original = process.env.UW_HTTP_STRICT_STATUS;
-            process.env.UW_HTTP_STRICT_STATUS = "false";
+            const original = process.env["UW_HTTP_STRICT_STATUS"];
+            process.env["UW_HTTP_STRICT_STATUS"] = "false";
 
             try {
                 createHttpClient({});
@@ -147,9 +147,9 @@ describe("HTTP Client Utils", () => {
                 expect(axiosConfig?.validateStatus!(500)).toBe(true);
             } finally {
                 if (original === undefined) {
-                    delete process.env.UW_HTTP_STRICT_STATUS;
+                    delete process.env["UW_HTTP_STRICT_STATUS"];
                 } else {
-                    process.env.UW_HTTP_STRICT_STATUS = original;
+                    process.env["UW_HTTP_STRICT_STATUS"] = original;
                 }
             }
         });

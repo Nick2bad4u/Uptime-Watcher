@@ -58,6 +58,7 @@ import {
     Tooltip,
 } from "chart.js";
 import Zoom from "chartjs-plugin-zoom";
+// eslint-disable-next-line import-x/no-unassigned-import -- Required for Chart.js date adapter
 import "chartjs-adapter-date-fns";
 import { memo, type NamedExoticComponent } from "react";
 import { Line } from "react-chartjs-2";

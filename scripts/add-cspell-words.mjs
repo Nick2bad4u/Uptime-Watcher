@@ -146,6 +146,7 @@ function parseArguments() {
             default: {
                 // First positional argument is custom words file path
                 if (
+                    arg &&
                     !arg.startsWith("-") &&
                     !config.customWordsFile.includes(arg)
                 ) {
@@ -156,10 +157,10 @@ function parseArguments() {
     }
 
     // Apply environment variables
-    if (process.env.CUSTOM_WORDS_FILE) {
-        config.customWordsFile = path.resolve(process.env.CUSTOM_WORDS_FILE);
+    if (process.env["CUSTOM_WORDS_FILE"]) {
+        config.customWordsFile = path.resolve(process.env["CUSTOM_WORDS_FILE"]);
     }
-    if (process.env.CSPELL_VERBOSE === "true") {
+    if (process.env["CSPELL_VERBOSE"] === "true") {
         config.verbose = true;
     }
 
@@ -307,7 +308,8 @@ async function createBackup(filePath, logger) {
         logger.debug(`Created backup: ${backupPath}`);
         return backupPath;
     } catch (error) {
-        logger.warn(`Failed to create backup: ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.warn(`Failed to create backup: ${errorMessage}`);
         throw error;
     }
 }
@@ -336,7 +338,8 @@ async function readCurrentWords(filePath, logger) {
             );
         }
     } catch (error) {
-        logger.error(`Failed to read custom words file: ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.error(`Failed to read custom words file: ${errorMessage}`);
         throw error;
     }
 
@@ -388,9 +391,9 @@ async function runCSpell(config, logger) {
             error.stdout
         ) {
             if ("stderr" in error && error.stderr) {
-                logger.debug("CSpell stderr:", error.stderr.toString());
+                logger.debug(`CSpell stderr: ${String(error.stderr)}`);
             }
-            return error.stdout.toString();
+            return String(error.stdout);
         }
         if (
             error &&
@@ -398,9 +401,10 @@ async function runCSpell(config, logger) {
             "stderr" in error &&
             error.stderr
         ) {
-            logger.error("CSpell stderr:", error.stderr.toString());
+            logger.error(`CSpell stderr: ${String(error.stderr)}`);
         }
-        throw new Error(`CSpell execution failed: ${error.message || error}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        throw new Error(`CSpell execution failed: ${errorMessage}`);
     }
 }
 
@@ -566,16 +570,17 @@ async function main() {
             `Dictionary now contains ${currentWords.size + newWords.size} words`
         );
     } catch (error) {
-        logger.error(`Script failed: ${error.message}`);
-        if (config.verbose) {
-            logger.error(error.stack);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.error(`Script failed: ${errorMessage}`);
+        if (config.verbose && error instanceof Error) {
+            logger.error(error.stack || "No stack trace available");
         }
         process.exit(1);
     }
 }
 
 // Run the script if executed directly
-if (import.meta.filename === path.resolve(process.argv[1])) {
+if (import.meta.filename === path.resolve(process.argv[1] || "")) {
     try {
         await main();
     } catch (error) {
