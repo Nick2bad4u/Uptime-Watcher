@@ -11,13 +11,12 @@
  * already have metadata --help, -h Show this help message
  */
 
-import { readFileSync, writeFileSync, readdirSync, statSync } from "fs";
-import { join, basename, dirname, resolve, sep } from "path";
-import { fileURLToPath } from "url";
+import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
+import path from "node:path";
 import minimatch from "minimatch";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __filename = import.meta.filename;
+const __dirname = import.meta.dirname;
 
 // ✨ ENHANCEMENT 2: Enhanced CLI argument parsing with validation (moved to top)
 /**
@@ -52,8 +51,8 @@ const options = {
     validate: args.includes("--validate"),
     backup: args.includes("--backup"),
     parallel: args.includes("--parallel"),
-    retries: parseInt(getArgValue("--retries") || "0") || 0,
-    timeout: parseInt(getArgValue("--timeout") || "30000") || 30000,
+    retries: Number.parseInt(getArgValue("--retries") || "0", 10) || 0,
+    timeout: Number.parseInt(getArgValue("--timeout") || "30000", 10) || 30_000,
 };
 
 // Enhanced argument validation
@@ -62,7 +61,7 @@ if (options.retries < 0 || options.retries > 5) {
     process.exit(1);
 }
 
-if (options.timeout < 1000 || options.timeout > 300000) {
+if (options.timeout < 1000 || options.timeout > 300_000) {
     console.error(
         "❌ Error: --timeout must be between 1000 and 300000 milliseconds"
     );
@@ -213,67 +212,25 @@ function timeOperation(operation, operationName) {
 }
 
 // ✨ ENHANCEMENT 4: Enhanced error handling with retry logic
-/**
- * Enhanced error handler with retry logic and exponential backoff
- *
- * @param {Function} operation - Operation to retry
- * @param {string} operationName - Name for logging
- * @param {number} maxRetries - Maximum retry attempts
- *
- * @returns {Promise<any>} Operation result
- */
-async function withRetry(
-    operation,
-    operationName,
-    maxRetries = options.retries
-) {
-    let lastError;
-
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-        try {
-            if (attempt > 0 && options.verbose) {
-                console.log(
-                    `✅ ${operationName} succeeded on attempt ${attempt + 1}`
-                );
-            }
-            return await operation();
-        } catch (error) {
-            lastError = error;
-            perfCounters.errors++;
-
-            if (attempt < maxRetries) {
-                const delay = Math.pow(2, attempt) * 1000; // Exponential backoff
-                console.warn(
-                    `⚠️  ${operationName} failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${delay}ms...`
-                );
-                await new Promise((resolve) => setTimeout(resolve, delay));
-            } else {
-                console.error(
-                    `❌ ${operationName} failed after ${attempt + 1} attempts:`,
-                    error.message
-                );
-            }
-        }
-    }
-
-    throw lastError;
-}
 
 /**
  * Enhanced logger with structured output
  */
 const logger = {
-    info: (message, ...args) => {
+    info: (/** @type {any} */ message, /** @type {any} */ ...args) => {
         console.log(`[INFO] ${new Date().toISOString()} - ${message}`, ...args);
     },
-    warn: (message, ...args) => {
+    warn: (/** @type {any} */ message, /** @type {any} */ ...args) => {
         perfCounters.warnings++;
         console.warn(
             `[WARN] ${new Date().toISOString()} - ${message}`,
             ...args
         );
     },
-    error: (message, error) => {
+    error: (
+        /** @type {any} */ message,
+        /** @type {{ message: any; name: any; stack: any }} */ error
+    ) => {
         perfCounters.errors++;
         if (error instanceof Error) {
             console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, {
@@ -298,14 +255,14 @@ const logger = {
  * @returns {string} Component name
  */
 function getComponentName(filePath) {
-    const fileName = basename(filePath);
+    const fileName = path.basename(filePath);
     // Remove test file extensions and modifiers
     const nameWithoutExt = fileName.replace(
-        /\.(test|spec)\.(ts|tsx|js|jsx)$/,
+        /\.(?<nameWithoutExt3>test|spec)\.(?<nameWithoutExt>ts|tsx|js|jsx)$/,
         ""
     );
     return nameWithoutExt.replace(
-        /\.(comprehensive|debug|coverage|foundation|simple|minimal|targeted|fixed|working)$/,
+        /\.(?<nameWithoutExt2>comprehensive|debug|coverage|foundation|simple|minimal|targeted|fixed|working)$/,
         ""
     );
 }
@@ -318,7 +275,7 @@ function getComponentName(filePath) {
  * @returns {string} Category
  */
 function getCategory(filePath) {
-    const pathParts = filePath.split(sep);
+    const pathParts = filePath.split(path.sep);
 
     if (pathParts.includes("managers")) return "Manager";
     if (pathParts.includes("services")) return "Service";
@@ -443,10 +400,10 @@ function processTestFile(filePath) {
 
             // Add metadata to test functions without parameters
             const testPattern =
-                /(it|test)\s*\(\s*['"`]([^'"`]+)['"`]\s*,\s*(async\s*)?\(\s*\)\s*=>\s*\{/g;
-            newContent = newContent.replace(
+                /(?<temp3>it|test)\s*\(\s*["'`](?<temp2>[^"'`]+)["'`]\s*,\s*(?<temp1>async\s*)?\(\s*\)\s*=>\s*{/g;
+            newContent = newContent.replaceAll(
                 testPattern,
-                (match, testType, testName, async) => {
+                (_match, testType, testName, async) => {
                     // ✨ Use cached metadata generator
                     const metadata = getCachedMetadata(filePath, testName);
                     return `${testType}("${testName}", ${async || ""}({ task, annotate }) => {\n${metadata}\n`;
@@ -455,15 +412,15 @@ function processTestFile(filePath) {
 
             // Add metadata to test functions with existing parameters
             const testWithParamsPattern =
-                /(it|test)\s*\(\s*['"`]([^'"`]+)['"`]\s*,\s*(async\s*)?\(\s*\{([^}]*)\}\s*\)\s*=>\s*\{/g;
-            newContent = newContent.replace(
+                /(?<temp4>it|test)\s*\(\s*["'`](?<temp3>[^"'`]+)["'`]\s*,\s*(?<temp2>async\s*)?\(\s*{(?<temp1>[^}]*)}\s*\)\s*=>\s*{/g;
+            newContent = newContent.replaceAll(
                 testWithParamsPattern,
-                (match, testType, testName, async, existingParams) => {
+                (_match, testType, testName, async, existingParams) => {
                     // Parse existing parameters and add task/annotate if not present
                     const params = existingParams
                         .split(",")
-                        .map((p) => p.trim())
-                        .filter((p) => p);
+                        .map((/** @type {string} */ p) => p.trim())
+                        .filter(Boolean);
                     if (!params.includes("task")) params.push("task");
                     if (!params.includes("annotate")) params.push("annotate");
 
@@ -508,18 +465,16 @@ function processTestFile(filePath) {
                 if (options.dryRun) {
                     console.log(`🔍 [DRY RUN] Would update: ${filePath}`);
                     return true;
-                } else {
-                    writeFileSync(filePath, newContent);
-                    console.log(`✅ Enhanced: ${filePath}`);
-                    perfCounters.filesProcessed++;
-                    return true;
                 }
-            } else {
-                console.log(`📝 No changes needed: ${filePath}`);
-                return false;
+                writeFileSync(filePath, newContent);
+                console.log(`✅ Enhanced: ${filePath}`);
+                perfCounters.filesProcessed++;
+                return true;
             }
+            console.log(`📝 No changes needed: ${filePath}`);
+            return false;
         },
-        `Processing ${basename(filePath)}`
+        `Processing ${path.basename(filePath)}`
     );
 }
 
@@ -542,7 +497,7 @@ function findTestFiles(dir, pattern, projectRoot) {
         }
 
         for (const item of items) {
-            const itemPath = join(dir, item);
+            const itemPath = path.join(dir, item);
             const stat = statSync(itemPath);
 
             if (
@@ -558,7 +513,7 @@ function findTestFiles(dir, pattern, projectRoot) {
             } else if (stat.isFile()) {
                 const relativePath = itemPath
                     .replace(projectRoot, "")
-                    .replace(/\\/g, "/")
+                    .replaceAll("\\", "/")
                     .replace(/^\/+/, "");
 
                 if (options.verbose) {
@@ -568,7 +523,7 @@ function findTestFiles(dir, pattern, projectRoot) {
                 }
 
                 // Use minimatch to check if file matches the pattern
-                let matches = minimatch(relativePath, pattern);
+                const matches = minimatch(relativePath, pattern);
 
                 if (matches) {
                     files.push(itemPath);
@@ -604,7 +559,7 @@ function main() {
     console.log(`⏱️  Timeout: ${options.timeout}ms`);
     console.log("");
 
-    const projectRoot = resolve(__dirname, "..");
+    const projectRoot = path.resolve(__dirname, "..");
 
     if (options.verbose) {
         console.log(`🗂️  Project root: ${projectRoot}`);
@@ -619,8 +574,8 @@ function main() {
         testFiles.forEach((file, index) => {
             const relativePath = file
                 .replace(projectRoot, "")
-                .replace(/\\/g, "/")
-                .substring(1);
+                .replaceAll("\\", "/")
+                .slice(1);
             console.log(`  ${index + 1}. ${relativePath}`);
         });
     }
@@ -635,7 +590,7 @@ function main() {
 
         if (options.verbose) {
             console.log(
-                `[${processed}/${testFiles.length}] Processing: ${basename(filePath)}`
+                `[${processed}/${testFiles.length}] Processing: ${path.basename(filePath)}`
             );
         }
 
@@ -647,7 +602,7 @@ function main() {
             errors++;
             logger.error(`Error processing ${filePath}`, error);
             if (!options.verbose) {
-                console.error(`❌ Error processing ${basename(filePath)}`);
+                console.error(`❌ Error processing ${path.basename(filePath)}`);
             }
         }
     }

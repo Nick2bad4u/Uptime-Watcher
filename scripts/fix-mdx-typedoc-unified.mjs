@@ -5,26 +5,29 @@ import {
     existsSync,
     readdirSync,
     statSync,
-} from "fs";
-import { join } from "path";
+} from "node:fs";
+import path from "node:path";
 
 // Unified docs directory
 const DOCS_DIR = "docs/docusaurus/docs";
 
+/**
+ * @param {string} filePath
+ */
 function fixFile(filePath) {
     let content = readFileSync(filePath, "utf8");
     let changed = false;
 
     // Find code block ranges so we don't touch content inside them
     const codeBlocks = [];
-    const codeBlockRegex = /```(?:[a-zA-Z0-9_-]*)[\s\S]*?```/g;
+    const codeBlockRegex = /```[\w-]*[\S\s]*?```/g;
     let match;
     while ((match = codeBlockRegex.exec(content)) !== null) {
         codeBlocks.push([match.index, codeBlockRegex.lastIndex]);
     }
 
     // Replace {anything} outside code blocks
-    content = content.replace(/\{([^}]+)\}/g, (m, p1, offset) => {
+    content = content.replaceAll(/{(?<temp1>[^}]+)}/g, (m, p1, offset) => {
         for (const [start, end] of codeBlocks) {
             if (offset >= start && offset < end) return m;
         }
@@ -33,7 +36,7 @@ function fixFile(filePath) {
     });
 
     // Replace <anything> outside code blocks
-    content = content.replace(/<([^>\n]+)>/g, (m, p1, offset) => {
+    content = content.replaceAll(/<(?<temp1>[^\n>]+)>/g, (m, p1, offset) => {
         for (const [start, end] of codeBlocks) {
             if (offset >= start && offset < end) return m;
         }
@@ -42,7 +45,7 @@ function fixFile(filePath) {
     });
 
     if (changed) {
-        const tempFilePath = filePath + ".tmp";
+        const tempFilePath = `${filePath}.tmp`;
         writeFileSync(tempFilePath, content, "utf8");
         renameSync(tempFilePath, filePath);
         console.log(`Fixed: ${filePath}`);
@@ -62,17 +65,17 @@ function walk(dir) {
     let files;
     try {
         files = readdirSync(dir);
-    } catch (err) {
-        console.error(`Failed to read directory: ${dir}`, err);
+    } catch (error) {
+        console.error(`Failed to read directory: ${dir}`, error);
         return;
     }
     for (const f of files) {
-        const p = join(dir, f);
+        const p = path.join(dir, f);
         let stat;
         try {
             stat = statSync(p);
-        } catch (err) {
-            console.error(`Failed to stat path: ${p}`, err);
+        } catch (error) {
+            console.error(`Failed to stat path: ${p}`, error);
             continue;
         }
         if (stat.isDirectory()) {
@@ -80,8 +83,8 @@ function walk(dir) {
         } else if (p.endsWith(".md")) {
             try {
                 fixFile(p);
-            } catch (err) {
-                console.error(`Failed to fix file: ${p}`, err);
+            } catch (error) {
+                console.error(`Failed to fix file: ${p}`, error);
             }
         }
     }

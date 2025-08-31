@@ -10,7 +10,7 @@
  *
  * @file Enhanced documentation downloader with enterprise-grade features
  *
- * @author GitHub Copilot Assistant
+ * @author Nick2bad4u
  *
  * @example
  *

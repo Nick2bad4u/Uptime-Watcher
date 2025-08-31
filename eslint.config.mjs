@@ -11,10 +11,8 @@
  * - Enhanced security and performance rules
  */
 
-/* eslint-disable import-x/no-named-as-default-member */
-/* eslint-disable no-underscore-dangle */
-
-/* eslint-disable n/no-unpublished-import */
+/* eslint-disable import-x/no-named-as-default-member -- Eslint doesn't use default*/
+/* eslint-disable n/no-unpublished-import -- Rule wants packages not in dev, doesn't apply */
 
 import pluginUseMemo2 from "@arthurgeron/eslint-plugin-react-usememo";
 import pluginDocusaurus from "@docusaurus/eslint-plugin";
@@ -174,7 +172,8 @@ import yamlEslintParser from "yaml-eslint-parser";
 
 // const __filename = fileURLToPath(import.meta.url);
 // const gitignorePath = path.resolve(__dirname, ".gitignore");
-const __dirname = import.meta.dirname;
+
+const dirname = import.meta.dirname;
 
 export default [
     // GLobal Configs and Rules
@@ -190,7 +189,6 @@ export default [
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         ignores: [
-            "CHANGELOG.md",
             "_ZENTASKS*",
             ".agentic-tools*",
             ".devskim.json",
@@ -201,38 +199,42 @@ export default [
             ".github/PULL_REQUEST_TEMPLATE/**",
             "**/_ZENTASKS*",
             "**/.agentic-tools*",
+            "**/.cache",
             "**/chatproject.md",
             "**/coverage-results.json",
             "**/Coverage/**",
             "**/coverage/**",
             "**/dist-electron/**",
+            "**/dist-shared/**",
+            "**/dist-scripts/**",
             "**/dist/**",
-            "**/shared/**",
             "**/node_modules/**",
+            "**/package-lock.json",
             "**/release/**",
-            // "vite.config.ts", // Ignore vite config due to parsing issues
-            // "vitest.config.ts", // Ignore vitest config due to parsing issues
-            // "config/testing/vitest.electron.config.ts", // Ignore vitest electron config
-            // "config/testing/vitest.shared.config.ts", // Ignore vitest shared config
+            "**/shared/**",
+            "CHANGELOG.md",
+            "coverage-report.json",
             "Coverage/",
             "coverage/",
             "dist-electron/",
+            "**/**dist**/**",
             "dist/",
-            "shared/",
-            "docs/docusaurus/docs/**",
-            "docs/docusaurus/build/**",
-            "docs/docusaurus/.docusaurus/**",
             "docs/Archive/**",
+            "docs/docusaurus/.docusaurus/**",
+            "docs/docusaurus/build/**",
+            "docs/docusaurus/docs/**",
+            "docs/Logger-Error-report.md",
             "docs/Packages/**",
             "docs/Reviews/**",
-            "node_modules/**",
-            "docs/Logger-Error-report.md",
-            "release/",
-            "coverage-report.json",
             "html/**",
+            "node_modules/**",
+            "release/",
             "report/**",
-            "**/package-lock.json",
-            "**/.cache",
+            "shared/",
+            // "config/testing/vitest.electron.config.ts", // Ignore vitest electron config
+            // "config/testing/vitest.shared.config.ts", // Ignore vitest shared config
+            // "vite.config.ts", // Ignore vite config due to parsing issues
+            // "vitest.config.ts", // Ignore vitest config due to parsing issues
         ],
     },
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -281,17 +283,18 @@ export default [
                     noWarnOnMultipleProjects: true, // Don't warn about multiple projects
                     // Use an array
                     project: [
-                        "tsconfig.electron.json",
-                        "config/testing/tsconfig.electron.test.json",
-                        "tsconfig.json",
-                        "config/testing/tsconfig.test.json",
                         "config/testing/tsconfig.configs.json",
-                        "tsconfig.shared.json",
+                        "config/testing/tsconfig.electron.test.json",
+                        "config/testing/tsconfig.scripts.json",
                         "config/testing/tsconfig.shared.test.json",
-                        "docs/docusaurus/tsconfig.json",
+                        "config/testing/tsconfig.test.json",
                         "docs/docusaurus/tsconfig.eslint.json",
-                        "docs/docusaurus/tsconfig.typedoc.json",
+                        "docs/docusaurus/tsconfig.json",
                         "docs/docusaurus/tsconfig.local.typedoc.json",
+                        "docs/docusaurus/tsconfig.typedoc.json",
+                        "tsconfig.electron.json",
+                        "tsconfig.json",
+                        "tsconfig.shared.json",
                     ],
                 }),
             ],
@@ -742,7 +745,7 @@ export default [
             ],
             react: { version: "19" },
             tailwindcss: {
-                config: `${__dirname}/src/index.css`,
+                config: `${dirname}/src/index.css`,
             },
         },
     },
@@ -804,7 +807,6 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -1935,7 +1937,6 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -3279,7 +3280,6 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -3341,8 +3341,6 @@ export default [
         },
         rules: {
             // TypeScript Backend (Electron) Rules
-
-            // TypeScript backend rules
             ...js.configs.all.rules,
             ...tseslint.configs.recommendedTypeChecked,
             ...tseslint.configs.recommended.rules,
@@ -4363,7 +4361,6 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -6883,6 +6880,162 @@ export default [
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
                     project: ["config/testing/tsconfig.electron.test.json"],
+                },
+            },
+            n: {
+                allowModules: [
+                    "electron",
+                    "node",
+                    "electron-devtools-installer",
+                ],
+            },
+            react: { version: "19" },
+        },
+    },
+
+    // Script files
+    {
+        files: [
+            "scripts/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
+            "scripts/download-docs-template.mjs",
+        ],
+        ignores: [
+            "scripts/coverage/**/*",
+            "scripts/dist/**/*",
+            "scripts/node_modules/**/*",
+            "scripts/download**",
+        ],
+        languageOptions: {
+            globals: {
+                ...globals.node,
+                __dirname: "readonly",
+                __filename: "readonly",
+                module: "readonly",
+                process: "readonly",
+                require: "readonly",
+            },
+        },
+        plugins: {
+            "@typescript-eslint": tseslint,
+            "eslint-comments": pluginComments,
+            "import-x": importX,
+            n: nodePlugin,
+            react: pluginReact,
+            "react-hooks": reactHooks,
+            unicorn: pluginUnicorn,
+            "unused-imports": pluginUnusedImports,
+            vitest: vitest,
+        },
+        rules: {
+            // Scripts Files Rules
+
+            ...js.configs.all.rules,
+            ...vitest.configs.recommended.rules,
+            ...pluginComments.configs.recommended.rules,
+            ...pluginUnicorn.configs.all.rules,
+
+            "@typescript-eslint/no-empty-function": "off",
+            // Allow flexible patterns for benchmark mock implementations
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-floating-promises": "off", // Benchmarks may not await all promises
+            "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
+            "@typescript-eslint/no-misused-promises": "off",
+            "@typescript-eslint/no-non-null-assertion": "off",
+            "@typescript-eslint/no-restricted-types": "off",
+            "@typescript-eslint/no-unsafe-function-type": "off",
+            "@typescript-eslint/no-unused-vars": "off",
+            "@typescript-eslint/require-await": "off", // Benchmarks may have async patterns
+            camelcase: "off",
+            "capitalized-comments": "off",
+            "class-methods-use-this": "off",
+            complexity: "off",
+            "default-case": "off",
+            "dot-notation": "off",
+            "func-names": "off",
+            "func-style": "off",
+            "id-length": "off",
+            "import-x/no-extraneous-dependencies": "off",
+            // Import rules relaxed for mock implementations
+            "import-x/no-unused-modules": "off",
+            "init-declarations": "off",
+            "max-classes-per-file": "off",
+            "max-depth": "off",
+            // Allow large files and classes for comprehensive benchmarks
+            "max-lines": "off",
+            "max-lines-per-function": "off",
+            "max-params": "off",
+            "max-statements": "off",
+            "new-cap": "off", // Allow new-cap for class constructors
+            "nitpick/no-redundant-vars": "off", // Allow redundant vars in benchmarks
+            "no-await-in-loop": "off", // Allow await in loops for sequential operations
+
+            "no-console": "off",
+            "no-continue": "off",
+            "no-div-regex": "off", // Allow division regex in benchmarks
+            "no-duplicate-imports": "off", // Allow duplicate imports for test setups
+            "no-inline-comments": "off",
+            "no-loop-func": "off", // Allow functions in loops for test setups
+            "no-magic-numbers": "off",
+            "no-new": "off", // Allow new for class constructors
+            "no-plusplus": "off",
+            "no-promise-executor-return": "off", // Allow returning values from promise executors
+            "no-redeclare": "off", // Allow redeclaring variables in tests
+            "no-shadow": "off",
+            "no-ternary": "off",
+            "no-throw-literal": "off",
+            "no-undef-init": "off",
+            "no-undefined": "off",
+            "no-underscore-dangle": "off",
+            "no-use-before-define": "off", // Allow use before define in benchmarks
+            "no-useless-assignment": "off",
+            "no-void": "off",
+            "object-shorthand": "off",
+            "one-var": "off",
+            "prefer-arrow-callback": "off",
+            "prefer-destructuring": "off",
+            "require-await": "off",
+            "require-unicode-regexp": "off",
+            "sort-imports": "off",
+            "sort-keys": "off",
+            "unicorn/consistent-function-scoping": "off",
+            "unicorn/filename-case": "off", // Allow benchmark files to have any case
+            "unicorn/no-array-for-each": "off", // Benchmarks may use forEach for testing
+            "unicorn/no-array-reduce": "off", // Benchmarks may test reduce performance
+            "unicorn/no-await-expression-member": "off",
+            // Allow performance-focused code patterns in benchmarks
+            "unicorn/no-keyword-prefix": [
+                "error",
+                {
+                    checkProperties: false,
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
+                },
+            ],
+            "unicorn/no-null": "off",
+            "unicorn/no-process-exit": "off", // Allow process.exit in scripts
+            "unicorn/no-unused-properties": "off",
+            "unicorn/no-useless-undefined": "off",
+            "unicorn/prefer-set-has": "off", // Benchmarks may compare different approaches
+            "unicorn/prefer-spread": "off", // Benchmarks may test different patterns
+            "unicorn/prevent-abbreviations": "off",
+        },
+        settings: {
+            "import-x/resolver": {
+                node: true,
+                project: ["./config/scripts/tsconfig.scripts.json"],
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: true,
+            },
+            "import/resolver": {
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: {
+                    alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
+                    project: ["./config/scripts/tsconfig.scripts.json"],
                 },
             },
             n: {

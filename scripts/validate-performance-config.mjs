@@ -4,14 +4,14 @@
  * Quick script to validate our Vite performance configuration
  */
 
-const fs = require("fs");
-const path = require("path");
+import { readFileSync } from "node:fs";
+import path from "node:path";
 
 console.log("🔍 Vite Performance Configuration Validator\n");
 
 // Check if package.json has our new scripts
-const packagePath = path.join(__dirname, "..", "package.json");
-const packageJson = JSON.parse(fs.readFileSync(packagePath, "utf8"));
+const packagePath = path.join(import.meta.dirname, "..", "package.json");
+const packageJson = JSON.parse(readFileSync(packagePath, "utf8"));
 
 const expectedScripts = [
     "debug:transform",
@@ -30,8 +30,8 @@ expectedScripts.forEach((script) => {
 });
 
 // Check if vite.config.ts has warmup configuration
-const viteConfigPath = path.join(__dirname, "..", "vite.config.ts");
-const viteConfig = fs.readFileSync(viteConfigPath, "utf8");
+const viteConfigPath = path.join(import.meta.dirname, "..", "vite.config.ts");
+const viteConfig = readFileSync(viteConfigPath, "utf8");
 
 console.log("\n⚙️  Checking Vite configuration:");
 const hasWarmup = viteConfig.includes("warmup:");

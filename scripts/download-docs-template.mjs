@@ -10,7 +10,7 @@
  *
  * @file Enhanced documentation downloader with enterprise-grade features
  *
- * @author GitHub Copilot Assistant
+ * @author Nick2bad4u
  *
  * @example
  *
@@ -42,7 +42,7 @@ const execFileAsync = promisify(execFile);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/* ==================== ENHANCED CONFIGURATION ==================== */
+/* ==================== TYPE DEFINITIONS ==================== */
 
 /**
  * @typedef {Object} DownloadConfig
@@ -68,6 +68,46 @@ const __dirname = path.dirname(__filename);
  * @property {string[]} forbiddenPatterns - Forbidden patterns for validation
  * @property {boolean} verbose - Enable verbose logging
  */
+
+/**
+ * @typedef {Object} Paths
+ *
+ * @property {string} outputDir - Output directory path
+ * @property {string} logFile - Log file path
+ * @property {string} hashesFile - Hashes file path
+ * @property {string} cacheDir - Cache directory path
+ */
+
+/**
+ * @typedef {Object} DownloadTask
+ *
+ * @property {string} page - Page path
+ * @property {string} url - Full URL to download
+ * @property {string} outputPath - Output file path
+ * @property {number} attempts - Number of attempts made
+ */
+
+/**
+ * @typedef {Object} DownloadResult
+ *
+ * @property {string} page - Page path
+ * @property {string} outputPath - Output file path
+ * @property {boolean} success - Whether download succeeded
+ * @property {string} [hash] - Content hash (if successful)
+ * @property {number} [size] - Content size in bytes (if successful)
+ * @property {string} [error] - Error message (if failed)
+ * @property {number} attempts - Number of attempts made
+ */
+
+/**
+ * @typedef {Object} InitializationResult
+ *
+ * @property {DownloadConfig} config - Parsed configuration
+ * @property {Logger} logger - Logger instance
+ * @property {Paths} paths - Path configuration
+ */
+
+/* ==================== ENHANCED CONFIGURATION ==================== */
 
 /**
  * Configuration object with comprehensive options
@@ -232,33 +272,63 @@ EXAMPLES:
  * Enhanced logger with multiple levels and formatting
  */
 class Logger {
+    /**
+     * @param {boolean} verbose - Enable verbose logging
+     */
     constructor(verbose = false) {
+        /** @type {boolean} */
         this.verbose = verbose || process.env.DOC_DOWNLOADER_VERBOSE === "true";
+        /** @type {number} */
         this.startTime = Date.now();
     }
 
+    /**
+     * @param {string} message
+     * @param {...any} args
+     */
     info(message, ...args) {
         console.log(`ℹ️ ${message}`, ...args);
     }
 
+    /**
+     * @param {string} message
+     * @param {...any} args
+     */
     success(message, ...args) {
         console.log(`✅ ${message}`, ...args);
     }
 
+    /**
+     * @param {string} message
+     * @param {...any} args
+     */
     warn(message, ...args) {
         console.warn(`⚠️ ${message}`, ...args);
     }
 
+    /**
+     * @param {string} message
+     * @param {...any} args
+     */
     error(message, ...args) {
         console.error(`❌ ${message}`, ...args);
     }
 
+    /**
+     * @param {string} message
+     * @param {...any} args
+     */
     debug(message, ...args) {
         if (this.verbose) {
             console.log(`🔍 ${message}`, ...args);
         }
     }
 
+    /**
+     * @param {number} current
+     * @param {number} total
+     * @param {string} item
+     */
     progress(current, total, item = "") {
         const percent = Math.round((current / total) * 100);
         const elapsed = Date.now() - this.startTime;
@@ -274,11 +344,7 @@ class Logger {
 /**
  * Initialize application with configuration and setup
  *
- * @returns {Promise<{
- *     config: DownloadConfig;
- *     logger: Logger;
- *     paths: Object;
- * }>}
+ * @returns {Promise<InitializationResult>}
  */
 async function initialize() {
     const config = parseArguments();
@@ -466,12 +532,12 @@ function cleanContent(content, config, logger) {
 /**
  * Download a single file with retry logic
  *
- * @param {Object} task - Download task
+ * @param {DownloadTask} task - Download task
  * @param {DownloadConfig} config - Configuration
  * @param {Logger} logger - Logger instance
- * @param {Object} paths - Path configuration
+ * @param {Paths} paths - Path configuration
  *
- * @returns {Promise<Object>} Download result
+ * @returns {Promise<DownloadResult>} Download result
  */
 async function downloadFile(task, config, logger, paths) {
     const { page, url, outputPath } = task;
@@ -575,12 +641,12 @@ async function downloadFile(task, config, logger, paths) {
 /**
  * Download files sequentially
  *
- * @param {Array} tasks - Download tasks
+ * @param {DownloadTask[]} tasks - Download tasks
  * @param {DownloadConfig} config - Configuration
  * @param {Logger} logger - Logger instance
- * @param {Object} paths - Path configuration
+ * @param {Paths} paths - Path configuration
  *
- * @returns {Promise<Array>} Download results
+ * @returns {Promise<DownloadResult[]>} Download results
  */
 async function downloadSequential(tasks, config, logger, paths) {
     const results = [];
@@ -599,12 +665,12 @@ async function downloadSequential(tasks, config, logger, paths) {
 /**
  * Download files in parallel with concurrency control
  *
- * @param {Array} tasks - Download tasks
+ * @param {DownloadTask[]} tasks - Download tasks
  * @param {DownloadConfig} config - Configuration
  * @param {Logger} logger - Logger instance
- * @param {Object} paths - Path configuration
+ * @param {Paths} paths - Path configuration
  *
- * @returns {Promise<Array>} Download results
+ * @returns {Promise<DownloadResult[]>} Download results
  */
 async function downloadParallel(tasks, config, logger, paths) {
     const results = [];
@@ -637,11 +703,11 @@ async function downloadParallel(tasks, config, logger, paths) {
 /**
  * Generate comprehensive report of download results
  *
- * @param {Array} results - Download results
+ * @param {DownloadResult[]} results - Download results
  * @param {DownloadConfig} config - Configuration
  * @param {Logger} logger - Logger instance
- * @param {Object} paths - Path configuration
- * @param {Object} previousHashes - Previous file hashes
+ * @param {Paths} paths - Path configuration
+ * @param {Record<string, string>} previousHashes - Previous file hashes
  *
  * @returns {Promise<void>}
  */
@@ -755,6 +821,7 @@ async function main() {
             : await downloadSequential(downloadTasks, config, logger, paths);
 
         // Process results and generate report
+        // @ts-ignore
         await generateReport(results, config, logger, paths, previousHashes);
 
         logger.success(`Download completed successfully!`);
@@ -772,7 +839,7 @@ async function main() {
  *
  * @param {string} page - Page path
  * @param {DownloadConfig} config - Configuration
- * @param {Object} paths - Path configuration
+ * @param {Paths} paths - Path configuration
  *
  * @returns {string} Output file path
  */

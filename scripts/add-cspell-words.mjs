@@ -8,7 +8,7 @@
  *
  * @file Enhanced CSpell dictionary management tool with advanced features
  *
- * @author GitHub Copilot Assistant
+ * @author Nick2bad4u
  *
  * @example
  *
@@ -27,15 +27,14 @@
  * @requires cspell (installed globally or via npx)
  */
 
-import { execSync } from "child_process";
-import fs from "fs/promises";
-import fsSync from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import { createHash } from "crypto";
+import { execSync } from "node:child_process";
+import fs from "node:fs/promises";
+import fsSync from "node:fs";
+import path from "node:path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = import.meta.dirname;
+
+const cspellConfigPath = "--config .cspell.json";
 
 /**
  * Configuration object for the script with validation and defaults
@@ -68,10 +67,10 @@ const DEFAULT_CONFIG = {
     minWordLength: 2,
     maxWordLength: 50,
     excludePatterns: [
-        "^\\d+$", // Pure numbers
+        String.raw`^\d+$`, // Pure numbers
         "^[a-f0-9]{32,}$", // Long hex strings (hashes)
         "^[A-Z_]{2,}$", // All caps constants (likely intentional)
-        "\\.(com|org|net|edu|gov)$", // Domain extensions
+        String.raw`\.(com|org|net|edu|gov)$`, // Domain extensions
         "^(http|https|ftp|ssh)$", // Protocols
     ],
     sortWords: true,
@@ -90,6 +89,7 @@ function parseArguments() {
     // Handle help flag
     if (args.includes("--help") || args.includes("-h")) {
         showHelp();
+
         process.exit(0);
     }
 
@@ -100,42 +100,50 @@ function parseArguments() {
 
         switch (arg) {
             case "--dry-run":
-            case "-d":
+            case "-d": {
                 config.dryRun = true;
                 break;
+            }
             case "--verbose":
-            case "-v":
+            case "-v": {
                 config.verbose = true;
                 break;
+            }
             case "--interactive":
-            case "-i":
+            case "-i": {
                 config.interactive = true;
                 break;
-            case "--no-backup":
+            }
+            case "--no-backup": {
                 config.createBackup = false;
                 break;
-            case "--no-sort":
+            }
+            case "--no-sort": {
                 config.sortWords = false;
                 break;
-            case "--min-length":
-                if (nextArg && !isNaN(parseInt(nextArg))) {
-                    config.minWordLength = parseInt(nextArg);
+            }
+            case "--min-length": {
+                if (nextArg && !Number.isNaN(Number.parseInt(nextArg, 10))) {
+                    config.minWordLength = Number.parseInt(nextArg, 10);
                     i++;
                 }
                 break;
-            case "--max-length":
-                if (nextArg && !isNaN(parseInt(nextArg))) {
-                    config.maxWordLength = parseInt(nextArg);
+            }
+            case "--max-length": {
+                if (nextArg && !Number.isNaN(Number.parseInt(nextArg, 10))) {
+                    config.maxWordLength = Number.parseInt(nextArg, 10);
                     i++;
                 }
                 break;
-            case "--patterns":
+            }
+            case "--patterns": {
                 if (nextArg) {
                     config.filePatterns = nextArg.split(",");
                     i++;
                 }
                 break;
-            default:
+            }
+            default: {
                 // First positional argument is custom words file path
                 if (
                     !arg.startsWith("-") &&
@@ -143,6 +151,7 @@ function parseArguments() {
                 ) {
                     config.customWordsFile = path.resolve(arg);
                 }
+            }
         }
     }
 
@@ -198,28 +207,51 @@ class Logger {
         this.verbose = verbose;
     }
 
+    /**
+     * @param {string} message
+     * @param {undefined[]} args
+     */
     info(message, ...args) {
         console.log(`ℹ️ ${message}`, ...args);
     }
 
+    /**
+     * @param {string} message
+     * @param {undefined[]} args
+     */
     success(message, ...args) {
         console.log(`✅ ${message}`, ...args);
     }
 
+    /**
+     * @param {string} message
+     * @param {undefined[]} args
+     */
     warn(message, ...args) {
         console.warn(`⚠️ ${message}`, ...args);
     }
 
+    /**
+     * @param {string} message
+     * @param {undefined[]} args
+     */
     error(message, ...args) {
         console.error(`❌ ${message}`, ...args);
     }
 
+    /**
+     * @param {string} message
+     * @param {(Config | undefined)[]} args
+     */
     debug(message, ...args) {
         if (this.verbose) {
             console.log(`🔍 ${message}`, ...args);
         }
     }
 
+    /**
+     * @param {string[]} data
+     */
     table(data) {
         console.table(data);
     }
@@ -267,7 +299,7 @@ function isValidWord(word, config) {
  * @returns {Promise<string>} Path to the backup file
  */
 async function createBackup(filePath, logger) {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const timestamp = new Date().toISOString().replaceAll(/[.:]/g, "-");
     const backupPath = `${filePath}.backup.${timestamp}`;
 
     try {
@@ -332,7 +364,7 @@ async function runCSpell(config, logger) {
         "cspell",
         `"${config.filePatterns.join(",")}"`,
         "--gitignore",
-        "--config cspell.json",
+        cspellConfigPath,
         "--words-only",
         "--unique",
         "--no-progress",
@@ -346,25 +378,29 @@ async function runCSpell(config, logger) {
             encoding: "utf8",
             maxBuffer: 1024 * 1024 * 10, // 10MB buffer
         });
-    } catch (err) {
+    } catch (error) {
         // cspell returns a non-zero exit code when spelling issues are found,
         // but the output (err.stdout) still contains the list of unknown words we want to process.
-        if (err && typeof err === "object" && "stdout" in err && err.stdout) {
-            if ("stderr" in err && err.stderr) {
-                logger.debug("CSpell stderr:", err.stderr.toString());
+        if (
+            error &&
+            typeof error === "object" &&
+            "stdout" in error &&
+            error.stdout
+        ) {
+            if ("stderr" in error && error.stderr) {
+                logger.debug("CSpell stderr:", error.stderr.toString());
             }
-            return err.stdout.toString();
-        } else {
-            if (
-                err &&
-                typeof err === "object" &&
-                "stderr" in err &&
-                err.stderr
-            ) {
-                logger.error("CSpell stderr:", err.stderr.toString());
-            }
-            throw new Error(`CSpell execution failed: ${err.message || err}`);
+            return error.stdout.toString();
         }
+        if (
+            error &&
+            typeof error === "object" &&
+            "stderr" in error &&
+            error.stderr
+        ) {
+            logger.error("CSpell stderr:", error.stderr.toString());
+        }
+        throw new Error(`CSpell execution failed: ${error.message || error}`);
     }
 }
 
@@ -382,7 +418,7 @@ function processFoundWords(cspellOutput, currentWords, config, logger) {
     const rawWords = cspellOutput
         .split(/\r?\n/)
         .map((w) => w.trim())
-        .filter((w) => w);
+        .filter(Boolean);
 
     logger.debug(`Found ${rawWords.length} raw words from cspell`);
 
@@ -446,14 +482,15 @@ async function writeUpdatedWords(
     }
 
     // Prepare content
-    let fileContent = currentContent.replace(/\s+$/, "");
+    const fileContent = currentContent.replace(/\s+$/, "");
     const newWordsArray = Array.from(newWords);
     const newWordsBlock = newWordsArray.join("\n");
 
     // Write back, ensuring only a single trailing newline in the file
-    const updatedContent =
-        [fileContent, newWordsBlock].filter(Boolean).join("\n").trimEnd() +
-        "\n";
+    const updatedContent = `${[fileContent, newWordsBlock]
+        .filter(Boolean)
+        .join("\n")
+        .trimEnd()}\n`;
 
     if (config.dryRun) {
         logger.info("DRY RUN: Would add the following words:");
@@ -467,23 +504,6 @@ async function writeUpdatedWords(
             logger.table(newWordsArray);
         }
     }
-}
-
-/**
- * Generate hash of current configuration for caching
- *
- * @param {Config} config - Configuration object
- *
- * @returns {string} Configuration hash
- */
-function generateConfigHash(config) {
-    const hashData = JSON.stringify({
-        filePatterns: config.filePatterns,
-        minWordLength: config.minWordLength,
-        maxWordLength: config.maxWordLength,
-        excludePatterns: config.excludePatterns,
-    });
-    return createHash("md5").update(hashData).digest("hex");
 }
 
 /**
@@ -555,6 +575,10 @@ async function main() {
 }
 
 // Run the script if executed directly
-if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
-    main().catch(console.error);
+if (import.meta.filename === path.resolve(process.argv[1])) {
+    try {
+        await main();
+    } catch (error) {
+        console.error(error);
+    }
 }

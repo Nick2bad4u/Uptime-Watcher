@@ -26,22 +26,32 @@ const CONFIG = {
  * Logger with colors
  */
 const log = {
-    info: (msg) => console.log(`\x1b[36m[INFO]\x1b[0m ${msg}`),
-    success: (msg) => console.log(`\x1b[32m[SUCCESS]\x1b[0m ${msg}`),
-    warning: (msg) => console.log(`\x1b[33m[WARNING]\x1b[0m ${msg}`),
-    error: (msg) => console.log(`\x1b[31m[ERROR]\x1b[0m ${msg}`),
+    info: (/** @type {any} */ msg) =>
+        console.log(`\u001B[36m[INFO]\u001B[0m ${msg}`),
+    success: (/** @type {any} */ msg) =>
+        console.log(`\u001B[32m[SUCCESS]\u001B[0m ${msg}`),
+    warning: (/** @type {any} */ msg) =>
+        console.log(`\u001B[33m[WARNING]\u001B[0m ${msg}`),
+    error: (/** @type {any} */ msg) =>
+        console.log(`\u001B[31m[ERROR]\u001B[0m ${msg}`),
 };
 
 /**
  * Check if import path is local (should be updated)
+ *
+ * @param {string} importPath
  */
 function isLocalImport(importPath) {
     // Local imports start with ./ or ../ or @shared/@electron/@app
-    return /^(\.{1,2}\/|@(shared|electron|app)\/)/.test(importPath);
+    return /^(?<temp2>\.{1,2}\/|@(?<temp1>shared|electron|app)\/)/.test(
+        importPath
+    );
 }
 
 /**
  * Update import path to use .mjs extension
+ *
+ * @param {string} importPath
  */
 function updateImportPath(importPath) {
     if (!isLocalImport(importPath)) {
@@ -53,12 +63,14 @@ function updateImportPath(importPath) {
     }
 
     // Remove existing extension and add .mjs
-    const withoutExt = importPath.replace(/\.(ts|tsx|js|jsx)$/, "");
+    const withoutExt = importPath.replace(/\.(?<temp1>ts|tsx|js|jsx)$/, "");
     return withoutExt + CONFIG.jsExtension;
 }
 
 /**
  * Process file content and update imports
+ *
+ * @param {string} content
  */
 function processImports(content) {
     let updated = content;
@@ -67,19 +79,24 @@ function processImports(content) {
     // Pattern to match import statements
     const importPatterns = [
         // import ... from '...'
-        /(\bimport\s+(?:(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)(?:\s*,\s*(?:\{[^}]*\}|\*\s+as\s+\w+))?)?\s+from\s+['"`])([^'"`]+)(['"`])/g,
+        /(?<temp3>\bimport\s+(?:(?:{[^}]*}|\*\s+as\s+\w+|\w+)(?:\s*,\s*(?:{[^}]*}|\*\s+as\s+\w+))?)?\s+from\s+["'`])(?<temp2>[^"'`]+)(?<temp1>["'`])/g,
         // import type ... from '...'
-        /(\bimport\s+type\s+(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)\s+from\s+['"`])([^'"`]+)(['"`])/g,
+        /(?<temp3>\bimport\s+type\s+(?:{[^}]*}|\*\s+as\s+\w+|\w+)\s+from\s+["'`])(?<temp2>[^"'`]+)(?<temp1>["'`])/g,
         // import('...')
-        /(import\s*\(\s*['"`])([^'"`]+)(['"`]\s*\))/g,
+        /(?<temp3>import\s*\(\s*["'`])(?<temp2>[^"'`]+)(?<temp1>["'`]\s*\))/g,
         // export ... from '...'
-        /(\bexport\s+(?:\{[^}]*\}|\*)\s+from\s+['"`])([^'"`]+)(['"`])/g,
+        /(?<temp3>\bexport\s+(?:{[^}]*}|\*)\s+from\s+["'`])(?<temp2>[^"'`]+)(?<temp1>["'`])/g,
     ];
 
     importPatterns.forEach((pattern) => {
         updated = updated.replace(
             pattern,
-            (match, prefix, importPath, suffix) => {
+            (
+                /** @type {any} */ match,
+                /** @type {any} */ prefix,
+                /** @type {any} */ importPath,
+                /** @type {any} */ suffix
+            ) => {
                 const newPath = updateImportPath(importPath);
                 if (newPath !== importPath) {
                     changeCount++;
@@ -97,6 +114,8 @@ function processImports(content) {
 
 /**
  * Migrate a TypeScript file to .mts
+ *
+ * @param {string} filePath
  */
 function migrateFile(filePath, isDryRun = false) {
     try {
@@ -118,18 +137,18 @@ function migrateFile(filePath, isDryRun = false) {
 
         if (isDryRun) {
             log.info("=== DRY RUN - Preview of changes ===");
-            if (originalContent !== updatedContent) {
+            if (originalContent === updatedContent) {
+                log.info("No changes needed");
+            } else {
                 console.log("\nUpdated content:");
                 console.log(updatedContent);
-            } else {
-                log.info("No changes needed");
             }
             return;
         }
 
         // Create backup
         if (CONFIG.createBackups) {
-            const backupPath = filePath + ".backup";
+            const backupPath = `${filePath}.backup`;
             fs.copyFileSync(filePath, backupPath);
             log.info(`Backup created: ${backupPath}`);
         }
@@ -143,13 +162,13 @@ function migrateFile(filePath, isDryRun = false) {
         fs.writeFileSync(newFilePath, updatedContent, "utf8");
 
         // Remove original if different
-        if (filePath !== newFilePath) {
+        if (filePath === newFilePath) {
+            log.success(`Updated: ${path.basename(filePath)}`);
+        } else {
             fs.unlinkSync(filePath);
             log.success(
                 `Migrated: ${path.basename(filePath)} → ${path.basename(newFilePath)}`
             );
-        } else {
-            log.success(`Updated: ${path.basename(filePath)}`);
         }
     } catch (error) {
         log.error(`Failed to migrate ${filePath}: ${error.message}`);

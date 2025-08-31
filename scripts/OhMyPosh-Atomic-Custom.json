@@ -160,6 +160,24 @@
             ]
         },
         {
+            "alignment": "right",
+            "type": "rprompt",
+            "segments": [
+                {
+                    "background": "#2f3b45",
+                    "foreground": "#cfd8dc",
+                    "leading_diamond": "",
+                    "trailing_diamond": "",
+                    "style": "diamond",
+                    "template": " ⌁ {{ .PromptCount }} ",
+                    "type": "text",
+                    "properties": {
+                        "always_enabled": true
+                    }
+                }
+            ]
+        },
+        {
             "alignment": "left",
             "type": "prompt",
             "segments": [
@@ -200,6 +218,23 @@
             "newline": true
         }
     ],
+    "console_title_template": "{{.Folder}}{{if .Root}} :: root{{end}} :: {{.Shell}}",
+    "debug_prompt": {
+        "background": "transparent",
+        "foreground": "#000000",
+        "template": "<#000000,#7C4DFF>  DEBUG </><#7C4DFF,transparent></> <#7C4DFF,transparent> {{ if .PID }}PID: {{ .PID }} {{ end }}{{ if .Session }}• {{ .Session }}{{ end }}</>"
+    },
+    "error_line": {
+        "background": "transparent",
+        "foreground": "#ffffff",
+        "template": "<#eb6f92,transparent></>"
+    },
+    "secondary_prompt": {
+        "background": "transparent",
+        "foreground": "#21c7c7",
+        "template": "{{ if .Root }}<#ef5350>root</> {{ end }}╰─ ",
+        "properties": {}
+    },
     "tooltips": [
         {
             "background": "#FFFB38",
@@ -933,7 +968,7 @@
             "foreground": "#111111",
             "leading_diamond": "",
             "style": "diamond",
-            "template": "  {{ .Count }} updates available ",
+            "template": "  OhMyPosh {{ .Version }}",
             "trailing_diamond": "",
             "type": "upgrade",
             "tips": [
@@ -984,5 +1019,21 @@
         }
     ],
     "tooltips_action": "replace",
+    "transient_prompt": {
+        "background": "transparent",
+        "foreground": "#ffffff",
+        "template": "{{ .Shell }}> "
+    },
+    "upgrade": {
+        "notice": true,
+        "interval": "168h",
+        "auto": true,
+        "source": "cdn"
+    },
+    "valid_line": {
+        "background": "transparent",
+        "foreground": "#ffffff",
+        "template": "<#e0def4,transparent></> "
+    },
     "version": 3
 }

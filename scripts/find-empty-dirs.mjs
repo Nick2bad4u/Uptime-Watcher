@@ -42,7 +42,7 @@
  *   - Permission errors when attempting to delete directories (with --delete flag).
  */
 
-import { join, relative } from "node:path";
+import path from "node:path";
 import { stat, readdir, rmdir } from "node:fs/promises";
 
 /**
@@ -173,7 +173,7 @@ if (!isQuiet && outputFormat === "text") {
 // Validate that ROOT_DIR contains all TARGET_DIRS before proceeding
 const validTargetDirs = [];
 for (const dir of targetDirs) {
-    const absPath = join(ROOT_DIR, dir);
+    const absPath = path.join(ROOT_DIR, dir);
     try {
         const stats = await stat(absPath);
         if (!stats.isDirectory()) {
@@ -188,7 +188,7 @@ for (const dir of targetDirs) {
         if (isVerbose) {
             console.log(`✅ Found target directory: ${dir}`);
         }
-    } catch (err) {
+    } catch (error) {
         if (!isQuiet) {
             console.warn(
                 `⚠️  Expected directory '${dir}' not found in ${ROOT_DIR}`
@@ -196,7 +196,7 @@ for (const dir of targetDirs) {
         }
         if (isVerbose) {
             console.log(
-                `   Error: ${err instanceof Error ? err.message : String(err)}`
+                `   Error: ${error instanceof Error ? error.message : String(error)}`
             );
         }
     }
@@ -256,18 +256,18 @@ async function isDirectory(path) {
     try {
         const stats = await stat(path);
         return stats.isDirectory();
-    } catch (err) {
+    } catch (error) {
         if (
-            err &&
-            typeof err === "object" &&
-            "code" in err &&
-            err.code === "EACCES"
+            error &&
+            typeof error === "object" &&
+            "code" in error &&
+            error.code === "EACCES"
         ) {
             console.warn(`Permission denied: ${path}`);
         } else {
             console.warn(
                 `Error accessing ${path}:`,
-                err instanceof Error ? err.message : String(err)
+                error instanceof Error ? error.message : String(error)
             );
         }
         return false;
@@ -285,10 +285,10 @@ async function isDirectory(path) {
 async function safeReadDir(dir) {
     try {
         return await readdir(dir);
-    } catch (err) {
+    } catch (error) {
         console.warn(
             `Error reading directory ${dir}:`,
-            err instanceof Error ? err.message : String(err)
+            error instanceof Error ? error.message : String(error)
         );
         return [];
     }
@@ -311,7 +311,7 @@ async function findEmptyDirs(dir) {
 
     const entries = await safeReadDir(dir);
     if (entries.length === 0) {
-        return [relative(ROOT_DIR, dir)];
+        return [path.relative(ROOT_DIR, dir)];
     }
 
     let emptyDirs = [];
@@ -322,19 +322,18 @@ async function findEmptyDirs(dir) {
     if (isVerbose && entries.length !== filteredEntries.length) {
         const excluded = entries.filter((entry) => shouldExcludeDir(entry));
         console.log(
-            `   Excluded from ${relative(ROOT_DIR, dir)}: ${excluded.join(", ")}`
+            `   Excluded from ${path.relative(ROOT_DIR, dir)}: ${excluded.join(", ")}`
         );
     }
 
     // Prepare promises for all non-excluded entries
     const results = await Promise.all(
         filteredEntries.map(async (entry) => {
-            const fullPath = join(dir, entry);
+            const fullPath = path.join(dir, entry);
             if (await isDirectory(fullPath)) {
                 return await findEmptyDirs(fullPath);
-            } else {
-                return null; // Mark as non-empty
             }
+            return null; // Mark as non-empty
         })
     );
 
@@ -348,7 +347,7 @@ async function findEmptyDirs(dir) {
         results.every((r) => Array.isArray(r) && r.length > 0);
 
     if (filteredEntries.length > 0 && allDirsEmpty) {
-        emptyDirs.push(relative(ROOT_DIR, dir));
+        emptyDirs.push(path.relative(ROOT_DIR, dir));
     }
     return emptyDirs;
 }
@@ -367,19 +366,19 @@ async function safeDeleteDir(dirPath) {
         const entries = await safeReadDir(dirPath);
         if (entries.length > 0) {
             console.error(
-                `❌ Cannot delete ${relative(ROOT_DIR, dirPath)}: Directory is not empty`
+                `❌ Cannot delete ${path.relative(ROOT_DIR, dirPath)}: Directory is not empty`
             );
             return false;
         }
 
         // Use rmdir for empty directories instead of rm
         await rmdir(dirPath);
-        console.log(`✅ Deleted: ${relative(ROOT_DIR, dirPath)}`);
+        console.log(`✅ Deleted: ${path.relative(ROOT_DIR, dirPath)}`);
         return true;
-    } catch (err) {
+    } catch (error) {
         console.error(
-            `❌ Failed to delete ${relative(ROOT_DIR, dirPath)}:`,
-            err instanceof Error ? err.message : String(err)
+            `❌ Failed to delete ${path.relative(ROOT_DIR, dirPath)}:`,
+            error instanceof Error ? error.message : String(error)
         );
         return false;
     }
@@ -391,7 +390,7 @@ async function main() {
     const results = {};
 
     for (const target of validTargetDirs) {
-        const absTarget = join(ROOT_DIR, target);
+        const absTarget = path.join(ROOT_DIR, target);
         try {
             const targetStat = await stat(absTarget);
             if (!targetStat.isDirectory()) continue;
@@ -426,22 +425,18 @@ async function main() {
                     if (!isQuiet) {
                         console.log(`🗂️  ${d}`);
                     }
-                    const absPath = join(ROOT_DIR, d);
+                    const absPath = path.join(ROOT_DIR, d);
                     if (await safeDeleteDir(absPath)) {
                         totalDeleted++;
                     }
                 }
-            } else {
+            } else if (!isQuiet && outputFormat === "text") {
                 for (const d of emptyDirs) {
-                    if (!isQuiet && outputFormat === "text") {
-                        console.log(`🗂️  ${d}`);
-                    }
+                    console.log(`🗂️  ${d}`);
                 }
             }
-        } else {
-            if (!isQuiet && outputFormat === "text") {
-                console.log(`No empty directories found under '${target}'.`);
-            }
+        } else if (!isQuiet && outputFormat === "text") {
+            console.log(`No empty directories found under '${target}'.`);
         }
     }
 
@@ -486,13 +481,17 @@ async function main() {
         }
     }
 }
-main().catch((err) => {
+
+// Use top-level await instead of promise chain
+try {
+    await main();
+} catch (error) {
     console.error(
         "An error occurred while running the find-empty-dirs script:",
-        err
+        error
     );
-    if (err && err.stack) {
-        console.error("Stack trace:", err.stack);
+    if (error && error.stack) {
+        console.error("Stack trace:", error.stack);
     }
     process.exit(1);
-});
+}

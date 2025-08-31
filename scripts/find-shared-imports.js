@@ -5,8 +5,14 @@
  * coverage analysis
  */
 
-const fs = require("fs");
-const path = require("path");
+import {
+    readdirSync,
+    statSync,
+    readFileSync,
+    existsSync,
+    writeFileSync,
+} from "node:fs";
+import path from "node:path";
 
 // Configuration
 const CONFIG = {
@@ -20,23 +26,29 @@ const CONFIG = {
         ".jsx",
     ],
     // Pattern to match @shared imports
-    importPattern: /from\s+["']@shared([^"']*)["']/g,
+    importPattern: /from\s+["']@shared[^"']*["']/g,
     // Output format options
     outputFormat: "detailed", // 'simple', 'detailed', 'json'
 };
 
 /**
  * Get all files recursively from a directory
+ *
+ * @param {string} dir
+ * @param {string | string[]} extensions
  */
 function getFilesRecursively(dir, extensions) {
     const files = [];
 
+    /**
+     * @param {string} currentDir
+     */
     function traverse(currentDir) {
-        const items = fs.readdirSync(currentDir);
+        const items = readdirSync(currentDir);
 
         for (const item of items) {
             const fullPath = path.join(currentDir, item);
-            const stat = fs.statSync(fullPath);
+            const stat = statSync(fullPath);
 
             if (stat.isDirectory()) {
                 // Skip node_modules and other common ignore directories
@@ -66,17 +78,25 @@ function getFilesRecursively(dir, extensions) {
 
 /**
  * Calculate relative path from one file to another
+ *
+ * @param {string} fromFile
+ * @param {string} toPath
  */
 function calculateRelativePath(fromFile, toPath) {
     const fromDir = path.dirname(fromFile);
     const relativePath = path.relative(fromDir, toPath);
 
     // Convert Windows paths to Unix-style for imports
-    return relativePath.replace(/\\/g, "/");
+    return relativePath.replaceAll("\\", "/");
 }
 
 /**
- * Suggest relative import path for @shared import
+ * Suggest relative import path for
+ *
+ * @param {any} filePath
+ * @param {string} sharedPath
+ *
+ * @shared import
  */
 function suggestRelativePath(filePath, sharedPath) {
     const workspaceRoot = process.cwd();
@@ -90,18 +110,22 @@ function suggestRelativePath(filePath, sharedPath) {
 
     // Ensure it starts with ./ or ../
     if (!relativePath.startsWith(".")) {
-        return "./" + relativePath;
+        return `./${relativePath}`;
     }
 
     return relativePath;
 }
 
 /**
- * Find @shared imports in a file
+ * Find
+ *
+ * @param {import("fs").PathOrFileDescriptor} filePath
+ *
+ * @shared imports in a file
  */
 function findSharedImports(filePath) {
     try {
-        const content = fs.readFileSync(filePath, "utf8");
+        const content = readFileSync(filePath, "utf8");
         const imports = [];
         let match;
 
@@ -112,7 +136,7 @@ function findSharedImports(filePath) {
             const fullMatch = match[0];
             const sharedPath = match[1];
             const lineNumber = content
-                .substring(0, match.index)
+                .slice(0, Math.max(0, match.index))
                 .split("\n").length;
 
             // Get the line content for context
@@ -137,42 +161,66 @@ function findSharedImports(filePath) {
 
 /**
  * Format output based on configuration
+ *
+ * @param {{
+ *     filePath: string;
+ *     fullPath: any;
+ *     imports: {
+ *         line: number;
+ *         content: string;
+ *         originalImport: string;
+ *         sharedPath: string;
+ *         suggestedPath: string;
+ *     }[];
+ * }[]} results
  */
 function formatOutput(results) {
     switch (CONFIG.outputFormat) {
-        case "simple":
+        case "simple": {
             return formatSimple(results);
-        case "json":
+        }
+        case "json": {
             return JSON.stringify(results, null, 2);
-        case "detailed":
-        default:
+        }
+
+        default: {
             return formatDetailed(results);
+        }
     }
 }
 
 /**
  * Format simple output (just file paths)
+ *
+ * @param {any[]} results
  */
 function formatSimple(results) {
     const files = results
-        .filter((r) => r.imports.length > 0)
-        .map((r) => r.filePath);
+        .filter(
+            (/** @type {{ imports: string | any[] }} */ r) =>
+                r.imports.length > 0
+        )
+        .map((/** @type {{ filePath: any }} */ r) => r.filePath);
     return files.join("\n");
 }
 
 /**
  * Format detailed output with import suggestions
+ *
+ * @param {any[]} results
  */
 function formatDetailed(results) {
     let output = "";
     let totalFiles = 0;
     let totalImports = 0;
 
-    output += "=".repeat(80) + "\n";
+    output += `${"=".repeat(80)}\n`;
     output += "SHARED IMPORT ANALYSIS REPORT\n";
-    output += "=".repeat(80) + "\n\n";
+    output += `${"=".repeat(80)}\n\n`;
 
-    const filesWithImports = results.filter((r) => r.imports.length > 0);
+    const filesWithImports = results.filter(
+        (/** @type {{ imports: string | any[] }} */ r) => r.imports.length > 0
+    );
 
     if (filesWithImports.length === 0) {
         output +=
@@ -194,7 +242,7 @@ function formatDetailed(results) {
             output += `   With:    from "${imp.suggestedPath}"\n\n`;
         }
 
-        output += "-".repeat(80) + "\n\n";
+        output += `${"-".repeat(80)}\n\n`;
     }
 
     output += `📊 SUMMARY:\n`;
@@ -221,7 +269,7 @@ function main() {
     for (const scanDir of CONFIG.scanDirs) {
         const fullScanPath = path.join(process.cwd(), scanDir);
 
-        if (!fs.existsSync(fullScanPath)) {
+        if (!existsSync(fullScanPath)) {
             console.warn(`⚠️  Directory not found: ${scanDir}`);
             continue;
         }
@@ -250,7 +298,7 @@ function main() {
     // Optionally save to file
     if (process.argv.includes("--save")) {
         const outputFile = "shared-imports-report.txt";
-        fs.writeFileSync(outputFile, output);
+        writeFileSync(outputFile, output);
         console.log(`📄 Report saved to ${outputFile}`);
     }
 

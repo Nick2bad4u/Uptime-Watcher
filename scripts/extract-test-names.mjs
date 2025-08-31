@@ -5,8 +5,8 @@
  * files to find describe() and it() blocks and exports test names
  */
 
-import { readFileSync, readdirSync, writeFileSync } from "fs";
-import { basename, join, resolve } from "path";
+import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import path from "node:path";
 
 /**
  * Extract test names from a single test file
@@ -18,7 +18,7 @@ import { basename, join, resolve } from "path";
 function extractTestNames(filePath) {
     try {
         const content = readFileSync(filePath, "utf8");
-        const fileName = basename(filePath);
+        const fileName = path.basename(filePath);
 
         const testStructure = {
             file: fileName,
@@ -28,19 +28,24 @@ function extractTestNames(filePath) {
         };
 
         // Regular expressions to match describe and it blocks
-        const describeRegex = /describe\s*\(\s*['"`]([^'"`]+)['"`]/g;
-        const itRegex = /(?:it|test)\s*\(\s*['"`]([^'"`]+)['"`]/g;
+        // Updated to use named capture groups for better readability and ESLint compliance
+        const describeRegex = /describe\s*\(\s*["'`](?<name>[^"'`]+)["'`]/g;
+        const itRegex = /(?:it|test)\s*\(\s*["'`](?<name>[^"'`]+)["'`]/g;
 
         let match;
 
         // Extract describe blocks
         while ((match = describeRegex.exec(content)) !== null) {
-            testStructure.describes.push(match[1]);
+            if (match.groups?.name) {
+                testStructure.describes.push(match.groups.name);
+            }
         }
 
         // Extract it/test blocks
         while ((match = itRegex.exec(content)) !== null) {
-            testStructure.tests.push(match[1]);
+            if (match.groups?.name) {
+                testStructure.tests.push(match.groups.name);
+            }
         }
 
         return testStructure;
@@ -64,7 +69,7 @@ function findTestFiles(dirPath, testFiles = []) {
         const entries = readdirSync(dirPath, { withFileTypes: true });
 
         for (const entry of entries) {
-            const fullPath = join(dirPath, entry.name);
+            const fullPath = path.join(dirPath, entry.name);
 
             if (entry.isDirectory()) {
                 // Skip node_modules, .git, dist folders, etc.
@@ -82,20 +87,18 @@ function findTestFiles(dirPath, testFiles = []) {
                     continue;
                 }
                 findTestFiles(fullPath, testFiles);
-            } else if (entry.isFile()) {
-                // Check if it's a test file
-                if (
-                    entry.name.includes(".test.") ||
+            } else if (
+                entry.isFile() && // Check if it's a test file
+                (entry.name.includes(".test.") ||
                     entry.name.includes(".spec.") ||
                     entry.name.endsWith(".test.ts") ||
                     entry.name.endsWith(".test.js") ||
                     entry.name.endsWith(".spec.ts") ||
                     entry.name.endsWith(".spec.js") ||
                     entry.name.endsWith(".bench.ts") ||
-                    entry.name.endsWith(".bench.js")
-                ) {
-                    testFiles.push(fullPath);
-                }
+                    entry.name.endsWith(".bench.js"))
+            ) {
+                testFiles.push(fullPath);
             }
         }
     } catch (error) {
@@ -116,10 +119,11 @@ function findTestFiles(dirPath, testFiles = []) {
  */
 function formatTestNames(testStructures, format = "list") {
     switch (format) {
-        case "json":
+        case "json": {
             return JSON.stringify(testStructures, null, 2);
+        }
 
-        case "tree":
+        case "tree": {
             let treeOutput = "";
             testStructures.forEach((structure) => {
                 if (
@@ -138,8 +142,9 @@ function formatTestNames(testStructures, format = "list") {
                 }
             });
             return treeOutput;
+        }
 
-        case "flat":
+        case "flat": {
             const allTests = [];
             testStructures.forEach((structure) => {
                 structure.tests.forEach((test) => {
@@ -147,9 +152,9 @@ function formatTestNames(testStructures, format = "list") {
                 });
             });
             return allTests.join("\n");
+        }
 
-        case "list":
-        default:
+        default: {
             let listOutput = "";
             testStructures.forEach((structure) => {
                 if (
@@ -174,6 +179,7 @@ function formatTestNames(testStructures, format = "list") {
                 }
             });
             return listOutput;
+        }
     }
 }
 
@@ -193,7 +199,7 @@ function main() {
                 ].includes(arg)
             )
             ?.replace("--", "") || "list";
-    const projectRoot = resolve(__dirname, "..");
+    const projectRoot = path.resolve(import.meta.dirname, "..");
 
     console.log(`Extracting test names from: ${projectRoot}`);
     console.log(`Output format: ${format}\n`);
@@ -236,7 +242,7 @@ function main() {
 
         // Export to file option
         if (args.includes("--save")) {
-            const outputFile = join(
+            const outputFile = path.join(
                 projectRoot,
                 `test-names-${Date.now()}.txt`
             );
@@ -278,7 +284,8 @@ if (process.argv.includes("--help") || process.argv.includes("-h")) {
 }
 
 // Run the script
-if (require.main === module) {
+// Updated to use ES module equivalent for checking if this is the main module (replaces CommonJS require.main === module)
+if (import.meta.url === `file://${process.argv[1]}`) {
     main();
 }
 

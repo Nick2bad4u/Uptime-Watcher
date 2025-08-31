@@ -5,8 +5,8 @@
  * through the project and renames files
  */
 
-import { readdirSync, renameSync } from "fs";
-import { parse, join, resolve } from "path";
+import { readdirSync, renameSync } from "node:fs";
+import path from "node:path";
 
 /**
  * Convert PascalCase string to camelCase
@@ -34,12 +34,12 @@ function pascalToCamelCase(str) {
  */
 function isPascalCase(filename) {
     // Get filename without extension
-    const nameWithoutExt = parse(filename).name;
+    const nameWithoutExt = path.parse(filename).name;
 
     // Check if it starts with uppercase and contains at least one more uppercase letter
     return (
         /^[A-Z][a-z]*[A-Z]/.test(nameWithoutExt) ||
-        /^[A-Z][A-Z]/.test(nameWithoutExt) ||
+        /^[A-Z]{2}/.test(nameWithoutExt) ||
         /^[A-Z][a-z]+$/.test(nameWithoutExt)
     );
 }
@@ -54,7 +54,7 @@ function processDirectory(dirPath, dryRun = false) {
     const entries = readdirSync(dirPath, { withFileTypes: true });
 
     for (const entry of entries) {
-        const fullPath = join(dirPath, entry.name);
+        const fullPath = path.join(dirPath, entry.name);
 
         if (entry.isDirectory()) {
             // Skip node_modules, .git, dist folders, etc.
@@ -72,27 +72,25 @@ function processDirectory(dirPath, dryRun = false) {
                 continue;
             }
             processDirectory(fullPath, dryRun);
-        } else if (entry.isFile()) {
-            // Check if filename is PascalCase
-            if (isPascalCase(entry.name)) {
-                const parsed = parse(entry.name);
-                const newName = pascalToCamelCase(parsed.name) + parsed.ext;
-                const newPath = join(dirPath, newName);
+        } else if (
+            entry.isFile() && // Check if filename is PascalCase
+            isPascalCase(entry.name)
+        ) {
+            const parsed = path.parse(entry.name);
+            const newName = pascalToCamelCase(parsed.name) + parsed.ext;
+            const newPath = path.join(dirPath, newName);
 
-                if (dryRun) {
-                    console.log(`Would rename: ${fullPath} → ${newPath}`);
-                } else {
-                    try {
-                        renameSync(fullPath, newPath);
-                        console.log(`Renamed: ${entry.name} → ${newName}`);
-                    } catch (error) {
-                        console.error(
-                            `Error renaming ${fullPath}:`,
-                            error instanceof Error
-                                ? error.message
-                                : String(error)
-                        );
-                    }
+            if (dryRun) {
+                console.log(`Would rename: ${fullPath} → ${newPath}`);
+            } else {
+                try {
+                    renameSync(fullPath, newPath);
+                    console.log(`Renamed: ${entry.name} → ${newName}`);
+                } catch (error) {
+                    console.error(
+                        `Error renaming ${fullPath}:`,
+                        error instanceof Error ? error.message : String(error)
+                    );
                 }
             }
         }
@@ -105,7 +103,7 @@ function processDirectory(dirPath, dryRun = false) {
 function main() {
     const args = process.argv.slice(2);
     const dryRun = args.includes("--dry-run") || args.includes("-d");
-    const projectRoot = resolve(__dirname, "..");
+    const projectRoot = path.resolve(import.meta.dirname, "..");
 
     console.log(
         `Converting PascalCase filenames to camelCase in: ${projectRoot}`
@@ -136,7 +134,7 @@ function main() {
 }
 
 // Run the script
-if (require.main === module) {
+if (process.argv[1] === import.meta.filename) {
     main();
 }
 

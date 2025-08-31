@@ -10,12 +10,10 @@
  * --pattern, -p Glob pattern for test files --help, -h Show this help message
  */
 
-import { readFileSync, writeFileSync, readdirSync, statSync } from "fs";
-import { join, dirname, resolve } from "path";
-import { fileURLToPath } from "url";
+import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
+import path from "node:path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = import.meta.dirname;
 
 // Command line argument parsing
 const args = process.argv.slice(2);
@@ -68,21 +66,21 @@ function fixFileQuotes(filePath) {
         const fixPatterns = [
             // Fix escaped quotes in test names
             {
-                find: /it\("should return \\"([^"]+)\\" for ([^"]+)", async \(\{/g,
-                replace: 'it("should return \\"$1\\" for $2", async ({',
+                find: /it\("should return \\"(?<temp2>[^"]+)\\" for (?<temp1>[^"]+)", async \({/g,
+                replace: String.raw`it("should return \"$1\" for $2", async ({`,
             },
             {
-                find: /it\('should return "([^"]+)" for ([^']+)', async \(\{/g,
+                find: /it\('should return "(?<temp2>[^"]+)" for (?<temp1>[^']+)', async \({/g,
                 replace: "it('should return \"$1\" for $2', async ({",
             },
             // Fix unterminated string literals
             {
-                find: /it\("([^"]*)"([^"]*)"([^"]*)", async \(\{/g,
-                replace: 'it("$1\\"$2\\"$3", async ({',
+                find: /it\("(?<temp3>[^"]*)"(?<temp2>[^"]*)"(?<temp1>[^"]*)", async \({/g,
+                replace: String.raw`it("$1\"$2\"$3", async ({`,
             },
             // Fix mixed quote issues
             {
-                find: /it\("([^"]*)'([^"]*)", async \(\{/g,
+                find: /it\("(?<temp2>[^"]*)'(?<temp1>[^"]*)", async \({/g,
                 replace: 'it("$1\'$2", async ({',
             },
             // Fix unnecessary escape characters
@@ -93,7 +91,7 @@ function fixFileQuotes(filePath) {
             // Fix double escaped quotes
             {
                 find: /\\\\"/g,
-                replace: '\\"',
+                replace: String.raw`\"`,
             },
         ];
 
@@ -107,8 +105,8 @@ function fixFileQuotes(filePath) {
 
         // Additional fixes for specific syntax errors
         // Fix incomplete string patterns
-        content = content.replace(
-            /should return "([^"]+)" for ([^",)]+)"/g,
+        content = content.replaceAll(
+            /should return "(?<temp2>[^"]+)" for (?<temp1>[^"),]+)"/g,
             'should return "$1" for $2'
         );
 
@@ -121,11 +119,10 @@ function fixFileQuotes(filePath) {
             if (options.dryRun) {
                 console.log(`🔍 [DRY RUN] Would fix quotes in: ${filePath}`);
                 return true;
-            } else {
-                writeFileSync(filePath, content);
-                console.log(`✅ Fixed quotes in: ${filePath}`);
-                return true;
             }
+            writeFileSync(filePath, content);
+            console.log(`✅ Fixed quotes in: ${filePath}`);
+            return true;
         }
 
         console.log(`📝 No quote issues found: ${filePath}`);
@@ -154,7 +151,7 @@ function findTestFiles(dir, pattern) {
         const items = readdirSync(dir);
 
         for (const item of items) {
-            const itemPath = join(dir, item);
+            const itemPath = path.join(dir, item);
             const stat = statSync(itemPath);
 
             if (
@@ -190,7 +187,7 @@ function main() {
     console.log(`🔍 Mode: ${options.dryRun ? "DRY RUN" : "EXECUTE"}`);
     console.log("");
 
-    const projectRoot = resolve(__dirname, "..");
+    const projectRoot = path.resolve(__dirname, "..");
     const testFiles = findTestFiles(projectRoot, options.pattern);
 
     console.log(`📊 Found ${testFiles.length} test files`);
