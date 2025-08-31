@@ -7,14 +7,161 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[b0b0256](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0b0256998efcbcf76329ca61001ed90077b574f)...
-[b0b0256](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0b0256998efcbcf76329ca61001ed90077b574f)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b0b0256998efcbcf76329ca61001ed90077b574f...b0b0256998efcbcf76329ca61001ed90077b574f))
+[[387beac](https://github.com/Nick2bad4u/Uptime-Watcher/commit/387beac82a8b5120690be3aa66ca3972e2381aa4)...
+[387beac](https://github.com/Nick2bad4u/Uptime-Watcher/commit/387beac82a8b5120690be3aa66ca3972e2381aa4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/387beac82a8b5120690be3aa66ca3972e2381aa4...387beac82a8b5120690be3aa66ca3972e2381aa4))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 13.4.0 [`(387beac)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/387beac82a8b5120690be3aa66ca3972e2381aa4)
+
+
+
+
+
+
+## [13.4.0] - 2025-08-31
+
+
+[[de1fe78](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de1fe78b55bd9d2d7e418d99efb84cd7d576def8)...
+[6b7569c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6b7569c64aa93dc9c52c6d0ca4d24723cc5438f6)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/de1fe78b55bd9d2d7e418d99efb84cd7d576def8...6b7569c64aa93dc9c52c6d0ca4d24723cc5438f6))
+
+
+### ✨ Features
+
+- ✨ [feat] Enhance script portability, test verbosity, and ESLint config
+
+- Refactors all Node.js scripts to use native ESM imports (`node:`), `import.meta.dirname/filename`, and removes CommonJS `require` for improved cross-platform compatibility and future-proofing.
+ - Adds a comprehensive test verbosity guide and introduces new npm script variants for quiet, minimal, verbose, and detailed test output, including coverage and documentation test scripts, enabling easier control over test output for CI, debugging, and development.
+ - Updates ESLint configuration with a dedicated scripts section, relaxing rules for benchmarks and scripts, and expands ignore patterns to better match project structure.
+ - Improves npm script memory usage for ESLint by setting `NODE_OPTIONS=--max_old_space_size=16384` via `cross-env`.
+ - Adds TypeScript configuration for scripts, enabling type checking and linting for all script files.
+ - Updates shell prompt configuration for more informative OhMyPosh segments.
+ - Cleans up code style in scripts, improves error handling, and modernizes regular expressions to use named capture groups and `replaceAll`.
+ - Updates documentation authorship attribution where appropriate.
+
+Relates to overall project workflow, developer experience, and maintainability improvements.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(06acc95)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/06acc95d8e0d99acc1cb8b15139b495c0bc351b4)
+
+
+- Implement Chart.js tree-shaking optimization [`(4e4982a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e4982a34fc6b2e14ae54ec31a4de56dd0579523)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Improve error handling and env usage in scripts
+
+- Enhances robustness of scripts by consistently handling errors using type checks and clear messaging.
+- Standardizes environment variable access via bracket notation, improving reliability across platforms.
+- Refines type annotations, code comments, and intentional error condition tests for better readability and maintainability.
+- Updates configuration to relax TypeScript strictness for script testing, reducing false positives.
+- Minor refactors in test code to avoid unused imports and clarify intention.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(cf4d137)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cf4d13710cbbf1657e0e41cb151ce59f78c55812)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update crate-ci/typos in the github-actions group (#59) [`(c129d09)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c129d095963e44c80197d6bd20a769bcb8ecd7a8)
+
+
 - [dependency] Update version 13.3.0 [`(b0b0256)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0b0256998efcbcf76329ca61001ed90077b574f)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Adopt readonly types and modern React imports
+
+- Updates most array and object properties across types, interfaces, and function signatures to use readonly variants for improved type safety and immutability.
+- Refactors React component imports to prefer named imports of types (e.g., ReactNode, NamedExoticComponent, FC) and functional utilities (e.g., memo), removing unused default imports and aligning with modern best practices.
+- Replaces plain error variable types in test suites with unknown for stricter error handling.
+- Cleans up test cases to use assertions over console logging, improving test clarity and maintainability.
+- Ensures consistent usage of undefined-coalescing (??) for more robust fallback handling.
+- Improves consistency and future-proofing of type usage throughout codebase, reducing risk of accidental mutations and making code more maintainable.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(de1fe78)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/de1fe78b55bd9d2d7e418d99efb84cd7d576def8)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Refactors TypeFest API documentation to enhance code clarity and consistency
+
+- Migrates all TypeFest API docs to use Markdown code blocks with explicit language tags, improving readability and IDE syntax highlighting.
+- Cleans up formatting, restructures type definitions, and standardizes code examples for better maintainability and easier navigation.
+- Updates summary logs to reflect new file hashes and revision status.
+- Documents missing file errors for traceability.
+- Prepares documentation for future automated parsing and improved developer onboarding.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dc029bd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dc029bd097073dc1883f8381ff756e0fb56e59f9)
+
+
+- 📝 [docs] Add TypeFest package documentation and type API references
+
+- Introduces comprehensive documentation for the TypeFest package, including detailed API docs for all type utilities, usage examples, and explanations of alternative type names and declined additions.
+- Documents built-in TypeScript utility types for user reference and clarifies their relationship to TypeFest types.
+- Records synchronization logs for TypeFest documentation syncs and hash tracking to ensure file integrity.
+- Provides markdown-based type definitions for all included TypeFest utilities, supporting advanced TypeScript use cases such as deep partials, type guards, and template literal manipulation.
+- Fixes previous failed validation of one file by ensuring all API reference files are present and validated.
+- Facilitates discoverability and usability for developers integrating TypeFest types in complex TypeScript projects.
+
+Relates to #TypeFestDocsSync
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dcc2432)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dcc2432c094c43369477a3f059fda0f6e5e2ee5d)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improve error message formatting and code consistency
+
+- Enhances readability by splitting long error message assignments across multiple lines in scripts and tests.
+- Updates formatting for array iteration blocks to follow consistent code style.
+- Reformats JSON configuration for improved clarity and maintainability.
+- Aims to reduce visual clutter and make future edits easier.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6b7569c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6b7569c64aa93dc9c52c6d0ca4d24723cc5438f6)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Improve edge case coverage, formatting, and store tests
+
+- Enhances test coverage for edge cases, store utilities, and constants by adding missing branches, error conditions, and integration scenarios.
+- Refactors test formatting for readability, consistency, and maintainability, including indentation and line breaks for complex assertions and object structures.
+- Adds and updates VS Code extension recommendations to support development and code review workflows.
+- Removes unused TypeScript native-preview dependencies to streamline package management and reduce install size.
+- Updates documentation and optimization summaries for accuracy, consistency, and clarity.
+- Addresses minor code style and formatting in scripts and CSS for improved readability and maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d9d774c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d9d774c861fcd9411513e8426d02f498b82f3b56)
+
+
+- 🧪 [test] Achieve 100% coverage for utilities and core logic
+
+- Adds comprehensive edge case and boundary tests for utility functions, store patterns, constants, and form logic
+- Replaces deprecated chart setup module and tests with improved tree-shaking and component-based registration
+- Updates and optimizes code for safer property checks and suppresses unnecessary linter disables
+- Expands CI/dev scripts for safer git operations and branch management
+- [dependency] Updates and adds dev dependencies for markdown tooling and charting
+- Improves accessibility and a11y compliance in UI form components
+- Fixes test logic to ensure stable assertions under timing-sensitive scenarios
+Relates to coverage improvement and maintainability
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7615a57)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7615a572356a629d264b8b428334bee2c595e166)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v13.3.0 [skip ci] [`(787ad44)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/787ad440976cb28e031c58a04b7d3951fc6de1df)
 
 
 
