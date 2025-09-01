@@ -7,14 +7,90 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[3788605](https://github.com/Nick2bad4u/Uptime-Watcher/commit/378860526e708da3217e4de1c80c3f53f5a51609)...
+[3788605](https://github.com/Nick2bad4u/Uptime-Watcher/commit/378860526e708da3217e4de1c80c3f53f5a51609)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/378860526e708da3217e4de1c80c3f53f5a51609...378860526e708da3217e4de1c80c3f53f5a51609))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 13.5.0 [`(3788605)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/378860526e708da3217e4de1c80c3f53f5a51609)
+
+
+
+
+
+
+## [13.5.0] - 2025-09-01
+
+
 [[387beac](https://github.com/Nick2bad4u/Uptime-Watcher/commit/387beac82a8b5120690be3aa66ca3972e2381aa4)...
-[387beac](https://github.com/Nick2bad4u/Uptime-Watcher/commit/387beac82a8b5120690be3aa66ca3972e2381aa4)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/387beac82a8b5120690be3aa66ca3972e2381aa4...387beac82a8b5120690be3aa66ca3972e2381aa4))
+[3198a49](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3198a49f4bede2314be768b0f29e01df9d379827)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/387beac82a8b5120690be3aa66ca3972e2381aa4...3198a49f4bede2314be768b0f29e01df9d379827))
+
+
+### ✨ Features
+
+- ✨ [feat] Enhance OhMyPosh theme for richer prompt UX
+
+- Introduces improved visual styling, expanded mapped locations, and advanced segment configurations for greater customization and clarity
+- Adds caching, tooltips, and new properties to segments for better performance and context-aware details
+- Refines prompt alignment, overflow handling, and shell integration to support modern terminal features
+- Updates upgrade source and various templates for more accurate status and transient prompts
+- Aims to deliver a more responsive, informative, and visually appealing shell experience
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5311ad7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5311ad783c0112f950d6a3491bc4b7c599431b44)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 13.4.0 [`(387beac)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/387beac82a8b5120690be3aa66ca3972e2381aa4)
+
+
+
+### 🛠️ Other Changes
+
+- Merge PR #57
+
+chore: format code with Prettier [skip-ci] [`(3198a49)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3198a49f4bede2314be768b0f29e01df9d379827)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Standardize segment min width and output overflow
+
+- Unifies segment appearance by ensuring consistent minimum width values throughout all relevant sections.
+- Adjusts output overflow handling from 'break' to 'hide' for improved visual consistency.
+- Removes unnecessary max width and tidies up segment option order.
+- Enhances prompt layout reliability on varied terminal sizes.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7b488e5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b488e5667a1cfe71de4be949ff7b43936deab5e)
+
+
+
+### 🧹 Chores
+
+- Format code with Prettier [skip-ci] [`(385553d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/385553d36d5f1ea6c859df548eb847bd1790ebcd)
+
+
+- Update changelogs for v13.4.0 [skip ci] [`(3e1ea66)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3e1ea666253d00c3c9defa91304b9a91b199befe)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update SQLite WASM management and dependencies
+
+- Improves the WASM download script with upstream version tracking, update checking, and flexible hash verification.
+- Adds support for update-related CLI flags and automatic version file management for easier maintenance.
+- Updates dependencies to latest versions, including spell checker, ESLint, and testing tools for compatibility and bug fixes.
+- Refines test and type-check npm scripts for consistency and improved usability.
+- Expands custom word list for spell checking.
+- Removes obsolete dependencies and aligns package management with upstream changes.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d67aed4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d67aed43e3487ae0d9d5971408018dc2b384c9aa)
 
 
 
