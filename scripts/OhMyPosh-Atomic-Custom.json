@@ -14,7 +14,6 @@
                     },
                     "foreground": "#ffffff",
                     "leading_diamond": "╭─",
-                    "max_width": 200,
                     "min_width": 80,
                     "properties": {
                         "mapped_shell_names": {
@@ -34,6 +33,7 @@
                 {
                     "background": "#ef5350",
                     "foreground": "#FFFB38",
+                    "min_width": 80,
                     "style": "diamond",
                     "template": "<parentBackground></>  ",
                     "type": "root"
@@ -41,6 +41,7 @@
                 {
                     "background": "#FF9248",
                     "foreground": "#2d3436",
+                    "min_width": 80,
                     "powerline_symbol": "",
                     "properties": {
                         "edge_format": "%s",
@@ -87,6 +88,7 @@
                         ".*/.*",
                         "~/.*"
                     ],
+                    "min_width": 80,
                     "powerline_symbol": "",
                     "properties": {
                         "branch_icon": "  ",
@@ -120,6 +122,7 @@
                         "strategy": "session"
                     },
                     "foreground": "#ffffff",
+                    "min_width": 80,
                     "properties": {
                         "style": "roundrock",
                         "threshold": 0
@@ -135,6 +138,7 @@
                         "{{ if .Error }}#890000{{ end }}"
                     ],
                     "foreground": "#000000",
+                    "min_width": 80,
                     "properties": {
                         "always_enabled": false
                     },
@@ -152,7 +156,7 @@
         {
             "alignment": "right",
             "filler": "",
-            "overflow": "break",
+            "overflow": "hide",
             "segments": [
                 {
                     "background": "#437683",
@@ -259,8 +263,9 @@
                 {
                     "background": "#2f3b45",
                     "foreground": "#cfd8dc",
-                    "leading_diamond": "",
                     "invert_powerline": true,
+                    "leading_diamond": "",
+                    "min_width": 80,
                     "properties": {
                         "always_enabled": true
                     },
@@ -276,6 +281,7 @@
                         "strategy": "session"
                     },
                     "foreground": "#111111",
+                    "min_width": 80,
                     "properties": {
                         "cache_duration": "24h"
                     },
@@ -284,17 +290,18 @@
                 },
                 {
                     "background": "#ffff66",
-                    "foreground": "#111111",
-                    "style": "diamond",
-                    "leading_diamond": "",
-                    "trailing_diamond": "",
-                    "invert_powerline": true,
-                    "template": "",
-                    "type": "root",
                     "cache": {
                         "duration": "1m",
                         "strategy": "session"
-                    }
+                    },
+                    "foreground": "#111111",
+                    "invert_powerline": true,
+                    "leading_diamond": "",
+                    "min_width": 80,
+                    "style": "diamond",
+                    "template": "",
+                    "trailing_diamond": "",
+                    "type": "root"
                 }
             ],
             "type": "rprompt"
@@ -305,6 +312,7 @@
             "segments": [
                 {
                     "foreground": "#21c7c7",
+                    "min_width": 80,
                     "style": "plain",
                     "template": "╰─",
                     "type": "text"
