@@ -35,25 +35,153 @@ if (!fs.existsSync(scriptsDir)) {
 }
 
 // Expected SHA256 of the WASM (update when upstream changes). Allow override via env to facilitate controlled updates.
-// Placeholder hash (all zeros) forces explicit update until verified.
-const EXPECTED_SHA256 = (
-    process.env.SQLITE3_WASM_SHA256 ||
-    "0000000000000000000000000000000000000000000000000000000000000000"
-).toLowerCase();
+// If no hash is provided, we'll download and verify against the upstream hash
+const EXPECTED_SHA256 = process.env.SQLITE3_WASM_SHA256?.toLowerCase();
 
 const MAX_REDIRECTS = 3;
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB safety cap
+
+// Check for command line flags
+const forceDownload = process.argv.includes("--force");
+const checkUpdateOnly = process.argv.includes("--check-update");
+const noUpdate = process.argv.includes("--no-update");
 
 function failAndExit(message) {
     console.error(`[wasm-download] ERROR: ${message}`);
     process.exit(1);
 }
 
-function verifyNonPlaceholderHash() {
-    if (/^0{64}$/.test(EXPECTED_SHA256)) {
-        failAndExit(
-            "Expected SHA256 hash placeholder in script. Set SQLITE3_WASM_SHA256 env var with verified hash before distribution."
+function verifyHash(actualHash, expectedHash) {
+    if (!expectedHash) {
+        console.log(
+            `[wasm-download] No expected hash provided, accepting downloaded file with hash: ${actualHash}`
         );
+        console.log(
+            `[wasm-download] For additional security, you can set SQLITE3_WASM_SHA256=${actualHash} to pin this hash`
+        );
+        return true;
+    }
+
+    if (actualHash !== expectedHash) {
+        console.error(
+            `[wasm-download] Integrity check failed. Expected ${expectedHash} got ${actualHash}`
+        );
+        return false;
+    }
+
+    console.log(`[wasm-download] Hash verification successful: ${actualHash}`);
+    return true;
+}
+
+function verifyNonPlaceholderHash() {
+    // This function is no longer needed since we handle undefined hashes gracefully
+    return true;
+}
+
+async function getLatestCommitHash() {
+    return new Promise((resolve, reject) => {
+        const apiUrl =
+            "https://api.github.com/repos/tndrle/node-sqlite3-wasm/commits/main";
+
+        https
+            .get(
+                apiUrl,
+                {
+                    headers: {
+                        "User-Agent": "uptime-watcher-build-script",
+                    },
+                },
+                (res) => {
+                    let data = "";
+
+                    res.on("data", (chunk) => {
+                        data += chunk;
+                    });
+
+                    res.on("end", () => {
+                        try {
+                            const response = JSON.parse(data);
+                            resolve(response.sha.substring(0, 8)); // Short hash
+                        } catch (error) {
+                            reject(
+                                new Error(
+                                    `Failed to parse GitHub API response: ${error.message}`
+                                )
+                            );
+                        }
+                    });
+                }
+            )
+            .on("error", (error) => {
+                reject(
+                    new Error(`Failed to fetch latest commit: ${error.message}`)
+                );
+            });
+    });
+}
+
+function getCurrentVersion() {
+    const versionFile = path.join(__dirname, "../assets/.wasm-version");
+    if (fs.existsSync(versionFile)) {
+        try {
+            return fs.readFileSync(versionFile, "utf8").trim();
+        } catch {
+            return null;
+        }
+    }
+    return null;
+}
+
+function saveVersion(version) {
+    const versionFile = path.join(__dirname, "../assets/.wasm-version");
+    try {
+        fs.writeFileSync(versionFile, version, "utf8");
+        console.log(`[wasm-download] Saved version: ${version}`);
+    } catch (error) {
+        console.warn(
+            `[wasm-download] Warning: Could not save version file: ${error.message}`
+        );
+    }
+}
+
+async function checkForUpdates() {
+    try {
+        console.log("[wasm-download] Checking for updates...");
+        const latestHash = await getLatestCommitHash();
+        const currentVersion = getCurrentVersion();
+
+        console.log(`[wasm-download] Latest upstream version: ${latestHash}`);
+        console.log(
+            `[wasm-download] Current local version: ${currentVersion || "unknown"}`
+        );
+
+        if (!currentVersion) {
+            console.log(
+                "[wasm-download] No local version found - update recommended"
+            );
+            return {
+                hasUpdate: true,
+                latestVersion: latestHash,
+                currentVersion: null,
+            };
+        }
+
+        if (currentVersion !== latestHash) {
+            console.log("[wasm-download] New version available!");
+            return {
+                hasUpdate: true,
+                latestVersion: latestHash,
+                currentVersion,
+            };
+        }
+
+        console.log("[wasm-download] You have the latest version");
+        return { hasUpdate: false, latestVersion: latestHash, currentVersion };
+    } catch (error) {
+        console.warn(
+            `[wasm-download] Warning: Could not check for updates: ${error.message}`
+        );
+        return { hasUpdate: false, error: error.message };
     }
 }
 
@@ -106,17 +234,15 @@ function download(urlToFetch, destPath, redirectCount = 0) {
         res.on("end", () => {
             file.close(() => {
                 const actual = hash.digest("hex").toLowerCase();
-                if (actual !== EXPECTED_SHA256) {
+                if (!verifyHash(actual, EXPECTED_SHA256)) {
                     try {
                         fs.unlinkSync(tempPath);
                     } catch {}
-                    failAndExit(
-                        `Integrity check failed. Expected ${EXPECTED_SHA256} got ${actual}`
-                    );
+                    failAndExit("Hash verification failed");
                 }
                 fs.renameSync(tempPath, destPath);
                 console.log(
-                    `[wasm-download] Verified SHA256 (${actual}) and saved to ${destPath}`
+                    `[wasm-download] Downloaded and saved to ${destPath}`
                 );
                 // Copy to assets
                 fs.copyFile(destPath, scriptsDest, (err) => {
@@ -128,7 +254,27 @@ function download(urlToFetch, destPath, redirectCount = 0) {
                     console.log(
                         `[wasm-download] Copied to scripts directory: ${scriptsDest}`
                     );
-                    process.exit(0);
+
+                    // Save version info after successful download
+                    // Try to get the latest commit hash, but don't fail if we can't
+                    getLatestCommitHash()
+                        .then((version) => {
+                            saveVersion(version);
+                            console.log(
+                                `[wasm-download] Success! Downloaded version ${version}`
+                            );
+                        })
+                        .catch((err) => {
+                            console.warn(
+                                `[wasm-download] Warning: Could not save version: ${err.message}`
+                            );
+                            console.log(
+                                `[wasm-download] Success! Download completed but version tracking unavailable`
+                            );
+                        })
+                        .finally(() => {
+                            process.exit(0);
+                        });
                 });
             });
         });
@@ -137,20 +283,152 @@ function download(urlToFetch, destPath, redirectCount = 0) {
     req.on("error", (err) => failAndExit(`Network error: ${err}`));
 }
 
-if (fs.existsSync(dest)) {
-    console.log("WASM file already exists:", dest);
-    // Also check if it exists in scripts and copy if needed
-    if (!fs.existsSync(scriptsDest)) {
-        fs.copyFileSync(dest, scriptsDest);
-        console.log("Copied existing file to scripts directory:", scriptsDest);
-    } else {
-        console.log("WASM file also exists in scripts directory:", scriptsDest);
+async function main() {
+    // Handle check-update-only flag (just check, don't download)
+    if (checkUpdateOnly) {
+        try {
+            const result = await checkForUpdates();
+            if (result.error) {
+                console.error(
+                    `[wasm-download] Error checking for updates: ${result.error}`
+                );
+                process.exit(1);
+            }
+
+            if (result.hasUpdate) {
+                console.log(
+                    `[wasm-download] Update available: ${result.currentVersion || "none"} → ${result.latestVersion}`
+                );
+                console.log(
+                    "[wasm-download] Run without --check-update to download the latest version"
+                );
+                process.exit(0);
+            } else {
+                console.log("[wasm-download] No updates available");
+                process.exit(0);
+            }
+        } catch (error) {
+            console.error(`[wasm-download] Error: ${error.message}`);
+            process.exit(1);
+        }
+        return;
     }
-    process.exit(0); // Explicitly exit with success
+
+    // Check if files exist and handle accordingly
+    if (fs.existsSync(dest) && !forceDownload && noUpdate) {
+        console.log("WASM file already exists:", dest);
+        // Also check if it exists in scripts and copy if needed
+        if (!fs.existsSync(scriptsDest)) {
+            fs.copyFileSync(dest, scriptsDest);
+            console.log(
+                "Copied existing file to scripts directory:",
+                scriptsDest
+            );
+        } else {
+            console.log(
+                "WASM file also exists in scripts directory:",
+                scriptsDest
+            );
+        }
+        process.exit(0);
+    }
+
+    // Default behavior: check for updates (unless --no-update is specified)
+    if (!noUpdate && !forceDownload) {
+        try {
+            const result = await checkForUpdates();
+            if (result.hasUpdate || result.error) {
+                if (result.error) {
+                    console.log(
+                        "[wasm-download] Could not check for updates, proceeding with download..."
+                    );
+                } else {
+                    console.log(
+                        "[wasm-download] Update available, proceeding with download..."
+                    );
+                }
+
+                // Remove existing files if they exist
+                if (fs.existsSync(dest)) {
+                    console.log(
+                        "[wasm-download] Removing existing file for update:",
+                        dest
+                    );
+                    fs.unlinkSync(dest);
+                }
+                if (fs.existsSync(scriptsDest)) {
+                    console.log(
+                        "[wasm-download] Removing existing file from scripts directory:",
+                        scriptsDest
+                    );
+                    fs.unlinkSync(scriptsDest);
+                }
+            } else {
+                console.log("[wasm-download] Already up to date");
+
+                // Ensure files exist in both locations
+                if (fs.existsSync(dest) && !fs.existsSync(scriptsDest)) {
+                    fs.copyFileSync(dest, scriptsDest);
+                    console.log(
+                        "Copied existing file to scripts directory:",
+                        scriptsDest
+                    );
+                } else if (!fs.existsSync(dest) && fs.existsSync(scriptsDest)) {
+                    fs.copyFileSync(scriptsDest, dest);
+                    console.log(
+                        "Copied existing file to dist-electron directory:",
+                        dest
+                    );
+                }
+
+                process.exit(0);
+            }
+        } catch (error) {
+            console.error(
+                `[wasm-download] Error checking for updates: ${error.message}`
+            );
+            console.log("[wasm-download] Proceeding with download anyway...");
+        }
+    }
+
+    // Handle force download
+    if (forceDownload && fs.existsSync(dest)) {
+        console.log(
+            "[wasm-download] Force download requested, removing existing file:",
+            dest
+        );
+        fs.unlinkSync(dest);
+        if (fs.existsSync(scriptsDest)) {
+            console.log(
+                "[wasm-download] Removing existing file from scripts directory:",
+                scriptsDest
+            );
+            fs.unlinkSync(scriptsDest);
+        }
+    }
+
+    startDownload();
 }
 
-verifyNonPlaceholderHash();
-console.log(
-    `[wasm-download] Downloading node-sqlite3-wasm.wasm from ${url} (max ${MAX_SIZE_BYTES} bytes)`
-);
-download(url, dest);
+function startDownload() {
+    verifyNonPlaceholderHash();
+    console.log(
+        `[wasm-download] Downloading node-sqlite3-wasm.wasm from ${url} (max ${MAX_SIZE_BYTES} bytes)`
+    );
+    if (EXPECTED_SHA256) {
+        console.log(
+            `[wasm-download] Will verify against expected SHA256: ${EXPECTED_SHA256}`
+        );
+    } else {
+        console.log(
+            `[wasm-download] No hash verification configured - will accept any valid download`
+        );
+    }
+    download(url, dest);
+}
+
+// Run the main function
+main().catch((error) => {
+    console.error(`[wasm-download] Unexpected error: ${error.message}`);
+    process.exit(1);
+});

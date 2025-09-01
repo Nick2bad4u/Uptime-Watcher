@@ -270,3 +270,13 @@ unsubscribers
 vdom
 vnode
 vnodes
+Intented
+amed
+atx
+cxxflags
+dri
+gio
+gtk
+sess
+xdg
+xlarge
