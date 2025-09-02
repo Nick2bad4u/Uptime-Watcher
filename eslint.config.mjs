@@ -197,6 +197,7 @@ export default [
             ".github/ISSUE_TEMPLATE/**",
             ".github/prompts/**",
             ".github/PULL_REQUEST_TEMPLATE/**",
+            ".stryker-tmp/**",
             "**/_ZENTASKS*",
             "**/.agentic-tools*",
             "**/.cache",
@@ -211,7 +212,6 @@ export default [
             "**/node_modules/**",
             "**/package-lock.json",
             "**/release/**",
-            "**/shared/**",
             "CHANGELOG.md",
             "coverage-report.json",
             "Coverage/",
@@ -230,7 +230,6 @@ export default [
             "node_modules/**",
             "release/",
             "report/**",
-            "shared/",
             // "config/testing/vitest.electron.config.ts", // Ignore vitest electron config
             // "config/testing/vitest.shared.config.ts", // Ignore vitest shared config
             // "vite.config.ts", // Ignore vite config due to parsing issues

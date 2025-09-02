@@ -556,3 +556,4 @@ repomix-output.xml
 
 # Instructions for Copilot
 .github/instructions/
+.stryker-tmp/

@@ -70,6 +70,7 @@
     "files.exclude": {
         "**/.husky/**": true,
         "**/.nyc_output/**": true,
+        "**/.stryker-tmp/**": true,
         "**/coverage/**": true,
         "**/dist-bench/**": true,
         "**/dist-electron-test/**": true,
@@ -93,6 +94,7 @@
     "files.watcherExclude": {
         "**/.husky/**": true,
         "**/.nyc_output/**": true,
+        "**/.stryker-tmp/**": true,
         "**/coverage/**": true,
         "**/dist-electron/**": true,
         "**/dist-scripts-test/**": true,
