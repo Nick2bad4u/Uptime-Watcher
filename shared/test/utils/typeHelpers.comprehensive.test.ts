@@ -39,9 +39,7 @@ describe("Shared Type Helpers", () => {
             await annotate("Operation: Validated Casting", "operation");
 
             const response = { data: "test" };
-            const validator = (val: unknown): val is { data: string } => {
-                return typeof val === "object" && val !== null && "data" in val;
-            };
+            const validator = (val: unknown): val is { data: string } => typeof val === "object" && val !== null && "data" in val;
 
             const result = castIpcResponse(response, validator);
             expect(result).toEqual({ data: "test" });
@@ -56,9 +54,7 @@ describe("Shared Type Helpers", () => {
             await annotate("Operation: Validation Failure", "operation");
 
             const response = "invalid";
-            const validator = (val: unknown): val is { data: string } => {
-                return typeof val === "object" && val !== null && "data" in val;
-            };
+            const validator = (val: unknown): val is { data: string } => typeof val === "object" && val !== null && "data" in val;
 
             expect(() => castIpcResponse(response, validator)).toThrow(
                 "IPC response validation failed"

@@ -551,7 +551,7 @@ describe("validatorUtils", () => {
             expect(isValidPort(80)).toBe(true);
             expect(isValidPort(443)).toBe(true);
             expect(isValidPort(1)).toBe(true);
-            expect(isValidPort(65535)).toBe(true);
+            expect(isValidPort(65_535)).toBe(true);
             expect(isValidPort(8080)).toBe(true);
         });
 
@@ -591,8 +591,8 @@ describe("validatorUtils", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isValidPort(-1)).toBe(false);
-            expect(isValidPort(65536)).toBe(false);
-            expect(isValidPort(70000)).toBe(false);
+            expect(isValidPort(65_536)).toBe(false);
+            expect(isValidPort(70_000)).toBe(false);
         });
 
         it("should return false for invalid port strings", async ({
@@ -675,7 +675,7 @@ describe("validatorUtils", () => {
             await annotate("Type: Business Logic", "type");
 
             // Testing HTTP URLs for validation completeness
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+             
             expect(isValidUrl("http://example.com")).toBe(true);
         });
 
@@ -853,7 +853,7 @@ describe("validatorUtils", () => {
 
             expect(safeInteger("123", 0)).toBe(123);
             expect(safeInteger("-456", 0)).toBe(-456);
-            expect(safeInteger("999999", 0)).toBe(999999);
+            expect(safeInteger("999999", 0)).toBe(999_999);
         });
     });
 });

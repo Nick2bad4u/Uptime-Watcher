@@ -83,15 +83,11 @@ describe("Shared Utils Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const validateCacheKey = (key: string): boolean => {
-                return (
+            const validateCacheKey = (key: string): boolean => (
                     key.length > 0 && key.includes(":") && !key.includes(" ")
                 );
-            };
 
-            const normalizeCacheKey = (key: string): string => {
-                return key.toLowerCase().replaceAll(/\s+/g, "-");
-            };
+            const normalizeCacheKey = (key: string): string => key.toLowerCase().replaceAll(/\s+/g, "-");
 
             const generateCacheKey = (
                 prefix: string,
@@ -280,15 +276,13 @@ describe("Shared Utils Coverage", () => {
                 operation: string,
                 status: "started" | "completed" | "failed",
                 details?: any
-            ) => {
-                return {
+            ) => ({
                     category,
                     operation,
                     status,
                     details: details || {},
                     timestamp: Date.now(),
-                };
-            };
+                });
 
             expect(
                 createCategoryTemplate(
@@ -362,8 +356,7 @@ describe("Shared Utils Coverage", () => {
             const filterLogs = (
                 logs: LogTemplate[],
                 filter: LogFilter
-            ): LogTemplate[] => {
-                return logs.filter((log) => {
+            ): LogTemplate[] => logs.filter((log) => {
                     if (filter.level && !filter.level.includes(log.level))
                         return false;
                     if (
@@ -378,7 +371,6 @@ describe("Shared Utils Coverage", () => {
                         return false;
                     return true;
                 });
-            };
 
             const errorLogs = filterLogs(mockLogs, { level: ["error"] });
             expect(errorLogs).toHaveLength(1);
@@ -585,11 +577,7 @@ describe("Shared Utils Coverage", () => {
                 formatWithContext: (
                     template: string,
                     context: Record<string, any>
-                ) => {
-                    return template.replaceAll(/{(\w+)}/g, (match, key) => {
-                        return context[key]?.toString() || match;
-                    });
-                },
+                ) => template.replaceAll(/{(\w+)}/g, (match, key) => context[key]?.toString() || match),
             };
 
             expect(
@@ -634,11 +622,9 @@ describe("Shared Utils Coverage", () => {
                 },
                 truncateString: (str: string, maxLength: number): string => {
                     if (str.length <= maxLength) return str;
-                    return str.slice(0, Math.max(0, maxLength - 3)) + "...";
+                    return `${str.slice(0, Math.max(0, maxLength - 3))  }...`;
                 },
-                normalizeWhitespace: (str: string): string => {
-                    return str.replaceAll(/\s+/g, " ").trim();
-                },
+                normalizeWhitespace: (str: string): string => str.replaceAll(/\s+/g, " ").trim(),
             };
 
             expect(stringUtils.safeToString(null)).toBe("null");

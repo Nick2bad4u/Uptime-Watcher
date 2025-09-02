@@ -134,7 +134,7 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const obj = { a: 1, b: 2, c: 3 };
-            const results: Array<[string, unknown]> = [];
+            const results: [string, unknown][] = [];
 
             safeObjectIteration(obj, (key, value) => {
                 results.push([key, value]);
@@ -196,7 +196,7 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
 
             const symbolKey = Symbol("test");
             const obj = { [symbolKey]: "value", regular: "prop" };
-            const results: Array<[PropertyKey, unknown]> = [];
+            const results: [PropertyKey, unknown][] = [];
 
             safeObjectIteration(obj, (key, value) => {
                 results.push([key, value]);
@@ -290,7 +290,7 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
             const result = safeObjectOmit(obj, [symbolKey]);
 
             expect(result).toEqual({ regular: "prop" });
-            expect(Object.hasOwnProperty.call(result, symbolKey)).toBe(false);
+            expect(Object.hasOwn(result, symbolKey)).toBe(false);
         });
     });
 

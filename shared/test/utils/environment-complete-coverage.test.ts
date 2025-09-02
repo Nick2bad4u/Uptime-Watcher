@@ -19,8 +19,8 @@ import {
 } from "../../utils/environment";
 
 describe("shared/utils/environment.ts - Complete Function Coverage", () => {
-    const originalProcess = global.process;
-    const originalWindow = global.window;
+    const originalProcess = globalThis.process;
+    const originalWindow = globalThis.window;
 
     beforeEach(() => {
         // Reset global state before each test
@@ -29,19 +29,19 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
 
     afterEach(() => {
         // Restore original globals
-        global.process = originalProcess;
+        globalThis.process = originalProcess;
 
         // Delete any property descriptors that might prevent restoration
-        if (global.hasOwnProperty("window")) {
-            delete (global as any).window;
+        if (globalThis.hasOwnProperty("window")) {
+            delete (globalThis as any).window;
         }
-        if (global.hasOwnProperty("document")) {
-            delete (global as any).document;
+        if (globalThis.hasOwnProperty("document")) {
+            delete (globalThis as any).document;
         }
 
         // Restore original window if it existed
         if (originalWindow !== undefined) {
-            global.window = originalWindow;
+            globalThis.window = originalWindow;
         }
     });
 
@@ -59,7 +59,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Mock process with env
-            global.process = {
+            globalThis.process = {
                 env: {
                     NODE_ENV: "test",
                     CODECOV_TOKEN: "test-token",
@@ -82,7 +82,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = undefined as any;
+            globalThis.process = undefined as any;
             expect(getEnvVar("NODE_ENV")).toBeUndefined();
         });
 
@@ -99,7 +99,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Mock process that throws when accessing env
-            global.process = {
+            globalThis.process = {
                 get env() {
                     throw new Error("Access denied");
                 },
@@ -120,7 +120,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: {},
             } as any;
 
@@ -142,7 +142,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: { NODE_ENV: "production" },
             } as any;
 
@@ -161,7 +161,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: {},
             } as any;
 
@@ -180,7 +180,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = undefined as any;
+            globalThis.process = undefined as any;
             expect(getEnvironment()).toBe("unknown");
         });
     });
@@ -198,7 +198,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: { NODE_ENV: "test" },
             } as any;
 
@@ -217,7 +217,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: {},
             } as any;
 
@@ -236,7 +236,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = undefined as any;
+            globalThis.process = undefined as any;
             expect(getNodeEnv()).toBe("development");
         });
     });
@@ -254,8 +254,8 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.window = {} as any;
-            global.document = {} as any;
+            globalThis.window = {} as any;
+            globalThis.document = {} as any;
             expect(isBrowserEnvironment()).toBe(true);
         });
 
@@ -271,7 +271,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.window = undefined as any;
+            globalThis.window = undefined as any;
             expect(isBrowserEnvironment()).toBe(false);
         });
 
@@ -289,8 +289,8 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
 
             // Create a getter that throws - but isBrowserEnvironment doesn't use try/catch
             // so this test should actually fail, let's change the approach
-            delete (global as any).window;
-            delete (global as any).document;
+            delete (globalThis as any).window;
+            delete (globalThis as any).document;
 
             // Test with undefined which should return false
             expect(isBrowserEnvironment()).toBe(false);
@@ -310,7 +310,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: { NODE_ENV: "development" },
             } as any;
 
@@ -329,7 +329,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: { NODE_ENV: "production" },
             } as any;
 
@@ -348,7 +348,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: {},
             } as any;
 
@@ -367,7 +367,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = undefined as any;
+            globalThis.process = undefined as any;
             expect(isDevelopment()).toBe(false);
         });
     });
@@ -385,7 +385,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: {},
                 versions: { node: "18.0.0" },
             } as any;
@@ -405,7 +405,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = undefined as any;
+            globalThis.process = undefined as any;
             expect(isNodeEnvironment()).toBe(false);
         });
 
@@ -423,7 +423,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
 
             // Since isNodeEnvironment doesn't use try/catch, let's test a different scenario
             // Test with process that has no versions property
-            global.process = {
+            globalThis.process = {
                 env: {},
             } as any;
 
@@ -444,7 +444,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: { NODE_ENV: "production" },
             } as any;
 
@@ -463,7 +463,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: { NODE_ENV: "development" },
             } as any;
 
@@ -482,7 +482,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: {},
             } as any;
 
@@ -501,7 +501,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = undefined as any;
+            globalThis.process = undefined as any;
             expect(isProduction()).toBe(false);
         });
     });
@@ -519,7 +519,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: { NODE_ENV: "test" },
             } as any;
 
@@ -538,7 +538,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: { NODE_ENV: "production" },
             } as any;
 
@@ -557,7 +557,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: {},
             } as any;
 
@@ -576,7 +576,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = undefined as any;
+            globalThis.process = undefined as any;
             expect(isTest()).toBe(false);
         });
     });
@@ -594,7 +594,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: { NODE_ENV: "test" },
             } as any;
 
@@ -617,7 +617,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: { NODE_ENV: "" },
             } as any;
 
@@ -637,7 +637,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            global.process = {
+            globalThis.process = {
                 env: { NODE_ENV: "PRODUCTION" },
             } as any;
 

@@ -60,7 +60,7 @@ describe("Database Types - Missing Coverage", () => {
                 status: "up" as const,
                 monitoring: 1,
                 response_time: 100,
-                check_interval: 60000,
+                check_interval: 60_000,
                 timeout: 5000,
                 retry_attempts: 3,
                 last_checked: "not-a-number", // This should trigger the uncovered line
@@ -128,7 +128,7 @@ describe("Database Types - Missing Coverage", () => {
                 "not-a-timestamp",
             ];
 
-            testCases.forEach((invalidTimestamp) => {
+            for (const invalidTimestamp of testCases) {
                 const historyRow = {
                     id: 1,
                     monitor_id: "test-id",
@@ -139,7 +139,7 @@ describe("Database Types - Missing Coverage", () => {
                 };
 
                 expect(isValidHistoryRow(historyRow)).toBe(false);
-            });
+            }
         });
     });
 });

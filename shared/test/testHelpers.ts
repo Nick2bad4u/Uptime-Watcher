@@ -34,7 +34,7 @@ export const createValidMonitor = (
     checkInterval: 30_000,
     history: [],
     host: "example.com",
-    id: "test-monitor-" + Math.random().toString(36).slice(2, 11),
+    id: `test-monitor-${  Math.random().toString(36).slice(2, 11)}`,
     lastChecked: new Date(),
     monitoring: true,
     port: 80,
@@ -74,12 +74,10 @@ export const createValidStatusHistory = (
 export const createValidMonitors = (
     count: number,
     basePartial: Partial<Monitor> = {}
-): Monitor[] => {
-    return Array.from({ length: count }, (_, index) =>
+): Monitor[] => Array.from({ length: count }, (_, index) =>
         createValidMonitor({
             ...basePartial,
             id: `test-monitor-${index}`,
             url: `https://example-${index}.com`,
         })
     );
-};

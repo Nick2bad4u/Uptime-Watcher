@@ -50,7 +50,7 @@ describe("StringConversion - Complete Function Coverage", () => {
             expect(stringConversionModule.safeStringify(123)).toBe("123");
             expect(stringConversionModule.safeStringify(-456)).toBe("-456");
             expect(stringConversionModule.safeStringify(3.14)).toBe("3.14");
-            expect(stringConversionModule.safeStringify(NaN)).toBe("NaN");
+            expect(stringConversionModule.safeStringify(Number.NaN)).toBe("NaN");
             expect(stringConversionModule.safeStringify(Infinity)).toBe(
                 "Infinity"
             );
@@ -247,7 +247,7 @@ describe("StringConversion - Complete Function Coverage", () => {
                 new Error(),
             ];
 
-            testValues.forEach((value) => {
+            for (const value of testValues) {
                 const result = stringConversionModule.safeStringify(value);
                 expect(typeof result).toBe("string");
                 expect(result).toBeDefined();
@@ -255,7 +255,7 @@ describe("StringConversion - Complete Function Coverage", () => {
                 // Test consistency - same input should produce same output
                 const result2 = stringConversionModule.safeStringify(value);
                 expect(result).toBe(result2);
-            });
+            }
         });
 
         it("should cover all switch case branches", async ({

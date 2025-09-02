@@ -121,7 +121,7 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNumber(NaN)).toBe(false);
+            expect(isNumber(Number.NaN)).toBe(false);
         });
 
         it("should return false for non-numbers", async ({
@@ -471,7 +471,7 @@ describe("typeGuards", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isDate(new Date("invalid"))).toBe(false);
-            expect(isDate(new Date(NaN))).toBe(false);
+            expect(isDate(new Date(Number.NaN))).toBe(false);
         });
 
         it("should return false for non-Date values", async ({
@@ -484,7 +484,7 @@ describe("typeGuards", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isDate("2023-01-01")).toBe(false);
-            expect(isDate(1672531200000)).toBe(false); // timestamp
+            expect(isDate(1_672_531_200_000)).toBe(false); // timestamp
             expect(isDate({})).toBe(false);
             expect(isDate(null)).toBe(false);
             expect(isDate(undefined)).toBe(false);
@@ -562,7 +562,7 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isFiniteNumber(NaN)).toBe(false);
+            expect(isFiniteNumber(Number.NaN)).toBe(false);
         });
 
         it("should return false for non-numbers", async ({
@@ -651,7 +651,7 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNegativeNumber(NaN)).toBe(false);
+            expect(isNonNegativeNumber(Number.NaN)).toBe(false);
         });
 
         it("should return false for non-numbers", async ({
@@ -769,7 +769,7 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPositiveNumber(NaN)).toBe(false);
+            expect(isPositiveNumber(Number.NaN)).toBe(false);
         });
 
         it("should return false for non-numbers", async ({
@@ -834,7 +834,7 @@ describe("typeGuards", () => {
             expect(isValidPort(80)).toBe(true);
             expect(isValidPort(443)).toBe(true);
             expect(isValidPort(8080)).toBe(true);
-            expect(isValidPort(65535)).toBe(true);
+            expect(isValidPort(65_535)).toBe(true);
         });
 
         it("should return false for port numbers outside valid range", async ({
@@ -848,8 +848,8 @@ describe("typeGuards", () => {
 
             expect(isValidPort(0)).toBe(false);
             expect(isValidPort(-1)).toBe(false);
-            expect(isValidPort(65536)).toBe(false);
-            expect(isValidPort(100000)).toBe(false);
+            expect(isValidPort(65_536)).toBe(false);
+            expect(isValidPort(100_000)).toBe(false);
         });
 
         it("should return false for non-integer numbers", async ({
@@ -873,7 +873,7 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort(NaN)).toBe(false);
+            expect(isValidPort(Number.NaN)).toBe(false);
         });
 
         it("should return false for non-numbers", async ({
@@ -895,7 +895,7 @@ describe("typeGuards", () => {
     describe("isValidTimestamp", () => {
         beforeAll(() => {
             // Mock Date.now to ensure consistent test results
-            vi.spyOn(Date, "now").mockReturnValue(1672531200000); // 2023-01-01 00:00:00 UTC
+            vi.spyOn(Date, "now").mockReturnValue(1_672_531_200_000); // 2023-01-01 00:00:00 UTC
         });
 
         afterAll(() => {
@@ -914,7 +914,7 @@ describe("typeGuards", () => {
             const now = Date.now();
             expect(isValidTimestamp(now)).toBe(true);
             expect(isValidTimestamp(now - 1000)).toBe(true); // 1 second ago
-            expect(isValidTimestamp(now - 86400000)).toBe(true); // 1 day ago
+            expect(isValidTimestamp(now - 86_400_000)).toBe(true); // 1 day ago
         });
 
         it("should return true for timestamps up to 1 day in the future", async ({
@@ -928,7 +928,7 @@ describe("typeGuards", () => {
 
             const now = Date.now();
             expect(isValidTimestamp(now + 1000)).toBe(true); // 1 second in future
-            expect(isValidTimestamp(now + 86400000)).toBe(true); // exactly 1 day in future
+            expect(isValidTimestamp(now + 86_400_000)).toBe(true); // exactly 1 day in future
         });
 
         it("should return false for timestamps too far in the future", async ({
@@ -941,8 +941,8 @@ describe("typeGuards", () => {
             await annotate("Type: Business Logic", "type");
 
             const now = Date.now();
-            expect(isValidTimestamp(now + 86400001)).toBe(false); // just over 1 day in future
-            expect(isValidTimestamp(now + 172800000)).toBe(false); // 2 days in future
+            expect(isValidTimestamp(now + 86_400_001)).toBe(false); // just over 1 day in future
+            expect(isValidTimestamp(now + 172_800_000)).toBe(false); // 2 days in future
         });
 
         it("should return false for zero and negative timestamps", async ({
@@ -956,7 +956,7 @@ describe("typeGuards", () => {
 
             expect(isValidTimestamp(0)).toBe(false);
             expect(isValidTimestamp(-1)).toBe(false);
-            expect(isValidTimestamp(-86400000)).toBe(false);
+            expect(isValidTimestamp(-86_400_000)).toBe(false);
         });
 
         it("should return false for non-numbers", async ({
@@ -983,7 +983,7 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
-            expect(isValidTimestamp(NaN)).toBe(false);
+            expect(isValidTimestamp(Number.NaN)).toBe(false);
             expect(isValidTimestamp(Infinity)).toBe(false);
             expect(isValidTimestamp(-Infinity)).toBe(false);
         });

@@ -60,7 +60,7 @@ describe("StringConversion - Missing Lines Coverage", () => {
                 ),
             ];
 
-            edgeCases.forEach((edgeCase, _index) => {
+            for (const [_index, edgeCase] of edgeCases.entries()) {
                 try {
                     const result = safeStringify(edgeCase);
                     expect(typeof result).toBe("string");
@@ -68,7 +68,7 @@ describe("StringConversion - Missing Lines Coverage", () => {
                     // Some edge cases might throw, which is acceptable
                     expect(error).toBeDefined();
                 }
-            });
+            }
         });
 
         it("should attempt to reach default case through type manipulation", async ({
@@ -120,12 +120,12 @@ describe("StringConversion - Missing Lines Coverage", () => {
                 })(),
             ];
 
-            testValues.forEach((value) => {
+            for (const value of testValues) {
                 const result = safeStringify(value);
                 expect(typeof result).toBe("string");
                 // The result should be a meaningful string representation
                 expect(result.length).toBeGreaterThan(0);
-            });
+            }
         });
     });
 });

@@ -10,8 +10,8 @@
  * @packageDocumentation
  */
 
-import type { Simplify } from "type-fest";
 import type { MonitorType } from "@shared/types";
+import type { Simplify } from "type-fest";
 
 /**
  * Advanced monitoring configuration options.

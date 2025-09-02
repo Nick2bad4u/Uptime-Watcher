@@ -33,7 +33,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                         id: "monitor-1",
                         type: "http",
                         url: "https://example.com",
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         history: [],
@@ -108,7 +108,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 id: "http-monitor",
                 type: "http",
                 url: "https://test.com",
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 2,
                 history: [],
@@ -139,7 +139,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 id: "dns-monitor",
                 type: "dns",
                 host: "example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 timeout: 3000,
                 retryAttempts: 1,
                 history: [],
@@ -173,7 +173,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 type: "port",
                 host: "test.example.com",
                 port: 443,
-                checkInterval: 45000,
+                checkInterval: 45_000,
                 timeout: 2000,
                 retryAttempts: 3,
                 history: [],
@@ -230,11 +230,11 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 { field: "expectedValue", value: "192.0.2.1" },
             ];
 
-            dnsFields.forEach(({ field, value }) => {
+            for (const { field, value } of dnsFields) {
                 const result = validateMonitorField("dns", field, value);
                 expect(result.success).toBe(true);
                 expect(result.metadata?.fieldName).toBe(field);
-            });
+            }
         });
 
         it("should validate PORT monitor specific fields successfully", async ({
@@ -254,11 +254,11 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 { field: "port", value: 443 },
             ];
 
-            portFields.forEach(({ field, value }) => {
+            for (const { field, value } of portFields) {
                 const result = validateMonitorField("port", field, value);
                 expect(result.success).toBe(true);
                 expect(result.metadata?.fieldName).toBe(field);
-            });
+            }
         });
 
         it("should validate common monitor fields for all types", async ({
@@ -274,7 +274,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
             await annotate("Type: Validation", "type");
 
             const commonFieldsWithoutType = [
-                { field: "checkInterval", value: 30000 },
+                { field: "checkInterval", value: 30_000 },
                 { field: "id", value: "test-id" },
                 { field: "monitoring", value: true },
                 { field: "responseTime", value: 200 },
@@ -283,13 +283,13 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 { field: "timeout", value: 5000 },
             ];
 
-            [
+            for (const monitorType of [
                 "http",
                 "dns",
                 "port",
-            ].forEach((monitorType) => {
+            ]) {
                 // Test common fields (excluding type)
-                commonFieldsWithoutType.forEach(({ field, value }) => {
+                for (const { field, value } of commonFieldsWithoutType) {
                     const result = validateMonitorField(
                         monitorType,
                         field,
@@ -297,7 +297,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                     );
                     expect(result.success).toBe(true);
                     expect(result.metadata?.fieldName).toBe(field);
-                });
+                }
 
                 // Test type field with correct value for each monitor type
                 const typeResult = validateMonitorField(
@@ -307,7 +307,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 );
                 expect(typeResult.success).toBe(true);
                 expect(typeResult.metadata?.fieldName).toBe("type");
-            });
+            }
         });
     });
 
@@ -334,7 +334,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                         id: "coverage-monitor",
                         type: "http",
                         url: "https://coverage.test",
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         history: [],
@@ -352,7 +352,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 id: "coverage-monitor",
                 type: "http",
                 url: "https://coverage.test",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 history: [],

@@ -366,17 +366,17 @@ describe("Chart Config Utilities", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const colorRegex = /^rgba?\(\d+,\s*\d+,\s*\d+(?:,\s*[\d.]+)?\)$/;
+            const colorRegex = /^rgba?\((?:\d+,\s*){2}\d+(?:,\s*[\d.]+)?\)$/;
 
-            DEFAULT_CHART_THEMES.dark.backgroundColors.forEach((color) => {
+            for (const color of DEFAULT_CHART_THEMES.dark.backgroundColors) {
                 expect(typeof color).toBe("string");
                 expect(color).toMatch(colorRegex);
-            });
+            }
 
-            DEFAULT_CHART_THEMES.dark.borderColors.forEach((color) => {
+            for (const color of DEFAULT_CHART_THEMES.dark.borderColors) {
                 expect(typeof color).toBe("string");
                 expect(color).toMatch(colorRegex);
-            });
+            }
         });
     });
 

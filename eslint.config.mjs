@@ -88,7 +88,6 @@ import pluginPerfectionist from "eslint-plugin-perfectionist";
 import pluginPreferArrow from "eslint-plugin-prefer-arrow";
 import pluginPrettier from "eslint-plugin-prettier";
 import pluginPromise from "eslint-plugin-promise";
-import putout from "eslint-plugin-putout";
 // eslint-disable-next-line depend/ban-dependencies -- Recommended one sucks
 import pluginReact from "eslint-plugin-react";
 import reactCompiler from "eslint-plugin-react-compiler";
@@ -142,6 +141,7 @@ import tomlEslintParser from "toml-eslint-parser";
 import yamlEslintParser from "yaml-eslint-parser";
 
 // Unused and Uninstalled Plugins:
+// import putout from "eslint-plugin-putout";
 // import * as nodeDependenciesPlugin from "eslint-plugin-node-dependencies"; Broken with isJson undefined error
 // eslint-config-prettier
 // eslint-find-rules
@@ -806,6 +806,7 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -838,7 +839,6 @@ export default [
             "prefer-arrow": pluginPreferArrow,
             prettier: pluginPrettier,
             promise: pluginPromise,
-            putout: putout,
             react: pluginReact,
             "react-hooks": reactHooks,
             "react-hooks-addons": reactHooksAddons,
@@ -1356,7 +1356,7 @@ export default [
             "etc/no-internal": "off",
             "etc/no-misused-generics": "warn",
             "etc/no-t": "off",
-            "etc/prefer-interface": "warn",
+            "etc/prefer-interface": "off",
             "etc/throw-error": "warn",
             "ex/no-unhandled": "warn",
             "format-sql/format": "warn",
@@ -1662,16 +1662,6 @@ export default [
             "promise/prefer-await-to-then": "warn",
             "promise/prefer-catch": "warn",
             "promise/spec-only": "warn",
-            "putout/align-spaces": "off",
-            "putout/array-element-newline": "off",
-            "putout/destructuring-as-function-argument": "off",
-            "putout/function-declaration-paren-newline": "off",
-            "putout/long-properties-destructuring": "off",
-            "putout/multiple-properties-destructuring": "off",
-            "putout/newline-function-call-arguments": "off",
-            "putout/object-property-newline": "error",
-            "putout/objects-braces-inside-array": "error",
-            "putout/single-property-destructuring": "off",
             "react-hooks-addons/no-unused-deps": "warn",
             "react/forbid-component-props": "off",
             // Disable problematic rules for Docusaurus
@@ -1936,6 +1926,7 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -1969,7 +1960,6 @@ export default [
             "prefer-arrow": pluginPreferArrow,
             prettier: pluginPrettier,
             promise: pluginPromise,
-            putout: putout,
             react: pluginReact,
             "react-compiler": reactCompiler,
             "react-form-fields": pluginReactFormFields,
@@ -2472,7 +2462,7 @@ export default [
             "etc/no-internal": "off",
             "etc/no-misused-generics": "warn",
             "etc/no-t": "off",
-            "etc/prefer-interface": "warn",
+            "etc/prefer-interface": "off",
             // Function style preferences - disabled as too aggressive
             // "prefer-arrow/prefer-arrow-functions": [
             //     "warn",
@@ -2767,16 +2757,6 @@ export default [
             "promise/prefer-await-to-then": "warn",
             "promise/prefer-catch": "warn",
             "promise/spec-only": "warn",
-            "putout/align-spaces": "off",
-            "putout/array-element-newline": "off",
-            "putout/destructuring-as-function-argument": "off",
-            "putout/function-declaration-paren-newline": "off",
-            "putout/long-properties-destructuring": "off",
-            "putout/multiple-properties-destructuring": "off",
-            "putout/newline-function-call-arguments": "off",
-            "putout/object-property-newline": "error",
-            "putout/objects-braces-inside-array": "off",
-            "putout/single-property-destructuring": "off",
             "react-form-fields/no-mix-controlled-with-uncontrolled": "error",
             "react-form-fields/no-only-value-prop": "error",
             "react-form-fields/styled-no-mix-controlled-with-uncontrolled":
@@ -3052,7 +3032,7 @@ export default [
             "regexp/require-unicode-regexp": "off",
             "regexp/require-unicode-sets-regexp": "warn",
             "regexp/sort-alternatives": "warn",
-            "regexp/sort-character-class-elements": "warn",
+            "regexp/sort-character-class-elements": "off",
             "regexp/unicode-escape": "warn",
             "regexp/unicode-property": "warn",
             "require-await": "off",
@@ -3279,6 +3259,7 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -3311,7 +3292,6 @@ export default [
             "prefer-arrow": pluginPreferArrow,
             prettier: pluginPrettier,
             promise: pluginPromise,
-            putout: putout,
             react: pluginReact,
             "react-hooks": reactHooks,
             "react-hooks-addons": reactHooksAddons,
@@ -3786,7 +3766,7 @@ export default [
             "etc/no-internal": "off",
             "etc/no-misused-generics": "warn",
             "etc/no-t": "off",
-            "etc/prefer-interface": "warn",
+            "etc/prefer-interface": "off",
             "etc/throw-error": "warn",
             "ex/no-unhandled": "warn",
             "format-sql/format": "warn",
@@ -4089,16 +4069,6 @@ export default [
             "promise/prefer-await-to-then": "warn",
             "promise/prefer-catch": "warn",
             "promise/spec-only": "warn",
-            "putout/align-spaces": "off",
-            "putout/array-element-newline": "off",
-            "putout/destructuring-as-function-argument": "off",
-            "putout/function-declaration-paren-newline": "off",
-            "putout/long-properties-destructuring": "off",
-            "putout/multiple-properties-destructuring": "off",
-            "putout/newline-function-call-arguments": "off",
-            "putout/object-property-newline": "error",
-            "putout/objects-braces-inside-array": "error",
-            "putout/single-property-destructuring": "off",
             "react-hooks-addons/no-unused-deps": "warn",
             // Security for backend
             "redos/no-vulnerable": "error",
@@ -4360,6 +4330,7 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -4393,7 +4364,6 @@ export default [
             "prefer-arrow": pluginPreferArrow,
             prettier: pluginPrettier,
             promise: pluginPromise,
-            putout: putout,
             react: pluginReact,
             "react-compiler": reactCompiler,
             "react-form-fields": pluginReactFormFields,
@@ -4896,7 +4866,7 @@ export default [
             "etc/no-internal": "off",
             "etc/no-misused-generics": "warn",
             "etc/no-t": "off",
-            "etc/prefer-interface": "warn",
+            "etc/prefer-interface": "off",
             // Function style preferences - disabled as too aggressive
             // "prefer-arrow/prefer-arrow-functions": [
             //     "warn",
@@ -5191,16 +5161,6 @@ export default [
             "promise/prefer-await-to-then": "warn",
             "promise/prefer-catch": "warn",
             "promise/spec-only": "warn",
-            "putout/align-spaces": "off",
-            "putout/array-element-newline": "off",
-            "putout/destructuring-as-function-argument": "off",
-            "putout/function-declaration-paren-newline": "off",
-            "putout/long-properties-destructuring": "off",
-            "putout/multiple-properties-destructuring": "off",
-            "putout/newline-function-call-arguments": "off",
-            "putout/object-property-newline": "error",
-            "putout/objects-braces-inside-array": "off",
-            "putout/single-property-destructuring": "off",
             "react-form-fields/no-mix-controlled-with-uncontrolled": "error",
             "react-form-fields/no-only-value-prop": "error",
             "react-form-fields/styled-no-mix-controlled-with-uncontrolled":
@@ -5476,7 +5436,7 @@ export default [
             "regexp/require-unicode-regexp": "off",
             "regexp/require-unicode-sets-regexp": "warn",
             "regexp/sort-alternatives": "warn",
-            "regexp/sort-character-class-elements": "warn",
+            "regexp/sort-character-class-elements": "off",
             "regexp/unicode-escape": "warn",
             "regexp/unicode-property": "warn",
             "require-await": "off",
@@ -6375,7 +6335,6 @@ export default [
             "prefer-arrow": pluginPreferArrow,
             prettier: pluginPrettier,
             promise: pluginPromise,
-            putout: putout,
             redos: pluginRedos,
             regexp: pluginRegexp,
             security: pluginSecurity,
@@ -6721,16 +6680,6 @@ export default [
             "promise/prefer-await-to-then": "warn",
             "promise/prefer-catch": "warn",
             "promise/spec-only": "warn",
-            "putout/align-spaces": "off",
-            "putout/array-element-newline": "off",
-            "putout/destructuring-as-function-argument": "off",
-            "putout/function-declaration-paren-newline": "off",
-            "putout/long-properties-destructuring": "off",
-            "putout/multiple-properties-destructuring": "off",
-            "putout/newline-function-call-arguments": "off",
-            "putout/object-property-newline": "error",
-            "putout/objects-braces-inside-array": "error",
-            "putout/single-property-destructuring": "off",
             // Security for backend
             "redos/no-vulnerable": "error",
             // RegExp
@@ -7080,7 +7029,6 @@ export default [
             "prefer-arrow": pluginPreferArrow,
             prettier: pluginPrettier,
             promise: pluginPromise,
-            putout: putout,
             react: pluginReact,
             "react-hooks": reactHooks,
             redos: pluginRedos,

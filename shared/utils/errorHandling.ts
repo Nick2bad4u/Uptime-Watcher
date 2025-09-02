@@ -119,8 +119,8 @@ async function handleBackendOperation<T>(
     context: ErrorHandlingBackendContext
 ): Promise<T> {
     // Extract properties safely
-    const logger = context.logger;
-    const operationName = context.operationName;
+    const { logger } = context;
+    const { operationName } = context;
 
     try {
         return await operation();

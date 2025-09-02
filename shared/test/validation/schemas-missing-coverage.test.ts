@@ -45,11 +45,11 @@ describe("Schemas - Missing Coverage", () => {
                 { type: "ping", field: "invalid_field", value: "test" },
             ];
 
-            testCases.forEach(({ type, field, value }) => {
+            for (const { type, field, value } of testCases) {
                 expect(() => {
                     validateMonitorField(type, field, value);
                 }).toThrow(`Unknown field: ${field}`);
-            });
+            }
         });
     });
 
@@ -75,7 +75,7 @@ describe("Schemas - Missing Coverage", () => {
                 status: "up",
                 monitoring: true,
                 responseTime: "invalid-number", // This should create ZodError with path
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 // Missing required fields to generate more errors
@@ -109,7 +109,7 @@ describe("Schemas - Missing Coverage", () => {
                 status: "up",
                 monitoring: true,
                 responseTime: 100,
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 url: "https://example.com",
@@ -210,11 +210,11 @@ describe("Schemas - Missing Coverage", () => {
                 },
             ];
 
-            edgeCases.forEach(({ name: _name, data }) => {
+            for (const { name: _name, data } of edgeCases) {
                 const result = validateMonitorData("http", data);
                 expect(result.success).toBe(false);
                 expect(result.errors.length).toBeGreaterThan(0);
-            });
+            }
         });
 
         test("should specifically target path.length condition", ({
@@ -238,7 +238,7 @@ describe("Schemas - Missing Coverage", () => {
                 status: "up",
                 monitoring: true,
                 responseTime: 100,
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 url: "https://example.com",

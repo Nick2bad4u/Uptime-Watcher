@@ -35,9 +35,7 @@ describe("Fixed Coverage Tests", () => {
 
             // Create an edge case object that might trigger default behavior
             const weirdObject = {
-                [Symbol.toPrimitive]: () => {
-                    return "weird";
-                },
+                [Symbol.toPrimitive]: () => "weird",
                 toString: () => "[Object]",
                 valueOf: () => ({}),
             };

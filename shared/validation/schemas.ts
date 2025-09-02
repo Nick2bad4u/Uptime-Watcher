@@ -11,7 +11,6 @@
  * @packageDocumentation
  */
 
-import type { UnknownRecord } from "type-fest";
 import type {
     BaseMonitorSchemaType,
     DnsMonitorSchemaType,
@@ -29,6 +28,7 @@ import type {
  */
 // Import from unified validation system
 import type { ValidationResult } from "@shared/types/validation";
+import type { UnknownRecord } from "type-fest";
 
 import validator from "validator";
 import * as z from "zod";

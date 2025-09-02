@@ -102,10 +102,10 @@ describe("String Conversion - 100% Coverage Tests", () => {
                 null, // Should go through object handling
             ];
 
-            testCases.forEach((testCase) => {
+            for (const testCase of testCases) {
                 const result = safeStringify(testCase);
                 expect(typeof result).toBe("string");
-            });
+            }
         });
     });
 });

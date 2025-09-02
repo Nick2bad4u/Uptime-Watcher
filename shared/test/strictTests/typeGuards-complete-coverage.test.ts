@@ -155,7 +155,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isNumber(0)).toBe(true);
             expect(isNumber(123)).toBe(true);
             expect(isNumber(-123)).toBe(true);
-            expect(isNumber(3.14159)).toBe(true);
+            expect(isNumber(3.141_59)).toBe(true);
             expect(isNumber(Infinity)).toBe(true);
             expect(isNumber(-Infinity)).toBe(true);
         });
@@ -169,7 +169,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNumber(NaN)).toBe(false);
+            expect(isNumber(Number.NaN)).toBe(false);
         });
 
         it("should return false for non-numbers", async ({
@@ -570,7 +570,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isDate(new Date("invalid"))).toBe(false);
-            expect(isDate(new Date(NaN))).toBe(false);
+            expect(isDate(new Date(Number.NaN))).toBe(false);
         });
 
         it("should return false for non-Date objects", async ({
@@ -649,7 +649,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isFiniteNumber(0)).toBe(true);
             expect(isFiniteNumber(123)).toBe(true);
             expect(isFiniteNumber(-123)).toBe(true);
-            expect(isFiniteNumber(3.14159)).toBe(true);
+            expect(isFiniteNumber(3.141_59)).toBe(true);
             expect(isFiniteNumber(Number.MAX_SAFE_INTEGER)).toBe(true);
             expect(isFiniteNumber(Number.MIN_SAFE_INTEGER)).toBe(true);
         });
@@ -679,7 +679,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isFiniteNumber(NaN)).toBe(false);
+            expect(isFiniteNumber(Number.NaN)).toBe(false);
         });
 
         it("should return false for non-numbers", async ({
@@ -754,7 +754,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
 
             expect(isNonNegativeNumber(0)).toBe(true);
             expect(isNonNegativeNumber(123)).toBe(true);
-            expect(isNonNegativeNumber(3.14159)).toBe(true);
+            expect(isNonNegativeNumber(3.141_59)).toBe(true);
             expect(isNonNegativeNumber(Infinity)).toBe(true);
         });
 
@@ -772,7 +772,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
 
             expect(isNonNegativeNumber(-1)).toBe(false);
             expect(isNonNegativeNumber(-123)).toBe(false);
-            expect(isNonNegativeNumber(-3.14159)).toBe(false);
+            expect(isNonNegativeNumber(-3.141_59)).toBe(false);
             expect(isNonNegativeNumber(-Infinity)).toBe(false);
         });
 
@@ -785,7 +785,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNegativeNumber(NaN)).toBe(false);
+            expect(isNonNegativeNumber(Number.NaN)).toBe(false);
         });
 
         it("should return false for non-numbers", async ({
@@ -877,7 +877,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
 
             expect(isPositiveNumber(1)).toBe(true);
             expect(isPositiveNumber(123)).toBe(true);
-            expect(isPositiveNumber(3.14159)).toBe(true);
+            expect(isPositiveNumber(3.141_59)).toBe(true);
             expect(isPositiveNumber(Infinity)).toBe(true);
         });
 
@@ -919,7 +919,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPositiveNumber(NaN)).toBe(false);
+            expect(isPositiveNumber(Number.NaN)).toBe(false);
         });
 
         it("should return false for non-numbers", async ({
@@ -996,7 +996,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isValidPort(443)).toBe(true);
             expect(isValidPort(3000)).toBe(true);
             expect(isValidPort(8080)).toBe(true);
-            expect(isValidPort(65535)).toBe(true);
+            expect(isValidPort(65_535)).toBe(true);
         });
 
         it("should return false for invalid port numbers", async ({
@@ -1013,8 +1013,8 @@ describe("TypeGuards - Complete Function Coverage", () => {
 
             expect(isValidPort(0)).toBe(false);
             expect(isValidPort(-1)).toBe(false);
-            expect(isValidPort(65536)).toBe(false);
-            expect(isValidPort(100000)).toBe(false);
+            expect(isValidPort(65_536)).toBe(false);
+            expect(isValidPort(100_000)).toBe(false);
         });
 
         it("should return false for non-integer numbers", async ({
@@ -1048,7 +1048,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isValidPort("80")).toBe(false);
             expect(isValidPort(null)).toBe(false);
             expect(isValidPort(undefined)).toBe(false);
-            expect(isValidPort(NaN)).toBe(false);
+            expect(isValidPort(Number.NaN)).toBe(false);
         });
     });
 
@@ -1079,8 +1079,8 @@ describe("TypeGuards - Complete Function Coverage", () => {
 
             expect(isValidTimestamp(now)).toBe(true);
             expect(isValidTimestamp(now - 1000)).toBe(true);
-            expect(isValidTimestamp(now + 3600000)).toBe(true); // 1 hour in future
-            expect(isValidTimestamp(1672531200000)).toBe(true); // Jan 1, 2023
+            expect(isValidTimestamp(now + 3_600_000)).toBe(true); // 1 hour in future
+            expect(isValidTimestamp(1_672_531_200_000)).toBe(true); // Jan 1, 2023
         });
 
         it("should return true for timestamps up to 1 day in future", async ({
@@ -1129,7 +1129,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
 
             expect(isValidTimestamp(0)).toBe(false);
             expect(isValidTimestamp(-1)).toBe(false);
-            expect(isValidTimestamp(-1000000)).toBe(false);
+            expect(isValidTimestamp(-1_000_000)).toBe(false);
         });
 
         it("should return false for non-numbers", async ({
@@ -1147,7 +1147,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isValidTimestamp("123456789")).toBe(false);
             expect(isValidTimestamp(null)).toBe(false);
             expect(isValidTimestamp(undefined)).toBe(false);
-            expect(isValidTimestamp(NaN)).toBe(false);
+            expect(isValidTimestamp(Number.NaN)).toBe(false);
         });
     });
 
@@ -1211,13 +1211,13 @@ describe("TypeGuards - Complete Function Coverage", () => {
                 false,
                 [],
                 {},
-                NaN,
+                Number.NaN,
                 Infinity,
                 new Date(),
                 new Error(),
             ];
 
-            testValues.forEach((value) => {
+            for (const value of testValues) {
                 // Each type guard should handle these values consistently and return boolean
                 expect(() => isObject(value)).not.toThrow();
                 expect(typeof isObject(value)).toBe("boolean");
@@ -1257,7 +1257,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
 
                 expect(() => isValidTimestamp(value)).not.toThrow();
                 expect(typeof isValidTimestamp(value)).toBe("boolean");
-            });
+            }
         });
     });
 });

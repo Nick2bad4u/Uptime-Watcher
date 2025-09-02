@@ -14,21 +14,21 @@
  * Cache configuration interface for type safety.
  */
 interface CacheConfigItem {
-    readonly name: string;
     readonly defaultTTL: number;
-    readonly maxSize: number;
     readonly enableStats: boolean;
+    readonly maxSize: number;
+    readonly name: string;
 }
 
 /**
  * Cache configuration collection type.
  */
 interface CacheConfigCollection {
-    readonly SITES: CacheConfigItem;
     readonly MONITORS: CacheConfigItem;
     readonly SETTINGS: CacheConfigItem;
-    readonly VALIDATION: CacheConfigItem;
+    readonly SITES: CacheConfigItem;
     readonly TEMPORARY: CacheConfigItem;
+    readonly VALIDATION: CacheConfigItem;
 }
 
 /**
@@ -47,24 +47,6 @@ interface CacheConfigCollection {
  */
 export const CACHE_CONFIG: CacheConfigCollection = Object.freeze({
     /**
-     * Configuration for site data caching.
-     *
-     * @remarks
-     * Used by SiteManager for caching site information with moderate expiration
-     * time suitable for site management operations.
-     */
-    SITES: Object.freeze({
-        /** Cache name identifier */
-        name: "sites",
-        /** TTL: 10 minutes - balances freshness with performance */
-        defaultTTL: 600_000,
-        /** Maximum entries: 500 sites */
-        maxSize: 500,
-        /** Enable statistics tracking */
-        enableStats: true,
-    }),
-
-    /**
      * Configuration for monitor data caching.
      *
      * @remarks
@@ -72,14 +54,14 @@ export const CACHE_CONFIG: CacheConfigCollection = Object.freeze({
      * shorter expiration for real-time monitoring needs.
      */
     MONITORS: Object.freeze({
-        /** Cache name identifier */
-        name: "monitors",
         /** TTL: 5 minutes - shorter for real-time monitoring */
         defaultTTL: 300_000,
-        /** Maximum entries: 1000 monitors */
-        maxSize: 1000,
         /** Enable statistics tracking */
         enableStats: true,
+        /** Maximum entries: 1000 monitors */
+        maxSize: 1000,
+        /** Cache name identifier */
+        name: "monitors",
     }),
 
     /**
@@ -90,32 +72,32 @@ export const CACHE_CONFIG: CacheConfigCollection = Object.freeze({
      * expiration since settings change infrequently.
      */
     SETTINGS: Object.freeze({
-        /** Cache name identifier */
-        name: "settings",
         /** TTL: 30 minutes - longer for infrequently changing data */
         defaultTTL: 1_800_000,
-        /** Maximum entries: 100 settings */
-        maxSize: 100,
         /** Enable statistics tracking */
         enableStats: true,
+        /** Maximum entries: 100 settings */
+        maxSize: 100,
+        /** Cache name identifier */
+        name: "settings",
     }),
 
     /**
-     * Configuration for validation results caching.
+     * Configuration for site data caching.
      *
      * @remarks
-     * Used by ConfigurationManager for caching validation results with moderate
-     * expiration to balance accuracy with performance.
+     * Used by SiteManager for caching site information with moderate expiration
+     * time suitable for site management operations.
      */
-    VALIDATION: Object.freeze({
-        /** Cache name identifier */
-        name: "validation-results",
-        /** TTL: 5 minutes - moderate for validation accuracy */
-        defaultTTL: 300_000,
-        /** Maximum entries: 200 validation results */
-        maxSize: 200,
+    SITES: Object.freeze({
+        /** TTL: 10 minutes - balances freshness with performance */
+        defaultTTL: 600_000,
         /** Enable statistics tracking */
         enableStats: true,
+        /** Maximum entries: 500 sites */
+        maxSize: 500,
+        /** Cache name identifier */
+        name: "sites",
     }),
 
     /**
@@ -126,14 +108,32 @@ export const CACHE_CONFIG: CacheConfigCollection = Object.freeze({
      * and disabled stats for performance.
      */
     TEMPORARY: Object.freeze({
-        /** Cache name identifier prefix (append operation type) */
-        name: "temporary",
         /** TTL: 5 minutes - short for temporary data */
         defaultTTL: 300_000,
-        /** Maximum entries: 1000 temporary items */
-        maxSize: 1000,
         /** Disable statistics for performance */
         enableStats: false,
+        /** Maximum entries: 1000 temporary items */
+        maxSize: 1000,
+        /** Cache name identifier prefix (append operation type) */
+        name: "temporary",
+    }),
+
+    /**
+     * Configuration for validation results caching.
+     *
+     * @remarks
+     * Used by ConfigurationManager for caching validation results with moderate
+     * expiration to balance accuracy with performance.
+     */
+    VALIDATION: Object.freeze({
+        /** TTL: 5 minutes - moderate for validation accuracy */
+        defaultTTL: 300_000,
+        /** Enable statistics tracking */
+        enableStats: true,
+        /** Maximum entries: 200 validation results */
+        maxSize: 200,
+        /** Cache name identifier */
+        name: "validation-results",
     }),
 } as const);
 
@@ -141,10 +141,10 @@ export const CACHE_CONFIG: CacheConfigCollection = Object.freeze({
  * Cache naming interface for type safety.
  */
 interface CacheNamesCollection {
-    readonly temporary: (operation: string) => string;
-    readonly sites: (suffix?: string) => string;
     readonly monitors: (suffix?: string) => string;
     readonly settings: (suffix?: string) => string;
+    readonly sites: (suffix?: string) => string;
+    readonly temporary: (operation: string) => string;
 }
 
 /**
@@ -155,36 +155,6 @@ interface CacheNamesCollection {
  * conventions, especially for temporary and dynamic caches.
  */
 export const CACHE_NAMES: CacheNamesCollection = Object.freeze({
-    /**
-     * Generate a temporary cache name with operation suffix.
-     *
-     * @example
-     *
-     * ```typescript
-     * const cacheName = CACHE_NAMES.temporary("import"); // "temporary-import"
-     * ```
-     *
-     * @param operation - The operation type (e.g., "import", "export", "sync")
-     *
-     * @returns Standardized temporary cache name
-     */
-    temporary: (operation: string): string => `temporary-${operation}`,
-
-    /**
-     * Generate a sites cache name with optional suffix.
-     *
-     * @example
-     *
-     * ```typescript
-     * const cacheName = CACHE_NAMES.sites("temp"); // "sites-temp"
-     * ```
-     *
-     * @param suffix - Optional suffix (e.g., "temp", "backup")
-     *
-     * @returns Standardized sites cache name
-     */
-    sites: (suffix?: string): string => (suffix ? `sites-${suffix}` : "sites"),
-
     /**
      * Generate a monitors cache name with optional suffix.
      *
@@ -204,6 +174,36 @@ export const CACHE_NAMES: CacheNamesCollection = Object.freeze({
      */
     settings: (suffix?: string): string =>
         suffix ? `settings-${suffix}` : "settings",
+
+    /**
+     * Generate a sites cache name with optional suffix.
+     *
+     * @example
+     *
+     * ```typescript
+     * const cacheName = CACHE_NAMES.sites("temp"); // "sites-temp"
+     * ```
+     *
+     * @param suffix - Optional suffix (e.g., "temp", "backup")
+     *
+     * @returns Standardized sites cache name
+     */
+    sites: (suffix?: string): string => (suffix ? `sites-${suffix}` : "sites"),
+
+    /**
+     * Generate a temporary cache name with operation suffix.
+     *
+     * @example
+     *
+     * ```typescript
+     * const cacheName = CACHE_NAMES.temporary("import"); // "temporary-import"
+     * ```
+     *
+     * @param operation - The operation type (e.g., "import", "export", "sync")
+     *
+     * @returns Standardized temporary cache name
+     */
+    temporary: (operation: string): string => `temporary-${operation}`,
 } as const);
 
 /**

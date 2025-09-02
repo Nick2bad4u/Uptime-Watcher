@@ -81,7 +81,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(typeGuards.isNonNullObject(null)).toBe(false);
             expect(typeGuards.isPositiveNumber(0)).toBe(false);
             expect(typeGuards.isString(123)).toBe(false);
-            expect(typeGuards.isValidPort(99999)).toBe(false);
+            expect(typeGuards.isValidPort(99_999)).toBe(false);
             expect(typeGuards.isValidTimestamp(-1)).toBe(false);
         });
     });

@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-import type { SetOptional, UnknownRecord, Merge, PartialDeep } from "type-fest";
+import type { Merge, PartialDeep, SetOptional, UnknownRecord } from "type-fest";
 
 /**
  * Animation configuration interface.

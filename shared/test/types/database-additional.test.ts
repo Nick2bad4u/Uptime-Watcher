@@ -110,7 +110,7 @@ describe("shared/types/database additional function coverage", () => {
                 timeout: 30,
                 retry_attempts: 3,
                 last_check: "invalid-timestamp", // This will cause NaN when parsed
-                next_check: Date.now() + 60000,
+                next_check: Date.now() + 60_000,
                 response_time: 100,
                 created_at: Date.now(),
                 updated_at: Date.now(),
@@ -150,7 +150,7 @@ describe("shared/types/database additional function coverage", () => {
                     timeout: 30,
                     retry_attempts: 3,
                     last_check: invalidTimestamp,
-                    next_check: Date.now() + 60000,
+                    next_check: Date.now() + 60_000,
                     response_time: 100,
                     created_at: Date.now(),
                     updated_at: Date.now(),
@@ -484,10 +484,10 @@ describe("shared/types/database additional function coverage", () => {
                 check_interval: 60,
                 timeout: 30,
                 retry_attempts: 3,
-                last_checked: Date.now() - 60000,
-                next_check: Date.now() + 60000,
+                last_checked: Date.now() - 60_000,
+                next_check: Date.now() + 60_000,
                 response_time: 150,
-                created_at: Date.now() - 86400000,
+                created_at: Date.now() - 86_400_000,
                 updated_at: Date.now(),
             };
 

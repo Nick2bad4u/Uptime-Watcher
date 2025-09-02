@@ -29,14 +29,14 @@ describe("Function Coverage Validation", () => {
         const httpFormData = {
             type: "http" as const,
             url: "https://example.com",
-            checkInterval: 60000,
+            checkInterval: 60_000,
             retryAttempts: 3,
             timeout: 5000,
         };
         const pingFormData = {
             type: "ping" as const,
             host: "example.com",
-            checkInterval: 60000,
+            checkInterval: 60_000,
             retryAttempts: 3,
             timeout: 5000,
         };
@@ -44,7 +44,7 @@ describe("Function Coverage Validation", () => {
             type: "port" as const,
             host: "example.com",
             port: 80,
-            checkInterval: 60000,
+            checkInterval: 60_000,
             retryAttempts: 3,
             timeout: 5000,
         };

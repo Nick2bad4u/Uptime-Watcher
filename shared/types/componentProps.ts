@@ -29,12 +29,12 @@ import type {
  * capabilities for components.
  */
 export interface CoreComponentProperties {
+    /** Component content (text, elements, or other components) */
+    readonly children?: ReactNode;
     /** Additional CSS classes for styling customization */
     readonly className?: string;
     /** Whether the component is disabled and non-interactive */
     readonly disabled?: boolean;
-    /** Component content (text, elements, or other components) */
-    readonly children?: ReactNode;
 }
 
 /**
@@ -45,10 +45,10 @@ export interface CoreComponentProperties {
  * other assistive technologies.
  */
 export interface AccessibilityProperties {
-    /** ARIA label for screen readers */
-    readonly "aria-label"?: string;
     /** ARIA described-by reference for additional descriptions */
     readonly "aria-describedby"?: string;
+    /** ARIA label for screen readers */
+    readonly "aria-label"?: string;
     /** ARIA labelledby reference for complex labeling */
     readonly "aria-labelledby"?: string;
     /** Role attribute for semantic meaning */
@@ -60,18 +60,18 @@ export interface AccessibilityProperties {
 /**
  * Standard size variants used across components.
  */
-export type ComponentSize = "xs" | "sm" | "md" | "lg" | "xl";
+export type ComponentSize = "lg" | "md" | "sm" | "xl" | "xs";
 
 /**
  * Standard visual variants for component theming.
  */
 export type ComponentVariant =
+    | "danger"
+    | "ghost"
     | "primary"
     | "secondary"
-    | "danger"
     | "success"
-    | "warning"
-    | "ghost";
+    | "warning";
 
 /**
  * Styling and theming properties.
@@ -81,14 +81,14 @@ export type ComponentVariant =
  * providing consistent theming across the application.
  */
 export interface StylingProperties {
-    /** Size variant for the component */
-    readonly size?: ComponentSize;
-    /** Visual variant for component theming */
-    readonly variant?: ComponentVariant;
     /** Whether component should take full width of its container */
     readonly fullWidth?: boolean;
+    /** Size variant for the component */
+    readonly size?: ComponentSize;
     /** Inline styles to apply (use sparingly) */
     readonly style?: CSSProperties;
+    /** Visual variant for component theming */
+    readonly variant?: ComponentVariant;
 }
 
 /**
@@ -99,10 +99,10 @@ export interface StylingProperties {
  * display visually.
  */
 export interface StateProperties {
-    /** Whether the component is in a loading state */
-    readonly loading?: boolean;
     /** Whether the component is in an active state */
     readonly active?: boolean;
+    /** Whether the component is in a loading state */
+    readonly loading?: boolean;
     /** Whether the component is selected */
     readonly selected?: boolean;
 }
@@ -117,16 +117,16 @@ export interface StateProperties {
  * children.
  */
 export interface FormFieldBaseProperties {
+    /** Error message to display when validation fails */
+    readonly error?: string;
+    /** Help text to provide guidance to users */
+    readonly helpText?: string;
     /** Unique identifier for the field (required for accessibility) */
     readonly id: string;
     /** Label text to display for the field */
     readonly label: string;
     /** Whether the field is required for form submission */
     readonly required?: boolean;
-    /** Error message to display when validation fails */
-    readonly error?: string;
-    /** Help text to provide guidance to users */
-    readonly helpText?: string;
 }
 
 /**
@@ -139,59 +139,55 @@ export interface FormFieldBaseProperties {
 export interface IconProperties {
     /** Icon element to display */
     readonly icon?: ReactNode;
-    /** Position of the icon relative to content */
-    readonly iconPosition?: "left" | "right";
     /** Color theme for the icon */
     readonly iconColor?: string;
     /** Whether to show only the icon (hide text content) */
     readonly iconOnly?: boolean;
+    /** Position of the icon relative to content */
+    readonly iconPosition?: "left" | "right";
 }
 
 /**
  * Event handler types for consistent event handling patterns.
  */
-export namespace EventHandlers {
-    /** Simple click handler for basic interactions */
-    export type Click = () => void;
 
-    /** Click handler with event object when event details are needed */
-    export type ClickWithEvent<TElement extends HTMLElement = HTMLElement> = (
-        event: MouseEvent<TElement>
-    ) => void;
+/** Simple click handler for basic interactions */
+export type ClickHandler = () => void;
 
-    /** Flexible click handler supporting both event and no-event patterns */
-    export type ClickFlexible<TElement extends HTMLElement = HTMLElement> =
-        | ((event: MouseEvent<TElement>) => void)
-        | (() => void);
+/** Click handler with event object when event details are needed */
+export type ClickWithEventHandler<TElement extends HTMLElement = HTMLElement> =
+    (event: MouseEvent<TElement>) => void;
 
-    /** Value-based change handler for form components */
-    export type Change = (value: string) => void;
+/** Flexible click handler supporting both event and no-event patterns */
+export type ClickFlexibleHandler<TElement extends HTMLElement = HTMLElement> =
+    | (() => void)
+    | ((event: MouseEvent<TElement>) => void);
 
-    /** Event-based change handler for low-level input components */
-    export type ChangeWithEvent<
-        TElement extends
-            | HTMLInputElement
-            | HTMLSelectElement = HTMLInputElement,
-    > = (event: ChangeEvent<TElement>) => void;
+/** Value-based change handler for form components */
+export type ChangeHandler = (value: string) => void;
 
-    /** Form submission handler */
-    export type Submit = (event: FormEvent<HTMLFormElement>) => void;
+/** Event-based change handler for low-level input components */
+export type ChangeWithEventHandler<
+    TElement extends HTMLInputElement | HTMLSelectElement = HTMLInputElement,
+> = (event: ChangeEvent<TElement>) => void;
 
-    /** Focus handler for input components */
-    export type Focus<TElement extends HTMLElement = HTMLElement> = (
-        event: FocusEvent<TElement>
-    ) => void;
+/** Form submission handler */
+export type SubmitHandler = (event: FormEvent<HTMLFormElement>) => void;
 
-    /** Blur handler for input components */
-    export type Blur<TElement extends HTMLElement = HTMLElement> = (
-        event: FocusEvent<TElement>
-    ) => void;
+/** Focus handler for input components */
+export type FocusHandler<TElement extends HTMLElement = HTMLElement> = (
+    event: FocusEvent<TElement>
+) => void;
 
-    /** Key press handler for keyboard interactions */
-    export type KeyPress<TElement extends HTMLElement = HTMLElement> = (
-        event: KeyboardEvent<TElement>
-    ) => void;
-}
+/** Blur handler for input components */
+export type BlurHandler<TElement extends HTMLElement = HTMLElement> = (
+    event: FocusEvent<TElement>
+) => void;
+
+/** Key press handler for keyboard interactions */
+export type KeyPressHandler<TElement extends HTMLElement = HTMLElement> = (
+    event: KeyboardEvent<TElement>
+) => void;
 
 /**
  * Button-specific properties combining common patterns.
@@ -201,17 +197,17 @@ export namespace EventHandlers {
  * serving as a standard template.
  */
 export interface StandardButtonProperties
-    extends CoreComponentProperties,
-        AccessibilityProperties,
-        StylingProperties,
+    extends AccessibilityProperties,
+        CoreComponentProperties,
+        IconProperties,
         StateProperties,
-        IconProperties {
+        StylingProperties {
     /** Click handler for button interactions */
-    readonly onClick?: EventHandlers.Click;
-    /** HTML button type */
-    readonly type?: "button" | "submit" | "reset";
+    readonly onClick?: ClickHandler;
     /** Tooltip text for hover states */
     readonly title?: string;
+    /** HTML button type */
+    readonly type?: "button" | "reset" | "submit";
 }
 
 /**
@@ -222,21 +218,21 @@ export interface StandardButtonProperties
  * consistent typing and behavior patterns.
  */
 export interface StandardInputProperties
-    extends CoreComponentProperties,
-        AccessibilityProperties,
+    extends AccessibilityProperties,
+        CoreComponentProperties,
         FormFieldBaseProperties {
-    /** Current input value */
-    readonly value: string;
+    /** Blur event handler */
+    readonly onBlur?: BlurHandler<HTMLInputElement>;
     /** Value change handler */
-    readonly onChange: EventHandlers.Change;
+    readonly onChange: ChangeHandler;
+    /** Focus event handler */
+    readonly onFocus?: FocusHandler<HTMLInputElement>;
     /** Placeholder text for empty inputs */
     readonly placeholder?: string;
     /** Input type for different input behaviors */
-    readonly type?: "text" | "email" | "url" | "password" | "number";
-    /** Focus event handler */
-    readonly onFocus?: EventHandlers.Focus<HTMLInputElement>;
-    /** Blur event handler */
-    readonly onBlur?: EventHandlers.Blur<HTMLInputElement>;
+    readonly type?: "email" | "number" | "password" | "text" | "url";
+    /** Current input value */
+    readonly value: string;
 }
 
 /**
@@ -247,33 +243,33 @@ export interface StandardInputProperties
  * with consistent option handling.
  */
 export interface StandardSelectProperties
-    extends CoreComponentProperties,
-        AccessibilityProperties,
+    extends AccessibilityProperties,
+        CoreComponentProperties,
         FormFieldBaseProperties {
-    /** Currently selected value */
-    readonly value: string;
+    /** Whether multiple selections are allowed */
+    readonly multiple?: boolean;
     /** Selection change handler */
-    readonly onChange: EventHandlers.Change;
+    readonly onChange: ChangeHandler;
     /** Available options for selection */
     readonly options: readonly SelectOption[];
     /** Placeholder text when no option is selected */
     readonly placeholder?: string;
-    /** Whether multiple selections are allowed */
-    readonly multiple?: boolean;
+    /** Currently selected value */
+    readonly value: string;
 }
 
 /**
  * Option definition for select components.
  */
 export interface SelectOption {
-    /** Unique value for the option */
-    readonly value: string;
-    /** Display label for the option */
-    readonly label: string;
     /** Whether this option is disabled */
     readonly disabled?: boolean;
     /** Optional group for organizing options */
     readonly group?: string;
+    /** Display label for the option */
+    readonly label: string;
+    /** Unique value for the option */
+    readonly value: string;
 }
 
 /**
@@ -284,18 +280,18 @@ export interface SelectOption {
  * checkboxes and radio buttons.
  */
 export interface StandardCheckableProperties
-    extends CoreComponentProperties,
-        AccessibilityProperties {
+    extends AccessibilityProperties,
+        CoreComponentProperties {
+    /** Whether the input is checked */
+    readonly checked: boolean;
     /** Unique identifier for the input */
     readonly id: string;
     /** Label text for the input */
     readonly label: string;
-    /** Whether the input is checked */
-    readonly checked: boolean;
-    /** Check state change handler */
-    readonly onChange: (checked: boolean) => void;
     /** Input name for form grouping */
     readonly name?: string;
+    /** Check state change handler */
+    readonly onChange: (checked: boolean) => void;
     /** Input value attribute */
     readonly value?: string;
 }
@@ -308,15 +304,15 @@ export interface StandardCheckableProperties
  * cards, panels, and boxes.
  */
 export interface StandardContainerProperties
-    extends CoreComponentProperties,
-        AccessibilityProperties,
+    extends AccessibilityProperties,
+        CoreComponentProperties,
         StylingProperties {
-    /** Optional click handler for interactive containers */
-    readonly onClick?: EventHandlers.Click;
-    /** Whether the container has elevated styling */
-    readonly elevated?: boolean;
     /** Whether the container has border styling */
     readonly bordered?: boolean;
+    /** Whether the container has elevated styling */
+    readonly elevated?: boolean;
+    /** Optional click handler for interactive containers */
+    readonly onClick?: ClickHandler;
     /** Padding variant for internal spacing */
     readonly padding?: ComponentSize;
 }
@@ -329,20 +325,20 @@ export interface StandardContainerProperties
  * with proper accessibility support.
  */
 export interface StandardModalProperties
-    extends CoreComponentProperties,
-        AccessibilityProperties {
-    /** Whether the modal is currently open */
-    readonly open: boolean;
-    /** Handler called when modal should close */
-    readonly onClose: () => void;
-    /** Modal title for accessibility */
-    readonly title: string;
-    /** Whether clicking outside closes the modal */
-    readonly closeOnOutsideClick?: boolean;
+    extends AccessibilityProperties,
+        CoreComponentProperties {
     /** Whether pressing escape closes the modal */
     readonly closeOnEscape?: boolean;
+    /** Whether clicking outside closes the modal */
+    readonly closeOnOutsideClick?: boolean;
+    /** Handler called when modal should close */
+    readonly onClose: () => void;
+    /** Whether the modal is currently open */
+    readonly open: boolean;
     /** Size variant for the modal */
     readonly size?: ComponentSize;
+    /** Modal title for accessibility */
+    readonly title: string;
 }
 
 /**
@@ -353,20 +349,20 @@ export interface StandardModalProperties
  * collections of data.
  */
 export interface StandardDataDisplayProperties<TItem>
-    extends CoreComponentProperties,
-        AccessibilityProperties {
-    /** Data items to display */
-    readonly items: readonly TItem[];
-    /** Render function for individual items */
-    readonly renderItem: (item: TItem, index: number) => ReactNode;
+    extends AccessibilityProperties,
+        CoreComponentProperties {
     /** Optional empty state content */
     readonly emptyContent?: ReactNode;
-    /** Loading state indicator */
-    readonly loading?: boolean;
     /** Error state content */
     readonly error?: string;
+    /** Data items to display */
+    readonly items: readonly TItem[];
     /** Key extractor for React list optimization */
-    readonly keyExtractor?: (item: TItem, index: number) => string | number;
+    readonly keyExtractor?: (item: TItem, index: number) => number | string;
+    /** Loading state indicator */
+    readonly loading?: boolean;
+    /** Render function for individual items */
+    readonly renderItem: (item: TItem, index: number) => ReactNode;
 }
 
 /**
@@ -388,11 +384,10 @@ export interface StandardDataDisplayProperties<TItem>
  * >;
  * ```
  */
-export type ComponentProperties<TBase, TOverrides = {}> = Omit<
+export type ComponentProperties<
     TBase,
-    keyof TOverrides
-> &
-    TOverrides;
+    TOverrides = Record<string, unknown>,
+> = Omit<TBase, keyof TOverrides> & TOverrides;
 
 /**
  * Utility type for making certain properties required.
@@ -406,7 +401,7 @@ export type ComponentProperties<TBase, TOverrides = {}> = Omit<
  * >;
  * ```
  */
-export type RequireProperties<T, K extends keyof T> = T & Required<Pick<T, K>>;
+export type RequireProperties<T, K extends keyof T> = Required<Pick<T, K>> & T;
 
 /**
  * Utility type for making certain properties optional.

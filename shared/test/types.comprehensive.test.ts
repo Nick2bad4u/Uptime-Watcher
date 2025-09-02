@@ -178,7 +178,7 @@ describe("shared/types type guards and validators", () => {
             status: "up",
             monitoring: true,
             responseTime: 150,
-            checkInterval: 60000,
+            checkInterval: 60_000,
             timeout: 5000,
             retryAttempts: 3,
             history: [],

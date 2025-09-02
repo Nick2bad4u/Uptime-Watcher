@@ -30,8 +30,8 @@ describe("Schemas - Complete Function Coverage", () => {
                 id: "test-id",
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60000,
-                timeout: 30000,
+                checkInterval: 60_000,
+                timeout: 30_000,
                 monitoring: true,
                 status: "up",
                 history: [],
@@ -50,8 +50,8 @@ describe("Schemas - Complete Function Coverage", () => {
                 type: "port",
                 host: "example.com",
                 port: 80,
-                checkInterval: 60000,
-                timeout: 30000,
+                checkInterval: 60_000,
+                timeout: 30_000,
                 monitoring: true,
                 status: "up",
                 history: [],
@@ -63,8 +63,8 @@ describe("Schemas - Complete Function Coverage", () => {
                 id: "ping-id",
                 type: "ping",
                 host: "example.com",
-                checkInterval: 60000,
-                timeout: 30000,
+                checkInterval: 60_000,
+                timeout: 30_000,
                 monitoring: true,
                 status: "up",
                 history: [],
@@ -77,8 +77,8 @@ describe("Schemas - Complete Function Coverage", () => {
                 type: "dns",
                 host: "example.com",
                 recordType: "A",
-                checkInterval: 60000,
-                timeout: 30000,
+                checkInterval: 60_000,
+                timeout: 30_000,
                 monitoring: true,
                 status: "up",
                 history: [],
@@ -95,7 +95,7 @@ describe("Schemas - Complete Function Coverage", () => {
                 "url",
                 "https://example.com"
             );
-            schemasModule.validateMonitorField("http", "timeout", 30000);
+            schemasModule.validateMonitorField("http", "timeout", 30_000);
             schemasModule.validateMonitorField("port", "host", "example.com");
             schemasModule.validateMonitorField("port", "port", 80);
             schemasModule.validateMonitorField("ping", "host", "example.com");
@@ -136,8 +136,8 @@ describe("Schemas - Complete Function Coverage", () => {
                         id: "monitor-1",
                         type: "http",
                         url: "https://example.com",
-                        checkInterval: 60000,
-                        timeout: 30000,
+                        checkInterval: 60_000,
+                        timeout: 30_000,
                         monitoring: true,
                         status: "up",
                         history: [],
@@ -190,10 +190,10 @@ describe("Schemas - Complete Function Coverage", () => {
             schemasModule.validateMonitorField(
                 "http",
                 "checkInterval",
-                2592000000
+                2_592_000_000
             ); // Maximum
             schemasModule.validateMonitorField("http", "timeout", 1000); // Minimum
-            schemasModule.validateMonitorField("http", "timeout", 300000); // Maximum
+            schemasModule.validateMonitorField("http", "timeout", 300_000); // Maximum
             schemasModule.validateMonitorField("http", "retryAttempts", 0); // Minimum
             schemasModule.validateMonitorField("http", "retryAttempts", 10); // Maximum
 
@@ -219,7 +219,7 @@ describe("Schemas - Complete Function Coverage", () => {
                     "nonexistentfield",
                     "value"
                 );
-            } catch (error) {
+            } catch {
                 // Expected to throw for unknown fields
             }
 
@@ -259,9 +259,9 @@ describe("Schemas - Complete Function Coverage", () => {
                 schemasModule.validateMonitorField(
                     type,
                     "checkInterval",
-                    60000
+                    60_000
                 );
-                schemasModule.validateMonitorField(type, "timeout", 30000);
+                schemasModule.validateMonitorField(type, "timeout", 30_000);
                 schemasModule.validateMonitorField(type, "monitoring", true);
                 schemasModule.validateMonitorField(type, "status", "up");
                 schemasModule.validateMonitorField(type, "responseTime", 200);

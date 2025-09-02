@@ -29,14 +29,14 @@ export interface CombineSignalsOptions {
  * @public
  */
 export interface RetryWithAbortOptions {
-    /** Maximum number of retry attempts */
-    maxRetries?: number;
-    /** Initial delay between retries in milliseconds */
-    initialDelay?: number;
     /** Multiplier for exponential backoff */
     backoffMultiplier?: number;
+    /** Initial delay between retries in milliseconds */
+    initialDelay?: number;
     /** Maximum delay between retries in milliseconds */
     maxDelay?: number;
+    /** Maximum number of retry attempts */
+    maxRetries?: number;
     /** AbortSignal to respect during retries */
     signal?: AbortSignal;
 }
@@ -186,10 +186,10 @@ export async function retryWithAbort<T>(
     options: RetryWithAbortOptions = {}
 ): Promise<T> {
     const {
-        maxRetries = 3,
-        initialDelay = 1000,
         backoffMultiplier = 2,
-        maxDelay = 30000,
+        initialDelay = 1000,
+        maxDelay = 30_000,
+        maxRetries = 3,
         signal,
     } = options;
 
@@ -251,7 +251,7 @@ export async function retryWithAbort<T>(
  *
  * @public
  */
-export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
     return new Promise((resolve, reject) => {
         if (signal?.aborted) {
             reject(new Error("Sleep was aborted"));

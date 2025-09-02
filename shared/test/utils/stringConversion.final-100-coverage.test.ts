@@ -84,11 +84,11 @@ describe("String Conversion - Final 100% Coverage", () => {
                 { value: BigInt(123), expected: "123" },
             ];
 
-            testCases.forEach(({ value, expected: _expected }) => {
+            for (const { value, expected: _expected } of testCases) {
                 const result = safeStringify(value);
                 expect(typeof result).toBe("string");
                 // Don't test exact values since they may vary, just ensure no errors
-            });
+            }
         });
 
         it("should attempt to reach the default case through type manipulation", async ({

@@ -48,7 +48,7 @@ describe("Final 90% Function Coverage Push", () => {
             (key) => typeof (sharedTypes as any)[key] === "function"
         );
 
-        functions.forEach((funcName) => {
+        for (const funcName of functions) {
             try {
                 const func = (sharedTypes as any)[funcName];
                 // Call with various test arguments
@@ -61,10 +61,10 @@ describe("Final 90% Function Coverage Push", () => {
                 func(123);
                 func(true);
                 func([]);
-            } catch (error) {
+            } catch {
                 // Expected for some functions with strict validation
             }
-        });
+        }
 
         // Specifically test known functions
         if (typeof sharedTypes.isComputedSiteStatus === "function") {
@@ -114,7 +114,7 @@ describe("Final 90% Function Coverage Push", () => {
             (key) => typeof (chartConfig as any)[key] === "function"
         );
 
-        functions.forEach((funcName) => {
+        for (const funcName of functions) {
             try {
                 const func = (chartConfig as any)[funcName];
                 func();
@@ -125,10 +125,10 @@ describe("Final 90% Function Coverage Push", () => {
                 func(123);
                 func(true);
                 func([]);
-            } catch (error) {
+            } catch {
                 // Expected for some functions
             }
-        });
+        }
 
         expect(true).toBe(true);
     });
@@ -151,7 +151,7 @@ describe("Final 90% Function Coverage Push", () => {
             (key) => typeof (formData as any)[key] === "function"
         );
 
-        functions.forEach((funcName) => {
+        for (const funcName of functions) {
             try {
                 const func = (formData as any)[funcName];
                 func();
@@ -162,10 +162,10 @@ describe("Final 90% Function Coverage Push", () => {
                 func(123);
                 func(true);
                 func([]);
-            } catch (error) {
+            } catch {
                 // Expected for some functions
             }
-        });
+        }
 
         expect(true).toBe(true);
     });
@@ -188,7 +188,7 @@ describe("Final 90% Function Coverage Push", () => {
             (key) => typeof (monitorConfig as any)[key] === "function"
         );
 
-        functions.forEach((funcName) => {
+        for (const funcName of functions) {
             try {
                 const func = (monitorConfig as any)[funcName];
                 func();
@@ -199,10 +199,10 @@ describe("Final 90% Function Coverage Push", () => {
                 func(123);
                 func(true);
                 func([]);
-            } catch (error) {
+            } catch {
                 // Expected for some functions
             }
-        });
+        }
 
         expect(true).toBe(true);
     });
@@ -225,7 +225,7 @@ describe("Final 90% Function Coverage Push", () => {
             (key) => typeof (themeConfig as any)[key] === "function"
         );
 
-        functions.forEach((funcName) => {
+        for (const funcName of functions) {
             try {
                 const func = (themeConfig as any)[funcName];
                 func();
@@ -236,10 +236,10 @@ describe("Final 90% Function Coverage Push", () => {
                 func(123);
                 func(true);
                 func([]);
-            } catch (error) {
+            } catch {
                 // Expected for some functions
             }
-        });
+        }
 
         expect(true).toBe(true);
     });
@@ -262,7 +262,7 @@ describe("Final 90% Function Coverage Push", () => {
             (key) => typeof (validation as any)[key] === "function"
         );
 
-        functions.forEach((funcName) => {
+        for (const funcName of functions) {
             try {
                 const func = (validation as any)[funcName];
                 func();
@@ -275,10 +275,10 @@ describe("Final 90% Function Coverage Push", () => {
                 func([]);
                 func({ success: true, errors: [] });
                 func({ success: false, errors: ["error"] });
-            } catch (error) {
+            } catch {
                 // Expected for some functions
             }
-        });
+        }
 
         // Specifically test known validation functions
         if (typeof validation.createSuccessResult === "function") {
@@ -323,51 +323,51 @@ describe("Final 90% Function Coverage Push", () => {
         const cacheKeysFunctions = Object.keys(cacheKeys).filter(
             (key) => typeof (cacheKeys as any)[key] === "function"
         );
-        cacheKeysFunctions.forEach((funcName) => {
+        for (const funcName of cacheKeysFunctions) {
             try {
                 const func = (cacheKeys as any)[funcName];
                 func("test");
                 func("test", "param2");
                 func("test", "param2", "param3");
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         // environment
         const envFunctions = Object.keys(environment).filter(
             (key) => typeof (environment as any)[key] === "function"
         );
-        envFunctions.forEach((funcName) => {
+        for (const funcName of envFunctions) {
             try {
                 const func = (environment as any)[funcName];
                 func();
                 func("test");
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         // errorCatalog
         const errorCatalogFunctions = Object.keys(errorCatalog).filter(
             (key) => typeof (errorCatalog as any)[key] === "function"
         );
-        errorCatalogFunctions.forEach((funcName) => {
+        for (const funcName of errorCatalogFunctions) {
             try {
                 const func = (errorCatalog as any)[funcName];
                 func();
                 func("test");
                 func(new Error("test"));
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         // jsonSafety
         const jsonSafetyFunctions = Object.keys(jsonSafety).filter(
             (key) => typeof (jsonSafety as any)[key] === "function"
         );
-        jsonSafetyFunctions.forEach((funcName) => {
+        for (const funcName of jsonSafetyFunctions) {
             try {
                 const func = (jsonSafety as any)[funcName];
                 func("{}");
@@ -376,16 +376,16 @@ describe("Final 90% Function Coverage Push", () => {
                 func({ test: "value" });
                 func((x: any) => typeof x === "object");
                 func("test", "fallback");
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         // objectSafety
         const objectSafetyFunctions = Object.keys(objectSafety).filter(
             (key) => typeof (objectSafety as any)[key] === "function"
         );
-        objectSafetyFunctions.forEach((funcName) => {
+        for (const funcName of objectSafetyFunctions) {
             try {
                 const func = (objectSafety as any)[funcName];
                 if (funcName === "safeObjectIteration") {
@@ -406,16 +406,16 @@ describe("Final 90% Function Coverage Push", () => {
                     func(["test"]);
                     func({}, ["test"]);
                 }
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         // safeConversions
         const safeConversionsFunctions = Object.keys(safeConversions).filter(
             (key) => typeof (safeConversions as any)[key] === "function"
         );
-        safeConversionsFunctions.forEach((funcName) => {
+        for (const funcName of safeConversionsFunctions) {
             try {
                 const func = (safeConversions as any)[funcName];
                 func("123");
@@ -423,16 +423,16 @@ describe("Final 90% Function Coverage Push", () => {
                 func(null);
                 func(undefined);
                 func(true);
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         // stringConversion
         const stringConversionFunctions = Object.keys(stringConversion).filter(
             (key) => typeof (stringConversion as any)[key] === "function"
         );
-        stringConversionFunctions.forEach((funcName) => {
+        for (const funcName of stringConversionFunctions) {
             try {
                 const func = (stringConversion as any)[funcName];
                 func("test");
@@ -444,16 +444,16 @@ describe("Final 90% Function Coverage Push", () => {
                 func([]);
                 func(Symbol("test"));
                 func(() => {});
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         // typeGuards - Call all functions
         const typeGuardsFunctions = Object.keys(typeGuards).filter(
             (key) => typeof (typeGuards as any)[key] === "function"
         );
-        typeGuardsFunctions.forEach((funcName) => {
+        for (const funcName of typeGuardsFunctions) {
             try {
                 const func = (typeGuards as any)[funcName];
                 func(null);
@@ -467,16 +467,16 @@ describe("Final 90% Function Coverage Push", () => {
                 func(new Error());
                 func(() => {});
                 func(["prop1"], (x: any) => typeof x === "string");
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         // typeHelpers
         const typeHelpersFunctions = Object.keys(typeHelpers).filter(
             (key) => typeof (typeHelpers as any)[key] === "function"
         );
-        typeHelpersFunctions.forEach((funcName) => {
+        for (const funcName of typeHelpersFunctions) {
             try {
                 const func = (typeHelpers as any)[funcName];
                 func({});
@@ -484,16 +484,16 @@ describe("Final 90% Function Coverage Push", () => {
                 func("test");
                 func((_x: any) => true);
                 func("Custom error message");
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         // validation utils
         const validationUtilsFunctions = Object.keys(validationUtils).filter(
             (key) => typeof (validationUtils as any)[key] === "function"
         );
-        validationUtilsFunctions.forEach((funcName) => {
+        for (const funcName of validationUtilsFunctions) {
             try {
                 const func = (validationUtils as any)[funcName];
                 func("http");
@@ -501,10 +501,10 @@ describe("Final 90% Function Coverage Push", () => {
                 func("ping");
                 func({ type: "http", url: "https://example.com" });
                 func({ identifier: "test", name: "test", monitors: [] });
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         expect(true).toBe(true);
     });
@@ -527,7 +527,7 @@ describe("Final 90% Function Coverage Push", () => {
         const schemasFunctions = Object.keys(schemas).filter(
             (key) => typeof (schemas as any)[key] === "function"
         );
-        schemasFunctions.forEach((funcName) => {
+        for (const funcName of schemasFunctions) {
             try {
                 const func = (schemas as any)[funcName];
                 func({ type: "http", url: "https://example.com" });
@@ -535,10 +535,10 @@ describe("Final 90% Function Coverage Push", () => {
                 func({ type: "ping", host: "example.com" });
                 func("http", "url", "https://example.com");
                 func({ identifier: "test", name: "test", monitors: [] });
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         // validatorUtils
         const validatorUtilsFunctions = Object.keys(
@@ -546,17 +546,17 @@ describe("Final 90% Function Coverage Push", () => {
         ).filter(
             (key) => typeof (validatorUtilsModule as any)[key] === "function"
         );
-        validatorUtilsFunctions.forEach((funcName) => {
+        for (const funcName of validatorUtilsFunctions) {
             try {
                 const func = (validatorUtilsModule as any)[funcName];
                 func("test");
                 func({ type: "http" });
                 func(["monitor1", "monitor2"]);
                 func({ identifier: "test", name: "test" });
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         expect(true).toBe(true);
     });
@@ -579,7 +579,7 @@ describe("Final 90% Function Coverage Push", () => {
         const errorHandlingFunctions = Object.keys(errorHandling).filter(
             (key) => typeof (errorHandling as any)[key] === "function"
         );
-        errorHandlingFunctions.forEach((funcName) => {
+        for (const funcName of errorHandlingFunctions) {
             try {
                 const func = (errorHandling as any)[funcName];
                 if (
@@ -608,31 +608,31 @@ describe("Final 90% Function Coverage Push", () => {
                         setError: () => {},
                     });
                 }
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         // logTemplates
         const logTemplatesFunctions = Object.keys(logTemplates).filter(
             (key) => typeof (logTemplates as any)[key] === "function"
         );
-        logTemplatesFunctions.forEach((funcName) => {
+        for (const funcName of logTemplatesFunctions) {
             try {
                 const func = (logTemplates as any)[funcName];
                 func("test");
                 func("test", {});
                 func("test", { variables: { key: "value" } });
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         // siteStatus
         const siteStatusFunctions = Object.keys(siteStatus).filter(
             (key) => typeof (siteStatus as any)[key] === "function"
         );
-        siteStatusFunctions.forEach((funcName) => {
+        for (const funcName of siteStatusFunctions) {
             try {
                 const func = (siteStatus as any)[funcName];
                 func("up");
@@ -641,10 +641,10 @@ describe("Final 90% Function Coverage Push", () => {
                 func("checking");
                 func([]);
                 func([{ status: "up" }]);
-            } catch (error) {
+            } catch {
                 // Expected
             }
-        });
+        }
 
         expect(true).toBe(true);
     });
@@ -705,7 +705,7 @@ describe("Final 90% Function Coverage Push", () => {
                         logger: { error: () => {} },
                         operationName: "test",
                     });
-                } catch (e) {
+                } catch {
                     // Ignore errors, just ensuring function is called
                 }
             },
@@ -756,7 +756,7 @@ describe("Final 90% Function Coverage Push", () => {
                     func({
                         type: "http",
                         url: "https://example.com",
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         status: "up",
@@ -774,7 +774,7 @@ describe("Final 90% Function Coverage Push", () => {
                             },
                         ],
                     });
-                } catch (error) {
+                } catch {
                     // Expected for functions with strict validation
                 }
             }

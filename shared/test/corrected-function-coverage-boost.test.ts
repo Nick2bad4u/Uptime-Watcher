@@ -184,10 +184,10 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
             }
 
             // Error message formatting scenarios with proper typing
-            const errorTemplates: Array<{
+            const errorTemplates: {
                 template: string;
                 vars: Record<string, string>;
-            }> = [
+            }[] = [
                 {
                     template: "Error {code}: {message}",
                     vars: { code: "500", message: "Server error" },

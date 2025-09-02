@@ -26,19 +26,19 @@
  *
  * @packageDocumentation
  *
- * @see {@link docs/Packages/Chart.js/hybrid-type-system.md} for comprehensive documentation
+ * For comprehensive documentation, see docs/Packages/Chart.js/hybrid-type-system.md
  */
 
 // Import official Chart.js types
-import type { ChartOptions, ChartData } from "chart.js";
+import type { ChartData, ChartOptions } from "chart.js";
 
 // Import our custom business logic types
 import type {
-    ChartScalesConfig,
-    ChartPluginsConfig,
-    ChartThemeConfig,
     ChartDataPoint,
     ChartDatasetConfig,
+    ChartPluginsConfig,
+    ChartScalesConfig,
+    ChartThemeConfig,
 } from "./chartConfig.js";
 
 /**
@@ -60,6 +60,10 @@ export interface UptimeChartOptions {
         duration?: number;
         easing?: string;
     };
+    /** Dataset configurations */
+    datasets?: Record<string, unknown>;
+    /** Element configurations */
+    elements?: Record<string, unknown>;
     /** Interaction configuration */
     interaction?: {
         intersect?: boolean;
@@ -67,16 +71,12 @@ export interface UptimeChartOptions {
     };
     /** Whether to maintain aspect ratio */
     maintainAspectRatio?: boolean;
+    /** Enhanced plugin configuration with theme integration */
+    plugins?: ChartPluginsConfig;
     /** Whether the chart is responsive */
     responsive?: boolean;
     /** Enhanced scale configuration with business logic */
     scales?: ChartScalesConfig;
-    /** Enhanced plugin configuration with theme integration */
-    plugins?: ChartPluginsConfig;
-    /** Element configurations */
-    elements?: Record<string, unknown>;
-    /** Dataset configurations */
-    datasets?: Record<string, unknown>;
 }
 
 /**
@@ -89,14 +89,14 @@ export interface UptimeChartOptions {
  * @public
  */
 export interface ChartTypeRegistry {
-    line: "line";
     bar: "bar";
-    doughnut: "doughnut";
-    pie: "pie";
-    scatter: "scatter";
     bubble: "bubble";
+    doughnut: "doughnut";
+    line: "line";
+    pie: "pie";
     polarArea: "polarArea";
     radar: "radar";
+    scatter: "scatter";
 }
 
 /**
@@ -110,10 +110,10 @@ export interface ChartTypeRegistry {
  * @public
  */
 export interface UptimeChartData {
+    /** Enhanced datasets with custom configuration */
+    datasets: ChartDatasetConfig[];
     /** Chart labels */
     labels?: string[];
-    /** Enhanced datasets with custom configuration */
-    datasets: Array<ChartDatasetConfig>;
 }
 
 /**
@@ -130,12 +130,12 @@ export interface UptimeChartData {
 export interface UptimeChartConfig<
     TType extends keyof ChartTypeRegistry = "line",
 > {
-    /** Chart type */
-    type: ChartTypeRegistry[TType];
     /** Enhanced chart data */
     data: UptimeChartData;
     /** Enhanced chart options */
     options?: UptimeChartOptions;
+    /** Chart type */
+    type: ChartTypeRegistry[TType];
 }
 
 /**
@@ -150,19 +150,6 @@ export interface UptimeChartConfig<
  */
 export interface ThemeAwareChartFactory {
     /**
-     * Create a line chart configuration with theme integration.
-     *
-     * @param data - Chart data
-     * @param themeConfig - Theme configuration
-     *
-     * @returns Complete chart configuration
-     */
-    createLineChart(
-        data: UptimeChartData,
-        themeConfig: ChartThemeConfig
-    ): UptimeChartConfig<"line">;
-
-    /**
      * Create a bar chart configuration with theme integration.
      *
      * @param data - Chart data
@@ -170,10 +157,10 @@ export interface ThemeAwareChartFactory {
      *
      * @returns Complete chart configuration
      */
-    createBarChart(
+    createBarChart: (
         data: UptimeChartData,
         themeConfig: ChartThemeConfig
-    ): UptimeChartConfig<"bar">;
+    ) => UptimeChartConfig<"bar">;
 
     /**
      * Create a doughnut chart configuration with theme integration.
@@ -183,10 +170,23 @@ export interface ThemeAwareChartFactory {
      *
      * @returns Complete chart configuration
      */
-    createDoughnutChart(
+    createDoughnutChart: (
         data: UptimeChartData,
         themeConfig: ChartThemeConfig
-    ): UptimeChartConfig<"doughnut">;
+    ) => UptimeChartConfig<"doughnut">;
+
+    /**
+     * Create a line chart configuration with theme integration.
+     *
+     * @param data - Chart data
+     * @param themeConfig - Theme configuration
+     *
+     * @returns Complete chart configuration
+     */
+    createLineChart: (
+        data: UptimeChartData,
+        themeConfig: ChartThemeConfig
+    ) => UptimeChartConfig;
 }
 
 /**
@@ -200,19 +200,6 @@ export interface ThemeAwareChartFactory {
  */
 export interface ChartUtilities {
     /**
-     * Safely get scale configuration from chart options.
-     *
-     * @param options - Chart options (hybrid or official)
-     * @param scaleId - Scale identifier
-     *
-     * @returns Scale configuration or undefined
-     */
-    getScaleConfig(
-        options: UptimeChartOptions | ChartOptions,
-        scaleId: string
-    ): ChartScalesConfig[keyof ChartScalesConfig] | undefined;
-
-    /**
      * Safely get plugin configuration from chart options.
      *
      * @param options - Chart options (hybrid or official)
@@ -220,10 +207,23 @@ export interface ChartUtilities {
      *
      * @returns Plugin configuration or undefined
      */
-    getPluginConfig(
-        options: UptimeChartOptions | ChartOptions,
+    getPluginConfig: (
+        options: ChartOptions | UptimeChartOptions,
         pluginId: string
-    ): ChartPluginsConfig[keyof ChartPluginsConfig] | undefined;
+    ) => ChartPluginsConfig[keyof ChartPluginsConfig] | undefined;
+
+    /**
+     * Safely get scale configuration from chart options.
+     *
+     * @param options - Chart options (hybrid or official)
+     * @param scaleId - Scale identifier
+     *
+     * @returns Scale configuration or undefined
+     */
+    getScaleConfig: (
+        options: ChartOptions | UptimeChartOptions,
+        scaleId: string
+    ) => ChartScalesConfig[keyof ChartScalesConfig] | undefined;
 
     /**
      * Convert hybrid chart configuration to Chart.js official format.
@@ -232,12 +232,12 @@ export interface ChartUtilities {
      *
      * @returns Chart.js compatible configuration
      */
-    toChartJsConfig<TType extends keyof ChartTypeRegistry>(
+    toChartJsConfig: <TType extends keyof ChartTypeRegistry>(
         config: UptimeChartConfig<TType>
-    ): {
-        type: ChartTypeRegistry[TType];
+    ) => {
         data: ChartData<ChartTypeRegistry[TType]>;
         options: ChartOptions<ChartTypeRegistry[TType]>;
+        type: ChartTypeRegistry[TType];
     };
 }
 
@@ -250,37 +250,36 @@ export interface ChartUtilities {
  * @public
  */
 export interface UptimeChartDataPoint extends ChartDataPoint {
-    /** Timestamp for the data point */
-    timestamp?: Date | string | number;
-    /** Status information for uptime monitoring */
-    status?: "up" | "down" | "warning" | "unknown";
-    /** Response time in milliseconds */
-    responseTime?: number;
     /** Additional metadata for business logic */
     metadata?: {
-        endpoint?: string;
-        statusCode?: number;
-        errorMessage?: string;
         [key: string]: unknown;
+        endpoint?: string;
+        errorMessage?: string;
+        statusCode?: number;
     };
+    /** Response time in milliseconds */
+    responseTime?: number;
+    /** Status information for uptime monitoring */
+    status?: "down" | "unknown" | "up" | "warning";
+    /** Timestamp for the data point */
+    timestamp?: Date | number | string;
 }
 
 /**
- * Re-export commonly used types for convenience.
+ * This file provides hybrid chart types that combine Chart.js official types
+ * with custom business logic types. Consumers should import types directly from
+ * their respective modules:
+ *
+ * - Chart.js types: import from "chart.js"
+ * - Custom types: import from "./chartConfig.js"
  *
  * @public
  */
-export type {
-    // Custom business logic types
-    ChartScalesConfig,
-    ChartPluginsConfig,
-    ChartThemeConfig,
-    ChartDataPoint,
-    ChartDatasetConfig,
-} from "./chartConfig.js";
 
-// Re-export Chart.js official types
-export type { ChartOptions, ChartData } from "chart.js";
+// Note: Re-exports have been removed to comply with no-barrel-files rule.
+// Import ChartDataPoint, ChartDatasetConfig, ChartPluginsConfig, ChartScalesConfig,
+// ChartThemeConfig directly from "./chartConfig.js"
+// Import ChartData, ChartOptions directly from "chart.js"
 
 /**
  * Type guard to check if chart options use our hybrid format.

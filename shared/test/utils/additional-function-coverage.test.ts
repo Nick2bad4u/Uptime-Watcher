@@ -376,7 +376,7 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const result1 = typeGuards.isValidPort(80);
-            const result2 = typeGuards.isValidPort(99999);
+            const result2 = typeGuards.isValidPort(99_999);
             const result3 = typeGuards.isValidPort(-1);
 
             expect(result1).toBe(true);
@@ -396,7 +396,7 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = typeGuards.isValidTimestamp(1640995200000);
+            const result1 = typeGuards.isValidTimestamp(1_640_995_200_000);
             const result2 = typeGuards.isValidTimestamp(-1);
 
             expect(result1).toBe(true);

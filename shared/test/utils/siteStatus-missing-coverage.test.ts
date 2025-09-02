@@ -32,7 +32,7 @@ describe("SiteStatus - Missing Coverage", () => {
                         status: "invalid-status" as any, // This should trigger the default case
                         monitoring: true,
                         responseTime: 100,
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         url: "https://example.com",
@@ -71,7 +71,7 @@ describe("SiteStatus - Missing Coverage", () => {
                 true,
             ];
 
-            invalidStatuses.forEach((invalidStatus) => {
+            for (const invalidStatus of invalidStatuses) {
                 const siteWithInvalidStatus = {
                     id: "1",
                     name: "Test Site",
@@ -85,7 +85,7 @@ describe("SiteStatus - Missing Coverage", () => {
                             status: invalidStatus as any,
                             monitoring: true,
                             responseTime: 100,
-                            checkInterval: 60000,
+                            checkInterval: 60_000,
                             timeout: 5000,
                             retryAttempts: 3,
                             url: "https://example.com",
@@ -98,7 +98,7 @@ describe("SiteStatus - Missing Coverage", () => {
                     siteWithInvalidStatus
                 );
                 expect(description).toBe("Unknown status");
-            });
+            }
         });
 
         test("should hit default case with mixed invalid statuses", ({
@@ -129,7 +129,7 @@ describe("SiteStatus - Missing Coverage", () => {
                         status: "invalid-status-1" as any,
                         monitoring: true,
                         responseTime: 100,
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         url: "https://example.com",
@@ -142,7 +142,7 @@ describe("SiteStatus - Missing Coverage", () => {
                         status: "invalid-status-2" as any,
                         monitoring: true,
                         responseTime: 150,
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         host: "example.com",
@@ -189,7 +189,7 @@ describe("SiteStatus - Missing Coverage", () => {
                         status: "definitely-not-a-valid-status" as any,
                         monitoring: true,
                         responseTime: 100,
-                        checkInterval: 60000,
+                        checkInterval: 60_000,
                         timeout: 5000,
                         retryAttempts: 3,
                         url: "https://example.com",

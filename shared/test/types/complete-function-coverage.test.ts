@@ -117,7 +117,7 @@ describe("Types Complete Function Coverage", () => {
             const validRow = {
                 monitorId: "monitor1",
                 status: "up",
-                timestamp: 123456,
+                timestamp: 123_456,
             };
             const result1 = database.isValidHistoryRow(validRow);
             const result2 = database.isValidHistoryRow({});

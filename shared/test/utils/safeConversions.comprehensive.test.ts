@@ -47,11 +47,11 @@ describe("safeConversions - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(safeParseCheckInterval(60000)).toBe(60000);
-            expect(safeParseCheckInterval("60000")).toBe(60000);
-            expect(safeParseCheckInterval(60)).toBe(300000); // below minimum
-            expect(safeParseCheckInterval("invalid")).toBe(300000);
-            expect(safeParseCheckInterval(null)).toBe(300000);
+            expect(safeParseCheckInterval(60_000)).toBe(60_000);
+            expect(safeParseCheckInterval("60000")).toBe(60_000);
+            expect(safeParseCheckInterval(60)).toBe(300_000); // below minimum
+            expect(safeParseCheckInterval("invalid")).toBe(300_000);
+            expect(safeParseCheckInterval(null)).toBe(300_000);
         });
     });
 
@@ -118,7 +118,7 @@ describe("safeConversions - Complete Function Coverage", () => {
             expect(safeParsePort(443)).toBe(443);
             expect(safeParsePort("8080")).toBe(8080);
             expect(safeParsePort(0)).toBe(80); // invalid port
-            expect(safeParsePort(65536)).toBe(80); // invalid port
+            expect(safeParsePort(65_536)).toBe(80); // invalid port
             expect(safeParsePort("invalid", 3000)).toBe(3000);
             expect(safeParsePort(null)).toBe(80);
         });
@@ -173,12 +173,12 @@ describe("safeConversions - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(safeParseTimeout(5000)).toBe(5000);
-            expect(safeParseTimeout("10000")).toBe(10000);
+            expect(safeParseTimeout("10000")).toBe(10_000);
             expect(safeParseTimeout(500)).toBe(500); // positive values pass through
-            expect(safeParseTimeout(0)).toBe(10000); // zero is invalid
-            expect(safeParseTimeout(-1000)).toBe(10000); // negative is invalid
-            expect(safeParseTimeout("invalid")).toBe(10000);
-            expect(safeParseTimeout(null)).toBe(10000);
+            expect(safeParseTimeout(0)).toBe(10_000); // zero is invalid
+            expect(safeParseTimeout(-1000)).toBe(10_000); // negative is invalid
+            expect(safeParseTimeout("invalid")).toBe(10_000);
+            expect(safeParseTimeout(null)).toBe(10_000);
         });
     });
 

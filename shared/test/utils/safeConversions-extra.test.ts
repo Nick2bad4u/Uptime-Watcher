@@ -34,7 +34,7 @@ describe("safeNumberConversion", () => {
         expect(safeNumberConversion(123)).toBe(123);
         expect(safeNumberConversion(0)).toBe(0);
         expect(safeNumberConversion(-456)).toBe(-456);
-        expect(safeNumberConversion(3.14159)).toBe(3.14159);
+        expect(safeNumberConversion(3.141_59)).toBe(3.141_59);
     });
 
     it("should convert valid numeric strings to numbers", async ({
@@ -49,10 +49,10 @@ describe("safeNumberConversion", () => {
         expect(safeNumberConversion("123")).toBe(123);
         expect(safeNumberConversion("0")).toBe(0);
         expect(safeNumberConversion("-456")).toBe(-456);
-        expect(safeNumberConversion("3.14159")).toBe(3.14159);
+        expect(safeNumberConversion("3.14159")).toBe(3.141_59);
         expect(safeNumberConversion("1e3")).toBe(1000);
         expect(safeNumberConversion("0xFF")).toBe(255);
-        expect(safeNumberConversion("1.23e-4")).toBe(0.000123);
+        expect(safeNumberConversion("1.23e-4")).toBe(0.000_123);
     });
 
     it("should return default value for invalid strings", async ({
@@ -110,7 +110,7 @@ describe("safeNumberConversion", () => {
 
         expect(safeNumberConversion(Infinity)).toBe(Infinity);
         expect(safeNumberConversion(-Infinity)).toBe(-Infinity);
-        expect(safeNumberConversion(NaN)).toBe(0); // NaN is a number but should use default
+        expect(safeNumberConversion(Number.NaN)).toBe(0); // NaN is a number but should use default
     });
 
     it("should handle edge cases with string representation of special values", async ({
@@ -140,8 +140,8 @@ describe("safeParseCheckInterval", () => {
 
         expect(safeParseCheckInterval(1000)).toBe(1000);
         expect(safeParseCheckInterval(5000)).toBe(5000);
-        expect(safeParseCheckInterval(300000)).toBe(300000);
-        expect(safeParseCheckInterval("60000")).toBe(60000);
+        expect(safeParseCheckInterval(300_000)).toBe(300_000);
+        expect(safeParseCheckInterval("60000")).toBe(60_000);
     });
 
     it("should enforce minimum check interval of 1000ms", async ({
@@ -153,10 +153,10 @@ describe("safeParseCheckInterval", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(safeParseCheckInterval(500)).toBe(300000); // default
-        expect(safeParseCheckInterval(999)).toBe(300000); // default
-        expect(safeParseCheckInterval("0")).toBe(300000); // default
-        expect(safeParseCheckInterval("-1000")).toBe(300000); // default
+        expect(safeParseCheckInterval(500)).toBe(300_000); // default
+        expect(safeParseCheckInterval(999)).toBe(300_000); // default
+        expect(safeParseCheckInterval("0")).toBe(300_000); // default
+        expect(safeParseCheckInterval("-1000")).toBe(300_000); // default
     });
 
     it("should use custom default value", async ({ task, annotate }) => {
@@ -166,7 +166,7 @@ describe("safeParseCheckInterval", () => {
         await annotate("Type: Business Logic", "type");
 
         expect(safeParseCheckInterval(500, 5000)).toBe(5000);
-        expect(safeParseCheckInterval("invalid", 10000)).toBe(10000);
+        expect(safeParseCheckInterval("invalid", 10_000)).toBe(10_000);
     });
 
     it("should handle invalid inputs", async ({ task, annotate }) => {
@@ -175,9 +175,9 @@ describe("safeParseCheckInterval", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(safeParseCheckInterval("invalid")).toBe(300000);
-        expect(safeParseCheckInterval(null)).toBe(300000);
-        expect(safeParseCheckInterval(undefined)).toBe(300000);
+        expect(safeParseCheckInterval("invalid")).toBe(300_000);
+        expect(safeParseCheckInterval(null)).toBe(300_000);
+        expect(safeParseCheckInterval(undefined)).toBe(300_000);
     });
 });
 
@@ -208,7 +208,7 @@ describe("safeParseFloat", () => {
         expect(safeParseFloat("123.45")).toBe(123.45);
         expect(safeParseFloat("0")).toBe(0);
         expect(safeParseFloat("-456.789")).toBe(-456.789);
-        expect(safeParseFloat("3.14159")).toBe(3.14159);
+        expect(safeParseFloat("3.14159")).toBe(3.141_59);
         expect(safeParseFloat(".5")).toBe(0.5);
         expect(safeParseFloat("5.")).toBe(5);
     });
@@ -279,7 +279,7 @@ describe("safeParseFloat", () => {
 
         expect(safeParseFloat(Infinity)).toBe(Infinity);
         expect(safeParseFloat(-Infinity)).toBe(-Infinity);
-        expect(safeParseFloat(NaN)).toBe(0); // NaN is a number but should use default
+        expect(safeParseFloat(Number.NaN)).toBe(0); // NaN is a number but should use default
     });
 });
 
@@ -385,7 +385,7 @@ describe("safeParseInt", () => {
 
         expect(safeParseInt(Infinity)).toBe(Infinity); // Infinity is a number, Math.floor(Infinity) = Infinity
         expect(safeParseInt(-Infinity)).toBe(-Infinity); // -Infinity is a number, Math.floor(-Infinity) = -Infinity
-        expect(safeParseInt(NaN)).toBe(0); // NaN should use default
+        expect(safeParseInt(Number.NaN)).toBe(0); // NaN should use default
     });
 });
 
@@ -479,7 +479,7 @@ describe("safeParsePort", () => {
         expect(safeParsePort(80)).toBe(80);
         expect(safeParsePort(443)).toBe(443);
         expect(safeParsePort(8080)).toBe(8080);
-        expect(safeParsePort(65535)).toBe(65535);
+        expect(safeParsePort(65_535)).toBe(65_535);
         expect(safeParsePort("3000")).toBe(3000);
     });
 
@@ -519,8 +519,8 @@ describe("safeParsePort", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(safeParsePort(65536)).toBe(80);
-        expect(safeParsePort(100000)).toBe(80);
+        expect(safeParsePort(65_536)).toBe(80);
+        expect(safeParsePort(100_000)).toBe(80);
         expect(safeParsePort("70000")).toBe(80);
     });
 
@@ -531,7 +531,7 @@ describe("safeParsePort", () => {
         await annotate("Type: Business Logic", "type");
 
         expect(safeParsePort(0, 3000)).toBe(3000);
-        expect(safeParsePort(65536, 8080)).toBe(8080);
+        expect(safeParsePort(65_536, 8080)).toBe(8080);
         expect(safeParsePort("invalid", 443)).toBe(443);
     });
 
@@ -555,8 +555,8 @@ describe("safeParsePort", () => {
 
         expect(safeParsePort(1)).toBe(1); // minimum valid port
         expect(safeParsePort("1")).toBe(1);
-        expect(safeParsePort(65535)).toBe(65535); // maximum valid port
-        expect(safeParsePort("65535")).toBe(65535);
+        expect(safeParsePort(65_535)).toBe(65_535); // maximum valid port
+        expect(safeParsePort("65535")).toBe(65_535);
     });
 
     it("should handle floating point numbers by flooring them", async ({
@@ -774,8 +774,8 @@ describe("safeParseTimeout", () => {
 
         expect(safeParseTimeout(1000)).toBe(1000);
         expect(safeParseTimeout(5000)).toBe(5000);
-        expect(safeParseTimeout(30000)).toBe(30000);
-        expect(safeParseTimeout("15000")).toBe(15000);
+        expect(safeParseTimeout(30_000)).toBe(30_000);
+        expect(safeParseTimeout("15000")).toBe(15_000);
     });
 
     it("should accept fractional timeout values", async ({
@@ -798,8 +798,8 @@ describe("safeParseTimeout", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(safeParseTimeout(0)).toBe(10000);
-        expect(safeParseTimeout("0")).toBe(10000);
+        expect(safeParseTimeout(0)).toBe(10_000);
+        expect(safeParseTimeout("0")).toBe(10_000);
     });
 
     it("should return default for negative timeout", async ({
@@ -811,9 +811,9 @@ describe("safeParseTimeout", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(safeParseTimeout(-1000)).toBe(10000);
-        expect(safeParseTimeout(-5000)).toBe(10000);
-        expect(safeParseTimeout("-2500")).toBe(10000);
+        expect(safeParseTimeout(-1000)).toBe(10_000);
+        expect(safeParseTimeout(-5000)).toBe(10_000);
+        expect(safeParseTimeout("-2500")).toBe(10_000);
     });
 
     it("should use custom default value", async ({ task, annotate }) => {
@@ -823,8 +823,8 @@ describe("safeParseTimeout", () => {
         await annotate("Type: Business Logic", "type");
 
         expect(safeParseTimeout(0, 5000)).toBe(5000);
-        expect(safeParseTimeout(-1000, 15000)).toBe(15000);
-        expect(safeParseTimeout("invalid", 20000)).toBe(20000);
+        expect(safeParseTimeout(-1000, 15_000)).toBe(15_000);
+        expect(safeParseTimeout("invalid", 20_000)).toBe(20_000);
     });
 
     it("should handle invalid inputs", async ({ task, annotate }) => {
@@ -833,10 +833,10 @@ describe("safeParseTimeout", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(safeParseTimeout("invalid")).toBe(10000);
-        expect(safeParseTimeout(null)).toBe(10000);
-        expect(safeParseTimeout(undefined)).toBe(10000);
-        expect(safeParseTimeout({})).toBe(10000);
+        expect(safeParseTimeout("invalid")).toBe(10_000);
+        expect(safeParseTimeout(null)).toBe(10_000);
+        expect(safeParseTimeout(undefined)).toBe(10_000);
+        expect(safeParseTimeout({})).toBe(10_000);
     });
 
     it("should handle special numeric values", async ({ task, annotate }) => {
@@ -846,8 +846,8 @@ describe("safeParseTimeout", () => {
         await annotate("Type: Business Logic", "type");
 
         expect(safeParseTimeout(Infinity)).toBe(Infinity);
-        expect(safeParseTimeout(-Infinity)).toBe(10000); // negative, so use default
-        expect(safeParseTimeout(NaN)).toBe(10000); // NaN should use default
+        expect(safeParseTimeout(-Infinity)).toBe(10_000); // negative, so use default
+        expect(safeParseTimeout(Number.NaN)).toBe(10_000); // NaN should use default
     });
 
     it("should handle very small positive numbers", async ({
@@ -866,8 +866,8 @@ describe("safeParseTimeout", () => {
 });
 
 describe("safeParseTimestamp", () => {
-    const CURRENT_TIME = 1640995200000; // 2022-01-01 00:00:00 UTC
-    const ONE_DAY = 86400000; // 24 hours in milliseconds
+    const CURRENT_TIME = 1_640_995_200_000; // 2022-01-01 00:00:00 UTC
+    const ONE_DAY = 86_400_000; // 24 hours in milliseconds
 
     beforeEach(() => {
         vi.spyOn(Date, "now").mockReturnValue(CURRENT_TIME);
@@ -998,7 +998,7 @@ describe("safeParseTimestamp", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        const oldTimestamp = 1000000000000; // Year 2001
+        const oldTimestamp = 1_000_000_000_000; // Year 2001
         expect(safeParseTimestamp(oldTimestamp)).toBe(oldTimestamp);
         expect(safeParseTimestamp("1000000000000")).toBe(oldTimestamp);
     });
@@ -1011,7 +1011,7 @@ describe("safeParseTimestamp", () => {
 
         expect(safeParseTimestamp(Infinity)).toBe(CURRENT_TIME); // Too far in future
         expect(safeParseTimestamp(-Infinity)).toBe(CURRENT_TIME); // Negative
-        expect(safeParseTimestamp(NaN)).toBe(CURRENT_TIME); // Invalid
+        expect(safeParseTimestamp(Number.NaN)).toBe(CURRENT_TIME); // Invalid
     });
 
     it("should use current time as default when no defaultValue provided", async ({
@@ -1042,7 +1042,7 @@ describe("Function Coverage Validation", () => {
 
         // Call each function with valid inputs to ensure they execute
         expect(safeNumberConversion(123)).toBe(123);
-        expect(safeParseCheckInterval(60000)).toBe(60000);
+        expect(safeParseCheckInterval(60_000)).toBe(60_000);
         expect(safeParseFloat(3.14)).toBe(3.14);
         expect(safeParseInt(42)).toBe(42);
         expect(safeParsePercentage(85.5)).toBe(85.5);
@@ -1054,14 +1054,14 @@ describe("Function Coverage Validation", () => {
 
         // Verify functions handle edge cases
         expect(safeNumberConversion("invalid")).toBe(0);
-        expect(safeParseCheckInterval("invalid")).toBe(300000);
+        expect(safeParseCheckInterval("invalid")).toBe(300_000);
         expect(safeParseFloat("invalid")).toBe(0);
         expect(safeParseInt("invalid")).toBe(0);
         expect(safeParsePercentage("invalid")).toBe(0);
         expect(safeParsePort("invalid")).toBe(80);
         expect(safeParsePositiveInt("invalid")).toBe(1);
         expect(safeParseRetryAttempts("invalid")).toBe(3);
-        expect(safeParseTimeout("invalid")).toBe(10000);
+        expect(safeParseTimeout("invalid")).toBe(10_000);
         expect(safeParseTimestamp("invalid")).toBeGreaterThan(0);
     });
 });

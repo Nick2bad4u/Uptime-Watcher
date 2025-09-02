@@ -10,6 +10,7 @@
  */
 
 import type { Simplify, UnknownRecord } from "type-fest";
+
 import type { MonitorConfig } from "./monitorConfig";
 import type { MonitorTypeConfig } from "./monitorTypes";
 import type { BaseValidationResult } from "./validation";
@@ -50,7 +51,7 @@ export interface KnownConfigValues {
     /** Auto-refresh interval in milliseconds */
     refreshInterval: number;
     /** Application theme (dark/light/high-contrast) */
-    theme: "dark" | "light" | "high-contrast";
+    theme: "dark" | "high-contrast" | "light";
 }
 
 /**

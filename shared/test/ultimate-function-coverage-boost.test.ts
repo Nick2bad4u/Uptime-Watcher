@@ -98,7 +98,7 @@ describe("Ultimate Function Coverage Boost", () => {
             [["a", "b"]],
             [() => {}],
             // Edge cases
-            [NaN],
+            [Number.NaN],
             [Infinity],
             [-Infinity],
             [""],
@@ -111,10 +111,10 @@ describe("Ultimate Function Coverage Boost", () => {
         let functionsCallCount = 0;
 
         // Iterate through each module
-        modules.forEach(({ module: mod }) => {
+        for (const { module: mod } of modules) {
             const exportedKeys = Object.keys(mod);
 
-            exportedKeys.forEach((key) => {
+            for (const key of exportedKeys) {
                 const exportedValue = (mod as any)[key];
 
                 if (typeof exportedValue === "function") {
@@ -128,7 +128,7 @@ describe("Ultimate Function Coverage Boost", () => {
                             exportedValue(...args);
                             functionCalled = true;
                             break; // Function executed successfully, move to next
-                        } catch (error) {
+                        } catch {
                             // Function threw an error, but it was still called
                             // This still counts for function coverage
                             functionCalled = true;
@@ -139,8 +139,8 @@ describe("Ultimate Function Coverage Boost", () => {
                     // Ensure we at least attempted to call the function
                     expect(functionCalled).toBe(true);
                 }
-            });
-        });
+            }
+        }
 
         // Ensure we found and called a significant number of functions
         expect(functionsCallCount).toBeGreaterThan(50);
@@ -184,7 +184,7 @@ describe("Ultimate Function Coverage Boost", () => {
             status: "up" as any,
             monitoring: true,
             responseTime: 100,
-            checkInterval: 30000,
+            checkInterval: 30_000,
             timeout: 5000,
             retryAttempts: 3,
         };
@@ -324,29 +324,29 @@ describe("Ultimate Function Coverage Boost", () => {
             validatorUtilsModule,
         ];
 
-        allModules.forEach((mod) => {
-            Object.keys(mod).forEach((key) => {
+        for (const mod of allModules) {
+            for (const key of Object.keys(mod)) {
                 const value = (mod as any)[key];
                 if (typeof value === "function") {
                     try {
                         // Attempt to call with minimal arguments
                         value();
-                    } catch (e) {
+                    } catch {
                         try {
                             // Try with one argument
                             value("test");
-                        } catch (e2) {
+                        } catch {
                             try {
                                 // Try with multiple arguments
                                 value("test", {}, [], 123, true);
-                            } catch (e3) {
+                            } catch {
                                 // Function was called even if it threw - that's what matters for coverage
                             }
                         }
                     }
                 }
-            });
-        });
+            }
+        }
 
         // Test passes if we get here without major errors
         expect(true).toBe(true);

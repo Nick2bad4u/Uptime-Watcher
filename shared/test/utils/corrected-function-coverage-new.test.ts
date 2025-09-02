@@ -50,7 +50,7 @@ describe("Corrected Function Coverage Tests", () => {
 
             // Test iteration with correct signature
             const testObj = { a: 1, b: 2 };
-            const results: Array<[string, unknown]> = [];
+            const results: [string, unknown][] = [];
             objectSafety.safeObjectIteration(testObj, (key, value) => {
                 results.push([key, value]);
             });

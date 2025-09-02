@@ -174,11 +174,11 @@ describe("isMonitorStatus", () => {
         "up",
     ];
 
-    validStatuses.forEach((status) => {
+    for (const status of validStatuses) {
         it(`should return true for valid status '${status}'`, () => {
             expect(isMonitorStatus(status)).toBe(true);
         });
-    });
+    }
 
     it("should return false for 'mixed' status", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
@@ -318,11 +318,11 @@ describe("isSiteStatus", () => {
         "up",
     ];
 
-    validStatuses.forEach((status) => {
+    for (const status of validStatuses) {
         it(`should return true for valid status '${status}'`, () => {
             expect(isSiteStatus(status)).toBe(true);
         });
-    });
+    }
 
     it("should return false for empty string", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
@@ -449,9 +449,9 @@ describe("isSiteStatus", () => {
         const computedStatuses = ["mixed", "unknown"];
         const allSiteStatuses = [...monitorStatuses, ...computedStatuses];
 
-        allSiteStatuses.forEach((status) => {
+        for (const status of allSiteStatuses) {
             expect(isSiteStatus(status)).toBe(true);
-        });
+        }
     });
 });
 
@@ -462,7 +462,7 @@ describe("validateMonitor", () => {
         status: "up",
         monitoring: true,
         responseTime: 150,
-        checkInterval: 60000,
+        checkInterval: 60_000,
         timeout: 5000,
         retryAttempts: 3,
         history: [],
@@ -651,25 +651,25 @@ describe("validateMonitor", () => {
             const monitor = createValidMonitor();
 
             // Valid statuses
-            [
+            for (const status of [
                 "down",
                 "paused",
                 "pending",
                 "up",
-            ].forEach((status) => {
+            ]) {
                 monitor.status = status as MonitorStatus;
                 expect(validateMonitor(monitor)).toBe(true);
-            });
+            }
 
             // Invalid statuses
-            [
+            for (const status of [
                 "mixed",
                 "unknown",
                 "invalid",
-            ].forEach((status) => {
+            ]) {
                 monitor.status = status as any;
                 expect(validateMonitor(monitor)).toBe(false);
-            });
+            }
         });
     });
 
@@ -728,7 +728,7 @@ describe("validateMonitor", () => {
             "retryAttempts",
         ];
 
-        numericFields.forEach((field) => {
+        for (const field of numericFields) {
             it(`should return false for missing ${field}`, () => {
                 const monitor = createValidMonitor();
                 delete (monitor as any)[field];
@@ -758,7 +758,7 @@ describe("validateMonitor", () => {
                 (monitor as any)[field] = -1;
                 expect(validateMonitor(monitor)).toBe(true);
             });
-        });
+        }
     });
 
     it("should return false for partial monitor objects", async ({
@@ -797,7 +797,7 @@ describe("validateMonitor", () => {
         monitor.responseTime = 150; // Reset
 
         // NaN is considered a number type in JavaScript, so it passes type check
-        monitor.timeout = NaN;
+        monitor.timeout = Number.NaN;
         expect(validateMonitor(monitor)).toBe(true);
 
         monitor.timeout = 5000; // Reset
@@ -837,7 +837,7 @@ describe("Function Coverage Validation", () => {
             status: "up" as MonitorStatus,
             monitoring: true,
             responseTime: 100,
-            checkInterval: 60000,
+            checkInterval: 60_000,
             timeout: 5000,
             retryAttempts: 3,
             lastChecked: new Date(),

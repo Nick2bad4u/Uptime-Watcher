@@ -27,8 +27,8 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
 
             // Test all safe conversion functions with valid inputs
             expect(safeConversions.safeNumberConversion("42", 0)).toBe(42);
-            expect(safeConversions.safeParseCheckInterval("30000", 60000)).toBe(
-                30000
+            expect(safeConversions.safeParseCheckInterval("30000", 60_000)).toBe(
+                30_000
             );
             expect(safeConversions.safeParseFloat("3.14", 0)).toBe(3.14);
             expect(safeConversions.safeParseInt("42", 0)).toBe(42);
@@ -36,18 +36,18 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeConversions.safeParsePort("8080", 80)).toBe(8080);
             expect(safeConversions.safeParsePositiveInt("10", 1)).toBe(10);
             expect(safeConversions.safeParseRetryAttempts("3", 1)).toBe(3);
-            expect(safeConversions.safeParseTimeout("5000", 10000)).toBe(5000);
+            expect(safeConversions.safeParseTimeout("5000", 10_000)).toBe(5000);
             expect(
                 safeConversions.safeParseTimestamp("1640995200000", Date.now())
-            ).toBe(1640995200000);
+            ).toBe(1_640_995_200_000);
 
             // Test with invalid inputs to trigger fallback logic
             expect(safeConversions.safeNumberConversion("invalid", 42)).toBe(
                 42
             );
             expect(
-                safeConversions.safeParseCheckInterval("invalid", 60000)
-            ).toBe(60000);
+                safeConversions.safeParseCheckInterval("invalid", 60_000)
+            ).toBe(60_000);
             expect(safeConversions.safeParseFloat("invalid", 3.14)).toBe(3.14);
             expect(safeConversions.safeParseInt("invalid", 42)).toBe(42);
             expect(safeConversions.safeParsePercentage("invalid", 50)).toBe(50);
@@ -56,12 +56,12 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeConversions.safeParseRetryAttempts("invalid", 1)).toBe(
                 1
             );
-            expect(safeConversions.safeParseTimeout("invalid", 10000)).toBe(
-                10000
+            expect(safeConversions.safeParseTimeout("invalid", 10_000)).toBe(
+                10_000
             );
             expect(
-                safeConversions.safeParseTimestamp("invalid", 123456789)
-            ).toBe(123456789);
+                safeConversions.safeParseTimestamp("invalid", 123_456_789)
+            ).toBe(123_456_789);
         });
     });
     describe("safeNumberConversion", () => {

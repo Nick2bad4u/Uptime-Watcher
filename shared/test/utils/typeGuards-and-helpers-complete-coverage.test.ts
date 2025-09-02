@@ -107,7 +107,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNumber(NaN)).toBe(false);
+            expect(isNumber(Number.NaN)).toBe(false);
             expect(isNumber("123")).toBe(false);
             expect(isNumber(null)).toBe(false);
             expect(isNumber(undefined)).toBe(false);
@@ -239,7 +239,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
                     3,
                 ])
             ).toBe(true);
-            expect(isArray(new Array(5))).toBe(true);
+            expect(isArray(Array.from({length: 5}))).toBe(true);
         });
 
         it("should return false for non-arrays", async ({ task, annotate }) => {
@@ -428,7 +428,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
 
             expect(isFiniteNumber(Infinity)).toBe(false);
             expect(isFiniteNumber(-Infinity)).toBe(false);
-            expect(isFiniteNumber(NaN)).toBe(false);
+            expect(isFiniteNumber(Number.NaN)).toBe(false);
             expect(isFiniteNumber("123")).toBe(false);
             expect(isFiniteNumber(null)).toBe(false);
         });
@@ -502,7 +502,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             expect(isNonNegativeNumber(-1)).toBe(false);
             expect(isNonNegativeNumber(-123)).toBe(false);
             expect(isNonNegativeNumber("42")).toBe(false);
-            expect(isNonNegativeNumber(NaN)).toBe(false);
+            expect(isNonNegativeNumber(Number.NaN)).toBe(false);
         });
     });
 
@@ -577,7 +577,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             expect(isPositiveNumber(0)).toBe(false);
             expect(isPositiveNumber(-1)).toBe(false);
             expect(isPositiveNumber("42")).toBe(false);
-            expect(isPositiveNumber(NaN)).toBe(false);
+            expect(isPositiveNumber(Number.NaN)).toBe(false);
         });
     });
 
@@ -631,7 +631,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             expect(isValidPort(80)).toBe(true);
             expect(isValidPort(443)).toBe(true);
             expect(isValidPort(8080)).toBe(true);
-            expect(isValidPort(65535)).toBe(true);
+            expect(isValidPort(65_535)).toBe(true);
         });
 
         it("should return false for invalid port numbers", async ({
@@ -648,10 +648,10 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
 
             expect(isValidPort(0)).toBe(false);
             expect(isValidPort(-1)).toBe(false);
-            expect(isValidPort(65536)).toBe(false);
+            expect(isValidPort(65_536)).toBe(false);
             expect(isValidPort(3.14)).toBe(false);
             expect(isValidPort("80")).toBe(false);
-            expect(isValidPort(NaN)).toBe(false);
+            expect(isValidPort(Number.NaN)).toBe(false);
         });
     });
 
@@ -669,7 +669,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isValidTimestamp(Date.now())).toBe(true);
-            expect(isValidTimestamp(1640995200000)).toBe(true); // 2022-01-01
+            expect(isValidTimestamp(1_640_995_200_000)).toBe(true); // 2022-01-01
             expect(isValidTimestamp(1)).toBe(true); // Minimum valid timestamp
         });
 
@@ -687,7 +687,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
 
             expect(isValidTimestamp(0)).toBe(false); // Must be > 0
             expect(isValidTimestamp(-1)).toBe(false);
-            expect(isValidTimestamp(NaN)).toBe(false);
+            expect(isValidTimestamp(Number.NaN)).toBe(false);
             expect(isValidTimestamp(Infinity)).toBe(false);
             expect(isValidTimestamp("1640995200000")).toBe(false);
             expect(isValidTimestamp(null)).toBe(false);
@@ -713,14 +713,12 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             const response = { success: true, data: "test" };
             const validator = (
                 value: unknown
-            ): value is { success: boolean; data: string } => {
-                return (
+            ): value is { success: boolean; data: string } => (
                     typeof value === "object" &&
                     value !== null &&
                     "success" in value &&
                     "data" in value
                 );
-            };
 
             const result = castIpcResponse(response, validator);
             expect(result).toEqual(response);
@@ -741,13 +739,11 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             const response = { invalid: true };
             const validator = (
                 value: unknown
-            ): value is { success: boolean } => {
-                return (
+            ): value is { success: boolean } => (
                     typeof value === "object" &&
                     value !== null &&
                     "success" in value
                 );
-            };
 
             expect(() => castIpcResponse(response, validator)).toThrow();
         });
@@ -788,7 +784,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
                     3,
                 ])
             ).toBe(true);
-            expect(isArrayHelper(new Array(5))).toBe(true);
+            expect(isArrayHelper(Array.from({length: 5}))).toBe(true);
         });
 
         it("should return false for non-arrays", async ({ task, annotate }) => {
@@ -991,8 +987,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
 
             const validator = (
                 value: unknown
-            ): value is { name: string; age: number } => {
-                return (
+            ): value is { name: string; age: number } => (
                     typeof value === "object" &&
                     value !== null &&
                     "name" in value &&
@@ -1000,7 +995,6 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
                     typeof (value as any).name === "string" &&
                     typeof (value as any).age === "number"
                 );
-            };
 
             const validObject = { name: "Alice", age: 30 };
             expect(validateAndConvert(validObject, validator)).toEqual(

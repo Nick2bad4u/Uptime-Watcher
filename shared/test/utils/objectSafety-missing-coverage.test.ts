@@ -129,11 +129,11 @@ describe("ObjectSafety - Missing Coverage", () => {
                 { input: { a: 1, b: 2 }, keys: ["a"] },
             ];
 
-            testCases.forEach(({ input, keys }) => {
+            for (const { input, keys } of testCases) {
                 const result = safeObjectOmit(input as any, keys);
                 expect(typeof result).toBe("object");
                 expect(result).not.toBe(input); // Should be a new object
-            });
+            }
         });
 
         test("should verify the exact conditional logic for null/undefined", ({
@@ -163,14 +163,14 @@ describe("ObjectSafety - Missing Coverage", () => {
             expect(result2).toEqual({});
 
             // Test combined case (shouldn't matter but tests the OR logic)
-            [null, undefined].forEach((testValue) => {
+            for (const testValue of [null, undefined]) {
                 const result = safeObjectOmit(testValue as any, [
                     "a",
                     "b",
                     "c",
                 ]);
                 expect(result).toEqual({});
-            });
+            }
         });
     });
 });

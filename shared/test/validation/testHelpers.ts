@@ -161,8 +161,7 @@ export const createValidPingMonitor = (
  */
 export const createValidSite = (
     overrides: Partial<SiteData> = {}
-): SiteData => {
-    return {
+): SiteData => ({
         createdAt: new Date(),
         id: "test-site",
         monitors: [createValidHttpMonitor()],
@@ -170,8 +169,7 @@ export const createValidSite = (
         status: "up" as const,
         updatedAt: new Date(),
         ...overrides,
-    };
-};
+    });
 
 /**
  * Creates a valid status history entry

@@ -163,7 +163,7 @@ describe("100% Coverage - Remaining Lines", () => {
             await annotate("Type: Validation", "type");
 
             // Test with a valid optional field that exists in the schema
-            const result = validateMonitorField("http", "timeout", 30000);
+            const result = validateMonitorField("http", "timeout", 30_000);
 
             // Should return a validation result for valid fields
             expect(result).toBeDefined();
@@ -214,7 +214,7 @@ describe("100% Coverage - Remaining Lines", () => {
                 const result = validateMonitorField(
                     "http",
                     field,
-                    field === "url" ? "https://example.com" : 30000
+                    field === "url" ? "https://example.com" : 30_000
                 );
                 // Each validation should return a result for valid fields
                 expect(result).toBeDefined();

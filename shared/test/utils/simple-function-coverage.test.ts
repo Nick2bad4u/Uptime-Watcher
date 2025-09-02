@@ -532,7 +532,7 @@ describe("Simple Function Coverage Tests", () => {
                 name: "Test",
                 type: "http" as const,
                 url: "https://example.com",
-                interval: 60000,
+                interval: 60_000,
                 timeout: 5000,
             };
             const errors = validation.getMonitorValidationErrors(monitor);
@@ -946,7 +946,7 @@ describe("Simple Function Coverage Tests", () => {
                 "function"
             );
 
-            expect(typeof safeConversions.safeParseCheckInterval(60000)).toBe(
+            expect(typeof safeConversions.safeParseCheckInterval(60_000)).toBe(
                 "number"
             );
         });

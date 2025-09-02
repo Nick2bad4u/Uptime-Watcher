@@ -17,58 +17,58 @@ import type { UnknownRecord } from "type-fest";
  * @public
  */
 export type ChartEasing =
-    | "linear"
-    | "easeInQuad"
-    | "easeOutQuad"
-    | "easeInOutQuad"
-    | "easeInCubic"
-    | "easeOutCubic"
-    | "easeInOutCubic"
-    | "easeInQuart"
-    | "easeOutQuart"
-    | "easeInOutQuart"
-    | "easeInQuint"
-    | "easeOutQuint"
-    | "easeInOutQuint"
-    | "easeInSine"
-    | "easeOutSine"
-    | "easeInOutSine"
-    | "easeInExpo"
-    | "easeOutExpo"
-    | "easeInOutExpo"
-    | "easeInCirc"
-    | "easeOutCirc"
-    | "easeInOutCirc"
-    | "easeInElastic"
-    | "easeOutElastic"
-    | "easeInOutElastic"
     | "easeInBack"
-    | "easeOutBack"
-    | "easeInOutBack"
     | "easeInBounce"
+    | "easeInCirc"
+    | "easeInCubic"
+    | "easeInElastic"
+    | "easeInExpo"
+    | "easeInOutBack"
+    | "easeInOutBounce"
+    | "easeInOutCirc"
+    | "easeInOutCubic"
+    | "easeInOutElastic"
+    | "easeInOutExpo"
+    | "easeInOutQuad"
+    | "easeInOutQuart"
+    | "easeInOutQuint"
+    | "easeInOutSine"
+    | "easeInQuad"
+    | "easeInQuart"
+    | "easeInQuint"
+    | "easeInSine"
+    | "easeOutBack"
     | "easeOutBounce"
-    | "easeInOutBounce";
+    | "easeOutCirc"
+    | "easeOutCubic"
+    | "easeOutElastic"
+    | "easeOutExpo"
+    | "easeOutQuad"
+    | "easeOutQuart"
+    | "easeOutQuint"
+    | "easeOutSine"
+    | "linear";
 
 /**
  * Chart.js position values for legends, titles, and axes.
  *
  * @public
  */
-export type ChartPosition = "top" | "left" | "bottom" | "right";
+export type ChartPosition = "bottom" | "left" | "right" | "top";
 
 /**
  * Chart.js legend position values (extends ChartPosition with chartArea).
  *
  * @public
  */
-export type ChartLegendPosition = ChartPosition | "chartArea";
+export type ChartLegendPosition = "chartArea" | ChartPosition;
 
 /**
  * Chart.js scale position values (extends ChartPosition with center).
  *
  * @public
  */
-export type ChartScalePosition = ChartPosition | "center";
+export type ChartScalePosition = "center" | ChartPosition;
 
 /**
  * Chart.js scale type values.
@@ -76,9 +76,9 @@ export type ChartScalePosition = ChartPosition | "center";
  * @public
  */
 export type ChartScaleType =
+    | "category"
     | "linear"
     | "logarithmic"
-    | "category"
     | "time"
     | "timeseries";
 
@@ -87,7 +87,7 @@ export type ChartScaleType =
  *
  * @public
  */
-export type ChartAlignment = "start" | "center" | "end";
+export type ChartAlignment = "center" | "end" | "start";
 
 /**
  * CSS font-style values for Chart.js font configurations.
@@ -95,25 +95,25 @@ export type ChartAlignment = "start" | "center" | "end";
  * @public
  */
 export type ChartFontStyle =
-    | "normal"
-    | "italic"
-    | "oblique"
+    | "inherit"
     | "initial"
-    | "inherit";
+    | "italic"
+    | "normal"
+    | "oblique";
 
 /**
  * CSS font-weight values for Chart.js font configurations.
  *
  * @public
  */
-export type ChartFontWeight = "normal" | "bold" | "lighter" | "bolder" | number;
+export type ChartFontWeight = "bold" | "bolder" | "lighter" | "normal" | number;
 
 /**
  * Chart.js alignment values.
  *
  * @public
  */
-export type ChartAlign = "start" | "center" | "end";
+export type ChartAlign = "center" | "end" | "start";
 
 /**
  * Chart.js chart type values.

@@ -22,10 +22,10 @@ describe("Complete 100% Coverage - Final Tests", () => {
 
             // Create an object with a custom valueOf that returns a novel type
             const weirdObject = {
-                valueOf: vi.fn(() => {
+                valueOf: vi.fn(() => 
                     // This is designed to test the default case in the switch
-                    return Symbol("test");
-                }),
+                     Symbol("test")
+                ),
                 toString: vi.fn(() => "[Weird Object]"),
             };
 
@@ -66,10 +66,10 @@ describe("Complete 100% Coverage - Final Tests", () => {
                 new (class UnknownType {})(),
             ];
 
-            testCases.forEach((testCase) => {
+            for (const testCase of testCases) {
                 const result = safeStringify(testCase);
                 expect(typeof result).toBe("string");
-            });
+            }
         });
     });
 
@@ -112,7 +112,7 @@ describe("Complete 100% Coverage - Final Tests", () => {
                 status: "up" as const,
                 monitoring: true,
                 responseTime: -1,
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 history: [],

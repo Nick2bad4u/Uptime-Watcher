@@ -766,7 +766,7 @@ describe("Shared Module - 100% Function Coverage", () => {
                 type: "http" as const,
                 url: "https://example.com",
                 status: "up" as const,
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 retryAttempts: 3,
                 timeout: 5000,
                 responseTime: 200,

@@ -43,7 +43,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeGuardsModule.isNumber(0)).toBe(true);
             expect(typeGuardsModule.isNumber(-456)).toBe(true);
             expect(typeGuardsModule.isNumber(3.14)).toBe(true);
-            expect(typeGuardsModule.isNumber(NaN)).toBe(false);
+            expect(typeGuardsModule.isNumber(Number.NaN)).toBe(false);
             expect(typeGuardsModule.isNumber("123")).toBe(false);
             expect(typeGuardsModule.isNumber(null)).toBe(false);
             expect(typeGuardsModule.isNumber(undefined)).toBe(false);
@@ -106,7 +106,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeGuardsModule.isDate(date)).toBe(true);
             expect(typeGuardsModule.isDate(new Date("2023-01-01"))).toBe(true);
             expect(typeGuardsModule.isDate("2023-01-01")).toBe(false);
-            expect(typeGuardsModule.isDate(1672531200000)).toBe(false);
+            expect(typeGuardsModule.isDate(1_672_531_200_000)).toBe(false);
             expect(typeGuardsModule.isDate({})).toBe(false);
             expect(typeGuardsModule.isDate(null)).toBe(false);
 
@@ -132,7 +132,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeGuardsModule.isFiniteNumber(3.14)).toBe(true);
             expect(typeGuardsModule.isFiniteNumber(Infinity)).toBe(false);
             expect(typeGuardsModule.isFiniteNumber(-Infinity)).toBe(false);
-            expect(typeGuardsModule.isFiniteNumber(NaN)).toBe(false);
+            expect(typeGuardsModule.isFiniteNumber(Number.NaN)).toBe(false);
             expect(typeGuardsModule.isFiniteNumber("123")).toBe(false);
 
             // Test isFunction function
@@ -157,7 +157,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeGuardsModule.isNonNegativeNumber(3.14)).toBe(true);
             expect(typeGuardsModule.isNonNegativeNumber(-1)).toBe(false);
             expect(typeGuardsModule.isNonNegativeNumber(-0.1)).toBe(false);
-            expect(typeGuardsModule.isNonNegativeNumber(NaN)).toBe(false);
+            expect(typeGuardsModule.isNonNegativeNumber(Number.NaN)).toBe(false);
             expect(typeGuardsModule.isNonNegativeNumber("0")).toBe(false);
 
             // Test isNonNullObject function
@@ -180,7 +180,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeGuardsModule.isPositiveNumber(0.1)).toBe(true);
             expect(typeGuardsModule.isPositiveNumber(0)).toBe(false);
             expect(typeGuardsModule.isPositiveNumber(-1)).toBe(false);
-            expect(typeGuardsModule.isPositiveNumber(NaN)).toBe(false);
+            expect(typeGuardsModule.isPositiveNumber(Number.NaN)).toBe(false);
             expect(typeGuardsModule.isPositiveNumber("1")).toBe(false);
 
             // Test isString function
@@ -198,26 +198,26 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeGuardsModule.isValidPort(80)).toBe(true);
             expect(typeGuardsModule.isValidPort(443)).toBe(true);
             expect(typeGuardsModule.isValidPort(1)).toBe(true);
-            expect(typeGuardsModule.isValidPort(65535)).toBe(true);
+            expect(typeGuardsModule.isValidPort(65_535)).toBe(true);
             expect(typeGuardsModule.isValidPort(0)).toBe(false);
-            expect(typeGuardsModule.isValidPort(65536)).toBe(false);
+            expect(typeGuardsModule.isValidPort(65_536)).toBe(false);
             expect(typeGuardsModule.isValidPort(-1)).toBe(false);
             expect(typeGuardsModule.isValidPort(3.14)).toBe(false);
             expect(typeGuardsModule.isValidPort("80")).toBe(false);
-            expect(typeGuardsModule.isValidPort(NaN)).toBe(false);
+            expect(typeGuardsModule.isValidPort(Number.NaN)).toBe(false);
 
             // Test isValidTimestamp function
             expect(typeof typeGuardsModule.isValidTimestamp).toBe("function");
             const now = Date.now();
             expect(typeGuardsModule.isValidTimestamp(now)).toBe(true);
-            expect(typeGuardsModule.isValidTimestamp(now - 86400000)).toBe(
+            expect(typeGuardsModule.isValidTimestamp(now - 86_400_000)).toBe(
                 true
             ); // 1 day ago
-            expect(typeGuardsModule.isValidTimestamp(1672531200000)).toBe(true); // Valid past timestamp
+            expect(typeGuardsModule.isValidTimestamp(1_672_531_200_000)).toBe(true); // Valid past timestamp
             expect(typeGuardsModule.isValidTimestamp(0)).toBe(false); // Must be > 0
             expect(typeGuardsModule.isValidTimestamp(-1)).toBe(false);
             expect(typeGuardsModule.isValidTimestamp(3.14)).toBe(true); // Decimal numbers are valid
-            expect(typeGuardsModule.isValidTimestamp(NaN)).toBe(false);
+            expect(typeGuardsModule.isValidTimestamp(Number.NaN)).toBe(false);
             expect(typeGuardsModule.isValidTimestamp("timestamp")).toBe(false);
             expect(typeGuardsModule.isValidTimestamp(null)).toBe(false);
         });
@@ -317,9 +317,9 @@ describe("TypeGuards - Complete Function Coverage", () => {
 
             // Test isValidPort with edge values
             expect(typeGuardsModule.isValidPort(1)).toBe(true);
-            expect(typeGuardsModule.isValidPort(65535)).toBe(true);
+            expect(typeGuardsModule.isValidPort(65_535)).toBe(true);
             expect(typeGuardsModule.isValidPort(0)).toBe(false);
-            expect(typeGuardsModule.isValidPort(65536)).toBe(false);
+            expect(typeGuardsModule.isValidPort(65_536)).toBe(false);
             expect(typeGuardsModule.isValidPort(1.5)).toBe(false);
 
             // Test isValidTimestamp with edge values (must be positive and not future)
@@ -356,7 +356,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
                 1,
                 -1,
                 3.14,
-                NaN,
+                Number.NaN,
                 Infinity,
                 "",
                 "string",
@@ -374,7 +374,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
                 Symbol("test"),
             ];
 
-            testValues.forEach((value) => {
+            for (const value of testValues) {
                 // All functions should return boolean
                 expect(typeof typeGuardsModule.isObject(value)).toBe("boolean");
                 expect(typeof typeGuardsModule.isNumber(value)).toBe("boolean");
@@ -406,7 +406,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
                 expect(typeof typeGuardsModule.isValidTimestamp(value)).toBe(
                     "boolean"
                 );
-            });
+            }
         });
     });
 });

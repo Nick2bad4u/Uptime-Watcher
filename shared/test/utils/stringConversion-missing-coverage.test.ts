@@ -99,13 +99,13 @@ describe("StringConversion - Missing Coverage", () => {
                 { value: BigInt(123), expected: "123" },
             ];
 
-            testCases.forEach(({ value, expected }) => {
+            for (const { value, expected } of testCases) {
                 const result = safeStringify(value);
                 expect(typeof result).toBe("string");
                 if (expected) {
                     expect(result).toBe(expected);
                 }
-            });
+            }
         });
 
         test("should handle edge cases that might hit default branch", ({
@@ -140,10 +140,10 @@ describe("StringConversion - Missing Coverage", () => {
                 (() => undefined)(), // Function returning undefined
             ];
 
-            testValues.forEach((value) => {
+            for (const value of testValues) {
                 const result = safeStringify(value);
                 expect(result).toBe(""); // All should return empty string for undefined
-            });
+            }
         });
 
         test("should attempt to reach default case through type manipulation", ({
@@ -187,7 +187,7 @@ describe("StringConversion - Missing Coverage", () => {
 
                 const result = safeStringify(proxy);
                 expect(typeof result).toBe("string");
-            } catch (error) {
+            } catch {
                 // If proxy creation fails, that's fine
             }
         });
@@ -232,14 +232,15 @@ describe("StringConversion - Missing Coverage", () => {
 
             // All of these should be covered by our switch statement
             // The default case would only be hit by unknown future typeof results
-            typeofResults.forEach((type) => {
+            for (const type of typeofResults) {
                 switch (type) {
-                    case "undefined":
+                    case "undefined": {
                         expect(safeStringify(undefined)).toBe("");
                         break;
+                    }
                     // Other cases are covered by other tests
                 }
-            });
+            }
         });
     });
 });

@@ -24,11 +24,11 @@ describe("validateMonitorType", () => {
         "dns",
     ];
 
-    validTypes.forEach((type) => {
+    for (const type of validTypes) {
         it(`should return true for valid type '${type}'`, () => {
             expect(validateMonitorType(type)).toBe(true);
         });
-    });
+    }
 
     it("should return false for null", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
@@ -115,7 +115,7 @@ describe("getMonitorValidationErrors", () => {
         id: "test-monitor",
         type: "http",
         status: "up",
-        checkInterval: 30000,
+        checkInterval: 30_000,
         timeout: 5000,
         retryAttempts: 3,
     });
@@ -744,7 +744,7 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "port" as const,
                 host: "example.com",
-                port: 65536,
+                port: 65_536,
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain(
@@ -784,9 +784,9 @@ describe("getMonitorValidationErrors", () => {
                 80,
                 443,
                 8080,
-                65535,
+                65_535,
             ];
-            validPorts.forEach((port) => {
+            for (const port of validPorts) {
                 const monitor = {
                     ...createBaseMonitor(),
                     type: "port" as const,
@@ -797,7 +797,7 @@ describe("getMonitorValidationErrors", () => {
                 expect(errors).not.toContain(
                     "Valid port number (1-65535) is required for port monitors"
                 );
-            });
+            }
         });
     });
 
@@ -961,7 +961,7 @@ describe("getMonitorValidationErrors", () => {
                 "TXT",
             ];
 
-            validRecordTypes.forEach((recordType) => {
+            for (const recordType of validRecordTypes) {
                 const monitor = {
                     ...createBaseMonitor(),
                     type: "dns" as const,
@@ -972,7 +972,7 @@ describe("getMonitorValidationErrors", () => {
                 expect(errors).not.toContain(
                     expect.stringContaining("Invalid record type")
                 );
-            });
+            }
         });
 
         it("should accept lowercase DNS record types", async ({
@@ -1334,7 +1334,7 @@ describe("validateSite", () => {
                 status: "up",
                 monitoring: true,
                 responseTime: 150,
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 history: [],
@@ -1380,7 +1380,7 @@ describe("validateSite", () => {
                 status: "up",
                 monitoring: true,
                 responseTime: 150,
-                checkInterval: 30000,
+                checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
                 history: [],

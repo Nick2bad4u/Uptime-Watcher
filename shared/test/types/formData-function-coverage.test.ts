@@ -27,7 +27,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             const validData = {
                 type: "http" as const,
                 url: "https://example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: 5000,
                 method: "GET" as const,
@@ -72,7 +72,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             const data = {
                 type: "dns",
                 name: "Test",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: 5000,
             };
@@ -96,7 +96,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             const validData = {
                 type: "ping" as const,
                 host: "example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: 5000,
             };
@@ -151,7 +151,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             const data = {
                 type: "http",
                 host: "example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: 5000,
             };
@@ -172,7 +172,7 @@ describe("FormData Types - Complete Function Coverage", () => {
 
             const data = {
                 type: "ping",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: 5000,
             };
@@ -194,7 +194,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             const data = {
                 type: "ping",
                 host: 123,
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: 5000,
             };
@@ -238,7 +238,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             const data = {
                 type: "ping",
                 host: "example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: "3",
                 timeout: 5000,
             };
@@ -260,7 +260,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             const data = {
                 type: "ping",
                 host: "example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: "5000",
             };
@@ -285,7 +285,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 type: "port" as const,
                 host: "example.com",
                 port: 443,
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: 5000,
             };
@@ -341,7 +341,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 type: "ping",
                 host: "example.com",
                 port: 443,
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: 5000,
             };
@@ -363,7 +363,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             const data = {
                 type: "port",
                 port: 443,
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: 5000,
             };
@@ -386,7 +386,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 type: "port",
                 host: 123,
                 port: 443,
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: 5000,
             };
@@ -408,7 +408,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             const data = {
                 type: "port",
                 host: "example.com",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: 5000,
             };
@@ -431,7 +431,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 type: "port",
                 host: "example.com",
                 port: "443",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: 5000,
             };
@@ -477,7 +477,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 type: "port",
                 host: "example.com",
                 port: 443,
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: "3",
                 timeout: 5000,
             };
@@ -500,7 +500,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 type: "port",
                 host: "example.com",
                 port: 443,
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 retryAttempts: 3,
                 timeout: "5000",
             };
@@ -526,7 +526,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 isHttpFormData({
                     type: "http" as const,
                     url: "https://test.com",
-                    checkInterval: 60000,
+                    checkInterval: 60_000,
                     retryAttempts: 3,
                     timeout: 5000,
                     method: "GET" as const,
@@ -539,7 +539,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 isPingFormData({
                     type: "ping" as const,
                     host: "test.com",
-                    checkInterval: 60000,
+                    checkInterval: 60_000,
                     retryAttempts: 3,
                     timeout: 5000,
                 })
@@ -551,7 +551,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                     type: "port" as const,
                     host: "test.com",
                     port: 80,
-                    checkInterval: 60000,
+                    checkInterval: 60_000,
                     retryAttempts: 3,
                     timeout: 5000,
                 })

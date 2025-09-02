@@ -287,7 +287,12 @@ export function isValidSettingsRow(obj: unknown): obj is SettingsRow {
         return false;
     }
 
-    const row = obj as UnknownRecord;
+    // Type guard: ensure obj is a record before casting
+    if (!RowValidationUtils.isValidObject(obj)) {
+        return false;
+    }
+
+    const row = obj;
     return (
         "key" in row &&
         row["key"] !== undefined &&
@@ -313,7 +318,12 @@ export function isValidSiteRow(obj: unknown): obj is SiteRow {
         return false;
     }
 
-    const row = obj as UnknownRecord;
+    // Type guard: ensure obj is a record before casting
+    if (!RowValidationUtils.isValidObject(obj)) {
+        return false;
+    }
+
+    const row = obj;
     return (
         "identifier" in row &&
         row["identifier"] !== undefined &&
@@ -350,26 +360,31 @@ export function safeGetRowProperty<T>(
     property: string,
     defaultValue: T
 ): T {
-    // Handle null/undefined row objects
+    // Handle null/undefined row objects - this check is needed despite the type
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!row || typeof row !== "object") {
         return defaultValue;
     }
 
     // First check for exact property name match (including properties with dots)
     if (property in row && row[property] !== undefined) {
+        // We can't safely assert the type here, so we need to trust the caller
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         return row[property] as T;
     }
 
     // Handle nested property access with dot notation
     if (property.includes(".")) {
         const parts = property.split(".");
-        let current: any = row;
+        // Use unknown instead of any for type safety
+        let current: unknown = row;
 
         for (const part of parts) {
             if (
                 current &&
                 typeof current === "object" &&
                 part in current &&
+                RowValidationUtils.isValidObject(current) &&
                 current[part] !== undefined
             ) {
                 current = current[part];
@@ -378,6 +393,8 @@ export function safeGetRowProperty<T>(
             }
         }
 
+        // We can't safely assert the type here, so we need to trust the caller
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         return current as T;
     }
 

@@ -172,11 +172,11 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             expect(validatorUtilsModule.isValidPort(80)).toBe(true); // Number
             expect(validatorUtilsModule.isValidPort("443")).toBe(true); // String
             expect(validatorUtilsModule.isValidPort("8080")).toBe(true);
-            expect(validatorUtilsModule.isValidPort(65535)).toBe(true); // Max valid port
+            expect(validatorUtilsModule.isValidPort(65_535)).toBe(true); // Max valid port
             expect(validatorUtilsModule.isValidPort(1)).toBe(true); // Min valid port
             expect(validatorUtilsModule.isValidPort(0)).toBe(false); // Reserved port
             expect(validatorUtilsModule.isValidPort("0")).toBe(false); // Reserved port string
-            expect(validatorUtilsModule.isValidPort(70000)).toBe(false); // Too high
+            expect(validatorUtilsModule.isValidPort(70_000)).toBe(false); // Too high
             expect(validatorUtilsModule.isValidPort("abc")).toBe(false);
             expect(validatorUtilsModule.isValidPort(null)).toBe(false);
             expect(validatorUtilsModule.isValidPort(undefined)).toBe(false);

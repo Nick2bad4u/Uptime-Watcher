@@ -667,12 +667,12 @@ describe("CacheKeys - Complete Function Coverage", () => {
                 CacheKeys.validation.monitorType("http"),
             ];
 
-            keys.forEach((key) => {
+            for (const key of keys) {
                 expect(isStandardizedCacheKey(key)).toBe(true);
                 const parsed = parseCacheKey(key);
                 expect(parsed.prefix).toBeDefined();
                 expect(parsed.identifier).toBeDefined();
-            });
+            }
         });
 
         it("should handle stress test with many cache keys", async ({
@@ -697,11 +697,11 @@ describe("CacheKeys - Complete Function Coverage", () => {
             }
 
             // Validate all keys
-            keys.forEach((key) => {
+            for (const key of keys) {
                 expect(isStandardizedCacheKey(key)).toBe(true);
                 const parsed = parseCacheKey(key as StandardizedCacheKey);
                 expect(parsed).toBeDefined();
-            });
+            }
         });
     });
 });

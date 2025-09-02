@@ -28,8 +28,8 @@ const mockElectronAPI = {
 };
 
 // Mock global window and electronAPI for Node.js test environment
-(global as any).window = global.window || {};
-Object.defineProperty(global.window, "electronAPI", {
+(globalThis as any).window = globalThis.window || {};
+Object.defineProperty(globalThis.window, "electronAPI", {
     value: mockElectronAPI,
     writable: true,
     configurable: true,
