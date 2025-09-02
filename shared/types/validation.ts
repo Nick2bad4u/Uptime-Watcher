@@ -172,12 +172,17 @@ export function createSuccessResult(
 export function isValidationResult(
     result: unknown
 ): result is BaseValidationResult {
-    return (
-        typeof result === "object" &&
-        result !== null &&
-        "errors" in result &&
-        "success" in result &&
-        Array.isArray((result as BaseValidationResult).errors) &&
-        typeof (result as BaseValidationResult).success === "boolean"
-    );
+    if (typeof result !== "object" || result === null) {
+        return false;
+    }
+
+    // Safe property access using 'in' operator with proper type narrowing
+    const hasRequiredProperties = "errors" in result && "success" in result;
+    if (!hasRequiredProperties) {
+        return false;
+    }
+
+    // Type-safe property access after narrowing
+    const obj = result as Record<string, unknown>;
+    return Array.isArray(obj["errors"]) && typeof obj["success"] === "boolean";
 }

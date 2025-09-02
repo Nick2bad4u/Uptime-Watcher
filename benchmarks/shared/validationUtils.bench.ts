@@ -47,7 +47,7 @@ describe("Shared Validation Utils Performance", () => {
         ".starting-dot.com",
         "ending-dot.com.",
         "spaces in domain.com",
-        "toolong" + "a".repeat(300) + ".com",
+        `toolong${  "a".repeat(300)  }.com`,
     ];
 
     const validIdentifiers = [
@@ -71,13 +71,13 @@ describe("Shared Validation Utils Performance", () => {
         443,
         3000,
         8080,
-        65535,
+        65_535,
     ];
     const invalidPorts = [
         0,
         -1,
-        65536,
-        99999,
+        65_536,
+        99_999,
         -5000,
     ];
 
@@ -184,13 +184,13 @@ describe("Shared Validation Utils Performance", () => {
 
     bench("safeInteger - valid conversions", () => {
         for (const str of mixedStringNumbers) {
-            safeInteger(str, 0, 0, 10000);
+            safeInteger(str, 0, 0, 10_000);
         }
     });
 
     bench("safeInteger - invalid conversions with fallback", () => {
         for (const str of invalidStringNumbers) {
-            safeInteger(str, 1000, 0, 10000);
+            safeInteger(str, 1000, 0, 10_000);
         }
     });
 
@@ -252,7 +252,7 @@ describe("Shared Validation Utils Performance", () => {
             isValidInteger(config.retries);
             isValidIdentifierArray(config.tags);
 
-            const timeout = safeInteger(config.timeout, 1000, 1000, 30000);
+            const timeout = safeInteger(config.timeout, 1000, 1000, 30_000);
             const retries = safeInteger(config.retries, 1, 1, 10);
         }
     });
@@ -284,8 +284,8 @@ describe("Shared Validation Utils Performance", () => {
     bench("edge case validation - very long strings", () => {
         const longStrings = [
             "a".repeat(1000),
-            "valid-" + "identifier-".repeat(50),
-            "https://" + "subdomain.".repeat(20) + "example.com",
+            `valid-${  "identifier-".repeat(50)}`,
+            `https://${  "subdomain.".repeat(20)  }example.com`,
         ];
 
         for (const str of longStrings) {
@@ -298,10 +298,10 @@ describe("Shared Validation Utils Performance", () => {
     bench("edge case validation - boundary values", () => {
         const boundaryValues = [
             1,
-            65535,
+            65_535,
             0,
             -1,
-            65536,
+            65_536,
             "1",
             "65535",
             "0",

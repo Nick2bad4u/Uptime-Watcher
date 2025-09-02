@@ -124,7 +124,7 @@ export interface EventMetadata {
  *
  * @throws Error if the middleware wishes to abort event processing.
  */
-// eslint-disable-next-line etc/prefer-interface -- Function type is simpler for middleware callbacks
+
 export type EventMiddleware<T = unknown> = (
     event: string,
     data: T,

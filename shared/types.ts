@@ -278,6 +278,8 @@ export function isSiteStatus(status: string): status is SiteStatus {
  * validation across frontend and backend.
  */
 export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
+    // Runtime validation requires null/undefined checks despite type signature
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!monitor || typeof monitor !== "object") {
         return false;
     }

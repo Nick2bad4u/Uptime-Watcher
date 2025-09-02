@@ -157,6 +157,8 @@ export function safeJsonParseArray<T>(
             }
         }
 
+        // Type assertion is safe here as we've validated all elements
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         return parsed as T[];
     }, "JSON parsing failed");
 }

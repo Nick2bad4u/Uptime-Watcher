@@ -44,12 +44,12 @@ import type React from "react";
 // ============================================================================
 
 /**
- * Creates a standardized handler for input changes with validation
+ * Creates a standardized handler for string input changes with validation
  *
  * @example
  *
  * ```tsx
- * const handleNameChange = createInputChangeHandler(
+ * const handleNameChange = createStringInputHandler(
  *     setName,
  *     (value) => value.length > 0
  * );
@@ -60,15 +60,49 @@ import type React from "react";
  *
  * @returns Input change handler
  */
-export function createInputChangeHandler<T>(
-    setValue: (value: T) => void,
-    validator?: (value: T) => boolean
+export function createStringInputHandler(
+    setValue: (value: string) => void,
+    validator?: (value: string) => boolean
 ): (event: React.ChangeEvent<HTMLInputElement>) => void {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value as T;
+        const { value } = event.target;
 
         if (!validator || validator(value)) {
             setValue(value);
+        }
+    };
+}
+
+/**
+ * Creates a standardized handler for input changes with type conversion
+ *
+ * @example
+ *
+ * ```tsx
+ * const handleAgeChange = createTypedInputHandler(
+ *     setAge,
+ *     (value) => parseInt(value, 10),
+ *     (age) => age >= 0
+ * );
+ * ```
+ *
+ * @param setValue - State setter function
+ * @param converter - Function to convert string to target type
+ * @param validator - Optional validation function
+ *
+ * @returns Input change handler
+ */
+export function createTypedInputHandler<T>(
+    setValue: (value: T) => void,
+    converter: (value: string) => T,
+    validator?: (value: T) => boolean
+): (event: React.ChangeEvent<HTMLInputElement>) => void {
+    return (event: React.ChangeEvent<HTMLInputElement>) => {
+        const stringValue = event.target.value;
+        const convertedValue = converter(stringValue);
+
+        if (!validator || validator(convertedValue)) {
+            setValue(convertedValue);
         }
     };
 }
@@ -86,16 +120,19 @@ export function createInputChangeHandler<T>(
  * ```
  *
  * @param setValue - State setter function
- * @param converter - Optional value converter function
+ * @param converter - Optional value converter function (defaults to identity)
  *
  * @returns Select change handler
  */
-export function createSelectChangeHandler<T>(
+export function createSelectChangeHandler<T = string>(
     setValue: (value: T) => void,
     converter?: (value: string) => T
 ): (event: React.ChangeEvent<HTMLSelectElement>) => void {
     return (event: React.ChangeEvent<HTMLSelectElement>) => {
         const rawValue = event.target.value;
+
+        // If no converter provided, assume T is string and use identity
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         const finalValue = converter ? converter(rawValue) : (rawValue as T);
         setValue(finalValue);
     };
@@ -160,3 +197,35 @@ export const validationPatterns = {
         (value: string): boolean =>
             allowedValues.includes(value),
 } as const;
+
+// ============================================================================
+// Backward Compatibility Functions
+// ============================================================================
+
+/**
+ * Legacy function for backward compatibility with existing tests and
+ * components. Creates a standardized input change handler for strings.
+ *
+ * @deprecated Use createStringInputHandler or createTypedInputHandler instead
+ *
+ * @param setValue - State setter function
+ * @param validator - Optional validation function
+ *
+ * @returns Input change handler
+ */
+export function createInputChangeHandler<T = string>(
+    setValue: (value: T) => void,
+    validator?: (value: T) => boolean
+): (event: React.ChangeEvent<HTMLInputElement>) => void {
+    return (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+
+        // For string types (default), pass the value directly
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        const finalValue = value as T;
+
+        if (!validator || validator(finalValue)) {
+            setValue(finalValue);
+        }
+    };
+}

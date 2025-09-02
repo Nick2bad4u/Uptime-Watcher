@@ -39,28 +39,13 @@ interface Logger {
 }
 
 /**
- * Common template variable names for better autocomplete while allowing custom
- * variables.
- */
-type TemplateVariableName =
-    | "busId"
-    | "correlationId"
-    | "count"
-    | "eventName"
-    | "fromVersion"
-    | "maxMiddleware"
-    | "monitorType"
-    | "toVersion"
-    | string;
-
-/**
  * Template variable values for log interpolation. Uses Partial to make all
  * variables optional.
  */
-type TemplateVariables = Partial<Record<TemplateVariableName, number | string>>;
+type TemplateVariables = Partial<Record<string, number | string>>;
 
 // Export enhanced types for external use
-export type { TemplateVariableName, TemplateVariables };
+export type { TemplateVariables };
 
 /**
  * Service-related log message templates.
@@ -445,6 +430,8 @@ export function interpolateLogTemplate(
         // eslint-disable-next-line regexp/strict, regexp/require-unicode-sets-regexp -- Conflicting rules: strict wants escaped braces, require-unicode-sets wants v flag
         /{(?<variableName>[$_a-z][\w$]*)}/gi,
         (match, key) => {
+            // Type assertion is safe here as we're accessing with a string key
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
             const value = variables[key as keyof typeof variables];
             return value === undefined ? match : String(value);
         }

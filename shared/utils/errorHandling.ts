@@ -127,7 +127,6 @@ async function handleBackendOperation<T>(
     } catch (error) {
         // Check if logger exists and has error method
         if (
-            logger &&
             typeof logger === "object" &&
             "error" in logger &&
             typeof logger.error === "function"
@@ -252,23 +251,13 @@ export async function withErrorHandling<T>(
 ): Promise<T> {
     // Check if it's a frontend store (has setError, clearError, setLoading
     // methods)
-    const isFrontendStore = Boolean(
-        storeOrContext &&
-            typeof storeOrContext === "object" &&
-            storeOrContext !== null &&
-            typeof storeOrContext === "object" &&
-            "setError" in storeOrContext &&
-            "clearError" in storeOrContext &&
-            "setLoading" in storeOrContext
-    );
+    const isFrontendStore =
+        typeof storeOrContext === "object" &&
+        "setError" in storeOrContext &&
+        "clearError" in storeOrContext &&
+        "setLoading" in storeOrContext;
 
     return isFrontendStore
-        ? handleFrontendOperation(
-              operation,
-              storeOrContext as ErrorHandlingFrontendStore
-          )
-        : handleBackendOperation(
-              operation,
-              storeOrContext as ErrorHandlingBackendContext
-          );
+        ? handleFrontendOperation(operation, storeOrContext)
+        : handleBackendOperation(operation, storeOrContext);
 }

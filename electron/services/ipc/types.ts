@@ -85,5 +85,5 @@ export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
  *
  * @public
  */
-// eslint-disable-next-line etc/prefer-interface -- Function type is simpler for validation callbacks
+
 export type IpcParameterValidator = (params: unknown[]) => null | string[];

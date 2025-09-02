@@ -31,7 +31,7 @@ describe("Shared Conversion and Validation Performance", () => {
         456.78,
         -999,
         0,
-        3.14159,
+        3.141_59,
     ];
     const stringNumbers = [
         "123",
@@ -68,21 +68,21 @@ describe("Shared Conversion and Validation Performance", () => {
         443,
         3000,
         8080,
-        65535,
+        65_535,
     ];
     const invalidPorts = [
         0,
         -1,
-        65536,
-        99999,
+        65_536,
+        99_999,
         "80",
         "invalid",
     ];
 
     const validTimestamps = [
         Date.now(),
-        Date.now() - 3600000,
-        1640995200000,
+        Date.now() - 3_600_000,
+        1_640_995_200_000,
     ];
     const invalidTimestamps = [
         -1,
@@ -90,7 +90,7 @@ describe("Shared Conversion and Validation Performance", () => {
         null,
         undefined,
         Infinity,
-        NaN,
+        Number.NaN,
     ];
 
     const conversionTestValues = [
@@ -142,7 +142,7 @@ describe("Shared Conversion and Validation Performance", () => {
             ...invalidNumbers,
         ];
         for (const value of allValues) {
-            safeParseFloat(value, 1.0);
+            safeParseFloat(value, 1);
         }
     });
 
@@ -237,7 +237,7 @@ describe("Shared Conversion and Validation Performance", () => {
             ...validNumbers,
             Infinity,
             -Infinity,
-            NaN,
+            Number.NaN,
             "123",
         ];
         for (const value of testValues) {
@@ -373,7 +373,7 @@ describe("Shared Conversion and Validation Performance", () => {
             -0,
             Infinity,
             -Infinity,
-            NaN,
+            Number.NaN,
             "",
             "0",
             "false",

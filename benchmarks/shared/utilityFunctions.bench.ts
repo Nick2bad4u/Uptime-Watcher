@@ -375,7 +375,7 @@ describe("Shared Utility Functions Performance", () => {
             "",
             0,
             false,
-            NaN,
+            Number.NaN,
             Infinity,
             -Infinity,
             Symbol("test"),

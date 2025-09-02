@@ -15,7 +15,7 @@ import type { Monitor } from "@shared/types";
  *
  * @public
  */
-// eslint-disable-next-line etc/prefer-interface -- Function type is simpler for formatter callbacks
+
 export type TitleSuffixFormatter = (monitor: Monitor) => string;
 
 /**

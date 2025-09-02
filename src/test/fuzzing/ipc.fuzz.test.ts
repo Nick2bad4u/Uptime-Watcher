@@ -134,16 +134,16 @@ describe('IPC Communication Fuzzing Tests', () => {
         it('should handle malformed IPC responses gracefully', () => {
             fc.assert(
                 fc.property(fc.anything(), (input: unknown) => {
-                    if (!isIpcResponse(input)) {
-                        // Should throw for invalid responses
-                        expect(() => extractIpcData(input)).toThrow();
-                    } else {
+                    if (isIpcResponse(input)) {
                         // May throw or return data based on success flag
                         if ((input as { success: boolean }).success) {
                             expect(() => extractIpcData(input)).not.toThrow();
                         } else {
                             expect(() => extractIpcData(input)).toThrow();
                         }
+                    } else {
+                        // Should throw for invalid responses
+                        expect(() => extractIpcData(input)).toThrow();
                     }
                 })
             );

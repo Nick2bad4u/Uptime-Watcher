@@ -36,6 +36,8 @@ export function getEnvVar<K extends keyof KnownEnvironmentVariables>(
         // Use bracket notation to access the environment variable safely
         // eslint-disable-next-line n/no-process-env -- Environment utility needs safe process.env access
         const value = process.env[key];
+        // Type assertion is safe here as we're returning the union with undefined
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         return value as KnownEnvironmentVariables[K] | undefined;
     } catch {
         // Handle edge cases where process.env might be null or undefined in

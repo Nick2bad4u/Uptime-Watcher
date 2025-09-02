@@ -373,7 +373,7 @@ export function parseCacheKey(key: StandardizedCacheKey): {
         }
 
         return {
-            identifier: identifier || "", // Allow empty identifier for 2-part keys
+            identifier: identifier ?? "", // Allow empty identifier for 2-part keys
             prefix,
         };
     }

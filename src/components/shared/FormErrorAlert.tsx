@@ -3,8 +3,7 @@
  */
 
 import type { CoreComponentProperties } from "@shared/types/componentProps";
-
-import { type FC } from "react";
+import type { FC } from "react";
 
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";

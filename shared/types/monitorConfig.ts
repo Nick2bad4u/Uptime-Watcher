@@ -272,9 +272,9 @@ export type MonitorConfig = Simplify<
  * @public
  */
 export function isHttpMonitorConfig(
-    config: MonitorConfig
+    config: MonitorConfig | null | undefined
 ): config is HttpMonitorConfig {
-    return config?.type === "http";
+    return config !== null && config !== undefined && config.type === "http";
 }
 
 /**
@@ -287,9 +287,9 @@ export function isHttpMonitorConfig(
  * @public
  */
 export function isPingMonitorConfig(
-    config: MonitorConfig
+    config: MonitorConfig | null | undefined
 ): config is PingMonitorConfig {
-    return config?.type === "ping";
+    return config !== null && config !== undefined && config.type === "ping";
 }
 
 /**
@@ -302,9 +302,9 @@ export function isPingMonitorConfig(
  * @public
  */
 export function isPortMonitorConfig(
-    config: MonitorConfig
+    config: MonitorConfig | null | undefined
 ): config is PortMonitorConfig {
-    return config?.type === "port";
+    return config !== null && config !== undefined && config.type === "port";
 }
 
 /**

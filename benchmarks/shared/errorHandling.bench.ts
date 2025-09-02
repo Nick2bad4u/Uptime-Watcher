@@ -408,7 +408,7 @@ describe("Shared Error Handling and Safety Performance", () => {
             "",
             0,
             false,
-            NaN,
+            Number.NaN,
             Infinity,
             -Infinity,
         ];

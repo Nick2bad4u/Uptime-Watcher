@@ -76,7 +76,7 @@ interface MiddlewareStacks {
 }
 
 // Helper functions for metrics middleware (reduces complexity by composition)
-// eslint-disable-next-line etc/prefer-interface -- Function type is simpler and clearer for callbacks
+
 type MetricsCallback = (metric: {
     name: string;
     type: "counter" | "timing";
@@ -157,7 +157,7 @@ type ValidationResult = boolean | { error?: string; isValid: boolean };
  *
  * @returns ValidationResult indicating if the data is valid
  */
-// eslint-disable-next-line etc/prefer-interface -- Function type is simpler and clearer for validators
+
 type ValidatorFunction<TData = unknown> = (data: TData) => ValidationResult;
 
 /**

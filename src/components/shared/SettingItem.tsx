@@ -3,8 +3,7 @@
  */
 
 import type { CoreComponentProperties } from "@shared/types/componentProps";
-
-import { type FC, type ReactNode } from "react";
+import type { FC, ReactNode } from "react";
 
 import { ThemedText } from "../../theme/components/ThemedText";
 

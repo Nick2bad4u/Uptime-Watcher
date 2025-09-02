@@ -252,10 +252,14 @@ export type MonitorFormData = HttpFormData | PingFormData | PortFormData;
 export function isHttpFormData(
     formData: MonitorFormData
 ): formData is HttpFormData {
+    // Runtime validation requires null/undefined checks despite type signature
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison
     if (formData === null || formData === undefined) {
         return false;
     }
     return (
+        // Additional null check for defensive programming
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         formData &&
         typeof formData === "object" &&
         formData.type === "http" &&
@@ -278,10 +282,14 @@ export function isHttpFormData(
 export function isPingFormData(
     formData: MonitorFormData
 ): formData is PingFormData {
+    // Runtime validation requires null/undefined checks despite type signature
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison
     if (formData === null || formData === undefined) {
         return false;
     }
     return (
+        // Additional null check for defensive programming
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         formData &&
         typeof formData === "object" &&
         formData.type === "ping" &&
@@ -304,10 +312,14 @@ export function isPingFormData(
 export function isPortFormData(
     formData: MonitorFormData
 ): formData is PortFormData {
+    // Runtime validation requires null/undefined checks despite type signature
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison
     if (formData === null || formData === undefined) {
         return false;
     }
     return (
+        // Additional null check for defensive programming
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         formData &&
         typeof formData === "object" &&
         formData.type === "port" &&

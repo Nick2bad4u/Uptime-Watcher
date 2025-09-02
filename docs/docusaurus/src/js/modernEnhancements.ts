@@ -4,7 +4,7 @@
  */
 
 // Type definitions
-// eslint-disable-next-line etc/prefer-interface -- function type is cleaner for simple signatures
+
 type CleanupFunction = () => void;
 
 interface CleanupRef {

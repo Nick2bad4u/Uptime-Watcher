@@ -69,7 +69,7 @@ export interface RetryWithAbortOptions {
  *
  * @public
  */
-export function combineAbortSignals(
+export function createCombinedAbortSignal(
     options: CombineSignalsOptions = {}
 ): AbortSignal {
     const { additionalSignals = [], timeoutMs } = options;
@@ -91,7 +91,10 @@ export function combineAbortSignals(
 
     // If only one signal, return it directly
     if (signals.length === 1) {
-        return signals[0]!;
+        const [signal] = signals;
+        if (signal) {
+            return signal;
+        }
     }
 
     // Combine multiple signals
@@ -136,14 +139,63 @@ export async function createAbortableOperation<T>(
     } = {}
 ): Promise<T> {
     const { cleanup, ...signalOptions } = options;
-    const signal = combineAbortSignals(signalOptions);
+    const signal = createCombinedAbortSignal(signalOptions);
 
     try {
-        const result = await operation(signal);
-        return result;
+        return await operation(signal);
     } finally {
         cleanup?.();
     }
+}
+
+/**
+ * Promise-based sleep function with abort support.
+ *
+ * @remarks
+ * Creates a cancelable delay that can be aborted via AbortSignal. Throws when
+ * the signal is aborted during the delay.
+ *
+ * @example
+ *
+ * ```typescript
+ * const controller = new AbortController();
+ *
+ * try {
+ *     await sleep(5000, controller.signal);
+ *     console.log("Delay completed");
+ * } catch (error) {
+ *     console.log("Delay was aborted");
+ * }
+ * ```
+ *
+ * @param ms - Delay in milliseconds
+ * @param signal - Optional AbortSignal for cancellation
+ *
+ * @returns Promise that resolves after the delay
+ *
+ * @throws When the signal is aborted
+ *
+ * @public
+ */
+export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+    return new Promise((resolve, reject) => {
+        if (signal?.aborted) {
+            reject(new Error("Sleep was aborted"));
+            return;
+        }
+
+        const timeoutId = setTimeout(() => {
+            resolve();
+        }, ms);
+
+        // Handle abort during sleep
+        const handleAbort = (): void => {
+            clearTimeout(timeoutId);
+            reject(new Error("Sleep was aborted"));
+        };
+
+        signal?.addEventListener("abort", handleAbort, { once: true });
+    });
 }
 
 /**
@@ -177,7 +229,7 @@ export async function createAbortableOperation<T>(
  *
  * @returns Promise that resolves to the operation result
  *
- * @throws {Error} When all retries are exhausted or operation is aborted
+ * @throws When all retries are exhausted or operation is aborted
  *
  * @public
  */
@@ -193,7 +245,7 @@ export async function retryWithAbort<T>(
         signal,
     } = options;
 
-    let lastError: Error;
+    let lastError: Error = new Error("No errors occurred");
     let delay = initialDelay;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -203,6 +255,7 @@ export async function retryWithAbort<T>(
         }
 
         try {
+            // eslint-disable-next-line no-await-in-loop
             return await operation();
         } catch (error) {
             lastError =
@@ -214,62 +267,13 @@ export async function retryWithAbort<T>(
             }
 
             // Wait with exponential backoff
+            // eslint-disable-next-line no-await-in-loop
             await sleep(delay, signal);
             delay = Math.min(delay * backoffMultiplier, maxDelay);
         }
     }
 
-    throw lastError!;
-}
-
-/**
- * Promise-based sleep function with abort support.
- *
- * @remarks
- * Creates a cancelable delay that can be aborted via AbortSignal. Throws when
- * the signal is aborted during the delay.
- *
- * @example
- *
- * ```typescript
- * const controller = new AbortController();
- *
- * try {
- *     await sleep(5000, controller.signal);
- *     console.log("Delay completed");
- * } catch (error) {
- *     console.log("Delay was aborted");
- * }
- * ```
- *
- * @param ms - Delay in milliseconds
- * @param signal - Optional AbortSignal for cancellation
- *
- * @returns Promise that resolves after the delay
- *
- * @throws {Error} When the signal is aborted
- *
- * @public
- */
-export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
-    return new Promise((resolve, reject) => {
-        if (signal?.aborted) {
-            reject(new Error("Sleep was aborted"));
-            return;
-        }
-
-        const timeoutId = setTimeout(() => {
-            resolve();
-        }, ms);
-
-        // Handle abort during sleep
-        const handleAbort = (): void => {
-            clearTimeout(timeoutId);
-            reject(new Error("Sleep was aborted"));
-        };
-
-        signal?.addEventListener("abort", handleAbort, { once: true });
-    });
+    throw lastError;
 }
 
 /**
@@ -346,7 +350,7 @@ export async function raceWithAbort<T>(
 
     return Promise.race([
         operation,
-        new Promise<never>((_, reject) => {
+        new Promise<never>((_resolve, reject) => {
             signal.addEventListener(
                 "abort",
                 () => {

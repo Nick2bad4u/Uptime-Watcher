@@ -27,7 +27,7 @@ import type {
 // Helper functions for benchmarking (since they don't exist in typeHelpers)
 function deepClone<T>(obj: T): T {
     if (obj === null || typeof obj !== "object") return obj;
-    if (obj instanceof Date) return new Date(obj.getTime()) as T;
+    if (obj instanceof Date) return new Date(obj) as T;
     if (Array.isArray(obj)) return obj.map(deepClone) as T;
 
     const cloned = {} as T;
@@ -124,7 +124,7 @@ async function retryWithBackoff<T>(
                 throw lastError;
             }
 
-            const delay = baseDelay * Math.pow(2, attempt);
+            const delay = baseDelay * 2**attempt;
             await new Promise((resolve) => setTimeout(resolve, delay));
         }
     }
@@ -197,14 +197,14 @@ describe("Shared Type Utilities Performance", () => {
         type: "http",
         url: "https://example.com",
         status: "up",
-        checkInterval: 60000,
+        checkInterval: 60_000,
         timeout: 5000,
         retryAttempts: 3,
         monitoring: true,
         responseTime: 150,
         lastChecked: new Date(),
         history: Array.from({ length: 10 }, (_, i) => ({
-            timestamp: Date.now() - i * 60000,
+            timestamp: Date.now() - i * 60_000,
             status: i % 2 === 0 ? "up" : "down",
             responseTime: 100 + Math.random() * 200,
             details: `Check result ${i}`,
@@ -374,7 +374,7 @@ describe("Shared Type Utilities Performance", () => {
 
     bench("mergeObjects - nested conflict resolution", () => {
         const obj1 = { config: { timeout: 5000, retries: 3 } };
-        const obj2 = { config: { timeout: 10000, maxRetries: 5 } };
+        const obj2 = { config: { timeout: 10_000, maxRetries: 5 } };
         mergeObjects(obj1, obj2);
     });
 

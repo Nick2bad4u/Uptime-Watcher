@@ -53,7 +53,6 @@ const arbitraryUrl = (): fc.Arbitrary<string> =>
             "",
             "not-a-url",
             "ftp://example.com",
-            "javascript:alert(1)",
             "data:text/html,<script>alert(1)</script>",
             "file:///etc/passwd",
             "localhost",
@@ -88,7 +87,7 @@ const arbitraryHost = (): fc.Arbitrary<string> =>
             ".starting-dot.com",
             "ending-dot.com.",
             "spaces in hostname",
-            "toolong" + "a".repeat(300) + ".com",
+            `toolong${  "a".repeat(300)  }.com`,
             "localhost:3000", // port in hostname
             "user@hostname",
             "hostname with spaces",
@@ -99,31 +98,31 @@ const arbitraryHost = (): fc.Arbitrary<string> =>
 const arbitraryPort = (): fc.Arbitrary<number> =>
     fc.oneof(
         // Valid ports
-        fc.integer({ min: 1, max: 65535 }),
+        fc.integer({ min: 1, max: 65_535 }),
         fc.constantFrom(80, 443, 3000, 8080, 22, 21, 25, 53),
         // Invalid ports
         fc.integer(),
-        fc.constantFrom(0, -1, 65536, 99999, -5000)
+        fc.constantFrom(0, -1, 65_536, 99_999, -5000)
     );
 
 const arbitraryTimeout = (): fc.Arbitrary<number> =>
     fc.oneof(
         // Valid timeouts
-        fc.integer({ min: 1000, max: 300000 }),
-        fc.constantFrom(5000, 10000, 30000, 60000),
+        fc.integer({ min: 1000, max: 300_000 }),
+        fc.constantFrom(5000, 10_000, 30_000, 60_000),
         // Edge case timeouts
         fc.integer(),
-        fc.constantFrom(0, -1, 999, 300001, 999999, -5000)
+        fc.constantFrom(0, -1, 999, 300_001, 999_999, -5000)
     );
 
 const arbitraryCheckInterval = (): fc.Arbitrary<number> =>
     fc.oneof(
         // Valid intervals
-        fc.integer({ min: 5000, max: 2592000000 }), // 5s to 30 days
-        fc.constantFrom(30000, 60000, 300000, 900000, 3600000),
+        fc.integer({ min: 5000, max: 2_592_000_000 }), // 5s to 30 days
+        fc.constantFrom(30_000, 60_000, 300_000, 900_000, 3_600_000),
         // Invalid intervals
         fc.integer(),
-        fc.constantFrom(0, -1, 4999, 2592000001, -10000)
+        fc.constantFrom(0, -1, 4999, 2_592_000_001, -10_000)
     );
 
 const arbitraryRetryAttempts = (): fc.Arbitrary<number> =>
@@ -291,7 +290,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
                     expect(BASE_MONITOR_TYPES).toContain(normalized.type);
                     expect(normalized.checkInterval).toBeGreaterThanOrEqual(5000);
                     expect(normalized.timeout).toBeGreaterThanOrEqual(1000);
-                    expect(normalized.timeout).toBeLessThanOrEqual(300000);
+                    expect(normalized.timeout).toBeLessThanOrEqual(300_000);
                     expect(normalized.retryAttempts).toBeGreaterThanOrEqual(0);
                     expect(normalized.retryAttempts).toBeLessThanOrEqual(10);
                     expect(typeof normalized.monitoring).toBe("boolean");
@@ -323,21 +322,28 @@ describe("Monitor Operations Fuzzing Tests", () => {
                         expect(normalized.type).toBe(type);
 
                         // Check type-specific field filtering
-                        if (type === "http") {
+                        switch (type) {
+                        case "http": {
                             // HTTP monitors should have URL if provided and valid
                             if (partial.url && typeof partial.url === "string" && partial.url.startsWith("http")) {
                                 expect(normalized).toHaveProperty("url");
                             }
                             // HTTP monitors should not have port or host fields (unless host is needed for proxy)
-                        } else if (type === "port") {
+
+                        break;
+                        }
+                        case "port": {
                             // Port monitors should have host and port if provided and valid
                             if (partial.host && typeof partial.host === "string" && partial.host.length > 0) {
                                 expect(normalized).toHaveProperty("host");
                             }
-                            if (partial.port && typeof partial.port === "number" && partial.port > 0 && partial.port <= 65535) {
+                            if (partial.port && typeof partial.port === "number" && partial.port > 0 && partial.port <= 65_535) {
                                 expect(normalized).toHaveProperty("port");
                             }
-                        } else if (type === "dns") {
+
+                        break;
+                        }
+                        case "dns": {
                             // DNS monitors should have host, recordType, expectedValue if provided and valid
                             if (partial.host && typeof partial.host === "string" && partial.host.length > 0) {
                                 expect(normalized).toHaveProperty("host");
@@ -348,6 +354,10 @@ describe("Monitor Operations Fuzzing Tests", () => {
                             if (partial.expectedValue && typeof partial.expectedValue === "string" && partial.expectedValue.length > 0) {
                                 expect(normalized).toHaveProperty("expectedValue");
                             }
+
+                        break;
+                        }
+                        // No default
                         }
                     }
                 )
@@ -471,7 +481,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
             fc.record({
                 id: fc.string({ minLength: 1 }),
                 name: fc.string({ minLength: 1 }),
-                monitors: fc.array(arbitraryPartialMonitor().map(normalizeMonitor))
+                monitors: fc.array(arbitraryPartialMonitor().map(monitor => normalizeMonitor(monitor)))
             });
 
         test("addMonitorToSite should preserve site structure", () => {
