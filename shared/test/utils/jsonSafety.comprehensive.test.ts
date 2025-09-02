@@ -23,11 +23,10 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const validator = (data: unknown): data is { name: string } => (
-                    typeof data === "object" &&
-                    data !== null &&
-                    typeof (data as any).name === "string"
-                );
+            const validator = (data: unknown): data is { name: string } =>
+                typeof data === "object" &&
+                data !== null &&
+                typeof (data as any).name === "string";
 
             const result = safeJsonParse('{"name":"test"}', validator);
             expect(result.success).toBe(true);
@@ -61,11 +60,10 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const validator = (data: unknown): data is { name: string } => (
-                    typeof data === "object" &&
-                    data !== null &&
-                    typeof (data as any).name === "string"
-                );
+            const validator = (data: unknown): data is { name: string } =>
+                typeof data === "object" &&
+                data !== null &&
+                typeof (data as any).name === "string";
 
             const result = safeJsonParse('{"value":123}', validator);
             expect(result.success).toBe(false);
@@ -122,10 +120,9 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const validator = (data: unknown): data is number[] => (
-                    Array.isArray(data) &&
-                    data.every((item) => typeof item === "number")
-                );
+            const validator = (data: unknown): data is number[] =>
+                Array.isArray(data) &&
+                data.every((item) => typeof item === "number");
             const result = safeJsonParse("[1,2,3]", validator);
 
             expect(result.success).toBe(true);
@@ -147,13 +144,10 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const elementValidator = (
-                data: unknown
-            ): data is { id: number } => (
-                    typeof data === "object" &&
-                    data !== null &&
-                    typeof (data as any).id === "number"
-                );
+            const elementValidator = (data: unknown): data is { id: number } =>
+                typeof data === "object" &&
+                data !== null &&
+                typeof (data as any).id === "number";
 
             const result = safeJsonParseArray(
                 '[{"id":1},{"id":2}]',
@@ -213,11 +207,10 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
 
             const elementValidator = (
                 data: unknown
-            ): data is { name: string } => (
-                    typeof data === "object" &&
-                    data !== null &&
-                    typeof (data as any).name === "string"
-                );
+            ): data is { name: string } =>
+                typeof data === "object" &&
+                data !== null &&
+                typeof (data as any).name === "string";
 
             const result = safeJsonParseArray(
                 '[{"name":"valid"},{"id":123}]',
@@ -508,11 +501,10 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const validator = (data: unknown): data is { name: string } => (
-                    typeof data === "object" &&
-                    data !== null &&
-                    typeof (data as any).name === "string"
-                );
+            const validator = (data: unknown): data is { name: string } =>
+                typeof data === "object" &&
+                data !== null &&
+                typeof (data as any).name === "string";
 
             const result = safeJsonParseWithFallback(
                 '{"name":"test"}',
@@ -531,11 +523,10 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const validator = (data: unknown): data is { name: string } => (
-                    typeof data === "object" &&
-                    data !== null &&
-                    typeof (data as any).name === "string"
-                );
+            const validator = (data: unknown): data is { name: string } =>
+                typeof data === "object" &&
+                data !== null &&
+                typeof (data as any).name === "string";
 
             const fallback = { name: "fallback" };
             const result = safeJsonParseWithFallback(
@@ -555,11 +546,10 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const validator = (data: unknown): data is { name: string } => (
-                    typeof data === "object" &&
-                    data !== null &&
-                    typeof (data as any).name === "string"
-                );
+            const validator = (data: unknown): data is { name: string } =>
+                typeof data === "object" &&
+                data !== null &&
+                typeof (data as any).name === "string";
 
             const fallback = { name: "fallback" };
             const result = safeJsonParseWithFallback(

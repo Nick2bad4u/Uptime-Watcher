@@ -12,10 +12,10 @@
     --transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     --shadow-elevation-1: 0 2px 4px rgb(0 0 0 / 6%), 0 1px 2px rgb(0 0 0 / 10%);
     --shadow-elevation-2: 0 4px 6px rgb(0 0 0 / 7%), 0 2px 4px rgb(0 0 0 / 6%);
-    --shadow-elevation-3: 0 10px 15px rgb(0 0 0 / 10%),
-        0 4px 6px rgb(0 0 0 / 5%);
-    --shadow-elevation-4: 0 20px 25px rgb(0 0 0 / 10%),
-        0 10px 10px rgb(0 0 0 / 4%);
+    --shadow-elevation-3:
+        0 10px 15px rgb(0 0 0 / 10%), 0 4px 6px rgb(0 0 0 / 5%);
+    --shadow-elevation-4:
+        0 20px 25px rgb(0 0 0 / 10%), 0 10px 10px rgb(0 0 0 / 4%);
     --border-radius-sm: 0.375rem;
     --border-radius-md: 0.5rem;
     --border-radius-lg: 0.75rem;

@@ -22,9 +22,9 @@ describe("Complete 100% Coverage - Final Tests", () => {
 
             // Create an object with a custom valueOf that returns a novel type
             const weirdObject = {
-                valueOf: vi.fn(() => 
+                valueOf: vi.fn(() =>
                     // This is designed to test the default case in the switch
-                     Symbol("test")
+                    Symbol("test")
                 ),
                 toString: vi.fn(() => "[Weird Object]"),
             };

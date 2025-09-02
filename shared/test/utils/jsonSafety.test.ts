@@ -20,13 +20,12 @@ describe("jsonSafety utilities", () => {
             age: number;
         }
 
-        const isValidUser = (data: unknown): data is TestUser => (
-                typeof data === "object" &&
-                data !== null &&
-                typeof (data as any).id === "string" &&
-                typeof (data as any).name === "string" &&
-                typeof (data as any).age === "number"
-            );
+        const isValidUser = (data: unknown): data is TestUser =>
+            typeof data === "object" &&
+            data !== null &&
+            typeof (data as any).id === "string" &&
+            typeof (data as any).name === "string" &&
+            typeof (data as any).age === "number";
 
         it("should successfully parse valid JSON with valid data", async ({
             task,
@@ -142,12 +141,11 @@ describe("jsonSafety utilities", () => {
             value: number;
         }
 
-        const isValidItem = (data: unknown): data is TestItem => (
-                typeof data === "object" &&
-                data !== null &&
-                typeof (data as any).id === "string" &&
-                typeof (data as any).value === "number"
-            );
+        const isValidItem = (data: unknown): data is TestItem =>
+            typeof data === "object" &&
+            data !== null &&
+            typeof (data as any).id === "string" &&
+            typeof (data as any).value === "number";
 
         it("should successfully parse valid JSON array with valid elements", async ({
             task,
@@ -286,12 +284,11 @@ describe("jsonSafety utilities", () => {
             retries: number;
         }
 
-        const isValidConfig = (data: unknown): data is TestConfig => (
-                typeof data === "object" &&
-                data !== null &&
-                typeof (data as any).timeout === "number" &&
-                typeof (data as any).retries === "number"
-            );
+        const isValidConfig = (data: unknown): data is TestConfig =>
+            typeof data === "object" &&
+            data !== null &&
+            typeof (data as any).timeout === "number" &&
+            typeof (data as any).retries === "number";
 
         const fallbackConfig: TestConfig = { timeout: 5000, retries: 3 };
 

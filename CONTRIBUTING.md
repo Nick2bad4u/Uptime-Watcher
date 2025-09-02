@@ -53,7 +53,6 @@ Thank you for considering contributing to Uptime Watcher! This document provides
    ```
 
 2. **Make Your Changes**
-
    - Keep commits small and focused
    - Write clear commit messages
    - Follow conventional commit format when possible

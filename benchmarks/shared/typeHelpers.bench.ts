@@ -124,7 +124,7 @@ async function retryWithBackoff<T>(
                 throw lastError;
             }
 
-            const delay = baseDelay * 2**attempt;
+            const delay = baseDelay * 2 ** attempt;
             await new Promise((resolve) => setTimeout(resolve, delay));
         }
     }

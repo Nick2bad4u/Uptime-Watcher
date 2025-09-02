@@ -675,7 +675,7 @@ describe("validatorUtils", () => {
             await annotate("Type: Business Logic", "type");
 
             // Testing HTTP URLs for validation completeness
-             
+
             expect(isValidUrl("http://example.com")).toBe(true);
         });
 

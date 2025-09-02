@@ -11,18 +11,16 @@
     overflow: hidden;
     padding: 4rem 0;
     background: #0a0a0a;
-    background-image: radial-gradient(
-            circle at 25% 25%,
-            #1a1a1a 0%,
-            transparent 50%
-        ),
+    background-image:
+        radial-gradient(circle at 25% 25%, #1a1a1a 0%, transparent 50%),
         radial-gradient(circle at 75% 75%, #1a1a1a 0%, transparent 50%);
     color: #fff;
 
     &::before {
         position: absolute;
         animation: gridPulse 4s ease-in-out infinite;
-        background: linear-gradient(
+        background:
+            linear-gradient(
                 90deg,
                 transparent 98%,
                 #27e34f 99%,
@@ -46,7 +44,8 @@
     &::after {
         position: absolute;
         animation: floatingParticles 20s linear infinite;
-        background-image: radial-gradient(
+        background-image:
+            radial-gradient(
                 2px 2px at 20px 30px,
                 rgb(39 227 79 / 30%),
                 transparent
@@ -1207,7 +1206,8 @@
 
     /* Update particle colors for light theme */
     &::after {
-        background-image: radial-gradient(
+        background-image:
+            radial-gradient(
                 2px 2px at 20px 30px,
                 rgb(6 102 204 / 30%),
                 transparent
@@ -1254,12 +1254,8 @@
 }
 
 [data-theme="light"] .heroSection::before {
-    background: linear-gradient(
-            90deg,
-            transparent 98%,
-            #007acc 99%,
-            transparent 100%
-        ),
+    background:
+        linear-gradient(90deg, transparent 98%, #007acc 99%, transparent 100%),
         linear-gradient(180deg, transparent 98%, #007acc 99%, transparent 100%);
 }
 

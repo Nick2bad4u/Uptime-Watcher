@@ -239,7 +239,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
                     3,
                 ])
             ).toBe(true);
-            expect(isArray(Array.from({length: 5}))).toBe(true);
+            expect(isArray(Array.from({ length: 5 }))).toBe(true);
         });
 
         it("should return false for non-arrays", async ({ task, annotate }) => {
@@ -713,12 +713,11 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             const response = { success: true, data: "test" };
             const validator = (
                 value: unknown
-            ): value is { success: boolean; data: string } => (
-                    typeof value === "object" &&
-                    value !== null &&
-                    "success" in value &&
-                    "data" in value
-                );
+            ): value is { success: boolean; data: string } =>
+                typeof value === "object" &&
+                value !== null &&
+                "success" in value &&
+                "data" in value;
 
             const result = castIpcResponse(response, validator);
             expect(result).toEqual(response);
@@ -737,13 +736,10 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const response = { invalid: true };
-            const validator = (
-                value: unknown
-            ): value is { success: boolean } => (
-                    typeof value === "object" &&
-                    value !== null &&
-                    "success" in value
-                );
+            const validator = (value: unknown): value is { success: boolean } =>
+                typeof value === "object" &&
+                value !== null &&
+                "success" in value;
 
             expect(() => castIpcResponse(response, validator)).toThrow();
         });
@@ -784,7 +780,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
                     3,
                 ])
             ).toBe(true);
-            expect(isArrayHelper(Array.from({length: 5}))).toBe(true);
+            expect(isArrayHelper(Array.from({ length: 5 }))).toBe(true);
         });
 
         it("should return false for non-arrays", async ({ task, annotate }) => {
@@ -987,14 +983,13 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
 
             const validator = (
                 value: unknown
-            ): value is { name: string; age: number } => (
-                    typeof value === "object" &&
-                    value !== null &&
-                    "name" in value &&
-                    "age" in value &&
-                    typeof (value as any).name === "string" &&
-                    typeof (value as any).age === "number"
-                );
+            ): value is { name: string; age: number } =>
+                typeof value === "object" &&
+                value !== null &&
+                "name" in value &&
+                "age" in value &&
+                typeof (value as any).name === "string" &&
+                typeof (value as any).age === "number";
 
             const validObject = { name: "Alice", age: 30 };
             expect(validateAndConvert(validObject, validator)).toEqual(

@@ -157,7 +157,9 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeGuardsModule.isNonNegativeNumber(3.14)).toBe(true);
             expect(typeGuardsModule.isNonNegativeNumber(-1)).toBe(false);
             expect(typeGuardsModule.isNonNegativeNumber(-0.1)).toBe(false);
-            expect(typeGuardsModule.isNonNegativeNumber(Number.NaN)).toBe(false);
+            expect(typeGuardsModule.isNonNegativeNumber(Number.NaN)).toBe(
+                false
+            );
             expect(typeGuardsModule.isNonNegativeNumber("0")).toBe(false);
 
             // Test isNonNullObject function
@@ -213,7 +215,9 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeGuardsModule.isValidTimestamp(now - 86_400_000)).toBe(
                 true
             ); // 1 day ago
-            expect(typeGuardsModule.isValidTimestamp(1_672_531_200_000)).toBe(true); // Valid past timestamp
+            expect(typeGuardsModule.isValidTimestamp(1_672_531_200_000)).toBe(
+                true
+            ); // Valid past timestamp
             expect(typeGuardsModule.isValidTimestamp(0)).toBe(false); // Must be > 0
             expect(typeGuardsModule.isValidTimestamp(-1)).toBe(false);
             expect(typeGuardsModule.isValidTimestamp(3.14)).toBe(true); // Decimal numbers are valid

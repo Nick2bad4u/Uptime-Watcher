@@ -646,20 +646,17 @@ export interface MonitorCheckResult {
 **Core Services**:
 
 1. **`EnhancedMonitorChecker`** - Main monitoring engine
-
    - Operation correlation with UUID tracking
    - Race condition prevention
    - Advanced timeout management
    - Status update validation
 
 2. **`MonitorOperationRegistry`** - Operation tracking
-
    - UUID-based operation IDs with collision prevention
    - Active operation management per monitor
    - Automatic cleanup on completion/timeout
 
 3. **`MonitorStatusUpdateService`** - Safe status updates
-
    - Validates monitoring state before updates
    - Operation correlation prevents conflicting updates
    - Database transaction safety
@@ -708,26 +705,22 @@ public getWindowService(): WindowService
 **Store Organization**:
 
 1. **`useSitesStore`** (Modular Composition)
-
    - `useSitesState` - Core state management
    - `useSiteOperations` - CRUD operations with error handling
    - `useSiteMonitoring` - Monitoring lifecycle management
    - `useSiteSync` - Backend synchronization
 
 2. **`useSettingsStore`** - Application preferences
-
    - Theme management, notification settings
    - History limits, auto-start configuration
    - Persistent storage sync
 
 3. **`useErrorStore`** - Global error management
-
    - Store-specific error isolation
    - Operation-level error tracking
    - Automatic error clearing
 
 4. **`useUiStore`** - UI state management
-
    - Modal visibility, active views
    - Loading states, user interactions
 
@@ -1077,28 +1070,24 @@ export function getEnvVar(name: string, defaultValue?: string): string {
 ### Absolute Requirements ✅
 
 1. **Type Safety First**
-
    - All IPC messages must be typed
    - No `any` or `unknown` unless absolutely necessary
    - Strict TypeScript configuration must be maintained
    - Use discriminated unions for complex types
 
 2. **Repository Pattern Compliance**
-
    - All database access through repositories
    - Use `executeTransaction()` for all mutations
    - Implement both async (public) and sync (internal) methods
    - Emit appropriate events for database operations
 
 3. **Error Handling Standards**
-
    - Use `withErrorHandling()` for all async operations
    - Frontend: Include store error management
    - Backend: Include proper logging context
    - Always re-throw errors after handling
 
 4. **Event-Driven Communication**
-
    - Prefer events over direct method calls
    - Use TypedEventBus with proper type definitions
    - Include comprehensive metadata in events
@@ -1113,21 +1102,18 @@ export function getEnvVar(name: string, defaultValue?: string): string {
 ### Architecture Constraints ⚠️
 
 1. **Enhanced Monitoring Only**
-
    - No fallback monitoring systems exist
    - MonitorManager requires enhanced services
    - All monitoring uses operation correlation
    - Return proper `MonitorCheckResult` interface
 
 2. **Transaction Safety**
-
    - All database mutations in transactions
    - Use repository patterns exclusively
    - Event emission within transaction scope
    - Proper rollback on errors
 
 3. **IPC Security**
-
    - All communication via contextBridge
    - Type-safe message contracts
    - Validation at IPC boundaries
@@ -1191,21 +1177,18 @@ export function getEnvVar(name: string, defaultValue?: string): string {
 ### Performance Considerations 🚀
 
 1. **Database Operations**
-
    - Use prepared statements in repositories
    - Batch operations within single transactions
    - Implement proper indexing strategies
    - Use connection pooling appropriately
 
 2. **Event System**
-
    - Avoid excessive event emission in tight loops
    - Use event batching for bulk operations
    - Implement proper event cleanup
    - Monitor event listener memory usage
 
 3. **State Management**
-
    - Use selector patterns for computed state
    - Implement proper state normalization
    - Avoid unnecessary re-renders with proper memo

@@ -27,9 +27,9 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
 
             // Test all safe conversion functions with valid inputs
             expect(safeConversions.safeNumberConversion("42", 0)).toBe(42);
-            expect(safeConversions.safeParseCheckInterval("30000", 60_000)).toBe(
-                30_000
-            );
+            expect(
+                safeConversions.safeParseCheckInterval("30000", 60_000)
+            ).toBe(30_000);
             expect(safeConversions.safeParseFloat("3.14", 0)).toBe(3.14);
             expect(safeConversions.safeParseInt("42", 0)).toBe(42);
             expect(safeConversions.safeParsePercentage("75", 0)).toBe(75);

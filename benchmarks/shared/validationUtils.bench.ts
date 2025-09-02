@@ -47,7 +47,7 @@ describe("Shared Validation Utils Performance", () => {
         ".starting-dot.com",
         "ending-dot.com.",
         "spaces in domain.com",
-        `toolong${  "a".repeat(300)  }.com`,
+        `toolong${"a".repeat(300)}.com`,
     ];
 
     const validIdentifiers = [
@@ -284,8 +284,8 @@ describe("Shared Validation Utils Performance", () => {
     bench("edge case validation - very long strings", () => {
         const longStrings = [
             "a".repeat(1000),
-            `valid-${  "identifier-".repeat(50)}`,
-            `https://${  "subdomain.".repeat(20)  }example.com`,
+            `valid-${"identifier-".repeat(50)}`,
+            `https://${"subdomain.".repeat(20)}example.com`,
         ];
 
         for (const str of longStrings) {
