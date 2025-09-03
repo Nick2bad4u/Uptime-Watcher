@@ -6011,8 +6011,8 @@ export default [
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
             // Relaxed function rules for tests (explicit for clarity)
-            "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
 
+            "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
@@ -6026,6 +6026,7 @@ export default [
             "id-length": "off",
             "loadable-imports/sort": "error",
             "max-classes-per-file": "off",
+            "max-depth": "off",
             "max-lines": "off",
             "max-lines-per-function": "off",
             "max-params": "off",

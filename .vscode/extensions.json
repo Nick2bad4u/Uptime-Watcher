@@ -26,6 +26,7 @@
         "chunsen.bracket-select",
         "michaelcurrin.auto-commit-msg",
         "rendinjast.amoled-black",
-        "piotrpalarz.vscode-gitignore-generator"
+        "piotrpalarz.vscode-gitignore-generator",
+        "xyz.local-history"
     ]
 }

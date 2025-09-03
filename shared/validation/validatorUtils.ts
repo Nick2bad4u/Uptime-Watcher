@@ -325,7 +325,13 @@ export function safeInteger(
     min?: number,
     max?: number
 ): number {
-    const str = String(value);
+    // eslint-disable-next-line @typescript-eslint/init-declarations -- assigned in try/catch
+    let str: string;
+    try {
+        str = String(value);
+    } catch {
+        return defaultValue;
+    }
 
     if (!isValidInteger(str)) {
         return defaultValue;

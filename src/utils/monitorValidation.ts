@@ -67,7 +67,8 @@ export function createMonitorObject(
     type: MonitorType,
     fields: Partial<MonitorFormData>
 ): MonitorCreationData {
-    return {
+    // Create base monitor with defaults
+    const baseData: MonitorCreationData = {
         history: [],
         monitoring: true,
         responseTime: -1,
@@ -77,6 +78,11 @@ export function createMonitorObject(
         type,
         ...fields,
     };
+
+    // Ensure the type is preserved if it was valid
+    baseData.type = type;
+
+    return baseData;
 }
 
 /**
