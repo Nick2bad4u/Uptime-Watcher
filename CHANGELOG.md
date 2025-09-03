@@ -7,14 +7,161 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[3788605](https://github.com/Nick2bad4u/Uptime-Watcher/commit/378860526e708da3217e4de1c80c3f53f5a51609)...
-[3788605](https://github.com/Nick2bad4u/Uptime-Watcher/commit/378860526e708da3217e4de1c80c3f53f5a51609)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/378860526e708da3217e4de1c80c3f53f5a51609...378860526e708da3217e4de1c80c3f53f5a51609))
+[[861fbec](https://github.com/Nick2bad4u/Uptime-Watcher/commit/861fbecde12c7d3d104d8c0b0028c0b25b67f2c7)...
+[861fbec](https://github.com/Nick2bad4u/Uptime-Watcher/commit/861fbecde12c7d3d104d8c0b0028c0b25b67f2c7)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/861fbecde12c7d3d104d8c0b0028c0b25b67f2c7...861fbecde12c7d3d104d8c0b0028c0b25b67f2c7))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 13.6.0 [`(861fbec)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/861fbecde12c7d3d104d8c0b0028c0b25b67f2c7)
+
+
+
+
+
+
+## [13.6.0] - 2025-09-03
+
+
+[[3788605](https://github.com/Nick2bad4u/Uptime-Watcher/commit/378860526e708da3217e4de1c80c3f53f5a51609)...
+[f583a61](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f583a619c9b753476e3ed97d8b993dd0c6e5e534)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/378860526e708da3217e4de1c80c3f53f5a51609...f583a619c9b753476e3ed97d8b993dd0c6e5e534))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update dependency group (#61) [`(afda465)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/afda465b694cabaffa0f87c4f64da8a582533cfc)
+
+
 - [dependency] Update version 13.5.0 [`(3788605)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/378860526e708da3217e4de1c80c3f53f5a51609)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Centralize monitor defaults and enhance validation
+
+- Refactors monitor creation and normalization to use a centralized default config, reducing duplication and risk of divergence between default and validation logic.
+- Improves monitor update and normalization by delegating type-specific default logic, ensuring required fields are always present and valid based on monitor type.
+- Enhances error handling when converting values to strings and when updating monitors, preventing invalid or malformed data from corrupting site state.
+- Adds multiple ESLint formatter dependencies and lint scripts for improved CI and developer workflow.
+- Updates several dev dependencies for better compatibility and reliability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9dbf4d8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9dbf4d850905b21a77f321c09938d9552bb6ac84)
+
+
+- 🚜 [refactor] Improve type safety, code clarity, and input handling
+
+- Refactors input change handlers for better type safety, introduces specialized and legacy-compatible functions, and updates tests for stricter validation logic.
+- Adds defensive runtime checks, explicit type assertions, and targeted eslint-disable comments for safe type narrowing and property access.
+- Standardizes number formatting with numeric separators and corrects edge case values across tests and benchmarks.
+- Removes redundant type definitions, switches to direct imports, and simplifies logic in several utility and validation functions.
+- Enhances error handling and object safety with clearer null/undefined checks and safe merges.
+- Improves code readability and maintainability by adopting modern patterns and clarifying defensive programming intentions.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(df8c9cc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/df8c9ccbc45e13fce40f6d2f1f7f2d2d4072cd5d)
+
+
+- 🚜 [refactor] Standardize numeric literals and improve type safety
+
+- Replaces magic numbers with digit separators in tests and shared types to enhance readability and prevent errors with large values.
+- Refactors loops to use for-of instead of forEach for better async compatibility and clarity.
+- Reorders properties and types in shared type definitions for consistency and maintainability.
+- Removes unused or redundant plugin and rule references in ESLint configuration, and disables aggressive rules that hinder flexibility.
+- Refactors chart type definitions for better alignment and future extensibility.
+- Improves object validation and type safety in database row checking and property access utilities.
+- Normalizes global access patterns in test environments for cross-platform compatibility.
+- Improves code style and consistency in utility and helper functions by using concise arrow syntax and better naming.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e1a517f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e1a517f42611bfd4f9f264a90c81b90ccc12d49b)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Add mascot images to README for visual clarity
+
+Enhances documentation by introducing mascot and panel images
+for improved visual engagement and clearer representation of
+application features.
+
+ - Improves discoverability and branding for users.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(805a2c7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/805a2c7bc4513da32505c200b8ef4895296762c1)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improve code formatting and readability in tests
+
+- Updates test files to consistently format multiline function calls, arguments, and object literals for better readability.
+- Removes unnecessary line breaks and indentation inconsistencies across various unit tests.
+- Enhances maintainability and clarity of test logic without changing functionality.
+
+No functional changes or logic modifications are introduced.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f583a61)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f583a619c9b753476e3ed97d8b993dd0c6e5e534)
+
+
+- 🎨 [style] Normalize formatting and whitespace across codebase
+
+- Unifies code style by converting redundant parentheses, improving spacing, and aligning multi-line constructs for greater readability and maintainability.
+- Consistently applies array and object formatting, removes unnecessary blank lines, and harmonizes CSS and Markdown style blocks.
+- Enhances test and fuzzing code clarity by standardizing property-based test presentation and nested object/array layouts.
+- Updates documentation guides for cleaner bullet points and list formatting without altering content.
+- No logic changes; purely improves developer experience and code review efficiency.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5ff94cc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ff94cc392f378d44cd56b5174a9e824ef3b90cb)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Refactors event handler usage and improves coverage
+
+- Replaces usage of namespaced event handler types with direct imports for improved clarity and developer experience across shared types and theme components.
+- Adds centralized namespace for event handler types to enhance discoverability and consistency.
+- Refactors fuzzing, property-based tests, and component tests for more robust coverage and aligns with updated type definitions.
+- Removes obsolete documentation on bug-finding tools to streamline project files.
+- Improves edge case handling in fuzzing tests and validation, increasing reliability and correctness.
+- Updates chart utility type imports for consistency.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4e2d88e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e2d88e9d742fe73b2490bb06f6d5e6728eb01c3)
+
+
+- 🧪 [test] Refactors type guard tests and improves fuzz coverage
+
+- Updates all test files to consistently use the 'guardUtils' namespace and improves naming for type guard and helper imports.
+- Refactors tests for clarity, edge case handling, and future maintainability, including more descriptive function names and explicit error objects.
+- Improves fuzzing and monitor normalization tests to better validate input boundaries, Unicode handling, malicious input, empty fields, and normalization of invalid data.
+- Adds more robust assertions for monitor type, numeric boundaries, and required fields to ensure coverage and correctness.
+- Adopts modern JavaScript practices for property deletion, RegExp usage, and global property checks, eliminating outdated syntax and potential lint errors.
+- Enhances overall test readability, reliability, and coverage for shared utility modules.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ca5a594)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ca5a594e8a17b70c1dbcb01122d191e6287b59f9)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v13.5.0 [skip ci] [`(2bc286f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2bc286fffb3b6c9f63e32c27613abafc883fe2c1)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Add Stryker mutation testing and fuzzing coverage
+
+- Integrates Stryker mutation testing into CI/CD with GitHub Actions workflow, incremental caching, and automated report uploads
+- Adds mutation score PR comments, dashboard integration, and quality gates for silent failure detection
+- Introduces comprehensive property-based fuzzing tests for form validation, monitor operations, IPC, and validator logic using fast-check
+- Updates ignore patterns and VSCode settings to exclude Stryker temp files from linting, search, and file watching
+- Documents advanced bug-finding strategies and tool recommendations for future test suite hardening
+- Adds mutation testing scripts and dependencies to package configuration for streamlined developer workflow
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1c8ec37)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1c8ec37fa01164b3e19900a906026d9f1485e825)
 
 
 
@@ -73,6 +220,15 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7b48
 ### 🧹 Chores
 
 - Format code with Prettier [skip-ci] [`(385553d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/385553d36d5f1ea6c859df548eb847bd1790ebcd)
+
+
+- 🧹 [chore] Remove obsolete optimization docs and migration scripts
+
+- Cleans up the repository by deleting outdated documentation files, migration script readmes, and PowerShell utility scripts related to ESLint rule organization, tree-shaking, and TypeScript migration.
+- Reduces clutter and potential confusion, ensuring only relevant and current tooling and documentation remain.
+- Improves overall maintainability by eliminating legacy artifacts no longer needed for the build process or codebase management.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(16da65b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/16da65b4b36760c5f335c03097c1a01eecdfd138)
 
 
 - Update changelogs for v13.4.0 [skip ci] [`(3e1ea66)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3e1ea666253d00c3c9defa91304b9a91b199befe)
