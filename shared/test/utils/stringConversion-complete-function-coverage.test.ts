@@ -305,9 +305,11 @@ describe("StringConversion - Complete Function Coverage", () => {
             expect(typeof stringConversionModule.safeStringify("test")).toBe(
                 "string"
             );
-            expect(typeof stringConversionModule.safeStringify(Symbol("test symbol"))).toBe(
-                "string"
-            );
+            expect(
+                typeof stringConversionModule.safeStringify(
+                    Symbol("test symbol")
+                )
+            ).toBe("string");
 
             // The default case should theoretically never be reached with current JS types
             // but it's there for safety and future-proofing

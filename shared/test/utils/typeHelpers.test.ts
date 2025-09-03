@@ -67,9 +67,9 @@ describe("shared/utils/typeHelpers Function Coverage Validation", () => {
             // Test validateAndConvert function
             const validator = (value: unknown): value is string =>
                 typeof value === "string";
-            expect(
-                helpersModule.validateAndConvert("test", validator)
-            ).toBe("test");
+            expect(helpersModule.validateAndConvert("test", validator)).toBe(
+                "test"
+            );
             try {
                 helpersModule.validateAndConvert(
                     123,

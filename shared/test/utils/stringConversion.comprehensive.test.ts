@@ -146,7 +146,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(safeStringify(Symbol("test"))).toBe("Symbol(test)");
-                        expect(safeStringify(Symbol("empty"))).toBe("Symbol(empty)");
+            expect(safeStringify(Symbol("empty"))).toBe("Symbol(empty)");
             expect(safeStringify(Symbol.iterator)).toBe(
                 "Symbol(Symbol.iterator)"
             );

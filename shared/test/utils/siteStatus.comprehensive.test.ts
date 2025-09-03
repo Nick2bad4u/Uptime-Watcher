@@ -632,14 +632,14 @@ describe("Edge Cases and Complex Scenarios", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Monitoring", "type");
 
-                const monitors = Array.from({ length: 100 }, (_, i) => ({
-                        monitoring: i % 2 === 0, // Half monitoring, half not
-                        status: (i % 3 === 0
-                                ? "up"
-                                : i % 3 === 1
-                                    ? "down"
-                                    : "pending") as MonitorStatus,
-                }));
+        const monitors = Array.from({ length: 100 }, (_, i) => ({
+            monitoring: i % 2 === 0, // Half monitoring, half not
+            status: (i % 3 === 0
+                ? "up"
+                : i % 3 === 1
+                  ? "down"
+                  : "pending") as MonitorStatus,
+        }));
 
         const site = createTestSite(monitors);
 

@@ -168,9 +168,12 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                 // No message property
             };
 
-            const result = validateMonitorData("http", function throwCustomError() {
-                throw customError;
-            });
+            const result = validateMonitorData(
+                "http",
+                function throwCustomError() {
+                    throw customError;
+                }
+            );
             expect(result.success).toBe(false);
             expect(result.errors.length).toBeGreaterThan(0);
         });

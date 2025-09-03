@@ -306,7 +306,11 @@ describe("Final 90% Function Coverage Push", () => {
     });
 
     // Helper function for testing module functions to reduce complexity
-    const testModuleFunctions = (_moduleName: string, moduleObject: any, customHandler?: (func: any, funcName: string) => void): void => {
+    const testModuleFunctions = (
+        _moduleName: string,
+        moduleObject: any,
+        customHandler?: (func: any, funcName: string) => void
+    ): void => {
         const functions = Object.keys(moduleObject).filter(
             (key) => typeof (moduleObject as any)[key] === "function"
         );
@@ -372,11 +376,7 @@ describe("Final 90% Function Coverage Push", () => {
             if (funcName === "safeObjectIteration") {
                 // safeObjectIteration requires a callback function
                 func({}, () => {}, "test context");
-                func(
-                    { test: "value" },
-                    (_k: string, _v: any) => {},
-                    "test"
-                );
+                func({ test: "value" }, (_k: string, _v: any) => {}, "test");
                 func(null, () => {}, "null test");
                 func(["test"], () => {}, "array test");
                 func({}, () => {}, ["context", "array"]);

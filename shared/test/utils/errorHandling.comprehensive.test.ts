@@ -12,8 +12,10 @@ import {
 } from "../../utils/errorHandling";
 
 describe("Error Handling Utilities - Comprehensive Coverage", () => {
-    let mockStore: ErrorHandlingFrontendStore = {} as ErrorHandlingFrontendStore;
-    let mockBackendContext: ErrorHandlingBackendContext = {} as ErrorHandlingBackendContext;
+    let mockStore: ErrorHandlingFrontendStore =
+        {} as ErrorHandlingFrontendStore;
+    let mockBackendContext: ErrorHandlingBackendContext =
+        {} as ErrorHandlingBackendContext;
     let mockConsole: typeof console = {} as typeof console;
 
     beforeEach(() => {

@@ -19,9 +19,7 @@ import type {
     MonitorStatus,
     Site,
 } from "../../../shared/types";
-import {
-    BASE_MONITOR_TYPES,
-} from "../../../shared/types";
+import { BASE_MONITOR_TYPES } from "../../../shared/types";
 import {
     createDefaultMonitor,
     normalizeMonitor,

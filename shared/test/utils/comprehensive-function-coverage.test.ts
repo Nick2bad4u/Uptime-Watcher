@@ -375,7 +375,9 @@ describe("Shared Module - 100% Function Coverage", () => {
             ).toBe(true);
             expect(guardUtilsModule.isBoolean(true)).toBe(true);
             expect(guardUtilsModule.isDate(new Date())).toBe(true);
-            expect(guardUtilsModule.isError(new Error("test error"))).toBe(true);
+            expect(guardUtilsModule.isError(new Error("test error"))).toBe(
+                true
+            );
             expect(guardUtilsModule.isFiniteNumber(123)).toBe(true);
             expect(guardUtilsModule.isFunction(() => {})).toBe(true);
             expect(guardUtilsModule.isNonNegativeNumber(0)).toBe(true);

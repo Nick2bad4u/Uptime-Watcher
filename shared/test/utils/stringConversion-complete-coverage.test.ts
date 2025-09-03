@@ -111,7 +111,9 @@ describe("shared/utils/stringConversion.ts - Complete Function Coverage", () => 
             await annotate("Type: Business Logic", "type");
 
             expect(safeStringify(() => {})).toBe("[Function]");
-            expect(safeStringify(function namedFunction() {})).toBe("[Function]");
+            expect(safeStringify(function namedFunction() {})).toBe(
+                "[Function]"
+            );
             expect(safeStringify(console.log)).toBe("[Function]");
             expect(safeStringify(Date)).toBe("[Function]");
         });

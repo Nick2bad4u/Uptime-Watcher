@@ -44,8 +44,7 @@
 
 <img src="./docs/assets/app-preview.png" alt="Application Preview WIP"></div>
 
-<img src="./assets/UptimeWatcherMascot.png" alt="Uptime Watcher Mascot">
----
+## <img src="./assets/UptimeWatcherMascot.png" alt="Uptime Watcher Mascot">
 
 ## 🎯 **What is Uptime Watcher?**
 

@@ -609,7 +609,9 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isError(new Error("test error"))).toBe(true);
             expect(isError(new Error("message"))).toBe(true);
             expect(isError(new TypeError("test type error"))).toBe(true);
-            expect(isError(new ReferenceError("test reference error"))).toBe(true);
+            expect(isError(new ReferenceError("test reference error"))).toBe(
+                true
+            );
             expect(isError(new SyntaxError("test syntax error"))).toBe(true);
         });
 
@@ -712,8 +714,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
 
             expect(isFunction(() => {})).toBe(true);
             expect(isFunction(function namedFunction() {})).toBe(true);
-            expect(isFunction(async function namedAsyncFunction() {})).toBe(true);
-            expect(isFunction(function* namedGeneratorFunction() {})).toBe(true);
+            expect(isFunction(async function namedAsyncFunction() {})).toBe(
+                true
+            );
+            expect(isFunction(function* namedGeneratorFunction() {})).toBe(
+                true
+            );
             expect(isFunction(Math.random)).toBe(true);
             expect(isFunction(console.log)).toBe(true);
         });

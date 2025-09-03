@@ -153,7 +153,9 @@ describe("String Conversion - Complete Coverage", () => {
             // Test different function types
             expect(safeStringify(function named() {})).toBe("[Function]");
             expect(safeStringify(() => {})).toBe("[Function]");
-            expect(safeStringify(async function asyncFunction() {})).toBe("[Function]");
+            expect(safeStringify(async function asyncFunction() {})).toBe(
+                "[Function]"
+            );
             expect(safeStringify(function* generator() {})).toBe("[Function]");
             // Test class with method for test coverage
             const TestClass = class {

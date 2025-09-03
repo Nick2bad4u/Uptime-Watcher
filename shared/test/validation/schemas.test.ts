@@ -623,7 +623,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 // Note: port 0 is actually valid in some contexts, so we might need to adjust this test
                 if (port !== 0) {
                     // Port 0 might be considered valid by validator.js, skip this specific case
-                    expect(() => portMonitorSchema.parse(invalidData)).toThrow();
+                    expect(() =>
+                        portMonitorSchema.parse(invalidData)
+                    ).toThrow();
                 }
             }
         });

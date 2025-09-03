@@ -66,9 +66,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             // Also test with false cases to ensure all branches are covered
             expect(isObject(null)).toBe(false);
             expect(isNumber("not a number")).toBe(false);
-            expect(hasProperties(testObj, ["nonexistent"])).toBe(
-                false
-            );
+            expect(hasProperties(testObj, ["nonexistent"])).toBe(false);
             expect(hasProperty(testObj, "nonexistent")).toBe(false);
             expect(isArray("not an array")).toBe(false);
             expect(isBoolean("not a boolean")).toBe(false);

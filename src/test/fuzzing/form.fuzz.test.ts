@@ -26,10 +26,13 @@ import { normalizeMonitor } from "../../stores/sites/utils/monitorOperations";
 type SimpleMonitorType = "http" | "ping" | "port" | "dns";
 
 // Helper function to safely create monitor objects for fuzzing tests
-function createMonitorObjectForFuzzing(type: SimpleMonitorType, formData: unknown) {
+function createMonitorObjectForFuzzing(
+    type: SimpleMonitorType,
+    formData: unknown
+) {
     return normalizeMonitor({
         type,
-        ...(typeof formData === 'object' && formData !== null ? formData : {})
+        ...(typeof formData === "object" && formData !== null ? formData : {}),
     });
 }
 
@@ -86,13 +89,19 @@ describe("Form Validation Fuzzing Tests", () => {
                         expect(() =>
                             normalizeMonitor({
                                 type,
-                                ...(typeof formData === 'object' && formData !== null ? formData : {})
+                                ...(typeof formData === "object" &&
+                                formData !== null
+                                    ? formData
+                                    : {}),
                             })
                         ).not.toThrow();
 
                         const result = normalizeMonitor({
                             type,
-                            ...(typeof formData === 'object' && formData !== null ? formData : {})
+                            ...(typeof formData === "object" &&
+                            formData !== null
+                                ? formData
+                                : {}),
                         });
 
                         // Property: result should always have required fields
@@ -105,11 +114,23 @@ describe("Form Validation Fuzzing Tests", () => {
                         expect(result).toHaveProperty("timeout");
 
                         // Property: type should match input if valid, otherwise should be normalized
-                        if (["http", "ping", "port", "dns"].includes(type)) {
+                        if (
+                            [
+                                "http",
+                                "ping",
+                                "port",
+                                "dns",
+                            ].includes(type)
+                        ) {
                             expect(result.type).toBe(type);
                         } else {
                             // Invalid types should be normalized to a valid default
-                            expect(["http", "ping", "port", "dns"]).toContain(result.type);
+                            expect([
+                                "http",
+                                "ping",
+                                "port",
+                                "dns",
+                            ]).toContain(result.type);
                         }
 
                         // Property: required fields should have correct default types
@@ -140,7 +161,10 @@ describe("Form Validation Fuzzing Tests", () => {
                         type: SimpleMonitorType,
                         formData: { timeout: number; retryAttempts: number }
                     ) => {
-                        const result = createMonitorObjectForFuzzing(type, formData);
+                        const result = createMonitorObjectForFuzzing(
+                            type,
+                            formData
+                        );
 
                         // Property: valid numeric data should be preserved
                         expect(result.timeout).toBe(formData.timeout);
@@ -195,7 +219,10 @@ describe("Form Validation Fuzzing Tests", () => {
                             createMonitorObjectForFuzzing(type, formData)
                         ).not.toThrow();
 
-                        const result = createMonitorObjectForFuzzing(type, formData);
+                        const result = createMonitorObjectForFuzzing(
+                            type,
+                            formData
+                        );
 
                         // Property: should maintain required fields even with invalid input
                         expect(result.type).toBe(type);
@@ -219,7 +246,10 @@ describe("Form Validation Fuzzing Tests", () => {
                             createMonitorObjectForFuzzing(type, complexData)
                         ).not.toThrow();
 
-                        const result = createMonitorObjectForFuzzing(type, complexData);
+                        const result = createMonitorObjectForFuzzing(
+                            type,
+                            complexData
+                        );
 
                         // Property: core fields should still be valid
                         expect(result.type).toBe(type);
@@ -260,7 +290,10 @@ describe("Form Validation Fuzzing Tests", () => {
                             createMonitorObjectForFuzzing(type, extremeData)
                         ).not.toThrow();
 
-                        const result = createMonitorObjectForFuzzing(type, extremeData);
+                        const result = createMonitorObjectForFuzzing(
+                            type,
+                            extremeData
+                        );
 
                         // Property: should handle extreme values gracefully
                         expect(result.type).toBe(type);
@@ -299,7 +332,10 @@ describe("Form Validation Fuzzing Tests", () => {
                             createMonitorObjectForFuzzing(type, unicodeData)
                         ).not.toThrow();
 
-                        const result = createMonitorObjectForFuzzing(type, unicodeData);
+                        const result = createMonitorObjectForFuzzing(
+                            type,
+                            unicodeData
+                        );
 
                         // Property: Function should handle Unicode gracefully
                         // Valid URLs may be preserved, invalid ones get defaults
@@ -335,7 +371,10 @@ describe("Form Validation Fuzzing Tests", () => {
                             createMonitorObjectForFuzzing(type, maliciousData)
                         ).not.toThrow();
 
-                        const result = createMonitorObjectForFuzzing(type, maliciousData);
+                        const result = createMonitorObjectForFuzzing(
+                            type,
+                            maliciousData
+                        );
 
                         // Property: should preserve legitimate fields for the monitor type
                         expect(result.url).toBe("https://example.com");
@@ -376,7 +415,10 @@ describe("Form Validation Fuzzing Tests", () => {
                             createMonitorObjectForFuzzing("http", formData)
                         ).not.toThrow();
 
-                        const result = createMonitorObjectForFuzzing("http", formData);
+                        const result = createMonitorObjectForFuzzing(
+                            "http",
+                            formData
+                        );
 
                         // Property: Empty/whitespace inputs should be normalized
                         // Invalid URLs should get default, HTTP monitors don't have host field
@@ -402,7 +444,10 @@ describe("Form Validation Fuzzing Tests", () => {
                             createMonitorObjectForFuzzing("http", formData)
                         ).not.toThrow();
 
-                        const result = createMonitorObjectForFuzzing("http", formData);
+                        const result = createMonitorObjectForFuzzing(
+                            "http",
+                            formData
+                        );
 
                         // Property: Very long strings are likely invalid URLs and should be normalized
                         // URL validation will reject extremely long URLs and apply defaults
@@ -508,7 +553,10 @@ describe("Form Validation Fuzzing Tests", () => {
                             createMonitorObjectForFuzzing("port", mixedData)
                         ).not.toThrow();
 
-                        const result = createMonitorObjectForFuzzing("port", mixedData);
+                        const result = createMonitorObjectForFuzzing(
+                            "port",
+                            mixedData
+                        );
 
                         // Property: should handle mixed types gracefully without throwing
                         expect(result.type).toBe("port");
