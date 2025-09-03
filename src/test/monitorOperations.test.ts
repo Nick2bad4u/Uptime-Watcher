@@ -60,6 +60,7 @@ describe("monitorOperations", () => {
                 status: "pending",
                 timeout: 5000,
                 type: "http",
+                url: "https://example.com",
             });
             expect(mockCrypto.randomUUID).toHaveBeenCalledOnce();
         });
@@ -455,6 +456,7 @@ describe("monitorOperations", () => {
                 status: "pending",
                 timeout: 5000,
                 type: "http",
+                url: "https://example.com",
             });
         });
 
@@ -601,6 +603,7 @@ describe("monitorOperations", () => {
                 status: "pending",
                 timeout: 5000,
                 type: "http",
+                url: "https://example.com",
             });
         });
 
@@ -624,6 +627,7 @@ describe("monitorOperations", () => {
             expect(result).toEqual({
                 activeOperations: [],
                 checkInterval: 300_000,
+                host: "localhost",
                 history: [],
                 id: mockUUID,
                 monitoring: true,
@@ -765,9 +769,10 @@ describe("monitorOperations", () => {
             const result = updateMonitorInSite(mockSite, "monitor-1", updates);
 
             expect(result.monitors[0]).toEqual({
-                activeOperations: [],
                 ...mockSite.monitors[0],
                 ...updates,
+                activeOperations: [],
+                url: "https://example.com",
             });
             expect(result.monitors[1]).toEqual(mockSite.monitors[1]);
         });
@@ -815,9 +820,10 @@ describe("monitorOperations", () => {
             const result = updateMonitorInSite(mockSite, "monitor-1", updates);
 
             expect(result.monitors[0]).toEqual({
-                activeOperations: [],
                 ...mockSite.monitors[0],
                 responseTime: 250,
+                activeOperations: [],
+                url: "https://example.com",
             });
         });
 
@@ -828,11 +834,11 @@ describe("monitorOperations", () => {
             await annotate("Type: Data Update", "type");
 
             const result = updateMonitorInSite(mockSite, "monitor-1", {});
-
             // When empty updates are applied, normalizeMonitor still ensures all fields are present
             expect(result.monitors[0]).toEqual({
                 ...mockSite.monitors[0],
                 activeOperations: [], // normalizeMonitor adds this field
+                url: "https://example.com", // default for http type
             });
         });
     });

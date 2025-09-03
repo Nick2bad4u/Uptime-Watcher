@@ -495,7 +495,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             });
         });
 
-        it("should handle keys with empty identifiers in 2-part format", async ({
+        it("should handle keys with empty identifiers in 2-part format for site prefix", async ({
             task,
             annotate,
         }) => {
@@ -531,7 +531,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             }).toThrow("Invalid cache key format: :identifier");
         });
 
-        it("should handle keys with empty identifiers in 2-part format", async ({
+        it("should handle keys with empty identifiers in 2-part format for config prefix", async ({
             task,
             annotate,
         }) => {
@@ -691,9 +691,11 @@ describe("CacheKeys - Complete Function Coverage", () => {
 
             // Generate many keys
             for (let i = 0; i < 100; i++) {
-                keys.push(CacheKeys.config.byName(`config-${i}`));
-                keys.push(CacheKeys.monitor.byId(`monitor-${i}`));
-                keys.push(CacheKeys.site.byIdentifier(`site-${i}`));
+                keys.push(
+                    CacheKeys.config.byName(`config-${i}`),
+                    CacheKeys.monitor.byId(`monitor-${i}`),
+                    CacheKeys.site.byIdentifier(`site-${i}`)
+                );
             }
 
             // Validate all keys

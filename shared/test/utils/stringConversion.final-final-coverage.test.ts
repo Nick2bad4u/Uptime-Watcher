@@ -100,7 +100,7 @@ describe("String Conversion - Final Final Coverage", () => {
             expect(voidResult).toBe("");
 
             // Test with actual undefined variable
-            let uninitialized;
+            const uninitialized = undefined;
             const uninitResult = safeStringify(uninitialized);
             expect(uninitResult).toBe("");
         });

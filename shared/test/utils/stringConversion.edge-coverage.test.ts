@@ -132,7 +132,7 @@ describe("String Conversion - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test different symbol types
-            expect(safeStringify(Symbol())).toContain("Symbol");
+            expect(safeStringify(Symbol("unnamed"))).toContain("Symbol");
             expect(safeStringify(Symbol("named"))).toContain("Symbol");
             expect(safeStringify(Symbol.for("global"))).toContain("Symbol");
             expect(safeStringify(Symbol.iterator)).toContain("Symbol");
@@ -153,7 +153,7 @@ describe("String Conversion - Complete Coverage", () => {
             // Test different function types
             expect(safeStringify(function named() {})).toBe("[Function]");
             expect(safeStringify(() => {})).toBe("[Function]");
-            expect(safeStringify(async function () {})).toBe("[Function]");
+            expect(safeStringify(async function asyncFunction() {})).toBe("[Function]");
             expect(safeStringify(function* generator() {})).toBe("[Function]");
             // Test class with method for test coverage
             const TestClass = class {

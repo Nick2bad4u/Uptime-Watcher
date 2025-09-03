@@ -77,7 +77,7 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
             expect(safeStringify(void 0)).toBe("");
 
             // Test with a variable that's undefined
-            let undefinedVar;
+            const undefinedVar = undefined;
             expect(safeStringify(undefinedVar)).toBe("");
         });
 

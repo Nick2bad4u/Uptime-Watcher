@@ -122,7 +122,7 @@ describe("jsonSafety utilities", () => {
             // Mock JSON.parse to throw a non-Error object
             const originalParse = JSON.parse;
             JSON.parse = vi.fn(() => {
-                throw "string error";
+                throw new Error("string error");
             });
 
             const result = safeJsonParse('{"test": true}', isValidUser);
@@ -265,13 +265,13 @@ describe("jsonSafety utilities", () => {
             // Mock JSON.parse to throw a non-Error object
             const originalParse = JSON.parse;
             JSON.parse = vi.fn(() => {
-                throw { message: "custom error" };
+                throw new Error("custom error");
             });
 
             const result = safeJsonParseArray('[{"test": true}]', isValidItem);
 
             expect(result.success).toBe(false);
-            expect(result.error).toBe("JSON parsing failed: [object Object]");
+            expect(result.error).toBe("JSON parsing failed: custom error");
 
             // Restore original
             JSON.parse = originalParse;
@@ -551,7 +551,7 @@ describe("jsonSafety utilities", () => {
             // Mock JSON.stringify to throw a non-Error object
             const originalStringify = JSON.stringify;
             JSON.stringify = vi.fn(() => {
-                throw "string error";
+                throw new Error("string error");
             });
 
             const result = safeJsonStringify({ test: true });

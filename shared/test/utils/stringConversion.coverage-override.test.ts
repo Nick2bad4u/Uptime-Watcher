@@ -25,7 +25,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - 100% Coverage Override", () => {
-    let originalTypeof: any;
+    let originalTypeof: any = undefined;
 
     beforeEach(() => {
         // Store the original typeof operator
@@ -141,7 +141,7 @@ describe("String Conversion - 100% Coverage Override", () => {
             // Objects and functions
             { value: {}, expected: "{}" },
             { value: [], expected: "[]" },
-            { value: function test() {}, expected: "[Function]" },
+            { value: function value() {}, expected: "[Function]" },
             { value: () => {}, expected: "[Function]" },
 
             // Edge cases

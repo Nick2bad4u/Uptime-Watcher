@@ -1586,6 +1586,26 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 await annotate("Category: Validation", "category");
                 await annotate("Type: Monitoring", "type");
 
+                function getValidValueForField(
+                    fieldName: string,
+                    monitorType: string
+                ): unknown {
+                    const validValues: UnknownRecord = {
+                        id: "test-id",
+                        type: monitorType,
+                        checkInterval: 30_000,
+                        timeout: 5000,
+                        retryAttempts: 3,
+                        monitoring: true,
+                        status: "pending",
+                        responseTime: 100,
+                        url: "https://example.com",
+                        host: "example.com",
+                        port: 8080,
+                    };
+                    return validValues[fieldName] || "default-value";
+                }
+
                 // Test base schema fields work for all monitor types
                 const types = [
                     "http",
@@ -1622,26 +1642,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     }
                 }
             });
-
-            function getValidValueForField(
-                fieldName: string,
-                monitorType: string
-            ): unknown {
-                const validValues: UnknownRecord = {
-                    id: "test-id",
-                    type: monitorType,
-                    checkInterval: 30_000,
-                    timeout: 5000,
-                    retryAttempts: 3,
-                    monitoring: true,
-                    status: "pending",
-                    responseTime: 100,
-                    url: "https://example.com",
-                    host: "example.com",
-                    port: 8080,
-                };
-                return validValues[fieldName] || "default-value";
-            }
         });
 
         describe("Edge cases for branch coverage", () => {
@@ -1732,7 +1732,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 vi.spyOn(monitorSchemas, "http", "get").mockReturnValue({
                     ...monitorSchemas.http,
                     parse: vi.fn().mockImplementation(() => {
-                        throw "String error object"; // Non-Error object
+                        throw new Error("String error object"); // Non-Error object
                     }),
                 });
 
@@ -1767,7 +1767,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 // Mock scenario to trigger non-Error handling (line 540)
                 const originalParse = siteSchema.parse;
                 vi.spyOn(siteSchema, "parse").mockImplementation(() => {
-                    throw "Site validation string error"; // Non-Error object
+                    throw new Error("Site validation string error"); // Non-Error object
                 });
 
                 const result = validateSiteData({

@@ -12,7 +12,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import * as typeHelpersModule from "@shared/utils/typeHelpers";
+import * as helpersModule from "@shared/utils/typeHelpers";
 
 describe("shared/utils/typeHelpers Function Coverage Validation", () => {
     describe("Function Coverage Validation", () => {
@@ -27,51 +27,51 @@ describe("shared/utils/typeHelpers Function Coverage Validation", () => {
 
             // Test castIpcResponse function
             const testData = { result: "success" };
-            const result = typeHelpersModule.castIpcResponse(testData);
+            const result = helpersModule.castIpcResponse(testData);
             expect(result).toBe(testData);
 
             // Test isArray function
             expect(
-                typeHelpersModule.isArray([
+                helpersModule.isArray([
                     1,
                     2,
                     3,
                 ])
             ).toBe(true);
-            expect(typeHelpersModule.isArray("not array")).toBe(false);
-            expect(typeHelpersModule.isArray(null)).toBe(false);
-            expect(typeHelpersModule.isArray(undefined)).toBe(false);
+            expect(helpersModule.isArray("not array")).toBe(false);
+            expect(helpersModule.isArray(null)).toBe(false);
+            expect(helpersModule.isArray(undefined)).toBe(false);
 
             // Test isRecord function
-            expect(typeHelpersModule.isRecord({ key: "value" })).toBe(true);
-            expect(typeHelpersModule.isRecord([])).toBe(false);
-            expect(typeHelpersModule.isRecord(null)).toBe(false);
-            expect(typeHelpersModule.isRecord(undefined)).toBe(false);
-            expect(typeHelpersModule.isRecord("string")).toBe(false);
+            expect(helpersModule.isRecord({ key: "value" })).toBe(true);
+            expect(helpersModule.isRecord([])).toBe(false);
+            expect(helpersModule.isRecord(null)).toBe(false);
+            expect(helpersModule.isRecord(undefined)).toBe(false);
+            expect(helpersModule.isRecord("string")).toBe(false);
 
             // Test safePropertyAccess function
             const testObj = { prop: "value", nested: { inner: "test" } };
-            expect(typeHelpersModule.safePropertyAccess(testObj, "prop")).toBe(
+            expect(helpersModule.safePropertyAccess(testObj, "prop")).toBe(
                 "value"
             );
             expect(
-                typeHelpersModule.safePropertyAccess(testObj, "missing")
+                helpersModule.safePropertyAccess(testObj, "missing")
             ).toBeUndefined();
             expect(
-                typeHelpersModule.safePropertyAccess(null, "prop")
+                helpersModule.safePropertyAccess(null, "prop")
             ).toBeUndefined();
             expect(
-                typeHelpersModule.safePropertyAccess("string", "prop")
+                helpersModule.safePropertyAccess("string", "prop")
             ).toBeUndefined();
 
             // Test validateAndConvert function
             const validator = (value: unknown): value is string =>
                 typeof value === "string";
             expect(
-                typeHelpersModule.validateAndConvert("test", validator)
+                helpersModule.validateAndConvert("test", validator)
             ).toBe("test");
             try {
-                typeHelpersModule.validateAndConvert(
+                helpersModule.validateAndConvert(
                     123,
                     validator,
                     "Not a string"

@@ -120,7 +120,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(isObject(new Error())).toBe(true);
+            expect(isObject(new Error("test error"))).toBe(true);
         });
 
         it("should return true for function objects", async ({
@@ -135,7 +135,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isObject(function () {})).toBe(false); // functions are not objects in this context
+            expect(isObject(function namedFunction() {})).toBe(false); // functions are not objects in this context
         });
     });
 
@@ -606,11 +606,11 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(isError(new Error())).toBe(true);
+            expect(isError(new Error("test error"))).toBe(true);
             expect(isError(new Error("message"))).toBe(true);
-            expect(isError(new TypeError())).toBe(true);
-            expect(isError(new ReferenceError())).toBe(true);
-            expect(isError(new SyntaxError())).toBe(true);
+            expect(isError(new TypeError("test type error"))).toBe(true);
+            expect(isError(new ReferenceError("test reference error"))).toBe(true);
+            expect(isError(new SyntaxError("test syntax error"))).toBe(true);
         });
 
         it("should return false for non-Error objects", async ({
@@ -711,9 +711,9 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isFunction(() => {})).toBe(true);
-            expect(isFunction(function () {})).toBe(true);
-            expect(isFunction(async function () {})).toBe(true);
-            expect(isFunction(function* () {})).toBe(true);
+            expect(isFunction(function namedFunction() {})).toBe(true);
+            expect(isFunction(async function namedAsyncFunction() {})).toBe(true);
+            expect(isFunction(function* namedGeneratorFunction() {})).toBe(true);
             expect(isFunction(Math.random)).toBe(true);
             expect(isFunction(console.log)).toBe(true);
         });
@@ -819,7 +819,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isNonNullObject({})).toBe(true);
             expect(isNonNullObject({ prop: "value" })).toBe(true);
             expect(isNonNullObject(new Date())).toBe(true);
-            expect(isNonNullObject(new Error())).toBe(true);
+            expect(isNonNullObject(new Error("test error"))).toBe(true);
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -1214,7 +1214,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
                 Number.NaN,
                 Infinity,
                 new Date(),
-                new Error(),
+                new Error("test error"),
             ];
 
             for (const value of testValues) {

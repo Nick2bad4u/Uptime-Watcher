@@ -75,7 +75,7 @@ describe("StringConversion - Complete Function Coverage", () => {
 
             // Test function case
             const testFunction = () => "test";
-            const namedFunction = function namedFn() {
+            const namedFunction = function namedFunction() {
                 return "named";
             };
             const arrowFunction = (x: number) => x * 2;
@@ -90,11 +90,11 @@ describe("StringConversion - Complete Function Coverage", () => {
             );
 
             // Test symbol case
-            const symbol1 = Symbol();
+            const symbol1 = Symbol("test symbol");
             const symbol2 = Symbol("test");
             const symbol3 = Symbol.for("global");
             expect(stringConversionModule.safeStringify(symbol1)).toBe(
-                "Symbol()"
+                "Symbol(test symbol)"
             );
             expect(stringConversionModule.safeStringify(symbol2)).toBe(
                 "Symbol(test)"
@@ -246,7 +246,7 @@ describe("StringConversion - Complete Function Coverage", () => {
                 new Date(),
                 /regex/,
                 () => {},
-                new Error(),
+                new Error("test error"),
             ];
 
             for (const value of testValues) {
@@ -305,7 +305,7 @@ describe("StringConversion - Complete Function Coverage", () => {
             expect(typeof stringConversionModule.safeStringify("test")).toBe(
                 "string"
             );
-            expect(typeof stringConversionModule.safeStringify(Symbol())).toBe(
+            expect(typeof stringConversionModule.safeStringify(Symbol("test symbol"))).toBe(
                 "string"
             );
 

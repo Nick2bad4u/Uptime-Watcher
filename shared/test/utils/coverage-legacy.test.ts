@@ -580,7 +580,7 @@ describe("Shared Utils Coverage", () => {
                     context: Record<string, any>
                 ) =>
                     template.replaceAll(
-                        /{(\w+)}/g,
+                        /{(?<key>\w+)}/g,
                         (match, key) => context[key]?.toString() || match
                     ),
             };

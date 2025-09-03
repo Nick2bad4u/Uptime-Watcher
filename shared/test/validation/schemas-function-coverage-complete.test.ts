@@ -300,13 +300,13 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 }
 
                 // Test type field with correct value for each monitor type
-                const typeResult = validateMonitorField(
+                const validationResult = validateMonitorField(
                     monitorType,
                     "type",
                     monitorType
                 );
-                expect(typeResult.success).toBe(true);
-                expect(typeResult.metadata?.fieldName).toBe("type");
+                expect(validationResult.success).toBe(true);
+                expect(validationResult.metadata?.fieldName).toBe("type");
             }
         });
     });

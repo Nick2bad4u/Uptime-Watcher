@@ -5,7 +5,7 @@
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
 
 describe("Environment - Catch Block Coverage", () => {
-    let originalProcessEnv: any;
+    let originalProcessEnv: any = {};
 
     beforeEach(() => {
         // Store original process.env

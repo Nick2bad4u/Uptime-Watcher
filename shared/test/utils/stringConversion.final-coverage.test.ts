@@ -24,7 +24,7 @@ describe("String Conversion - Final Coverage", () => {
             expect(safeStringify(undefined)).toBe("");
 
             // Test different undefined scenarios
-            let undefinedVar;
+            const undefinedVar = undefined;
             expect(safeStringify(undefinedVar)).toBe("");
             expect(safeStringify(void 0)).toBe("");
         });

@@ -3,6 +3,7 @@
  * namespace and related types work correctly
  */
 
+import React from "react";
 import { describe, it, expect } from "vitest";
 import { EventHandlers } from "@shared/types/componentProps";
 

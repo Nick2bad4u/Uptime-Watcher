@@ -92,7 +92,7 @@ describe("typeGuards", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isObject(new Date())).toBe(true);
-            expect(isObject(new Error())).toBe(true);
+            expect(isObject(new Error("test error"))).toBe(true);
             expect(isObject(/regex/)).toBe(true);
         });
     });
@@ -501,11 +501,11 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(isError(new Error())).toBe(true);
+            expect(isError(new Error("test error"))).toBe(true);
             expect(isError(new Error("message"))).toBe(true);
-            expect(isError(new TypeError())).toBe(true);
-            expect(isError(new ReferenceError())).toBe(true);
-            expect(isError(new SyntaxError())).toBe(true);
+            expect(isError(new TypeError("type error"))).toBe(true);
+            expect(isError(new ReferenceError("reference error"))).toBe(true);
+            expect(isError(new SyntaxError("syntax error"))).toBe(true);
         });
 
         it("should return false for non-Error values", async ({
@@ -589,7 +589,7 @@ describe("typeGuards", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isFunction(() => {})).toBe(true);
-            expect(isFunction(function () {})).toBe(true);
+            expect(isFunction(function namedFunction() {})).toBe(true);
             expect(isFunction(function named() {})).toBe(true);
             expect(isFunction(async () => {})).toBe(true);
             expect(isFunction(function* generator() {})).toBe(true);
@@ -680,7 +680,7 @@ describe("typeGuards", () => {
             expect(isNonNullObject({})).toBe(true);
             expect(isNonNullObject({ foo: "bar" })).toBe(true);
             expect(isNonNullObject(new Date())).toBe(true);
-            expect(isNonNullObject(new Error())).toBe(true);
+            expect(isNonNullObject(new Error("test error"))).toBe(true);
         });
 
         it("should return false for null", async ({ task, annotate }) => {

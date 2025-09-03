@@ -237,7 +237,7 @@ describe("Error Handling Utils", () => {
             originalError.stack = "original stack trace";
             const operation = vi.fn().mockRejectedValue(originalError);
 
-            let caughtError: any;
+            let caughtError: any = undefined;
             try {
                 await withErrorHandling(operation, mockBackendContext);
             } catch (error) {

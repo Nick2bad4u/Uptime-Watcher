@@ -269,8 +269,6 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const isString = (value: unknown): value is string =>
-                typeof value === "string";
             expect(
                 isArray(
                     [
@@ -445,7 +443,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isFunction(() => {})).toBe(true);
-            expect(isFunction(function () {})).toBe(true);
+            expect(isFunction(function testFunction() {})).toBe(true);
             expect(isFunction(Date)).toBe(true);
             expect(isFunction(console.log)).toBe(true);
         });
@@ -1015,7 +1013,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const numberValidator = (value: unknown): value is number =>
-                typeof value === "number" && !isNaN(value);
+                typeof value === "number" && !Number.isNaN(value);
 
             expect(validateAndConvert(42, numberValidator)).toBe(42);
             expect(() => validateAndConvert("42", numberValidator)).toThrow();

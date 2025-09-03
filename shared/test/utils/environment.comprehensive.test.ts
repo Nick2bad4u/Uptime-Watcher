@@ -13,7 +13,7 @@ const mockProcess = {
 } as any;
 
 describe("Environment Detection Utilities", () => {
-    let originalProcess: any;
+    let originalProcess: any = undefined;
 
     beforeEach(() => {
         // Store original process
@@ -262,8 +262,8 @@ describe("Environment Detection Utilities", () => {
     });
 
     describe("isBrowserEnvironment", () => {
-        let originalWindow: any;
-        let originalDocument: any;
+        let originalWindow: any = undefined;
+        let originalDocument: any = undefined;
 
         beforeEach(() => {
             originalWindow = globalThis.window;

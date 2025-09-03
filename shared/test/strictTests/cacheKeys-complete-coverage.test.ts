@@ -674,9 +674,11 @@ describe("CacheKeys - Complete Function Coverage", () => {
 
             // Generate many keys
             for (let i = 0; i < 100; i++) {
-                keys.push(CacheKeys.config.byName(`config-${i}`));
-                keys.push(CacheKeys.monitor.byId(`monitor-${i}`));
-                keys.push(CacheKeys.site.byIdentifier(`site-${i}`));
+                keys.push(
+                    CacheKeys.config.byName(`config-${i}`),
+                    CacheKeys.monitor.byId(`monitor-${i}`),
+                    CacheKeys.site.byIdentifier(`site-${i}`)
+                );
             }
 
             // Validate all keys

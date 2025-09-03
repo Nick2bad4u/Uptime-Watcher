@@ -28,7 +28,7 @@ import type {
 function deepClone<T>(obj: T): T {
     if (obj === null || typeof obj !== "object") return obj;
     if (obj instanceof Date) return new Date(obj) as T;
-    if (Array.isArray(obj)) return obj.map(deepClone) as T;
+    if (Array.isArray(obj)) return obj.map((item) => deepClone(item)) as T;
 
     const cloned = {} as T;
     for (const key in obj) {
@@ -74,7 +74,7 @@ function getNestedProperty(obj: unknown, path: string): unknown {
     for (const key of keys) {
         if (isRecord(current) && key in current) {
             current = current[key];
-        } else if (Array.isArray(current) && !isNaN(Number(key))) {
+        } else if (Array.isArray(current) && !Number.isNaN(Number(key))) {
             current = current[Number(key)];
         } else {
             return undefined;

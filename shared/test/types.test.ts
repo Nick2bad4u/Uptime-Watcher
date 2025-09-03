@@ -600,7 +600,8 @@ describe("validateMonitor", () => {
 
             // Test with first valid type if BASE_MONITOR_TYPES is available
             if (BASE_MONITOR_TYPES && BASE_MONITOR_TYPES.length > 0) {
-                monitor.type = BASE_MONITOR_TYPES[0];
+                const [firstType] = BASE_MONITOR_TYPES;
+                monitor.type = firstType;
                 expect(validateMonitor(monitor)).toBe(true);
             }
 
@@ -731,7 +732,8 @@ describe("validateMonitor", () => {
         for (const field of numericFields) {
             it(`should return false for missing ${field}`, () => {
                 const monitor = createValidMonitor();
-                delete (monitor as any)[field];
+                // Use Reflect.deleteProperty to avoid dynamic delete lint error
+                Reflect.deleteProperty(monitor as any, field);
                 expect(validateMonitor(monitor)).toBe(false);
             });
 

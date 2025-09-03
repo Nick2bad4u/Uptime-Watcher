@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import * as objectSafety from "../../utils/objectSafety";
-import * as typeGuards from "../../utils/typeGuards";
+import * as guardUtils from "../../utils/typeGuards";
 import * as validation from "../../utils/validation";
 import * as siteStatus from "../../utils/siteStatus";
 import * as errorCatalog from "../../utils/errorCatalog";
@@ -78,8 +78,8 @@ describe("Corrected Function Coverage Tests", () => {
         });
     });
 
-    describe("typeGuards functions", () => {
-        test("basic typeGuards functions exist", ({ task, annotate }) => {
+    describe("guardUtils functions", () => {
+        test("basic guardUtils functions exist", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: corrected-function-coverage-new", "component");
             annotate("Category: Utility", "category");
@@ -90,14 +90,14 @@ describe("Corrected Function Coverage Tests", () => {
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
-            expect(typeGuards.isObject).toBeDefined();
-            expect(typeGuards.isString).toBeDefined();
-            expect(typeGuards.isNumber).toBeDefined();
-            expect(typeGuards.isBoolean).toBeDefined();
-            expect(typeGuards.isArray).toBeDefined();
-            expect(typeGuards.isFunction).toBeDefined();
-            expect(typeGuards.isDate).toBeDefined();
-            expect(typeGuards.isError).toBeDefined();
+            expect(guardUtils.isObject).toBeDefined();
+            expect(guardUtils.isString).toBeDefined();
+            expect(guardUtils.isNumber).toBeDefined();
+            expect(guardUtils.isBoolean).toBeDefined();
+            expect(guardUtils.isArray).toBeDefined();
+            expect(guardUtils.isFunction).toBeDefined();
+            expect(guardUtils.isDate).toBeDefined();
+            expect(guardUtils.isError).toBeDefined();
         });
     });
 

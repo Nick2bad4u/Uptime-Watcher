@@ -63,7 +63,9 @@ describe("Complete 100% Coverage - Final Tests", () => {
                     }
                 ),
                 // Try to create something that might confuse typeof
-                new (class UnknownType {})(),
+                new (class UnknownType {
+                    public testProperty = "test";
+                })(),
             ];
 
             for (const testCase of testCases) {

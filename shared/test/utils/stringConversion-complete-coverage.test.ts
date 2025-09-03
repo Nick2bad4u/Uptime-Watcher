@@ -111,7 +111,7 @@ describe("shared/utils/stringConversion.ts - Complete Function Coverage", () => 
             await annotate("Type: Business Logic", "type");
 
             expect(safeStringify(() => {})).toBe("[Function]");
-            expect(safeStringify(function () {})).toBe("[Function]");
+            expect(safeStringify(function namedFunction() {})).toBe("[Function]");
             expect(safeStringify(console.log)).toBe("[Function]");
             expect(safeStringify(Date)).toBe("[Function]");
         });
@@ -127,11 +127,11 @@ describe("shared/utils/stringConversion.ts - Complete Function Coverage", () => 
 
             const symbol1 = Symbol("test");
             const symbol2 = Symbol.for("global");
-            const symbol3 = Symbol();
+            const symbol3 = Symbol("empty");
 
             expect(safeStringify(symbol1)).toBe("Symbol(test)");
             expect(safeStringify(symbol2)).toBe("Symbol(global)");
-            expect(safeStringify(symbol3)).toBe("Symbol()");
+            expect(safeStringify(symbol3)).toBe("Symbol(empty)");
         });
 
         it("should convert simple objects to JSON strings", async ({
@@ -192,7 +192,7 @@ describe("shared/utils/stringConversion.ts - Complete Function Coverage", () => 
             expect(safeStringify(new Date("2023-01-01"))).toContain(
                 "2023-01-01"
             );
-            expect(safeStringify(new RegExp("test"))).toBe("{}"); // RegExp serializes to empty object
+            expect(safeStringify(/test/)).toBe("{}"); // RegExp serializes to empty object
             expect(safeStringify(new Error("test"))).toBe("{}"); // Error serializes to empty object
         });
 

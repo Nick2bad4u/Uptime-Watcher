@@ -407,6 +407,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 "ftp://example.com", // Wrong protocol
                 "//example.com", // Protocol relative
                 "example.com", // No protocol
+                // eslint-disable-next-line no-script-url -- Testing dangerous protocol for security validation
                 "javascript:alert(1)", // Dangerous protocol
                 "https://", // No host
                 "https://.", // Invalid host
@@ -620,11 +621,10 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 };
 
                 // Note: port 0 is actually valid in some contexts, so we might need to adjust this test
-                if (port === 0) {
+                if (port !== 0) {
                     // Port 0 might be considered valid by validator.js, skip this specific case
-                    continue;
+                    expect(() => portMonitorSchema.parse(invalidData)).toThrow();
                 }
-                expect(() => portMonitorSchema.parse(invalidData)).toThrow();
             }
         });
 

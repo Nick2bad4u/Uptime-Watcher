@@ -168,7 +168,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                 // No message property
             };
 
-            const result = validateMonitorData("http", function () {
+            const result = validateMonitorData("http", function throwCustomError() {
                 throw customError;
             });
             expect(result.success).toBe(false);
@@ -187,7 +187,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
             // Test with various invalid types to exercise all error paths
             const testCases = [
                 BigInt(123),
-                function () {},
+                function testFunction() {},
                 new Date("invalid"),
                 /regex/,
             ];
@@ -289,32 +289,28 @@ describe("Validation Schemas - Final Branch Coverage", () => {
 
             for (const test of fieldTests) {
                 // Test with valid value
-                let validValue;
-                switch (test.field) {
-                    case "port": {
-                        validValue = 8080;
-                        break;
+                const validValue = (() => {
+                    switch (test.field) {
+                        case "port": {
+                            return 8080;
+                        }
+                        case "timeout": {
+                            return 5000;
+                        }
+                        case "checkInterval": {
+                            return 30_000;
+                        }
+                        case "retryAttempts": {
+                            return 3;
+                        }
+                        case "host": {
+                            return "example.com";
+                        }
+                        default: {
+                            return "https://example.com";
+                        }
                     }
-                    case "timeout": {
-                        validValue = 5000;
-                        break;
-                    }
-                    case "checkInterval": {
-                        validValue = 30_000;
-                        break;
-                    }
-                    case "retryAttempts": {
-                        validValue = 3;
-                        break;
-                    }
-                    case "host": {
-                        validValue = "example.com";
-                        break;
-                    }
-                    default: {
-                        validValue = "https://example.com";
-                    }
-                }
+                })();
 
                 const validResult = validateMonitorField(
                     test.type,
@@ -332,32 +328,28 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                 expect(validResult.success).toBe(true);
 
                 // Test with invalid value
-                let invalidValue;
-                switch (test.field) {
-                    case "port": {
-                        invalidValue = -1;
-                        break;
+                const invalidValue = (() => {
+                    switch (test.field) {
+                        case "port": {
+                            return -1;
+                        }
+                        case "timeout": {
+                            return -1;
+                        }
+                        case "checkInterval": {
+                            return -1;
+                        }
+                        case "retryAttempts": {
+                            return -1;
+                        }
+                        case "host": {
+                            return "";
+                        }
+                        default: {
+                            return "invalid-url";
+                        }
                     }
-                    case "timeout": {
-                        invalidValue = -1;
-                        break;
-                    }
-                    case "checkInterval": {
-                        invalidValue = -1;
-                        break;
-                    }
-                    case "retryAttempts": {
-                        invalidValue = -1;
-                        break;
-                    }
-                    case "host": {
-                        invalidValue = "";
-                        break;
-                    }
-                    default: {
-                        invalidValue = "invalid-url";
-                    }
-                }
+                })();
 
                 const invalidResult = validateMonitorField(
                     test.type,

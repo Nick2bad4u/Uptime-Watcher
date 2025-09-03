@@ -7,20 +7,18 @@
  */
 
 import { describe, expect, it } from "vitest";
-import type {
-    AdvancedMonitorConfig,
-    BaseMonitorConfig,
-    HttpMonitorConfig,
-    PingMonitorConfig,
-    PortMonitorConfig,
-    MonitorConfig,
-    MonitorConfigTemplate,
-} from "../../types/monitorConfig";
 import {
+    DEFAULT_MONITOR_CONFIG,
     isHttpMonitorConfig,
     isPingMonitorConfig,
     isPortMonitorConfig,
-    DEFAULT_MONITOR_CONFIG,
+    type AdvancedMonitorConfig,
+    type BaseMonitorConfig,
+    type HttpMonitorConfig,
+    type MonitorConfig,
+    type MonitorConfigTemplate,
+    type PingMonitorConfig,
+    type PortMonitorConfig,
 } from "../../types/monitorConfig";
 
 describe("Monitor Configuration Types", () => {

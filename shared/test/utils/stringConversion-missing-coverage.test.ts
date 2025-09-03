@@ -95,7 +95,7 @@ describe("StringConversion - Missing Coverage", () => {
                 { value: {}, expected: "{}" },
                 { value: [], expected: "[]" },
                 { value: Symbol("test"), expected: "Symbol(test)" },
-                { value: function namedTestFunc() {}, expected: "[Function]" },
+                { value: function value() {}, expected: "[Function]" },
                 { value: BigInt(123), expected: "123" },
             ];
 
@@ -239,6 +239,10 @@ describe("StringConversion - Missing Coverage", () => {
                         break;
                     }
                     // Other cases are covered by other tests
+                    default: {
+                        // Handle unknown future typeof results
+                        break;
+                    }
                 }
             }
         });

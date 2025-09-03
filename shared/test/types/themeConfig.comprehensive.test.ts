@@ -5,28 +5,26 @@
 
 import { describe, expect, it } from "vitest";
 
-import type {
-    AnimationConfig,
-    BackgroundColors,
-    BorderColors,
-    BorderRadiusConfig,
-    ColorPalette,
-    ComponentConfig,
-    HoverColors,
-    ShadowConfig,
-    SpacingConfig,
-    StatusColors,
-    TextColors,
-    ThemeColors,
-    ThemeConfig,
-    ThemeConfigWithModes,
-    ThemeOverride,
-    TypographyConfig,
-} from "../../types/themeConfig";
 import {
     DEFAULT_THEME_CONFIG,
     isColorPalette,
     isThemeConfig,
+    type AnimationConfig,
+    type BackgroundColors,
+    type BorderColors,
+    type BorderRadiusConfig,
+    type ColorPalette,
+    type ComponentConfig,
+    type HoverColors,
+    type ShadowConfig,
+    type SpacingConfig,
+    type StatusColors,
+    type TextColors,
+    type ThemeColors,
+    type ThemeConfig,
+    type ThemeConfigWithModes,
+    type ThemeOverride,
+    type TypographyConfig,
 } from "../../types/themeConfig";
 
 describe("Theme Config Types - Comprehensive Coverage", () => {

@@ -361,31 +361,31 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const typeGuardsModule = await import("../../utils/typeGuards.js");
+            const guardUtilsModule = await import("../../utils/typeGuards.js");
 
             // Call all exported functions
-            expect(typeGuardsModule.hasProperties({ a: 1 }, ["a"])).toBe(true);
-            expect(typeGuardsModule.hasProperty({ a: 1 }, "a")).toBe(true);
+            expect(guardUtilsModule.hasProperties({ a: 1 }, ["a"])).toBe(true);
+            expect(guardUtilsModule.hasProperty({ a: 1 }, "a")).toBe(true);
             expect(
-                typeGuardsModule.isArray([
+                guardUtilsModule.isArray([
                     1,
                     2,
                     3,
                 ])
             ).toBe(true);
-            expect(typeGuardsModule.isBoolean(true)).toBe(true);
-            expect(typeGuardsModule.isDate(new Date())).toBe(true);
-            expect(typeGuardsModule.isError(new Error())).toBe(true);
-            expect(typeGuardsModule.isFiniteNumber(123)).toBe(true);
-            expect(typeGuardsModule.isFunction(() => {})).toBe(true);
-            expect(typeGuardsModule.isNonNegativeNumber(0)).toBe(true);
-            expect(typeGuardsModule.isNonNullObject({})).toBe(true);
-            expect(typeGuardsModule.isNumber(123)).toBe(true);
-            expect(typeGuardsModule.isObject({})).toBe(true);
-            expect(typeGuardsModule.isPositiveNumber(1)).toBe(true);
-            expect(typeGuardsModule.isString("test")).toBe(true);
-            expect(typeGuardsModule.isValidPort(8080)).toBe(true);
-            expect(typeGuardsModule.isValidTimestamp(Date.now())).toBe(true);
+            expect(guardUtilsModule.isBoolean(true)).toBe(true);
+            expect(guardUtilsModule.isDate(new Date())).toBe(true);
+            expect(guardUtilsModule.isError(new Error("test error"))).toBe(true);
+            expect(guardUtilsModule.isFiniteNumber(123)).toBe(true);
+            expect(guardUtilsModule.isFunction(() => {})).toBe(true);
+            expect(guardUtilsModule.isNonNegativeNumber(0)).toBe(true);
+            expect(guardUtilsModule.isNonNullObject({})).toBe(true);
+            expect(guardUtilsModule.isNumber(123)).toBe(true);
+            expect(guardUtilsModule.isObject({})).toBe(true);
+            expect(guardUtilsModule.isPositiveNumber(1)).toBe(true);
+            expect(guardUtilsModule.isString("test")).toBe(true);
+            expect(guardUtilsModule.isValidPort(8080)).toBe(true);
+            expect(guardUtilsModule.isValidTimestamp(Date.now())).toBe(true);
         });
     });
 
@@ -402,23 +402,23 @@ describe("Shared Module - 100% Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const typeHelpersModule = await import(
+            const helperUtilsModule = await import(
                 "../../utils/typeHelpers.js"
             );
 
             // Call all exported functions
-            expect(typeHelpersModule.castIpcResponse("test")).toBe("test");
+            expect(helperUtilsModule.castIpcResponse("test")).toBe("test");
             expect(
-                typeHelpersModule.isArray([
+                helperUtilsModule.isArray([
                     1,
                     2,
                     3,
                 ])
             ).toBe(true);
-            expect(typeHelpersModule.isRecord({})).toBe(true);
-            expect(typeHelpersModule.safePropertyAccess({ a: 1 }, "a")).toBe(1);
+            expect(helperUtilsModule.isRecord({})).toBe(true);
+            expect(helperUtilsModule.safePropertyAccess({ a: 1 }, "a")).toBe(1);
             expect(
-                typeHelpersModule.validateAndConvert(
+                helperUtilsModule.validateAndConvert(
                     "test",
                     (x) => typeof x === "string"
                 )

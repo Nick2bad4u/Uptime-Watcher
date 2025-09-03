@@ -73,7 +73,7 @@ describe("String Conversion - Unreachable Code Coverage", () => {
         await annotate("Type: Business Logic", "type");
 
         // Different ways to get undefined values
-        let undefinedVar;
+        const undefinedVar = undefined;
         expect(safeStringify(undefinedVar)).toBe("");
 
         // Property that doesn't exist

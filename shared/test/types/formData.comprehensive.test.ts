@@ -1,19 +1,17 @@
 import { describe, expect, it } from "vitest";
-import type {
-    AddSiteFormState,
-    FormMode,
-    HttpFormData,
-    MonitorFieldValidation,
-    MonitorFormData,
-    PingFormData,
-    PortFormData,
-    SiteFormData,
-} from "../../types/formData";
 import {
     DEFAULT_FORM_DATA,
     isHttpFormData,
     isPingFormData,
     isPortFormData,
+    type AddSiteFormState,
+    type FormMode,
+    type HttpFormData,
+    type MonitorFieldValidation,
+    type MonitorFormData,
+    type PingFormData,
+    type PortFormData,
+    type SiteFormData,
 } from "../../types/formData";
 
 describe("FormData Types", () => {
@@ -781,9 +779,9 @@ describe("FormData Types", () => {
                     }
                     default: {
                         // TypeScript should catch this at compile time
-                        const _exhaustive: never = monitor as never;
+                        const exhaustiveCheck: never = monitor as never;
                         throw new Error(
-                            `Unhandled monitor type: ${_exhaustive}`
+                            `Unhandled monitor type: ${exhaustiveCheck}`
                         );
                     }
                 }

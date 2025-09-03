@@ -87,8 +87,8 @@ describe("Validation Fuzzing Tests", () => {
         });
 
         it("should reject URLs with dangerous schemes", () => {
-            // eslint-disable-next-line no-script-url
             const dangerousSchemes = [
+                // eslint-disable-next-line no-script-url -- Testing dangerous URL schemes for security validation
                 "javascript:",
                 "data:",
                 "vbscript:",

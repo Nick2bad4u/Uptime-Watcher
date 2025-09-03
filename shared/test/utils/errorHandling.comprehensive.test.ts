@@ -5,16 +5,16 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type {
-    ErrorHandlingBackendContext,
-    ErrorHandlingFrontendStore,
+import {
+    withErrorHandling,
+    type ErrorHandlingBackendContext,
+    type ErrorHandlingFrontendStore,
 } from "../../utils/errorHandling";
-import { withErrorHandling } from "../../utils/errorHandling";
 
 describe("Error Handling Utilities - Comprehensive Coverage", () => {
-    let mockStore: ErrorHandlingFrontendStore;
-    let mockBackendContext: ErrorHandlingBackendContext;
-    let mockConsole: typeof console;
+    let mockStore: ErrorHandlingFrontendStore = {} as ErrorHandlingFrontendStore;
+    let mockBackendContext: ErrorHandlingBackendContext = {} as ErrorHandlingBackendContext;
+    let mockConsole: typeof console = {} as typeof console;
 
     beforeEach(() => {
         // Mock frontend store

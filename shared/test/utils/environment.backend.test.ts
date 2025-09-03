@@ -15,7 +15,7 @@ import {
 } from "../../utils/environment";
 
 describe("environment utilities - Backend Coverage", () => {
-    let originalEnv: NodeJS.ProcessEnv;
+    let originalEnv: Record<string, string | undefined> = {};
 
     beforeEach(() => {
         // Save original environment

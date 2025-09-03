@@ -32,10 +32,10 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
         globalThis.process = originalProcess;
 
         // Delete any property descriptors that might prevent restoration
-        if (globalThis.hasOwnProperty("window")) {
+        if (Object.hasOwn(globalThis, "window")) {
             delete (globalThis as any).window;
         }
-        if (globalThis.hasOwnProperty("document")) {
+        if (Object.hasOwn(globalThis, "document")) {
             delete (globalThis as any).document;
         }
 

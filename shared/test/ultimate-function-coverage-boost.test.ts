@@ -22,8 +22,8 @@ import * as jsonSafety from "../utils/jsonSafety";
 import * as objectSafety from "../utils/objectSafety";
 import * as safeConversions from "../utils/safeConversions";
 import * as stringConversion from "../utils/stringConversion";
-import * as typeGuards from "../utils/typeGuards";
-import * as typeHelpers from "../utils/typeHelpers";
+import * as guardUtils from "../utils/typeGuards";
+import * as helperUtils from "../utils/typeHelpers";
 import * as validationUtils from "../utils/validation";
 import * as validatorUtilsModule from "../validation/validatorUtils";
 
@@ -56,8 +56,8 @@ describe("Ultimate Function Coverage Boost", () => {
             { name: "objectSafety", module: objectSafety },
             { name: "safeConversions", module: safeConversions },
             { name: "stringConversion", module: stringConversion },
-            { name: "typeGuards", module: typeGuards },
-            { name: "typeHelpers", module: typeHelpers },
+            { name: "guardUtils", module: guardUtils },
+            { name: "helperUtils", module: helperUtils },
             { name: "validationUtils", module: validationUtils },
             { name: "validatorUtilsModule", module: validatorUtilsModule },
         ];
@@ -123,16 +123,15 @@ describe("Ultimate Function Coverage Boost", () => {
                     // Try calling the function with different argument combinations
                     let functionCalled = false;
 
-                    for (const args of testArgs) {
+                    // Test with the first available argument set
+                    if (testArgs.length > 0) {
                         try {
-                            exportedValue(...args);
+                            exportedValue(...testArgs[0]);
                             functionCalled = true;
-                            break; // Function executed successfully, move to next
                         } catch {
                             // Function threw an error, but it was still called
                             // This still counts for function coverage
                             functionCalled = true;
-                            break;
                         }
                     }
 
@@ -280,10 +279,10 @@ describe("Ultimate Function Coverage Boost", () => {
 
         // Test jsonSafety functions with proper arguments
         expect(
-            jsonSafety.safeJsonParse('{"test": true}', typeGuards.isObject)
+            jsonSafety.safeJsonParse('{"test": true}', guardUtils.isObject)
         ).toBeDefined();
         expect(
-            jsonSafety.safeJsonParseArray("[1,2,3]", typeGuards.isNumber)
+            jsonSafety.safeJsonParseArray("[1,2,3]", guardUtils.isNumber)
         ).toBeDefined();
         expect(
             jsonSafety.safeJsonStringifyWithFallback({ test: true }, "fallback")
@@ -318,8 +317,8 @@ describe("Ultimate Function Coverage Boost", () => {
             objectSafety,
             safeConversions,
             stringConversion,
-            typeGuards,
-            typeHelpers,
+            guardUtils,
+            helperUtils,
             validationUtils,
             validatorUtilsModule,
         ];

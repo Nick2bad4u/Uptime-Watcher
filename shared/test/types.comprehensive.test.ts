@@ -8,8 +8,8 @@ import {
     isMonitorStatus,
     isSiteStatus,
     validateMonitor,
+    type Monitor,
 } from "../types";
-import type { Monitor } from "../types";
 
 describe("shared/types type guards and validators", () => {
     describe("isComputedSiteStatus", () => {

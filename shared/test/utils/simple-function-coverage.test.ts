@@ -1,13 +1,17 @@
 import * as objectSafety from "../../utils/objectSafety";
+// eslint-disable-next-line unicorn/no-keyword-prefix -- keeping readable namespace
 import * as typeGuards from "../../utils/typeGuards";
 import * as validation from "../../utils/validation";
 import * as siteStatus from "../../utils/siteStatus";
 import * as errorCatalog from "../../utils/errorCatalog";
 import * as environment from "../../utils/environment";
 import * as safeConversions from "../../utils/safeConversions";
+// eslint-disable-next-line unicorn/no-keyword-prefix -- keeping readable namespace
 import * as typeHelpers from "../../utils/typeHelpers";
 import * as jsonSafety from "../../utils/jsonSafety";
 import * as stringConversion from "../../utils/stringConversion";
+
+import { describe, expect } from "vitest";
 
 describe("Simple Function Coverage Tests", () => {
     describe("objectSafety functions", () => {
