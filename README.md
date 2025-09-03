@@ -44,6 +44,7 @@
 
 <img src="./docs/assets/app-preview.png" alt="Application Preview WIP"></div>
 
+<img src="./assets/UptimeWatcherMascot.png" alt="Uptime Watcher Mascot">
 ---
 
 ## 🎯 **What is Uptime Watcher?**
@@ -71,6 +72,8 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 - **📜 Historical Data**: Comprehensive uptime history with SQLite storage
 - **⚙️ Flexible Configuration**: Customizable check intervals from 30 seconds to 30 minutes
 - **💾 Data Persistence**: Local SQLite database with backup/restore functionality
+
+<img src="./assets/UptimeWatcherMascotServer.png" alt="Uptime Watcher Mascot Server">
 
 ## 📋 **Monitor Types**
 
@@ -180,6 +183,8 @@ npm run electron-dev
 
 <img src="./docs/assets/notifications-screenshot.png" alt="Notifications">
 <em>Smart desktop notifications with customizable alert preferences</em></div>
+
+<img src="./assets/UptimeWatcherMascotPanel.png" alt="Uptime Watcher Mascot Panel">
 
 ---
 
