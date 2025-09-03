@@ -326,9 +326,18 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
 
                     const response =
                         await window.electronAPI.monitorTypes.getMonitorTypes();
-                    const configs = safeExtractIpcData<MonitorTypeConfig[]>(
+                    const rawConfigs = safeExtractIpcData<MonitorTypeConfig[]>(
                         response,
                         []
+                    );
+
+                    // Filter out invalid/malformed configs
+                    const configs = rawConfigs.filter(
+                        (config): config is MonitorTypeConfig =>
+                            config != null &&
+                            typeof config === "object" &&
+                            typeof config.type === "string" &&
+                            config.type.length > 0
                     );
 
                     // Build field configs map

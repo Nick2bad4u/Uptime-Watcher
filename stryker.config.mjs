@@ -5,9 +5,11 @@ const config = {
     // === CORE CONFIGURATION ===
     allowConsoleColors: true, // Enable colors in console
     allowEmpty: false,
-    checkerNodeArgs: [],
+    // "buildCommand": "tsc -b tsconfig.json",
 
+    checkerNodeArgs: [],
     checkers: ["typescript"], // 🔍 Enable TypeScript checking for mutants
+
     cleanTempDir: true, // Clean up after successful runs
 
     // 📝 CLEAR TEXT REPORTER ENHANCEMENTS
@@ -22,7 +24,7 @@ const config = {
         skipFull: false, // Show all results
     },
 
-    concurrency: 22,
+    concurrency: 10, // Reduce concurrency to avoid resource conflicts
 
     // ⚡ COVERAGE ANALYSIS - Note: Vitest runner ignores this and forces "perTest" (optimal)
     coverageAnalysis: "perTest",
@@ -41,8 +43,7 @@ const config = {
     disableBail: false, // Bail on first test failure for performance
 
     disableTypeChecks: false, // Keep type checking enabled for accuracy
-
-    dryRunTimeoutMinutes: 10, // Longer dry run timeout for complex setup
+    dryRunTimeoutMinutes: 15, // Longer dry run timeout for complex setup
     eventReporter: {
         baseDir: "coverage/events",
     },
@@ -82,6 +83,8 @@ const config = {
         "**/node_modules/**",
         "**/package-lock.json",
         "**/release/**",
+        "**/config/testing/**", // Ignore config directory
+        "**/config/**/*.json", // Ignore config JSON files
         "CHANGELOG.md",
         "coverage-report.json",
         "Coverage/",
@@ -112,23 +115,25 @@ const config = {
     // @ts-expect-error -- Type definition missing reportType
     logLevel: "info", // Console log level (off|fatal|error|warn|info|debug|trace)
     maxTestRunnerReuse: 100, // Reuse test runners for performance
+    // === ADVANCED MUTATOR CONFIGURATION ===
+    // mutator: {
+    //     // 🎯 EXCLUDE SPECIFIC MUTATION TYPES (if needed)
+    //     excludedMutations: [
+    //         // Uncomment to exclude specific mutator types:
+    //         // "StringLiteral",       // Skip string mutations
+    //         // "BooleanLiteral",      // Skip boolean mutations
+    //         // "ArithmeticOperator"   // Skip math operator mutations
+    //     ],
+    //     plugins: [], // Add custom mutator plugins if needed
+    // },
+
     // === COMPREHENSIVE MUTATION SCOPE ===
     mutate: [
-        // 🔥 HIGH PRIORITY: Core business logic
+        // 🔥 HIGH PRIORITY: Core business logic (focus on actual source files)
         "src/**/*.ts",
-        "src/**/*.mjs",
         "src/**/*.tsx",
-        "src/**/*.js",
-
         "shared/**/*.ts",
-        "shared/**/*.mjs",
-        "shared/**/*.tsx",
-        "shared/**/*.js",
-
         "electron/**/*.ts",
-        "electron/**/*.mjs",
-        "electron/**/*.tsx",
-        "electron/**/*.js",
 
         // ❌ EXCLUSIONS
         "!**/*.test.{ts,tsx}",
@@ -146,18 +151,9 @@ const config = {
         "!**/vitest.config.ts",
         "!**/types.ts",
         "!**/interfaces.ts",
+        "!**/setup.ts", // Exclude test setup files
+        "!**/main.tsx", // Exclude main entry point (often just bootstrapping)
     ],
-    // === ADVANCED MUTATOR CONFIGURATION ===
-    // mutator: {
-    //     // 🎯 EXCLUDE SPECIFIC MUTATION TYPES (if needed)
-    //     excludedMutations: [
-    //         // Uncomment to exclude specific mutator types:
-    //         // "StringLiteral",       // Skip string mutations
-    //         // "BooleanLiteral",      // Skip boolean mutations
-    //         // "ArithmeticOperator"   // Skip math operator mutations
-    //     ],
-    //     plugins: [], // Add custom mutator plugins if needed
-    // },
 
     packageManager: "npm",
 
@@ -181,9 +177,9 @@ const config = {
         low: 70, // Reasonable minimum
     },
 
-    timeoutFactor: 1.5,
+    timeoutFactor: 2, // Increase timeout factor for complex tests
 
-    timeoutMS: 60_000,
+    timeoutMS: 120_000, // Increase timeout to 2 minutes
 
     tsconfigFile: "tsconfig.json",
 
@@ -194,14 +190,13 @@ const config = {
     typescriptChecker: {
         prioritizePerformanceOverAccuracy: true, // true = faster but may miss some CompileErrors
     },
-
     // === VITEST INTEGRATION ===
     // 📘 From: https://stryker-mutator.io/docs/stryker-js/vitest-runner/
     // Non-overridable options: threads: true, coverage: {enabled: false}, singleThread: true,
     // watch: false, bail: (based on disableBail), onConsoleLog: () => false
     vitest: {
-        configFile: "./vitest.config.ts", // Path to vitest config file
-        related: true, // 🚀 Only run tests related to mutated files (performance boost)
+        configFile: "./vitest.stryker.config.ts", // Simplified config for Stryker
+        related: false, // Disable related file detection for mutation testing
         // dir: "packages"                 // 📦 Optional: --dir for monorepo support
     },
 

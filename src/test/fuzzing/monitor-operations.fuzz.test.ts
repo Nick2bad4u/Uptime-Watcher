@@ -636,7 +636,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
                         );
 
                         // Should always return a site
-                        expect(updated).toHaveProperty("id");
+                        expect(updated).toHaveProperty("identifier");
                         expect(updated).toHaveProperty("name");
                         expect(updated).toHaveProperty("monitors");
 

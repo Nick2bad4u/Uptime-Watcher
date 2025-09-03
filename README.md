@@ -72,8 +72,6 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 - **⚙️ Flexible Configuration**: Customizable check intervals from 30 seconds to 30 minutes
 - **💾 Data Persistence**: Local SQLite database with backup/restore functionality
 
-<img src="./assets/UptimeWatcherMascotServer.png" alt="Uptime Watcher Mascot Server">
-
 ## 📋 **Monitor Types**
 
 | Type           | Purpose                   | Features                                                                              |
@@ -183,8 +181,6 @@ npm run electron-dev
 <img src="./docs/assets/notifications-screenshot.png" alt="Notifications">
 <em>Smart desktop notifications with customizable alert preferences</em></div>
 
-<img src="./assets/UptimeWatcherMascotPanel.png" alt="Uptime Watcher Mascot Panel">
-
 ---
 
 ## 👨‍💻 **Development**
@@ -282,6 +278,9 @@ We welcome contributions from the community! Here's how you can help:
 [![GitHub Issues](https://img.shields.io/badge/Issues-GitHub-blue?logo=github)](https://github.com/Nick2bad4u/Uptime-Watcher/issues) [![Documentation](https://img.shields.io/badge/Docs-Available-brightgreen)](./docs/)
 
 ---
+
+<img src="./assets/UptimeWatcherMascotServer.png" alt="Uptime Watcher Mascot Server">
+
 
 <div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 

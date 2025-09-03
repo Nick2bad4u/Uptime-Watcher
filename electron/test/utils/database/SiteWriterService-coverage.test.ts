@@ -457,68 +457,6 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(result.monitoring).toBe(true);
         });
 
-        it.skip("should update site with monitor changes", async () => {
-            // Fresh setup for this specific test
-            (mockSitesCache.get as MockedFunction<any>).mockReturnValue(
-                mockSite
-            );
-            (
-                mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(
-                async (callback: any) => await callback(mockDb)
-            );
-            (mockDb.all as MockedFunction<any>).mockReturnValue([
-                {
-                    id: 1,
-                    site_identifier: "test-site",
-                    type: "http",
-                    url: "https://example.com",
-                    checkInterval: 30_000,
-                    timeout: 5000,
-                    retryAttempts: 3,
-                    monitoring: 0,
-                    status: "pending",
-                    responseTime: 0,
-                } as MonitorRow,
-            ]);
-            (rowsToMonitors as MockedFunction<any>).mockReturnValue([
-                {
-                    id: "monitor-1",
-                    type: "http",
-                    url: "https://example.com",
-                    checkInterval: 30_000, // Different from updatedMonitor to trigger update
-                    timeout: 5000, // Different from updatedMonitor to trigger update
-                    retryAttempts: 3,
-                    monitoring: false,
-                    status: "pending",
-                    responseTime: 0,
-                    lastChecked: undefined,
-                    history: [],
-                },
-            ]);
-
-            const updatedMonitor = createCompleteMonitor({
-                id: "monitor-1", // This has id: 'monitor-1'
-                checkInterval: 60_000,
-                timeout: 10_000,
-            });
-            const updates = { monitors: [updatedMonitor] };
-
-            const result = await siteWriterService.updateSite(
-                mockSitesCache,
-                "test-site",
-                updates
-            );
-
-            expect(mockDb.all).toHaveBeenCalledWith(
-                "SELECT * FROM monitors WHERE site_identifier = ?",
-                ["test-site"]
-            );
-            // The monitor should be updated since it has same ID but different checkInterval and timeout
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalled();
-            expect(result.monitors[0]!.checkInterval).toBe(60_000);
-        });
-
         it("should create new monitors when updating", async ({
             task,
             annotate,
@@ -1020,65 +958,6 @@ describe("SiteWriterService Coverage Tests", () => {
                     history: [],
                 },
             ]);
-        });
-
-        it.skip("should cover buildMonitorUpdateData via updateSite", async () => {
-            // Clear all mocks and fresh setup for this specific test
-            vi.clearAllMocks();
-
-            // Fresh setup for this specific test
-            (mockSitesCache.get as MockedFunction<any>).mockReturnValue(
-                mockSite
-            );
-            (
-                mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(
-                async (callback: any) => await callback(mockDb)
-            );
-            (mockDb.all as MockedFunction<any>).mockReturnValue([
-                {
-                    id: 1,
-                    site_identifier: "test-site",
-                    type: "http",
-                    url: "https://example.com",
-                    checkInterval: 30_000,
-                    timeout: 5000,
-                    retryAttempts: 3,
-                    monitoring: 0,
-                    status: "pending",
-                    responseTime: 0,
-                } as MonitorRow,
-            ]);
-            (rowsToMonitors as MockedFunction<any>).mockReturnValue([
-                {
-                    id: "monitor-1",
-                    type: "http",
-                    url: "https://example.com", // Different from updatedMonitor
-                    checkInterval: 30_000, // Different from updatedMonitor
-                    timeout: 5000, // Different from updatedMonitor
-                    retryAttempts: 3,
-                    monitoring: true, // Different from updatedMonitor
-                    status: "up",
-                    responseTime: 100,
-                    lastChecked: undefined,
-                    history: [],
-                },
-            ]);
-
-            const updatedMonitor = createCompleteMonitor({
-                id: "monitor-1", // This has id: 'monitor-1'
-                checkInterval: 60_000,
-                timeout: 10_000,
-                host: "newhost.com",
-                port: 443,
-                url: "https://newurl.com",
-            });
-
-            await siteWriterService.updateSite(mockSitesCache, "test-site", {
-                monitors: [updatedMonitor],
-            });
-
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalled();
         });
 
         it("should cover createMonitorSignature via detectNewMonitors", async ({

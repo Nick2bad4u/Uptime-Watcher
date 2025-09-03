@@ -107,6 +107,9 @@ jobs:
                   path: |
                       reports/mutation/
                       reports/stryker-incremental.json
+                      coverage/stryker.json
+                      coverage/stryker.html
+                      coverage/events
                   retention-days: 30
 
             - name: Comment mutation score on PR
@@ -115,7 +118,7 @@ jobs:
               with:
                   script: |
                       const fs = require('fs');
-                      const path = 'reports/mutation/mutation.json';
+                      const path = 'coverage/stryker.json';
 
                       if (fs.existsSync(path)) {
                         const report = JSON.parse(fs.readFileSync(path, 'utf8'));
