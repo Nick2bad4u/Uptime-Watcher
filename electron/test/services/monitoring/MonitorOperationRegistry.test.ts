@@ -757,8 +757,8 @@ describe("MonitorOperationRegistry", () => {
             expect(operationRegistry).toBe(operationRegistry);
 
             // Test that multiple calls return the same instance
-            const _result1 = operationRegistry.initiateCheck("test-1");
-            const _result2 = operationRegistry.initiateCheck("test-2");
+            operationRegistry.initiateCheck("test-1");
+            operationRegistry.initiateCheck("test-2");
 
             expect(operationRegistry.getActiveOperations().size).toBe(2);
         });

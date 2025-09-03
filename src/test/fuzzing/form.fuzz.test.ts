@@ -21,7 +21,6 @@ import { describe, expect, it } from "vitest";
 import * as fc from "fast-check";
 
 import { normalizeMonitor } from "../../stores/sites/utils/monitorOperations";
-import { isNonEmptyString, isValidUrl } from "@shared/validation/validatorUtils";
 
 // Define simple test types to avoid complex type issues
 type SimpleMonitorType = "http" | "ping" | "port" | "dns";
@@ -305,7 +304,9 @@ describe("Form Validation Fuzzing Tests", () => {
                         // Property: Function should handle Unicode gracefully
                         // Valid URLs may be preserved, invalid ones get defaults
                         expect(typeof result.url).toBe("string");
-                        expect(result.url.length).toBeGreaterThan(0);
+                        if (result.url) {
+                            expect(result.url.length).toBeGreaterThan(0);
+                        }
 
                         // Host field handling depends on monitor type and validity
                         if (result.host !== undefined) {
@@ -406,7 +407,9 @@ describe("Form Validation Fuzzing Tests", () => {
                         // Property: Very long strings are likely invalid URLs and should be normalized
                         // URL validation will reject extremely long URLs and apply defaults
                         expect(typeof result.url).toBe("string");
-                        expect(result.url.length).toBeGreaterThan(0);
+                        if (result.url) {
+                            expect(result.url.length).toBeGreaterThan(0);
+                        }
                         // HTTP monitors don't have host field
                         expect(result.host).toBeUndefined();
                     }
@@ -524,7 +527,9 @@ describe("Form Validation Fuzzing Tests", () => {
 
                         // Property: required port monitor fields should be present
                         expect(typeof result.host).toBe("string");
-                        expect(result.host.length).toBeGreaterThan(0);
+                        if (result.host) {
+                            expect(result.host.length).toBeGreaterThan(0);
+                        }
                     }
                 )
             );

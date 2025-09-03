@@ -306,7 +306,7 @@ describe("Final 90% Function Coverage Push", () => {
     });
 
     // Helper function for testing module functions to reduce complexity
-    const testModuleFunctions = (moduleName: string, moduleObject: any, customHandler?: (func: any, funcName: string) => void): void => {
+    const testModuleFunctions = (_moduleName: string, moduleObject: any, customHandler?: (func: any, funcName: string) => void): void => {
         const functions = Object.keys(moduleObject).filter(
             (key) => typeof (moduleObject as any)[key] === "function"
         );

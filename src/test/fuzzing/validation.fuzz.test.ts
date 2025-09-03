@@ -87,19 +87,20 @@ describe("Validation Fuzzing Tests", () => {
         });
 
         it("should reject URLs with dangerous schemes", () => {
-            const dangerousSchemes = [
+            const dangerousSchemes = new Set([
                 // eslint-disable-next-line no-script-url -- Testing dangerous URL schemes for security validation
                 "javascript:",
                 "data:",
                 "vbscript:",
-            ];
+            ]);
 
             fc.assert(
                 fc.property(
                     fc.oneof(
-                        fc.constant(dangerousSchemes[0]),
-                        fc.constant(dangerousSchemes[1]),
-                        fc.constant(dangerousSchemes[2]),
+                        // eslint-disable-next-line no-script-url -- Testing dangerous URL schemes for security validation
+                        fc.constant("javascript:"),
+                        fc.constant("data:"),
+                        fc.constant("vbscript:"),
                         fc.constant("file:///"),
                         fc.constant("chrome://"),
                         fc.constant("chrome-extension://")
@@ -110,7 +111,7 @@ describe("Validation Fuzzing Tests", () => {
                         const result = isValidUrl(url);
 
                         // These schemes should generally be rejected for security
-                        if (dangerousSchemes.includes(scheme)) {
+                        if (dangerousSchemes.has(scheme)) {
                             expect(result).toBe(false);
                         }
                     }

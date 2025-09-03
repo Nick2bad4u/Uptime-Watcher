@@ -1,6 +1,6 @@
 import type {
+    ClickHandler,
     CoreComponentProperties,
-    EventHandlers,
 } from "@shared/types/componentProps";
 
 import {
@@ -28,7 +28,7 @@ export interface ThemedIconButtonProperties extends CoreComponentProperties {
     /** Whether the button is in a loading state */
     readonly loading?: boolean;
     /** Callback fired when button is clicked */
-    readonly onClick?: EventHandlers.Click;
+    readonly onClick?: ClickHandler;
     /** Size variant for the button */
     readonly size?: ButtonSize;
     /** Tooltip text to display on hover */

@@ -17,11 +17,10 @@ import type {
     Monitor,
     MonitorType,
     MonitorStatus,
+    Site,
 } from "../../../shared/types";
 import {
     BASE_MONITOR_TYPES,
-    MONITOR_STATUS,
-    DEFAULT_MONITOR_STATUS,
 } from "../../../shared/types";
 import {
     createDefaultMonitor,
@@ -182,7 +181,7 @@ const arbitraryPartialMonitor = (): fc.Arbitrary<Partial<Monitor>> =>
         responseTime: fc.option(fc.integer()),
         recordType: fc.option(fc.string()),
         expectedValue: fc.option(fc.string()),
-        activeOperations: fc.option(fc.array(fc.string())),
+        activeOperations: fc.option(fc.array(fc.string()), { nil: undefined }),
         history: fc.option(
             fc.array(
                 fc.record({
@@ -564,14 +563,11 @@ describe("Monitor Operations Fuzzing Tests", () => {
     });
 
     describe("site monitor operations", () => {
-        const arbitrarySite = (): fc.Arbitrary<{
-            id: string;
-            name: string;
-            monitors: Monitor[];
-        }> =>
+        const arbitrarySite = (): fc.Arbitrary<Site> =>
             fc.record({
-                id: fc.string({ minLength: 1 }),
+                identifier: fc.string({ minLength: 1 }),
                 name: fc.string({ minLength: 1 }),
+                monitoring: fc.boolean(),
                 monitors: fc.array(
                     arbitraryPartialMonitor().map((monitor) =>
                         normalizeMonitor(monitor)
@@ -588,7 +584,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
                         const monitor = normalizeMonitor(monitorData);
                         const updated = addMonitorToSite(site, monitor);
 
-                        expect(updated.id).toBe(site.id);
+                        expect(updated.identifier).toBe(site.identifier);
                         expect(updated.name).toBe(site.name);
                         expect(updated.monitors).toHaveLength(
                             site.monitors.length + 1

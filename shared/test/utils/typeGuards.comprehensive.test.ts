@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { isValidUrl } from "../../validation/validatorUtils";
 // Import ALL functions from typeGuards to ensure coverage
-import * as guardFunctions from "../../utils/typeGuards";
 import {
     hasProperties,
     hasProperty,

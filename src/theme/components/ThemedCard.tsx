@@ -55,8 +55,8 @@
  */
 
 import type {
+    ClickHandler,
     CoreComponentProperties,
-    EventHandlers,
 } from "@shared/types/componentProps";
 
 import {
@@ -92,7 +92,7 @@ export interface ThemedCardProperties extends CoreComponentProperties {
     /** Color theme for the icon (uses theme color names) */
     readonly iconColor?: string;
     /** Click handler for the card */
-    readonly onClick?: EventHandlers.Click;
+    readonly onClick?: ClickHandler;
     /** Mouse enter handler for hover effects */
     readonly onMouseEnter?: () => void;
     /** Mouse leave handler for hover effects */

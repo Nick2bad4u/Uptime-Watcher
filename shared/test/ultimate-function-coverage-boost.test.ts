@@ -126,7 +126,12 @@ describe("Ultimate Function Coverage Boost", () => {
                     // Test with the first available argument set
                     if (testArgs.length > 0) {
                         try {
-                            exportedValue(...testArgs[0]);
+                            const [args] = testArgs;
+                            if (Array.isArray(args)) {
+                                exportedValue(...args);
+                            } else {
+                                exportedValue(args);
+                            }
                             functionCalled = true;
                         } catch {
                             // Function threw an error, but it was still called

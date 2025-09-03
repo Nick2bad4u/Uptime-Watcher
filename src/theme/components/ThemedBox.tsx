@@ -11,8 +11,8 @@
 
 import type {
     AccessibilityProperties,
+    ClickHandler,
     CoreComponentProperties,
-    EventHandlers,
 } from "@shared/types/componentProps";
 
 import {
@@ -69,7 +69,7 @@ export interface ThemedBoxProperties
      * When provided the component will add keyboard handling and ARIA
      * attributes for accessibility if the rendered element is a `div`.
      */
-    readonly onClick?: EventHandlers.Click;
+    readonly onClick?: ClickHandler;
 
     /**
      * Mouse enter callback.
@@ -224,6 +224,7 @@ const ThemedBoxComponent = ({
     const handleKeyDown = (e: KeyboardEvent): void => {
         if ((e.key === "Enter" || e.key === " ") && onClick) {
             e.preventDefault();
+            // Safe to call since onClick is checked for existence above
 
             onClick();
         }

@@ -17,7 +17,7 @@
  * @see hybrid-type-system.md for hybrid type strategy
  */
 
-import type { ChartScalesConfig } from "@shared/types/chartHybrid";
+import type { ChartScalesConfig } from "@shared/types/chartConfig";
 import type { Simplify } from "type-fest";
 
 import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";

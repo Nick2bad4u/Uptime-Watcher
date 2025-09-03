@@ -5,7 +5,13 @@
 
 import React from "react";
 import { describe, it, expect } from "vitest";
-import { EventHandlers } from "@shared/types/componentProps";
+import {
+    ClickHandler,
+    ClickWithEventHandler,
+    ClickFlexibleHandler,
+    ChangeHandler,
+    ChangeWithEventHandler
+} from "@shared/types/componentProps";
 
 describe("Component Props - EventHandlers Namespace", () => {
     describe("Click event handlers", () => {
@@ -15,7 +21,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const handler: EventHandlers.Click = () => {};
+            const handler: ClickHandler = () => {};
             expect(typeof handler).toBe("function");
         });
 
@@ -28,7 +34,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Event Processing", "type");
 
-            const handler: EventHandlers.ClickWithEvent<HTMLButtonElement> = (
+            const handler: ClickWithEventHandler<HTMLButtonElement> = (
                 event: React.MouseEvent<HTMLButtonElement>
             ) => {
                 expect(event).toBeDefined();
@@ -45,7 +51,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Event Processing", "type");
 
-            const handler: EventHandlers.ClickFlexible<
+            const handler: ClickFlexibleHandler<
                 HTMLButtonElement
             > = () => {};
             expect(typeof handler).toBe("function");
@@ -60,7 +66,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Event Processing", "type");
 
-            const handler: EventHandlers.ClickFlexible<HTMLButtonElement> = (
+            const handler: ClickFlexibleHandler<HTMLButtonElement> = (
                 event?: React.MouseEvent<HTMLButtonElement>
             ) => {
                 if (event) {
@@ -81,7 +87,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const handler: EventHandlers.Change = (value: string) => {
+            const handler: ChangeHandler = (value: string) => {
                 expect(typeof value).toBe("string");
             };
             expect(typeof handler).toBe("function");
@@ -96,7 +102,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Event Processing", "type");
 
-            const handler: EventHandlers.ChangeWithEvent<HTMLInputElement> = (
+            const handler: ChangeWithEventHandler<HTMLInputElement> = (
                 event: React.ChangeEvent<HTMLInputElement>
             ) => {
                 expect(event.target).toBeDefined();
@@ -113,13 +119,13 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const inputHandler: EventHandlers.ChangeWithEvent<
+            const inputHandler: ChangeWithEventHandler<
                 HTMLInputElement
             > = (event: React.ChangeEvent<HTMLInputElement>) => {
                 expect(event.target.value).toBeDefined();
             };
 
-            const selectHandler: EventHandlers.ChangeWithEvent<
+            const selectHandler: ChangeWithEventHandler<
                 HTMLSelectElement
             > = (event: React.ChangeEvent<HTMLSelectElement>) => {
                 expect(event.target.value).toBeDefined();
@@ -141,7 +147,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Type: Business Logic", "type");
 
             interface MockButtonProperties {
-                onClick?: EventHandlers.ClickWithEvent<HTMLButtonElement>;
+                onClick?: ClickWithEventHandler<HTMLButtonElement>;
                 children: React.ReactNode;
             }
 
@@ -166,7 +172,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Type: Business Logic", "type");
 
             interface MockInputProperties {
-                onChange?: EventHandlers.ChangeWithEvent<HTMLInputElement>;
+                onChange?: ChangeWithEventHandler<HTMLInputElement>;
                 value: string;
             }
 
@@ -191,7 +197,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Type: Business Logic", "type");
 
             interface MockFlexibleProperties {
-                onClick?: EventHandlers.ClickFlexible<HTMLDivElement>;
+                onClick?: ClickFlexibleHandler<HTMLDivElement>;
                 onHover?: () => void;
             }
 
@@ -225,7 +231,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Type: Business Logic", "type");
 
             // This should compile fine
-            const buttonHandler: EventHandlers.ClickWithEvent<
+            const buttonHandler: ClickWithEventHandler<
                 HTMLButtonElement
             > = (event: React.MouseEvent<HTMLButtonElement>) => {
                 expect(event.currentTarget.tagName.toLowerCase()).toBe(
@@ -234,7 +240,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             };
 
             // This should also compile fine
-            const divHandler: EventHandlers.ClickWithEvent<HTMLDivElement> = (
+            const divHandler: ClickWithEventHandler<HTMLDivElement> = (
                 event: React.MouseEvent<HTMLDivElement>
             ) => {
                 expect(event.currentTarget.tagName.toLowerCase()).toBe("div");
@@ -250,7 +256,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const handler: EventHandlers.ClickWithEvent<HTMLButtonElement> = (
+            const handler: ClickWithEventHandler<HTMLButtonElement> = (
                 event: React.MouseEvent<HTMLButtonElement>
             ): void => {
                 // Explicitly void return
@@ -269,7 +275,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const flexibleHandler: EventHandlers.ClickFlexible<
+            const flexibleHandler: ClickFlexibleHandler<
                 HTMLButtonElement
             > = (event?: React.MouseEvent<HTMLButtonElement>) => {
                 // Optional event parameter
@@ -299,12 +305,12 @@ describe("Component Props - EventHandlers Namespace", () => {
 
             interface ClickableComponentProperties
                 extends BaseComponentProperties {
-                onClick?: EventHandlers.ClickWithEvent<HTMLButtonElement>;
+                onClick?: ClickWithEventHandler<HTMLButtonElement>;
             }
 
             interface FormComponentProperties extends BaseComponentProperties {
-                onChange?: EventHandlers.ChangeWithEvent<HTMLInputElement>;
-                onSubmit?: EventHandlers.Click;
+                onChange?: ChangeWithEventHandler<HTMLInputElement>;
+                onSubmit?: ClickHandler;
             }
 
             const clickableProps: ClickableComponentProperties = {
@@ -340,14 +346,14 @@ describe("Component Props - EventHandlers Namespace", () => {
 
             interface ConditionalComponentProperties {
                 onClick?:
-                    | EventHandlers.ClickWithEvent<HTMLButtonElement>
+                    | ClickWithEventHandler<HTMLButtonElement>
                     | undefined;
                 disabled?: boolean;
             }
 
             const getHandler = (
                 disabled: boolean
-            ): EventHandlers.ClickWithEvent<HTMLButtonElement> | undefined => {
+            ): ClickWithEventHandler<HTMLButtonElement> | undefined => {
                 if (disabled) {
                     return undefined;
                 }
@@ -382,17 +388,17 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Type: Export Operation", "type");
 
             // Test that we can create handlers using namespace types
-            const clickHandler: EventHandlers.Click = () => {};
-            const clickWithEventHandler: EventHandlers.ClickWithEvent<
+            const clickHandler: ClickHandler = () => {};
+            const clickWithEventHandler: ClickWithEventHandler<
                 HTMLButtonElement
             > = () => {};
-            const flexibleHandler: EventHandlers.ClickFlexible<
+            const flexibleHandler: ClickFlexibleHandler<
                 HTMLButtonElement
             > = () => {};
-            const changeHandler: EventHandlers.Change = (value: string) => {
+            const changeHandler: ChangeHandler = (value: string) => {
                 expect(typeof value).toBe("string");
             };
-            const changeWithEventHandler: EventHandlers.ChangeWithEvent<
+            const changeWithEventHandler: ChangeWithEventHandler<
                 HTMLInputElement
             > = () => {};
 
@@ -415,7 +421,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             // This test verifies that the import path works correctly
             // The import at the top of this file demonstrates this
             // We test that the namespace types are accessible
-            const testHandler: EventHandlers.Click = () => {};
+            const testHandler: ClickHandler = () => {};
             expect(typeof testHandler).toBe("function");
         });
     });

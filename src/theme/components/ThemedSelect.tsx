@@ -155,8 +155,11 @@ const ThemedSelectComponent = ({
             currentTheme.spacing.md,
             currentTheme.spacing.sm,
             currentTheme.typography.fontSize.sm,
+
             getBackgroundClass,
+
             getBorderClass,
+
             getTextClass,
         ]
     );

@@ -171,6 +171,44 @@ export type ChangeWithEventHandler<
     TElement extends HTMLInputElement | HTMLSelectElement = HTMLInputElement,
 > = (event: ChangeEvent<TElement>) => void;
 
+/**
+ * Centralized namespace for event handler types to ensure consistency.
+ *
+ * @remarks
+ * This namespace provides convenient access to all event handler types used
+ * throughout the application. It promotes consistency and makes it easier to
+ * discover available handler types.
+ */
+// eslint-disable-next-line @typescript-eslint/no-namespace -- Namespace provides organized access to event handler types for better developer experience and API consistency
+export namespace EventHandlers {
+    /** Click handler with event object when event details are needed */
+    export type ClickWithEvent<TElement extends HTMLElement = HTMLElement> =
+        ClickWithEventHandler<TElement>;
+
+    /** Flexible click handler supporting both event and no-event patterns */
+    export type ClickFlexible<TElement extends HTMLElement = HTMLElement> =
+        ClickFlexibleHandler<TElement>;
+
+    /** Event-based change handler for low-level input components */
+    export type ChangeWithEvent<
+        TElement extends
+            | HTMLInputElement
+            | HTMLSelectElement = HTMLInputElement,
+    > = ChangeWithEventHandler<TElement>;
+
+    /** Focus handler for input components */
+    export type Focus<TElement extends HTMLElement = HTMLElement> =
+        FocusHandler<TElement>;
+
+    /** Blur handler for input components */
+    export type Blur<TElement extends HTMLElement = HTMLElement> =
+        BlurHandler<TElement>;
+
+    /** Key press handler for keyboard interactions */
+    export type KeyPress<TElement extends HTMLElement = HTMLElement> =
+        KeyPressHandler<TElement>;
+}
+
 /** Form submission handler */
 export type SubmitHandler = (event: FormEvent<HTMLFormElement>) => void;
 
