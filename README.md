@@ -281,7 +281,6 @@ We welcome contributions from the community! Here's how you can help:
 
 <img src="./assets/UptimeWatcherMascotServer.png" alt="Uptime Watcher Mascot Server">
 
-
 <div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 
 <em>Last updated: August 2025 • Version 12.9.0</em></div>
