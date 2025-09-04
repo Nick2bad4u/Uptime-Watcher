@@ -7,14 +7,64 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[5e54a97](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e54a97847bb5527c6b2b905a7e972b39f1292ff)...
+[5e54a97](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e54a97847bb5527c6b2b905a7e972b39f1292ff)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5e54a97847bb5527c6b2b905a7e972b39f1292ff...5e54a97847bb5527c6b2b905a7e972b39f1292ff))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 13.7.0 [`(5e54a97)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e54a97847bb5527c6b2b905a7e972b39f1292ff)
+
+
+
+
+
+
+## [13.7.0] - 2025-09-04
+
+
 [[861fbec](https://github.com/Nick2bad4u/Uptime-Watcher/commit/861fbecde12c7d3d104d8c0b0028c0b25b67f2c7)...
-[861fbec](https://github.com/Nick2bad4u/Uptime-Watcher/commit/861fbecde12c7d3d104d8c0b0028c0b25b67f2c7)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/861fbecde12c7d3d104d8c0b0028c0b25b67f2c7...861fbecde12c7d3d104d8c0b0028c0b25b67f2c7))
+[b1e82fd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b1e82fdaec2947a9199154361f97b03d9ad889b2)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/861fbecde12c7d3d104d8c0b0028c0b25b67f2c7...b1e82fdaec2947a9199154361f97b03d9ad889b2))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 13.6.0 [`(861fbec)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/861fbecde12c7d3d104d8c0b0028c0b25b67f2c7)
+
+
+
+### 🛠️ Other Changes
+
+- Add comprehensive tests for useMonitorTypesStore and ThemedProgress component
+
+- Introduced a new test suite for useMonitorTypesStore with 100% coverage, focusing on store initialization, loading monitor types, error handling, validation, formatting operations, and state management.
+- Added arithmetic mutation tests for ThemedProgress component to detect potential issues in percentage calculation logic, including edge cases and bounds checking.
+- Enhanced useSiteAnalytics tests to cover downtime period calculations, MTTR computation, and percentile index clamping, ensuring robustness against arithmetic mutations.
+- Updated Vite configuration to exclude additional directories and files from coverage reports, improving accuracy in test coverage metrics.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b1e82fd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b1e82fdaec2947a9199154361f97b03d9ad889b2)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add property-based fuzzing and improve mutation coverage
+
+- Introduces property-based fuzzing tests for backend, database, and shared utilities to strengthen input validation, error handling, and security.
+- Updates test suites and store logic to better handle malformed data and edge cases, increasing resilience.
+- Enhances Stryker mutation testing by refining configuration, concurrency, and exclusion lists for more reliable and comprehensive mutation analysis.
+- Adds prompt generation and workflow documentation for mutation coverage gaps, enabling systematic improvement.
+- Cleans up .gitignore and related docs to support new mutation workflow.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0593130)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/05931306af1bb80a7993bea3621e10d7c09dba6d)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v13.6.0 [skip ci] [`(a31e50d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a31e50d006e17e3f7430f3309f7fe89a37fb751d)
 
 
 
