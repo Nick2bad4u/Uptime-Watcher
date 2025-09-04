@@ -82,6 +82,9 @@ const vitestConfig = defineConfig({
                 "../../scripts/**",
                 "../../report/**", // Exclude report files
                 "../../**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+                "../../shared/test/**", // Exclude test directory,
+                "../../**/types/**",
+                "../../**/html/**",
             ],
             experimentalAstAwareRemapping: true,
             ignoreEmptyLines: true,

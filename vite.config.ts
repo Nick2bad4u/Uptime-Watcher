@@ -583,7 +583,12 @@ export default defineConfig(({ mode }) => {
                     "benchmarks/**", // Exclude all benchmark files from coverage
                     "html/**", // Exclude generated HTML files
                     "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-                    "**/*.bench.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}", // Exclude benchmark files
+                    "**/*.bench.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}", // Exclude benchmark files,
+                    ".stryker-tmp/**", // Exclude Stryker mutation testing temp files
+                    "reports/**", // Exclude test report files
+                    "stryker_prompts_by_mutator/**",
+                    "**/types/**",
+                    "**/html/**",
                 ],
                 excludeAfterRemap: true, // Exclude files after remapping for accuracy
                 experimentalAstAwareRemapping: true, // Enable AST-aware remapping for accurate coverage

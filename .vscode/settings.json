@@ -89,9 +89,11 @@
         "**/html/**": true,
         "**/node_modules/**": true,
         "**/release/**": true,
-        "**/report/**": true
+        "**/report/**": true,
+        "**/reports/**": true
     },
     "files.watcherExclude": {
+        "**/.cache/**": true,
         "**/.husky/**": true,
         "**/.nyc_output/**": true,
         "**/.stryker-tmp/**": true,
@@ -113,9 +115,11 @@
         "**/html/**": true,
         "**/node_modules/**": true,
         "**/release/**": true,
-        "**/report/**": true
+        "**/report/**": true,
+        "**/reports/**": true
     },
     "search.exclude": {
+        "**/.cache/**": true,
         "**/.husky/**": true,
         "**/.nyc_output/**": true,
         "**/.stryker-tmp/**": true,
@@ -137,7 +141,8 @@
         "**/html/**": true,
         "**/node_modules/**": true,
         "**/release/**": true,
-        "**/report/**": true
+        "**/report/**": true,
+        "**/reports/**": true
     },
     "sonarlint.connectedMode.project": {
         "connectionId": "nick2bad4u",

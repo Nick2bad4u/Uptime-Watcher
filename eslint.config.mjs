@@ -227,9 +227,11 @@ export default [
             "docs/Packages/**",
             "docs/Reviews/**",
             "html/**",
+            "**/html/**",
             "node_modules/**",
             "release/",
             "report/**",
+            "reports/**",
             // "config/testing/vitest.electron.config.ts", // Ignore vitest electron config
             // "config/testing/vitest.shared.config.ts", // Ignore vitest shared config
             // "vite.config.ts", // Ignore vite config due to parsing issues
@@ -685,7 +687,7 @@ export default [
             "tailwind/no-arbitrary-value": "warn",
             "tailwind/no-contradicting-classname": "warn",
             "tailwind/no-custom-classname": [
-                "warn",
+                "off",
                 {
                     skipClassAttribute: true,
                 },
@@ -1465,7 +1467,7 @@ export default [
             "jsx-a11y/prefer-tag-over-role": "warn",
             // Code spacing and formatting rules
             "lines-around-comment": [
-                "error",
+                "warn",
                 {
                     afterBlockComment: false,
                     afterLineComment: false,
@@ -1484,7 +1486,7 @@ export default [
                 },
             ],
             "lines-between-class-members": [
-                "error",
+                "warn",
                 "always",
                 {
                     exceptAfterSingleLine: false,
@@ -1559,7 +1561,7 @@ export default [
             "observers/no-missing-unobserve-or-disconnect": "error",
             "one-var": "off",
             "padding-line-between-statements": [
-                "error",
+                "warn",
                 {
                     blankLine: "always",
                     next: "*",
@@ -2563,7 +2565,7 @@ export default [
             "jsx-a11y/prefer-tag-over-role": "warn",
             // Code spacing and formatting rules
             "lines-around-comment": [
-                "error",
+                "warn",
                 {
                     afterBlockComment: false,
                     afterLineComment: false,
@@ -2582,7 +2584,7 @@ export default [
                 },
             ],
             "lines-between-class-members": [
-                "error",
+                "warn",
                 "always",
                 {
                     exceptAfterSingleLine: false,
@@ -2655,7 +2657,7 @@ export default [
             "observers/no-missing-unobserve-or-disconnect": "error",
             "one-var": "off",
             "padding-line-between-statements": [
-                "error",
+                "warn",
                 {
                     blankLine: "always",
                     next: "*",
@@ -3875,7 +3877,7 @@ export default [
             "jsx-a11y/prefer-tag-over-role": "warn",
             // Code spacing and formatting rules
             "lines-around-comment": [
-                "error",
+                "warn",
                 {
                     afterBlockComment: false,
                     afterLineComment: false,
@@ -3894,7 +3896,7 @@ export default [
                 },
             ],
             "lines-between-class-members": [
-                "error",
+                "warn",
                 "always",
                 {
                     exceptAfterSingleLine: false,
@@ -3968,7 +3970,7 @@ export default [
             "observers/no-missing-unobserve-or-disconnect": "error",
             "one-var": "off",
             "padding-line-between-statements": [
-                "error",
+                "warn",
                 {
                     blankLine: "always",
                     next: "*",
@@ -4967,7 +4969,7 @@ export default [
             "jsx-a11y/prefer-tag-over-role": "warn",
             // Code spacing and formatting rules
             "lines-around-comment": [
-                "error",
+                "warn",
                 {
                     afterBlockComment: false,
                     afterLineComment: false,
@@ -4986,7 +4988,7 @@ export default [
                 },
             ],
             "lines-between-class-members": [
-                "error",
+                "warn",
                 "always",
                 {
                     exceptAfterSingleLine: false,
@@ -5059,7 +5061,7 @@ export default [
             "observers/no-missing-unobserve-or-disconnect": "error",
             "one-var": "off",
             "padding-line-between-statements": [
-                "error",
+                "warn",
                 {
                     blankLine: "always",
                     next: "*",

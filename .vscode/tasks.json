@@ -132,17 +132,17 @@
             "type": "shell"
         },
         {
-            "command": "npm run lint:all:check",
+            "command": "npm run lint",
             "label": "Lint All",
             "type": "shell"
         },
         {
-            "command": "npm run lint:all:fix",
+            "command": "npm run lint:fix",
             "label": "Lint All (Fix)",
             "type": "shell"
         },
         {
-            "command": "npm run test:all",
+            "command": "npm run test",
             "label": "Test All",
             "type": "shell"
         },

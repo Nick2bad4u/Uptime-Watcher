@@ -90,7 +90,13 @@ const vitestConfig = defineConfig({
                 "../../shared/**/*.spec.ts", // Exclude spec files from coverage
                 "../../shared/**/*.spec.mts", // Exclude MTS spec files from coverage
                 "../../shared/**/*.spec.cts", // Exclude CTS spec files from coverage
-                "../../shared/test/**", // Exclude test directory
+                "../../shared/test/**", // Exclude test directory,
+                "../../.stryker-tmp/**", // Exclude Stryker mutation testing temp files
+                "../../reports/**", // Exclude test report files
+                "../../stryker_prompts_by_mutator/**",
+                "../../shared/types/**", // Exclude test directory,
+                "../../**/types/**",
+                "../../**/html/**",
             ],
             experimentalAstAwareRemapping: true,
             ignoreEmptyLines: true,

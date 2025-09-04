@@ -19,7 +19,7 @@ interface FeatureProps extends FeatureItem {
 
 const Feature: FC<FeatureProps> = ({ description, icon, style, title }) => (
     <div className={clsx("col col--4")} style={style}>
-        {/* eslint-disable-next-line tailwind/no-custom-classname */}
+        {}
         <div className={clsx("text--center", styles["featureCard"])}>
             <div className={styles["featureIcon"]}>{icon}</div>
             <div className="padding-horiz--md">

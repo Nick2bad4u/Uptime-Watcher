@@ -91,7 +91,7 @@ describe("middleware.ts", () => {
         });
     });
     describe("createMetricsMiddleware", () => {
-        it("tracks counts and timings, calls metricsCallback", async ({
+        it("tracks counts and timings with correct arithmetic (kills +1/-1 and duration +/- mutants)", async ({
             task,
             annotate,
         }) => {
@@ -100,23 +100,52 @@ describe("middleware.ts", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const metricsCallback = vi.fn();
-            const next = vi.fn();
+            vi.useFakeTimers();
+            const metricsCallback = vi.fn(
+                (_metric: {
+                    name: string;
+                    type: "counter" | "timing";
+                    value: number;
+                }) => {}
+            );
+            const next = vi.fn(async () => {
+                // Simulate some processing time
+                await Promise.resolve();
+                vi.advanceTimersByTime(25);
+            });
             const mw = createMetricsMiddleware({ metricsCallback });
+            // First invocation => count should become 1
             await mw("eventC", {}, next);
-            expect(metricsCallback).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    name: "events.eventC.count",
-                    type: "counter",
-                })
-            );
-            expect(metricsCallback).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    name: "events.eventC.duration",
-                    type: "timing",
-                })
-            );
-            expect(next).toHaveBeenCalled();
+            // Second invocation => count should become 2 (verifies +1 not -1)
+            await mw("eventC", {}, next);
+
+            const emitted = metricsCallback.mock.calls.map((c) => c[0] as {
+                name: string;
+                type: "counter" | "timing";
+                value: number;
+            });
+            const counterMetrics = emitted.filter((m) => m.type === "counter");
+            const timingMetrics = emitted.filter((m) => m.type === "timing");
+
+            // Expect two counter emissions with incremental values 1 then 2
+            expect(counterMetrics).toHaveLength(2);
+            expect(counterMetrics[0]).toMatchObject({
+                name: "events.eventC.count",
+                value: 1,
+            });
+            expect(counterMetrics[1]).toMatchObject({
+                name: "events.eventC.count",
+                value: 2,
+            });
+
+            // Timing metrics should be small (processing time ~25ms). A mutant using '+' would create a huge value (≈ Date.now()*2)
+            expect(timingMetrics).not.toHaveLength(0);
+            for (const metric of timingMetrics) {
+                expect(metric.value).toBeGreaterThanOrEqual(0);
+                expect(metric.value).toBeLessThan(1000); // Guard against Date.now()+startTime mutation
+            }
+            expect(next).toHaveBeenCalledTimes(2);
+            vi.useRealTimers();
         });
         it("can disable counts or timings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

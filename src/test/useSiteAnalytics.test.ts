@@ -354,6 +354,110 @@ describe("useSiteAnalytics", () => {
             expect(result.current.uptime).toBe("0.00");
             expect(result.current.avgResponseTime).toBe(0);
         });
+
+        it("should calculate downtime period durations using subtraction (kills end-start -> end+start mutation)", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            // Construct a monitor with a clear contiguous down period
+            const t0 = now - 5000; // earliest
+            const t1 = now - 4000; // still down
+            const t2 = now - 3000; // recovery (up)
+            // History should be ordered oldest -> newest for expected calcs
+            const monitor: Monitor = {
+                checkInterval: 60_000,
+                history: [
+                    createStatusRecord(t0, "down", 0),
+                    createStatusRecord(t1, "down", 0),
+                    createStatusRecord(t2, "up", 120),
+                ],
+                id: "downtime-subtraction",
+                monitoring: true,
+                status: "up",
+                type: "http",
+                url: "https://example.com",
+                responseTime: 0,
+                timeout: 0,
+                retryAttempts: 0,
+            };
+
+            const { result } = renderHook(() => useSiteAnalytics(monitor, "24h"));
+            // duration should be t1 - t0 (1000ms)
+            expect(result.current.downtimePeriods).toHaveLength(1);
+            expect(result.current.downtimePeriods[0]?.duration).toBe(1000);
+            // Mutated (end + start) would yield ~ t1 + t0 (a huge number, certainly > now)
+            expect(result.current.downtimePeriods[0]?.duration).toBeLessThan(10_000);
+        });
+
+        it("should compute MTTR as totalDowntime / count (kills multiplication mutation)", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            // Two distinct downtime incidents separated by up record
+            const tA1 = now - 10_000;
+            const tA2 = now - 9000; // first incident 1000ms
+            const tUp = now - 8000;
+            const tB1 = now - 7000;
+            const tB2 = now - 6500; // second incident 500ms
+            const monitor: Monitor = {
+                checkInterval: 60_000,
+                history: [
+                    createStatusRecord(tA1, "down", 0),
+                    createStatusRecord(tA2, "down", 0),
+                    createStatusRecord(tUp, "up", 150),
+                    createStatusRecord(tB1, "down", 0),
+                    createStatusRecord(tB2, "down", 0),
+                ],
+                id: "mttr-monitor",
+                monitoring: true,
+                status: "up",
+                type: "http",
+                url: "https://example.com",
+                responseTime: 0,
+                timeout: 0,
+                retryAttempts: 0,
+            };
+            const { result } = renderHook(() => useSiteAnalytics(monitor, "24h"));
+            // total downtime = 1000 + 500 = 1500; count=2 -> mttr=750
+            expect(result.current.totalDowntime).toBe(1500);
+            expect(result.current.incidentCount).toBe(2);
+            expect(result.current.mttr).toBe(750);
+            // Mutation (totalDowntime * count) => 3000; ensure not equal
+            expect(result.current.mttr).not.toBe(3000);
+        });
+
+        it("should clamp percentile index (kills arrayLength - 1 -> arrayLength + 1 mutation)", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            // Small history where percentile calculation could overflow
+            const monitor: Monitor = {
+                checkInterval: 60_000,
+                history: [
+                    createStatusRecord(now - 1000, "up", 10),
+                    createStatusRecord(now - 2000, "up", 20),
+                ],
+                id: "percentile-clamp",
+                monitoring: true,
+                status: "up",
+                type: "http",
+                url: "https://example.com",
+                responseTime: 0,
+                timeout: 0,
+                retryAttempts: 0,
+            };
+            const { result } = renderHook(() => useSiteAnalytics(monitor, "24h"));
+            // p99 should resolve to last element (20) not undefined
+            expect([10, 20]).toContain(result.current.p99);
+            expect(result.current.p99).toBeGreaterThanOrEqual(10);
+            expect(result.current.p99).toBeLessThanOrEqual(20);
+        });
     });
 
     describe("Performance Metrics", () => {
