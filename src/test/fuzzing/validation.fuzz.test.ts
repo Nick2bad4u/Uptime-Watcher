@@ -58,6 +58,9 @@ describe("Validation Fuzzing Tests", () => {
                         const url = `${protocol}${domain}:${port}${path}`;
                         const result = isValidUrl(url);
 
+                        // Always make an assertion to satisfy Vitest
+                        expect(typeof result).toBe("boolean");
+
                         // If the result is true, it should be a proper HTTPS URL
                         if (result) {
                             expect(

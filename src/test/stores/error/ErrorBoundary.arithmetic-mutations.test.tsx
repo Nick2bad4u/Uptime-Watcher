@@ -1,5 +1,4 @@
 /**
- * @fileoverview Arithmetic mutation tests for ErrorBoundary component
  * @module src/test/stores/error/ErrorBoundary.arithmetic-mutations
  *
  * These tests target specific arithmetic operations in the ErrorBoundary component
@@ -10,6 +9,8 @@
  * - Line 121: `retryCount: prevState.retryCount + 1` -> `retryCount: prevState.retryCount - 1`
  * - Line 121: `retryCount: prevState.retryCount + 1` -> `retryCount: prevState.retryCount * 1`
  * - Line 121: `retryCount: prevState.retryCount + 1` -> `retryCount: prevState.retryCount / 1`
+ *
+ * @file Arithmetic mutation tests for ErrorBoundary component
  */
 
 import type { JSX } from "react";
@@ -37,7 +38,7 @@ let globalShouldThrow = true;
 
 const ThrowingComponent = ({
     shouldThrow = globalShouldThrow,
-    throwMessage = "Test error for ErrorBoundary"
+    throwMessage = "Test error for ErrorBoundary",
 }: ThrowingComponentProperties): JSX.Element => {
     if (shouldThrow) {
         throw new Error(throwMessage);
@@ -55,7 +56,10 @@ interface MockFallbackProperties {
     readonly onRetry?: () => void;
 }
 
-const MockFallback = ({ error, onRetry }: MockFallbackProperties): JSX.Element => (
+const MockFallback = ({
+    error,
+    onRetry,
+}: MockFallbackProperties): JSX.Element => (
     <div>
         <p>Error caught: {error?.message}</p>
         <button onClick={onRetry} type="button">
@@ -66,15 +70,20 @@ const MockFallback = ({ error, onRetry }: MockFallbackProperties): JSX.Element =
 
 describe("ErrorBoundary Arithmetic Mutations", () => {
     /**
-     * Test the retryCount increment arithmetic to ensure mutations are detected.
+     * Test the retryCount increment arithmetic to ensure mutations are
+     * detected.
      *
-     * Target: retryCount: prevState.retryCount + 1
-     * Mutations to kill:
-     * - retryCount: prevState.retryCount - 1 (would cause retryCount to stay the same or decrease)
-     * - retryCount: prevState.retryCount * 1 (would not increment retryCount)
-     * - retryCount: prevState.retryCount / 1 (would not increment retryCount)
+     * Target: retryCount: prevState.retryCount + 1 Mutations to kill:
+     *
+     * - RetryCount: prevState.retryCount - 1 (would cause retryCount to stay the
+     *   same or decrease)
+     * - RetryCount: prevState.retryCount * 1 (would not increment retryCount)
+     * - RetryCount: prevState.retryCount / 1 (would not increment retryCount)
      */
-    it("should increment retryCount on each retry attempt", ({ task, annotate }) => {
+    it("should increment retryCount on each retry attempt", ({
+        task,
+        annotate,
+    }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: ErrorBoundary", "component");
         annotate("Category: Error Handling", "category");
@@ -95,7 +104,9 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             );
 
             // Verify error fallback is displayed
-            expect(screen.getByText("Error caught: Arithmetic test error")).toBeInTheDocument();
+            expect(
+                screen.getByText("Error caught: Arithmetic test error")
+            ).toBeInTheDocument();
 
             // Get the retry button
             const retryButton = screen.getByRole("button", { name: /retry/i });
@@ -110,11 +121,12 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             // After retry, the component should re-render with incremented retryCount
             // The key prop of the div wrapper uses retryCount, so children should remount
             // If + was mutated to - or other operators, retryCount would not increment properly
-            expect(screen.getByText("Normal component content")).toBeInTheDocument();
+            expect(
+                screen.getByText("Normal component content")
+            ).toBeInTheDocument();
 
             // Verify we're back to normal content (error was cleared)
             expect(screen.queryByText("Error caught:")).not.toBeInTheDocument();
-
         } finally {
             console.error = originalConsoleError;
             globalShouldThrow = true; // Reset for other tests
@@ -125,7 +137,10 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
      * Test that retryCount properly increments through multiple retry cycles.
      * This specifically targets the + arithmetic operation.
      */
-    it("should correctly perform retryCount arithmetic across multiple retries", ({ task, annotate }) => {
+    it("should correctly perform retryCount arithmetic across multiple retries", ({
+        task,
+        annotate,
+    }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: ErrorBoundary", "component");
         annotate("Category: Error Handling", "category");
@@ -140,7 +155,11 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
 
             const KeyTrackingComponent = (): JSX.Element => {
                 retryAttempts += 1;
-                return <div data-testid={`component-mount-${retryAttempts}`}>Component mounted</div>;
+                return (
+                    <div data-testid={`component-mount-${retryAttempts}`}>
+                        Component mounted
+                    </div>
+                );
             };
 
             // First mount with error
@@ -152,13 +171,17 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             );
 
             // Should show error state
-            expect(screen.getByText("Error caught: Test error for ErrorBoundary")).toBeInTheDocument();
+            expect(
+                screen.getByText("Error caught: Test error for ErrorBoundary")
+            ).toBeInTheDocument();
             const retryButton = screen.getByRole("button", { name: /retry/i });
 
             // First retry
             globalShouldThrow = false;
             fireEvent.click(retryButton);
-            expect(screen.getByText("Normal component content")).toBeInTheDocument();
+            expect(
+                screen.getByText("Normal component content")
+            ).toBeInTheDocument();
 
             // Second error cycle - use rerender instead of new render to avoid multiple components
             globalShouldThrow = true;
@@ -167,7 +190,9 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
                     <ThrowingComponent throwMessage="Second error" />
                 </ErrorBoundary>
             );
-            expect(screen.getByText("Error caught: Second error")).toBeInTheDocument();
+            expect(
+                screen.getByText("Error caught: Second error")
+            ).toBeInTheDocument();
 
             // Second retry - retryCount should be 1 + 1 = 2
             globalShouldThrow = false;
@@ -175,8 +200,9 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             fireEvent.click(retryButton2);
 
             // Should succeed again - demonstrating consistent arithmetic
-            expect(screen.getAllByText("Normal component content")).toHaveLength(1);
-
+            expect(
+                screen.getAllByText("Normal component content")
+            ).toHaveLength(1);
         } finally {
             console.error = originalConsoleError;
             globalShouldThrow = true;
@@ -184,10 +210,13 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
     });
 
     /**
-     * Test that the key prop (which uses retryCount) changes correctly.
-     * This verifies that the arithmetic result affects component behavior.
+     * Test that the key prop (which uses retryCount) changes correctly. This
+     * verifies that the arithmetic result affects component behavior.
      */
-    it("should use incremented retryCount as key for component remounting", ({ task, annotate }) => {
+    it("should use incremented retryCount as key for component remounting", ({
+        task,
+        annotate,
+    }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: ErrorBoundary", "component");
         annotate("Category: Error Handling", "category");
@@ -215,7 +244,9 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             fireEvent.click(retryButton);
 
             // Should now see normal content
-            expect(screen.getAllByText("Normal component content")).toHaveLength(1);
+            expect(
+                screen.getAllByText("Normal component content")
+            ).toHaveLength(1);
 
             // Trigger another error to test retryCount increment again
             globalShouldThrow = true;
@@ -225,7 +256,9 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
                 </ErrorBoundary>
             );
 
-            expect(screen.getByText("Error caught: Second error test")).toBeInTheDocument();
+            expect(
+                screen.getByText("Error caught: Second error test")
+            ).toBeInTheDocument();
 
             // Second retry should increment retryCount to 2
             globalShouldThrow = false;
@@ -233,8 +266,9 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             fireEvent.click(retryButton2);
 
             // Should see normal content again - key should have changed due to retryCount increment
-            expect(screen.getAllByText("Normal component content")).toHaveLength(1);
-
+            expect(
+                screen.getAllByText("Normal component content")
+            ).toHaveLength(1);
         } finally {
             console.error = originalConsoleError;
             globalShouldThrow = true;

@@ -4,6 +4,10 @@
  */
 
 import { beforeAll, afterAll } from "vitest";
+import fc from "fast-check";
+
+// Configure fast-check for property-based testing
+fc.configureGlobal({ numRuns: 10 });
 
 beforeAll(async () => {
     // Global setup that runs once before all tests

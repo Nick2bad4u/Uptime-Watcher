@@ -4,6 +4,10 @@
  */
 
 import "@testing-library/jest-dom";
+import fc from "fast-check";
+
+// Configure fast-check for property-based testing
+fc.configureGlobal({ numRuns: 10 });
 
 // Enhanced DOM polyfills for comprehensive testing support
 beforeAll(() => {

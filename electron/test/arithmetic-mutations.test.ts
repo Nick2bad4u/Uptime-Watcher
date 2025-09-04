@@ -1,13 +1,15 @@
 /**
  * Arithmetic Operator Mutation Tests
  *
- * @file Tests specifically designed to catch ArithmeticOperator mutations
- * that survived Stryker mutation testing.
+ * @file Tests specifically designed to catch ArithmeticOperator mutations that
+ *   survived Stryker mutation testing.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-09-03
  *
  * @category Tests
+ *
  * @tags ["mutation-testing", "arithmetic", "stryker"]
  */
 
@@ -19,7 +21,10 @@ describe("ArithmeticOperator Mutation Tests", () => {
     });
 
     describe("Middleware Duration Calculation", () => {
-        it("should calculate duration correctly using subtraction (kills Date.now() + startTime mutant)", async ({ task, annotate }) => {
+        it("should calculate duration correctly using subtraction (kills Date.now() + startTime mutant)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: middleware", "component");
             await annotate("Category: Timing", "category");
@@ -52,7 +57,10 @@ describe("ArithmeticOperator Mutation Tests", () => {
     });
 
     describe("DatabaseCommands Loop Index Calculation", () => {
-        it("should start loop from correct index using subtraction (kills length + 1 mutant)", async ({ task, annotate }) => {
+        it("should start loop from correct index using subtraction (kills length + 1 mutant)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DatabaseCommands", "component");
             await annotate("Category: Looping", "category");
@@ -63,7 +71,11 @@ describe("ArithmeticOperator Mutation Tests", () => {
             // Original: for (let i = this.executedCommands.length - 1; i >= 0; i--) {
             // Mutated: this.executedCommands.length + 1
 
-            const commands = ["command1", "command2", "command3"];
+            const commands = [
+                "command1",
+                "command2",
+                "command3",
+            ];
 
             // Correct index calculation: length - 1 = last valid index
             const correctStartIndex = commands.length - 1;
@@ -85,7 +97,10 @@ describe("ArithmeticOperator Mutation Tests", () => {
     });
 
     describe("EnhancedMonitorChecker Pruning Threshold", () => {
-        it("should calculate pruning threshold using addition (kills historyLimit - bufferSize mutant)", async ({ task, annotate }) => {
+        it("should calculate pruning threshold using addition (kills historyLimit - bufferSize mutant)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: EnhancedMonitorChecker", "component");
             await annotate("Category: Buffer Management", "category");
@@ -119,7 +134,10 @@ describe("ArithmeticOperator Mutation Tests", () => {
     });
 
     describe("HttpMonitor Timing Calculations", () => {
-        it("should calculate elapsed time using subtraction (kills now + last mutant)", async ({ task, annotate }) => {
+        it("should calculate elapsed time using subtraction (kills now + last mutant)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HttpMonitor", "component");
             await annotate("Category: Timing", "category");
@@ -131,7 +149,7 @@ describe("ArithmeticOperator Mutation Tests", () => {
             // Mutated: now + last
 
             const last = 1000; // Last check timestamp
-            const now = 1500;  // Current timestamp
+            const now = 1500; // Current timestamp
 
             // Correct calculation: time elapsed since last check
             const correctElapsed = now - last;
@@ -150,7 +168,10 @@ describe("ArithmeticOperator Mutation Tests", () => {
             expect(mutatedElapsed).toBeGreaterThan(last);
         });
 
-        it("should calculate wait time using subtraction (kills minIntervalMs + since mutant)", async ({ task, annotate }) => {
+        it("should calculate wait time using subtraction (kills minIntervalMs + since mutant)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HttpMonitor", "component");
             await annotate("Category: Timing", "category");
@@ -182,7 +203,10 @@ describe("ArithmeticOperator Mutation Tests", () => {
     });
 
     describe("HTTP Client Content Length Calculations", () => {
-        it("should calculate content length using multiplication (kills 1 * 1024 / 1024 mutant)", async ({ task, annotate }) => {
+        it("should calculate content length using multiplication (kills 1 * 1024 / 1024 mutant)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: httpClient", "component");
             await annotate("Category: Configuration", "category");
@@ -198,7 +222,7 @@ describe("ArithmeticOperator Mutation Tests", () => {
             expect(correctContentLength).toBe(1_048_576); // 1MB in bytes
 
             // Mutated calculation would use division instead
-            const mutatedContentLength = 1 * 1024 / 1024;
+            const mutatedContentLength = (1 * 1024) / 1024;
             expect(mutatedContentLength).toBe(1); // 1 byte
 
             // The correct value should be much larger
@@ -208,10 +232,15 @@ describe("ArithmeticOperator Mutation Tests", () => {
             expect(mutatedContentLength).toBeLessThan(10);
 
             // Verify they are vastly different
-            expect(correctContentLength).toBeGreaterThan(mutatedContentLength * 1_000_000);
+            expect(correctContentLength).toBeGreaterThan(
+                mutatedContentLength * 1_000_000
+            );
         });
 
-        it("should calculate body length using multiplication (kills 8 / 1024 mutant)", async ({ task, annotate }) => {
+        it("should calculate body length using multiplication (kills 8 / 1024 mutant)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: httpClient", "component");
             await annotate("Category: Configuration", "category");
@@ -239,7 +268,10 @@ describe("ArithmeticOperator Mutation Tests", () => {
     });
 
     describe("Ping Retry Response Time", () => {
-        it("should calculate response time using subtraction (kills Date.now() + startTime mutant)", async ({ task, annotate }) => {
+        it("should calculate response time using subtraction (kills Date.now() + startTime mutant)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: pingRetry", "component");
             await annotate("Category: Timing", "category");
@@ -267,12 +299,17 @@ describe("ArithmeticOperator Mutation Tests", () => {
             expect(mutatedResponseTime).toBeGreaterThan(1_000_000_000);
 
             // They should be vastly different
-            expect(mutatedResponseTime).toBeGreaterThan(correctResponseTime * 1_000_000);
+            expect(mutatedResponseTime).toBeGreaterThan(
+                correctResponseTime * 1_000_000
+            );
         });
     });
 
     describe("UptimeOrchestrator Setup Results", () => {
-        it("should calculate failed count using subtraction (kills setupResults.length + successful mutant)", async ({ task, annotate }) => {
+        it("should calculate failed count using subtraction (kills setupResults.length + successful mutant)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Statistics", "category");
@@ -283,7 +320,7 @@ describe("ArithmeticOperator Mutation Tests", () => {
             // Original: const failed = setupResults.length - successful;
             // Mutated: setupResults.length + successful
 
-            const setupResults = Array.from({length: 10}); // 10 total setup attempts
+            const setupResults = Array.from({ length: 10 }); // 10 total setup attempts
             const successful = 7; // 7 successful setups
 
             // Correct calculation: failures = total - successful
@@ -304,7 +341,10 @@ describe("ArithmeticOperator Mutation Tests", () => {
     });
 
     describe("Operational Hooks Exponential Backoff", () => {
-        it("should calculate exponential backoff using multiplication (kills initialDelay / 2 ** (attempt - 1) mutant)", async ({ task, annotate }) => {
+        it("should calculate exponential backoff using multiplication (kills initialDelay / 2 ** (attempt - 1) mutant)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationalHooks", "component");
             await annotate("Category: Retry Logic", "category");
@@ -333,7 +373,10 @@ describe("ArithmeticOperator Mutation Tests", () => {
             expect(mutatedDelay).toBeLessThan(initialDelay);
         });
 
-        it("should calculate linear backoff using multiplication (kills initialDelay / attempt mutant)", async ({ task, annotate }) => {
+        it("should calculate linear backoff using multiplication (kills initialDelay / attempt mutant)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationalHooks", "component");
             await annotate("Category: Retry Logic", "category");
@@ -362,7 +405,10 @@ describe("ArithmeticOperator Mutation Tests", () => {
             expect(mutatedDelay).toBeLessThan(initialDelay);
         });
 
-        it("should increment attempt counter (kills attempt - 1 mutant)", async ({ task, annotate }) => {
+        it("should increment attempt counter (kills attempt - 1 mutant)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationalHooks", "component");
             await annotate("Category: Retry Logic", "category");

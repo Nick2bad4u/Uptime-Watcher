@@ -119,11 +119,14 @@ describe("middleware.ts", () => {
             // Second invocation => count should become 2 (verifies +1 not -1)
             await mw("eventC", {}, next);
 
-            const emitted = metricsCallback.mock.calls.map((c) => c[0] as {
-                name: string;
-                type: "counter" | "timing";
-                value: number;
-            });
+            const emitted = metricsCallback.mock.calls.map(
+                (c) =>
+                    c[0] as {
+                        name: string;
+                        type: "counter" | "timing";
+                        value: number;
+                    }
+            );
             const counterMetrics = emitted.filter((m) => m.type === "counter");
             const timingMetrics = emitted.filter((m) => m.type === "timing");
 

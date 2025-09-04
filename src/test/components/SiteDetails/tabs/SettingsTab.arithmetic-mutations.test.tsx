@@ -1,8 +1,9 @@
 /**
  * Arithmetic mutation tests for SettingsTab.tsx
  *
- * Targets arithmetic operations to kill arithmetic operator mutations.
- * These tests ensure proper calculations in interval display, retry calculations, and duration formatting.
+ * Targets arithmetic operations to kill arithmetic operator mutations. These
+ * tests ensure proper calculations in interval display, retry calculations, and
+ * duration formatting.
  */
 
 import { render, screen } from "@testing-library/react";
@@ -48,7 +49,11 @@ vi.mock("../../../../theme/useTheme", () => ({
                     "4xl": "36px",
                 },
                 fontFamily: {
-                    sans: ["Inter", "system-ui", "sans-serif"],
+                    sans: [
+                        "Inter",
+                        "system-ui",
+                        "sans-serif",
+                    ],
                     mono: ["JetBrains Mono", "monospace"],
                 },
                 fontWeight: {
@@ -181,12 +186,19 @@ vi.mock("../../../../utils/fallbacks", () => ({
 }));
 
 vi.mock("../../../../utils/time", () => ({
-    formatRetryAttemptsText: vi.fn((attempts: number) => `${attempts + 1} attempts + backoff`),
+    formatRetryAttemptsText: vi.fn(
+        (attempts: number) => `${attempts + 1} attempts + backoff`
+    ),
     getIntervalLabel: vi.fn((interval: number) => `${interval / 1000}s`),
 }));
 
 vi.mock("../../../../constants", () => ({
-    CHECK_INTERVALS: [30_000, 60_000, 300_000, 600_000],
+    CHECK_INTERVALS: [
+        30_000,
+        60_000,
+        300_000,
+        600_000,
+    ],
     TIMEOUT_CONSTRAINTS: { MIN: 1000, MAX: 30_000, STEP: 1000 },
     RETRY_CONSTRAINTS: { MIN: 0, MAX: 5, STEP: 1 },
     TRANSITION_ALL: "all 0.2s ease-in-out",
@@ -247,10 +259,14 @@ describe("SettingsTab arithmetic mutations", () => {
             render(<SettingsTab {...props} />);
 
             // Should display "Monitor checks every 60 seconds"
-            expect(screen.getByText(/Monitor checks every 60 seconds/)).toBeInTheDocument();
+            expect(
+                screen.getByText(/Monitor checks every 60 seconds/)
+            ).toBeInTheDocument();
 
             // Mutation (/ 1000 -> * 1000) would yield 60,000,000 which would be incorrect
-            expect(screen.queryByText(/Monitor checks every 60{7} seconds/)).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(/Monitor checks every 60{7} seconds/)
+            ).not.toBeInTheDocument();
         });
 
         it("should handle sub-second intervals correctly", () => {
@@ -262,10 +278,14 @@ describe("SettingsTab arithmetic mutations", () => {
             render(<SettingsTab {...props} />);
 
             // Should display "Monitor checks every 1 seconds" (Math.round(0.5) = 1)
-            expect(screen.getByText(/Monitor checks every 1 seconds/)).toBeInTheDocument();
+            expect(
+                screen.getByText(/Monitor checks every 1 seconds/)
+            ).toBeInTheDocument();
 
             // Mutation (/ 1000 -> * 1000) would yield 500,000 which would be incorrect
-            expect(screen.queryByText(/Monitor checks every 50{5} seconds/)).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(/Monitor checks every 50{5} seconds/)
+            ).not.toBeInTheDocument();
         });
     });
 
@@ -280,10 +300,14 @@ describe("SettingsTab arithmetic mutations", () => {
             render(<SettingsTab {...props} />);
 
             // Should display "4 attempts" (3 + 1 = 4) - target the specific span with just the attempts text
-            expect(screen.getByText('4 attempts + backoff')).toBeInTheDocument();
+            expect(
+                screen.getByText("4 attempts + backoff")
+            ).toBeInTheDocument();
 
             // Mutation (+ 1 -> - 1) would yield 2 attempts which would be incorrect
-            expect(screen.queryByText(/2 attempts \+ backoff/)).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(/2 attempts \+ backoff/)
+            ).not.toBeInTheDocument();
         });
 
         it("should handle zero retries correctly", () => {
@@ -296,10 +320,14 @@ describe("SettingsTab arithmetic mutations", () => {
             render(<SettingsTab {...props} />);
 
             // Should display "1 attempts" (0 + 1 = 1)
-            expect(screen.getByText(/1 attempts \+ backoff/)).toBeInTheDocument();
+            expect(
+                screen.getByText(/1 attempts \+ backoff/)
+            ).toBeInTheDocument();
 
             // Mutation (+ 1 -> - 1) would yield -1 attempts which would be incorrect
-            expect(screen.queryByText(/-1 attempts \+ backoff/)).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(/-1 attempts \+ backoff/)
+            ).not.toBeInTheDocument();
         });
     });
 
@@ -433,14 +461,20 @@ describe("SettingsTab arithmetic mutations", () => {
             render(<SettingsTab {...props} />);
 
             // Check interval display: Math.round(30000 / 1000) = 30 seconds
-            expect(screen.getByText(/Monitor checks every 30 seconds/)).toBeInTheDocument();
+            expect(
+                screen.getByText(/Monitor checks every 30 seconds/)
+            ).toBeInTheDocument();
 
             // Check retry attempts display: 2 + 1 = 3 attempts - target the specific span
-            expect(screen.getByText('3 attempts + backoff')).toBeInTheDocument();
+            expect(
+                screen.getByText("3 attempts + backoff")
+            ).toBeInTheDocument();
 
             // Check max duration calculation appears (calculateMaxDuration with all its arithmetic)
             // timeout=10, retryAttempts=2 -> should be around 22s total
-            expect(screen.getByText(/Maximum check duration/)).toBeInTheDocument();
+            expect(
+                screen.getByText(/Maximum check duration/)
+            ).toBeInTheDocument();
         });
     });
 });

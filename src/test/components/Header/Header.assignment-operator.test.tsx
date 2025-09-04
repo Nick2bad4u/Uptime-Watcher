@@ -2,8 +2,9 @@
  * Mutation-specific test for Header component assignment operations
  *
  * @remarks
- * Tests specifically target the AssignmentOperator mutations on lines 125 and 126
- * of Header.tsx where totalCounts.paused and totalCounts.pending are accumulated
+ * Tests specifically target the AssignmentOperator mutations on lines 125 and
+ * 126 of Header.tsx where totalCounts.paused and totalCounts.pending are
+ * accumulated
  */
 
 import { render } from "@testing-library/react";
@@ -43,7 +44,11 @@ describe("Header Assignment Operator Mutations", () => {
             currentTheme: {
                 colors: {
                     background: { primary: "#ffffff" },
-                    status: { up: "#22c55e", down: "#ef4444", pending: "#f59e0b" },
+                    status: {
+                        up: "#22c55e",
+                        down: "#ef4444",
+                        pending: "#f59e0b",
+                    },
                 },
                 typography: {
                     fontSize: { xs: "0.75rem", sm: "0.875rem", base: "1rem" },
@@ -78,10 +83,12 @@ describe("Header Assignment Operator Mutations", () => {
     });
 
     /**
-     * Test to detect mutation on line 125: `totalCounts.paused += siteCounts.paused;` -> `totalCounts.paused -= siteCounts.paused`
+     * Test to detect mutation on line 125: `totalCounts.paused +=
+     * siteCounts.paused;` -> `totalCounts.paused -= siteCounts.paused`
      *
-     * This test verifies that paused monitor counts are properly accumulated across sites.
-     * If the mutation is present (subtracting instead of adding), the total count will be incorrect.
+     * This test verifies that paused monitor counts are properly accumulated
+     * across sites. If the mutation is present (subtracting instead of adding),
+     * the total count will be incorrect.
      */
     it("should properly accumulate paused monitor counts across sites", () => {
         const sitesWithPausedMonitors: Site[] = [
@@ -173,10 +180,12 @@ describe("Header Assignment Operator Mutations", () => {
     });
 
     /**
-     * Test to detect mutation on line 126: `totalCounts.pending += siteCounts.pending;` -> `totalCounts.pending -= siteCounts.pending`
+     * Test to detect mutation on line 126: `totalCounts.pending +=
+     * siteCounts.pending;` -> `totalCounts.pending -= siteCounts.pending`
      *
-     * This test verifies that pending monitor counts are properly accumulated across sites.
-     * If the mutation is present (subtracting instead of adding), the total count will be incorrect.
+     * This test verifies that pending monitor counts are properly accumulated
+     * across sites. If the mutation is present (subtracting instead of adding),
+     * the total count will be incorrect.
      */
     it("should properly accumulate pending monitor counts across sites", () => {
         const sitesWithPendingMonitors: Site[] = [
@@ -277,10 +286,11 @@ describe("Header Assignment Operator Mutations", () => {
     });
 
     /**
-     * Test to detect both mutations by testing with multiple sites having both paused and pending monitors
+     * Test to detect both mutations by testing with multiple sites having both
+     * paused and pending monitors
      *
-     * This test creates a comprehensive scenario that would reveal incorrect counting
-     * if either assignment operation is mutated.
+     * This test creates a comprehensive scenario that would reveal incorrect
+     * counting if either assignment operation is mutated.
      */
     it("should correctly accumulate both paused and pending counts with multiple sites", () => {
         const sitesWithMixedStatus: Site[] = [

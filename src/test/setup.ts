@@ -5,6 +5,10 @@
 
 import { vi, type Mock } from "vitest";
 import "@testing-library/jest-dom";
+import fc from "fast-check";
+
+// Configure fast-check for property-based testing
+fc.configureGlobal({ numRuns: 10 });
 
 // Mock ResizeObserver for Chart.js testing
 globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({

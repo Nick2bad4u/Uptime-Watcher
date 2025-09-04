@@ -2,13 +2,12 @@
  * Arithmetic mutation tests for MonitorManager.ts
  *
  * Targets interval division operations to kill arithmetic operator mutations.
- * These tests ensure proper millisecond to sec            // The division should still use DEFAULT_CHECK_INTERVAL (300000) not customInterval
-            expect(mockInterpolateLogTemplate).toHaveBeenCalledWith(
-                expect.anything(),
-                expect.objectContaining({
-                    interval: 300, // DEFAULT_CHECK_INTERVAL (300000) / 1000 = 300s
-                    monitorId: "custom-monitor",
-                })versions in logging and calculations.
+ * These tests ensure proper millisecond to sec // The division should still use
+ * DEFAULT_CHECK_INTERVAL (300000) not customInterval
+ * expect(mockInterpolateLogTemplate).toHaveBeenCalledWith( expect.anything(),
+ * expect.objectContaining({ interval: 300, // DEFAULT_CHECK_INTERVAL (300000) /
+ * 1000 = 300s monitorId: "custom-monitor", })versions in logging and
+ * calculations.
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -16,13 +15,21 @@ import { MonitorManager } from "../../managers/MonitorManager";
 import type { Site, Monitor } from "../../../shared/types.js";
 
 // Hoist the mock function to avoid initialization issues
-const mockInterpolateLogTemplate = vi.hoisted(() => vi.fn((template: string, params: any) => {
-    // Simulate template interpolation for arithmetic testing
-    if (template && typeof template === 'string' && template.includes("interval") && params && params.interval !== undefined) {
-        return `Applied interval for monitor ${params.monitorId}: ${params.interval}s`;
-    }
-    return template || "";
-}));
+const mockInterpolateLogTemplate = vi.hoisted(() =>
+    vi.fn((template: string, params: any) => {
+        // Simulate template interpolation for arithmetic testing
+        if (
+            template &&
+            typeof template === "string" &&
+            template.includes("interval") &&
+            params &&
+            params.interval !== undefined
+        ) {
+            return `Applied interval for monitor ${params.monitorId}: ${params.interval}s`;
+        }
+        return template || "";
+    })
+);
 
 // Mock all dependencies
 vi.mock("../../services/database/DatabaseService");
@@ -31,11 +38,14 @@ vi.mock("../../../shared/utils/logTemplates", () => ({
     interpolateLogTemplate: mockInterpolateLogTemplate,
     LOG_TEMPLATES: {
         debug: {
-            MONITOR_INTERVALS_APPLIED: "[MonitorManager] Applied interval for monitor {monitorId}: {interval}s",
-            MONITOR_MANAGER_INTERVALS_SETTING: "[MonitorManager] Applying default intervals for site: {identifier}",
+            MONITOR_INTERVALS_APPLIED:
+                "[MonitorManager] Applied interval for monitor {monitorId}: {interval}s",
+            MONITOR_MANAGER_INTERVALS_SETTING:
+                "[MonitorManager] Applying default intervals for site: {identifier}",
         },
         services: {
-            MONITOR_MANAGER_APPLYING_INTERVALS: "[MonitorManager] Completed applying default intervals for site: {identifier}",
+            MONITOR_MANAGER_APPLYING_INTERVALS:
+                "[MonitorManager] Completed applying default intervals for site: {identifier}",
         },
     },
 }));
@@ -61,12 +71,20 @@ describe("MonitorManager arithmetic mutations", () => {
         vi.clearAllMocks();
 
         // Reset template interpolation mock to return seconds value for testing
-        mockInterpolateLogTemplate.mockImplementation((template: string, params: any) => {
-            if (template && typeof template === 'string' && template.includes("interval") && params && params.interval !== undefined) {
-                return `Applied interval for monitor ${params.monitorId}: ${params.interval}s`;
+        mockInterpolateLogTemplate.mockImplementation(
+            (template: string, params: any) => {
+                if (
+                    template &&
+                    typeof template === "string" &&
+                    template.includes("interval") &&
+                    params &&
+                    params.interval !== undefined
+                ) {
+                    return `Applied interval for monitor ${params.monitorId}: ${params.interval}s`;
+                }
+                return template || "";
             }
-            return template || "";
-        });
+        );
 
         mockDependencies = {
             eventEmitter: {
@@ -142,8 +160,12 @@ describe("MonitorManager arithmetic mutations", () => {
             };
 
             // Mock repository to return monitors that need interval updates
-            mockDependencies.siteRepository.findAllSites.mockResolvedValue([testSite]);
-            mockDependencies.monitorRepository.findMonitorsBySiteId.mockResolvedValue(testSite.monitors);
+            mockDependencies.siteRepository.findAllSites.mockResolvedValue([
+                testSite,
+            ]);
+            mockDependencies.monitorRepository.findMonitorsBySiteId.mockResolvedValue(
+                testSite.monitors
+            );
 
             // Act: Setup site for monitoring (this triggers the interval application and division)
             await manager.setupSiteForMonitoring(testSite);
@@ -188,8 +210,12 @@ describe("MonitorManager arithmetic mutations", () => {
                 ],
             };
 
-            mockDependencies.siteRepository.findAllSites.mockResolvedValue([testSite]);
-            mockDependencies.monitorRepository.findMonitorsBySiteId.mockResolvedValue(testSite.monitors);
+            mockDependencies.siteRepository.findAllSites.mockResolvedValue([
+                testSite,
+            ]);
+            mockDependencies.monitorRepository.findMonitorsBySiteId.mockResolvedValue(
+                testSite.monitors
+            );
 
             await manager.setupSiteForMonitoring(testSite);
 
@@ -224,15 +250,22 @@ describe("MonitorManager arithmetic mutations", () => {
                 ],
             };
 
-            mockDependencies.siteRepository.findAllSites.mockResolvedValue([testSite]);
-            mockDependencies.monitorRepository.findMonitorsBySiteId.mockResolvedValue(testSite.monitors);
+            mockDependencies.siteRepository.findAllSites.mockResolvedValue([
+                testSite,
+            ]);
+            mockDependencies.monitorRepository.findMonitorsBySiteId.mockResolvedValue(
+                testSite.monitors
+            );
 
             await manager.setupSiteForMonitoring(testSite);
 
             // Extract the actual interval value that was logged
             const calls = mockInterpolateLogTemplate.mock.calls;
-            const intervalCall = calls.find(call =>
-                call[1] && typeof call[1] === 'object' && 'interval' in call[1]
+            const intervalCall = calls.find(
+                (call) =>
+                    call[1] &&
+                    typeof call[1] === "object" &&
+                    "interval" in call[1]
             );
 
             expect(intervalCall).toBeDefined();

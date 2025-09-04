@@ -2,8 +2,8 @@
  * Mutation-specific test for HttpMonitor active counter assignment operations
  *
  * @remarks
- * Tests specifically target the AssignmentOperator mutations on lines 101 and 106
- * of HttpMonitor.ts where active counter is incremented and decremented
+ * Tests specifically target the AssignmentOperator mutations on lines 101 and
+ * 106 of HttpMonitor.ts where active counter is incremented and decremented
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -99,11 +99,13 @@ describe("HttpMonitor Active Counter Assignment Operations", () => {
     });
 
     /**
-     * Test to detect mutation on line 101: `this.active += 1;` -> `this.active -= 1`
+     * Test to detect mutation on line 101: `this.active += 1;` -> `this.active
+     * -= 1`
      *
-     * This test verifies that the active counter is properly incremented when starting
-     * a request. If the mutation is present (decrementing instead of incrementing),
-     * the rate limiter will incorrectly manage concurrent requests.
+     * This test verifies that the active counter is properly incremented when
+     * starting a request. If the mutation is present (decrementing instead of
+     * incrementing), the rate limiter will incorrectly manage concurrent
+     * requests.
      */
     it("should properly increment active counter when starting request", async () => {
         const { withOperationalHooks } = vi.mocked(
@@ -140,7 +142,7 @@ describe("HttpMonitor Active Counter Assignment Operations", () => {
         const checkPromise = httpMonitor.check(monitor);
 
         // Give it time to increment the counter
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise((resolve) => setTimeout(resolve, 10));
 
         // Start a second request - this should be throttled if active counter is working correctly
         const secondCheckPromise = httpMonitor.check({
@@ -165,11 +167,12 @@ describe("HttpMonitor Active Counter Assignment Operations", () => {
     });
 
     /**
-     * Test to detect mutation on line 106: `this.active -= 1;` -> `this.active += 1`
+     * Test to detect mutation on line 106: `this.active -= 1;` -> `this.active
+     * += 1`
      *
-     * This test verifies that the active counter is properly decremented when finishing
-     * a request. If the mutation is present (incrementing instead of decrementing),
-     * the active counter will grow indefinitely.
+     * This test verifies that the active counter is properly decremented when
+     * finishing a request. If the mutation is present (incrementing instead of
+     * decrementing), the active counter will grow indefinitely.
      */
     it("should properly decrement active counter when request completes", async () => {
         const { withOperationalHooks } = vi.mocked(
@@ -224,7 +227,8 @@ describe("HttpMonitor Active Counter Assignment Operations", () => {
     });
 
     /**
-     * Test to detect both mutations by verifying consistent rate limiting behavior
+     * Test to detect both mutations by verifying consistent rate limiting
+     * behavior
      *
      * This test creates a scenario where proper counter management is critical
      * for correct rate limiting behavior.

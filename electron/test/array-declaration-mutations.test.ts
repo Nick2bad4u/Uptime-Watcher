@@ -1,14 +1,16 @@
 /**
  * Array Declaration Mutation Tests
  *
- * @file Tests specifically designed to catch ArrayDeclaration mutations
- * that survived Stryker mutation testing. Covers database operations,
- * empty array initializations, and frontend array handling.
+ * @file Tests specifically designed to catch ArrayDeclaration mutations that
+ *   survived Stryker mutation testing. Covers database operations, empty array
+ *   initializations, and frontend array handling.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-09-03
  *
  * @category Tests
+ *
  * @tags ["mutation-testing", "array-declaration", "stryker"]
  */
 
@@ -20,7 +22,10 @@ describe("ArrayDeclaration Mutation Tests", () => {
     });
 
     describe("Database Parameter Arrays", () => {
-        it("should pass non-empty parameter arrays to database operations", async ({ task, annotate }) => {
+        it("should pass non-empty parameter arrays to database operations", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Database Operations", "component");
             await annotate("Category: Data Access", "category");
@@ -41,8 +46,14 @@ describe("ArrayDeclaration Mutation Tests", () => {
             mockDb.run("DELETE FROM monitors WHERE id = ?", [monitorId]);
 
             // Verify parameters were passed correctly
-            expect(mockDbRun).toHaveBeenCalledWith("DELETE FROM sites WHERE id = ?", [siteIdentifier]);
-            expect(mockDbRun).toHaveBeenCalledWith("DELETE FROM monitors WHERE id = ?", [monitorId]);
+            expect(mockDbRun).toHaveBeenCalledWith(
+                "DELETE FROM sites WHERE id = ?",
+                [siteIdentifier]
+            );
+            expect(mockDbRun).toHaveBeenCalledWith(
+                "DELETE FROM monitors WHERE id = ?",
+                [monitorId]
+            );
 
             // Mutated version would pass empty array [], which would fail the operation
             mockDbRun.mockClear();
@@ -51,13 +62,19 @@ describe("ArrayDeclaration Mutation Tests", () => {
             mockDb.run("DELETE FROM sites WHERE id = ?", []);
 
             // With empty array, the operation would be called but with wrong parameters
-            expect(mockDbRun).toHaveBeenCalledWith("DELETE FROM sites WHERE id = ?", []);
+            expect(mockDbRun).toHaveBeenCalledWith(
+                "DELETE FROM sites WHERE id = ?",
+                []
+            );
 
             // The mutation would cause the query to fail or behave incorrectly
             // because the placeholder ? would have no corresponding value
         });
 
-        it("should initialize update arrays correctly (kills empty array mutations)", async ({ task, annotate }) => {
+        it("should initialize update arrays correctly (kills empty array mutations)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Database Updates", "component");
             await annotate("Category: Data Access", "category");
@@ -101,15 +118,24 @@ describe("ArrayDeclaration Mutation Tests", () => {
             const mutatedResult = buildUpdateQueryMutated();
 
             // Mutated version would have the unwanted "Stryker was here" entries
-            expect(mutatedResult.updateFields).toEqual(["Stryker was here", "name"]);
-            expect(mutatedResult.updateValues).toEqual(["Stryker was here", "New Name"]);
+            expect(mutatedResult.updateFields).toEqual([
+                "Stryker was here",
+                "name",
+            ]);
+            expect(mutatedResult.updateValues).toEqual([
+                "Stryker was here",
+                "New Name",
+            ]);
 
             // Verify they are different
             expect(result.updateFields).not.toEqual(mutatedResult.updateFields);
             expect(result.updateValues).not.toEqual(mutatedResult.updateValues);
         });
 
-        it("should clear active operations with empty array (kills non-empty array mutations)", async ({ task, annotate }) => {
+        it("should clear active operations with empty array (kills non-empty array mutations)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Monitor Operations", "component");
             await annotate("Category: State Management", "category");
@@ -121,7 +147,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
             function clearActiveOperations(monitorId: string) {
                 return {
                     monitorId,
-                    activeOperations: [] // Should be empty to clear operations
+                    activeOperations: [], // Should be empty to clear operations
                 };
             }
 
@@ -135,7 +161,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
             function clearActiveOperationsMutated(monitorId: string) {
                 return {
                     monitorId,
-                    activeOperations: ["Stryker was here"]
+                    activeOperations: ["Stryker was here"],
                 };
             }
 
@@ -144,15 +170,22 @@ describe("ArrayDeclaration Mutation Tests", () => {
             // Mutated version would not properly clear operations
             expect(mutatedResult.activeOperations).not.toEqual([]);
             expect(mutatedResult.activeOperations).toHaveLength(1);
-            expect(mutatedResult.activeOperations).toContain("Stryker was here");
+            expect(mutatedResult.activeOperations).toContain(
+                "Stryker was here"
+            );
 
             // This would break the clearing functionality
-            expect(result.activeOperations).not.toEqual(mutatedResult.activeOperations);
+            expect(result.activeOperations).not.toEqual(
+                mutatedResult.activeOperations
+            );
         });
     });
 
     describe("Frontend Array Operations", () => {
-        it("should handle dependency arrays correctly in React hooks", async ({ task, annotate }) => {
+        it("should handle dependency arrays correctly in React hooks", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: React Hooks", "component");
             await annotate("Category: Frontend", "category");
@@ -175,13 +208,18 @@ describe("ArrayDeclaration Mutation Tests", () => {
             mockUseEffect.mockClear();
             mockUseEffect(callback, ["Stryker was here"]);
 
-            expect(mockUseEffect).toHaveBeenCalledWith(callback, ["Stryker was here"]);
+            expect(mockUseEffect).toHaveBeenCalledWith(callback, [
+                "Stryker was here",
+            ]);
 
             // The behavior would be different - effect would re-run when the dependency changes
             // instead of running only once
         });
 
-        it("should initialize component state arrays correctly", async ({ task, annotate }) => {
+        it("should initialize component state arrays correctly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Component State", "component");
             await annotate("Category: Frontend", "category");
@@ -230,7 +268,10 @@ describe("ArrayDeclaration Mutation Tests", () => {
             expect(mutatedState.selectedItems).toContain("Stryker was here");
         });
 
-        it("should handle form field configurations correctly", async ({ task, annotate }) => {
+        it("should handle form field configurations correctly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Form Fields", "component");
             await annotate("Category: Frontend", "category");
@@ -260,7 +301,11 @@ describe("ArrayDeclaration Mutation Tests", () => {
 
             // Test error case
             const errorConfig = getFormFieldConfig(true);
-            expect(errorConfig.baseClasses).toEqual(["form-field", "input", "error"]);
+            expect(errorConfig.baseClasses).toEqual([
+                "form-field",
+                "input",
+                "error",
+            ]);
             expect(errorConfig.errorMessages).toEqual(["Required field"]);
 
             // If arrays were mutated to start with ["Stryker was here"],
@@ -284,10 +329,15 @@ describe("ArrayDeclaration Mutation Tests", () => {
             expect(mutatedConfig.errorMessages).toContain("Stryker was here");
 
             // This would break styling and validation
-            expect(normalConfig.baseClasses).not.toEqual(mutatedConfig.baseClasses);
+            expect(normalConfig.baseClasses).not.toEqual(
+                mutatedConfig.baseClasses
+            );
         });
 
-        it("should handle monitor type configurations correctly", async ({ task, annotate }) => {
+        it("should handle monitor type configurations correctly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Monitor Configuration", "component");
             await annotate("Category: Business Logic", "category");
@@ -354,12 +404,17 @@ describe("ArrayDeclaration Mutation Tests", () => {
             expect(mutatedConfig.validationRules).toContain("Stryker was here");
 
             // The mutated version would have wrong configurations
-            expect(httpConfig.requiredFields).not.toEqual(mutatedConfig.requiredFields);
+            expect(httpConfig.requiredFields).not.toEqual(
+                mutatedConfig.requiredFields
+            );
         });
     });
 
     describe("Validation and Schema Arrays", () => {
-        it("should initialize validation error arrays correctly", async ({ task, annotate }) => {
+        it("should initialize validation error arrays correctly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Validation", "component");
             await annotate("Category: Data Validation", "category");
@@ -386,20 +441,31 @@ describe("ArrayDeclaration Mutation Tests", () => {
             }
 
             // Test valid data
-            const validResult = validateFormData({ name: "Test", url: "https://example.com" });
+            const validResult = validateFormData({
+                name: "Test",
+                url: "https://example.com",
+            });
             expect(validResult.errors).toEqual([]);
             expect(validResult.warnings).toEqual([]);
             expect(validResult.isValid).toBe(true);
 
             // Test data that generates warning
-            const warningResult = validateFormData({ name: "Test", url: "ftp://example.com" });
+            const warningResult = validateFormData({
+                name: "Test",
+                url: "ftp://example.com",
+            });
             expect(warningResult.errors).toEqual([]);
-            expect(warningResult.warnings).toEqual(["URL should start with http or https"]);
+            expect(warningResult.warnings).toEqual([
+                "URL should start with http or https",
+            ]);
             expect(warningResult.isValid).toBe(true);
 
             // Test invalid data
             const invalidResult = validateFormData({});
-            expect(invalidResult.errors).toEqual(["Name is required", "URL is required"]);
+            expect(invalidResult.errors).toEqual([
+                "Name is required",
+                "URL is required",
+            ]);
             expect(invalidResult.warnings).toEqual([]);
             expect(invalidResult.isValid).toBe(false);
 
@@ -417,7 +483,10 @@ describe("ArrayDeclaration Mutation Tests", () => {
                 return { errors, warnings, isValid: errors.length === 0 };
             }
 
-            const mutatedResult = validateFormDataMutated({ name: "Test", url: "https://example.com" });
+            const mutatedResult = validateFormDataMutated({
+                name: "Test",
+                url: "https://example.com",
+            });
             expect(mutatedResult.errors).toContain("Stryker was here");
             expect(mutatedResult.warnings).toContain("Stryker was here");
             expect(mutatedResult.isValid).toBe(false); // Would always be false due to pollution
@@ -427,7 +496,10 @@ describe("ArrayDeclaration Mutation Tests", () => {
             expect(validResult.isValid).not.toBe(mutatedResult.isValid);
         });
 
-        it("should handle schema field arrays correctly", async ({ task, annotate }) => {
+        it("should handle schema field arrays correctly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Schema Definition", "component");
             await annotate("Category: Data Schema", "category");
@@ -438,7 +510,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
             function defineMonitorSchema() {
                 const requiredFields: string[] = [];
                 const optionalFields: string[] = [];
-                const defaultValues: {field: string; value: any}[] = [];
+                const defaultValues: { field: string; value: any }[] = [];
 
                 // Build schema dynamically
                 requiredFields.push("name", "type", "url");
@@ -451,9 +523,19 @@ describe("ArrayDeclaration Mutation Tests", () => {
             const schema = defineMonitorSchema();
 
             // Correct schema should have the expected fields
-            expect(schema.requiredFields).toEqual(["name", "type", "url"]);
-            expect(schema.optionalFields).toEqual(["timeout", "headers", "interval"]);
-            expect(schema.defaultValues).toEqual([{ field: "timeout", value: 30_000 }]);
+            expect(schema.requiredFields).toEqual([
+                "name",
+                "type",
+                "url",
+            ]);
+            expect(schema.optionalFields).toEqual([
+                "timeout",
+                "headers",
+                "interval",
+            ]);
+            expect(schema.defaultValues).toEqual([
+                { field: "timeout", value: 30_000 },
+            ]);
 
             // Mutated version would have pollution
             function defineMonitorSchemaMutated() {
@@ -476,12 +558,17 @@ describe("ArrayDeclaration Mutation Tests", () => {
             expect(mutatedSchema.defaultValues).toContain("Stryker was here");
 
             // This would break schema validation and processing
-            expect(schema.requiredFields).not.toEqual(mutatedSchema.requiredFields);
+            expect(schema.requiredFields).not.toEqual(
+                mutatedSchema.requiredFields
+            );
         });
     });
 
     describe("Cache and State Management Arrays", () => {
-        it("should initialize cache collections correctly", async ({ task, annotate }) => {
+        it("should initialize cache collections correctly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Cache Management", "component");
             await annotate("Category: State Management", "category");
@@ -491,7 +578,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
             // Like entries arrays, keys arrays, etc.
 
             function initializeCache() {
-                const entries: {key: string; value: any}[] = [];
+                const entries: { key: string; value: any }[] = [];
                 const keys: string[] = [];
                 const values: any[] = [];
 
@@ -508,7 +595,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
                         entries.length = 0;
                         keys.length = 0;
                         values.length = 0;
-                    }
+                    },
                 };
             }
 
@@ -527,7 +614,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
             expect(cache.values).toEqual(["value1", "value2"]);
             expect(cache.entries).toEqual([
                 { key: "key1", value: "value1" },
-                { key: "key2", value: "value2" }
+                { key: "key2", value: "value2" },
             ]);
 
             // Clear should empty all arrays

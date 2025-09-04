@@ -11,7 +11,11 @@ import path from "node:path";
 import pc from "picocolors";
 import { normalizePath } from "vite";
 import { type UserConfig } from "vite";
-import { defineConfig } from "vitest/config";
+import {
+    coverageConfigDefaults,
+    defaultExclude,
+    defineConfig,
+} from "vitest/config";
 
 const dirname = import.meta.dirname;
 
@@ -47,9 +51,7 @@ const vitestConfig = defineConfig({
         bail: 100,
         benchmark: {
             exclude: ["**/node_modules/**", "**/dist/**"],
-            include: [
-                "../../shared/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}",
-            ],
+            include: ["shared/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}"],
             outputJson: "./coverage/shared/bench-results.json",
             reporters: ["default", "verbose"],
         },
@@ -60,47 +62,51 @@ const vitestConfig = defineConfig({
         },
         clearMocks: true,
         coverage: {
-            all: false, // Only test loaded files, not all files
+            all: false, // Include all source files in coverage
+            allowExternal: false,
+            clean: true, // Clean coverage directory before each run
+            cleanOnRerun: true, // Clean on rerun in watch mode
             exclude: [
-                "../../**/*.config.*",
-                "../../**/*.d.ts",
-                "../../**/dist/**",
-                "../../**/dist-shared/**",
-                "../../**/docs/**",
-                "../../**/index.ts", // Exclude barrel export files
-                "../../**/index.tsx",
-                "../../**/node_modules/**",
+                "**/*.config.*",
+                "**/*.d.ts",
+                "**/dist/**",
+                "**/dist-shared/**",
+                "**/docs/**",
+                "**/index.ts", // Exclude barrel export files
+                "**/index.tsx",
+                "**/node_modules/**",
                 // Intentional selective exclusion vs backend parity:
-                "../../src/**/types.ts",
-                "../../electron/**/types.ts",
-                "../../**/types.tsx",
-                "../../coverage/**",
-                "../../dist-electron/**",
-                "../../dist/**",
-                "../../src/**", // Exclude frontend files
-                "../../electron/**", // Exclude electron files
-                "../../release/**",
-                "../../scripts/**",
-                "../../shared/test",
-                "../../report/**",
-                "../../**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-                "../../shared/**/*.test.ts", // Exclude test files from coverage
-                "../../shared/**/*.test.mts", // Exclude MTS test files from coverage
-                "../../shared/**/*.test.cts", // Exclude CTS test files from coverage
-                "../../shared/**/*.spec.ts", // Exclude spec files from coverage
-                "../../shared/**/*.spec.mts", // Exclude MTS spec files from coverage
-                "../../shared/**/*.spec.cts", // Exclude CTS spec files from coverage
-                "../../shared/test/**", // Exclude test directory,
-                "../../.stryker-tmp/**", // Exclude Stryker mutation testing temp files
-                "../../reports/**", // Exclude test report files
-                "../../stryker_prompts_by_mutator/**",
-                "../../shared/types/**", // Exclude test directory,
-                "../../**/types/**",
-                "../../**/html/**",
+                "src/**/types.ts",
+                "electron/**/types.ts",
+                "**/types.tsx",
+                "coverage/**",
+                "dist-electron/**",
+                "dist/**",
+                "src/**", // Exclude frontend files
+                "electron/**", // Exclude electron files
+                "release/**",
+                "scripts/**",
+                "shared/test",
+                "report/**",
+                "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+                "shared/**/*.test.ts", // Exclude test files from coverage
+                "shared/**/*.test.mts", // Exclude MTS test files from coverage
+                "shared/**/*.test.cts", // Exclude CTS test files from coverage
+                "shared/**/*.spec.ts", // Exclude spec files from coverage
+                "shared/**/*.spec.mts", // Exclude MTS spec files from coverage
+                "shared/**/*.spec.cts", // Exclude CTS spec files from coverage
+                "shared/test/**", // Exclude test directory,
+                ".stryker-tmp/**", // Exclude Stryker mutation testing temp files
+                "reports/**", // Exclude test report files
+                "stryker_prompts_by_mutator/**",
+                "shared/types/**", // Exclude test directory,
+                "**/types/**",
+                "**/html/**",
+                ...coverageConfigDefaults.exclude,
             ],
             experimentalAstAwareRemapping: true,
             ignoreEmptyLines: true,
-            include: ["../../shared/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}"],
+            include: ["shared/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}"],
             provider: "v8" as const, // Use V8 provider for consistency
             reporter: [
                 "text",
@@ -143,13 +149,13 @@ const vitestConfig = defineConfig({
         },
         environment: "node",
         exclude: [
-            "**/node_modules/**",
-            "**/dist/**",
+            "**/dist*/**",
             "**/dist-electron/**",
             "**/src/**",
             "**/electron/**",
             "**/coverage/**",
             "**/docs/**",
+            ...defaultExclude,
         ],
         expect: {
             poll: { interval: 50, timeout: 1000 },
@@ -165,7 +171,7 @@ const vitestConfig = defineConfig({
         fileParallelism: true,
         globals: true, // Enable global test functions
         include: [
-            "../../shared/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+            "shared/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
         ],
         includeTaskLocation: true, // Parity: enable task location annotations
         isolate: true,
@@ -205,7 +211,7 @@ const vitestConfig = defineConfig({
             groupOrder: 0,
             setupFiles: "parallel",
         },
-        setupFiles: ["../../shared/test/setup.ts"], // Setup files for custom context injection
+        setupFiles: ["shared/test/setup.ts"], // Setup files for custom context injection
         slowTestThreshold: 300,
         testTimeout: 10_000, // 10 second timeout for shared tests
         typecheck: {
@@ -213,10 +219,11 @@ const vitestConfig = defineConfig({
             checker: "tsc",
             enabled: true,
             exclude: [
-                "**/node_modules/**",
-                "**/dist/**",
-                "**/cypress/**",
+                "**/dist*/**",
+                "**/html/**",
+                "**/docs/**",
                 "**/.{idea,git,cache,output,temp}/**",
+                ...defaultExclude,
             ],
             ignoreSourceErrors: false,
             include: ["**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],

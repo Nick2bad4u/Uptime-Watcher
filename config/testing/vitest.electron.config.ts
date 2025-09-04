@@ -10,7 +10,11 @@ import path from "node:path";
 import pc from "picocolors";
 import { normalizePath } from "vite";
 import { type UserConfig } from "vite";
-import { defineConfig } from "vitest/config";
+import {
+    coverageConfigDefaults,
+    defaultExclude,
+    defineConfig,
+} from "vitest/config";
 
 const dirname = import.meta.dirname;
 
@@ -46,10 +50,12 @@ const vitestConfig = defineConfig({
         attachmentsDir: "./.cache/.vitest-attachments-electron",
         bail: 100,
         benchmark: {
-            exclude: ["**/node_modules/**", "**/dist/**"],
-            include: [
-                "../../electron/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}",
+            exclude: [
+                "**/dist*/**",
+                "**/html/**",
+                ...defaultExclude,
             ],
+            include: ["electron/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}"],
             outputJson: "./coverage/electron/bench-results.json",
             reporters: ["default", "verbose"],
         },
@@ -60,37 +66,39 @@ const vitestConfig = defineConfig({
         },
         clearMocks: true,
         coverage: {
-            all: false, // Disable all file coverage, only test loaded files
+            all: false, // Include all source files in coverage
+            allowExternal: false,
+            clean: true, // Clean coverage directory before each run
+            cleanOnRerun: true, // Clean on rerun in watch mode
             exclude: [
-                "../../**/*.config.*",
-                "../../**/*.d.ts",
-                "../../**/dist/**", // Exclude any dist folder anywhere
-                "../../**/docs/**",
-                "../../**/index.ts", // Exclude all barrel export files
-                "../../**/index.tsx", // Exclude JSX barrel export files
-                "../../**/node_modules/**",
-                "../../**/types.ts", // Exclude type definition files
-                "../../**/types.tsx", // Exclude type definition files with JSX
-                "../../coverage/**",
-                "../../dist-electron/**",
-                "../../shared/test",
-                "../../dist-shared/**",
-                "../../dist/**",
-                "../../src/**", // Exclude all src files from electron coverage
-                "../../index.ts", // Barrel export file at root
-                "../../release/**",
-                "../../scripts/**",
-                "../../report/**", // Exclude report files
-                "../../**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-                "../../shared/test/**", // Exclude test directory,
-                "../../**/types/**",
-                "../../**/html/**",
+                "**/*.config.*",
+                "**/*.d.ts",
+                "**/dist/**", // Exclude any dist folder anywhere
+                "**/docs/**",
+                "**/index.ts", // Exclude all barrel export files
+                "**/index.tsx", // Exclude JSX barrel export files
+                "**/node_modules/**",
+                "**/types.ts", // Exclude type definition files
+                "**/types.tsx", // Exclude type definition files with JSX
+                "coverage/**",
+                "dist-electron/**",
+                "shared/test",
+                "dist-shared/**",
+                "dist/**",
+                "src/**", // Exclude all src files from electron coverage
+                "index.ts", // Barrel export file at root
+                "release/**",
+                "scripts/**",
+                "report/**", // Exclude report files
+                "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+                "shared/test/**", // Exclude test directory,
+                "**/types/**",
+                "**/html/**",
+                ...coverageConfigDefaults.exclude,
             ],
             experimentalAstAwareRemapping: true,
             ignoreEmptyLines: true,
-            include: [
-                "../../electron/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-            ],
+            include: ["electron/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}"],
             provider: "v8" as const,
             reporter: [
                 "text",
@@ -134,12 +142,13 @@ const vitestConfig = defineConfig({
         },
         environment: "node",
         exclude: [
-            "**/node_modules/**",
-            "**/dist/**",
+            "**/dist*/**",
+            "**/html/**",
             "**/dist-electron/**",
             "**/src/**",
             "**/coverage/**",
             "**/docs/**",
+            ...defaultExclude,
         ],
         expect: {
             poll: { interval: 50, timeout: 1000 },
@@ -155,7 +164,7 @@ const vitestConfig = defineConfig({
         fileParallelism: true,
         globals: true, // Enable global test functions (describe, it, expect)
         include: [
-            "../../electron/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+            "electron/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
         ],
         includeTaskLocation: true,
         isolate: true,
@@ -195,7 +204,7 @@ const vitestConfig = defineConfig({
             groupOrder: 0,
             setupFiles: "parallel",
         },
-        setupFiles: ["../../electron/test/setup.ts"],
+        setupFiles: ["electron/test/setup.ts"],
         slowTestThreshold: 300,
         testTimeout: 15_000, // Set Vitest timeout to 15 seconds
         typecheck: {
@@ -203,10 +212,10 @@ const vitestConfig = defineConfig({
             checker: "tsc",
             enabled: true,
             exclude: [
-                "**/node_modules/**",
-                "**/dist/**",
-                "**/cypress/**",
+                "**/dist*/**",
+                "**/html/**",
                 "**/.{idea,git,cache,output,temp}/**",
+                ...defaultExclude,
             ],
             ignoreSourceErrors: false,
             include: ["**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],

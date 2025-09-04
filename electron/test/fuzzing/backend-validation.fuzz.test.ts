@@ -21,7 +21,7 @@
 /* eslint-disable no-script-url, prefer-template, unicorn/prefer-string-replace-all, prefer-named-capture-group, arrow-body-style, unicorn/numeric-separators-style, unicorn/better-regex -- Testing malicious patterns and security vulnerabilities */
 
 import { describe, expect, it } from "vitest";
-import * as fc from "fast-check";
+import fc from "fast-check";
 
 describe("Backend Validation Fuzzing Tests", () => {
     describe("Monitor Data Validation", () => {
@@ -37,14 +37,19 @@ describe("Backend Validation Fuzzing Tests", () => {
                         fc.constant(undefined),
                         fc.constant(123),
                         fc.constant({}),
-                        fc.constant([]),
+                        fc.constant([])
                     ),
                     (type: any) => {
                         // Property: type validation should never throw
                         expect(() => {
                             const isValidMonitorType = (t: any): boolean => {
                                 if (typeof t !== "string") return false;
-                                return ["http", "ping", "dns", "tcp"].includes(t.toLowerCase());
+                                return [
+                                    "http",
+                                    "ping",
+                                    "dns",
+                                    "tcp",
+                                ].includes(t.toLowerCase());
                             };
 
                             const result = isValidMonitorType(type);
@@ -64,22 +69,22 @@ describe("Backend Validation Fuzzing Tests", () => {
                             fc.string({ minLength: 0, maxLength: 0 }), // Empty string
                             fc.constant(null),
                             fc.constant(undefined),
-                            fc.string().map(s => s.repeat(1000)), // Very long string
+                            fc.string().map((s) => s.repeat(1000)) // Very long string
                         ),
                         type: fc.oneof(
                             fc.constantFrom("http", "ping", "dns", "tcp"),
                             fc.string(), // Invalid types
                             fc.constant(null),
-                            fc.constant(undefined),
+                            fc.constant(undefined)
                         ),
                         url: fc.oneof(
                             fc.webUrl(),
                             fc.string(),
-                            fc.string().map(s => "javascript:" + s), // XSS attempt
-                            fc.string().map(s => "data:" + s), // Data URL
-                            fc.string().map(s => "file://" + s), // File access attempt
+                            fc.string().map((s) => "javascript:" + s), // XSS attempt
+                            fc.string().map((s) => "data:" + s), // Data URL
+                            fc.string().map((s) => "file://" + s), // File access attempt
                             fc.constant(null),
-                            fc.constant(undefined),
+                            fc.constant(undefined)
                         ),
                     }),
                     (monitorData: any) => {
@@ -92,7 +97,12 @@ describe("Backend Validation Fuzzing Tests", () => {
                                     typeof data.id === "string" &&
                                     data.id.length > 0 &&
                                     typeof data.type === "string" &&
-                                    ["http", "ping", "dns", "tcp"].includes(data.type.toLowerCase())
+                                    [
+                                        "http",
+                                        "ping",
+                                        "dns",
+                                        "tcp",
+                                    ].includes(data.type.toLowerCase())
                                 );
                             };
 
@@ -111,23 +121,28 @@ describe("Backend Validation Fuzzing Tests", () => {
                 fc.property(
                     fc.oneof(
                         fc.webUrl(),
-                        fc.string().map(s => "javascript:" + s),
-                        fc.string().map(s => "data:text/html," + s),
-                        fc.string().map(s => "file:///" + s),
-                        fc.string().map(s => "vbscript:" + s),
-                        fc.string().map(s => s + "/../../../etc/passwd"),
-                        fc.string().map(s => s + "\0"),
-                        fc.string().map(s => s.repeat(10000)),
+                        fc.string().map((s) => "javascript:" + s),
+                        fc.string().map((s) => "data:text/html," + s),
+                        fc.string().map((s) => "file:///" + s),
+                        fc.string().map((s) => "vbscript:" + s),
+                        fc.string().map((s) => s + "/../../../etc/passwd"),
+                        fc.string().map((s) => s + "\0"),
+                        fc.string().map((s) => s.repeat(10000)),
                         fc.string(),
                         fc.constant(""),
                         fc.constant(null),
-                        fc.constant(undefined),
+                        fc.constant(undefined)
                     ),
                     (url: any) => {
                         // Property: URL sanitization should never throw
                         expect(() => {
-                            const sanitizeUrl = (inputUrl: any): string | null => {
-                                if (typeof inputUrl !== "string" || inputUrl.length === 0) {
+                            const sanitizeUrl = (
+                                inputUrl: any
+                            ): string | null => {
+                                if (
+                                    typeof inputUrl !== "string" ||
+                                    inputUrl.length === 0
+                                ) {
                                     return null;
                                 }
 
@@ -135,7 +150,8 @@ describe("Backend Validation Fuzzing Tests", () => {
                                 const cleaned = inputUrl.replace(/\0/g, "");
 
                                 // Check for dangerous schemes
-                                const dangerousSchemes = /^(javascript|data|file|vbscript):/i;
+                                const dangerousSchemes =
+                                    /^(javascript|data|file|vbscript):/i;
                                 if (dangerousSchemes.test(cleaned)) {
                                     return null;
                                 }
@@ -179,19 +195,24 @@ describe("Backend Validation Fuzzing Tests", () => {
                         fc.ipV4(),
                         fc.ipV6(),
                         fc.string(),
-                        fc.string().map(s => s + "'DROP TABLE sites;--"),
-                        fc.string().map(s => s + "\0"),
-                        fc.string().map(s => s + "/../../../etc/passwd"),
-                        fc.string().map(s => s.repeat(1000)),
+                        fc.string().map((s) => s + "'DROP TABLE sites;--"),
+                        fc.string().map((s) => s + "\0"),
+                        fc.string().map((s) => s + "/../../../etc/passwd"),
+                        fc.string().map((s) => s.repeat(1000)),
                         fc.constant(""),
                         fc.constant(null),
-                        fc.constant(undefined),
+                        fc.constant(undefined)
                     ),
                     (host: any) => {
                         // Property: host sanitization should never throw
                         expect(() => {
-                            const sanitizeHost = (inputHost: any): string | null => {
-                                if (typeof inputHost !== "string" || inputHost.length === 0) {
+                            const sanitizeHost = (
+                                inputHost: any
+                            ): string | null => {
+                                if (
+                                    typeof inputHost !== "string" ||
+                                    inputHost.length === 0
+                                ) {
                                     return null;
                                 }
 
@@ -201,7 +222,8 @@ describe("Backend Validation Fuzzing Tests", () => {
                                     .replace(/\.\./g, "");
 
                                 // Check for SQL injection patterns
-                                const sqlPatterns = /(drop\s+table|delete\s+from|insert\s+into)/i;
+                                const sqlPatterns =
+                                    /(drop\s+table|delete\s+from|insert\s+into)/i;
                                 if (sqlPatterns.test(cleaned)) {
                                     return null;
                                 }
@@ -218,16 +240,24 @@ describe("Backend Validation Fuzzing Tests", () => {
 
                             if (sanitized !== null) {
                                 // Property: sanitized hosts should not contain SQL injection patterns
-                                expect(sanitized.toLowerCase()).not.toMatch(/drop\s+table/);
-                                expect(sanitized.toLowerCase()).not.toMatch(/delete\s+from/);
-                                expect(sanitized.toLowerCase()).not.toMatch(/insert\s+into/);
+                                expect(sanitized.toLowerCase()).not.toMatch(
+                                    /drop\s+table/
+                                );
+                                expect(sanitized.toLowerCase()).not.toMatch(
+                                    /delete\s+from/
+                                );
+                                expect(sanitized.toLowerCase()).not.toMatch(
+                                    /insert\s+into/
+                                );
 
                                 // Property: should not contain null bytes or path traversal
                                 expect(sanitized).not.toContain("\0");
                                 expect(sanitized).not.toContain("../");
 
                                 // Property: should have reasonable length
-                                expect(sanitized.length).toBeLessThanOrEqual(253);
+                                expect(sanitized.length).toBeLessThanOrEqual(
+                                    253
+                                );
                             }
                         }).not.toThrow();
                     }
@@ -253,14 +283,18 @@ describe("Backend Validation Fuzzing Tests", () => {
                         fc.string(),
                         fc.constant("123"),
                         fc.constant(""),
-                        fc.constant("abc"),
+                        fc.constant("abc")
                     ),
                     (value: any) => {
                         // Test port validation
                         expect(() => {
                             const isValidPort = (port: any): boolean => {
                                 if (typeof port !== "number") return false;
-                                return Number.isInteger(port) && port >= 1 && port <= 65535;
+                                return (
+                                    Number.isInteger(port) &&
+                                    port >= 1 &&
+                                    port <= 65535
+                                );
                             };
 
                             const result = isValidPort(value);
@@ -271,7 +305,11 @@ describe("Backend Validation Fuzzing Tests", () => {
                         expect(() => {
                             const isValidTimeout = (timeout: any): boolean => {
                                 if (typeof timeout !== "number") return false;
-                                return Number.isFinite(timeout) && timeout > 0 && timeout <= 300_000;
+                                return (
+                                    Number.isFinite(timeout) &&
+                                    timeout > 0 &&
+                                    timeout <= 300_000
+                                );
                             };
 
                             const result = isValidTimeout(value);
@@ -289,18 +327,22 @@ describe("Backend Validation Fuzzing Tests", () => {
                 fc.property(
                     fc.oneof(
                         fc.string(),
-                        fc.string().map(s => s + "'; DROP TABLE sites; --"),
-                        fc.string().map(s => s + "' OR '1'='1"),
-                        fc.string().map(s => s + "; DELETE FROM monitors"),
-                        fc.string().map(s => s + "' UNION SELECT * FROM users"),
-                        fc.string().map(s => s + "'; INSERT INTO"),
-                        fc.string().map(s => s + "\"; UPDATE"),
-                        fc.string().map(s => s + "/*comment*/"),
-                        fc.string(),
+                        fc.string().map((s) => s + "'; DROP TABLE sites; --"),
+                        fc.string().map((s) => s + "' OR '1'='1"),
+                        fc.string().map((s) => s + "; DELETE FROM monitors"),
+                        fc
+                            .string()
+                            .map((s) => s + "' UNION SELECT * FROM users"),
+                        fc.string().map((s) => s + "'; INSERT INTO"),
+                        fc.string().map((s) => s + '"; UPDATE'),
+                        fc.string().map((s) => s + "/*comment*/"),
+                        fc.string()
                     ),
                     (input: string) => {
                         expect(() => {
-                            const containsSqlInjection = (str: string): boolean => {
+                            const containsSqlInjection = (
+                                str: string
+                            ): boolean => {
                                 const patterns = [
                                     /(\b(drop|delete|insert|update|union|select)\b)|(['";])/i,
                                     /--/,
@@ -308,7 +350,9 @@ describe("Backend Validation Fuzzing Tests", () => {
                                     /\*\//,
                                 ];
 
-                                return patterns.some(pattern => pattern.test(str));
+                                return patterns.some((pattern) =>
+                                    pattern.test(str)
+                                );
                             };
 
                             const result = containsSqlInjection(input);

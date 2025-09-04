@@ -2,13 +2,16 @@
  * React Component Array Declaration Mutation Tests
  *
  * @file Tests specifically targeting array declaration mutations in React
- * components, focusing on useEffect, useMemo, and useCallback dependency arrays.
- * Each test verifies that dependency arrays work correctly and would fail if mutated.
+ *   components, focusing on useEffect, useMemo, and useCallback dependency
+ *   arrays. Each test verifies that dependency arrays work correctly and would
+ *   fail if mutated.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-09-03
  *
  * @category Tests
+ *
  * @tags ["mutation-testing", "react", "hooks", "dependency-arrays"]
  */
 
@@ -31,17 +34,24 @@ describe("React Component Array Declaration Mutation Tests", () => {
     });
 
     describe("App.tsx - useEffect and useCallback dependency arrays", () => {
-        it("should have empty dependency arrays for one-time effects (Lines 136, 139)", async ({ task, annotate }) => {
+        it("should have empty dependency arrays for one-time effects (Lines 136, 139)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("File: src/App.tsx", "source");
             await annotate("Lines: 136, 139", "location");
-            await annotate("Mutation: }, []) → }, [\"Stryker was here\"]", "mutation");
+            await annotate(
+                'Mutation: }, []) → }, ["Stryker was here"]',
+                "mutation"
+            );
 
             // Test the useCallback hooks with empty dependency arrays
             // These should run only once during component initialization
 
             const TestComponent = () => {
-                const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
+                const [showLoadingOverlay, setShowLoadingOverlay] =
+                    useState(false);
 
                 // Line 136 - clearLoadingOverlay callback
                 const clearLoadingOverlay = useCallback(() => {
@@ -53,14 +63,19 @@ describe("React Component Array Declaration Mutation Tests", () => {
                     setShowLoadingOverlay(true);
                 }, []); // This dependency array is targeted by mutation
 
-                return { clearLoadingOverlay, showLoadingOverlayCallback, showLoadingOverlay };
+                return {
+                    clearLoadingOverlay,
+                    showLoadingOverlayCallback,
+                    showLoadingOverlay,
+                };
             };
 
             const { result, rerender } = renderHook(TestComponent);
 
             // Get initial callback references
             const initialClearCallback = result.current.clearLoadingOverlay;
-            const initialShowCallback = result.current.showLoadingOverlayCallback;
+            const initialShowCallback =
+                result.current.showLoadingOverlayCallback;
 
             // Rerender the component multiple times
             rerender();
@@ -68,8 +83,12 @@ describe("React Component Array Declaration Mutation Tests", () => {
             rerender();
 
             // With empty dependency arrays, callbacks should remain stable (same reference)
-            expect(result.current.clearLoadingOverlay).toBe(initialClearCallback);
-            expect(result.current.showLoadingOverlayCallback).toBe(initialShowCallback);
+            expect(result.current.clearLoadingOverlay).toBe(
+                initialClearCallback
+            );
+            expect(result.current.showLoadingOverlayCallback).toBe(
+                initialShowCallback
+            );
 
             // Test that callbacks work correctly
             act(() => {
@@ -83,13 +102,20 @@ describe("React Component Array Declaration Mutation Tests", () => {
             expect(result.current.showLoadingOverlay).toBe(false);
         });
 
-        it("should fail if dependency arrays are mutated to contain values", async ({ task, annotate }) => {
+        it("should fail if dependency arrays are mutated to contain values", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
-            await annotate("Verifies callbacks would be recreated unnecessarily", "purpose");
+            await annotate(
+                "Verifies callbacks would be recreated unnecessarily",
+                "purpose"
+            );
 
             // Simulate the mutated behavior with non-empty dependency arrays
             const TestComponentMutated = () => {
-                const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
+                const [showLoadingOverlay, setShowLoadingOverlay] =
+                    useState(false);
 
                 // Mutated version - dependency arrays contain "Stryker was here"
                 const clearLoadingOverlay = useCallback(() => {
@@ -107,7 +133,8 @@ describe("React Component Array Declaration Mutation Tests", () => {
 
             // Get initial callback references
             const initialClearCallback = result.current.clearLoadingOverlay;
-            const initialShowCallback = result.current.showLoadingOverlayCallback;
+            const initialShowCallback =
+                result.current.showLoadingOverlayCallback;
 
             // Rerender the component
             rerender();
@@ -115,18 +142,28 @@ describe("React Component Array Declaration Mutation Tests", () => {
             // With mutated dependency arrays containing constant values,
             // callbacks would still be stable (since "Stryker was here" doesn't change)
             // but this represents incorrect dependency tracking
-            expect(result.current.clearLoadingOverlay).toBe(initialClearCallback);
-            expect(result.current.showLoadingOverlayCallback).toBe(initialShowCallback);
+            expect(result.current.clearLoadingOverlay).toBe(
+                initialClearCallback
+            );
+            expect(result.current.showLoadingOverlayCallback).toBe(
+                initialShowCallback
+            );
 
             // However, the intent is violated - these callbacks don't actually depend
             // on "Stryker was here", indicating a logic error
         });
 
-        it("should handle App initialization effects with empty dependencies (Lines 226, 244)", async ({ task, annotate }) => {
+        it("should handle App initialization effects with empty dependencies (Lines 226, 244)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("File: src/App.tsx", "source");
             await annotate("Lines: 226, 244", "location");
-            await annotate("Mutation: }, []) → }, [\"Stryker was here\"]", "mutation");
+            await annotate(
+                'Mutation: }, []) → }, ["Stryker was here"]',
+                "mutation"
+            );
 
             // Test useEffect hooks that should run only once during app initialization
             let initializationCallCount = 0;
@@ -169,9 +206,15 @@ describe("React Component Array Declaration Mutation Tests", () => {
     });
 
     describe("AddSiteForm.tsx - useCallback dependency arrays", () => {
-        it("should handle monitor type change callback with correct dependencies (Line 169)", async ({ task, annotate }) => {
+        it("should handle monitor type change callback with correct dependencies (Line 169)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("File: src/components/AddSiteForm/AddSiteForm.tsx", "source");
+            await annotate(
+                "File: src/components/AddSiteForm/AddSiteForm.tsx",
+                "source"
+            );
             await annotate("Line: 169", "location");
             await annotate("Mutation: [setMonitorType] → []", "mutation");
 
@@ -183,7 +226,11 @@ describe("React Component Array Declaration Mutation Tests", () => {
                 // Line 169 - handleMonitorTypeChange callback
                 const handleMonitorTypeChange = useCallback(
                     (value: string) => {
-                        if (value === "http" || value === "ping" || value === "dns") {
+                        if (
+                            value === "http" ||
+                            value === "ping" ||
+                            value === "dns"
+                        ) {
                             setMonitorType(value);
                         }
                     },
@@ -215,7 +262,10 @@ describe("React Component Array Declaration Mutation Tests", () => {
             expect(result.current.monitorType).toBe("dns"); // Should remain unchanged
         });
 
-        it("should fail if setMonitorType dependency is mutated to empty array", async ({ task, annotate }) => {
+        it("should fail if setMonitorType dependency is mutated to empty array", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
             await annotate("Verifies callback might become stale", "purpose");
 
@@ -226,7 +276,11 @@ describe("React Component Array Declaration Mutation Tests", () => {
                 // Mutated version - empty dependency array
                 const handleMonitorTypeChange = useCallback(
                     (value: string) => {
-                        if (value === "http" || value === "ping" || value === "dns") {
+                        if (
+                            value === "http" ||
+                            value === "ping" ||
+                            value === "dns"
+                        ) {
                             setMonitorType(value);
                         }
                     },
@@ -251,9 +305,15 @@ describe("React Component Array Declaration Mutation Tests", () => {
             // and could cause issues in complex scenarios or with React optimizations
         });
 
-        it("should handle check interval change callback with correct dependencies (Line 181)", async ({ task, annotate }) => {
+        it("should handle check interval change callback with correct dependencies (Line 181)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("File: src/components/AddSiteForm/AddSiteForm.tsx", "source");
+            await annotate(
+                "File: src/components/AddSiteForm/AddSiteForm.tsx",
+                "source"
+            );
             await annotate("Line: 181", "location");
             await annotate("Mutation: [setCheckInterval] → []", "mutation");
 
@@ -303,11 +363,20 @@ describe("React Component Array Declaration Mutation Tests", () => {
             expect(result.current.checkInterval).toBe(15_000); // Should remain unchanged (negative)
         });
 
-        it("should handle form success callback with multiple dependencies (Line 188)", async ({ task, annotate }) => {
+        it("should handle form success callback with multiple dependencies (Line 188)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("File: src/components/AddSiteForm/AddSiteForm.tsx", "source");
+            await annotate(
+                "File: src/components/AddSiteForm/AddSiteForm.tsx",
+                "source"
+            );
             await annotate("Line: 188", "location");
-            await annotate("Mutation: }, [onSuccess, resetForm]) → }, []", "mutation");
+            await annotate(
+                "Mutation: }, [onSuccess, resetForm]) → }, []",
+                "mutation"
+            );
 
             // Test useCallback with multiple dependencies
 
@@ -345,11 +414,17 @@ describe("React Component Array Declaration Mutation Tests", () => {
     });
 
     describe("Component State Array Initialization", () => {
-        it("should initialize component arrays as empty (Lines 333, 342)", async ({ task, annotate }) => {
+        it("should initialize component arrays as empty (Lines 333, 342)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("File: src/components/AddSiteForm/AddSiteForm.tsx", "source");
+            await annotate(
+                "File: src/components/AddSiteForm/AddSiteForm.tsx",
+                "source"
+            );
             await annotate("Lines: 333, 342", "location");
-            await annotate("Mutation: [] → [\"Stryker was here\"]", "mutation");
+            await annotate('Mutation: [] → ["Stryker was here"]', "mutation");
 
             // Test component state arrays that should initialize as empty
 
@@ -357,14 +432,16 @@ describe("React Component Array Declaration Mutation Tests", () => {
                 // Lines 333, 342 - empty array initializations
                 const [errors, setErrors] = useState<string[]>([]);
                 const [warnings, setWarnings] = useState<string[]>([]);
-                const [validationMessages, setValidationMessages] = useState<string[]>([]);
+                const [validationMessages, setValidationMessages] = useState<
+                    string[]
+                >([]);
 
                 const addError = (error: string) => {
-                    setErrors(prev => [...prev, error]);
+                    setErrors((prev) => [...prev, error]);
                 };
 
                 const addWarning = (warning: string) => {
-                    setWarnings(prev => [...prev, warning]);
+                    setWarnings((prev) => [...prev, warning]);
                 };
 
                 return {
@@ -372,7 +449,7 @@ describe("React Component Array Declaration Mutation Tests", () => {
                     warnings,
                     validationMessages,
                     addError,
-                    addWarning
+                    addWarning,
                 };
             };
 
@@ -399,16 +476,28 @@ describe("React Component Array Declaration Mutation Tests", () => {
             expect(result.current.warnings).toEqual(["Test warning"]);
         });
 
-        it("should fail if state arrays are mutated to start with data", async ({ task, annotate }) => {
+        it("should fail if state arrays are mutated to start with data", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
-            await annotate("Verifies component would start with invalid state", "purpose");
+            await annotate(
+                "Verifies component would start with invalid state",
+                "purpose"
+            );
 
             // Simulate the mutated behavior
             const TestStateArrayMutated = () => {
                 // Mutated version - arrays start with "Stryker was here"
-                const [errors, setErrors] = useState<string[]>(["Stryker was here"]);
-                const [warnings, setWarnings] = useState<string[]>(["Stryker was here"]);
-                const [validationMessages, setValidationMessages] = useState<string[]>(["Stryker was here"]);
+                const [errors, setErrors] = useState<string[]>([
+                    "Stryker was here",
+                ]);
+                const [warnings, setWarnings] = useState<string[]>([
+                    "Stryker was here",
+                ]);
+                const [validationMessages, setValidationMessages] = useState<
+                    string[]
+                >(["Stryker was here"]);
 
                 return { errors, warnings, validationMessages };
             };
@@ -422,7 +511,9 @@ describe("React Component Array Declaration Mutation Tests", () => {
 
             expect(result.current.errors).toContain("Stryker was here");
             expect(result.current.warnings).toContain("Stryker was here");
-            expect(result.current.validationMessages).toContain("Stryker was here");
+            expect(result.current.validationMessages).toContain(
+                "Stryker was here"
+            );
 
             expect(result.current.errors).toHaveLength(1);
             expect(result.current.warnings).toHaveLength(1);
@@ -434,7 +525,10 @@ describe("React Component Array Declaration Mutation Tests", () => {
     });
 
     describe("useMemo dependency arrays", () => {
-        it("should memoize values with correct dependencies", async ({ task, annotate }) => {
+        it("should memoize values with correct dependencies", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMemo hooks", "component");
             await annotate("Type: Dependency arrays", "type");
@@ -475,7 +569,10 @@ describe("React Component Array Declaration Mutation Tests", () => {
             expect(computationCount).toBe(2); // No additional computation
         });
 
-        it("should fail if useMemo dependencies are mutated incorrectly", async ({ task, annotate }) => {
+        it("should fail if useMemo dependencies are mutated incorrectly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
             await annotate("Verifies memoization would be broken", "purpose");
 

@@ -20,7 +20,10 @@ vi.mock("../../electronUtils", () => ({
     isDev: vi.fn(() => true),
 }));
 
-import { withIpcHandler, withIpcHandlerValidation } from "../../../services/ipc/utils";
+import {
+    withIpcHandler,
+    withIpcHandlerValidation,
+} from "../../../services/ipc/utils";
 import { logger as mockLogger } from "../../../utils/logger";
 
 describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => {
@@ -58,7 +61,8 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
 
             // If mutation (Date.now() + startTime) was applied, we'd get 2750ms instead of 750ms
             expect(result.metadata?.duration).not.toBe(2750);
-        });        it("should calculate duration correctly for failed operations", async () => {
+        });
+        it("should calculate duration correctly for failed operations", async () => {
             const error = new Error("Test error");
             const handler = vi.fn().mockRejectedValue(error);
 
@@ -157,7 +161,9 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
 
         it("should not calculate duration for validation failures (early return)", async () => {
             const handler = vi.fn();
-            const validateParams = vi.fn().mockReturnValue(["Invalid parameter"]);
+            const validateParams = vi
+                .fn()
+                .mockReturnValue(["Invalid parameter"]);
 
             const result = await withIpcHandlerValidation(
                 "validate-channel",

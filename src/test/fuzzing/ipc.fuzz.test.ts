@@ -19,7 +19,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import * as fc from "fast-check";
+import fc from "fast-check";
 
 import {
     isIpcResponse,

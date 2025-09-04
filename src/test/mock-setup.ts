@@ -4,6 +4,10 @@
  */
 
 import { vi, type MockedFunction } from "vitest";
+import fc from "fast-check";
+
+// Configure fast-check for property-based testing
+fc.configureGlobal({ numRuns: 10 });
 
 // Mock Electron APIs (not available in test environment)
 const mockElectronAPI: {

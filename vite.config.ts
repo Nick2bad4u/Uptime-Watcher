@@ -24,6 +24,7 @@ import electron from "vite-plugin-electron";
 import { ViteMcp } from "vite-plugin-mcp";
 import packageVersion from "vite-plugin-package-version";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+import { coverageConfigDefaults, defaultExclude } from "vitest/config";
 
 import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
 
@@ -544,7 +545,11 @@ export default defineConfig(({ mode }) => {
             attachmentsDir: "./.cache/.vitest-attachments",
             bail: 100, // Stop after 100 failures to avoid excessive output
             benchmark: {
-                exclude: ["**/node_modules/**", "**/dist/**"],
+                exclude: [
+                    "**/dist*/**",
+                    "**/html/**",
+                    ...defaultExclude,
+                ],
                 include: [
                     "benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
                 ],
@@ -560,7 +565,9 @@ export default defineConfig(({ mode }) => {
             // Enable detailed code coverage analysis
             coverage: {
                 all: true, // Include all source files in coverage
+                allowExternal: false,
                 clean: true, // Clean coverage directory before each run
+                cleanOnRerun: true, // Clean on rerun in watch mode
                 exclude: [
                     "**/*.config.*",
                     "**/*.d.ts",
@@ -589,6 +596,8 @@ export default defineConfig(({ mode }) => {
                     "stryker_prompts_by_mutator/**",
                     "**/types/**",
                     "**/html/**",
+                    "**/config/**",
+                    ...coverageConfigDefaults.exclude,
                 ],
                 excludeAfterRemap: true, // Exclude files after remapping for accuracy
                 experimentalAstAwareRemapping: true, // Enable AST-aware remapping for accurate coverage
@@ -650,6 +659,7 @@ export default defineConfig(({ mode }) => {
                 "**/dist-electron/**",
                 "electron/**",
                 "**/coverage/**",
+                ...defaultExclude,
             ],
             expect: {
                 poll: { interval: 50, timeout: 1000 },
@@ -719,10 +729,10 @@ export default defineConfig(({ mode }) => {
                 checker: "tsc",
                 enabled: true,
                 exclude: [
-                    "**/node_modules/**",
-                    "**/dist/**",
-                    "**/cypress/**",
+                    "**/dist*/**",
+                    "**/html/**",
                     "**/.{idea,git,cache,output,temp}/**",
+                    ...defaultExclude,
                 ],
                 ignoreSourceErrors: false,
                 include: ["**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],

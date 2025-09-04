@@ -2,13 +2,15 @@
  * Specific Array Declaration Mutation Tests
  *
  * @file Tests specifically targeting the exact array declaration mutations
- * identified in the Stryker mutation testing prompts. Each test targets
- * a specific file and line number mutation to ensure it's properly killed.
+ *   identified in the Stryker mutation testing prompts. Each test targets a
+ *   specific file and line number mutation to ensure it's properly killed.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-09-03
  *
  * @category Tests
+ *
  * @tags ["mutation-testing", "array-declaration", "stryker", "specific-mutations"]
  */
 
@@ -19,8 +21,8 @@ import { Database } from "node-sqlite3-wasm";
 vi.mock("../services/database/DatabaseService", () => ({
     DatabaseService: vi.fn(() => ({
         executeTransaction: vi.fn(),
-        db: vi.fn()
-    }))
+        db: vi.fn(),
+    })),
 }));
 
 describe("Specific Array Declaration Mutation Tests", () => {
@@ -35,15 +37,15 @@ describe("Specific Array Declaration Mutation Tests", () => {
             run: vi.fn(),
             prepare: vi.fn(() => ({
                 run: vi.fn(),
-                finalize: vi.fn()
+                finalize: vi.fn(),
             })),
             exec: vi.fn(),
-            transaction: vi.fn()
+            transaction: vi.fn(),
         };
 
         // Setup mock event emitter
         mockEventEmitter = {
-            emitTyped: vi.fn()
+            emitTyped: vi.fn(),
         };
     });
 
@@ -52,17 +54,26 @@ describe("Specific Array Declaration Mutation Tests", () => {
     });
 
     describe("SiteManager.ts Line 365 - updatedFields array", () => {
-        it("should emit site updated event with monitors field in updatedFields array", async ({ task, annotate }) => {
+        it("should emit site updated event with monitors field in updatedFields array", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("File: electron/managers/SiteManager.ts", "source");
             await annotate("Line: 365", "location");
-            await annotate("Mutation: updatedFields: [\"monitors\"] → []", "mutation");
+            await annotate(
+                'Mutation: updatedFields: ["monitors"] → []',
+                "mutation"
+            );
 
             // This test targets the specific mutation:
             // updatedFields: ["monitors"] → []
 
             // Mock the SiteManager event emission behavior
-            async function emitSiteUpdatedEvent(siteIdentifier: string, updatedSite: any) {
+            async function emitSiteUpdatedEvent(
+                siteIdentifier: string,
+                updatedSite: any
+            ) {
                 // This is the actual code pattern from line 365
                 await mockEventEmitter.emitTyped("internal:site:updated", {
                     identifier: siteIdentifier,
@@ -85,7 +96,7 @@ describe("Specific Array Declaration Mutation Tests", () => {
                     identifier: siteIdentifier,
                     operation: "updated",
                     site: updatedSite,
-                    updatedFields: ["monitors"] // Must contain "monitors"
+                    updatedFields: ["monitors"], // Must contain "monitors"
                 })
             );
 
@@ -97,12 +108,21 @@ describe("Specific Array Declaration Mutation Tests", () => {
             expect(emittedEvent.updatedFields).toHaveLength(1);
         });
 
-        it("should fail if updatedFields is mutated to empty array", async ({ task, annotate }) => {
+        it("should fail if updatedFields is mutated to empty array", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
-            await annotate("Verifies mutation would break functionality", "purpose");
+            await annotate(
+                "Verifies mutation would break functionality",
+                "purpose"
+            );
 
             // Simulate the mutated behavior
-            async function emitSiteUpdatedEventMutated(siteIdentifier: string, updatedSite: any) {
+            async function emitSiteUpdatedEventMutated(
+                siteIdentifier: string,
+                updatedSite: any
+            ) {
                 await mockEventEmitter.emitTyped("internal:site:updated", {
                     identifier: siteIdentifier,
                     operation: "updated",
@@ -129,9 +149,15 @@ describe("Specific Array Declaration Mutation Tests", () => {
     });
 
     describe("HistoryRepository.ts Line 202 - stmt.run parameter array", () => {
-        it("should pass correct parameters array to database statement", async ({ task, annotate }) => {
+        it("should pass correct parameters array to database statement", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("File: electron/services/database/HistoryRepository.ts", "source");
+            await annotate(
+                "File: electron/services/database/HistoryRepository.ts",
+                "source"
+            );
             await annotate("Line: 202", "location");
             await annotate("Mutation: stmt.run([ → []", "mutation");
 
@@ -140,7 +166,7 @@ describe("Specific Array Declaration Mutation Tests", () => {
 
             const mockStmt = {
                 run: vi.fn(),
-                finalize: vi.fn()
+                finalize: vi.fn(),
             };
             mockDb.prepare.mockReturnValue(mockStmt);
 
@@ -169,20 +195,22 @@ describe("Specific Array Declaration Mutation Tests", () => {
                     timestamp: Date.now(),
                     status: "up",
                     responseTime: 250,
-                    details: "OK"
+                    details: "OK",
                 },
                 {
                     timestamp: Date.now() + 1000,
                     status: "down",
                     responseTime: null,
-                    details: "Timeout"
-                }
+                    details: "Timeout",
+                },
             ];
 
             insertHistoryEntries(testEntries);
 
             // Verify the statement was prepared
-            expect(mockDb.prepare).toHaveBeenCalledWith("INSERT INTO history ...");
+            expect(mockDb.prepare).toHaveBeenCalledWith(
+                "INSERT INTO history ..."
+            );
 
             // Verify stmt.run was called with correct parameters for each entry
             expect(mockStmt.run).toHaveBeenCalledTimes(2);
@@ -193,7 +221,7 @@ describe("Specific Array Declaration Mutation Tests", () => {
                 testEntries[0].timestamp,
                 "up",
                 250,
-                "OK"
+                "OK",
             ]);
 
             // Check second entry parameters
@@ -202,7 +230,7 @@ describe("Specific Array Declaration Mutation Tests", () => {
                 testEntries[1].timestamp,
                 "down",
                 null,
-                "Timeout"
+                "Timeout",
             ]);
 
             // Verify the parameters arrays are not empty
@@ -215,13 +243,19 @@ describe("Specific Array Declaration Mutation Tests", () => {
             expect(secondCallArgs).toHaveLength(5);
         });
 
-        it("should fail if stmt.run parameters are mutated to empty array", async ({ task, annotate }) => {
+        it("should fail if stmt.run parameters are mutated to empty array", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
-            await annotate("Verifies database corruption would occur", "purpose");
+            await annotate(
+                "Verifies database corruption would occur",
+                "purpose"
+            );
 
             const mockStmt = {
                 run: vi.fn(),
-                finalize: vi.fn()
+                finalize: vi.fn(),
             };
             mockDb.prepare.mockReturnValue(mockStmt);
 
@@ -244,8 +278,8 @@ describe("Specific Array Declaration Mutation Tests", () => {
                     timestamp: Date.now(),
                     status: "up",
                     responseTime: 250,
-                    details: "OK"
-                }
+                    details: "OK",
+                },
             ];
 
             insertHistoryEntriesMutated(testEntries);
@@ -263,11 +297,20 @@ describe("Specific Array Declaration Mutation Tests", () => {
     });
 
     describe("MonitorRepository.ts Line 537 - activeOperations clear", () => {
-        it("should clear active operations with empty array", async ({ task, annotate }) => {
+        it("should clear active operations with empty array", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("File: electron/services/database/MonitorRepository.ts", "source");
+            await annotate(
+                "File: electron/services/database/MonitorRepository.ts",
+                "source"
+            );
             await annotate("Line: 537", "location");
-            await annotate("Mutation: { activeOperations: [] } → { activeOperations: [\"Stryker was here\"] }", "mutation");
+            await annotate(
+                'Mutation: { activeOperations: [] } → { activeOperations: ["Stryker was here"] }',
+                "mutation"
+            );
 
             // This test targets the mutation where clearing active operations
             // gets mutated from [] to ["Stryker was here"]
@@ -278,10 +321,10 @@ describe("Specific Array Declaration Mutation Tests", () => {
                 const updateData = { activeOperations: [] };
 
                 // Simulate the database update
-                mockDb.run("UPDATE monitors SET activeOperations = ? WHERE id = ?", [
-                    JSON.stringify(updateData.activeOperations),
-                    monitorId
-                ]);
+                mockDb.run(
+                    "UPDATE monitors SET activeOperations = ? WHERE id = ?",
+                    [JSON.stringify(updateData.activeOperations), monitorId]
+                );
 
                 return updateData;
             }
@@ -300,19 +343,25 @@ describe("Specific Array Declaration Mutation Tests", () => {
             );
         });
 
-        it("should fail if activeOperations is mutated to contain data", async ({ task, annotate }) => {
+        it("should fail if activeOperations is mutated to contain data", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
-            await annotate("Verifies operations would not be properly cleared", "purpose");
+            await annotate(
+                "Verifies operations would not be properly cleared",
+                "purpose"
+            );
 
             // Simulate the mutated behavior
             function clearActiveOperationsMutated(monitorId: string) {
                 // This is the mutation
                 const updateData = { activeOperations: ["Stryker was here"] };
 
-                mockDb.run("UPDATE monitors SET activeOperations = ? WHERE id = ?", [
-                    JSON.stringify(updateData.activeOperations),
-                    monitorId
-                ]);
+                mockDb.run(
+                    "UPDATE monitors SET activeOperations = ? WHERE id = ?",
+                    [JSON.stringify(updateData.activeOperations), monitorId]
+                );
 
                 return updateData;
             }
@@ -329,15 +378,21 @@ describe("Specific Array Declaration Mutation Tests", () => {
             // Operations would remain "active" when they should be cleared
             expect(mockDb.run).toHaveBeenCalledWith(
                 "UPDATE monitors SET activeOperations = ? WHERE id = ?",
-                ["[\"Stryker was here\"]", monitorId]
+                ['["Stryker was here"]', monitorId]
             );
         });
     });
 
     describe("MonitorRepository.ts Line 636 - siteIdentifier parameter", () => {
-        it("should pass siteIdentifier in parameter array for query", async ({ task, annotate }) => {
+        it("should pass siteIdentifier in parameter array for query", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("File: electron/services/database/MonitorRepository.ts", "source");
+            await annotate(
+                "File: electron/services/database/MonitorRepository.ts",
+                "source"
+            );
             await annotate("Line: 636", "location");
             await annotate("Mutation: [siteIdentifier] → []", "mutation");
 
@@ -364,7 +419,10 @@ describe("Specific Array Declaration Mutation Tests", () => {
             expect(result[0]).toHaveProperty("id");
         });
 
-        it("should fail if siteIdentifier parameter array is mutated to empty", async ({ task, annotate }) => {
+        it("should fail if siteIdentifier parameter array is mutated to empty", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
             await annotate("Verifies incorrect query parameters", "purpose");
 
@@ -375,7 +433,12 @@ describe("Specific Array Declaration Mutation Tests", () => {
                 parameterArray = params;
                 // Empty parameters would return all monitors (wrong behavior)
                 if (params.length === 0) {
-                    return [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }]; // All monitors
+                    return [
+                        { id: 1 },
+                        { id: 2 },
+                        { id: 3 },
+                        { id: 4 },
+                    ]; // All monitors
                 }
                 return [{ id: 1 }]; // Only the site's monitors
             }
@@ -401,11 +464,20 @@ describe("Specific Array Declaration Mutation Tests", () => {
     });
 
     describe("MonitorRepository.ts Line 738-739 - updateFields and updateValues arrays", () => {
-        it("should initialize update arrays as empty and populate them correctly", async ({ task, annotate }) => {
+        it("should initialize update arrays as empty and populate them correctly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("File: electron/services/database/MonitorRepository.ts", "source");
+            await annotate(
+                "File: electron/services/database/MonitorRepository.ts",
+                "source"
+            );
             await annotate("Lines: 738-739", "location");
-            await annotate("Mutation: const array = [] → [\"Stryker was here\"]", "mutation");
+            await annotate(
+                'Mutation: const array = [] → ["Stryker was here"]',
+                "mutation"
+            );
 
             // This targets mutations where empty array initialization gets mutated
 
@@ -426,7 +498,7 @@ describe("Specific Array Declaration Mutation Tests", () => {
             const updates = {
                 name: "Updated Monitor",
                 timeout: 30_000,
-                status: "active"
+                status: "active",
             };
 
             const result = buildUpdateQuery(updates);
@@ -435,13 +507,13 @@ describe("Specific Array Declaration Mutation Tests", () => {
             expect(result.updateFields).toEqual([
                 "name = ?",
                 "timeout = ?",
-                "status = ?"
+                "status = ?",
             ]);
 
             expect(result.updateValues).toEqual([
                 "Updated Monitor",
                 30_000,
-                "active"
+                "active",
             ]);
 
             expect(result.updateFields).toHaveLength(3);
@@ -452,7 +524,10 @@ describe("Specific Array Declaration Mutation Tests", () => {
             expect(result.updateValues).not.toContain("Stryker was here");
         });
 
-        it("should fail if update arrays are mutated to start with pollution", async ({ task, annotate }) => {
+        it("should fail if update arrays are mutated to start with pollution", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
             await annotate("Verifies SQL query would be corrupted", "purpose");
 
@@ -473,7 +548,7 @@ describe("Specific Array Declaration Mutation Tests", () => {
 
             const updates = {
                 name: "Updated Monitor",
-                status: "active"
+                status: "active",
             };
 
             const result = buildUpdateQueryMutated(updates);
@@ -485,13 +560,13 @@ describe("Specific Array Declaration Mutation Tests", () => {
             expect(result.updateFields).toEqual([
                 "Stryker was here",
                 "name = ?",
-                "status = ?"
+                "status = ?",
             ]);
 
             expect(result.updateValues).toEqual([
                 "Stryker was here",
                 "Updated Monitor",
-                "active"
+                "active",
             ]);
 
             // This would break the SQL query generation

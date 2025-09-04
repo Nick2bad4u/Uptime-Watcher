@@ -1,8 +1,9 @@
 /**
  * Simplified 100% test coverage for useMonitorTypesStore
  *
- * This test suite provides comprehensive coverage focusing on actual functionality
- * rather than mock complexity, ensuring all code paths are exercised.
+ * This test suite provides comprehensive coverage focusing on actual
+ * functionality rather than mock complexity, ensuring all code paths are
+ * exercised.
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
@@ -127,7 +128,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             });
 
             expect(result.current.monitorTypes).toEqual(mockConfigs);
-            expect(result.current.fieldConfigs.http).toEqual(mockConfigs[0]!.fields);
+            expect(result.current.fieldConfigs.http).toEqual(
+                mockConfigs[0]!.fields
+            );
             expect(result.current.isLoaded).toBe(true);
             expect(result.current.isLoading).toBe(false);
             expect(result.current.lastError).toBeUndefined();
@@ -137,7 +140,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
     describe("Error Handling and Edge Cases", () => {
         it("should handle loading errors properly", async () => {
             const testError = new Error("Loading failed");
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockRejectedValue(testError);
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockRejectedValue(
+                testError
+            );
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
@@ -187,7 +192,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
         });
 
         it("should handle safeExtractIpcData returning fallback", async () => {
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(null);
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
+                null
+            );
             mockSafeExtractIpcData.mockReturnValue([]); // Fallback value
 
             const { result } = renderHook(() => useMonitorTypesStore());
@@ -211,15 +218,20 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 metadata: {},
             };
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(mockResult);
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
+                mockResult
+            );
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
             let validationResult: ValidationResult;
             await act(async () => {
-                validationResult = await result.current.validateMonitorData("http", {
-                    url: "https://example.com",
-                });
+                validationResult = await result.current.validateMonitorData(
+                    "http",
+                    {
+                        url: "https://example.com",
+                    }
+                );
             });
 
             expect(validationResult!).toEqual(mockResult);
@@ -233,13 +245,18 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 // Missing warnings and metadata
             };
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(mockResult);
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
+                mockResult
+            );
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
             let validationResult: ValidationResult;
             await act(async () => {
-                validationResult = await result.current.validateMonitorData("http", {});
+                validationResult = await result.current.validateMonitorData(
+                    "http",
+                    {}
+                );
             });
 
             expect(validationResult!.success).toBe(false);
@@ -250,7 +267,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
         it("should handle validation errors", async () => {
             const testError = new Error("Validation service unavailable");
-            mockElectronAPI.monitorTypes.validateMonitorData.mockRejectedValue(testError);
+            mockElectronAPI.monitorTypes.validateMonitorData.mockRejectedValue(
+                testError
+            );
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
@@ -262,21 +281,28 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 }
             });
 
-            expect(result.current.lastError).toBe("Validation service unavailable");
+            expect(result.current.lastError).toBe(
+                "Validation service unavailable"
+            );
         });
     });
 
     describe("Formatting Operations", () => {
         it("should format monitor details successfully", async () => {
             const formattedDetail = "Formatted detail text";
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(formattedDetail);
+            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(
+                formattedDetail
+            );
             mockSafeExtractIpcData.mockReturnValue(formattedDetail);
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
             let formatted: string;
             await act(async () => {
-                formatted = await result.current.formatMonitorDetail("http", "raw detail");
+                formatted = await result.current.formatMonitorDetail(
+                    "http",
+                    "raw detail"
+                );
             });
 
             expect(formatted!).toBe(formattedDetail);
@@ -284,7 +310,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
         it("should handle format detail errors", async () => {
             const testError = new Error("Format service error");
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockRejectedValue(testError);
+            mockElectronAPI.monitorTypes.formatMonitorDetail.mockRejectedValue(
+                testError
+            );
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
@@ -301,31 +329,41 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
         it("should format monitor title suffix", async () => {
             const suffix = " - example.com";
-            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(suffix);
+            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
+                suffix
+            );
             mockSafeExtractIpcData.mockReturnValue(suffix);
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
             let formatted: string;
             await act(async () => {
-                formatted = await result.current.formatMonitorTitleSuffix("http", {
-                    id: "test",
-                    url: "https://example.com",
-                } as Monitor);
+                formatted = await result.current.formatMonitorTitleSuffix(
+                    "http",
+                    {
+                        id: "test",
+                        url: "https://example.com",
+                    } as Monitor
+                );
             });
 
             expect(formatted!).toBe(suffix);
         });
 
         it("should handle fallback values for formatting", async () => {
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(null);
+            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(
+                null
+            );
             mockSafeExtractIpcData.mockReturnValue("fallback");
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
             let formatted: string;
             await act(async () => {
-                formatted = await result.current.formatMonitorDetail("http", "details");
+                formatted = await result.current.formatMonitorDetail(
+                    "http",
+                    "details"
+                );
             });
 
             expect(formatted!).toBe("fallback");
@@ -387,7 +425,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             const config = result.current.getFieldConfig("http" as MonitorType);
             expect(config).toEqual(testFields);
 
-            const nonExistent = result.current.getFieldConfig("nonexistent" as MonitorType);
+            const nonExistent = result.current.getFieldConfig(
+                "nonexistent" as MonitorType
+            );
             expect(nonExistent).toBeUndefined();
         });
 
@@ -432,7 +472,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             });
 
             // Should not call the API since already loaded
-            expect(mockElectronAPI.monitorTypes.getMonitorTypes).not.toHaveBeenCalled();
+            expect(
+                mockElectronAPI.monitorTypes.getMonitorTypes
+            ).not.toHaveBeenCalled();
         });
 
         it("should reload if there was an error", async () => {
@@ -457,7 +499,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             });
 
             // Should call the API to reload due to error
-            expect(mockElectronAPI.monitorTypes.getMonitorTypes).toHaveBeenCalled();
+            expect(
+                mockElectronAPI.monitorTypes.getMonitorTypes
+            ).toHaveBeenCalled();
         });
     });
 
@@ -499,7 +543,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 metadata: {},
             };
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(mockResult);
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
+                mockResult
+            );
 
             await act(async () => {
                 await result.current.validateMonitorData("http", {});
@@ -588,7 +634,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             });
 
             expect(result.current.monitorTypes).toHaveLength(1);
-            expect(result.current.monitorTypes[0]!.type).toBe("special-chars-!@#$%");
+            expect(result.current.monitorTypes[0]!.type).toBe(
+                "special-chars-!@#$%"
+            );
         });
     });
 });

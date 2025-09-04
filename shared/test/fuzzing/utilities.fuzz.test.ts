@@ -3,9 +3,9 @@
  *
  * @remarks
  * Tests shared utility functions, type validation, and common functionality
- * using property-based testing with fast-check. Validates that shared
- * utilities handle malformed input, edge cases, and maintain type safety
- * across different scenarios.
+ * using property-based testing with fast-check. Validates that shared utilities
+ * handle malformed input, edge cases, and maintain type safety across different
+ * scenarios.
  *
  * Key areas tested:
  *
@@ -19,7 +19,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import * as fc from "fast-check";
+import fc from "fast-check";
 
 describe("Shared Utilities Fuzzing Tests", () => {
     describe("String Validation", () => {
@@ -35,11 +35,14 @@ describe("Shared Utilities Fuzzing Tests", () => {
                         fc.constant(false),
                         fc.constant({}),
                         fc.constant([]),
-                        fc.string().map(s => s.repeat(10_000)), // Very long string
+                        fc.string().map((s) => s.repeat(10_000)) // Very long string
                     ),
                     (input: any) => {
                         expect(() => {
-                            const isValidString = (value: any): value is string => typeof value === "string" && value.length > 0;
+                            const isValidString = (
+                                value: any
+                            ): value is string =>
+                                typeof value === "string" && value.length > 0;
 
                             const result = isValidString(input);
                             expect(typeof result).toBe("boolean");
@@ -54,15 +57,17 @@ describe("Shared Utilities Fuzzing Tests", () => {
                 fc.property(
                     fc.oneof(
                         fc.string(),
-                        fc.string().map(s => `${s  }<script>alert('xss')</script>`),
-                        fc.string().map(s => `${s  }javascript:void(0)`),
-                        fc.string().map(s => `${s  }\0\r\n`),
-                        fc.string().map(s => `${s  }../../../etc/passwd`),
-                        fc.string().map(s => `${s  }\${process.env.SECRET}`),
-                        fc.string().map(s => s.repeat(1000)),
+                        fc
+                            .string()
+                            .map((s) => `${s}<script>alert('xss')</script>`),
+                        fc.string().map((s) => `${s}javascript:void(0)`),
+                        fc.string().map((s) => `${s}\0\r\n`),
+                        fc.string().map((s) => `${s}../../../etc/passwd`),
+                        fc.string().map((s) => `${s}\${process.env.SECRET}`),
+                        fc.string().map((s) => s.repeat(1000)),
                         fc.constant(""),
                         fc.constant(null),
-                        fc.constant(undefined),
+                        fc.constant(undefined)
                     ),
                     (input: any) => {
                         expect(() => {
@@ -73,7 +78,10 @@ describe("Shared Utilities Fuzzing Tests", () => {
 
                                 // Remove null bytes and control characters
                                 // eslint-disable-next-line no-control-regex
-                                const cleaned = value.replaceAll(/[\0-\u001F\u007F]/g, "");
+                                const cleaned = value.replaceAll(
+                                    /[\0-\u001F\u007F]/g,
+                                    ""
+                                );
 
                                 // Limit length and return
                                 return cleaned.slice(0, 1000);
@@ -104,29 +112,34 @@ describe("Shared Utilities Fuzzing Tests", () => {
                     fc.oneof(
                         fc.webUrl(),
                         fc.string(),
-                        fc.string().map(s => `https://${  s}`),
-                        fc.string().map(s => `https://${  s}`),
-                        fc.string().map(s => `ftp://${  s}`),
-                        fc.string().map(s => `javascript:${  s}`),
-                        fc.string().map(s => `data:${  s}`),
-                        fc.string().map(s => `file://${  s}`),
+                        fc.string().map((s) => `https://${s}`),
+                        fc.string().map((s) => `https://${s}`),
+                        fc.string().map((s) => `ftp://${s}`),
+                        fc.string().map((s) => `javascript:${s}`),
+                        fc.string().map((s) => `data:${s}`),
+                        fc.string().map((s) => `file://${s}`),
                         fc.constant(""),
                         fc.constant(null),
                         fc.constant(undefined),
                         fc.constant("not-a-url"),
                         fc.constant("http://"),
-                        fc.constant("://example.com"),
+                        fc.constant("://example.com")
                     ),
                     (input: any) => {
                         expect(() => {
                             const isValidUrl = (url: any): boolean => {
-                                if (typeof url !== "string" || url.length === 0) {
+                                if (
+                                    typeof url !== "string" ||
+                                    url.length === 0
+                                ) {
                                     return false;
                                 }
 
                                 try {
                                     const parsed = new URL(url);
-                                    return ["http:", "https:"].includes(parsed.protocol);
+                                    return ["http:", "https:"].includes(
+                                        parsed.protocol
+                                    );
                                 } catch {
                                     return false;
                                 }
@@ -147,9 +160,21 @@ describe("Shared Utilities Fuzzing Tests", () => {
                 fc.property(
                     fc.oneof(
                         fc.record({
-                            timeout: fc.oneof(fc.integer(), fc.string(), fc.constant(null)),
-                            retries: fc.oneof(fc.integer(), fc.string(), fc.constant(null)),
-                            interval: fc.oneof(fc.integer(), fc.string(), fc.constant(null)),
+                            timeout: fc.oneof(
+                                fc.integer(),
+                                fc.string(),
+                                fc.constant(null)
+                            ),
+                            retries: fc.oneof(
+                                fc.integer(),
+                                fc.string(),
+                                fc.constant(null)
+                            ),
+                            interval: fc.oneof(
+                                fc.integer(),
+                                fc.string(),
+                                fc.constant(null)
+                            ),
                         }),
                         fc.constant({}),
                         fc.constant(null),
@@ -160,7 +185,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
                             timeout: fc.constant(Number.POSITIVE_INFINITY),
                             retries: fc.constant(Number.NEGATIVE_INFINITY),
                             interval: fc.constant(Number.NaN),
-                        }),
+                        })
                     ),
                     (config: any) => {
                         expect(() => {
@@ -177,16 +202,37 @@ describe("Shared Utilities Fuzzing Tests", () => {
 
                                 const result = { ...defaults };
 
-                                if (typeof input.timeout === "number" && Number.isFinite(input.timeout) && input.timeout > 0) {
-                                    result.timeout = Math.min(input.timeout, 300_000); // Max 5 minutes
+                                if (
+                                    typeof input.timeout === "number" &&
+                                    Number.isFinite(input.timeout) &&
+                                    input.timeout > 0
+                                ) {
+                                    result.timeout = Math.min(
+                                        input.timeout,
+                                        300_000
+                                    ); // Max 5 minutes
                                 }
 
-                                if (typeof input.retries === "number" && Number.isInteger(input.retries) && input.retries >= 0) {
-                                    result.retries = Math.min(input.retries, 10); // Max 10 retries
+                                if (
+                                    typeof input.retries === "number" &&
+                                    Number.isInteger(input.retries) &&
+                                    input.retries >= 0
+                                ) {
+                                    result.retries = Math.min(
+                                        input.retries,
+                                        10
+                                    ); // Max 10 retries
                                 }
 
-                                if (typeof input.interval === "number" && Number.isFinite(input.interval) && input.interval > 0) {
-                                    result.interval = Math.min(input.interval, 86_400_000); // Max 24 hours
+                                if (
+                                    typeof input.interval === "number" &&
+                                    Number.isFinite(input.interval) &&
+                                    input.interval > 0
+                                ) {
+                                    result.interval = Math.min(
+                                        input.interval,
+                                        86_400_000
+                                    ); // Max 24 hours
                                 }
 
                                 return result;
@@ -207,7 +253,9 @@ describe("Shared Utilities Fuzzing Tests", () => {
                             expect(result.retries).toBeGreaterThanOrEqual(0);
                             expect(result.retries).toBeLessThanOrEqual(10);
                             expect(result.interval).toBeGreaterThan(0);
-                            expect(result.interval).toBeLessThanOrEqual(86_400_000);
+                            expect(result.interval).toBeLessThanOrEqual(
+                                86_400_000
+                            );
 
                             // Property: values should be finite
                             expect(Number.isFinite(result.timeout)).toBe(true);
@@ -236,17 +284,20 @@ describe("Shared Utilities Fuzzing Tests", () => {
                         fc.integer(),
                         fc.boolean(),
                         fc.constant([]),
-                        fc.constant(new Date()),
+                        fc.constant(new Date())
                     ),
                     (input: any) => {
                         expect(() => {
-                            const hasIdAndName = (obj: any): obj is { id: string; name: string } => Boolean(
+                            const hasIdAndName = (
+                                obj: any
+                            ): obj is { id: string; name: string } =>
+                                Boolean(
                                     obj &&
-                                    typeof obj === "object" &&
-                                    typeof obj.id === "string" &&
-                                    typeof obj.name === "string" &&
-                                    obj.id.length > 0 &&
-                                    obj.name.length > 0
+                                        typeof obj === "object" &&
+                                        typeof obj.id === "string" &&
+                                        typeof obj.name === "string" &&
+                                        obj.id.length > 0 &&
+                                        obj.name.length > 0
                                 );
 
                             const result = hasIdAndName(input);
@@ -272,29 +323,52 @@ describe("Shared Utilities Fuzzing Tests", () => {
                 fc.property(
                     fc.oneof(
                         fc.string(),
-                        fc.string().map(s => `${s  } at /path/to/secret/file.js:123`),
-                        fc.string().map(s => `${s  } Error: ENOENT: no such file /home/user/.env`),
-                        fc.string().map(s => `${s  } password=secret123`),
-                        fc.string().map(s => `${s  } Authorization: Bearer token123`),
-                        fc.string().map(s => s + "\n".repeat(1000)), // Many newlines
-                        fc.string().map(s => s.repeat(5000)), // Very long message
+                        fc
+                            .string()
+                            .map((s) => `${s} at /path/to/secret/file.js:123`),
+                        fc
+                            .string()
+                            .map(
+                                (s) =>
+                                    `${s} Error: ENOENT: no such file /home/user/.env`
+                            ),
+                        fc.string().map((s) => `${s} password=secret123`),
+                        fc
+                            .string()
+                            .map((s) => `${s} Authorization: Bearer token123`),
+                        fc.string().map((s) => s + "\n".repeat(1000)), // Many newlines
+                        fc.string().map((s) => s.repeat(5000)), // Very long message
                         fc.constant(""),
                         fc.constant(null),
-                        fc.constant(undefined),
+                        fc.constant(undefined)
                     ),
                     (errorInput: any) => {
                         expect(() => {
-                            const sanitizeErrorMessage = (error: any): string => {
-                                const message = error instanceof Error ? error.message
-                                    : typeof error === "string" ? error
-                                    : "Unknown error";
+                            const sanitizeErrorMessage = (
+                                error: any
+                            ): string => {
+                                const message =
+                                    error instanceof Error
+                                        ? error.message
+                                        : typeof error === "string"
+                                          ? error
+                                          : "Unknown error";
 
                                 // Remove sensitive patterns
                                 const sanitized = message
-                                    .replaceAll(/password[:=]\S*/gi, "password=***")
-                                    .replaceAll(/authorization[:=]\S*/gi, "authorization=***")
+                                    .replaceAll(
+                                        /password[:=]\S*/gi,
+                                        "password=***"
+                                    )
+                                    .replaceAll(
+                                        /authorization[:=]\S*/gi,
+                                        "authorization=***"
+                                    )
                                     .replaceAll(/bearer\s+\S+/gi, "bearer ***")
-                                    .replaceAll(/\/\S*\.(?:env|key|pem|crt)\S*/gi, "***")
+                                    .replaceAll(
+                                        /\/\S*\.(?:env|key|pem|crt)\S*/gi,
+                                        "***"
+                                    )
                                     .replaceAll(/\s+/g, " ") // Normalize whitespace
                                     .trim();
 
@@ -308,9 +382,15 @@ describe("Shared Utilities Fuzzing Tests", () => {
                             expect(typeof result).toBe("string");
 
                             // Property: should not contain sensitive patterns
-                            expect(result.toLowerCase()).not.toMatch(/password[:=][^\s*]/);
-                            expect(result.toLowerCase()).not.toMatch(/authorization[:=][^\s*]/);
-                            expect(result.toLowerCase()).not.toMatch(/bearer\s+[^\s*]/);
+                            expect(result.toLowerCase()).not.toMatch(
+                                /password[:=][^\s*]/
+                            );
+                            expect(result.toLowerCase()).not.toMatch(
+                                /authorization[:=][^\s*]/
+                            );
+                            expect(result.toLowerCase()).not.toMatch(
+                                /bearer\s+[^\s*]/
+                            );
 
                             // Property: should have reasonable length
                             expect(result.length).toBeLessThanOrEqual(500);
@@ -330,13 +410,23 @@ describe("Shared Utilities Fuzzing Tests", () => {
                 fc.property(
                     fc.oneof(
                         fc.array(fc.string()),
-                        fc.array(fc.oneof(fc.string(), fc.integer(), fc.boolean(), fc.constant(null))),
+                        fc.array(
+                            fc.oneof(
+                                fc.string(),
+                                fc.integer(),
+                                fc.boolean(),
+                                fc.constant(null)
+                            )
+                        ),
                         fc.constant([]),
                         fc.constant(null),
                         fc.constant(undefined),
                         fc.constant("not-an-array"),
                         fc.constant({}),
-                        fc.array(fc.string(), { minLength: 1000, maxLength: 1000 }), // Very large array
+                        fc.array(fc.string(), {
+                            minLength: 1000,
+                            maxLength: 1000,
+                        }) // Very large array
                     ),
                     (input: any) => {
                         expect(() => {
@@ -346,8 +436,13 @@ describe("Shared Utilities Fuzzing Tests", () => {
                                 }
 
                                 return arr
-                                    .filter((item): item is string => typeof item === "string")
-                                    .filter((str): str is string => str.length > 0)
+                                    .filter(
+                                        (item): item is string =>
+                                            typeof item === "string"
+                                    )
+                                    .filter(
+                                        (str): str is string => str.length > 0
+                                    )
                                     .slice(0, 100); // Limit to 100 items
                             };
 

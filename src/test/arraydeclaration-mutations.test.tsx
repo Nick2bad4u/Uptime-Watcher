@@ -1,36 +1,48 @@
 /**
  * Test suite for ArrayDeclaration mutations
- * 
+ *
  * These tests are designed to catch specific array declaration mutations
  * identified by Stryker mutation testing. These mutations primarily affect
  * React hook dependency arrays and other array declarations.
  *
  * @file Tests for array declaration mutations
+ *
  * @author GitHub Copilot
+ *
  * @since 2025-09-03
+ *
  * @category MutationTesting
+ *
  * @tags ["mutation-testing", "array-declarations", "react-hooks", "dependency-arrays"]
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import {
+    render,
+    screen,
+    fireEvent,
+    waitFor,
+    act,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 // Mock implementations to test dependency array behavior
-const createMockComponent = (dependencies: any[], effectCallback: () => void) => function MockComponent() {
+const createMockComponent = (dependencies: any[], effectCallback: () => void) =>
+    function MockComponent() {
         React.useEffect(effectCallback, dependencies);
         return <div data-testid="mock-component">Mock Component</div>;
     };
 
-const createMockCallback = (dependencies: any[], callback: () => void) => function MockComponent() {
+const createMockCallback = (dependencies: any[], callback: () => void) =>
+    function MockComponent() {
         const memoizedCallback = React.useCallback(callback, dependencies);
-        
+
         React.useEffect(() => {
             memoizedCallback();
         }, [memoizedCallback]);
-        
+
         return <div data-testid="mock-component">Mock Component</div>;
     };
 
@@ -47,18 +59,15 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
     describe("Header.tsx Line 171: [setShowAddSiteModal] dependency", () => {
         it("should re-create callback when dependency changes (detect [] mutation)", () => {
             let rerenderCount = 0;
-            
+
             function TestComponent({ setter }: { setter: () => void }) {
                 const handleClick = React.useCallback(() => {
                     setter();
                     rerenderCount++;
                 }, [setter]); // Original: [setter]
-                
+
                 return (
-                    <button 
-                        onClick={handleClick} 
-                        data-testid="test-button"
-                    >
+                    <button onClick={handleClick} data-testid="test-button">
                         Click me
                     </button>
                 );
@@ -68,18 +77,18 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
             const setter2 = vi.fn();
 
             const { rerender } = render(<TestComponent setter={setter1} />);
-            
+
             // First render and click
             fireEvent.click(screen.getByTestId("test-button"));
             expect(setter1).toHaveBeenCalledTimes(1);
-            
+
             // Re-render with new setter
             rerender(<TestComponent setter={setter2} />);
-            
+
             // Second click with new setter
             fireEvent.click(screen.getByTestId("test-button"));
             expect(setter2).toHaveBeenCalledTimes(1);
-            
+
             // With mutation (empty array []), the callback wouldn't update
             // and setter2 would never be called, setter1 would be called again
         });
@@ -87,41 +96,42 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
 
     describe("Header.tsx Line 175: [setShowSettings] dependency", () => {
         it("should memoize callback correctly with dependency (detect [] mutation)", () => {
-            const mockSetters = [vi.fn(), vi.fn(), vi.fn()];
+            const mockSetters = [
+                vi.fn(),
+                vi.fn(),
+                vi.fn(),
+            ];
             let currentSetterIndex = 0;
 
             function TestComponent() {
                 const currentSetter = mockSetters[currentSetterIndex];
-                
+
                 const handleClick = React.useCallback(() => {
                     currentSetter();
                 }, [currentSetter]); // Original: [currentSetter]
-                
+
                 return (
-                    <button 
-                        onClick={handleClick} 
-                        data-testid="settings-button"
-                    >
+                    <button onClick={handleClick} data-testid="settings-button">
                         Show Settings
                     </button>
                 );
             }
 
             const { rerender } = render(<TestComponent />);
-            
+
             // Click with first setter
             fireEvent.click(screen.getByTestId("settings-button"));
             expect(mockSetters[0]).toHaveBeenCalledTimes(1);
-            
+
             // Change to second setter and rerender
             currentSetterIndex = 1;
             rerender(<TestComponent />);
-            
+
             // Click should use new setter
             fireEvent.click(screen.getByTestId("settings-button"));
             expect(mockSetters[1]).toHaveBeenCalledTimes(1);
             expect(mockSetters[0]).toHaveBeenCalledTimes(1); // Should not be called again
-            
+
             // With mutation [], the callback would be stale and keep using mockSetters[0]
         });
     });
@@ -133,7 +143,10 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
             let updateSettingsValue = vi.fn();
 
             function TestComponent() {
-                React.useEffect(effectCallback, [settingsValue, updateSettingsValue]);
+                React.useEffect(effectCallback, [
+                    settingsValue,
+                    updateSettingsValue,
+                ]);
                 return <div data-testid="settings-component">Settings</div>;
             }
 
@@ -162,9 +175,14 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
 
             function TestComponent() {
                 const settings = { historyLimit };
-                
-                React.useEffect(effectCallback, [settings.historyLimit, updateHistoryLimitValue]);
-                return <div data-testid="history-component">History Settings</div>;
+
+                React.useEffect(effectCallback, [
+                    settings.historyLimit,
+                    updateHistoryLimitValue,
+                ]);
+                return (
+                    <div data-testid="history-component">History Settings</div>
+                );
             }
 
             const { rerender } = render(<TestComponent />);
@@ -203,7 +221,7 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
             rerender(<TestComponent />);
             expect(effectCallback).toHaveBeenCalledTimes(2);
 
-            // Change resetSettings function  
+            // Change resetSettings function
             resetSettings = vi.fn();
             rerender(<TestComponent />);
             expect(effectCallback).toHaveBeenCalledTimes(3);
@@ -245,11 +263,36 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
 
                 return (
                     <div>
-                        <button onClick={themeCallback} data-testid="theme-button">Theme</button>
-                        <button onClick={historyCallback} data-testid="history-button">History</button>
-                        <button onClick={settingCallback1} data-testid="setting1-button">Setting 1</button>
-                        <button onClick={settingCallback2} data-testid="setting2-button">Setting 2</button>
-                        <button onClick={settingCallback3} data-testid="setting3-button">Setting 3</button>
+                        <button
+                            onClick={themeCallback}
+                            data-testid="theme-button"
+                        >
+                            Theme
+                        </button>
+                        <button
+                            onClick={historyCallback}
+                            data-testid="history-button"
+                        >
+                            History
+                        </button>
+                        <button
+                            onClick={settingCallback1}
+                            data-testid="setting1-button"
+                        >
+                            Setting 1
+                        </button>
+                        <button
+                            onClick={settingCallback2}
+                            data-testid="setting2-button"
+                        >
+                            Setting 2
+                        </button>
+                        <button
+                            onClick={settingCallback3}
+                            data-testid="setting3-button"
+                        >
+                            Setting 3
+                        </button>
                     </div>
                 );
             }
@@ -282,7 +325,7 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
     describe("General Array Declaration Mutations", () => {
         it("should handle empty arrays vs populated arrays correctly", () => {
             const mockCallback = vi.fn();
-            
+
             // Test that empty dependency array behaves differently from populated array
             function ComponentWithEmptyDeps() {
                 React.useEffect(mockCallback, []); // Runs once
@@ -303,7 +346,9 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
             mockCallback.mockClear();
 
             // Test with dependencies
-            const { rerender, unmount: unmount2 } = render(<ComponentWithDeps value={1} />);
+            const { rerender, unmount: unmount2 } = render(
+                <ComponentWithDeps value={1} />
+            );
             expect(mockCallback).toHaveBeenCalledTimes(1);
 
             rerender(<ComponentWithDeps value={2} />);

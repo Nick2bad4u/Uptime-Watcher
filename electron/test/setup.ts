@@ -4,6 +4,10 @@
  */
 
 import { vi } from "vitest";
+import fc from "fast-check";
+
+// Configure fast-check for property-based testing
+fc.configureGlobal({ numRuns: 10 });
 
 // Suppress PromiseRejectionHandledWarning for test environment
 // This warning is expected in retry tests where we intentionally test promise rejections

@@ -2,13 +2,15 @@
  * Shared Validation Array Declaration Mutation Tests
  *
  * @file Tests specifically targeting array declaration mutations in shared
- * validation schemas and utility functions. Focuses on validation error arrays,
- * warning arrays, and schema field arrays.
+ *   validation schemas and utility functions. Focuses on validation error
+ *   arrays, warning arrays, and schema field arrays.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-09-03
  *
  * @category Tests
+ *
  * @tags ["mutation-testing", "validation", "schemas", "arrays"]
  */
 
@@ -24,22 +26,30 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
     });
 
     describe("schemas.ts - Line 56 status enum array", () => {
-        it("should validate status with correct enum values", async ({ task, annotate }) => {
+        it("should validate status with correct enum values", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("File: shared/validation/schemas.ts", "source");
             await annotate("Line: 56", "location");
-            await annotate("Mutation: z.enum([\"up\", \"down\"]) → z.enum([])", "mutation");
+            await annotate(
+                'Mutation: z.enum(["up", "down"]) → z.enum([])',
+                "mutation"
+            );
 
             // This tests the status enum array that could be mutated to empty
             // status: z.enum(["up", "down"]) → status: z.enum([])
 
             function createStatusHistorySchema() {
-                return z.object({
-                    details: z.string().optional(),
-                    responseTime: z.number(),
-                    status: z.enum(["up", "down"]), // This array is mutation target
-                    timestamp: z.number(),
-                }).strict();
+                return z
+                    .object({
+                        details: z.string().optional(),
+                        responseTime: z.number(),
+                        status: z.enum(["up", "down"]), // This array is mutation target
+                        timestamp: z.number(),
+                    })
+                    .strict();
             }
 
             const schema = createStatusHistorySchema();
@@ -49,14 +59,14 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
                 details: "OK",
                 responseTime: 200,
                 status: "up" as const,
-                timestamp: Date.now()
+                timestamp: Date.now(),
             };
 
             const validDownData = {
                 details: "Timeout",
                 responseTime: 0,
                 status: "down" as const,
-                timestamp: Date.now()
+                timestamp: Date.now(),
             };
 
             // Should validate successfully
@@ -74,24 +84,32 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
                 details: "Error",
                 responseTime: 0,
                 status: "unknown",
-                timestamp: Date.now()
+                timestamp: Date.now(),
             };
 
             expect(() => schema.parse(invalidData)).toThrow();
         });
 
-        it("should fail if status enum array is mutated to empty", async ({ task, annotate }) => {
+        it("should fail if status enum array is mutated to empty", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
-            await annotate("Verifies status validation would be broken", "purpose");
+            await annotate(
+                "Verifies status validation would be broken",
+                "purpose"
+            );
 
             // Simulate the mutated behavior with empty enum array
             function createStatusHistorySchemaMutated() {
-                return z.object({
-                    details: z.string().optional(),
-                    responseTime: z.number(),
-                    status: z.enum([]), // This is the mutation - empty array
-                    timestamp: z.number(),
-                }).strict();
+                return z
+                    .object({
+                        details: z.string().optional(),
+                        responseTime: z.number(),
+                        status: z.enum([]), // This is the mutation - empty array
+                        timestamp: z.number(),
+                    })
+                    .strict();
             }
 
             // Creating schema with empty enum should throw or fail
@@ -102,7 +120,7 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
                     details: "OK",
                     responseTime: 200,
                     status: "up",
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
                 };
 
                 schema.parse(testData);
@@ -114,11 +132,17 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
     });
 
     describe("schemas.ts - Validation error and warning arrays", () => {
-        it("should initialize warnings array as empty (Lines 459, 472, 477)", async ({ task, annotate }) => {
+        it("should initialize warnings array as empty (Lines 459, 472, 477)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("File: shared/validation/schemas.ts", "source");
             await annotate("Lines: 459, 472, 477", "location");
-            await annotate("Mutation: warnings: [] → warnings: [\"Stryker was here\"]", "mutation");
+            await annotate(
+                'Mutation: warnings: [] → warnings: ["Stryker was here"]',
+                "mutation"
+            );
 
             // Test validation functions that initialize warnings as empty arrays
 
@@ -165,7 +189,7 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             // Test error processing
             const testIssues = [
                 { message: "Field required", severity: "error" },
-                { message: "Consider updating", severity: "warning" }
+                { message: "Consider updating", severity: "warning" },
             ];
 
             const processResult = processValidationErrors(testIssues);
@@ -175,9 +199,15 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             expect(processResult.errors).toHaveLength(1);
         });
 
-        it("should fail if warnings arrays are mutated to contain initial data", async ({ task, annotate }) => {
+        it("should fail if warnings arrays are mutated to contain initial data", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
-            await annotate("Verifies validation would show false warnings", "purpose");
+            await annotate(
+                "Verifies validation would show false warnings",
+                "purpose"
+            );
 
             // Simulate the mutated behavior
             function validateWithWarningsMutated(data: any) {
@@ -222,7 +252,7 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
 
             // Test mutated error processing
             const testIssues = [
-                { message: "Field required", severity: "error" }
+                { message: "Field required", severity: "error" },
             ];
 
             const processResult = processValidationErrorsMutated(testIssues);
@@ -234,11 +264,17 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             // Even successful validations would show "Stryker was here" warning
         });
 
-        it("should handle validation with errors array properly (Line 578)", async ({ task, annotate }) => {
+        it("should handle validation with errors array properly (Line 578)", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("File: shared/validation/schemas.ts", "source");
             await annotate("Line: 578", "location");
-            await annotate("Mutation: errors: [message] → errors: []", "mutation");
+            await annotate(
+                "Mutation: errors: [message] → errors: []",
+                "mutation"
+            );
 
             // Test error array initialization and population
 
@@ -247,13 +283,13 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
                     return {
                         errors: [],
                         warnings: [],
-                        success: true
+                        success: true,
                     };
                 }
 
                 // Line 578 area - errors array handling
                 const errors: string[] = [
-                    "Validation failed for the following reasons:"
+                    "Validation failed for the following reasons:",
                 ]; // This array initialization is mutation target
 
                 const warnings: string[] = [];
@@ -276,13 +312,15 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
                 issues: [
                     { type: "error", message: "Name is required" },
                     { type: "error", message: "Invalid URL format" },
-                    { type: "warning", message: "Consider using HTTPS" }
-                ]
+                    { type: "warning", message: "Consider using HTTPS" },
+                ],
             };
 
             const result = processValidationErrors(validationResult);
 
-            expect(result.errors).toContain("Validation failed for the following reasons:");
+            expect(result.errors).toContain(
+                "Validation failed for the following reasons:"
+            );
             expect(result.errors).toContain("Name is required");
             expect(result.errors).toContain("Invalid URL format");
             expect(result.errors).toHaveLength(3);
@@ -292,7 +330,10 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             expect(result.success).toBe(false);
         });
 
-        it("should fail if errors array is mutated to be empty", async ({ task, annotate }) => {
+        it("should fail if errors array is mutated to be empty", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
             await annotate("Verifies error messages would be lost", "purpose");
 
@@ -302,7 +343,7 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
                     return {
                         errors: [],
                         warnings: [],
-                        success: true
+                        success: true,
                     };
                 }
 
@@ -326,14 +367,16 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
                 success: false,
                 issues: [
                     { type: "error", message: "Name is required" },
-                    { type: "error", message: "Invalid URL format" }
-                ]
+                    { type: "error", message: "Invalid URL format" },
+                ],
             };
 
             const result = processValidationErrorsMutated(validationResult);
 
             // The mutated version would miss the introductory error message
-            expect(result.errors).not.toContain("Validation failed for the following reasons:");
+            expect(result.errors).not.toContain(
+                "Validation failed for the following reasons:"
+            );
             expect(result.errors).toContain("Name is required");
             expect(result.errors).toContain("Invalid URL format");
             expect(result.errors).toHaveLength(2); // Missing the intro message
@@ -343,7 +386,10 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
     });
 
     describe("Configuration and Field Arrays", () => {
-        it("should handle monitor type field configurations correctly", async ({ task, annotate }) => {
+        it("should handle monitor type field configurations correctly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Monitor Configuration", "component");
             await annotate("Type: Field Arrays", "type");
@@ -371,7 +417,10 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
                     case "dns": {
                         requiredFields.push("hostname", "recordType");
                         optionalFields.push("resolver", "timeout");
-                        validationRules.push("hostname-format", "record-type-valid");
+                        validationRules.push(
+                            "hostname-format",
+                            "record-type-valid"
+                        );
                         break;
                     }
                     default: {
@@ -387,19 +436,31 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             const httpConfig = getMonitorFieldSchema("http");
             expect(httpConfig.requiredFields).toEqual(["url", "method"]);
             expect(httpConfig.optionalFields).toEqual(["headers", "timeout"]);
-            expect(httpConfig.validationRules).toEqual(["url-format", "method-valid"]);
+            expect(httpConfig.validationRules).toEqual([
+                "url-format",
+                "method-valid",
+            ]);
 
             // Test ping monitor configuration
             const pingConfig = getMonitorFieldSchema("ping");
             expect(pingConfig.requiredFields).toEqual(["host"]);
             expect(pingConfig.optionalFields).toEqual(["packets", "timeout"]);
-            expect(pingConfig.validationRules).toEqual(["host-format", "packets-range"]);
+            expect(pingConfig.validationRules).toEqual([
+                "host-format",
+                "packets-range",
+            ]);
 
             // Test DNS monitor configuration
             const dnsConfig = getMonitorFieldSchema("dns");
-            expect(dnsConfig.requiredFields).toEqual(["hostname", "recordType"]);
+            expect(dnsConfig.requiredFields).toEqual([
+                "hostname",
+                "recordType",
+            ]);
             expect(dnsConfig.optionalFields).toEqual(["resolver", "timeout"]);
-            expect(dnsConfig.validationRules).toEqual(["hostname-format", "record-type-valid"]);
+            expect(dnsConfig.validationRules).toEqual([
+                "hostname-format",
+                "record-type-valid",
+            ]);
 
             // Test unknown monitor type (should have empty arrays)
             const unknownConfig = getMonitorFieldSchema("unknown");
@@ -408,9 +469,15 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             expect(unknownConfig.validationRules).toEqual([]);
         });
 
-        it("should fail if field arrays are mutated to start with data", async ({ task, annotate }) => {
+        it("should fail if field arrays are mutated to start with data", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
-            await annotate("Verifies configuration would be corrupted", "purpose");
+            await annotate(
+                "Verifies configuration would be corrupted",
+                "purpose"
+            );
 
             // Simulate the mutated behavior
             function getMonitorFieldSchemaMutated(monitorType: string) {
@@ -441,9 +508,21 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             expect(httpConfig.optionalFields).toContain("Stryker was here");
             expect(httpConfig.validationRules).toContain("Stryker was here");
 
-            expect(httpConfig.requiredFields).toEqual(["Stryker was here", "url", "method"]);
-            expect(httpConfig.optionalFields).toEqual(["Stryker was here", "headers", "timeout"]);
-            expect(httpConfig.validationRules).toEqual(["Stryker was here", "url-format", "method-valid"]);
+            expect(httpConfig.requiredFields).toEqual([
+                "Stryker was here",
+                "url",
+                "method",
+            ]);
+            expect(httpConfig.optionalFields).toEqual([
+                "Stryker was here",
+                "headers",
+                "timeout",
+            ]);
+            expect(httpConfig.validationRules).toEqual([
+                "Stryker was here",
+                "url-format",
+                "method-valid",
+            ]);
 
             // This would break form generation and validation
             // Forms would try to validate "Stryker was here" as a field name
@@ -451,7 +530,10 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
     });
 
     describe("Utility Function Arrays", () => {
-        it("should handle array utility functions correctly", async ({ task, annotate }) => {
+        it("should handle array utility functions correctly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Utility Functions", "component");
             await annotate("Type: Array Processing", "type");
@@ -492,13 +574,13 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             // Test warning processing
             const rawWarnings = [
                 { message: "Deprecated field", severity: "low" },
-                { message: "Performance concern", severity: "medium" }
+                { message: "Performance concern", severity: "medium" },
             ];
 
             const warningResult = processValidationWarnings(rawWarnings);
             expect(warningResult.processedWarnings).toEqual([
                 "Warning: Deprecated field",
-                "Warning: Performance concern"
+                "Warning: Performance concern",
             ]);
             expect(warningResult.severityLevels).toEqual(["low", "medium"]);
 
@@ -506,17 +588,26 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             const rawErrors = [
                 { message: "System failure", critical: true },
                 { message: "Minor issue", critical: false },
-                { message: "Data corruption", critical: true }
+                { message: "Data corruption", critical: true },
             ];
 
             const errorResult = filterValidationErrors(rawErrors);
-            expect(errorResult.criticalErrors).toEqual(["System failure", "Data corruption"]);
+            expect(errorResult.criticalErrors).toEqual([
+                "System failure",
+                "Data corruption",
+            ]);
             expect(errorResult.minorErrors).toEqual(["Minor issue"]);
         });
 
-        it("should fail if utility arrays are mutated", async ({ task, annotate }) => {
+        it("should fail if utility arrays are mutated", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "mutation-verification");
-            await annotate("Verifies utility functions would be corrupted", "purpose");
+            await annotate(
+                "Verifies utility functions would be corrupted",
+                "purpose"
+            );
 
             // Simulate mutated utility functions
             function processValidationWarningsMutated(rawWarnings: any[]) {
@@ -537,7 +628,7 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             }
 
             const rawWarnings = [
-                { message: "Deprecated field", severity: "low" }
+                { message: "Deprecated field", severity: "low" },
             ];
 
             const result = processValidationWarningsMutated(rawWarnings);
@@ -548,12 +639,9 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
 
             expect(result.processedWarnings).toEqual([
                 "Stryker was here",
-                "Warning: Deprecated field"
+                "Warning: Deprecated field",
             ]);
-            expect(result.severityLevels).toEqual([
-                "Stryker was here",
-                "low"
-            ]);
+            expect(result.severityLevels).toEqual(["Stryker was here", "low"]);
 
             // This would show "Stryker was here" as a warning to users
             // and break severity level processing

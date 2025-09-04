@@ -983,7 +983,7 @@ describe("useMonitorTypesStore", () => {
                     isLoading: false,
                     lastError: undefined,
                 });
-                await new Promise(resolve => setTimeout(resolve, 50));
+                await new Promise((resolve) => setTimeout(resolve, 50));
             });
         });
 
@@ -1011,18 +1011,23 @@ describe("useMonitorTypesStore", () => {
             useMonitorTypesStore.setState(initialState);
 
             // Give the store time to settle
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise((resolve) => setTimeout(resolve, 100));
 
-            const { result, unmount } = renderHook(() => useMonitorTypesStore());
+            const { result, unmount } = renderHook(() =>
+                useMonitorTypesStore()
+            );
 
             // Simple wait for hook to be ready
             await act(async () => {
-                await new Promise(resolve => setTimeout(resolve, 50));
+                await new Promise((resolve) => setTimeout(resolve, 50));
             });
 
             // If the hook didn't initialize properly, this is a test environment timing issue
             // We'll assert that at minimum, the filter logic in the store works correctly
-            if (!result.current || typeof result.current.loadMonitorTypes !== 'function') {
+            if (
+                !result.current ||
+                typeof result.current.loadMonitorTypes !== "function"
+            ) {
                 // Test the store filtering logic directly since hook rendering had timing issues
                 const storeState = useMonitorTypesStore.getState();
                 expect(storeState).toBeDefined();

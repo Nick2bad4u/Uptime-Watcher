@@ -2,9 +2,10 @@
  * Property-based fuzzing tests for database repository operations.
  *
  * @remarks
- * Tests database repository operations using property-based testing with fast-check.
- * Validates that repository operations handle malformed input, edge cases, and
- * potential security vulnerabilities gracefully through transaction handling.
+ * Tests database repository operations using property-based testing with
+ * fast-check. Validates that repository operations handle malformed input, edge
+ * cases, and potential security vulnerabilities gracefully through transaction
+ * handling.
  *
  * Key areas tested:
  *
@@ -17,8 +18,15 @@
  * @packageDocumentation
  */
 
-import { describe, expect, it, vi, beforeEach, type MockedFunction } from "vitest";
-import * as fc from "fast-check";
+import {
+    describe,
+    expect,
+    it,
+    vi,
+    beforeEach,
+    type MockedFunction,
+} from "vitest";
+import fc from "fast-check";
 import type { Site, Monitor } from "@shared/validation/schemas";
 import type { SiteRow, MonitorRow, HistoryRow } from "@shared/types/database";
 import { DatabaseService } from "../../services/database/DatabaseService";
@@ -57,9 +65,15 @@ describe("Database Operations Fuzzing Tests", () => {
         } as any;
 
         vi.clearAllMocks();
-        siteRepository = new SiteRepository({ databaseService: mockDatabaseService });
-        monitorRepository = new MonitorRepository({ databaseService: mockDatabaseService });
-        historyRepository = new HistoryRepository({ databaseService: mockDatabaseService });
+        siteRepository = new SiteRepository({
+            databaseService: mockDatabaseService,
+        });
+        monitorRepository = new MonitorRepository({
+            databaseService: mockDatabaseService,
+        });
+        historyRepository = new HistoryRepository({
+            databaseService: mockDatabaseService,
+        });
     });
 
     describe("Site Repository Fuzzing", () => {
@@ -69,19 +83,37 @@ describe("Database Operations Fuzzing Tests", () => {
                     fc.record({
                         identifier: fc.string({ minLength: 1, maxLength: 100 }),
                         monitoring: fc.boolean(),
-                        monitors: fc.array(fc.record({
-                            id: fc.string({ minLength: 1, maxLength: 50 }),
-                            type: fc.constant("http"), // Use only http type to match schema
-                            url: fc.string({ minLength: 1, maxLength: 200 }),
-                            checkInterval: fc.integer({ min: 1000, max: 300_000 }),
-                            timeout: fc.integer({ min: 1000, max: 30_000 }),
-                            retryAttempts: fc.integer({ min: 1, max: 10 }),
-                            status: fc.constantFrom("up", "down", "pending", "paused"),
-                            monitoring: fc.boolean(),
-                            responseTime: fc.integer({ min: 0, max: 30_000 }),
-                        }), { minLength: 0, maxLength: 5 })
+                        monitors: fc.array(
+                            fc.record({
+                                id: fc.string({ minLength: 1, maxLength: 50 }),
+                                type: fc.constant("http"), // Use only http type to match schema
+                                url: fc.string({
+                                    minLength: 1,
+                                    maxLength: 200,
+                                }),
+                                checkInterval: fc.integer({
+                                    min: 1000,
+                                    max: 300_000,
+                                }),
+                                timeout: fc.integer({ min: 1000, max: 30_000 }),
+                                retryAttempts: fc.integer({ min: 1, max: 10 }),
+                                status: fc.constantFrom(
+                                    "up",
+                                    "down",
+                                    "pending",
+                                    "paused"
+                                ),
+                                monitoring: fc.boolean(),
+                                responseTime: fc.integer({
+                                    min: 0,
+                                    max: 30_000,
+                                }),
+                            }),
+                            { minLength: 0, maxLength: 5 }
+                        ),
                     }),
-                    async (siteData: any) => { // Use any to avoid complex type issues
+                    async (siteData: any) => {
+                        // Use any to avoid complex type issues
                         mockDatabaseService.executeTransaction.mockImplementation(
                             async (callback: any) => await callback(mockDb)
                         );
@@ -91,7 +123,9 @@ describe("Database Operations Fuzzing Tests", () => {
                         let didCallDatabase = false;
                         try {
                             await siteRepository.upsert(siteData);
-                            didCallDatabase = mockDatabaseService.executeTransaction.mock.calls.length > 0;
+                            didCallDatabase =
+                                mockDatabaseService.executeTransaction.mock
+                                    .calls.length > 0;
                         } catch (error) {
                             // Method may throw for invalid data, which is acceptable
                             // But we can still check if it was validated before hitting database
@@ -111,8 +145,8 @@ describe("Database Operations Fuzzing Tests", () => {
                     fc.oneof(
                         fc.string({ minLength: 1, maxLength: 100 }),
                         fc.string({ minLength: 0, maxLength: 0 }), // Empty string
-                        fc.string().map(s => s.repeat(100)), // Long string
-                        fc.string().map(s => `${s}'DROP TABLE sites;--`) // SQL injection attempt
+                        fc.string().map((s) => s.repeat(100)), // Long string
+                        fc.string().map((s) => `${s}'DROP TABLE sites;--`) // SQL injection attempt
                     ),
                     async (identifier: string) => {
                         mockDatabaseService.executeTransaction.mockImplementation(
@@ -123,16 +157,24 @@ describe("Database Operations Fuzzing Tests", () => {
                         // Should not throw even for malicious identifiers
                         let result: any;
                         try {
-                            result = await siteRepository.findByIdentifier(identifier);
+                            result =
+                                await siteRepository.findByIdentifier(
+                                    identifier
+                                );
                             // Should be null or undefined for non-existent items
-                            expect(result === null || result === undefined).toBe(true); // null or undefined
+                            expect(
+                                result === null || result === undefined
+                            ).toBe(true); // null or undefined
                         } catch (error) {
                             // Method may throw for invalid identifiers, which is acceptable
                         }
 
                         // Verify SQL injection protection if database was called
                         if (mockDb.get.mock.calls.length > 0) {
-                            const [sql] = mockDb.get.mock.calls[0] as [string, any[]];
+                            const [sql] = mockDb.get.mock.calls[0] as [
+                                string,
+                                any[],
+                            ];
                             expect(sql).toContain("?"); // Parameterized query
                             expect(sql).not.toContain("DROP"); // No direct injection
                         }
@@ -144,44 +186,40 @@ describe("Database Operations Fuzzing Tests", () => {
 
         it("should handle delete operations safely", async () => {
             await fc.assert(
-                fc.asyncProperty(
-                    fc.string(),
-                    async (identifier: string) => {
-                        mockDatabaseService.executeTransaction.mockImplementation(
-                            async (callback: any) => await callback(mockDb)
-                        );
-                        mockDb.run.mockReturnValue({ changes: 0 });
+                fc.asyncProperty(fc.string(), async (identifier: string) => {
+                    mockDatabaseService.executeTransaction.mockImplementation(
+                        async (callback: any) => await callback(mockDb)
+                    );
+                    mockDb.run.mockReturnValue({ changes: 0 });
 
-                        // Should return boolean and not throw
-                        const result = await siteRepository.delete(identifier);
-                        expect(typeof result).toBe("boolean");
-                        expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-                    }
-                ),
+                    // Should return boolean and not throw
+                    const result = await siteRepository.delete(identifier);
+                    expect(typeof result).toBe("boolean");
+                    expect(
+                        mockDatabaseService.executeTransaction
+                    ).toHaveBeenCalled();
+                }),
                 { numRuns: 20 }
             );
         });
 
         it("should handle exists operations with any identifier", async () => {
             await fc.assert(
-                fc.asyncProperty(
-                    fc.string(),
-                    async (identifier: string) => {
-                        mockDatabaseService.executeTransaction.mockImplementation(
-                            async (callback: any) => await callback(mockDb)
-                        );
-                        mockDb.get.mockReturnValue(null);
+                fc.asyncProperty(fc.string(), async (identifier: string) => {
+                    mockDatabaseService.executeTransaction.mockImplementation(
+                        async (callback: any) => await callback(mockDb)
+                    );
+                    mockDb.get.mockReturnValue(null);
 
-                        // Should handle any identifier gracefully
-                        try {
-                            const result = await siteRepository.exists(identifier);
-                            expect(typeof result).toBe("boolean");
-                        } catch (error) {
-                            // Method may throw for invalid identifiers, which is acceptable
-                            expect(true).toBe(true); // Test passes if it throws or succeeds
-                        }
+                    // Should handle any identifier gracefully
+                    try {
+                        const result = await siteRepository.exists(identifier);
+                        expect(typeof result).toBe("boolean");
+                    } catch (error) {
+                        // Method may throw for invalid identifiers, which is acceptable
+                        expect(true).toBe(true); // Test passes if it throws or succeeds
                     }
-                ),
+                }),
                 { numRuns: 20 }
             );
         });
@@ -197,7 +235,12 @@ describe("Database Operations Fuzzing Tests", () => {
                         checkInterval: fc.integer({ min: 1000, max: 300_000 }),
                         timeout: fc.integer({ min: 1000, max: 30_000 }),
                         retryAttempts: fc.integer({ min: 1, max: 10 }),
-                        status: fc.constantFrom("up", "down", "pending", "paused"),
+                        status: fc.constantFrom(
+                            "up",
+                            "down",
+                            "pending",
+                            "paused"
+                        ),
                         monitoring: fc.boolean(),
                         responseTime: fc.integer({ min: 0, max: 30_000 }),
                     }),
@@ -210,10 +253,15 @@ describe("Database Operations Fuzzing Tests", () => {
 
                         // Should not throw for valid-looking data
                         await expect(async () => {
-                            await monitorRepository.create(siteIdentifier, monitorData);
+                            await monitorRepository.create(
+                                siteIdentifier,
+                                monitorData
+                            );
                         }).not.toThrow();
 
-                        expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+                        expect(
+                            mockDatabaseService.executeTransaction
+                        ).toHaveBeenCalled();
                     }
                 ),
                 { numRuns: 20 }
@@ -222,24 +270,24 @@ describe("Database Operations Fuzzing Tests", () => {
 
         it("should handle findByIdentifier with various monitor IDs", async () => {
             await fc.assert(
-                fc.asyncProperty(
-                    fc.string(),
-                    async (monitorId: string) => {
-                        mockDatabaseService.executeTransaction.mockImplementation(
-                            async (callback: any) => await callback(mockDb)
-                        );
-                        mockDb.get.mockReturnValue(null);
+                fc.asyncProperty(fc.string(), async (monitorId: string) => {
+                    mockDatabaseService.executeTransaction.mockImplementation(
+                        async (callback: any) => await callback(mockDb)
+                    );
+                    mockDb.get.mockReturnValue(null);
 
-                        // Should handle any monitor ID gracefully
-                        try {
-                            const result = await monitorRepository.findByIdentifier(monitorId);
-                            // Should be null or undefined for non-existent monitors
-                            expect(result === null || result === undefined).toBe(true); // null or undefined
-                        } catch (error) {
-                            // Method may throw for invalid IDs, which is acceptable
-                        }
+                    // Should handle any monitor ID gracefully
+                    try {
+                        const result =
+                            await monitorRepository.findByIdentifier(monitorId);
+                        // Should be null or undefined for non-existent monitors
+                        expect(result === null || result === undefined).toBe(
+                            true
+                        ); // null or undefined
+                    } catch (error) {
+                        // Method may throw for invalid IDs, which is acceptable
                     }
-                ),
+                }),
                 { numRuns: 20 }
             );
         });
@@ -256,7 +304,10 @@ describe("Database Operations Fuzzing Tests", () => {
 
                         // Should handle any site identifier gracefully
                         try {
-                            const result = await monitorRepository.findBySiteIdentifier(siteIdentifier);
+                            const result =
+                                await monitorRepository.findBySiteIdentifier(
+                                    siteIdentifier
+                                );
                             expect(Array.isArray(result)).toBe(true);
                         } catch (error) {
                             // Method may throw for invalid identifiers, which is acceptable
@@ -269,20 +320,19 @@ describe("Database Operations Fuzzing Tests", () => {
 
         it("should handle delete operations safely", async () => {
             await fc.assert(
-                fc.asyncProperty(
-                    fc.string(),
-                    async (monitorId: string) => {
-                        mockDatabaseService.executeTransaction.mockImplementation(
-                            async (callback: any) => await callback(mockDb)
-                        );
-                        mockDb.run.mockReturnValue({ changes: 0 });
+                fc.asyncProperty(fc.string(), async (monitorId: string) => {
+                    mockDatabaseService.executeTransaction.mockImplementation(
+                        async (callback: any) => await callback(mockDb)
+                    );
+                    mockDb.run.mockReturnValue({ changes: 0 });
 
-                        // Should return boolean and not throw
-                        const result = await monitorRepository.delete(monitorId);
-                        expect(typeof result).toBe("boolean");
-                        expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-                    }
-                ),
+                    // Should return boolean and not throw
+                    const result = await monitorRepository.delete(monitorId);
+                    expect(typeof result).toBe("boolean");
+                    expect(
+                        mockDatabaseService.executeTransaction
+                    ).toHaveBeenCalled();
+                }),
                 { numRuns: 20 }
             );
         });
@@ -316,7 +366,11 @@ describe("Database Operations Fuzzing Tests", () => {
             await monitorRepository.findByIdentifier(testIdentifier);
 
             // Check that SQL queries use parameterized statements
-            const getAllCalls = [...mockDb.get.mock.calls, ...mockDb.run.mock.calls, ...mockDb.all.mock.calls];
+            const getAllCalls = [
+                ...mockDb.get.mock.calls,
+                ...mockDb.run.mock.calls,
+                ...mockDb.all.mock.calls,
+            ];
 
             for (const [sql] of getAllCalls) {
                 if (typeof sql === "string") {

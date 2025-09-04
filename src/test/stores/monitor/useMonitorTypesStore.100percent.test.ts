@@ -115,6 +115,8 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
     });
 
     describe("IPC Response Edge Cases", () => {
+
+
         it("should handle safeExtractIpcData returning null", async ({
             task,
             annotate,
