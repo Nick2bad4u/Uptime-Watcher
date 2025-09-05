@@ -26,7 +26,7 @@ jobs:
 
             - name: Set up Node
               id: setup-node
-              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+              uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
               with:
                   node-version: "22"
                   cache: "npm"
@@ -99,7 +99,7 @@ jobs:
             # Upload frontend coverage to Codecov
             - name: Upload frontend coverage to Codecov
               id: upload-frontend-coverage
-              uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
+              uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
@@ -118,7 +118,7 @@ jobs:
             # Upload electron coverage to Codecov
             - name: Upload electron coverage to Codecov
               id: upload-electron-coverage
-              uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
+              uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
@@ -137,7 +137,7 @@ jobs:
             # Upload shared coverage to Codecov
             - name: Upload shared coverage to Codecov
               id: upload-shared-coverage
-              uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
+              uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
