@@ -42,7 +42,7 @@ interface Logger {
  * Template variable values for log interpolation. Uses Partial to make all
  * variables optional.
  */
-type TemplateVariables = Partial<Record<string, number | string>>;
+type TemplateVariables = Partial<Record<string, null | number | string>>;
 
 // Export enhanced types for external use
 export type { TemplateVariables };
@@ -388,12 +388,12 @@ export interface LogTemplatesInterface {
 /**
  * Complete log templates catalog.
  */
-export const LOG_TEMPLATES: LogTemplatesInterface = {
+export const LOG_TEMPLATES: LogTemplatesInterface = Object.freeze({
     debug: DEBUG_LOGS,
     errors: ERROR_LOGS,
     services: SERVICE_LOGS,
     warnings: WARNING_LOGS,
-} as const;
+} as const);
 
 /**
  * Type representing all possible log template values.
@@ -433,7 +433,9 @@ export function interpolateLogTemplate(
             // Type assertion is safe here as we're accessing with a string key
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
             const value = variables[key as keyof typeof variables];
-            return value === undefined ? match : String(value);
+            return value === undefined || value === null
+                ? match
+                : String(value);
         }
     );
 }

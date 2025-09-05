@@ -22,15 +22,8 @@ const dirname = import.meta.dirname;
 const vitestConfig = defineConfig({
     cacheDir: "./.cache/.vitest-shared",
     esbuild: {
-        include: [
-            "**/*.js",
-            "**/*.mjs",
-            "**/*.cjs",
-            "**/*.ts",
-            "**/*.mts",
-            "**/*.cts",
-            "**/*.tsx",
-        ],
+        // Combine JS/TS and module variants into a single glob for brevity.
+        include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
         keepNames: true,
         target: "esnext",
     },
@@ -62,48 +55,49 @@ const vitestConfig = defineConfig({
         },
         clearMocks: true,
         coverage: {
-            all: false, // Include all source files in coverage
+            all: true, // Include all source files in coverage
             allowExternal: false,
             clean: true, // Clean coverage directory before each run
             cleanOnRerun: true, // Clean on rerun in watch mode
             exclude: [
+                // Config, typings, barrel files, and node modules
                 "**/*.config.*",
                 "**/*.d.ts",
+                "**/index.{ts,tsx}",
+                "**/node_modules/**",
+                // Build/artifact/docs/coverage
                 "**/dist/**",
                 "**/dist-shared/**",
-                "**/docs/**",
-                "**/index.ts", // Exclude barrel export files
-                "**/index.tsx",
-                "**/node_modules/**",
-                // Intentional selective exclusion vs backend parity:
-                "src/**/types.ts",
-                "electron/**/types.ts",
-                "**/types.tsx",
-                "coverage/**",
-                "dist-electron/**",
                 "dist/**",
-                "src/**", // Exclude frontend files
-                "electron/**", // Exclude electron files
+                "dist-electron/**",
+                "docs/**",
+                "coverage/**",
+                // Release, scripts, and tooling outputs
                 "release/**",
                 "scripts/**",
-                "shared/test",
                 "report/**",
+                "reports/**",
+                // Frontend & Electron (broad excludes; replace with selective entries if desired)
+                "src/**",
+                "electron/**",
+                // Shared tests and general test/spec patterns
+                "shared/test/**",
+                "shared/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
                 "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-                "shared/**/*.test.ts", // Exclude test files from coverage
-                "shared/**/*.test.mts", // Exclude MTS test files from coverage
-                "shared/**/*.test.cts", // Exclude CTS test files from coverage
-                "shared/**/*.spec.ts", // Exclude spec files from coverage
-                "shared/**/*.spec.mts", // Exclude MTS spec files from coverage
-                "shared/**/*.spec.cts", // Exclude CTS spec files from coverage
-                "shared/test/**", // Exclude test directory,
-                ".stryker-tmp/**", // Exclude Stryker mutation testing temp files
-                "reports/**", // Exclude test report files
-                "stryker_prompts_by_mutator/**",
-                "shared/types/**", // Exclude test directory,
+                // Additional shared test/spec variants (kept for explicitness)
+                "shared/**/*.test.*",
+                "shared/**/*.spec.*",
+                // Types and html folders
+                "shared/types/**",
                 "**/types/**",
                 "**/html/**",
+                // Stryker and mutation testing temp files
+                ".stryker-tmp/**",
+                "stryker_prompts_by_mutator/**",
+                // Preserve Vitest default excludes
                 ...coverageConfigDefaults.exclude,
             ],
+            excludeAfterRemap: true, // Exclude files after remapping for accuracy
             experimentalAstAwareRemapping: true,
             ignoreEmptyLines: true,
             include: ["shared/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}"],
@@ -172,6 +166,7 @@ const vitestConfig = defineConfig({
         globals: true, // Enable global test functions
         include: [
             "shared/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+            "../../shared/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
         ],
         includeTaskLocation: true, // Parity: enable task location annotations
         isolate: true,

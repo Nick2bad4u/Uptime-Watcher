@@ -267,8 +267,15 @@ export async function retryWithAbort<T>(
             }
 
             // Wait with exponential backoff
-            // eslint-disable-next-line no-await-in-loop
-            await sleep(delay, signal);
+            try {
+                // eslint-disable-next-line no-await-in-loop
+                await sleep(delay, signal);
+            } catch (sleepError) {
+                if (signal?.aborted) {
+                    throw new Error("Operation was aborted");
+                }
+                throw sleepError;
+            }
             delay = Math.min(delay * backoffMultiplier, maxDelay);
         }
     }
@@ -308,8 +315,8 @@ export function isAbortError(error: unknown): boolean {
         return (
             error.name === "AbortError" ||
             error.name === "TimeoutError" ||
-            error.message.includes("aborted") ||
-            error.message.includes("cancelled")
+            error.message.toLowerCase().includes("aborted") ||
+            error.message.toLowerCase().includes("cancelled")
         );
     }
     return false;

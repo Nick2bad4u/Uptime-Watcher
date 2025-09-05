@@ -21,16 +21,7 @@ const dirname = import.meta.dirname;
 const vitestConfig = defineConfig({
     cacheDir: "./.cache/.vitest-backend",
     esbuild: {
-        include: [
-            "**/*.cjs",
-            "**/*.cts",
-            "**/*.js",
-            "**/*.jsx",
-            "**/*.mjs",
-            "**/*.mts",
-            "**/*.ts",
-            "**/*.tsx",
-        ],
+        include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
         keepNames: true,
         target: "esnext",
     },
@@ -66,36 +57,33 @@ const vitestConfig = defineConfig({
         },
         clearMocks: true,
         coverage: {
-            all: false, // Include all source files in coverage
+            all: true, // Include all source files in coverage
             allowExternal: false,
             clean: true, // Clean coverage directory before each run
             cleanOnRerun: true, // Clean on rerun in watch mode
             exclude: [
                 "**/*.config.*",
                 "**/*.d.ts",
-                "**/dist/**", // Exclude any dist folder anywhere
-                "**/docs/**",
-                "**/index.ts", // Exclude all barrel export files
-                "**/index.tsx", // Exclude JSX barrel export files
+                "**/dist*/**", // covers dist/, dist-electron/, dist-shared/, etc.
                 "**/node_modules/**",
-                "**/types.ts", // Exclude type definition files
-                "**/types.tsx", // Exclude type definition files with JSX
-                "coverage/**",
-                "dist-electron/**",
-                "shared/test",
-                "dist-shared/**",
-                "dist/**",
-                "src/**", // Exclude all src files from electron coverage
-                "index.ts", // Barrel export file at root
+                "**/docs/**",
+                "**/coverage/**",
+                "**/index.{ts,tsx}", // root + nested index.ts / index.tsx
+                "**/types.{ts,tsx}", // single-file types
+                "**/types/**", // types directories
+                "shared/test/**", // covers file + dir form
+                "src/**",
                 "release/**",
                 "scripts/**",
-                "report/**", // Exclude report files
+                "report/**",
                 "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-                "shared/test/**", // Exclude test directory,
-                "**/types/**",
+                "**/electron/utils/interfaces.ts",
                 "**/html/**",
+                "**/enhanced-testUtilities.ts/**",
+                "electron/test/utils/enhanced-testUtilities.ts", // specific file exclude due to usage in tests
                 ...coverageConfigDefaults.exclude,
             ],
+            excludeAfterRemap: true, // Exclude files after remapping for accuracy
             experimentalAstAwareRemapping: true,
             ignoreEmptyLines: true,
             include: ["electron/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}"],
@@ -165,6 +153,7 @@ const vitestConfig = defineConfig({
         globals: true, // Enable global test functions (describe, it, expect)
         include: [
             "electron/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+            "../../electron/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
         ],
         includeTaskLocation: true,
         isolate: true,
