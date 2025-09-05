@@ -157,13 +157,12 @@ describe("CacheKeys - Complete Function Coverage", () => {
                 cacheKeysModule.parseCacheKey("prefix::identifier")
             ).toThrow();
 
-            // Note: parseCacheKey doesn't throw for too many parts, it just uses the first 3
-            const manyParts = cacheKeysModule.parseCacheKey(
-                "prefix:operation:identifier:extra" as any
-            );
-            expect(manyParts.prefix).toBe("prefix");
-            expect(manyParts.operation).toBe("operation");
-            expect(manyParts.identifier).toBe("identifier");
+            // parseCacheKey now throws for keys with too many parts
+            expect(() =>
+                cacheKeysModule.parseCacheKey(
+                    "prefix:operation:identifier:extra" as any
+                )
+            ).toThrow("Invalid cache key format: prefix:operation:identifier:extra");
 
             // Verify all major function paths are executed
             expect(cacheKeysModule.CacheKeys).toBeDefined();

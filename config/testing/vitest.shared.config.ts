@@ -43,8 +43,15 @@ const vitestConfig = defineConfig({
         attachmentsDir: "./.cache/.vitest-attachments-shared",
         bail: 100,
         benchmark: {
-            exclude: ["**/node_modules/**", "**/dist/**"],
-            include: ["shared/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}"],
+            exclude: [
+                "**/dist*/**",
+                "**/html/**",
+                ...defaultExclude,
+            ],
+            include: [
+                "shared/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}",
+                "../../shared/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}",
+            ],
             outputJson: "./coverage/shared/bench-results.json",
             reporters: ["default", "verbose"],
         },

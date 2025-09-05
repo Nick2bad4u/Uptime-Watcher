@@ -46,7 +46,10 @@ const vitestConfig = defineConfig({
                 "**/html/**",
                 ...defaultExclude,
             ],
-            include: ["electron/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}"],
+            include: [
+                "electron/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}",
+                "../../electron/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}",
+            ],
             outputJson: "./coverage/electron/bench-results.json",
             reporters: ["default", "verbose"],
         },

@@ -163,7 +163,7 @@ describe("Cache Keys Function Coverage", () => {
             });
         });
 
-        it("should handle empty identifier in 2-part keys", async ({
+        it("should throw error for empty identifier in 2-part keys", async ({
             task,
             annotate,
         }) => {
@@ -175,11 +175,7 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = parseCacheKey("site:" as any);
-            expect(result).toEqual({
-                prefix: "site",
-                identifier: "",
-            });
+            expect(() => parseCacheKey("site:" as any)).toThrow("Invalid cache key format: site:");
         });
 
         it("should throw error for empty prefix in 2-part keys", async ({

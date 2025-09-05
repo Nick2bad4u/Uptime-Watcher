@@ -1,196 +1,216 @@
 {
-    "tasks": [
-        {
-            "group": "build",
-            "label": "Start Vite Dev Server",
-            "script": "dev",
-            "type": "npm",
-            "presentation": {
-                "panel": "shared",
-                "reveal": "always",
-                "clear": false,
-                "echo": true,
-                "focus": false,
-                "showReuseMessage": true
-            },
-            "problemMatcher": {
-                "owner": "vite",
-                "background": {
-                    "beginsPattern": ".*VITE v.*",
-                    "endsPattern": ".*ready in.*",
-                    "activeOnStart": true
-                },
-                "pattern": {
-                    "regexp": ".*"
-                }
-            },
-            "isBackground": true
-        },
-        {
-            "group": "build",
-            "label": "Install Dependencies",
-            "script": "install",
-            "type": "npm",
-            "presentation": {
-                "panel": "shared",
-                "reveal": "always",
-                "echo": true,
-                "focus": false
-            }
-        },
-        {
-            "group": "build",
-            "label": "Build Application",
-            "script": "build",
-            "type": "npm",
-            "presentation": {
-                "panel": "shared",
-                "reveal": "always",
-                "echo": true,
-                "focus": false
-            }
-        },
-        {
-            "command": "npx tsc -p tsconfig.json && npm run postbuild",
-            "group": "build",
-            "label": "Build Electron Main (Dev)",
-            "type": "shell",
-            "presentation": {
-                "panel": "shared",
-                "reveal": "always",
-                "echo": true,
-                "focus": false
-            }
-        },
-        {
-            "group": "build",
-            "label": "Start Vite Dev Server",
-            "script": "dev",
-            "type": "npm",
-            "presentation": {
-                "panel": "shared",
-                "reveal": "always",
-                "clear": false,
-                "echo": true,
-                "focus": false,
-                "showReuseMessage": true
-            },
-            "problemMatcher": {
-                "owner": "vite",
-                "background": {
-                    "beginsPattern": ".*VITE v.*",
-                    "endsPattern": ".*ready in.*",
-                    "activeOnStart": true
-                },
-                "pattern": {
-                    "regexp": ".*"
-                }
-            },
-            "isBackground": true
-        },
-        {
-            "command": "npm run build",
-            "label": "Build (Vite + Electron)",
-            "type": "shell",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        },
-        {
-            "command": "npm run clean",
-            "label": "Clean All",
-            "type": "shell"
-        },
-        {
-            "command": "npm run start",
-            "label": "Start App (Dev)",
-            "type": "shell",
-            "group": {
-                "kind": "test",
-                "isDefault": true
-            }
-        },
-        {
-            "command": "npm run start:electron",
-            "label": "Start Electron Only",
-            "type": "shell"
-        },
-        {
-            "command": "npm run start-both",
-            "label": "Start Both (Dev + Electron)",
-            "type": "shell"
-        },
-        {
-            "command": "npm run debug:electron",
-            "label": "Debug Electron",
-            "type": "shell"
-        },
-        {
-            "command": "npm run type-check:all",
-            "label": "Type Check (All)",
-            "type": "shell"
-        },
-        {
-            "command": "npm run lint",
-            "label": "Lint All",
-            "type": "shell"
-        },
-        {
-            "command": "npm run lint:fix",
-            "label": "Lint All (Fix)",
-            "type": "shell"
-        },
-        {
-            "command": "npm run test",
-            "label": "Test All",
-            "type": "shell"
-        },
-        {
-            "command": "npm run test:electron",
-            "label": "Test Electron",
-            "type": "shell"
-        },
-        {
-            "command": "npm run test:coverage",
-            "label": "Test Coverage",
-            "type": "shell"
-        },
-        {
-            "command": "npm run docs:build",
-            "label": "Docs Build",
-            "type": "shell"
-        },
-        {
-            "command": "npm run docs:preview",
-            "label": "Docs Preview",
-            "type": "shell"
-        },
-        {
-            "command": "npm run dep:check",
-            "label": "Dependency Check",
-            "type": "shell"
-        },
-        {
-            "command": "npm run dep:update",
-            "label": "Dependency Update",
-            "type": "shell"
-        },
-        {
-            "command": "npm run format",
-            "label": "Format All",
-            "type": "shell"
-        },
-        {
-            "command": "npm run context",
-            "label": "Context Compress",
-            "type": "shell"
-        },
-        {
-            "command": "npm run quality:check",
-            "label": "Quality Check",
-            "type": "shell"
-        }
-    ],
-    "version": "2.0.0"
+	"tasks": [
+		{
+			"group": "build",
+			"label": "Start Vite Dev Server",
+			"script": "dev",
+			"type": "npm",
+			"presentation": {
+				"panel": "shared",
+				"reveal": "always",
+				"clear": false,
+				"echo": true,
+				"focus": false,
+				"showReuseMessage": true
+			},
+			"problemMatcher": {
+				"owner": "vite",
+				"background": {
+					"beginsPattern": ".*VITE v.*",
+					"endsPattern": ".*ready in.*",
+					"activeOnStart": true
+				},
+				"pattern": {
+					"regexp": ".*"
+				}
+			},
+			"isBackground": true
+		},
+		{
+			"group": "build",
+			"label": "Install Dependencies",
+			"script": "install",
+			"type": "npm",
+			"presentation": {
+				"panel": "shared",
+				"reveal": "always",
+				"echo": true,
+				"focus": false
+			}
+		},
+		{
+			"group": "build",
+			"label": "Build Application",
+			"script": "build",
+			"type": "npm",
+			"presentation": {
+				"panel": "shared",
+				"reveal": "always",
+				"echo": true,
+				"focus": false
+			}
+		},
+		{
+			"command": "npx tsc -p tsconfig.json && npm run postbuild",
+			"group": "build",
+			"label": "Build Electron Main (Dev)",
+			"type": "shell",
+			"presentation": {
+				"panel": "shared",
+				"reveal": "always",
+				"echo": true,
+				"focus": false
+			}
+		},
+		{
+			"group": "build",
+			"label": "Start Vite Dev Server",
+			"script": "dev",
+			"type": "npm",
+			"presentation": {
+				"panel": "shared",
+				"reveal": "always",
+				"clear": false,
+				"echo": true,
+				"focus": false,
+				"showReuseMessage": true
+			},
+			"problemMatcher": {
+				"owner": "vite",
+				"background": {
+					"beginsPattern": ".*VITE v.*",
+					"endsPattern": ".*ready in.*",
+					"activeOnStart": true
+				},
+				"pattern": {
+					"regexp": ".*"
+				}
+			},
+			"isBackground": true
+		},
+		{
+			"command": "npm run build",
+			"label": "Build (Vite + Electron)",
+			"type": "shell",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"command": "npm run clean",
+			"label": "Clean All",
+			"type": "shell"
+		},
+		{
+			"command": "npm run start",
+			"label": "Start App (Dev)",
+			"type": "shell",
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			}
+		},
+		{
+			"command": "npm run start:electron",
+			"label": "Start Electron Only",
+			"type": "shell"
+		},
+		{
+			"command": "npm run start-both",
+			"label": "Start Both (Dev + Electron)",
+			"type": "shell"
+		},
+		{
+			"command": "npm run debug:electron",
+			"label": "Debug Electron",
+			"type": "shell"
+		},
+		{
+			"command": "npm run type-check:all",
+			"label": "Type Check (All)",
+			"type": "shell"
+		},
+		{
+			"command": "npm run lint",
+			"label": "Lint All",
+			"type": "shell"
+		},
+		{
+			"command": "npm run lint:fix",
+			"label": "Lint All (Fix)",
+			"type": "shell"
+		},
+		{
+			"command": "npm run test",
+			"label": "Test All",
+			"type": "shell"
+		},
+		{
+			"command": "npm run test:electron",
+			"label": "Test Electron",
+			"type": "shell"
+		},
+		{
+			"command": "npm run test:coverage",
+			"label": "Test Coverage",
+			"type": "shell"
+		},
+		{
+			"command": "npm run docs:build",
+			"label": "Docs Build",
+			"type": "shell"
+		},
+		{
+			"command": "npm run docs:preview",
+			"label": "Docs Preview",
+			"type": "shell"
+		},
+		{
+			"command": "npm run dep:check",
+			"label": "Dependency Check",
+			"type": "shell"
+		},
+		{
+			"command": "npm run dep:update",
+			"label": "Dependency Update",
+			"type": "shell"
+		},
+		{
+			"command": "npm run format",
+			"label": "Format All",
+			"type": "shell"
+		},
+		{
+			"command": "npm run context",
+			"label": "Context Compress",
+			"type": "shell"
+		},
+		{
+			"command": "npm run quality:check",
+			"label": "Quality Check",
+			"type": "shell"
+		},
+		{
+			"label": "Final Coverage Analysis",
+			"type": "shell",
+			"command": "npm run test:coverage"
+		},
+		{
+			"label": "Electron Coverage Analysis",
+			"type": "shell",
+			"command": "npm run test:electron:coverage"
+		},
+		{
+			"label": "Shared Modules Final Coverage Analysis",
+			"type": "shell",
+			"command": "npm run test:shared:coverage"
+		},
+		{
+			"label": "Run Vitest Benchmarks",
+			"type": "shell",
+			"command": "npm run bench"
+		}
+	],
+	"version": "2.0.0"
 }

@@ -77,7 +77,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
                                 }
 
                                 // Remove null bytes and control characters
-                                // eslint-disable-next-line no-control-regex
+                                 
                                 const cleaned = value.replaceAll(
                                     /[\0-\u001F\u007F]/g,
                                     ""

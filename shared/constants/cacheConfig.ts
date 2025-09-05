@@ -163,7 +163,7 @@ export const CACHE_NAMES: CacheNamesCollection = Object.freeze({
      * @returns Standardized monitors cache name
      */
     monitors: (suffix?: string): string =>
-        suffix ? `monitors-${suffix}` : "monitors",
+        suffix === undefined ? "monitors" : `monitors-${suffix}`,
 
     /**
      * Generate a settings cache name with optional suffix.
@@ -173,7 +173,7 @@ export const CACHE_NAMES: CacheNamesCollection = Object.freeze({
      * @returns Standardized settings cache name
      */
     settings: (suffix?: string): string =>
-        suffix ? `settings-${suffix}` : "settings",
+        suffix === undefined ? "settings" : `settings-${suffix}`,
 
     /**
      * Generate a sites cache name with optional suffix.
@@ -188,7 +188,8 @@ export const CACHE_NAMES: CacheNamesCollection = Object.freeze({
      *
      * @returns Standardized sites cache name
      */
-    sites: (suffix?: string): string => (suffix ? `sites-${suffix}` : "sites"),
+    sites: (suffix?: string): string =>
+        suffix === undefined ? "sites" : `sites-${suffix}`,
 
     /**
      * Generate a temporary cache name with operation suffix.

@@ -495,7 +495,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             });
         });
 
-        it("should handle keys with empty identifiers in 2-part format for site prefix", async ({
+        it("should throw error for keys with empty identifiers in 2-part format for site prefix", async ({
             task,
             annotate,
         }) => {
@@ -507,11 +507,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = parseCacheKey("site:" as StandardizedCacheKey);
-            expect(result).toEqual({
-                prefix: "site",
-                identifier: "",
-            });
+            expect(() => parseCacheKey("site:" as StandardizedCacheKey)).toThrow("Invalid cache key format: site:");
         });
 
         it("should throw error for invalid 2-part format with empty prefix", async ({
@@ -531,7 +527,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             }).toThrow("Invalid cache key format: :identifier");
         });
 
-        it("should handle keys with empty identifiers in 2-part format for config prefix", async ({
+        it("should throw error for keys with empty identifiers in 2-part format for config prefix", async ({
             task,
             annotate,
         }) => {
@@ -543,11 +539,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = parseCacheKey("config:" as StandardizedCacheKey);
-            expect(result).toEqual({
-                prefix: "config",
-                identifier: "",
-            });
+            expect(() => parseCacheKey("config:" as StandardizedCacheKey)).toThrow("Invalid cache key format: config:");
         });
 
         it("should throw error for invalid 3-part format with empty prefix", async ({

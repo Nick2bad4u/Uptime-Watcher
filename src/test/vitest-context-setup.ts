@@ -6,6 +6,10 @@
  */
 
 import { beforeEach } from "vitest";
+import fc from "fast-check";
+
+// Configure fast-check for property-based testing
+fc.configureGlobal({ numRuns: 10 });
 
 // No custom context injection needed - Vitest provides task and annotate automatically
 beforeEach(() => {

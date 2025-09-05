@@ -514,7 +514,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             }).toThrow("Invalid cache key format: :identifier");
         });
 
-        it("should handle 2-part format with empty identifier", async ({
+        it("should throw error for 2-part format with empty identifier", async ({
             task,
             annotate,
         }) => {
@@ -526,11 +526,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = parseCacheKey("config:" as StandardizedCacheKey);
-            expect(result).toEqual({
-                prefix: "config",
-                identifier: "",
-            });
+            expect(() => parseCacheKey("config:" as StandardizedCacheKey)).toThrow("Invalid cache key format: config:");
         });
 
         it("should throw error for invalid 3-part format with empty prefix", async ({

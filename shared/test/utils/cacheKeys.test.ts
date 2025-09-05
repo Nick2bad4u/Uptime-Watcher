@@ -771,17 +771,13 @@ describe("cacheKeys", () => {
             });
         });
 
-        it("should handle empty identifiers", async ({ task, annotate }) => {
+        it("should throw error for empty identifiers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: cacheKeys", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = parseCacheKey("config:" as StandardizedCacheKey);
-            expect(result).toEqual({
-                prefix: "config",
-                identifier: "",
-            });
+            expect(() => parseCacheKey("config:" as StandardizedCacheKey)).toThrow("Invalid cache key format: config:");
 
             expect(() =>
                 parseCacheKey("monitor:operation:" as StandardizedCacheKey)
