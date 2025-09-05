@@ -101,8 +101,11 @@ export function isValidIdentifier(value: unknown): value is string {
     }
 
     // Allow alphanumeric characters, hyphens, and underscores
-    // eslint-disable-next-line regexp/require-unicode-sets-regexp -- Character class not compatible with 'v' flag
-    return validator.isAlphanumeric(value.replaceAll(/[_-]/g, ""));
+    const cleanedValue = value.replaceAll(/[_-]/g, "");
+
+    // Must have at least one alphanumeric character remaining
+
+    return cleanedValue.length > 0 && validator.isAlphanumeric(cleanedValue);
 }
 
 /**
@@ -282,12 +285,13 @@ export function isValidUrl(
         return false;
     }
 
-    // Default options to allow localhost
+    // Default options to allow localhost and restrict to HTTP/HTTPS
     const urlOptions = {
         allow_protocol_relative_urls: false,
         allow_trailing_dot: false,
         allow_underscores: false,
         disallow_auth: false,
+        protocols: ["http", "https"], // Restrict to web protocols by default
         require_host: true,
         require_port: false,
         require_protocol: true,

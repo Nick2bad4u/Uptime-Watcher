@@ -34,9 +34,9 @@ const vitestConfig = defineConfig({
     },
     resolve: {
         alias: {
-            "@app": normalizePath(path.resolve(dirname, "../../src")),
-            "@electron": normalizePath(path.resolve(dirname, "../../electron")),
-            "@shared": normalizePath(path.resolve(dirname, "../../shared")),
+            "@app": normalizePath(path.resolve(dirname, "src")),
+            "@electron": normalizePath(path.resolve(dirname, "electron")),
+            "@shared": normalizePath(path.resolve(dirname, "shared")),
         },
     },
     test: {
@@ -48,10 +48,7 @@ const vitestConfig = defineConfig({
                 "**/html/**",
                 ...defaultExclude,
             ],
-            include: [
-                "shared/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}",
-                "../../shared/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}",
-            ],
+            include: ["shared/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}"],
             outputJson: "./coverage/shared/bench-results.json",
             reporters: ["default", "verbose"],
         },
@@ -173,7 +170,6 @@ const vitestConfig = defineConfig({
         globals: true, // Enable global test functions
         include: [
             "shared/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-            "../../shared/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
         ],
         includeTaskLocation: true, // Parity: enable task location annotations
         isolate: true,

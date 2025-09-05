@@ -176,11 +176,11 @@ import yamlEslintParser from "yaml-eslint-parser";
 const ROOT_DIR = import.meta.dirname;
 
 export default [
-    // GLobal Configs and Rules
+    // Global Configs and Rules
     importX.flatConfigs.typescript,
     progress.configs.recommended,
     noBarrelFiles.flat,
-    // @ts-expect-error -- working fine - tested
+    // @ts-expect-error: nitpick.configs.recommended may not have correct types, but runtime usage is verified and safe
     nitpick.configs.recommended,
 
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -686,6 +686,11 @@ export default [
             "tailwind/migration-from-tailwind-2": "warn",
             "tailwind/no-arbitrary-value": "warn",
             "tailwind/no-contradicting-classname": "warn",
+            /**
+            * Performance issue with the plugin, somewhat mitigated setting cssFiles to an empty array.
+            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
+            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
+            */
             "tailwind/no-custom-classname": [
                 "off",
                 {
@@ -3023,6 +3028,11 @@ export default [
             // "tailwind/migration-from-tailwind-2": "warn",
             // "tailwind/no-arbitrary-value": "warn",
             // "tailwind/no-contradicting-classname": "warn",
+            /**
+            * Performance issue with the plugin, somewhat mitigated setting cssFiles to an empty array.
+            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
+            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
+            */
             // "tailwind/no-custom-classname": "off",
             // "tailwind/no-unnecessary-arbitrary-value": "warn",
             "regexp/prefer-plus-quantifier": "warn",
@@ -5427,6 +5437,11 @@ export default [
             // "tailwind/migration-from-tailwind-2": "warn",
             // "tailwind/no-arbitrary-value": "warn",
             // "tailwind/no-contradicting-classname": "warn",
+            /**
+            * Performance issue with the plugin, somewhat mitigated setting cssFiles to an empty array.
+            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
+            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
+            */
             // "tailwind/no-custom-classname": "off",
             // "tailwind/no-unnecessary-arbitrary-value": "warn",
             "regexp/prefer-plus-quantifier": "warn",

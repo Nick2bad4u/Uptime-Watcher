@@ -3,6 +3,17 @@
  * configuration for consistent testing behavior
  */
 
+import EventEmitter from "node:events";
+
+// Set max listeners to prevent memory leak warnings in tests
+const MAX_LISTENERS = 200; // Higher threshold for test environment
+
+// Set default max listeners for all EventEmitter instances
+EventEmitter.defaultMaxListeners = MAX_LISTENERS;
+
+// Set max listeners specifically for the process object
+process.setMaxListeners(MAX_LISTENERS);
+
 import { vi, type MockedFunction } from "vitest";
 import fc from "fast-check";
 

@@ -334,7 +334,6 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                     // Filter out invalid/malformed configs
                     const configs = rawConfigs.filter(
                         (config): config is MonitorTypeConfig =>
-                            config != null &&
                             typeof config === "object" &&
                             typeof config.type === "string" &&
                             config.type.length > 0

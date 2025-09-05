@@ -365,26 +365,47 @@ export function parseCacheKey(key: StandardizedCacheKey): {
 } {
     const parts = key.split(KEY_SEPARATOR);
 
+    // Only allow 2-part or 3-part keys
+    if (parts.length < 2 || parts.length > 3) {
+        throw new Error(`Invalid cache key format: ${key}`);
+    }
+
     if (parts.length === 2) {
         const [prefix, identifier] = parts;
 
-        if (!prefix) {
+        if (
+            !prefix ||
+            !identifier ||
+            prefix.trim() !== prefix ||
+            identifier.trim() !== identifier ||
+            identifier.trim().length === 0
+        ) {
             throw new Error(`Invalid cache key format: ${key}`);
         }
 
         return {
-            identifier: identifier ?? "", // Allow empty identifier for 2-part keys
+            identifier,
             prefix,
         };
     }
 
+    // parts.length === 3
     const [
         prefix,
         operation,
         identifier,
     ] = parts;
 
-    if (!prefix || !operation || !identifier) {
+    if (
+        !prefix ||
+        !operation ||
+        !identifier ||
+        prefix.trim() !== prefix ||
+        operation.trim() !== operation ||
+        identifier.trim() !== identifier ||
+        operation.trim().length === 0 ||
+        identifier.trim().length === 0
+    ) {
         throw new Error(`Invalid cache key format: ${key}`);
     }
 

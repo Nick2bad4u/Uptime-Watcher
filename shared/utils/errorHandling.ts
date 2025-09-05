@@ -39,6 +39,24 @@ export interface ErrorHandlingFrontendStore {
 }
 
 /**
+ * Get the appropriate error message based on the operation name.
+ *
+ * @param operationName - The operation name (should be string, but defensive)
+ *
+ * @returns Formatted error message
+ */
+function getErrorMessage(operationName: unknown): string {
+    if (
+        operationName &&
+        (typeof operationName === "string" || typeof operationName === "number")
+    ) {
+        // Accept strings and numbers for operation names
+        return `Failed to ${operationName}`;
+    }
+    return "Async operation failed";
+}
+
+/**
  * Shared error handling utility for async operations. Provides a unified
  * pattern for error logging, reporting, and state management.
  *
@@ -125,26 +143,21 @@ async function handleBackendOperation<T>(
     try {
         return await operation();
     } catch (error) {
-        // Check if logger exists and has error method
-        if (
-            typeof logger === "object" &&
-            "error" in logger &&
-            typeof logger.error === "function"
-        ) {
-            logger.error(
-                operationName
-                    ? `Failed to ${operationName}`
-                    : "Async operation failed",
-                error
-            );
-        } else {
-            console.error(
-                operationName
-                    ? `Failed to ${operationName}`
-                    : "Async operation failed",
-                error
-            );
+        const errorMessage = getErrorMessage(operationName);
+
+        // Safely handle logging - fallback to console.error if logger is invalid
+        try {
+            if (logger && typeof logger.error === "function") {
+                logger.error(errorMessage, error);
+            } else {
+                console.error(errorMessage, error);
+            }
+        } catch (logError) {
+            // Fallback to console.error if logger.error throws
+            console.error(errorMessage, error);
+            console.warn("Logger error during error handling:", logError);
         }
+
         throw error;
     }
 }

@@ -386,7 +386,7 @@ function validateFieldWithSchema(
 
     // Get the schema for the monitor type
     const schema = getMonitorSchema(type);
-    if (schema && fieldName in schema.shape) {
+    if (schema && Object.hasOwn(schema.shape, fieldName)) {
         // Use the specific schema's field definition
         // Type assertion is safe since we check field existence above
         const fieldSchema =
@@ -400,7 +400,7 @@ function validateFieldWithSchema(
 
     // Fallback to base schema for common fields
     const commonFields = baseMonitorSchema.shape;
-    if (fieldName in commonFields) {
+    if (Object.hasOwn(commonFields, fieldName)) {
         return z
             .object({
                 [fieldName]:

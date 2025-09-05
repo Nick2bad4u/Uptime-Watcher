@@ -81,8 +81,11 @@ export function createCombinedAbortSignal(
         signals.push(AbortSignal.timeout(timeoutMs));
     }
 
-    // Add additional signals
-    signals.push(...additionalSignals.filter(Boolean));
+    // Add additional signals (handle null/undefined additionalSignals)
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (additionalSignals) {
+        signals.push(...additionalSignals.filter(Boolean));
+    }
 
     // If no signals to combine, create a signal that never aborts
     if (signals.length === 0) {
@@ -233,6 +236,7 @@ export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
  *
  * @public
  */
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export async function retryWithAbort<T>(
     operation: () => Promise<T>,
     options: RetryWithAbortOptions = {}

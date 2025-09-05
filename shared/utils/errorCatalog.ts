@@ -386,7 +386,9 @@ export function formatErrorMessage(
     let result = template;
     for (const [key, value] of Object.entries(params)) {
         const placeholder = `{${key}}`;
-        result = result.replaceAll(placeholder, String(value));
+        const stringValue = String(value);
+        // Use replacement function to avoid special replacement pattern interpretation
+        result = result.replaceAll(placeholder, () => stringValue);
     }
     return result;
 }

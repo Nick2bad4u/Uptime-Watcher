@@ -55,7 +55,9 @@ const titleSuffixFormatters: Record<string, TitleSuffixFormatter> = {
 export function getTitleSuffixFormatter(
     monitorType: string
 ): TitleSuffixFormatter | undefined {
-    return titleSuffixFormatters[monitorType];
+    return Object.hasOwn(titleSuffixFormatters, monitorType)
+        ? titleSuffixFormatters[monitorType]
+        : undefined;
 }
 
 /**

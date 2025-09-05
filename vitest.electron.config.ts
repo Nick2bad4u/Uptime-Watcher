@@ -32,9 +32,9 @@ const vitestConfig = defineConfig({
     },
     resolve: {
         alias: {
-            "@app": normalizePath(path.resolve(dirname, "../../src")),
-            "@electron": normalizePath(path.resolve(dirname, "../../electron")),
-            "@shared": normalizePath(path.resolve(dirname, "../../shared")),
+            "@app": normalizePath(path.resolve(dirname, "src")),
+            "@electron": normalizePath(path.resolve(dirname, "electron")),
+            "@shared": normalizePath(path.resolve(dirname, "shared")),
         },
     },
     test: {
@@ -46,10 +46,7 @@ const vitestConfig = defineConfig({
                 "**/html/**",
                 ...defaultExclude,
             ],
-            include: [
-                "electron/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}",
-                "../../electron/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}",
-            ],
+            include: ["electron/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}"],
             outputJson: "./coverage/electron/bench-results.json",
             reporters: ["default", "verbose"],
         },
@@ -156,7 +153,6 @@ const vitestConfig = defineConfig({
         globals: true, // Enable global test functions (describe, it, expect)
         include: [
             "electron/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-            "../../electron/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
         ],
         includeTaskLocation: true,
         isolate: true,

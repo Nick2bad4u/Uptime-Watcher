@@ -536,7 +536,7 @@ export const monitorOperations = {
      */
     updateStatus: (monitor: Monitor, status: Monitor["status"]): Monitor => {
         if (!isMonitorStatus(status)) {
-            throw new Error(`Invalid monitor status: ${String(status)}`);
+            throw new Error("Invalid monitor status");
         }
         return {
             ...monitor,

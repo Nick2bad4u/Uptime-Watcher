@@ -29,10 +29,23 @@ import { coverageConfigDefaults, defaultExclude } from "vitest/config";
 import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
 
 const dirname = import.meta.dirname;
+const VITE_BUILD_TARGET = "esnext";
 
 /**
- * Vite configuration object. Sets up build settings for both renderer (React)
- * and main/preload processes.
+ * @remarks
+ * This configuration sets up build and development settings for both the React
+ * renderer process and Electron main/preload scripts. It includes plugin
+ * integration, code splitting, coverage, static asset handling, and
+ * architectural optimizations for a robust Electron + React workflow.
+ *
+ * - Renderer (SPA): React frontend with advanced chunking, CSS Modules, and HMR.
+ * - Electron Main/Preload: Separate build targets, sourcemaps, and hot
+ *   reload/restart.
+ * - Plugins: Coverage, bundle analysis, static copy, CSP dev fix, and more.
+ * - Testing: Vitest configuration for frontend, with coverage and performance
+ *   optimizations.
+ *
+ * Vite configuration for Uptime Watcher Electron app.
  */
 
 export default defineConfig(({ mode }) => {
@@ -41,7 +54,7 @@ export default defineConfig(({ mode }) => {
     const isTestMode = mode === "test";
     const isDev = mode === "development";
     return {
-        appType: "spa", // Single Page Application
+        appType: "spa", // Required for Electron renderer process (SPA mode ensures correct routing and asset loading)
         base: "./", // Ensures relative asset paths for Electron
         build: {
             assetsDir: "assets",
@@ -74,14 +87,16 @@ export default defineConfig(({ mode }) => {
                 },
             },
             sourcemap: true, // Recommended for Electron debugging
-            target: "esnext", // Updated to esnext for CSS Modules compatibility
+            target: VITE_BUILD_TARGET, // Updated to esnext for CSS Modules compatibility
         },
-        cache: true,
         cacheDir: "./.cache/.vite", // Separate cache to avoid conflicts
         css: {
             devSourcemap: true, // Enable source maps for CSS in development
             modules: {
-                generateScopedName: "[name]__[local]___[hash:base64:5]", // Custom scoped name pattern
+                // Custom scoped name pattern: [name]__[local]___[hash:base64:5]
+                // This pattern ensures class names are unique per file and component, improves readability in debugging,
+                // and avoids collisions in production by including a short hash. It balances clarity and uniqueness.
+                generateScopedName: "[name]__[local]___[hash:base64:5]",
                 // CSS Modules configuration
                 localsConvention: "camelCase" as const, // Convert kebab-case to camelCase for named exports
             },
@@ -112,7 +127,7 @@ export default defineConfig(({ mode }) => {
         optimizeDeps: {
             // Force dependency optimization to handle large chunks better
             esbuildOptions: {
-                target: "esnext", // Use latest JS features for smaller output
+                target: VITE_BUILD_TARGET, // Use latest JS features for smaller output
                 // Note: splitting, format, and treeShaking are handled by Vite itself
                 // and should not be configured here to avoid conflicts
             },
@@ -141,7 +156,30 @@ export default defineConfig(({ mode }) => {
             }),
             // Inject package version into import.meta.env.PACKAGE_VERSION
             packageVersion(),
-            // Custom plugin to fix CSP eval() issue with zod in development
+            /**
+             * @remarks
+             * Csp-dev-fix
+             *
+             * Temporarily adds 'unsafe-eval' to the Content Security Policy
+             * (CSP) in development mode to allow libraries (like zod) that use
+             * eval or new Function for code generation.
+             *
+             * Security Implications:
+             *
+             * - 'unsafe-eval' is a known CSP relaxation that allows dynamic code
+             *   execution, which can be exploited in production.
+             * - This plugin only enables 'unsafe-eval' when running the Vite dev
+             *   server (context.server is truthy).
+             * - In production builds, the CSP remains strict and does NOT include
+             *   'unsafe-eval'.
+             *
+             * Why it's safe in development:
+             *
+             * - The development server is only accessible locally and is not
+             *   exposed to the public internet.
+             * - This change is necessary for developer experience and debugging,
+             *   but is never present in production output.
+             */
             {
                 name: "csp-dev-fix",
                 transformIndexHtml(html, context) {
@@ -170,6 +208,7 @@ export default defineConfig(({ mode }) => {
                         build: {
                             outDir: "dist-electron",
                             sourcemap: true, // Enable sourcemaps for main process
+                            target: VITE_BUILD_TARGET, // Ensure CSS Modules compatibility
                         },
                         resolve: {
                             alias: {
@@ -205,6 +244,7 @@ export default defineConfig(({ mode }) => {
                                 },
                             },
                             sourcemap: true, // Enable sourcemaps for preload script
+                            target: "esnext", // Ensure CSS Modules compatibility
                         },
                         resolve: {
                             alias: {
@@ -247,6 +287,14 @@ export default defineConfig(({ mode }) => {
             //     },
             //     enableBuild: false, // Disable in build mode (use CI for production checking)
             // }),
+            /**
+             * @remarks
+             * ViteMcp Integrates the vite-plugin-mcp for enhanced module cache
+             * performance and improved build speed. This plugin optimizes
+             * caching and module resolution, reducing rebuild times during
+             * development. It is included to accelerate the Vite build process
+             * and improve developer experience.
+             */
             ViteMcp(),
             // Only include react-scan in development mode to avoid sourcemap warnings in production
             ...(isDev
@@ -411,8 +459,17 @@ export default defineConfig(({ mode }) => {
                                         `    📊 Size: ${sizeInKB} KB (${originalSize.toLocaleString()} bytes)`
                                     );
                                     console.log(`    🔧 Version: ${version}`);
+                                    // Estimate compression potential (assume typical WASM compression ratio ~65%)
+                                    const estimatedCompressedSize =
+                                        contents.length * 0.35;
+                                    const compressionPotential = (
+                                        (1 -
+                                            estimatedCompressedSize /
+                                                contents.length) *
+                                        100
+                                    ).toFixed(1);
                                     console.log(
-                                        `    🎯 Compression potential: ${((1 - contents.length / (contents.length * 1.5)) * 100).toFixed(1)}% savings possible`
+                                        `    🎯 Compression potential: ${compressionPotential}% savings possible (estimated)`
                                     );
 
                                     // Production approach: Preserve SQLite WASM integrity
@@ -452,19 +509,22 @@ export default defineConfig(({ mode }) => {
             // Put the Codecov vite plugin after all other plugins
             codecovVitePlugin({
                 bundleName: "uptime-watcher",
-                enableBundleAnalysis: codecovToken !== undefined,
+                enableBundleAnalysis: Boolean(codecovToken),
                 ...(codecovToken ? { uploadToken: codecovToken } : {}),
                 telemetry: false, // Disable telemetry for faster builds
             }),
         ],
         preview: {
             open: false, // Don't auto-open browser (Electron only)
-            port: 6174, // Different from dev server port to avoid conflicts
+            port: 6174, // Preview server uses port 6174 to avoid conflicts with dev server (5173).
+            // Rationale: Keeping preview and dev server ports different ensures that running both simultaneously does not cause port binding issues.
             strictPort: true, // Fail if port is taken (prevents silent port changes)
         },
         publicDir: "public",
         resolve: {
             alias: {
+                "@app": normalizePath(path.resolve(dirname, "src")),
+                "@electron": normalizePath(path.resolve(dirname, "electron")),
                 "@shared": normalizePath(path.resolve(dirname, "shared")),
             },
             extensions: [
@@ -486,7 +546,8 @@ export default defineConfig(({ mode }) => {
                 protocol: "ws", // Use WebSocket for HMR
             },
             open: false, // Don't auto-open browser (Electron only)
-            port: 5173,
+            port: 5173, // Dev server uses port 5173. This is intentionally different from preview port (6174) to prevent accidental overlap.
+            // Rationale: Separating dev and preview ports allows both environments to run concurrently without port conflicts, aiding development and testing.
             strictPort: true, // Fail if port is taken (prevents silent port changes)
             warmup: {
                 // Warm up frequently used files to improve initial loading performance
@@ -542,6 +603,8 @@ export default defineConfig(({ mode }) => {
             },
         },
         test: {
+            // Directory for storing Vitest test attachments (screenshots, logs, etc.) in a hidden cache folder.
+            // This helps keep test artifacts organized and out of the main source tree.
             attachmentsDir: "./.cache/.vitest-attachments",
             bail: 100, // Stop after 100 failures to avoid excessive output
             benchmark: {
@@ -638,12 +701,19 @@ export default defineConfig(({ mode }) => {
                 aIndicator: pc.red(pc.bold("--")),
                 bIndicator: pc.green(pc.bold("++")),
                 expand: true,
+                // The value 20 for maxDepth was chosen to provide sufficient context for deeply nested object diffs.
+                // This helps debugging complex test failures, but may impact performance for very large or deeply nested objects.
+                // Monitor test performance and adjust this value if you encounter slowdowns with large diffs.
                 maxDepth: 20,
                 omitAnnotationLines: true,
                 printBasicPrototype: false,
                 truncateAnnotation: pc.cyan(
-                    pc.bold("... Diff result is truncated")
+                    pc.bold("... Diff output truncated for readability")
                 ),
+                // The value 250 for truncateThreshold was selected to balance readability and performance.
+                // It limits the maximum number of diff lines shown, preventing excessively long outputs
+                // while still providing enough context for most test failures. Increasing this value may
+                // slow down output and clutter logs; decreasing it could hide important diff details.
                 truncateThreshold: 250,
             },
             env: {
@@ -701,8 +771,8 @@ export default defineConfig(({ mode }) => {
             printConsoleTrace: false, // Disable stack trace printing for cleaner output
             projects: [
                 "vitest.config.ts",
-                String.raw`config\testing\vitest.electron.config.ts`,
-                String.raw`config\testing\vitest.shared.config.ts`,
+                "vitest.electron.config.ts",
+                "vitest.shared.config.ts",
             ],
             // Improve test output
             reporters: [
