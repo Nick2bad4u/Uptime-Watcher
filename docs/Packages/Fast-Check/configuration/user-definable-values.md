@@ -1,0 +1,1 @@
+<a href="/dubzzz/fast-check/tree/main/website/docs/configuration/user-definable-values.md">Moved Permanently</a>.

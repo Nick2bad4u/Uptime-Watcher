@@ -116,12 +116,10 @@ const __dirname = path.dirname(__filename);
  */
 const CONFIG = {
     // Core configuration
-    docName: "Example-Package",
+    docName: "@fast-check-vitest",
     baseUrl:
-        "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/main ", // or master
+        "https://raw.githubusercontent.com/dubzzz/fast-check/refs/heads/main/packages/vitest",
     pages: [
-        "examples/example.js",
-        "examples/example2.html",
         "README.md",
     ],
 

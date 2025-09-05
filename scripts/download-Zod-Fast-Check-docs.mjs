@@ -41,6 +41,8 @@ const execFileAsync = promisify(execFile);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// (debug markers removed)
+
 /* ==================== TYPE DEFINITIONS ==================== */
 
 /**
@@ -116,12 +118,10 @@ const __dirname = path.dirname(__filename);
  */
 const CONFIG = {
     // Core configuration
-    docName: "Example-Package",
+    docName: "Zod-Fast-Check",
     baseUrl:
-        "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/main ", // or master
+        "https://raw.githubusercontent.com/DavidTimms/zod-fast-check/refs/heads/main",
     pages: [
-        "examples/example.js",
-        "examples/example2.html",
         "README.md",
     ],
 
@@ -239,42 +239,42 @@ function parseArguments() {
  */
 function showHelp() {
     const msg = [
-        'Universal Documentation Downloader v2.0.0',
-        '',
-        'USAGE:',
-        '  node scripts/download-docs-template.mjs [OPTIONS]',
-        '',
-        'OPTIONS:',
-        '  --help, -h              Show this help message',
-        '  --cache                 Enable caching (default: true)',
-        '  --no-cache              Disable caching',
-        '  --parallel              Enable parallel processing (default: true)',
-        '  --no-parallel           Disable parallel processing',
-        '  --validate              Enable content validation (default: true)',
-        '  --no-validate           Disable content validation',
-        '  --retry <n>             Max retry attempts (default: 3)',
-        '  --force                 Ignore cache & force re-download',
-        '  --timeout <seconds>     Request timeout in seconds (default: 30)',
-        '  --concurrency <n>       Max concurrent downloads (default: 5)',
-        '  --doc-name <name>       Documentation set name',
-        '  --base-url <url>        Base URL for documentation',
-        '',
-        'ENVIRONMENT VARIABLES:',
-        '  DOCS_OUTPUT_DIR         Custom output directory',
-        '  DOC_DOWNLOADER_CACHE    Cache directory override',
-        '  DOC_DOWNLOADER_VERBOSE  Enable verbose logging',
-        '',
-        'EXAMPLES:',
-        '  node scripts/download-docs-template.mjs --cache --parallel',
-        '  node scripts/download-docs-template.mjs --retry=5 --timeout=60',
-        '  DOCS_OUTPUT_DIR=/tmp/docs node scripts/download-docs-template.mjs',
-        ''
-    ].join('\n');
+        "Universal Documentation Downloader v2.0.0",
+        "",
+        "USAGE:",
+        "  node scripts/download-docs-template.mjs [OPTIONS]",
+        "",
+        "OPTIONS:",
+        "  --help, -h              Show this help message",
+        "  --cache                 Enable caching (default: true)",
+        "  --no-cache              Disable caching",
+        "  --parallel              Enable parallel processing (default: true)",
+        "  --no-parallel           Disable parallel processing",
+        "  --validate              Enable content validation (default: true)",
+        "  --no-validate           Disable content validation",
+        "  --retry <n>             Max retry attempts (default: 3)",
+        "  --force                 Ignore cache & force re-download",
+        "  --timeout <seconds>     Request timeout in seconds (default: 30)",
+        "  --concurrency <n>       Max concurrent downloads (default: 5)",
+        "  --doc-name <name>       Documentation set name",
+        "  --base-url <url>        Base URL for documentation",
+        "",
+        "ENVIRONMENT VARIABLES:",
+        "  DOCS_OUTPUT_DIR         Custom output directory",
+        "  DOC_DOWNLOADER_CACHE    Cache directory override",
+        "  DOC_DOWNLOADER_VERBOSE  Enable verbose logging",
+        "",
+        "EXAMPLES:",
+        "  node scripts/download-docs-template.mjs --cache --parallel",
+        "  node scripts/download-docs-template.mjs --retry=5 --timeout=60",
+        "  DOCS_OUTPUT_DIR=/tmp/docs node scripts/download-docs-template.mjs",
+        "",
+    ].join("\n");
     try {
         const fd = process.stdout.fd;
-        fsSync.writeFileSync(fd, msg + '\n');
-    } catch {
-        console.log(msg);
+        fsSync.writeFileSync(fd, msg + "\n");
+    } catch (e) {
+        try { fsSync.writeFileSync(1, msg + "\n"); } catch { console.log(msg); }
     }
 }
 
@@ -551,6 +551,9 @@ function cleanContent(content, config, logger) {
  *
  * @returns {Promise<DownloadResult>} Download result
  */
+/**
+ * Attempt to determine if pandoc is available (cached result).
+ */
 let _pandocAvailableCache = null;
 async function isPandocAvailable(logger) {
     if (_pandocAvailableCache !== null) return _pandocAvailableCache;
@@ -558,12 +561,16 @@ async function isPandocAvailable(logger) {
         await execFileAsync("pandoc", ["--version"], { timeout: 4000 });
         _pandocAvailableCache = true;
     } catch (e) {
-        logger.warn("Pandoc not available – using raw download fallback");
+        logger.warn("Pandoc not available – falling back to raw download mode");
         _pandocAvailableCache = false;
     }
     return _pandocAvailableCache;
 }
 
+/**
+ * Minimal raw HTTP(S) downloader (no transformation) used when pandoc missing
+ * and when input/output formats are identical markdown.
+ */
 async function rawDownload(url, timeoutMs) {
     const protocol = await import(url.startsWith("https") ? "https" : "http");
     return new Promise((resolve, reject) => {
@@ -578,19 +585,31 @@ async function rawDownload(url, timeoutMs) {
             res.on("end", () => resolve(data));
         });
         req.on("error", reject);
-        req.setTimeout(timeoutMs, () => req.destroy(new Error("Request timeout")));
+        req.setTimeout(timeoutMs, () => {
+            req.destroy(new Error("Request timeout"));
+        });
     });
 }
 
+/**
+ * Download a single file with retry logic, caching & optional pandoc use.
+ * @param {DownloadTask} task
+ * @param {DownloadConfig} config
+ * @param {Logger} logger
+ * @param {Paths} paths
+ * @param {Record<string,string>} previousHashes
+ * @returns {Promise<DownloadResult>}
+ */
 async function downloadFile(task, config, logger, paths, previousHashes) {
     const { page, url, outputPath } = task;
 
+    // Early skip with cache
     if (config.enableCache && !config.force && fsSync.existsSync(outputPath)) {
         try {
-            const existing = await fs.readFile(outputPath, "utf8");
+            const existingContent = await fs.readFile(outputPath, "utf8");
             const existingHash = crypto
                 .createHash("sha256")
-                .update(existing)
+                .update(existingContent)
                 .digest("hex");
             if (previousHashes[page] && previousHashes[page] === existingHash) {
                 logger.info(`♻️  Cache hit (unchanged) - skipping ${page}`);
@@ -599,7 +618,7 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
                     outputPath,
                     success: true,
                     hash: existingHash,
-                    size: existing.length,
+                    size: existingContent.length,
                     attempts: 0,
                 };
             }
@@ -621,6 +640,7 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
                 `Downloading ${page} (attempt ${attempt}/${config.maxRetries})` +
                     (useRaw ? " [raw]" : " [pandoc]")
             );
+
             await fs.mkdir(path.dirname(outputPath), { recursive: true });
             let content;
             if (useRaw) {
@@ -649,15 +669,25 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
                 }
                 content = await fs.readFile(outputPath, "utf8");
             }
+
             if (!validateContent(content, config, logger)) {
                 throw new Error(`Content validation failed for: ${page}`);
             }
+
             content = rewriteLinks(content, config.baseUrl, logger);
             content = cleanContent(content, config, logger);
             await fs.writeFile(outputPath, content, "utf8");
+
             const hash = crypto.createHash("sha256").update(content).digest("hex");
             logger.success(`Downloaded: ${page}`);
-            return { page, outputPath, success: true, hash, size: content.length, attempts: attempt };
+            return {
+                page,
+                outputPath,
+                success: true,
+                hash,
+                size: content.length,
+                attempts: attempt,
+            };
         } catch (error) {
             lastError = error;
             logger.warn(
@@ -670,10 +700,17 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
             }
         }
     }
+
     logger.error(
         `Failed to download ${page} after ${config.maxRetries} attempts: ${lastError?.message}`
     );
-    return { page, outputPath, success: false, error: lastError?.message || "Unknown error", attempts: config.maxRetries };
+    return {
+        page,
+        outputPath,
+        success: false,
+        error: lastError?.message || "Unknown error",
+        attempts: config.maxRetries,
+    };
 }
 
 /**
@@ -891,9 +928,10 @@ function getOutputPath(page, config, paths) {
 }
 
 // Execute main function if this is the main module
-const templateArgvPath = path.resolve(process.argv[1]);
-const templateMetaPath = fileURLToPath(import.meta.url);
-if (templateMetaPath === templateArgvPath) {
+// Debug main trigger check
+const argvPath = path.resolve(process.argv[1]);
+const metaPath = fileURLToPath(import.meta.url);
+if (metaPath === argvPath) {
     main().catch(console.error);
 }
 

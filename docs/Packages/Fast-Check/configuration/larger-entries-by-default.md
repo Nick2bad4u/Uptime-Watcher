@@ -1,0 +1,1 @@
+<a href="/dubzzz/fast-check/tree/main/website/docs/configuration/larger-entries-by-default.md">Moved Permanently</a>.

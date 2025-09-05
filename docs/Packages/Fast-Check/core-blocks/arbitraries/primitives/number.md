@@ -1,0 +1,1 @@
+<a href="/dubzzz/fast-check/tree/main/website/docs/core-blocks/arbitraries/primitives/number.md">Moved Permanently</a>.

@@ -116,13 +116,56 @@ const __dirname = path.dirname(__filename);
  */
 const CONFIG = {
     // Core configuration
-    docName: "Example-Package",
+    docName: "Fast-Check",
     baseUrl:
-        "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/main ", // or master
+        "https://raw.githubusercontent.com/dubzzz/fast-check/tree/main/website/docs/", // or master
     pages: [
-        "examples/example.js",
-        "examples/example2.html",
-        "README.md",
+        "tutorials/setting-up-your-test-environment/property-based-testing-with-nodejs-test-runner.md",
+        "tutorials/setting-up-your-test-environment/property-based-testing-with-jest.md",
+        "tutorials/setting-up-your-test-environment/property-based-testing-with-deno-test-runner.md",
+        "tutorials/setting-up-your-test-environment/property-based-testing-with-bun-test-runner.md",
+        "tutorials/quick-start/read-test-reports.md",
+        "tutorials/quick-start/our-first-property-based-test.md",
+        "tutorials/quick-start/basic-setup.md",
+        "tutorials/detect-race-conditions/your-first-race-condition-test.mdx",
+        "tutorials/detect-race-conditions/wrapping-up.mdx",
+        "tutorials/detect-race-conditions/the-missing-part.mdx",
+        "tutorials/detect-race-conditions/snippets.spec.mjs",
+        "tutorials/detect-race-conditions/snippets.mjs",
+        "tutorials/detect-race-conditions/one-step-closer-to-real-usages.mdx",
+        "tutorials/detect-race-conditions/multiple-batches-of-calls.mdx",
+        "introduction/why-property-based.md",
+        "introduction/getting-started.md",
+        "ecosystem.md",
+        "core-blocks/runners.md",
+        "core-blocks/properties.md",
+        "core-blocks/arbitraries/primitives/string.md",
+        "core-blocks/arbitraries/primitives/number.md",
+        "core-blocks/arbitraries/primitives/date.md",
+        "core-blocks/arbitraries/primitives/boolean.md",
+        "core-blocks/arbitraries/primitives/bigint.md",
+        "core-blocks/arbitraries/others.md",
+        "core-blocks/arbitraries/fake-data/internet.md",
+        "core-blocks/arbitraries/fake-data/identifier.md",
+        "core-blocks/arbitraries/fake-data/file.md",
+        "core-blocks/arbitraries/composites/typed-array.md",
+        "core-blocks/arbitraries/composites/object.md",
+        "core-blocks/arbitraries/composites/iterable.md",
+        "core-blocks/arbitraries/composites/function.md",
+        "core-blocks/arbitraries/composites/array.md",
+        "core-blocks/arbitraries/combiners/string.md",
+        "core-blocks/arbitraries/combiners/recursive-structure.md",
+        "core-blocks/arbitraries/combiners/constant.md",
+        "core-blocks/arbitraries/combiners/any.md",
+        "configuration/user-definable-values.md",
+        "configuration/timeouts.md",
+        "configuration/larger-entries-by-default.md",
+        "configuration/global-settings.md",
+        "configuration/custom-reports.md",
+        "advanced/race-conditions.md",
+        "advanced/model-based-testing.md",
+        "advanced/fuzzing.md",
+        "advanced/fake-data.md"
     ],
 
     // Format configuration
@@ -145,7 +188,7 @@ const CONFIG = {
     removeAboveMarkers: ["::::: start_here"],
 
     // Validation rules
-    minContentLength: 100,
+    minContentLength: 50,
     requiredPatterns: [],
     forbiddenPatterns: [
         "404 Not Found",

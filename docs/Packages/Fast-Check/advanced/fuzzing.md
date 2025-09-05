@@ -1,0 +1,1 @@
+<a href="/dubzzz/fast-check/tree/main/website/docs/advanced/fuzzing.md">Moved Permanently</a>.

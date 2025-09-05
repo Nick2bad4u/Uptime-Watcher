@@ -1,0 +1,1 @@
+<a href="/dubzzz/fast-check/tree/main/website/docs/core-blocks/arbitraries/primitives/bigint.md">Moved Permanently</a>.

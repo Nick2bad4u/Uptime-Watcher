@@ -1,0 +1,1 @@
+<a href="/dubzzz/fast-check/tree/main/website/docs/core-blocks/arbitraries/composites/iterable.md">Moved Permanently</a>.

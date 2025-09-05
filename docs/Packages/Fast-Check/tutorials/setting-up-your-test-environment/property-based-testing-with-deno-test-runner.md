@@ -1,0 +1,1 @@
+<a href="/dubzzz/fast-check/tree/main/website/docs/tutorials/setting-up-your-test-environment/property-based-testing-with-deno-test-runner.md">Moved Permanently</a>.

@@ -1,0 +1,1 @@
+<a href="/dubzzz/fast-check/tree/main/website/docs/tutorials/detect-race-conditions/snippets.spec.mjs">Moved Permanently</a>.

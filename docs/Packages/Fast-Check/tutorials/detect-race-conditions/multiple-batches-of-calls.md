@@ -1,0 +1,1 @@
+<a href="/dubzzz/fast-check/tree/main/website/docs/tutorials/detect-race-conditions/multiple-batches-of-calls.mdx">Moved Permanently</a>.
