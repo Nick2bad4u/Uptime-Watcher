@@ -1,12 +1,25 @@
 /**
  * @fileoverview Fuzzing tests for objectSafety utilities
- * @author AI Generated
+ *         test.prop([
+            fc.anything(),
+            fc.anything(),
+            fc.anything()
+        ])("should use validator when provided", (key, value, fallback) => {
+            const obj = { [key]: value };
+            const [validatorResult] = fc.sample(fc.boolean(), 1);
+            const validator = vi.fn().mockReturnValue(validatorResult as boolean) as unknown as ValidatorFunction;
+
+            const result = safeObjectAccess(obj, key, fallback, validator);
+
+            expect(validator).toHaveBeenCalledWith(value);
+            expect(result).toBe(validatorResult ? value : fallback);
+        });erated
  * @since 2024
  */
 
 import fc from "fast-check";
 import { test } from "@fast-check/vitest";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, vi } from "vitest";
 import {
     safeObjectAccess,
     safeObjectIteration,
@@ -16,6 +29,8 @@ import {
     typedObjectKeys,
     typedObjectValues
 } from "../../utils/objectSafety";
+
+type ValidatorFunction = (val: unknown) => val is unknown;
 
 describe("objectSafety.ts fuzzing tests", () => {
     describe("safeObjectAccess", () => {
@@ -72,7 +87,7 @@ describe("objectSafety.ts fuzzing tests", () => {
         ])("should use validator when provided", (key, value, fallback) => {
             const obj = { [key]: value };
             const [validatorResult] = fc.sample(fc.boolean(), 1);
-            const validator = vi.fn().mockReturnValue(validatorResult);
+            const validator = vi.fn().mockReturnValue(validatorResult as boolean) as unknown as ValidatorFunction;
 
             const result = safeObjectAccess(obj, key, fallback, validator);
 
@@ -203,8 +218,8 @@ describe("objectSafety.ts fuzzing tests", () => {
 
             // Check that other keys are preserved
             for (const key of Object.keys(obj)) {
-                if (!keysToOmit.includes(key)) {
-                    expect(result).toHaveProperty(key, obj[key]);
+                if (!(keysToOmit as unknown as string[]).includes(key)) {
+                    expect(result).toHaveProperty(key, obj[key as keyof typeof obj]);
                 }
             }
         });
@@ -232,7 +247,7 @@ describe("objectSafety.ts fuzzing tests", () => {
                 prop2: fc.anything(),
                 prop3: fc.anything()
             }),
-            fc.array(fc.string())
+            fc.array(fc.constantFrom("prop1", "prop2", "prop3"))
         ])("should maintain immutability", (obj, keys) => {
             const originalKeys = Object.keys(obj);
             const result = safeObjectOmit(obj, keys);
@@ -266,13 +281,13 @@ describe("objectSafety.ts fuzzing tests", () => {
 
             // Check that result only has picked keys
             for (const key of Object.keys(result)) {
-                expect(keysToPick.includes(key)).toBe(true);
+                expect((keysToPick as unknown as string[]).includes(key)).toBe(true);
             }
         });
 
         test.prop([
             fc.record({ a: fc.string(), b: fc.integer() }),
-            fc.array(fc.string()).filter(arr => arr.length > 0)
+            fc.array(fc.constantFrom("a", "b")).filter(arr => arr.length > 0)
         ])("should maintain immutability", (obj, keys) => {
             const originalKeys = Object.keys(obj);
             const result = safeObjectPick(obj, keys);
@@ -372,7 +387,7 @@ describe("objectSafety.ts fuzzing tests", () => {
 
                 const keys = typedObjectKeys(obj);
 
-                expect(keys.includes("nonEnum")).toBe(false);
+                expect((keys as string[]).includes("nonEnum")).toBe(false);
             }
         );
     });

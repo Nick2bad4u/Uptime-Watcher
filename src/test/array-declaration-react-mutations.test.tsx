@@ -17,12 +17,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useEffect, useCallback, useMemo, useState, useRef } from "react";
-
-// Mock React hooks for mutation testing
-const mockUseEffect = vi.fn();
-const mockUseCallback = vi.fn();
-const mockUseMemo = vi.fn();
+import { useEffect, useCallback, useMemo, useState } from "react";
 
 describe("React Component Array Declaration Mutation Tests", () => {
     beforeEach(() => {
@@ -114,7 +109,7 @@ describe("React Component Array Declaration Mutation Tests", () => {
 
             // Simulate the mutated behavior with non-empty dependency arrays
             const TestComponentMutated = () => {
-                const [showLoadingOverlay, setShowLoadingOverlay] =
+                const [_showLoadingOverlay, setShowLoadingOverlay] =
                     useState(false);
 
                 // Mutated version - dependency arrays contain "Stryker was here"
@@ -432,7 +427,7 @@ describe("React Component Array Declaration Mutation Tests", () => {
                 // Lines 333, 342 - empty array initializations
                 const [errors, setErrors] = useState<string[]>([]);
                 const [warnings, setWarnings] = useState<string[]>([]);
-                const [validationMessages, setValidationMessages] = useState<
+                const [validationMessages, _setValidationMessages] = useState<
                     string[]
                 >([]);
 
@@ -489,13 +484,13 @@ describe("React Component Array Declaration Mutation Tests", () => {
             // Simulate the mutated behavior
             const TestStateArrayMutated = () => {
                 // Mutated version - arrays start with "Stryker was here"
-                const [errors, setErrors] = useState<string[]>([
+                const [errors, _setErrors] = useState<string[]>([
                     "Stryker was here",
                 ]);
-                const [warnings, setWarnings] = useState<string[]>([
+                const [warnings, _setWarnings] = useState<string[]>([
                     "Stryker was here",
                 ]);
-                const [validationMessages, setValidationMessages] = useState<
+                const [validationMessages, _setValidationMessages] = useState<
                     string[]
                 >(["Stryker was here"]);
 

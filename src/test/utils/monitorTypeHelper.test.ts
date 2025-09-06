@@ -725,9 +725,8 @@ describe("monitorTypeHelper", () => {
         describe("clearMonitorTypeCache property tests", () => {
             test.prop([
                 fc.constantFrom("test", "reset", "clear", "refresh")
-            ])("should always clear the cache regardless of input context", (context) => {
+            ])("should always clear the cache regardless of input context", (_context) => {
                 // Setup some cache data
-                const cacheKey = `${context}-monitor-types`;
                 vi.mocked(AppCaches.monitorTypes.set).mockImplementation(() => {});
                 vi.mocked(AppCaches.monitorTypes.get).mockReturnValue([]);
                 vi.mocked(AppCaches.monitorTypes.clear).mockImplementation(() => {});
@@ -799,6 +798,9 @@ describe("monitorTypeHelper", () => {
                 fc.integer({ min: 0, max: 4 })
             ])("should find monitor type config when type exists", async (mockTypes, targetIndex) => {
                 const targetType = mockTypes[targetIndex % mockTypes.length];
+                if (!targetType) {
+                    throw new Error('Expected target type to be defined');
+                }
 
                 // Setup mocks to return the mock types
                 vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(mockTypes as any);
@@ -814,7 +816,7 @@ describe("monitorTypeHelper", () => {
                     displayName: fc.string({ minLength: 1, maxLength: 50 }),
                     description: fc.string({ minLength: 5, maxLength: 200 })
                 }), { minLength: 1, maxLength: 5 }),
-                fc.string({ minLength: 1, maxLength: 30 }).filter(type => true) // We'll filter in the test
+                fc.string({ minLength: 1, maxLength: 30 }).filter(_type => true) // We'll filter in the test
             ])("should return undefined when monitor type not found", async (mockTypes, searchType) => {
                 // Ensure searchType doesn't match any existing type
                 const usedTypes = new Set(mockTypes.map(t => t.type));
@@ -846,8 +848,12 @@ describe("monitorTypeHelper", () => {
 
                 expect(result).toHaveLength(mockTypes.length);
                 for (const [index, option] of result.entries()) {
-                    expect(option.label).toBe(mockTypes[index].displayName);
-                    expect(option.value).toBe(mockTypes[index].type);
+                    const mockType = mockTypes[index];
+                    if (!mockType) {
+                        throw new Error(`Expected mockType at index ${index} to be defined`);
+                    }
+                    expect(option.label).toBe(mockType.displayName);
+                    expect(option.value).toBe(mockType.type);
                 }
             });
 

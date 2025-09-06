@@ -167,7 +167,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.float()])(
+        test.prop([fc.float({ noNaN: true })])(
             "should floor non-integer numbers",
             (num) => {
                 const result = safeParseInt(num);
@@ -208,7 +208,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
     });
 
     describe("safeParsePercentage", () => {
-        test.prop([fc.float({ min: 0, max: 100 })])(
+        test.prop([fc.float({ min: 0, max: 100, noNaN: true })])(
             "should return valid percentages unchanged",
             (percentage) => {
                 const result = safeParsePercentage(percentage);

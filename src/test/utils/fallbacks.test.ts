@@ -1689,7 +1689,7 @@ describe("Fallback Utilities", () => {
         describe("Property-based Tests", () => {
             test.prop([fc.string().filter((s) => s.trim().length > 0)])(
                 "should validate UiDefaults properties maintain consistent types",
-                (propertyName) => {
+                (_propertyName) => {
                     // Test that UiDefaults is a consistent object
                     expect(UiDefaults).toEqual(expect.any(Object));
                     expect(typeof UiDefaults).toBe("object");
@@ -1699,7 +1699,7 @@ describe("Fallback Utilities", () => {
 
             test.prop([fc.string().filter((s) => s.trim().length > 0)])(
                 "should validate MonitorDefaults maintains correct type structure",
-                (propertyName) => {
+                (_propertyName) => {
                     // Test that MonitorDefaults has expected numeric properties
                     expect(typeof MonitorDefaults.checkInterval).toBe("number");
                     expect(typeof MonitorDefaults.responseTime).toBe("number");
@@ -1716,7 +1716,7 @@ describe("Fallback Utilities", () => {
 
             test.prop([fc.string().filter((s) => s.trim().length > 0)])(
                 "should validate SiteDefaults has consistent boolean monitoring property",
-                (propertyName) => {
+                (_propertyName) => {
                     expect(typeof SiteDefaults.monitoring).toBe("boolean");
                     expect(SiteDefaults).toEqual(expect.any(Object));
                     expect(SiteDefaults).not.toBeNull();

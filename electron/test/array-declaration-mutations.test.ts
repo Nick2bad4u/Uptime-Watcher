@@ -229,9 +229,9 @@ describe("ArrayDeclaration Mutation Tests", () => {
             // useState([]) -> useState(["Stryker was here"])
 
             function initializeComponentState() {
-                const errors = []; // Should start empty
-                const options = []; // Should start empty
-                const selectedItems = []; // Should start empty
+                const errors: string[] = []; // Should start empty
+                const options: unknown[] = []; // Should start empty
+                const selectedItems: unknown[] = []; // Should start empty
 
                 return { errors, options, selectedItems };
             }
@@ -389,7 +389,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
 
             // If mutation made arrays start with ["Stryker was here"],
             // it would break monitor type logic
-            function getMonitorTypeFieldsMutated(monitorType: string) {
+            function getMonitorTypeFieldsMutated(_monitorType: string) {
                 const requiredFields = ["Stryker was here"];
                 const optionalFields = ["Stryker was here"];
                 const validationRules = ["Stryker was here"];

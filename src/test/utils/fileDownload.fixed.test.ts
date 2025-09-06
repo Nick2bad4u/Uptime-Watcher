@@ -431,15 +431,17 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
                     if (timestampMatch?.groups) {
                         const { timestamp } = timestampMatch.groups;
-                        const [year, month, day] = timestamp.split('-');
+                        if (timestamp) {
+                            const [year, month, day] = timestamp.split('-');
 
-                        // Validate timestamp format
-                        expect(Number(year)).toBeGreaterThanOrEqual(2000);
-                        expect(Number(year)).toBeLessThanOrEqual(3000);
-                        expect(Number(month)).toBeGreaterThanOrEqual(1);
-                        expect(Number(month)).toBeLessThanOrEqual(12);
-                        expect(Number(day)).toBeGreaterThanOrEqual(1);
-                        expect(Number(day)).toBeLessThanOrEqual(31);
+                            // Validate timestamp format
+                            expect(Number(year)).toBeGreaterThanOrEqual(2000);
+                            expect(Number(year)).toBeLessThanOrEqual(3000);
+                            expect(Number(month)).toBeGreaterThanOrEqual(1);
+                            expect(Number(month)).toBeLessThanOrEqual(12);
+                            expect(Number(day)).toBeGreaterThanOrEqual(1);
+                            expect(Number(day)).toBeLessThanOrEqual(31);
+                        }
                     }
                 }
             );

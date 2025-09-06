@@ -14,8 +14,6 @@ import {
     retryWithAbort,
     isAbortError,
     raceWithAbort,
-    type CombineSignalsOptions,
-    type RetryWithAbortOptions,
 } from "../../utils/abortUtils.js";
 
 describe("AbortUtils Fuzzing Tests", () => {
@@ -29,7 +27,24 @@ describe("AbortUtils Fuzzing Tests", () => {
         ])(
             "should create valid AbortSignal from options",
             async (options) => {
-                const signal = createCombinedAbortSignal(options);
+                // Normalize null values to undefined for exact optional properties
+                const normalizedOptions: {
+                    timeoutMs?: number;
+                    reason?: string;
+                    additionalSignals?: AbortSignal[];
+                } = {};
+
+                if (options.timeoutMs !== null && options.timeoutMs !== undefined) {
+                    normalizedOptions.timeoutMs = options.timeoutMs;
+                }
+                if (options.reason !== null && options.reason !== undefined) {
+                    normalizedOptions.reason = options.reason;
+                }
+                if (options.additionalSignals !== null && options.additionalSignals !== undefined) {
+                    normalizedOptions.additionalSignals = options.additionalSignals;
+                }
+
+                const signal = createCombinedAbortSignal(normalizedOptions);
 
                 expect(signal).toBeInstanceOf(AbortSignal);
                 expect(typeof signal.aborted).toBe("boolean");
@@ -38,7 +53,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 expect(typeof signal.removeEventListener).toBe("function");
 
                 // Signal should not be aborted initially (unless timeout is very small)
-                if (!options.timeoutMs || options.timeoutMs > 10) {
+                if (!normalizedOptions.timeoutMs || normalizedOptions.timeoutMs > 10) {
                     expect(signal.aborted).toBe(false);
                 }
             }
@@ -136,7 +151,7 @@ describe("AbortUtils Fuzzing Tests", () => {
 
         test.prop([fc.integer({ min: 10, max: 100 })])(
             "should call cleanup function even when operation throws",
-            async (timeoutMs) => {
+            async (_timeoutMs) => {
                 const cleanup = vi.fn();
                 const operation = vi.fn(async () => {
                     throw new Error("Operation failed");

@@ -6,6 +6,9 @@
 import { vi } from "vitest";
 import fc from "fast-check";
 
+// Increase Node.js process listener limits for tests to prevent MaxListenersExceededWarning
+process.setMaxListeners(200);
+
 // Configure fast-check for property-based testing
 fc.configureGlobal({ numRuns: 10 });
 

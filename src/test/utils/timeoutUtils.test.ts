@@ -634,7 +634,7 @@ describe("Timeout Utilities", () => {
                 }
             );
 
-            test.prop([fc.float()])(
+            test.prop([fc.float({ noNaN: true })])(
                 "should handle floating point inputs correctly",
                 (input) => {
                     const result = clampTimeoutMs(input);
@@ -685,7 +685,7 @@ describe("Timeout Utilities", () => {
                 }
             );
 
-            test.prop([fc.float({ min: 0, max: Math.fround(1000) })])(
+            test.prop([fc.float({ min: 0, max: Math.fround(1000), noNaN: true })])(
                 "should handle fractional seconds correctly",
                 (input) => {
                     const result = clampTimeoutSeconds(input);

@@ -896,7 +896,11 @@ describe("Status Utilities", () => {
                     expect(result).toMatch(/^[a-z][\dA-Za-z]*$/);
 
                     // Property: Should start with lowercase
-                    expect(result[0]).toBe(result[0].toLowerCase());
+                    const firstChar = result[0];
+                    if (!firstChar) {
+                        throw new Error('Expected result to have at least one character');
+                    }
+                    expect(firstChar).toBe(firstChar.toLowerCase());
 
                     // Property: Should be longer than any single word (compound identifier)
                     if (phrase.includes(" ")) {
@@ -932,7 +936,11 @@ describe("Status Utilities", () => {
                     const result = createStatusIdentifier(phrase);
 
                     // Property: Should start with lowercase first word
-                    expect(result.startsWith(words[0].toLowerCase())).toBe(true);
+                    const firstWord = words[0];
+                    if (!firstWord) {
+                        throw new Error('Expected at least one word');
+                    }
+                    expect(result.startsWith(firstWord.toLowerCase())).toBe(true);
 
                     // Property: Should not contain spaces
                     expect(result).not.toContain(" ");

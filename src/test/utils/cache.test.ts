@@ -1075,31 +1075,31 @@ describe("Cache Utilities", () => {
 
                     // Fill cache to capacity (2 entries) with controlled timing
                     mockNow.mockReturnValue(1000);
-                    cache.set(keys[0], "value0");
+                    cache.set(keys[0]!, "value0");
 
                     mockNow.mockReturnValue(1100);
-                    cache.set(keys[1], "value1");
+                    cache.set(keys[1]!, "value1");
 
                     expect(cache.size).toBe(2);
-                    expect(cache.has(keys[0])).toBe(true);
-                    expect(cache.has(keys[1])).toBe(true);
+                    expect(cache.has(keys[0]!)).toBe(true);
+                    expect(cache.has(keys[1]!)).toBe(true);
 
                     // Access first key to make it recently used
                     mockNow.mockReturnValue(1200);
-                    cache.get(keys[0]);
+                    cache.get(keys[0]!);
 
                     // Add third entry - should evict keys[1] (least recently used)
                     mockNow.mockReturnValue(1300);
-                    cache.set(keys[2], "value2");
+                    cache.set(keys[2]!, "value2");
 
                     // Property: Recently accessed key should remain
-                    expect(cache.has(keys[0])).toBe(true);
+                    expect(cache.has(keys[0]!)).toBe(true);
 
                     // Property: New key should exist
-                    expect(cache.has(keys[2])).toBe(true);
+                    expect(cache.has(keys[2]!)).toBe(true);
 
                     // Property: Non-accessed key should be evicted
-                    expect(cache.has(keys[1])).toBe(false);
+                    expect(cache.has(keys[1]!)).toBe(false);
 
                     // Property: Cache size should still be maxSize
                     expect(cache.size).toBe(maxSize);
@@ -1304,7 +1304,7 @@ describe("Cache Utilities", () => {
                         AppCaches.uiHelpers.set(key, value, ttl);
                     }
 
-                    const maxTtl = Math.max(...entries.map(([, valueIgnored, ttlValue]) => ttlValue));
+                    const maxTtl = Math.max(...entries.map(([, _value, ttlValue]) => ttlValue));
 
                     // Advance time past all TTLs
                     mockNow.mockReturnValue(1000 + maxTtl + 100);

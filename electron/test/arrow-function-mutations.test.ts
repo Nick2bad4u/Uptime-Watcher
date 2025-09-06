@@ -14,7 +14,7 @@
  * @file Unit tests for arrow function mutations in backend Electron code.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 describe("Backend Arrow Function Mutation Tests", () => {
     describe("electron/preload.ts - IPC Function Definitions", () => {
@@ -78,9 +78,6 @@ describe("Backend Arrow Function Mutation Tests", () => {
 
             // Simulate the mutation: () => undefined
             const removeMonitorMutated = (): undefined => undefined;
-
-            const siteId = "test-site";
-            const monitorId = "monitor-123";
 
             // The mutated function would return undefined instead of a Promise
             const result = removeMonitorMutated();
@@ -393,7 +390,7 @@ describe("Backend Arrow Function Mutation Tests", () => {
             ];
 
             for (const testCase of testCases) {
-                const originalResult = testCase.original(testCase.input);
+                const originalResult = (testCase.original as any)(testCase.input);
                 const mutatedResult = testCase.mutated();
 
                 expect(originalResult).toBe(testCase.expectedOriginal);

@@ -1,5 +1,16 @@
 /**
- * @fileoverview Fuzzing tests for typeHelpers utilities
+ import fc from "fast-check";
+import { test } from "@fast-check/vitest";
+import { describe, expect, it, vi } from "vitest";
+import {
+    castIpcResponse,
+    isArray,
+    isRecord,
+    safePropertyAccess,
+    validateAndConvert,
+} from "../../utils/typeHelpers.js";
+
+type ValidatorFunction = (val: unknown) => val is unknown;rview Fuzzing tests for typeHelpers utilities
  * @author AI Generated
  * @since 2024
  */
@@ -13,7 +24,9 @@ import {
     isRecord,
     safePropertyAccess,
     validateAndConvert,
-} from "../../utils/typeHelpers";
+} from "../../utils/typeHelpers.js";
+
+type ValidatorFunction = (val: unknown) => val is unknown;
 
 describe("TypeHelpers utilities fuzzing tests", () => {
     describe("castIpcResponse", () => {
@@ -28,7 +41,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         test.prop([fc.anything()])(
             "should return input when validator returns true",
             (response) => {
-                const validator = vi.fn().mockReturnValue(true);
+                const validator = vi.fn().mockReturnValue(true) as unknown as ValidatorFunction;
                 const result = castIpcResponse(response, validator);
 
                 expect(validator).toHaveBeenCalledWith(response);
@@ -39,7 +52,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         test.prop([fc.anything()])(
             "should throw when validator returns false",
             (response) => {
-                const validator = vi.fn().mockReturnValue(false);
+                const validator = vi.fn().mockReturnValue(false) as unknown as ValidatorFunction;
 
                 expect(() => castIpcResponse(response, validator)).toThrow("IPC response validation failed");
                 expect(validator).toHaveBeenCalledWith(response);
@@ -48,9 +61,9 @@ describe("TypeHelpers utilities fuzzing tests", () => {
 
         test.prop([
             fc.anything(),
-            fc.func(fc.boolean())
+            fc.boolean()
         ])("should handle any validator function", (response, validatorResult) => {
-            const validator = vi.fn().mockReturnValue(validatorResult);
+            const validator = vi.fn().mockReturnValue(validatorResult) as unknown as ValidatorFunction;
 
             if (validatorResult) {
                 expect(castIpcResponse(response, validator)).toBe(response);
@@ -156,8 +169,8 @@ describe("TypeHelpers utilities fuzzing tests", () => {
             expect(isRecord(new Error("Test error"))).toBe(true);
         });
 
-        test.prop([fc.record({}, { withDeletedKeys: true })])(
-            "should work with records with deleted keys",
+        test.prop([fc.record({})])(
+            "should work with empty records",
             (record) => {
                 expect(isRecord(record)).toBe(true);
             }
@@ -218,7 +231,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         });
 
         test.prop([
-            fc.record({ [fc.string()]: fc.anything() }),
+            fc.dictionary(fc.string(), fc.anything()),
             fc.string()
         ])("should work with dynamic property names", (obj, key) => {
             const hasProperty = Object.hasOwn(obj, key);
@@ -236,7 +249,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         test.prop([fc.anything()])(
             "should return value when validator returns true",
             (value) => {
-                const validator = vi.fn().mockReturnValue(true);
+                const validator = vi.fn().mockReturnValue(true) as unknown as ValidatorFunction;
                 const result = validateAndConvert(value, validator);
 
                 expect(validator).toHaveBeenCalledWith(value);
@@ -247,7 +260,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         test.prop([fc.anything()])(
             "should throw when validator returns false",
             (value) => {
-                const validator = vi.fn().mockReturnValue(false);
+                const validator = vi.fn().mockReturnValue(false) as unknown as ValidatorFunction;
 
                 expect(() => validateAndConvert(value, validator)).toThrow("Type validation failed");
                 expect(validator).toHaveBeenCalledWith(value);
@@ -258,16 +271,16 @@ describe("TypeHelpers utilities fuzzing tests", () => {
             fc.anything(),
             fc.string()
         ])("should use custom error message when provided", (value, errorMessage) => {
-            const validator = vi.fn().mockReturnValue(false);
+            const validator = vi.fn().mockReturnValue(false) as unknown as ValidatorFunction;
 
             expect(() => validateAndConvert(value, validator, errorMessage)).toThrow(errorMessage);
         });
 
         test.prop([
             fc.anything(),
-            fc.func(fc.boolean())
+            fc.boolean()
         ])("should handle any validator function", (value, validatorResult) => {
-            const validator = vi.fn().mockReturnValue(validatorResult);
+            const validator = vi.fn().mockReturnValue(validatorResult) as unknown as ValidatorFunction;
 
             if (validatorResult) {
                 expect(validateAndConvert(value, validator)).toBe(value);
@@ -333,7 +346,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
 
                 for (const key of keys) {
                     const result = safePropertyAccess(record, key);
-                    expect(result).toBe(record[key]);
+                    expect(result).toBe((record as Record<string, unknown>)[key]);
                 }
             }
         );

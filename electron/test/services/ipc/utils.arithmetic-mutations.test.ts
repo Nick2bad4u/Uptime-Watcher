@@ -24,7 +24,6 @@ import {
     withIpcHandler,
     withIpcHandlerValidation,
 } from "../../../services/ipc/utils";
-import { logger as mockLogger } from "../../../utils/logger";
 
 describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => {
     beforeEach(() => {
@@ -60,7 +59,7 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
             });
 
             // If mutation (Date.now() + startTime) was applied, we'd get 2750ms instead of 750ms
-            expect(result.metadata?.duration).not.toBe(2750);
+            expect(result.metadata?.['duration']).not.toBe(2750);
         });
         it("should calculate duration correctly for failed operations", async () => {
             const error = new Error("Test error");
@@ -86,7 +85,7 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
             });
 
             // If mutation (Date.now() + startTime) was applied, we'd get 4500ms instead of 500ms
-            expect(result.metadata?.duration).not.toBe(4500);
+            expect(result.metadata?.['duration']).not.toBe(4500);
         });
     });
 
@@ -123,7 +122,7 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
             expect(handler).toHaveBeenCalledWith("param1", "param2");
 
             // If mutation (Date.now() + startTime) was applied, we'd get 6300ms instead of 300ms
-            expect(result.metadata?.duration).not.toBe(6300);
+            expect(result.metadata?.['duration']).not.toBe(6300);
         });
 
         it("should calculate duration correctly for failed parameterized operations", async () => {
@@ -156,7 +155,7 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
             });
 
             // If mutation (Date.now() + startTime) was applied, we'd get 8600ms instead of 600ms
-            expect(result.metadata?.duration).not.toBe(8600);
+            expect(result.metadata?.['duration']).not.toBe(8600);
         });
 
         it("should not calculate duration for validation failures (early return)", async () => {

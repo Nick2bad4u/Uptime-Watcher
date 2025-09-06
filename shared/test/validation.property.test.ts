@@ -354,11 +354,16 @@ describe('Validation Utils Property-Based Tests', () => {
             }));
 
             // All results should be identical
+            const [firstResult] = results;
+            expect(firstResult).toBeDefined();
+
             for (let i = 1; i < results.length; i++) {
-                expect(results[i].identifier).toBe(results[0].identifier);
-                expect(results[i].port).toBe(results[0].port);
-                expect(results[i].host).toBe(results[0].host);
-                expect(results[i].url).toBe(results[0].url);
+                const currentResult = results[i];
+                expect(currentResult).toBeDefined();
+                expect(currentResult!.identifier).toBe(firstResult!.identifier);
+                expect(currentResult!.port).toBe(firstResult!.port);
+                expect(currentResult!.host).toBe(firstResult!.host);
+                expect(currentResult!.url).toBe(firstResult!.url);
             }
         });
 

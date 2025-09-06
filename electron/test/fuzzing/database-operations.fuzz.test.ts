@@ -27,9 +27,6 @@ import {
     type MockedFunction,
 } from "vitest";
 import fc from "fast-check";
-import type { Site, Monitor } from "@shared/validation/schemas";
-import type { SiteRow, MonitorRow, HistoryRow } from "@shared/types/database";
-import { DatabaseService } from "../../services/database/DatabaseService";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
@@ -120,12 +117,8 @@ describe("Database Operations Fuzzing Tests", () => {
                         mockDb.run.mockReturnValue({ lastInsertRowid: 1 });
 
                         // Should not throw for valid-looking data
-                        let didCallDatabase = false;
                         try {
                             await siteRepository.upsert(siteData);
-                            didCallDatabase =
-                                mockDatabaseService.executeTransaction.mock
-                                    .calls.length > 0;
                         } catch (error) {
                             // Method may throw for invalid data, which is acceptable
                             // But we can still check if it was validated before hitting database

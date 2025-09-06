@@ -17,9 +17,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { z } from "zod";
 
-// Mock validation functions for testing
-const mockValidationResult = vi.fn();
-
 describe("Shared Validation Array Declaration Mutation Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();

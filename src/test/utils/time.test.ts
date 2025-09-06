@@ -800,14 +800,22 @@ describe("Time Utilities", () => {
                     // Property: Minutes should be between 1-59
                     const minutesMatch = result.match(/^(?<minutes>\d+)m/);
                     expect(minutesMatch).toBeTruthy();
-                    const minutes = Number.parseInt(minutesMatch![1], 10);
+                    const minutesCapture = minutesMatch![1];
+                    if (!minutesCapture) {
+                        throw new Error('Expected minutes capture group to be defined');
+                    }
+                    const minutes = Number.parseInt(minutesCapture, 10);
                     expect(minutes).toBeGreaterThanOrEqual(1);
                     expect(minutes).toBeLessThanOrEqual(59);
 
                     // Property: Seconds should be between 0-59
                     const secondsMatch = result.match(/(?<seconds>\d+)s$/);
                     expect(secondsMatch).toBeTruthy();
-                    const seconds = Number.parseInt(secondsMatch![1], 10);
+                    const secondsCapture = secondsMatch![1];
+                    if (!secondsCapture) {
+                        throw new Error('Expected seconds capture group to be defined');
+                    }
+                    const seconds = Number.parseInt(secondsCapture, 10);
                     expect(seconds).toBeGreaterThanOrEqual(0);
                     expect(seconds).toBeLessThanOrEqual(59);
                 }
@@ -822,13 +830,21 @@ describe("Time Utilities", () => {
                     // Property: Hours should be at least 1
                     const hoursMatch = result.match(/^(?<hours>\d+)h/);
                     expect(hoursMatch).toBeTruthy();
-                    const hours = Number.parseInt(hoursMatch![1], 10);
+                    const hoursCapture = hoursMatch![1];
+                    if (!hoursCapture) {
+                        throw new Error('Expected hours capture group to be defined');
+                    }
+                    const hours = Number.parseInt(hoursCapture, 10);
                     expect(hours).toBeGreaterThanOrEqual(1);
 
                     // Property: Minutes should be between 0-59
                     const minutesMatch = result.match(/(?<minutes>\d+)m$/);
                     expect(minutesMatch).toBeTruthy();
-                    const minutes = Number.parseInt(minutesMatch![1], 10);
+                    const minutesCapture = minutesMatch![1];
+                    if (!minutesCapture) {
+                        throw new Error('Expected minutes capture group to be defined');
+                    }
+                    const minutes = Number.parseInt(minutesCapture, 10);
                     expect(minutes).toBeGreaterThanOrEqual(0);
                     expect(minutes).toBeLessThanOrEqual(59);
                 }

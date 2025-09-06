@@ -101,7 +101,7 @@ export function isValidIdentifier(value: unknown): value is string {
     }
 
     // Allow alphanumeric characters, hyphens, and underscores
-    const cleanedValue = value.replaceAll(/[_-]/g, "");
+    const cleanedValue = value.replaceAll(/[_\-]/gv, "");
 
     // Must have at least one alphanumeric character remaining
 

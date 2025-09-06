@@ -22,38 +22,12 @@ import {
     render,
     screen,
     fireEvent,
-    waitFor,
-    act,
 } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
-// Mock implementations to test dependency array behavior
-const createMockComponent = (dependencies: any[], effectCallback: () => void) =>
-    function MockComponent() {
-        React.useEffect(effectCallback, dependencies);
-        return <div data-testid="mock-component">Mock Component</div>;
-    };
-
-const createMockCallback = (dependencies: any[], callback: () => void) =>
-    function MockComponent() {
-        const memoizedCallback = React.useCallback(callback, dependencies);
-
-        React.useEffect(() => {
-            memoizedCallback();
-        }, [memoizedCallback]);
-
-        return <div data-testid="mock-component">Mock Component</div>;
-    };
-
 describe("ArrayDeclaration Mutations - React Dependencies", () => {
-    let mockEffectCallback: ReturnType<typeof vi.fn>;
-    let mockSetState: ReturnType<typeof vi.fn>;
-
     beforeEach(() => {
         vi.clearAllMocks();
-        mockEffectCallback = vi.fn();
-        mockSetState = vi.fn();
     });
 
     describe("Header.tsx Line 171: [setShowAddSiteModal] dependency", () => {
@@ -107,7 +81,7 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
                 const currentSetter = mockSetters[currentSetterIndex];
 
                 const handleClick = React.useCallback(() => {
-                    currentSetter();
+                    currentSetter!();
                 }, [currentSetter]); // Original: [currentSetter]
 
                 return (

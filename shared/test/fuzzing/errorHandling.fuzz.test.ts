@@ -55,7 +55,7 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
             // Force type to pass TypeScript compilation but fail runtime check
             const context: ErrorHandlingBackendContext = {
                 logger: invalidLogger as any,
-                operationName
+                ...(operationName !== undefined && { operationName })
             };
 
             const failingOperation = async () => {
@@ -105,7 +105,6 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
 
             const context: ErrorHandlingBackendContext = {
                 logger: { someOtherMethod: () => {} } as any, // Invalid logger without error method
-                operationName: undefined
             };
 
             const failingOperation = async () => {

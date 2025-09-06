@@ -150,18 +150,6 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
         console.error = vi.fn();
 
         try {
-            // Track retryCount changes by monitoring the key prop behavior
-            let retryAttempts = 0;
-
-            const KeyTrackingComponent = (): JSX.Element => {
-                retryAttempts += 1;
-                return (
-                    <div data-testid={`component-mount-${retryAttempts}`}>
-                        Component mounted
-                    </div>
-                );
-            };
-
             // First mount with error
             globalShouldThrow = true;
             const { rerender } = render(

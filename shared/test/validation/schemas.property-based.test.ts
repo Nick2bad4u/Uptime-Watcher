@@ -1,13 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect } from "vitest";
 import * as fc from "fast-check";
 import { test } from "@fast-check/vitest";
 import {
     baseMonitorSchema,
     httpMonitorSchema,
-    portMonitorSchema,
-    pingMonitorSchema,
-    dnsMonitorSchema,
-    siteSchema,
 } from "../../validation/schemas.js";
 
 /**

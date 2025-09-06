@@ -1033,11 +1033,11 @@ describe("Chart Utilities", () => {
                     // Property: Properties should be accessible
                     if (xScale && typeof xScale === "object") {
                         const xScaleObj = xScale as Record<string, unknown>;
-                        expect(xScaleObj.type).toEqual(config.scales.x.type);
+                        expect(xScaleObj["type"]).toEqual(config.scales.x.type);
                     }
                     if (yScale && typeof yScale === "object") {
                         const yScaleObj = yScale as Record<string, unknown>;
-                        expect(yScaleObj.type).toEqual(config.scales.y.type);
+                        expect(yScaleObj["type"]).toEqual(config.scales.y.type);
                     }
                 }
             );
@@ -1349,7 +1349,7 @@ describe("Chart Utilities", () => {
                     expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBe(getScaleProperty(config, "y", "beginAtZero"));
 
                     // Property: getNestedScaleProperty should access nested properties correctly
-                    const expectedTitleText = (config.scales.x.title as Record<string, unknown>).text;
+                    const expectedTitleText = (config.scales.x.title as Record<string, unknown>)["text"];
                     expect(getNestedScaleProperty(config, "x", "title.text")).toBe(expectedTitleText);
                 }
             );

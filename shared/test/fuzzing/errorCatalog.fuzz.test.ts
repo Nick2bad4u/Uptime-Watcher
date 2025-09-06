@@ -18,7 +18,6 @@ import {
     IPC_ERRORS,
     formatErrorMessage,
     isKnownErrorMessage,
-    type ErrorMessage,
 } from "../../utils/errorCatalog";
 
 describe("ErrorCatalog utilities fuzzing tests", () => {
@@ -200,8 +199,8 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
 
         test("should return true for all catalog error messages", () => {
             // Test all error messages from all categories
-            for (const [categoryName, category] of Object.entries(ERROR_CATALOG)) {
-                for (const [errorKey, errorValue] of Object.entries(category)) {
+            for (const [_categoryName, category] of Object.entries(ERROR_CATALOG)) {
+                for (const [_errorKey, errorValue] of Object.entries(category)) {
                     if (typeof errorValue === "string") {
                         expect(isKnownErrorMessage(errorValue)).toBe(true);
                     }

@@ -1,5 +1,9 @@
 /**
- * Fast-Check property-based fuzzing tests for jsonSafety.ts
+ * Fast-Check property-based fuzzing tests    ]);
+
+    const alwaysTrue = (_data: unknown): _data is unknown => true;
+
+    for (const invalidJson of invalidJsonStrings) {jsonSafety.ts
  *
  * Targets uncovered line 31: `return error instanceof Error ? error : new Error(String(error));`
  * This line handles conversion of non-Error values to Error instances in ensureError function.
@@ -15,7 +19,6 @@ import {
     safeJsonParse,
     safeJsonParseArray,
     safeJsonStringify,
-    type SafeJsonResult,
 } from "@shared/utils/jsonSafety";
 
 /**
@@ -48,7 +51,7 @@ test.prop([
         `${JSON.stringify(value)},}`, // Trailing comma
     ];
 
-    const alwaysTrue = (data: unknown): data is unknown => true;
+    const alwaysTrue = (_data: unknown): _data is unknown => true;
 
     for (const invalidJson of invalidJsonStrings) {
         // First check if this is actually invalid JSON
@@ -92,7 +95,7 @@ test.prop([
     const validJsonString = JSON.stringify(nonArrayValue);
 
     // Use a validator that always fails to trigger the TypeError for arrays
-    const alwaysFailValidator = (item: unknown): item is never => false;
+    const alwaysFailValidator = (_item: unknown): _item is never => false;
 
     const result = safeJsonParseArray(validJsonString, alwaysFailValidator);
 
@@ -210,7 +213,7 @@ test.prop([
             }
         }),
 ])("Malformed JSON strings trigger consistent error handling through ensureError", (malformedJson) => {
-    const alwaysTrue = (data: unknown): data is unknown => true;
+    const alwaysTrue = (_data: unknown): _data is unknown => true;
     const result = safeJsonParse(malformedJson, alwaysTrue);
 
     expect(result.success).toBe(false);
@@ -230,7 +233,7 @@ test.prop([
     fc.json(), // Valid JSON strings
 ])("Custom validator TypeErrors are handled correctly by ensureError", (validJson) => {
     // Validator that throws TypeError with specific messages
-    const throwingValidator = (data: unknown): data is never => {
+    const throwingValidator = (_data: unknown): _data is never => {
         throw new TypeError("does not match expected type");
     };
 

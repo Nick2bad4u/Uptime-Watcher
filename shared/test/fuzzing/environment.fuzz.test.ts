@@ -6,7 +6,7 @@
 
 import fc from "fast-check";
 import { test } from "@fast-check/vitest";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
     getEnvVar,
     getEnvironment,

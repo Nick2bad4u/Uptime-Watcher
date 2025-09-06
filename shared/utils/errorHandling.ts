@@ -145,13 +145,9 @@ async function handleBackendOperation<T>(
     } catch (error) {
         const errorMessage = getErrorMessage(operationName);
 
-        // Safely handle logging - fallback to console.error if logger is invalid
+        // Safely handle logging - fallback to console.error if logger fails
         try {
-            if (logger && typeof logger.error === "function") {
-                logger.error(errorMessage, error);
-            } else {
-                console.error(errorMessage, error);
-            }
+            logger.error(errorMessage, error);
         } catch (logError) {
             // Fallback to console.error if logger.error throws
             console.error(errorMessage, error);

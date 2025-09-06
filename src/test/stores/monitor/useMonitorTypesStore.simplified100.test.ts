@@ -6,16 +6,15 @@
  * exercised.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import type {
     Monitor,
-    MonitorType,
     MonitorFieldDefinition,
+    MonitorType,
 } from "../../../../shared/types";
 import type { MonitorTypeConfig } from "../../../../shared/types/monitorTypes";
 import type { ValidationResult } from "../../../../shared/types/validation";
-import type { IpcResponse } from "../../../types/ipc";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 
 // Hoisted mocks
@@ -128,7 +127,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             });
 
             expect(result.current.monitorTypes).toEqual(mockConfigs);
-            expect(result.current.fieldConfigs.http).toEqual(
+            expect(result.current.fieldConfigs["http"]).toEqual(
                 mockConfigs[0]!.fields
             );
             expect(result.current.isLoaded).toBe(true);

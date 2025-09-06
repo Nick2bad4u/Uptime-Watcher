@@ -139,6 +139,9 @@ import jsoncEslintParser from "jsonc-eslint-parser";
 import path from "node:path";
 import tomlEslintParser from "toml-eslint-parser";
 import yamlEslintParser from "yaml-eslint-parser";
+import gitignore from 'eslint-config-flat-gitignore'
+import pluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
+
 
 // Unused and Uninstalled Plugins:
 // import putout from "eslint-plugin-putout";
@@ -176,6 +179,9 @@ import yamlEslintParser from "yaml-eslint-parser";
 const ROOT_DIR = import.meta.dirname;
 
 export default [
+    gitignore({
+        root: true
+      }),
     // Global Configs and Rules
     importX.flatConfigs.typescript,
     progress.configs.recommended,
@@ -665,11 +671,13 @@ export default [
             "no-hardcoded-strings": pluginNoHardcoded,
             tailwind: tailwind,
             "undefined-css-classes": pluginUndefinedCss,
+            "better-tailwindcss": pluginBetterTailwindcss,
         },
         rules: {
             // TypeScript rules
             ...css.configs.recommended.rules,
             ...pluginUndefinedCss.configs["with-tailwind"].rules,
+            ...pluginBetterTailwindcss.configs.correctness.rules,
             // No Hardcoded Strings Plugin Rules (no-hardcoded-strings/*)
             // "no-hardcoded-strings/no-hardcoded-strings": [
             //     "warn",
@@ -688,13 +696,19 @@ export default [
             "tailwind/no-contradicting-classname": "warn",
             /**
             * Performance issue with the plugin, somewhat mitigated setting cssFiles to an empty array.
-            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
-            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
+            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276#issuecomment-2481272848
+            * @link https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
             */
             "tailwind/no-custom-classname": [
-                "off",
+                "warn",
                 {
                     skipClassAttribute: true,
+                },
+            ],
+            "better-tailwindcss/no-unregistered-classes": [
+                "warn",
+                {
+                    detectComponentClasses: true,
                 },
             ],
             "tailwind/no-unnecessary-arbitrary-value": "warn",
@@ -702,6 +716,10 @@ export default [
             "undefined-css-classes/no-undefined-css-classes": "off",
         },
         settings: {
+            "better-tailwindcss": {
+                // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
+                "entryPoint": "./src/index.css",
+              },
             "boundaries/elements": [
                 { pattern: "src/App.tsx", type: "app" },
                 { pattern: "src/main.tsx", type: "main" },
@@ -752,6 +770,8 @@ export default [
             react: { version: "19" },
             tailwindcss: {
                 config: `${ROOT_DIR}/src/index.css`,
+                // @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276#issuecomment-2481272848
+                cssFiles: ['./src/index.css'],
             },
         },
     },
@@ -1910,6 +1930,7 @@ export default [
             },
         },
         plugins: {
+            "better-tailwindcss": pluginBetterTailwindcss,
             "@arthurgeron/react-usememo": pluginUseMemo2,
             "@eslint-react": eslintReact,
             "@eslint-react/dom": eslintReactDom,
@@ -2051,6 +2072,8 @@ export default [
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
+            ...pluginBetterTailwindcss.configs.correctness.rules,
+
             "@arthurgeron/react-usememo/require-memo": "off",
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "off",
@@ -3033,7 +3056,18 @@ export default [
             * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
             * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
             */
-            // "tailwind/no-custom-classname": "off",
+            "tailwind/no-custom-classname": [
+                "warn",
+                {
+                    skipClassAttribute: true,
+                },
+            ],
+            "better-tailwindcss/no-unregistered-classes": [
+                "warn",
+                {
+                    detectComponentClasses: true,
+                },
+            ],
             // "tailwind/no-unnecessary-arbitrary-value": "warn",
             "regexp/prefer-plus-quantifier": "warn",
             "regexp/prefer-quantifier": "warn",
@@ -3145,6 +3179,10 @@ export default [
             "zod/require-strict": "error",
         },
         settings: {
+            "better-tailwindcss": {
+                // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
+                "entryPoint": "./src/index.css",
+            },
             "boundaries/elements": [
                 { capture: ["app"], pattern: "src/App.tsx", type: "app" },
                 { capture: ["main"], pattern: "src/main.tsx", type: "main" },
@@ -3207,8 +3245,10 @@ export default [
                 ],
             },
             react: { version: "19" },
-            tailwind: {
-                config: "./tailwind.config.mjs",
+            tailwindcss: {
+                config: `${ROOT_DIR}/src/index.css`,
+                // @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276#issuecomment-2481272848
+                cssFiles: ['./src/index.css'],
             },
         },
     },
@@ -5442,7 +5482,12 @@ export default [
             * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
             * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
             */
-            // "tailwind/no-custom-classname": "off",
+            "tailwind/no-custom-classname": [
+                "warn",
+                {
+                    skipClassAttribute: true,
+                },
+            ],
             // "tailwind/no-unnecessary-arbitrary-value": "warn",
             "regexp/prefer-plus-quantifier": "warn",
             "regexp/prefer-quantifier": "warn",
@@ -5609,8 +5654,14 @@ export default [
                 ],
             },
             react: { version: "19" },
-            tailwind: {
-                config: "./tailwind.config.mjs",
+            tailwindcss: {
+                config: `${ROOT_DIR}/src/index.css`,
+                // @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
+                cssFiles: ['./src/index.css'],
+            },
+            "better-tailwindcss": {
+                // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
+                "entryPoint": "./src/index.css",
             },
         },
     },

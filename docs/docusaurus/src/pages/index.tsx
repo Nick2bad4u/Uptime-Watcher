@@ -1,4 +1,6 @@
 /* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable tailwind/no-custom-classname -- not tailwind */
+/* eslint-disable better-tailwindcss/no-unregistered-classes */
 /* eslint-disable @typescript-eslint/dot-notation -- Required for Strict TS */
 /* eslint-disable deprecation/deprecation */
 /* eslint-disable etc/no-deprecated */

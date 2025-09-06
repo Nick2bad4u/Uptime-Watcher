@@ -15,7 +15,6 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { Database } from "node-sqlite3-wasm";
 
 // Mock database service and related imports
 vi.mock("../services/database/DatabaseService", () => ({
@@ -218,7 +217,7 @@ describe("Specific Array Declaration Mutation Tests", () => {
             // Check first entry parameters
             expect(mockStmt.run).toHaveBeenNthCalledWith(1, [
                 "monitor123",
-                testEntries[0].timestamp,
+                testEntries[0]!.timestamp,
                 "up",
                 250,
                 "OK",
@@ -227,15 +226,15 @@ describe("Specific Array Declaration Mutation Tests", () => {
             // Check second entry parameters
             expect(mockStmt.run).toHaveBeenNthCalledWith(2, [
                 "monitor123",
-                testEntries[1].timestamp,
+                testEntries[1]!.timestamp,
                 "down",
                 null,
                 "Timeout",
             ]);
 
             // Verify the parameters arrays are not empty
-            const firstCallArgs = mockStmt.run.mock.calls[0][0];
-            const secondCallArgs = mockStmt.run.mock.calls[1][0];
+            const firstCallArgs = mockStmt.run.mock.calls[0]![0];
+            const secondCallArgs = mockStmt.run.mock.calls[1]![0];
 
             expect(firstCallArgs).not.toEqual([]);
             expect(secondCallArgs).not.toEqual([]);
@@ -264,7 +263,7 @@ describe("Specific Array Declaration Mutation Tests", () => {
                 const stmt = mockDb.prepare("INSERT INTO history ...");
 
                 try {
-                    for (const entry of historyEntries) {
+                    for (const _entry of historyEntries) {
                         // This is the mutation: stmt.run([ → []
                         stmt.run([]); // Empty parameters array
                     }
@@ -287,7 +286,7 @@ describe("Specific Array Declaration Mutation Tests", () => {
             // Verify the mutated version would call with empty array
             expect(mockStmt.run).toHaveBeenCalledWith([]);
 
-            const callArgs = mockStmt.run.mock.calls[0][0];
+            const callArgs = mockStmt.run.mock.calls[0]![0];
             expect(callArgs).toEqual([]);
             expect(callArgs).toHaveLength(0);
 
@@ -397,7 +396,7 @@ describe("Specific Array Declaration Mutation Tests", () => {
             await annotate("Mutation: [siteIdentifier] → []", "mutation");
 
             // Mock query function that would be called with parameter array
-            function executeQuery(sql: string, params: any[]) {
+            function executeQuery(_sql: string, params: any[]) {
                 expect(params).not.toEqual([]); // Fails if mutated to empty array
                 expect(params).toContain("test-site");
                 return [{ id: 1 }, { id: 2 }];
@@ -429,7 +428,7 @@ describe("Specific Array Declaration Mutation Tests", () => {
             let parameterArray: any[] = [];
 
             // Mock query function to capture what parameters were passed
-            function executeQuery(sql: string, params: any[]) {
+            function executeQuery(_sql: string, params: any[]) {
                 parameterArray = params;
                 // Empty parameters would return all monitors (wrong behavior)
                 if (params.length === 0) {
@@ -444,7 +443,7 @@ describe("Specific Array Declaration Mutation Tests", () => {
             }
 
             // Simulate the mutated code
-            function getMonitorIdsForSiteMutated(siteIdentifier: string) {
+            function getMonitorIdsForSiteMutated(_siteIdentifier: string) {
                 // The mutation: [siteIdentifier] → []
                 return executeQuery(
                     "SELECT id FROM monitors WHERE site_identifier = ?",

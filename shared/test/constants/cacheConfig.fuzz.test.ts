@@ -10,7 +10,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
-import { CACHE_CONFIG, CACHE_NAMES, type CacheConfig, type CacheConfigKey, type CacheConfigType } from "../../../shared/constants/cacheConfig";
+import { CACHE_CONFIG, CACHE_NAMES, type CacheConfig, type CacheConfigKey } from "../../../shared/constants/cacheConfig";
 
 describe("cacheConfig - Property-Based Fuzzing Tests", () => {
     describe("CACHE_CONFIG validation", () => {
@@ -218,13 +218,14 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                 fc.property(
                     fc.option(fc.string()),
                     (suffix) => {
-                        const result = CACHE_NAMES.sites(suffix);
+                        const normalizedSuffix = suffix === null ? undefined : suffix;
+                        const result = CACHE_NAMES.sites(normalizedSuffix);
 
                         // This tests the ternary operator: suffix === undefined ? "sites" : `sites-${suffix}`
-                        if (suffix === undefined) {
+                        if (normalizedSuffix === undefined) {
                             expect(result).toBe("sites");
                         } else {
-                            expect(result).toBe(`sites-${suffix}`);
+                            expect(result).toBe(`sites-${normalizedSuffix}`);
                         }
                     }
                 )

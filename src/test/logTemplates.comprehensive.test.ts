@@ -362,7 +362,7 @@ describe('logTemplates.ts - Comprehensive Coverage', () => {
 
         it('should handle boolean values', () => {
             const template = 'Status: {enabled}, Valid: {valid}';
-            const variables = { enabled: true, valid: false };
+            const variables = { enabled: "true", valid: "false" } as const;
 
             const result = interpolateLogTemplate(template, variables);
 

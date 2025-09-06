@@ -22,11 +22,9 @@ import { act, renderHook } from "@testing-library/react";
 import type {
     Monitor,
     MonitorType,
-    MonitorFieldDefinition,
 } from "../../../../shared/types";
 import type { MonitorTypeConfig } from "../../../../shared/types/monitorTypes";
 import type { ValidationResult } from "../../../../shared/types/validation";
-import type { IpcResponse } from "../../../types/ipc";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 
 // Store the original implementations to restore later
@@ -313,17 +311,12 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                             required: true,
                             label: "Target URL",
                             placeholder: "https://example.com",
-                            validation: {
-                                pattern: "^https?://",
-                                message: "Must be a valid URL",
-                            },
                         },
                         {
                             name: "timeout",
                             type: "number",
                             required: false,
                             label: "Timeout (seconds)",
-                            defaultValue: 30,
                             min: 1,
                             max: 300,
                         },
@@ -337,7 +330,6 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                                 { value: "POST", label: "POST" },
                                 { value: "PUT", label: "PUT" },
                             ],
-                            defaultValue: "GET",
                         },
                     ],
                 },
@@ -378,7 +370,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             // Mock withErrorHandling to throw an error during operation
-            originalWithErrorHandling.mockImplementation(async (operation) => {
+            originalWithErrorHandling.mockImplementation(async (_operation) => {
                 throw new Error("withErrorHandling failed");
             });
 
@@ -416,7 +408,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             for (const errorType of errorTypes) {
                 originalWithErrorHandling.mockImplementationOnce(
-                    async (operation, store) => {
+                    async (_operation, store) => {
                         try {
                             store.clearError();
                             store.setLoading(true);

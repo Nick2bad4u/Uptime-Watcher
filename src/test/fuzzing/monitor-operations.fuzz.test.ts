@@ -166,31 +166,41 @@ const arbitraryMixedValue = (): fc.Arbitrary<unknown> =>
 
 const arbitraryPartialMonitor = (): fc.Arbitrary<Partial<Monitor>> =>
     fc.record({
-        id: fc.option(fc.string()),
-        type: fc.option(arbitraryMonitorType()),
-        url: fc.option(arbitraryUrl()),
-        host: fc.option(arbitraryHost()),
-        port: fc.option(arbitraryPort()),
-        timeout: fc.option(arbitraryTimeout()),
-        checkInterval: fc.option(arbitraryCheckInterval()),
-        retryAttempts: fc.option(arbitraryRetryAttempts()),
-        monitoring: fc.option(fc.boolean()),
-        status: fc.option(arbitraryMonitorStatus()),
-        responseTime: fc.option(fc.integer()),
-        recordType: fc.option(fc.string()),
-        expectedValue: fc.option(fc.string()),
-        activeOperations: fc.option(fc.array(fc.string()), { nil: undefined }),
-        history: fc.option(
-            fc.array(
-                fc.record({
-                    timestamp: fc.integer(),
-                    status: fc.constantFrom("up", "down"), // StatusHistory only supports "up" | "down"
-                    responseTime: fc.integer({ min: 0 }),
-                    details: fc.option(fc.string()),
-                })
-            )
+        id: fc.string(),
+        type: arbitraryMonitorType(),
+        url: arbitraryUrl(),
+        host: arbitraryHost(),
+        port: arbitraryPort(),
+        timeout: arbitraryTimeout(),
+        checkInterval: arbitraryCheckInterval(),
+        retryAttempts: arbitraryRetryAttempts(),
+        monitoring: fc.boolean(),
+        status: arbitraryMonitorStatus(),
+        responseTime: fc.integer(),
+        recordType: fc.string(),
+        expectedValue: fc.string(),
+        activeOperations: fc.array(fc.string()),
+        history: fc.array(
+            fc.record({
+                timestamp: fc.integer(),
+                status: fc.constantFrom("up", "down"), // StatusHistory only supports "up" | "down"
+                responseTime: fc.integer({ min: 0 }),
+                details: fc.string(),
+            })
         ),
-        lastChecked: fc.option(fc.date()),
+        lastChecked: fc.date(),
+    }).map(fullMonitor => {
+        // Create a partial by randomly selecting which properties to include
+        const partial: Partial<Monitor> = {};
+        const keys = Object.keys(fullMonitor) as (keyof Monitor)[];
+
+        for (const key of keys) {
+            if (Math.random() > 0.5) { // Randomly include ~50% of properties
+                (partial as any)[key] = fullMonitor[key];
+            }
+        }
+
+        return partial;
     });
 
 // Generate monitor with mixed type contamination

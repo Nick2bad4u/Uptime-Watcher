@@ -38,8 +38,22 @@ export function convertError(error: unknown): ErrorConversionResult {
         };
     }
 
+    // Safely convert to string with fallback for problematic objects
+    // eslint-disable-next-line @typescript-eslint/init-declarations
+    let errorMessage: string;
+    try {
+        errorMessage = String(error);
+    } catch {
+        // Fallback for objects that can't be converted to string
+        try {
+            errorMessage = JSON.stringify(error);
+        } catch {
+            errorMessage = "[object cannot be converted to string]";
+        }
+    }
+
     return {
-        error: new Error(String(error)),
+        error: new Error(errorMessage),
         originalType: typeof error,
         wasError: false,
     };

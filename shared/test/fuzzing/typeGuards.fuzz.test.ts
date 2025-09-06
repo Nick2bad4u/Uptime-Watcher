@@ -124,6 +124,9 @@ describe("TypeGuards Fuzzing Tests", () => {
             (value, properties) => {
                 const result = hasProperties(value, properties);
 
+                // Always make at least one assertion
+                expect(typeof result).toBe("boolean");
+
                 if (result) {
                     // If hasProperties returns true, value must be object with all props
                     expect(isObject(value)).toBe(true);
@@ -135,6 +138,12 @@ describe("TypeGuards Fuzzing Tests", () => {
                 if (isObject(value)) {
                     const allPropsExist = properties.every(prop => Object.hasOwn(value, prop));
                     expect(result).toBe(allPropsExist);
+                } else if (properties.length > 0) {
+                    // If value is not an object and properties is not empty, result should be false
+                    expect(result).toBe(false);
+                } else {
+                    // Empty properties array should return true for any value
+                    expect(result).toBe(true);
                 }
             }
         );

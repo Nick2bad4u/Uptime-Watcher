@@ -729,8 +729,14 @@ describe("Monitor UI Helpers", () => {
 
         test.prop([
             fc.record({
-                primary: fc.option(fc.string({ minLength: 1, maxLength: 100 }), { nil: undefined }),
-                secondary: fc.option(fc.string({ minLength: 1, maxLength: 100 }), { nil: undefined }),
+                primary: fc.string({ minLength: 1, maxLength: 100 }),
+                secondary: fc.string({ minLength: 1, maxLength: 100 }),
+            }).map(full => {
+                // Create a proper partial object that satisfies exactOptionalPropertyTypes
+                const partial: { primary?: string; secondary?: string } = {};
+                if (Math.random() > 0.3) partial.primary = full.primary;
+                if (Math.random() > 0.3) partial.secondary = full.secondary;
+                return partial;
             })
         ])("should handle getMonitorHelpTexts with various help text configurations", async (helpTexts) => {
             // Clear cache before each test

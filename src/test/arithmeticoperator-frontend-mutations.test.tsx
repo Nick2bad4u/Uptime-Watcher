@@ -16,8 +16,6 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 describe("ArithmeticOperator Mutations - Frontend Components", () => {

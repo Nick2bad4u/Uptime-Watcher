@@ -757,12 +757,12 @@ export default defineConfig(({ mode }) => {
             outputFile: {
                 json: "./coverage/test-results.json",
             },
-            // Modern performance optimizations
+            // Modern performance optimizations - optimized for multi-project stability
             pool: "threads", // Use worker threads for better performance
             poolOptions: {
                 threads: {
                     isolate: true, // Isolate tests for better reliability
-                    maxThreads: 24, // Limit concurrent threads to reduce listener conflicts
+                    maxThreads: 8, // Reduced from 24 to prevent resource contention in multi-project setup
                     minThreads: 1, // Ensure at least one thread
                     singleThread: false, // Enable multi-threading
                     useAtomics: true,
@@ -788,6 +788,8 @@ export default defineConfig(({ mode }) => {
             ],
             retry: 0, // No retries to surface issues immediately
             sequence: {
+                // Run projects sequentially to avoid resource contention
+                concurrent: false,
                 groupOrder: 0,
                 setupFiles: "parallel",
             },

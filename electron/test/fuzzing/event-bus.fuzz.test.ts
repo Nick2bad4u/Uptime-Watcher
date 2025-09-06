@@ -122,6 +122,10 @@ describe("TypedEventBus Fuzzing Tests", () => {
 
                         // Data might be transformed for safety, but should be defined
                         expect(received).toHaveProperty("data");
+
+                        // Clean up listeners after each iteration to prevent accumulation
+                        eventBus.removeAllListeners();
+                        eventBus.clearMiddleware();
                     }
                 ),
                 { numRuns: 30 }
@@ -167,6 +171,10 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         if (eventData._meta !== undefined) {
                             expect(received).toHaveProperty("_originalMeta");
                         }
+
+                        // Clean up listeners after each iteration to prevent accumulation
+                        eventBus.removeAllListeners();
+                        eventBus.clearMiddleware();
                     }
                 ),
                 { numRuns: 20 }
@@ -214,15 +222,15 @@ describe("TypedEventBus Fuzzing Tests", () => {
 
                             if (
                                 allPreviousCallNext &&
-                                (config.behavior === "throw" ||
-                                    config.behavior === "async-throw")
+                                (config!.behavior === "throw" ||
+                                    config!.behavior === "async-throw")
                             ) {
                                 shouldExpectError = true;
                                 break; // Found the first throwing middleware that will execute
                             }
 
                             // If this middleware doesn't call next, no subsequent middleware will execute
-                            if (!config.shouldCallNext) {
+                            if (!config!.shouldCallNext) {
                                 break;
                             }
                         }
@@ -232,7 +240,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
                             index,
                             config,
                         ] of middlewareConfigs.entries()) {
-                            eventBus.use(async (eventName, data, next) => {
+                            eventBus.use(async (_eventName, _data, next) => {
                                 executionOrder.push(
                                     `middleware-${index}-start`
                                 );
@@ -292,6 +300,10 @@ describe("TypedEventBus Fuzzing Tests", () => {
                                 expect(receivedEvents).toHaveLength(1);
                             }
                         }
+
+                        // Clean up listeners and middleware after each iteration
+                        eventBus.removeAllListeners();
+                        eventBus.clearMiddleware();
                     }
                 ),
                 { numRuns: 25 }
@@ -316,7 +328,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         try {
                             for (let i = 0; i < middlewareCount; i++) {
                                 busWithLimit.use(
-                                    async (eventName, data, next) => {
+                                    async (_eventName, _data, next) => {
                                         await next();
                                     }
                                 );
@@ -335,6 +347,10 @@ describe("TypedEventBus Fuzzing Tests", () => {
                                 middlewareCount
                             );
                         }
+
+                        // Clean up the test bus after each iteration
+                        busWithLimit.removeAllListeners();
+                        busWithLimit.clearMiddleware();
                     }
                 ),
                 { numRuns: 20 }
@@ -402,6 +418,10 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         expect(receivedEvents[0]).toHaveProperty("id");
                         expect(receivedEvents[0]).toHaveProperty("data");
                         expect(receivedEvents[0]).toHaveProperty("_meta");
+
+                        // Clean up listeners after each iteration to prevent accumulation
+                        eventBus.removeAllListeners();
+                        eventBus.clearMiddleware();
                     }
                 ),
                 { numRuns: 10 } // Fewer runs for performance tests
@@ -507,6 +527,10 @@ describe("TypedEventBus Fuzzing Tests", () => {
                                 message: "test",
                             })
                         ).resolves.toBeUndefined();
+
+                        // Clean up listeners after each iteration to prevent accumulation
+                        eventBus.removeAllListeners();
+                        eventBus.clearMiddleware();
                     }
                 ),
                 { numRuns: 15 }
@@ -541,7 +565,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
                             index,
                             config,
                         ] of listenerConfigs.entries()) {
-                            eventBus.onTyped("test:simple", async (data) => {
+                            eventBus.onTyped("test:simple", async (_data) => {
                                 executedListeners.push(index);
 
                                 if (config.shouldThrow) {
@@ -585,6 +609,10 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         expect(executedListeners).toHaveLength(
                             listenerConfigs.length
                         );
+
+                        // Clean up listeners after each iteration to prevent accumulation
+                        eventBus.removeAllListeners();
+                        eventBus.clearMiddleware();
                     }
                 ),
                 { numRuns: 20 }

@@ -1438,7 +1438,7 @@ describe("Monitor Validation Utilities", () => {
 
                 expect(result.type).toBe(monitorType);
                 expect(result.monitoring).toBe(baseData.monitoring);
-                expect(result.checkInterval).toBe(baseData.checkInterval);
+                expect(result['checkInterval']).toBe(baseData.checkInterval);
                 expect(result.timeout).toBe(baseData.timeout);
                 expect(result.retryAttempts).toBe(baseData.retryAttempts);
                 expect(result.responseTime).toBe(-1); // Default value
@@ -1458,7 +1458,7 @@ describe("Monitor Validation Utilities", () => {
                 const result = createMonitorObject("http", httpData as any);
 
                 expect(result.type).toBe("http");
-                expect(result.url).toBe(httpData.url);
+                expect(result['url']).toBe(httpData.url);
             });
 
             test.prop([
@@ -1474,8 +1474,8 @@ describe("Monitor Validation Utilities", () => {
                 const result = createMonitorObject("port", portData as any);
 
                 expect(result.type).toBe("port");
-                expect(result.host).toBe(portData.host);
-                expect(result.port).toBe(portData.port);
+                expect(result['host']).toBe(portData.host);
+                expect(result['port']).toBe(portData.port);
             });
 
             test.prop([

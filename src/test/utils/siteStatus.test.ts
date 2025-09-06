@@ -232,9 +232,15 @@ describe("siteStatus Property-based Tests", () => {
         test.prop([fc.array(monitorArb, { minLength: 2, maxLength: 5 })])("should return mixed when monitors have different statuses", (monitors) => {
             // Ensure we have at least 2 different statuses
             const differentStatuses: MonitorStatus[] = ["up", "down"];
+            const status1 = differentStatuses[0];
+            const status2 = differentStatuses[1];
+            if (!status1 || !status2) {
+                throw new Error('Expected status values to be defined');
+            }
+
             const mixedMonitors: { monitoring: boolean; status: MonitorStatus }[] = [
-                { monitoring: true, status: differentStatuses[0] },
-                { monitoring: true, status: differentStatuses[1] },
+                { monitoring: true, status: status1 },
+                { monitoring: true, status: status2 },
                 ...monitors.slice(2)
             ];
 

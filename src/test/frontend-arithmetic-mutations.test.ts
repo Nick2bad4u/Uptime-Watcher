@@ -242,8 +242,8 @@ describe("Frontend ArithmeticOperator Mutation Tests", () => {
             // With different values where mutant 2 would fail
             const left2 = 950;
             const overlayRight2 = left2 + overlayW; // 1050
-            const mutant2Overflow2 = overlayRight2 > mutant2Limit; // 1050 > 1008 = true
-            const correctOverflow2 = overlayRight2 > viewportLimit; // 1050 > 992 = true
+            expect(overlayRight2 > mutant2Limit).toBe(true); // 1050 > 1008 = true
+            expect(overlayRight2 > viewportLimit).toBe(true); // 1050 > 992 = true
 
             // Both should be true here, but with values in between:
             const leftBetween = 945;
@@ -257,14 +257,14 @@ describe("Frontend ArithmeticOperator Mutation Tests", () => {
             // Try values that would show the difference
             const leftEdge = 936; // Exactly at edge for mutant
             const overlayRightEdge = leftEdge + overlayW; // 1036
-            const correctOverflowEdge = overlayRightEdge > viewportLimit; // 1036 > 992 = true
-            const mutant2OverflowEdge = overlayRightEdge > mutant2Limit; // 1036 > 1008 = true
+            expect(overlayRightEdge > viewportLimit).toBe(true); // 1036 > 992 = true
+            expect(overlayRightEdge > mutant2Limit).toBe(true); // 1036 > 1008 = true
 
             // Find a case where they differ
             const leftDiff = 920;
             const overlayRightDiff = leftDiff + overlayW; // 1020
-            const correctOverflowDiff = overlayRightDiff > viewportLimit; // 1020 > 992 = true
-            const mutant2OverflowDiff = overlayRightDiff > mutant2Limit; // 1020 > 1008 = true
+            expect(overlayRightDiff > viewportLimit).toBe(true); // 1020 > 992 = true
+            expect(overlayRightDiff > mutant2Limit).toBe(true); // 1020 > 1008 = true
 
             // Let's try smaller overlay to find difference
             const leftTest = 1000;

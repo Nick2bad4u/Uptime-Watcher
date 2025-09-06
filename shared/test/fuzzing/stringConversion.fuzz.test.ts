@@ -202,7 +202,7 @@ describe("StringConversion - Fast-Check Fuzzing Tests", () => {
                 baseValue,
                 Object.assign(Object.create(null), { toString: () => baseValue }),
                 new Proxy({}, {
-                    get(target, prop) {
+                    get(_target, prop) {
                         if (prop === Symbol.toPrimitive || prop === "valueOf" || prop === "toString") {
                             return () => baseValue;
                         }
