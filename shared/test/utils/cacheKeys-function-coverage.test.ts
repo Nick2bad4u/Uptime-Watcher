@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 import { isStandardizedCacheKey, parseCacheKey } from "../../utils/cacheKeys";
 
 describe("Cache Keys Function Coverage", () => {
-    describe("isStandardizedCacheKey", () => {
+    describe(isStandardizedCacheKey, () => {
         it("should return true for valid 2-part cache keys", async ({
             task,
             annotate,
@@ -23,8 +23,8 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
-            expect(isStandardizedCacheKey("site:site-123")).toBe(true);
-            expect(isStandardizedCacheKey("monitor:monitor-456")).toBe(true);
+            expect(isStandardizedCacheKey("site:site-123")).toBeTruthy();
+            expect(isStandardizedCacheKey("monitor:monitor-456")).toBeTruthy();
         });
 
         it("should return true for valid 3-part cache keys", async ({
@@ -39,9 +39,9 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
-            expect(isStandardizedCacheKey("site:loading:site-123")).toBe(true);
-            expect(isStandardizedCacheKey("monitor:checking:monitor-456")).toBe(
-                true
+            expect(isStandardizedCacheKey("site:loading:site-123")).toBeTruthy();
+            expect(isStandardizedCacheKey("monitor:checking:monitor-456")).toBeTruthy(
+                
             );
         });
 
@@ -57,7 +57,7 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isStandardizedCacheKey("site")).toBe(false);
+            expect(isStandardizedCacheKey("site")).toBeFalsy();
         });
 
         it("should return false for keys with too many parts", async ({
@@ -72,8 +72,8 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isStandardizedCacheKey("site:loading:site-123:extra")).toBe(
-                false
+            expect(isStandardizedCacheKey("site:loading:site-123:extra")).toBeFalsy(
+                
             );
         });
 
@@ -89,7 +89,7 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isStandardizedCacheKey(":site-123")).toBe(false);
+            expect(isStandardizedCacheKey(":site-123")).toBeFalsy();
         });
 
         it("should return false for 3-part keys with empty operation", async ({
@@ -104,7 +104,7 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isStandardizedCacheKey("site::site-123")).toBe(false);
+            expect(isStandardizedCacheKey("site::site-123")).toBeFalsy();
         });
 
         it("should return false for invalid prefixes", async ({
@@ -119,11 +119,11 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isStandardizedCacheKey("invalid:site-123")).toBe(false);
+            expect(isStandardizedCacheKey("invalid:site-123")).toBeFalsy();
         });
     });
 
-    describe("parseCacheKey", () => {
+    describe(parseCacheKey, () => {
         it("should parse valid 2-part cache keys", async ({
             task,
             annotate,
@@ -235,7 +235,7 @@ describe("Cache Keys Function Coverage", () => {
             const key = "site:loading:site-123";
 
             // Check validation first
-            expect(isStandardizedCacheKey(key)).toBe(true);
+            expect(isStandardizedCacheKey(key)).toBeTruthy();
 
             // Then parse successfully
             const parsed = parseCacheKey(key as any);

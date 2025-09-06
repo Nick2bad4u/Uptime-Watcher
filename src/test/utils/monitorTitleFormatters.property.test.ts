@@ -63,7 +63,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
         fc.constant("NS")
     );
 
-    describe("formatTitleSuffix", () => {
+    describe(formatTitleSuffix, () => {
         test.prop([monitorTypeArbitrary])(
             "should always return a string",
             (type) => {
@@ -109,8 +109,8 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                 (url) => {
                     const monitor = createBaseMonitor({ type: "http", url });
                     const result = formatTitleSuffix(monitor);
-                    expect(result.startsWith(" (")).toBe(true);
-                    expect(result.endsWith(")")).toBe(true);
+                    expect(result.startsWith(" (")).toBeTruthy();
+                    expect(result.endsWith(")")).toBeTruthy();
                     expect(result).toContain(url);
                 }
             );
@@ -275,7 +275,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
         });
     });
 
-    describe("getTitleSuffixFormatter", () => {
+    describe(getTitleSuffixFormatter, () => {
         test.prop([fc.string()])(
             "should return function for known monitor types, undefined for unknown",
             (monitorType) => {
@@ -300,7 +300,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
         );
     });
 
-    describe("registerTitleSuffixFormatter", () => {
+    describe(registerTitleSuffixFormatter, () => {
         beforeEach(() => {
             // Clean up any previously registered custom formatters
         });
@@ -399,7 +399,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
 
                     const result = formatTitleSuffix(testMonitor);
                     // Should still work, as JavaScript coerces null to string
-                    expect(typeof result === "string" || result === null).toBe(true);
+                    expect(typeof result === "string" || result === null).toBeTruthy();
                 }
             );
         });

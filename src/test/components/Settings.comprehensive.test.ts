@@ -60,11 +60,11 @@ describe("Settings Component Coverage Tests", () => {
             ];
 
             for (const key of validKeys) {
-                expect(ALLOWED_SETTINGS_KEYS.has(key as any)).toBe(true);
+                expect(ALLOWED_SETTINGS_KEYS.has(key as any)).toBeTruthy();
             }
 
             for (const key of invalidKeys) {
-                expect(ALLOWED_SETTINGS_KEYS.has(key as any)).toBe(false);
+                expect(ALLOWED_SETTINGS_KEYS.has(key as any)).toBeFalsy();
             }
         });
     });
@@ -128,7 +128,7 @@ describe("Settings Component Coverage Tests", () => {
             );
             expect(typeof settingsStore.updateSettings).toBe("function");
 
-            expect(settingsStore.settings.autoStart).toBe(false);
+            expect(settingsStore.settings.autoStart).toBeFalsy();
             expect(settingsStore.settings.historyLimit).toBe(100);
             expect(settingsStore.settings.theme).toBe("system");
         });
@@ -173,7 +173,7 @@ describe("Settings Component Coverage Tests", () => {
                 setTheme: vi.fn(),
             };
 
-            expect(Array.isArray(theme.availableThemes)).toBe(true);
+            expect(Array.isArray(theme.availableThemes)).toBeTruthy();
             expect(typeof theme.isDark).toBe("boolean");
             expect(typeof theme.setTheme).toBe("function");
 
@@ -284,13 +284,13 @@ describe("Settings Component Coverage Tests", () => {
             };
 
             // Test valid keys
-            expect(handleSettingChange("autoStart", true)).toBe(true);
-            expect(handleSettingChange("theme", "dark")).toBe(true);
-            expect(handleSettingChange("notifications", false)).toBe(true);
+            expect(handleSettingChange("autoStart", true)).toBeTruthy();
+            expect(handleSettingChange("theme", "dark")).toBeTruthy();
+            expect(handleSettingChange("notifications", false)).toBeTruthy();
 
             // Test invalid keys
-            expect(handleSettingChange("invalidKey", "value")).toBe(false);
-            expect(handleSettingChange("notAllowed", 123)).toBe(false);
+            expect(handleSettingChange("invalidKey", "value")).toBeFalsy();
+            expect(handleSettingChange("notAllowed", 123)).toBeFalsy();
         });
 
         it("should handle different value types", async ({
@@ -337,11 +337,11 @@ describe("Settings Component Coverage Tests", () => {
             ];
             const DEFAULT_HISTORY_LIMIT = 100;
 
-            expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBe(true);
+            expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBeTruthy();
             expect(HISTORY_LIMIT_OPTIONS.length).toBeGreaterThan(0);
             expect(typeof DEFAULT_HISTORY_LIMIT).toBe("number");
-            expect(HISTORY_LIMIT_OPTIONS.includes(DEFAULT_HISTORY_LIMIT)).toBe(
-                true
+            expect(HISTORY_LIMIT_OPTIONS).toContain(
+                DEFAULT_HISTORY_LIMIT
             );
 
             for (const limit of HISTORY_LIMIT_OPTIONS) {
@@ -430,8 +430,8 @@ describe("Settings Component Coverage Tests", () => {
                         "light",
                         "dark",
                         "system",
-                    ].includes(theme)
-                ).toBe(true);
+                    ]
+                ).toContain(theme);
             }
         });
 
@@ -582,8 +582,8 @@ describe("Settings Component Coverage Tests", () => {
             const [showButtonLoading, setShowButtonLoading] = useState(false);
             const [syncSuccess, setSyncSuccess] = useState(false);
 
-            expect(showButtonLoading).toBe(false);
-            expect(syncSuccess).toBe(false);
+            expect(showButtonLoading).toBeFalsy();
+            expect(syncSuccess).toBeFalsy();
             expect(typeof setShowButtonLoading).toBe("function");
             expect(typeof setSyncSuccess).toBe("function");
         });
@@ -677,8 +677,8 @@ describe("Settings Component Coverage Tests", () => {
                 "Reset all settings to defaults",
             ];
 
-            expect(Array.isArray(features)).toBe(true);
-            expect(features.length).toBe(9);
+            expect(Array.isArray(features)).toBeTruthy();
+            expect(features).toHaveLength(9);
 
             for (const feature of features) {
                 expect(typeof feature).toBe("string");
@@ -708,7 +708,7 @@ describe("Settings Component Coverage Tests", () => {
                 expect(
                     component.startsWith("Themed") ||
                         component === "StatusIndicator"
-                ).toBe(true);
+                ).toBeTruthy();
             }
         });
     });
@@ -792,7 +792,7 @@ describe("Settings Component Coverage Tests", () => {
             };
 
             for (const element of Object.values(architectureElements)) {
-                expect(element).toBe(true);
+                expect(element).toBeTruthy();
             }
         });
     });

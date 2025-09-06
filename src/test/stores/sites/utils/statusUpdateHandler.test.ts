@@ -132,7 +132,7 @@ describe("StatusUpdateHandler", () => {
 
             const testManager = new StatusUpdateManager(mockOptions);
             expect(testManager).toBeDefined();
-            expect(testManager.isSubscribed()).toBe(false);
+            expect(testManager.isSubscribed()).toBeFalsy();
         });
 
         it("should initialize without optional onUpdate callback", async ({
@@ -151,7 +151,7 @@ describe("StatusUpdateHandler", () => {
             };
             const testManager = new StatusUpdateManager(optionsWithoutCallback);
             expect(testManager).toBeDefined();
-            expect(testManager.isSubscribed()).toBe(false);
+            expect(testManager.isSubscribed()).toBeFalsy();
         });
     });
 
@@ -162,7 +162,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(manager.isSubscribed()).toBe(false);
+            expect(manager.isSubscribed()).toBeFalsy();
         });
 
         it("should become subscribed after calling subscribe", async ({
@@ -186,7 +186,7 @@ describe("StatusUpdateHandler", () => {
             );
 
             manager.subscribe();
-            expect(manager.isSubscribed()).toBe(true);
+            expect(manager.isSubscribed()).toBeTruthy();
         });
 
         it("should set up event listeners when subscribing", async ({
@@ -269,10 +269,10 @@ describe("StatusUpdateHandler", () => {
             );
 
             manager.subscribe();
-            expect(manager.isSubscribed()).toBe(true);
+            expect(manager.isSubscribed()).toBeTruthy();
 
             manager.unsubscribe();
-            expect(manager.isSubscribed()).toBe(false);
+            expect(manager.isSubscribed()).toBeFalsy();
             expect(cleanupFn).toHaveBeenCalledTimes(3); // Called for each event type
         });
 
@@ -285,9 +285,9 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(manager.isSubscribed()).toBe(false);
+            expect(manager.isSubscribed()).toBeFalsy();
             expect(() => manager.unsubscribe()).not.toThrow();
-            expect(manager.isSubscribed()).toBe(false);
+            expect(manager.isSubscribed()).toBeFalsy();
         });
     });
 
@@ -428,7 +428,7 @@ describe("StatusUpdateHandler", () => {
             expect(mockSetSites).toHaveBeenCalled();
             const newSites = mockSetSites.mock.calls[0][0];
             expect(newSites).toBeDefined();
-            expect(Array.isArray(newSites)).toBe(true);
+            expect(Array.isArray(newSites)).toBeTruthy();
         });
 
         it("should fall back to full sync when site not found", async ({
@@ -717,7 +717,7 @@ describe("StatusUpdateHandler", () => {
 
             manager = new StatusUpdateManager(mockOptions);
             expect(() => manager.unsubscribe()).not.toThrow();
-            expect(manager.isSubscribed()).toBe(false);
+            expect(manager.isSubscribed()).toBeFalsy();
         });
     });
 

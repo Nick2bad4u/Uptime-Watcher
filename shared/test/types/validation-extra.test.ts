@@ -34,8 +34,8 @@ describe("Function Coverage Validation", () => {
         const failureResult = validation.createFailureResult(["test error"]);
         const successResult = validation.createSuccessResult("test data");
 
-        expect(failureResult.success).toBe(false);
-        expect(successResult.success).toBe(true);
+        expect(failureResult.success).toBeFalsy();
+        expect(successResult.success).toBeTruthy();
         expect(typeof validation.isValidationResult(failureResult)).toBe(
             "boolean"
         );

@@ -45,28 +45,28 @@ describe("Component Coverage Boost", () => {
                     loading: false,
                     error: null,
                 })
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 SiteListLogic.shouldShowLoading({
                     sites: [],
                     loading: true,
                     error: null,
                 })
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 SiteListLogic.shouldShowError({
                     sites: [],
                     loading: false,
                     error: "Network error",
                 })
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 SiteListLogic.shouldShowSites({
                     sites: [{ id: "1", name: "Test", status: "up" }],
                     loading: false,
                     error: null,
                 })
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should handle site list rendering scenarios", ({
@@ -168,8 +168,8 @@ describe("Component Coverage Boost", () => {
             expect(siteDetailsLogic.getTabKey("overview", "123")).toBe(
                 "overview-123"
             );
-            expect(siteDetailsLogic.isValidTab("overview")).toBe(true);
-            expect(siteDetailsLogic.isValidTab("invalid")).toBe(false);
+            expect(siteDetailsLogic.isValidTab("overview")).toBeTruthy();
+            expect(siteDetailsLogic.isValidTab("invalid")).toBeFalsy();
             expect(siteDetailsLogic.getDefaultTab()).toBe("overview");
 
             const newState = siteDetailsLogic.handleTabChange(
@@ -301,13 +301,13 @@ describe("Component Coverage Boost", () => {
 
             const items = navigationLogic.getNavigationItems("123", true);
             expect(items).toHaveLength(4);
-            expect(items[1]?.disabled).toBe(false);
+            expect(items[1]?.disabled).toBeFalsy();
 
             const itemsNoData = navigationLogic.getNavigationItems(
                 "123",
                 false
             );
-            expect(itemsNoData[1]?.disabled).toBe(true);
+            expect(itemsNoData[1]?.disabled).toBeTruthy();
 
             expect(
                 navigationLogic.getActiveItem(items, "analytics")?.label
@@ -404,7 +404,7 @@ describe("Component Coverage Boost", () => {
                 filteredHistory: baseHistory,
                 monitor: baseMonitor,
             };
-            expect(areHistoryPropsEqual(props1, props2)).toBe(true);
+            expect(areHistoryPropsEqual(props1, props2)).toBeTruthy();
 
             // Test different history lengths
             const props3 = {
@@ -414,7 +414,7 @@ describe("Component Coverage Boost", () => {
                 ],
                 monitor: baseMonitor,
             };
-            expect(areHistoryPropsEqual(props1, props3)).toBe(false);
+            expect(areHistoryPropsEqual(props1, props3)).toBeFalsy();
 
             // Test different timestamps
             const differentHistory = [{ timestamp: 2000, status: "up" }];
@@ -422,17 +422,17 @@ describe("Component Coverage Boost", () => {
                 filteredHistory: differentHistory,
                 monitor: baseMonitor,
             };
-            expect(areHistoryPropsEqual(props1, props4)).toBe(false);
+            expect(areHistoryPropsEqual(props1, props4)).toBeFalsy();
 
             // Test both monitors undefined
             const props5 = { filteredHistory: baseHistory, monitor: undefined };
             const props6 = { filteredHistory: baseHistory, monitor: undefined };
-            expect(areHistoryPropsEqual(props5, props6)).toBe(true);
+            expect(areHistoryPropsEqual(props5, props6)).toBeTruthy();
 
             // Test one monitor undefined
             const props7 = { filteredHistory: baseHistory, monitor: undefined };
-            expect(areHistoryPropsEqual(props1, props7)).toBe(false);
-            expect(areHistoryPropsEqual(props7, props1)).toBe(false);
+            expect(areHistoryPropsEqual(props1, props7)).toBeFalsy();
+            expect(areHistoryPropsEqual(props7, props1)).toBeFalsy();
 
             // Test different monitor IDs
             const differentMonitor = {
@@ -444,7 +444,7 @@ describe("Component Coverage Boost", () => {
                 filteredHistory: baseHistory,
                 monitor: differentMonitor,
             };
-            expect(areHistoryPropsEqual(props1, props8)).toBe(false);
+            expect(areHistoryPropsEqual(props1, props8)).toBeFalsy();
 
             // Test different monitor types
             const differentTypeMonitor = {
@@ -456,7 +456,7 @@ describe("Component Coverage Boost", () => {
                 filteredHistory: baseHistory,
                 monitor: differentTypeMonitor,
             };
-            expect(areHistoryPropsEqual(props1, props9)).toBe(false);
+            expect(areHistoryPropsEqual(props1, props9)).toBeFalsy();
 
             // Test different URLs
             const differentUrlMonitor = {
@@ -468,7 +468,7 @@ describe("Component Coverage Boost", () => {
                 filteredHistory: baseHistory,
                 monitor: differentUrlMonitor,
             };
-            expect(areHistoryPropsEqual(props1, props10)).toBe(false);
+            expect(areHistoryPropsEqual(props1, props10)).toBeFalsy();
 
             // Test different ports
             const portMonitor1 = {
@@ -491,7 +491,7 @@ describe("Component Coverage Boost", () => {
                 filteredHistory: baseHistory,
                 monitor: portMonitor2,
             };
-            expect(areHistoryPropsEqual(props11, props12)).toBe(false);
+            expect(areHistoryPropsEqual(props11, props12)).toBeFalsy();
 
             // Test different hosts
             const hostMonitor1 = {
@@ -514,7 +514,7 @@ describe("Component Coverage Boost", () => {
                 filteredHistory: baseHistory,
                 monitor: hostMonitor2,
             };
-            expect(areHistoryPropsEqual(props13, props14)).toBe(false);
+            expect(areHistoryPropsEqual(props13, props14)).toBeFalsy();
         });
 
         it("should handle SiteCardHistory title generation logic", ({
@@ -711,34 +711,34 @@ describe("Component Coverage Boost", () => {
             };
 
             // Test enabled state
-            expect(actionButtonLogic.shouldDisableButtons(baseProps)).toBe(
-                false
+            expect(actionButtonLogic.shouldDisableButtons(baseProps)).toBeFalsy(
+                
             );
 
             // Test disabled state
             const disabledProps = { ...baseProps, disabled: true };
-            expect(actionButtonLogic.shouldDisableButtons(disabledProps)).toBe(
-                true
+            expect(actionButtonLogic.shouldDisableButtons(disabledProps)).toBeTruthy(
+                
             );
 
             // Test loading state
             const loadingProps = { ...baseProps, isLoading: true };
-            expect(actionButtonLogic.shouldDisableButtons(loadingProps)).toBe(
-                true
+            expect(actionButtonLogic.shouldDisableButtons(loadingProps)).toBeTruthy(
+                
             );
 
             // Test monitoring states
             const monitoringProps = { ...baseProps, isMonitoring: true };
             const buttonState =
                 actionButtonLogic.getButtonState(monitoringProps);
-            expect(buttonState.showStopButton).toBe(true);
-            expect(buttonState.showStartButton).toBe(false);
+            expect(buttonState.showStopButton).toBeTruthy();
+            expect(buttonState.showStartButton).toBeFalsy();
 
             const notMonitoringProps = { ...baseProps, isMonitoring: false };
             const notMonitoringState =
                 actionButtonLogic.getButtonState(notMonitoringProps);
-            expect(notMonitoringState.showStopButton).toBe(false);
-            expect(notMonitoringState.showStartButton).toBe(true);
+            expect(notMonitoringState.showStopButton).toBeFalsy();
+            expect(notMonitoringState.showStartButton).toBeTruthy();
 
             // Test event handling with stopPropagation
             const mockEvent = {
@@ -822,20 +822,20 @@ describe("Component Coverage Boost", () => {
                 siteMonitoringLogic.shouldShowSiteMonitoringButton(
                     propsAllRunning
                 )
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 siteMonitoringLogic.shouldShowSiteMonitoringButton(
                     propsNoneRunning
                 )
-            ).toBe(true);
+            ).toBeTruthy();
 
             const allRunningMonitoringProps =
                 siteMonitoringLogic.getSiteMonitoringProps(propsAllRunning);
-            expect(allRunningMonitoringProps.allMonitorsRunning).toBe(true);
+            expect(allRunningMonitoringProps.allMonitorsRunning).toBeTruthy();
 
             const noneRunningMonitoringProps =
                 siteMonitoringLogic.getSiteMonitoringProps(propsNoneRunning);
-            expect(noneRunningMonitoringProps.allMonitorsRunning).toBe(false);
+            expect(noneRunningMonitoringProps.allMonitorsRunning).toBeFalsy();
         });
     });
 
@@ -1117,7 +1117,7 @@ describe("Component Coverage Boost", () => {
                 false
             );
             expect(deleteButton.props["variant"]).toBe("danger");
-            expect(deleteButton.visible).toBe(false);
+            expect(deleteButton.visible).toBeFalsy();
 
             const metric = monitorUILogic.createMetricDisplay(
                 "Response Time",

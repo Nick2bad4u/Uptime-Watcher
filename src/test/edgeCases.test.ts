@@ -12,7 +12,7 @@ describe("Edge Cases", () => {
         await annotate("Type: Business Logic", "type");
 
         // Basic edge case test
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 
     it("should handle null values", async ({ task, annotate }) => {

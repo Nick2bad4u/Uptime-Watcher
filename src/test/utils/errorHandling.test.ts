@@ -25,7 +25,7 @@ describe("Error Handling Utilities", () => {
         vi.clearAllMocks();
     });
 
-    describe("ensureError", () => {
+    describe(ensureError, () => {
         describe("Error instance handling", () => {
             it("should return the same Error object when input is already an Error", async ({
                 task,
@@ -225,7 +225,7 @@ describe("Error Handling Utilities", () => {
         });
     });
 
-    describe("withUtilityErrorHandling", () => {
+    describe(withUtilityErrorHandling, () => {
         describe("Successful operations", () => {
             it("should return the operation result when operation succeeds", async ({
                 task,
@@ -244,7 +244,7 @@ describe("Error Handling Utilities", () => {
                 );
 
                 expect(result).toBe("success result");
-                expect(operation).toHaveBeenCalledOnce();
+                expect(operation).toHaveBeenCalledTimes(1);
             });
 
             it("should return complex object results", async ({
@@ -336,7 +336,7 @@ describe("Error Handling Utilities", () => {
                     )
                 ).rejects.toThrow("Original error");
 
-                expect(operation).toHaveBeenCalledOnce();
+                expect(operation).toHaveBeenCalledTimes(1);
             });
 
             it("should log error before throwing when shouldThrow is true", async ({
@@ -411,7 +411,7 @@ describe("Error Handling Utilities", () => {
                 );
 
                 expect(result).toBe(fallbackValue);
-                expect(operation).toHaveBeenCalledOnce();
+                expect(operation).toHaveBeenCalledTimes(1);
             });
 
             it("should log error before returning fallback value", async ({
@@ -493,7 +493,7 @@ describe("Error Handling Utilities", () => {
                     true,
                     false
                 );
-                expect(booleanResult).toBe(true);
+                expect(booleanResult).toBeTruthy();
 
                 // Array fallback
                 const arrayResult = await withUtilityErrorHandling(
@@ -832,7 +832,7 @@ describe("Error Handling Utilities", () => {
                     const operation = vi.fn().mockResolvedValue(expectedResult);
                     const result = await withUtilityErrorHandling(operation, "test");
                     expect(result).toBe(expectedResult);
-                    expect(operation).toHaveBeenCalledOnce();
+                    expect(operation).toHaveBeenCalledTimes(1);
                 }
             );
 
@@ -850,7 +850,7 @@ describe("Error Handling Utilities", () => {
                     );
 
                     expect(result).toBe(fallbackValue);
-                    expect(operation).toHaveBeenCalledOnce();
+                    expect(operation).toHaveBeenCalledTimes(1);
                 }
             );
 
@@ -864,7 +864,7 @@ describe("Error Handling Utilities", () => {
                         withUtilityErrorHandling(operation, operationName, undefined, true)
                     ).rejects.toBe(error);
 
-                    expect(operation).toHaveBeenCalledOnce();
+                    expect(operation).toHaveBeenCalledTimes(1);
                 }
             );
         });

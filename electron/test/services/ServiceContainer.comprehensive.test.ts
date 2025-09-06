@@ -865,11 +865,11 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
 
             const status = container.getInitializationStatus();
 
-            expect(status["DatabaseService"]).toBe(true);
-            expect(status["ConfigurationManager"]).toBe(true);
-            expect(status["HistoryRepository"]).toBe(true);
-            expect(status["MonitorManager"]).toBe(false);
-            expect(status["UptimeOrchestrator"]).toBe(false);
+            expect(status["DatabaseService"]).toBeTruthy();
+            expect(status["ConfigurationManager"]).toBeTruthy();
+            expect(status["HistoryRepository"]).toBeTruthy();
+            expect(status["MonitorManager"]).toBeFalsy();
+            expect(status["UptimeOrchestrator"]).toBeFalsy();
         });
 
         it("should return empty array for getInitializedServices when no services initialized", async ({
@@ -937,7 +937,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             const services = container.getInitializedServices();
 
             expect(services).toHaveLength(14); // All services except IpcService and MonitorManager
-            expect(services.every((s) => s.name && s.service)).toBe(true);
+            expect(services.every((s) => s.name && s.service)).toBeTruthy();
         });
     });
 
@@ -1181,7 +1181,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
                 "monitor1"
             );
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(monitorManager.startMonitoringForSite).toHaveBeenCalledWith(
                 "site1",
                 "monitor1"
@@ -1209,7 +1209,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
                 "monitor1"
             );
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(monitorManager.stopMonitoringForSite).toHaveBeenCalledWith(
                 "site1",
                 "monitor1"

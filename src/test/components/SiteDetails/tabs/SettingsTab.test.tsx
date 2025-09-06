@@ -221,7 +221,7 @@ vi.mock("../../../../utils/errorHandling", () => ({
         }),
 }));
 
-describe("SettingsTab", () => {
+describe(SettingsTab, () => {
     let baseMockSite: Site;
     let baseMockMonitor: Monitor;
     let baseProps: any;

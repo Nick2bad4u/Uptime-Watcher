@@ -141,7 +141,7 @@ describe("Complete 100% Coverage - Final Tests", () => {
             const invalidTimestamp = "not-a-number";
             const result =
                 RowValidationUtils.isValidTimestamp(invalidTimestamp);
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should handle property access edge cases (lines 372-373)", async ({

@@ -47,7 +47,7 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
             objectSafetyModule.safeObjectIteration(testObj, (key, value) => {
                 iterationResults.push(`${key}:${value}`);
             });
-            expect(Array.isArray(iterationResults)).toBe(true);
+            expect(Array.isArray(iterationResults)).toBeTruthy();
             expect(iterationResults.length).toBeGreaterThan(0);
 
             // Test safeObjectIteration with null input (should not throw)
@@ -73,17 +73,17 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
             // Test typedObjectEntries function
             const entriesResult =
                 objectSafetyModule.typedObjectEntries(testObj);
-            expect(Array.isArray(entriesResult)).toBe(true);
+            expect(Array.isArray(entriesResult)).toBeTruthy();
             expect(entriesResult.length).toBeGreaterThan(0);
 
             // Test typedObjectKeys function
             const keysResult = objectSafetyModule.typedObjectKeys(testObj);
-            expect(Array.isArray(keysResult)).toBe(true);
+            expect(Array.isArray(keysResult)).toBeTruthy();
             expect(keysResult.length).toBeGreaterThan(0);
 
             // Test typedObjectValues function
             const valuesResult = objectSafetyModule.typedObjectValues(testObj);
-            expect(Array.isArray(valuesResult)).toBe(true);
+            expect(Array.isArray(valuesResult)).toBeTruthy();
             expect(valuesResult.length).toBeGreaterThan(0);
         });
     });
@@ -139,7 +139,7 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
 
                     // Should collect all enumerable string keys
                     const expectedKeys = Object.keys(obj);
-                    expect(collected.length).toBe(expectedKeys.length);
+                    expect(collected).toHaveLength(expectedKeys.length);
                 }
             ));
         });
@@ -163,7 +163,7 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                         });
                     }).not.toThrow();
 
-                    expect(collected.length).toBe(0);
+                    expect(collected).toHaveLength(0);
                 }
             ));
         });
@@ -222,7 +222,7 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
 
                     // Should only contain picked keys
                     const resultKeys = Object.keys(result);
-                    expect(resultKeys.length).toBe(keysToPick.length);
+                    expect(resultKeys).toHaveLength(keysToPick.length);
 
                     for (const pickedKey of keysToPick) {
                         expect(result).toHaveProperty(pickedKey);
@@ -250,10 +250,10 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                     const entries = objectSafetyModule.typedObjectEntries(obj);
 
                     // Should be an array
-                    expect(Array.isArray(entries)).toBe(true);
+                    expect(Array.isArray(entries)).toBeTruthy();
 
                     // Should have same length as Object.keys
-                    expect(entries.length).toBe(Object.keys(obj).length);
+                    expect(entries).toHaveLength(Object.keys(obj).length);
 
                     // Each entry should be a [key, value] pair from the original object
                     for (const [key, value] of entries) {
@@ -275,7 +275,7 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                     const keys = objectSafetyModule.typedObjectKeys(obj);
 
                     // Should be an array
-                    expect(Array.isArray(keys)).toBe(true);
+                    expect(Array.isArray(keys)).toBeTruthy();
 
                     // Should match Object.keys result
                     const expectedKeys = Object.keys(obj);
@@ -300,14 +300,14 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                     const values = objectSafetyModule.typedObjectValues(obj);
 
                     // Should be an array
-                    expect(Array.isArray(values)).toBe(true);
+                    expect(Array.isArray(values)).toBeTruthy();
 
                     // Should match Object.values result
                     const expectedValues = Object.values(obj);
                     expect(values).toEqual(expectedValues);
 
                     // Should have same length as Object.keys
-                    expect(values.length).toBe(Object.keys(obj).length);
+                    expect(values).toHaveLength(Object.keys(obj).length);
                 }
             ));
         });
@@ -396,8 +396,8 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                     const entries = objectSafetyModule.typedObjectEntries(obj);
 
                     // Invariants
-                    expect(keys.length).toBe(values.length);
-                    expect(keys.length).toBe(entries.length);
+                    expect(keys).toHaveLength(values.length);
+                    expect(keys).toHaveLength(entries.length);
 
                     // Each entry should correspond to a key and value
                     for (const [key, value] of entries) {

@@ -41,7 +41,7 @@ describe("Monitoring Data Validation", () => {
         vi.clearAllMocks();
     });
 
-    describe("parseUptimeValue", () => {
+    describe(parseUptimeValue, () => {
         it("should parse valid numeric strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -202,7 +202,7 @@ describe("Monitoring Data Validation", () => {
         });
     });
 
-    describe("isValidUrl", () => {
+    describe(isValidUrl, () => {
         it("should return true for valid HTTPS URLs", async ({
             task,
             annotate,
@@ -212,14 +212,14 @@ describe("Monitoring Data Validation", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl("https://example.com")).toBe(true);
-            expect(isValidUrl("https://www.example.com")).toBe(true);
-            expect(isValidUrl("https://example.com:443")).toBe(true);
-            expect(isValidUrl("https://example.com/path")).toBe(true);
-            expect(isValidUrl("https://example.com/path?query=value")).toBe(
-                true
+            expect(isValidUrl("https://example.com")).toBeTruthy();
+            expect(isValidUrl("https://www.example.com")).toBeTruthy();
+            expect(isValidUrl("https://example.com:443")).toBeTruthy();
+            expect(isValidUrl("https://example.com/path")).toBeTruthy();
+            expect(isValidUrl("https://example.com/path?query=value")).toBeTruthy(
+                
             );
-            expect(isValidUrl("https://example.com#anchor")).toBe(true);
+            expect(isValidUrl("https://example.com#anchor")).toBeTruthy();
         });
 
         it("should return true for valid HTTP/HTTPS URLs", async ({
@@ -232,10 +232,10 @@ describe("Monitoring Data Validation", () => {
             await annotate("Type: Business Logic", "type");
 
             // validator.js only accepts HTTP/HTTPS protocols by default
-            expect(isValidUrl("https://example.com")).toBe(true);
-            expect(isValidUrl("http://example.com")).toBe(true);
-            expect(isValidUrl("https://localhost")).toBe(true);
-            expect(isValidUrl("http://localhost:3000")).toBe(true);
+            expect(isValidUrl("https://example.com")).toBeTruthy();
+            expect(isValidUrl("http://example.com")).toBeTruthy();
+            expect(isValidUrl("https://localhost")).toBeTruthy();
+            expect(isValidUrl("http://localhost:3000")).toBeTruthy();
         });
 
         it("should handle different URL schemes per validator.js behavior", async ({
@@ -248,11 +248,11 @@ describe("Monitoring Data Validation", () => {
             await annotate("Type: Business Logic", "type");
 
             // Our validation rejects FTP protocol - only HTTP/HTTPS allowed
-            expect(isValidUrl("ftp://example.com")).toBe(false);
+            expect(isValidUrl("ftp://example.com")).toBeFalsy();
             // validator.js rejects these protocols by default
-            expect(isValidUrl("file:///path/to/file")).toBe(false);
-            expect(isValidUrl("mailto:test@example.com")).toBe(false);
-            expect(isValidUrl("tel:+1234567890")).toBe(false);
+            expect(isValidUrl("file:///path/to/file")).toBeFalsy();
+            expect(isValidUrl("mailto:test@example.com")).toBeFalsy();
+            expect(isValidUrl("tel:+1234567890")).toBeFalsy();
         });
 
         it("should return false for invalid URLs", async ({
@@ -264,10 +264,10 @@ describe("Monitoring Data Validation", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl("not-a-url")).toBe(false);
-            expect(isValidUrl("example.com")).toBe(false); // missing protocol
-            expect(isValidUrl("://example.com")).toBe(false); // missing scheme
-            expect(isValidUrl("")).toBe(false);
+            expect(isValidUrl("not-a-url")).toBeFalsy();
+            expect(isValidUrl("example.com")).toBeFalsy(); // missing protocol
+            expect(isValidUrl("://example.com")).toBeFalsy(); // missing scheme
+            expect(isValidUrl("")).toBeFalsy();
         });
 
         it("should return false for null, undefined, and non-string inputs", async ({
@@ -279,12 +279,12 @@ describe("Monitoring Data Validation", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl(null as any)).toBe(false);
-            expect(isValidUrl(undefined as any)).toBe(false);
-            expect(isValidUrl(123 as any)).toBe(false);
-            expect(isValidUrl({} as any)).toBe(false);
-            expect(isValidUrl([] as any)).toBe(false);
-            expect(isValidUrl(true as any)).toBe(false);
+            expect(isValidUrl(null as any)).toBeFalsy();
+            expect(isValidUrl(undefined as any)).toBeFalsy();
+            expect(isValidUrl(123 as any)).toBeFalsy();
+            expect(isValidUrl({} as any)).toBeFalsy();
+            expect(isValidUrl([] as any)).toBeFalsy();
+            expect(isValidUrl(true as any)).toBeFalsy();
         });
 
         it("should handle edge cases and malformed URLs", async ({
@@ -296,12 +296,12 @@ describe("Monitoring Data Validation", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl("https://")).toBe(false);
-            expect(isValidUrl("https:///")).toBe(false);
-            expect(isValidUrl("https://[")).toBe(false);
-            expect(isValidUrl("https://]")).toBe(false);
+            expect(isValidUrl("https://")).toBeFalsy();
+            expect(isValidUrl("https:///")).toBeFalsy();
+            expect(isValidUrl("https://[")).toBeFalsy();
+            expect(isValidUrl("https://]")).toBeFalsy();
             // validator.js rejects URLs with double dots for security
-            expect(isValidUrl("https://example..com")).toBe(false);
+            expect(isValidUrl("https://example..com")).toBeFalsy();
         });
 
         it("should handle special characters in URLs", async ({
@@ -314,19 +314,19 @@ describe("Monitoring Data Validation", () => {
             await annotate("Type: Business Logic", "type");
 
             // validator.js rejects URLs with unencoded spaces for security
-            expect(isValidUrl("https://example.com/path with spaces")).toBe(
-                false
+            expect(isValidUrl("https://example.com/path with spaces")).toBeFalsy(
+                
             );
             expect(
                 isValidUrl("https://example.com/path%20with%20encoded%20spaces")
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 isValidUrl("https://example.com/path?param=value&other=test")
-            ).toBe(true);
+            ).toBeTruthy();
         });
     });
 
-    describe("safeGetHostname", () => {
+    describe(safeGetHostname, () => {
         it("should extract hostname from valid HTTPS URLs", async ({
             task,
             annotate,

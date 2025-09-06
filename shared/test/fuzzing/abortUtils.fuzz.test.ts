@@ -17,7 +17,7 @@ import {
 } from "../../utils/abortUtils.js";
 
 describe("AbortUtils Fuzzing Tests", () => {
-    describe("createCombinedAbortSignal", () => {
+    describe(createCombinedAbortSignal, () => {
         test.prop([
             fc.record({
                 timeoutMs: fc.option(fc.integer({ min: 1, max: 100 })), // Reduced max for faster tests
@@ -54,7 +54,7 @@ describe("AbortUtils Fuzzing Tests", () => {
 
                 // Signal should not be aborted initially (unless timeout is very small)
                 if (!normalizedOptions.timeoutMs || normalizedOptions.timeoutMs > 10) {
-                    expect(signal.aborted).toBe(false);
+                    expect(signal.aborted).toBeFalsy();
                 }
             }
         );
@@ -67,7 +67,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 });
 
                 expect(combinedSignal).toBeInstanceOf(AbortSignal);
-                expect(combinedSignal.aborted).toBe(false);
+                expect(combinedSignal.aborted).toBeFalsy();
             }
         );
 
@@ -76,14 +76,14 @@ describe("AbortUtils Fuzzing Tests", () => {
             async (timeoutMs) => {
                 const signal = createCombinedAbortSignal({ timeoutMs });
 
-                expect(signal.aborted).toBe(false);
+                expect(signal.aborted).toBeFalsy();
 
                 // Wait for timeout + buffer
                 await new Promise<void>(resolve => {
                     setTimeout(resolve, timeoutMs + 20);
                 });
 
-                expect(signal.aborted).toBe(true);
+                expect(signal.aborted).toBeTruthy();
             }
         );
 
@@ -93,7 +93,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 const signal = createCombinedAbortSignal();
 
                 expect(signal).toBeInstanceOf(AbortSignal);
-                expect(signal.aborted).toBe(false);
+                expect(signal.aborted).toBeFalsy();
             }
         );
 
@@ -107,7 +107,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                     additionalSignals: [controller.signal],
                 });
 
-                expect(signal.aborted).toBe(true);
+                expect(signal.aborted).toBeTruthy();
             }
         );
 
@@ -129,7 +129,7 @@ describe("AbortUtils Fuzzing Tests", () => {
         );
     });
 
-    describe("createAbortableOperation", () => {
+    describe(createAbortableOperation, () => {
         test.prop([
             fc.integer({ min: 1, max: 100 }),
             fc.string(),
@@ -199,7 +199,7 @@ describe("AbortUtils Fuzzing Tests", () => {
         );
     });
 
-    describe("sleep", () => {
+    describe(sleep, () => {
         test.prop([fc.integer({ min: 1, max: 50 })])(
             "should sleep for specified duration",
             async (ms) => {
@@ -249,7 +249,7 @@ describe("AbortUtils Fuzzing Tests", () => {
         );
     });
 
-    describe("retryWithAbort", () => {
+    describe(retryWithAbort, () => {
         test.prop([
             fc.record({
                 maxRetries: fc.integer({ min: 0, max: 2 }),
@@ -358,14 +358,14 @@ describe("AbortUtils Fuzzing Tests", () => {
         );
     });
 
-    describe("isAbortError", () => {
+    describe(isAbortError, () => {
         test.prop([fc.string()])(
             "should identify AbortError by name",
             (message) => {
                 const error = new Error(message);
                 error.name = "AbortError";
 
-                expect(isAbortError(error)).toBe(true);
+                expect(isAbortError(error)).toBeTruthy();
             }
         );
 
@@ -375,7 +375,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 const error = new Error(message);
                 error.name = "TimeoutError";
 
-                expect(isAbortError(error)).toBe(true);
+                expect(isAbortError(error)).toBeTruthy();
             }
         );
 
@@ -389,7 +389,7 @@ describe("AbortUtils Fuzzing Tests", () => {
             (message) => {
                 const error = new Error(message);
 
-                expect(isAbortError(error)).toBe(true);
+                expect(isAbortError(error)).toBeTruthy();
             }
         );
 
@@ -404,34 +404,34 @@ describe("AbortUtils Fuzzing Tests", () => {
             (message) => {
                 const error = new Error(message);
 
-                expect(isAbortError(error)).toBe(false);
+                expect(isAbortError(error)).toBeFalsy();
             }
         );
 
         test.prop([fc.anything().filter(x => !(x instanceof Error))])(
             "should return false for non-Error values",
             (value) => {
-                expect(isAbortError(value)).toBe(false);
+                expect(isAbortError(value)).toBeFalsy();
             }
         );
 
         test(
             "should handle edge cases",
             () => {
-                expect(isAbortError(null)).toBe(false);
-                expect(isAbortError(undefined)).toBe(false);
-                expect(isAbortError({})).toBe(false);
-                expect(isAbortError("string")).toBe(false);
-                expect(isAbortError(123)).toBe(false);
+                expect(isAbortError(null)).toBeFalsy();
+                expect(isAbortError(undefined)).toBeFalsy();
+                expect(isAbortError({})).toBeFalsy();
+                expect(isAbortError("string")).toBeFalsy();
+                expect(isAbortError(123)).toBeFalsy();
 
                 // DOMException AbortError
                 const domError = new DOMException("Operation aborted", "AbortError");
-                expect(isAbortError(domError)).toBe(true);
+                expect(isAbortError(domError)).toBeTruthy();
             }
         );
     });
 
-    describe("raceWithAbort", () => {
+    describe(raceWithAbort, () => {
         test.prop([fc.string(), fc.integer({ min: 10, max: 100 })])(
             "should resolve with operation result when not aborted",
             async (result, delayMs) => {
@@ -520,7 +520,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                     additionalSignals: signals,
                 });
 
-                expect(combinedSignal.aborted).toBe(false);
+                expect(combinedSignal.aborted).toBeFalsy();
 
                 // Abort all controllers
                 for (const c of controllers) {
@@ -528,7 +528,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 }
 
                 // Combined signal should be aborted
-                expect(combinedSignal.aborted).toBe(true);
+                expect(combinedSignal.aborted).toBeTruthy();
             }
         );
 

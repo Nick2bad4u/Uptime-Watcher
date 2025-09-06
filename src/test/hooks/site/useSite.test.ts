@@ -214,7 +214,7 @@ describe("useSite Hook - Coverage Tests", () => {
             expect(result.current.handleCardClick).toBeDefined();
 
             // Should include loading state
-            expect(result.current.isLoading).toBe(false);
+            expect(result.current.isLoading).toBeFalsy();
         });
 
         it("should have isLoading property that does not get overwritten", async ({
@@ -236,7 +236,7 @@ describe("useSite Hook - Coverage Tests", () => {
 
             const { result } = renderHook(() => useSite(mockSite));
 
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
         });
     });
 
@@ -285,7 +285,7 @@ describe("useSite Hook - Coverage Tests", () => {
 
             // Actions should take precedence (last spread wins)
             expect((result.current as any).commonProp).toBe("from-actions");
-            expect(result.current.isLoading).toBe(false); // Added last, should not be overwritten
+            expect(result.current.isLoading).toBeFalsy(); // Added last, should not be overwritten
         });
     });
 });

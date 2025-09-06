@@ -401,7 +401,7 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         // These should trigger the handleDynamicFieldChange methods
         await waitFor(() => {
             // Verify the handlers were called (through mocked setters)
-            expect(true).toBe(true); // The actual validation depends on mocked setter calls
+            expect(true).toBeTruthy(); // The actual validation depends on mocked setter calls
         });
     });
 

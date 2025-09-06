@@ -970,11 +970,11 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     };
                     const invalidData = { notSites: "invalid" };
 
-                    expect(guardFunction(validData)).toBe(true);
-                    expect(guardFunction(invalidData)).toBe(false);
-                    expect(guardFunction(null)).toBe(false);
-                    expect(guardFunction("string")).toBe(false);
-                    expect(guardFunction({})).toBe(false); // No sites array
+                    expect(guardFunction(validData)).toBeTruthy();
+                    expect(guardFunction(invalidData)).toBeFalsy();
+                    expect(guardFunction(null)).toBeFalsy();
+                    expect(guardFunction("string")).toBeFalsy();
+                    expect(guardFunction({})).toBeFalsy(); // No sites array
 
                     return {
                         success: true,

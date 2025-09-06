@@ -193,23 +193,23 @@ describe("ArithmeticOperator Mutations - Frontend Components", () => {
 
                 // Original: left + overlayW > viewportW - 8
                 const exceedsRight = left + overlayW > viewportW - 8;
-                expect(exceedsRight).toBe(true); // 850 + 200 = 1050 > 992
+                expect(exceedsRight).toBeTruthy(); // 850 + 200 = 1050 > 992
 
                 // Test mutations:
                 // 1. left - overlayW (instead of +)
                 const mutation1 = left - overlayW > viewportW - 8;
-                expect(mutation1).toBe(false); // 650 > 992 = false ≠ true
+                expect(mutation1).toBeFalsy(); // 650 > 992 = false ≠ true
 
                 // 2. viewportW + 8 (instead of -)
                 const mutation2 = left + overlayW > viewportW + 8;
-                expect(mutation2).toBe(true); // 1050 > 1008 = true (same result)
+                expect(mutation2).toBeTruthy(); // 1050 > 1008 = true (same result)
 
                 // Test with different values where mutation2 matters
                 const smallLeft = 800;
                 const check1 = smallLeft + overlayW > viewportW - 8;
                 const check2 = smallLeft + overlayW > viewportW + 8;
-                expect(check1).toBe(true); // 1000 > 992 = true
-                expect(check2).toBe(false); // 1000 > 1008 = false ≠ true
+                expect(check1).toBeTruthy(); // 1000 > 992 = true
+                expect(check2).toBeFalsy(); // 1000 > 1008 = false ≠ true
             });
         });
 
@@ -221,14 +221,14 @@ describe("ArithmeticOperator Mutations - Frontend Components", () => {
 
                 // Original: top + overlayH > viewportH - 8
                 const exceedsBottom = top + overlayH > viewportH - 8;
-                expect(exceedsBottom).toBe(true); // 850 + 200 = 1050 > 992
+                expect(exceedsBottom).toBeTruthy(); // 850 + 200 = 1050 > 992
 
                 // With mutations, similar logic to above test
                 const mutation1 = top - overlayH > viewportH - 8;
-                expect(mutation1).toBe(false); // 650 > 992 = false ≠ true
+                expect(mutation1).toBeFalsy(); // 650 > 992 = false ≠ true
 
                 const mutation2 = top + overlayH > viewportH + 8;
-                expect(mutation2).toBe(true); // 1050 > 1008 = true
+                expect(mutation2).toBeTruthy(); // 1050 > 1008 = true
             });
         });
     });

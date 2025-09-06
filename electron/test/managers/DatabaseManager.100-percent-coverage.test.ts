@@ -545,7 +545,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             const result = await databaseManager.importData(importData);
 
             // Assert
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(mockCommandExecutor.execute).toHaveBeenCalled();
         });
 
@@ -571,7 +571,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             const result = await databaseManager.importData(importData);
 
             // Assert
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:data-imported",
                 expect.objectContaining({
@@ -606,7 +606,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             const result = await databaseManager.importData(importData);
 
             // Assert
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             // Should still attempt to emit the event
             expect(mockEventEmitter.emitTyped).toHaveBeenCalled();
         });
@@ -1211,7 +1211,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             );
 
             const importResult = await databaseManager.importData("{}");
-            expect(importResult).toBe(false);
+            expect(importResult).toBeFalsy();
         });
     });
 });

@@ -20,7 +20,7 @@ describe("ValidatorUtils Fuzzing - Line 333", () => {
             fc.constantFrom("", " ", "123.456", "NaN", "abc")
         ])("should correctly identify invalid integers", (invalidValue) => {
             const result = isValidInteger(invalidValue);
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 });

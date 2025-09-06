@@ -56,7 +56,7 @@ Object.defineProperty(globalThis, "document", {
 
 import { ThemeManager } from "../../theme/ThemeManager";
 
-describe("ThemeManager", () => {
+describe(ThemeManager, () => {
     let themeManager: ThemeManager;
 
     beforeEach(() => {
@@ -142,7 +142,7 @@ describe("ThemeManager", () => {
             await annotate("Type: Business Logic", "type");
 
             const availableThemes = themeManager.getAvailableThemes();
-            expect(Array.isArray(availableThemes)).toBe(true);
+            expect(Array.isArray(availableThemes)).toBeTruthy();
             expect(availableThemes.length).toBeGreaterThan(0);
             expect(availableThemes).toContain("light");
             expect(availableThemes).toContain("dark");
@@ -226,9 +226,9 @@ describe("ThemeManager", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
-            expect(themeManager.isValidThemeName("light")).toBe(true);
-            expect(themeManager.isValidThemeName("dark")).toBe(true);
-            expect(themeManager.isValidThemeName("high-contrast")).toBe(true);
+            expect(themeManager.isValidThemeName("light")).toBeTruthy();
+            expect(themeManager.isValidThemeName("dark")).toBeTruthy();
+            expect(themeManager.isValidThemeName("high-contrast")).toBeTruthy();
         });
 
         it("should reject invalid theme names", async ({ task, annotate }) => {
@@ -237,10 +237,10 @@ describe("ThemeManager", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(themeManager.isValidThemeName("invalid")).toBe(false);
-            expect(themeManager.isValidThemeName("")).toBe(false);
-            expect(themeManager.isValidThemeName("123")).toBe(false);
-            expect(themeManager.isValidThemeName("custom-theme")).toBe(false);
+            expect(themeManager.isValidThemeName("invalid")).toBeFalsy();
+            expect(themeManager.isValidThemeName("")).toBeFalsy();
+            expect(themeManager.isValidThemeName("123")).toBeFalsy();
+            expect(themeManager.isValidThemeName("custom-theme")).toBeFalsy();
         });
 
         it("should handle edge cases", async ({ task, annotate }) => {
@@ -249,10 +249,10 @@ describe("ThemeManager", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(themeManager.isValidThemeName(null as any)).toBe(false);
-            expect(themeManager.isValidThemeName(undefined as any)).toBe(false);
-            expect(themeManager.isValidThemeName(123 as any)).toBe(false);
-            expect(themeManager.isValidThemeName({} as any)).toBe(false);
+            expect(themeManager.isValidThemeName(null as any)).toBeFalsy();
+            expect(themeManager.isValidThemeName(undefined as any)).toBeFalsy();
+            expect(themeManager.isValidThemeName(123 as any)).toBeFalsy();
+            expect(themeManager.isValidThemeName({} as any)).toBeFalsy();
         });
     });
 
@@ -368,7 +368,7 @@ describe("ThemeManager", () => {
                 overrides
             );
 
-            expect(customTheme.isDark).toBe(false);
+            expect(customTheme.isDark).toBeFalsy();
             expect(customTheme.colors).toEqual(baseTheme.colors); // Should preserve unmodified properties
         });
 
@@ -402,7 +402,7 @@ describe("ThemeManager", () => {
             );
 
             expect(customTheme.name).toBe("custom-theme");
-            expect(customTheme.isDark).toBe(true);
+            expect(customTheme.isDark).toBeTruthy();
             expect(customTheme.typography).toEqual(baseTheme.typography);
         });
     });

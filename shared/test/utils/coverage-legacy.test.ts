@@ -99,8 +99,8 @@ describe("Shared Utils Coverage", () => {
                 return `${prefix}:${normalizedParts.join(":")}`;
             };
 
-            expect(validateCacheKey("sites:all")).toBe(true);
-            expect(validateCacheKey("invalid key")).toBe(false);
+            expect(validateCacheKey("sites:all")).toBeTruthy();
+            expect(validateCacheKey("invalid key")).toBeFalsy();
             expect(normalizeCacheKey("Site Name")).toBe("site-name");
             expect(generateCacheKey("sites", "My Site", "Status")).toBe(
                 "sites:my-site:status"
@@ -166,9 +166,9 @@ describe("Shared Utils Coverage", () => {
 
             cacheOps.set("sites:123", { name: "Test Site" });
             expect(cacheOps.get("sites:123")).toEqual({ name: "Test Site" });
-            expect(cacheOps.exists("sites:123")).toBe(true);
-            expect(cacheOps.delete("sites:123")).toBe(true);
-            expect(cacheOps.exists("sites:123")).toBe(false);
+            expect(cacheOps.exists("sites:123")).toBeTruthy();
+            expect(cacheOps.delete("sites:123")).toBeTruthy();
+            expect(cacheOps.exists("sites:123")).toBeFalsy();
         });
     });
 
@@ -463,7 +463,7 @@ describe("Shared Utils Coverage", () => {
             expect(errorCatalog["NETWORK_TIMEOUT"]?.severity).toBe("medium");
             expect(
                 errorCatalog["DATABASE_CONNECTION_FAILED"]?.recoverable
-            ).toBe(false);
+            ).toBeFalsy();
             expect(
                 errorCatalog["INVALID_MONITOR_CONFIG"]?.suggestions
             ).toContain("Check required fields");
@@ -523,7 +523,7 @@ describe("Shared Utils Coverage", () => {
             expect(errorHandler.getErrorInfo("TEST_ERROR")?.message).toBe(
                 "Test error message"
             );
-            expect(errorHandler.isRecoverable("TEST_ERROR")).toBe(true);
+            expect(errorHandler.isRecoverable("TEST_ERROR")).toBeTruthy();
             expect(errorHandler.getSuggestions("TEST_ERROR")).toEqual([
                 "Test suggestion",
             ]);
@@ -734,11 +734,11 @@ describe("Shared Utils Coverage", () => {
             expect(conversionUtils.safeNumber("123.45")).toBe(123.45);
             expect(conversionUtils.safeNumber("invalid", 42)).toBe(42);
             expect(conversionUtils.safeNumber(Number.NaN, 10)).toBe(10);
-            expect(conversionUtils.safeBoolean("true")).toBe(true);
-            expect(conversionUtils.safeBoolean("false")).toBe(false);
-            expect(conversionUtils.safeBoolean(1)).toBe(true);
-            expect(conversionUtils.safeBoolean(0)).toBe(false);
-            expect(conversionUtils.safeBoolean("invalid", true)).toBe(true);
+            expect(conversionUtils.safeBoolean("true")).toBeTruthy();
+            expect(conversionUtils.safeBoolean("false")).toBeFalsy();
+            expect(conversionUtils.safeBoolean(1)).toBeTruthy();
+            expect(conversionUtils.safeBoolean(0)).toBeFalsy();
+            expect(conversionUtils.safeBoolean("invalid", true)).toBeTruthy();
         });
     });
 });

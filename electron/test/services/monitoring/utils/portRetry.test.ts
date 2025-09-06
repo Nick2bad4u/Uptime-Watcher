@@ -59,7 +59,7 @@ import { performSinglePortCheck } from "../../../../services/monitoring/utils/po
 import { handlePortCheckError } from "../../../../services/monitoring/utils/portErrorHandling";
 import { RETRY_BACKOFF } from "../../../../constants";
 
-describe("performPortCheckWithRetry", () => {
+describe(performPortCheckWithRetry, () => {
     const mockResult = {
         status: "up" as const,
         responseTime: 150,

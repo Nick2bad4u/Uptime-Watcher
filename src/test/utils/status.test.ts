@@ -12,7 +12,7 @@ import { test, fc } from "@fast-check/vitest";
 import { formatStatusWithIcon, getStatusIcon, createStatusIdentifier } from "../../utils/status";
 
 describe("Status Utilities", () => {
-    describe("getStatusIcon", () => {
+    describe(getStatusIcon, () => {
         describe("Standard status icons", () => {
             it("should return down icon for 'down' status", async ({
                 task,
@@ -263,7 +263,7 @@ describe("Status Utilities", () => {
         });
     });
 
-    describe("formatStatusWithIcon", () => {
+    describe(formatStatusWithIcon, () => {
         describe("Standard status formatting", () => {
             it("should format 'down' status correctly", async ({
                 task,
@@ -807,7 +807,7 @@ describe("Status Utilities", () => {
 
                     // Property: Should contain expected icon
                     const expectedIcon = getStatusIcon(status);
-                    expect(result.startsWith(expectedIcon)).toBe(true);
+                    expect(result.startsWith(expectedIcon)).toBeTruthy();
 
                     // Property: Text portion should be properly formatted
                     // The text part is: first char uppercase + rest lowercase
@@ -823,7 +823,7 @@ describe("Status Utilities", () => {
                     const iconResult = getStatusIcon(status);
 
                     // Property: Formatted result should start with the icon from getStatusIcon
-                    expect(formattedResult.startsWith(iconResult)).toBe(true);
+                    expect(formattedResult.startsWith(iconResult)).toBeTruthy();
                 }
             );
 
@@ -940,7 +940,7 @@ describe("Status Utilities", () => {
                     if (!firstWord) {
                         throw new Error('Expected at least one word');
                     }
-                    expect(result.startsWith(firstWord.toLowerCase())).toBe(true);
+                    expect(result.startsWith(firstWord.toLowerCase())).toBeTruthy();
 
                     // Property: Should not contain spaces
                     expect(result).not.toContain(" ");
@@ -961,7 +961,7 @@ describe("Status Utilities", () => {
                     const formatted = formatStatusWithIcon(status);
 
                     // Property: Formatted string should start with the icon
-                    expect(formatted.startsWith(icon)).toBe(true);
+                    expect(formatted.startsWith(icon)).toBeTruthy();
 
                     // Property: Both functions should handle same input consistently
                     expect(typeof icon).toBe("string");

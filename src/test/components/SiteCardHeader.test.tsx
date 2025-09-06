@@ -69,8 +69,8 @@ describe("SiteCardHeader", () => {
 
         const props = { ...defaultProps };
         expect(props.site.site.name).toBe("Test Site");
-        expect(props.display.isLoading).toBe(false);
-        expect(props.monitoring.isMonitoring).toBe(false);
+        expect(props.display.isLoading).toBeFalsy();
+        expect(props.monitoring.isMonitoring).toBeFalsy();
     });
 
     it("should handle different site states", ({ task, annotate }) => {

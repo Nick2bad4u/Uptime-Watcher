@@ -143,7 +143,7 @@ const mockNotificationService = {
     notifyMonitorDown: vi.fn(),
 };
 
-describe("ApplicationService", () => {
+describe(ApplicationService, () => {
     let applicationService: ApplicationService;
     let mockApp: any;
     let mockServiceContainer: any;
@@ -213,7 +213,7 @@ describe("ApplicationService", () => {
             applicationService = new ApplicationService();
 
             // Verify signal hasn't been aborted during test execution
-            expect(signal.aborted).toBe(false);
+            expect(signal.aborted).toBeFalsy();
 
             // Assert
             expect(mockLogger.info).toHaveBeenCalledWith(
@@ -249,7 +249,7 @@ describe("ApplicationService", () => {
             applicationService = new ApplicationService();
 
             // Verify signal state
-            expect(signal.aborted).toBe(false);
+            expect(signal.aborted).toBeFalsy();
 
             // Assert
             expect(mockServiceContainer.getInstance).toHaveBeenCalledWith({
@@ -433,7 +433,7 @@ describe("ApplicationService", () => {
             const cleanupPromise = applicationService.cleanup();
 
             // Verify signal is not aborted during cleanup
-            expect(signal.aborted).toBe(false);
+            expect(signal.aborted).toBeFalsy();
 
             // Act
             await cleanupPromise;
@@ -480,7 +480,7 @@ describe("ApplicationService", () => {
             );
 
             // Verify signal state after error
-            expect(signal.aborted).toBe(false);
+            expect(signal.aborted).toBeFalsy();
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "APPLICATION_CLEANUP_ERROR",
@@ -542,7 +542,7 @@ describe("ApplicationService", () => {
             await expect(cleanupPromise).rejects.toThrow("Operation aborted");
 
             // Verify test signal is still intact
-            expect(signal.aborted).toBe(false);
+            expect(signal.aborted).toBeFalsy();
         });
         it("should cleanup IPC service if cleanup method exists", async ({
             task,
@@ -782,7 +782,7 @@ describe("ApplicationService", () => {
             await new Promise((resolve) => setTimeout(resolve, 0));
 
             // Verify signal hasn't been aborted during async operations
-            expect(signal.aborted).toBe(false);
+            expect(signal.aborted).toBeFalsy();
 
             // Assert
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -840,7 +840,7 @@ describe("ApplicationService", () => {
             await new Promise((resolve) => setTimeout(resolve, 50));
 
             // Verify test signal is intact
-            expect(signal.aborted).toBe(false);
+            expect(signal.aborted).toBeFalsy();
 
             // Assert that error was logged due to cancellation
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -1197,7 +1197,7 @@ describe("ApplicationService", () => {
             expect(() => new ApplicationService()).not.toThrow();
 
             // Verify signal state
-            expect(signal.aborted).toBe(false);
+            expect(signal.aborted).toBeFalsy();
         });
         it("should handle null/undefined event data", async ({
             task,
@@ -1231,7 +1231,7 @@ describe("ApplicationService", () => {
             expect(() => monitorUpHandler?.(undefined)).not.toThrow();
 
             // Verify signal state after operations
-            expect(signal.aborted).toBe(false);
+            expect(signal.aborted).toBeFalsy();
         });
 
         it("should handle service container getInstance returning undefined", async ({

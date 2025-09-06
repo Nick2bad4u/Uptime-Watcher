@@ -12,7 +12,7 @@ import {
 } from "../../validation/validatorUtils";
 
 describe("Shared Validation Utils", () => {
-    describe("isNonEmptyString", () => {
+    describe(isNonEmptyString, () => {
         it("should return true for non-empty strings", async ({
             task,
             annotate,
@@ -22,9 +22,9 @@ describe("Shared Validation Utils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonEmptyString("test")).toBe(true);
-            expect(isNonEmptyString("valid string")).toBe(true);
-            expect(isNonEmptyString(" padded ")).toBe(true);
+            expect(isNonEmptyString("test")).toBeTruthy();
+            expect(isNonEmptyString("valid string")).toBeTruthy();
+            expect(isNonEmptyString(" padded ")).toBeTruthy();
         });
 
         it("should return false for empty/invalid values", async ({
@@ -36,15 +36,15 @@ describe("Shared Validation Utils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonEmptyString("")).toBe(false);
-            expect(isNonEmptyString("   ")).toBe(false); // Only whitespace
-            expect(isNonEmptyString(null)).toBe(false);
-            expect(isNonEmptyString(undefined)).toBe(false);
-            expect(isNonEmptyString(123)).toBe(false);
+            expect(isNonEmptyString("")).toBeFalsy();
+            expect(isNonEmptyString("   ")).toBeFalsy(); // Only whitespace
+            expect(isNonEmptyString(null)).toBeFalsy();
+            expect(isNonEmptyString(undefined)).toBeFalsy();
+            expect(isNonEmptyString(123)).toBeFalsy();
         });
     });
 
-    describe("isValidUrl", () => {
+    describe(isValidUrl, () => {
         it("should validate correct URL formats", async ({
             task,
             annotate,
@@ -54,9 +54,9 @@ describe("Shared Validation Utils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
-            expect(isValidUrl("https://example.com")).toBe(true);
-            expect(isValidUrl("http://localhost:3000")).toBe(true);
-            expect(isValidUrl("https://sub.domain.com/path")).toBe(true);
+            expect(isValidUrl("https://example.com")).toBeTruthy();
+            expect(isValidUrl("http://localhost:3000")).toBeTruthy();
+            expect(isValidUrl("https://sub.domain.com/path")).toBeTruthy();
         });
 
         it("should reject invalid URL formats", async ({ task, annotate }) => {
@@ -65,10 +65,10 @@ describe("Shared Validation Utils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl("not-a-url")).toBe(false);
-            expect(isValidUrl("")).toBe(false);
-            expect(isValidUrl("//example.com")).toBe(false);
-            expect(isValidUrl(null)).toBe(false);
+            expect(isValidUrl("not-a-url")).toBeFalsy();
+            expect(isValidUrl("")).toBeFalsy();
+            expect(isValidUrl("//example.com")).toBeFalsy();
+            expect(isValidUrl(null)).toBeFalsy();
         });
 
         it("should respect validation options", async ({ task, annotate }) => {
@@ -80,14 +80,14 @@ describe("Shared Validation Utils", () => {
             // Test with protocol restriction
             expect(
                 isValidUrl("https://example.com", { protocols: ["https"] })
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 isValidUrl("ftp://example.com", { protocols: ["https"] })
-            ).toBe(false);
+            ).toBeFalsy();
         });
     });
 
-    describe("isValidFQDN", () => {
+    describe(isValidFQDN, () => {
         it("should validate correct FQDN formats", async ({
             task,
             annotate,
@@ -97,9 +97,9 @@ describe("Shared Validation Utils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
-            expect(isValidFQDN("example.com")).toBe(true);
-            expect(isValidFQDN("sub.example.com")).toBe(true);
-            expect(isValidFQDN("test-site.example.org")).toBe(true);
+            expect(isValidFQDN("example.com")).toBeTruthy();
+            expect(isValidFQDN("sub.example.com")).toBeTruthy();
+            expect(isValidFQDN("test-site.example.org")).toBeTruthy();
         });
 
         it("should reject invalid FQDN formats", async ({ task, annotate }) => {
@@ -108,11 +108,11 @@ describe("Shared Validation Utils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidFQDN("")).toBe(false);
-            expect(isValidFQDN(".com")).toBe(false);
-            expect(isValidFQDN("example.")).toBe(false);
-            expect(isValidFQDN("ex ample.com")).toBe(false);
-            expect(isValidFQDN(null)).toBe(false);
+            expect(isValidFQDN("")).toBeFalsy();
+            expect(isValidFQDN(".com")).toBeFalsy();
+            expect(isValidFQDN("example.")).toBeFalsy();
+            expect(isValidFQDN("ex ample.com")).toBeFalsy();
+            expect(isValidFQDN(null)).toBeFalsy();
         });
 
         it("should handle localhost based on options", async ({
@@ -125,11 +125,11 @@ describe("Shared Validation Utils", () => {
             await annotate("Type: Business Logic", "type");
 
             // By default, localhost might not be valid FQDN
-            expect(isValidFQDN("localhost", { require_tld: false })).toBe(true);
+            expect(isValidFQDN("localhost", { require_tld: false })).toBeTruthy();
         });
     });
 
-    describe("isValidIdentifier", () => {
+    describe(isValidIdentifier, () => {
         it("should validate correct identifier formats", async ({
             task,
             annotate,
@@ -139,11 +139,11 @@ describe("Shared Validation Utils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
-            expect(isValidIdentifier("test")).toBe(true);
-            expect(isValidIdentifier("test123")).toBe(true);
-            expect(isValidIdentifier("test-name")).toBe(true);
-            expect(isValidIdentifier("test_name")).toBe(true);
-            expect(isValidIdentifier("test-123_name")).toBe(true);
+            expect(isValidIdentifier("test")).toBeTruthy();
+            expect(isValidIdentifier("test123")).toBeTruthy();
+            expect(isValidIdentifier("test-name")).toBeTruthy();
+            expect(isValidIdentifier("test_name")).toBeTruthy();
+            expect(isValidIdentifier("test-123_name")).toBeTruthy();
         });
 
         it("should reject invalid identifier formats", async ({
@@ -155,17 +155,17 @@ describe("Shared Validation Utils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidIdentifier("")).toBe(false);
-            expect(isValidIdentifier("   ")).toBe(false);
-            expect(isValidIdentifier("test@name")).toBe(false);
-            expect(isValidIdentifier("test.name")).toBe(false);
-            expect(isValidIdentifier("test name")).toBe(false);
-            expect(isValidIdentifier(null)).toBe(false);
-            expect(isValidIdentifier(123)).toBe(false);
+            expect(isValidIdentifier("")).toBeFalsy();
+            expect(isValidIdentifier("   ")).toBeFalsy();
+            expect(isValidIdentifier("test@name")).toBeFalsy();
+            expect(isValidIdentifier("test.name")).toBeFalsy();
+            expect(isValidIdentifier("test name")).toBeFalsy();
+            expect(isValidIdentifier(null)).toBeFalsy();
+            expect(isValidIdentifier(123)).toBeFalsy();
         });
     });
 
-    describe("safeInteger", () => {
+    describe(safeInteger, () => {
         it("should parse valid integers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validationUtils", "component");
@@ -228,15 +228,15 @@ describe("Shared Validation Utils", () => {
 
             // Test URL validation
             const url = "https://example.com";
-            expect(isValidUrl(url)).toBe(true);
+            expect(isValidUrl(url)).toBeTruthy();
 
             // Test FQDN validation
             const domain = "example.com";
-            expect(isValidFQDN(domain)).toBe(true);
+            expect(isValidFQDN(domain)).toBeTruthy();
 
             // Test identifier validation
             const identifier = "test-site-123";
-            expect(isValidIdentifier(identifier)).toBe(true);
+            expect(isValidIdentifier(identifier)).toBeTruthy();
 
             // Test safe integer parsing
             const timeout = safeInteger("5000", 1000, 1000, 30_000);
@@ -253,10 +253,10 @@ describe("Shared Validation Utils", () => {
             await annotate("Type: Validation", "type");
 
             // All these should be false/default values
-            expect(isNonEmptyString("")).toBe(false);
-            expect(isValidUrl("invalid")).toBe(false);
-            expect(isValidFQDN("")).toBe(false);
-            expect(isValidIdentifier("")).toBe(false);
+            expect(isNonEmptyString("")).toBeFalsy();
+            expect(isValidUrl("invalid")).toBeFalsy();
+            expect(isValidFQDN("")).toBeFalsy();
+            expect(isValidIdentifier("")).toBeFalsy();
             expect(safeInteger("invalid", 0)).toBe(0);
         });
     });

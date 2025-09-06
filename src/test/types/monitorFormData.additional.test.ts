@@ -35,7 +35,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 recordType: "A",
                 expectedValue: "192.168.1.1",
             };
-            expect(isDnsFormData(data)).toBe(true);
+            expect(isDnsFormData(data)).toBeTruthy();
         });
 
         it("should return false for empty string host", async ({
@@ -55,7 +55,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 host: "",
                 recordType: "A",
             };
-            expect(isDnsFormData(data)).toBe(false);
+            expect(isDnsFormData(data)).toBeFalsy();
         });
 
         it("should return false for empty string recordType", async ({
@@ -75,7 +75,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 host: "example.com",
                 recordType: "",
             };
-            expect(isDnsFormData(data)).toBe(false);
+            expect(isDnsFormData(data)).toBeFalsy();
         });
     });
 
@@ -97,7 +97,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 host: "example.com",
                 timeout: 5000,
             };
-            expect(isPingFormData(data)).toBe(true);
+            expect(isPingFormData(data)).toBeTruthy();
         });
 
         it("should return false for empty string host", async ({
@@ -116,7 +116,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 type: "ping" as const,
                 host: "",
             };
-            expect(isPingFormData(data)).toBe(false);
+            expect(isPingFormData(data)).toBeFalsy();
         });
     });
 
@@ -139,7 +139,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 port: 443,
                 ssl: true,
             };
-            expect(isPortFormData(data)).toBe(true);
+            expect(isPortFormData(data)).toBeTruthy();
         });
 
         it("should return false for zero port", async ({ task, annotate }) => {
@@ -156,7 +156,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 host: "example.com",
                 port: 0,
             };
-            expect(isPortFormData(data)).toBe(false);
+            expect(isPortFormData(data)).toBeFalsy();
         });
 
         it("should return false for negative port", async ({
@@ -176,7 +176,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 host: "example.com",
                 port: -1,
             };
-            expect(isPortFormData(data)).toBe(false);
+            expect(isPortFormData(data)).toBeFalsy();
         });
 
         it("should return false for port above 65535", async ({
@@ -196,7 +196,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 host: "example.com",
                 port: 65_536,
             };
-            expect(isPortFormData(data)).toBe(false);
+            expect(isPortFormData(data)).toBeFalsy();
         });
     });
 
@@ -222,7 +222,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 timeout: 5000,
                 retryAttempts: 3,
             };
-            expect(isHttpFormData(data)).toBe(true);
+            expect(isHttpFormData(data)).toBeTruthy();
         });
 
         it("should return false for empty string url", async ({
@@ -241,7 +241,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 type: "http" as const,
                 url: "",
             };
-            expect(isHttpFormData(data)).toBe(false);
+            expect(isHttpFormData(data)).toBeFalsy();
         });
     });
 
@@ -265,7 +265,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 timeout: 5000,
                 retryAttempts: 3,
             };
-            expect(isValidMonitorFormData(data)).toBe(true);
+            expect(isValidMonitorFormData(data)).toBeTruthy();
         });
 
         it("should return true for valid port monitor form data", async ({
@@ -288,7 +288,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 timeout: 5000,
                 retryAttempts: 3,
             };
-            expect(isValidMonitorFormData(data)).toBe(true);
+            expect(isValidMonitorFormData(data)).toBeTruthy();
         });
 
         it("should return false for partial data missing required fields", async ({
@@ -308,7 +308,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 // Missing url
                 name: "Incomplete Monitor",
             };
-            expect(isValidMonitorFormData(data)).toBe(false);
+            expect(isValidMonitorFormData(data)).toBeFalsy();
         });
 
         it("should return false for data with missing type", async ({
@@ -327,7 +327,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 url: "https://example.com",
                 name: "No Type Monitor",
             };
-            expect(isValidMonitorFormData(data)).toBe(false);
+            expect(isValidMonitorFormData(data)).toBeFalsy();
         });
     });
 
@@ -367,8 +367,8 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 ssl: true,
                 monitoring: false,
             };
-            expect(safeGetFormProperty(data, "ssl", false)).toBe(true);
-            expect(safeGetFormProperty(data, "monitoring", true)).toBe(false);
+            expect(safeGetFormProperty(data, "ssl", false)).toBeTruthy();
+            expect(safeGetFormProperty(data, "monitoring", true)).toBeFalsy();
         });
 
         it("should handle array values", async ({ task, annotate }) => {
@@ -412,7 +412,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
             };
             expect(safeGetFormProperty(data, "empty", "default")).toBe("");
             expect(safeGetFormProperty(data, "zero", 999)).toBe(0);
-            expect(safeGetFormProperty(data, "falsy", true)).toBe(false);
+            expect(safeGetFormProperty(data, "falsy", true)).toBeFalsy();
         });
     });
 
@@ -470,7 +470,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 name: "Test",
             };
             safeSetFormProperty(data, "ssl", true);
-            expect((data as any)["ssl"]).toBe(true);
+            expect((data as any)["ssl"]).toBeTruthy();
             expect(data.name).toBe("Test");
         });
 
@@ -518,7 +518,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
             safeSetFormProperty(data, "newProp", "newValue");
             expect(data.name).toBe("Test");
             expect(data.timeout).toBe(5000);
-            expect(data.ssl).toBe(true);
+            expect(data.ssl).toBeTruthy();
             expect(data.tags).toEqual(["api"]);
             expect((data as any)["newProp"]).toBe("newValue");
         });

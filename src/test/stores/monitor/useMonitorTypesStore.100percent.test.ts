@@ -141,7 +141,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             // Should use fallback (empty array) when extraction fails
             expect(result.current.monitorTypes).toEqual([]);
             expect(result.current.fieldConfigs).toEqual({});
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
         });
 
         it("should handle safeExtractIpcData with various fallback types", async ({
@@ -285,8 +285,8 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             });
 
             // Should only keep valid configs (filtering happens in store)
-            expect(result.current.isLoaded).toBe(true);
-            expect(Array.isArray(result.current.monitorTypes)).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
+            expect(Array.isArray(result.current.monitorTypes)).toBeTruthy();
         });
 
         it("should handle configs with complex field structures", async ({
@@ -354,8 +354,8 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 await result.current.loadMonitorTypes();
             });
 
-            expect(result.current.isLoaded).toBe(true);
-            expect(Array.isArray(result.current.monitorTypes)).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
+            expect(Array.isArray(result.current.monitorTypes)).toBeTruthy();
         });
     });
 
@@ -435,7 +435,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 });
 
                 expect(result.current.lastError).toBe(String(errorType));
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             }
         });
 
@@ -496,7 +496,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             });
 
             // Loading state should still be true since withErrorHandling didn't reset it
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
 
             // The error should be set since our mock calls setError
             expect(result.current.lastError).toBe("Operation failed");
@@ -536,9 +536,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 });
             });
 
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
             expect(result.current.lastError).toBe("Direct mutation error");
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.monitorTypes).toHaveLength(1);
             expect(result.current.fieldConfigs).toHaveProperty("direct");
         });
@@ -969,8 +969,8 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             }
 
             // Store should be in a consistent state
-            expect(result.current.isLoaded).toBe(true);
-            expect(Array.isArray(result.current.monitorTypes)).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
+            expect(Array.isArray(result.current.monitorTypes)).toBeTruthy();
             expect(typeof result.current.fieldConfigs).toBe("object");
         });
 
@@ -1009,7 +1009,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             await loadPromise;
 
             // State should reflect the final operation result
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
         });
 
         it("should handle memory pressure and cleanup scenarios", async ({
@@ -1181,9 +1181,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Verify state changes were captured
             expect(stateChanges.length).toBeGreaterThan(0);
-            expect(stateChanges.some((change) => change.lastError === "Test error")).toBe(true);
-            expect(stateChanges.some((change) => change.isLoading === true)).toBe(true);
-            expect(stateChanges.some((change) => change.lastError === undefined)).toBe(true);
+            expect(stateChanges.some((change) => change.lastError === "Test error")).toBeTruthy();
+            expect(stateChanges.some((change) => change.isLoading === true)).toBeTruthy();
+            expect(stateChanges.some((change) => change.lastError === undefined)).toBeTruthy();
 
             unsubscribe();
         });

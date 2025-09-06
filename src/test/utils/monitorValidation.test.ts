@@ -68,7 +68,7 @@ describe("Monitor Validation Utilities", () => {
         vi.clearAllMocks();
     });
 
-    describe("createMonitorObject", () => {
+    describe(createMonitorObject, () => {
         it("should create monitor object with default values for HTTP type", async ({
             task,
             annotate,
@@ -160,7 +160,7 @@ describe("Monitor Validation Utilities", () => {
 
             expect(result["type"]).toBe("http");
             expect(result["history"]).toEqual([]);
-            expect(result["monitoring"]).toBe(true);
+            expect(result["monitoring"]).toBeTruthy();
             expect(result["responseTime"]).toBe(-1);
             expect(result["retryAttempts"]).toBe(3);
             expect(result["status"]).toBe("pending");
@@ -209,7 +209,7 @@ describe("Monitor Validation Utilities", () => {
         });
     });
 
-    describe("validateMonitorData", () => {
+    describe(validateMonitorData, () => {
         it("should validate monitor data successfully via backend", async ({
             task,
             annotate,
@@ -397,7 +397,7 @@ describe("Monitor Validation Utilities", () => {
         });
     });
 
-    describe("validateMonitorDataClientSide", () => {
+    describe(validateMonitorDataClientSide, () => {
         it("should validate monitor data using shared schemas", async ({
             task,
             annotate,
@@ -508,7 +508,7 @@ describe("Monitor Validation Utilities", () => {
         });
     });
 
-    describe("validateMonitorField", () => {
+    describe(validateMonitorField, () => {
         beforeEach(() => {
             // Mock validateMonitorData for use in validateMonitorField
             mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue({
@@ -673,7 +673,7 @@ describe("Monitor Validation Utilities", () => {
         });
     });
 
-    describe("validateMonitorFieldClientSide", () => {
+    describe(validateMonitorFieldClientSide, () => {
         it("should validate field using shared schemas", async ({
             task,
             annotate,
@@ -796,7 +796,7 @@ describe("Monitor Validation Utilities", () => {
         });
     });
 
-    describe("validateMonitorFormData", () => {
+    describe(validateMonitorFormData, () => {
         beforeEach(() => {
             vi.mocked(sharedValidateMonitorField).mockReturnValue({
                 errors: [],
@@ -820,7 +820,7 @@ describe("Monitor Validation Utilities", () => {
                     url: "https://example.com",
                 });
 
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 expect(result.errors).toEqual([]);
                 expect(sharedValidateMonitorField).toHaveBeenCalledWith(
                     "http",
@@ -910,7 +910,7 @@ describe("Monitor Validation Utilities", () => {
                     port: 3000,
                 });
 
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 expect(result.errors).toEqual([]);
                 expect(sharedValidateMonitorField).toHaveBeenCalledWith(
                     "port",
@@ -1091,7 +1091,7 @@ describe("Monitor Validation Utilities", () => {
                     host: "example.com",
                 });
 
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 expect(result.errors).toEqual([]);
                 expect(sharedValidateMonitorField).toHaveBeenCalledWith(
                     "ping",
@@ -1244,7 +1244,7 @@ describe("Monitor Validation Utilities", () => {
                 { someField: "value" } as any
             );
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors).toContain(
                 "Unsupported monitor type: unknown"
             );
@@ -1259,8 +1259,8 @@ describe("Monitor Validation Utilities", () => {
             const httpResult = await validateMonitorFormData("http", {});
             const portResult = await validateMonitorFormData("port", {});
 
-            expect(httpResult.success).toBe(false);
-            expect(portResult.success).toBe(false);
+            expect(httpResult.success).toBeFalsy();
+            expect(portResult.success).toBeFalsy();
             expect(httpResult.errors).toContain(
                 "URL is required for HTTP monitors"
             );
@@ -1297,7 +1297,7 @@ describe("Monitor Validation Utilities", () => {
             expect(monitor).toBeDefined();
             expect(monitor.type).toBe("http");
             expect(monitor.history).toEqual([]);
-            expect(monitor.monitoring).toBe(true);
+            expect(monitor.monitoring).toBeTruthy();
         });
 
         it("should ensure ValidationResult has correct structure", async ({
@@ -1316,9 +1316,9 @@ describe("Monitor Validation Utilities", () => {
             };
 
             expect(result).toBeDefined();
-            expect(Array.isArray(result.errors)).toBe(true);
+            expect(Array.isArray(result.errors)).toBeTruthy();
             expect(typeof result.success).toBe("boolean");
-            expect(Array.isArray(result.warnings)).toBe(true);
+            expect(Array.isArray(result.warnings)).toBeTruthy();
         });
     });
 
@@ -1418,7 +1418,7 @@ describe("Monitor Validation Utilities", () => {
 
             expect(result["errors"]).toHaveLength(3);
             expect(result["warnings"]).toHaveLength(2);
-            expect(result["success"]).toBe(false);
+            expect(result["success"]).toBeFalsy();
         });
     });
 
@@ -1532,7 +1532,7 @@ describe("Monitor Validation Utilities", () => {
                 // Should return a validation result structure
                 expect(result).toHaveProperty("success");
                 expect(result).toHaveProperty("errors");
-                expect(Array.isArray(result.errors)).toBe(true);
+                expect(Array.isArray(result.errors)).toBeTruthy();
             });
 
             test.prop([
@@ -1552,7 +1552,7 @@ describe("Monitor Validation Utilities", () => {
                 // Should return a validation result structure
                 expect(result).toHaveProperty("success");
                 expect(result).toHaveProperty("errors");
-                expect(Array.isArray(result.errors)).toBe(true);
+                expect(Array.isArray(result.errors)).toBeTruthy();
             });
         });
     });

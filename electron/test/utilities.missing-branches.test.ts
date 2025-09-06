@@ -136,7 +136,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
             );
 
             // All calls should not throw
-            expect(true).toBe(true); // Test passes if no errors thrown
+            expect(true).toBeTruthy(); // Test passes if no errors thrown
         });
     });
 
@@ -344,8 +344,8 @@ describe("Utility Files - Missing Branch Coverage", () => {
             const results = await Promise.allSettled(promises);
 
             expect(results).toHaveLength(promises.length);
-            expect(results.some((r) => r.status === "fulfilled")).toBe(true);
-            expect(results.some((r) => r.status === "rejected")).toBe(true);
+            expect(results.some((r) => r.status === "fulfilled")).toBeTruthy();
+            expect(results.some((r) => r.status === "rejected")).toBeTruthy();
         });
 
         it("should handle timeout scenarios", async ({ task, annotate }) => {
@@ -466,11 +466,11 @@ describe("Utility Files - Missing Branch Coverage", () => {
 
                     // Use results to avoid unused variable warnings
                     expect(typeof length).toBe("number");
-                    expect(Array.isArray(filtered)).toBe(true);
-                    expect(Array.isArray(mapped)).toBe(true);
+                    expect(Array.isArray(filtered)).toBeTruthy();
+                    expect(Array.isArray(mapped)).toBeTruthy();
                     expect(typeof hasSome).toBe("boolean");
                     expect(typeof hasAll).toBe("boolean");
-                    expect(Array.isArray(spread)).toBe(true);
+                    expect(Array.isArray(spread)).toBeTruthy();
                 }).not.toThrow();
             }
         });
@@ -507,9 +507,9 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     const hasKey = "key" in obj;
 
                     // Use results to avoid unused variable warnings
-                    expect(Array.isArray(keys)).toBe(true);
-                    expect(Array.isArray(values)).toBe(true);
-                    expect(Array.isArray(entries)).toBe(true);
+                    expect(Array.isArray(keys)).toBeTruthy();
+                    expect(Array.isArray(values)).toBeTruthy();
+                    expect(Array.isArray(entries)).toBeTruthy();
                     expect(typeof hasProperty).toBe("boolean");
                     expect(typeof hasKey).toBe("boolean");
                 }).not.toThrow();
@@ -550,14 +550,14 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 const serialized = JSON.stringify(largeArray.slice(0, 100)); // Partial to avoid timeout
 
                 // Use results to avoid unused variable warnings
-                expect(Array.isArray(filtered)).toBe(true);
-                expect(Array.isArray(mapped)).toBe(true);
+                expect(Array.isArray(filtered)).toBeTruthy();
+                expect(Array.isArray(mapped)).toBeTruthy();
                 expect(typeof keyCount).toBe("number");
                 expect(typeof serialized).toBe("string");
             }).not.toThrow();
 
-            expect(largeArray.length).toBe(10_000);
-            expect(Object.keys(largeObject).length).toBe(10_000);
+            expect(largeArray).toHaveLength(10_000);
+            expect(Object.keys(largeObject)).toHaveLength(10_000);
         });
 
         it("should handle rapid operations", async ({ task, annotate }) => {

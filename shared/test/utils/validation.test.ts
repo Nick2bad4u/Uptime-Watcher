@@ -12,7 +12,7 @@ import {
 } from "../../utils/validation";
 
 describe("Shared Validation - Backend Coverage", () => {
-    describe("getMonitorValidationErrors", () => {
+    describe(getMonitorValidationErrors, () => {
         it("should return no errors for valid HTTP monitor", async ({
             task,
             annotate,
@@ -85,7 +85,7 @@ describe("Shared Validation - Backend Coverage", () => {
         });
     });
 
-    describe("validateMonitorType", () => {
+    describe(validateMonitorType, () => {
         it("should validate correct monitor types", async ({
             task,
             annotate,
@@ -95,8 +95,8 @@ describe("Shared Validation - Backend Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            expect(validateMonitorType("http")).toBe(true);
-            expect(validateMonitorType("port")).toBe(true);
+            expect(validateMonitorType("http")).toBeTruthy();
+            expect(validateMonitorType("port")).toBeTruthy();
         });
 
         it("should reject invalid types", async ({ task, annotate }) => {
@@ -105,14 +105,14 @@ describe("Shared Validation - Backend Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(validateMonitorType("invalid")).toBe(false);
-            expect(validateMonitorType(123)).toBe(false);
-            expect(validateMonitorType(null)).toBe(false);
-            expect(validateMonitorType(undefined)).toBe(false);
+            expect(validateMonitorType("invalid")).toBeFalsy();
+            expect(validateMonitorType(123)).toBeFalsy();
+            expect(validateMonitorType(null)).toBeFalsy();
+            expect(validateMonitorType(undefined)).toBeFalsy();
         });
     });
 
-    describe("validateSite", () => {
+    describe(validateSite, () => {
         it("should validate complete site", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
@@ -140,7 +140,7 @@ describe("Shared Validation - Backend Coverage", () => {
                 ],
             };
 
-            expect(validateSite(site)).toBe(true);
+            expect(validateSite(site)).toBeTruthy();
         });
 
         it("should reject invalid site structure", async ({
@@ -152,12 +152,12 @@ describe("Shared Validation - Backend Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(validateSite(null as unknown as Partial<Site>)).toBe(false);
-            expect(validateSite(undefined as unknown as Partial<Site>)).toBe(
-                false
+            expect(validateSite(null as unknown as Partial<Site>)).toBeFalsy();
+            expect(validateSite(undefined as unknown as Partial<Site>)).toBeFalsy(
+                
             );
-            expect(validateSite("string" as unknown as Partial<Site>)).toBe(
-                false
+            expect(validateSite("string" as unknown as Partial<Site>)).toBeFalsy(
+                
             );
         });
 
@@ -176,7 +176,7 @@ describe("Shared Validation - Backend Coverage", () => {
                 monitors: [],
             } as Partial<Site>;
 
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
 
         it("should reject site with invalid monitors", async ({
@@ -201,7 +201,7 @@ describe("Shared Validation - Backend Coverage", () => {
                 ],
             } as Partial<Site>;
 
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
     });
 });

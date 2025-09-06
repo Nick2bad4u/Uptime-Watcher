@@ -37,17 +37,17 @@ describe("shared/utils/typeHelpers Function Coverage Validation", () => {
                     2,
                     3,
                 ])
-            ).toBe(true);
-            expect(helpersModule.isArray("not array")).toBe(false);
-            expect(helpersModule.isArray(null)).toBe(false);
-            expect(helpersModule.isArray(undefined)).toBe(false);
+            ).toBeTruthy();
+            expect(helpersModule.isArray("not array")).toBeFalsy();
+            expect(helpersModule.isArray(null)).toBeFalsy();
+            expect(helpersModule.isArray(undefined)).toBeFalsy();
 
             // Test isRecord function
-            expect(helpersModule.isRecord({ key: "value" })).toBe(true);
-            expect(helpersModule.isRecord([])).toBe(false);
-            expect(helpersModule.isRecord(null)).toBe(false);
-            expect(helpersModule.isRecord(undefined)).toBe(false);
-            expect(helpersModule.isRecord("string")).toBe(false);
+            expect(helpersModule.isRecord({ key: "value" })).toBeTruthy();
+            expect(helpersModule.isRecord([])).toBeFalsy();
+            expect(helpersModule.isRecord(null)).toBeFalsy();
+            expect(helpersModule.isRecord(undefined)).toBeFalsy();
+            expect(helpersModule.isRecord("string")).toBeFalsy();
 
             // Test safePropertyAccess function
             const testObj = { prop: "value", nested: { inner: "test" } };
@@ -76,7 +76,7 @@ describe("shared/utils/typeHelpers Function Coverage Validation", () => {
                     validator,
                     "Not a string"
                 );
-                expect(false).toBe(true); // Should not reach here
+                expect(false).toBeTruthy(); // Should not reach here
             } catch (error) {
                 expect(error).toBeInstanceOf(Error);
             }

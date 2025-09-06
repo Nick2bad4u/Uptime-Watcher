@@ -91,7 +91,7 @@ describe("History Manipulation Utilities", () => {
         vi.restoreAllMocks();
     });
 
-    describe("addHistoryEntry", () => {
+    describe(addHistoryEntry, () => {
         it("should add history entry successfully", async ({
             task,
             annotate,
@@ -339,7 +339,7 @@ describe("History Manipulation Utilities", () => {
         });
     });
 
-    describe("bulkInsertHistory", () => {
+    describe(bulkInsertHistory, () => {
         const historyEntries = [
             { ...sampleStatusHistory, details: "First entry" },
             {
@@ -502,7 +502,7 @@ describe("History Manipulation Utilities", () => {
                         "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
                     );
                     expect(mockPrepare().run).toHaveBeenCalledTimes(historyEntries.length);
-                    expect(mockPrepare().finalize).toHaveBeenCalledOnce();
+                    expect(mockPrepare().finalize).toHaveBeenCalledTimes(1);
                 }
             );
 
@@ -593,9 +593,9 @@ describe("History Manipulation Utilities", () => {
                     const endTime = performance.now();
 
                     // Assert
-                    expect(mockPrepare).toHaveBeenCalledOnce();
+                    expect(mockPrepare).toHaveBeenCalledTimes(1);
                     expect(mockStatement.run).toHaveBeenCalledTimes(largeHistoryArray.length);
-                    expect(mockStatement.finalize).toHaveBeenCalledOnce();
+                    expect(mockStatement.finalize).toHaveBeenCalledTimes(1);
 
                     // Performance assertion - should complete quickly
                     expect(endTime - startTime).toBeLessThan(100); // Should complete within 100ms
@@ -625,13 +625,13 @@ describe("History Manipulation Utilities", () => {
                     bulkInsertHistory(mockDb, monitorId, historyEntries);
 
                     // Assert - Finalize should always be called for cleanup
-                    expect(mockStatement.finalize).toHaveBeenCalledOnce();
+                    expect(mockStatement.finalize).toHaveBeenCalledTimes(1);
                 }
             );
         });
     });
 
-    describe("deleteAllHistory", () => {
+    describe(deleteAllHistory, () => {
         it("should delete all history successfully", async ({
             task,
             annotate,
@@ -702,7 +702,7 @@ describe("History Manipulation Utilities", () => {
         });
     });
 
-    describe("deleteHistoryByMonitorId", () => {
+    describe(deleteHistoryByMonitorId, () => {
         it("should delete history for specific monitor successfully", async ({
             task,
             annotate,
@@ -875,7 +875,7 @@ describe("History Manipulation Utilities", () => {
         });
     });
 
-    describe("pruneHistoryForMonitor", () => {
+    describe(pruneHistoryForMonitor, () => {
         it("should return early when limit is zero or negative", async ({
             task,
             annotate,

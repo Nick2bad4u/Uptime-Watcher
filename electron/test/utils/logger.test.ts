@@ -28,6 +28,6 @@ describe("Logger Module", () => {
         await annotate("Type: Business Logic", "type");
 
         // Test disabled to avoid complex dev tools dependencies in test environment
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 });

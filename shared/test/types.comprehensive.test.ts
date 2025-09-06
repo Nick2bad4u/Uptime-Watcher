@@ -12,7 +12,7 @@ import {
 } from "../types";
 
 describe("shared/types type guards and validators", () => {
-    describe("isComputedSiteStatus", () => {
+    describe(isComputedSiteStatus, () => {
         it("should return true for 'mixed' status", async ({
             task,
             annotate,
@@ -22,7 +22,7 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isComputedSiteStatus("mixed")).toBe(true);
+            expect(isComputedSiteStatus("mixed")).toBeTruthy();
         });
 
         it("should return true for 'unknown' status", async ({
@@ -34,7 +34,7 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isComputedSiteStatus("unknown")).toBe(true);
+            expect(isComputedSiteStatus("unknown")).toBeTruthy();
         });
 
         it("should return false for other status values", async ({
@@ -46,12 +46,12 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isComputedSiteStatus("up")).toBe(false);
-            expect(isComputedSiteStatus("down")).toBe(false);
-            expect(isComputedSiteStatus("pending")).toBe(false);
-            expect(isComputedSiteStatus("paused")).toBe(false);
-            expect(isComputedSiteStatus("invalid")).toBe(false);
-            expect(isComputedSiteStatus("")).toBe(false);
+            expect(isComputedSiteStatus("up")).toBeFalsy();
+            expect(isComputedSiteStatus("down")).toBeFalsy();
+            expect(isComputedSiteStatus("pending")).toBeFalsy();
+            expect(isComputedSiteStatus("paused")).toBeFalsy();
+            expect(isComputedSiteStatus("invalid")).toBeFalsy();
+            expect(isComputedSiteStatus("")).toBeFalsy();
         });
 
         it("should return false for non-string values", async ({
@@ -63,16 +63,16 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isComputedSiteStatus(null as any)).toBe(false);
-            expect(isComputedSiteStatus(undefined as any)).toBe(false);
-            expect(isComputedSiteStatus(123 as any)).toBe(false);
-            expect(isComputedSiteStatus(true as any)).toBe(false);
-            expect(isComputedSiteStatus({} as any)).toBe(false);
-            expect(isComputedSiteStatus([] as any)).toBe(false);
+            expect(isComputedSiteStatus(null as any)).toBeFalsy();
+            expect(isComputedSiteStatus(undefined as any)).toBeFalsy();
+            expect(isComputedSiteStatus(123 as any)).toBeFalsy();
+            expect(isComputedSiteStatus(true as any)).toBeFalsy();
+            expect(isComputedSiteStatus({} as any)).toBeFalsy();
+            expect(isComputedSiteStatus([] as any)).toBeFalsy();
         });
     });
 
-    describe("isMonitorStatus", () => {
+    describe(isMonitorStatus, () => {
         it("should return true for valid monitor statuses", async ({
             task,
             annotate,
@@ -82,10 +82,10 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            expect(isMonitorStatus("down")).toBe(true);
-            expect(isMonitorStatus("paused")).toBe(true);
-            expect(isMonitorStatus("pending")).toBe(true);
-            expect(isMonitorStatus("up")).toBe(true);
+            expect(isMonitorStatus("down")).toBeTruthy();
+            expect(isMonitorStatus("paused")).toBeTruthy();
+            expect(isMonitorStatus("pending")).toBeTruthy();
+            expect(isMonitorStatus("up")).toBeTruthy();
         });
 
         it("should return false for invalid monitor statuses", async ({
@@ -97,10 +97,10 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            expect(isMonitorStatus("mixed")).toBe(false);
-            expect(isMonitorStatus("unknown")).toBe(false);
-            expect(isMonitorStatus("invalid")).toBe(false);
-            expect(isMonitorStatus("")).toBe(false);
+            expect(isMonitorStatus("mixed")).toBeFalsy();
+            expect(isMonitorStatus("unknown")).toBeFalsy();
+            expect(isMonitorStatus("invalid")).toBeFalsy();
+            expect(isMonitorStatus("")).toBeFalsy();
         });
 
         it("should return false for non-string values", async ({
@@ -112,16 +112,16 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isMonitorStatus(null as any)).toBe(false);
-            expect(isMonitorStatus(undefined as any)).toBe(false);
-            expect(isMonitorStatus(123 as any)).toBe(false);
-            expect(isMonitorStatus(true as any)).toBe(false);
-            expect(isMonitorStatus({} as any)).toBe(false);
-            expect(isMonitorStatus([] as any)).toBe(false);
+            expect(isMonitorStatus(null as any)).toBeFalsy();
+            expect(isMonitorStatus(undefined as any)).toBeFalsy();
+            expect(isMonitorStatus(123 as any)).toBeFalsy();
+            expect(isMonitorStatus(true as any)).toBeFalsy();
+            expect(isMonitorStatus({} as any)).toBeFalsy();
+            expect(isMonitorStatus([] as any)).toBeFalsy();
         });
     });
 
-    describe("isSiteStatus", () => {
+    describe(isSiteStatus, () => {
         it("should return true for valid site statuses", async ({
             task,
             annotate,
@@ -131,12 +131,12 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isSiteStatus("down")).toBe(true);
-            expect(isSiteStatus("mixed")).toBe(true);
-            expect(isSiteStatus("paused")).toBe(true);
-            expect(isSiteStatus("pending")).toBe(true);
-            expect(isSiteStatus("unknown")).toBe(true);
-            expect(isSiteStatus("up")).toBe(true);
+            expect(isSiteStatus("down")).toBeTruthy();
+            expect(isSiteStatus("mixed")).toBeTruthy();
+            expect(isSiteStatus("paused")).toBeTruthy();
+            expect(isSiteStatus("pending")).toBeTruthy();
+            expect(isSiteStatus("unknown")).toBeTruthy();
+            expect(isSiteStatus("up")).toBeTruthy();
         });
 
         it("should return false for invalid site statuses", async ({
@@ -148,9 +148,9 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isSiteStatus("invalid")).toBe(false);
-            expect(isSiteStatus("")).toBe(false);
-            expect(isSiteStatus("error")).toBe(false);
+            expect(isSiteStatus("invalid")).toBeFalsy();
+            expect(isSiteStatus("")).toBeFalsy();
+            expect(isSiteStatus("error")).toBeFalsy();
         });
 
         it("should return false for non-string values", async ({
@@ -162,16 +162,16 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isSiteStatus(null as any)).toBe(false);
-            expect(isSiteStatus(undefined as any)).toBe(false);
-            expect(isSiteStatus(123 as any)).toBe(false);
-            expect(isSiteStatus(true as any)).toBe(false);
-            expect(isSiteStatus({} as any)).toBe(false);
-            expect(isSiteStatus([] as any)).toBe(false);
+            expect(isSiteStatus(null as any)).toBeFalsy();
+            expect(isSiteStatus(undefined as any)).toBeFalsy();
+            expect(isSiteStatus(123 as any)).toBeFalsy();
+            expect(isSiteStatus(true as any)).toBeFalsy();
+            expect(isSiteStatus({} as any)).toBeFalsy();
+            expect(isSiteStatus([] as any)).toBeFalsy();
         });
     });
 
-    describe("validateMonitor", () => {
+    describe(validateMonitor, () => {
         const validMonitor: Monitor = {
             id: "test-monitor-id",
             type: "http",
@@ -193,7 +193,7 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            expect(validateMonitor(validMonitor)).toBe(true);
+            expect(validateMonitor(validMonitor)).toBeTruthy();
         });
 
         it("should return true for valid monitor with activeOperations", async ({
@@ -209,7 +209,7 @@ describe("shared/types type guards and validators", () => {
                 ...validMonitor,
                 activeOperations: ["check", "ping"],
             };
-            expect(validateMonitor(monitorWithActiveOps)).toBe(true);
+            expect(validateMonitor(monitorWithActiveOps)).toBeTruthy();
         });
 
         it("should return true for valid monitor with undefined activeOperations", async ({
@@ -223,7 +223,7 @@ describe("shared/types type guards and validators", () => {
 
             const monitorWithUndefinedOps = { ...validMonitor };
             delete (monitorWithUndefinedOps as any).activeOperations;
-            expect(validateMonitor(monitorWithUndefinedOps)).toBe(true);
+            expect(validateMonitor(monitorWithUndefinedOps)).toBeTruthy();
         });
 
         it("should return false for monitor with missing id", async ({
@@ -237,7 +237,7 @@ describe("shared/types type guards and validators", () => {
 
             const invalidMonitor = { ...validMonitor };
             delete (invalidMonitor as any).id;
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for monitor with invalid id type", async ({
@@ -250,7 +250,7 @@ describe("shared/types type guards and validators", () => {
             await annotate("Type: Monitoring", "type");
 
             const invalidMonitor = { ...validMonitor, id: 123 } as any;
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for monitor with missing type", async ({
@@ -264,7 +264,7 @@ describe("shared/types type guards and validators", () => {
 
             const invalidMonitor = { ...validMonitor };
             delete (invalidMonitor as any).type;
-            expect(validateMonitor(invalidMonitor as any)).toBe(false);
+            expect(validateMonitor(invalidMonitor as any)).toBeFalsy();
         });
 
         it("should return false for monitor with invalid type", async ({
@@ -280,7 +280,7 @@ describe("shared/types type guards and validators", () => {
                 ...validMonitor,
                 type: "invalid-type",
             } as any;
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for monitor with invalid status", async ({
@@ -296,7 +296,7 @@ describe("shared/types type guards and validators", () => {
                 ...validMonitor,
                 status: "invalid-status",
             } as any;
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for monitor with invalid monitoring type", async ({
@@ -312,7 +312,7 @@ describe("shared/types type guards and validators", () => {
                 ...validMonitor,
                 monitoring: "true",
             } as any;
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for monitor with invalid responseTime type", async ({
@@ -328,7 +328,7 @@ describe("shared/types type guards and validators", () => {
                 ...validMonitor,
                 responseTime: "150",
             } as any;
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for monitor with invalid checkInterval type", async ({
@@ -344,7 +344,7 @@ describe("shared/types type guards and validators", () => {
                 ...validMonitor,
                 checkInterval: "60000",
             } as any;
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for monitor with invalid timeout type", async ({
@@ -357,7 +357,7 @@ describe("shared/types type guards and validators", () => {
             await annotate("Type: Monitoring", "type");
 
             const invalidMonitor = { ...validMonitor, timeout: "5000" } as any;
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for monitor with invalid retryAttempts type", async ({
@@ -373,7 +373,7 @@ describe("shared/types type guards and validators", () => {
                 ...validMonitor,
                 retryAttempts: "3",
             } as any;
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for monitor with invalid history type", async ({
@@ -386,7 +386,7 @@ describe("shared/types type guards and validators", () => {
             await annotate("Type: Monitoring", "type");
 
             const invalidMonitor = { ...validMonitor, history: "[]" } as any;
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for monitor with invalid activeOperations", async ({
@@ -406,7 +406,7 @@ describe("shared/types type guards and validators", () => {
                     "invalid",
                 ], // Contains non-string
             } as any;
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for monitor with activeOperations containing empty strings", async ({
@@ -426,7 +426,7 @@ describe("shared/types type guards and validators", () => {
                     "   ",
                 ], // Contains empty/whitespace strings
             };
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for monitor with non-array activeOperations", async ({
@@ -442,7 +442,7 @@ describe("shared/types type guards and validators", () => {
                 ...validMonitor,
                 activeOperations: "not-an-array",
             } as any;
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for completely invalid input", async ({
@@ -454,11 +454,11 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(validateMonitor(null as any)).toBe(false);
-            expect(validateMonitor(undefined as any)).toBe(false);
-            expect(validateMonitor({} as any)).toBe(false);
-            expect(validateMonitor("not an object" as any)).toBe(false);
-            expect(validateMonitor(123 as any)).toBe(false);
+            expect(validateMonitor(null as any)).toBeFalsy();
+            expect(validateMonitor(undefined as any)).toBeFalsy();
+            expect(validateMonitor({} as any)).toBeFalsy();
+            expect(validateMonitor("not an object" as any)).toBeFalsy();
+            expect(validateMonitor(123 as any)).toBeFalsy();
         });
     });
 });

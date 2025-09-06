@@ -44,7 +44,7 @@ describe("electronUtils.ts - Branch Coverage", () => {
             mockApp.isPackaged = false;
 
             const result = electronUtils.isDev();
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
         it("should return false when NODE_ENV is development BUT app is packaged", async () => {
             // Mock isDevelopment to return true
@@ -57,7 +57,7 @@ describe("electronUtils.ts - Branch Coverage", () => {
             mockApp.isPackaged = true;
 
             const result = electronUtils.isDev();
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
         it("should return false when app is not packaged BUT NODE_ENV is not development", async () => {
             // Mock isDevelopment to return false (production/test/other)
@@ -70,7 +70,7 @@ describe("electronUtils.ts - Branch Coverage", () => {
             mockApp.isPackaged = false;
 
             const result = electronUtils.isDev();
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
         it("should return false when NODE_ENV is production AND app is packaged", async () => {
             // Mock isDevelopment to return false
@@ -83,7 +83,7 @@ describe("electronUtils.ts - Branch Coverage", () => {
             mockApp.isPackaged = true;
 
             const result = electronUtils.isDev();
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
     describe("Edge Cases and Boundary Conditions", () => {
@@ -96,7 +96,7 @@ describe("electronUtils.ts - Branch Coverage", () => {
             mockApp.isPackaged = false;
 
             const result = electronUtils.isDev();
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
         it("should handle NODE_ENV as test and packaged app", async () => {
             const { isDevelopment } = await import(
@@ -107,7 +107,7 @@ describe("electronUtils.ts - Branch Coverage", () => {
             mockApp.isPackaged = true;
 
             const result = electronUtils.isDev();
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
         it("should handle various NODE_ENV values consistently", async () => {
             const { isDevelopment } = await import(
@@ -117,15 +117,15 @@ describe("electronUtils.ts - Branch Coverage", () => {
 
             // Test with development
             (isDevelopment as any).mockReturnValue(true);
-            expect(electronUtils.isDev()).toBe(true);
+            expect(electronUtils.isDev()).toBeTruthy();
 
             // Test with production
             (isDevelopment as any).mockReturnValue(false);
-            expect(electronUtils.isDev()).toBe(false);
+            expect(electronUtils.isDev()).toBeFalsy();
 
             // Test with test environment
             (isDevelopment as any).mockReturnValue(false);
-            expect(electronUtils.isDev()).toBe(false);
+            expect(electronUtils.isDev()).toBeFalsy();
         });
     });
     describe("Integration with app.isPackaged", () => {
@@ -160,7 +160,7 @@ describe("electronUtils.ts - Branch Coverage", () => {
             (isDevelopment as any).mockReturnValue(true);
             mockApp.isPackaged = false;
 
-            expect(electronUtils.isDev()).toBe(true);
+            expect(electronUtils.isDev()).toBeTruthy();
         });
         it("should behave correctly in production build", async () => {
             // Production: NODE_ENV=production, packaged
@@ -170,7 +170,7 @@ describe("electronUtils.ts - Branch Coverage", () => {
             (isDevelopment as any).mockReturnValue(false);
             mockApp.isPackaged = true;
 
-            expect(electronUtils.isDev()).toBe(false);
+            expect(electronUtils.isDev()).toBeFalsy();
         });
         it("should behave correctly in testing environment", async () => {
             // Testing: NODE_ENV=test, not packaged
@@ -180,7 +180,7 @@ describe("electronUtils.ts - Branch Coverage", () => {
             (isDevelopment as any).mockReturnValue(false);
             mockApp.isPackaged = false;
 
-            expect(electronUtils.isDev()).toBe(false);
+            expect(electronUtils.isDev()).toBeFalsy();
         });
     });
     describe("Function Behavior Validation", () => {
@@ -195,7 +195,7 @@ describe("electronUtils.ts - Branch Coverage", () => {
             );
 
             expect(typeof electronUtils.isDev).toBe("function");
-            expect(electronUtils.isDev.length).toBe(0); // No parameters
+            expect(electronUtils.isDev).toHaveLength(0); // No parameters
         });
         it("should return a boolean value consistently", async () => {
             const { isDevelopment } = await import(

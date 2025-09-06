@@ -45,7 +45,7 @@ vi.mock("react-icons/fi", () => ({
     FiSave: () => <svg data-testid="save-icon">Save Icon</svg>,
 }));
 
-describe("SaveButton", () => {
+describe(SaveButton, () => {
     const defaultProps: SaveButtonProperties = {
         onClick: vi.fn(),
     };

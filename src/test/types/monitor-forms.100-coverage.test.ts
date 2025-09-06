@@ -83,7 +83,7 @@ describe("Monitor Forms - 100% Coverage Tests", () => {
             expect(httpFields.retryAttempts).toBe(3);
             expect(httpFields.timeout).toBe(10_000);
             expect(httpFields.expectedStatusCode).toBe(200);
-            expect(httpFields.followRedirects).toBe(true);
+            expect(httpFields.followRedirects).toBeTruthy();
             expect(httpFields.method).toBe("GET");
         });
 

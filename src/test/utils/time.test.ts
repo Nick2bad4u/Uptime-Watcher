@@ -14,7 +14,7 @@ import {
 } from "../../utils/time";
 
 describe("Time Utilities", () => {
-    describe("formatDuration", () => {
+    describe(formatDuration, () => {
         it("should format seconds only", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -89,7 +89,7 @@ describe("Time Utilities", () => {
         });
     });
 
-    describe("formatFullTimestamp", () => {
+    describe(formatFullTimestamp, () => {
         it("should format timestamp as locale string", async ({
             task,
             annotate,
@@ -140,7 +140,7 @@ describe("Time Utilities", () => {
         });
     });
 
-    describe("formatIntervalDuration", () => {
+    describe(formatIntervalDuration, () => {
         it("should format seconds for values under 1 minute", async ({
             task,
             annotate,
@@ -211,7 +211,7 @@ describe("Time Utilities", () => {
         });
     });
 
-    describe("formatRelativeTimestamp", () => {
+    describe(formatRelativeTimestamp, () => {
         let mockNow: ReturnType<typeof vi.spyOn>;
 
         beforeEach(() => {
@@ -341,7 +341,7 @@ describe("Time Utilities", () => {
         });
     });
 
-    describe("formatResponseDuration", () => {
+    describe(formatResponseDuration, () => {
         it("should format milliseconds for values under 1 second", async ({
             task,
             annotate,
@@ -412,7 +412,7 @@ describe("Time Utilities", () => {
         });
     });
 
-    describe("formatResponseTime", () => {
+    describe(formatResponseTime, () => {
         it("should return 'N/A' for undefined, null, or missing values", async ({
             task,
             annotate,
@@ -492,7 +492,7 @@ describe("Time Utilities", () => {
         });
     });
 
-    describe("getIntervalLabel", () => {
+    describe(getIntervalLabel, () => {
         it("should format numeric intervals using formatIntervalDuration", async ({
             task,
             annotate,
@@ -555,7 +555,7 @@ describe("Time Utilities", () => {
         });
     });
 
-    describe("formatRetryAttemptsText", () => {
+    describe(formatRetryAttemptsText, () => {
         it("should return special message for 0 attempts", async ({
             task,
             annotate,
@@ -772,7 +772,7 @@ describe("Time Utilities", () => {
                         /^\d+m \d+s$/, // minutes and seconds
                         /^\d+h \d+m$/ // hours and minutes
                     ];
-                    expect(patterns.some(pattern => pattern.test(result))).toBe(true);
+                    expect(patterns.some(pattern => pattern.test(result))).toBeTruthy();
 
                     // Property: No negative values should appear in output
                     expect(result).not.toMatch(/-\d/);

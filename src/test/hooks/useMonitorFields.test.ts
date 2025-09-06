@@ -126,7 +126,7 @@ describe("useMonitorFields Hook", () => {
 
             const { result } = renderHook(() => useMonitorFields());
 
-            expect(result.current.isLoaded).toBe(false);
+            expect(result.current.isLoaded).toBeFalsy();
             expect(result.current.error).toBeUndefined();
             expect(result.current.getFields).toBeInstanceOf(Function);
             expect(result.current.getRequiredFields).toBeInstanceOf(Function);
@@ -179,7 +179,7 @@ describe("useMonitorFields Hook", () => {
             const { result } = renderHook(() => useMonitorFields());
 
             // Since the store is already loaded, should immediately be available
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.error).toBeUndefined();
             expect(result.current.getFields("http")).toEqual(
                 mockFieldDefinitions
@@ -209,7 +209,7 @@ describe("useMonitorFields Hook", () => {
             const { result } = renderHook(() => useMonitorFields());
 
             await waitFor(() => {
-                expect(result.current.isLoaded).toBe(true);
+                expect(result.current.isLoaded).toBeTruthy();
             });
 
             expect(result.current.error).toBeUndefined();
@@ -287,7 +287,7 @@ describe("useMonitorFields Hook", () => {
             const { result } = renderHook(() => useMonitorFields());
 
             await waitFor(() => {
-                expect(result.current.isLoaded).toBe(true);
+                expect(result.current.isLoaded).toBeTruthy();
             });
 
             return result;
@@ -431,7 +431,7 @@ describe("useMonitorFields Hook", () => {
                 const { result } = renderHook(() => useMonitorFields());
 
                 await waitFor(() => {
-                    expect(result.current.isLoaded).toBe(true);
+                    expect(result.current.isLoaded).toBeTruthy();
                 });
 
                 expect(
@@ -452,17 +452,17 @@ describe("useMonitorFields Hook", () => {
 
                 const result = await setupHookWithData();
 
-                expect(result.current.isFieldRequired("http", "url")).toBe(
-                    true
+                expect(result.current.isFieldRequired("http", "url")).toBeTruthy(
+                    
                 );
-                expect(result.current.isFieldRequired("http", "timeout")).toBe(
-                    true
+                expect(result.current.isFieldRequired("http", "timeout")).toBeTruthy(
+                    
                 );
-                expect(result.current.isFieldRequired("tcp", "host")).toBe(
-                    true
+                expect(result.current.isFieldRequired("tcp", "host")).toBeTruthy(
+                    
                 );
-                expect(result.current.isFieldRequired("tcp", "port")).toBe(
-                    true
+                expect(result.current.isFieldRequired("tcp", "port")).toBeTruthy(
+                    
                 );
             });
 
@@ -477,8 +477,8 @@ describe("useMonitorFields Hook", () => {
 
                 const result = await setupHookWithData();
 
-                expect(result.current.isFieldRequired("http", "method")).toBe(
-                    false
+                expect(result.current.isFieldRequired("http", "method")).toBeFalsy(
+                    
                 );
             });
 
@@ -495,13 +495,13 @@ describe("useMonitorFields Hook", () => {
 
                 expect(
                     result.current.isFieldRequired("http", "non-existent-field")
-                ).toBe(false);
+                ).toBeFalsy();
                 expect(
                     result.current.isFieldRequired(
                         "non-existent-type",
                         "any-field"
                     )
-                ).toBe(false);
+                ).toBeFalsy();
             });
 
             it("should handle empty field names", async ({
@@ -515,7 +515,7 @@ describe("useMonitorFields Hook", () => {
 
                 const result = await setupHookWithData();
 
-                expect(result.current.isFieldRequired("http", "")).toBe(false);
+                expect(result.current.isFieldRequired("http", "")).toBeFalsy();
             });
         });
     });
@@ -534,7 +534,7 @@ describe("useMonitorFields Hook", () => {
 
             const { result } = renderHook(() => useMonitorFields());
 
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.error).toBe("IPC communication failed");
             expect(result.current.getFields("http")).toEqual([]);
         });
@@ -553,7 +553,7 @@ describe("useMonitorFields Hook", () => {
 
             const { result } = renderHook(() => useMonitorFields());
 
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.error).toBe(
                 "Failed to load monitor field configurations"
             );
@@ -577,7 +577,7 @@ describe("useMonitorFields Hook", () => {
 
             const { result } = renderHook(() => useMonitorFields());
 
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.error).toBe(
                 "Failed to load monitor field configurations"
             );
@@ -600,7 +600,7 @@ describe("useMonitorFields Hook", () => {
             const { result } = renderHook(() => useMonitorFields());
 
             expect(result.current.error).toBeDefined();
-            expect(result.current.isLoaded).toBe(true); // Should be true to prevent infinite loading
+            expect(result.current.isLoaded).toBeTruthy(); // Should be true to prevent infinite loading
         });
     });
 
@@ -630,7 +630,7 @@ describe("useMonitorFields Hook", () => {
 
             const { result } = renderHook(() => useMonitorFields());
 
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.error).toBeUndefined();
             expect(result.current.getFields("http")).toEqual(
                 mockFieldDefinitions
@@ -652,7 +652,7 @@ describe("useMonitorFields Hook", () => {
 
             const { result } = renderHook(() => useMonitorFields());
 
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.error).toBeUndefined();
             expect(result.current.getFields("any-type")).toEqual([]);
         });
@@ -696,7 +696,7 @@ describe("useMonitorFields Hook", () => {
             const { result, rerender } = renderHook(() => useMonitorFields());
 
             await waitFor(() => {
-                expect(result.current.isLoaded).toBe(true);
+                expect(result.current.isLoaded).toBeTruthy();
             });
 
             const initialGetFields = result.current.getFields;
@@ -753,12 +753,12 @@ describe("useMonitorFields Hook", () => {
             const { result } = renderHook(() => useMonitorFields());
 
             await waitFor(() => {
-                expect(result.current.isLoaded).toBe(true);
+                expect(result.current.isLoaded).toBeTruthy();
             });
 
             // Should handle gracefully - missing required defaults to false
-            expect(result.current.isFieldRequired("incomplete", "field1")).toBe(
-                false
+            expect(result.current.isFieldRequired("incomplete", "field1")).toBeFalsy(
+                
             );
             expect(result.current.getRequiredFields("incomplete")).toEqual([]);
         });
@@ -793,7 +793,7 @@ describe("useMonitorFields Hook", () => {
             const { result } = renderHook(() => useMonitorFields());
 
             await waitFor(() => {
-                expect(result.current.isLoaded).toBe(true);
+                expect(result.current.isLoaded).toBeTruthy();
             });
 
             // Should not crash and return empty arrays
@@ -801,7 +801,7 @@ describe("useMonitorFields Hook", () => {
             expect(result.current.getRequiredFields("no-fields")).toEqual([]);
             expect(
                 result.current.isFieldRequired("no-fields", "any-field")
-            ).toBe(false);
+            ).toBeFalsy();
         });
     });
 });

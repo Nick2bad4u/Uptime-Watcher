@@ -74,7 +74,7 @@ const createMockBoundingClientRect = (overrides = {}) => ({
     ...overrides,
 });
 
-describe("ScreenshotThumbnail", () => {
+describe(ScreenshotThumbnail, () => {
     const defaultProps = {
         siteName: "Example Site",
         url: "https://example.com",

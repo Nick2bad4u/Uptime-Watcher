@@ -174,7 +174,7 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             ).validateMonitorForCheck.bind(checker);
             const result = validateMethod(monitor, site, "test-monitor-id");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -276,7 +276,7 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             await saveMethod(monitor, checkResult);
 
             // Should not throw, error should be caught and logged
-            expect(true).toBe(true); // Test passes if no error thrown
+            expect(true).toBeTruthy(); // Test passes if no error thrown
         });
     });
 

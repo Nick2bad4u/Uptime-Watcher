@@ -14,7 +14,7 @@ import {
 import { isNumber, isString } from "../../utils/typeGuards";
 
 describe("Shared Type Helpers", () => {
-    describe("castIpcResponse", () => {
+    describe(castIpcResponse, () => {
         it("should cast response without validator", async ({
             task,
             annotate,
@@ -64,21 +64,21 @@ describe("Shared Type Helpers", () => {
         });
     });
 
-    describe("isArray", () => {
+    describe(isArray, () => {
         it("should return true for arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "unit");
             await annotate("Component: Type Helpers", "component");
             await annotate("Operation: Array Type Guard", "operation");
 
-            expect(isArray([])).toBe(true);
+            expect(isArray([])).toBeTruthy();
             expect(
                 isArray([
                     1,
                     2,
                     3,
                 ])
-            ).toBe(true);
-            expect(isArray(["a", "b"])).toBe(true);
+            ).toBeTruthy();
+            expect(isArray(["a", "b"])).toBeTruthy();
         });
 
         it("should return false for non-arrays", async ({ task, annotate }) => {
@@ -86,15 +86,15 @@ describe("Shared Type Helpers", () => {
             await annotate("Component: Type Helpers", "component");
             await annotate("Operation: Array Type Guard", "operation");
 
-            expect(isArray({})).toBe(false);
-            expect(isArray("string")).toBe(false);
-            expect(isArray(123)).toBe(false);
-            expect(isArray(null)).toBe(false);
-            expect(isArray(undefined)).toBe(false);
+            expect(isArray({})).toBeFalsy();
+            expect(isArray("string")).toBeFalsy();
+            expect(isArray(123)).toBeFalsy();
+            expect(isArray(null)).toBeFalsy();
+            expect(isArray(undefined)).toBeFalsy();
         });
     });
 
-    describe("isNumber", () => {
+    describe(isNumber, () => {
         it("should return true for valid numbers", async ({
             task,
             annotate,
@@ -103,10 +103,10 @@ describe("Shared Type Helpers", () => {
             await annotate("Component: Type Helpers", "component");
             await annotate("Operation: Number Type Guard", "operation");
 
-            expect(isNumber(123)).toBe(true);
-            expect(isNumber(0)).toBe(true);
-            expect(isNumber(-1)).toBe(true);
-            expect(isNumber(3.14)).toBe(true);
+            expect(isNumber(123)).toBeTruthy();
+            expect(isNumber(0)).toBeTruthy();
+            expect(isNumber(-1)).toBeTruthy();
+            expect(isNumber(3.14)).toBeTruthy();
         });
 
         it("should return false for invalid numbers and non-numbers", async ({
@@ -117,15 +117,15 @@ describe("Shared Type Helpers", () => {
             await annotate("Component: Type Helpers", "component");
             await annotate("Operation: Number Type Guard", "operation");
 
-            expect(isNumber(Number.NaN)).toBe(false);
-            expect(isNumber("123")).toBe(false);
-            expect(isNumber(null)).toBe(false);
-            expect(isNumber(undefined)).toBe(false);
-            expect(isNumber({})).toBe(false);
+            expect(isNumber(Number.NaN)).toBeFalsy();
+            expect(isNumber("123")).toBeFalsy();
+            expect(isNumber(null)).toBeFalsy();
+            expect(isNumber(undefined)).toBeFalsy();
+            expect(isNumber({})).toBeFalsy();
         });
     });
 
-    describe("isRecord", () => {
+    describe(isRecord, () => {
         it("should return true for record objects", async ({
             task,
             annotate,
@@ -134,9 +134,9 @@ describe("Shared Type Helpers", () => {
             await annotate("Component: Type Helpers", "component");
             await annotate("Operation: Record Type Guard", "operation");
 
-            expect(isRecord({})).toBe(true);
-            expect(isRecord({ a: 1 })).toBe(true);
-            expect(isRecord(new Date())).toBe(true);
+            expect(isRecord({})).toBeTruthy();
+            expect(isRecord({ a: 1 })).toBeTruthy();
+            expect(isRecord(new Date())).toBeTruthy();
         });
 
         it("should return false for non-record values", async ({
@@ -147,23 +147,23 @@ describe("Shared Type Helpers", () => {
             await annotate("Component: Type Helpers", "component");
             await annotate("Operation: Record Type Guard", "operation");
 
-            expect(isRecord(null)).toBe(false);
-            expect(isRecord([])).toBe(false);
-            expect(isRecord("string")).toBe(false);
-            expect(isRecord(123)).toBe(false);
-            expect(isRecord(undefined)).toBe(false);
+            expect(isRecord(null)).toBeFalsy();
+            expect(isRecord([])).toBeFalsy();
+            expect(isRecord("string")).toBeFalsy();
+            expect(isRecord(123)).toBeFalsy();
+            expect(isRecord(undefined)).toBeFalsy();
         });
     });
 
-    describe("isString", () => {
+    describe(isString, () => {
         it("should return true for strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "unit");
             await annotate("Component: Type Helpers", "component");
             await annotate("Operation: String Type Guard", "operation");
 
-            expect(isString("test")).toBe(true);
-            expect(isString("")).toBe(true);
-            expect(isString(" ")).toBe(true);
+            expect(isString("test")).toBeTruthy();
+            expect(isString("")).toBeTruthy();
+            expect(isString(" ")).toBeTruthy();
         });
 
         it("should return false for non-strings", async ({
@@ -174,15 +174,15 @@ describe("Shared Type Helpers", () => {
             await annotate("Component: Type Helpers", "component");
             await annotate("Operation: String Type Guard", "operation");
 
-            expect(isString(123)).toBe(false);
-            expect(isString(null)).toBe(false);
-            expect(isString(undefined)).toBe(false);
-            expect(isString({})).toBe(false);
-            expect(isString([])).toBe(false);
+            expect(isString(123)).toBeFalsy();
+            expect(isString(null)).toBeFalsy();
+            expect(isString(undefined)).toBeFalsy();
+            expect(isString({})).toBeFalsy();
+            expect(isString([])).toBeFalsy();
         });
     });
 
-    describe("safePropertyAccess", () => {
+    describe(safePropertyAccess, () => {
         it("should return property value for existing properties", async ({
             task,
             annotate,
@@ -212,7 +212,7 @@ describe("Shared Type Helpers", () => {
         });
     });
 
-    describe("validateAndConvert", () => {
+    describe(validateAndConvert, () => {
         it("should return validated value for valid types", async ({
             task,
             annotate,
@@ -285,14 +285,14 @@ describe("Shared Type Helpers", () => {
             expect(safePropertyAccess(complexObject.user, "name")).toBe("test");
 
             // Test array type checking
-            expect(isArray(complexObject.items)).toBe(true);
+            expect(isArray(complexObject.items)).toBeTruthy();
 
             // Test record type checking
-            expect(isRecord(complexObject.user)).toBe(true);
-            expect(isRecord(complexObject)).toBe(true);
+            expect(isRecord(complexObject.user)).toBeTruthy();
+            expect(isRecord(complexObject)).toBeTruthy();
 
             // Test number checking
-            expect(isNumber(complexObject.count)).toBe(true);
+            expect(isNumber(complexObject.count)).toBeTruthy();
         });
 
         it("should handle edge cases gracefully", async ({
@@ -304,15 +304,15 @@ describe("Shared Type Helpers", () => {
             await annotate("Operation: Edge Case Handling", "operation");
 
             // Empty arrays and objects
-            expect(isArray([])).toBe(true);
-            expect(isRecord({})).toBe(true);
+            expect(isArray([])).toBeTruthy();
+            expect(isRecord({})).toBeTruthy();
 
             // Special values
-            expect(isArray([])).toBe(true);
-            expect(isRecord(Object.create(null))).toBe(true);
+            expect(isArray([])).toBeTruthy();
+            expect(isRecord(Object.create(null))).toBeTruthy();
 
             // Function types (should NOT be treated as records in this implementation)
-            expect(isRecord(() => {})).toBe(false);
+            expect(isRecord(() => {})).toBeFalsy();
 
             // Safe property access edge cases
             expect(safePropertyAccess({}, "missing")).toBeUndefined();
@@ -335,14 +335,14 @@ describe("Shared Type Helpers", () => {
 
             // Chain safe property access
             const user = safePropertyAccess(data, "user");
-            expect(isRecord(user)).toBe(true);
+            expect(isRecord(user)).toBeTruthy();
 
             if (isRecord(user)) {
                 const name = safePropertyAccess(user, "name");
-                expect(isString(name)).toBe(true);
+                expect(isString(name)).toBeTruthy();
 
                 const settings = safePropertyAccess(user, "settings");
-                expect(isRecord(settings)).toBe(true);
+                expect(isRecord(settings)).toBeTruthy();
             }
         });
     });

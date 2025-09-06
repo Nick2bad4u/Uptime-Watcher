@@ -37,7 +37,7 @@ vi.mock("../utils/time", () => ({
     },
 }));
 
-describe("useSiteAnalytics", () => {
+describe(useSiteAnalytics, () => {
     const now = Date.now();
     const twoHoursAgo = now - 2 * 60 * 60 * 1000;
     const threeDaysAgo = now - 3 * 24 * 60 * 60 * 1000;
@@ -881,7 +881,7 @@ describe("useSiteAnalytics", () => {
     });
 });
 
-describe("useChartData", () => {
+describe(useChartData, () => {
     const mockTheme: Theme = {
         colors: {
             error: "#ef4444",
@@ -1091,7 +1091,7 @@ describe("SiteAnalyticsUtils", () => {
 
             const result = SiteAnalyticsUtils.calculateSLA(99.95, 99.9);
 
-            expect(result.compliant).toBe(true);
+            expect(result.compliant).toBeTruthy();
             expect(result.deficit).toBe(0);
             expect(result.allowedDowntime).toBeCloseTo(0.001, 10); // (100 - 99.9) / 100
             expect(result.actualDowntime).toBeCloseTo(0.0005, 10); // (100 - 99.95) / 100
@@ -1108,7 +1108,7 @@ describe("SiteAnalyticsUtils", () => {
 
             const result = SiteAnalyticsUtils.calculateSLA(99.5, 99.9);
 
-            expect(result.compliant).toBe(false);
+            expect(result.compliant).toBeFalsy();
             expect(result.deficit).toBeCloseTo(0.4, 10);
             expect(result.allowedDowntime).toBeCloseTo(0.001, 10);
             expect(result.actualDowntime).toBe(0.005);
@@ -1136,7 +1136,7 @@ describe("SiteAnalyticsUtils", () => {
 
             const result = SiteAnalyticsUtils.calculateSLA(100, 99.9);
 
-            expect(result.compliant).toBe(true);
+            expect(result.compliant).toBeTruthy();
             expect(result.deficit).toBe(0);
             expect(result.actualDowntime).toBe(0);
         });
@@ -1149,7 +1149,7 @@ describe("SiteAnalyticsUtils", () => {
 
             const result = SiteAnalyticsUtils.calculateSLA(0, 99.9);
 
-            expect(result.compliant).toBe(false);
+            expect(result.compliant).toBeFalsy();
             expect(result.deficit).toBe(99.9);
             expect(result.actualDowntime).toBe(1);
         });

@@ -25,7 +25,7 @@ describe("environment utilities - Backend Coverage", () => {
         // Restore original environment
         process.env = originalEnv;
     });
-    describe("getEnvironment", () => {
+    describe(getEnvironment, () => {
         it("should return NODE_ENV value in backend", async ({
             task,
             annotate,
@@ -74,7 +74,7 @@ describe("environment utilities - Backend Coverage", () => {
             }
         });
     });
-    describe("getEnvVar", () => {
+    describe(getEnvVar, () => {
         it("should retrieve NODE_ENV in backend", async ({
             task,
             annotate,
@@ -141,7 +141,7 @@ describe("environment utilities - Backend Coverage", () => {
             expect(getEnvVar("NODE_ENV")).toBe("");
         });
     });
-    describe("getNodeEnv", () => {
+    describe(getNodeEnv, () => {
         it("should return NODE_ENV value in backend", async ({
             task,
             annotate,
@@ -190,7 +190,7 @@ describe("environment utilities - Backend Coverage", () => {
             }
         });
     });
-    describe("isBrowserEnvironment", () => {
+    describe(isBrowserEnvironment, () => {
         it("should return false in backend context", async ({
             task,
             annotate,
@@ -203,7 +203,7 @@ describe("environment utilities - Backend Coverage", () => {
 
             // In electron backend, window should be undefined
             expect(typeof globalThis.window).toBe("undefined");
-            expect(isBrowserEnvironment()).toBe(false);
+            expect(isBrowserEnvironment()).toBeFalsy();
         });
         it("should handle backend environment correctly", async ({
             task,
@@ -219,10 +219,10 @@ describe("environment utilities - Backend Coverage", () => {
             expect(typeof process).toBe("object");
             expect(typeof process.versions).toBe("object");
             expect(typeof process.versions.node).toBe("string");
-            expect(isBrowserEnvironment()).toBe(false);
+            expect(isBrowserEnvironment()).toBeFalsy();
         });
     });
-    describe("isNodeEnvironment", () => {
+    describe(isNodeEnvironment, () => {
         it("should return true in backend context", async ({
             task,
             annotate,
@@ -233,7 +233,7 @@ describe("environment utilities - Backend Coverage", () => {
                 "component"
             );
 
-            expect(isNodeEnvironment()).toBe(true);
+            expect(isNodeEnvironment()).toBeTruthy();
         });
         it("should detect Node.js environment correctly", async ({
             task,
@@ -248,10 +248,10 @@ describe("environment utilities - Backend Coverage", () => {
             expect(typeof process).toBe("object");
             expect(typeof process.versions).toBe("object");
             expect(typeof process.versions.node).toBe("string");
-            expect(isNodeEnvironment()).toBe(true);
+            expect(isNodeEnvironment()).toBeTruthy();
         });
     });
-    describe("isDevelopment", () => {
+    describe(isDevelopment, () => {
         it("should return true when NODE_ENV is development in backend", async ({
             task,
             annotate,
@@ -263,7 +263,7 @@ describe("environment utilities - Backend Coverage", () => {
             );
 
             process.env["NODE_ENV"] = "development";
-            expect(isDevelopment()).toBe(true);
+            expect(isDevelopment()).toBeTruthy();
         });
         it("should return false when NODE_ENV is not development in backend", async ({
             task,
@@ -276,10 +276,10 @@ describe("environment utilities - Backend Coverage", () => {
             );
 
             process.env["NODE_ENV"] = "production";
-            expect(isDevelopment()).toBe(false);
+            expect(isDevelopment()).toBeFalsy();
 
             process.env["NODE_ENV"] = "test";
-            expect(isDevelopment()).toBe(false);
+            expect(isDevelopment()).toBeFalsy();
         });
         it("should return false as default in backend", async ({
             task,
@@ -292,10 +292,10 @@ describe("environment utilities - Backend Coverage", () => {
             );
 
             delete process.env["NODE_ENV"];
-            expect(isDevelopment()).toBe(false);
+            expect(isDevelopment()).toBeFalsy();
         });
     });
-    describe("isProduction", () => {
+    describe(isProduction, () => {
         it("should return true when NODE_ENV is production in backend", async ({
             task,
             annotate,
@@ -307,7 +307,7 @@ describe("environment utilities - Backend Coverage", () => {
             );
 
             process.env["NODE_ENV"] = "production";
-            expect(isProduction()).toBe(true);
+            expect(isProduction()).toBeTruthy();
         });
         it("should return false when NODE_ENV is not production in backend", async ({
             task,
@@ -320,10 +320,10 @@ describe("environment utilities - Backend Coverage", () => {
             );
 
             process.env["NODE_ENV"] = "development";
-            expect(isProduction()).toBe(false);
+            expect(isProduction()).toBeFalsy();
 
             process.env["NODE_ENV"] = "test";
-            expect(isProduction()).toBe(false);
+            expect(isProduction()).toBeFalsy();
         });
         it("should return false as default in backend", async ({
             task,
@@ -336,10 +336,10 @@ describe("environment utilities - Backend Coverage", () => {
             );
 
             delete process.env["NODE_ENV"];
-            expect(isProduction()).toBe(false);
+            expect(isProduction()).toBeFalsy();
         });
     });
-    describe("isTest", () => {
+    describe(isTest, () => {
         it("should return true when NODE_ENV is test in backend", async ({
             task,
             annotate,
@@ -351,7 +351,7 @@ describe("environment utilities - Backend Coverage", () => {
             );
 
             process.env["NODE_ENV"] = "test";
-            expect(isTest()).toBe(true);
+            expect(isTest()).toBeTruthy();
         });
         it("should return false when NODE_ENV is not test in backend", async ({
             task,
@@ -364,10 +364,10 @@ describe("environment utilities - Backend Coverage", () => {
             );
 
             process.env["NODE_ENV"] = "development";
-            expect(isTest()).toBe(false);
+            expect(isTest()).toBeFalsy();
 
             process.env["NODE_ENV"] = "production";
-            expect(isTest()).toBe(false);
+            expect(isTest()).toBeFalsy();
         });
         it("should return false as default in backend", async ({
             task,
@@ -380,7 +380,7 @@ describe("environment utilities - Backend Coverage", () => {
             );
 
             delete process.env["NODE_ENV"];
-            expect(isTest()).toBe(false);
+            expect(isTest()).toBeFalsy();
         });
     });
     describe("Backend-specific integration scenarios", () => {
@@ -421,8 +421,8 @@ describe("environment utilities - Backend Coverage", () => {
             );
 
             // Electron main process should be detected as Node environment
-            expect(isNodeEnvironment()).toBe(true);
-            expect(isBrowserEnvironment()).toBe(false);
+            expect(isNodeEnvironment()).toBeTruthy();
+            expect(isBrowserEnvironment()).toBeFalsy();
 
             // Should have access to Node.js APIs
             expect(typeof process).toBe("object");
@@ -441,7 +441,7 @@ describe("environment utilities - Backend Coverage", () => {
             process.env["NODE_ENV"] = "production";
             process.env["CODECOV_TOKEN"] = "backend-token";
 
-            expect(isProduction()).toBe(true);
+            expect(isProduction()).toBeTruthy();
             expect(getEnvVar("CODECOV_TOKEN")).toBe("backend-token");
         });
         it("should maintain consistency with shared utilities", async ({

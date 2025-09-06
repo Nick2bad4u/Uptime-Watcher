@@ -12,7 +12,7 @@ import {
     type ThemedTooltipProperties,
 } from "../../../theme/components/ThemedTooltip";
 
-describe("ThemedTooltip", () => {
+describe(ThemedTooltip, () => {
     const defaultProps: ThemedTooltipProperties = {
         content: "Test tooltip content",
         children: <span>Hover me</span>,

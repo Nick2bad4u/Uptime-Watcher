@@ -71,7 +71,7 @@ describe("Monitor Type Guards", () => {
         ...overrides,
     });
 
-    describe("getMonitorRetryAttempts", () => {
+    describe(getMonitorRetryAttempts, () => {
         it("should return monitor's retry attempts when valid", async ({
             task,
             annotate,
@@ -205,7 +205,7 @@ describe("Monitor Type Guards", () => {
         });
     });
 
-    describe("getMonitorTimeout", () => {
+    describe(getMonitorTimeout, () => {
         it("should return monitor's timeout when valid", async ({
             task,
             annotate,
@@ -353,7 +353,7 @@ describe("Monitor Type Guards", () => {
         });
     });
 
-    describe("hasValidHost", () => {
+    describe(hasValidHost, () => {
         it("should return true for valid FQDN host", async ({
             task,
             annotate,
@@ -369,7 +369,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidHost(monitor);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(isNonEmptyString).toHaveBeenCalledWith("example.com");
             expect(isValidFQDN).toHaveBeenCalledWith("example.com", {
                 require_tld: false,
@@ -391,7 +391,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidHost(monitor);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(isNonEmptyString).toHaveBeenCalledWith("localhost");
             expect(isValidFQDN).toHaveBeenCalledWith("localhost", {
                 require_tld: false,
@@ -413,7 +413,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidHost(monitor);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return true for hostname with hyphens", async ({
@@ -431,7 +431,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidHost(monitor);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return true for hostname with underscores", async ({
@@ -449,7 +449,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidHost(monitor);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return false when isNonEmptyString returns false", async ({
@@ -466,7 +466,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidHost(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(isNonEmptyString).toHaveBeenCalledWith("");
         });
 
@@ -485,7 +485,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidHost(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when host is undefined", async ({
@@ -502,7 +502,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidHost(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when host is null", async ({
@@ -519,7 +519,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidHost(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when host is not a string", async ({
@@ -536,7 +536,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidHost(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should handle complex FQDN validation scenarios", async ({
@@ -567,7 +567,7 @@ describe("Monitor Type Guards", () => {
         });
     });
 
-    describe("hasValidPort", () => {
+    describe(hasValidPort, () => {
         it("should return true for valid port numbers", async ({
             task,
             annotate,
@@ -590,7 +590,7 @@ describe("Monitor Type Guards", () => {
             for (const port of validPorts) {
                 const monitor = createTestMonitor({ port });
                 const result = hasValidPort(monitor);
-                expect(result).toBe(true);
+                expect(result).toBeTruthy();
             }
         });
 
@@ -607,7 +607,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidPort(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false for negative port numbers", async ({
@@ -628,7 +628,7 @@ describe("Monitor Type Guards", () => {
             for (const port of invalidPorts) {
                 const monitor = createTestMonitor({ port });
                 const result = hasValidPort(monitor);
-                expect(result).toBe(false);
+                expect(result).toBeFalsy();
             }
         });
 
@@ -650,7 +650,7 @@ describe("Monitor Type Guards", () => {
             for (const port of invalidPorts) {
                 const monitor = createTestMonitor({ port });
                 const result = hasValidPort(monitor);
-                expect(result).toBe(false);
+                expect(result).toBeFalsy();
             }
         });
 
@@ -675,7 +675,7 @@ describe("Monitor Type Guards", () => {
             for (const port of invalidPorts) {
                 const monitor = createTestMonitor({ port: port as any });
                 const result = hasValidPort(monitor);
-                expect(result).toBe(false);
+                expect(result).toBeFalsy();
             }
         });
 
@@ -692,7 +692,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidPort(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when port is Infinity", async ({
@@ -708,7 +708,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidPort(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when port is -Infinity", async ({
@@ -724,7 +724,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidPort(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should handle edge cases at boundaries", async ({
@@ -770,12 +770,12 @@ describe("Monitor Type Guards", () => {
                 const result = hasValidPort(monitor);
                 // Floating point numbers are still numbers, but may not be valid ports
                 // The function checks typeof === "number", so this depends on implementation
-                expect(result).toBe(true); // They are numbers within valid range
+                expect(result).toBeTruthy(); // They are numbers within valid range
             }
         });
     });
 
-    describe("hasValidRetryAttempts", () => {
+    describe(hasValidRetryAttempts, () => {
         it("should return true for valid retry attempts", async ({
             task,
             annotate,
@@ -797,7 +797,7 @@ describe("Monitor Type Guards", () => {
             for (const retryAttempts of validRetryAttempts) {
                 const monitor = createTestMonitor({ retryAttempts });
                 const result = hasValidRetryAttempts(monitor);
-                expect(result).toBe(true);
+                expect(result).toBeTruthy();
             }
         });
 
@@ -819,7 +819,7 @@ describe("Monitor Type Guards", () => {
             for (const retryAttempts of invalidRetryAttempts) {
                 const monitor = createTestMonitor({ retryAttempts });
                 const result = hasValidRetryAttempts(monitor);
-                expect(result).toBe(false);
+                expect(result).toBeFalsy();
             }
         });
 
@@ -846,7 +846,7 @@ describe("Monitor Type Guards", () => {
                     retryAttempts: retryAttempts as any,
                 });
                 const result = hasValidRetryAttempts(monitor);
-                expect(result).toBe(false);
+                expect(result).toBeFalsy();
             }
         });
 
@@ -863,7 +863,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidRetryAttempts(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when retryAttempts is Infinity", async ({
@@ -879,7 +879,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidRetryAttempts(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should handle floating point retry attempts", async ({
@@ -900,7 +900,7 @@ describe("Monitor Type Guards", () => {
             for (const retryAttempts of floatingPoints) {
                 const monitor = createTestMonitor({ retryAttempts });
                 const result = hasValidRetryAttempts(monitor);
-                expect(result).toBe(true); // They are numbers >= 0
+                expect(result).toBeTruthy(); // They are numbers >= 0
             }
         });
 
@@ -917,7 +917,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidRetryAttempts(monitor);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should handle very large retry attempts", async ({
@@ -933,11 +933,11 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidRetryAttempts(monitor);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
     });
 
-    describe("hasValidTimeout", () => {
+    describe(hasValidTimeout, () => {
         it("should return true for valid timeout values", async ({
             task,
             annotate,
@@ -959,7 +959,7 @@ describe("Monitor Type Guards", () => {
             for (const timeout of validTimeouts) {
                 const monitor = createTestMonitor({ timeout });
                 const result = hasValidTimeout(monitor);
-                expect(result).toBe(true);
+                expect(result).toBeTruthy();
             }
         });
 
@@ -976,7 +976,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidTimeout(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false for negative timeout values", async ({
@@ -997,7 +997,7 @@ describe("Monitor Type Guards", () => {
             for (const timeout of invalidTimeouts) {
                 const monitor = createTestMonitor({ timeout });
                 const result = hasValidTimeout(monitor);
-                expect(result).toBe(false);
+                expect(result).toBeFalsy();
             }
         });
 
@@ -1022,7 +1022,7 @@ describe("Monitor Type Guards", () => {
             for (const timeout of invalidTimeouts) {
                 const monitor = createTestMonitor({ timeout: timeout as any });
                 const result = hasValidTimeout(monitor);
-                expect(result).toBe(false);
+                expect(result).toBeFalsy();
             }
         });
 
@@ -1039,7 +1039,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidTimeout(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when timeout is Infinity", async ({
@@ -1055,7 +1055,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidTimeout(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when timeout is -Infinity", async ({
@@ -1071,7 +1071,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidTimeout(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should handle very small positive timeouts", async ({
@@ -1092,7 +1092,7 @@ describe("Monitor Type Guards", () => {
             for (const timeout of smallTimeouts) {
                 const monitor = createTestMonitor({ timeout });
                 const result = hasValidTimeout(monitor);
-                expect(result).toBe(true);
+                expect(result).toBeTruthy();
             }
         });
 
@@ -1109,7 +1109,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidTimeout(monitor);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should handle edge case at boundary", async ({
@@ -1137,7 +1137,7 @@ describe("Monitor Type Guards", () => {
         });
     });
 
-    describe("hasValidUrl", () => {
+    describe(hasValidUrl, () => {
         it("should return true when isValidUrl returns true", async ({
             task,
             annotate,
@@ -1152,7 +1152,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidUrl(monitor);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(isValidUrl).toHaveBeenCalledWith("https://example.com");
         });
 
@@ -1170,7 +1170,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidUrl(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(isValidUrl).toHaveBeenCalledWith("invalid-url");
         });
 
@@ -1227,7 +1227,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidUrl(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(isValidUrl).toHaveBeenCalledWith(undefined);
         });
 
@@ -1242,7 +1242,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidUrl(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(isValidUrl).toHaveBeenCalledWith(null);
         });
 
@@ -1257,7 +1257,7 @@ describe("Monitor Type Guards", () => {
 
             const result = hasValidUrl(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(isValidUrl).toHaveBeenCalledWith(123);
         });
 
@@ -1408,11 +1408,11 @@ describe("Monitor Type Guards", () => {
             vi.mocked(isValidFQDN).mockReturnValue(true);
             vi.mocked(isValidUrl).mockReturnValue(true);
 
-            expect(hasValidHost(complexMonitor)).toBe(true);
-            expect(hasValidPort(complexMonitor)).toBe(true);
-            expect(hasValidTimeout(complexMonitor)).toBe(true);
-            expect(hasValidRetryAttempts(complexMonitor)).toBe(true);
-            expect(hasValidUrl(complexMonitor)).toBe(true);
+            expect(hasValidHost(complexMonitor)).toBeTruthy();
+            expect(hasValidPort(complexMonitor)).toBeTruthy();
+            expect(hasValidTimeout(complexMonitor)).toBeTruthy();
+            expect(hasValidRetryAttempts(complexMonitor)).toBeTruthy();
+            expect(hasValidUrl(complexMonitor)).toBeTruthy();
         });
 
         it("should handle monitors with mixed valid and invalid properties", async ({
@@ -1436,11 +1436,11 @@ describe("Monitor Type Guards", () => {
             vi.mocked(isValidFQDN).mockReturnValue(true);
             vi.mocked(isValidUrl).mockReturnValue(false);
 
-            expect(hasValidHost(mixedMonitor)).toBe(true);
-            expect(hasValidPort(mixedMonitor)).toBe(false);
-            expect(hasValidTimeout(mixedMonitor)).toBe(true);
-            expect(hasValidRetryAttempts(mixedMonitor)).toBe(false);
-            expect(hasValidUrl(mixedMonitor)).toBe(false);
+            expect(hasValidHost(mixedMonitor)).toBeTruthy();
+            expect(hasValidPort(mixedMonitor)).toBeFalsy();
+            expect(hasValidTimeout(mixedMonitor)).toBeTruthy();
+            expect(hasValidRetryAttempts(mixedMonitor)).toBeFalsy();
+            expect(hasValidUrl(mixedMonitor)).toBeFalsy();
         });
     });
 
@@ -1468,11 +1468,11 @@ describe("Monitor Type Guards", () => {
 
             // Call each function multiple times
             for (let i = 0; i < 100; i++) {
-                expect(hasValidHost(monitor)).toBe(true);
-                expect(hasValidPort(monitor)).toBe(true);
-                expect(hasValidTimeout(monitor)).toBe(true);
-                expect(hasValidRetryAttempts(monitor)).toBe(true);
-                expect(hasValidUrl(monitor)).toBe(true);
+                expect(hasValidHost(monitor)).toBeTruthy();
+                expect(hasValidPort(monitor)).toBeTruthy();
+                expect(hasValidTimeout(monitor)).toBeTruthy();
+                expect(hasValidRetryAttempts(monitor)).toBeTruthy();
+                expect(hasValidUrl(monitor)).toBeTruthy();
             }
         });
 
@@ -1491,11 +1491,11 @@ describe("Monitor Type Guards", () => {
             vi.mocked(isValidFQDN).mockReturnValue(false);
             vi.mocked(isValidUrl).mockReturnValue(false);
 
-            expect(hasValidHost(malformedMonitor)).toBe(false);
-            expect(hasValidPort(malformedMonitor)).toBe(false);
-            expect(hasValidTimeout(malformedMonitor)).toBe(false);
-            expect(hasValidRetryAttempts(malformedMonitor)).toBe(false);
-            expect(hasValidUrl(malformedMonitor)).toBe(false);
+            expect(hasValidHost(malformedMonitor)).toBeFalsy();
+            expect(hasValidPort(malformedMonitor)).toBeFalsy();
+            expect(hasValidTimeout(malformedMonitor)).toBeFalsy();
+            expect(hasValidRetryAttempts(malformedMonitor)).toBeFalsy();
+            expect(hasValidUrl(malformedMonitor)).toBeFalsy();
         });
 
         it("should handle monitors with all properties undefined", async ({
@@ -1519,11 +1519,11 @@ describe("Monitor Type Guards", () => {
             vi.mocked(isValidFQDN).mockReturnValue(false);
             vi.mocked(isValidUrl).mockReturnValue(false);
 
-            expect(hasValidHost(undefinedMonitor)).toBe(false);
-            expect(hasValidPort(undefinedMonitor)).toBe(false);
-            expect(hasValidTimeout(undefinedMonitor)).toBe(false);
-            expect(hasValidRetryAttempts(undefinedMonitor)).toBe(false);
-            expect(hasValidUrl(undefinedMonitor)).toBe(false);
+            expect(hasValidHost(undefinedMonitor)).toBeFalsy();
+            expect(hasValidPort(undefinedMonitor)).toBeFalsy();
+            expect(hasValidTimeout(undefinedMonitor)).toBeFalsy();
+            expect(hasValidRetryAttempts(undefinedMonitor)).toBeFalsy();
+            expect(hasValidUrl(undefinedMonitor)).toBeFalsy();
         });
     });
 });

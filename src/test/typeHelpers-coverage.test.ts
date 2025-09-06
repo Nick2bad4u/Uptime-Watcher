@@ -20,17 +20,17 @@ describe("typeHelpers Direct Function Coverage", () => {
     });
 
     it("should call isArray function", () => {
-        expect(isArray([])).toBe(true);
-        expect(isArray([1, 2, 3])).toBe(true);
-        expect(isArray("not array")).toBe(false);
-        expect(isArray({})).toBe(false);
+        expect(isArray([])).toBeTruthy();
+        expect(isArray([1, 2, 3])).toBeTruthy();
+        expect(isArray("not array")).toBeFalsy();
+        expect(isArray({})).toBeFalsy();
     });
 
     it("should call isRecord function", () => {
-        expect(isRecord({})).toBe(true);
-        expect(isRecord({ a: 1 })).toBe(true);
-        expect(isRecord(null)).toBe(false);
-        expect(isRecord([])).toBe(false);
+        expect(isRecord({})).toBeTruthy();
+        expect(isRecord({ a: 1 })).toBeTruthy();
+        expect(isRecord(null)).toBeFalsy();
+        expect(isRecord([])).toBeFalsy();
     });
 
     it("should call safePropertyAccess function", () => {

@@ -631,8 +631,8 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             expect(utilityFunctions.multiply(2, 3)).toBe(6);
             expect(utilityFunctions.divide(6, 2)).toBe(3);
             expect(utilityFunctions.divide(6, 0)).toBe(0);
-            expect(utilityFunctions.isEven(4)).toBe(true);
-            expect(utilityFunctions.isEven(5)).toBe(false);
+            expect(utilityFunctions.isEven(4)).toBeTruthy();
+            expect(utilityFunctions.isEven(5)).toBeFalsy();
             expect(utilityFunctions.capitalize("hello")).toBe("Hello");
         });
     });

@@ -610,7 +610,7 @@ describe("Log Templates", () => {
                 const hasKnownPrefix = knownPrefixes.some((prefix) =>
                     message.startsWith(prefix)
                 );
-                expect(hasKnownPrefix).toBe(true);
+                expect(hasKnownPrefix).toBeTruthy();
             }
         });
 

@@ -15,7 +15,7 @@ import {
 } from "../../shared/validation/validatorUtils.js";
 
 describe("Shared Validation Utils", () => {
-    describe("isNonEmptyString", () => {
+    describe(isNonEmptyString, () => {
         it("should return true for non-empty strings", async ({
             task,
             annotate,
@@ -24,9 +24,9 @@ describe("Shared Validation Utils", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isNonEmptyString("test")).toBe(true);
-            expect(isNonEmptyString("valid string")).toBe(true);
-            expect(isNonEmptyString(" padded ")).toBe(true);
+            expect(isNonEmptyString("test")).toBeTruthy();
+            expect(isNonEmptyString("valid string")).toBeTruthy();
+            expect(isNonEmptyString(" padded ")).toBeTruthy();
         });
         it("should return false for empty/invalid values", async ({
             task,
@@ -36,15 +36,15 @@ describe("Shared Validation Utils", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isNonEmptyString("")).toBe(false);
-            expect(isNonEmptyString("   ")).toBe(false); // Only whitespace
-            expect(isNonEmptyString(null)).toBe(false);
-            expect(isNonEmptyString(undefined)).toBe(false);
-            expect(isNonEmptyString(123)).toBe(false);
+            expect(isNonEmptyString("")).toBeFalsy();
+            expect(isNonEmptyString("   ")).toBeFalsy(); // Only whitespace
+            expect(isNonEmptyString(null)).toBeFalsy();
+            expect(isNonEmptyString(undefined)).toBeFalsy();
+            expect(isNonEmptyString(123)).toBeFalsy();
         });
     });
 
-    describe("isValidUrl", () => {
+    describe(isValidUrl, () => {
         it("should validate correct URL formats", async ({
             task,
             annotate,
@@ -53,20 +53,20 @@ describe("Shared Validation Utils", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isValidUrl("https://example.com")).toBe(true);
-            expect(isValidUrl("https://sub.domain.com/path")).toBe(true);
-            expect(isValidUrl("https://api.example.com:8080/v1/test")).toBe(
-                true
+            expect(isValidUrl("https://example.com")).toBeTruthy();
+            expect(isValidUrl("https://sub.domain.com/path")).toBeTruthy();
+            expect(isValidUrl("https://api.example.com:8080/v1/test")).toBeTruthy(
+                
             );
         });
         it("should reject invalid URL formats", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isValidUrl("not-a-url")).toBe(false);
-            expect(isValidUrl("")).toBe(false);
-            expect(isValidUrl("//example.com")).toBe(false);
-            expect(isValidUrl(null)).toBe(false);
+            expect(isValidUrl("not-a-url")).toBeFalsy();
+            expect(isValidUrl("")).toBeFalsy();
+            expect(isValidUrl("//example.com")).toBeFalsy();
+            expect(isValidUrl(null)).toBeFalsy();
         });
         it("should respect validation options", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -75,13 +75,13 @@ describe("Shared Validation Utils", () => {
             // Test with protocol restriction
             expect(
                 isValidUrl("https://example.com", { protocols: ["https"] })
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 isValidUrl("ftp://example.com", { protocols: ["https"] })
-            ).toBe(false);
+            ).toBeFalsy();
         });
     });
-    describe("isValidFQDN", () => {
+    describe(isValidFQDN, () => {
         it("should validate correct FQDN formats", async ({
             task,
             annotate,
@@ -89,19 +89,19 @@ describe("Shared Validation Utils", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isValidFQDN("example.com")).toBe(true);
-            expect(isValidFQDN("sub.example.com")).toBe(true);
-            expect(isValidFQDN("test-site.example.org")).toBe(true);
+            expect(isValidFQDN("example.com")).toBeTruthy();
+            expect(isValidFQDN("sub.example.com")).toBeTruthy();
+            expect(isValidFQDN("test-site.example.org")).toBeTruthy();
         });
         it("should reject invalid FQDN formats", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isValidFQDN("")).toBe(false);
-            expect(isValidFQDN(".com")).toBe(false);
-            expect(isValidFQDN("example.")).toBe(false);
-            expect(isValidFQDN("ex ample.com")).toBe(false);
-            expect(isValidFQDN(null)).toBe(false);
+            expect(isValidFQDN("")).toBeFalsy();
+            expect(isValidFQDN(".com")).toBeFalsy();
+            expect(isValidFQDN("example.")).toBeFalsy();
+            expect(isValidFQDN("ex ample.com")).toBeFalsy();
+            expect(isValidFQDN(null)).toBeFalsy();
         });
         it("should handle localhost based on options", async ({
             task,
@@ -111,10 +111,10 @@ describe("Shared Validation Utils", () => {
             await annotate("Component: Shared Validation Utils", "component");
 
             // By default, localhost might not be valid FQDN
-            expect(isValidFQDN("localhost", { require_tld: false })).toBe(true);
+            expect(isValidFQDN("localhost", { require_tld: false })).toBeTruthy();
         });
     });
-    describe("isValidIdentifier", () => {
+    describe(isValidIdentifier, () => {
         it("should validate correct identifier formats", async ({
             task,
             annotate,
@@ -122,11 +122,11 @@ describe("Shared Validation Utils", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isValidIdentifier("test")).toBe(true);
-            expect(isValidIdentifier("test123")).toBe(true);
-            expect(isValidIdentifier("test-name")).toBe(true);
-            expect(isValidIdentifier("test_name")).toBe(true);
-            expect(isValidIdentifier("test-123_name")).toBe(true);
+            expect(isValidIdentifier("test")).toBeTruthy();
+            expect(isValidIdentifier("test123")).toBeTruthy();
+            expect(isValidIdentifier("test-name")).toBeTruthy();
+            expect(isValidIdentifier("test_name")).toBeTruthy();
+            expect(isValidIdentifier("test-123_name")).toBeTruthy();
         });
         it("should reject invalid identifier formats", async ({
             task,
@@ -135,16 +135,16 @@ describe("Shared Validation Utils", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isValidIdentifier("")).toBe(false);
-            expect(isValidIdentifier("   ")).toBe(false);
-            expect(isValidIdentifier("test@name")).toBe(false);
-            expect(isValidIdentifier("test.name")).toBe(false);
-            expect(isValidIdentifier("test name")).toBe(false);
-            expect(isValidIdentifier(null)).toBe(false);
-            expect(isValidIdentifier(123)).toBe(false);
+            expect(isValidIdentifier("")).toBeFalsy();
+            expect(isValidIdentifier("   ")).toBeFalsy();
+            expect(isValidIdentifier("test@name")).toBeFalsy();
+            expect(isValidIdentifier("test.name")).toBeFalsy();
+            expect(isValidIdentifier("test name")).toBeFalsy();
+            expect(isValidIdentifier(null)).toBeFalsy();
+            expect(isValidIdentifier(123)).toBeFalsy();
         });
     });
-    describe("safeInteger", () => {
+    describe(safeInteger, () => {
         it("should parse valid integers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
@@ -193,15 +193,15 @@ describe("Shared Validation Utils", () => {
 
             // Test URL validation
             const url = "https://example.com";
-            expect(isValidUrl(url)).toBe(true);
+            expect(isValidUrl(url)).toBeTruthy();
 
             // Test FQDN validation
             const domain = "example.com";
-            expect(isValidFQDN(domain)).toBe(true);
+            expect(isValidFQDN(domain)).toBeTruthy();
 
             // Test identifier validation
             const identifier = "test-site-123";
-            expect(isValidIdentifier(identifier)).toBe(true);
+            expect(isValidIdentifier(identifier)).toBeTruthy();
 
             // Test safe integer parsing
             const timeout = safeInteger("5000", 1000, 1000, 30_000);
@@ -215,30 +215,30 @@ describe("Shared Validation Utils", () => {
             await annotate("Component: Shared Validation Utils", "component");
 
             // All these should be false/default values
-            expect(isNonEmptyString("")).toBe(false);
-            expect(isValidUrl("invalid")).toBe(false);
-            expect(isValidFQDN("")).toBe(false);
-            expect(isValidIdentifier("")).toBe(false);
+            expect(isNonEmptyString("")).toBeFalsy();
+            expect(isValidUrl("invalid")).toBeFalsy();
+            expect(isValidFQDN("")).toBeFalsy();
+            expect(isValidIdentifier("")).toBeFalsy();
             expect(safeInteger("invalid", 0)).toBe(0);
         });
     });
-    describe("isValidInteger", () => {
+    describe(isValidInteger, () => {
         it("should validate integer strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isValidInteger("123")).toBe(true);
-            expect(isValidInteger("0")).toBe(true);
-            expect(isValidInteger("-456")).toBe(true);
+            expect(isValidInteger("123")).toBeTruthy();
+            expect(isValidInteger("0")).toBeTruthy();
+            expect(isValidInteger("-456")).toBeTruthy();
         });
         it("should reject non-integer values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isValidInteger("123.45")).toBe(false);
-            expect(isValidInteger("abc")).toBe(false);
-            expect(isValidInteger("")).toBe(false);
-            expect(isValidInteger(null)).toBe(false);
+            expect(isValidInteger("123.45")).toBeFalsy();
+            expect(isValidInteger("abc")).toBeFalsy();
+            expect(isValidInteger("")).toBeFalsy();
+            expect(isValidInteger(null)).toBeFalsy();
         });
         it("should respect bounds when provided", async ({
             task,
@@ -247,12 +247,12 @@ describe("Shared Validation Utils", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isValidInteger("150", { min: 100, max: 200 })).toBe(true);
-            expect(isValidInteger("50", { min: 100, max: 200 })).toBe(false);
-            expect(isValidInteger("250", { min: 100, max: 200 })).toBe(false);
+            expect(isValidInteger("150", { min: 100, max: 200 })).toBeTruthy();
+            expect(isValidInteger("50", { min: 100, max: 200 })).toBeFalsy();
+            expect(isValidInteger("250", { min: 100, max: 200 })).toBeFalsy();
         });
     });
-    describe("isValidNumeric", () => {
+    describe(isValidNumeric, () => {
         it("should validate numeric strings including decimals", async ({
             task,
             annotate,
@@ -260,21 +260,21 @@ describe("Shared Validation Utils", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isValidNumeric("123")).toBe(true);
-            expect(isValidNumeric("123.45")).toBe(true);
-            expect(isValidNumeric("0.5")).toBe(true);
-            expect(isValidNumeric("-45.67")).toBe(true);
+            expect(isValidNumeric("123")).toBeTruthy();
+            expect(isValidNumeric("123.45")).toBeTruthy();
+            expect(isValidNumeric("0.5")).toBeTruthy();
+            expect(isValidNumeric("-45.67")).toBeTruthy();
         });
         it("should reject non-numeric values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isValidNumeric("abc")).toBe(false);
-            expect(isValidNumeric("")).toBe(false);
-            expect(isValidNumeric(null)).toBe(false);
+            expect(isValidNumeric("abc")).toBeFalsy();
+            expect(isValidNumeric("")).toBeFalsy();
+            expect(isValidNumeric(null)).toBeFalsy();
         });
     });
-    describe("isValidIdentifierArray", () => {
+    describe(isValidIdentifierArray, () => {
         it("should validate arrays of valid identifiers", async ({
             task,
             annotate,
@@ -288,11 +288,11 @@ describe("Shared Validation Utils", () => {
                     "valid",
                     "array",
                 ])
-            ).toBe(true);
-            expect(isValidIdentifierArray(["test-123", "valid_name"])).toBe(
-                true
+            ).toBeTruthy();
+            expect(isValidIdentifierArray(["test-123", "valid_name"])).toBeTruthy(
+                
             );
-            expect(isValidIdentifierArray([])).toBe(true);
+            expect(isValidIdentifierArray([])).toBeTruthy();
         });
         it("should reject invalid arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -304,11 +304,11 @@ describe("Shared Validation Utils", () => {
                     "",
                     "invalid",
                 ])
-            ).toBe(false);
-            expect(isValidIdentifierArray(["test", null as any])).toBe(false);
-            expect(isValidIdentifierArray([123 as any])).toBe(false);
-            expect(isValidIdentifierArray("not-array" as any)).toBe(false);
-            expect(isValidIdentifierArray(null)).toBe(false);
+            ).toBeFalsy();
+            expect(isValidIdentifierArray(["test", null as any])).toBeFalsy();
+            expect(isValidIdentifierArray([123 as any])).toBeFalsy();
+            expect(isValidIdentifierArray("not-array" as any)).toBeFalsy();
+            expect(isValidIdentifierArray(null)).toBeFalsy();
         });
     });
     describe("Comprehensive validation scenarios", () => {
@@ -328,11 +328,11 @@ describe("Shared Validation Utils", () => {
                 tags: ["production", "api-health"],
             };
 
-            expect(isValidIdentifier(monitorConfig.name)).toBe(true);
-            expect(isValidUrl(monitorConfig.url)).toBe(true);
-            expect(isValidInteger(monitorConfig.timeout)).toBe(true);
-            expect(isValidInteger(monitorConfig.retries)).toBe(true);
-            expect(isValidIdentifierArray(monitorConfig.tags)).toBe(true);
+            expect(isValidIdentifier(monitorConfig.name)).toBeTruthy();
+            expect(isValidUrl(monitorConfig.url)).toBeTruthy();
+            expect(isValidInteger(monitorConfig.timeout)).toBeTruthy();
+            expect(isValidInteger(monitorConfig.retries)).toBeTruthy();
+            expect(isValidIdentifierArray(monitorConfig.tags)).toBeTruthy();
 
             // Safe parsing
             const timeout = safeInteger(

@@ -16,6 +16,6 @@ describe("Simple Utility Coverage Test", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 });

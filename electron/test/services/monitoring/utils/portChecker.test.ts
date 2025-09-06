@@ -66,7 +66,7 @@ Object.defineProperty(globalThis, "performance", {
     writable: true,
 });
 
-describe("performSinglePortCheck", () => {
+describe(performSinglePortCheck, () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
@@ -697,7 +697,7 @@ describe("performSinglePortCheck", () => {
                     result2,
                     result3,
                 ].every((r) => r.status === "up")
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should work correctly when mixing successful and failed checks", async ({

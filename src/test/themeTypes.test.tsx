@@ -190,9 +190,9 @@ describe("Theme Types Module", () => {
             };
 
             // Test font families
-            expect(Array.isArray(typography.fontFamily.sans)).toBe(true);
+            expect(Array.isArray(typography.fontFamily.sans)).toBeTruthy();
             expect(typography.fontFamily.sans[0]).toBe("Inter");
-            expect(Array.isArray(typography.fontFamily.mono)).toBe(true);
+            expect(Array.isArray(typography.fontFamily.mono)).toBeTruthy();
 
             // Test font sizes
             expect(typography.fontSize.xs).toBe("0.75rem");
@@ -390,7 +390,7 @@ describe("Theme Types Module", () => {
 
             expect(theme.name).toBe("Test Theme");
             expect(theme.colors).toBe(mockColors);
-            expect(theme.isDark).toBe(false);
+            expect(theme.isDark).toBeFalsy();
             expect(theme.spacing.md).toBe("1rem");
             expect(theme.typography.fontSize.base).toBe("1rem");
         });
@@ -412,7 +412,7 @@ describe("Theme Types Module", () => {
             };
 
             expect(darkTheme.name).toBe("Dark Theme");
-            expect(darkTheme.isDark).toBe(true);
+            expect(darkTheme.isDark).toBeTruthy();
         });
     });
 
@@ -549,8 +549,8 @@ describe("Theme Types Module", () => {
 
             expect(state.customThemes?.["custom1"]).toBe(customTheme1);
             expect(state.customThemes?.["custom2"]).toBe(customTheme2);
-            expect(state.customThemes?.["custom1"]?.isDark).toBe(false);
-            expect(state.customThemes?.["custom2"]?.isDark).toBe(true);
+            expect(state.customThemes?.["custom1"]?.isDark).toBeFalsy();
+            expect(state.customThemes?.["custom2"]?.isDark).toBeTruthy();
         });
     });
 
@@ -759,8 +759,8 @@ describe("Theme Types Module", () => {
                 },
             };
 
-            expect(Array.isArray(typography.fontFamily?.sans)).toBe(true);
-            expect(Array.isArray(typography.fontFamily?.mono)).toBe(true);
+            expect(Array.isArray(typography.fontFamily?.sans)).toBeTruthy();
+            expect(Array.isArray(typography.fontFamily?.mono)).toBeTruthy();
         });
     });
 });

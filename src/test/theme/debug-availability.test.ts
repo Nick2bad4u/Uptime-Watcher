@@ -25,6 +25,6 @@ describe("Debug Availability Description", () => {
         expect(result.current.getAvailabilityDescription(80)).toBeDefined();
 
         // Just to pass the test
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 });

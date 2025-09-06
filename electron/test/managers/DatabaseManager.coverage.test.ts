@@ -346,7 +346,7 @@ describe("DatabaseManager - Coverage Tests", () => {
 
             const result = await databaseManager.importData('{"test": "data"}');
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(mockExecutor.execute).toHaveBeenCalled();
         });
 
@@ -383,7 +383,7 @@ describe("DatabaseManager - Coverage Tests", () => {
 
             const result = await databaseManager.importData("invalid-json");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(failureCommandExecutor.execute).toHaveBeenCalled();
         });
     });

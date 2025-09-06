@@ -184,7 +184,7 @@ describe("useSitesStore - Complete Function Coverage", () => {
             };
 
             expect(initialState.sites).toEqual([]);
-            expect(Array.isArray(initialState.sites)).toBe(true);
+            expect(Array.isArray(initialState.sites)).toBeTruthy();
         });
 
         it("should test shared function creation pattern", async ({
@@ -258,7 +258,7 @@ describe("useSitesStore - Complete Function Coverage", () => {
             expect(mockActions.setSites([testSite])).toEqual([testSite]);
             expect(mockActions.addSite(testSite)).toEqual(testSite);
             expect(mockActions.removeSite("test")).toBe("test");
-            expect(mockActions.setLoading(true)).toBe(true);
+            expect(mockActions.setLoading(true)).toBeTruthy();
             expect(mockActions.setError("error")).toBe("error");
         });
     });
@@ -286,7 +286,7 @@ describe("useSitesStore - Complete Function Coverage", () => {
 
             expect(typeof testSite.identifier).toBe("string");
             expect(typeof testSite.name).toBe("string");
-            expect(Array.isArray(testSite.monitors)).toBe(true);
+            expect(Array.isArray(testSite.monitors)).toBeTruthy();
             expect(typeof testSite.monitoring).toBe("boolean");
         });
 
@@ -318,8 +318,8 @@ describe("useSitesStore - Complete Function Coverage", () => {
             ];
 
             expect(sites).toHaveLength(2);
-            expect(sites[0]?.monitoring).toBe(false);
-            expect(sites[1]?.monitoring).toBe(true);
+            expect(sites[0]?.monitoring).toBeFalsy();
+            expect(sites[1]?.monitoring).toBeTruthy();
         });
     });
 

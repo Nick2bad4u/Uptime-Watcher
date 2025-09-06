@@ -62,7 +62,7 @@ describe("Store Utils", () => {
         vi.useRealTimers();
     });
 
-    describe("createBaseStore", () => {
+    describe(createBaseStore, () => {
         it("should create a base store with proper initial values", async ({
             task,
             annotate,
@@ -171,7 +171,7 @@ describe("Store Utils", () => {
         });
     });
 
-    describe("createPersistConfig", () => {
+    describe(createPersistConfig, () => {
         it("should create a persist config with prefixed name", async ({
             task,
             annotate,
@@ -227,7 +227,7 @@ describe("Store Utils", () => {
         });
     });
 
-    describe("debounce", () => {
+    describe(debounce, () => {
         it("should debounce function calls", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: utils", "component");
@@ -354,7 +354,7 @@ describe("Store Utils", () => {
         });
     });
 
-    describe("logStoreAction", () => {
+    describe(logStoreAction, () => {
         it("should log store action in development mode", async ({
             task,
             annotate,
@@ -438,7 +438,7 @@ describe("Store Utils", () => {
         });
     });
 
-    describe("waitForElectronAPI", () => {
+    describe(waitForElectronAPI, () => {
         it("should resolve immediately when electronAPI is available", async ({
             task,
             annotate,

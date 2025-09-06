@@ -15,7 +15,7 @@ vi.mock("../components/Dashboard/SiteCard/components/MetricCard", () => ({
     ),
 }));
 
-describe("SiteCardMetrics", () => {
+describe(SiteCardMetrics, () => {
     it("renders all metrics with correct values", ({ task, annotate }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: SiteCardMetrics", "component");

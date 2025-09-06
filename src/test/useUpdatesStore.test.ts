@@ -33,7 +33,7 @@ setupElectronAPIMock({
     },
 });
 
-describe("useUpdatesStore", () => {
+describe(useUpdatesStore, () => {
     beforeEach(() => {
         // Reset the store before each test
         useUpdatesStore.setState({

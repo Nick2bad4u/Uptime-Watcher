@@ -20,7 +20,7 @@ beforeEach(() => {
     vi.clearAllMocks();
 });
 
-describe("useThemeStyles", () => {
+describe(useThemeStyles, () => {
     it("should return theme styles object", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: useThemeStyles", "component");

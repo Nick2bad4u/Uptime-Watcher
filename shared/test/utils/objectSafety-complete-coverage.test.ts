@@ -16,7 +16,7 @@ import {
 } from "../../utils/objectSafety";
 
 describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
-    describe("safeObjectAccess", () => {
+    describe(safeObjectAccess, () => {
         it("should return property value when exists and valid", async ({
             task,
             annotate,
@@ -120,7 +120,7 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
         });
     });
 
-    describe("safeObjectIteration", () => {
+    describe(safeObjectIteration, () => {
         it("should iterate over object properties safely", async ({
             task,
             annotate,
@@ -204,12 +204,12 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
 
             // Object.entries() only returns enumerable string keys, not symbols
             expect(results).toHaveLength(1);
-            expect(results.some(([key]) => key === "regular")).toBe(true);
-            expect(results.some(([key]) => key === symbolKey)).toBe(false);
+            expect(results.some(([key]) => key === "regular")).toBeTruthy();
+            expect(results.some(([key]) => key === symbolKey)).toBeFalsy();
         });
     });
 
-    describe("safeObjectOmit", () => {
+    describe(safeObjectOmit, () => {
         it("should omit specified keys from object", async ({
             task,
             annotate,
@@ -290,11 +290,11 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
             const result = safeObjectOmit(obj, [symbolKey]);
 
             expect(result).toEqual({ regular: "prop" });
-            expect(Object.hasOwn(result, symbolKey)).toBe(false);
+            expect(Object.hasOwn(result, symbolKey)).toBeFalsy();
         });
     });
 
-    describe("safeObjectPick", () => {
+    describe(safeObjectPick, () => {
         it("should pick specified keys from object", async ({
             task,
             annotate,
@@ -383,7 +383,7 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
         });
     });
 
-    describe("typedObjectEntries", () => {
+    describe(typedObjectEntries, () => {
         it("should return typed object entries", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -433,7 +433,7 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
         });
     });
 
-    describe("typedObjectKeys", () => {
+    describe(typedObjectKeys, () => {
         it("should return typed object keys", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -488,7 +488,7 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
         });
     });
 
-    describe("typedObjectValues", () => {
+    describe(typedObjectValues, () => {
         it("should return typed object values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(

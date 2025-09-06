@@ -423,7 +423,7 @@ describe("ServiceContainer - Fixed Tests", () => {
 
             const initializedServices = container.getInitializedServices();
 
-            expect(Array.isArray(initializedServices)).toBe(true);
+            expect(Array.isArray(initializedServices)).toBeTruthy();
             expect(initializedServices.length).toBeGreaterThan(0);
         });
     });

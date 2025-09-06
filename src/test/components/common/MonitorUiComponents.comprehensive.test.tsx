@@ -35,7 +35,7 @@ describe("MonitorUiComponents", () => {
         vi.clearAllMocks();
     });
 
-    describe("ConditionalResponseTime", () => {
+    describe(ConditionalResponseTime, () => {
         const defaultProps = {
             monitorType: "http" as MonitorType,
             children: <div data-testid="children">Response time content</div>,
@@ -290,7 +290,7 @@ describe("MonitorUiComponents", () => {
         });
     });
 
-    describe("DetailLabel", () => {
+    describe(DetailLabel, () => {
         const defaultProps = {
             monitorType: "http" as MonitorType,
             details: "example.com",

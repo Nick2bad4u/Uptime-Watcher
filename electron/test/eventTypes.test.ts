@@ -18,7 +18,7 @@
 import { describe, it, expect } from "vitest";
 import { isEventOfCategory, getEventPriority } from "../events/eventTypes.js";
 
-describe("isEventOfCategory", () => {
+describe(isEventOfCategory, () => {
     it("returns true for event in category", async ({ task, annotate }) => {
         await annotate(
             `Testing positive event categorization for ${task.name}`,
@@ -33,9 +33,9 @@ describe("isEventOfCategory", () => {
             "test-case"
         );
 
-        expect(isEventOfCategory("site:added", "SITE")).toBe(true);
-        expect(isEventOfCategory("monitor:added", "MONITOR")).toBe(true);
-        expect(isEventOfCategory("system:error", "SYSTEM")).toBe(true);
+        expect(isEventOfCategory("site:added", "SITE")).toBeTruthy();
+        expect(isEventOfCategory("monitor:added", "MONITOR")).toBeTruthy();
+        expect(isEventOfCategory("system:error", "SYSTEM")).toBeTruthy();
     });
     it("returns false for event not in category", async ({
         task,
@@ -54,9 +54,9 @@ describe("isEventOfCategory", () => {
             "test-case"
         );
 
-        expect(isEventOfCategory("site:added", "MONITOR")).toBe(false);
-        expect(isEventOfCategory("monitor:added", "SITE")).toBe(false);
-        expect(isEventOfCategory("system:error", "PERFORMANCE")).toBe(false);
+        expect(isEventOfCategory("site:added", "MONITOR")).toBeFalsy();
+        expect(isEventOfCategory("monitor:added", "SITE")).toBeFalsy();
+        expect(isEventOfCategory("system:error", "PERFORMANCE")).toBeFalsy();
     });
     it("handles unknown event/category gracefully", async ({
         task,
@@ -72,12 +72,12 @@ describe("isEventOfCategory", () => {
             "error-handling"
         );
 
-        expect(isEventOfCategory("not:an:event", "SITE")).toBe(false);
+        expect(isEventOfCategory("not:an:event", "SITE")).toBeFalsy();
         // @ts-expect-error - intentionally testing unknown category
-        expect(isEventOfCategory("site:added", "NOT_A_CATEGORY")).toBe(false);
+        expect(isEventOfCategory("site:added", "NOT_A_CATEGORY")).toBeFalsy();
     });
 });
-describe("getEventPriority", () => {
+describe(getEventPriority, () => {
     it("returns correct priority for known events", async ({
         task,
         annotate,

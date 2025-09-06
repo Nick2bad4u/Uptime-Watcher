@@ -35,7 +35,7 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("dns", data);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.errors).toHaveLength(0);
         });
 
@@ -62,7 +62,7 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("dns", data);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.errors).toHaveLength(0);
         });
 
@@ -84,12 +84,12 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("dns", data);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
                     error.includes("Host is required")
                 )
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should reject DNS form data with invalid host type", async ({
@@ -111,12 +111,12 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("dns", data as any);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
                     error.includes("Host is required")
                 )
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should reject DNS form data with missing recordType", async ({
@@ -137,12 +137,12 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("dns", data);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
                     error.includes("Record type is required")
                 )
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should reject DNS form data with invalid recordType type", async ({
@@ -164,12 +164,12 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("dns", data as any);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
                     error.includes("Record type is required")
                 )
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should handle DNS form data with empty expectedValue", async ({
@@ -192,7 +192,7 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("dns", data);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
         });
 
         it("should handle DNS form data with whitespace-only expectedValue", async ({
@@ -215,7 +215,7 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("dns", data);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
         });
     });
 
@@ -242,7 +242,7 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("port", data);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.errors).toHaveLength(0);
         });
 
@@ -264,12 +264,12 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("port", data);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
                     error.includes("Host is required")
                 )
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should reject port form data with invalid host type", async ({
@@ -291,12 +291,12 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("port", data as any);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
                     error.includes("Host is required")
                 )
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should reject port form data with missing port", async ({
@@ -317,12 +317,12 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("port", data);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
                     error.includes("Port is required")
                 )
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should reject port form data with invalid port type", async ({
@@ -344,12 +344,12 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("port", data as any);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
                     error.includes("Port is required")
                 )
-            ).toBe(true);
+            ).toBeTruthy();
         });
     });
 
@@ -375,7 +375,7 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("ping", data);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.errors).toHaveLength(0);
         });
 
@@ -396,12 +396,12 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("ping", data);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
                     error.includes("Host is required")
                 )
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should reject ping form data with invalid host type", async ({
@@ -422,12 +422,12 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("ping", data as any);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) =>
                     error.includes("Host is required")
                 )
-            ).toBe(true);
+            ).toBeTruthy();
         });
     });
 
@@ -453,7 +453,7 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("http", data);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.errors).toHaveLength(0);
         });
 
@@ -474,10 +474,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("http", data);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) => error.includes("URL is required"))
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should reject HTTP form data with invalid url type", async ({
@@ -498,10 +498,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("http", data as any);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(
                 result.errors.some((error) => error.includes("URL is required"))
-            ).toBe(true);
+            ).toBeTruthy();
         });
     });
 
@@ -541,19 +541,19 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const result1 = await validateMonitorFormData("http", null as any);
-            expect(result1.success).toBe(false);
+            expect(result1.success).toBeFalsy();
 
             const result2 = await validateMonitorFormData(
                 "http",
                 undefined as any
             );
-            expect(result2.success).toBe(false);
+            expect(result2.success).toBeFalsy();
 
             const result3 = await validateMonitorFormData(
                 "http",
                 "not an object" as any
             );
-            expect(result3.success).toBe(false);
+            expect(result3.success).toBeFalsy();
         });
 
         it("should handle empty object", async ({ task, annotate }) => {
@@ -566,7 +566,7 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = await validateMonitorFormData("http", {} as any);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
     });

@@ -55,7 +55,7 @@ describe("SiteCard Component Coverage Tests", () => {
 
             expect(mockSite.identifier).toBe("test-site");
             expect(mockSite.name).toBe("Test Site");
-            expect(Array.isArray(mockSite.monitors)).toBe(true);
+            expect(Array.isArray(mockSite.monitors)).toBeTruthy();
             expect(mockSite.monitors).toHaveLength(1);
         });
 
@@ -166,7 +166,7 @@ describe("SiteCard Component Coverage Tests", () => {
                 };
 
                 expect(typeof useSiteResult.checkCount).toBe("number");
-                expect(Array.isArray(useSiteResult.filteredHistory)).toBe(true);
+                expect(Array.isArray(useSiteResult.filteredHistory)).toBeTruthy();
                 expect(typeof useSiteResult.handleCardClick).toBe("function");
                 expect(typeof useSiteResult.isLoading).toBe("boolean");
                 expect(typeof useSiteResult.isMonitoring).toBe("boolean");
@@ -240,10 +240,10 @@ describe("SiteCard Component Coverage Tests", () => {
                         (m: any) => m.monitoring === true
                     );
 
-                expect(allRunning1).toBe(true);
-                expect(allRunning2).toBe(false);
-                expect(allRunning3).toBe(false);
-                expect(allRunning4).toBe(false);
+                expect(allRunning1).toBeTruthy();
+                expect(allRunning2).toBeFalsy();
+                expect(allRunning3).toBeFalsy();
+                expect(allRunning4).toBeFalsy();
             });
         });
 
@@ -316,7 +316,7 @@ describe("SiteCard Component Coverage Tests", () => {
                     onClick: vi.fn(),
                 };
 
-                expect(Array.isArray(historyProps.history)).toBe(true);
+                expect(Array.isArray(historyProps.history)).toBeTruthy();
                 expect(typeof historyProps.onClick).toBe("function");
             });
 
@@ -358,7 +358,7 @@ describe("SiteCard Component Coverage Tests", () => {
 
                 for (const component of subComponents) {
                     expect(typeof component).toBe("string");
-                    expect(component.startsWith("SiteCard")).toBe(true);
+                    expect(component.startsWith("SiteCard")).toBeTruthy();
                 }
             });
 
@@ -452,10 +452,10 @@ describe("SiteCard Component Coverage Tests", () => {
                     isMonitoring: true,
                 };
 
-                expect(loadingStates.isLoading).toBe(true);
-                expect(loadingStates.isMonitoring).toBe(false);
-                expect(activeStates.isLoading).toBe(false);
-                expect(activeStates.isMonitoring).toBe(true);
+                expect(loadingStates.isLoading).toBeTruthy();
+                expect(loadingStates.isMonitoring).toBeFalsy();
+                expect(activeStates.isLoading).toBeFalsy();
+                expect(activeStates.isMonitoring).toBeTruthy();
             });
 
             it("should handle monitor selection", () => {
@@ -466,8 +466,8 @@ describe("SiteCard Component Coverage Tests", () => {
                     "monitor-3",
                 ];
 
-                expect(availableMonitors.includes(selectedMonitorId)).toBe(
-                    true
+                expect(availableMonitors).toContain(
+                    selectedMonitorId
                 );
                 expect(typeof selectedMonitorId).toBe("string");
             });

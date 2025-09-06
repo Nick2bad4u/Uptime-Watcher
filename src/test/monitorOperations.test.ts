@@ -37,7 +37,7 @@ describe("monitorOperations", () => {
         vi.restoreAllMocks();
     });
 
-    describe("createDefaultMonitor", () => {
+    describe(createDefaultMonitor, () => {
         it("should create a default monitor with default values", async ({
             task,
             annotate,
@@ -62,7 +62,7 @@ describe("monitorOperations", () => {
                 type: "http",
                 url: "https://example.com",
             });
-            expect(mockCrypto.randomUUID).toHaveBeenCalledOnce();
+            expect(mockCrypto.randomUUID).toHaveBeenCalledTimes(1);
         });
 
         it("should create a monitor with overrides", async ({
@@ -138,7 +138,7 @@ describe("monitorOperations", () => {
         });
     });
 
-    describe("validateMonitor", () => {
+    describe(validateMonitor, () => {
         it("should return true for valid monitor", async ({
             task,
             annotate,
@@ -161,7 +161,7 @@ describe("monitorOperations", () => {
                 retryAttempts: 3,
             };
 
-            expect(validateMonitor(validMonitor)).toBe(true);
+            expect(validateMonitor(validMonitor)).toBeTruthy();
         });
 
         it("should return false for missing id", async ({ task, annotate }) => {
@@ -177,8 +177,8 @@ describe("monitorOperations", () => {
                 type: "http",
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
-                false
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
+                
             );
         });
 
@@ -199,8 +199,8 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
-                false
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
+                
             );
         });
 
@@ -220,8 +220,8 @@ describe("monitorOperations", () => {
                 status: "up" as const,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
-                false
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
+                
             );
         });
 
@@ -242,8 +242,8 @@ describe("monitorOperations", () => {
                 type: 123,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
-                false
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
+                
             );
         });
 
@@ -263,8 +263,8 @@ describe("monitorOperations", () => {
                 type: "http",
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
-                false
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
+                
             );
         });
 
@@ -285,8 +285,8 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
-                false
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
+                
             );
         });
 
@@ -307,8 +307,8 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
-                false
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
+                
             );
         });
 
@@ -328,8 +328,8 @@ describe("monitorOperations", () => {
                 type: "http",
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
-                false
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
+                
             );
         });
 
@@ -350,8 +350,8 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
-                false
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
+                
             );
         });
 
@@ -371,8 +371,8 @@ describe("monitorOperations", () => {
                 type: "http",
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
-                false
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
+                
             );
         });
 
@@ -393,8 +393,8 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBe(
-                false
+            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
+                
             );
         });
 
@@ -426,14 +426,14 @@ describe("monitorOperations", () => {
                     timeout: 5000,
                     type: "http" as MonitorType,
                 };
-                expect(validateMonitor(monitor as unknown as Monitor)).toBe(
-                    true
+                expect(validateMonitor(monitor as unknown as Monitor)).toBeTruthy(
+                    
                 );
             }
         });
     });
 
-    describe("normalizeMonitor", () => {
+    describe(normalizeMonitor, () => {
         it("should normalize empty monitor with defaults", async ({
             task,
             annotate,
@@ -641,7 +641,7 @@ describe("monitorOperations", () => {
         });
     });
 
-    describe("findMonitorInSite", () => {
+    describe(findMonitorInSite, () => {
         const mockSite: Site = {
             identifier: "site-1",
             monitoring: true,
@@ -723,7 +723,7 @@ describe("monitorOperations", () => {
         });
     });
 
-    describe("updateMonitorInSite", () => {
+    describe(updateMonitorInSite, () => {
         const mockSite: Site = {
             identifier: "site-1",
             monitoring: true,
@@ -843,7 +843,7 @@ describe("monitorOperations", () => {
         });
     });
 
-    describe("addMonitorToSite", () => {
+    describe(addMonitorToSite, () => {
         const mockSite: Site = {
             identifier: "site-1",
             monitoring: true,
@@ -943,7 +943,7 @@ describe("monitorOperations", () => {
         });
     });
 
-    describe("removeMonitorFromSite", () => {
+    describe(removeMonitorFromSite, () => {
         const mockSite: Site = {
             identifier: "site-1",
             monitoring: true,
@@ -1055,7 +1055,7 @@ describe("monitorOperations", () => {
         });
     });
 
-    describe("validateMonitorExists", () => {
+    describe(validateMonitorExists, () => {
         const mockSite: Site = {
             identifier: "site-1",
             monitoring: true,

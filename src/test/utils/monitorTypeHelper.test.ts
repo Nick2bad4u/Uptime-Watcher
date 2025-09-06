@@ -156,7 +156,7 @@ describe("monitorTypeHelper", () => {
         vi.restoreAllMocks();
     });
 
-    describe("clearMonitorTypeCache", () => {
+    describe(clearMonitorTypeCache, () => {
         it("should call cache clear method", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -185,7 +185,7 @@ describe("monitorTypeHelper", () => {
         });
     });
 
-    describe("getAvailableMonitorTypes", () => {
+    describe(getAvailableMonitorTypes, () => {
         it("should return cached data when available", async ({
             task,
             annotate,
@@ -351,7 +351,7 @@ describe("monitorTypeHelper", () => {
         });
     });
 
-    describe("getMonitorTypeConfig", () => {
+    describe(getMonitorTypeConfig, () => {
         beforeEach(() => {
             // Mock getAvailableMonitorTypes by directly mocking the cache
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
@@ -476,7 +476,7 @@ describe("monitorTypeHelper", () => {
         });
     });
 
-    describe("getMonitorTypeOptions", () => {
+    describe(getMonitorTypeOptions, () => {
         beforeEach(() => {
             // Mock getAvailableMonitorTypes by directly mocking the cache
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
@@ -875,7 +875,7 @@ describe("monitorTypeHelper", () => {
 
                 const result = await getMonitorTypeOptions();
 
-                expect(Array.isArray(result)).toBe(true);
+                expect(Array.isArray(result)).toBeTruthy();
                 if (emptyCase === 0) {
                     expect(result).toHaveLength(0);
                 }

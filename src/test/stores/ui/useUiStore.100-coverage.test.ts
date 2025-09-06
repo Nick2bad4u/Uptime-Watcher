@@ -128,32 +128,32 @@ describe("useUIStore - 100% Coverage Tests", () => {
             await act(async () => {
                 result.current.setShowAddSiteModal(true);
             });
-            expect(result.current.showAddSiteModal).toBe(true);
+            expect(result.current.showAddSiteModal).toBeTruthy();
 
             await act(async () => {
                 result.current.setShowAddSiteModal(false);
             });
-            expect(result.current.showAddSiteModal).toBe(false);
+            expect(result.current.showAddSiteModal).toBeFalsy();
 
             await act(async () => {
                 result.current.setShowAdvancedMetrics(true);
             });
-            expect(result.current.showAdvancedMetrics).toBe(true);
+            expect(result.current.showAdvancedMetrics).toBeTruthy();
 
             await act(async () => {
                 result.current.setShowAdvancedMetrics(false);
             });
-            expect(result.current.showAdvancedMetrics).toBe(false);
+            expect(result.current.showAdvancedMetrics).toBeFalsy();
 
             await act(async () => {
                 result.current.setShowSettings(true);
             });
-            expect(result.current.showSettings).toBe(true);
+            expect(result.current.showSettings).toBeTruthy();
 
             await act(async () => {
                 result.current.setShowSettings(false);
             });
-            expect(result.current.showSettings).toBe(false);
+            expect(result.current.showSettings).toBeFalsy();
         });
     });
 });

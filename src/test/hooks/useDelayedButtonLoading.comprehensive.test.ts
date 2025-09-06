@@ -15,7 +15,7 @@ vi.mock("../../constants", () => ({
     },
 }));
 
-describe("useDelayedButtonLoading", () => {
+describe(useDelayedButtonLoading, () => {
     beforeEach(() => {
         vi.useFakeTimers();
     });
@@ -39,7 +39,7 @@ describe("useDelayedButtonLoading", () => {
             const { result } = renderHook(() => useDelayedButtonLoading(false));
 
             // Assert
-            expect(result.current).toBe(false);
+            expect(result.current).toBeFalsy();
         });
 
         it("should return false initially when isLoading is true", async ({
@@ -55,7 +55,7 @@ describe("useDelayedButtonLoading", () => {
             const { result } = renderHook(() => useDelayedButtonLoading(true));
 
             // Assert
-            expect(result.current).toBe(false);
+            expect(result.current).toBeFalsy();
         });
     });
 
@@ -81,7 +81,7 @@ describe("useDelayedButtonLoading", () => {
             rerender({ isLoading: true });
 
             // Assert - Should still be false immediately
-            expect(result.current).toBe(false);
+            expect(result.current).toBeFalsy();
 
             // Act - Advance timer by loading button delay
             act(() => {
@@ -89,7 +89,7 @@ describe("useDelayedButtonLoading", () => {
             });
 
             // Assert - Should now show loading
-            expect(result.current).toBe(true);
+            expect(result.current).toBeTruthy();
         });
 
         it("should hide loading after delay when isLoading becomes false", async ({
@@ -113,13 +113,13 @@ describe("useDelayedButtonLoading", () => {
             act(() => {
                 vi.advanceTimersByTime(100);
             });
-            expect(result.current).toBe(true);
+            expect(result.current).toBeTruthy();
 
             // Act - Stop loading
             rerender({ isLoading: false });
 
             // Assert - Should still be true immediately
-            expect(result.current).toBe(true);
+            expect(result.current).toBeTruthy();
 
             // Act - Advance timer by state update defer delay
             act(() => {
@@ -127,7 +127,7 @@ describe("useDelayedButtonLoading", () => {
             });
 
             // Assert - Should now hide loading
-            expect(result.current).toBe(false);
+            expect(result.current).toBeFalsy();
         });
 
         it("should not show loading if isLoading becomes false before delay expires", async ({
@@ -162,7 +162,7 @@ describe("useDelayedButtonLoading", () => {
             });
 
             // Assert - Should remain false throughout
-            expect(result.current).toBe(false);
+            expect(result.current).toBeFalsy();
         });
     });
 
@@ -245,7 +245,7 @@ describe("useDelayedButtonLoading", () => {
             act(() => vi.advanceTimersByTime(100));
 
             // Assert - Should be false after all rapid changes
-            expect(result.current).toBe(false);
+            expect(result.current).toBeFalsy();
         });
     });
 
@@ -272,11 +272,11 @@ describe("useDelayedButtonLoading", () => {
 
             // Assert - Should not show loading before delay
             act(() => vi.advanceTimersByTime(99));
-            expect(result.current).toBe(false);
+            expect(result.current).toBeFalsy();
 
             // Assert - Should show loading after exact delay
             act(() => vi.advanceTimersByTime(1));
-            expect(result.current).toBe(true);
+            expect(result.current).toBeTruthy();
         });
 
         it("should use correct delay for hiding loading state", async ({
@@ -298,18 +298,18 @@ describe("useDelayedButtonLoading", () => {
 
             // Setup - Show loading first
             act(() => vi.advanceTimersByTime(100));
-            expect(result.current).toBe(true);
+            expect(result.current).toBeTruthy();
 
             // Act
             rerender({ isLoading: false });
 
             // Assert - Should not hide loading before delay
             act(() => vi.advanceTimersByTime(49));
-            expect(result.current).toBe(true);
+            expect(result.current).toBeTruthy();
 
             // Assert - Should hide loading after exact delay
             act(() => vi.advanceTimersByTime(1));
-            expect(result.current).toBe(false);
+            expect(result.current).toBeFalsy();
         });
     });
 
@@ -429,7 +429,7 @@ describe("useDelayedButtonLoading", () => {
             rerender({ isLoading: false });
 
             // Assert - Should not cause issues (verified by not throwing)
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle prop changes without memory leaks", async ({
@@ -479,22 +479,22 @@ describe("useDelayedButtonLoading", () => {
 
             // Act - User clicks submit (loading starts)
             rerender({ isLoading: true });
-            expect(result.current).toBe(false); // No immediate loading state
+            expect(result.current).toBeFalsy(); // No immediate loading state
 
             // Act - Loading delay passes
             act(() => vi.advanceTimersByTime(100));
-            expect(result.current).toBe(true); // Now showing loading
+            expect(result.current).toBeTruthy(); // Now showing loading
 
             // Act - Server responds quickly (loading stops)
             rerender({ isLoading: false });
-            expect(result.current).toBe(true); // Still showing loading
+            expect(result.current).toBeTruthy(); // Still showing loading
 
             // Act - Hide delay passes
             act(() => vi.advanceTimersByTime(50));
-            expect(result.current).toBe(false); // Loading hidden
+            expect(result.current).toBeFalsy(); // Loading hidden
 
             // Assert - Complete flow worked correctly
-            expect(result.current).toBe(false);
+            expect(result.current).toBeFalsy();
         });
 
         it("should handle very fast operations without showing loading", async ({
@@ -521,7 +521,7 @@ describe("useDelayedButtonLoading", () => {
             act(() => vi.advanceTimersByTime(100)); // Complete all timers
 
             // Assert - Should never have shown loading
-            expect(result.current).toBe(false);
+            expect(result.current).toBeFalsy();
         });
 
         it("should handle long-running operations correctly", async ({
@@ -544,19 +544,19 @@ describe("useDelayedButtonLoading", () => {
             // Act - Long operation
             rerender({ isLoading: true });
             act(() => vi.advanceTimersByTime(100)); // Show loading
-            expect(result.current).toBe(true);
+            expect(result.current).toBeTruthy();
 
             // Act - Continue long operation
             act(() => vi.advanceTimersByTime(5000)); // 5 seconds
-            expect(result.current).toBe(true); // Should still show loading
+            expect(result.current).toBeTruthy(); // Should still show loading
 
             // Act - Operation completes
             rerender({ isLoading: false });
             act(() => vi.advanceTimersByTime(50)); // Hide loading
-            expect(result.current).toBe(false);
+            expect(result.current).toBeFalsy();
 
             // Assert - Full long operation flow worked
-            expect(result.current).toBe(false);
+            expect(result.current).toBeFalsy();
         });
     });
 

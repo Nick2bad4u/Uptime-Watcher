@@ -55,7 +55,7 @@ describe("Status Utils Property-Based Tests", () => {
         fc.constant("DNS RESOLUTION FAILED")
     );
 
-    describe("getStatusIcon", () => {
+    describe(getStatusIcon, () => {
         test.prop([knownStatusValues])(
             "should return correct emoji for known status values",
             (status) => {
@@ -124,7 +124,7 @@ describe("Status Utils Property-Based Tests", () => {
         });
     });
 
-    describe("formatStatusWithIcon", () => {
+    describe(formatStatusWithIcon, () => {
         test.prop([knownStatusValues])(
             "should format known status values correctly",
             (status) => {
@@ -156,7 +156,7 @@ describe("Status Utils Property-Based Tests", () => {
             (status) => {
                 const formatted = formatStatusWithIcon(status);
                 const textPart = formatted.split(" ").slice(1).join(" ");
-                expect(textPart.length).toBe(status.length);
+                expect(textPart).toHaveLength(status.length);
             }
         );
 
@@ -165,7 +165,7 @@ describe("Status Utils Property-Based Tests", () => {
             (status) => {
                 const formatted = formatStatusWithIcon(status);
                 const expectedIcon = getStatusIcon(status);
-                expect(formatted.startsWith(expectedIcon)).toBe(true);
+                expect(formatted.startsWith(expectedIcon)).toBeTruthy();
             }
         );
 
@@ -180,7 +180,7 @@ describe("Status Utils Property-Based Tests", () => {
         });
     });
 
-    describe("createStatusIdentifier", () => {
+    describe(createStatusIdentifier, () => {
         test.prop([fc.string({ minLength: 1, maxLength: 50 }).filter(s => s.trim().length > 0)])(
             "should always return a string",
             (statusText) => {
@@ -288,7 +288,7 @@ describe("Status Utils Property-Based Tests", () => {
             (status) => {
                 const formatted = formatStatusWithIcon(status);
                 const expectedIcon = getStatusIcon(status);
-                expect(formatted.startsWith(expectedIcon)).toBe(true);
+                expect(formatted.startsWith(expectedIcon)).toBeTruthy();
             }
         );
 
@@ -299,7 +299,7 @@ describe("Status Utils Property-Based Tests", () => {
                 // Format is "{icon} {text}" where text has same length as status
                 // So formatted length should be icon length + 1 (space) + status length
                 const iconLength = getStatusIcon(status).length;
-                expect(formatted.length).toBe(iconLength + 1 + status.length);
+                expect(formatted).toHaveLength(iconLength + 1 + status.length);
             }
         );
 
@@ -326,7 +326,7 @@ describe("Status Utils Property-Based Tests", () => {
                 expect(["❌", "🔄", "⏸️", "⏳", "❓", "✅"]).toContain(icon);
 
                 // Formatted should start with the same icon
-                expect(formatted.startsWith(icon)).toBe(true);
+                expect(formatted.startsWith(icon)).toBeTruthy();
 
                 // Identifier should be the same as the original (since they're single words)
                 expect(identifier).toBe(status);
@@ -366,7 +366,7 @@ describe("Status Utils Property-Based Tests", () => {
 
             // Results should still be valid
             expect(getStatusIcon("测试")).toBe("⚪");
-            expect(formatStatusWithIcon("🚀").startsWith("⚪")).toBe(true);
+            expect(formatStatusWithIcon("🚀").startsWith("⚪")).toBeTruthy();
 
             const identifier = createStatusIdentifier("test-émoji_status");
             expect(identifier).not.toMatch(/[\s_-]/);

@@ -18,7 +18,7 @@ Object.defineProperty(globalThis, "matchMedia", {
     })),
 });
 
-describe("ThemeManager", () => {
+describe(ThemeManager, () => {
     let themeManager: ThemeManager;
     let mockDocumentElement: any;
     let mockBodyClassList: any;
@@ -257,9 +257,9 @@ describe("ThemeManager", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
-            expect(themeManager.isValidThemeName("light")).toBe(true);
-            expect(themeManager.isValidThemeName("dark")).toBe(true);
-            expect(themeManager.isValidThemeName("system")).toBe(true);
+            expect(themeManager.isValidThemeName("light")).toBeTruthy();
+            expect(themeManager.isValidThemeName("dark")).toBeTruthy();
+            expect(themeManager.isValidThemeName("system")).toBeTruthy();
         });
 
         it("should reject invalid theme names", async ({ task, annotate }) => {
@@ -268,8 +268,8 @@ describe("ThemeManager", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(themeManager.isValidThemeName("invalid")).toBe(false);
-            expect(themeManager.isValidThemeName("")).toBe(false);
+            expect(themeManager.isValidThemeName("invalid")).toBeFalsy();
+            expect(themeManager.isValidThemeName("")).toBeFalsy();
         });
     });
 

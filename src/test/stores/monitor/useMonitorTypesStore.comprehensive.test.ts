@@ -61,7 +61,7 @@ Object.defineProperty(globalThis, "window", {
     writable: true,
 });
 
-describe("useMonitorTypesStore", () => {
+describe(useMonitorTypesStore, () => {
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
@@ -92,8 +92,8 @@ describe("useMonitorTypesStore", () => {
             const { result } = renderHook(() => useMonitorTypesStore());
 
             expect(result.current.fieldConfigs).toEqual({});
-            expect(result.current.isLoaded).toBe(false);
-            expect(result.current.isLoading).toBe(false);
+            expect(result.current.isLoaded).toBeFalsy();
+            expect(result.current.isLoading).toBeFalsy();
             expect(result.current.lastError).toBeUndefined();
             expect(result.current.monitorTypes).toEqual([]);
         });
@@ -151,7 +151,7 @@ describe("useMonitorTypesStore", () => {
             });
 
             expect(result.current.monitorTypes).toEqual(mockMonitorTypes);
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.fieldConfigs).toEqual({
                 http: mockMonitorTypes[0]!.fields,
                 ping: mockMonitorTypes[1]!.fields,
@@ -214,7 +214,7 @@ describe("useMonitorTypesStore", () => {
             expect(
                 mockElectronAPI.monitorTypes.getMonitorTypes
             ).toHaveBeenCalledTimes(1);
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
         });
 
         it("should reload if error exists", async ({ task, annotate }) => {
@@ -273,7 +273,7 @@ describe("useMonitorTypesStore", () => {
             });
 
             expect(result.current.lastError).toBe(errorMessage);
-            expect(result.current.isLoading).toBe(false);
+            expect(result.current.isLoading).toBeFalsy();
         });
 
         it("should handle empty response with fallback", async ({
@@ -297,7 +297,7 @@ describe("useMonitorTypesStore", () => {
 
             expect(result.current.monitorTypes).toEqual([]);
             expect(result.current.fieldConfigs).toEqual({});
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
         });
     });
 
@@ -339,7 +339,7 @@ describe("useMonitorTypesStore", () => {
             });
 
             expect(result.current.monitorTypes).toEqual(mockMonitorTypes);
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
             expect(
                 mockElectronAPI.monitorTypes.getMonitorTypes
             ).toHaveBeenCalledTimes(1);
@@ -415,7 +415,7 @@ describe("useMonitorTypesStore", () => {
                 );
             });
 
-            expect(validationResult!.success).toBe(false);
+            expect(validationResult!.success).toBeFalsy();
             expect(validationResult!.errors).toEqual(["URL is required"]);
         });
 
@@ -781,13 +781,13 @@ describe("useMonitorTypesStore", () => {
                 result.current.setLoading(true);
             });
 
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
 
             act(() => {
                 result.current.setLoading(false);
             });
 
-            expect(result.current.isLoading).toBe(false);
+            expect(result.current.isLoading).toBeFalsy();
         });
     });
 
@@ -843,7 +843,7 @@ describe("useMonitorTypesStore", () => {
                 await result.current.loadMonitorTypes();
             });
 
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.monitorTypes).toEqual(mockMonitorTypes);
 
             // Get field config
@@ -861,7 +861,7 @@ describe("useMonitorTypesStore", () => {
                 );
             });
 
-            expect(validationResult!.success).toBe(true);
+            expect(validationResult!.success).toBeTruthy();
 
             // Format details
             let formattedDetail: string;
@@ -900,7 +900,7 @@ describe("useMonitorTypesStore", () => {
             });
 
             expect(result.current.lastError).toBe("Network error");
-            expect(result.current.isLoaded).toBe(false);
+            expect(result.current.isLoaded).toBeFalsy();
 
             // Then recover with successful call
             const mockMonitorTypes: MonitorTypeConfig[] = [
@@ -922,7 +922,7 @@ describe("useMonitorTypesStore", () => {
             });
 
             expect(result.current.lastError).toBeUndefined();
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.monitorTypes).toEqual(mockMonitorTypes);
         });
     });
@@ -972,7 +972,7 @@ describe("useMonitorTypesStore", () => {
             expect(
                 mockElectronAPI.monitorTypes.getMonitorTypes
             ).toHaveBeenCalledTimes(2); // Changed from 1 to 2 - concurrent calls both execute
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
 
             // Clean up after concurrent test to prevent interference
             await act(async () => {
@@ -1031,7 +1031,7 @@ describe("useMonitorTypesStore", () => {
                 // Test the store filtering logic directly since hook rendering had timing issues
                 const storeState = useMonitorTypesStore.getState();
                 expect(storeState).toBeDefined();
-                expect(storeState.isLoaded).toBe(false); // Should start not loaded
+                expect(storeState.isLoaded).toBeFalsy(); // Should start not loaded
                 unmount();
                 return;
             }
@@ -1041,9 +1041,9 @@ describe("useMonitorTypesStore", () => {
             });
 
             // Should handle malformed data gracefully
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
             // The store should filter out invalid entries and keep only valid ones
-            expect(Array.isArray(result.current.monitorTypes)).toBe(true);
+            expect(Array.isArray(result.current.monitorTypes)).toBeTruthy();
 
             unmount();
         });

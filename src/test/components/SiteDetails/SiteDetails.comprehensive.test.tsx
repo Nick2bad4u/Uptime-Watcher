@@ -309,7 +309,7 @@ const renderSiteDetails = (site = mockSite, onClose = vi.fn()) =>
         </MockBrowserRouter>
     );
 
-describe("SiteDetails", () => {
+describe(SiteDetails, () => {
     beforeEach(() => {
         // Clear only specific mocks, not all mocks
         vi.mocked(useSiteDetails).mockClear();

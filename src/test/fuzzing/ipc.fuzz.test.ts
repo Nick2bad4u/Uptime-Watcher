@@ -75,7 +75,7 @@ describe("IPC Communication Fuzzing Tests", () => {
                         const result = isIpcResponse(response);
 
                         // Should return true since it has required 'success' boolean property
-                        expect(result).toBe(true);
+                        expect(result).toBeTruthy();
                     }
                 )
             );
@@ -107,7 +107,7 @@ describe("IPC Communication Fuzzing Tests", () => {
                             typeof (input as { success: unknown }).success !==
                                 "boolean"
                         ) {
-                            expect(result).toBe(false);
+                            expect(result).toBeFalsy();
                         }
                     }
                 )
@@ -134,7 +134,7 @@ describe("IPC Communication Fuzzing Tests", () => {
 
                         expect(() => isIpcResponse(response)).not.toThrow();
                         const result = isIpcResponse(response);
-                        expect(result).toBe(true);
+                        expect(result).toBeTruthy();
                     }
                 )
             );
@@ -355,7 +355,7 @@ describe("IPC Communication Fuzzing Tests", () => {
                         };
 
                         expect(() => isIpcResponse(response)).not.toThrow();
-                        expect(isIpcResponse(response)).toBe(true);
+                        expect(isIpcResponse(response)).toBeTruthy();
 
                         if (success) {
                             expect(() =>

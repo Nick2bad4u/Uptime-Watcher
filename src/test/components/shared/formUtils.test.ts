@@ -162,7 +162,7 @@ describe("Form Utilities", () => {
                     expect(setValue).toHaveBeenCalledWith(convertedValue);
                     // Should be NaN for non-numeric strings
                     if (!/^\d+/.test(nonNumericValue)) {
-                        expect(Number.isNaN(convertedValue)).toBe(true);
+                        expect(Number.isNaN(convertedValue)).toBeTruthy();
                     }
                 }
             );
@@ -209,9 +209,9 @@ describe("Form Utilities", () => {
                 (nonEmptyString) => {
                     const isValid = validationPatterns.nonEmptyString(nonEmptyString);
                     if (nonEmptyString.trim().length > 0) {
-                        expect(isValid).toBe(true);
+                        expect(isValid).toBeTruthy();
                     } else {
-                        expect(isValid).toBe(false);
+                        expect(isValid).toBeFalsy();
                     }
                 }
             );
@@ -223,7 +223,7 @@ describe("Form Utilities", () => {
                 "should reject empty and whitespace-only strings",
                 (emptyString) => {
                     const isValid = validationPatterns.nonEmptyString(emptyString);
-                    expect(isValid).toBe(false);
+                    expect(isValid).toBeFalsy();
                 }
             );
 
@@ -232,7 +232,7 @@ describe("Form Utilities", () => {
                 (portNumber) => {
                     const validator = validationPatterns.numberInRange(1, 65_535);
                     const isValid = validator(portNumber);
-                    expect(isValid).toBe(true);
+                    expect(isValid).toBeTruthy();
                 }
             );
 
@@ -244,7 +244,7 @@ describe("Form Utilities", () => {
                 (invalidPort) => {
                     const validator = validationPatterns.numberInRange(1, 65_535);
                     const isValid = validator(invalidPort);
-                    expect(isValid).toBe(false);
+                    expect(isValid).toBeFalsy();
                 }
             );
 
@@ -253,7 +253,7 @@ describe("Form Utilities", () => {
                 (allowedInterval) => {
                     const validator = validationPatterns.oneOfNumbers([5000, 10_000, 30_000, 60_000]);
                     const isValid = validator(allowedInterval);
-                    expect(isValid).toBe(true);
+                    expect(isValid).toBeTruthy();
                 }
             );
 
@@ -264,7 +264,7 @@ describe("Form Utilities", () => {
                 (disallowedInterval) => {
                     const validator = validationPatterns.oneOfNumbers([5000, 10_000, 30_000, 60_000]);
                     const isValid = validator(disallowedInterval);
-                    expect(isValid).toBe(false);
+                    expect(isValid).toBeFalsy();
                 }
             );
 
@@ -273,7 +273,7 @@ describe("Form Utilities", () => {
                 (allowedType) => {
                     const validator = validationPatterns.oneOfStrings(["http", "port", "ping"]);
                     const isValid = validator(allowedType);
-                    expect(isValid).toBe(true);
+                    expect(isValid).toBeTruthy();
                 }
             );
 
@@ -282,7 +282,7 @@ describe("Form Utilities", () => {
                 (disallowedType) => {
                     const validator = validationPatterns.oneOfStrings(["http", "port", "ping"]);
                     const isValid = validator(disallowedType);
-                    expect(isValid).toBe(false);
+                    expect(isValid).toBeFalsy();
                 }
             );
 
@@ -335,7 +335,7 @@ describe("Form Utilities", () => {
                     expect(setValue).toHaveBeenCalledWith(whitespaceInput);
 
                     // Verify whitespace properties
-                    expect(whitespaceInput.trim().length).toBe(0);
+                    expect(whitespaceInput.trim()).toHaveLength(0);
                 }
             );
 
@@ -374,13 +374,13 @@ describe("Form Utilities", () => {
                     const hasHtmlChars = ["<", ">", "&", "'", '"'].some(char =>
                         htmlLikeInput.includes(char)
                     );
-                    expect(hasHtmlChars).toBe(true);
+                    expect(hasHtmlChars).toBeTruthy();
                 }
             );
         });
     });
 
-    describe("createInputChangeHandler", () => {
+    describe(createInputChangeHandler, () => {
         it("should create handler that sets value without validation", async ({
             task,
             annotate,
@@ -519,7 +519,7 @@ describe("Form Utilities", () => {
         });
     });
 
-    describe("createSelectChangeHandler", () => {
+    describe(createSelectChangeHandler, () => {
         it("should create handler that sets value without conversion", async ({
             task,
             annotate,
@@ -651,7 +651,7 @@ describe("Form Utilities", () => {
         });
     });
 
-    describe("createCheckboxChangeHandler", () => {
+    describe(createCheckboxChangeHandler, () => {
         it("should create handler that sets checked state to true", async ({
             task,
             annotate,
@@ -737,10 +737,10 @@ describe("Form Utilities", () => {
                 await annotate("Category: Component", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(validationPatterns.nonEmptyString("hello")).toBe(true);
-                expect(validationPatterns.nonEmptyString("a")).toBe(true);
-                expect(validationPatterns.nonEmptyString("   content   ")).toBe(
-                    true
+                expect(validationPatterns.nonEmptyString("hello")).toBeTruthy();
+                expect(validationPatterns.nonEmptyString("a")).toBeTruthy();
+                expect(validationPatterns.nonEmptyString("   content   ")).toBeTruthy(
+                    
                 );
             });
 
@@ -753,9 +753,9 @@ describe("Form Utilities", () => {
                 await annotate("Category: Component", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(validationPatterns.nonEmptyString("")).toBe(false);
-                expect(validationPatterns.nonEmptyString("   ")).toBe(false);
-                expect(validationPatterns.nonEmptyString("\t\n")).toBe(false);
+                expect(validationPatterns.nonEmptyString("")).toBeFalsy();
+                expect(validationPatterns.nonEmptyString("   ")).toBeFalsy();
+                expect(validationPatterns.nonEmptyString("\t\n")).toBeFalsy();
             });
 
             it("should handle special characters and unicode", async ({
@@ -767,9 +767,9 @@ describe("Form Utilities", () => {
                 await annotate("Category: Component", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(validationPatterns.nonEmptyString("🎉")).toBe(true);
-                expect(validationPatterns.nonEmptyString("@#$%")).toBe(true);
-                expect(validationPatterns.nonEmptyString("你好")).toBe(true);
+                expect(validationPatterns.nonEmptyString("🎉")).toBeTruthy();
+                expect(validationPatterns.nonEmptyString("@#$%")).toBeTruthy();
+                expect(validationPatterns.nonEmptyString("你好")).toBeTruthy();
             });
         });
 
@@ -785,9 +785,9 @@ describe("Form Utilities", () => {
 
                 const validator = validationPatterns.numberInRange(1, 10);
 
-                expect(validator(1)).toBe(true);
-                expect(validator(5)).toBe(true);
-                expect(validator(10)).toBe(true);
+                expect(validator(1)).toBeTruthy();
+                expect(validator(5)).toBeTruthy();
+                expect(validator(10)).toBeTruthy();
             });
 
             it("should create validator that rejects numbers outside range", async ({
@@ -801,10 +801,10 @@ describe("Form Utilities", () => {
 
                 const validator = validationPatterns.numberInRange(1, 10);
 
-                expect(validator(0)).toBe(false);
-                expect(validator(11)).toBe(false);
-                expect(validator(-5)).toBe(false);
-                expect(validator(100)).toBe(false);
+                expect(validator(0)).toBeFalsy();
+                expect(validator(11)).toBeFalsy();
+                expect(validator(-5)).toBeFalsy();
+                expect(validator(100)).toBeFalsy();
             });
 
             it("should handle negative ranges", async ({ task, annotate }) => {
@@ -815,11 +815,11 @@ describe("Form Utilities", () => {
 
                 const validator = validationPatterns.numberInRange(-10, -1);
 
-                expect(validator(-5)).toBe(true);
-                expect(validator(-10)).toBe(true);
-                expect(validator(-1)).toBe(true);
-                expect(validator(0)).toBe(false);
-                expect(validator(-11)).toBe(false);
+                expect(validator(-5)).toBeTruthy();
+                expect(validator(-10)).toBeTruthy();
+                expect(validator(-1)).toBeTruthy();
+                expect(validator(0)).toBeFalsy();
+                expect(validator(-11)).toBeFalsy();
             });
 
             it("should handle floating point numbers", async ({
@@ -833,11 +833,11 @@ describe("Form Utilities", () => {
 
                 const validator = validationPatterns.numberInRange(0.1, 0.9);
 
-                expect(validator(0.5)).toBe(true);
-                expect(validator(0.1)).toBe(true);
-                expect(validator(0.9)).toBe(true);
-                expect(validator(0.05)).toBe(false);
-                expect(validator(1)).toBe(false);
+                expect(validator(0.5)).toBeTruthy();
+                expect(validator(0.1)).toBeTruthy();
+                expect(validator(0.9)).toBeTruthy();
+                expect(validator(0.05)).toBeFalsy();
+                expect(validator(1)).toBeFalsy();
             });
 
             it("should handle single-point range", async ({
@@ -851,9 +851,9 @@ describe("Form Utilities", () => {
 
                 const validator = validationPatterns.numberInRange(5, 5);
 
-                expect(validator(5)).toBe(true);
-                expect(validator(4)).toBe(false);
-                expect(validator(6)).toBe(false);
+                expect(validator(5)).toBeTruthy();
+                expect(validator(4)).toBeFalsy();
+                expect(validator(6)).toBeFalsy();
             });
         });
 
@@ -874,10 +874,10 @@ describe("Form Utilities", () => {
                     7,
                 ]);
 
-                expect(validator(1)).toBe(true);
-                expect(validator(3)).toBe(true);
-                expect(validator(5)).toBe(true);
-                expect(validator(7)).toBe(true);
+                expect(validator(1)).toBeTruthy();
+                expect(validator(3)).toBeTruthy();
+                expect(validator(5)).toBeTruthy();
+                expect(validator(7)).toBeTruthy();
             });
 
             it("should create validator that rejects non-allowed numbers", async ({
@@ -896,11 +896,11 @@ describe("Form Utilities", () => {
                     7,
                 ]);
 
-                expect(validator(2)).toBe(false);
-                expect(validator(4)).toBe(false);
-                expect(validator(6)).toBe(false);
-                expect(validator(8)).toBe(false);
-                expect(validator(0)).toBe(false);
+                expect(validator(2)).toBeFalsy();
+                expect(validator(4)).toBeFalsy();
+                expect(validator(6)).toBeFalsy();
+                expect(validator(8)).toBeFalsy();
+                expect(validator(0)).toBeFalsy();
             });
 
             it("should handle empty array", async ({ task, annotate }) => {
@@ -911,9 +911,9 @@ describe("Form Utilities", () => {
 
                 const validator = validationPatterns.oneOfNumbers([]);
 
-                expect(validator(1)).toBe(false);
-                expect(validator(0)).toBe(false);
-                expect(validator(-1)).toBe(false);
+                expect(validator(1)).toBeFalsy();
+                expect(validator(0)).toBeFalsy();
+                expect(validator(-1)).toBeFalsy();
             });
 
             it("should handle negative numbers", async ({ task, annotate }) => {
@@ -928,11 +928,11 @@ describe("Form Utilities", () => {
                     -10,
                 ]);
 
-                expect(validator(-1)).toBe(true);
-                expect(validator(-5)).toBe(true);
-                expect(validator(-10)).toBe(true);
-                expect(validator(1)).toBe(false);
-                expect(validator(0)).toBe(false);
+                expect(validator(-1)).toBeTruthy();
+                expect(validator(-5)).toBeTruthy();
+                expect(validator(-10)).toBeTruthy();
+                expect(validator(1)).toBeFalsy();
+                expect(validator(0)).toBeFalsy();
             });
 
             it("should handle floating point numbers", async ({
@@ -950,11 +950,11 @@ describe("Form Utilities", () => {
                     3.14,
                 ]);
 
-                expect(validator(1.5)).toBe(true);
-                expect(validator(2.7)).toBe(true);
-                expect(validator(3.14)).toBe(true);
-                expect(validator(1.4)).toBe(false);
-                expect(validator(3)).toBe(false);
+                expect(validator(1.5)).toBeTruthy();
+                expect(validator(2.7)).toBeTruthy();
+                expect(validator(3.14)).toBeTruthy();
+                expect(validator(1.4)).toBeFalsy();
+                expect(validator(3)).toBeFalsy();
             });
         });
 
@@ -974,9 +974,9 @@ describe("Form Utilities", () => {
                     "blue",
                 ]);
 
-                expect(validator("red")).toBe(true);
-                expect(validator("green")).toBe(true);
-                expect(validator("blue")).toBe(true);
+                expect(validator("red")).toBeTruthy();
+                expect(validator("green")).toBeTruthy();
+                expect(validator("blue")).toBeTruthy();
             });
 
             it("should create validator that rejects non-allowed strings", async ({
@@ -994,10 +994,10 @@ describe("Form Utilities", () => {
                     "blue",
                 ]);
 
-                expect(validator("yellow")).toBe(false);
-                expect(validator("purple")).toBe(false);
-                expect(validator("")).toBe(false);
-                expect(validator("Red")).toBe(false); // Case sensitive
+                expect(validator("yellow")).toBeFalsy();
+                expect(validator("purple")).toBeFalsy();
+                expect(validator("")).toBeFalsy();
+                expect(validator("Red")).toBeFalsy(); // Case sensitive
             });
 
             it("should handle empty array", async ({ task, annotate }) => {
@@ -1008,8 +1008,8 @@ describe("Form Utilities", () => {
 
                 const validator = validationPatterns.oneOfStrings([]);
 
-                expect(validator("anything")).toBe(false);
-                expect(validator("")).toBe(false);
+                expect(validator("anything")).toBeFalsy();
+                expect(validator("")).toBeFalsy();
             });
 
             it("should handle empty strings in allowed values", async ({
@@ -1027,10 +1027,10 @@ describe("Form Utilities", () => {
                     "option2",
                 ]);
 
-                expect(validator("")).toBe(true);
-                expect(validator("option1")).toBe(true);
-                expect(validator("option2")).toBe(true);
-                expect(validator("option3")).toBe(false);
+                expect(validator("")).toBeTruthy();
+                expect(validator("option1")).toBeTruthy();
+                expect(validator("option2")).toBeTruthy();
+                expect(validator("option3")).toBeFalsy();
             });
 
             it("should handle special characters and unicode", async ({
@@ -1048,10 +1048,10 @@ describe("Form Utilities", () => {
                     "🎉",
                 ]);
 
-                expect(validator("@#$%")).toBe(true);
-                expect(validator("你好")).toBe(true);
-                expect(validator("🎉")).toBe(true);
-                expect(validator("hello")).toBe(false);
+                expect(validator("@#$%")).toBeTruthy();
+                expect(validator("你好")).toBeTruthy();
+                expect(validator("🎉")).toBeTruthy();
+                expect(validator("hello")).toBeFalsy();
             });
 
             it("should be case sensitive", async ({ task, annotate }) => {
@@ -1065,11 +1065,11 @@ describe("Form Utilities", () => {
                     "World",
                 ]);
 
-                expect(validator("Hello")).toBe(true);
-                expect(validator("World")).toBe(true);
-                expect(validator("hello")).toBe(false);
-                expect(validator("world")).toBe(false);
-                expect(validator("HELLO")).toBe(false);
+                expect(validator("Hello")).toBeTruthy();
+                expect(validator("World")).toBeTruthy();
+                expect(validator("hello")).toBeFalsy();
+                expect(validator("world")).toBeFalsy();
+                expect(validator("HELLO")).toBeFalsy();
             });
         });
     });

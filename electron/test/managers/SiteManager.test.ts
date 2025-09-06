@@ -19,7 +19,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { SiteManager } from "../../managers/SiteManager";
 import type { Site } from "../../../shared/types.js";
 
-describe("SiteManager", () => {
+describe(SiteManager, () => {
     let manager: SiteManager;
     let mockDependencies: any;
     // let mockSitesCache: any; // Currently unused
@@ -307,7 +307,7 @@ describe("SiteManager", () => {
             const result = await manager.getSites();
 
             expect(result).toEqual(dbSites);
-            expect(Array.isArray(result)).toBe(true);
+            expect(Array.isArray(result)).toBeTruthy();
         });
     });
 
@@ -352,7 +352,7 @@ describe("SiteManager", () => {
                 expect.anything(),
                 "site1"
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return false when site not found", async ({ annotate }) => {
@@ -386,7 +386,7 @@ describe("SiteManager", () => {
 
             const result = await manager.removeSite("nonexistent");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -508,7 +508,7 @@ describe("SiteManager", () => {
 
             const result = await manager.removeMonitor("site1", "mon1");
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
     });
     describe("updateSitesCache", () => {
@@ -725,7 +725,7 @@ describe("SiteManager", () => {
                 const result =
                     await manager["executeMonitorDeletion"]("monitor1");
 
-                expect(result).toBe(true);
+                expect(result).toBeTruthy();
                 expect(
                     manager["repositories"].monitorRepository.delete
                 ).toHaveBeenCalledWith("monitor1");
@@ -739,7 +739,7 @@ describe("SiteManager", () => {
                 const result =
                     await manager["executeMonitorDeletion"]("monitor1");
 
-                expect(result).toBe(false);
+                expect(result).toBeFalsy();
             });
             it("should handle monitor deletion errors", async () => {
                 vi.spyOn(

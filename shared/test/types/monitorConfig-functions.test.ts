@@ -14,7 +14,7 @@ import {
 } from "../../types/monitorConfig";
 
 describe("shared/types/monitorConfig function coverage", () => {
-    describe("isHttpMonitorConfig", () => {
+    describe(isHttpMonitorConfig, () => {
         it("should return true for valid HttpMonitorConfig", async ({
             task,
             annotate,
@@ -40,7 +40,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 headers: {},
             };
 
-            expect(isHttpMonitorConfig(validConfig)).toBe(true);
+            expect(isHttpMonitorConfig(validConfig)).toBeTruthy();
         });
 
         it("should return true for minimal valid HttpMonitorConfig", async ({
@@ -66,7 +66,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 expectedStatusCodes: [],
             };
 
-            expect(isHttpMonitorConfig(minimalConfig)).toBe(true);
+            expect(isHttpMonitorConfig(minimalConfig)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -75,7 +75,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isHttpMonitorConfig(null as any)).toBe(false);
+            expect(isHttpMonitorConfig(null as any)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -84,7 +84,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isHttpMonitorConfig(undefined as any)).toBe(false);
+            expect(isHttpMonitorConfig(undefined as any)).toBeFalsy();
         });
 
         it("should return false for primitive types", async ({
@@ -96,9 +96,9 @@ describe("shared/types/monitorConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isHttpMonitorConfig("string" as any)).toBe(false);
-            expect(isHttpMonitorConfig(123 as any)).toBe(false);
-            expect(isHttpMonitorConfig(true as any)).toBe(false);
+            expect(isHttpMonitorConfig("string" as any)).toBeFalsy();
+            expect(isHttpMonitorConfig(123 as any)).toBeFalsy();
+            expect(isHttpMonitorConfig(true as any)).toBeFalsy();
         });
 
         it("should return false for object missing required properties", async ({
@@ -115,7 +115,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 // missing other required properties
             };
 
-            expect(isHttpMonitorConfig(incompleteConfig as any)).toBe(false);
+            expect(isHttpMonitorConfig(incompleteConfig as any)).toBeFalsy();
         });
 
         it("should return false for object with wrong property types", async ({
@@ -142,11 +142,11 @@ describe("shared/types/monitorConfig function coverage", () => {
                 bodyNotMatch: "",
             };
 
-            expect(isHttpMonitorConfig(invalidConfig as any)).toBe(false);
+            expect(isHttpMonitorConfig(invalidConfig as any)).toBeFalsy();
         });
     });
 
-    describe("isPingMonitorConfig", () => {
+    describe(isPingMonitorConfig, () => {
         it("should return true for valid PingMonitorConfig", async ({
             task,
             annotate,
@@ -170,7 +170,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 packetSize: 64,
             };
 
-            expect(isPingMonitorConfig(validConfig)).toBe(true);
+            expect(isPingMonitorConfig(validConfig)).toBeTruthy();
         });
 
         it("should return true for minimal valid PingMonitorConfig", async ({
@@ -196,7 +196,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 packetSize: 32,
             };
 
-            expect(isPingMonitorConfig(minimalConfig)).toBe(true);
+            expect(isPingMonitorConfig(minimalConfig)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -205,7 +205,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPingMonitorConfig(null as any)).toBe(false);
+            expect(isPingMonitorConfig(null as any)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -214,7 +214,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPingMonitorConfig(undefined as any)).toBe(false);
+            expect(isPingMonitorConfig(undefined as any)).toBeFalsy();
         });
 
         it("should return false for primitive types", async ({
@@ -226,9 +226,9 @@ describe("shared/types/monitorConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPingMonitorConfig("string" as any)).toBe(false);
-            expect(isPingMonitorConfig(123 as any)).toBe(false);
-            expect(isPingMonitorConfig(true as any)).toBe(false);
+            expect(isPingMonitorConfig("string" as any)).toBeFalsy();
+            expect(isPingMonitorConfig(123 as any)).toBeFalsy();
+            expect(isPingMonitorConfig(true as any)).toBeFalsy();
         });
 
         it("should return false for object missing required properties", async ({
@@ -245,7 +245,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 // missing other required properties
             };
 
-            expect(isPingMonitorConfig(incompleteConfig as any)).toBe(false);
+            expect(isPingMonitorConfig(incompleteConfig as any)).toBeFalsy();
         });
 
         it("should return false for object with wrong property types", async ({
@@ -266,11 +266,11 @@ describe("shared/types/monitorConfig function coverage", () => {
                 expectedResponseTime: 100,
             };
 
-            expect(isPingMonitorConfig(invalidConfig as any)).toBe(false);
+            expect(isPingMonitorConfig(invalidConfig as any)).toBeFalsy();
         });
     });
 
-    describe("isPortMonitorConfig", () => {
+    describe(isPortMonitorConfig, () => {
         it("should return true for valid PortMonitorConfig", async ({
             task,
             annotate,
@@ -293,7 +293,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 connectionTimeout: 10_000,
             };
 
-            expect(isPortMonitorConfig(validConfig)).toBe(true);
+            expect(isPortMonitorConfig(validConfig)).toBeTruthy();
         });
 
         it("should return true for different protocol", async ({
@@ -322,7 +322,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 },
             };
 
-            expect(isPortMonitorConfig(udpConfig)).toBe(true);
+            expect(isPortMonitorConfig(udpConfig)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -331,7 +331,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPortMonitorConfig(null as any)).toBe(false);
+            expect(isPortMonitorConfig(null as any)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -340,7 +340,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPortMonitorConfig(undefined as any)).toBe(false);
+            expect(isPortMonitorConfig(undefined as any)).toBeFalsy();
         });
 
         it("should return false for primitive types", async ({
@@ -352,9 +352,9 @@ describe("shared/types/monitorConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPortMonitorConfig("string" as any)).toBe(false);
-            expect(isPortMonitorConfig(123 as any)).toBe(false);
-            expect(isPortMonitorConfig(true as any)).toBe(false);
+            expect(isPortMonitorConfig("string" as any)).toBeFalsy();
+            expect(isPortMonitorConfig(123 as any)).toBeFalsy();
+            expect(isPortMonitorConfig(true as any)).toBeFalsy();
         });
 
         it("should return false for object missing required properties", async ({
@@ -372,7 +372,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 // missing other required properties
             };
 
-            expect(isPortMonitorConfig(incompleteConfig as any)).toBe(false);
+            expect(isPortMonitorConfig(incompleteConfig as any)).toBeFalsy();
         });
 
         it("should return false for object with wrong property types", async ({
@@ -392,7 +392,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 protocol: "tcp",
             };
 
-            expect(isPortMonitorConfig(invalidConfig as any)).toBe(false);
+            expect(isPortMonitorConfig(invalidConfig as any)).toBeFalsy();
         });
 
         it("should handle edge case ports", async ({ task, annotate }) => {
@@ -414,7 +414,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 connectionTimeout: 5000,
             };
 
-            expect(isPortMonitorConfig(edgeCaseConfig)).toBe(true);
+            expect(isPortMonitorConfig(edgeCaseConfig)).toBeTruthy();
         });
     });
 
@@ -470,17 +470,17 @@ describe("shared/types/monitorConfig function coverage", () => {
             };
 
             // Each config should only match its own type
-            expect(isHttpMonitorConfig(httpConfig)).toBe(true);
-            expect(isPingMonitorConfig(httpConfig)).toBe(false);
-            expect(isPortMonitorConfig(httpConfig)).toBe(false);
+            expect(isHttpMonitorConfig(httpConfig)).toBeTruthy();
+            expect(isPingMonitorConfig(httpConfig)).toBeFalsy();
+            expect(isPortMonitorConfig(httpConfig)).toBeFalsy();
 
-            expect(isHttpMonitorConfig(pingConfig)).toBe(false);
-            expect(isPingMonitorConfig(pingConfig)).toBe(true);
-            expect(isPortMonitorConfig(pingConfig)).toBe(false);
+            expect(isHttpMonitorConfig(pingConfig)).toBeFalsy();
+            expect(isPingMonitorConfig(pingConfig)).toBeTruthy();
+            expect(isPortMonitorConfig(pingConfig)).toBeFalsy();
 
-            expect(isHttpMonitorConfig(portConfig)).toBe(false);
-            expect(isPingMonitorConfig(portConfig)).toBe(false);
-            expect(isPortMonitorConfig(portConfig)).toBe(true);
+            expect(isHttpMonitorConfig(portConfig)).toBeFalsy();
+            expect(isPingMonitorConfig(portConfig)).toBeFalsy();
+            expect(isPortMonitorConfig(portConfig)).toBeTruthy();
         });
 
         it("should handle complex real-world configurations", async ({
@@ -520,7 +520,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 },
             };
 
-            expect(isHttpMonitorConfig(complexHttpConfig)).toBe(true);
+            expect(isHttpMonitorConfig(complexHttpConfig)).toBeTruthy();
         });
 
         it("should handle boundary values", async ({ task, annotate }) => {
@@ -544,7 +544,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 packetSize: 1,
             };
 
-            expect(isPingMonitorConfig(extremeConfig)).toBe(true);
+            expect(isPingMonitorConfig(extremeConfig)).toBeTruthy();
         });
     });
 });

@@ -469,7 +469,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setUrl("https://example.com"); // Valid URL for HTTP
                 });
 
-                expect(result.current.isFormValid()).toBe(false);
+                expect(result.current.isFormValid()).toBeFalsy();
             });
 
             it("should be invalid when name is only whitespace in new mode", async ({
@@ -489,7 +489,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setUrl("https://example.com");
                 });
 
-                expect(result.current.isFormValid()).toBe(false);
+                expect(result.current.isFormValid()).toBeFalsy();
             });
 
             it("should be valid with proper name and required fields in new mode", async ({
@@ -509,7 +509,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setUrl("https://example.com");
                 });
 
-                expect(result.current.isFormValid()).toBe(true);
+                expect(result.current.isFormValid()).toBeTruthy();
             });
         });
 
@@ -531,7 +531,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setUrl("https://example.com");
                 });
 
-                expect(result.current.isFormValid()).toBe(false);
+                expect(result.current.isFormValid()).toBeFalsy();
             });
 
             it("should be valid with selected existing site and required fields", async ({
@@ -551,7 +551,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setUrl("https://example.com");
                 });
 
-                expect(result.current.isFormValid()).toBe(true);
+                expect(result.current.isFormValid()).toBeTruthy();
             });
         });
 
@@ -574,7 +574,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setUrl(""); // Required field empty
                 });
 
-                expect(result.current.isFormValid()).toBe(false);
+                expect(result.current.isFormValid()).toBeFalsy();
             });
 
             it("should be invalid when required HTTP URL field is whitespace", async ({
@@ -595,7 +595,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setUrl("   "); // Whitespace only
                 });
 
-                expect(result.current.isFormValid()).toBe(false);
+                expect(result.current.isFormValid()).toBeFalsy();
             });
 
             it("should be invalid when required port monitor host field is empty", async ({
@@ -617,7 +617,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setPort("8080");
                 });
 
-                expect(result.current.isFormValid()).toBe(false);
+                expect(result.current.isFormValid()).toBeFalsy();
             });
 
             it("should be invalid when required port monitor port field is empty", async ({
@@ -639,7 +639,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setPort(""); // Required field empty
                 });
 
-                expect(result.current.isFormValid()).toBe(false);
+                expect(result.current.isFormValid()).toBeFalsy();
             });
 
             it("should be valid when all required port monitor fields are filled", async ({
@@ -661,7 +661,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setPort("8080");
                 });
 
-                expect(result.current.isFormValid()).toBe(true);
+                expect(result.current.isFormValid()).toBeTruthy();
             });
 
             it("should be invalid when required ping monitor host field is empty", async ({
@@ -682,7 +682,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setHost(""); // Required field empty
                 });
 
-                expect(result.current.isFormValid()).toBe(false);
+                expect(result.current.isFormValid()).toBeFalsy();
             });
 
             it("should be valid when all required ping monitor fields are filled", async ({
@@ -703,7 +703,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setHost("example.com");
                 });
 
-                expect(result.current.isFormValid()).toBe(true);
+                expect(result.current.isFormValid()).toBeTruthy();
             });
         });
 
@@ -738,7 +738,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     // Host is not required in this configuration
                 });
 
-                expect(result.current.isFormValid()).toBe(true);
+                expect(result.current.isFormValid()).toBeTruthy();
             });
 
             it("should handle monitor types with no required fields", async ({
@@ -761,7 +761,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setName("My Site");
                 });
 
-                expect(result.current.isFormValid()).toBe(true);
+                expect(result.current.isFormValid()).toBeTruthy();
             });
         });
     });
@@ -853,7 +853,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 result.current.setName("My Site");
             });
 
-            expect(result.current.isFormValid()).toBe(true);
+            expect(result.current.isFormValid()).toBeTruthy();
         });
 
         it("should handle getFields with fields having no name property", async ({
@@ -879,7 +879,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             });
 
             // Should be invalid because the empty field name is required but can't be satisfied
-            expect(result.current.isFormValid()).toBe(false);
+            expect(result.current.isFormValid()).toBeFalsy();
         });
 
         it("should handle validation with undefined field values", async ({
@@ -998,21 +998,21 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 result.current.setUrl("https://example.com");
             });
 
-            expect(result.current.isFormValid()).toBe(true);
+            expect(result.current.isFormValid()).toBeTruthy();
 
             // Make it invalid
             act(() => {
                 result.current.setName("");
             });
 
-            expect(result.current.isFormValid()).toBe(false);
+            expect(result.current.isFormValid()).toBeFalsy();
 
             // Make it valid again
             act(() => {
                 result.current.setName("My Site");
             });
 
-            expect(result.current.isFormValid()).toBe(true);
+            expect(result.current.isFormValid()).toBeTruthy();
         });
 
         it("should handle getFields function dependency changes", async ({
@@ -1033,7 +1033,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 result.current.setUrl("https://example.com");
             });
 
-            expect(result.current.isFormValid()).toBe(true);
+            expect(result.current.isFormValid()).toBeTruthy();
 
             // Change getFields mock to require different fields
             mockGetFields.mockImplementation(() => [
@@ -1045,7 +1045,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             rerender();
 
             // Now validation should use new requirements
-            expect(result.current.isFormValid()).toBe(false);
+            expect(result.current.isFormValid()).toBeFalsy();
 
             // Satisfy new requirements
             act(() => {
@@ -1053,7 +1053,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 result.current.setPort("8080");
             });
 
-            expect(result.current.isFormValid()).toBe(true);
+            expect(result.current.isFormValid()).toBeTruthy();
         });
     });
 

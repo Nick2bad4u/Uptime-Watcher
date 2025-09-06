@@ -27,7 +27,7 @@ vi.mock("../../../utils/logger", () => ({
     },
 }));
 
-describe("AutoUpdaterService", () => {
+describe(AutoUpdaterService, () => {
     let autoUpdaterService: AutoUpdaterService;
     let mockAutoUpdater: any;
     let statusCallback: any;

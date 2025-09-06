@@ -149,7 +149,7 @@ describe("Backend Constants", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Event Processing", "type");
 
-            expect(Object.isFrozen(RETRY_BACKOFF)).toBe(true);
+            expect(Object.isFrozen(RETRY_BACKOFF)).toBeTruthy();
         });
 
         it("should have reasonable retry timing values", async ({
@@ -320,7 +320,7 @@ describe("Backend Constants", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Event Processing", "type");
 
-            expect(Object.isFrozen(CACHE_TTL)).toBe(true);
+            expect(Object.isFrozen(CACHE_TTL)).toBeTruthy();
         });
 
         it("should have reasonable TTL values for different cache types", async ({
@@ -451,7 +451,7 @@ describe("Backend Constants", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Event Processing", "type");
 
-            expect(Object.isFrozen(CACHE_SIZE_LIMITS)).toBe(true);
+            expect(Object.isFrozen(CACHE_SIZE_LIMITS)).toBeTruthy();
         });
 
         it("should have reasonable size limits for memory efficiency", async ({
@@ -608,9 +608,9 @@ describe("Backend Constants", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(Object.isFrozen(RETRY_BACKOFF)).toBe(true);
-            expect(Object.isFrozen(CACHE_TTL)).toBe(true);
-            expect(Object.isFrozen(CACHE_SIZE_LIMITS)).toBe(true);
+            expect(Object.isFrozen(RETRY_BACKOFF)).toBeTruthy();
+            expect(Object.isFrozen(CACHE_TTL)).toBeTruthy();
+            expect(Object.isFrozen(CACHE_SIZE_LIMITS)).toBeTruthy();
         });
 
         it("should not allow modification of frozen objects", async ({

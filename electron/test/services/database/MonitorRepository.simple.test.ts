@@ -112,7 +112,7 @@ describe("MonitorRepository Coverage Tests", () => {
             });
             // Just testing that we can call the method - types will be validated at runtime
             await repository.create("site-identifier", {} as any);
-            expect(true).toBe(true); // Test passes if no error thrown
+            expect(true).toBeTruthy(); // Test passes if no error thrown
         } catch (error) {
             // Database operations might fail in test environment
             expect(error).toBeInstanceOf(Error);
@@ -136,7 +136,7 @@ describe("MonitorRepository Coverage Tests", () => {
                 databaseService: mockDatabaseService,
             });
             await repository.findByIdentifier("test-id");
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -159,7 +159,7 @@ describe("MonitorRepository Coverage Tests", () => {
                 databaseService: mockDatabaseService,
             });
             await repository.findBySiteIdentifier("site-id");
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -179,7 +179,7 @@ describe("MonitorRepository Coverage Tests", () => {
                 databaseService: mockDatabaseService,
             });
             await repository.update("test-id", { status: "up" });
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -199,7 +199,7 @@ describe("MonitorRepository Coverage Tests", () => {
                 databaseService: mockDatabaseService,
             });
             await repository.delete("test-id");
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -222,7 +222,7 @@ describe("MonitorRepository Coverage Tests", () => {
                 databaseService: mockDatabaseService,
             });
             await repository.getAllMonitorIds();
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -243,7 +243,7 @@ describe("MonitorRepository Coverage Tests", () => {
             });
             // Just testing that we can call the method - types will be validated at runtime
             await repository.bulkCreate("site-identifier", [] as any);
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -266,7 +266,7 @@ describe("MonitorRepository Coverage Tests", () => {
                 databaseService: mockDatabaseService,
             });
             await repository.clearActiveOperations("test-id");
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -286,7 +286,7 @@ describe("MonitorRepository Coverage Tests", () => {
                 databaseService: mockDatabaseService,
             });
             await repository.deleteAll();
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -309,7 +309,7 @@ describe("MonitorRepository Coverage Tests", () => {
                 databaseService: mockDatabaseService,
             });
             await repository.deleteBySiteIdentifier("site-id");
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -361,7 +361,7 @@ describe("MonitorRepository Coverage Tests", () => {
             await repository.findBySiteIdentifier("site-id");
             await repository.getAllMonitorIds();
 
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -392,7 +392,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
             // This should exercise the internal method
             repository.clearActiveOperationsInternal(mockDb as any, "test-id");
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }

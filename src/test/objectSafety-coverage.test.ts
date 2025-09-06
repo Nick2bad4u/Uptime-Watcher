@@ -50,19 +50,19 @@ describe("objectSafety Direct Function Coverage", () => {
 
     it("should call typedObjectEntries function", () => {
         const entries = typedObjectEntries(testObj);
-        expect(Array.isArray(entries)).toBe(true);
-        expect(entries.length > 0).toBe(true);
+        expect(Array.isArray(entries)).toBeTruthy();
+        expect(entries.length).toBeGreaterThan(0);
     });
 
     it("should call typedObjectKeys function", () => {
         const keys = typedObjectKeys(testObj);
-        expect(Array.isArray(keys)).toBe(true);
-        expect(keys.includes("name" as keyof typeof testObj)).toBe(true);
+        expect(Array.isArray(keys)).toBeTruthy();
+        expect(keys).toContain("name" as keyof typeof testObj);
     });
 
     it("should call typedObjectValues function", () => {
         const values = typedObjectValues(testObj);
-        expect(Array.isArray(values)).toBe(true);
-        expect(values.includes("test")).toBe(true);
+        expect(Array.isArray(values)).toBeTruthy();
+        expect(values).toContain("test");
     });
 });

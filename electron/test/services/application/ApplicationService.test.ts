@@ -155,7 +155,7 @@ vi.mock("../../electronUtils", () => ({
     isDev: mockIsDev,
 }));
 
-describe("ApplicationService", () => {
+describe(ApplicationService, () => {
     let applicationService: ApplicationService;
 
     beforeEach(() => {
@@ -245,7 +245,7 @@ describe("ApplicationService", () => {
         });
         it("BrowserWindow tests disabled - focusing on business logic only", () => {
             // Following user instruction: "WE DO NOT NEED TO TEST LOGGER/DEV TOOLS IN TESTS"
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 });

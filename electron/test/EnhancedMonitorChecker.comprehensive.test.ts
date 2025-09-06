@@ -28,7 +28,7 @@ function createTestSite(overrides: Partial<Site> = {}): Site {
     };
 }
 
-describe("EnhancedMonitorChecker", () => {
+describe(EnhancedMonitorChecker, () => {
     let checker: EnhancedMonitorChecker;
     let mockConfig: any;
 
@@ -190,7 +190,7 @@ describe("EnhancedMonitorChecker", () => {
         // The actual implementation may return different results based on service availability
         // Result can be either a StatusUpdate object or undefined depending on implementation
         // Just verify the method completes without throwing errors
-        expect(typeof result === "object" || result === undefined).toBe(true);
+        expect(typeof result === "object" || result === undefined).toBeTruthy();
     });
 
     it("should handle startMonitoring", async ({ task, annotate }) => {

@@ -23,7 +23,7 @@ vi.mock("../../../services/logger", () => ({
     },
 }));
 
-describe("DynamicMonitorFields", () => {
+describe(DynamicMonitorFields, () => {
     const defaultProps = {
         monitorType: "http",
         values: { url: "https://example.com", timeout: 5000 },

@@ -43,7 +43,7 @@ describe("Retry Utilities", () => {
         vi.useRealTimers();
     });
 
-    describe("withRetry", () => {
+    describe(withRetry, () => {
         describe("Success scenarios", () => {
             it("should return result when operation succeeds on first try", async ({
                 task,
@@ -108,11 +108,11 @@ describe("Retry Utilities", () => {
                     3,
                 ]);
 
-                expect(await withRetry(numberOperation)).toBe(42);
-                expect(await withRetry(objectOperation)).toEqual({
+                await expect(withRetry(numberOperation)).resolves.toBe(42);
+                await expect(withRetry(objectOperation)).resolves.toEqual({
                     key: "value",
                 });
-                expect(await withRetry(arrayOperation)).toEqual([
+                await expect(withRetry(arrayOperation)).resolves.toEqual([
                     1,
                     2,
                     3,
@@ -492,7 +492,7 @@ describe("Retry Utilities", () => {
         });
     });
 
-    describe("withDbRetry", () => {
+    describe(withDbRetry, () => {
         describe("Function behavior", () => {
             it("should use optimized database settings", async ({
                 task,
@@ -885,7 +885,7 @@ describe("Retry Utilities", () => {
             const results = await Promise.all(promises);
 
             expect(results).toHaveLength(100);
-            expect(results.every((r, i) => r === `success-${i}`)).toBe(true);
+            expect(results.every((r, i) => r === `success-${i}`)).toBeTruthy();
         });
 
         it("should handle rapid-fire operations efficiently", async ({

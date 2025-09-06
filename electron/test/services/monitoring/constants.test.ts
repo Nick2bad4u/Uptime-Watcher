@@ -328,7 +328,7 @@ describe("Monitoring Service Constants", () => {
                 expect(
                     Number.isFinite(value),
                     `Constant ${name} should be a finite number`
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(value, `Constant ${name} should not be NaN`).not.toBe(
                     Number.NaN
                 );
@@ -375,17 +375,17 @@ describe("Monitoring Service Constants", () => {
             );
 
             // These should be integers (counts, steps, etc.)
-            expect(Number.isInteger(DEFAULT_RETRY_ATTEMPTS)).toBe(true);
-            expect(Number.isInteger(MAX_MIGRATION_STEPS)).toBe(true);
-            expect(Number.isInteger(MAX_LOG_DATA_LENGTH)).toBe(true);
-            expect(Number.isInteger(SECONDS_TO_MS_MULTIPLIER)).toBe(true);
+            expect(Number.isInteger(DEFAULT_RETRY_ATTEMPTS)).toBeTruthy();
+            expect(Number.isInteger(MAX_MIGRATION_STEPS)).toBeTruthy();
+            expect(Number.isInteger(MAX_LOG_DATA_LENGTH)).toBeTruthy();
+            expect(Number.isInteger(SECONDS_TO_MS_MULTIPLIER)).toBeTruthy();
 
             // Time intervals should also be integers (milliseconds/seconds)
-            expect(Number.isInteger(MIN_CHECK_INTERVAL)).toBe(true);
-            expect(Number.isInteger(DEFAULT_MONITOR_TIMEOUT_SECONDS)).toBe(
-                true
+            expect(Number.isInteger(MIN_CHECK_INTERVAL)).toBeTruthy();
+            expect(Number.isInteger(DEFAULT_MONITOR_TIMEOUT_SECONDS)).toBeTruthy(
+                
             );
-            expect(Number.isInteger(MONITOR_TIMEOUT_BUFFER_MS)).toBe(true);
+            expect(Number.isInteger(MONITOR_TIMEOUT_BUFFER_MS)).toBeTruthy();
         });
     });
 

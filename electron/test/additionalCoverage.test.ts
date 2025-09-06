@@ -180,11 +180,11 @@ describe("Additional Coverage Tests", () => {
                 2,
                 3,
             ];
-            expect(testArray.length).toBe(3);
+            expect(testArray).toHaveLength(3);
 
             // Test object handling
             const testObj = {};
-            expect(Object.keys(testObj).length).toBe(0);
+            expect(Object.keys(testObj)).toHaveLength(0);
         });
     });
     describe("Async Coverage", () => {

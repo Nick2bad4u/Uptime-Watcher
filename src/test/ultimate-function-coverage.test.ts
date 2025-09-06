@@ -52,11 +52,11 @@ describe("Ultimate Function Coverage - Error Handling", () => {
         expect(formatErrorMessage({})).toBe("Unknown error");
 
         // Test isKnownErrorMessage
-        expect(isKnownErrorMessage("Network error occurred")).toBe(true);
-        expect(isKnownErrorMessage("Request timeout")).toBe(true);
-        expect(isKnownErrorMessage("Connection refused by server")).toBe(true);
-        expect(isKnownErrorMessage("Unknown error type")).toBe(false);
-        expect(isKnownErrorMessage("")).toBe(false);
+        expect(isKnownErrorMessage("Network error occurred")).toBeTruthy();
+        expect(isKnownErrorMessage("Request timeout")).toBeTruthy();
+        expect(isKnownErrorMessage("Connection refused by server")).toBeTruthy();
+        expect(isKnownErrorMessage("Unknown error type")).toBeFalsy();
+        expect(isKnownErrorMessage("")).toBeFalsy();
     });
 });
 
@@ -128,20 +128,20 @@ describe("Ultimate Function Coverage - Chart Configuration", () => {
             );
 
         // Test hasPlugins
-        expect(hasPlugins({ plugins: [] })).toBe(true);
-        expect(hasPlugins({ plugins: { legend: {} } })).toBe(true);
-        expect(hasPlugins({ other: "value" })).toBe(false);
-        expect(hasPlugins(null)).toBe(false);
-        expect(hasPlugins(undefined)).toBe(false);
-        expect(hasPlugins("string")).toBe(false);
+        expect(hasPlugins({ plugins: [] })).toBeTruthy();
+        expect(hasPlugins({ plugins: { legend: {} } })).toBeTruthy();
+        expect(hasPlugins({ other: "value" })).toBeFalsy();
+        expect(hasPlugins(null)).toBeFalsy();
+        expect(hasPlugins(undefined)).toBeFalsy();
+        expect(hasPlugins("string")).toBeFalsy();
 
         // Test hasScales
-        expect(hasScales({ scales: {} })).toBe(true);
-        expect(hasScales({ scales: { x: {}, y: {} } })).toBe(true);
-        expect(hasScales({ other: "value" })).toBe(false);
-        expect(hasScales(null)).toBe(false);
-        expect(hasScales(undefined)).toBe(false);
-        expect(hasScales(123)).toBe(false);
+        expect(hasScales({ scales: {} })).toBeTruthy();
+        expect(hasScales({ scales: { x: {}, y: {} } })).toBeTruthy();
+        expect(hasScales({ other: "value" })).toBeFalsy();
+        expect(hasScales(null)).toBeFalsy();
+        expect(hasScales(undefined)).toBeFalsy();
+        expect(hasScales(123)).toBeFalsy();
     });
 });
 
@@ -170,27 +170,27 @@ describe("Ultimate Function Coverage - Validation Functions", () => {
             Number.isInteger(port) && port >= 1 && port <= 65_535;
 
         // Test isValidHost
-        expect(isValidHost("example.com")).toBe(true);
-        expect(isValidHost("sub.example.com")).toBe(true);
-        expect(isValidHost("localhost")).toBe(true);
-        expect(isValidHost("test123.com")).toBe(true);
-        expect(isValidHost("")).toBe(false);
-        expect(isValidHost("  ")).toBe(false);
-        expect(isValidHost("invalid..com")).toBe(false);
-        expect(isValidHost(".invalid.com")).toBe(false);
-        expect(isValidHost("invalid.com.")).toBe(false);
+        expect(isValidHost("example.com")).toBeTruthy();
+        expect(isValidHost("sub.example.com")).toBeTruthy();
+        expect(isValidHost("localhost")).toBeTruthy();
+        expect(isValidHost("test123.com")).toBeTruthy();
+        expect(isValidHost("")).toBeFalsy();
+        expect(isValidHost("  ")).toBeFalsy();
+        expect(isValidHost("invalid..com")).toBeFalsy();
+        expect(isValidHost(".invalid.com")).toBeFalsy();
+        expect(isValidHost("invalid.com.")).toBeFalsy();
 
         // Test isValidPort
-        expect(isValidPort(80)).toBe(true);
-        expect(isValidPort(443)).toBe(true);
-        expect(isValidPort(8080)).toBe(true);
-        expect(isValidPort(1)).toBe(true);
-        expect(isValidPort(65_535)).toBe(true);
-        expect(isValidPort(0)).toBe(false);
-        expect(isValidPort(-1)).toBe(false);
-        expect(isValidPort(65_536)).toBe(false);
-        expect(isValidPort(3.14)).toBe(false);
-        expect(isValidPort(Number.NaN)).toBe(false);
+        expect(isValidPort(80)).toBeTruthy();
+        expect(isValidPort(443)).toBeTruthy();
+        expect(isValidPort(8080)).toBeTruthy();
+        expect(isValidPort(1)).toBeTruthy();
+        expect(isValidPort(65_535)).toBeTruthy();
+        expect(isValidPort(0)).toBeFalsy();
+        expect(isValidPort(-1)).toBeFalsy();
+        expect(isValidPort(65_536)).toBeFalsy();
+        expect(isValidPort(3.14)).toBeFalsy();
+        expect(isValidPort(Number.NaN)).toBeFalsy();
     });
 
     it("should test monitor validation functions", async ({
@@ -274,13 +274,13 @@ describe("Ultimate Function Coverage - Validation Functions", () => {
         ]);
 
         // Test validateMonitorType
-        expect(validateMonitorType("http")).toBe(true);
-        expect(validateMonitorType("https")).toBe(true);
-        expect(validateMonitorType("tcp")).toBe(true);
-        expect(validateMonitorType("ping")).toBe(true);
-        expect(validateMonitorType("ftp")).toBe(false);
-        expect(validateMonitorType("invalid")).toBe(false);
-        expect(validateMonitorType("")).toBe(false);
+        expect(validateMonitorType("http")).toBeTruthy();
+        expect(validateMonitorType("https")).toBeTruthy();
+        expect(validateMonitorType("tcp")).toBeTruthy();
+        expect(validateMonitorType("ping")).toBeTruthy();
+        expect(validateMonitorType("ftp")).toBeFalsy();
+        expect(validateMonitorType("invalid")).toBeFalsy();
+        expect(validateMonitorType("")).toBeFalsy();
     });
 
     it("should test site validation functions", async ({ task, annotate }) => {
@@ -443,12 +443,12 @@ describe("Ultimate Function Coverage - Cache Utilities", () => {
         expect(CacheKeys.ANALYTICS_DATA("daily")).toBe("analytics_daily");
 
         // Test isStandardizedCacheKey
-        expect(isStandardizedCacheKey("monitor_status_123")).toBe(true);
-        expect(isStandardizedCacheKey("site_status_abc")).toBe(true);
-        expect(isStandardizedCacheKey("user_settings")).toBe(true);
-        expect(isStandardizedCacheKey("analytics_daily")).toBe(true);
-        expect(isStandardizedCacheKey("invalid_key")).toBe(false);
-        expect(isStandardizedCacheKey("")).toBe(false);
+        expect(isStandardizedCacheKey("monitor_status_123")).toBeTruthy();
+        expect(isStandardizedCacheKey("site_status_abc")).toBeTruthy();
+        expect(isStandardizedCacheKey("user_settings")).toBeTruthy();
+        expect(isStandardizedCacheKey("analytics_daily")).toBeTruthy();
+        expect(isStandardizedCacheKey("invalid_key")).toBeFalsy();
+        expect(isStandardizedCacheKey("")).toBeFalsy();
 
         // Test parseCacheKey
         expect(parseCacheKey("monitor_status_123")).toEqual({

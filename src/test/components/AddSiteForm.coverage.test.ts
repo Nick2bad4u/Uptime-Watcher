@@ -20,11 +20,11 @@ describe("AddSiteForm Component Coverage Tests", () => {
             ];
 
             for (const mode of validModes) {
-                expect(validModes.includes(mode)).toBe(true);
+                expect(validModes).toContain(mode);
             }
 
             for (const mode of invalidModes) {
-                expect(validModes.includes(mode)).toBe(false);
+                expect(validModes).not.toContain(mode);
             }
         });
 
@@ -36,9 +36,9 @@ describe("AddSiteForm Component Coverage Tests", () => {
 
             const baseMonitorTypes = new Set(["http", "port"]);
 
-            expect(baseMonitorTypes.has("http")).toBe(true);
-            expect(baseMonitorTypes.has("port")).toBe(true);
-            expect(baseMonitorTypes.has("invalid")).toBe(false);
+            expect(baseMonitorTypes.has("http")).toBeTruthy();
+            expect(baseMonitorTypes.has("port")).toBeTruthy();
+            expect(baseMonitorTypes.has("invalid")).toBeFalsy();
         });
 
         it("should handle numeric validation", async ({ task, annotate }) => {
@@ -133,7 +133,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
             };
 
             expect(typeof errorStore.clearError).toBe("function");
-            expect(errorStore.isLoading).toBe(false);
+            expect(errorStore.isLoading).toBeFalsy();
             expect(errorStore.lastError).toBeNull();
         });
 
@@ -154,7 +154,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
 
             expect(typeof sitesStore.addMonitorToSite).toBe("function");
             expect(typeof sitesStore.createSite).toBe("function");
-            expect(Array.isArray(sitesStore.sites)).toBe(true);
+            expect(Array.isArray(sitesStore.sites)).toBeTruthy();
             expect(sitesStore.sites).toHaveLength(2);
         });
     });
@@ -192,8 +192,8 @@ describe("AddSiteForm Component Coverage Tests", () => {
                 ],
             };
 
-            expect(monitorTypes.isLoading).toBe(false);
-            expect(Array.isArray(monitorTypes.options)).toBe(true);
+            expect(monitorTypes.isLoading).toBeFalsy();
+            expect(Array.isArray(monitorTypes.options)).toBeTruthy();
             expect(monitorTypes.options).toHaveLength(2);
 
             for (const option of monitorTypes.options) {
@@ -362,7 +362,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
                 60_000,
             ];
 
-            expect(Array.isArray(CHECK_INTERVALS)).toBe(true);
+            expect(Array.isArray(CHECK_INTERVALS)).toBeTruthy();
             expect(CHECK_INTERVALS.length).toBeGreaterThan(0);
 
             for (const interval of CHECK_INTERVALS) {
@@ -441,7 +441,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
             const callback = vi.fn();
 
             expect(typeof callback).toBe("function");
-            expect(Array.isArray(dependencies)).toBe(true);
+            expect(Array.isArray(dependencies)).toBeTruthy();
         });
     });
 

@@ -70,7 +70,7 @@ vi.mock("../../common/MonitorUiComponents", () => ({
     ),
 }));
 
-describe("HistoryTab", () => {
+describe(HistoryTab, () => {
     const mockFormatFullTimestamp = vi.fn((timestamp: number) =>
         new Date(timestamp).toISOString()
     );

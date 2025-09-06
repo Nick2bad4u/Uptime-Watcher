@@ -36,12 +36,12 @@ describe("Function Coverage Validation", () => {
         const nodeEnvValue = environmentModule.getEnvVar("NODE_ENV");
         expect(
             typeof nodeEnvValue === "string" || nodeEnvValue === undefined
-        ).toBe(true);
+        ).toBeTruthy();
 
         const codecovValue = environmentModule.getEnvVar("CODECOV_TOKEN");
         expect(
             typeof codecovValue === "string" || codecovValue === undefined
-        ).toBe(true);
+        ).toBeTruthy();
 
         // Test environment detection functions
         const environment = environmentModule.getEnvironment();
@@ -68,17 +68,17 @@ describe("Function Coverage Validation", () => {
 
         // Validate consistent behavior between related functions
         if (isDev) {
-            expect(isProd).toBe(false);
+            expect(isProd).toBeFalsy();
         }
 
         if (isProd) {
-            expect(isDev).toBe(false);
+            expect(isDev).toBeFalsy();
         }
 
         // In Node.js environment, we expect isNode to be true and isBrowser to be false
         if (typeof process !== "undefined") {
-            expect(isNode).toBe(true);
-            expect(isBrowser).toBe(false);
+            expect(isNode).toBeTruthy();
+            expect(isBrowser).toBeFalsy();
         }
     });
 });

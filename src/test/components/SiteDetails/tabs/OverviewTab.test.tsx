@@ -179,7 +179,7 @@ vi.mock("../../../../utils/time", () => ({
     }),
 }));
 
-describe("OverviewTab", () => {
+describe(OverviewTab, () => {
     const mockFormatResponseTime = vi.fn((time: number) => `${time}ms`);
     const mockHandleIntervalChange = vi.fn();
     const mockHandleRemoveMonitor = vi.fn();

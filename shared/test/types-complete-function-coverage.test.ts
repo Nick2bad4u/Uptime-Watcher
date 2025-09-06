@@ -31,45 +31,45 @@ describe("Shared Types - Complete Function Coverage", () => {
             expect(typeof typesModule.isComputedSiteStatus).toBe("function");
 
             // Test all valid computed site status values
-            expect(typesModule.isComputedSiteStatus("mixed")).toBe(true);
-            expect(typesModule.isComputedSiteStatus("unknown")).toBe(true);
+            expect(typesModule.isComputedSiteStatus("mixed")).toBeTruthy();
+            expect(typesModule.isComputedSiteStatus("unknown")).toBeTruthy();
 
             // Test invalid values
-            expect(typesModule.isComputedSiteStatus("up")).toBe(false);
-            expect(typesModule.isComputedSiteStatus("down")).toBe(false);
-            expect(typesModule.isComputedSiteStatus("pending")).toBe(false);
-            expect(typesModule.isComputedSiteStatus("invalid")).toBe(false);
-            expect(typesModule.isComputedSiteStatus("")).toBe(false);
+            expect(typesModule.isComputedSiteStatus("up")).toBeFalsy();
+            expect(typesModule.isComputedSiteStatus("down")).toBeFalsy();
+            expect(typesModule.isComputedSiteStatus("pending")).toBeFalsy();
+            expect(typesModule.isComputedSiteStatus("invalid")).toBeFalsy();
+            expect(typesModule.isComputedSiteStatus("")).toBeFalsy();
 
             // Test isMonitorStatus function
             expect(typeof typesModule.isMonitorStatus).toBe("function");
 
             // Test all valid monitor status values
-            expect(typesModule.isMonitorStatus("up")).toBe(true);
-            expect(typesModule.isMonitorStatus("down")).toBe(true);
-            expect(typesModule.isMonitorStatus("pending")).toBe(true);
-            expect(typesModule.isMonitorStatus("paused")).toBe(true);
+            expect(typesModule.isMonitorStatus("up")).toBeTruthy();
+            expect(typesModule.isMonitorStatus("down")).toBeTruthy();
+            expect(typesModule.isMonitorStatus("pending")).toBeTruthy();
+            expect(typesModule.isMonitorStatus("paused")).toBeTruthy();
 
             // Test invalid values
-            expect(typesModule.isMonitorStatus("mixed")).toBe(false);
-            expect(typesModule.isMonitorStatus("unknown")).toBe(false);
-            expect(typesModule.isMonitorStatus("invalid")).toBe(false);
-            expect(typesModule.isMonitorStatus("")).toBe(false);
+            expect(typesModule.isMonitorStatus("mixed")).toBeFalsy();
+            expect(typesModule.isMonitorStatus("unknown")).toBeFalsy();
+            expect(typesModule.isMonitorStatus("invalid")).toBeFalsy();
+            expect(typesModule.isMonitorStatus("")).toBeFalsy();
 
             // Test isSiteStatus function
             expect(typeof typesModule.isSiteStatus).toBe("function");
 
             // Test all valid site status values (includes both monitor statuses and computed)
-            expect(typesModule.isSiteStatus("up")).toBe(true);
-            expect(typesModule.isSiteStatus("down")).toBe(true);
-            expect(typesModule.isSiteStatus("pending")).toBe(true);
-            expect(typesModule.isSiteStatus("paused")).toBe(true);
-            expect(typesModule.isSiteStatus("mixed")).toBe(true);
-            expect(typesModule.isSiteStatus("unknown")).toBe(true);
+            expect(typesModule.isSiteStatus("up")).toBeTruthy();
+            expect(typesModule.isSiteStatus("down")).toBeTruthy();
+            expect(typesModule.isSiteStatus("pending")).toBeTruthy();
+            expect(typesModule.isSiteStatus("paused")).toBeTruthy();
+            expect(typesModule.isSiteStatus("mixed")).toBeTruthy();
+            expect(typesModule.isSiteStatus("unknown")).toBeTruthy();
 
             // Test invalid values
-            expect(typesModule.isSiteStatus("invalid")).toBe(false);
-            expect(typesModule.isSiteStatus("")).toBe(false);
+            expect(typesModule.isSiteStatus("invalid")).toBeFalsy();
+            expect(typesModule.isSiteStatus("")).toBeFalsy();
 
             // Test validateMonitor function
             expect(typeof typesModule.validateMonitor).toBe("function");
@@ -87,7 +87,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                 history: [] as any[],
                 activeOperations: ["operation-1", "operation-2"],
             };
-            expect(typesModule.validateMonitor(validMonitor)).toBe(true);
+            expect(typesModule.validateMonitor(validMonitor)).toBeTruthy();
 
             // Test valid monitor without optional fields
             const minimalValidMonitor = {
@@ -101,17 +101,17 @@ describe("Shared Types - Complete Function Coverage", () => {
                 retryAttempts: 1,
                 history: [],
             };
-            expect(typesModule.validateMonitor(minimalValidMonitor)).toBe(true);
+            expect(typesModule.validateMonitor(minimalValidMonitor)).toBeTruthy();
 
             // Test invalid monitors
-            expect(typesModule.validateMonitor(null as any)).toBe(false);
-            expect(typesModule.validateMonitor(undefined as any)).toBe(false);
-            expect(typesModule.validateMonitor({} as any)).toBe(false);
-            expect(typesModule.validateMonitor("string" as any)).toBe(false);
-            expect(typesModule.validateMonitor(123 as any)).toBe(false);
+            expect(typesModule.validateMonitor(null as any)).toBeFalsy();
+            expect(typesModule.validateMonitor(undefined as any)).toBeFalsy();
+            expect(typesModule.validateMonitor({} as any)).toBeFalsy();
+            expect(typesModule.validateMonitor("string" as any)).toBeFalsy();
+            expect(typesModule.validateMonitor(123 as any)).toBeFalsy();
 
             // Test monitor with missing required fields
-            expect(typesModule.validateMonitor({ id: "test" })).toBe(false);
+            expect(typesModule.validateMonitor({ id: "test" })).toBeFalsy();
             expect(
                 typesModule.validateMonitor({
                     id: "test",
@@ -119,7 +119,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     status: "up",
                     monitoring: true,
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             // Test monitor with invalid field types
             expect(
@@ -134,7 +134,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     retryAttempts: 3,
                     history: [],
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 typesModule.validateMonitor({
@@ -148,7 +148,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     retryAttempts: 3,
                     history: [],
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 typesModule.validateMonitor({
@@ -162,7 +162,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     retryAttempts: 3,
                     history: [],
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 typesModule.validateMonitor({
@@ -176,7 +176,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     retryAttempts: 3,
                     history: [],
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 typesModule.validateMonitor({
@@ -190,7 +190,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     retryAttempts: 3,
                     history: [],
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 typesModule.validateMonitor({
@@ -204,7 +204,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     retryAttempts: 3,
                     history: "not-array" as any, // should be array
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             // Test monitor with invalid activeOperations
             expect(
@@ -220,7 +220,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     history: [],
                     activeOperations: "not-array" as any, // should be array or undefined
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 typesModule.validateMonitor({
@@ -235,7 +235,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     history: [],
                     activeOperations: [123 as any, "valid"], // all elements should be strings
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 typesModule.validateMonitor({
@@ -250,7 +250,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     history: [],
                     activeOperations: ["", "valid"], // empty strings should be invalid
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 typesModule.validateMonitor({
@@ -265,7 +265,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     history: [],
                     activeOperations: ["   ", "valid"], // whitespace-only strings should be invalid
                 })
-            ).toBe(false);
+            ).toBeFalsy();
         });
 
         it("should test constants and type definitions", async ({
@@ -281,7 +281,7 @@ describe("Shared Types - Complete Function Coverage", () => {
             await annotate("Type: Initialization", "type");
 
             // Test BASE_MONITOR_TYPES constant
-            expect(Array.isArray(typesModule.BASE_MONITOR_TYPES)).toBe(true);
+            expect(Array.isArray(typesModule.BASE_MONITOR_TYPES)).toBeTruthy();
             expect(typesModule.BASE_MONITOR_TYPES).toContain("http");
             expect(typesModule.BASE_MONITOR_TYPES).toContain("port");
             expect(typesModule.BASE_MONITOR_TYPES).toContain("ping");
@@ -326,7 +326,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     retryAttempts: 3,
                     history: [],
                 };
-                expect(typesModule.validateMonitor(testMonitor)).toBe(true);
+                expect(typesModule.validateMonitor(testMonitor)).toBeTruthy();
             }
         });
 
@@ -346,8 +346,8 @@ describe("Shared Types - Complete Function Coverage", () => {
             const statusValues = Object.values(typesModule.MONITOR_STATUS);
 
             for (const status of statusValues) {
-                expect(typesModule.isMonitorStatus(status)).toBe(true);
-                expect(typesModule.isSiteStatus(status)).toBe(true);
+                expect(typesModule.isMonitorStatus(status)).toBeTruthy();
+                expect(typesModule.isSiteStatus(status)).toBeTruthy();
 
                 // Test in validateMonitor
                 const testMonitor = {
@@ -361,7 +361,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     retryAttempts: 3,
                     history: [],
                 };
-                expect(typesModule.validateMonitor(testMonitor)).toBe(true);
+                expect(typesModule.validateMonitor(testMonitor)).toBeTruthy();
             }
         });
 
@@ -389,11 +389,11 @@ describe("Shared Types - Complete Function Coverage", () => {
             ];
 
             for (const input of nonStringInputs) {
-                expect(typesModule.isComputedSiteStatus(input as any)).toBe(
-                    false
+                expect(typesModule.isComputedSiteStatus(input as any)).toBeFalsy(
+                    
                 );
-                expect(typesModule.isMonitorStatus(input as any)).toBe(false);
-                expect(typesModule.isSiteStatus(input as any)).toBe(false);
+                expect(typesModule.isMonitorStatus(input as any)).toBeFalsy();
+                expect(typesModule.isSiteStatus(input as any)).toBeFalsy();
             }
 
             // Test validateMonitor with various invalid inputs
@@ -408,7 +408,7 @@ describe("Shared Types - Complete Function Coverage", () => {
             ];
 
             for (const input of invalidInputs) {
-                expect(typesModule.validateMonitor(input as any)).toBe(false);
+                expect(typesModule.validateMonitor(input as any)).toBeFalsy();
             }
 
             // Test validateMonitor with partial objects
@@ -432,7 +432,7 @@ describe("Shared Types - Complete Function Coverage", () => {
             ];
 
             for (const obj of partialObjects) {
-                expect(typesModule.validateMonitor(obj)).toBe(false);
+                expect(typesModule.validateMonitor(obj)).toBeFalsy();
             }
         });
     });

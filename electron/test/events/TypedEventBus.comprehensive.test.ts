@@ -296,7 +296,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(eventBus.getDiagnostics().middlewareCount).toBe(2);
 
             const removed = eventBus.removeMiddleware(mockMiddleware);
-            expect(removed).toBe(true);
+            expect(removed).toBeTruthy();
             expect(eventBus.getDiagnostics().middlewareCount).toBe(1);
         });
         it("should return false when removing non-existent middleware", async ({
@@ -313,7 +313,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             const nonExistentMiddleware = vi.fn();
 
             const removed = eventBus.removeMiddleware(nonExistentMiddleware);
-            expect(removed).toBe(false);
+            expect(removed).toBeFalsy();
             expect(eventBus.getDiagnostics().middlewareCount).toBe(1);
         });
         it("should clear all middleware", async ({ task, annotate }) => {
@@ -437,7 +437,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             await eventBus.emitTyped("array-event", testArray);
 
             const receivedData = mockListener.mock.calls[0]?.[0];
-            expect(Array.isArray(receivedData)).toBe(true);
+            expect(Array.isArray(receivedData)).toBeTruthy();
             expect(receivedData).toEqual([
                 1,
                 2,
@@ -450,7 +450,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             // Verify _meta is non-enumerable
             expect(
                 Object.propertyIsEnumerable.call(receivedData, "_meta")
-            ).toBe(false);
+            ).toBeFalsy();
         });
         it("should handle complex objects correctly", async () => {
             eventBus.onTyped("complex-object", mockListener);
@@ -649,7 +649,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             await eventBus.emitTyped("array-event", sparseArray);
 
             const receivedData = mockListener.mock.calls[0]?.[0];
-            expect(receivedData.length).toBe(11);
+            expect(receivedData).toHaveLength(11);
             expect(receivedData[0]).toBe(1);
             expect(receivedData[1]).toBe(2);
             expect(receivedData[2]).toBe(3);
@@ -758,8 +758,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             await eventBus.emitTyped("array-event", []);
 
             const receivedData = mockListener.mock.calls[0]?.[0];
-            expect(Array.isArray(receivedData)).toBe(true);
-            expect(receivedData.length).toBe(0);
+            expect(Array.isArray(receivedData)).toBeTruthy();
+            expect(receivedData).toHaveLength(0);
             expect(receivedData._meta).toEqual(expect.any(Object));
         });
     });
@@ -869,8 +869,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             await eventBus.emitTyped("array-event", arr);
 
             const receivedData = mockListener.mock.calls[0]?.[0];
-            expect(Array.isArray(receivedData)).toBe(true);
-            expect(receivedData.length).toBe(3);
+            expect(Array.isArray(receivedData)).toBeTruthy();
+            expect(receivedData).toHaveLength(3);
             expect(receivedData._meta).toEqual(expect.any(Object));
         });
         it("should handle middleware that throws non-Error objects", async () => {
@@ -1033,12 +1033,12 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(eventBus.getDiagnostics().middlewareCount).toBe(3);
 
             const removed = eventBus.removeMiddleware(duplicateMiddleware);
-            expect(removed).toBe(true);
+            expect(removed).toBeTruthy();
             expect(eventBus.getDiagnostics().middlewareCount).toBe(2);
 
             // Should only remove first occurrence
             const secondRemove = eventBus.removeMiddleware(duplicateMiddleware);
-            expect(secondRemove).toBe(true);
+            expect(secondRemove).toBeTruthy();
             expect(eventBus.getDiagnostics().middlewareCount).toBe(1);
         });
         it("should handle middleware processing with empty middleware array", async () => {

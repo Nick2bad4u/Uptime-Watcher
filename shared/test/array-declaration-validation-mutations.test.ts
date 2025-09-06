@@ -181,7 +181,7 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             const successResult = validateWithWarnings({ name: "test" });
             expect(successResult.warnings).toEqual([]);
             expect(successResult.warnings).toHaveLength(0);
-            expect(successResult.success).toBe(true);
+            expect(successResult.success).toBeTruthy();
 
             // Test error processing
             const testIssues = [
@@ -245,7 +245,7 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             expect(successResult.warnings).not.toEqual([]);
             expect(successResult.warnings).toContain("Stryker was here");
             expect(successResult.warnings).toHaveLength(1);
-            expect(successResult.success).toBe(true);
+            expect(successResult.success).toBeTruthy();
 
             // Test mutated error processing
             const testIssues = [
@@ -324,7 +324,7 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
 
             expect(result.warnings).toContain("Consider using HTTPS");
             expect(result.warnings).toHaveLength(1);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
         });
 
         it("should fail if errors array is mutated to be empty", async ({

@@ -56,7 +56,7 @@ const createMockTheme = (isDark = false) => ({
     toggleTheme: vi.fn(),
 });
 
-describe("SiteList", () => {
+describe(SiteList, () => {
     const mockSites: Site[] = [
         {
             identifier: "site-1",

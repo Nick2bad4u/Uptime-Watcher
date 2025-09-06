@@ -35,7 +35,7 @@ vi.mock("react-chartjs-2", () => ({
 }));
 
 describe("ChartComponents", () => {
-    describe("ResponseTimeChart", () => {
+    describe(ResponseTimeChart, () => {
         const mockResponseTimeData: ResponseTimeChartData = {
             labels: [
                 "10:00",
@@ -233,7 +233,7 @@ describe("ChartComponents", () => {
         });
     });
 
-    describe("UptimeChart", () => {
+    describe(UptimeChart, () => {
         const mockUptimeData: UptimeChartData = {
             labels: ["Uptime", "Downtime"],
             datasets: [
@@ -397,7 +397,7 @@ describe("ChartComponents", () => {
         });
     });
 
-    describe("StatusChart", () => {
+    describe(StatusChart, () => {
         const mockStatusData: StatusBarChartData = {
             labels: [
                 "Up",

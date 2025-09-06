@@ -32,7 +32,7 @@ function createMockMonitor(overrides: Partial<Monitor> = {}): Monitor {
 }
 
 describe("monitorTitleFormatters", () => {
-    describe("formatTitleSuffix", () => {
+    describe(formatTitleSuffix, () => {
         describe("HTTP monitor type", () => {
             it("should return formatted URL suffix for HTTP monitor with URL", async ({
                 task,
@@ -675,7 +675,7 @@ describe("monitorTitleFormatters", () => {
         });
     });
 
-    describe("getTitleSuffixFormatter", () => {
+    describe(getTitleSuffixFormatter, () => {
         it("should return HTTP formatter for 'http' type", async ({
             task,
             annotate,
@@ -781,7 +781,7 @@ describe("monitorTitleFormatters", () => {
         });
     });
 
-    describe("registerTitleSuffixFormatter", () => {
+    describe(registerTitleSuffixFormatter, () => {
         beforeEach(() => {
             // Clean up any custom formatters registered in tests
             // This is done by overriding with undefined, which effectively removes them

@@ -65,8 +65,8 @@ describe("Function Coverage Validation", () => {
         expect(formData.DEFAULT_FORM_DATA.port.type).toBe("port");
 
         // Verify basic functionality
-        expect(formData.isHttpFormData(httpFormData)).toBe(true);
-        expect(formData.isPingFormData(pingFormData)).toBe(true);
-        expect(formData.isPortFormData(portFormData)).toBe(true);
+        expect(formData.isHttpFormData(httpFormData)).toBeTruthy();
+        expect(formData.isPingFormData(pingFormData)).toBeTruthy();
+        expect(formData.isPortFormData(portFormData)).toBeTruthy();
     });
 });

@@ -152,7 +152,7 @@ describe("FormData Types", () => {
 
             expect(httpWithOptions.method).toBe("POST");
             expect(httpWithOptions.expectedStatusCode).toBe(201);
-            expect(httpWithOptions.followRedirects).toBe(false);
+            expect(httpWithOptions.followRedirects).toBeFalsy();
             expect(httpWithOptions.headers).toBeDefined();
             expect(httpWithOptions.auth).toBeDefined();
             expect(httpWithOptions.expectedContent).toBe("success");
@@ -422,8 +422,8 @@ describe("FormData Types", () => {
                 retryAttempts: 3,
             };
 
-            expect(isHttpFormData(httpData)).toBe(true);
-            expect(isHttpFormData(pingData)).toBe(false);
+            expect(isHttpFormData(httpData)).toBeTruthy();
+            expect(isHttpFormData(pingData)).toBeFalsy();
 
             if (isHttpFormData(httpData)) {
                 expect(httpData.url).toBeDefined();
@@ -453,8 +453,8 @@ describe("FormData Types", () => {
                 retryAttempts: 3,
             };
 
-            expect(isPingFormData(pingData)).toBe(true);
-            expect(isPingFormData(portData)).toBe(false);
+            expect(isPingFormData(pingData)).toBeTruthy();
+            expect(isPingFormData(portData)).toBeFalsy();
 
             if (isPingFormData(pingData)) {
                 expect(pingData.host).toBeDefined();
@@ -484,8 +484,8 @@ describe("FormData Types", () => {
                 retryAttempts: 3,
             };
 
-            expect(isPortFormData(portData)).toBe(true);
-            expect(isPortFormData(httpData)).toBe(false);
+            expect(isPortFormData(portData)).toBeTruthy();
+            expect(isPortFormData(httpData)).toBeFalsy();
 
             if (isPortFormData(portData)) {
                 expect(portData.port).toBeDefined();
@@ -506,10 +506,10 @@ describe("FormData Types", () => {
             expect(httpDefaults.checkInterval).toBe(300_000);
             expect(httpDefaults.timeout).toBe(30_000);
             expect(httpDefaults.retryAttempts).toBe(3);
-            expect(httpDefaults.enabled).toBe(true);
+            expect(httpDefaults.enabled).toBeTruthy();
             expect(httpDefaults.method).toBe("GET");
             expect(httpDefaults.expectedStatusCode).toBe(200);
-            expect(httpDefaults.followRedirects).toBe(true);
+            expect(httpDefaults.followRedirects).toBeTruthy();
         });
 
         it("should provide ping defaults", async ({ task, annotate }) => {
@@ -524,7 +524,7 @@ describe("FormData Types", () => {
             expect(pingDefaults.checkInterval).toBe(300_000);
             expect(pingDefaults.timeout).toBe(30_000);
             expect(pingDefaults.retryAttempts).toBe(3);
-            expect(pingDefaults.enabled).toBe(true);
+            expect(pingDefaults.enabled).toBeTruthy();
             expect(pingDefaults.packetCount).toBe(4);
             expect(pingDefaults.packetSize).toBe(32);
             expect(pingDefaults.maxPacketLoss).toBe(0);
@@ -542,7 +542,7 @@ describe("FormData Types", () => {
             expect(portDefaults.checkInterval).toBe(300_000);
             expect(portDefaults.timeout).toBe(30_000);
             expect(portDefaults.retryAttempts).toBe(3);
-            expect(portDefaults.enabled).toBe(true);
+            expect(portDefaults.enabled).toBeTruthy();
             expect(portDefaults.port).toBe(80);
             expect(portDefaults.connectionTimeout).toBe(10_000);
         });
@@ -662,7 +662,7 @@ describe("FormData Types", () => {
 
             expect(validation.fieldName).toBe("checkInterval");
             expect(validation.fieldType).toBe("number");
-            expect(validation.required).toBe(true);
+            expect(validation.required).toBeTruthy();
             expect(validation.min).toBe(60_000);
             expect(validation.max).toBe(3_600_000);
             expect(typeof validation.validator).toBe("function");

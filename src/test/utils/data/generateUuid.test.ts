@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { generateUuid } from "../../../utils/data/generateUuid";
 
-describe("generateUuid", () => {
+describe(generateUuid, () => {
     beforeEach(() => {
         vi.restoreAllMocks();
     });
@@ -112,7 +112,7 @@ describe("generateUuid", () => {
             const result = generateUuid();
 
             expect(result).toMatch(/^site-[\da-z]+-\d+$/);
-            expect(result.startsWith("site-")).toBe(true);
+            expect(result.startsWith("site-")).toBeTruthy();
 
             // Restore original
             globalThis.crypto = originalCrypto;
@@ -132,7 +132,7 @@ describe("generateUuid", () => {
             const result = generateUuid();
 
             expect(result).toMatch(/^site-[\da-z]+-\d+$/);
-            expect(result.startsWith("site-")).toBe(true);
+            expect(result.startsWith("site-")).toBeTruthy();
         });
 
         it("should use fallback when crypto.randomUUID is not a function", async ({
@@ -151,7 +151,7 @@ describe("generateUuid", () => {
             const result = generateUuid();
 
             expect(result).toMatch(/^site-[\da-z]+-\d+$/);
-            expect(result.startsWith("site-")).toBe(true);
+            expect(result.startsWith("site-")).toBeTruthy();
         });
 
         it("should generate unique fallback UUIDs on multiple calls", async ({
@@ -198,7 +198,7 @@ describe("generateUuid", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = generateUuid();
-            expect(result.startsWith("site-")).toBe(true);
+            expect(result.startsWith("site-")).toBeTruthy();
         });
 
         it("should contain timestamp", async ({ task, annotate }) => {
@@ -274,7 +274,7 @@ describe("generateUuid", () => {
             const result = generateUuid();
 
             expect(result).toMatch(/^site-[\da-z]+-9{13}$/);
-            expect(result.includes("9999999999999")).toBe(true);
+            expect(result).toContain("9999999999999");
 
             mockNow.mockRestore();
             globalThis.crypto = originalCrypto;
@@ -297,7 +297,7 @@ describe("generateUuid", () => {
             const result = generateUuid();
 
             expect(result).toMatch(/^site-[\da-z]+-0$/);
-            expect(result.endsWith("-0")).toBe(true);
+            expect(result.endsWith("-0")).toBeTruthy();
 
             mockNow.mockRestore();
             globalThis.crypto = originalCrypto;
@@ -387,8 +387,8 @@ describe("generateUuid", () => {
             const id = generateUuid();
             const filename = `temp-${id}.tmp`;
 
-            expect(filename.startsWith("temp-")).toBe(true);
-            expect(filename.endsWith(".tmp")).toBe(true);
+            expect(filename.startsWith("temp-")).toBeTruthy();
+            expect(filename.endsWith(".tmp")).toBeTruthy();
             expect(filename.length).toBeGreaterThan(10);
         });
 

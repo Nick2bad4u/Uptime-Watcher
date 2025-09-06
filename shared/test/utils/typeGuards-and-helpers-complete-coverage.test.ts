@@ -37,7 +37,7 @@ import {
 } from "../../utils/typeHelpers";
 
 describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
-    describe("isObject", () => {
+    describe(isObject, () => {
         it("should return true for plain objects", async ({
             task,
             annotate,
@@ -50,9 +50,9 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isObject({})).toBe(true);
-            expect(isObject({ key: "value" })).toBe(true);
-            expect(isObject(Object.create(null))).toBe(true);
+            expect(isObject({})).toBeTruthy();
+            expect(isObject({ key: "value" })).toBeTruthy();
+            expect(isObject(Object.create(null))).toBeTruthy();
         });
 
         it("should return false for non-objects", async ({
@@ -67,16 +67,16 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isObject(null)).toBe(false);
-            expect(isObject(undefined)).toBe(false);
-            expect(isObject("string")).toBe(false);
-            expect(isObject(123)).toBe(false);
-            expect(isObject([])).toBe(false);
-            expect(isObject(() => {})).toBe(false);
+            expect(isObject(null)).toBeFalsy();
+            expect(isObject(undefined)).toBeFalsy();
+            expect(isObject("string")).toBeFalsy();
+            expect(isObject(123)).toBeFalsy();
+            expect(isObject([])).toBeFalsy();
+            expect(isObject(() => {})).toBeFalsy();
         });
     });
 
-    describe("isNumber", () => {
+    describe(isNumber, () => {
         it("should return true for valid numbers", async ({
             task,
             annotate,
@@ -89,10 +89,10 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNumber(42)).toBe(true);
-            expect(isNumber(0)).toBe(true);
-            expect(isNumber(-123)).toBe(true);
-            expect(isNumber(3.14)).toBe(true);
+            expect(isNumber(42)).toBeTruthy();
+            expect(isNumber(0)).toBeTruthy();
+            expect(isNumber(-123)).toBeTruthy();
+            expect(isNumber(3.14)).toBeTruthy();
         });
 
         it("should return false for NaN and non-numbers", async ({
@@ -107,15 +107,15 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNumber(Number.NaN)).toBe(false);
-            expect(isNumber("123")).toBe(false);
-            expect(isNumber(null)).toBe(false);
-            expect(isNumber(undefined)).toBe(false);
-            expect(isNumber({})).toBe(false);
+            expect(isNumber(Number.NaN)).toBeFalsy();
+            expect(isNumber("123")).toBeFalsy();
+            expect(isNumber(null)).toBeFalsy();
+            expect(isNumber(undefined)).toBeFalsy();
+            expect(isNumber({})).toBeFalsy();
         });
     });
 
-    describe("hasProperties", () => {
+    describe(hasProperties, () => {
         it("should return true when object has all specified properties", async ({
             task,
             annotate,
@@ -129,9 +129,9 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const obj = { a: 1, b: 2, c: 3 };
-            expect(hasProperties(obj, ["a", "b"])).toBe(true);
-            expect(hasProperties(obj, ["a"])).toBe(true);
-            expect(hasProperties(obj, [])).toBe(true);
+            expect(hasProperties(obj, ["a", "b"])).toBeTruthy();
+            expect(hasProperties(obj, ["a"])).toBeTruthy();
+            expect(hasProperties(obj, [])).toBeTruthy();
         });
 
         it("should return false when object is missing properties", async ({
@@ -147,8 +147,8 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const obj = { a: 1, b: 2 };
-            expect(hasProperties(obj, ["a", "c"])).toBe(false);
-            expect(hasProperties(obj, ["d"])).toBe(false);
+            expect(hasProperties(obj, ["a", "c"])).toBeFalsy();
+            expect(hasProperties(obj, ["d"])).toBeFalsy();
         });
 
         it("should return false for non-objects", async ({
@@ -163,13 +163,13 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(hasProperties(null, ["a"])).toBe(false);
-            expect(hasProperties("string", ["length"])).toBe(false);
-            expect(hasProperties(123, ["toString"])).toBe(false);
+            expect(hasProperties(null, ["a"])).toBeFalsy();
+            expect(hasProperties("string", ["length"])).toBeFalsy();
+            expect(hasProperties(123, ["toString"])).toBeFalsy();
         });
     });
 
-    describe("hasProperty", () => {
+    describe(hasProperty, () => {
         it("should return true when object has specified property", async ({
             task,
             annotate,
@@ -183,8 +183,8 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const obj = { a: 1, b: undefined };
-            expect(hasProperty(obj, "a")).toBe(true);
-            expect(hasProperty(obj, "b")).toBe(true); // undefined values still count as having the property
+            expect(hasProperty(obj, "a")).toBeTruthy();
+            expect(hasProperty(obj, "b")).toBeTruthy(); // undefined values still count as having the property
         });
 
         it("should return false when object doesn't have property", async ({
@@ -200,7 +200,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const obj = { a: 1 };
-            expect(hasProperty(obj, "b")).toBe(false);
+            expect(hasProperty(obj, "b")).toBeFalsy();
         });
 
         it("should return false for non-objects", async ({
@@ -215,13 +215,13 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(hasProperty(null, "a")).toBe(false);
-            expect(hasProperty(undefined, "a")).toBe(false);
-            expect(hasProperty("string", "length")).toBe(false);
+            expect(hasProperty(null, "a")).toBeFalsy();
+            expect(hasProperty(undefined, "a")).toBeFalsy();
+            expect(hasProperty("string", "length")).toBeFalsy();
         });
     });
 
-    describe("isArray", () => {
+    describe(isArray, () => {
         it("should return true for arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -231,15 +231,15 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isArray([])).toBe(true);
+            expect(isArray([])).toBeTruthy();
             expect(
                 isArray([
                     1,
                     2,
                     3,
                 ])
-            ).toBe(true);
-            expect(isArray(Array.from({ length: 5 }))).toBe(true);
+            ).toBeTruthy();
+            expect(isArray(Array.from({ length: 5 }))).toBeTruthy();
         });
 
         it("should return false for non-arrays", async ({ task, annotate }) => {
@@ -251,10 +251,10 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isArray({})).toBe(false);
-            expect(isArray("string")).toBe(false);
-            expect(isArray(null)).toBe(false);
-            expect(isArray(undefined)).toBe(false);
+            expect(isArray({})).toBeFalsy();
+            expect(isArray("string")).toBeFalsy();
+            expect(isArray(null)).toBeFalsy();
+            expect(isArray(undefined)).toBeFalsy();
         });
 
         it("should validate array item types when itemValidator provided", async ({
@@ -278,7 +278,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
                     ],
                     isString
                 )
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 isArray(
                     [
@@ -288,12 +288,12 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
                     ],
                     isString
                 )
-            ).toBe(false);
-            expect(isArray([], isString)).toBe(true); // empty array is valid
+            ).toBeFalsy();
+            expect(isArray([], isString)).toBeTruthy(); // empty array is valid
         });
     });
 
-    describe("isBoolean", () => {
+    describe(isBoolean, () => {
         it("should return true for booleans", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -303,8 +303,8 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isBoolean(true)).toBe(true);
-            expect(isBoolean(false)).toBe(true);
+            expect(isBoolean(true)).toBeTruthy();
+            expect(isBoolean(false)).toBeTruthy();
         });
 
         it("should return false for non-booleans", async ({
@@ -319,15 +319,15 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isBoolean("true")).toBe(false);
-            expect(isBoolean(1)).toBe(false);
-            expect(isBoolean(0)).toBe(false);
-            expect(isBoolean(null)).toBe(false);
-            expect(isBoolean(undefined)).toBe(false);
+            expect(isBoolean("true")).toBeFalsy();
+            expect(isBoolean(1)).toBeFalsy();
+            expect(isBoolean(0)).toBeFalsy();
+            expect(isBoolean(null)).toBeFalsy();
+            expect(isBoolean(undefined)).toBeFalsy();
         });
     });
 
-    describe("isDate", () => {
+    describe(isDate, () => {
         it("should return true for valid dates", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -337,8 +337,8 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isDate(new Date())).toBe(true);
-            expect(isDate(new Date("2023-01-01"))).toBe(true);
+            expect(isDate(new Date())).toBeTruthy();
+            expect(isDate(new Date("2023-01-01"))).toBeTruthy();
         });
 
         it("should return false for invalid dates and non-dates", async ({
@@ -353,14 +353,14 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isDate(new Date("invalid"))).toBe(false);
-            expect(isDate("2023-01-01")).toBe(false);
-            expect(isDate(null)).toBe(false);
-            expect(isDate({})).toBe(false);
+            expect(isDate(new Date("invalid"))).toBeFalsy();
+            expect(isDate("2023-01-01")).toBeFalsy();
+            expect(isDate(null)).toBeFalsy();
+            expect(isDate({})).toBeFalsy();
         });
     });
 
-    describe("isError", () => {
+    describe(isError, () => {
         it("should return true for Error instances", async ({
             task,
             annotate,
@@ -373,9 +373,9 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(isError(new Error("test"))).toBe(true);
-            expect(isError(new TypeError("test"))).toBe(true);
-            expect(isError(new RangeError("test"))).toBe(true);
+            expect(isError(new Error("test"))).toBeTruthy();
+            expect(isError(new TypeError("test"))).toBeTruthy();
+            expect(isError(new RangeError("test"))).toBeTruthy();
         });
 
         it("should return false for non-errors", async ({ task, annotate }) => {
@@ -387,13 +387,13 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(isError("error")).toBe(false);
-            expect(isError({ message: "error" })).toBe(false);
-            expect(isError(null)).toBe(false);
+            expect(isError("error")).toBeFalsy();
+            expect(isError({ message: "error" })).toBeFalsy();
+            expect(isError(null)).toBeFalsy();
         });
     });
 
-    describe("isFiniteNumber", () => {
+    describe(isFiniteNumber, () => {
         it("should return true for finite numbers", async ({
             task,
             annotate,
@@ -406,10 +406,10 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
-            expect(isFiniteNumber(42)).toBe(true);
-            expect(isFiniteNumber(0)).toBe(true);
-            expect(isFiniteNumber(-123)).toBe(true);
-            expect(isFiniteNumber(3.14)).toBe(true);
+            expect(isFiniteNumber(42)).toBeTruthy();
+            expect(isFiniteNumber(0)).toBeTruthy();
+            expect(isFiniteNumber(-123)).toBeTruthy();
+            expect(isFiniteNumber(3.14)).toBeTruthy();
         });
 
         it("should return false for infinite numbers and non-numbers", async ({
@@ -424,15 +424,15 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
-            expect(isFiniteNumber(Infinity)).toBe(false);
-            expect(isFiniteNumber(-Infinity)).toBe(false);
-            expect(isFiniteNumber(Number.NaN)).toBe(false);
-            expect(isFiniteNumber("123")).toBe(false);
-            expect(isFiniteNumber(null)).toBe(false);
+            expect(isFiniteNumber(Infinity)).toBeFalsy();
+            expect(isFiniteNumber(-Infinity)).toBeFalsy();
+            expect(isFiniteNumber(Number.NaN)).toBeFalsy();
+            expect(isFiniteNumber("123")).toBeFalsy();
+            expect(isFiniteNumber(null)).toBeFalsy();
         });
     });
 
-    describe("isFunction", () => {
+    describe(isFunction, () => {
         it("should return true for functions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -442,10 +442,10 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isFunction(() => {})).toBe(true);
-            expect(isFunction(function testFunction() {})).toBe(true);
-            expect(isFunction(Date)).toBe(true);
-            expect(isFunction(console.log)).toBe(true);
+            expect(isFunction(() => {})).toBeTruthy();
+            expect(isFunction(function testFunction() {})).toBeTruthy();
+            expect(isFunction(Date)).toBeTruthy();
+            expect(isFunction(console.log)).toBeTruthy();
         });
 
         it("should return false for non-functions", async ({
@@ -460,14 +460,14 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isFunction({})).toBe(false);
-            expect(isFunction("function")).toBe(false);
-            expect(isFunction(null)).toBe(false);
-            expect(isFunction(123)).toBe(false);
+            expect(isFunction({})).toBeFalsy();
+            expect(isFunction("function")).toBeFalsy();
+            expect(isFunction(null)).toBeFalsy();
+            expect(isFunction(123)).toBeFalsy();
         });
     });
 
-    describe("isNonNegativeNumber", () => {
+    describe(isNonNegativeNumber, () => {
         it("should return true for non-negative numbers", async ({
             task,
             annotate,
@@ -480,9 +480,9 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNegativeNumber(0)).toBe(true);
-            expect(isNonNegativeNumber(42)).toBe(true);
-            expect(isNonNegativeNumber(3.14)).toBe(true);
+            expect(isNonNegativeNumber(0)).toBeTruthy();
+            expect(isNonNegativeNumber(42)).toBeTruthy();
+            expect(isNonNegativeNumber(3.14)).toBeTruthy();
         });
 
         it("should return false for negative numbers and non-numbers", async ({
@@ -497,14 +497,14 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNegativeNumber(-1)).toBe(false);
-            expect(isNonNegativeNumber(-123)).toBe(false);
-            expect(isNonNegativeNumber("42")).toBe(false);
-            expect(isNonNegativeNumber(Number.NaN)).toBe(false);
+            expect(isNonNegativeNumber(-1)).toBeFalsy();
+            expect(isNonNegativeNumber(-123)).toBeFalsy();
+            expect(isNonNegativeNumber("42")).toBeFalsy();
+            expect(isNonNegativeNumber(Number.NaN)).toBeFalsy();
         });
     });
 
-    describe("isNonNullObject", () => {
+    describe(isNonNullObject, () => {
         it("should return true for non-null objects", async ({
             task,
             annotate,
@@ -517,9 +517,9 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNullObject({})).toBe(true);
-            expect(isNonNullObject({ key: "value" })).toBe(true);
-            expect(isNonNullObject(new Date())).toBe(true); // Date objects are non-null objects
+            expect(isNonNullObject({})).toBeTruthy();
+            expect(isNonNullObject({ key: "value" })).toBeTruthy();
+            expect(isNonNullObject(new Date())).toBeTruthy(); // Date objects are non-null objects
         });
 
         it("should return false for null and non-objects", async ({
@@ -534,15 +534,15 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNullObject(null)).toBe(false);
-            expect(isNonNullObject(undefined)).toBe(false);
-            expect(isNonNullObject("string")).toBe(false);
-            expect(isNonNullObject(123)).toBe(false);
-            expect(isNonNullObject([])).toBe(false); // Arrays are excluded by isObject
+            expect(isNonNullObject(null)).toBeFalsy();
+            expect(isNonNullObject(undefined)).toBeFalsy();
+            expect(isNonNullObject("string")).toBeFalsy();
+            expect(isNonNullObject(123)).toBeFalsy();
+            expect(isNonNullObject([])).toBeFalsy(); // Arrays are excluded by isObject
         });
     });
 
-    describe("isPositiveNumber", () => {
+    describe(isPositiveNumber, () => {
         it("should return true for positive numbers", async ({
             task,
             annotate,
@@ -555,9 +555,9 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPositiveNumber(1)).toBe(true);
-            expect(isPositiveNumber(42)).toBe(true);
-            expect(isPositiveNumber(3.14)).toBe(true);
+            expect(isPositiveNumber(1)).toBeTruthy();
+            expect(isPositiveNumber(42)).toBeTruthy();
+            expect(isPositiveNumber(3.14)).toBeTruthy();
         });
 
         it("should return false for zero, negative numbers, and non-numbers", async ({
@@ -572,14 +572,14 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPositiveNumber(0)).toBe(false);
-            expect(isPositiveNumber(-1)).toBe(false);
-            expect(isPositiveNumber("42")).toBe(false);
-            expect(isPositiveNumber(Number.NaN)).toBe(false);
+            expect(isPositiveNumber(0)).toBeFalsy();
+            expect(isPositiveNumber(-1)).toBeFalsy();
+            expect(isPositiveNumber("42")).toBeFalsy();
+            expect(isPositiveNumber(Number.NaN)).toBeFalsy();
         });
     });
 
-    describe("isString", () => {
+    describe(isString, () => {
         it("should return true for strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -589,9 +589,9 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isString("hello")).toBe(true);
-            expect(isString("")).toBe(true);
-            expect(isString(" ")).toBe(true);
+            expect(isString("hello")).toBeTruthy();
+            expect(isString("")).toBeTruthy();
+            expect(isString(" ")).toBeTruthy();
         });
 
         it("should return false for non-strings", async ({
@@ -606,14 +606,14 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isString(123)).toBe(false);
-            expect(isString(null)).toBe(false);
-            expect(isString(undefined)).toBe(false);
-            expect(isString({})).toBe(false);
+            expect(isString(123)).toBeFalsy();
+            expect(isString(null)).toBeFalsy();
+            expect(isString(undefined)).toBeFalsy();
+            expect(isString({})).toBeFalsy();
         });
     });
 
-    describe("isValidPort", () => {
+    describe(isValidPort, () => {
         it("should return true for valid port numbers", async ({
             task,
             annotate,
@@ -626,10 +626,10 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort(80)).toBe(true);
-            expect(isValidPort(443)).toBe(true);
-            expect(isValidPort(8080)).toBe(true);
-            expect(isValidPort(65_535)).toBe(true);
+            expect(isValidPort(80)).toBeTruthy();
+            expect(isValidPort(443)).toBeTruthy();
+            expect(isValidPort(8080)).toBeTruthy();
+            expect(isValidPort(65_535)).toBeTruthy();
         });
 
         it("should return false for invalid port numbers", async ({
@@ -644,16 +644,16 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort(0)).toBe(false);
-            expect(isValidPort(-1)).toBe(false);
-            expect(isValidPort(65_536)).toBe(false);
-            expect(isValidPort(3.14)).toBe(false);
-            expect(isValidPort("80")).toBe(false);
-            expect(isValidPort(Number.NaN)).toBe(false);
+            expect(isValidPort(0)).toBeFalsy();
+            expect(isValidPort(-1)).toBeFalsy();
+            expect(isValidPort(65_536)).toBeFalsy();
+            expect(isValidPort(3.14)).toBeFalsy();
+            expect(isValidPort("80")).toBeFalsy();
+            expect(isValidPort(Number.NaN)).toBeFalsy();
         });
     });
 
-    describe("isValidTimestamp", () => {
+    describe(isValidTimestamp, () => {
         it("should return true for valid timestamps", async ({
             task,
             annotate,
@@ -666,9 +666,9 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidTimestamp(Date.now())).toBe(true);
-            expect(isValidTimestamp(1_640_995_200_000)).toBe(true); // 2022-01-01
-            expect(isValidTimestamp(1)).toBe(true); // Minimum valid timestamp
+            expect(isValidTimestamp(Date.now())).toBeTruthy();
+            expect(isValidTimestamp(1_640_995_200_000)).toBeTruthy(); // 2022-01-01
+            expect(isValidTimestamp(1)).toBeTruthy(); // Minimum valid timestamp
         });
 
         it("should return false for invalid timestamps", async ({
@@ -683,19 +683,19 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidTimestamp(0)).toBe(false); // Must be > 0
-            expect(isValidTimestamp(-1)).toBe(false);
-            expect(isValidTimestamp(Number.NaN)).toBe(false);
-            expect(isValidTimestamp(Infinity)).toBe(false);
-            expect(isValidTimestamp("1640995200000")).toBe(false);
-            expect(isValidTimestamp(null)).toBe(false);
-            expect(isValidTimestamp(Date.now() + 90_000_000)).toBe(false); // Too far in future
+            expect(isValidTimestamp(0)).toBeFalsy(); // Must be > 0
+            expect(isValidTimestamp(-1)).toBeFalsy();
+            expect(isValidTimestamp(Number.NaN)).toBeFalsy();
+            expect(isValidTimestamp(Infinity)).toBeFalsy();
+            expect(isValidTimestamp("1640995200000")).toBeFalsy();
+            expect(isValidTimestamp(null)).toBeFalsy();
+            expect(isValidTimestamp(Date.now() + 90_000_000)).toBeFalsy(); // Too far in future
         });
     });
 });
 
 describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
-    describe("castIpcResponse", () => {
+    describe(castIpcResponse, () => {
         it("should cast response when validation passes", async ({
             task,
             annotate,
@@ -760,7 +760,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
         });
     });
 
-    describe("isArrayHelper", () => {
+    describe(isArrayHelper, () => {
         it("should return true for arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -770,15 +770,15 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isArrayHelper([])).toBe(true);
+            expect(isArrayHelper([])).toBeTruthy();
             expect(
                 isArrayHelper([
                     1,
                     2,
                     3,
                 ])
-            ).toBe(true);
-            expect(isArrayHelper(Array.from({ length: 5 }))).toBe(true);
+            ).toBeTruthy();
+            expect(isArrayHelper(Array.from({ length: 5 }))).toBeTruthy();
         });
 
         it("should return false for non-arrays", async ({ task, annotate }) => {
@@ -790,14 +790,14 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isArrayHelper({})).toBe(false);
-            expect(isArrayHelper("string")).toBe(false);
-            expect(isArrayHelper(null)).toBe(false);
-            expect(isArrayHelper(undefined)).toBe(false);
+            expect(isArrayHelper({})).toBeFalsy();
+            expect(isArrayHelper("string")).toBeFalsy();
+            expect(isArrayHelper(null)).toBeFalsy();
+            expect(isArrayHelper(undefined)).toBeFalsy();
         });
     });
 
-    describe("isRecord", () => {
+    describe(isRecord, () => {
         it("should return true for plain objects", async ({
             task,
             annotate,
@@ -810,10 +810,10 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isRecord({})).toBe(true);
-            expect(isRecord({ key: "value" })).toBe(true);
-            expect(isRecord(Object.create(null))).toBe(true);
-            expect(isRecord(new Date())).toBe(true); // Date objects are records per isRecord logic
+            expect(isRecord({})).toBeTruthy();
+            expect(isRecord({ key: "value" })).toBeTruthy();
+            expect(isRecord(Object.create(null))).toBeTruthy();
+            expect(isRecord(new Date())).toBeTruthy(); // Date objects are records per isRecord logic
         });
 
         it("should return false for non-objects and arrays", async ({
@@ -828,15 +828,15 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isRecord(null)).toBe(false);
-            expect(isRecord(undefined)).toBe(false);
-            expect(isRecord("string")).toBe(false);
-            expect(isRecord(123)).toBe(false);
-            expect(isRecord([])).toBe(false); // Arrays are excluded
+            expect(isRecord(null)).toBeFalsy();
+            expect(isRecord(undefined)).toBeFalsy();
+            expect(isRecord("string")).toBeFalsy();
+            expect(isRecord(123)).toBeFalsy();
+            expect(isRecord([])).toBeFalsy(); // Arrays are excluded
         });
     });
 
-    describe("safePropertyAccess", () => {
+    describe(safePropertyAccess, () => {
         it("should return property value when object has the property", async ({
             task,
             annotate,
@@ -907,7 +907,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
         });
     });
 
-    describe("validateAndConvert", () => {
+    describe(validateAndConvert, () => {
         it("should return validated value when validation passes", async ({
             task,
             annotate,
@@ -1041,15 +1041,15 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             };
 
             // Use multiple type guards together
-            expect(isRecord(data)).toBe(true);
-            expect(hasProperty(data, "users")).toBe(true);
+            expect(isRecord(data)).toBeTruthy();
+            expect(hasProperty(data, "users")).toBeTruthy();
 
             const users = safePropertyAccess(data, "users");
-            expect(isArrayHelper(users)).toBe(true);
+            expect(isArrayHelper(users)).toBeTruthy();
 
             if (isArrayHelper(users)) {
                 expect(users).toHaveLength(2);
-                expect(isRecord(users[0])).toBe(true);
+                expect(isRecord(users[0])).toBeTruthy();
             }
         });
     });

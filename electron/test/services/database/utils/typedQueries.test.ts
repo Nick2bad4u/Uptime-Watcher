@@ -54,7 +54,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
         mockGet = mockDb.get as MockedFunction<any>;
         mockAll = mockDb.all as MockedFunction<any>;
     });
-    describe("insertWithReturning", () => {
+    describe(insertWithReturning, () => {
         it("should return inserted record with generated fields", async ({
             task,
             annotate,
@@ -353,7 +353,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             );
         });
     });
-    describe("queryForCount", () => {
+    describe(queryForCount, () => {
         it("should return count result from COUNT query", async ({
             task,
             annotate,
@@ -553,7 +553,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         expect(result).toBeDefined();
                         expect(result!.count).toBe(count);
                         expect(typeof result!.count).toBe("number");
-                        expect(Number.isInteger(result!.count)).toBe(true);
+                        expect(Number.isInteger(result!.count)).toBeTruthy();
                         expect(result!.count).toBeGreaterThanOrEqual(0);
                     }
                 }
@@ -583,12 +583,12 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
                     // Verify structure
                     expect(Object.keys(result!)).toEqual(["count"]);
-                    expect(Object.hasOwn(result!, "count")).toBe(true);
+                    expect(Object.hasOwn(result!, "count")).toBeTruthy();
                 }
             );
         });
     });
-    describe("queryForIds", () => {
+    describe(queryForIds, () => {
         it("should return array of ID objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -743,7 +743,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
                     // Assert
                     expect(result).toEqual(expectedIds);
-                    expect(Array.isArray(result)).toBe(true);
+                    expect(Array.isArray(result)).toBeTruthy();
                     expect(result).toHaveLength(expectedIds.length);
 
                     for (const item of result!) {
@@ -800,13 +800,13 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
                     // Assert
                     expect(result).toEqual([]);
-                    expect(Array.isArray(result)).toBe(true);
+                    expect(Array.isArray(result)).toBeTruthy();
                     expect(result).toHaveLength(0);
                 }
             );
         });
     });
-    describe("queryForRecords", () => {
+    describe(queryForRecords, () => {
         it("should return array of typed records", async ({
             task,
             annotate,
@@ -1013,7 +1013,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
                     // Assert
                     expect(result).toEqual(expectedRecords);
-                    expect(Array.isArray(result)).toBe(true);
+                    expect(Array.isArray(result)).toBeTruthy();
                     expect(result).toHaveLength(expectedRecords.length);
                     expect(mockAll).toHaveBeenCalledWith(query, []);
                 }
@@ -1071,13 +1071,13 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
                     // Assert
                     expect(result).toEqual([]);
-                    expect(Array.isArray(result)).toBe(true);
+                    expect(Array.isArray(result)).toBeTruthy();
                     expect(result).toHaveLength(0);
                 }
             );
         });
     });
-    describe("queryForSingleRecord", () => {
+    describe(queryForSingleRecord, () => {
         it("should return single record when found", async ({
             task,
             annotate,

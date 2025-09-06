@@ -45,7 +45,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
         }
     });
 
-    describe("getEnvVar", () => {
+    describe(getEnvVar, () => {
         it("should return environment variable value when process exists", async ({
             task,
             annotate,
@@ -129,7 +129,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
         });
     });
 
-    describe("getEnvironment", () => {
+    describe(getEnvironment, () => {
         it("should return NODE_ENV value when available", async ({
             task,
             annotate,
@@ -185,7 +185,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
         });
     });
 
-    describe("getNodeEnv", () => {
+    describe(getNodeEnv, () => {
         it("should return NODE_ENV value when available", async ({
             task,
             annotate,
@@ -241,7 +241,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
         });
     });
 
-    describe("isBrowserEnvironment", () => {
+    describe(isBrowserEnvironment, () => {
         it("should return true when window and document are defined", async ({
             task,
             annotate,
@@ -256,7 +256,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
 
             globalThis.window = {} as any;
             globalThis.document = {} as any;
-            expect(isBrowserEnvironment()).toBe(true);
+            expect(isBrowserEnvironment()).toBeTruthy();
         });
 
         it("should return false when window is undefined", async ({
@@ -272,7 +272,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             globalThis.window = undefined as any;
-            expect(isBrowserEnvironment()).toBe(false);
+            expect(isBrowserEnvironment()).toBeFalsy();
         });
 
         it("should return false when window access throws", async ({
@@ -293,11 +293,11 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             delete (globalThis as any).document;
 
             // Test with undefined which should return false
-            expect(isBrowserEnvironment()).toBe(false);
+            expect(isBrowserEnvironment()).toBeFalsy();
         });
     });
 
-    describe("isDevelopment", () => {
+    describe(isDevelopment, () => {
         it("should return true when NODE_ENV is 'development'", async ({
             task,
             annotate,
@@ -314,7 +314,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 env: { NODE_ENV: "development" },
             } as any;
 
-            expect(isDevelopment()).toBe(true);
+            expect(isDevelopment()).toBeTruthy();
         });
 
         it("should return false when NODE_ENV is not 'development'", async ({
@@ -333,7 +333,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 env: { NODE_ENV: "production" },
             } as any;
 
-            expect(isDevelopment()).toBe(false);
+            expect(isDevelopment()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is not set (no default to development)", async ({
@@ -352,7 +352,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 env: {},
             } as any;
 
-            expect(isDevelopment()).toBe(false);
+            expect(isDevelopment()).toBeFalsy();
         });
 
         it("should return false when process is undefined (no default to development)", async ({
@@ -368,11 +368,11 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             globalThis.process = undefined as any;
-            expect(isDevelopment()).toBe(false);
+            expect(isDevelopment()).toBeFalsy();
         });
     });
 
-    describe("isNodeEnvironment", () => {
+    describe(isNodeEnvironment, () => {
         it("should return true when process with versions.node is defined", async ({
             task,
             annotate,
@@ -390,7 +390,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 versions: { node: "18.0.0" },
             } as any;
 
-            expect(isNodeEnvironment()).toBe(true);
+            expect(isNodeEnvironment()).toBeTruthy();
         });
 
         it("should return false when process is undefined", async ({
@@ -406,7 +406,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             globalThis.process = undefined as any;
-            expect(isNodeEnvironment()).toBe(false);
+            expect(isNodeEnvironment()).toBeFalsy();
         });
 
         it("should return false when process access throws", async ({
@@ -427,11 +427,11 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 env: {},
             } as any;
 
-            expect(isNodeEnvironment()).toBe(false);
+            expect(isNodeEnvironment()).toBeFalsy();
         });
     });
 
-    describe("isProduction", () => {
+    describe(isProduction, () => {
         it("should return true when NODE_ENV is 'production'", async ({
             task,
             annotate,
@@ -448,7 +448,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 env: { NODE_ENV: "production" },
             } as any;
 
-            expect(isProduction()).toBe(true);
+            expect(isProduction()).toBeTruthy();
         });
 
         it("should return false when NODE_ENV is not 'production'", async ({
@@ -467,7 +467,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 env: { NODE_ENV: "development" },
             } as any;
 
-            expect(isProduction()).toBe(false);
+            expect(isProduction()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is not set", async ({
@@ -486,7 +486,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 env: {},
             } as any;
 
-            expect(isProduction()).toBe(false);
+            expect(isProduction()).toBeFalsy();
         });
 
         it("should return false when process is undefined", async ({
@@ -502,11 +502,11 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             globalThis.process = undefined as any;
-            expect(isProduction()).toBe(false);
+            expect(isProduction()).toBeFalsy();
         });
     });
 
-    describe("isTest", () => {
+    describe(isTest, () => {
         it("should return true when NODE_ENV is 'test'", async ({
             task,
             annotate,
@@ -523,7 +523,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 env: { NODE_ENV: "test" },
             } as any;
 
-            expect(isTest()).toBe(true);
+            expect(isTest()).toBeTruthy();
         });
 
         it("should return false when NODE_ENV is not 'test'", async ({
@@ -542,7 +542,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 env: { NODE_ENV: "production" },
             } as any;
 
-            expect(isTest()).toBe(false);
+            expect(isTest()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is not set", async ({
@@ -561,7 +561,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 env: {},
             } as any;
 
-            expect(isTest()).toBe(false);
+            expect(isTest()).toBeFalsy();
         });
 
         it("should return false when process is undefined", async ({
@@ -577,7 +577,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             globalThis.process = undefined as any;
-            expect(isTest()).toBe(false);
+            expect(isTest()).toBeFalsy();
         });
     });
 
@@ -598,9 +598,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 env: { NODE_ENV: "test" },
             } as any;
 
-            expect(isTest()).toBe(true);
-            expect(isDevelopment()).toBe(false);
-            expect(isProduction()).toBe(false);
+            expect(isTest()).toBeTruthy();
+            expect(isDevelopment()).toBeFalsy();
+            expect(isProduction()).toBeFalsy();
             expect(getEnvironment()).toBe("test");
             expect(getNodeEnv()).toBe("test");
         });
@@ -623,9 +623,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
 
             expect(getEnvironment()).toBe("");
             expect(getNodeEnv()).toBe("");
-            expect(isDevelopment()).toBe(false);
-            expect(isProduction()).toBe(false);
-            expect(isTest()).toBe(false);
+            expect(isDevelopment()).toBeFalsy();
+            expect(isProduction()).toBeFalsy();
+            expect(isTest()).toBeFalsy();
         });
 
         it("should handle case sensitivity", async ({ task, annotate }) => {
@@ -641,7 +641,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 env: { NODE_ENV: "PRODUCTION" },
             } as any;
 
-            expect(isProduction()).toBe(false); // Should be case sensitive
+            expect(isProduction()).toBeFalsy(); // Should be case sensitive
             expect(getEnvironment()).toBe("PRODUCTION");
         });
     });

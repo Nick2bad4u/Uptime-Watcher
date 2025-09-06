@@ -70,7 +70,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
         );
     });
 
-    describe("formatErrorMessage", () => {
+    describe(formatErrorMessage, () => {
         test.prop([
             fc.string(),
             fc.record({}, { requiredKeys: [] })
@@ -188,7 +188,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
         });
     });
 
-    describe("isKnownErrorMessage", () => {
+    describe(isKnownErrorMessage, () => {
         test.prop([fc.string()])(
             "should return boolean for any string input",
             (message) => {
@@ -202,7 +202,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
             for (const [_categoryName, category] of Object.entries(ERROR_CATALOG)) {
                 for (const [_errorKey, errorValue] of Object.entries(category)) {
                     if (typeof errorValue === "string") {
-                        expect(isKnownErrorMessage(errorValue)).toBe(true);
+                        expect(isKnownErrorMessage(errorValue)).toBeTruthy();
                     }
                 }
             }
@@ -217,48 +217,48 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
                 return !allMessages.includes(str);
             })
         ])("should return false for unknown error messages", (message) => {
-            expect(isKnownErrorMessage(message)).toBe(false);
+            expect(isKnownErrorMessage(message)).toBeFalsy();
         });
 
         it("should return true for all SITE_ERRORS", () => {
             for (const error of Object.values(SITE_ERRORS)) {
-                expect(isKnownErrorMessage(error)).toBe(true);
+                expect(isKnownErrorMessage(error)).toBeTruthy();
             }
         });
 
         it("should return true for all MONITOR_ERRORS", () => {
             for (const error of Object.values(MONITOR_ERRORS)) {
-                expect(isKnownErrorMessage(error)).toBe(true);
+                expect(isKnownErrorMessage(error)).toBeTruthy();
             }
         });
 
         it("should return true for all VALIDATION_ERRORS", () => {
             for (const error of Object.values(VALIDATION_ERRORS)) {
-                expect(isKnownErrorMessage(error)).toBe(true);
+                expect(isKnownErrorMessage(error)).toBeTruthy();
             }
         });
 
         it("should return true for all SYSTEM_ERRORS", () => {
             for (const error of Object.values(SYSTEM_ERRORS)) {
-                expect(isKnownErrorMessage(error)).toBe(true);
+                expect(isKnownErrorMessage(error)).toBeTruthy();
             }
         });
 
         it("should return true for all NETWORK_ERRORS", () => {
             for (const error of Object.values(NETWORK_ERRORS)) {
-                expect(isKnownErrorMessage(error)).toBe(true);
+                expect(isKnownErrorMessage(error)).toBeTruthy();
             }
         });
 
         it("should return true for all DATABASE_ERRORS", () => {
             for (const error of Object.values(DATABASE_ERRORS)) {
-                expect(isKnownErrorMessage(error)).toBe(true);
+                expect(isKnownErrorMessage(error)).toBeTruthy();
             }
         });
 
         it("should return true for all IPC_ERRORS", () => {
             for (const error of Object.values(IPC_ERRORS)) {
-                expect(isKnownErrorMessage(error)).toBe(true);
+                expect(isKnownErrorMessage(error)).toBeTruthy();
             }
         });
 

@@ -43,7 +43,7 @@ describe("Fallback Utilities", () => {
         vi.clearAllMocks();
     });
 
-    describe("isNullOrUndefined", () => {
+    describe(isNullOrUndefined, () => {
         describe("Null values", () => {
             it("should return true for null", async ({ task, annotate }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
@@ -51,7 +51,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(null)).toBe(true);
+                expect(isNullOrUndefined(null)).toBeTruthy();
             });
 
             it("should return true for undefined", async ({
@@ -63,7 +63,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(undefined)).toBe(true);
+                expect(isNullOrUndefined(undefined)).toBeTruthy();
             });
         });
 
@@ -77,7 +77,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined("http")).toBe(false);
+                expect(isNullOrUndefined("http")).toBeFalsy();
             });
 
             it("should return false for zero", async ({ task, annotate }) => {
@@ -86,7 +86,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(0)).toBe(false);
+                expect(isNullOrUndefined(0)).toBeFalsy();
             });
 
             it("should return false for false", async ({ task, annotate }) => {
@@ -95,7 +95,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(false)).toBe(false);
+                expect(isNullOrUndefined(false)).toBeFalsy();
             });
 
             it("should return false for NaN", async ({ task, annotate }) => {
@@ -104,7 +104,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(Number.NaN)).toBe(false);
+                expect(isNullOrUndefined(Number.NaN)).toBeFalsy();
             });
         });
 
@@ -115,7 +115,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined("http")).toBe(false);
+                expect(isNullOrUndefined("http")).toBeFalsy();
             });
 
             it("should return false for number", async ({ task, annotate }) => {
@@ -124,7 +124,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(42)).toBe(false);
+                expect(isNullOrUndefined(42)).toBeFalsy();
             });
 
             it("should return false for boolean true", async ({
@@ -136,7 +136,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(true)).toBe(false);
+                expect(isNullOrUndefined(true)).toBeFalsy();
             });
 
             it("should return false for object", async ({ task, annotate }) => {
@@ -145,7 +145,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined({})).toBe(false);
+                expect(isNullOrUndefined({})).toBeFalsy();
             });
 
             it("should return false for array", async ({ task, annotate }) => {
@@ -154,7 +154,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined([])).toBe(false);
+                expect(isNullOrUndefined([])).toBeFalsy();
             });
 
             it("should return false for function", async ({
@@ -166,7 +166,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(() => {})).toBe(false);
+                expect(isNullOrUndefined(() => {})).toBeFalsy();
             });
         });
 
@@ -174,7 +174,7 @@ describe("Fallback Utilities", () => {
             test.prop([fc.oneof(fc.constant(null), fc.constant(undefined))])(
                 "should always return true for null or undefined values",
                 (nullOrUndef) => {
-                    expect(isNullOrUndefined(nullOrUndef)).toBe(true);
+                    expect(isNullOrUndefined(nullOrUndef)).toBeTruthy();
                 }
             );
 
@@ -196,20 +196,20 @@ describe("Fallback Utilities", () => {
             ])(
                 "should always return false for non-null/undefined values including falsy ones",
                 (value) => {
-                    expect(isNullOrUndefined(value)).toBe(false);
+                    expect(isNullOrUndefined(value)).toBeFalsy();
                 }
             );
 
             test.prop([fc.anything().filter((v) => v !== null && v !== undefined)])(
                 "should return false for any defined value",
                 (value) => {
-                    expect(isNullOrUndefined(value)).toBe(false);
+                    expect(isNullOrUndefined(value)).toBeFalsy();
                 }
             );
         });
     });
 
-    describe("withAsyncErrorHandling", () => {
+    describe(withAsyncErrorHandling, () => {
         it("should return a sync function that handles async operations", async ({
             task,
             annotate,
@@ -246,7 +246,7 @@ describe("Fallback Utilities", () => {
 
             handler();
 
-            expect(asyncOperation).toHaveBeenCalledOnce();
+            expect(asyncOperation).toHaveBeenCalledTimes(1);
         });
 
         it("should handle async operations that throw errors", async ({
@@ -317,7 +317,7 @@ describe("Fallback Utilities", () => {
 
                     // Wait a bit to allow async operation to complete
                     await new Promise(resolve => setTimeout(resolve, 0));
-                    expect(mockAsyncOp).toHaveBeenCalledOnce();
+                    expect(mockAsyncOp).toHaveBeenCalledTimes(1);
                 }
             );
 
@@ -332,13 +332,13 @@ describe("Fallback Utilities", () => {
 
                     // Wait a bit to allow async operation to complete
                     await new Promise(resolve => setTimeout(resolve, 0));
-                    expect(mockAsyncOp).toHaveBeenCalledOnce();
+                    expect(mockAsyncOp).toHaveBeenCalledTimes(1);
                 }
             );
         });
     });
 
-    describe("withSyncErrorHandling", () => {
+    describe(withSyncErrorHandling, () => {
         beforeEach(() => {
             vi.clearAllMocks();
         });
@@ -363,7 +363,7 @@ describe("Fallback Utilities", () => {
                 );
 
                 expect(result).toBe("success result");
-                expect(operation).toHaveBeenCalledOnce();
+                expect(operation).toHaveBeenCalledTimes(1);
             });
 
             it("should handle complex return types", async ({
@@ -421,7 +421,7 @@ describe("Fallback Utilities", () => {
                     fallback
                 );
 
-                expect(result).toBe(false);
+                expect(result).toBeFalsy();
             });
         });
 
@@ -448,7 +448,7 @@ describe("Fallback Utilities", () => {
                 );
 
                 expect(result).toBe(fallback);
-                expect(operation).toHaveBeenCalledOnce();
+                expect(operation).toHaveBeenCalledTimes(1);
                 expect(logger.logger.error).toHaveBeenCalled();
             });
 
@@ -518,7 +518,7 @@ describe("Fallback Utilities", () => {
                     );
 
                     expect(result).toBe(mockResult);
-                    expect(operation).toHaveBeenCalledOnce();
+                    expect(operation).toHaveBeenCalledTimes(1);
                 }
             );
 
@@ -540,7 +540,7 @@ describe("Fallback Utilities", () => {
                     );
 
                     expect(result).toBe(fallbackValue);
-                    expect(operation).toHaveBeenCalledOnce();
+                    expect(operation).toHaveBeenCalledTimes(1);
                     expect(logger.logger.error).toHaveBeenCalled();
                 }
             );
@@ -569,7 +569,7 @@ describe("Fallback Utilities", () => {
         });
     });
 
-    describe("withFallback", () => {
+    describe(withFallback, () => {
         describe("Null/undefined handling", () => {
             it("should return fallback for null value", async ({
                 task,
@@ -620,7 +620,7 @@ describe("Fallback Utilities", () => {
 
                 expect(withFallback("http", "fallback")).toBe("http");
                 expect(withFallback(0, 42)).toBe(0);
-                expect(withFallback(false, true)).toBe(false);
+                expect(withFallback(false, true)).toBeFalsy();
             });
 
             it("should handle complex types", async ({ task, annotate }) => {
@@ -681,7 +681,7 @@ describe("Fallback Utilities", () => {
         });
     });
 
-    describe("getMonitorDisplayIdentifier", () => {
+    describe(getMonitorDisplayIdentifier, () => {
         describe("HTTP monitors", () => {
             it("should return URL for HTTP monitor", async ({
                 task,
@@ -1054,7 +1054,7 @@ describe("Fallback Utilities", () => {
         });
     });
 
-    describe("getMonitorTypeDisplayLabel", () => {
+    describe(getMonitorTypeDisplayLabel, () => {
         describe("Configured monitor types", () => {
             it("should return configured label for HTTP", async ({
                 task,
@@ -1260,7 +1260,7 @@ describe("Fallback Utilities", () => {
 
                     expect(typeof result).toBe("string");
                     expect(result.length).toBeGreaterThan(0);
-                    expect(result.endsWith(" Monitor")).toBe(true);
+                    expect(result.endsWith(" Monitor")).toBeTruthy();
 
                     // First character should be uppercase
                     expect(result.charAt(0)).toBe(result.charAt(0).toUpperCase());
@@ -1286,16 +1286,16 @@ describe("Fallback Utilities", () => {
 
                     expect(typeof result).toBe("string");
                     expect(result.length).toBeGreaterThan(0);
-                    expect(result.endsWith(" Monitor")).toBe(true);
+                    expect(result.endsWith(" Monitor")).toBeTruthy();
 
                     // Should contain some capitalization
-                    expect(/[A-Z]/.test(result)).toBe(true);
+                    expect(/[A-Z]/.test(result)).toBeTruthy();
                 }
             );
         });
     });
 
-    describe("truncateForLogging", () => {
+    describe(truncateForLogging, () => {
         describe("Basic truncation", () => {
             it("should return original string if shorter than maxLength", async ({
                 task,
@@ -1334,7 +1334,7 @@ describe("Fallback Utilities", () => {
                 const text = "a".repeat(60);
                 const result = truncateForLogging(text, 50);
                 expect(result).toBe("a".repeat(50));
-                expect(result.length).toBe(50);
+                expect(result).toHaveLength(50);
             });
         });
 
@@ -1350,7 +1350,7 @@ describe("Fallback Utilities", () => {
 
                 const text = "a".repeat(60);
                 const result = truncateForLogging(text);
-                expect(result.length).toBe(50);
+                expect(result).toHaveLength(50);
             });
 
             it("should handle text exactly at default length", async ({
@@ -1438,7 +1438,7 @@ describe("Fallback Utilities", () => {
                 // Unicode characters may take multiple bytes, so slice(0, 3) might not work as expected
                 const result = truncateForLogging(unicode, 3);
                 expect(result.length).toBeLessThanOrEqual(3);
-                expect(result.startsWith("🎉")).toBe(true);
+                expect(result.startsWith("🎉")).toBeTruthy();
             });
 
             it("should handle newlines and special characters", async ({
@@ -1470,7 +1470,7 @@ describe("Fallback Utilities", () => {
                 const url =
                     "https://very-long-domain-name.example.com/very/long/path/with/many/segments";
                 const result = truncateForLogging(url, 30);
-                expect(result.length).toBe(30);
+                expect(result).toHaveLength(30);
                 expect(result).toBe("https://very-long-domain-name.");
             });
 
@@ -1483,7 +1483,7 @@ describe("Fallback Utilities", () => {
                 const error =
                     "Connection failed: Unable to connect to server at example.com:8080 after 30 seconds timeout";
                 const result = truncateForLogging(error, 50);
-                expect(result.length).toBe(50);
+                expect(result).toHaveLength(50);
                 expect(result).toBe(
                     "Connection failed: Unable to connect to server at "
                 );
@@ -1537,7 +1537,7 @@ describe("Fallback Utilities", () => {
                 "should truncate long strings to specified length",
                 (longText, maxLength) => {
                     const result = truncateForLogging(longText, maxLength);
-                    expect(result.length).toBe(maxLength);
+                    expect(result).toHaveLength(maxLength);
                     expect(result).toBe(longText.slice(0, maxLength));
                 }
             );
@@ -1547,7 +1547,7 @@ describe("Fallback Utilities", () => {
                 (maxLength) => {
                     const text = "sample text";
                     const result = truncateForLogging(text, maxLength);
-                    expect(result.length).toBe(maxLength);
+                    expect(result).toHaveLength(maxLength);
                     if (maxLength === 0) {
                         expect(result).toBe("");
                     } else {
@@ -1666,7 +1666,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(SiteDefaults.monitoring).toBe(true);
+                expect(SiteDefaults.monitoring).toBeTruthy();
             });
 
             it("should be deeply frozen (readonly)", async ({
@@ -1679,7 +1679,7 @@ describe("Fallback Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 // Note: 'as const' provides type-level readonly but not runtime immutability
-                expect(SiteDefaults.monitoring).toBe(true);
+                expect(SiteDefaults.monitoring).toBeTruthy();
                 // Test that values are accessible and correct
                 (SiteDefaults as any).monitoring = false;
                 // The object should be treated as readonly in TypeScript

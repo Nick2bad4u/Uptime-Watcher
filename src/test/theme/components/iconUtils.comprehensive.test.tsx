@@ -11,7 +11,7 @@ import {
 } from "../../../theme/components/iconUtils";
 
 describe("iconUtils functions", () => {
-    describe("getIconColorClass", () => {
+    describe(getIconColorClass, () => {
         it("should return undefined for no color", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
@@ -153,7 +153,7 @@ describe("iconUtils functions", () => {
         });
     });
 
-    describe("renderColoredIcon", () => {
+    describe(renderColoredIcon, () => {
         it("should return the icon as-is when icon is falsy", ({
             task,
             annotate,
@@ -170,7 +170,7 @@ describe("iconUtils functions", () => {
 
             expect(renderColoredIcon(null)).toBeNull();
             expect(renderColoredIcon(undefined)).toBeUndefined();
-            expect(renderColoredIcon(false)).toBe(false);
+            expect(renderColoredIcon(false)).toBeFalsy();
         });
 
         it("should return icon as-is when no color is provided", ({

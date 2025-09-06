@@ -25,29 +25,29 @@ describe("Final Function Coverage Push", () => {
         const types = await import("../../shared/types");
 
         // Test isComputedSiteStatus
-        expect(types.isComputedSiteStatus("mixed")).toBe(true);
-        expect(types.isComputedSiteStatus("unknown")).toBe(true);
-        expect(types.isComputedSiteStatus("up")).toBe(false);
-        expect(types.isComputedSiteStatus("down")).toBe(false);
-        expect(types.isComputedSiteStatus("pending")).toBe(false);
-        expect(types.isComputedSiteStatus("paused")).toBe(false);
+        expect(types.isComputedSiteStatus("mixed")).toBeTruthy();
+        expect(types.isComputedSiteStatus("unknown")).toBeTruthy();
+        expect(types.isComputedSiteStatus("up")).toBeFalsy();
+        expect(types.isComputedSiteStatus("down")).toBeFalsy();
+        expect(types.isComputedSiteStatus("pending")).toBeFalsy();
+        expect(types.isComputedSiteStatus("paused")).toBeFalsy();
 
         // Test isMonitorStatus
-        expect(types.isMonitorStatus("up")).toBe(true);
-        expect(types.isMonitorStatus("down")).toBe(true);
-        expect(types.isMonitorStatus("pending")).toBe(true);
-        expect(types.isMonitorStatus("paused")).toBe(true);
-        expect(types.isMonitorStatus("mixed")).toBe(false);
-        expect(types.isMonitorStatus("unknown")).toBe(false);
+        expect(types.isMonitorStatus("up")).toBeTruthy();
+        expect(types.isMonitorStatus("down")).toBeTruthy();
+        expect(types.isMonitorStatus("pending")).toBeTruthy();
+        expect(types.isMonitorStatus("paused")).toBeTruthy();
+        expect(types.isMonitorStatus("mixed")).toBeFalsy();
+        expect(types.isMonitorStatus("unknown")).toBeFalsy();
 
         // Test isSiteStatus
-        expect(types.isSiteStatus("up")).toBe(true);
-        expect(types.isSiteStatus("down")).toBe(true);
-        expect(types.isSiteStatus("mixed")).toBe(true);
-        expect(types.isSiteStatus("unknown")).toBe(true);
-        expect(types.isSiteStatus("pending")).toBe(true);
-        expect(types.isSiteStatus("paused")).toBe(true);
-        expect(types.isSiteStatus("invalid")).toBe(false);
+        expect(types.isSiteStatus("up")).toBeTruthy();
+        expect(types.isSiteStatus("down")).toBeTruthy();
+        expect(types.isSiteStatus("mixed")).toBeTruthy();
+        expect(types.isSiteStatus("unknown")).toBeTruthy();
+        expect(types.isSiteStatus("pending")).toBeTruthy();
+        expect(types.isSiteStatus("paused")).toBeTruthy();
+        expect(types.isSiteStatus("invalid")).toBeFalsy();
 
         // Test validateMonitor with valid monitor
         const validMonitor = {
@@ -61,12 +61,12 @@ describe("Final Function Coverage Push", () => {
             retryAttempts: 3,
             history: [],
         };
-        expect(types.validateMonitor(validMonitor)).toBe(true);
+        expect(types.validateMonitor(validMonitor)).toBeTruthy();
 
         // Test validateMonitor with invalid monitor
-        expect(types.validateMonitor({})).toBe(false);
-        expect(types.validateMonitor(null as any)).toBe(false);
-        expect(types.validateMonitor(undefined as any)).toBe(false);
+        expect(types.validateMonitor({})).toBeFalsy();
+        expect(types.validateMonitor(null as any)).toBeFalsy();
+        expect(types.validateMonitor(undefined as any)).toBeFalsy();
     });
 
     it("should comprehensively test all shared/utils/validation.ts functions", async ({
@@ -86,12 +86,12 @@ describe("Final Function Coverage Push", () => {
         const validation = await import("../../shared/utils/validation");
 
         // Test validateMonitorType
-        expect(validation.validateMonitorType("http")).toBe(true);
-        expect(validation.validateMonitorType("port")).toBe(true);
-        expect(validation.validateMonitorType("ping")).toBe(true);
-        expect(validation.validateMonitorType("dns")).toBe(true);
-        expect(validation.validateMonitorType("invalid")).toBe(false);
-        expect(validation.validateMonitorType("")).toBe(false);
+        expect(validation.validateMonitorType("http")).toBeTruthy();
+        expect(validation.validateMonitorType("port")).toBeTruthy();
+        expect(validation.validateMonitorType("ping")).toBeTruthy();
+        expect(validation.validateMonitorType("dns")).toBeTruthy();
+        expect(validation.validateMonitorType("invalid")).toBeFalsy();
+        expect(validation.validateMonitorType("")).toBeFalsy();
 
         // Test getMonitorValidationErrors
         const validMonitor = {
@@ -102,7 +102,7 @@ describe("Final Function Coverage Push", () => {
             retryAttempts: 3,
         };
         const errors1 = validation.getMonitorValidationErrors(validMonitor);
-        expect(Array.isArray(errors1)).toBe(true);
+        expect(Array.isArray(errors1)).toBeTruthy();
 
         const invalidMonitor = {
             type: "invalid" as any, // Invalid type for testing validation
@@ -111,7 +111,7 @@ describe("Final Function Coverage Push", () => {
             retryAttempts: -1,
         };
         const errors2 = validation.getMonitorValidationErrors(invalidMonitor);
-        expect(Array.isArray(errors2)).toBe(true);
+        expect(Array.isArray(errors2)).toBeTruthy();
 
         // Test validateSite
         const validSite = {
@@ -122,13 +122,13 @@ describe("Final Function Coverage Push", () => {
         const siteResult = validation.validateSite(validSite);
         expect(
             typeof siteResult === "boolean" || typeof siteResult === "object"
-        ).toBe(true);
+        ).toBeTruthy();
 
         const invalidSite = {};
         const siteResult2 = validation.validateSite(invalidSite);
         expect(
             typeof siteResult2 === "boolean" || typeof siteResult2 === "object"
-        ).toBe(true);
+        ).toBeTruthy();
     });
 
     it("should comprehensively test all shared/utils/typeGuards.ts functions", async ({
@@ -149,83 +149,83 @@ describe("Final Function Coverage Push", () => {
         const typeGuards = await import("../../shared/utils/typeGuards");
 
         // Test isObject
-        expect(typeGuards.isObject({})).toBe(true);
-        expect(typeGuards.isObject([])).toBe(false);
-        expect(typeGuards.isObject(null)).toBe(false);
-        expect(typeGuards.isObject("string")).toBe(false);
+        expect(typeGuards.isObject({})).toBeTruthy();
+        expect(typeGuards.isObject([])).toBeFalsy();
+        expect(typeGuards.isObject(null)).toBeFalsy();
+        expect(typeGuards.isObject("string")).toBeFalsy();
 
         // Test isNumber
-        expect(typeGuards.isNumber(123)).toBe(true);
-        expect(typeGuards.isNumber("123")).toBe(false);
-        expect(typeGuards.isNumber(Number.NaN)).toBe(false);
+        expect(typeGuards.isNumber(123)).toBeTruthy();
+        expect(typeGuards.isNumber("123")).toBeFalsy();
+        expect(typeGuards.isNumber(Number.NaN)).toBeFalsy();
 
         // Test hasProperties
-        expect(typeGuards.hasProperties({ a: 1, b: 2 }, ["a", "b"])).toBe(true);
-        expect(typeGuards.hasProperties({ a: 1 }, ["a", "b"])).toBe(false);
-        expect(typeGuards.hasProperties(null, ["a"])).toBe(false);
+        expect(typeGuards.hasProperties({ a: 1, b: 2 }, ["a", "b"])).toBeTruthy();
+        expect(typeGuards.hasProperties({ a: 1 }, ["a", "b"])).toBeFalsy();
+        expect(typeGuards.hasProperties(null, ["a"])).toBeFalsy();
 
         // Test hasProperty
-        expect(typeGuards.hasProperty({ a: 1 }, "a")).toBe(true);
-        expect(typeGuards.hasProperty({}, "a")).toBe(false);
-        expect(typeGuards.hasProperty(null, "a")).toBe(false);
+        expect(typeGuards.hasProperty({ a: 1 }, "a")).toBeTruthy();
+        expect(typeGuards.hasProperty({}, "a")).toBeFalsy();
+        expect(typeGuards.hasProperty(null, "a")).toBeFalsy();
 
         // Test isArray
-        expect(typeGuards.isArray([])).toBe(true);
-        expect(typeGuards.isArray({})).toBe(false);
-        expect(typeGuards.isArray("string")).toBe(false);
+        expect(typeGuards.isArray([])).toBeTruthy();
+        expect(typeGuards.isArray({})).toBeFalsy();
+        expect(typeGuards.isArray("string")).toBeFalsy();
 
         // Test isBoolean
-        expect(typeGuards.isBoolean(true)).toBe(true);
-        expect(typeGuards.isBoolean(false)).toBe(true);
-        expect(typeGuards.isBoolean(1)).toBe(false);
+        expect(typeGuards.isBoolean(true)).toBeTruthy();
+        expect(typeGuards.isBoolean(false)).toBeTruthy();
+        expect(typeGuards.isBoolean(1)).toBeFalsy();
 
         // Test isDate
-        expect(typeGuards.isDate(new Date())).toBe(true);
-        expect(typeGuards.isDate("2023-01-01")).toBe(false);
-        expect(typeGuards.isDate(123_456_789)).toBe(false);
+        expect(typeGuards.isDate(new Date())).toBeTruthy();
+        expect(typeGuards.isDate("2023-01-01")).toBeFalsy();
+        expect(typeGuards.isDate(123_456_789)).toBeFalsy();
 
         // Test isError
         // eslint-disable-next-line unicorn/error-message
-        expect(typeGuards.isError(new Error())).toBe(true);
-        expect(typeGuards.isError("error")).toBe(false);
+        expect(typeGuards.isError(new Error())).toBeTruthy();
+        expect(typeGuards.isError("error")).toBeFalsy();
 
         // Test isFiniteNumber
-        expect(typeGuards.isFiniteNumber(123)).toBe(true);
-        expect(typeGuards.isFiniteNumber(Infinity)).toBe(false);
-        expect(typeGuards.isFiniteNumber(Number.NaN)).toBe(false);
+        expect(typeGuards.isFiniteNumber(123)).toBeTruthy();
+        expect(typeGuards.isFiniteNumber(Infinity)).toBeFalsy();
+        expect(typeGuards.isFiniteNumber(Number.NaN)).toBeFalsy();
 
         // Test isFunction
-        expect(typeGuards.isFunction(() => {})).toBe(true);
-        expect(typeGuards.isFunction("function")).toBe(false);
+        expect(typeGuards.isFunction(() => {})).toBeTruthy();
+        expect(typeGuards.isFunction("function")).toBeFalsy();
 
         // Test isNonNegativeNumber
-        expect(typeGuards.isNonNegativeNumber(0)).toBe(true);
-        expect(typeGuards.isNonNegativeNumber(123)).toBe(true);
-        expect(typeGuards.isNonNegativeNumber(-1)).toBe(false);
+        expect(typeGuards.isNonNegativeNumber(0)).toBeTruthy();
+        expect(typeGuards.isNonNegativeNumber(123)).toBeTruthy();
+        expect(typeGuards.isNonNegativeNumber(-1)).toBeFalsy();
 
         // Test isNonNullObject
-        expect(typeGuards.isNonNullObject({})).toBe(true);
-        expect(typeGuards.isNonNullObject(null)).toBe(false);
-        expect(typeGuards.isNonNullObject("string")).toBe(false);
+        expect(typeGuards.isNonNullObject({})).toBeTruthy();
+        expect(typeGuards.isNonNullObject(null)).toBeFalsy();
+        expect(typeGuards.isNonNullObject("string")).toBeFalsy();
 
         // Test isPositiveNumber
-        expect(typeGuards.isPositiveNumber(123)).toBe(true);
-        expect(typeGuards.isPositiveNumber(0)).toBe(false);
-        expect(typeGuards.isPositiveNumber(-1)).toBe(false);
+        expect(typeGuards.isPositiveNumber(123)).toBeTruthy();
+        expect(typeGuards.isPositiveNumber(0)).toBeFalsy();
+        expect(typeGuards.isPositiveNumber(-1)).toBeFalsy();
 
         // Test isString
-        expect(typeGuards.isString("hello")).toBe(true);
-        expect(typeGuards.isString(123)).toBe(false);
+        expect(typeGuards.isString("hello")).toBeTruthy();
+        expect(typeGuards.isString(123)).toBeFalsy();
 
         // Test isValidPort
-        expect(typeGuards.isValidPort(80)).toBe(true);
-        expect(typeGuards.isValidPort(65_535)).toBe(true);
-        expect(typeGuards.isValidPort(0)).toBe(false);
-        expect(typeGuards.isValidPort(70_000)).toBe(false);
+        expect(typeGuards.isValidPort(80)).toBeTruthy();
+        expect(typeGuards.isValidPort(65_535)).toBeTruthy();
+        expect(typeGuards.isValidPort(0)).toBeFalsy();
+        expect(typeGuards.isValidPort(70_000)).toBeFalsy();
 
         // Test isValidTimestamp
-        expect(typeGuards.isValidTimestamp(Date.now())).toBe(true);
-        expect(typeGuards.isValidTimestamp(-1)).toBe(false);
+        expect(typeGuards.isValidTimestamp(Date.now())).toBeTruthy();
+        expect(typeGuards.isValidTimestamp(-1)).toBeFalsy();
     });
 
     it("should comprehensively test all shared/utils functions", async ({
@@ -403,6 +403,6 @@ describe("Final Function Coverage Push", () => {
         }
 
         // Ensure test passes
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 });

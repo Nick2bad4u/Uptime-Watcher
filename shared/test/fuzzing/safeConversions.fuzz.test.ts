@@ -21,7 +21,7 @@ import {
 } from "../../utils/safeConversions";
 
 describe("SafeConversions utilities fuzzing tests", () => {
-    describe("safeNumberConversion", () => {
+    describe(safeNumberConversion, () => {
         test.prop([fc.float().filter(n => !Number.isNaN(n))])(
             "should return numbers unchanged",
             (num) => {
@@ -79,7 +79,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         });
     });
 
-    describe("safeParseCheckInterval", () => {
+    describe(safeParseCheckInterval, () => {
         test.prop([fc.integer({ min: 1000 })])(
             "should return valid intervals unchanged",
             (interval) => {
@@ -118,7 +118,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         );
     });
 
-    describe("safeParseFloat", () => {
+    describe(safeParseFloat, () => {
         test.prop([fc.float()])(
             "should return floats unchanged",
             (num) => {
@@ -158,7 +158,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         });
     });
 
-    describe("safeParseInt", () => {
+    describe(safeParseInt, () => {
         test.prop([fc.integer()])(
             "should return integers unchanged",
             (num) => {
@@ -194,7 +194,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
             (value) => {
                 expect(() => safeParseInt(value)).not.toThrow();
                 expect(typeof safeParseInt(value)).toBe("number");
-                expect(Number.isInteger(safeParseInt(value))).toBe(true);
+                expect(Number.isInteger(safeParseInt(value))).toBeTruthy();
             }
         );
 
@@ -207,7 +207,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         });
     });
 
-    describe("safeParsePercentage", () => {
+    describe(safeParsePercentage, () => {
         test.prop([fc.float({ min: 0, max: 100, noNaN: true })])(
             "should return valid percentages unchanged",
             (percentage) => {
@@ -249,7 +249,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         });
     });
 
-    describe("safeParsePort", () => {
+    describe(safeParsePort, () => {
         test.prop([fc.integer({ min: 1, max: 65_535 })])(
             "should return valid ports unchanged",
             (port) => {
@@ -285,7 +285,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         });
     });
 
-    describe("safeParsePositiveInt", () => {
+    describe(safeParsePositiveInt, () => {
         test.prop([fc.integer({ min: 1 })])(
             "should return positive integers unchanged",
             (num) => {
@@ -308,7 +308,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
             (value) => {
                 const result = safeParsePositiveInt(value);
                 expect(result).toBeGreaterThan(0);
-                expect(Number.isInteger(result)).toBe(true);
+                expect(Number.isInteger(result)).toBeTruthy();
             }
         );
 
@@ -320,7 +320,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         });
     });
 
-    describe("safeParseRetryAttempts", () => {
+    describe(safeParseRetryAttempts, () => {
         test.prop([fc.integer({ min: 0, max: 10 })])(
             "should return valid retry attempts unchanged",
             (attempts) => {
@@ -355,7 +355,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         });
     });
 
-    describe("safeParseTimeout", () => {
+    describe(safeParseTimeout, () => {
         test.prop([fc.float({ min: Math.fround(0.1), noNaN: true })])(
             "should return positive timeouts unchanged",
             (timeout) => {
@@ -389,7 +389,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         });
     });
 
-    describe("safeParseTimestamp", () => {
+    describe(safeParseTimestamp, () => {
         test.prop([fc.integer({ min: 1, max: Date.now() + 86_400_000 })])(
             "should return valid timestamps unchanged",
             (timestamp) => {
@@ -489,7 +489,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
                 expect(typeof baseNum).toBe("number");
                 expect(typeof floatNum).toBe("number");
                 expect(typeof intNum).toBe("number");
-                expect(Number.isInteger(intNum)).toBe(true);
+                expect(Number.isInteger(intNum)).toBeTruthy();
             }
         );
 

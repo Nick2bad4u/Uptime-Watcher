@@ -201,8 +201,8 @@ describe("SiteManager Mock Debug", () => {
         };
 
         // Verify that mocking is working correctly
-        expect(debugInfo.cache.isGetMocked).toBe(true);
-        expect(debugInfo.repo.isGetSitesMocked).toBe(true);
-        expect(debugInfo.writer.isCreateSiteMocked).toBe(true);
+        expect(debugInfo.cache.isGetMocked).toBeTruthy();
+        expect(debugInfo.repo.isGetSitesMocked).toBeTruthy();
+        expect(debugInfo.writer.isCreateSiteMocked).toBeTruthy();
     });
 });

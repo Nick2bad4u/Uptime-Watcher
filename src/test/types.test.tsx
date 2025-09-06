@@ -93,8 +93,8 @@ describe("Types Module", () => {
             expect(monitor.url).toBe("https://example.com");
             expect(monitor.responseTime).toBe(250);
             expect(monitor.lastChecked).toBeInstanceOf(Date);
-            expect(Array.isArray(monitor.history)).toBe(true);
-            expect(monitor.monitoring).toBe(true);
+            expect(Array.isArray(monitor.history)).toBeTruthy();
+            expect(monitor.monitoring).toBeTruthy();
             expect(monitor.checkInterval).toBe(60_000);
             expect(monitor.timeout).toBe(5000);
             expect(monitor.retryAttempts).toBe(3);
@@ -223,8 +223,8 @@ describe("Types Module", () => {
 
             expect(site.identifier).toBe("site-123");
             expect(site.name).toBe("Test Site");
-            expect(Array.isArray(site.monitors)).toBe(true);
-            expect(site.monitoring).toBe(true);
+            expect(Array.isArray(site.monitors)).toBeTruthy();
+            expect(site.monitoring).toBeTruthy();
         });
 
         it("should create Site with multiple monitors", ({
@@ -300,7 +300,7 @@ describe("Types Module", () => {
 
             expect(site.identifier).toBe("minimal-site");
             expect(site.name).toBe("");
-            expect(site.monitoring).toBe(false);
+            expect(site.monitoring).toBeFalsy();
             expect(site.monitors).toHaveLength(0);
         });
     });
@@ -729,7 +729,7 @@ describe("Types Module", () => {
             expect(minimalMonitor.port).toBeUndefined();
             expect(minimalMonitor.responseTime).toBe(0);
             expect(minimalMonitor.lastChecked).toBeUndefined();
-            expect(minimalMonitor.monitoring).toBe(false);
+            expect(minimalMonitor.monitoring).toBeFalsy();
             expect(minimalMonitor.checkInterval).toBe(+0);
             expect(minimalMonitor.timeout).toBe(+0);
             expect(minimalMonitor.retryAttempts).toBe(0);
@@ -754,7 +754,7 @@ describe("Types Module", () => {
             };
 
             expect(minimalSite.name).toBe("");
-            expect(minimalSite.monitoring).toBe(false);
+            expect(minimalSite.monitoring).toBeFalsy();
         });
 
         it("should handle optional StatusUpdate fields", ({

@@ -21,7 +21,7 @@ describe("logTemplates function coverage", () => {
         vi.clearAllMocks();
     });
 
-    describe("createTemplateLogger", () => {
+    describe(createTemplateLogger, () => {
         it("should create a logger with template functions", async ({
             task,
             annotate,
@@ -187,7 +187,7 @@ describe("logTemplates function coverage", () => {
         });
     });
 
-    describe("interpolateLogTemplate", () => {
+    describe(interpolateLogTemplate, () => {
         it("should interpolate basic placeholders", async ({
             task,
             annotate,

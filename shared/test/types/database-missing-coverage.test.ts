@@ -31,8 +31,8 @@ describe("Database Types - Missing Coverage", () => {
                 details: null,
             };
 
-            expect(isValidHistoryRow(historyRowWithInvalidTimestamp)).toBe(
-                false
+            expect(isValidHistoryRow(historyRowWithInvalidTimestamp)).toBeFalsy(
+                
             );
         });
 
@@ -68,8 +68,8 @@ describe("Database Types - Missing Coverage", () => {
                 updated_at: Date.now(),
             };
 
-            expect(isValidMonitorRow(monitorRowWithInvalidTimestamp)).toBe(
-                false
+            expect(isValidMonitorRow(monitorRowWithInvalidTimestamp)).toBeFalsy(
+                
             );
         });
 
@@ -98,7 +98,7 @@ describe("Database Types - Missing Coverage", () => {
                 updated_at: Date.now(),
             };
 
-            expect(isValidSiteRow(siteRowWithInvalidTimestamp)).toBe(false);
+            expect(isValidSiteRow(siteRowWithInvalidTimestamp)).toBeFalsy();
         });
 
         test("should handle edge case string timestamps that become NaN", ({
@@ -138,7 +138,7 @@ describe("Database Types - Missing Coverage", () => {
                     details: null,
                 };
 
-                expect(isValidHistoryRow(historyRow)).toBe(false);
+                expect(isValidHistoryRow(historyRow)).toBeFalsy();
             }
         });
     });

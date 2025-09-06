@@ -29,6 +29,6 @@ describe("Components Index Barrel Exports", () => {
         await annotate("Type: Business Logic", "type");
 
         // Verify this is structured as a TypeScript module
-        expect(true).toBe(true); // Placeholder to ensure at least some test runs
+        expect(true).toBeTruthy(); // Placeholder to ensure at least some test runs
     });
 });

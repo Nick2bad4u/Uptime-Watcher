@@ -576,7 +576,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
 
             expect(site).toHaveProperty("identifier");
             expect(site).toHaveProperty("name");
-            expect(Array.isArray(site.monitors)).toBe(true);
+            expect(Array.isArray(site.monitors)).toBeTruthy();
         });
 
         it("should handle monitor parameter", () => {

@@ -313,7 +313,6 @@ export default [
     // YAML/YML files
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        name: "YAML/YML files",
         files: ["**/*.{yaml,yml}"],
         ignores: [],
         languageOptions: {
@@ -323,6 +322,7 @@ export default [
                 defaultYAMLVersion: "1.2",
             },
         },
+        name: "YAML/YML files",
         plugins: {
             "json-schema-validator": eslintPluginJsonSchemaValidator,
             yml: eslintPluginYml,
@@ -359,12 +359,12 @@ export default [
     // HTML files
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        name: "HTML files",
         files: ["**/*.{html,htm,xhtml}"],
         ignores: ["report/**"],
         languageOptions: {
             parser: htmlParser,
         },
+        name: "HTML files",
         plugins: {
             html: html,
         },
@@ -387,9 +387,9 @@ export default [
     // HTML in JS/TS files (HTML Literals)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        name: "HTML in JS/TS files",
         files: ["**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: ["report/**"],
+        name: "HTML in JS/TS files",
         plugins: {
             html: html,
         },
@@ -441,12 +441,12 @@ export default [
     // Package.json Linting
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        name: "Package.json files",
         files: ["**/package.json"],
         languageOptions: {
             parser: jsoncEslintParser,
             parserOptions: { jsonSyntax: "JSON" },
         },
+        name: "Package.json files",
         plugins: { json: json, "package-json": packageJson },
         rules: {
             ...json.configs.recommended.rules,
@@ -472,8 +472,8 @@ export default [
     // MDX Eslint Rules (mdx/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        name: "MDX files",
         files: ["**/*.mdx"],
+        name: "MDX files",
         plugins: { mdx: mdx },
 
         rules: {
@@ -501,9 +501,9 @@ export default [
     // MD Eslint Rules (md/*, markdown/*, markup/*, atom/*, rss/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        name: "Markdown files",
         files: ["**/*.{md,markup,atom,rss,markdown}"],
         language: "markdown/gfm",
+        name: "Markdown files",
         plugins: {
             markdown: markdown,
         },
@@ -532,7 +532,6 @@ export default [
     // CSS Eslint Rules (css/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        name: "CSS files",
         files: ["**/*.css"],
         ignores: [
             "docs/**",
@@ -542,6 +541,7 @@ export default [
         languageOptions: {
             tolerant: true,
         },
+        name: "CSS files",
         plugins: {
             css: css,
         },
@@ -559,12 +559,12 @@ export default [
     // JSONC Eslint Rules (jsonc/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        name: "JSONC files",
         files: [
             "**/*.jsonc",
             ".vscode/*.json",
         ],
         ignores: [],
+        name: "JSONC files",
         plugins: {
             eslintPluginJsonc: eslintPluginJsonc,
             json: json,
@@ -589,9 +589,9 @@ export default [
     // JSON Eslint Rules (json/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        name: "JSON files",
         files: ["**/*.json"],
         language: "json/json",
+        name: "JSON files",
         plugins: {
             json: json,
             "json-schema-validator": eslintPluginJsonSchemaValidator,
@@ -605,9 +605,9 @@ export default [
     // JSON5 Eslint Rules (json5/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        name: "JSON files",
         files: ["**/*.json5"],
         language: "json/json5",
+        name: "JSON files",
         plugins: {
             json: json,
             "json-schema-validator": eslintPluginJsonSchemaValidator,
@@ -621,13 +621,13 @@ export default [
     // TOML Eslint Rules (toml/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        name: "TOML files",
         files: ["**/*.toml"],
         ignores: ["lychee.toml"],
         languageOptions: {
             parser: tomlEslintParser,
             parserOptions: { tomlVersion: "1.0.0" },
         },
+        name: "TOML files",
         plugins: { toml: eslintPluginToml },
         rules: {
             // TOML Eslint Plugin Rules (toml/*)
@@ -654,7 +654,6 @@ export default [
     // TSX/JSX Eslint Rules (tsx/*, jsx/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        name: "TSX/JSX files",
         files: ["**/*.{tsx,jsx}"],
         ignores: [],
         languageOptions: {
@@ -679,6 +678,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
+        name: "TSX/JSX files",
         plugins: {
             "better-tailwindcss": pluginBetterTailwindcss,
             css: css,
@@ -793,7 +793,6 @@ export default [
     // Docusaurus Eslint Rules (docusaurus/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        name: "Docusaurus files",
         files: ["docs/docusaurus/**/*.{ts,tsx,mjs,cjs,js,jsx,mts,cts}"],
         ignores: [
             "docs/docusaurus/docs/**",
@@ -823,6 +822,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
+        name: "Docusaurus files",
         plugins: {
             "@docusaurus": pluginDocusaurus,
             "@eslint-react": eslintReact,
@@ -1866,7 +1866,6 @@ export default [
 
     // Docusaurus CSS
     {
-        name: "Docusaurus CSS",
         files: ["docs/docusaurus/**/*.css"],
         ignores: [
             "docs/docusaurus/docs/**",
@@ -1877,6 +1876,7 @@ export default [
         languageOptions: {
             tolerant: true,
         },
+        name: "Docusaurus CSS",
         plugins: {
             "@docusaurus": pluginDocusaurus,
             css: css,
@@ -1916,7 +1916,6 @@ export default [
 
     // TypeScript frontend files (React + Zustand)
     {
-        name: "TypeScript Frontend (React + Zustand)",
         files: ["src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: [
             "**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -1945,6 +1944,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
+        name: "TypeScript Frontend (React + Zustand)",
         plugins: {
             "@arthurgeron/react-usememo": pluginUseMemo2,
             "@eslint-react": eslintReact,
@@ -3271,7 +3271,6 @@ export default [
 
     // Electron backend files
     {
-        name: "Electron Backend",
         files: ["electron/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: [
             "electron/**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -3305,6 +3304,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
+        name: "Electron Backend",
         plugins: {
             "@eslint-react": eslintReact,
             "@eslint-react/dom": eslintReactDom,
@@ -4345,7 +4345,6 @@ export default [
 
     // TypeScript Shared (React and non-React)
     {
-        name: "TypeScript Shared (React and non-React)",
         files: ["shared/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: [
             "**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -4376,6 +4375,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
+        name: "TypeScript Shared (React and non-React)",
         plugins: {
             "@arthurgeron/react-usememo": pluginUseMemo2,
             "@eslint-react": eslintReact,
@@ -5686,7 +5686,6 @@ export default [
 
     // Test files (Frontend)
     {
-        name: "Tests (Frontend)",
         files: [
             "src/**/*.{spec,test}.*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "src/**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -5723,6 +5722,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
+        name: "Tests (Frontend)",
         plugins: {
             "@typescript-eslint": tseslint,
             "eslint-comments": pluginComments,
@@ -5750,37 +5750,8 @@ export default [
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
 
-            "vitest/no-commented-out-tests": "warn",
-            "vitest/no-disabled-tests": "warn",
-            "vitest/no-test-prefixes": "warn",
-            "vitest/no-focused-tests": "warn",
-            "vitest/no-alias-methods": "warn",
-            "vitest/no-identical-title": "warn",
-            "vitest/no-import-node-test": "warn",
-            "vitest/no-interpolation-in-snapshots": "warn",
-            "vitest/prefer-called-once": "warn",
-            "vitest/prefer-called-times": "warn",
-            "vitest/prefer-called-with": "warn",
-            "vitest/prefer-comparison-matcher": "warn",
-            "vitest/prefer-describe-function-title": "warn",
-            "vitest/prefer-expect-resolves": "warn",
-            "vitest/prefer-spy-on": "warn",
-            "vitest/prefer-strict-boolean-matchers": "warn",
-            "vitest/prefer-to-be": "off",
-            "vitest/prefer-to-be-falsy": "warn",
-            "vitest/prefer-to-be-object": "warn",
-            "vitest/prefer-to-be-truthy": "warn",
-            "vitest/prefer-to-contain": "warn",
-            "vitest/prefer-to-have-length": "warn",
-            "vitest/prefer-todo": "warn",
-            "vitest/prefer-vi-mocked": "warn",
-            "vitest/require-mock-type-parameters": "off",
-            "vitest/valid-expect": "warn",
-            "vitest/valid-title": "warn",
-
             // Relaxed function rules for tests (explicit for clarity)
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
-
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "@typescript-eslint/no-non-null-assertion": "off",
@@ -5807,7 +5778,9 @@ export default [
             "max-lines-per-function": "off",
             "max-params": "off",
             "max-statements": "off",
+
             "new-cap": "off", // Allow new-cap for class constructors
+
             "nitpick/no-redundant-vars": "off", // Allow redundant vars in tests
             "no-await-in-loop": "off", // Allow await in loops for sequential operations
             "no-console": "off",
@@ -5862,6 +5835,33 @@ export default [
             "unicorn/prefer-global-this": "off", // Allow globalThis for test setups
             "unicorn/prefer-optional-catch-binding": "off", // Allow optional catch binding for test flexibility
             "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
+            "vitest/no-alias-methods": "warn",
+            "vitest/no-commented-out-tests": "warn",
+            "vitest/no-disabled-tests": "warn",
+            "vitest/no-focused-tests": "warn",
+            "vitest/no-identical-title": "warn",
+            "vitest/no-import-node-test": "warn",
+            "vitest/no-interpolation-in-snapshots": "warn",
+            "vitest/no-test-prefixes": "warn",
+            "vitest/prefer-called-once": "off",
+            "vitest/prefer-called-times": "warn",
+            "vitest/prefer-called-with": "off",
+            "vitest/prefer-comparison-matcher": "warn",
+            "vitest/prefer-describe-function-title": "warn",
+            "vitest/prefer-expect-resolves": "warn",
+            "vitest/prefer-spy-on": "off",
+            "vitest/prefer-strict-boolean-matchers": "off",
+            "vitest/prefer-to-be": "off",
+            "vitest/prefer-to-be-falsy": "warn",
+            "vitest/prefer-to-be-object": "warn",
+            "vitest/prefer-to-be-truthy": "warn",
+            "vitest/prefer-to-contain": "warn",
+            "vitest/prefer-to-have-length": "warn",
+            "vitest/prefer-todo": "warn",
+            "vitest/prefer-vi-mocked": "off",
+            "vitest/require-mock-type-parameters": "off",
+            "vitest/valid-expect": "warn",
+            "vitest/valid-title": "warn",
         },
 
         settings: {
@@ -5896,7 +5896,6 @@ export default [
 
     // Test files (Backend)
     {
-        name: "Tests (Backend)",
         files: [
             "electron/**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "electron/test/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -5929,6 +5928,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
+        name: "Tests (Backend)",
         plugins: {
             "@typescript-eslint": tseslint,
             "import-x": importX,
@@ -5953,42 +5953,12 @@ export default [
             ...pluginUnicorn.configs.all.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
 
-            "vitest/no-commented-out-tests": "warn",
-            "vitest/no-disabled-tests": "warn",
-            "vitest/no-test-prefixes": "warn",
-            "vitest/no-focused-tests": "warn",
-            "vitest/no-alias-methods": "warn",
-            "vitest/no-identical-title": "warn",
-            "vitest/no-import-node-test": "warn",
-            "vitest/no-interpolation-in-snapshots": "warn",
-            "vitest/prefer-called-once": "warn",
-            "vitest/prefer-called-times": "warn",
-            "vitest/prefer-called-with": "warn",
-            "vitest/prefer-comparison-matcher": "warn",
-            "vitest/prefer-describe-function-title": "warn",
-            "vitest/prefer-expect-resolves": "warn",
-            "vitest/prefer-spy-on": "warn",
-            "vitest/prefer-strict-boolean-matchers": "warn",
-            "vitest/prefer-to-be": "off",
-            "vitest/prefer-to-be-falsy": "warn",
-            "vitest/prefer-to-be-object": "warn",
-            "vitest/prefer-to-be-truthy": "warn",
-            "vitest/prefer-to-contain": "warn",
-            "vitest/prefer-to-have-length": "warn",
-            "vitest/prefer-todo": "warn",
-            "vitest/prefer-vi-mocked": "warn",
-            "vitest/require-mock-type-parameters": "off",
-            "vitest/valid-expect": "warn",
-            "vitest/valid-title": "warn",
-
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
-
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
             "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
-
             "@typescript-eslint/no-unused-vars": "off",
             "@typescript-eslint/no-use-before-define": "off", // Allow use before define in tests
             camelcase: "off",
@@ -6011,12 +5981,15 @@ export default [
             "max-lines-per-function": "off",
             "max-params": "off",
             "max-statements": "off",
+
             "new-cap": "off", // Allow new-cap for class constructors
+
             "no-await-in-loop": "off", // Allow await in loops for sequential operations
             "no-console": "off",
             "no-duplicate-imports": "off", // Allow duplicate imports for test setups
             "no-inline-comments": "off",
             "no-loop-func": "off", // Allow functions in loops for test setups
+
             "no-magic-numbers": "off",
             "no-new": "off", // Allow new for class constructors
             // No Only Tests
@@ -6066,6 +6039,33 @@ export default [
             "unicorn/prefer-global-this": "off", // Allow globalThis for test setups
             "unicorn/prefer-optional-catch-binding": "off", // Allow optional catch binding for test flexibility
             "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
+            "vitest/no-alias-methods": "warn",
+            "vitest/no-commented-out-tests": "warn",
+            "vitest/no-disabled-tests": "warn",
+            "vitest/no-focused-tests": "warn",
+            "vitest/no-identical-title": "warn",
+            "vitest/no-import-node-test": "warn",
+            "vitest/no-interpolation-in-snapshots": "warn",
+            "vitest/no-test-prefixes": "warn",
+            "vitest/prefer-called-once": "off",
+            "vitest/prefer-called-times": "warn",
+            "vitest/prefer-called-with": "off",
+            "vitest/prefer-comparison-matcher": "warn",
+            "vitest/prefer-describe-function-title": "warn",
+            "vitest/prefer-expect-resolves": "warn",
+            "vitest/prefer-spy-on": "off",
+            "vitest/prefer-strict-boolean-matchers": "off",
+            "vitest/prefer-to-be": "off",
+            "vitest/prefer-to-be-falsy": "warn",
+            "vitest/prefer-to-be-object": "warn",
+            "vitest/prefer-to-be-truthy": "warn",
+            "vitest/prefer-to-contain": "warn",
+            "vitest/prefer-to-have-length": "warn",
+            "vitest/prefer-todo": "warn",
+            "vitest/prefer-vi-mocked": "off",
+            "vitest/require-mock-type-parameters": "off",
+            "vitest/valid-expect": "warn",
+            "vitest/valid-title": "warn",
         },
         settings: {
             "import-x/resolver": {
@@ -6098,7 +6098,6 @@ export default [
 
     // Shared Test Files
     {
-        name: "Tests (Shared)",
         files: [
             "shared/**/*.{spec,test}.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
             "shared/test/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
@@ -6131,6 +6130,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
+        name: "Tests (Shared)",
         plugins: {
             "@typescript-eslint": tseslint,
             "eslint-comments": pluginComments,
@@ -6157,36 +6157,6 @@ export default [
             ...pluginComments.configs.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
-
-            "vitest/no-commented-out-tests": "warn",
-            "vitest/no-disabled-tests": "warn",
-            "vitest/no-test-prefixes": "warn",
-            "vitest/no-focused-tests": "warn",
-            "vitest/no-alias-methods": "warn",
-            "vitest/no-identical-title": "warn",
-            "vitest/no-import-node-test": "warn",
-            "vitest/no-interpolation-in-snapshots": "warn",
-            "vitest/prefer-called-once": "warn",
-            "vitest/prefer-called-times": "warn",
-            "vitest/prefer-called-with": "warn",
-            "vitest/prefer-comparison-matcher": "warn",
-            "vitest/prefer-describe-function-title": "warn",
-            "vitest/prefer-expect-resolves": "warn",
-            "vitest/prefer-spy-on": "warn",
-            "vitest/prefer-strict-boolean-matchers": "warn",
-            "vitest/prefer-to-be": "off",
-            "vitest/prefer-to-be-falsy": "warn",
-            "vitest/prefer-to-be-object": "warn",
-            "vitest/prefer-to-be-truthy": "warn",
-            "vitest/prefer-to-contain": "warn",
-            "vitest/prefer-to-have-length": "warn",
-            "vitest/prefer-todo": "warn",
-            "vitest/prefer-vi-mocked": "warn",
-            "vitest/require-mock-type-parameters": "off",
-            "vitest/valid-expect": "warn",
-            "vitest/valid-title": "warn",
-
-            // Relaxed function rules for tests (explicit for clarity)
 
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
@@ -6215,6 +6185,9 @@ export default [
             "no-undef-init": "off",
             "no-undefined": "off",
             "no-void": "off",
+
+            // Relaxed function rules for tests (explicit for clarity)
+
             "object-shorthand": "off",
             "one-var": "off",
             "prefer-arrow-callback": "off",
@@ -6246,6 +6219,33 @@ export default [
             "unicorn/no-unused-properties": "off", // Allow unused properties in test setups
             "unicorn/no-useless-undefined": "off", // Allow undefined in test setups
             "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
+            "vitest/no-alias-methods": "warn",
+            "vitest/no-commented-out-tests": "warn",
+            "vitest/no-disabled-tests": "warn",
+            "vitest/no-focused-tests": "warn",
+            "vitest/no-identical-title": "warn",
+            "vitest/no-import-node-test": "warn",
+            "vitest/no-interpolation-in-snapshots": "warn",
+            "vitest/no-test-prefixes": "warn",
+            "vitest/prefer-called-once": "off",
+            "vitest/prefer-called-times": "warn",
+            "vitest/prefer-called-with": "off",
+            "vitest/prefer-comparison-matcher": "warn",
+            "vitest/prefer-describe-function-title": "warn",
+            "vitest/prefer-expect-resolves": "warn",
+            "vitest/prefer-spy-on": "off",
+            "vitest/prefer-strict-boolean-matchers": "off",
+            "vitest/prefer-to-be": "off",
+            "vitest/prefer-to-be-falsy": "warn",
+            "vitest/prefer-to-be-object": "warn",
+            "vitest/prefer-to-be-truthy": "warn",
+            "vitest/prefer-to-contain": "warn",
+            "vitest/prefer-to-have-length": "warn",
+            "vitest/prefer-todo": "warn",
+            "vitest/prefer-vi-mocked": "off",
+            "vitest/require-mock-type-parameters": "off",
+            "vitest/valid-expect": "warn",
+            "vitest/valid-title": "warn",
         },
 
         settings: {
@@ -6280,7 +6280,6 @@ export default [
 
     // Benchmark files
     {
-        name: "Benchmarks",
         files: [
             "benchmarks/**/*.bench.*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "benchmarks/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
@@ -6315,6 +6314,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
+        name: "Benchmarks",
         plugins: {
             "@typescript-eslint": tseslint,
             "eslint-comments": pluginComments,
@@ -6462,7 +6462,6 @@ export default [
 
     // TypeScript Config files using Electron Test TSConfig
     {
-        name: "TypeScript Config Files",
         files: [
             "**/*.config.{ts,tsx,mts,cts}", // Configuration files
             "**/*.config.**.*.{ts,tsx,mts,cts}",
@@ -6493,6 +6492,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
+        name: "TypeScript Config Files",
         plugins: {
             "@typescript-eslint": tseslint,
             "array-func": arrayFunc,
@@ -7022,7 +7022,6 @@ export default [
 
     // Script files
     {
-        name: "Script Files",
         files: [
             "scripts/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
             "scripts/download-docs-template.mjs",
@@ -7043,6 +7042,7 @@ export default [
                 require: "readonly",
             },
         },
+        name: "Script Files",
         plugins: {
             "@typescript-eslint": tseslint,
             "eslint-comments": pluginComments,
@@ -7179,7 +7179,6 @@ export default [
 
     // JS/MJS Configuration files
     {
-        name: "JS/MJS Config Files",
         files: [
             "**/*.config.{js,mjs,cts,cjs}",
             "**/*.config.**.*.{js,mjs,cts,cjs}",
@@ -7194,6 +7193,7 @@ export default [
                 require: "readonly",
             },
         },
+        name: "JS/MJS Config Files",
         plugins: {
             "@typescript-eslint": tseslint,
             compat: pluginCompat,
@@ -7304,12 +7304,12 @@ export default [
 
     // Strict Test files (Frontend)
     {
-        name: "Strict Test Files (Frontend)",
         files: [
             "shared/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "src/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "electron/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
         ],
+        name: "Strict Test Files (Frontend)",
         plugins: {
             vitest: vitest,
         },
@@ -7325,8 +7325,8 @@ export default [
 
     // Theme components override - disable react-perf rule for inline styling
     {
-        name: "Theme Components Override",
         files: ["src/theme/**/*.{ts,tsx,cts,mts}"],
+        name: "Theme Components Override",
         rules: {
             // Theme components legitimately need inline styles for dynamic theming
             "react-perf/jsx-no-new-object-as-prop": "warn",
@@ -7335,7 +7335,6 @@ export default [
 
     // YAML/YML disable empty key for github workflows (false positive)
     {
-        name: "YAML/YML Github Workflows Disable Empty Key",
         files: [
             "**/.github/workflows/**/*.{yaml,yml}",
             "config/tools/flatpak-build.yml",
@@ -7343,6 +7342,7 @@ export default [
             "**/.spellcheck.yml",
             "**/.pre-commit-config.yaml",
         ],
+        name: "YAML/YML Github Workflows Disable Empty Key",
         rules: {
             "yml/block-mapping-colon-indicator-newline": "off",
             "yml/no-empty-key": "off",

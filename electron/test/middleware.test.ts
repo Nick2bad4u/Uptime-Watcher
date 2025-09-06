@@ -43,7 +43,7 @@ describe("middleware.ts", () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
-    describe("createLoggingMiddleware", () => {
+    describe(createLoggingMiddleware, () => {
         it("logs at correct level with data", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: middleware", "component");
@@ -90,7 +90,7 @@ describe("middleware.ts", () => {
             expect(next).toHaveBeenCalled();
         });
     });
-    describe("createMetricsMiddleware", () => {
+    describe(createMetricsMiddleware, () => {
         it("tracks counts and timings with correct arithmetic (kills +1/-1 and duration +/- mutants)", async ({
             task,
             annotate,
@@ -167,7 +167,7 @@ describe("middleware.ts", () => {
             expect(metricsCallback).not.toHaveBeenCalled();
         });
     });
-    describe("createErrorHandlingMiddleware", () => {
+    describe(createErrorHandlingMiddleware, () => {
         it("catches errors and logs, calls onError, continues if continueOnError", async ({
             task,
             annotate,
@@ -204,7 +204,7 @@ describe("middleware.ts", () => {
             await expect(mw("eventF", {}, next)).rejects.toThrow("fail2");
         });
     });
-    describe("createRateLimitMiddleware", () => {
+    describe(createRateLimitMiddleware, () => {
         it("allows events under the limit", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: middleware", "component");
@@ -264,7 +264,7 @@ describe("middleware.ts", () => {
             expect(onRateLimit).toHaveBeenCalledWith("eventI", {});
         });
     });
-    describe("createValidationMiddleware", () => {
+    describe(createValidationMiddleware, () => {
         it("passes valid data", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: middleware", "component");
@@ -312,7 +312,7 @@ describe("middleware.ts", () => {
             expect(logger.error).toHaveBeenCalled();
         });
     });
-    describe("createFilterMiddleware", () => {
+    describe(createFilterMiddleware, () => {
         it("blocks events not in allowList", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: middleware", "component");
@@ -367,7 +367,7 @@ describe("middleware.ts", () => {
             expect(next).toHaveBeenCalled();
         });
     });
-    describe("createDebugMiddleware", () => {
+    describe(createDebugMiddleware, () => {
         it("logs debug info when enabled", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: middleware", "component");
@@ -403,7 +403,7 @@ describe("middleware.ts", () => {
             expect(next).toHaveBeenCalled();
         });
     });
-    describe("composeMiddleware", () => {
+    describe(composeMiddleware, () => {
         it("runs all middleware in order", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: middleware", "component");

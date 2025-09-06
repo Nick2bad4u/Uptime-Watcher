@@ -171,9 +171,9 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             const result = scheduler.startMonitor("site1", monitor);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(scheduler.getActiveCount()).toBe(1);
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeTruthy();
             expect(scheduler.getActiveMonitors()).toEqual(["site1|monitor1"]);
         });
 
@@ -190,7 +190,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             const result = scheduler.startMonitor("site1", monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(scheduler.getActiveCount()).toBe(0);
         });
 
@@ -213,7 +213,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             const result = scheduler.startMonitor("site1", monitor);
 
-            expect(result).toBe(true); // startMonitor ignores monitoring flag
+            expect(result).toBeTruthy(); // startMonitor ignores monitoring flag
             expect(scheduler.getActiveCount()).toBe(1);
         });
 
@@ -236,9 +236,9 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             const result = scheduler.startMonitor("site1", monitor);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             // The monitor should still be started with minimum interval
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeTruthy();
         });
 
         it("should execute check callback at specified intervals", async ({
@@ -326,12 +326,12 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             });
 
             scheduler.startMonitor("site1", monitor);
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeTruthy();
 
             const result = scheduler.stopMonitor("site1", "monitor1");
 
-            expect(result).toBe(true);
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(false);
+            expect(result).toBeTruthy();
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeFalsy();
             expect(scheduler.getActiveCount()).toBe(0);
         });
 
@@ -346,7 +346,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             const result = scheduler.stopMonitor("site1", "nonexistent");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should handle stopping monitor that is already stopped", async ({
@@ -372,7 +372,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             // Try to stop again
             const result = scheduler.stopMonitor("site1", "monitor1");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -402,8 +402,8 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             const result = scheduler.restartMonitor("site1", monitor);
 
-            expect(result).toBe(true);
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
+            expect(result).toBeTruthy();
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeTruthy();
         });
 
         it("should start monitoring for non-active monitor", async ({
@@ -425,8 +425,8 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             const result = scheduler.restartMonitor("site1", monitor);
 
-            expect(result).toBe(true);
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
+            expect(result).toBeTruthy();
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeTruthy();
         });
 
         it("should return false for monitor without ID", async ({
@@ -448,7 +448,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             const result = scheduler.restartMonitor("site1", monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -492,8 +492,8 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             scheduler.startSite(site);
 
             expect(scheduler.getActiveCount()).toBe(2);
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
-            expect(scheduler.isMonitoring("site1", "monitor2")).toBe(true);
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeTruthy();
+            expect(scheduler.isMonitoring("site1", "monitor2")).toBeTruthy();
         });
 
         it("should handle site with no monitors", async ({
@@ -589,8 +589,8 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             scheduler.stopSite("site1");
 
             expect(scheduler.getActiveCount()).toBe(0);
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(false);
-            expect(scheduler.isMonitoring("site1", "monitor2")).toBe(false);
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeFalsy();
+            expect(scheduler.isMonitoring("site1", "monitor2")).toBeFalsy();
         });
 
         it("should handle stopping non-existent site", async ({
@@ -651,8 +651,8 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             scheduler.stopSite("site1");
 
             expect(scheduler.getActiveCount()).toBe(1);
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(false);
-            expect(scheduler.isMonitoring("site2", "monitor2")).toBe(true);
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeFalsy();
+            expect(scheduler.isMonitoring("site2", "monitor2")).toBeTruthy();
         });
     });
 
@@ -810,7 +810,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             expect(errorCallback).toHaveBeenCalledWith("site1", "monitor1");
             // Monitor should still be active after error
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeTruthy();
         });
 
         it("should handle monitor with zero check interval", async ({
@@ -832,8 +832,8 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             // Should use default check interval when 0 is specified (0 means use default)
             const result = scheduler.startMonitor("site1", monitor);
-            expect(result).toBe(true);
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
+            expect(result).toBeTruthy();
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeTruthy();
         });
 
         it("should handle monitor with negative check interval", async ({
@@ -878,8 +878,8 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             const result = scheduler.startMonitor("site1", monitor);
 
-            expect(result).toBe(true);
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
+            expect(result).toBeTruthy();
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeTruthy();
         });
 
         it("should handle empty string site identifier", async ({
@@ -901,8 +901,8 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             const result = scheduler.startMonitor("", monitor);
 
-            expect(result).toBe(true);
-            expect(scheduler.isMonitoring("", "monitor1")).toBe(true);
+            expect(result).toBeTruthy();
+            expect(scheduler.isMonitoring("", "monitor1")).toBeTruthy();
         });
 
         it("should handle empty string monitor ID by returning false", async ({
@@ -924,8 +924,8 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
             const result = scheduler.startMonitor("site1", monitor);
 
-            expect(result).toBe(false); // Empty string ID is treated as no ID
-            expect(scheduler.isMonitoring("site1", "")).toBe(false);
+            expect(result).toBeFalsy(); // Empty string ID is treated as no ID
+            expect(scheduler.isMonitoring("site1", "")).toBeFalsy();
         });
     });
 
@@ -977,7 +977,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             scheduler.startMonitor("site1", monitor);
 
             // Monitor should be started despite low interval
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeTruthy();
         });
     });
 
@@ -1012,10 +1012,10 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             });
 
             scheduler.startMonitor("site1", monitor1);
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeTruthy();
 
             scheduler.restartMonitor("site1", monitor2);
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeTruthy();
             expect(scheduler.getActiveCount()).toBe(1);
         });
 
@@ -1054,8 +1054,8 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             scheduler.restartMonitor("site1", monitor2);
 
             expect(scheduler.getActiveCount()).toBe(1);
-            expect(scheduler.isMonitoring("site1", "monitor1")).toBe(false);
-            expect(scheduler.isMonitoring("site1", "monitor2")).toBe(true);
+            expect(scheduler.isMonitoring("site1", "monitor1")).toBeFalsy();
+            expect(scheduler.isMonitoring("site1", "monitor2")).toBeTruthy();
         });
     });
 });

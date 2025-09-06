@@ -38,7 +38,7 @@ describe("Duration Utils Property-Based Tests", () => {
         fc.constant(10)
     );
 
-    describe("calculateMaxDuration", () => {
+    describe(calculateMaxDuration, () => {
         test.prop([reasonableTimeout, reasonableRetries])(
             "should always return a properly formatted duration string",
             (timeout, retries) => {

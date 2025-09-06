@@ -506,7 +506,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             const sites = await siteRepositoryService.getSitesFromDatabase();
 
-            expect(sites[0]?.monitoring).toBe(true);
+            expect(sites[0]?.monitoring).toBeTruthy();
         });
 
         it("should handle monitor without ID", async ({ task, annotate }) => {
@@ -884,7 +884,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
         });
     });
 
-    describe("SiteLoadingError", () => {
+    describe(SiteLoadingError, () => {
         it("should create error with message", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepositoryService", "component");
@@ -1029,7 +1029,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
 
             // Verify complete workflow
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.sitesLoaded).toBe(1);
             expect(mockSiteCache.set).toHaveBeenCalledWith("complex-site", {
                 identifier: "complex-site",

@@ -30,7 +30,7 @@ describe("Store Loading State Tests", () => {
         await annotate("Type: Data Loading", "type");
 
         // Test that the new store structure handles loading states correctly
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 
     it("should handle error states properly", async ({ task, annotate }) => {
@@ -40,7 +40,7 @@ describe("Store Loading State Tests", () => {
         await annotate("Type: Error Handling", "type");
 
         // Test that the new store structure handles error states correctly
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 
     it("should handle concurrent operations", async ({ task, annotate }) => {
@@ -50,6 +50,6 @@ describe("Store Loading State Tests", () => {
         await annotate("Type: Business Logic", "type");
 
         // Test that the new store structure handles concurrent operations correctly
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 });

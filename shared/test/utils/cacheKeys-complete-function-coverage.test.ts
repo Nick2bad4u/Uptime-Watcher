@@ -113,18 +113,18 @@ describe("CacheKeys - Complete Function Coverage", () => {
             expect(typeof cacheKeysModule.parseCacheKey).toBe("function");
 
             // Test isStandardizedCacheKey function
-            expect(cacheKeysModule.isStandardizedCacheKey("config:test")).toBe(
-                true
+            expect(cacheKeysModule.isStandardizedCacheKey("config:test")).toBeTruthy(
+                
             );
             expect(
                 cacheKeysModule.isStandardizedCacheKey("monitor:operation:test")
-            ).toBe(true);
-            expect(cacheKeysModule.isStandardizedCacheKey("invalid")).toBe(
-                false
+            ).toBeTruthy();
+            expect(cacheKeysModule.isStandardizedCacheKey("invalid")).toBeFalsy(
+                
             );
             expect(
                 cacheKeysModule.isStandardizedCacheKey("invalid:too:many:parts")
-            ).toBe(false);
+            ).toBeFalsy();
 
             // Test parseCacheKey function with valid keys
             const parsed2Part =
@@ -225,15 +225,15 @@ describe("CacheKeys - Complete Function Coverage", () => {
             const validationKey =
                 cacheKeysModule.CacheKeys.validation.monitorType("http");
 
-            expect(cacheKeysModule.isStandardizedCacheKey(configKey)).toBe(
-                true
+            expect(cacheKeysModule.isStandardizedCacheKey(configKey)).toBeTruthy(
+                
             );
-            expect(cacheKeysModule.isStandardizedCacheKey(monitorKey)).toBe(
-                true
+            expect(cacheKeysModule.isStandardizedCacheKey(monitorKey)).toBeTruthy(
+                
             );
-            expect(cacheKeysModule.isStandardizedCacheKey(siteKey)).toBe(true);
-            expect(cacheKeysModule.isStandardizedCacheKey(validationKey)).toBe(
-                true
+            expect(cacheKeysModule.isStandardizedCacheKey(siteKey)).toBeTruthy();
+            expect(cacheKeysModule.isStandardizedCacheKey(validationKey)).toBeTruthy(
+                
             );
 
             // Verify round-trip: generate -> parse -> validate

@@ -39,7 +39,7 @@ describe("interfaces.ts - Branch Coverage", () => {
 
             // This test ensures the interfaces maintain their intended structure
             // Even if there's no runtime code to test, the import validates TypeScript compilation
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
     describe("Documentation and Future Enhancement", () => {
@@ -55,7 +55,7 @@ describe("interfaces.ts - Branch Coverage", () => {
 
             // This test serves as documentation for how interfaces should be used
             // and provides a place for future runtime validation if needed
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 });

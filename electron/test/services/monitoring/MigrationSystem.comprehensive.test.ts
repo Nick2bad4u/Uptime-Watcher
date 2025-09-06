@@ -366,7 +366,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 expect(
                     migrationRegistry.canMigrate("http", "1.0.0", "1.1.0")
-                ).toBe(true);
+                ).toBeTruthy();
             });
 
             it("should return false when no migration path exists", async ({
@@ -380,7 +380,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 expect(
                     migrationRegistry.canMigrate("http", "1.0.0", "2.0.0")
-                ).toBe(false);
+                ).toBeFalsy();
             });
 
             it("should return true for same versions", async ({
@@ -394,7 +394,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 expect(
                     migrationRegistry.canMigrate("http", "1.0.0", "1.0.0")
-                ).toBe(true);
+                ).toBeTruthy();
             });
 
             it("should return false for invalid version strings", async ({
@@ -408,7 +408,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 expect(
                     migrationRegistry.canMigrate("http", "invalid", "1.1.0")
-                ).toBe(false);
+                ).toBeFalsy();
             });
         });
 
@@ -495,8 +495,8 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 await annotate("Type: Business Logic", "type");
 
                 versionManager.setVersion("http", "1.1.0");
-                expect(versionManager.isVersionApplied("http", "1.1.0")).toBe(
-                    true
+                expect(versionManager.isVersionApplied("http", "1.1.0")).toBeTruthy(
+                    
                 );
             });
 
@@ -510,8 +510,8 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 await annotate("Type: Business Logic", "type");
 
                 versionManager.setVersion("http", "1.1.0");
-                expect(versionManager.isVersionApplied("http", "1.0.0")).toBe(
-                    false
+                expect(versionManager.isVersionApplied("http", "1.0.0")).toBeFalsy(
+                    
                 );
             });
 
@@ -526,7 +526,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 expect(
                     versionManager.isVersionApplied("unknown", "1.0.0")
-                ).toBe(false);
+                ).toBeFalsy();
             });
         });
 
@@ -593,7 +593,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 const versions = versionManager.getAllVersions();
                 const httpVersion = versions.get("http");
 
-                expect(httpVersion?.applied).toBe(true);
+                expect(httpVersion?.applied).toBeTruthy();
                 expect(httpVersion?.timestamp).toBeGreaterThanOrEqual(
                     beforeTime
                 );
@@ -627,7 +627,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                     "1.0.0"
                 );
 
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 expect(result.appliedMigrations).toEqual([]);
                 expect(result.data).toBe(data);
                 expect(result.errors).toEqual([]);
@@ -663,7 +663,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                     "1.1.0"
                 );
 
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 expect(result.appliedMigrations).toEqual(["1.0.0_to_1.1.0"]);
                 expect(result.data).toEqual({ ...data, timeout: 30_000 });
                 expect(result.errors).toEqual([]);
@@ -705,7 +705,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                     "1.2.0"
                 );
 
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 expect(result.appliedMigrations).toEqual([
                     "1.0.0_to_1.1.0",
                     "1.1.0_to_1.2.0",
@@ -742,7 +742,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                     "2.0.0"
                 );
 
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 expect(result.warnings).toContain(
                     "Applied breaking migration: Breaking change"
                 );
@@ -775,7 +775,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                     "1.1.0"
                 );
 
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
                 expect(result.errors).toHaveLength(1);
                 expect(result.errors[0]).toContain(
                     "Migration failed: Failing migration"
@@ -810,7 +810,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                     "1.1.0"
                 );
 
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
                 expect(result.errors[0]).toContain("String error");
             });
 
@@ -849,7 +849,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                     "1.2.0"
                 );
 
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
                 expect(result.appliedMigrations).toEqual([]); // No migrations should be marked as applied
                 expect(result.errors).toHaveLength(1);
             });
@@ -872,7 +872,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                     "2.0.0"
                 );
 
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
                 expect(result.errors).toHaveLength(1);
                 expect(result.errors[0]).toContain(
                     "Migration orchestration failed"
@@ -900,8 +900,8 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 );
 
                 expect(versionManager.getVersion("http")).toBe("1.1.0");
-                expect(versionManager.isVersionApplied("http", "1.1.0")).toBe(
-                    true
+                expect(versionManager.isVersionApplied("http", "1.1.0")).toBeTruthy(
+                    
                 );
             });
 
@@ -957,7 +957,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
     });
 
     describe("Factory Functions", () => {
-        describe("createMigrationOrchestrator", () => {
+        describe(createMigrationOrchestrator, () => {
             it("should create orchestrator instance", async ({
                 task,
                 annotate,
@@ -1043,8 +1043,8 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(exampleMigrations.httpV1_0_to_1_1.toVersion).toBe(
                     "1.1.0"
                 );
-                expect(exampleMigrations.httpV1_0_to_1_1.isBreaking).toBe(
-                    false
+                expect(exampleMigrations.httpV1_0_to_1_1.isBreaking).toBeFalsy(
+                    
                 );
                 expect(exampleMigrations.httpV1_0_to_1_1.description).toContain(
                     "timeout"
@@ -1186,8 +1186,8 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(exampleMigrations.portV1_0_to_1_1.toVersion).toBe(
                     "1.1.0"
                 );
-                expect(exampleMigrations.portV1_0_to_1_1.isBreaking).toBe(
-                    false
+                expect(exampleMigrations.portV1_0_to_1_1.isBreaking).toBeFalsy(
+                    
                 );
                 expect(exampleMigrations.portV1_0_to_1_1.description).toContain(
                     "port"
@@ -1227,7 +1227,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 "1.1.0"
             );
 
-            expect(httpResult.success).toBe(true);
+            expect(httpResult.success).toBeTruthy();
             expect(httpResult.data?.["timeout"]).toBe(30_000);
 
             // Test port migration
@@ -1239,12 +1239,12 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 "1.1.0"
             );
 
-            expect(portResult.success).toBe(true);
+            expect(portResult.success).toBeTruthy();
             expect(portResult.data?.["port"]).toBe(8080);
 
             // Verify version tracking
-            expect(versionManager.isVersionApplied("http", "1.1.0")).toBe(true);
-            expect(versionManager.isVersionApplied("port", "1.1.0")).toBe(true);
+            expect(versionManager.isVersionApplied("http", "1.1.0")).toBeTruthy();
+            expect(versionManager.isVersionApplied("port", "1.1.0")).toBeTruthy();
         });
 
         it("should handle complex migration chains", async ({
@@ -1293,7 +1293,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 "2.0.0"
             );
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.appliedMigrations).toHaveLength(3);
             expect(result.warnings).toHaveLength(1);
             expect(result.data).toEqual({

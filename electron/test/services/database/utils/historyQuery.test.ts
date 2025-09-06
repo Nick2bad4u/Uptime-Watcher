@@ -56,7 +56,7 @@ describe("historyQuery utilities", () => {
         vi.restoreAllMocks();
     });
 
-    describe("findHistoryByMonitorId", () => {
+    describe(findHistoryByMonitorId, () => {
         it("should return empty array when no history entries exist", async ({
             task,
             annotate,
@@ -320,7 +320,7 @@ describe("historyQuery utilities", () => {
                         [monitorId]
                     );
 
-                    expect(Array.isArray(result)).toBe(true);
+                    expect(Array.isArray(result)).toBeTruthy();
                     expect(result).toHaveLength(historyRows.length);
 
                     if (historyRows.length > 0) {
@@ -346,7 +346,7 @@ describe("historyQuery utilities", () => {
 
                     // Assert
                     expect(result).toEqual([]);
-                    expect(Array.isArray(result)).toBe(true);
+                    expect(Array.isArray(result)).toBeTruthy();
                     expect(result).toHaveLength(0);
                 }
             );
@@ -411,7 +411,7 @@ describe("historyQuery utilities", () => {
                             [monitorId]
                         );
 
-                        expect(Array.isArray(result)).toBe(true);
+                        expect(Array.isArray(result)).toBeTruthy();
                     }
 
                     expect(mockDb.all).toHaveBeenCalledTimes(monitorIds.length);
@@ -420,7 +420,7 @@ describe("historyQuery utilities", () => {
         });
     });
 
-    describe("getHistoryCount", () => {
+    describe(getHistoryCount, () => {
         it("should return count when history entries exist", async ({
             task,
             annotate,
@@ -665,7 +665,7 @@ describe("historyQuery utilities", () => {
 
                     // Assert
                     expect(result).toBe(edgeCount);
-                    expect(Number.isInteger(result)).toBe(true);
+                    expect(Number.isInteger(result)).toBeTruthy();
                     expect(result).toBeGreaterThanOrEqual(0);
                 }
             );
@@ -724,7 +724,7 @@ describe("historyQuery utilities", () => {
         });
     });
 
-    describe("getLatestHistoryEntry", () => {
+    describe(getLatestHistoryEntry, () => {
         it("should return latest history entry when it exists", async ({
             task,
             annotate,
@@ -1125,8 +1125,8 @@ describe("historyQuery utilities", () => {
                     expect(result).toEqual(expectedMappedEntry);
 
                     if (result) {
-                        expect(Number.isFinite(result.timestamp)).toBe(true);
-                        expect(Number.isFinite(result.responseTime)).toBe(true);
+                        expect(Number.isFinite(result.timestamp)).toBeTruthy();
+                        expect(Number.isFinite(result.responseTime)).toBeTruthy();
                         expect(result.timestamp).toBe(edgeData.timestamp);
                         expect(result.responseTime).toBe(edgeData.responseTime);
                     }
@@ -1169,7 +1169,7 @@ describe("historyQuery utilities", () => {
             const latest = getLatestHistoryEntry(mockDb, mockMonitorId);
 
             expect(latest).toEqual(mockMappedEntry);
-            expect(mockDb.get).toHaveBeenCalledOnce();
+            expect(mockDb.get).toHaveBeenCalledTimes(1);
             expect(rowToHistoryEntry).toHaveBeenCalledWith(mockRow);
         });
 

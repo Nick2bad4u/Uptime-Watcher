@@ -144,7 +144,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
                 "timeout",
                 "invalid_number"
             );
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
 

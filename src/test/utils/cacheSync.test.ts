@@ -91,7 +91,7 @@ describe("cacheSync", () => {
         }
     });
 
-    describe("setupCacheSync", () => {
+    describe(setupCacheSync, () => {
         describe("when window is undefined (SSR/Node environment)", () => {
             it("should return no-op cleanup function and warn", async ({
                 task,

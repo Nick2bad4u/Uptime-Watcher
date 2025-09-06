@@ -40,7 +40,7 @@ const mockDatabaseService = {
     getDatabase: vi.fn().mockReturnValue(mockDatabase),
 };
 
-describe("SettingsRepository", () => {
+describe(SettingsRepository, () => {
     let repository: SettingsRepository;
 
     beforeEach(() => {

@@ -120,7 +120,7 @@ describe("Monitor UI Helpers", () => {
             });
 
             const result = await allSupportsAdvancedAnalytics(["http", "port"]);
-            expect(result).toBe(false); // Default fallback when no mocking works
+            expect(result).toBeFalsy(); // Default fallback when no mocking works
         });
 
         it("should return false when any monitor type doesn't support advanced analytics", async ({
@@ -137,7 +137,7 @@ describe("Monitor UI Helpers", () => {
             );
 
             const result = await allSupportsAdvancedAnalytics(["http", "port"]);
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return true for empty array", async ({ task, annotate }) => {
@@ -151,7 +151,7 @@ describe("Monitor UI Helpers", () => {
             );
 
             const result = await allSupportsAdvancedAnalytics([]);
-            expect(result).toBe(true); // Empty array means all elements satisfy the condition (vacuous truth)
+            expect(result).toBeTruthy(); // Empty array means all elements satisfy the condition (vacuous truth)
         });
     });
 
@@ -170,7 +170,7 @@ describe("Monitor UI Helpers", () => {
             );
 
             const result = await allSupportsResponseTime(["http", "port"]);
-            expect(result).toBe(false); // Default fallback
+            expect(result).toBeFalsy(); // Default fallback
         });
 
         it("should handle empty array", async ({ task, annotate }) => {
@@ -184,7 +184,7 @@ describe("Monitor UI Helpers", () => {
             );
 
             const result = await allSupportsResponseTime([]);
-            expect(result).toBe(true); // Empty array means all elements satisfy the condition (vacuous truth)
+            expect(result).toBeTruthy(); // Empty array means all elements satisfy the condition (vacuous truth)
         });
     });
 
@@ -665,7 +665,7 @@ describe("Monitor UI Helpers", () => {
 
             const result = await shouldShowUrl("http");
             // In test environment, may fallback to false
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when config doesn't show URL", async ({
@@ -690,7 +690,7 @@ describe("Monitor UI Helpers", () => {
             });
 
             const result = await shouldShowUrl("http");
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when config not available", async ({
@@ -709,7 +709,7 @@ describe("Monitor UI Helpers", () => {
             mockCacheGet.mockReturnValue(undefined);
 
             const result = await shouldShowUrl("http");
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -734,7 +734,7 @@ describe("Monitor UI Helpers", () => {
             });
 
             const result = await supportsAdvancedAnalytics("http");
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return false when config doesn't support advanced analytics", async ({
@@ -784,7 +784,7 @@ describe("Monitor UI Helpers", () => {
 
             const result = await supportsResponseTime("http");
             // In test environment, may fallback to false
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when config doesn't support response time", async ({
@@ -807,7 +807,7 @@ describe("Monitor UI Helpers", () => {
             });
 
             const result = await supportsResponseTime("http");
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 

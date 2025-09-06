@@ -138,7 +138,7 @@ vi.mock("./", () => ({
     StateSyncHandlerValidators: {},
 }));
 
-describe("IpcService", () => {
+describe(IpcService, () => {
     let ipcService: IpcService;
 
     beforeEach(() => {
@@ -310,7 +310,7 @@ describe("IpcService", () => {
                     }),
                 });
                 // Check that the data is an array with monitor type configs
-                expect(Array.isArray(result.data)).toBe(true);
+                expect(Array.isArray(result.data)).toBeTruthy();
                 expect(result.data.length).toBeGreaterThan(0);
             } else {
                 expect.fail("Handler not found for get-monitor-types");
@@ -339,8 +339,8 @@ describe("IpcService", () => {
             if (getAllHandler) {
                 // This test verifies that the handler doesn't throw on complex configurations
                 const result = await getAllHandler();
-                expect(result.success).toBe(true);
-                expect(Array.isArray(result.data)).toBe(true);
+                expect(result.success).toBeTruthy();
+                expect(Array.isArray(result.data)).toBeTruthy();
             } else {
                 expect.fail("Handler not found for get-monitor-types");
             }
@@ -406,7 +406,7 @@ describe("IpcService", () => {
                     }),
                 });
                 // Remove mock call expectation since we're using real implementation
-                expect(Array.isArray(result.data)).toBe(true);
+                expect(Array.isArray(result.data)).toBeTruthy();
                 expect(result.data.length).toBeGreaterThan(0);
             } else {
                 expect.fail("Handler not found for get-monitor-types");
@@ -544,7 +544,7 @@ describe("IpcService", () => {
                     }),
                 });
                 // Remove mock expectation since we're using real implementation
-                expect(Array.isArray(result.data)).toBe(true);
+                expect(Array.isArray(result.data)).toBeTruthy();
             } else {
                 expect.fail("Handler not found for get-monitor-types");
             }

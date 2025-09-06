@@ -232,7 +232,7 @@ const arbitraryContaminatedMonitor = (): fc.Arbitrary<
     });
 
 describe("Monitor Operations Fuzzing Tests", () => {
-    describe("createDefaultMonitor", () => {
+    describe(createDefaultMonitor, () => {
         test("should create valid monitor with any partial override", () => {
             fc.assert(
                 fc.property(arbitraryPartialMonitor(), (overrides) => {
@@ -268,8 +268,8 @@ describe("Monitor Operations Fuzzing Tests", () => {
                         "paused",
                     ]).toContain(monitor.status);
                     expect(typeof monitor.responseTime).toBe("number");
-                    expect(Array.isArray(monitor.history)).toBe(true);
-                    expect(Array.isArray(monitor.activeOperations)).toBe(true);
+                    expect(Array.isArray(monitor.history)).toBeTruthy();
+                    expect(Array.isArray(monitor.activeOperations)).toBeTruthy();
                 })
             );
         });
@@ -290,7 +290,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
         });
     });
 
-    describe("normalizeMonitor", () => {
+    describe(normalizeMonitor, () => {
         test("should normalize any partial monitor input", () => {
             fc.assert(
                 fc.property(arbitraryPartialMonitor(), (partial) => {
@@ -326,9 +326,9 @@ describe("Monitor Operations Fuzzing Tests", () => {
                         "pending",
                         "paused",
                     ]).toContain(normalized.status);
-                    expect(Array.isArray(normalized.history)).toBe(true);
-                    expect(Array.isArray(normalized.activeOperations)).toBe(
-                        true
+                    expect(Array.isArray(normalized.history)).toBeTruthy();
+                    expect(Array.isArray(normalized.activeOperations)).toBeTruthy(
+                        
                     );
                 })
             );

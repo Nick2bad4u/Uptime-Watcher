@@ -27,7 +27,7 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(mockFormData).toBeDefined();
             expect(mockFormData.siteName).toBe("test");
             expect(mockFormData.url).toBe("https://example.com");
-            expect(Array.isArray(mockFormData.monitors)).toBe(true);
+            expect(Array.isArray(mockFormData.monitors)).toBeTruthy();
         });
 
         it("should test MonitorConfig types", async ({ task, annotate }) => {
@@ -100,9 +100,9 @@ describe("Comprehensive Coverage Boost Tests", () => {
             };
 
             expect(mockValidationResult).toBeDefined();
-            expect(mockValidationResult.isValid).toBe(true);
-            expect(Array.isArray(mockValidationResult.errors)).toBe(true);
-            expect(Array.isArray(mockValidationResult.warnings)).toBe(true);
+            expect(mockValidationResult.isValid).toBeTruthy();
+            expect(Array.isArray(mockValidationResult.errors)).toBeTruthy();
+            expect(Array.isArray(mockValidationResult.warnings)).toBeTruthy();
         });
     });
 
@@ -129,7 +129,7 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(mockMonitorForm.name).toBe("Test Monitor");
             expect(mockMonitorForm.type).toBe("http");
             expect(mockMonitorForm.url).toBe("https://example.com");
-            expect(mockMonitorForm.enabled).toBe(true);
+            expect(mockMonitorForm.enabled).toBeTruthy();
         });
 
         it("should test monitorFormData types", async ({ task, annotate }) => {
@@ -159,10 +159,10 @@ describe("Comprehensive Coverage Boost Tests", () => {
             };
 
             expect(mockFormData).toBeDefined();
-            expect(Array.isArray(mockFormData.monitors)).toBe(true);
-            expect(mockFormData.monitors.length).toBe(1);
+            expect(Array.isArray(mockFormData.monitors)).toBeTruthy();
+            expect(mockFormData.monitors).toHaveLength(1);
             expect(mockFormData.monitors[0]?.type).toBe("http");
-            expect(mockFormData.validation.hasErrors).toBe(false);
+            expect(mockFormData.validation.hasErrors).toBeFalsy();
         });
     });
 
@@ -284,8 +284,8 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 !mockSiteListState.loading &&
                 !mockSiteListState.error;
 
-            expect(isEmpty).toBe(true);
-            expect(shouldShowEmptyState).toBe(true);
+            expect(isEmpty).toBeTruthy();
+            expect(shouldShowEmptyState).toBeTruthy();
         });
 
         it("should test SiteDetails navigation", async ({ task, annotate }) => {
@@ -312,9 +312,9 @@ describe("Comprehensive Coverage Boost Tests", () => {
             const isValidTab = (tab: string) =>
                 mockNavigationState.availableTabs.includes(tab);
 
-            expect(isValidTab("overview")).toBe(true);
-            expect(isValidTab("analytics")).toBe(true);
-            expect(isValidTab("invalid")).toBe(false);
+            expect(isValidTab("overview")).toBeTruthy();
+            expect(isValidTab("analytics")).toBeTruthy();
+            expect(isValidTab("invalid")).toBeFalsy();
             expect(mockNavigationState.currentTab).toBe("overview");
         });
 
@@ -380,8 +380,8 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 error,
             });
 
-            expect(startMonitoring().isMonitoring).toBe(true);
-            expect(stopMonitoring().isMonitoring).toBe(false);
+            expect(startMonitoring().isMonitoring).toBeTruthy();
+            expect(stopMonitoring().isMonitoring).toBeFalsy();
             expect(setError("Network error").error).toBe("Network error");
         });
 
@@ -425,9 +425,9 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(download.filename).toBe("test.json");
             expect(download.blob).toBeInstanceOf(Blob);
             expect(download.url).toContain("test.json");
-            expect(mockFileDownload.validateFilename("test.json")).toBe(true);
-            expect(mockFileDownload.validateFilename("invalid/file")).toBe(
-                false
+            expect(mockFileDownload.validateFilename("test.json")).toBeTruthy();
+            expect(mockFileDownload.validateFilename("invalid/file")).toBeFalsy(
+                
             );
             expect(mockFileDownload.getFileExtension("test.json")).toBe("json");
         });
@@ -472,7 +472,7 @@ describe("Comprehensive Coverage Boost Tests", () => {
             });
 
             expect(updateSetting("theme", "dark").theme).toBe("dark");
-            expect(updateSetting("theme", "dark").hasChanges).toBe(true);
+            expect(updateSetting("theme", "dark").hasChanges).toBeTruthy();
             expect(resetSettings().historyLimit).toBe(500);
         });
 
@@ -523,7 +523,7 @@ describe("Comprehensive Coverage Boost Tests", () => {
 
             expect(mockThemeComponents.Button.variants).toContain("primary");
             expect(mockThemeComponents.Input.types).toContain("url");
-            expect(mockThemeComponents.Card.sizes.length).toBe(3);
+            expect(mockThemeComponents.Card.sizes).toHaveLength(3);
             expect(mockThemeComponents.Modal.positions).toContain("center");
         });
     });
@@ -566,11 +566,11 @@ describe("Comprehensive Coverage Boost Tests", () => {
 
             const error = new Error("Test error");
             const errorState = simulateError(error);
-            expect(errorState.hasError).toBe(true);
+            expect(errorState.hasError).toBeTruthy();
             expect(errorState.error).toBe(error);
 
             const resetState = resetError();
-            expect(resetState.hasError).toBe(false);
+            expect(resetState.hasError).toBeFalsy();
             expect(resetState.retryCount).toBe(1);
         });
 

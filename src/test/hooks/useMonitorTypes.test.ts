@@ -49,19 +49,19 @@ describe("useMonitorTypes Hook", () => {
             const { result } = renderHook(() => useMonitorTypes());
 
             // Initially loading
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
             expect(result.current.options).toEqual([]);
             expect(result.current.error).toBeUndefined();
 
             // Wait for loading to complete
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             // Should have loaded options successfully
             expect(result.current.options).toEqual(mockOptions);
             expect(result.current.error).toBeUndefined();
-            expect(mockGetMonitorTypeOptions).toHaveBeenCalledOnce();
+            expect(mockGetMonitorTypeOptions).toHaveBeenCalledTimes(1);
             expect(mockLogger.error).not.toHaveBeenCalled();
         });
 
@@ -92,7 +92,7 @@ describe("useMonitorTypes Hook", () => {
 
             // Wait for initial load
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
             expect(result.current.options).toEqual(initialOptions);
 
@@ -102,11 +102,11 @@ describe("useMonitorTypes Hook", () => {
             });
 
             // Should be loading again
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
 
             // Wait for refresh to complete
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.options).toEqual(refreshedOptions);
@@ -124,7 +124,7 @@ describe("useMonitorTypes Hook", () => {
             const { result } = renderHook(() => useMonitorTypes());
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.options).toEqual([]);
@@ -150,7 +150,7 @@ describe("useMonitorTypes Hook", () => {
             const { result } = renderHook(() => useMonitorTypes());
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.options).toEqual(specialOptions);
@@ -173,7 +173,7 @@ describe("useMonitorTypes Hook", () => {
             const { result } = renderHook(() => useMonitorTypes());
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.options).toEqual([
@@ -200,7 +200,7 @@ describe("useMonitorTypes Hook", () => {
             const { result } = renderHook(() => useMonitorTypes());
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.options).toEqual([
@@ -229,7 +229,7 @@ describe("useMonitorTypes Hook", () => {
             const { result } = renderHook(() => useMonitorTypes());
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.options).toEqual([
@@ -259,7 +259,7 @@ describe("useMonitorTypes Hook", () => {
             const { result } = renderHook(() => useMonitorTypes());
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.options).toEqual([
@@ -294,7 +294,7 @@ describe("useMonitorTypes Hook", () => {
 
             // Wait for initial error
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
             expect(result.current.error).toBeDefined();
             expect(result.current.options).toEqual([
@@ -307,7 +307,7 @@ describe("useMonitorTypes Hook", () => {
             });
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.error).toBeUndefined();
@@ -331,7 +331,7 @@ describe("useMonitorTypes Hook", () => {
 
             // Wait for initial success
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
             expect(result.current.options).toEqual(initialOptions);
             expect(result.current.error).toBeUndefined();
@@ -342,7 +342,7 @@ describe("useMonitorTypes Hook", () => {
             });
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.error).toBe(
@@ -377,7 +377,7 @@ describe("useMonitorTypes Hook", () => {
             const { result } = renderHook(() => useMonitorTypes());
 
             // Should start loading
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
             expect(result.current.options).toEqual([]);
 
             // Resolve the promise
@@ -386,7 +386,7 @@ describe("useMonitorTypes Hook", () => {
             });
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
         });
 
@@ -406,7 +406,7 @@ describe("useMonitorTypes Hook", () => {
 
             // Wait for initial load
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             // Start refresh
@@ -425,7 +425,7 @@ describe("useMonitorTypes Hook", () => {
             });
 
             // Should be loading during refresh
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
 
             // Complete refresh
             act(() => {
@@ -433,7 +433,7 @@ describe("useMonitorTypes Hook", () => {
             });
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
         });
 
@@ -453,7 +453,7 @@ describe("useMonitorTypes Hook", () => {
 
             // Wait for initial load
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             // Make multiple rapid refresh calls
@@ -464,7 +464,7 @@ describe("useMonitorTypes Hook", () => {
             });
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             // Should still work correctly
@@ -490,7 +490,7 @@ describe("useMonitorTypes Hook", () => {
             const { result } = renderHook(() => useMonitorTypes());
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.options).toEqual([
@@ -516,7 +516,7 @@ describe("useMonitorTypes Hook", () => {
             const { result } = renderHook(() => useMonitorTypes());
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             // Modify the returned options
@@ -554,7 +554,7 @@ describe("useMonitorTypes Hook", () => {
 
             const { result, unmount } = renderHook(() => useMonitorTypes());
 
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
 
             // Unmount while loading
             unmount();
@@ -565,7 +565,7 @@ describe("useMonitorTypes Hook", () => {
             });
 
             // Should not cause any errors or warnings
-            expect(mockGetMonitorTypeOptions).toHaveBeenCalledOnce();
+            expect(mockGetMonitorTypeOptions).toHaveBeenCalledTimes(1);
         });
 
         it("should work with real-world monitor type data", async ({
@@ -589,7 +589,7 @@ describe("useMonitorTypes Hook", () => {
             const { result } = renderHook(() => useMonitorTypes());
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.options).toEqual(realWorldOptions);
@@ -600,7 +600,7 @@ describe("useMonitorTypes Hook", () => {
                         typeof opt.label === "string" &&
                         typeof opt.value === "string"
                 )
-            ).toBe(true);
+            ).toBeTruthy();
         });
     });
 
@@ -619,17 +619,17 @@ describe("useMonitorTypes Hook", () => {
             const { result } = renderHook(() => useMonitorTypes());
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             // Check that all expected properties exist with correct types
             expect(typeof result.current.isLoading).toBe("boolean");
-            expect(Array.isArray(result.current.options)).toBe(true);
+            expect(Array.isArray(result.current.options)).toBeTruthy();
             expect(typeof result.current.refresh).toBe("function");
             expect(
                 result.current.error === undefined ||
                     typeof result.current.error === "string"
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should have refresh function that returns a Promise", async ({
@@ -646,7 +646,7 @@ describe("useMonitorTypes Hook", () => {
             const { result } = renderHook(() => useMonitorTypes());
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             const refreshPromise = result.current.refresh();

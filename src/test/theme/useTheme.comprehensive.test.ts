@@ -229,7 +229,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
         });
     });
 
-    describe("useTheme", () => {
+    describe(useTheme, () => {
         it("should initialize with correct default values", async ({
             task,
             annotate,
@@ -242,7 +242,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             const { result } = renderHook(() => useTheme());
 
             expect(result.current.themeName).toBe("light");
-            expect(result.current.isDark).toBe(false);
+            expect(result.current.isDark).toBeFalsy();
             expect(result.current.availableThemes).toEqual([
                 "light",
                 "dark",
@@ -500,7 +500,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
         });
     });
 
-    describe("useAvailabilityColors", () => {
+    describe(useAvailabilityColors, () => {
         it("should return correct colors for different availability percentages", async ({
             task,
             annotate,
@@ -661,7 +661,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
         });
     });
 
-    describe("useStatusColors", () => {
+    describe(useStatusColors, () => {
         it("should return all status colors from current theme", async ({
             task,
             annotate,
@@ -680,7 +680,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
         });
     });
 
-    describe("useThemeClasses", () => {
+    describe(useThemeClasses, () => {
         it("should return background classes with CSS custom properties", async ({
             task,
             annotate,
@@ -809,7 +809,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
         });
     });
 
-    describe("useThemeValue", () => {
+    describe(useThemeValue, () => {
         it("should return selected value from current theme", async ({
             task,
             annotate,
@@ -823,7 +823,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
                 useThemeValue((theme) => theme.isDark)
             );
 
-            expect(result.current).toBe(false);
+            expect(result.current).toBeFalsy();
         });
 
         it("should return theme name from selector", async ({

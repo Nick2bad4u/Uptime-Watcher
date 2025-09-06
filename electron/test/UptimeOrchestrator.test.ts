@@ -88,7 +88,7 @@ const mockSiteManager = {
     initialize: vi.fn(() => Promise.resolve()),
 } as unknown as SiteManager;
 
-describe("UptimeOrchestrator", () => {
+describe(UptimeOrchestrator, () => {
     let orchestrator: UptimeOrchestrator;
     let dependencies: UptimeOrchestratorDependencies;
 
@@ -383,7 +383,7 @@ describe("UptimeOrchestrator", () => {
             expect(mockSiteManager.removeSite).toHaveBeenCalledWith(
                 "test-site"
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should update site successfully", async ({ task, annotate }) => {
@@ -478,7 +478,7 @@ describe("UptimeOrchestrator", () => {
             expect(
                 mockMonitorManager.startMonitoringForSite
             ).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should start monitoring for site without monitor ID", async ({
@@ -496,7 +496,7 @@ describe("UptimeOrchestrator", () => {
             expect(
                 mockMonitorManager.startMonitoringForSite
             ).toHaveBeenCalledWith("test-site", undefined);
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should stop monitoring for site", async ({ task, annotate }) => {
@@ -513,7 +513,7 @@ describe("UptimeOrchestrator", () => {
             expect(
                 mockMonitorManager.stopMonitoringForSite
             ).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should stop monitoring for site without monitor ID", async ({
@@ -531,7 +531,7 @@ describe("UptimeOrchestrator", () => {
             expect(
                 mockMonitorManager.stopMonitoringForSite
             ).toHaveBeenCalledWith("test-site", undefined);
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should remove monitor successfully", async ({ task, annotate }) => {
@@ -552,7 +552,7 @@ describe("UptimeOrchestrator", () => {
                 "test-site",
                 "monitor-1"
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should handle monitor removal with failed stop monitoring", async ({
@@ -577,7 +577,7 @@ describe("UptimeOrchestrator", () => {
                 "test-site",
                 "monitor-1"
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should handle monitor removal with failed database removal", async ({
@@ -601,7 +601,7 @@ describe("UptimeOrchestrator", () => {
             expect(
                 mockMonitorManager.startMonitoringForSite
             ).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should handle monitor removal with failed restart after failed removal", async ({
@@ -714,7 +714,7 @@ describe("UptimeOrchestrator", () => {
             expect(mockDatabaseManager.importData).toHaveBeenCalledWith(
                 testData
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should get history limit", async ({ task, annotate }) => {

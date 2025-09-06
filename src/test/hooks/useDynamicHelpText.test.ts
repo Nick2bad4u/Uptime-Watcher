@@ -46,7 +46,7 @@ describe("useDynamicHelpText Hook", () => {
 
             const { result } = renderHook(() => useDynamicHelpText("http"));
 
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
             expect(result.current.error).toBeUndefined();
             expect(result.current.primary).toBeUndefined();
             expect(result.current.secondary).toBeUndefined();
@@ -70,11 +70,11 @@ describe("useDynamicHelpText Hook", () => {
             const { result } = renderHook(() => useDynamicHelpText("http"));
 
             // Initial state
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
 
             // Wait for loading to complete
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.primary).toBe("HTTP monitor primary help");
@@ -95,7 +95,7 @@ describe("useDynamicHelpText Hook", () => {
             const { result } = renderHook(() => useDynamicHelpText("http"));
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.primary).toBeUndefined();
@@ -118,7 +118,7 @@ describe("useDynamicHelpText Hook", () => {
             );
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.primary).toBe("Only primary help text");
@@ -140,7 +140,7 @@ describe("useDynamicHelpText Hook", () => {
             const { result } = renderHook(() => useDynamicHelpText("http"));
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.error).toBe("Network error");
@@ -165,7 +165,7 @@ describe("useDynamicHelpText Hook", () => {
             );
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.error).toBe("Help text unavailable");
@@ -191,7 +191,7 @@ describe("useDynamicHelpText Hook", () => {
             const { result } = renderHook(() => useDynamicHelpText("http"));
 
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             expect(result.current.error).toBe("Help text unavailable");
@@ -226,7 +226,7 @@ describe("useDynamicHelpText Hook", () => {
 
             // Wait for first load
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
             expect(result.current.primary).toBe("HTTP help");
 
@@ -234,11 +234,11 @@ describe("useDynamicHelpText Hook", () => {
             rerender({ monitorType: "ping" as MonitorType });
 
             // Should start loading again
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
 
             // Wait for second load
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
             expect(result.current.primary).toBe("Ping help");
 
@@ -277,7 +277,7 @@ describe("useDynamicHelpText Hook", () => {
 
             // Wait for first load to fail
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
             expect(result.current.error).toBe("First error");
 
@@ -285,12 +285,12 @@ describe("useDynamicHelpText Hook", () => {
             rerender({ monitorType: "ping" as MonitorType });
 
             // Should clear error during loading
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
             expect(result.current.error).toBeUndefined();
 
             // Wait for successful load
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
             expect(result.current.error).toBeUndefined();
             expect(result.current.primary).toBe("Success help");
@@ -324,7 +324,7 @@ describe("useDynamicHelpText Hook", () => {
             );
 
             // Should be loading
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
 
             // Unmount before promise resolves
             unmount();
@@ -336,7 +336,7 @@ describe("useDynamicHelpText Hook", () => {
             await new Promise((resolve) => setTimeout(resolve, 10));
 
             // The component should still show loading state from last render
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
             expect(result.current.primary).toBeUndefined();
         });
 
@@ -371,13 +371,13 @@ describe("useDynamicHelpText Hook", () => {
             );
 
             // Should be loading first request
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
 
             // Change monitor type before first request resolves
             rerender({ monitorType: "ping" as MonitorType });
 
             // Should start loading second request
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
 
             // Resolve first promise (should be ignored)
             resolveFirstPromise!({
@@ -386,7 +386,7 @@ describe("useDynamicHelpText Hook", () => {
 
             // Wait for second request to complete
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             // Should only show result from second request
@@ -411,7 +411,7 @@ describe("useDynamicHelpText Hook", () => {
                 );
 
                 await waitFor(() => {
-                    expect(result.current.isLoading).toBe(false);
+                    expect(result.current.isLoading).toBeFalsy();
                 });
 
                 expect(result.current.primary).toBe(expectedHelp.primary);
@@ -449,7 +449,7 @@ describe("useDynamicHelpText Hook", () => {
             const { result } = renderHook(() => useDynamicHelpText("http"));
 
             // Initial state
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
             expect(result.current.error).toBeUndefined();
             expect(result.current.primary).toBeUndefined();
             expect(result.current.secondary).toBeUndefined();
@@ -459,11 +459,11 @@ describe("useDynamicHelpText Hook", () => {
 
             // Wait for completion
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             // Final state
-            expect(result.current.isLoading).toBe(false);
+            expect(result.current.isLoading).toBeFalsy();
             expect(result.current.error).toBeUndefined();
             expect(result.current.primary).toBe("Loaded help");
         });
@@ -495,7 +495,7 @@ describe("useDynamicHelpText Hook", () => {
 
             // Wait for final result
             await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                expect(result.current.isLoading).toBeFalsy();
             });
 
             // Should show result from final request

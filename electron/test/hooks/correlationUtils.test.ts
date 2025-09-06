@@ -11,7 +11,7 @@ import {
 } from "../../utils/correlation";
 
 describe("correlationUtils", () => {
-    describe("generateCorrelationId", () => {
+    describe(generateCorrelationId, () => {
         it("should generate a unique correlation ID", async ({
             task,
             annotate,
@@ -63,7 +63,7 @@ describe("correlationUtils", () => {
         });
     });
 
-    describe("ValidationError", () => {
+    describe(ValidationError, () => {
         it("should create a validation error with error messages", async ({
             task,
             annotate,

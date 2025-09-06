@@ -172,7 +172,7 @@ describe("StringConversion - Complete Function Coverage", () => {
             expect(
                 complexResult === "[Complex Object]" ||
                     complexResult.startsWith("{")
-            ).toBe(true);
+            ).toBeTruthy();
 
             // Test various object types
             const map = new Map([["key", "value"]]);

@@ -291,7 +291,7 @@ describe("Environment Detection Utilities", () => {
                 "../../utils/environment"
             );
 
-            expect(isBrowserEnvironment()).toBe(true);
+            expect(isBrowserEnvironment()).toBeTruthy();
         });
 
         it("should return false when window is undefined", async ({
@@ -310,7 +310,7 @@ describe("Environment Detection Utilities", () => {
                 "../../utils/environment"
             );
 
-            expect(isBrowserEnvironment()).toBe(false);
+            expect(isBrowserEnvironment()).toBeFalsy();
         });
 
         it("should return false when document is undefined", async ({
@@ -329,7 +329,7 @@ describe("Environment Detection Utilities", () => {
                 "../../utils/environment"
             );
 
-            expect(isBrowserEnvironment()).toBe(false);
+            expect(isBrowserEnvironment()).toBeFalsy();
         });
 
         it("should return false when both window and document are undefined", async ({
@@ -348,7 +348,7 @@ describe("Environment Detection Utilities", () => {
                 "../../utils/environment"
             );
 
-            expect(isBrowserEnvironment()).toBe(false);
+            expect(isBrowserEnvironment()).toBeFalsy();
         });
     });
 
@@ -369,7 +369,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isDevelopment } = await import("../../utils/environment");
 
-            expect(isDevelopment()).toBe(true);
+            expect(isDevelopment()).toBeTruthy();
         });
 
         it("should return false when NODE_ENV is 'production'", async ({
@@ -388,7 +388,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isDevelopment } = await import("../../utils/environment");
 
-            expect(isDevelopment()).toBe(false);
+            expect(isDevelopment()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is 'test'", async ({
@@ -407,7 +407,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isDevelopment } = await import("../../utils/environment");
 
-            expect(isDevelopment()).toBe(false);
+            expect(isDevelopment()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is not set", async ({
@@ -423,7 +423,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isDevelopment } = await import("../../utils/environment");
 
-            expect(isDevelopment()).toBe(false);
+            expect(isDevelopment()).toBeFalsy();
         });
 
         it("should return false when process is undefined", async ({
@@ -439,7 +439,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isDevelopment } = await import("../../utils/environment");
 
-            expect(isDevelopment()).toBe(false);
+            expect(isDevelopment()).toBeFalsy();
         });
 
         it("should be case sensitive", async ({ task, annotate }) => {
@@ -455,7 +455,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isDevelopment } = await import("../../utils/environment");
 
-            expect(isDevelopment()).toBe(false);
+            expect(isDevelopment()).toBeFalsy();
         });
     });
 
@@ -478,7 +478,7 @@ describe("Environment Detection Utilities", () => {
                 "../../utils/environment"
             );
 
-            expect(isNodeEnvironment()).toBe(true);
+            expect(isNodeEnvironment()).toBeTruthy();
         });
 
         it("should return false when process is undefined", async ({
@@ -496,7 +496,7 @@ describe("Environment Detection Utilities", () => {
                 "../../utils/environment"
             );
 
-            expect(isNodeEnvironment()).toBe(false);
+            expect(isNodeEnvironment()).toBeFalsy();
         });
 
         it("should return false when process.versions is undefined", async ({
@@ -517,7 +517,7 @@ describe("Environment Detection Utilities", () => {
                 "../../utils/environment"
             );
 
-            expect(isNodeEnvironment()).toBe(false);
+            expect(isNodeEnvironment()).toBeFalsy();
         });
 
         it("should return false when process.versions is not an object", async ({
@@ -538,7 +538,7 @@ describe("Environment Detection Utilities", () => {
                 "../../utils/environment"
             );
 
-            expect(isNodeEnvironment()).toBe(false);
+            expect(isNodeEnvironment()).toBeFalsy();
         });
 
         it("should return false when process.versions.node is undefined", async ({
@@ -556,7 +556,7 @@ describe("Environment Detection Utilities", () => {
                 "../../utils/environment"
             );
 
-            expect(isNodeEnvironment()).toBe(false);
+            expect(isNodeEnvironment()).toBeFalsy();
         });
 
         it("should return false when process.versions.node is empty string", async ({
@@ -577,7 +577,7 @@ describe("Environment Detection Utilities", () => {
                 "../../utils/environment"
             );
 
-            expect(isNodeEnvironment()).toBe(false);
+            expect(isNodeEnvironment()).toBeFalsy();
         });
     });
 
@@ -598,7 +598,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isProduction } = await import("../../utils/environment");
 
-            expect(isProduction()).toBe(true);
+            expect(isProduction()).toBeTruthy();
         });
 
         it("should return false when NODE_ENV is 'development'", async ({
@@ -617,7 +617,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isProduction } = await import("../../utils/environment");
 
-            expect(isProduction()).toBe(false);
+            expect(isProduction()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is 'test'", async ({
@@ -636,7 +636,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isProduction } = await import("../../utils/environment");
 
-            expect(isProduction()).toBe(false);
+            expect(isProduction()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is not set", async ({
@@ -652,7 +652,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isProduction } = await import("../../utils/environment");
 
-            expect(isProduction()).toBe(false);
+            expect(isProduction()).toBeFalsy();
         });
 
         it("should return false when process is undefined", async ({
@@ -668,7 +668,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isProduction } = await import("../../utils/environment");
 
-            expect(isProduction()).toBe(false);
+            expect(isProduction()).toBeFalsy();
         });
 
         it("should be case sensitive", async ({ task, annotate }) => {
@@ -684,7 +684,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isProduction } = await import("../../utils/environment");
 
-            expect(isProduction()).toBe(false);
+            expect(isProduction()).toBeFalsy();
         });
     });
 
@@ -705,7 +705,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isTest } = await import("../../utils/environment");
 
-            expect(isTest()).toBe(true);
+            expect(isTest()).toBeTruthy();
         });
 
         it("should return false when NODE_ENV is 'development'", async ({
@@ -724,7 +724,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isTest } = await import("../../utils/environment");
 
-            expect(isTest()).toBe(false);
+            expect(isTest()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is 'production'", async ({
@@ -743,7 +743,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isTest } = await import("../../utils/environment");
 
-            expect(isTest()).toBe(false);
+            expect(isTest()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is not set", async ({
@@ -759,7 +759,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isTest } = await import("../../utils/environment");
 
-            expect(isTest()).toBe(false);
+            expect(isTest()).toBeFalsy();
         });
 
         it("should return false when process is undefined", async ({
@@ -775,7 +775,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isTest } = await import("../../utils/environment");
 
-            expect(isTest()).toBe(false);
+            expect(isTest()).toBeFalsy();
         });
 
         it("should be case sensitive", async ({ task, annotate }) => {
@@ -791,7 +791,7 @@ describe("Environment Detection Utilities", () => {
 
             const { isTest } = await import("../../utils/environment");
 
-            expect(isTest()).toBe(false);
+            expect(isTest()).toBeFalsy();
         });
     });
 
@@ -818,9 +818,9 @@ describe("Environment Detection Utilities", () => {
                 getEnvironment,
             } = await import("../../utils/environment");
 
-            expect(isDevelopment()).toBe(true);
-            expect(isProduction()).toBe(false);
-            expect(isTest()).toBe(false);
+            expect(isDevelopment()).toBeTruthy();
+            expect(isProduction()).toBeFalsy();
+            expect(isTest()).toBeFalsy();
             expect(getNodeEnv()).toBe("development");
             expect(getEnvironment()).toBe("development");
         });
@@ -846,10 +846,10 @@ describe("Environment Detection Utilities", () => {
                 getEnvVar,
             } = await import("../../utils/environment");
 
-            expect(isDevelopment()).toBe(false);
-            expect(isProduction()).toBe(false);
-            expect(isTest()).toBe(false);
-            expect(isNodeEnvironment()).toBe(false);
+            expect(isDevelopment()).toBeFalsy();
+            expect(isProduction()).toBeFalsy();
+            expect(isTest()).toBeFalsy();
+            expect(isNodeEnvironment()).toBeFalsy();
             expect(getNodeEnv()).toBe("development");
             expect(getEnvironment()).toBe("unknown");
             expect(getEnvVar("NODE_ENV")).toBeUndefined();

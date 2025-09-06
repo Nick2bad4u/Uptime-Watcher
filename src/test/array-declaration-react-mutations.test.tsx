@@ -89,12 +89,12 @@ describe("React Component Array Declaration Mutation Tests", () => {
             act(() => {
                 result.current.showLoadingOverlayCallback();
             });
-            expect(result.current.showLoadingOverlay).toBe(true);
+            expect(result.current.showLoadingOverlay).toBeTruthy();
 
             act(() => {
                 result.current.clearLoadingOverlay();
             });
-            expect(result.current.showLoadingOverlay).toBe(false);
+            expect(result.current.showLoadingOverlay).toBeFalsy();
         });
 
         it("should fail if dependency arrays are mutated to contain values", async ({
@@ -187,7 +187,7 @@ describe("React Component Array Declaration Mutation Tests", () => {
             // Initially, effects should have run once
             expect(initializationCallCount).toBe(1);
             expect(settingsLoadCallCount).toBe(1);
-            expect(result.current.initialized).toBe(true);
+            expect(result.current.initialized).toBeTruthy();
 
             // Rerender multiple times
             rerender();

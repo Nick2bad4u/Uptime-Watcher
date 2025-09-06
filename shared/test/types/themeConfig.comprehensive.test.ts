@@ -257,11 +257,11 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
                 // Missing required colors
             };
 
-            expect(isColorPalette(validPalette)).toBe(true);
-            expect(isColorPalette(invalidPalette)).toBe(false);
-            expect(isColorPalette(null)).toBe(false);
-            expect(isColorPalette(undefined)).toBe(false);
-            expect(isColorPalette("string")).toBe(false);
+            expect(isColorPalette(validPalette)).toBeTruthy();
+            expect(isColorPalette(invalidPalette)).toBeFalsy();
+            expect(isColorPalette(null)).toBeFalsy();
+            expect(isColorPalette(undefined)).toBeFalsy();
+            expect(isColorPalette("string")).toBeFalsy();
         });
     });
 
@@ -855,11 +855,11 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
                 // Missing required properties
             };
 
-            expect(isThemeConfig(validConfig)).toBe(true);
-            expect(isThemeConfig(invalidConfig)).toBe(false);
-            expect(isThemeConfig(null)).toBe(false);
-            expect(isThemeConfig(undefined)).toBe(false);
-            expect(isThemeConfig("string")).toBe(false);
+            expect(isThemeConfig(validConfig)).toBeTruthy();
+            expect(isThemeConfig(invalidConfig)).toBeFalsy();
+            expect(isThemeConfig(null)).toBeFalsy();
+            expect(isThemeConfig(undefined)).toBeFalsy();
+            expect(isThemeConfig("string")).toBeFalsy();
         });
     });
 
@@ -1189,11 +1189,11 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isColorPalette({})).toBe(false);
-            expect(isColorPalette({ 50: "" })).toBe(false);
-            expect(isColorPalette({ 50: "#fff", 100: null })).toBe(false);
-            expect(isColorPalette([])).toBe(false);
-            expect(isColorPalette(123)).toBe(false);
+            expect(isColorPalette({})).toBeFalsy();
+            expect(isColorPalette({ 50: "" })).toBeFalsy();
+            expect(isColorPalette({ 50: "#fff", 100: null })).toBeFalsy();
+            expect(isColorPalette([])).toBeFalsy();
+            expect(isColorPalette(123)).toBeFalsy();
         });
 
         it("should handle edge cases for isThemeConfig", async ({
@@ -1205,11 +1205,11 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isThemeConfig({})).toBe(false);
-            expect(isThemeConfig({ animation: {} })).toBe(false);
-            expect(isThemeConfig({ animation: null })).toBe(false);
-            expect(isThemeConfig([])).toBe(false);
-            expect(isThemeConfig(123)).toBe(false);
+            expect(isThemeConfig({})).toBeFalsy();
+            expect(isThemeConfig({ animation: {} })).toBeFalsy();
+            expect(isThemeConfig({ animation: null })).toBeFalsy();
+            expect(isThemeConfig([])).toBeFalsy();
+            expect(isThemeConfig(123)).toBeFalsy();
         });
     });
 
@@ -1307,7 +1307,7 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
                 typography: DEFAULT_THEME_CONFIG.typography,
             };
 
-            expect(isThemeConfig(complexConfig)).toBe(true);
+            expect(isThemeConfig(complexConfig)).toBeTruthy();
             expect(complexConfig.colors.primary.primary).toBe("#3b82f6");
             expect(complexConfig.animation.duration.normal).toBe("300ms");
         });

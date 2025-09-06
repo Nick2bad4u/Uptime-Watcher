@@ -281,7 +281,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             const result = await repository.delete("monitor-123");
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
         it("should return false when monitor not found", async ({
@@ -299,7 +299,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             const result = await repository.delete("nonexistent");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
         it("should handle deletion errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

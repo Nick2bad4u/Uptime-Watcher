@@ -19,22 +19,22 @@ describe("environment Direct Function Coverage", () => {
     it("should call getEnvVar function", () => {
         // Call with valid keys
         const nodeEnv = getEnvVar("NODE_ENV");
-        expect(typeof nodeEnv === "string" || nodeEnv === undefined).toBe(true);
+        expect(typeof nodeEnv === "string" || nodeEnv === undefined).toBeTruthy();
 
         const codecov = getEnvVar("CODECOV_TOKEN");
-        expect(typeof codecov === "string" || codecov === undefined).toBe(true);
+        expect(typeof codecov === "string" || codecov === undefined).toBeTruthy();
     });
 
     it("should call getEnvironment function", () => {
         const env = getEnvironment();
         expect(typeof env).toBe("string");
-        expect(env.length > 0).toBe(true);
+        expect(env.length).toBeGreaterThan(0);
     });
 
     it("should call getNodeEnv function", () => {
         const nodeEnv = getNodeEnv();
         expect(typeof nodeEnv).toBe("string");
-        expect(nodeEnv.length > 0).toBe(true);
+        expect(nodeEnv.length).toBeGreaterThan(0);
     });
 
     it("should call isBrowserEnvironment function", () => {

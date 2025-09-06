@@ -419,7 +419,7 @@ describe("Console Statement Remediation", () => {
                 console.log(`  Use when: ${when}`);
             }
 
-            expect(guidelines.length).toBe(4);
+            expect(guidelines).toHaveLength(4);
         });
         it("should provide migration strategy", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -471,7 +471,7 @@ describe("Console Statement Remediation", () => {
                 console.log(`   Action: ${action}`);
             }
 
-            expect(migrationSteps.length).toBe(5);
+            expect(migrationSteps).toHaveLength(5);
         });
     });
     describe("Automated Fixes", () => {
@@ -552,7 +552,7 @@ function replaceConsoleStatements(fileContent: string): string {
 
             const script = generateReplacementScript();
             expect(script.length).toBeGreaterThan(0);
-            expect(replacementPatterns.length).toBe(5);
+            expect(replacementPatterns).toHaveLength(5);
         });
     });
 });

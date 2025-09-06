@@ -89,7 +89,7 @@ describe("Electron Utils", () => {
     // Add actual utility function tests here when available
     it("should format response time correctly", () => {
         // This test is intentionally empty as the function doesn't exist yet
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 });
 describe("Electron Main Process", () => {

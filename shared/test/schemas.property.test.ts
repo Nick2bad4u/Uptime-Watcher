@@ -197,7 +197,7 @@ describe('Schema Property-Based Tests', () => {
             'should validate any generated monitor data',
             (monitorData) => {
                 const result = baseMonitorSchema.safeParse(monitorData);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
 
                 if (result.success) {
                     expect(result.data).toEqual(monitorData);
@@ -220,7 +220,7 @@ describe('Schema Property-Based Tests', () => {
             const [originalData] = fc.sample(baseMonitorArbitrary, 1);
             const parseResult = baseMonitorSchema.safeParse(originalData);
 
-            expect(parseResult.success).toBe(true);
+            expect(parseResult.success).toBeTruthy();
 
             if (parseResult.success) {
                 const serialized = JSON.stringify(parseResult.data);
@@ -233,7 +233,7 @@ describe('Schema Property-Based Tests', () => {
 
                 const reparseResult = baseMonitorSchema.safeParse(deserialized);
 
-                expect(reparseResult.success).toBe(true);
+                expect(reparseResult.success).toBeTruthy();
                 if (reparseResult.success) {
                     // Note: dates might be serialized as strings, so we need to handle that
                     expect(reparseResult.data).toMatchObject(
@@ -253,7 +253,7 @@ describe('Schema Property-Based Tests', () => {
             'should validate HTTP monitor data with proper URL format',
             (httpMonitor) => {
                 const result = httpMonitorSchema.safeParse(httpMonitor);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
 
                 if (result.success) {
                     expect(result.data.type).toBe('http');
@@ -278,7 +278,7 @@ describe('Schema Property-Based Tests', () => {
             for (const invalidUrl of invalidUrls) {
                 const invalidMonitor = { ...validHttpMonitor as object, url: invalidUrl };
                 const result = httpMonitorSchema.safeParse(invalidMonitor);
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
             }
         });
     });
@@ -288,7 +288,7 @@ describe('Schema Property-Based Tests', () => {
             'should validate port monitor data with valid ports and hosts',
             (portMonitor) => {
                 const result = portMonitorSchema.safeParse(portMonitor);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
 
                 if (result.success) {
                     expect(result.data.type).toBe('port');
@@ -307,7 +307,7 @@ describe('Schema Property-Based Tests', () => {
             for (const invalidPort of invalidPorts) {
                 const invalidMonitor = { ...validPortMonitor as object, port: invalidPort };
                 const result = portMonitorSchema.safeParse(invalidMonitor);
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
             }
         });
     });
@@ -317,7 +317,7 @@ describe('Schema Property-Based Tests', () => {
             'should validate ping monitor data with valid hosts',
             (pingMonitor) => {
                 const result = pingMonitorSchema.safeParse(pingMonitor);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
 
                 if (result.success) {
                     expect(result.data.type).toBe('ping');
@@ -333,7 +333,7 @@ describe('Schema Property-Based Tests', () => {
             'should validate DNS monitor data with valid record types',
             (dnsMonitor) => {
                 const result = dnsMonitorSchema.safeParse(dnsMonitor);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
 
                 if (result.success) {
                     expect(result.data.type).toBe('dns');
@@ -352,7 +352,7 @@ describe('Schema Property-Based Tests', () => {
             'should validate any monitor type through discriminated union',
             (monitor) => {
                 const result = monitorSchema.safeParse(monitor);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
 
                 if (result.success) {
                     expect(['http', 'port', 'ping', 'dns']).toContain(result.data.type);
@@ -394,7 +394,7 @@ describe('Schema Property-Based Tests', () => {
             'should validate site data with monitors array',
             (site) => {
                 const result = siteSchema.safeParse(site);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
 
                 if (result.success) {
                     expect(result.data.name).toBeTypeOf('string');
@@ -404,13 +404,13 @@ describe('Schema Property-Based Tests', () => {
                     expect(result.data.identifier.length).toBeGreaterThan(0);
                     expect(result.data.identifier.length).toBeLessThanOrEqual(100);
                     expect(result.data.monitoring).toBeTypeOf('boolean');
-                    expect(Array.isArray(result.data.monitors)).toBe(true);
+                    expect(Array.isArray(result.data.monitors)).toBeTruthy();
                     expect(result.data.monitors.length).toBeGreaterThanOrEqual(1);
 
                     // Validate each monitor
                     for (const monitor of result.data.monitors) {
                         const monitorResult = monitorSchema.safeParse(monitor);
-                        expect(monitorResult.success).toBe(true);
+                        expect(monitorResult.success).toBeTruthy();
                     }
                 }
             }
@@ -421,7 +421,7 @@ describe('Schema Property-Based Tests', () => {
             const siteWithoutMonitors = { ...validSite as object, monitors: [] };
 
             const result = siteSchema.safeParse(siteWithoutMonitors);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
         });
 
         test('should reject sites with names that are too long', () => {
@@ -430,17 +430,17 @@ describe('Schema Property-Based Tests', () => {
             const siteWithLongName = { ...validSite as object, name: longName };
 
             const result = siteSchema.safeParse(siteWithLongName);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
         });
     });
 
     describe('Validation Functions', () => {
-        describe('validateMonitorData', () => {
+        describe(validateMonitorData, () => {
             test.prop([monitorArbitrary])(
                 'should validate monitor data using validation function',
                 (monitorData) => {
                     const result = validateMonitorData(monitorData.type, monitorData);
-                    expect(result.success).toBe(true);
+                    expect(result.success).toBeTruthy();
                     if (result.success) {
                         expect(result.data).toBeDefined();
                         expect((result.data as { type: string }).type).toBe(monitorData.type);
@@ -453,7 +453,7 @@ describe('Schema Property-Based Tests', () => {
                 const invalidType = 'invalid-type';
 
                 const result = validateMonitorData(invalidType, monitorData);
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
             });
 
             test.prop([fc.constantFrom('http', 'port', 'ping', 'dns')])(
@@ -462,17 +462,17 @@ describe('Schema Property-Based Tests', () => {
                     const invalidData = null;
 
                     const result = validateMonitorData(type, invalidData);
-                    expect(result.success).toBe(false);
+                    expect(result.success).toBeFalsy();
                 }
             );
         });
 
-        describe('validateSiteData', () => {
+        describe(validateSiteData, () => {
             test.prop([siteArbitrary])(
                 'should validate site data using validation function',
                 (siteData) => {
                     const result = validateSiteData(siteData);
-                    expect(result.success).toBe(true);
+                    expect(result.success).toBeTruthy();
                     if (result.success) {
                         expect(result.data).toBeDefined();
                         expect(result.data).toMatchObject(siteData);

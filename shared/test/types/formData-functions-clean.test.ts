@@ -14,7 +14,7 @@ import {
 } from "../../types/formData";
 
 describe("shared/types/formData function coverage", () => {
-    describe("isHttpFormData", () => {
+    describe(isHttpFormData, () => {
         it("should return true for valid HttpFormData", async ({
             task,
             annotate,
@@ -41,7 +41,7 @@ describe("shared/types/formData function coverage", () => {
                 expectedContent: "Success",
             };
 
-            expect(isHttpFormData(validFormData)).toBe(true);
+            expect(isHttpFormData(validFormData)).toBeTruthy();
         });
 
         it("should return true for minimal valid HttpFormData", async ({
@@ -63,7 +63,7 @@ describe("shared/types/formData function coverage", () => {
                 followRedirects: false,
             };
 
-            expect(isHttpFormData(minimalFormData)).toBe(true);
+            expect(isHttpFormData(minimalFormData)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -72,7 +72,7 @@ describe("shared/types/formData function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isHttpFormData(null as any)).toBe(false);
+            expect(isHttpFormData(null as any)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -81,7 +81,7 @@ describe("shared/types/formData function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isHttpFormData(undefined as any)).toBe(false);
+            expect(isHttpFormData(undefined as any)).toBeFalsy();
         });
 
         it("should return false for primitive types", async ({
@@ -93,9 +93,9 @@ describe("shared/types/formData function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isHttpFormData("string" as any)).toBe(false);
-            expect(isHttpFormData(123 as any)).toBe(false);
-            expect(isHttpFormData(true as any)).toBe(false);
+            expect(isHttpFormData("string" as any)).toBeFalsy();
+            expect(isHttpFormData(123 as any)).toBeFalsy();
+            expect(isHttpFormData(true as any)).toBeFalsy();
         });
 
         it("should return false for object missing required properties", async ({
@@ -112,7 +112,7 @@ describe("shared/types/formData function coverage", () => {
                 url: "https://example.com",
                 // missing other required properties
             };
-            expect(isHttpFormData(incompleteFormData as any)).toBe(false);
+            expect(isHttpFormData(incompleteFormData as any)).toBeFalsy();
         });
 
         it("should return false for object with wrong type", async ({
@@ -136,7 +136,7 @@ describe("shared/types/formData function coverage", () => {
                 headers: {},
             };
 
-            expect(isHttpFormData(wrongTypeFormData as any)).toBe(false);
+            expect(isHttpFormData(wrongTypeFormData as any)).toBeFalsy();
         });
 
         it("should return false for object with wrong property types", async ({
@@ -160,11 +160,11 @@ describe("shared/types/formData function coverage", () => {
                 headers: {},
             };
 
-            expect(isHttpFormData(invalidFormData as any)).toBe(false);
+            expect(isHttpFormData(invalidFormData as any)).toBeFalsy();
         });
     });
 
-    describe("isPingFormData", () => {
+    describe(isPingFormData, () => {
         it("should return true for valid PingFormData", async ({
             task,
             annotate,
@@ -185,7 +185,7 @@ describe("shared/types/formData function coverage", () => {
                 maxPacketLoss: 25,
             };
 
-            expect(isPingFormData(validFormData)).toBe(true);
+            expect(isPingFormData(validFormData)).toBeTruthy();
         });
 
         it("should return true for minimal valid PingFormData", async ({
@@ -205,7 +205,7 @@ describe("shared/types/formData function coverage", () => {
                 retryAttempts: 0,
             };
 
-            expect(isPingFormData(minimalFormData)).toBe(true);
+            expect(isPingFormData(minimalFormData)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -214,7 +214,7 @@ describe("shared/types/formData function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPingFormData(null as any)).toBe(false);
+            expect(isPingFormData(null as any)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -223,7 +223,7 @@ describe("shared/types/formData function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPingFormData(undefined as any)).toBe(false);
+            expect(isPingFormData(undefined as any)).toBeFalsy();
         });
 
         it("should return false for primitive types", async ({
@@ -235,9 +235,9 @@ describe("shared/types/formData function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPingFormData("string" as any)).toBe(false);
-            expect(isPingFormData(123 as any)).toBe(false);
-            expect(isPingFormData(true as any)).toBe(false);
+            expect(isPingFormData("string" as any)).toBeFalsy();
+            expect(isPingFormData(123 as any)).toBeFalsy();
+            expect(isPingFormData(true as any)).toBeFalsy();
         });
 
         it("should return false for object missing required properties", async ({
@@ -254,7 +254,7 @@ describe("shared/types/formData function coverage", () => {
                 host: "example.com",
                 // missing other required properties
             };
-            expect(isPingFormData(incompleteFormData as any)).toBe(false);
+            expect(isPingFormData(incompleteFormData as any)).toBeFalsy();
         });
 
         it("should return false for object with wrong type", async ({
@@ -275,11 +275,11 @@ describe("shared/types/formData function coverage", () => {
                 packetSize: 64,
             };
 
-            expect(isPingFormData(wrongTypeFormData as any)).toBe(false);
+            expect(isPingFormData(wrongTypeFormData as any)).toBeFalsy();
         });
     });
 
-    describe("isPortFormData", () => {
+    describe(isPortFormData, () => {
         it("should return true for valid PortFormData", async ({
             task,
             annotate,
@@ -299,7 +299,7 @@ describe("shared/types/formData function coverage", () => {
                 connectionTimeout: 3000,
             };
 
-            expect(isPortFormData(validFormData)).toBe(true);
+            expect(isPortFormData(validFormData)).toBeTruthy();
         });
 
         it("should return true for minimal valid PortFormData", async ({
@@ -320,7 +320,7 @@ describe("shared/types/formData function coverage", () => {
                 retryAttempts: 0,
             };
 
-            expect(isPortFormData(minimalFormData)).toBe(true);
+            expect(isPortFormData(minimalFormData)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -329,7 +329,7 @@ describe("shared/types/formData function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPortFormData(null as any)).toBe(false);
+            expect(isPortFormData(null as any)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -338,7 +338,7 @@ describe("shared/types/formData function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPortFormData(undefined as any)).toBe(false);
+            expect(isPortFormData(undefined as any)).toBeFalsy();
         });
 
         it("should return false for primitive types", async ({
@@ -350,9 +350,9 @@ describe("shared/types/formData function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPortFormData("string" as any)).toBe(false);
-            expect(isPortFormData(123 as any)).toBe(false);
-            expect(isPortFormData(true as any)).toBe(false);
+            expect(isPortFormData("string" as any)).toBeFalsy();
+            expect(isPortFormData(123 as any)).toBeFalsy();
+            expect(isPortFormData(true as any)).toBeFalsy();
         });
 
         it("should return false for object missing required properties", async ({
@@ -370,7 +370,7 @@ describe("shared/types/formData function coverage", () => {
                 port: 443,
                 // missing other required properties
             };
-            expect(isPortFormData(incompleteFormData as any)).toBe(false);
+            expect(isPortFormData(incompleteFormData as any)).toBeFalsy();
         });
 
         it("should return false for object with wrong type", async ({
@@ -391,7 +391,7 @@ describe("shared/types/formData function coverage", () => {
                 retryAttempts: 3,
             };
 
-            expect(isPortFormData(wrongTypeFormData as any)).toBe(false);
+            expect(isPortFormData(wrongTypeFormData as any)).toBeFalsy();
         });
 
         it("should return false for object with wrong property types", async ({
@@ -412,7 +412,7 @@ describe("shared/types/formData function coverage", () => {
                 retryAttempts: 3,
             };
 
-            expect(isPortFormData(invalidFormData as any)).toBe(false);
+            expect(isPortFormData(invalidFormData as any)).toBeFalsy();
         });
     });
 
@@ -463,17 +463,17 @@ describe("shared/types/formData function coverage", () => {
             };
 
             // Each type guard should only return true for its own type
-            expect(isHttpFormData(httpFormData)).toBe(true);
-            expect(isPingFormData(httpFormData as any)).toBe(false);
-            expect(isPortFormData(httpFormData as any)).toBe(false);
+            expect(isHttpFormData(httpFormData)).toBeTruthy();
+            expect(isPingFormData(httpFormData as any)).toBeFalsy();
+            expect(isPortFormData(httpFormData as any)).toBeFalsy();
 
-            expect(isHttpFormData(pingFormData as any)).toBe(false);
-            expect(isPingFormData(pingFormData)).toBe(true);
-            expect(isPortFormData(pingFormData as any)).toBe(false);
+            expect(isHttpFormData(pingFormData as any)).toBeFalsy();
+            expect(isPingFormData(pingFormData)).toBeTruthy();
+            expect(isPortFormData(pingFormData as any)).toBeFalsy();
 
-            expect(isHttpFormData(portFormData as any)).toBe(false);
-            expect(isPingFormData(portFormData as any)).toBe(false);
-            expect(isPortFormData(portFormData)).toBe(true);
+            expect(isHttpFormData(portFormData as any)).toBeFalsy();
+            expect(isPingFormData(portFormData as any)).toBeFalsy();
+            expect(isPortFormData(portFormData)).toBeTruthy();
         });
     });
 });

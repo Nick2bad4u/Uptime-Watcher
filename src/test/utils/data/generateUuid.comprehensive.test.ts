@@ -6,7 +6,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { generateUuid } from "../../../utils/data/generateUuid";
 
-describe("generateUuid", () => {
+describe(generateUuid, () => {
     let originalCrypto: any;
 
     beforeEach(() => {
@@ -297,8 +297,8 @@ describe("generateUuid", () => {
 
             // Assert
             expect(result).toMatch(/^site-[\da-z]{9}-\d{13}$/);
-            expect(result.startsWith("site-")).toBe(true);
-            expect(result.includes("-1672531200000")).toBe(true); // timestamp part
+            expect(result.startsWith("site-")).toBeTruthy();
+            expect(result).toContain("-1672531200000"); // timestamp part
         });
 
         it("should handle different Math.random values correctly", async ({
@@ -364,8 +364,8 @@ describe("generateUuid", () => {
             const result = generateUuid();
 
             // Assert
-            expect(result.endsWith(`-${testTimestamp}`)).toBe(true);
-            expect(result.includes(testTimestamp.toString())).toBe(true);
+            expect(result.endsWith(`-${testTimestamp}`)).toBeTruthy();
+            expect(result).toContain(testTimestamp.toString());
         });
     });
 
@@ -394,7 +394,7 @@ describe("generateUuid", () => {
 
             // Assert
             expect(result).toBe(`site-4feornbt3-${largeTimestamp}`);
-            expect(result.includes(largeTimestamp.toString())).toBe(true);
+            expect(result).toContain(largeTimestamp.toString());
         });
 
         it("should handle timestamp of 0", async ({ task, annotate }) => {
@@ -417,7 +417,7 @@ describe("generateUuid", () => {
 
             // Assert
             expect(result).toBe("site-i-0");
-            expect(result.endsWith("-0")).toBe(true);
+            expect(result.endsWith("-0")).toBeTruthy();
         });
 
         it("should handle Math.random returning exactly 0", async ({
@@ -442,7 +442,7 @@ describe("generateUuid", () => {
 
             // Assert
             expect(result).toBe("site--1000");
-            expect(result.includes("-1000")).toBe(true);
+            expect(result).toContain("-1000");
         });
 
         it("should handle Math.random returning close to 1", async ({
@@ -469,7 +469,7 @@ describe("generateUuid", () => {
 
             // Assert
             expect(result).toBe("site-zzzzzxtmw-1000");
-            expect(result.includes("zzzzzxtmw")).toBe(true);
+            expect(result).toContain("zzzzzxtmw");
         });
     });
 
@@ -756,7 +756,7 @@ describe("generateUuid", () => {
 
             const result = generateUuid();
             expect(result).toBe("site-r-1640995200000");
-            expect(result.startsWith("site-")).toBe(true);
+            expect(result.startsWith("site-")).toBeTruthy();
         });
 
         it("should work for database primary keys", async ({

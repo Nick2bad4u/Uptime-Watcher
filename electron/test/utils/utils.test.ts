@@ -36,7 +36,7 @@ describe("Electron Utils", () => {
         vi.resetAllMocks();
     });
 
-    describe("isDev", () => {
+    describe(isDev, () => {
         it("should return true when NODE_ENV is development AND app is not packaged", async ({
             task,
             annotate,
@@ -49,7 +49,7 @@ describe("Electron Utils", () => {
             process.env["NODE_ENV"] = "development";
             mockApp.isPackaged = false; // Both conditions met
 
-            expect(isDev()).toBe(true);
+            expect(isDev()).toBeTruthy();
         });
 
         it("should return false when NODE_ENV is development but app is packaged", async ({
@@ -64,7 +64,7 @@ describe("Electron Utils", () => {
             process.env["NODE_ENV"] = "development";
             mockApp.isPackaged = true; // Both conditions not met: app IS packaged
 
-            expect(isDev()).toBe(false);
+            expect(isDev()).toBeFalsy();
         });
 
         it("should return false when app is not packaged but NODE_ENV is not development", async ({
@@ -79,7 +79,7 @@ describe("Electron Utils", () => {
             process.env["NODE_ENV"] = "production";
             mockApp.isPackaged = false; // Both conditions not met: NODE_ENV !== "development"
 
-            expect(isDev()).toBe(false);
+            expect(isDev()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is production and app is packaged", async ({
@@ -94,7 +94,7 @@ describe("Electron Utils", () => {
             process.env["NODE_ENV"] = "production";
             mockApp.isPackaged = true;
 
-            expect(isDev()).toBe(false);
+            expect(isDev()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is undefined and app is not packaged", async ({
@@ -109,7 +109,7 @@ describe("Electron Utils", () => {
             delete process.env["NODE_ENV"];
             mockApp.isPackaged = false; // NODE_ENV undefined means isDevelopment() returns false
 
-            expect(isDev()).toBe(false);
+            expect(isDev()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is undefined and app is packaged", async ({
@@ -124,7 +124,7 @@ describe("Electron Utils", () => {
             delete process.env["NODE_ENV"];
             mockApp.isPackaged = true;
 
-            expect(isDev()).toBe(false);
+            expect(isDev()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is test and app is packaged", async ({
@@ -139,7 +139,7 @@ describe("Electron Utils", () => {
             process.env["NODE_ENV"] = "test";
             mockApp.isPackaged = true;
 
-            expect(isDev()).toBe(false); // NODE_ENV !== "development" AND app.isPackaged
+            expect(isDev()).toBeFalsy(); // NODE_ENV !== "development" AND app.isPackaged
         });
 
         it("should return false when NODE_ENV is any other value and app is packaged", async ({
@@ -154,7 +154,7 @@ describe("Electron Utils", () => {
             process.env["NODE_ENV"] = "staging";
             mockApp.isPackaged = true;
 
-            expect(isDev()).toBe(false); // NODE_ENV !== "development" AND app.isPackaged
+            expect(isDev()).toBeFalsy(); // NODE_ENV !== "development" AND app.isPackaged
         });
 
         it("should handle mixed scenarios correctly", async ({
@@ -169,22 +169,22 @@ describe("Electron Utils", () => {
             // Test case 1: development + packaged (should be FALSE)
             process.env["NODE_ENV"] = "development";
             mockApp.isPackaged = true;
-            expect(isDev()).toBe(false);
+            expect(isDev()).toBeFalsy();
 
             // Test case 2: production + not packaged (should be FALSE)
             process.env["NODE_ENV"] = "production";
             mockApp.isPackaged = false;
-            expect(isDev()).toBe(false);
+            expect(isDev()).toBeFalsy();
 
             // Test case 3: development + not packaged (should be TRUE)
             process.env["NODE_ENV"] = "development";
             mockApp.isPackaged = false;
-            expect(isDev()).toBe(true);
+            expect(isDev()).toBeTruthy();
 
             // Test case 4: empty string NODE_ENV + packaged (should be FALSE)
             process.env["NODE_ENV"] = "";
             mockApp.isPackaged = true;
-            expect(isDev()).toBe(false); // Empty string !== "development" AND app.isPackaged
+            expect(isDev()).toBeFalsy(); // Empty string !== "development" AND app.isPackaged
         });
     });
 });

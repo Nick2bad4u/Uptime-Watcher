@@ -22,7 +22,7 @@ import {
 } from "../../utils/correlation.js";
 
 describe("Correlation Utility", () => {
-    describe("generateCorrelationId", () => {
+    describe(generateCorrelationId, () => {
         it("should generate a correlation ID", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: correlation", "component");
@@ -133,7 +133,7 @@ describe("Correlation Utility", () => {
             }
         });
     });
-    describe("ValidationError", () => {
+    describe(ValidationError, () => {
         it("should create ValidationError with single error", async ({
             task,
             annotate,

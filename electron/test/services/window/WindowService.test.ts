@@ -75,7 +75,7 @@ import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
 import { WindowService } from "../../../services/window/WindowService";
 
-describe("WindowService", () => {
+describe(WindowService, () => {
     let windowService: WindowService;
 
     beforeEach(() => {
@@ -247,7 +247,7 @@ describe("WindowService", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
-            expect(windowService.hasMainWindow()).toBe(false);
+            expect(windowService.hasMainWindow()).toBeFalsy();
         });
 
         it("should return true when window exists and is not destroyed", async ({
@@ -262,7 +262,7 @@ describe("WindowService", () => {
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(false);
 
-            expect(windowService.hasMainWindow()).toBe(true);
+            expect(windowService.hasMainWindow()).toBeTruthy();
         });
 
         it("should return false when window is destroyed", async ({
@@ -277,7 +277,7 @@ describe("WindowService", () => {
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(true);
 
-            expect(windowService.hasMainWindow()).toBe(false);
+            expect(windowService.hasMainWindow()).toBeFalsy();
         });
     });
 

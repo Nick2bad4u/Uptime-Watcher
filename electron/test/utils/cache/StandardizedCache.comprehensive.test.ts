@@ -137,9 +137,9 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             // Should trigger LRU eviction
             cache.set("key3", "value3");
             expect(cache.size).toBe(2);
-            expect(cache.has("key1")).toBe(false); // Oldest should be evicted
-            expect(cache.has("key2")).toBe(true);
-            expect(cache.has("key3")).toBe(true);
+            expect(cache.has("key1")).toBeFalsy(); // Oldest should be evicted
+            expect(cache.has("key2")).toBeTruthy();
+            expect(cache.has("key3")).toBeTruthy();
         });
 
         it("should handle enableStats = false", async ({ task, annotate }) => {
@@ -305,10 +305,10 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache.set("key1", "value1", 500);
 
-            expect(cache.has("key1")).toBe(true);
+            expect(cache.has("key1")).toBeTruthy();
 
             vi.advanceTimersByTime(600);
-            expect(cache.has("key1")).toBe(false);
+            expect(cache.has("key1")).toBeFalsy();
         });
 
         it("should clean up expired items in entries() method", async ({
@@ -403,10 +403,10 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.set("key4", "value4");
 
             expect(cache.size).toBe(3);
-            expect(cache.has("key1")).toBe(false); // Should be evicted (oldest)
-            expect(cache.has("key2")).toBe(true);
-            expect(cache.has("key3")).toBe(true);
-            expect(cache.has("key4")).toBe(true);
+            expect(cache.has("key1")).toBeFalsy(); // Should be evicted (oldest)
+            expect(cache.has("key2")).toBeTruthy();
+            expect(cache.has("key3")).toBeTruthy();
+            expect(cache.has("key4")).toBeTruthy();
 
             expect(eventSpy).toHaveBeenCalledWith({
                 cacheName: "test-cache",
@@ -436,8 +436,8 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             expect(cache.size).toBe(3);
             expect(cache.get("key1")).toBe("new_value1");
-            expect(cache.has("key2")).toBe(true);
-            expect(cache.has("key3")).toBe(true);
+            expect(cache.has("key2")).toBeTruthy();
+            expect(cache.has("key3")).toBeTruthy();
         });
 
         it("should handle eviction when cache is empty", async ({
@@ -1039,10 +1039,10 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             const cleaned = cache.cleanup();
 
             expect(cleaned).toBe(2); // key1 and key2 should be cleaned
-            expect(cache.has("key1")).toBe(false);
-            expect(cache.has("key2")).toBe(false);
-            expect(cache.has("key3")).toBe(true);
-            expect(cache.has("key4")).toBe(true);
+            expect(cache.has("key1")).toBeFalsy();
+            expect(cache.has("key2")).toBeFalsy();
+            expect(cache.has("key3")).toBeTruthy();
+            expect(cache.has("key4")).toBeTruthy();
         });
 
         it("should return 0 when no items need cleanup", async ({
@@ -1194,7 +1194,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache = new StandardizedCache({ name: "test-cache" });
 
-            expect(cache.delete("nonexistent")).toBe(false);
+            expect(cache.delete("nonexistent")).toBeFalsy();
         });
 
         it("should handle invalidating non-existent keys", async ({
@@ -1268,8 +1268,8 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache.set("key2", "value2");
             expect(cache.size).toBe(1);
-            expect(cache.has("key1")).toBe(false);
-            expect(cache.has("key2")).toBe(true);
+            expect(cache.has("key1")).toBeFalsy();
+            expect(cache.has("key2")).toBeTruthy();
         });
 
         it("should maintain size consistency after all operations", async ({

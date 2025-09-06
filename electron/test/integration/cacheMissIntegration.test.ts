@@ -14,7 +14,7 @@ describe("Resilient Database Operations Integration", () => {
             await annotate("Type: Business Logic", "type");
 
             // Placeholder test to avoid empty test suite
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 });

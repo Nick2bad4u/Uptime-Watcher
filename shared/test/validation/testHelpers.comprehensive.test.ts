@@ -14,7 +14,7 @@ import {
 } from "./testHelpers";
 
 describe("Test Helpers - Comprehensive Coverage", () => {
-    describe("createValidBaseMonitor", () => {
+    describe(createValidBaseMonitor, () => {
         it("should create a valid base monitor with default values", async ({
             task,
             annotate,
@@ -165,7 +165,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
         });
     });
 
-    describe("createValidHttpMonitor", () => {
+    describe(createValidHttpMonitor, () => {
         it("should create a valid HTTP monitor with default values", async ({
             task,
             annotate,
@@ -241,7 +241,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
         });
     });
 
-    describe("createValidPortMonitor", () => {
+    describe(createValidPortMonitor, () => {
         it("should create a valid port monitor with default values", async ({
             task,
             annotate,
@@ -337,7 +337,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
         });
     });
 
-    describe("createValidPingMonitor", () => {
+    describe(createValidPingMonitor, () => {
         it("should create a valid ping monitor with default values", async ({
             task,
             annotate,
@@ -416,7 +416,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
         });
     });
 
-    describe("createValidSite", () => {
+    describe(createValidSite, () => {
         it("should create a valid site with default values", async ({
             task,
             annotate,
@@ -538,7 +538,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
         });
     });
 
-    describe("createValidStatusHistory", () => {
+    describe(createValidStatusHistory, () => {
         it("should create a valid status history with default values", async ({
             task,
             annotate,
@@ -709,8 +709,8 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             });
 
             expect(site.monitors).toHaveLength(3);
-            expect(site.monitors.every((m) => m.history)).toBe(true);
-            expect(site.monitors.every((m) => m.id)).toBe(true);
+            expect(site.monitors.every((m) => m.history)).toBeTruthy();
+            expect(site.monitors.every((m) => m.id)).toBeTruthy();
         });
 
         it("should handle complex nested overrides", async ({
@@ -740,12 +740,12 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             });
 
             expect(httpMonitor.checkInterval).toBe(120_000);
-            expect(httpMonitor.monitoring).toBe(false);
+            expect(httpMonitor.monitoring).toBeFalsy();
             expect(httpMonitor.retryAttempts).toBe(5);
             expect(httpMonitor.url).toBe("https://complex-override.com");
 
             expect(portMonitor.checkInterval).toBe(120_000);
-            expect(portMonitor.monitoring).toBe(false);
+            expect(portMonitor.monitoring).toBeFalsy();
             expect(portMonitor.retryAttempts).toBe(5);
             expect(portMonitor.host).toBe("complex-host.com");
             expect(portMonitor.port).toBe(9999);

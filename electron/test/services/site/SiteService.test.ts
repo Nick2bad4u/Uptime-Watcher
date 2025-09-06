@@ -50,7 +50,7 @@ const mockDatabaseService = {
 // Get the mocked logger instance
 const mockLogger = vi.mocked(logger);
 
-describe("SiteService", () => {
+describe(SiteService, () => {
     let siteService: SiteService;
 
     beforeEach(() => {
@@ -135,7 +135,7 @@ describe("SiteService", () => {
             const result =
                 await siteService.deleteSiteWithRelatedData(mockSiteIdentifier);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(
                 mockDatabaseService.executeTransaction
             ).toHaveBeenCalledTimes(1);
@@ -203,7 +203,7 @@ describe("SiteService", () => {
             const result =
                 await siteService.deleteSiteWithRelatedData(mockSiteIdentifier);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(
                 mockHistoryRepository.deleteByMonitorId
             ).not.toHaveBeenCalled();
@@ -543,7 +543,7 @@ describe("SiteService", () => {
                     mockSiteIdentifier
                 );
 
-            expect(result?.monitoring).toBe(false);
+            expect(result?.monitoring).toBeFalsy();
         });
 
         it("should handle multiple monitors with their history", async ({
@@ -806,7 +806,7 @@ describe("SiteService", () => {
 
             const result = await siteService.getAllWithDetails();
 
-            expect(result[0]!.monitoring).toBe(false);
+            expect(result[0]!.monitoring).toBeFalsy();
         });
 
         it("should log debug and info messages", async ({ task, annotate }) => {

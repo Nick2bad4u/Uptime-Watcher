@@ -21,7 +21,7 @@ vi.mock("../../stores/sites/useSitesStore", () => ({
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 
-describe("useSelectedSite", () => {
+describe(useSelectedSite, () => {
     const mockUseUIStore = useUIStore as any;
     const mockUseSitesStore = useSitesStore as any;
 

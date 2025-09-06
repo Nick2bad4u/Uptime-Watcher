@@ -25,7 +25,7 @@ vi.mock("react", async () => {
     };
 });
 
-describe("useSelectedSite", () => {
+describe(useSelectedSite, () => {
     // Get mock references
     let mockUseSitesStore: any;
     let mockUseUIStore: any;

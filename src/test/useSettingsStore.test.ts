@@ -51,7 +51,7 @@ vi.mock("../constants", () => ({
     DEFAULT_HISTORY_LIMIT: 100,
 }));
 
-describe("useSettingsStore", () => {
+describe(useSettingsStore, () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Reset store state to defaults
@@ -107,10 +107,10 @@ describe("useSettingsStore", () => {
             useSettingsStore.getState().updateSettings(updates);
 
             const state = useSettingsStore.getState();
-            expect(state.settings.notifications).toBe(false);
-            expect(state.settings.soundAlerts).toBe(true);
+            expect(state.settings.notifications).toBeFalsy();
+            expect(state.settings.soundAlerts).toBeTruthy();
             expect(state.settings.theme).toBe("dark");
-            expect(state.settings.autoStart).toBe(false); // unchanged
+            expect(state.settings.autoStart).toBeFalsy(); // unchanged
         });
 
         it("should reset settings to defaults", async ({ task, annotate }) => {
@@ -206,7 +206,7 @@ describe("useSettingsStore", () => {
             useSettingsStore.getState().updateSettings({ autoStart: true });
 
             const state = useSettingsStore.getState();
-            expect(state.settings.autoStart).toBe(true);
+            expect(state.settings.autoStart).toBeTruthy();
         });
 
         it("should update historyLimit via updateSettings", async ({
@@ -238,7 +238,7 @@ describe("useSettingsStore", () => {
                 .updateSettings({ minimizeToTray: false });
 
             const state = useSettingsStore.getState();
-            expect(state.settings.minimizeToTray).toBe(false);
+            expect(state.settings.minimizeToTray).toBeFalsy();
         });
 
         it("should update notifications via updateSettings", async ({
@@ -255,7 +255,7 @@ describe("useSettingsStore", () => {
                 .updateSettings({ notifications: false });
 
             const state = useSettingsStore.getState();
-            expect(state.settings.notifications).toBe(false);
+            expect(state.settings.notifications).toBeFalsy();
         });
 
         it("should update soundAlerts via updateSettings", async ({
@@ -270,7 +270,7 @@ describe("useSettingsStore", () => {
             useSettingsStore.getState().updateSettings({ soundAlerts: true });
 
             const state = useSettingsStore.getState();
-            expect(state.settings.soundAlerts).toBe(true);
+            expect(state.settings.soundAlerts).toBeTruthy();
         });
 
         it("should update theme via updateSettings", async ({
@@ -355,7 +355,7 @@ describe("useSettingsStore", () => {
             // Here we just verify the state was updated
             const state = useSettingsStore.getState();
             expect(state.settings.theme).toBe("dark");
-            expect(state.settings.notifications).toBe(false);
+            expect(state.settings.notifications).toBeFalsy();
             expect(state.settings.autoStart).toBe(originalSettings.autoStart);
         });
     });
@@ -374,7 +374,7 @@ describe("useSettingsStore", () => {
             });
 
             const state = useSettingsStore.getState();
-            expect(state.settings.notifications).toBe(false);
+            expect(state.settings.notifications).toBeFalsy();
             // All other settings should remain unchanged
             expect(state.settings.autoStart).toBe(originalSettings.autoStart);
             expect(state.settings.historyLimit).toBe(
@@ -483,8 +483,8 @@ describe("useSettingsStore", () => {
             useSettingsStore.getState().updateSettings({ theme: "dark" });
 
             const state = useSettingsStore.getState();
-            expect(state.settings.autoStart).toBe(true);
-            expect(state.settings.notifications).toBe(false);
+            expect(state.settings.autoStart).toBeTruthy();
+            expect(state.settings.notifications).toBeFalsy();
             expect(state.settings.theme).toBe("dark");
         });
 
@@ -502,8 +502,8 @@ describe("useSettingsStore", () => {
             store.updateSettings({ historyLimit: 200 });
 
             const state = useSettingsStore.getState();
-            expect(state.settings.autoStart).toBe(true);
-            expect(state.settings.notifications).toBe(false);
+            expect(state.settings.autoStart).toBeTruthy();
+            expect(state.settings.notifications).toBeFalsy();
             expect(state.settings.theme).toBe("light");
             expect(state.settings.historyLimit).toBe(200);
         });
@@ -542,36 +542,36 @@ describe("useSettingsStore", () => {
 
             // Test autoStart
             store.updateSettings({ autoStart: true });
-            expect(useSettingsStore.getState().settings.autoStart).toBe(true);
+            expect(useSettingsStore.getState().settings.autoStart).toBeTruthy();
             store.updateSettings({ autoStart: false });
-            expect(useSettingsStore.getState().settings.autoStart).toBe(false);
+            expect(useSettingsStore.getState().settings.autoStart).toBeFalsy();
 
             // Test minimizeToTray
             store.updateSettings({ minimizeToTray: true });
-            expect(useSettingsStore.getState().settings.minimizeToTray).toBe(
-                true
+            expect(useSettingsStore.getState().settings.minimizeToTray).toBeTruthy(
+                
             );
             store.updateSettings({ minimizeToTray: false });
-            expect(useSettingsStore.getState().settings.minimizeToTray).toBe(
-                false
+            expect(useSettingsStore.getState().settings.minimizeToTray).toBeFalsy(
+                
             );
 
             // Test notifications
             store.updateSettings({ notifications: true });
-            expect(useSettingsStore.getState().settings.notifications).toBe(
-                true
+            expect(useSettingsStore.getState().settings.notifications).toBeTruthy(
+                
             );
             store.updateSettings({ notifications: false });
-            expect(useSettingsStore.getState().settings.notifications).toBe(
-                false
+            expect(useSettingsStore.getState().settings.notifications).toBeFalsy(
+                
             );
 
             // Test soundAlerts
             store.updateSettings({ soundAlerts: true });
-            expect(useSettingsStore.getState().settings.soundAlerts).toBe(true);
+            expect(useSettingsStore.getState().settings.soundAlerts).toBeTruthy();
             store.updateSettings({ soundAlerts: false });
-            expect(useSettingsStore.getState().settings.soundAlerts).toBe(
-                false
+            expect(useSettingsStore.getState().settings.soundAlerts).toBeFalsy(
+                
             );
         });
     });

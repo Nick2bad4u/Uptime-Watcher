@@ -53,7 +53,7 @@ describe("Shared Types Coverage", () => {
             expect(formData.url).toBe("https://example.com");
             expect(formData.monitors).toHaveLength(1);
             expect(formData.monitors[0]?.type).toBe("http");
-            expect(formData.validation?.isValid).toBe(true);
+            expect(formData.validation?.isValid).toBeTruthy();
         });
 
         it("should validate form data fields", async ({ task, annotate }) => {
@@ -96,14 +96,14 @@ describe("Shared Types Coverage", () => {
                 return true;
             };
 
-            expect(validateField(fieldValidations[0]!, "Test Site")).toBe(true);
-            expect(validateField(fieldValidations[0]!, "")).toBe(false);
+            expect(validateField(fieldValidations[0]!, "Test Site")).toBeTruthy();
+            expect(validateField(fieldValidations[0]!, "")).toBeFalsy();
             expect(
                 validateField(fieldValidations[1]!, "https://example.com")
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 validateField(fieldValidations[1]!, "ftp://example.com")
-            ).toBe(false);
+            ).toBeFalsy();
         });
     });
 
@@ -156,11 +156,11 @@ describe("Shared Types Coverage", () => {
             };
 
             expect(httpMonitor.type).toBe("http");
-            expect(httpMonitor.enabled).toBe(true);
+            expect(httpMonitor.enabled).toBeTruthy();
             expect(httpMonitor.configuration["url"]).toBe(
                 "https://example.com"
             );
-            expect(httpMonitor.alerts?.onFailure).toBe(true);
+            expect(httpMonitor.alerts?.onFailure).toBeTruthy();
         });
 
         it("should validate monitor configurations", async ({
@@ -195,14 +195,14 @@ describe("Shared Types Coverage", () => {
                     attempts >= 0 && attempts <= 10,
             };
 
-            expect(validator.validateType("http")).toBe(true);
-            expect(validator.validateType("invalid")).toBe(false);
-            expect(validator.validateInterval(60_000)).toBe(true);
-            expect(validator.validateInterval(10_000)).toBe(false);
-            expect(validator.validateTimeout(30_000)).toBe(true);
-            expect(validator.validateTimeout(500_000)).toBe(false);
-            expect(validator.validateRetryAttempts(3)).toBe(true);
-            expect(validator.validateRetryAttempts(15)).toBe(false);
+            expect(validator.validateType("http")).toBeTruthy();
+            expect(validator.validateType("invalid")).toBeFalsy();
+            expect(validator.validateInterval(60_000)).toBeTruthy();
+            expect(validator.validateInterval(10_000)).toBeFalsy();
+            expect(validator.validateTimeout(30_000)).toBeTruthy();
+            expect(validator.validateTimeout(500_000)).toBeFalsy();
+            expect(validator.validateRetryAttempts(3)).toBeTruthy();
+            expect(validator.validateRetryAttempts(15)).toBeFalsy();
         });
     });
 
@@ -420,7 +420,7 @@ describe("Shared Types Coverage", () => {
                 },
             };
 
-            expect(validationResult.isValid).toBe(false);
+            expect(validationResult.isValid).toBeFalsy();
             expect(validationResult.errors).toHaveLength(1);
             expect(validationResult.warnings).toHaveLength(1);
             expect(validationResult.errors[0]?.code).toBe("REQUIRED_FIELD");
@@ -494,15 +494,15 @@ describe("Shared Types Coverage", () => {
                 }
             };
 
-            expect(applyValidationRule(validationRules[0]!, "Test Site")).toBe(
-                true
+            expect(applyValidationRule(validationRules[0]!, "Test Site")).toBeTruthy(
+                
             );
-            expect(applyValidationRule(validationRules[0]!, "")).toBe(false);
+            expect(applyValidationRule(validationRules[0]!, "")).toBeFalsy();
             expect(
                 applyValidationRule(validationRules[1]!, "https://example.com")
-            ).toBe(true);
-            expect(applyValidationRule(validationRules[2]!, 5000)).toBe(true);
-            expect(applyValidationRule(validationRules[2]!, 500)).toBe(false);
+            ).toBeTruthy();
+            expect(applyValidationRule(validationRules[2]!, 5000)).toBeTruthy();
+            expect(applyValidationRule(validationRules[2]!, 500)).toBeFalsy();
         });
     });
 });

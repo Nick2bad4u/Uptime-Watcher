@@ -19,7 +19,7 @@ Object.defineProperty(globalThis, "location", {
     writable: true,
 });
 
-describe("DefaultErrorFallback", () => {
+describe(DefaultErrorFallback, () => {
     const mockOnRetry = vi.fn();
 
     beforeEach(() => {

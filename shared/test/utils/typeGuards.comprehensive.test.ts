@@ -46,44 +46,44 @@ describe("Type Guards - Comprehensive Coverage", () => {
             const testError = new Error("test");
 
             // Call every function with various inputs to ensure coverage
-            expect(isObject(testObj)).toBe(true);
-            expect(isNumber(42)).toBe(true);
-            expect(hasProperties(testObj, ["a"])).toBe(true);
-            expect(hasProperty(testObj, "a")).toBe(true);
-            expect(isArray(testArray)).toBe(true);
-            expect(isBoolean(true)).toBe(true);
-            expect(isDate(testDate)).toBe(true);
-            expect(isError(testError)).toBe(true);
-            expect(isFiniteNumber(42)).toBe(true);
-            expect(isFunction(() => {})).toBe(true);
-            expect(isNonNegativeNumber(0)).toBe(true);
-            expect(isNonNullObject(testObj)).toBe(true);
-            expect(isPositiveNumber(1)).toBe(true);
-            expect(isString("test")).toBe(true);
-            expect(isValidPort(80)).toBe(true);
-            expect(isValidTimestamp(Date.now())).toBe(true);
+            expect(isObject(testObj)).toBeTruthy();
+            expect(isNumber(42)).toBeTruthy();
+            expect(hasProperties(testObj, ["a"])).toBeTruthy();
+            expect(hasProperty(testObj, "a")).toBeTruthy();
+            expect(isArray(testArray)).toBeTruthy();
+            expect(isBoolean(true)).toBeTruthy();
+            expect(isDate(testDate)).toBeTruthy();
+            expect(isError(testError)).toBeTruthy();
+            expect(isFiniteNumber(42)).toBeTruthy();
+            expect(isFunction(() => {})).toBeTruthy();
+            expect(isNonNegativeNumber(0)).toBeTruthy();
+            expect(isNonNullObject(testObj)).toBeTruthy();
+            expect(isPositiveNumber(1)).toBeTruthy();
+            expect(isString("test")).toBeTruthy();
+            expect(isValidPort(80)).toBeTruthy();
+            expect(isValidTimestamp(Date.now())).toBeTruthy();
 
             // Also test with false cases to ensure all branches are covered
-            expect(isObject(null)).toBe(false);
-            expect(isNumber("not a number")).toBe(false);
-            expect(hasProperties(testObj, ["nonexistent"])).toBe(false);
-            expect(hasProperty(testObj, "nonexistent")).toBe(false);
-            expect(isArray("not an array")).toBe(false);
-            expect(isBoolean("not a boolean")).toBe(false);
-            expect(isDate("not a date")).toBe(false);
-            expect(isError("not an error")).toBe(false);
-            expect(isFiniteNumber(Infinity)).toBe(false);
-            expect(isFunction("not a function")).toBe(false);
-            expect(isNonNegativeNumber(-1)).toBe(false);
-            expect(isNonNullObject(null)).toBe(false);
-            expect(isPositiveNumber(0)).toBe(false);
-            expect(isString(123)).toBe(false);
-            expect(isValidPort(99_999)).toBe(false);
-            expect(isValidTimestamp(-1)).toBe(false);
+            expect(isObject(null)).toBeFalsy();
+            expect(isNumber("not a number")).toBeFalsy();
+            expect(hasProperties(testObj, ["nonexistent"])).toBeFalsy();
+            expect(hasProperty(testObj, "nonexistent")).toBeFalsy();
+            expect(isArray("not an array")).toBeFalsy();
+            expect(isBoolean("not a boolean")).toBeFalsy();
+            expect(isDate("not a date")).toBeFalsy();
+            expect(isError("not an error")).toBeFalsy();
+            expect(isFiniteNumber(Infinity)).toBeFalsy();
+            expect(isFunction("not a function")).toBeFalsy();
+            expect(isNonNegativeNumber(-1)).toBeFalsy();
+            expect(isNonNullObject(null)).toBeFalsy();
+            expect(isPositiveNumber(0)).toBeFalsy();
+            expect(isString(123)).toBeFalsy();
+            expect(isValidPort(99_999)).toBeFalsy();
+            expect(isValidTimestamp(-1)).toBeFalsy();
         });
     });
 
-    describe("hasProperties", () => {
+    describe(hasProperties, () => {
         it("should return true when object has all specified properties", async ({
             task,
             annotate,
@@ -94,15 +94,15 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const obj = { a: 1, b: 2, c: 3 };
-            expect(hasProperties(obj, ["a", "b"])).toBe(true);
+            expect(hasProperties(obj, ["a", "b"])).toBeTruthy();
             expect(
                 hasProperties(obj, [
                     "a",
                     "b",
                     "c",
                 ])
-            ).toBe(true);
-            expect(hasProperties(obj, [])).toBe(true); // Empty array - vacuous truth
+            ).toBeTruthy();
+            expect(hasProperties(obj, [])).toBeTruthy(); // Empty array - vacuous truth
         });
 
         it("should return false when object is missing some properties", async ({
@@ -121,8 +121,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
                     "b",
                     "c",
                 ])
-            ).toBe(false);
-            expect(hasProperties(obj, ["d"])).toBe(false);
+            ).toBeFalsy();
+            expect(hasProperties(obj, ["d"])).toBeFalsy();
         });
 
         it("should return false for non-objects", async ({
@@ -134,12 +134,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(hasProperties(null, ["a"])).toBe(false);
-            expect(hasProperties(undefined, ["a"])).toBe(false);
-            expect(hasProperties("string", ["a"])).toBe(false);
-            expect(hasProperties(42, ["a"])).toBe(false);
-            expect(hasProperties([], ["a"])).toBe(false);
-            expect(hasProperties(true, ["a"])).toBe(false);
+            expect(hasProperties(null, ["a"])).toBeFalsy();
+            expect(hasProperties(undefined, ["a"])).toBeFalsy();
+            expect(hasProperties("string", ["a"])).toBeFalsy();
+            expect(hasProperties(42, ["a"])).toBeFalsy();
+            expect(hasProperties([], ["a"])).toBeFalsy();
+            expect(hasProperties(true, ["a"])).toBeFalsy();
         });
 
         it("should handle symbol properties", async ({ task, annotate }) => {
@@ -150,8 +150,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             const sym = Symbol("test");
             const obj = { [sym]: "value", regular: "prop" };
-            expect(hasProperties(obj, [sym])).toBe(true);
-            expect(hasProperties(obj, ["regular", sym])).toBe(true);
+            expect(hasProperties(obj, [sym])).toBeTruthy();
+            expect(hasProperties(obj, ["regular", sym])).toBeTruthy();
         });
 
         it("should handle inherited properties correctly", async ({
@@ -169,8 +169,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             child.own = "childValue";
 
             // hasProperties uses Object.hasOwn, so inherited properties should not count
-            expect(hasProperties(child, ["own"])).toBe(true);
-            expect(hasProperties(child, ["inherited"])).toBe(false); // inherited, not own
+            expect(hasProperties(child, ["own"])).toBeTruthy();
+            expect(hasProperties(child, ["inherited"])).toBeFalsy(); // inherited, not own
         });
 
         it("should handle edge cases", async ({ task, annotate }) => {
@@ -181,15 +181,15 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             const obj = Object.create(null); // Object without prototype
             obj.prop = "value";
-            expect(hasProperties(obj, ["prop"])).toBe(true);
+            expect(hasProperties(obj, ["prop"])).toBeTruthy();
 
             // Empty properties array
-            expect(hasProperties({}, [])).toBe(true);
-            expect(hasProperties(null, [])).toBe(false); // Still need valid object
+            expect(hasProperties({}, [])).toBeTruthy();
+            expect(hasProperties(null, [])).toBeFalsy(); // Still need valid object
         });
     });
 
-    describe("hasProperty", () => {
+    describe(hasProperty, () => {
         it("should return true when object has the specified property", async ({
             task,
             annotate,
@@ -200,9 +200,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const obj = { a: 1, b: undefined, c: null };
-            expect(hasProperty(obj, "a")).toBe(true);
-            expect(hasProperty(obj, "b")).toBe(true); // undefined is still a property
-            expect(hasProperty(obj, "c")).toBe(true); // null is still a property
+            expect(hasProperty(obj, "a")).toBeTruthy();
+            expect(hasProperty(obj, "b")).toBeTruthy(); // undefined is still a property
+            expect(hasProperty(obj, "c")).toBeTruthy(); // null is still a property
         });
 
         it("should return false when object doesn't have the property", async ({
@@ -215,8 +215,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const obj = { a: 1 };
-            expect(hasProperty(obj, "b")).toBe(false);
-            expect(hasProperty(obj, "toString")).toBe(false); // inherited property
+            expect(hasProperty(obj, "b")).toBeFalsy();
+            expect(hasProperty(obj, "toString")).toBeFalsy(); // inherited property
         });
 
         it("should return false for non-objects", async ({
@@ -228,12 +228,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(hasProperty(null, "prop")).toBe(false);
-            expect(hasProperty(undefined, "prop")).toBe(false);
-            expect(hasProperty("string", "prop")).toBe(false);
-            expect(hasProperty(42, "prop")).toBe(false);
-            expect(hasProperty([], "prop")).toBe(false);
-            expect(hasProperty(true, "prop")).toBe(false);
+            expect(hasProperty(null, "prop")).toBeFalsy();
+            expect(hasProperty(undefined, "prop")).toBeFalsy();
+            expect(hasProperty("string", "prop")).toBeFalsy();
+            expect(hasProperty(42, "prop")).toBeFalsy();
+            expect(hasProperty([], "prop")).toBeFalsy();
+            expect(hasProperty(true, "prop")).toBeFalsy();
         });
 
         it("should handle symbol properties", async ({ task, annotate }) => {
@@ -244,7 +244,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             const sym = Symbol("test");
             const obj = { [sym]: "value" };
-            expect(hasProperty(obj, sym)).toBe(true);
+            expect(hasProperty(obj, sym)).toBeTruthy();
         });
 
         it("should handle numeric property keys", async ({
@@ -257,13 +257,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const obj = { 0: "zero", 1: "one" };
-            expect(hasProperty(obj, 0)).toBe(true);
-            expect(hasProperty(obj, 1)).toBe(true);
-            expect(hasProperty(obj, 2)).toBe(false);
+            expect(hasProperty(obj, 0)).toBeTruthy();
+            expect(hasProperty(obj, 1)).toBeTruthy();
+            expect(hasProperty(obj, 2)).toBeFalsy();
         });
     });
 
-    describe("isArray", () => {
+    describe(isArray, () => {
         it("should return true for arrays without validator", async ({
             task,
             annotate,
@@ -273,28 +273,28 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isArray([])).toBe(true);
+            expect(isArray([])).toBeTruthy();
             expect(
                 isArray([
                     1,
                     2,
                     3,
                 ])
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 isArray([
                     "a",
                     "b",
                     "c",
                 ])
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 isArray([
                     1,
                     "mixed",
                     true,
                 ])
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should return false for non-arrays", async ({ task, annotate }) => {
@@ -303,12 +303,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isArray({})).toBe(false);
-            expect(isArray("string")).toBe(false);
-            expect(isArray(42)).toBe(false);
-            expect(isArray(null)).toBe(false);
-            expect(isArray(undefined)).toBe(false);
-            expect(isArray(true)).toBe(false);
+            expect(isArray({})).toBeFalsy();
+            expect(isArray("string")).toBeFalsy();
+            expect(isArray(42)).toBeFalsy();
+            expect(isArray(null)).toBeFalsy();
+            expect(isArray(undefined)).toBeFalsy();
+            expect(isArray(true)).toBeFalsy();
         });
 
         it("should validate array items when validator is provided", async ({
@@ -334,7 +334,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
                     ],
                     localIsString
                 )
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 isArray(
                     [
@@ -344,12 +344,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
                     ],
                     localIsNumber
                 )
-            ).toBe(true);
-            expect(isArray([], isString)).toBe(true); // Empty array passes any validator
+            ).toBeTruthy();
+            expect(isArray([], isString)).toBeTruthy(); // Empty array passes any validator
 
             // Mixed arrays should fail type-specific validators
-            expect(isArray([1, "mixed"], isString)).toBe(false);
-            expect(isArray(["mixed", 1], isNumber)).toBe(false);
+            expect(isArray([1, "mixed"], isString)).toBeFalsy();
+            expect(isArray(["mixed", 1], isNumber)).toBeFalsy();
             expect(
                 isArray(
                     [
@@ -359,7 +359,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
                     ],
                     isNumber
                 )
-            ).toBe(false);
+            ).toBeFalsy();
         });
 
         it("should handle complex validators", async ({ task, annotate }) => {
@@ -380,7 +380,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
                     ],
                     localIsPositiveNumber
                 )
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 isArray(
                     [
@@ -390,7 +390,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
                     ],
                     localIsPositiveNumber
                 )
-            ).toBe(false); // 0 is not positive
+            ).toBeFalsy(); // 0 is not positive
             expect(
                 isArray(
                     [
@@ -400,11 +400,11 @@ describe("Type Guards - Comprehensive Coverage", () => {
                     ],
                     localIsPositiveNumber
                 )
-            ).toBe(false); // -1 is not positive
+            ).toBeFalsy(); // -1 is not positive
         });
     });
 
-    describe("isBoolean", () => {
+    describe(isBoolean, () => {
         it("should return true for boolean values", async ({
             task,
             annotate,
@@ -414,8 +414,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isBoolean(true)).toBe(true);
-            expect(isBoolean(false)).toBe(true);
+            expect(isBoolean(true)).toBeTruthy();
+            expect(isBoolean(false)).toBeTruthy();
         });
 
         it("should return false for non-boolean values", async ({
@@ -427,14 +427,14 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isBoolean(1)).toBe(false);
-            expect(isBoolean(0)).toBe(false);
-            expect(isBoolean("true")).toBe(false);
-            expect(isBoolean("false")).toBe(false);
-            expect(isBoolean(null)).toBe(false);
-            expect(isBoolean(undefined)).toBe(false);
-            expect(isBoolean({})).toBe(false);
-            expect(isBoolean([])).toBe(false);
+            expect(isBoolean(1)).toBeFalsy();
+            expect(isBoolean(0)).toBeFalsy();
+            expect(isBoolean("true")).toBeFalsy();
+            expect(isBoolean("false")).toBeFalsy();
+            expect(isBoolean(null)).toBeFalsy();
+            expect(isBoolean(undefined)).toBeFalsy();
+            expect(isBoolean({})).toBeFalsy();
+            expect(isBoolean([])).toBeFalsy();
         });
 
         it("should handle Boolean object instances", async ({
@@ -448,13 +448,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             // Test with object wrappers (non-primitive values that aren't booleans)
             const objectValue = { valueOf: () => true };
-            expect(isBoolean(objectValue)).toBe(false);
+            expect(isBoolean(objectValue)).toBeFalsy();
             const objectValueFalse = { valueOf: () => false };
-            expect(isBoolean(objectValueFalse)).toBe(false);
+            expect(isBoolean(objectValueFalse)).toBeFalsy();
         });
     });
 
-    describe("isDate", () => {
+    describe(isDate, () => {
         it("should return true for valid Date objects", async ({
             task,
             annotate,
@@ -464,10 +464,10 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isDate(new Date())).toBe(true);
-            expect(isDate(new Date("2023-01-01"))).toBe(true);
-            expect(isDate(new Date(0))).toBe(true); // Unix epoch
-            expect(isDate(new Date(Date.now()))).toBe(true);
+            expect(isDate(new Date())).toBeTruthy();
+            expect(isDate(new Date("2023-01-01"))).toBeTruthy();
+            expect(isDate(new Date(0))).toBeTruthy(); // Unix epoch
+            expect(isDate(new Date(Date.now()))).toBeTruthy();
         });
 
         it("should return false for invalid Date objects", async ({
@@ -479,8 +479,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isDate(new Date("invalid"))).toBe(false);
-            expect(isDate(new Date(Number.NaN))).toBe(false);
+            expect(isDate(new Date("invalid"))).toBeFalsy();
+            expect(isDate(new Date(Number.NaN))).toBeFalsy();
         });
 
         it("should return false for non-Date values", async ({
@@ -492,12 +492,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isDate("2023-01-01")).toBe(false);
-            expect(isDate(1_672_531_200_000)).toBe(false); // Valid timestamp but not Date
-            expect(isDate(null)).toBe(false);
-            expect(isDate(undefined)).toBe(false);
-            expect(isDate({})).toBe(false);
-            expect(isDate([])).toBe(false);
+            expect(isDate("2023-01-01")).toBeFalsy();
+            expect(isDate(1_672_531_200_000)).toBeFalsy(); // Valid timestamp but not Date
+            expect(isDate(null)).toBeFalsy();
+            expect(isDate(undefined)).toBeFalsy();
+            expect(isDate({})).toBeFalsy();
+            expect(isDate([])).toBeFalsy();
         });
 
         it("should handle edge cases", async ({ task, annotate }) => {
@@ -507,15 +507,15 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Date.prototype is a Date but invalid
-            expect(isDate(Date.prototype)).toBe(false);
+            expect(isDate(Date.prototype)).toBeFalsy();
 
             // Date-like objects should fail
             const dateLike = { getTime: () => Date.now() };
-            expect(isDate(dateLike)).toBe(false);
+            expect(isDate(dateLike)).toBeFalsy();
         });
     });
 
-    describe("isError", () => {
+    describe(isError, () => {
         it("should return true for Error instances", async ({
             task,
             annotate,
@@ -525,12 +525,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(isError(new Error("test error"))).toBe(true);
-            expect(isError(new Error("message"))).toBe(true);
-            expect(isError(new TypeError("type error"))).toBe(true);
-            expect(isError(new ReferenceError("reference error"))).toBe(true);
-            expect(isError(new SyntaxError("syntax error"))).toBe(true);
-            expect(isError(new RangeError("range error"))).toBe(true);
+            expect(isError(new Error("test error"))).toBeTruthy();
+            expect(isError(new Error("message"))).toBeTruthy();
+            expect(isError(new TypeError("type error"))).toBeTruthy();
+            expect(isError(new ReferenceError("reference error"))).toBeTruthy();
+            expect(isError(new SyntaxError("syntax error"))).toBeTruthy();
+            expect(isError(new RangeError("range error"))).toBeTruthy();
         });
 
         it("should return false for non-Error values", async ({
@@ -542,12 +542,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(isError("error")).toBe(false);
-            expect(isError({ message: "error" })).toBe(false);
-            expect(isError(null)).toBe(false);
-            expect(isError(undefined)).toBe(false);
-            expect(isError({})).toBe(false);
-            expect(isError([])).toBe(false);
+            expect(isError("error")).toBeFalsy();
+            expect(isError({ message: "error" })).toBeFalsy();
+            expect(isError(null)).toBeFalsy();
+            expect(isError(undefined)).toBeFalsy();
+            expect(isError({})).toBeFalsy();
+            expect(isError([])).toBeFalsy();
         });
 
         it("should handle custom Error subclasses", async ({
@@ -566,8 +566,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
                 }
             }
 
-            expect(isError(new CustomError())).toBe(true);
-            expect(isError(new CustomError("custom message"))).toBe(true);
+            expect(isError(new CustomError())).toBeTruthy();
+            expect(isError(new CustomError("custom message"))).toBeTruthy();
         });
 
         it("should handle Error-like objects", async ({ task, annotate }) => {
@@ -582,11 +582,11 @@ describe("Type Guards - Comprehensive Coverage", () => {
                 stack: "Error: Something went wrong\n    at ...",
             };
 
-            expect(isError(errorLike)).toBe(false); // Not instanceof Error
+            expect(isError(errorLike)).toBeFalsy(); // Not instanceof Error
         });
     });
 
-    describe("isFiniteNumber", () => {
+    describe(isFiniteNumber, () => {
         it("should return true for finite numbers", async ({
             task,
             annotate,
@@ -596,13 +596,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
-            expect(isFiniteNumber(0)).toBe(true);
-            expect(isFiniteNumber(42)).toBe(true);
-            expect(isFiniteNumber(-42)).toBe(true);
-            expect(isFiniteNumber(3.14)).toBe(true);
-            expect(isFiniteNumber(-3.14)).toBe(true);
-            expect(isFiniteNumber(Number.MAX_SAFE_INTEGER)).toBe(true);
-            expect(isFiniteNumber(Number.MIN_SAFE_INTEGER)).toBe(true);
+            expect(isFiniteNumber(0)).toBeTruthy();
+            expect(isFiniteNumber(42)).toBeTruthy();
+            expect(isFiniteNumber(-42)).toBeTruthy();
+            expect(isFiniteNumber(3.14)).toBeTruthy();
+            expect(isFiniteNumber(-3.14)).toBeTruthy();
+            expect(isFiniteNumber(Number.MAX_SAFE_INTEGER)).toBeTruthy();
+            expect(isFiniteNumber(Number.MIN_SAFE_INTEGER)).toBeTruthy();
         });
 
         it("should return false for infinite numbers", async ({
@@ -614,10 +614,10 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
-            expect(isFiniteNumber(Infinity)).toBe(false);
-            expect(isFiniteNumber(-Infinity)).toBe(false);
-            expect(isFiniteNumber(Number.POSITIVE_INFINITY)).toBe(false);
-            expect(isFiniteNumber(Number.NEGATIVE_INFINITY)).toBe(false);
+            expect(isFiniteNumber(Infinity)).toBeFalsy();
+            expect(isFiniteNumber(-Infinity)).toBeFalsy();
+            expect(isFiniteNumber(Number.POSITIVE_INFINITY)).toBeFalsy();
+            expect(isFiniteNumber(Number.NEGATIVE_INFINITY)).toBeFalsy();
         });
 
         it("should return false for NaN", async ({ task, annotate }) => {
@@ -626,8 +626,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isFiniteNumber(Number.NaN)).toBe(false);
-            expect(isFiniteNumber(Number.NaN)).toBe(false);
+            expect(isFiniteNumber(Number.NaN)).toBeFalsy();
+            expect(isFiniteNumber(Number.NaN)).toBeFalsy();
         });
 
         it("should return false for non-numbers", async ({
@@ -639,12 +639,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isFiniteNumber("42")).toBe(false);
-            expect(isFiniteNumber(null)).toBe(false);
-            expect(isFiniteNumber(undefined)).toBe(false);
-            expect(isFiniteNumber(true)).toBe(false);
-            expect(isFiniteNumber({})).toBe(false);
-            expect(isFiniteNumber([])).toBe(false);
+            expect(isFiniteNumber("42")).toBeFalsy();
+            expect(isFiniteNumber(null)).toBeFalsy();
+            expect(isFiniteNumber(undefined)).toBeFalsy();
+            expect(isFiniteNumber(true)).toBeFalsy();
+            expect(isFiniteNumber({})).toBeFalsy();
+            expect(isFiniteNumber([])).toBeFalsy();
         });
 
         it("should handle edge number values", async ({ task, annotate }) => {
@@ -653,26 +653,26 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isFiniteNumber(Number.MIN_VALUE)).toBe(true);
-            expect(isFiniteNumber(-Number.MIN_VALUE)).toBe(true);
-            expect(isFiniteNumber(Number.MAX_VALUE)).toBe(true);
-            expect(isFiniteNumber(-Number.MAX_VALUE)).toBe(true);
+            expect(isFiniteNumber(Number.MIN_VALUE)).toBeTruthy();
+            expect(isFiniteNumber(-Number.MIN_VALUE)).toBeTruthy();
+            expect(isFiniteNumber(Number.MAX_VALUE)).toBeTruthy();
+            expect(isFiniteNumber(-Number.MAX_VALUE)).toBeTruthy();
         });
     });
 
-    describe("isFunction", () => {
+    describe(isFunction, () => {
         it("should return true for functions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: guardFunctions", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isFunction(() => {})).toBe(true);
-            expect(isFunction(function normalFunction() {})).toBe(true);
-            expect(isFunction(async () => {})).toBe(true);
-            expect(isFunction(function* generatorFunction() {})).toBe(true);
-            expect(isFunction(console.log)).toBe(true);
-            expect(isFunction(Math.max)).toBe(true);
+            expect(isFunction(() => {})).toBeTruthy();
+            expect(isFunction(function normalFunction() {})).toBeTruthy();
+            expect(isFunction(async () => {})).toBeTruthy();
+            expect(isFunction(function* generatorFunction() {})).toBeTruthy();
+            expect(isFunction(console.log)).toBeTruthy();
+            expect(isFunction(Math.max)).toBeTruthy();
         });
 
         it("should return true for constructors", async ({
@@ -684,10 +684,10 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
-            expect(isFunction(Array)).toBe(true);
-            expect(isFunction(Object)).toBe(true);
-            expect(isFunction(Date)).toBe(true);
-            expect(isFunction(function Constructor() {})).toBe(true);
+            expect(isFunction(Array)).toBeTruthy();
+            expect(isFunction(Object)).toBeTruthy();
+            expect(isFunction(Date)).toBeTruthy();
+            expect(isFunction(function Constructor() {})).toBeTruthy();
         });
 
         it("should return false for non-functions", async ({
@@ -699,13 +699,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isFunction({})).toBe(false);
-            expect(isFunction([])).toBe(false);
-            expect(isFunction("function")).toBe(false);
-            expect(isFunction(42)).toBe(false);
-            expect(isFunction(null)).toBe(false);
-            expect(isFunction(undefined)).toBe(false);
-            expect(isFunction(true)).toBe(false);
+            expect(isFunction({})).toBeFalsy();
+            expect(isFunction([])).toBeFalsy();
+            expect(isFunction("function")).toBeFalsy();
+            expect(isFunction(42)).toBeFalsy();
+            expect(isFunction(null)).toBeFalsy();
+            expect(isFunction(undefined)).toBeFalsy();
+            expect(isFunction(true)).toBeFalsy();
         });
 
         it("should handle class constructors", async ({ task, annotate }) => {
@@ -717,7 +717,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             class TestClass {
                 public name = "test";
             }
-            expect(isFunction(TestClass)).toBe(true);
+            expect(isFunction(TestClass)).toBeTruthy();
         });
 
         it("should handle bound functions", async ({ task, annotate }) => {
@@ -728,11 +728,11 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             function testFn() {}
             const boundFn = testFn.bind(null);
-            expect(isFunction(boundFn)).toBe(true);
+            expect(isFunction(boundFn)).toBeTruthy();
         });
     });
 
-    describe("isNonNegativeNumber", () => {
+    describe(isNonNegativeNumber, () => {
         it("should return true for non-negative numbers", async ({
             task,
             annotate,
@@ -742,11 +742,11 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNegativeNumber(0)).toBe(true);
-            expect(isNonNegativeNumber(1)).toBe(true);
-            expect(isNonNegativeNumber(42)).toBe(true);
-            expect(isNonNegativeNumber(3.14)).toBe(true);
-            expect(isNonNegativeNumber(Number.MAX_VALUE)).toBe(true);
+            expect(isNonNegativeNumber(0)).toBeTruthy();
+            expect(isNonNegativeNumber(1)).toBeTruthy();
+            expect(isNonNegativeNumber(42)).toBeTruthy();
+            expect(isNonNegativeNumber(3.14)).toBeTruthy();
+            expect(isNonNegativeNumber(Number.MAX_VALUE)).toBeTruthy();
         });
 
         it("should return false for negative numbers", async ({
@@ -758,10 +758,10 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNegativeNumber(-1)).toBe(false);
-            expect(isNonNegativeNumber(-42)).toBe(false);
-            expect(isNonNegativeNumber(-3.14)).toBe(false);
-            expect(isNonNegativeNumber(Number.MIN_SAFE_INTEGER)).toBe(false);
+            expect(isNonNegativeNumber(-1)).toBeFalsy();
+            expect(isNonNegativeNumber(-42)).toBeFalsy();
+            expect(isNonNegativeNumber(-3.14)).toBeFalsy();
+            expect(isNonNegativeNumber(Number.MIN_SAFE_INTEGER)).toBeFalsy();
         });
 
         it("should return false for NaN and non-numbers", async ({
@@ -773,9 +773,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNegativeNumber(Number.NaN)).toBe(false);
-            expect(isNonNegativeNumber("5")).toBe(false);
-            expect(isNonNegativeNumber(null)).toBe(false);
+            expect(isNonNegativeNumber(Number.NaN)).toBeFalsy();
+            expect(isNonNegativeNumber("5")).toBeFalsy();
+            expect(isNonNegativeNumber(null)).toBeFalsy();
         });
 
         it("should handle infinity correctly", async ({ task, annotate }) => {
@@ -785,8 +785,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Initialization", "type");
 
             // Infinity is a number in JavaScript, so these should return true
-            expect(isNonNegativeNumber(Infinity)).toBe(true);
-            expect(isNonNegativeNumber(-Infinity)).toBe(false); // negative
+            expect(isNonNegativeNumber(Infinity)).toBeTruthy();
+            expect(isNonNegativeNumber(-Infinity)).toBeFalsy(); // negative
         });
 
         it("should return false for non-numbers", async ({
@@ -798,16 +798,16 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNegativeNumber("0")).toBe(false);
-            expect(isNonNegativeNumber(null)).toBe(false);
-            expect(isNonNegativeNumber(undefined)).toBe(false);
-            expect(isNonNegativeNumber(true)).toBe(false);
-            expect(isNonNegativeNumber({})).toBe(false);
-            expect(isNonNegativeNumber([])).toBe(false);
+            expect(isNonNegativeNumber("0")).toBeFalsy();
+            expect(isNonNegativeNumber(null)).toBeFalsy();
+            expect(isNonNegativeNumber(undefined)).toBeFalsy();
+            expect(isNonNegativeNumber(true)).toBeFalsy();
+            expect(isNonNegativeNumber({})).toBeFalsy();
+            expect(isNonNegativeNumber([])).toBeFalsy();
         });
     });
 
-    describe("isNonNullObject", () => {
+    describe(isNonNullObject, () => {
         it("should return true for plain objects", async ({
             task,
             annotate,
@@ -817,9 +817,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNullObject({})).toBe(true);
-            expect(isNonNullObject({ a: 1 })).toBe(true);
-            expect(isNonNullObject(Object.create(null))).toBe(true);
+            expect(isNonNullObject({})).toBeTruthy();
+            expect(isNonNullObject({ a: 1 })).toBeTruthy();
+            expect(isNonNullObject(Object.create(null))).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -828,7 +828,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNullObject(null)).toBe(false);
+            expect(isNonNullObject(null)).toBeFalsy();
         });
 
         it("should return false for arrays", async ({ task, annotate }) => {
@@ -837,14 +837,14 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNullObject([])).toBe(false);
+            expect(isNonNullObject([])).toBeFalsy();
             expect(
                 isNonNullObject([
                     1,
                     2,
                     3,
                 ])
-            ).toBe(false);
+            ).toBeFalsy();
         });
 
         it("should return false for primitives", async ({ task, annotate }) => {
@@ -853,10 +853,10 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNullObject("string")).toBe(false);
-            expect(isNonNullObject(42)).toBe(false);
-            expect(isNonNullObject(true)).toBe(false);
-            expect(isNonNullObject(undefined)).toBe(false);
+            expect(isNonNullObject("string")).toBeFalsy();
+            expect(isNonNullObject(42)).toBeFalsy();
+            expect(isNonNullObject(true)).toBeFalsy();
+            expect(isNonNullObject(undefined)).toBeFalsy();
         });
 
         it("should return true for object instances", async ({
@@ -868,9 +868,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNullObject(new Date())).toBe(true);
-            expect(isNonNullObject(new Error("test error"))).toBe(true);
-            expect(isNonNullObject(/regex/)).toBe(true);
+            expect(isNonNullObject(new Date())).toBeTruthy();
+            expect(isNonNullObject(new Error("test error"))).toBeTruthy();
+            expect(isNonNullObject(/regex/)).toBeTruthy();
         });
 
         it("should return false for functions", async ({ task, annotate }) => {
@@ -879,12 +879,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNullObject(() => {})).toBe(false);
-            expect(isNonNullObject(function namedFunction() {})).toBe(false);
+            expect(isNonNullObject(() => {})).toBeFalsy();
+            expect(isNonNullObject(function namedFunction() {})).toBeFalsy();
         });
     });
 
-    describe("isNumber", () => {
+    describe(isNumber, () => {
         it("should return true for valid numbers", async ({
             task,
             annotate,
@@ -894,13 +894,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNumber(0)).toBe(true);
-            expect(isNumber(42)).toBe(true);
-            expect(isNumber(-42)).toBe(true);
-            expect(isNumber(3.14)).toBe(true);
-            expect(isNumber(-3.14)).toBe(true);
-            expect(isNumber(Infinity)).toBe(true);
-            expect(isNumber(-Infinity)).toBe(true);
+            expect(isNumber(0)).toBeTruthy();
+            expect(isNumber(42)).toBeTruthy();
+            expect(isNumber(-42)).toBeTruthy();
+            expect(isNumber(3.14)).toBeTruthy();
+            expect(isNumber(-3.14)).toBeTruthy();
+            expect(isNumber(Infinity)).toBeTruthy();
+            expect(isNumber(-Infinity)).toBeTruthy();
         });
 
         it("should return false for NaN", async ({ task, annotate }) => {
@@ -909,8 +909,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNumber(Number.NaN)).toBe(false);
-            expect(isNumber(Number.NaN)).toBe(false);
+            expect(isNumber(Number.NaN)).toBeFalsy();
+            expect(isNumber(Number.NaN)).toBeFalsy();
         });
 
         it("should return false for non-numbers", async ({
@@ -922,12 +922,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNumber("42")).toBe(false);
-            expect(isNumber(null)).toBe(false);
-            expect(isNumber(undefined)).toBe(false);
-            expect(isNumber(true)).toBe(false);
-            expect(isNumber({})).toBe(false);
-            expect(isNumber([])).toBe(false);
+            expect(isNumber("42")).toBeFalsy();
+            expect(isNumber(null)).toBeFalsy();
+            expect(isNumber(undefined)).toBeFalsy();
+            expect(isNumber(true)).toBeFalsy();
+            expect(isNumber({})).toBeFalsy();
+            expect(isNumber([])).toBeFalsy();
         });
 
         it("should handle Number object instances", async ({
@@ -941,7 +941,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             // Test object wrapper instead of primitive number
             const numberObject = { valueOf: () => 42 };
-            expect(isNumber(numberObject)).toBe(false); // Objects, not primitives
+            expect(isNumber(numberObject)).toBeFalsy(); // Objects, not primitives
         });
 
         it("should handle edge number values", async ({ task, annotate }) => {
@@ -950,14 +950,14 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNumber(Number.MAX_VALUE)).toBe(true);
-            expect(isNumber(Number.MIN_VALUE)).toBe(true);
-            expect(isNumber(Number.MAX_SAFE_INTEGER)).toBe(true);
-            expect(isNumber(Number.MIN_SAFE_INTEGER)).toBe(true);
+            expect(isNumber(Number.MAX_VALUE)).toBeTruthy();
+            expect(isNumber(Number.MIN_VALUE)).toBeTruthy();
+            expect(isNumber(Number.MAX_SAFE_INTEGER)).toBeTruthy();
+            expect(isNumber(Number.MIN_SAFE_INTEGER)).toBeTruthy();
         });
     });
 
-    describe("isObject", () => {
+    describe(isObject, () => {
         it("should return true for plain objects", async ({
             task,
             annotate,
@@ -967,9 +967,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isObject({})).toBe(true);
-            expect(isObject({ a: 1 })).toBe(true);
-            expect(isObject(Object.create(null))).toBe(true);
+            expect(isObject({})).toBeTruthy();
+            expect(isObject({ a: 1 })).toBeTruthy();
+            expect(isObject(Object.create(null))).toBeTruthy();
         });
 
         it("should return true for object instances", async ({
@@ -981,11 +981,11 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isObject(new Date())).toBe(true);
-            expect(isObject(new Error("test error"))).toBe(true);
-            expect(isObject(/regex/)).toBe(true);
-            expect(isObject(new Map())).toBe(true);
-            expect(isObject(new Set())).toBe(true);
+            expect(isObject(new Date())).toBeTruthy();
+            expect(isObject(new Error("test error"))).toBeTruthy();
+            expect(isObject(/regex/)).toBeTruthy();
+            expect(isObject(new Map())).toBeTruthy();
+            expect(isObject(new Set())).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -994,7 +994,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isObject(null)).toBe(false);
+            expect(isObject(null)).toBeFalsy();
         });
 
         it("should return false for arrays", async ({ task, annotate }) => {
@@ -1003,14 +1003,14 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isObject([])).toBe(false);
+            expect(isObject([])).toBeFalsy();
             expect(
                 isObject([
                     1,
                     2,
                     3,
                 ])
-            ).toBe(false);
+            ).toBeFalsy();
         });
 
         it("should return false for primitives", async ({ task, annotate }) => {
@@ -1019,10 +1019,10 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isObject("string")).toBe(false);
-            expect(isObject(42)).toBe(false);
-            expect(isObject(true)).toBe(false);
-            expect(isObject(undefined)).toBe(false);
+            expect(isObject("string")).toBeFalsy();
+            expect(isObject(42)).toBeFalsy();
+            expect(isObject(true)).toBeFalsy();
+            expect(isObject(undefined)).toBeFalsy();
         });
 
         it("should return false for functions", async ({ task, annotate }) => {
@@ -1031,12 +1031,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isObject(() => {})).toBe(false);
-            expect(isObject(function namedTestFunction() {})).toBe(false);
+            expect(isObject(() => {})).toBeFalsy();
+            expect(isObject(function namedTestFunction() {})).toBeFalsy();
         });
     });
 
-    describe("isPositiveNumber", () => {
+    describe(isPositiveNumber, () => {
         it("should return true for positive numbers", async ({
             task,
             annotate,
@@ -1046,11 +1046,11 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPositiveNumber(1)).toBe(true);
-            expect(isPositiveNumber(42)).toBe(true);
-            expect(isPositiveNumber(3.14)).toBe(true);
-            expect(isPositiveNumber(0.1)).toBe(true);
-            expect(isPositiveNumber(Number.MAX_VALUE)).toBe(true);
+            expect(isPositiveNumber(1)).toBeTruthy();
+            expect(isPositiveNumber(42)).toBeTruthy();
+            expect(isPositiveNumber(3.14)).toBeTruthy();
+            expect(isPositiveNumber(0.1)).toBeTruthy();
+            expect(isPositiveNumber(Number.MAX_VALUE)).toBeTruthy();
         });
 
         it("should return false for zero", async ({ task, annotate }) => {
@@ -1059,8 +1059,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPositiveNumber(0)).toBe(false);
-            expect(isPositiveNumber(-0)).toBe(false);
+            expect(isPositiveNumber(0)).toBeFalsy();
+            expect(isPositiveNumber(-0)).toBeFalsy();
         });
 
         it("should return false for negative numbers", async ({
@@ -1072,10 +1072,10 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPositiveNumber(-1)).toBe(false);
-            expect(isPositiveNumber(-42)).toBe(false);
-            expect(isPositiveNumber(-3.14)).toBe(false);
-            expect(isPositiveNumber(Number.MIN_SAFE_INTEGER)).toBe(false);
+            expect(isPositiveNumber(-1)).toBeFalsy();
+            expect(isPositiveNumber(-42)).toBeFalsy();
+            expect(isPositiveNumber(-3.14)).toBeFalsy();
+            expect(isPositiveNumber(Number.MIN_SAFE_INTEGER)).toBeFalsy();
         });
 
         it("should return false for NaN, zero, and non-numbers", async ({
@@ -1087,10 +1087,10 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPositiveNumber(Number.NaN)).toBe(false);
-            expect(isPositiveNumber(0)).toBe(false);
-            expect(isPositiveNumber("5")).toBe(false);
-            expect(isPositiveNumber(null)).toBe(false);
+            expect(isPositiveNumber(Number.NaN)).toBeFalsy();
+            expect(isPositiveNumber(0)).toBeFalsy();
+            expect(isPositiveNumber("5")).toBeFalsy();
+            expect(isPositiveNumber(null)).toBeFalsy();
         });
 
         it("should handle infinity correctly", async ({ task, annotate }) => {
@@ -1100,8 +1100,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Initialization", "type");
 
             // Infinity is a number in JavaScript, so positive infinity should return true
-            expect(isPositiveNumber(Infinity)).toBe(true);
-            expect(isPositiveNumber(-Infinity)).toBe(false); // negative
+            expect(isPositiveNumber(Infinity)).toBeTruthy();
+            expect(isPositiveNumber(-Infinity)).toBeFalsy(); // negative
         });
 
         it("should return false for non-numbers", async ({
@@ -1113,27 +1113,27 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPositiveNumber("1")).toBe(false);
-            expect(isPositiveNumber(null)).toBe(false);
-            expect(isPositiveNumber(undefined)).toBe(false);
-            expect(isPositiveNumber(true)).toBe(false);
-            expect(isPositiveNumber({})).toBe(false);
-            expect(isPositiveNumber([])).toBe(false);
+            expect(isPositiveNumber("1")).toBeFalsy();
+            expect(isPositiveNumber(null)).toBeFalsy();
+            expect(isPositiveNumber(undefined)).toBeFalsy();
+            expect(isPositiveNumber(true)).toBeFalsy();
+            expect(isPositiveNumber({})).toBeFalsy();
+            expect(isPositiveNumber([])).toBeFalsy();
         });
     });
 
-    describe("isString", () => {
+    describe(isString, () => {
         it("should return true for strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: guardFunctions", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isString("")).toBe(true);
-            expect(isString("hello")).toBe(true);
-            expect(isString("123")).toBe(true);
-            expect(isString("true")).toBe(true);
-            expect(isString("null")).toBe(true);
+            expect(isString("")).toBeTruthy();
+            expect(isString("hello")).toBeTruthy();
+            expect(isString("123")).toBeTruthy();
+            expect(isString("true")).toBeTruthy();
+            expect(isString("null")).toBeTruthy();
         });
 
         it("should return false for non-strings", async ({
@@ -1145,12 +1145,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isString(42)).toBe(false);
-            expect(isString(true)).toBe(false);
-            expect(isString(null)).toBe(false);
-            expect(isString(undefined)).toBe(false);
-            expect(isString({})).toBe(false);
-            expect(isString([])).toBe(false);
+            expect(isString(42)).toBeFalsy();
+            expect(isString(true)).toBeFalsy();
+            expect(isString(null)).toBeFalsy();
+            expect(isString(undefined)).toBeFalsy();
+            expect(isString({})).toBeFalsy();
+            expect(isString([])).toBeFalsy();
         });
 
         it("should handle String object instances", async ({
@@ -1164,7 +1164,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             // Test string object instead of primitive string
             const stringObject = { valueOf: () => "hello" };
-            expect(isString(stringObject)).toBe(false); // Objects, not primitives
+            expect(isString(stringObject)).toBeFalsy(); // Objects, not primitives
         });
 
         it("should handle template literals", async ({ task, annotate }) => {
@@ -1174,11 +1174,11 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const name = "world";
-            expect(isString(`Hello ${name}`)).toBe(true);
+            expect(isString(`Hello ${name}`)).toBeTruthy();
         });
     });
 
-    describe("isValidPort", () => {
+    describe(isValidPort, () => {
         it("should return true for valid port numbers", async ({
             task,
             annotate,
@@ -1188,12 +1188,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort(1)).toBe(true);
-            expect(isValidPort(80)).toBe(true);
-            expect(isValidPort(443)).toBe(true);
-            expect(isValidPort(3000)).toBe(true);
-            expect(isValidPort(8080)).toBe(true);
-            expect(isValidPort(65_535)).toBe(true); // Maximum port
+            expect(isValidPort(1)).toBeTruthy();
+            expect(isValidPort(80)).toBeTruthy();
+            expect(isValidPort(443)).toBeTruthy();
+            expect(isValidPort(3000)).toBeTruthy();
+            expect(isValidPort(8080)).toBeTruthy();
+            expect(isValidPort(65_535)).toBeTruthy(); // Maximum port
         });
 
         it("should return false for invalid port numbers", async ({
@@ -1205,10 +1205,10 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort(0)).toBe(false); // Too low
-            expect(isValidPort(65_536)).toBe(false); // Too high
-            expect(isValidPort(-1)).toBe(false); // Negative
-            expect(isValidPort(3.14)).toBe(false); // Not integer
+            expect(isValidPort(0)).toBeFalsy(); // Too low
+            expect(isValidPort(65_536)).toBeFalsy(); // Too high
+            expect(isValidPort(-1)).toBeFalsy(); // Negative
+            expect(isValidPort(3.14)).toBeFalsy(); // Not integer
         });
 
         it("should return false for non-numbers", async ({
@@ -1220,12 +1220,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort("80")).toBe(false);
-            expect(isValidPort(null)).toBe(false);
-            expect(isValidPort(undefined)).toBe(false);
-            expect(isValidPort(true)).toBe(false);
-            expect(isValidPort({})).toBe(false);
-            expect(isValidPort([])).toBe(false);
+            expect(isValidPort("80")).toBeFalsy();
+            expect(isValidPort(null)).toBeFalsy();
+            expect(isValidPort(undefined)).toBeFalsy();
+            expect(isValidPort(true)).toBeFalsy();
+            expect(isValidPort({})).toBeFalsy();
+            expect(isValidPort([])).toBeFalsy();
         });
 
         it("should return false for NaN and infinity", async ({
@@ -1237,9 +1237,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
-            expect(isValidPort(Number.NaN)).toBe(false);
-            expect(isValidPort(Infinity)).toBe(false);
-            expect(isValidPort(-Infinity)).toBe(false);
+            expect(isValidPort(Number.NaN)).toBeFalsy();
+            expect(isValidPort(Infinity)).toBeFalsy();
+            expect(isValidPort(-Infinity)).toBeFalsy();
         });
 
         it("should handle edge cases", async ({ task, annotate }) => {
@@ -1248,12 +1248,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort(1)).toBe(true); // Still integer
-            expect(isValidPort(1.1)).toBe(false); // Not integer
+            expect(isValidPort(1)).toBeTruthy(); // Still integer
+            expect(isValidPort(1.1)).toBeFalsy(); // Not integer
         });
     });
 
-    describe("isValidTimestamp", () => {
+    describe(isValidTimestamp, () => {
         const dayInMs = 86_400_000;
         let currentTime = 0;
 
@@ -1271,10 +1271,10 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidTimestamp(1)).toBe(true); // Very old but positive
-            expect(isValidTimestamp(currentTime)).toBe(true); // Current time
-            expect(isValidTimestamp(currentTime - dayInMs)).toBe(true); // Yesterday
-            expect(isValidTimestamp(currentTime + dayInMs)).toBe(true); // Tomorrow (within allowed future)
+            expect(isValidTimestamp(1)).toBeTruthy(); // Very old but positive
+            expect(isValidTimestamp(currentTime)).toBeTruthy(); // Current time
+            expect(isValidTimestamp(currentTime - dayInMs)).toBeTruthy(); // Yesterday
+            expect(isValidTimestamp(currentTime + dayInMs)).toBeTruthy(); // Tomorrow (within allowed future)
         });
 
         it("should return false for invalid timestamps", async ({
@@ -1286,9 +1286,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidTimestamp(0)).toBe(false); // Not positive
-            expect(isValidTimestamp(-1)).toBe(false); // Negative
-            expect(isValidTimestamp(currentTime + dayInMs + 1000)).toBe(false); // Too far in future
+            expect(isValidTimestamp(0)).toBeFalsy(); // Not positive
+            expect(isValidTimestamp(-1)).toBeFalsy(); // Negative
+            expect(isValidTimestamp(currentTime + dayInMs + 1000)).toBeFalsy(); // Too far in future
         });
 
         it("should return false for non-numbers", async ({
@@ -1300,12 +1300,12 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidTimestamp("1672531200000")).toBe(false);
-            expect(isValidTimestamp(null)).toBe(false);
-            expect(isValidTimestamp(undefined)).toBe(false);
-            expect(isValidTimestamp(true)).toBe(false);
-            expect(isValidTimestamp({})).toBe(false);
-            expect(isValidTimestamp([])).toBe(false);
+            expect(isValidTimestamp("1672531200000")).toBeFalsy();
+            expect(isValidTimestamp(null)).toBeFalsy();
+            expect(isValidTimestamp(undefined)).toBeFalsy();
+            expect(isValidTimestamp(true)).toBeFalsy();
+            expect(isValidTimestamp({})).toBeFalsy();
+            expect(isValidTimestamp([])).toBeFalsy();
         });
 
         it("should return false for NaN and infinity", async ({
@@ -1317,9 +1317,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
-            expect(isValidTimestamp(Number.NaN)).toBe(false);
-            expect(isValidTimestamp(Infinity)).toBe(false);
-            expect(isValidTimestamp(-Infinity)).toBe(false);
+            expect(isValidTimestamp(Number.NaN)).toBeFalsy();
+            expect(isValidTimestamp(Infinity)).toBeFalsy();
+            expect(isValidTimestamp(-Infinity)).toBeFalsy();
         });
 
         it("should handle edge cases", async ({ task, annotate }) => {
@@ -1328,10 +1328,10 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidTimestamp(3.14)).toBe(true); // Decimal numbers are still valid
-            expect(isValidTimestamp(currentTime + dayInMs - 1000)).toBe(true); // Well under limit
-            expect(isValidTimestamp(currentTime + dayInMs + 10_000)).toBe(
-                false
+            expect(isValidTimestamp(3.14)).toBeTruthy(); // Decimal numbers are still valid
+            expect(isValidTimestamp(currentTime + dayInMs - 1000)).toBeTruthy(); // Well under limit
+            expect(isValidTimestamp(currentTime + dayInMs + 10_000)).toBeFalsy(
+                
             ); // Well over limit
         });
     });
@@ -1379,14 +1379,14 @@ describe("Type Guards - Comprehensive Coverage", () => {
                     tags: unknown;
                     config: unknown;
                 };
-                expect(isPositiveNumber(typedData.id)).toBe(true);
-                expect(isString(typedData.name)).toBe(true);
-                expect(isValidPort(typedData.port)).toBe(true);
-                expect(isValidUrl(typedData.url)).toBe(true);
-                expect(isBoolean(typedData.active)).toBe(true);
-                expect(isDate(typedData.created)).toBe(true);
-                expect(isArray(typedData.tags, isString)).toBe(true);
-                expect(isObject(typedData.config)).toBe(true);
+                expect(isPositiveNumber(typedData.id)).toBeTruthy();
+                expect(isString(typedData.name)).toBeTruthy();
+                expect(isValidPort(typedData.port)).toBeTruthy();
+                expect(isValidUrl(typedData.url)).toBeTruthy();
+                expect(isBoolean(typedData.active)).toBeTruthy();
+                expect(isDate(typedData.created)).toBeTruthy();
+                expect(isArray(typedData.tags, isString)).toBeTruthy();
+                expect(isObject(typedData.config)).toBeTruthy();
             }
         });
 
@@ -1402,25 +1402,25 @@ describe("Type Guards - Comprehensive Coverage", () => {
             // Test complex scenarios without using eval
             expect(
                 isString("123") && !isNumber("123") && !isValidPort("123")
-            ).toBe(true);
-            expect(!isString(123) && isNumber(123) && isValidPort(123)).toBe(
-                true
+            ).toBeTruthy();
+            expect(!isString(123) && isNumber(123) && isValidPort(123)).toBeTruthy(
+                
             );
-            expect(isArray([]) && !isObject([]) && !isString([])).toBe(true);
-            expect(!isArray({}) && isObject({}) && !isFunction({})).toBe(true);
+            expect(isArray([]) && !isObject([]) && !isString([])).toBeTruthy();
+            expect(!isArray({}) && isObject({}) && !isFunction({})).toBeTruthy();
 
             const testFn = () => {};
             expect(
                 isFunction(testFn) && !isObject(testFn) && !isString(testFn)
-            ).toBe(true);
+            ).toBeTruthy();
 
             const testDate = new Date();
             expect(
                 isDate(testDate) && isObject(testDate) && !isString(testDate)
-            ).toBe(true);
+            ).toBeTruthy();
 
-            expect(!isObject(null) && !isString(null) && !isNumber(null)).toBe(
-                true
+            expect(!isObject(null) && !isString(null) && !isNumber(null)).toBeTruthy(
+                
             );
         });
     });

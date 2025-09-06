@@ -74,7 +74,7 @@ describe("Corrected Function Coverage Tests", () => {
             // Test typed entries
             const testObj = { a: 1, b: 2 };
             const entries = objectSafety.typedObjectEntries(testObj);
-            expect(Array.isArray(entries)).toBe(true);
+            expect(Array.isArray(entries)).toBeTruthy();
         });
     });
 

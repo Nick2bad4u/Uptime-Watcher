@@ -21,7 +21,7 @@ import {
     safeParseTimestamp,
 } from "@shared/utils/safeConversions";
 
-describe("safeNumberConversion", () => {
+describe(safeNumberConversion, () => {
     it("should return the number when given a valid number", async ({
         task,
         annotate,
@@ -128,7 +128,7 @@ describe("safeNumberConversion", () => {
     });
 });
 
-describe("safeParseCheckInterval", () => {
+describe(safeParseCheckInterval, () => {
     it("should return valid check intervals unchanged", async ({
         task,
         annotate,
@@ -181,7 +181,7 @@ describe("safeParseCheckInterval", () => {
     });
 });
 
-describe("safeParseFloat", () => {
+describe(safeParseFloat, () => {
     it("should return the number when given a valid number", async ({
         task,
         annotate,
@@ -283,7 +283,7 @@ describe("safeParseFloat", () => {
     });
 });
 
-describe("safeParseInt", () => {
+describe(safeParseInt, () => {
     it("should return integers unchanged", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: safeConversions-extra", "component");
@@ -389,7 +389,7 @@ describe("safeParseInt", () => {
     });
 });
 
-describe("safeParsePercentage", () => {
+describe(safeParsePercentage, () => {
     it("should return valid percentages unchanged", async ({
         task,
         annotate,
@@ -466,7 +466,7 @@ describe("safeParsePercentage", () => {
     });
 });
 
-describe("safeParsePort", () => {
+describe(safeParsePort, () => {
     it("should return valid port numbers unchanged", async ({
         task,
         annotate,
@@ -574,7 +574,7 @@ describe("safeParsePort", () => {
     });
 });
 
-describe("safeParsePositiveInt", () => {
+describe(safeParsePositiveInt, () => {
     it("should return positive integers unchanged", async ({
         task,
         annotate,
@@ -665,7 +665,7 @@ describe("safeParsePositiveInt", () => {
     });
 });
 
-describe("safeParseRetryAttempts", () => {
+describe(safeParseRetryAttempts, () => {
     it("should return valid retry attempts unchanged", async ({
         task,
         annotate,
@@ -762,7 +762,7 @@ describe("safeParseRetryAttempts", () => {
     });
 });
 
-describe("safeParseTimeout", () => {
+describe(safeParseTimeout, () => {
     it("should return positive timeout values unchanged", async ({
         task,
         annotate,
@@ -865,7 +865,7 @@ describe("safeParseTimeout", () => {
     });
 });
 
-describe("safeParseTimestamp", () => {
+describe(safeParseTimestamp, () => {
     const CURRENT_TIME = 1_640_995_200_000; // 2022-01-01 00:00:00 UTC
     const ONE_DAY = 86_400_000; // 24 hours in milliseconds
 

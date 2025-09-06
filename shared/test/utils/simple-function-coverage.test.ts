@@ -195,8 +195,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isObject).toBeDefined();
             expect(typeof typeGuards.isObject).toBe("function");
 
-            expect(typeGuards.isObject({})).toBe(true);
-            expect(typeGuards.isObject(null)).toBe(false);
+            expect(typeGuards.isObject({})).toBeTruthy();
+            expect(typeGuards.isObject(null)).toBeFalsy();
         });
 
         test("isNumber function exists and works", ({ task, annotate }) => {
@@ -213,8 +213,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isNumber).toBeDefined();
             expect(typeof typeGuards.isNumber).toBe("function");
 
-            expect(typeGuards.isNumber(123)).toBe(true);
-            expect(typeGuards.isNumber("123")).toBe(false);
+            expect(typeGuards.isNumber(123)).toBeTruthy();
+            expect(typeGuards.isNumber("123")).toBeFalsy();
         });
 
         test("hasProperties function exists and works", ({
@@ -235,8 +235,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof typeGuards.hasProperties).toBe("function");
 
             const obj = { a: 1, b: 2 };
-            expect(typeGuards.hasProperties(obj, ["a"])).toBe(true);
-            expect(typeGuards.hasProperties(obj, ["c"])).toBe(false);
+            expect(typeGuards.hasProperties(obj, ["a"])).toBeTruthy();
+            expect(typeGuards.hasProperties(obj, ["c"])).toBeFalsy();
         });
 
         test("hasProperty function exists and works", ({ task, annotate }) => {
@@ -254,8 +254,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeof typeGuards.hasProperty).toBe("function");
 
             const obj = { a: 1 };
-            expect(typeGuards.hasProperty(obj, "a")).toBe(true);
-            expect(typeGuards.hasProperty(obj, "b")).toBe(false);
+            expect(typeGuards.hasProperty(obj, "a")).toBeTruthy();
+            expect(typeGuards.hasProperty(obj, "b")).toBeFalsy();
         });
 
         test("isArray function exists and works", ({ task, annotate }) => {
@@ -272,8 +272,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isArray).toBeDefined();
             expect(typeof typeGuards.isArray).toBe("function");
 
-            expect(typeGuards.isArray([])).toBe(true);
-            expect(typeGuards.isArray({})).toBe(false);
+            expect(typeGuards.isArray([])).toBeTruthy();
+            expect(typeGuards.isArray({})).toBeFalsy();
         });
 
         test("isBoolean function exists and works", ({ task, annotate }) => {
@@ -290,8 +290,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isBoolean).toBeDefined();
             expect(typeof typeGuards.isBoolean).toBe("function");
 
-            expect(typeGuards.isBoolean(true)).toBe(true);
-            expect(typeGuards.isBoolean(1)).toBe(false);
+            expect(typeGuards.isBoolean(true)).toBeTruthy();
+            expect(typeGuards.isBoolean(1)).toBeFalsy();
         });
 
         test("isDate function exists and works", ({ task, annotate }) => {
@@ -308,8 +308,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isDate).toBeDefined();
             expect(typeof typeGuards.isDate).toBe("function");
 
-            expect(typeGuards.isDate(new Date())).toBe(true);
-            expect(typeGuards.isDate("2023-01-01")).toBe(false);
+            expect(typeGuards.isDate(new Date())).toBeTruthy();
+            expect(typeGuards.isDate("2023-01-01")).toBeFalsy();
         });
 
         test("isError function exists and works", ({ task, annotate }) => {
@@ -326,8 +326,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isError).toBeDefined();
             expect(typeof typeGuards.isError).toBe("function");
 
-            expect(typeGuards.isError(new Error("test"))).toBe(true);
-            expect(typeGuards.isError("error")).toBe(false);
+            expect(typeGuards.isError(new Error("test"))).toBeTruthy();
+            expect(typeGuards.isError("error")).toBeFalsy();
         });
 
         test("isFiniteNumber function exists and works", ({
@@ -347,8 +347,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isFiniteNumber).toBeDefined();
             expect(typeof typeGuards.isFiniteNumber).toBe("function");
 
-            expect(typeGuards.isFiniteNumber(123)).toBe(true);
-            expect(typeGuards.isFiniteNumber(Infinity)).toBe(false);
+            expect(typeGuards.isFiniteNumber(123)).toBeTruthy();
+            expect(typeGuards.isFiniteNumber(Infinity)).toBeFalsy();
         });
 
         test("isFunction function exists and works", ({ task, annotate }) => {
@@ -365,8 +365,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isFunction).toBeDefined();
             expect(typeof typeGuards.isFunction).toBe("function");
 
-            expect(typeGuards.isFunction(() => {})).toBe(true);
-            expect(typeGuards.isFunction("function")).toBe(false);
+            expect(typeGuards.isFunction(() => {})).toBeTruthy();
+            expect(typeGuards.isFunction("function")).toBeFalsy();
         });
 
         test("isNonNegativeNumber function exists and works", ({
@@ -386,8 +386,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isNonNegativeNumber).toBeDefined();
             expect(typeof typeGuards.isNonNegativeNumber).toBe("function");
 
-            expect(typeGuards.isNonNegativeNumber(0)).toBe(true);
-            expect(typeGuards.isNonNegativeNumber(-1)).toBe(false);
+            expect(typeGuards.isNonNegativeNumber(0)).toBeTruthy();
+            expect(typeGuards.isNonNegativeNumber(-1)).toBeFalsy();
         });
 
         test("isNonNullObject function exists and works", ({
@@ -407,8 +407,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isNonNullObject).toBeDefined();
             expect(typeof typeGuards.isNonNullObject).toBe("function");
 
-            expect(typeGuards.isNonNullObject({})).toBe(true);
-            expect(typeGuards.isNonNullObject(null)).toBe(false);
+            expect(typeGuards.isNonNullObject({})).toBeTruthy();
+            expect(typeGuards.isNonNullObject(null)).toBeFalsy();
         });
 
         test("isPositiveNumber function exists and works", ({
@@ -428,8 +428,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isPositiveNumber).toBeDefined();
             expect(typeof typeGuards.isPositiveNumber).toBe("function");
 
-            expect(typeGuards.isPositiveNumber(1)).toBe(true);
-            expect(typeGuards.isPositiveNumber(0)).toBe(false);
+            expect(typeGuards.isPositiveNumber(1)).toBeTruthy();
+            expect(typeGuards.isPositiveNumber(0)).toBeFalsy();
         });
 
         test("isString function exists and works", ({ task, annotate }) => {
@@ -446,8 +446,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isString).toBeDefined();
             expect(typeof typeGuards.isString).toBe("function");
 
-            expect(typeGuards.isString("hello")).toBe(true);
-            expect(typeGuards.isString(123)).toBe(false);
+            expect(typeGuards.isString("hello")).toBeTruthy();
+            expect(typeGuards.isString(123)).toBeFalsy();
         });
 
         test("isValidPort function exists and works", ({ task, annotate }) => {
@@ -464,8 +464,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isValidPort).toBeDefined();
             expect(typeof typeGuards.isValidPort).toBe("function");
 
-            expect(typeGuards.isValidPort(80)).toBe(true);
-            expect(typeGuards.isValidPort(0)).toBe(false);
+            expect(typeGuards.isValidPort(80)).toBeTruthy();
+            expect(typeGuards.isValidPort(0)).toBeFalsy();
         });
 
         test("isValidTimestamp function exists and works", ({
@@ -485,8 +485,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeGuards.isValidTimestamp).toBeDefined();
             expect(typeof typeGuards.isValidTimestamp).toBe("function");
 
-            expect(typeGuards.isValidTimestamp(Date.now())).toBe(true);
-            expect(typeGuards.isValidTimestamp(-1)).toBe(false);
+            expect(typeGuards.isValidTimestamp(Date.now())).toBeTruthy();
+            expect(typeGuards.isValidTimestamp(-1)).toBeFalsy();
         });
     });
 
@@ -508,8 +508,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(validation.validateMonitorType).toBeDefined();
             expect(typeof validation.validateMonitorType).toBe("function");
 
-            expect(validation.validateMonitorType("http")).toBe(true);
-            expect(validation.validateMonitorType("invalid")).toBe(false);
+            expect(validation.validateMonitorType("http")).toBeTruthy();
+            expect(validation.validateMonitorType("invalid")).toBeFalsy();
         });
 
         test("getMonitorValidationErrors function exists and works", ({
@@ -540,7 +540,7 @@ describe("Simple Function Coverage Tests", () => {
                 timeout: 5000,
             };
             const errors = validation.getMonitorValidationErrors(monitor);
-            expect(Array.isArray(errors)).toBe(true);
+            expect(Array.isArray(errors)).toBeTruthy();
         });
 
         test("validateSite function exists and works", ({ task, annotate }) => {
@@ -1164,8 +1164,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeHelpers.isArray).toBeDefined();
             expect(typeof typeHelpers.isArray).toBe("function");
 
-            expect(typeHelpers.isArray([])).toBe(true);
-            expect(typeHelpers.isArray({})).toBe(false);
+            expect(typeHelpers.isArray([])).toBeTruthy();
+            expect(typeHelpers.isArray({})).toBeFalsy();
         });
 
         test("isRecord function exists and works", ({ task, annotate }) => {
@@ -1182,8 +1182,8 @@ describe("Simple Function Coverage Tests", () => {
             expect(typeHelpers.isRecord).toBeDefined();
             expect(typeof typeHelpers.isRecord).toBe("function");
 
-            expect(typeHelpers.isRecord({})).toBe(true);
-            expect(typeHelpers.isRecord([])).toBe(false);
+            expect(typeHelpers.isRecord({})).toBeTruthy();
+            expect(typeHelpers.isRecord([])).toBeFalsy();
         });
 
         test("safePropertyAccess function exists and works", ({

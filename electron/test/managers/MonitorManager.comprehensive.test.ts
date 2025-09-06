@@ -219,7 +219,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 "site-1",
                 "monitor-1"
             );
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return initial monitoring state as false", async ({
@@ -245,7 +245,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 "purpose"
             );
 
-            expect(manager.isMonitoringActive()).toBe(false);
+            expect(manager.isMonitoringActive()).toBeFalsy();
         });
 
         it("should restart monitor with new config successfully", async ({
@@ -281,7 +281,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 "site-1",
                 mockMonitor
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
     });
 
@@ -429,7 +429,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             await manager.setupNewMonitors(siteWithNewMonitors, newMonitorIds);
 
             // The setup should complete without errors
-            expect(true).toBe(true); // Test completed successfully
+            expect(true).toBeTruthy(); // Test completed successfully
         });
 
         it("should handle empty new monitor IDs array", async () => {
@@ -640,7 +640,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                     operation: "started",
                 })
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should start monitoring for specific site without monitor ID", async () => {
@@ -661,7 +661,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                     operation: "started",
                 })
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should handle failed start monitoring for site", async () => {
@@ -679,7 +679,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 "internal:monitor:started",
                 expect.any(Object)
             );
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should stop monitoring for all sites", async () => {
@@ -725,7 +725,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                     reason: "user",
                 })
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should handle failed stop monitoring for site", async () => {
@@ -743,7 +743,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 "internal:monitor:stopped",
                 expect.any(Object)
             );
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -762,7 +762,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                             id,
                             monitorId
                         );
-                        expect(recursiveResult).toBe(false);
+                        expect(recursiveResult).toBeFalsy();
                     }
                     return true;
                 }
@@ -772,7 +772,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 "site-1",
                 "monitor-1"
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should handle recursive call prevention in stopMonitoringForSite", async () => {
@@ -789,7 +789,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                             id,
                             monitorId
                         );
-                        expect(recursiveResult).toBe(false);
+                        expect(recursiveResult).toBeFalsy();
                     }
                     return true;
                 }
@@ -799,7 +799,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 "site-1",
                 "monitor-1"
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should handle shouldApplyDefaultInterval with zero checkInterval", async () => {

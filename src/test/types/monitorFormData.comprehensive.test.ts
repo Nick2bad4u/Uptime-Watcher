@@ -40,7 +40,7 @@ describe("Monitor Form Data Types", () => {
             };
 
             expect(baseForm.checkInterval).toBe(300_000);
-            expect(baseForm.monitoring).toBe(true);
+            expect(baseForm.monitoring).toBeTruthy();
             expect(baseForm.retryAttempts).toBe(3);
             expect(baseForm.timeout).toBe(10_000);
             expect(baseForm.type).toBe("http");
@@ -66,7 +66,7 @@ describe("Monitor Form Data Types", () => {
 
             expect(dynamicForm.checkInterval).toBe(300_000);
             expect(dynamicForm["customProperty"]).toBe("custom value");
-            expect(dynamicForm.monitoring).toBe(true);
+            expect(dynamicForm.monitoring).toBeTruthy();
         });
 
         it("should support HttpFormData interface", async ({
@@ -197,7 +197,7 @@ describe("Monitor Form Data Types", () => {
 
             expect(defaultHttp.type).toBe("http");
             expect(defaultHttp.checkInterval).toBe(300_000);
-            expect(defaultHttp.monitoring).toBe(true);
+            expect(defaultHttp.monitoring).toBeTruthy();
             expect(defaultHttp.retryAttempts).toBe(3);
             expect(defaultHttp.timeout).toBe(10_000);
         });
@@ -215,7 +215,7 @@ describe("Monitor Form Data Types", () => {
 
             expect(defaultPing.type).toBe("ping");
             expect(defaultPing.checkInterval).toBe(300_000);
-            expect(defaultPing.monitoring).toBe(true);
+            expect(defaultPing.monitoring).toBeTruthy();
             expect(defaultPing.retryAttempts).toBe(3);
             expect(defaultPing.timeout).toBe(10_000);
         });
@@ -233,7 +233,7 @@ describe("Monitor Form Data Types", () => {
 
             expect(defaultPort.type).toBe("port");
             expect(defaultPort.checkInterval).toBe(300_000);
-            expect(defaultPort.monitoring).toBe(true);
+            expect(defaultPort.monitoring).toBeTruthy();
             expect(defaultPort.retryAttempts).toBe(3);
             expect(defaultPort.timeout).toBe(10_000);
         });
@@ -253,14 +253,14 @@ describe("Monitor Form Data Types", () => {
 
             expect(defaultCustom.type).toBe("custom");
             expect(defaultCustom.checkInterval).toBe(300_000);
-            expect(defaultCustom.monitoring).toBe(true);
+            expect(defaultCustom.monitoring).toBeTruthy();
             expect(defaultCustom.retryAttempts).toBe(3);
             expect(defaultCustom.timeout).toBe(10_000);
         });
     });
 
     describe("Type Guard Functions", () => {
-        describe("isHttpFormData", () => {
+        describe(isHttpFormData, () => {
             it("should return true for valid HTTP form data", async ({
                 task,
                 annotate,
@@ -275,7 +275,7 @@ describe("Monitor Form Data Types", () => {
                     url: "https://example.com",
                 };
 
-                expect(isHttpFormData(httpData)).toBe(true);
+                expect(isHttpFormData(httpData)).toBeTruthy();
             });
 
             it("should return false for data with wrong type", async ({
@@ -294,7 +294,7 @@ describe("Monitor Form Data Types", () => {
 
                 expect(
                     isHttpFormData(wrongType as Partial<MonitorFormData>)
-                ).toBe(false);
+                ).toBeFalsy();
             });
 
             it("should return false for data missing URL", async ({
@@ -312,7 +312,7 @@ describe("Monitor Form Data Types", () => {
 
                 expect(
                     isHttpFormData(missingUrl as Partial<MonitorFormData>)
-                ).toBe(false);
+                ).toBeFalsy();
             });
 
             it("should return false for data with invalid URL type", async ({
@@ -329,11 +329,11 @@ describe("Monitor Form Data Types", () => {
                     url: 123,
                 };
 
-                expect(isHttpFormData(invalidUrl as any)).toBe(false);
+                expect(isHttpFormData(invalidUrl as any)).toBeFalsy();
             });
         });
 
-        describe("isPingFormData", () => {
+        describe(isPingFormData, () => {
             it("should return true for valid ping form data", async ({
                 task,
                 annotate,
@@ -348,7 +348,7 @@ describe("Monitor Form Data Types", () => {
                     type: "ping",
                 };
 
-                expect(isPingFormData(pingData)).toBe(true);
+                expect(isPingFormData(pingData)).toBeTruthy();
             });
 
             it("should return false for data with wrong type", async ({
@@ -367,7 +367,7 @@ describe("Monitor Form Data Types", () => {
 
                 expect(
                     isPingFormData(wrongType as Partial<MonitorFormData>)
-                ).toBe(false);
+                ).toBeFalsy();
             });
 
             it("should return false for data missing host", async ({
@@ -385,7 +385,7 @@ describe("Monitor Form Data Types", () => {
 
                 expect(
                     isPingFormData(missingHost as Partial<MonitorFormData>)
-                ).toBe(false);
+                ).toBeFalsy();
             });
 
             it("should return false for data with invalid host type", async ({
@@ -402,11 +402,11 @@ describe("Monitor Form Data Types", () => {
                     type: "ping" as const,
                 };
 
-                expect(isPingFormData(invalidHost as any)).toBe(false);
+                expect(isPingFormData(invalidHost as any)).toBeFalsy();
             });
         });
 
-        describe("isPortFormData", () => {
+        describe(isPortFormData, () => {
             it("should return true for valid port form data", async ({
                 task,
                 annotate,
@@ -422,7 +422,7 @@ describe("Monitor Form Data Types", () => {
                     type: "port",
                 };
 
-                expect(isPortFormData(portData)).toBe(true);
+                expect(isPortFormData(portData)).toBeTruthy();
             });
 
             it("should return false for data with wrong type", async ({
@@ -442,7 +442,7 @@ describe("Monitor Form Data Types", () => {
 
                 expect(
                     isPortFormData(wrongType as Partial<MonitorFormData>)
-                ).toBe(false);
+                ).toBeFalsy();
             });
 
             it("should return false for data missing host", async ({
@@ -461,7 +461,7 @@ describe("Monitor Form Data Types", () => {
 
                 expect(
                     isPortFormData(missingHost as Partial<MonitorFormData>)
-                ).toBe(false);
+                ).toBeFalsy();
             });
 
             it("should return false for data missing port", async ({
@@ -480,7 +480,7 @@ describe("Monitor Form Data Types", () => {
 
                 expect(
                     isPortFormData(missingPort as Partial<MonitorFormData>)
-                ).toBe(false);
+                ).toBeFalsy();
             });
 
             it("should return false for data with invalid host type", async ({
@@ -498,7 +498,7 @@ describe("Monitor Form Data Types", () => {
                     type: "port" as const,
                 };
 
-                expect(isPortFormData(invalidHost as any)).toBe(false);
+                expect(isPortFormData(invalidHost as any)).toBeFalsy();
             });
 
             it("should return false for data with invalid port type", async ({
@@ -516,11 +516,11 @@ describe("Monitor Form Data Types", () => {
                     type: "port" as const,
                 };
 
-                expect(isPortFormData(invalidPort as any)).toBe(false);
+                expect(isPortFormData(invalidPort as any)).toBeFalsy();
             });
         });
 
-        describe("isValidMonitorFormData", () => {
+        describe(isValidMonitorFormData, () => {
             it("should return true for valid HTTP form data", async ({
                 task,
                 annotate,
@@ -535,7 +535,7 @@ describe("Monitor Form Data Types", () => {
                     url: "https://example.com",
                 };
 
-                expect(isValidMonitorFormData(httpData)).toBe(true);
+                expect(isValidMonitorFormData(httpData)).toBeTruthy();
             });
 
             it("should return true for valid ping form data", async ({
@@ -552,7 +552,7 @@ describe("Monitor Form Data Types", () => {
                     type: "ping",
                 };
 
-                expect(isValidMonitorFormData(pingData)).toBe(true);
+                expect(isValidMonitorFormData(pingData)).toBeTruthy();
             });
 
             it("should return true for valid port form data", async ({
@@ -570,7 +570,7 @@ describe("Monitor Form Data Types", () => {
                     type: "port",
                 };
 
-                expect(isValidMonitorFormData(portData)).toBe(true);
+                expect(isValidMonitorFormData(portData)).toBeTruthy();
             });
 
             it("should return false for null data", async ({
@@ -582,7 +582,7 @@ describe("Monitor Form Data Types", () => {
                 await annotate("Category: Core", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isValidMonitorFormData(null)).toBe(false);
+                expect(isValidMonitorFormData(null)).toBeFalsy();
             });
 
             it("should return false for non-object data", async ({
@@ -594,9 +594,9 @@ describe("Monitor Form Data Types", () => {
                 await annotate("Category: Core", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isValidMonitorFormData("string")).toBe(false);
-                expect(isValidMonitorFormData(123)).toBe(false);
-                expect(isValidMonitorFormData(true)).toBe(false);
+                expect(isValidMonitorFormData("string")).toBeFalsy();
+                expect(isValidMonitorFormData(123)).toBeFalsy();
+                expect(isValidMonitorFormData(true)).toBeFalsy();
             });
 
             it("should return false for data without type", async ({
@@ -612,7 +612,7 @@ describe("Monitor Form Data Types", () => {
                     url: "https://example.com",
                 };
 
-                expect(isValidMonitorFormData(noType)).toBe(false);
+                expect(isValidMonitorFormData(noType)).toBeFalsy();
             });
 
             it("should return false for data with invalid type", async ({
@@ -629,7 +629,7 @@ describe("Monitor Form Data Types", () => {
                     url: "https://example.com",
                 };
 
-                expect(isValidMonitorFormData(invalidType)).toBe(false);
+                expect(isValidMonitorFormData(invalidType)).toBeFalsy();
             });
 
             it("should return false for unknown monitor type", async ({
@@ -646,7 +646,7 @@ describe("Monitor Form Data Types", () => {
                     data: "some data",
                 };
 
-                expect(isValidMonitorFormData(unknownType)).toBe(false);
+                expect(isValidMonitorFormData(unknownType)).toBeFalsy();
             });
 
             it("should return false for incomplete valid type data", async ({
@@ -663,13 +663,13 @@ describe("Monitor Form Data Types", () => {
                     // Missing required URL
                 };
 
-                expect(isValidMonitorFormData(incompleteHttp)).toBe(false);
+                expect(isValidMonitorFormData(incompleteHttp)).toBeFalsy();
             });
         });
     });
 
     describe("Safe Property Access Functions", () => {
-        describe("safeGetFormProperty", () => {
+        describe(safeGetFormProperty, () => {
             it("should return property value when it exists", async ({
                 task,
                 annotate,
@@ -745,12 +745,12 @@ describe("Monitor Form Data Types", () => {
                 expect(safeGetFormProperty(data, "checkInterval", 1000)).toBe(
                     0
                 );
-                expect(safeGetFormProperty(data, "enabled", true)).toBe(false);
+                expect(safeGetFormProperty(data, "enabled", true)).toBeFalsy();
                 expect(safeGetFormProperty(data, "text", "default")).toBe("");
             });
         });
 
-        describe("safeSetFormProperty", () => {
+        describe(safeSetFormProperty, () => {
             it("should set property on form data", async ({
                 task,
                 annotate,
@@ -811,7 +811,7 @@ describe("Monitor Form Data Types", () => {
 
                 expect(data["number"]).toBe(123);
                 expect(data["string"]).toBe("test");
-                expect(data["boolean"]).toBe(true);
+                expect(data["boolean"]).toBeTruthy();
                 expect(data["object"]).toEqual({ nested: "value" });
                 expect(data["array"]).toEqual([
                     1,
@@ -843,8 +843,8 @@ describe("Monitor Form Data Types", () => {
             safeSetFormProperty(dynamicData, "method", "POST");
 
             // Validate the final form
-            expect(isValidMonitorFormData(dynamicData)).toBe(true);
-            expect(isHttpFormData(dynamicData as any)).toBe(true);
+            expect(isValidMonitorFormData(dynamicData)).toBeTruthy();
+            expect(isHttpFormData(dynamicData as any)).toBeTruthy();
         });
 
         it("should handle form data editing workflow", async ({
@@ -878,7 +878,7 @@ describe("Monitor Form Data Types", () => {
             expect(safeGetFormProperty(editedData, "checkInterval", 0)).toBe(
                 600_000
             );
-            expect(isValidMonitorFormData(editedData)).toBe(true);
+            expect(isValidMonitorFormData(editedData)).toBeTruthy();
         });
 
         it("should handle different monitor type conversions", async ({
@@ -906,9 +906,9 @@ describe("Monitor Form Data Types", () => {
             safeSetFormProperty(dynamicPort, "host", "example.com");
             safeSetFormProperty(dynamicPort, "port", 443);
 
-            expect(isHttpFormData(dynamicHttp as any)).toBe(true);
-            expect(isPingFormData(dynamicPing as any)).toBe(true);
-            expect(isPortFormData(dynamicPort as any)).toBe(true);
+            expect(isHttpFormData(dynamicHttp as any)).toBeTruthy();
+            expect(isPingFormData(dynamicPing as any)).toBeTruthy();
+            expect(isPortFormData(dynamicPort as any)).toBeTruthy();
         });
 
         it("should handle validation error scenarios", async ({
@@ -933,7 +933,7 @@ describe("Monitor Form Data Types", () => {
             ];
 
             for (const scenario of invalidScenarios) {
-                expect(isValidMonitorFormData(scenario)).toBe(false);
+                expect(isValidMonitorFormData(scenario)).toBeFalsy();
             }
         });
 
@@ -965,9 +965,9 @@ describe("Monitor Form Data Types", () => {
                 // Missing other optional properties
             };
 
-            expect(isHttpFormData(partialHttp)).toBe(true);
-            expect(isPingFormData(partialPing)).toBe(true);
-            expect(isPortFormData(partialPort)).toBe(true);
+            expect(isHttpFormData(partialHttp)).toBeTruthy();
+            expect(isPingFormData(partialPing)).toBeTruthy();
+            expect(isPortFormData(partialPort)).toBeTruthy();
         });
     });
 });

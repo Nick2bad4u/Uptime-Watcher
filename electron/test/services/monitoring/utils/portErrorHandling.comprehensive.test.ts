@@ -258,8 +258,8 @@ describe("Port Error Handling", () => {
 
             const error = new PortCheckError("Test", 100);
 
-            expect(error instanceof Error).toBe(true);
-            expect(error instanceof PortCheckError).toBe(true);
+            expect(error instanceof Error).toBeTruthy();
+            expect(error instanceof PortCheckError).toBeTruthy();
             expect(Object.getPrototypeOf(error)).toBe(PortCheckError.prototype);
         });
 
@@ -283,7 +283,7 @@ describe("Port Error Handling", () => {
 
             // The property exists and has the expected value
             expect(error.responseTime).toBe(100);
-            expect(Object.hasOwn(error, "responseTime")).toBe(true);
+            expect(Object.hasOwn(error, "responseTime")).toBeTruthy();
         });
 
         it("should handle empty string message", async ({ task, annotate }) => {

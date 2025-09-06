@@ -63,7 +63,7 @@ describe('Cache Utils Property-Based Tests', () => {
             // Verify all unique entries can be retrieved with their latest values
             for (const [key, expectedValue] of expectedValues.entries()) {
                 expect(cache.get(key)).toBe(expectedValue);
-                expect(cache.has(key)).toBe(true);
+                expect(cache.has(key)).toBeTruthy();
             }
         });
 
@@ -90,7 +90,7 @@ describe('Cache Utils Property-Based Tests', () => {
 
             // Test non-existent keys
             expect(cache.get('non-existent-key')).toBeUndefined();
-            expect(cache.has('non-existent-key')).toBe(false);
+            expect(cache.has('non-existent-key')).toBeFalsy();
         });
 
         fcTest.prop([
@@ -109,12 +109,12 @@ describe('Cache Utils Property-Based Tests', () => {
                 if (firstEntry) {
                     const [firstKey] = firstEntry;
                     const deleted = cache.delete(firstKey);
-                    expect(deleted).toBe(true);
+                    expect(deleted).toBeTruthy();
                     expect(cache.get(firstKey)).toBeUndefined();
-                    expect(cache.has(firstKey)).toBe(false);
+                    expect(cache.has(firstKey)).toBeFalsy();
 
                     // Second delete should return false
-                    expect(cache.delete(firstKey)).toBe(false);
+                    expect(cache.delete(firstKey)).toBeFalsy();
                 }
             }
         });
@@ -136,7 +136,7 @@ describe('Cache Utils Property-Based Tests', () => {
             // Verify all entries are gone
             for (const [key] of entries) {
                 expect(cache.get(key)).toBeUndefined();
-                expect(cache.has(key)).toBe(false);
+                expect(cache.has(key)).toBeFalsy();
             }
         });
 
@@ -173,7 +173,7 @@ describe('Cache Utils Property-Based Tests', () => {
 
             // Entry should be expired and removed
             expect(cache.get(key)).toBeUndefined();
-            expect(cache.has(key)).toBe(false);
+            expect(cache.has(key)).toBeFalsy();
         });
 
         fcTest.prop([
@@ -281,9 +281,9 @@ describe('Cache Utils Property-Based Tests', () => {
 
             // First entry should still exist (was recently accessed)
             if (firstKey) {
-                expect(cache.has(firstKey)).toBe(true);
+                expect(cache.has(firstKey)).toBeTruthy();
             }
-            expect(cache.has(newKey)).toBe(true);
+            expect(cache.has(newKey)).toBeTruthy();
         });
 
         fcTest.prop([
@@ -307,8 +307,8 @@ describe('Cache Utils Property-Based Tests', () => {
             cache.set('newKey', 'newValue');
 
             expect(cache.size).toBe(maxSize);
-            expect(cache.has('key0')).toBe(true); // Recently accessed
-            expect(cache.has('newKey')).toBe(true); // Just added
+            expect(cache.has('key0')).toBeTruthy(); // Recently accessed
+            expect(cache.has('newKey')).toBeTruthy(); // Just added
         });
     });
 
@@ -383,7 +383,7 @@ describe('Cache Utils Property-Based Tests', () => {
             const result = await getCachedOrFetch(cache, key, fetcher);
 
             expect(result).toBe(value);
-            expect(fetcher).toHaveBeenCalledOnce();
+            expect(fetcher).toHaveBeenCalledTimes(1);
             expect(cache.get(key)).toBe(value);
         });
 
@@ -415,7 +415,7 @@ describe('Cache Utils Property-Based Tests', () => {
 
             await expect(getCachedOrFetch(cache, key, fetcher, ttl)).rejects.toThrow('Fetch failed');
 
-            expect(fetcher).toHaveBeenCalledOnce();
+            expect(fetcher).toHaveBeenCalledTimes(1);
             expect(cache.get(key)).toBeUndefined(); // Should not cache errors
         });
 

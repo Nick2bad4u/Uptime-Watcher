@@ -27,7 +27,7 @@ Object.defineProperty(globalThis, "localStorage", {
     value: localStorageMock,
 });
 
-describe("useUIStore", () => {
+describe(useUIStore, () => {
     const mockSite: Site = {
         identifier: "test-site-123",
         name: "Test Site",
@@ -78,9 +78,9 @@ describe("useUIStore", () => {
 
             expect(result.current.activeSiteDetailsTab).toBe("site-overview");
             expect(result.current.selectedSiteId).toBeUndefined();
-            expect(result.current.showAdvancedMetrics).toBe(false);
-            expect(result.current.showSettings).toBe(false);
-            expect(result.current.showSiteDetails).toBe(false);
+            expect(result.current.showAdvancedMetrics).toBeFalsy();
+            expect(result.current.showSettings).toBeFalsy();
+            expect(result.current.showSiteDetails).toBeFalsy();
             expect(result.current.siteDetailsChartTimeRange).toBe("24h");
         });
 
@@ -313,7 +313,7 @@ describe("useUIStore", () => {
                 result.current.setShowAdvancedMetrics(true);
             });
 
-            expect(result.current.showAdvancedMetrics).toBe(true);
+            expect(result.current.showAdvancedMetrics).toBeTruthy();
         });
 
         it("should hide advanced metrics", async ({ task, annotate }) => {
@@ -328,13 +328,13 @@ describe("useUIStore", () => {
             act(() => {
                 result.current.setShowAdvancedMetrics(true);
             });
-            expect(result.current.showAdvancedMetrics).toBe(true);
+            expect(result.current.showAdvancedMetrics).toBeTruthy();
 
             // Then hide them
             act(() => {
                 result.current.setShowAdvancedMetrics(false);
             });
-            expect(result.current.showAdvancedMetrics).toBe(false);
+            expect(result.current.showAdvancedMetrics).toBeFalsy();
         });
 
         it("should toggle advanced metrics multiple times", async ({
@@ -352,12 +352,12 @@ describe("useUIStore", () => {
                 act(() => {
                     result.current.setShowAdvancedMetrics(true);
                 });
-                expect(result.current.showAdvancedMetrics).toBe(true);
+                expect(result.current.showAdvancedMetrics).toBeTruthy();
 
                 act(() => {
                     result.current.setShowAdvancedMetrics(false);
                 });
-                expect(result.current.showAdvancedMetrics).toBe(false);
+                expect(result.current.showAdvancedMetrics).toBeFalsy();
             }
         });
     });
@@ -375,7 +375,7 @@ describe("useUIStore", () => {
                 result.current.setShowSettings(true);
             });
 
-            expect(result.current.showSettings).toBe(true);
+            expect(result.current.showSettings).toBeTruthy();
         });
 
         it("should hide settings modal", async ({ task, annotate }) => {
@@ -390,13 +390,13 @@ describe("useUIStore", () => {
             act(() => {
                 result.current.setShowSettings(true);
             });
-            expect(result.current.showSettings).toBe(true);
+            expect(result.current.showSettings).toBeTruthy();
 
             // Then hide it
             act(() => {
                 result.current.setShowSettings(false);
             });
-            expect(result.current.showSettings).toBe(false);
+            expect(result.current.showSettings).toBeFalsy();
         });
 
         it("should toggle settings modal multiple times", async ({
@@ -414,12 +414,12 @@ describe("useUIStore", () => {
                 act(() => {
                     result.current.setShowSettings(true);
                 });
-                expect(result.current.showSettings).toBe(true);
+                expect(result.current.showSettings).toBeTruthy();
 
                 act(() => {
                     result.current.setShowSettings(false);
                 });
-                expect(result.current.showSettings).toBe(false);
+                expect(result.current.showSettings).toBeFalsy();
             }
         });
     });
@@ -437,7 +437,7 @@ describe("useUIStore", () => {
                 result.current.setShowSiteDetails(true);
             });
 
-            expect(result.current.showSiteDetails).toBe(true);
+            expect(result.current.showSiteDetails).toBeTruthy();
         });
 
         it("should hide site details modal", async ({ task, annotate }) => {
@@ -452,13 +452,13 @@ describe("useUIStore", () => {
             act(() => {
                 result.current.setShowSiteDetails(true);
             });
-            expect(result.current.showSiteDetails).toBe(true);
+            expect(result.current.showSiteDetails).toBeTruthy();
 
             // Then hide it
             act(() => {
                 result.current.setShowSiteDetails(false);
             });
-            expect(result.current.showSiteDetails).toBe(false);
+            expect(result.current.showSiteDetails).toBeFalsy();
         });
 
         it("should handle simultaneous modal states", async ({
@@ -477,8 +477,8 @@ describe("useUIStore", () => {
                 result.current.setShowSiteDetails(true);
             });
 
-            expect(result.current.showSettings).toBe(true);
-            expect(result.current.showSiteDetails).toBe(true);
+            expect(result.current.showSettings).toBeTruthy();
+            expect(result.current.showSiteDetails).toBeTruthy();
         });
     });
 
@@ -614,7 +614,7 @@ describe("useUIStore", () => {
                 result1.current.setShowAdvancedMetrics(true);
             });
 
-            expect(result2.current.showAdvancedMetrics).toBe(true);
+            expect(result2.current.showAdvancedMetrics).toBeTruthy();
         });
 
         it("should react to state changes immediately", async ({
@@ -628,13 +628,13 @@ describe("useUIStore", () => {
 
             const { result } = renderHook(() => useUIStore());
 
-            expect(result.current.showSettings).toBe(false);
+            expect(result.current.showSettings).toBeFalsy();
 
             act(() => {
                 result.current.setShowSettings(true);
             });
 
-            expect(result.current.showSettings).toBe(true);
+            expect(result.current.showSettings).toBeTruthy();
         });
 
         it("should handle rapid state changes", async ({ task, annotate }) => {
@@ -653,9 +653,9 @@ describe("useUIStore", () => {
                 result.current.setSiteDetailsChartTimeRange("7d");
             });
 
-            expect(result.current.showSettings).toBe(true);
-            expect(result.current.showSiteDetails).toBe(true);
-            expect(result.current.showAdvancedMetrics).toBe(true);
+            expect(result.current.showSettings).toBeTruthy();
+            expect(result.current.showSiteDetails).toBeTruthy();
+            expect(result.current.showAdvancedMetrics).toBeTruthy();
             expect(result.current.activeSiteDetailsTab).toBe("analytics");
             expect(result.current.siteDetailsChartTimeRange).toBe("7d");
         });
@@ -677,19 +677,19 @@ describe("useUIStore", () => {
             act(() => {
                 result.current.setShowSettings(true);
             });
-            expect(result.current.showSettings).toBe(true);
+            expect(result.current.showSettings).toBeTruthy();
 
             // User enables advanced metrics
             act(() => {
                 result.current.setShowAdvancedMetrics(true);
             });
-            expect(result.current.showAdvancedMetrics).toBe(true);
+            expect(result.current.showAdvancedMetrics).toBeTruthy();
 
             // User closes settings
             act(() => {
                 result.current.setShowSettings(false);
             });
-            expect(result.current.showSettings).toBe(false);
+            expect(result.current.showSettings).toBeFalsy();
 
             // User selects a site
             act(() => {
@@ -701,7 +701,7 @@ describe("useUIStore", () => {
             act(() => {
                 result.current.setShowSiteDetails(true);
             });
-            expect(result.current.showSiteDetails).toBe(true);
+            expect(result.current.showSiteDetails).toBeTruthy();
 
             // User switches to analytics tab
             act(() => {
@@ -719,10 +719,10 @@ describe("useUIStore", () => {
             act(() => {
                 result.current.setShowSiteDetails(false);
             });
-            expect(result.current.showSiteDetails).toBe(false);
+            expect(result.current.showSiteDetails).toBeFalsy();
 
             // Advanced metrics should still be enabled
-            expect(result.current.showAdvancedMetrics).toBe(true);
+            expect(result.current.showAdvancedMetrics).toBeTruthy();
             // Tab and time range should be preserved
             expect(result.current.activeSiteDetailsTab).toBe("analytics");
             expect(result.current.siteDetailsChartTimeRange).toBe("7d");
@@ -781,11 +781,11 @@ describe("useUIStore", () => {
             });
 
             expect(result.current.selectedSiteId).toBe(mockSite.identifier);
-            expect(result.current.showSiteDetails).toBe(true);
+            expect(result.current.showSiteDetails).toBeTruthy();
             expect(result.current.activeSiteDetailsTab).toBe("history");
             expect(result.current.siteDetailsChartTimeRange).toBe("30d");
-            expect(result.current.showAdvancedMetrics).toBe(true);
-            expect(result.current.showSettings).toBe(false);
+            expect(result.current.showAdvancedMetrics).toBeTruthy();
+            expect(result.current.showSettings).toBeFalsy();
         });
 
         it("should maintain independent state for different properties", async ({
@@ -810,9 +810,9 @@ describe("useUIStore", () => {
                 result.current.setShowSettings(true);
             });
 
-            expect(result.current.showAdvancedMetrics).toBe(true);
+            expect(result.current.showAdvancedMetrics).toBeTruthy();
             expect(result.current.activeSiteDetailsTab).toBe("analytics");
-            expect(result.current.showSettings).toBe(true);
+            expect(result.current.showSettings).toBeTruthy();
 
             // Change one property
             act(() => {
@@ -821,8 +821,8 @@ describe("useUIStore", () => {
 
             // Others should remain unchanged
             expect(result.current.activeSiteDetailsTab).toBe("analytics");
-            expect(result.current.showSettings).toBe(true);
-            expect(result.current.showAdvancedMetrics).toBe(false);
+            expect(result.current.showSettings).toBeTruthy();
+            expect(result.current.showAdvancedMetrics).toBeFalsy();
         });
     });
 
@@ -843,7 +843,7 @@ describe("useUIStore", () => {
                 act(() => {
                     result.current.setShowSettings(true);
                 });
-                expect(result.current.showSettings).toBe(true);
+                expect(result.current.showSettings).toBeTruthy();
             }
 
             for (let i = 0; i < 5; i++) {
@@ -907,25 +907,25 @@ describe("useUIStore", () => {
                 const getState = booleanStates[index]!;
 
                 // Should start false
-                expect(getState!()).toBe(false);
+                expect(getState!()).toBeFalsy();
 
                 // Set true
                 act(() => {
                     action(true);
                 });
-                expect(getState!()).toBe(true);
+                expect(getState!()).toBeTruthy();
 
                 // Set false
                 act(() => {
                     action(false);
                 });
-                expect(getState!()).toBe(false);
+                expect(getState!()).toBeFalsy();
 
                 // Set true again
                 act(() => {
                     action(true);
                 });
-                expect(getState!()).toBe(true);
+                expect(getState!()).toBeTruthy();
             }
         });
     });

@@ -53,7 +53,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
 
             expect(result.error).toBeInstanceOf(Error);
             expect(result.originalType).toBe(typeof value);
-            expect(result.wasError).toBe(false);
+            expect(result.wasError).toBeFalsy();
             expect(result.error.message).toBe(String(value));
         });
 
@@ -65,7 +65,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
 
             expect(result.error).toBe(originalError);
             expect(result.originalType).toBe('Error');
-            expect(result.wasError).toBe(true);
+            expect(result.wasError).toBeTruthy();
         });
 
         fcTest.prop([
@@ -83,7 +83,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
 
             expect(result.error).toBe(customError);
             expect(result.originalType).toBe('Error');
-            expect(result.wasError).toBe(true);
+            expect(result.wasError).toBeTruthy();
             expect(result.error.name).toBe('CustomError');
         });
 
@@ -99,7 +99,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
                 const arrayResult = convertError(arrayValue);
                 expect(arrayResult.error).toBeInstanceOf(Error);
                 expect(arrayResult.originalType).toBe('object');
-                expect(arrayResult.wasError).toBe(false);
+                expect(arrayResult.wasError).toBeFalsy();
                 expect(typeof arrayResult.error.message).toBe('string');
             } catch (error) {
                 // If conversion fails, at least check that an error is thrown consistently
@@ -111,7 +111,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
                 const objectResult = convertError(objectValue);
                 expect(objectResult.error).toBeInstanceOf(Error);
                 expect(objectResult.originalType).toBe('object');
-                expect(objectResult.wasError).toBe(false);
+                expect(objectResult.wasError).toBeFalsy();
                 expect(typeof objectResult.error.message).toBe('string');
             } catch (error) {
                 // If conversion fails, at least check that an error is thrown consistently
@@ -175,7 +175,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
             const result = await withUtilityErrorHandling(operation, operationName);
 
             expect(result).toBe(returnValue);
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
 
         fcTest.prop([
@@ -188,7 +188,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
             const result = await withUtilityErrorHandling(operation, operationName, fallbackValue, false);
 
             expect(result).toBe(fallbackValue);
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
 
         fcTest.prop([
@@ -199,7 +199,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
 
             await expect(withUtilityErrorHandling(operation, operationName, undefined, true))
                 .rejects.toThrow(errorMessage);
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
 
         fcTest.prop([
@@ -210,7 +210,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
 
             await expect(withUtilityErrorHandling(operation, operationName))
                 .rejects.toThrow(`${operationName} failed and no fallback value provided`);
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
 
         fcTest.prop([
@@ -228,7 +228,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
             await expect(withUtilityErrorHandling(operation, operationName, undefined, true))
                 .rejects.toThrow(String(thrownValue));
 
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
 
         fcTest.prop([
@@ -243,7 +243,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
                 const operation = vi.fn().mockResolvedValue(value);
                 const result = await withUtilityErrorHandling(operation, operationName, fallbackValue, shouldThrow);
                 expect(result).toBe(value);
-                expect(operation).toHaveBeenCalledOnce();
+                expect(operation).toHaveBeenCalledTimes(1);
             }
         });
 
@@ -262,7 +262,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
             const result = convertError(circularObj);
             expect(result.error).toBeInstanceOf(Error);
             expect(result.originalType).toBe('object');
-            expect(result.wasError).toBe(false);
+            expect(result.wasError).toBeFalsy();
             // The message should be a string representation without throwing
             expect(typeof result.error.message).toBe('string');
         });
@@ -276,7 +276,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
             const result = convertError(functionAsError);
             expect(result.error).toBeInstanceOf(Error);
             expect(result.originalType).toBe('function');
-            expect(result.wasError).toBe(false);
+            expect(result.wasError).toBeFalsy();
             expect(result.error.message).toContain(String(functionAsError));
         });
 
@@ -288,7 +288,7 @@ describe('Error Handling Utils Property-Based Tests', () => {
             const result = convertError(symbolValue);
             expect(result.error).toBeInstanceOf(Error);
             expect(result.originalType).toBe('symbol');
-            expect(result.wasError).toBe(false);
+            expect(result.wasError).toBeFalsy();
             expect(result.error.message).toContain(description);
         });
 

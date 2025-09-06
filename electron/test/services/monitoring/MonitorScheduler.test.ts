@@ -40,7 +40,7 @@ vi.mock("../../../utils/logger", () => ({
 // Unmock MonitorScheduler for this test file so we can test the real implementation
 vi.unmock("../../../services/monitoring/MonitorScheduler");
 
-describe("MonitorScheduler", () => {
+describe(MonitorScheduler, () => {
     let scheduler: MonitorScheduler;
     let mockCheckCallback: Mock;
 
@@ -124,8 +124,8 @@ describe("MonitorScheduler", () => {
 
             const result = scheduler.startMonitor("site-1", mockMonitor);
 
-            expect(result).toBe(true);
-            expect(scheduler["intervals"].has("site-1|monitor-1")).toBe(true);
+            expect(result).toBeTruthy();
+            expect(scheduler["intervals"].has("site-1|monitor-1")).toBeTruthy();
         });
 
         it("should return false for monitor without ID", async ({
@@ -144,7 +144,7 @@ describe("MonitorScheduler", () => {
 
             const result = scheduler.startMonitor("site-1", monitorWithoutId);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(logger.warn).toHaveBeenCalledWith(
                 "[MonitorScheduler] Cannot start monitoring for monitor without ID: site-1"
             );
@@ -295,12 +295,12 @@ describe("MonitorScheduler", () => {
             scheduler.setCheckCallback(mockCheckCallback);
             scheduler.startMonitor("site-1", mockMonitor);
 
-            expect(scheduler["intervals"].has("site-1|monitor-1")).toBe(true);
+            expect(scheduler["intervals"].has("site-1|monitor-1")).toBeTruthy();
 
             const result = scheduler.stopMonitor("site-1", "monitor-1");
 
-            expect(result).toBe(true);
-            expect(scheduler["intervals"].has("site-1|monitor-1")).toBe(false);
+            expect(result).toBeTruthy();
+            expect(scheduler["intervals"].has("site-1|monitor-1")).toBeFalsy();
         });
 
         it("should return false when stopping non-existent monitor", async ({
@@ -314,7 +314,7 @@ describe("MonitorScheduler", () => {
 
             const result = scheduler.stopMonitor("site-1", "non-existent");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should log debug info when isDev returns true", async ({
@@ -389,7 +389,7 @@ describe("MonitorScheduler", () => {
             scheduler.stopSite("site-1", [mockMonitor]);
 
             expect(scheduler["intervals"].size).toBe(1);
-            expect(scheduler.isMonitoring("site-1", "monitor-2")).toBe(true);
+            expect(scheduler.isMonitoring("site-1", "monitor-2")).toBeTruthy();
         });
 
         it("should handle empty monitors array gracefully", async ({
@@ -496,7 +496,7 @@ describe("MonitorScheduler", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBe(false);
+            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeFalsy();
         });
 
         it("should return true for active monitor", async ({
@@ -511,7 +511,7 @@ describe("MonitorScheduler", () => {
             scheduler.setCheckCallback(mockCheckCallback);
             scheduler.startMonitor("site-1", mockMonitor);
 
-            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBe(true);
+            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeTruthy();
         });
 
         it("should return false after stopping monitor", async ({
@@ -527,7 +527,7 @@ describe("MonitorScheduler", () => {
             scheduler.startMonitor("site-1", mockMonitor);
             scheduler.stopMonitor("site-1", "monitor-1");
 
-            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBe(false);
+            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeFalsy();
         });
     });
 
@@ -556,9 +556,9 @@ describe("MonitorScheduler", () => {
             scheduler.startSite(mockSite);
 
             expect(scheduler.getActiveCount()).toBe(2);
-            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBe(true);
-            expect(scheduler.isMonitoring("site-1", "monitor-2")).toBe(true);
-            expect(scheduler.isMonitoring("site-1", "monitor-3")).toBe(false);
+            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeTruthy();
+            expect(scheduler.isMonitoring("site-1", "monitor-2")).toBeTruthy();
+            expect(scheduler.isMonitoring("site-1", "monitor-3")).toBeFalsy();
         });
 
         it("should skip monitors without IDs", async ({ task, annotate }) => {
@@ -597,12 +597,12 @@ describe("MonitorScheduler", () => {
             scheduler.setCheckCallback(mockCheckCallback);
             scheduler.startMonitor("site-1", mockMonitor);
 
-            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBe(true);
+            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeTruthy();
 
             const result = scheduler.restartMonitor("site-1", mockMonitor);
 
-            expect(result).toBe(true);
-            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBe(true);
+            expect(result).toBeTruthy();
+            expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeTruthy();
         });
 
         it("should return false for monitor without ID", async ({
@@ -622,7 +622,7 @@ describe("MonitorScheduler", () => {
                 monitorWithoutId as Site["monitors"][0]
             );
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 

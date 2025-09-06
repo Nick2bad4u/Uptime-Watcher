@@ -21,20 +21,20 @@ describe("Function Coverage Boost Tests", () => {
             );
 
             // Test all valid monitor types
-            expect(validateMonitorType("http")).toBe(true);
-            expect(validateMonitorType("https")).toBe(false); // invalid type
-            expect(validateMonitorType("port")).toBe(true);
-            expect(validateMonitorType("ping")).toBe(true);
-            expect(validateMonitorType("dns")).toBe(true);
+            expect(validateMonitorType("http")).toBeTruthy();
+            expect(validateMonitorType("https")).toBeFalsy(); // invalid type
+            expect(validateMonitorType("port")).toBeTruthy();
+            expect(validateMonitorType("ping")).toBeTruthy();
+            expect(validateMonitorType("dns")).toBeTruthy();
 
             // Test invalid cases
-            expect(validateMonitorType("")).toBe(false);
-            expect(validateMonitorType("invalid")).toBe(false);
-            expect(validateMonitorType(null)).toBe(false);
-            expect(validateMonitorType(undefined)).toBe(false);
-            expect(validateMonitorType(123)).toBe(false);
-            expect(validateMonitorType({})).toBe(false);
-            expect(validateMonitorType([])).toBe(false);
+            expect(validateMonitorType("")).toBeFalsy();
+            expect(validateMonitorType("invalid")).toBeFalsy();
+            expect(validateMonitorType(null)).toBeFalsy();
+            expect(validateMonitorType(undefined)).toBeFalsy();
+            expect(validateMonitorType(123)).toBeFalsy();
+            expect(validateMonitorType({})).toBeFalsy();
+            expect(validateMonitorType([])).toBeFalsy();
         });
 
         it("should test validateSite from shared/utils/validation", async ({
@@ -58,19 +58,19 @@ describe("Function Coverage Boost Tests", () => {
                 monitors: [],
             };
 
-            expect(validateSite(validSite)).toBe(true);
+            expect(validateSite(validSite)).toBeTruthy();
 
             // Invalid cases
-            expect(validateSite({})).toBe(false);
-            expect(validateSite(null as any)).toBe(false);
-            expect(validateSite(undefined as any)).toBe(false);
-            expect(validateSite("string" as any)).toBe(false);
-            expect(validateSite(123 as any)).toBe(false);
+            expect(validateSite({})).toBeFalsy();
+            expect(validateSite(null as any)).toBeFalsy();
+            expect(validateSite(undefined as any)).toBeFalsy();
+            expect(validateSite("string" as any)).toBeFalsy();
+            expect(validateSite(123 as any)).toBeFalsy();
 
             // Missing required fields
-            expect(validateSite({ identifier: "test" })).toBe(false);
-            expect(validateSite({ name: "Test" })).toBe(false);
-            expect(validateSite({ monitoring: true })).toBe(false);
+            expect(validateSite({ identifier: "test" })).toBeFalsy();
+            expect(validateSite({ name: "Test" })).toBeFalsy();
+            expect(validateSite({ monitoring: true })).toBeFalsy();
 
             // Invalid field types
             expect(
@@ -80,7 +80,7 @@ describe("Function Coverage Boost Tests", () => {
                     monitoring: true,
                     monitors: [],
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 validateSite({
@@ -89,7 +89,7 @@ describe("Function Coverage Boost Tests", () => {
                     monitoring: true,
                     monitors: [],
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 validateSite({
@@ -98,7 +98,7 @@ describe("Function Coverage Boost Tests", () => {
                     monitoring: "not-boolean",
                     monitors: [],
                 } as any)
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 validateSite({
@@ -107,7 +107,7 @@ describe("Function Coverage Boost Tests", () => {
                     monitoring: true,
                     monitors: "not-array",
                 } as any)
-            ).toBe(false);
+            ).toBeFalsy();
         });
 
         it("should test getMonitorValidationErrors comprehensive cases", async ({
@@ -193,7 +193,7 @@ describe("Function Coverage Boost Tests", () => {
             expect(dnsErrors).toContain("Host is required for DNS monitors");
             expect(
                 dnsErrors.some((error) => error.includes("Invalid record type"))
-            ).toBe(true);
+            ).toBeTruthy();
         });
     });
 
@@ -397,13 +397,13 @@ describe("Function Coverage Boost Tests", () => {
                     // Test with different feature types
                     const responseTimeTypes =
                         monitorUiModule.getTypesWithFeature("responseTime");
-                    expect(Array.isArray(responseTimeTypes)).toBe(true);
+                    expect(Array.isArray(responseTimeTypes)).toBeTruthy();
 
                     const analyticsTypes =
                         monitorUiModule.getTypesWithFeature(
                             "advancedAnalytics"
                         );
-                    expect(Array.isArray(analyticsTypes)).toBe(true);
+                    expect(Array.isArray(analyticsTypes)).toBeTruthy();
                 }
 
                 // Test other exported functions

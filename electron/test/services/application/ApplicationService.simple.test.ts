@@ -107,7 +107,7 @@ describe("ApplicationService Coverage Tests", () => {
         try {
             const service = new ApplicationService();
             await service.cleanup();
-            expect(true).toBe(true); // Test passes if no error thrown
+            expect(true).toBeTruthy(); // Test passes if no error thrown
         } catch (error) {
             // Cleanup operations might fail in test environment
             expect(error).toBeInstanceOf(Error);
@@ -238,7 +238,7 @@ describe("ApplicationService Coverage Tests", () => {
             await service.cleanup();
             await service.cleanup(); // Should handle being called twice
 
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -262,7 +262,7 @@ describe("ApplicationService Coverage Tests", () => {
             // Try cleanup to test service interactions
             await service.cleanup();
 
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }

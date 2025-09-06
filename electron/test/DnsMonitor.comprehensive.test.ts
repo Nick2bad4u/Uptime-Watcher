@@ -85,7 +85,7 @@ function createTestMonitor(overrides: Partial<Monitor> = {}): Monitor {
     };
 }
 
-describe("DnsMonitor", () => {
+describe(DnsMonitor, () => {
     let dnsMonitor: DnsMonitor;
 
     beforeEach(() => {

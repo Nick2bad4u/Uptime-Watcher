@@ -55,7 +55,7 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
     ),
 }));
 
-describe("FormErrorAlert", () => {
+describe(FormErrorAlert, () => {
     const defaultProps: FormErrorAlertProperties = {
         error: "Test error message",
         onClearError: vi.fn(),

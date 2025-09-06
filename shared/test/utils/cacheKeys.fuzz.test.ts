@@ -45,9 +45,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const key = CacheKeys.config.byName(name);
 
                         expect(key).toBe(`config:${name}`);
-                        expect(key.startsWith("config:")).toBe(true);
-                        expect(key.includes(name)).toBe(true);
-                        expect(isStandardizedCacheKey(key)).toBe(true);
+                        expect(key.startsWith("config:")).toBeTruthy();
+                        expect(key).toContain(name);
+                        expect(isStandardizedCacheKey(key)).toBeTruthy();
 
                         return true;
                     }
@@ -64,9 +64,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const key = CacheKeys.config.validation(name);
 
                         expect(key).toBe(`config:validation:${name}`);
-                        expect(key.startsWith("config:validation:")).toBe(true);
-                        expect(key.includes(name)).toBe(true);
-                        expect(isStandardizedCacheKey(key)).toBe(true);
+                        expect(key.startsWith("config:validation:")).toBeTruthy();
+                        expect(key).toContain(name);
+                        expect(isStandardizedCacheKey(key)).toBeTruthy();
 
                         return true;
                     }
@@ -94,8 +94,8 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const validationKey = CacheKeys.config.validation(name);
 
                         // Both should be valid standardized keys
-                        expect(isStandardizedCacheKey(byNameKey)).toBe(true);
-                        expect(isStandardizedCacheKey(validationKey)).toBe(true);
+                        expect(isStandardizedCacheKey(byNameKey)).toBeTruthy();
+                        expect(isStandardizedCacheKey(validationKey)).toBeTruthy();
 
                         // Both should contain the original name
                         expect(byNameKey).toContain(name);
@@ -117,9 +117,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const key = CacheKeys.monitor.byId(id);
 
                         expect(key).toBe(`monitor:${id}`);
-                        expect(key.startsWith("monitor:")).toBe(true);
-                        expect(key.includes(id)).toBe(true);
-                        expect(isStandardizedCacheKey(key)).toBe(true);
+                        expect(key.startsWith("monitor:")).toBeTruthy();
+                        expect(key).toContain(id);
+                        expect(isStandardizedCacheKey(key)).toBeTruthy();
 
                         return true;
                     }
@@ -136,9 +136,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const key = CacheKeys.monitor.bySite(siteIdentifier);
 
                         expect(key).toBe(`monitor:site:${siteIdentifier}`);
-                        expect(key.startsWith("monitor:site:")).toBe(true);
-                        expect(key.includes(siteIdentifier)).toBe(true);
-                        expect(isStandardizedCacheKey(key)).toBe(true);
+                        expect(key.startsWith("monitor:site:")).toBeTruthy();
+                        expect(key).toContain(siteIdentifier);
+                        expect(isStandardizedCacheKey(key)).toBeTruthy();
 
                         return true;
                     }
@@ -155,9 +155,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const key = CacheKeys.monitor.operation(id);
 
                         expect(key).toBe(`monitor:operation:${id}`);
-                        expect(key.startsWith("monitor:operation:")).toBe(true);
-                        expect(key.includes(id)).toBe(true);
-                        expect(isStandardizedCacheKey(key)).toBe(true);
+                        expect(key.startsWith("monitor:operation:")).toBeTruthy();
+                        expect(key).toContain(id);
+                        expect(isStandardizedCacheKey(key)).toBeTruthy();
 
                         return true;
                     }
@@ -176,9 +176,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const key = CacheKeys.site.byIdentifier(identifier);
 
                         expect(key).toBe(`site:${identifier}`);
-                        expect(key.startsWith("site:")).toBe(true);
-                        expect(key.includes(identifier)).toBe(true);
-                        expect(isStandardizedCacheKey(key)).toBe(true);
+                        expect(key.startsWith("site:")).toBeTruthy();
+                        expect(key).toContain(identifier);
+                        expect(isStandardizedCacheKey(key)).toBeTruthy();
 
                         return true;
                     }
@@ -193,8 +193,8 @@ describe("Cache Keys - Property-Based Tests", () => {
                     const key = CacheKeys.site.bulkOperation();
 
                     expect(key).toBe("site:bulk");
-                    expect(key.startsWith("site:")).toBe(true);
-                    expect(isStandardizedCacheKey(key)).toBe(true);
+                    expect(key.startsWith("site:")).toBeTruthy();
+                    expect(isStandardizedCacheKey(key)).toBeTruthy();
 
                     return true;
                 })
@@ -209,9 +209,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const key = CacheKeys.site.loading(identifier);
 
                         expect(key).toBe(`site:loading:${identifier}`);
-                        expect(key.startsWith("site:loading:")).toBe(true);
-                        expect(key.includes(identifier)).toBe(true);
-                        expect(isStandardizedCacheKey(key)).toBe(true);
+                        expect(key.startsWith("site:loading:")).toBeTruthy();
+                        expect(key).toContain(identifier);
+                        expect(isStandardizedCacheKey(key)).toBeTruthy();
 
                         return true;
                     }
@@ -231,10 +231,10 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const key = CacheKeys.validation.byType(type, identifier);
 
                         expect(key).toBe(`validation:${type}:${identifier}`);
-                        expect(key.startsWith("validation:")).toBe(true);
-                        expect(key.includes(type)).toBe(true);
-                        expect(key.includes(identifier)).toBe(true);
-                        expect(isStandardizedCacheKey(key)).toBe(true);
+                        expect(key.startsWith("validation:")).toBeTruthy();
+                        expect(key).toContain(type);
+                        expect(key).toContain(identifier);
+                        expect(isStandardizedCacheKey(key)).toBeTruthy();
 
                         return true;
                     }
@@ -251,9 +251,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const key = CacheKeys.validation.monitorType(monitorType);
 
                         expect(key).toBe(`validation:monitor-type:${monitorType}`);
-                        expect(key.startsWith("validation:monitor-type:")).toBe(true);
-                        expect(key.includes(monitorType)).toBe(true);
-                        expect(isStandardizedCacheKey(key)).toBe(true);
+                        expect(key.startsWith("validation:monitor-type:")).toBeTruthy();
+                        expect(key).toContain(monitorType);
+                        expect(isStandardizedCacheKey(key)).toBeTruthy();
 
                         return true;
                     }
@@ -273,7 +273,7 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const key = `${prefix}:${identifier}`;
                         const result = isStandardizedCacheKey(key);
 
-                        expect(result).toBe(true);
+                        expect(result).toBeTruthy();
                         return true;
                     }
                 ),
@@ -291,7 +291,7 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const key = `${prefix}:${operation}:${identifier}`;
                         const result = isStandardizedCacheKey(key);
 
-                        expect(result).toBe(true);
+                        expect(result).toBeTruthy();
                         return true;
                     }
                 ),
@@ -315,7 +315,7 @@ describe("Cache Keys - Property-Based Tests", () => {
                     (invalidKey) => {
                         const result = isStandardizedCacheKey(invalidKey);
 
-                        expect(result).toBe(false);
+                        expect(result).toBeFalsy();
                         return true;
                     }
                 ),
@@ -334,7 +334,7 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const key = `${invalidPrefix}:${identifier}`;
                         const result = isStandardizedCacheKey(key);
 
-                        expect(result).toBe(false);
+                        expect(result).toBeFalsy();
                         return true;
                     }
                 ),
@@ -474,7 +474,7 @@ describe("Cache Keys - Property-Based Tests", () => {
 
                         for (const key of keys) {
                             // Each key should be valid
-                            expect(isStandardizedCacheKey(key)).toBe(true);
+                            expect(isStandardizedCacheKey(key)).toBeTruthy();
 
                             // Each key should be parseable
                             const parsed = parseCacheKey(key as StandardizedCacheKey);
@@ -504,9 +504,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                         const siteKey = CacheKeys.site.byIdentifier(identifier);
 
                         // All should be valid
-                        expect(isStandardizedCacheKey(configKey)).toBe(true);
-                        expect(isStandardizedCacheKey(monitorKey)).toBe(true);
-                        expect(isStandardizedCacheKey(siteKey)).toBe(true);
+                        expect(isStandardizedCacheKey(configKey)).toBeTruthy();
+                        expect(isStandardizedCacheKey(monitorKey)).toBeTruthy();
+                        expect(isStandardizedCacheKey(siteKey)).toBeTruthy();
 
                         // All should contain the identifier
                         expect(configKey).toContain(identifier);
@@ -514,9 +514,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                         expect(siteKey).toContain(identifier);
 
                         // All should have different prefixes
-                        expect(configKey.startsWith("config:")).toBe(true);
-                        expect(monitorKey.startsWith("monitor:")).toBe(true);
-                        expect(siteKey.startsWith("site:")).toBe(true);
+                        expect(configKey.startsWith("config:")).toBeTruthy();
+                        expect(monitorKey.startsWith("monitor:")).toBeTruthy();
+                        expect(siteKey.startsWith("site:")).toBeTruthy();
 
                         // Parsed identifiers should match
                         const configParsed = parseCacheKey(configKey as StandardizedCacheKey);

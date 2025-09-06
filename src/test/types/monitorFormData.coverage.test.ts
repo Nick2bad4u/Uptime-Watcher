@@ -48,7 +48,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
 
             expect(Object.keys(minimalFormData)).toHaveLength(0);
             expect(partialFormData.type).toBe("http");
-            expect(partialFormData.monitoring).toBe(true);
+            expect(partialFormData.monitoring).toBeTruthy();
         });
 
         it("should validate numeric fields", async ({ task, annotate }) => {
@@ -126,7 +126,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
 
             expect(dynamicData["knownField"]).toBe("known");
             expect(typeof dynamicData["unknownField"]).toBe("object");
-            expect(Array.isArray(dynamicData["arrayField"])).toBe(true);
+            expect(Array.isArray(dynamicData["arrayField"])).toBeTruthy();
             expect(dynamicData["nullField"]).toBeNull();
             expect(dynamicData["undefinedField"]).toBeUndefined();
         });
@@ -152,7 +152,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(extensibleFormData.checkInterval).toBe(45_000);
             expect(extensibleFormData.customParameter1).toBe("value1");
             expect(extensibleFormData.customParameter2).toBe(999);
-            expect(extensibleFormData.customParameter3).toBe(true);
+            expect(extensibleFormData.customParameter3).toBeTruthy();
         });
     });
 
@@ -245,11 +245,11 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             };
 
             const validations = validateFormData(validData);
-            expect(validations.hasType).toBe(true);
-            expect(validations.hasValidCheckInterval).toBe(true);
-            expect(validations.hasValidTimeout).toBe(true);
-            expect(validations.hasValidRetryAttempts).toBe(true);
-            expect(validations.hasValidMonitoring).toBe(true);
+            expect(validations.hasType).toBeTruthy();
+            expect(validations.hasValidCheckInterval).toBeTruthy();
+            expect(validations.hasValidTimeout).toBeTruthy();
+            expect(validations.hasValidRetryAttempts).toBeTruthy();
+            expect(validations.hasValidMonitoring).toBeTruthy();
         });
 
         it("should handle invalid form data", async ({ task, annotate }) => {
@@ -278,11 +278,11 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 hasValidMonitoring: typeof invalidData.monitoring === "boolean",
             };
 
-            expect(validations.hasValidType).toBe(false);
-            expect(validations.hasValidCheckInterval).toBe(false);
-            expect(validations.hasValidTimeout).toBe(false);
-            expect(validations.hasValidRetryAttempts).toBe(false);
-            expect(validations.hasValidMonitoring).toBe(false);
+            expect(validations.hasValidType).toBeFalsy();
+            expect(validations.hasValidCheckInterval).toBeFalsy();
+            expect(validations.hasValidTimeout).toBeFalsy();
+            expect(validations.hasValidRetryAttempts).toBeFalsy();
+            expect(validations.hasValidMonitoring).toBeFalsy();
         });
     });
 
@@ -345,7 +345,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             };
 
             expect(mergedData.checkInterval).toBe(60_000); // From default
-            expect(mergedData.monitoring).toBe(true); // Overridden by user
+            expect(mergedData.monitoring).toBeTruthy(); // Overridden by user
             expect(mergedData.type).toBe("http"); // From user
             expect(mergedData.url).toBe("https://user-site.com"); // From user
         });
@@ -413,7 +413,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             };
 
             expect(defaultFormData.checkInterval).toBe(60_000);
-            expect(defaultFormData.monitoring).toBe(false);
+            expect(defaultFormData.monitoring).toBeFalsy();
             expect(defaultFormData.retryAttempts).toBe(3);
             expect(defaultFormData.timeout).toBe(5000);
             expect(defaultFormData.type).toBe("http");
@@ -436,13 +436,13 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 range: { min: number; max: number }
             ) => value >= range.min && value <= range.max;
 
-            expect(testValue(30_000, fieldRanges.checkInterval)).toBe(true);
-            expect(testValue(3, fieldRanges.retryAttempts)).toBe(true);
-            expect(testValue(5000, fieldRanges.timeout)).toBe(true);
+            expect(testValue(30_000, fieldRanges.checkInterval)).toBeTruthy();
+            expect(testValue(3, fieldRanges.retryAttempts)).toBeTruthy();
+            expect(testValue(5000, fieldRanges.timeout)).toBeTruthy();
 
-            expect(testValue(500, fieldRanges.checkInterval)).toBe(false); // Too low
-            expect(testValue(15, fieldRanges.retryAttempts)).toBe(false); // Too high
-            expect(testValue(50_000, fieldRanges.timeout)).toBe(false); // Too high
+            expect(testValue(500, fieldRanges.checkInterval)).toBeFalsy(); // Too low
+            expect(testValue(15, fieldRanges.retryAttempts)).toBeFalsy(); // Too high
+            expect(testValue(50_000, fieldRanges.timeout)).toBeFalsy(); // Too high
         });
     });
 
@@ -472,8 +472,8 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 // Missing URL
             };
 
-            expect(isCompleteHttpFormData(completeData)).toBe(true);
-            expect(isCompleteHttpFormData(incompleteData)).toBe(false);
+            expect(isCompleteHttpFormData(completeData)).toBeTruthy();
+            expect(isCompleteHttpFormData(incompleteData)).toBeFalsy();
         });
 
         it("should sanitize form data", async ({ task, annotate }) => {
@@ -516,7 +516,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             const sanitized = sanitizeFormData(rawData);
             expect(sanitized.type).toBe("http");
             expect(sanitized.checkInterval).toBeUndefined(); // Invalid string
-            expect(sanitized.monitoring).toBe(false); // Default for invalid
+            expect(sanitized.monitoring).toBeFalsy(); // Default for invalid
             expect(sanitized.retryAttempts).toBeUndefined(); // Invalid negative
             expect(sanitized.timeout).toBe(5000);
             expect(sanitized).not.toHaveProperty("extraField");
@@ -556,7 +556,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(extendedData.url).toBe("https://extended.com");
             expect(extendedData.customHttpField).toBe("custom-value");
             expect(extendedData.checkInterval).toBe(30_000);
-            expect(extendedData.monitoring).toBe(true);
+            expect(extendedData.monitoring).toBeTruthy();
         });
 
         it("should handle multiple interface inheritance", async ({

@@ -16,7 +16,7 @@ import {
 import { hasScales } from "../../../shared/types/chartConfig";
 
 describe("Chart Utilities", () => {
-    describe("hasScales", () => {
+    describe(hasScales, () => {
         it("should return true for valid scale configuration", async ({
             task,
             annotate,
@@ -32,7 +32,7 @@ describe("Chart Utilities", () => {
                     y: { title: { text: "Y Axis" } },
                 },
             };
-            expect(hasScales(config)).toBe(true);
+            expect(hasScales(config)).toBeTruthy();
         });
 
         it("should return true for partial scale configuration", async ({
@@ -50,7 +50,7 @@ describe("Chart Utilities", () => {
                     // y is optional
                 },
             };
-            expect(hasScales(config)).toBe(true);
+            expect(hasScales(config)).toBeTruthy();
         });
 
         it("should return true for empty scales object", async ({
@@ -65,7 +65,7 @@ describe("Chart Utilities", () => {
             const config = {
                 scales: {},
             };
-            expect(hasScales(config)).toBe(true);
+            expect(hasScales(config)).toBeTruthy();
         });
 
         it("should return false for null config", async ({
@@ -77,7 +77,7 @@ describe("Chart Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(hasScales(null)).toBe(false);
+            expect(hasScales(null)).toBeFalsy();
         });
 
         it("should return false for undefined config", async ({
@@ -89,7 +89,7 @@ describe("Chart Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(hasScales(undefined)).toBe(false);
+            expect(hasScales(undefined)).toBeFalsy();
         });
 
         it("should return false for non-object config", async ({
@@ -101,10 +101,10 @@ describe("Chart Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(hasScales("string")).toBe(false);
-            expect(hasScales(123)).toBe(false);
-            expect(hasScales(true)).toBe(false);
-            expect(hasScales([])).toBe(false);
+            expect(hasScales("string")).toBeFalsy();
+            expect(hasScales(123)).toBeFalsy();
+            expect(hasScales(true)).toBeFalsy();
+            expect(hasScales([])).toBeFalsy();
         });
 
         it("should return false for config without scales property", async ({
@@ -120,7 +120,7 @@ describe("Chart Utilities", () => {
                 type: "line",
                 data: {},
             };
-            expect(hasScales(config)).toBe(false);
+            expect(hasScales(config)).toBeFalsy();
         });
 
         it("should return false for config with null scales", async ({
@@ -135,7 +135,7 @@ describe("Chart Utilities", () => {
             const config = {
                 scales: null,
             };
-            expect(hasScales(config)).toBe(false);
+            expect(hasScales(config)).toBeFalsy();
         });
 
         it("should return false for config with non-object scales", async ({
@@ -150,11 +150,11 @@ describe("Chart Utilities", () => {
             const config = {
                 scales: "invalid",
             };
-            expect(hasScales(config)).toBe(false);
+            expect(hasScales(config)).toBeFalsy();
         });
     });
 
-    describe("getScaleConfig", () => {
+    describe(getScaleConfig, () => {
         const validConfig = {
             scales: {
                 x: {
@@ -305,7 +305,7 @@ describe("Chart Utilities", () => {
         });
     });
 
-    describe("getScaleProperty", () => {
+    describe(getScaleProperty, () => {
         const validConfig = {
             scales: {
                 x: {
@@ -348,8 +348,8 @@ describe("Chart Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(getScaleProperty(validConfig, "y", "type")).toBe("category");
-            expect(getScaleProperty(validConfig, "y", "beginAtZero")).toBe(
-                true
+            expect(getScaleProperty(validConfig, "y", "beginAtZero")).toBeTruthy(
+                
             );
         });
 
@@ -434,13 +434,13 @@ describe("Chart Utilities", () => {
                 },
             };
             expect(getScaleProperty(config, "x", "zeroValue")).toBe(0);
-            expect(getScaleProperty(config, "x", "falseValue")).toBe(false);
+            expect(getScaleProperty(config, "x", "falseValue")).toBeFalsy();
             expect(getScaleProperty(config, "x", "emptyString")).toBe("");
             expect(getScaleProperty(config, "x", "nullValue")).toBe(null);
         });
     });
 
-    describe("getNestedScaleProperty", () => {
+    describe(getNestedScaleProperty, () => {
         const validConfig = {
             scales: {
                 x: {
@@ -499,7 +499,7 @@ describe("Chart Utilities", () => {
             );
             expect(
                 getNestedScaleProperty(validConfig, "x", "title.display")
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 getNestedScaleProperty(validConfig, "x", "title.font.size")
             ).toBe(14);
@@ -522,7 +522,7 @@ describe("Chart Utilities", () => {
             );
             expect(
                 getNestedScaleProperty(validConfig, "y", "title.display")
-            ).toBe(false);
+            ).toBeFalsy();
         });
 
         it("should return undefined for non-existent nested property", async ({
@@ -738,8 +738,8 @@ describe("Chart Utilities", () => {
                 },
             };
             expect(getNestedScaleProperty(config, "x", "values.zero")).toBe(0);
-            expect(getNestedScaleProperty(config, "x", "values.false")).toBe(
-                false
+            expect(getNestedScaleProperty(config, "x", "values.false")).toBeFalsy(
+                
             );
             expect(getNestedScaleProperty(config, "x", "values.empty")).toBe(
                 ""
@@ -815,7 +815,7 @@ describe("Chart Utilities", () => {
             };
 
             // Test hasScales
-            expect(hasScales(complexConfig)).toBe(true);
+            expect(hasScales(complexConfig)).toBeTruthy();
 
             // Test getScaleConfig
             const xScale = getScaleConfig(complexConfig, "x");
@@ -829,8 +829,8 @@ describe("Chart Utilities", () => {
             expect(getScaleProperty(complexConfig, "x", "type")).toBe(
                 "category"
             );
-            expect(getScaleProperty(complexConfig, "y", "beginAtZero")).toBe(
-                true
+            expect(getScaleProperty(complexConfig, "y", "beginAtZero")).toBeTruthy(
+                
             );
 
             // Test getNestedScaleProperty
@@ -957,7 +957,7 @@ describe("Chart Utilities", () => {
                     const result = hasScales(input);
 
                     // Property: Should return false for objects without scales
-                    expect(result).toBe(false);
+                    expect(result).toBeFalsy();
                 }
             );
         });
@@ -1116,7 +1116,7 @@ describe("Chart Utilities", () => {
                     // Property: Should distinguish between undefined and other falsy values
                     expect(getScaleProperty(config, "x", "nullValue")).toBe(null);
                     expect(getScaleProperty(config, "x", "undefinedValue")).toBe(undefined);
-                    expect(getScaleProperty(config, "x", "falseValue")).toBe(false);
+                    expect(getScaleProperty(config, "x", "falseValue")).toBeFalsy();
                     expect(getScaleProperty(config, "x", "zeroValue")).toBe(0);
                     expect(getScaleProperty(config, "x", "emptyString")).toBe("");
 
@@ -1277,7 +1277,7 @@ describe("Chart Utilities", () => {
                     // Property: Should return exact falsy values, not undefined
                     expect(getNestedScaleProperty(config, "x", "emptyString")).toBe("");
                     expect(getNestedScaleProperty(config, "x", "nullValue")).toBe(null);
-                    expect(getNestedScaleProperty(config, "x", "falseValue")).toBe(false);
+                    expect(getNestedScaleProperty(config, "x", "falseValue")).toBeFalsy();
                     expect(getNestedScaleProperty(config, "x", "zeroValue")).toBe(0);
 
                     // Property: Nested falsy values should be accessible
@@ -1325,7 +1325,7 @@ describe("Chart Utilities", () => {
                 "should maintain consistency across all utility functions",
                 (config) => {
                     // Property: hasScales should return true for valid config
-                    expect(hasScales(config)).toBe(true);
+                    expect(hasScales(config)).toBeTruthy();
 
                     // Property: getScaleConfig should return valid scale objects
                     const xScale = getScaleConfig(config, "x");
@@ -1358,7 +1358,7 @@ describe("Chart Utilities", () => {
                 "should consistently handle invalid configurations",
                 (invalidConfig) => {
                     // Property: All functions should handle invalid configs consistently
-                    expect(hasScales(invalidConfig)).toBe(false);
+                    expect(hasScales(invalidConfig)).toBeFalsy();
                     expect(getScaleConfig(invalidConfig, "x")).toBeUndefined();
                     expect(getScaleConfig(invalidConfig, "y")).toBeUndefined();
                     expect(getScaleProperty(invalidConfig, "x", "type")).toBeUndefined();
@@ -1423,7 +1423,7 @@ describe("Chart Utilities", () => {
                 "should handle realistic Chart.js configurations",
                 (config) => {
                     // Property: Should handle complex Chart.js scale configurations
-                    expect(hasScales(config)).toBe(true);
+                    expect(hasScales(config)).toBeTruthy();
 
                     const xScale = getScaleConfig(config, "x");
                     const yScale = getScaleConfig(config, "y");

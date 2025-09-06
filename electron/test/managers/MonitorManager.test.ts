@@ -18,7 +18,7 @@
 import { MonitorManager } from "../../managers/MonitorManager";
 import { vi, describe, beforeEach, it, expect } from "vitest";
 
-describe("MonitorManager", () => {
+describe(MonitorManager, () => {
     let manager: MonitorManager;
     let dependencies: any;
     let enhancedServices: any;
@@ -134,7 +134,7 @@ describe("MonitorManager", () => {
             "purpose"
         );
 
-        expect(manager.isMonitoringActive()).toBe(false);
+        expect(manager.isMonitoringActive()).toBeFalsy();
     });
 
     it("should call checkSiteManually and emit event", async ({

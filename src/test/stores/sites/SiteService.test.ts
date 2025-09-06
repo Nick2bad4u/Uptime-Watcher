@@ -95,7 +95,7 @@ describe("SiteService", () => {
 
             const sites = await SiteService.getSites();
 
-            expect(mockElectronAPI.sites.getSites).toHaveBeenCalledOnce();
+            expect(mockElectronAPI.sites.getSites).toHaveBeenCalledTimes(1);
             expect(sites).toEqual(mockSites);
         });
 
@@ -509,7 +509,7 @@ describe("SiteService", () => {
 
             expect(
                 mockElectronAPI.data.downloadSQLiteBackup
-            ).toHaveBeenCalledOnce();
+            ).toHaveBeenCalledTimes(1);
             expect(result).toEqual(backupData);
         });
 

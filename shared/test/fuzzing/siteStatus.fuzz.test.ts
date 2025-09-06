@@ -29,7 +29,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
         monitors: fc.array(monitorArbitrary, { minLength: 0, maxLength: 10 }),
     });
 
-    describe("calculateSiteMonitoringStatus", () => {
+    describe(calculateSiteMonitoringStatus, () => {
         test.prop([siteArbitrary])(
             "should return one of the three monitoring states",
             (site) => {
@@ -98,7 +98,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
         });
     });
 
-    describe("calculateSiteStatus", () => {
+    describe(calculateSiteStatus, () => {
         test.prop([siteArbitrary])(
             "should return valid site status",
             (site) => {
@@ -149,7 +149,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
         });
     });
 
-    describe("getSiteDisplayStatus", () => {
+    describe(getSiteDisplayStatus, () => {
         test.prop([siteArbitrary])(
             "should return valid display status",
             (site) => {
@@ -202,7 +202,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
         });
     });
 
-    describe("getSiteStatusDescription", () => {
+    describe(getSiteStatusDescription, () => {
         test.prop([siteArbitrary])(
             "should return non-empty string description",
             (site) => {
@@ -253,7 +253,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
         );
     });
 
-    describe("getSiteStatusVariant", () => {
+    describe(getSiteStatusVariant, () => {
         test.prop([siteStatusArbitrary])(
             "should return valid color variant",
             (status) => {

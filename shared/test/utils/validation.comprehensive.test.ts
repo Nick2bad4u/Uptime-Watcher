@@ -12,7 +12,7 @@ import {
 } from "../../utils/validation";
 
 describe("Shared Validation Utilities - Comprehensive Coverage", () => {
-    describe("getMonitorValidationErrors", () => {
+    describe(getMonitorValidationErrors, () => {
         describe("Basic field validation", () => {
             it("should return no errors for valid HTTP monitor", async ({
                 task,
@@ -632,8 +632,8 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
                 const errors = getMonitorValidationErrors(monitor);
                 // Should not contain any port-related errors
-                expect(errors.some((error) => error.includes("port"))).toBe(
-                    false
+                expect(errors.some((error) => error.includes("port"))).toBeFalsy(
+                    
                 );
             });
 
@@ -657,7 +657,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 // Should not contain host-related errors for valid hosts
                 expect(
                     errors.some((error) => error.includes("Host is required"))
-                ).toBe(false);
+                ).toBeFalsy();
             });
         });
 
@@ -734,7 +734,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
         });
     });
 
-    describe("validateMonitorType", () => {
+    describe(validateMonitorType, () => {
         it("should return true for valid http type", async ({
             task,
             annotate,
@@ -744,7 +744,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(validateMonitorType("http")).toBe(true);
+            expect(validateMonitorType("http")).toBeTruthy();
         });
 
         it("should return true for valid port type", async ({
@@ -756,7 +756,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(validateMonitorType("port")).toBe(true);
+            expect(validateMonitorType("port")).toBeTruthy();
         });
 
         it("should return true for valid ping type", async ({
@@ -768,7 +768,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(validateMonitorType("ping")).toBe(true);
+            expect(validateMonitorType("ping")).toBeTruthy();
         });
 
         it("should return false for invalid string type", async ({
@@ -780,7 +780,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(validateMonitorType("invalid")).toBe(false);
+            expect(validateMonitorType("invalid")).toBeFalsy();
         });
 
         it("should return false for non-string values", async ({
@@ -792,11 +792,11 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(validateMonitorType(123)).toBe(false);
-            expect(validateMonitorType(null)).toBe(false);
-            expect(validateMonitorType(undefined)).toBe(false);
-            expect(validateMonitorType({})).toBe(false);
-            expect(validateMonitorType([])).toBe(false);
+            expect(validateMonitorType(123)).toBeFalsy();
+            expect(validateMonitorType(null)).toBeFalsy();
+            expect(validateMonitorType(undefined)).toBeFalsy();
+            expect(validateMonitorType({})).toBeFalsy();
+            expect(validateMonitorType([])).toBeFalsy();
         });
 
         it("should return false for empty string", async ({
@@ -808,7 +808,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(validateMonitorType("")).toBe(false);
+            expect(validateMonitorType("")).toBeFalsy();
         });
 
         it("should be case sensitive", async ({ task, annotate }) => {
@@ -817,12 +817,12 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(validateMonitorType("HTTP")).toBe(false);
-            expect(validateMonitorType("Port")).toBe(false);
+            expect(validateMonitorType("HTTP")).toBeFalsy();
+            expect(validateMonitorType("Port")).toBeFalsy();
         });
     });
 
-    describe("validateSite", () => {
+    describe(validateSite, () => {
         describe("Valid sites", () => {
             it("should return true for valid site with HTTP monitor", async ({
                 task,
@@ -853,7 +853,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     ],
                 };
 
-                expect(validateSite(site)).toBe(true);
+                expect(validateSite(site)).toBeTruthy();
             });
 
             it("should return true for valid site with port monitor", async ({
@@ -886,7 +886,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     ],
                 };
 
-                expect(validateSite(site)).toBe(true);
+                expect(validateSite(site)).toBeTruthy();
             });
 
             it("should return true for valid site with multiple monitors", async ({
@@ -931,7 +931,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     ],
                 };
 
-                expect(validateSite(site)).toBe(true);
+                expect(validateSite(site)).toBeTruthy();
             });
 
             it("should return true for valid site with empty monitors array", async ({
@@ -950,7 +950,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     monitors: [],
                 };
 
-                expect(validateSite(site)).toBe(true);
+                expect(validateSite(site)).toBeTruthy();
             });
         });
 
@@ -961,8 +961,8 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(validateSite(null as unknown as Partial<Site>)).toBe(
-                    false
+                expect(validateSite(null as unknown as Partial<Site>)).toBeFalsy(
+                    
                 );
             });
 
@@ -977,7 +977,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
                 expect(
                     validateSite(undefined as unknown as Partial<Site>)
-                ).toBe(false);
+                ).toBeFalsy();
             });
 
             it("should return false for non-object", async ({
@@ -989,14 +989,14 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(validateSite("string" as unknown as Partial<Site>)).toBe(
-                    false
+                expect(validateSite("string" as unknown as Partial<Site>)).toBeFalsy(
+                    
                 );
-                expect(validateSite(123 as unknown as Partial<Site>)).toBe(
-                    false
+                expect(validateSite(123 as unknown as Partial<Site>)).toBeFalsy(
+                    
                 );
-                expect(validateSite([] as unknown as Partial<Site>)).toBe(
-                    false
+                expect(validateSite([] as unknown as Partial<Site>)).toBeFalsy(
+                    
                 );
             });
 
@@ -1015,7 +1015,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     monitors: [],
                 } as Partial<Site>;
 
-                expect(validateSite(site)).toBe(false);
+                expect(validateSite(site)).toBeFalsy();
             });
 
             it("should return false for non-string identifier", async ({
@@ -1034,7 +1034,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     monitors: [],
                 } as unknown as Partial<Site>;
 
-                expect(validateSite(site)).toBe(false);
+                expect(validateSite(site)).toBeFalsy();
             });
 
             it("should return false for empty identifier", async ({
@@ -1053,7 +1053,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     monitors: [],
                 };
 
-                expect(validateSite(site)).toBe(false);
+                expect(validateSite(site)).toBeFalsy();
             });
 
             it("should return false for missing name", async ({
@@ -1071,7 +1071,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     monitors: [],
                 } as Partial<Site>;
 
-                expect(validateSite(site)).toBe(false);
+                expect(validateSite(site)).toBeFalsy();
             });
 
             it("should return false for non-string name", async ({
@@ -1090,7 +1090,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     monitors: [],
                 } as unknown as Partial<Site>;
 
-                expect(validateSite(site)).toBe(false);
+                expect(validateSite(site)).toBeFalsy();
             });
 
             it("should return false for empty name", async ({
@@ -1109,7 +1109,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     monitors: [],
                 };
 
-                expect(validateSite(site)).toBe(false);
+                expect(validateSite(site)).toBeFalsy();
             });
 
             it("should return false for missing monitoring", async ({
@@ -1127,7 +1127,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     monitors: [],
                 } as Partial<Site>;
 
-                expect(validateSite(site)).toBe(false);
+                expect(validateSite(site)).toBeFalsy();
             });
 
             it("should return false for non-boolean monitoring", async ({
@@ -1146,7 +1146,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     monitors: [],
                 } as unknown as Partial<Site>;
 
-                expect(validateSite(site)).toBe(false);
+                expect(validateSite(site)).toBeFalsy();
             });
 
             it("should return false for missing monitors", async ({
@@ -1164,7 +1164,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     monitoring: true,
                 } as Partial<Site>;
 
-                expect(validateSite(site)).toBe(false);
+                expect(validateSite(site)).toBeFalsy();
             });
 
             it("should return false for non-array monitors", async ({
@@ -1183,7 +1183,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     monitors: "not-array",
                 } as unknown as Partial<Site>;
 
-                expect(validateSite(site)).toBe(false);
+                expect(validateSite(site)).toBeFalsy();
             });
 
             it("should return false for invalid monitor in array", async ({
@@ -1208,7 +1208,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     ],
                 } as Partial<Site>;
 
-                expect(validateSite(site)).toBe(false);
+                expect(validateSite(site)).toBeFalsy();
             });
 
             it("should return false for non-object monitor in array", async ({
@@ -1227,7 +1227,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     monitors: ["not-object"],
                 } as unknown as Partial<Site>;
 
-                expect(validateSite(site)).toBe(false);
+                expect(validateSite(site)).toBeFalsy();
             });
 
             it("should return false for null monitor in array", async ({
@@ -1246,7 +1246,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     monitors: [null],
                 } as unknown as Partial<Site>;
 
-                expect(validateSite(site)).toBe(false);
+                expect(validateSite(site)).toBeFalsy();
             });
         });
     });

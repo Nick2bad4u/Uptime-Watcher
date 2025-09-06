@@ -42,7 +42,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
             expect(actualCategories).toEqual(
                 expect.arrayContaining(expectedCategories)
             );
-            expect(actualCategories.length).toBe(expectedCategories.length);
+            expect(actualCategories).toHaveLength(expectedCategories.length);
         });
         it("should contain expected events in each category", async ({
             task,
@@ -99,7 +99,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
             expect(actualPriorities).toEqual(
                 expect.arrayContaining(expectedPriorities)
             );
-            expect(actualPriorities.length).toBe(expectedPriorities.length);
+            expect(actualPriorities).toHaveLength(expectedPriorities.length);
         });
         it("should categorize events correctly by priority", async ({
             task,
@@ -129,14 +129,14 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("cache:invalidated", "CACHE")).toBe(
-                    true
+                expect(isEventOfCategory("cache:invalidated", "CACHE")).toBeTruthy(
+                    
                 );
-                expect(isEventOfCategory("site:cache-miss", "CACHE")).toBe(
-                    true
+                expect(isEventOfCategory("site:cache-miss", "CACHE")).toBeTruthy(
+                    
                 );
-                expect(isEventOfCategory("site:cache-updated", "CACHE")).toBe(
-                    true
+                expect(isEventOfCategory("site:cache-updated", "CACHE")).toBeTruthy(
+                    
                 );
             });
             it("should return false for non-cache events", async ({
@@ -149,8 +149,8 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("site:added", "CACHE")).toBe(false);
-                expect(isEventOfCategory("monitor:up", "CACHE")).toBe(false);
+                expect(isEventOfCategory("site:added", "CACHE")).toBeFalsy();
+                expect(isEventOfCategory("monitor:up", "CACHE")).toBeFalsy();
             });
         });
         describe("CONFIG category", () => {
@@ -164,8 +164,8 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("config:changed", "CONFIG")).toBe(
-                    true
+                expect(isEventOfCategory("config:changed", "CONFIG")).toBeTruthy(
+                    
                 );
             });
             it("should return false for non-config events", async ({
@@ -178,8 +178,8 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("site:added", "CONFIG")).toBe(false);
-                expect(isEventOfCategory("monitor:up", "CONFIG")).toBe(false);
+                expect(isEventOfCategory("site:added", "CONFIG")).toBeFalsy();
+                expect(isEventOfCategory("monitor:up", "CONFIG")).toBeFalsy();
             });
         });
         describe("DATABASE category", () => {
@@ -195,22 +195,22 @@ describe("eventTypes - Comprehensive Coverage", () => {
 
                 expect(
                     isEventOfCategory("database:backup-created", "DATABASE")
-                ).toBe(true);
-                expect(isEventOfCategory("database:error", "DATABASE")).toBe(
-                    true
+                ).toBeTruthy();
+                expect(isEventOfCategory("database:error", "DATABASE")).toBeTruthy(
+                    
                 );
-                expect(isEventOfCategory("database:retry", "DATABASE")).toBe(
-                    true
+                expect(isEventOfCategory("database:retry", "DATABASE")).toBeTruthy(
+                    
                 );
-                expect(isEventOfCategory("database:success", "DATABASE")).toBe(
-                    true
+                expect(isEventOfCategory("database:success", "DATABASE")).toBeTruthy(
+                    
                 );
                 expect(
                     isEventOfCategory(
                         "database:transaction-completed",
                         "DATABASE"
                     )
-                ).toBe(true);
+                ).toBeTruthy();
             });
             it("should return false for non-database events", async ({
                 task,
@@ -222,13 +222,13 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("site:added", "DATABASE")).toBe(false);
+                expect(isEventOfCategory("site:added", "DATABASE")).toBeFalsy();
                 expect(
                     isEventOfCategory(
                         "internal:database:initialized",
                         "DATABASE"
                     )
-                ).toBe(false);
+                ).toBeFalsy();
             });
         });
         describe("INTERNAL_DATABASE category", () => {
@@ -247,31 +247,31 @@ describe("eventTypes - Comprehensive Coverage", () => {
                         "internal:database:backup-downloaded",
                         "INTERNAL_DATABASE"
                     )
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory(
                         "internal:database:data-exported",
                         "INTERNAL_DATABASE"
                     )
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory(
                         "internal:database:data-imported",
                         "INTERNAL_DATABASE"
                     )
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory(
                         "internal:database:initialized",
                         "INTERNAL_DATABASE"
                     )
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory(
                         "internal:database:sites-refreshed",
                         "INTERNAL_DATABASE"
                     )
-                ).toBe(true);
+                ).toBeTruthy();
             });
             it("should return false for non-internal database events", async ({
                 task,
@@ -285,10 +285,10 @@ describe("eventTypes - Comprehensive Coverage", () => {
 
                 expect(
                     isEventOfCategory("database:error", "INTERNAL_DATABASE")
-                ).toBe(false);
+                ).toBeFalsy();
                 expect(
                     isEventOfCategory("site:added", "INTERNAL_DATABASE")
-                ).toBe(false);
+                ).toBeFalsy();
             });
         });
         describe("INTERNAL_MONITOR category", () => {
@@ -307,31 +307,31 @@ describe("eventTypes - Comprehensive Coverage", () => {
                         "internal:monitor:all-started",
                         "INTERNAL_MONITOR"
                     )
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory(
                         "internal:monitor:all-stopped",
                         "INTERNAL_MONITOR"
                     )
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory(
                         "internal:monitor:manual-check-completed",
                         "INTERNAL_MONITOR"
                     )
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory(
                         "internal:monitor:started",
                         "INTERNAL_MONITOR"
                     )
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory(
                         "internal:monitor:stopped",
                         "INTERNAL_MONITOR"
                     )
-                ).toBe(true);
+                ).toBeTruthy();
             });
             it("should return false for non-internal monitor events", async ({
                 task,
@@ -345,10 +345,10 @@ describe("eventTypes - Comprehensive Coverage", () => {
 
                 expect(
                     isEventOfCategory("monitor:up", "INTERNAL_MONITOR")
-                ).toBe(false);
+                ).toBeFalsy();
                 expect(
                     isEventOfCategory("site:added", "INTERNAL_MONITOR")
-                ).toBe(false);
+                ).toBeFalsy();
             });
         });
         describe("INTERNAL_SITE category", () => {
@@ -364,25 +364,25 @@ describe("eventTypes - Comprehensive Coverage", () => {
 
                 expect(
                     isEventOfCategory("internal:site:added", "INTERNAL_SITE")
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory("internal:site:removed", "INTERNAL_SITE")
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory("internal:site:updated", "INTERNAL_SITE")
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory(
                         "internal:site:cache-updated",
                         "INTERNAL_SITE"
                     )
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory(
                         "internal:site:start-monitoring-requested",
                         "INTERNAL_SITE"
                     )
-                ).toBe(true);
+                ).toBeTruthy();
             });
             it("should return false for non-internal site events", async ({
                 task,
@@ -394,11 +394,11 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("site:added", "INTERNAL_SITE")).toBe(
-                    false
+                expect(isEventOfCategory("site:added", "INTERNAL_SITE")).toBeFalsy(
+                    
                 );
-                expect(isEventOfCategory("monitor:up", "INTERNAL_SITE")).toBe(
-                    false
+                expect(isEventOfCategory("monitor:up", "INTERNAL_SITE")).toBeFalsy(
+                    
                 );
             });
         });
@@ -413,20 +413,20 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("monitor:added", "MONITOR")).toBe(
-                    true
+                expect(isEventOfCategory("monitor:added", "MONITOR")).toBeTruthy(
+                    
                 );
                 expect(
                     isEventOfCategory("monitor:check-completed", "MONITOR")
-                ).toBe(true);
-                expect(isEventOfCategory("monitor:removed", "MONITOR")).toBe(
-                    true
+                ).toBeTruthy();
+                expect(isEventOfCategory("monitor:removed", "MONITOR")).toBeTruthy(
+                    
                 );
                 expect(
                     isEventOfCategory("monitor:status-changed", "MONITOR")
-                ).toBe(true);
-                expect(isEventOfCategory("monitor:up", "MONITOR")).toBe(true);
-                expect(isEventOfCategory("monitor:down", "MONITOR")).toBe(true);
+                ).toBeTruthy();
+                expect(isEventOfCategory("monitor:up", "MONITOR")).toBeTruthy();
+                expect(isEventOfCategory("monitor:down", "MONITOR")).toBeTruthy();
             });
             it("should return false for non-monitor events", async ({
                 task,
@@ -438,10 +438,10 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("site:added", "MONITOR")).toBe(false);
+                expect(isEventOfCategory("site:added", "MONITOR")).toBeFalsy();
                 expect(
                     isEventOfCategory("internal:monitor:started", "MONITOR")
-                ).toBe(false);
+                ).toBeFalsy();
             });
         });
         describe("MONITORING category", () => {
@@ -457,10 +457,10 @@ describe("eventTypes - Comprehensive Coverage", () => {
 
                 expect(
                     isEventOfCategory("monitoring:started", "MONITORING")
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory("monitoring:stopped", "MONITORING")
-                ).toBe(true);
+                ).toBeTruthy();
             });
             it("should return false for non-monitoring events", async ({
                 task,
@@ -472,11 +472,11 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("monitor:up", "MONITORING")).toBe(
-                    false
+                expect(isEventOfCategory("monitor:up", "MONITORING")).toBeFalsy(
+                    
                 );
-                expect(isEventOfCategory("site:added", "MONITORING")).toBe(
-                    false
+                expect(isEventOfCategory("site:added", "MONITORING")).toBeFalsy(
+                    
                 );
             });
         });
@@ -493,10 +493,10 @@ describe("eventTypes - Comprehensive Coverage", () => {
 
                 expect(
                     isEventOfCategory("performance:metric", "PERFORMANCE")
-                ).toBe(true);
+                ).toBeTruthy();
                 expect(
                     isEventOfCategory("performance:warning", "PERFORMANCE")
-                ).toBe(true);
+                ).toBeTruthy();
             });
             it("should return false for non-performance events", async ({
                 task,
@@ -508,11 +508,11 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("monitor:up", "PERFORMANCE")).toBe(
-                    false
+                expect(isEventOfCategory("monitor:up", "PERFORMANCE")).toBeFalsy(
+                    
                 );
-                expect(isEventOfCategory("site:added", "PERFORMANCE")).toBe(
-                    false
+                expect(isEventOfCategory("site:added", "PERFORMANCE")).toBeFalsy(
+                    
                 );
             });
         });
@@ -527,12 +527,12 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("site:added", "SITE")).toBe(true);
-                expect(isEventOfCategory("site:removed", "SITE")).toBe(true);
-                expect(isEventOfCategory("site:updated", "SITE")).toBe(true);
+                expect(isEventOfCategory("site:added", "SITE")).toBeTruthy();
+                expect(isEventOfCategory("site:removed", "SITE")).toBeTruthy();
+                expect(isEventOfCategory("site:updated", "SITE")).toBeTruthy();
                 expect(
                     isEventOfCategory("sites:state-synchronized", "SITE")
-                ).toBe(true);
+                ).toBeTruthy();
             });
             it("should return false for non-site events", async ({
                 task,
@@ -544,9 +544,9 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("monitor:up", "SITE")).toBe(false);
-                expect(isEventOfCategory("internal:site:added", "SITE")).toBe(
-                    false
+                expect(isEventOfCategory("monitor:up", "SITE")).toBeFalsy();
+                expect(isEventOfCategory("internal:site:added", "SITE")).toBeFalsy(
+                    
                 );
             });
         });
@@ -561,12 +561,12 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("system:error", "SYSTEM")).toBe(true);
-                expect(isEventOfCategory("system:shutdown", "SYSTEM")).toBe(
-                    true
+                expect(isEventOfCategory("system:error", "SYSTEM")).toBeTruthy();
+                expect(isEventOfCategory("system:shutdown", "SYSTEM")).toBeTruthy(
+                    
                 );
-                expect(isEventOfCategory("system:startup", "SYSTEM")).toBe(
-                    true
+                expect(isEventOfCategory("system:startup", "SYSTEM")).toBeTruthy(
+                    
                 );
             });
             it("should return false for non-system events", async ({
@@ -579,8 +579,8 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "component"
                 );
 
-                expect(isEventOfCategory("monitor:up", "SYSTEM")).toBe(false);
-                expect(isEventOfCategory("site:added", "SYSTEM")).toBe(false);
+                expect(isEventOfCategory("monitor:up", "SYSTEM")).toBeFalsy();
+                expect(isEventOfCategory("site:added", "SYSTEM")).toBeFalsy();
             });
         });
         describe("Default case - unknown categories", () => {
@@ -597,16 +597,16 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 // These will test the default case in the switch statement
                 expect(
                     isEventOfCategory("site:added", "UNKNOWN_CATEGORY" as any)
-                ).toBe(false);
+                ).toBeFalsy();
                 expect(
                     isEventOfCategory(
                         "monitor:up",
                         "NOT_A_REAL_CATEGORY" as any
                     )
-                ).toBe(false);
+                ).toBeFalsy();
                 expect(
                     isEventOfCategory("system:error", "FAKE_CATEGORY" as any)
-                ).toBe(false);
+                ).toBeFalsy();
             });
         });
         describe("Edge cases", () => {
@@ -629,8 +629,8 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     "config:changed",
                     "PERFORMANCE"
                 );
-                expect(result1).toBe(false);
-                expect(result2).toBe(false);
+                expect(result1).toBeFalsy();
+                expect(result2).toBeFalsy();
             });
             it("should handle all category combinations", async ({
                 task,
@@ -651,9 +651,9 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 for (const category of categories) {
                     const result = isEventOfCategory(testEvent, category);
                     if (category === "SITE") {
-                        expect(result).toBe(true);
+                        expect(result).toBeTruthy();
                     } else {
-                        expect(result).toBe(false);
+                        expect(result).toBeFalsy();
                     }
                 }
             });
@@ -871,7 +871,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
             const eventName: keyof UptimeEvents = "site:added";
             const category: keyof typeof EVENT_CATEGORIES = "SITE";
 
-            expect(isEventOfCategory(eventName, category)).toBe(true);
+            expect(isEventOfCategory(eventName, category)).toBeTruthy();
             expect(getEventPriority(eventName)).toBe("MEDIUM");
         });
         it("should maintain readonly contracts for constants", async ({

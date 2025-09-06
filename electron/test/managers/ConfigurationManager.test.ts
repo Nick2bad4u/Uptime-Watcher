@@ -51,7 +51,7 @@ function createMockSite(overrides: Partial<Site> = {}): Site {
     } as Site;
 }
 
-describe("ConfigurationManager", () => {
+describe(ConfigurationManager, () => {
     let configManager: ConfigurationManager;
     let mockMonitorValidator: any;
     let mockSiteValidator: any;
@@ -95,8 +95,8 @@ describe("ConfigurationManager", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Initialization", "type");
 
-            expect(MonitorValidator).toHaveBeenCalledOnce();
-            expect(SiteValidator).toHaveBeenCalledOnce();
+            expect(MonitorValidator).toHaveBeenCalledTimes(1);
+            expect(SiteValidator).toHaveBeenCalledTimes(1);
             expect(configManager).toBeInstanceOf(ConfigurationManager);
         });
     });
@@ -234,7 +234,7 @@ describe("ConfigurationManager", () => {
             expect(
                 mockMonitorValidator.shouldApplyDefaultInterval
             ).toHaveBeenCalledWith(monitor);
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return false when monitor validator returns false", async ({
@@ -253,7 +253,7 @@ describe("ConfigurationManager", () => {
 
             const result = configManager.shouldApplyDefaultInterval(monitor);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -277,7 +277,7 @@ describe("ConfigurationManager", () => {
 
             const result = configManager.shouldAutoStartMonitoring(site);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false for sites without monitors", async ({
@@ -293,7 +293,7 @@ describe("ConfigurationManager", () => {
 
             const result = configManager.shouldAutoStartMonitoring(site);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when site monitoring is disabled", async ({
@@ -309,7 +309,7 @@ describe("ConfigurationManager", () => {
 
             const result = configManager.shouldAutoStartMonitoring(site);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return true when conditions are met", async ({
@@ -325,7 +325,7 @@ describe("ConfigurationManager", () => {
 
             const result = configManager.shouldAutoStartMonitoring(site);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should handle site with multiple monitors", async ({
@@ -347,7 +347,7 @@ describe("ConfigurationManager", () => {
 
             const result = configManager.shouldAutoStartMonitoring(site);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
     });
 
@@ -366,7 +366,7 @@ describe("ConfigurationManager", () => {
             expect(
                 mockSiteValidator.shouldIncludeInExport
             ).toHaveBeenCalledWith(site);
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return false when site validator returns false", async ({
@@ -383,7 +383,7 @@ describe("ConfigurationManager", () => {
 
             const result = configManager.shouldIncludeInExport(site);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -442,7 +442,7 @@ describe("ConfigurationManager", () => {
 
             expect(
                 mockMonitorValidator.validateMonitorConfiguration
-            ).toHaveBeenCalledOnce();
+            ).toHaveBeenCalledTimes(1);
             expect(result1).toEqual(expectedResult);
             expect(result2).toEqual(expectedResult);
         });
@@ -643,7 +643,7 @@ describe("ConfigurationManager", () => {
 
             expect(
                 mockSiteValidator.validateSiteConfiguration
-            ).toHaveBeenCalledOnce();
+            ).toHaveBeenCalledTimes(1);
             expect(result1).toEqual(expectedResult);
             expect(result2).toEqual(expectedResult);
         });
@@ -780,7 +780,7 @@ describe("ConfigurationManager", () => {
             await configManager.validateMonitorConfiguration(monitor);
             expect(
                 mockMonitorValidator.validateMonitorConfiguration
-            ).toHaveBeenCalledOnce();
+            ).toHaveBeenCalledTimes(1);
 
             // Clear cache
             configManager.clearValidationCache();
@@ -898,12 +898,12 @@ describe("ConfigurationManager", () => {
 
             expect(
                 configManager.shouldAutoStartMonitoring(siteWithMonitors)
-            ).toBe(false);
+            ).toBeFalsy();
             expect(
                 configManager.shouldAutoStartMonitoring(siteWithoutMonitors)
-            ).toBe(false);
-            expect(configManager.shouldAutoStartMonitoring(siteDisabled)).toBe(
-                false
+            ).toBeFalsy();
+            expect(configManager.shouldAutoStartMonitoring(siteDisabled)).toBeFalsy(
+                
             );
         });
 
@@ -952,12 +952,12 @@ describe("ConfigurationManager", () => {
             expect(result).toEqual(expectedResult);
 
             // Verify that complex sites can be auto-started
-            expect(configManager.shouldAutoStartMonitoring(complexSite)).toBe(
-                true
+            expect(configManager.shouldAutoStartMonitoring(complexSite)).toBeTruthy(
+                
             );
 
             // Verify that complex sites can be included in export
-            expect(configManager.shouldIncludeInExport(complexSite)).toBe(true);
+            expect(configManager.shouldIncludeInExport(complexSite)).toBeTruthy();
         });
     });
 });

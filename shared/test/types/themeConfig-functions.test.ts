@@ -11,7 +11,7 @@ import {
 } from "../../types/themeConfig";
 
 describe("shared/types/themeConfig function coverage", () => {
-    describe("isColorPalette", () => {
+    describe(isColorPalette, () => {
         it("should return true for valid ColorPalette object", async ({
             task,
             annotate,
@@ -30,7 +30,7 @@ describe("shared/types/themeConfig function coverage", () => {
                 info: "#00aaff",
             };
 
-            expect(isColorPalette(validPalette)).toBe(true);
+            expect(isColorPalette(validPalette)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -39,7 +39,7 @@ describe("shared/types/themeConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isColorPalette(null)).toBe(false);
+            expect(isColorPalette(null)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -48,7 +48,7 @@ describe("shared/types/themeConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isColorPalette(undefined)).toBe(false);
+            expect(isColorPalette(undefined)).toBeFalsy();
         });
 
         it("should return false for primitive types", async ({
@@ -60,9 +60,9 @@ describe("shared/types/themeConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isColorPalette("string")).toBe(false);
-            expect(isColorPalette(123)).toBe(false);
-            expect(isColorPalette(true)).toBe(false);
+            expect(isColorPalette("string")).toBeFalsy();
+            expect(isColorPalette(123)).toBeFalsy();
+            expect(isColorPalette(true)).toBeFalsy();
         });
 
         it("should return false for array", async ({ task, annotate }) => {
@@ -71,7 +71,7 @@ describe("shared/types/themeConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isColorPalette([])).toBe(false);
+            expect(isColorPalette([])).toBeFalsy();
         });
 
         it("should return false for object missing required properties", async ({
@@ -89,7 +89,7 @@ describe("shared/types/themeConfig function coverage", () => {
                 // missing other required properties
             };
 
-            expect(isColorPalette(incompletePalette)).toBe(false);
+            expect(isColorPalette(incompletePalette)).toBeFalsy();
         });
 
         it("should return false for object with invalid property types", async ({
@@ -113,7 +113,7 @@ describe("shared/types/themeConfig function coverage", () => {
                 muted: "#999999",
             };
 
-            expect(isColorPalette(invalidPalette)).toBe(false);
+            expect(isColorPalette(invalidPalette)).toBeFalsy();
         });
 
         it("should handle edge cases with color values", async ({
@@ -135,11 +135,11 @@ describe("shared/types/themeConfig function coverage", () => {
             };
 
             // Should pass type check with valid color values
-            expect(isColorPalette(edgeCasePalette)).toBe(true);
+            expect(isColorPalette(edgeCasePalette)).toBeTruthy();
         });
     });
 
-    describe("isThemeConfig", () => {
+    describe(isThemeConfig, () => {
         it("should return true for valid ThemeConfig object", async ({
             task,
             annotate,
@@ -270,7 +270,7 @@ describe("shared/types/themeConfig function coverage", () => {
                 },
             };
 
-            expect(isThemeConfig(validConfig as any)).toBe(true);
+            expect(isThemeConfig(validConfig as any)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -279,7 +279,7 @@ describe("shared/types/themeConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isThemeConfig(null)).toBe(false);
+            expect(isThemeConfig(null)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -288,7 +288,7 @@ describe("shared/types/themeConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isThemeConfig(undefined)).toBe(false);
+            expect(isThemeConfig(undefined)).toBeFalsy();
         });
 
         it("should return false for primitive types", async ({
@@ -300,9 +300,9 @@ describe("shared/types/themeConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isThemeConfig("string")).toBe(false);
-            expect(isThemeConfig(123)).toBe(false);
-            expect(isThemeConfig(true)).toBe(false);
+            expect(isThemeConfig("string")).toBeFalsy();
+            expect(isThemeConfig(123)).toBeFalsy();
+            expect(isThemeConfig(true)).toBeFalsy();
         });
 
         it("should return false for array", async ({ task, annotate }) => {
@@ -311,7 +311,7 @@ describe("shared/types/themeConfig function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isThemeConfig([])).toBe(false);
+            expect(isThemeConfig([])).toBeFalsy();
         });
 
         it("should return false for object missing required properties", async ({
@@ -340,7 +340,7 @@ describe("shared/types/themeConfig function coverage", () => {
                 // missing fonts, spacing, borderRadius
             };
 
-            expect(isThemeConfig(incompleteConfig)).toBe(false);
+            expect(isThemeConfig(incompleteConfig)).toBeFalsy();
         });
 
         it("should return false for object with invalid nested structure", async ({
@@ -385,7 +385,7 @@ describe("shared/types/themeConfig function coverage", () => {
                 },
             };
 
-            expect(isThemeConfig(invalidConfig)).toBe(false);
+            expect(isThemeConfig(invalidConfig)).toBeFalsy();
         });
 
         it("should return false for object missing color themes", async ({
@@ -430,7 +430,7 @@ describe("shared/types/themeConfig function coverage", () => {
                 },
             };
 
-            expect(isThemeConfig(configMissingThemes)).toBe(false);
+            expect(isThemeConfig(configMissingThemes)).toBeFalsy();
         });
     });
 
@@ -554,8 +554,8 @@ describe("shared/types/themeConfig function coverage", () => {
                 },
             };
 
-            expect(isThemeConfig(themeConfig as any)).toBe(true);
-            expect(isColorPalette(themeConfig.colors.primary)).toBe(true); // Test the actual ColorPalette
+            expect(isThemeConfig(themeConfig as any)).toBeTruthy();
+            expect(isColorPalette(themeConfig.colors.primary)).toBeTruthy(); // Test the actual ColorPalette
         });
 
         it("should handle edge cases with both validators", async ({
@@ -647,7 +647,7 @@ describe("shared/types/themeConfig function coverage", () => {
                 },
             };
 
-            expect(isThemeConfig(minimalValidTheme as any)).toBe(true);
+            expect(isThemeConfig(minimalValidTheme as any)).toBeTruthy();
         });
     });
 });

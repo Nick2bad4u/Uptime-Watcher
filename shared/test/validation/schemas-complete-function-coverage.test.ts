@@ -154,7 +154,7 @@ describe("Schemas - Complete Function Coverage", () => {
 
             // The important thing is that all functions were called and executed
             // This achieves function coverage regardless of validation results
-            expect(true).toBe(true); // Test passes if we reach here without errors
+            expect(true).toBeTruthy(); // Test passes if we reach here without errors
         });
 
         it("should exercise additional function paths and error conditions", async ({
@@ -224,7 +224,7 @@ describe("Schemas - Complete Function Coverage", () => {
             }
 
             // All functions have been called with various inputs
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should call validation functions with all supported monitor types", async ({
@@ -320,7 +320,7 @@ describe("Schemas - Complete Function Coverage", () => {
                 "192.168.1.1"
             );
 
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 });

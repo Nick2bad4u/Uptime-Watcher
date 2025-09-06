@@ -66,7 +66,7 @@ describe("Validation Fuzzing Tests", () => {
                             expect(
                                 url.startsWith("https://") ||
                                     url.startsWith("ftp://")
-                            ).toBe(true);
+                            ).toBeTruthy();
                         }
                     }
                 )
@@ -115,7 +115,7 @@ describe("Validation Fuzzing Tests", () => {
 
                         // These schemes should generally be rejected for security
                         if (dangerousSchemes.has(scheme)) {
-                            expect(result).toBe(false);
+                            expect(result).toBeFalsy();
                         }
                     }
                 )
@@ -146,7 +146,7 @@ describe("Validation Fuzzing Tests", () => {
                         const result = isValidHost(ip);
 
                         // Valid IPv4 addresses should be accepted
-                        expect(result).toBe(true);
+                        expect(result).toBeTruthy();
                     }
                 )
             );
@@ -217,7 +217,7 @@ describe("Validation Fuzzing Tests", () => {
                             host.includes("#") ||
                             host.includes("$")
                         ) {
-                            expect(result).toBe(false);
+                            expect(result).toBeFalsy();
                         }
                     }
                 )
@@ -242,7 +242,7 @@ describe("Validation Fuzzing Tests", () => {
                     fc.integer({ min: 1, max: 65_535 }),
                     (port: number) => {
                         const result = isValidPort(port);
-                        expect(result).toBe(true);
+                        expect(result).toBeTruthy();
                     }
                 )
             );
@@ -258,7 +258,7 @@ describe("Validation Fuzzing Tests", () => {
                     ),
                     (port: number) => {
                         const result = isValidPort(port);
-                        expect(result).toBe(false);
+                        expect(result).toBeFalsy();
                     }
                 )
             );
@@ -281,7 +281,7 @@ describe("Validation Fuzzing Tests", () => {
 
                         // String "0" should be rejected
                         if (portStr === "0") {
-                            expect(result).toBe(false);
+                            expect(result).toBeFalsy();
                         }
                     }
                 )
@@ -302,9 +302,9 @@ describe("Validation Fuzzing Tests", () => {
                         const result = isValidPort(portStr);
 
                         if (portStr === "1" || portStr === "65535") {
-                            expect(result).toBe(true);
+                            expect(result).toBeTruthy();
                         } else {
-                            expect(result).toBe(false);
+                            expect(result).toBeFalsy();
                         }
                     }
                 )

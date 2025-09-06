@@ -63,7 +63,7 @@ describe("Backend Arrow Function Mutation Tests", () => {
 
             // Verify function signature is correct (not undefined)
             expect(typeof removeMonitor).toBe("function");
-            expect(removeMonitor.length).toBe(2); // Should accept 2 parameters
+            expect(removeMonitor).toHaveLength(2); // Should accept 2 parameters
         });
 
         it("should fail if removeMonitor is mutated to return undefined", async ({
@@ -84,7 +84,7 @@ describe("Backend Arrow Function Mutation Tests", () => {
 
             expect(result).toBeUndefined();
             expect(typeof removeMonitorMutated).toBe("function");
-            expect(removeMonitorMutated.length).toBe(0); // Mutation accepts 0 parameters
+            expect(removeMonitorMutated).toHaveLength(0); // Mutation accepts 0 parameters
 
             // This demonstrates the mutation breaks the expected return type
             expect(result).not.toBeInstanceOf(Promise);
@@ -128,7 +128,7 @@ describe("Backend Arrow Function Mutation Tests", () => {
 
             // Verify function signature
             expect(typeof getSyncStatus).toBe("function");
-            expect(getSyncStatus.length).toBe(0);
+            expect(getSyncStatus).toHaveLength(0);
         });
 
         it("should define requestFullSync function with correct signature (Line 576)", async ({
@@ -276,7 +276,7 @@ describe("Backend Arrow Function Mutation Tests", () => {
 
             expect(site).toBeDefined();
             expect(site?.id).toBe("site1");
-            expect(site?.monitors.some((m) => m.id === monitorId)).toBe(true);
+            expect(site?.monitors.some((m) => m.id === monitorId)).toBeTruthy();
         });
     });
 
@@ -309,7 +309,7 @@ describe("Backend Arrow Function Mutation Tests", () => {
             );
 
             expect(activeMonitors).toHaveLength(2);
-            expect(activeMonitors.every((m) => m.monitoring)).toBe(true);
+            expect(activeMonitors.every((m) => m.monitoring)).toBeTruthy();
             expect(activeMonitors.map((m) => m.id)).toEqual(["1", "3"]);
         });
 
@@ -341,11 +341,11 @@ describe("Backend Arrow Function Mutation Tests", () => {
             );
 
             expect(successResults).toHaveLength(2);
-            expect(successResults.every((r) => r.status === "fulfilled")).toBe(
-                true
+            expect(successResults.every((r) => r.status === "fulfilled")).toBeTruthy(
+                
             );
-            expect(successResults.every((r) => r.value?.success === true)).toBe(
-                true
+            expect(successResults.every((r) => r.value?.success === true)).toBeTruthy(
+                
             );
         });
     });

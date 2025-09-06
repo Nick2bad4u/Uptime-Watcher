@@ -178,7 +178,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
 
             expect(result.current.currentSite).toEqual(mockSite);
             expect(result.current.selectedMonitorId).toBe("monitor-1");
-            expect(result.current.isLoading).toBe(false);
+            expect(result.current.isLoading).toBeFalsy();
         });
 
         it("should handle site with no monitors", async ({
@@ -218,7 +218,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             );
 
             expect(result.current.selectedMonitor).toBeUndefined();
-            expect(result.current.isMonitoring).toBe(false);
+            expect(result.current.isMonitoring).toBeFalsy();
         });
 
         it("should handle site not found in store", async ({
@@ -252,7 +252,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             );
 
             expect(result.current.currentSite.name).toBe("Unnamed Site");
-            expect(result.current.currentSite.monitoring).toBe(true);
+            expect(result.current.currentSite.monitoring).toBeTruthy();
             expect(result.current.currentSite.monitors).toEqual([]);
         });
     });
@@ -269,14 +269,14 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             );
 
             expect(result.current.localName).toBe("Test Site");
-            expect(result.current.hasUnsavedChanges).toBe(false);
+            expect(result.current.hasUnsavedChanges).toBeFalsy();
 
             // Simulate name change using act for state updates
             act(() => {
                 result.current.setLocalName("New Site Name");
             });
 
-            expect(result.current.hasUnsavedChanges).toBe(true);
+            expect(result.current.hasUnsavedChanges).toBeTruthy();
         });
 
         it("should track monitoring state", async ({ task, annotate }) => {
@@ -289,7 +289,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
                 useSiteDetails({ site: mockSite })
             );
 
-            expect(result.current.isMonitoring).toBe(true);
+            expect(result.current.isMonitoring).toBeTruthy();
             expect(result.current.selectedMonitor).toBeDefined();
         });
 
@@ -358,7 +358,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             });
 
             // If we get here without errors, the handler executed successfully
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 
@@ -393,7 +393,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             );
 
             expect(result.current.activeSiteDetailsTab).toBe("overview");
-            expect(result.current.showAdvancedMetrics).toBe(false);
+            expect(result.current.showAdvancedMetrics).toBeFalsy();
             expect(result.current.siteDetailsChartTimeRange).toBe("1h");
             expect(typeof result.current.setActiveSiteDetailsTab).toBe(
                 "function"
@@ -420,7 +420,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
                 useSiteDetails({ site: mockSite })
             );
 
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
         });
     });
 
@@ -576,7 +576,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             // Test passes if no error is thrown
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle handleCheckNow when no monitor is selected", async ({
@@ -951,7 +951,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             // Verify name change is reflected in state
             expect(result.current.localName).toBe("Updated Site Name");
-            expect(result.current.hasUnsavedChanges).toBe(true);
+            expect(result.current.hasUnsavedChanges).toBeTruthy();
 
             // Execute the save handler without errors
             await act(async () => {
@@ -959,7 +959,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             // Test passes if no error is thrown
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should not save site name when no changes are made", async ({
@@ -1027,7 +1027,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 'Are you sure you want to remove the monitor "https://example.com" from Test Site?'
             );
             // Test passes if no error is thrown
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should not remove monitor when user cancels confirmation", async ({
@@ -1095,7 +1095,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 "Are you sure you want to remove Test Site?"
             );
             // Test passes if no error is thrown
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should not delete site when user cancels confirmation", async ({
@@ -1160,7 +1160,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             // Test passes if no error is thrown
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle start monitoring for specific monitor", async ({
@@ -1186,7 +1186,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             // Test passes if no error is thrown
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle stop monitoring for site", async ({
@@ -1207,7 +1207,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             // Test passes if no error is thrown
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle stop monitoring for specific monitor", async ({
@@ -1228,7 +1228,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             // Test passes if no error is thrown
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 
@@ -1353,7 +1353,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 useSiteDetails({ site: mockSite })
             );
 
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
         });
 
         it("should initialize local values from current monitor", async ({
@@ -1388,21 +1388,21 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             );
 
             // Initially no changes
-            expect(result.current.hasUnsavedChanges).toBe(false);
+            expect(result.current.hasUnsavedChanges).toBeFalsy();
 
             // Change local name
             act(() => {
                 result.current.setLocalName("Changed Name");
             });
 
-            expect(result.current.hasUnsavedChanges).toBe(true);
+            expect(result.current.hasUnsavedChanges).toBeTruthy();
 
             // Reset to original name
             act(() => {
                 result.current.setLocalName("Test Site");
             });
 
-            expect(result.current.hasUnsavedChanges).toBe(false);
+            expect(result.current.hasUnsavedChanges).toBeFalsy();
         });
     });
 

@@ -26,7 +26,7 @@ globalThis.window = {
     electronAPI: mockElectronAPI,
 } as never;
 
-describe("useMonitorTypesStore", () => {
+describe(useMonitorTypesStore, () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -41,8 +41,8 @@ describe("useMonitorTypesStore", () => {
 
         expect(result.current.monitorTypes).toEqual([]);
         expect(result.current.fieldConfigs).toEqual({});
-        expect(result.current.isLoaded).toBe(false);
-        expect(result.current.isLoading).toBe(false);
+        expect(result.current.isLoaded).toBeFalsy();
+        expect(result.current.isLoading).toBeFalsy();
         expect(result.current.lastError).toBeUndefined();
     });
 
@@ -85,7 +85,7 @@ describe("useMonitorTypesStore", () => {
         });
 
         expect(result.current.monitorTypes).toEqual(mockMonitorTypes);
-        expect(result.current.isLoaded).toBe(true);
+        expect(result.current.isLoaded).toBeTruthy();
         expect(result.current.fieldConfigs["http"]).toEqual([
             { name: "url", type: "url", required: true, label: "URL" },
         ]);
@@ -112,12 +112,12 @@ describe("useMonitorTypesStore", () => {
         act(() => {
             result.current.setLoading(true);
         });
-        expect(result.current.isLoading).toBe(true);
+        expect(result.current.isLoading).toBeTruthy();
 
         act(() => {
             result.current.setLoading(false);
         });
-        expect(result.current.isLoading).toBe(false);
+        expect(result.current.isLoading).toBeFalsy();
     });
 
     it("should refresh monitor types", async ({ task, annotate }) => {
@@ -142,7 +142,7 @@ describe("useMonitorTypesStore", () => {
             await result.current.refreshMonitorTypes();
         });
 
-        expect(result.current.isLoaded).toBe(true);
+        expect(result.current.isLoaded).toBeTruthy();
     });
 
     it("should validate monitor data", async ({ task, annotate }) => {

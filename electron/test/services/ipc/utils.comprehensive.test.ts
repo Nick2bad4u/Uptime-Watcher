@@ -608,7 +608,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
     });
 
     describe("Response Creators - Standardized Formatting", () => {
-        describe("createErrorResponse", () => {
+        describe(createErrorResponse, () => {
             it("should create basic error response", async ({
                 task,
                 annotate,
@@ -720,7 +720,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
         });
 
-        describe("createSuccessResponse", () => {
+        describe(createSuccessResponse, () => {
             it("should create success response without data", async ({
                 task,
                 annotate,
@@ -868,7 +868,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(numberResult.data).toBe(42);
 
                 const booleanResult = createSuccessResponse(true);
-                expect(booleanResult.data).toBe(true);
+                expect(booleanResult.data).toBeTruthy();
             });
 
             it("should handle array data", async ({ task, annotate }) => {
@@ -897,7 +897,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
         });
 
-        describe("createValidationResponse", () => {
+        describe(createValidationResponse, () => {
             it("should create successful validation response with defaults", async ({
                 task,
                 annotate,
@@ -1019,7 +1019,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
     });
 
     describe("Handler Wrappers - Error Handling and Logging", () => {
-        describe("withIpcHandler", () => {
+        describe(withIpcHandler, () => {
             it("should wrap successful handler with response formatting", async ({
                 task,
                 annotate,
@@ -1191,7 +1191,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
         });
 
-        describe("withIpcHandlerValidation", () => {
+        describe(withIpcHandlerValidation, () => {
             it("should execute handler with valid parameters", async ({
                 task,
                 annotate,
@@ -1281,7 +1281,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 );
 
                 expect(result.data).toBe("sync validated result");
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
             });
 
             it("should handle errors in validated handlers", async ({
@@ -1372,7 +1372,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
         });
 
-        describe("registerStandardizedIpcHandler", () => {
+        describe(registerStandardizedIpcHandler, () => {
             it("should register handler without validation", async ({
                 task,
                 annotate,
@@ -1396,7 +1396,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     "test-registration",
                     expect.any(Function)
                 );
-                expect(registeredHandlers.has("test-registration")).toBe(true);
+                expect(registeredHandlers.has("test-registration")).toBeTruthy();
             });
 
             it("should register handler with validation", async ({
@@ -1423,8 +1423,8 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     "validated-registration",
                     expect.any(Function)
                 );
-                expect(registeredHandlers.has("validated-registration")).toBe(
-                    true
+                expect(registeredHandlers.has("validated-registration")).toBeTruthy(
+                    
                 );
             });
 
@@ -1461,7 +1461,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 );
 
                 expect(mockHandler).toHaveBeenCalledWith("arg1", "arg2");
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 expect(result.data).toBe("execution test");
             });
 
@@ -1500,7 +1500,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
                 expect(mockValidator).toHaveBeenCalledWith(["validArg"]);
                 expect(mockHandler).toHaveBeenCalledWith("validArg");
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 expect(result.data).toBe("validated execution");
             });
 
@@ -1535,9 +1535,9 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 );
 
                 expect(registeredHandlers.size).toBe(3);
-                expect(registeredHandlers.has("handler1")).toBe(true);
-                expect(registeredHandlers.has("handler2")).toBe(true);
-                expect(registeredHandlers.has("handler3")).toBe(true);
+                expect(registeredHandlers.has("handler1")).toBeTruthy();
+                expect(registeredHandlers.has("handler2")).toBeTruthy();
+                expect(registeredHandlers.has("handler3")).toBeTruthy();
             });
         });
     });

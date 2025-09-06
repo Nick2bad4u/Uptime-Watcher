@@ -120,7 +120,7 @@ describe("IPC Types", () => {
                 data: "test data",
             };
 
-            expect(response.success).toBe(true);
+            expect(response.success).toBeTruthy();
             expect(response.data).toBe("test data");
             expect(response.error).toBeUndefined();
             expect(response.warnings).toBeUndefined();
@@ -138,7 +138,7 @@ describe("IPC Types", () => {
                 error: "Something went wrong",
             };
 
-            expect(response.success).toBe(false);
+            expect(response.success).toBeFalsy();
             expect(response.error).toBe("Something went wrong");
             expect(response.data).toBeUndefined();
         });
@@ -158,7 +158,7 @@ describe("IPC Types", () => {
                 warnings: ["Deprecated method used", "Performance warning"],
             };
 
-            expect(response.success).toBe(true);
+            expect(response.success).toBeTruthy();
             expect(response.data).toBe(42);
             expect(response.warnings).toEqual([
                 "Deprecated method used",
@@ -187,7 +187,7 @@ describe("IPC Types", () => {
                 metadata,
             };
 
-            expect(response.success).toBe(true);
+            expect(response.success).toBeTruthy();
             expect(response.data).toEqual(["item1", "item2"]);
             expect(response.metadata).toEqual(metadata);
         });
@@ -219,7 +219,7 @@ describe("IPC Types", () => {
                 data: complexData,
             };
 
-            expect(response.success).toBe(true);
+            expect(response.success).toBeTruthy();
             expect(response.data).toEqual(complexData);
         });
 
@@ -242,7 +242,7 @@ describe("IPC Types", () => {
                 data: arrayData,
             };
 
-            expect(response.success).toBe(true);
+            expect(response.success).toBeTruthy();
             expect(response.data).toEqual(arrayData);
         });
 
@@ -259,7 +259,7 @@ describe("IPC Types", () => {
                 success: true,
             };
 
-            expect(response.success).toBe(true);
+            expect(response.success).toBeTruthy();
             expect(response.data).toBeUndefined();
         });
     });
@@ -285,7 +285,7 @@ describe("IPC Types", () => {
                 errors: [],
             };
 
-            expect(response.success).toBe(true);
+            expect(response.success).toBeTruthy();
             expect(response.data).toEqual(validationResult);
             expect(response.errors).toEqual([]);
         });
@@ -310,7 +310,7 @@ describe("IPC Types", () => {
                 errors: ["Field is required", "Invalid format"],
             };
 
-            expect(response.success).toBe(false);
+            expect(response.success).toBeFalsy();
             expect(response.data).toEqual(validationResult);
             expect(response.errors).toEqual([
                 "Field is required",
@@ -342,7 +342,7 @@ describe("IPC Types", () => {
             };
 
             // Should have all IpcResponse properties
-            expect(response.success).toBe(false);
+            expect(response.success).toBeFalsy();
             expect(response.error).toBe("Validation process failed");
             expect(response.warnings).toEqual([
                 "Data was modified during validation",
@@ -355,6 +355,7 @@ describe("IPC Types", () => {
         });
     });
 
+    // eslint-disable-next-line vitest/prefer-describe-function-title
     describe("IpcParameterValidator", () => {
         it("should define a function that returns null for valid parameters", async ({
             task,
@@ -495,13 +496,13 @@ describe("IPC Types", () => {
                 name: "test",
             });
 
-            expect(stringResponse.success).toBe(true);
+            expect(stringResponse.success).toBeTruthy();
             expect(stringResponse.data).toBe("hello");
 
-            expect(numberResponse.success).toBe(true);
+            expect(numberResponse.success).toBeTruthy();
             expect(numberResponse.data).toBe(42);
 
-            expect(objectResponse.success).toBe(true);
+            expect(objectResponse.success).toBeTruthy();
             expect(objectResponse.data).toEqual({ id: 1, name: "test" });
         });
 
@@ -521,7 +522,7 @@ describe("IPC Types", () => {
 
             const errorResponse = createErrorResponse("Operation failed");
 
-            expect(errorResponse.success).toBe(false);
+            expect(errorResponse.success).toBeFalsy();
             expect(errorResponse.error).toBe("Operation failed");
             expect(errorResponse.data).toBeUndefined();
         });

@@ -20,7 +20,7 @@ describe('cacheKeys fuzzing tests', () => {
         fc.string({ minLength: 1, maxLength: 50 }).filter(s => !s.includes(':')),
         (prefix, identifier) => {
           const key = `${prefix}:${identifier}`;
-          expect(isStandardizedCacheKey(key)).toBe(true);
+          expect(isStandardizedCacheKey(key)).toBeTruthy();
         }
       ), { numRuns: 100 });
     });
@@ -37,7 +37,7 @@ describe('cacheKeys fuzzing tests', () => {
         fc.string({ minLength: 1, maxLength: 50 }).filter(s => !s.includes(':')),
         (prefix, operation, identifier) => {
           const key = `${prefix}:${operation}:${identifier}`;
-          expect(isStandardizedCacheKey(key)).toBe(true);
+          expect(isStandardizedCacheKey(key)).toBeTruthy();
         }
       ), { numRuns: 100 });
     });
@@ -55,7 +55,7 @@ describe('cacheKeys fuzzing tests', () => {
           fc.string().filter(s => s.split(':').length > 3 || s.split(':').length < 2 || !['config', 'monitor', 'site', 'validation'].includes(s.split(':')[0] || '')) // invalid patterns
         ),
         (invalidKey) => {
-          expect(isStandardizedCacheKey(invalidKey)).toBe(false);
+          expect(isStandardizedCacheKey(invalidKey)).toBeFalsy();
         }
       ), { numRuns: 100 });
     });
@@ -71,7 +71,7 @@ describe('cacheKeys fuzzing tests', () => {
         fc.string({ minLength: 1 }).filter(s => !s.includes(':') && s.trim().length > 0),
         (prefix, identifier) => {
           const key = `${prefix}:${identifier}`;
-          expect(isStandardizedCacheKey(key)).toBe(true);
+          expect(isStandardizedCacheKey(key)).toBeTruthy();
         }
       ), { numRuns: 50 });
     });
@@ -155,7 +155,7 @@ describe('cacheKeys fuzzing tests', () => {
           const key = operation ? `${prefix}:${operation}:${identifier}` : `${prefix}:${identifier}`;
 
           // Key should be valid
-          expect(isStandardizedCacheKey(key)).toBe(true);
+          expect(isStandardizedCacheKey(key)).toBeTruthy();
 
           // Parse should work
           const parsed = parseCacheKey(key as any);

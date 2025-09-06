@@ -120,7 +120,7 @@ describe("Utils Additional Function Coverage", () => {
             const obj = { a: 1, b: 2 };
             const result = objectSafety.typedObjectEntries(obj);
 
-            expect(Array.isArray(result)).toBe(true);
+            expect(Array.isArray(result)).toBeTruthy();
             expect(result).toEqual([
                 ["a", 1],
                 ["b", 2],
@@ -142,7 +142,7 @@ describe("Utils Additional Function Coverage", () => {
             const obj = { a: 1, b: 2 };
             const result = objectSafety.typedObjectKeys(obj);
 
-            expect(Array.isArray(result)).toBe(true);
+            expect(Array.isArray(result)).toBeTruthy();
             expect(result).toEqual(["a", "b"]);
         });
 
@@ -161,7 +161,7 @@ describe("Utils Additional Function Coverage", () => {
             const obj = { a: 1, b: 2 };
             const result = objectSafety.typedObjectValues(obj);
 
-            expect(Array.isArray(result)).toBe(true);
+            expect(Array.isArray(result)).toBeTruthy();
             expect(result).toEqual([1, 2]);
         });
     });
@@ -183,8 +183,8 @@ describe("Utils Additional Function Coverage", () => {
             ]);
             const result2 = guardUtils.isArray("not array");
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
         });
 
         it("should call isFunction function", async ({ task, annotate }) => {
@@ -199,8 +199,8 @@ describe("Utils Additional Function Coverage", () => {
             const result1 = guardUtils.isFunction(() => {});
             const result2 = guardUtils.isFunction("not function");
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
         });
 
         it("should call isError function", async ({ task, annotate }) => {
@@ -215,8 +215,8 @@ describe("Utils Additional Function Coverage", () => {
             const result1 = guardUtils.isError(new Error("test"));
             const result2 = guardUtils.isError("not error");
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
         });
 
         it("should call isDate function", async ({ task, annotate }) => {
@@ -231,8 +231,8 @@ describe("Utils Additional Function Coverage", () => {
             const result1 = guardUtils.isDate(new Date());
             const result2 = guardUtils.isDate("not date");
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
         });
 
         it("should call hasProperty function", async ({ task, annotate }) => {
@@ -248,8 +248,8 @@ describe("Utils Additional Function Coverage", () => {
             const result1 = guardUtils.hasProperty(obj, "test");
             const result2 = guardUtils.hasProperty(obj, "missing");
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
         });
 
         it("should call isPositiveNumber function", async ({
@@ -268,9 +268,9 @@ describe("Utils Additional Function Coverage", () => {
             const result2 = guardUtils.isPositiveNumber(-5);
             const result3 = guardUtils.isPositiveNumber(0);
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
-            expect(result3).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
+            expect(result3).toBeFalsy();
         });
 
         it("should call isBoolean function", async ({ task, annotate }) => {
@@ -285,8 +285,8 @@ describe("Utils Additional Function Coverage", () => {
             const result1 = guardUtils.isBoolean(true);
             const result2 = guardUtils.isBoolean("not boolean");
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
         });
 
         it("should call isFiniteNumber function", async ({
@@ -304,8 +304,8 @@ describe("Utils Additional Function Coverage", () => {
             const result1 = guardUtils.isFiniteNumber(5);
             const result2 = guardUtils.isFiniteNumber(Infinity);
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
         });
 
         it("should call isNonNegativeNumber function", async ({
@@ -324,9 +324,9 @@ describe("Utils Additional Function Coverage", () => {
             const result2 = guardUtils.isNonNegativeNumber(-5);
             const result3 = guardUtils.isNonNegativeNumber(0);
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
-            expect(result3).toBe(true);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
+            expect(result3).toBeTruthy();
         });
 
         it("should call isNonNullObject function", async ({
@@ -345,9 +345,9 @@ describe("Utils Additional Function Coverage", () => {
             const result2 = guardUtils.isNonNullObject(null);
             const result3 = guardUtils.isNonNullObject([]);
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
-            expect(result3).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
+            expect(result3).toBeFalsy();
         });
 
         it("should call isString function", async ({ task, annotate }) => {
@@ -362,8 +362,8 @@ describe("Utils Additional Function Coverage", () => {
             const result1 = guardUtils.isString("test");
             const result2 = guardUtils.isString(123);
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
         });
 
         it("should call isValidPort function", async ({ task, annotate }) => {
@@ -379,9 +379,9 @@ describe("Utils Additional Function Coverage", () => {
             const result2 = guardUtils.isValidPort(99_999);
             const result3 = guardUtils.isValidPort(-1);
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
-            expect(result3).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
+            expect(result3).toBeFalsy();
         });
 
         it("should call isValidTimestamp function", async ({
@@ -399,8 +399,8 @@ describe("Utils Additional Function Coverage", () => {
             const result1 = guardUtils.isValidTimestamp(1_640_995_200_000);
             const result2 = guardUtils.isValidTimestamp(-1);
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
         });
     });
 
@@ -423,7 +423,7 @@ describe("Utils Additional Function Coverage", () => {
             };
             const result = validation.getMonitorValidationErrors(monitor);
 
-            expect(Array.isArray(result)).toBe(true);
+            expect(Array.isArray(result)).toBeTruthy();
         });
 
         it("should call validateMonitorType function", async ({
@@ -441,8 +441,8 @@ describe("Utils Additional Function Coverage", () => {
             const result1 = validation.validateMonitorType("http");
             const result2 = validation.validateMonitorType("invalid");
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
         });
 
         it("should call validateSite function", async ({ task, annotate }) => {

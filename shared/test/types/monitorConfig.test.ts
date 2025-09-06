@@ -72,8 +72,8 @@ describe("Function Coverage Validation", () => {
         monitorConfig.isPortMonitorConfig(portConfig);
 
         // Verify basic functionality
-        expect(monitorConfig.isHttpMonitorConfig(httpConfig)).toBe(true);
-        expect(monitorConfig.isPingMonitorConfig(pingConfig)).toBe(true);
-        expect(monitorConfig.isPortMonitorConfig(portConfig)).toBe(true);
+        expect(monitorConfig.isHttpMonitorConfig(httpConfig)).toBeTruthy();
+        expect(monitorConfig.isPingMonitorConfig(pingConfig)).toBeTruthy();
+        expect(monitorConfig.isPortMonitorConfig(portConfig)).toBeTruthy();
     });
 });

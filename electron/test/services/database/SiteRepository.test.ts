@@ -19,7 +19,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { fc } from "@fast-check/vitest";
 import { SiteRepository } from "../../../services/database/SiteRepository";
 
-describe("SiteRepository", () => {
+describe(SiteRepository, () => {
     let repository: SiteRepository;
     let mockDatabaseService: any;
     let mockDatabase: any;
@@ -195,7 +195,7 @@ describe("SiteRepository", () => {
 
             const result = await repository.delete("site1");
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
         it("should return false when site not found", async ({
             task,
@@ -222,7 +222,7 @@ describe("SiteRepository", () => {
 
             const result = await repository.delete("nonexistent");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
         it("should handle deletion errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -295,7 +295,7 @@ describe("SiteRepository", () => {
             });
             const result = await repository.exists("site1");
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
         it("should return false when site does not exist", async ({
             task,
@@ -317,7 +317,7 @@ describe("SiteRepository", () => {
             });
             const result = await repository.exists("nonexistent");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
     describe("bulkInsert", () => {
@@ -507,7 +507,7 @@ describe("SiteRepository", () => {
 
                             const result = await repository.delete(siteId);
 
-                            expect(result).toBe(true);
+                            expect(result).toBeTruthy();
                             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
                             expect(mockDatabase.run).toHaveBeenCalledWith(
                                 "DELETE FROM sites WHERE id = ?",

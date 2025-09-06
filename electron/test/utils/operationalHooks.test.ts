@@ -9,7 +9,7 @@ import {
 } from "../../utils/operationalHooks";
 
 describe("Operational Hooks", () => {
-    describe("withOperationalHooks", () => {
+    describe(withOperationalHooks, () => {
         it("should successfully execute operation", async ({
             task,
             annotate,
@@ -94,7 +94,7 @@ describe("Operational Hooks", () => {
             expect(onFailure).not.toHaveBeenCalled();
         });
     });
-    describe("withDatabaseOperation", () => {
+    describe(withDatabaseOperation, () => {
         it("should be a specialized wrapper with correct defaults", async ({
             task,
             annotate,

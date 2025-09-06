@@ -959,7 +959,7 @@ describe("Theme Components - Complete Coverage", () => {
             render(<ThemedCheckbox checked onChange={mockOnChange} />);
 
             const checkbox = screen.getByRole("checkbox") as HTMLInputElement;
-            expect(checkbox.checked).toBe(true);
+            expect(checkbox.checked).toBeTruthy();
         });
 
         it("should handle disabled state", ({ task, annotate }) => {

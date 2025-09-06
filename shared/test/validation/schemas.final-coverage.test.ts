@@ -38,7 +38,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
 
             const result = validateMonitorData("http", invalidData);
             // Should succeed even with undefined optional field
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
         });
 
         it("should handle validation with zero-length path in Zod issues", async ({
@@ -52,7 +52,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
 
             // Test root-level validation error (zero-length path)
             const result = validateMonitorData("http", null);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
     });
@@ -69,7 +69,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
 
             // Mock the schema parsing to throw a non-Error object
             const result = validateMonitorData("http", Symbol("invalid"));
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
             // The actual error message from Zod for symbols
             expect(result.errors[0]).toContain("Invalid input");
@@ -88,7 +88,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
 
             // Create invalid data that will trigger non-Zod error
             const result = validateSiteData(Symbol("invalid"));
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
             // The actual error message from Zod for symbols
             expect(result.errors[0]).toContain("Invalid input");
@@ -111,7 +111,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
             };
 
             const result = validateSiteData(invalidSiteData);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
     });
@@ -174,7 +174,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                     throw customError;
                 }
             );
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
@@ -197,7 +197,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
 
             for (const testCase of testCases) {
                 const result = validateMonitorData("http", testCase);
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
                 expect(result.errors.length).toBeGreaterThan(0);
             }
         });
@@ -234,7 +234,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                         testCase.field,
                         testCase.value
                     );
-                    expect(result.success).toBe(false);
+                    expect(result.success).toBeFalsy();
                 }
             }
         });
@@ -260,12 +260,12 @@ describe("Validation Schemas - Final Branch Coverage", () => {
             for (const type of types) {
                 const result = validateMonitorData(type, {});
                 if (type === "unknown") {
-                    expect(result.success).toBe(false);
+                    expect(result.success).toBeFalsy();
                     expect(result.errors).toContain(
                         `Unknown monitor type: ${type}`
                     );
                 } else {
-                    expect(result.success).toBe(false);
+                    expect(result.success).toBeFalsy();
                     expect(result.errors.length).toBeGreaterThan(0);
                 }
             }
@@ -328,7 +328,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                         validResult.errors
                     );
                 }
-                expect(validResult.success).toBe(true);
+                expect(validResult.success).toBeTruthy();
 
                 // Test with invalid value
                 const invalidValue = (() => {
@@ -359,7 +359,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                     test.field,
                     invalidValue
                 );
-                expect(invalidResult.success).toBe(false);
+                expect(invalidResult.success).toBeFalsy();
             }
         });
     });

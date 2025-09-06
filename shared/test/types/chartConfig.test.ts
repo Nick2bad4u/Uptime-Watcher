@@ -10,7 +10,7 @@ import {
 } from "../../types/chartConfig.js";
 
 describe("Chart Config Utilities", () => {
-    describe("hasPlugins", () => {
+    describe(hasPlugins, () => {
         it("should return true for object with plugins property", async ({
             task,
             annotate,
@@ -27,7 +27,7 @@ describe("Chart Config Utilities", () => {
                 },
             };
 
-            expect(hasPlugins(config)).toBe(true);
+            expect(hasPlugins(config)).toBeTruthy();
         });
 
         it("should return false for object without plugins property", async ({
@@ -44,7 +44,7 @@ describe("Chart Config Utilities", () => {
                 responsive: true,
             };
 
-            expect(hasPlugins(config)).toBe(false);
+            expect(hasPlugins(config)).toBeFalsy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -53,7 +53,7 @@ describe("Chart Config Utilities", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(hasPlugins(null)).toBe(false);
+            expect(hasPlugins(null)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -62,7 +62,7 @@ describe("Chart Config Utilities", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(hasPlugins(undefined)).toBe(false);
+            expect(hasPlugins(undefined)).toBeFalsy();
         });
 
         it("should return false for primitive values", async ({
@@ -74,9 +74,9 @@ describe("Chart Config Utilities", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(hasPlugins("string")).toBe(false);
-            expect(hasPlugins(123)).toBe(false);
-            expect(hasPlugins(true)).toBe(false);
+            expect(hasPlugins("string")).toBeFalsy();
+            expect(hasPlugins(123)).toBeFalsy();
+            expect(hasPlugins(true)).toBeFalsy();
         });
 
         it("should return false for object with plugins as non-object", async ({
@@ -92,7 +92,7 @@ describe("Chart Config Utilities", () => {
                 plugins: "not an object",
             };
 
-            expect(hasPlugins(config)).toBe(false);
+            expect(hasPlugins(config)).toBeFalsy();
         });
 
         it("should return false for object with plugins as null", async ({
@@ -108,7 +108,7 @@ describe("Chart Config Utilities", () => {
                 plugins: null,
             };
 
-            expect(hasPlugins(config)).toBe(false);
+            expect(hasPlugins(config)).toBeFalsy();
         });
 
         it("should return true for object with empty plugins object", async ({
@@ -124,11 +124,11 @@ describe("Chart Config Utilities", () => {
                 plugins: {},
             };
 
-            expect(hasPlugins(config)).toBe(true);
+            expect(hasPlugins(config)).toBeTruthy();
         });
     });
 
-    describe("hasScales", () => {
+    describe(hasScales, () => {
         it("should return true for object with scales property", async ({
             task,
             annotate,
@@ -145,7 +145,7 @@ describe("Chart Config Utilities", () => {
                 },
             };
 
-            expect(hasScales(config)).toBe(true);
+            expect(hasScales(config)).toBeTruthy();
         });
 
         it("should return false for object without scales property", async ({
@@ -162,7 +162,7 @@ describe("Chart Config Utilities", () => {
                 responsive: true,
             };
 
-            expect(hasScales(config)).toBe(false);
+            expect(hasScales(config)).toBeFalsy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -171,7 +171,7 @@ describe("Chart Config Utilities", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(hasScales(null)).toBe(false);
+            expect(hasScales(null)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -180,7 +180,7 @@ describe("Chart Config Utilities", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(hasScales(undefined)).toBe(false);
+            expect(hasScales(undefined)).toBeFalsy();
         });
 
         it("should return false for primitive values", async ({
@@ -192,9 +192,9 @@ describe("Chart Config Utilities", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(hasScales("string")).toBe(false);
-            expect(hasScales(123)).toBe(false);
-            expect(hasScales(true)).toBe(false);
+            expect(hasScales("string")).toBeFalsy();
+            expect(hasScales(123)).toBeFalsy();
+            expect(hasScales(true)).toBeFalsy();
         });
 
         it("should return false for object with scales as non-object", async ({
@@ -210,7 +210,7 @@ describe("Chart Config Utilities", () => {
                 scales: "not an object",
             };
 
-            expect(hasScales(config)).toBe(false);
+            expect(hasScales(config)).toBeFalsy();
         });
 
         it("should return false for object with scales as null", async ({
@@ -226,7 +226,7 @@ describe("Chart Config Utilities", () => {
                 scales: null,
             };
 
-            expect(hasScales(config)).toBe(false);
+            expect(hasScales(config)).toBeFalsy();
         });
 
         it("should return true for object with empty scales object", async ({
@@ -242,7 +242,7 @@ describe("Chart Config Utilities", () => {
                 scales: {},
             };
 
-            expect(hasScales(config)).toBe(true);
+            expect(hasScales(config)).toBeTruthy();
         });
 
         it("should handle complex nested scales configuration", async ({
@@ -275,7 +275,7 @@ describe("Chart Config Utilities", () => {
                 },
             };
 
-            expect(hasScales(config)).toBe(true);
+            expect(hasScales(config)).toBeTruthy();
         });
     });
 
@@ -294,9 +294,9 @@ describe("Chart Config Utilities", () => {
             expect(DEFAULT_CHART_THEMES.dark.borderColors).toBeDefined();
             expect(
                 Array.isArray(DEFAULT_CHART_THEMES.dark.backgroundColors)
-            ).toBe(true);
-            expect(Array.isArray(DEFAULT_CHART_THEMES.dark.borderColors)).toBe(
-                true
+            ).toBeTruthy();
+            expect(Array.isArray(DEFAULT_CHART_THEMES.dark.borderColors)).toBeTruthy(
+                
             );
         });
 
@@ -314,9 +314,9 @@ describe("Chart Config Utilities", () => {
             expect(DEFAULT_CHART_THEMES.light.borderColors).toBeDefined();
             expect(
                 Array.isArray(DEFAULT_CHART_THEMES.light.backgroundColors)
-            ).toBe(true);
-            expect(Array.isArray(DEFAULT_CHART_THEMES.light.borderColors)).toBe(
-                true
+            ).toBeTruthy();
+            expect(Array.isArray(DEFAULT_CHART_THEMES.light.borderColors)).toBeTruthy(
+                
             );
         });
 
@@ -352,10 +352,10 @@ describe("Chart Config Utilities", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(DEFAULT_CHART_THEMES.dark.backgroundColors.length).toBe(
+            expect(DEFAULT_CHART_THEMES.dark.backgroundColors).toHaveLength(
                 DEFAULT_CHART_THEMES.dark.borderColors.length
             );
-            expect(DEFAULT_CHART_THEMES.light.backgroundColors.length).toBe(
+            expect(DEFAULT_CHART_THEMES.light.backgroundColors).toHaveLength(
                 DEFAULT_CHART_THEMES.light.borderColors.length
             );
         });
@@ -403,8 +403,8 @@ describe("Chart Config Utilities", () => {
                 },
             };
 
-            expect(hasPlugins(fullConfig)).toBe(true);
-            expect(hasScales(fullConfig)).toBe(true);
+            expect(hasPlugins(fullConfig)).toBeTruthy();
+            expect(hasScales(fullConfig)).toBeTruthy();
         });
 
         it("should handle partial configurations correctly", async ({
@@ -424,11 +424,11 @@ describe("Chart Config Utilities", () => {
                 scales: { x: { type: "linear" } },
             };
 
-            expect(hasPlugins(pluginsOnlyConfig)).toBe(true);
-            expect(hasScales(pluginsOnlyConfig)).toBe(false);
+            expect(hasPlugins(pluginsOnlyConfig)).toBeTruthy();
+            expect(hasScales(pluginsOnlyConfig)).toBeFalsy();
 
-            expect(hasPlugins(scalesOnlyConfig)).toBe(false);
-            expect(hasScales(scalesOnlyConfig)).toBe(true);
+            expect(hasPlugins(scalesOnlyConfig)).toBeFalsy();
+            expect(hasScales(scalesOnlyConfig)).toBeTruthy();
         });
     });
 });

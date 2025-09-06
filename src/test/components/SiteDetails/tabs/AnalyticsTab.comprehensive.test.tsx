@@ -144,7 +144,7 @@ vi.mock("../../../../components/SiteDetails/charts/UptimeChart", () => ({
     ),
 }));
 
-describe("AnalyticsTab", () => {
+describe(AnalyticsTab, () => {
     const createMockProps = (
         overrides?: Partial<AnalyticsTabProperties>
     ): AnalyticsTabProperties => {

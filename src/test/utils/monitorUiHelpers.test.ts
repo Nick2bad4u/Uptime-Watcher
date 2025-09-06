@@ -104,7 +104,7 @@ describe("Monitor UI Helpers", () => {
                 "port",
             ]);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return false when some monitor types don't support advanced analytics", async ({
@@ -137,7 +137,7 @@ describe("Monitor UI Helpers", () => {
                 "port",
             ]);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return true for empty array", async ({ task, annotate }) => {
@@ -150,7 +150,7 @@ describe("Monitor UI Helpers", () => {
                 []
             );
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
     });
 
@@ -179,7 +179,7 @@ describe("Monitor UI Helpers", () => {
                 "port",
             ]);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return false when some monitor types don't support response time", async ({
@@ -212,7 +212,7 @@ describe("Monitor UI Helpers", () => {
                 "port",
             ]);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return true for empty array", async ({ task, annotate }) => {
@@ -223,7 +223,7 @@ describe("Monitor UI Helpers", () => {
 
             const result = await monitorUiHelpers.allSupportsResponseTime([]);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
     });
 
@@ -247,7 +247,7 @@ describe("Monitor UI Helpers", () => {
             const result =
                 await monitorUiHelpers.supportsAdvancedAnalytics("http");
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return false when monitor type doesn't support advanced analytics", async ({
@@ -269,7 +269,7 @@ describe("Monitor UI Helpers", () => {
             const result =
                 await monitorUiHelpers.supportsAdvancedAnalytics("http");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when config is undefined", async ({
@@ -286,7 +286,7 @@ describe("Monitor UI Helpers", () => {
             const result =
                 await monitorUiHelpers.supportsAdvancedAnalytics("http");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -309,7 +309,7 @@ describe("Monitor UI Helpers", () => {
 
             const result = await monitorUiHelpers.supportsResponseTime("http");
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return false when monitor type doesn't support response time", async ({
@@ -330,7 +330,7 @@ describe("Monitor UI Helpers", () => {
 
             const result = await monitorUiHelpers.supportsResponseTime("http");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when config is undefined", async ({
@@ -346,7 +346,7 @@ describe("Monitor UI Helpers", () => {
 
             const result = await monitorUiHelpers.supportsResponseTime("http");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -369,7 +369,7 @@ describe("Monitor UI Helpers", () => {
 
             const result = await monitorUiHelpers.shouldShowUrl("http");
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return false when monitor type shouldn't show URL", async ({
@@ -390,7 +390,7 @@ describe("Monitor UI Helpers", () => {
 
             const result = await monitorUiHelpers.shouldShowUrl("http");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when config is undefined", async ({
@@ -406,7 +406,7 @@ describe("Monitor UI Helpers", () => {
 
             const result = await monitorUiHelpers.shouldShowUrl("http");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -419,13 +419,13 @@ describe("Monitor UI Helpers", () => {
 
             // Set some data in cache
             AppCaches.uiHelpers.set("test-key", "test-value");
-            expect(AppCaches.uiHelpers.has("test-key")).toBe(true);
+            expect(AppCaches.uiHelpers.has("test-key")).toBeTruthy();
 
             // Clear cache
             monitorUiHelpers.clearConfigCache();
 
             // Verify cache is cleared
-            expect(AppCaches.uiHelpers.has("test-key")).toBe(false);
+            expect(AppCaches.uiHelpers.has("test-key")).toBeFalsy();
         });
     });
 
@@ -494,17 +494,17 @@ describe("Monitor UI Helpers", () => {
             );
 
             // All functions should return their fallback values on error
-            expect(
-                await monitorUiHelpers.supportsAdvancedAnalytics("http")
-            ).toBe(false);
-            expect(await monitorUiHelpers.supportsResponseTime("http")).toBe(
-                false
+            await expect(
+                monitorUiHelpers.supportsAdvancedAnalytics("http")
+            ).resolves.toBeFalsy();
+            await expect(monitorUiHelpers.supportsResponseTime("http")).resolves.toBeFalsy(
+                
             );
-            expect(await monitorUiHelpers.shouldShowUrl("http")).toBe(false);
-            expect(await monitorUiHelpers.getAnalyticsLabel("http")).toBe(
+            await expect(monitorUiHelpers.shouldShowUrl("http")).resolves.toBeFalsy();
+            await expect(monitorUiHelpers.getAnalyticsLabel("http")).resolves.toBe(
                 "HTTP Response Time"
             );
-            expect(await monitorUiHelpers.getMonitorHelpTexts("http")).toEqual(
+            await expect(monitorUiHelpers.getMonitorHelpTexts("http")).resolves.toEqual(
                 {}
             );
         });
@@ -523,14 +523,14 @@ describe("Monitor UI Helpers", () => {
             // Mock to return undefined for invalid types (this is the default, but let's be explicit)
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
 
-            expect(
-                await monitorUiHelpers.supportsAdvancedAnalytics(invalidType)
-            ).toBe(false);
-            expect(
-                await monitorUiHelpers.supportsResponseTime(invalidType)
-            ).toBe(false);
-            expect(await monitorUiHelpers.shouldShowUrl(invalidType)).toBe(
-                false
+            await expect(
+                monitorUiHelpers.supportsAdvancedAnalytics(invalidType)
+            ).resolves.toBeFalsy();
+            await expect(
+                monitorUiHelpers.supportsResponseTime(invalidType)
+            ).resolves.toBeFalsy();
+            await expect(monitorUiHelpers.shouldShowUrl(invalidType)).resolves.toBeFalsy(
+                
             );
         });
     });
@@ -665,10 +665,10 @@ describe("Monitor UI Helpers", () => {
 
             // Property: Empty array should return true (vacuous truth)
             if (monitorTypes.length === 0) {
-                expect(result).toBe(true);
+                expect(result).toBeTruthy();
             } else {
                 // Property: All types supporting analytics should return true
-                expect(result).toBe(true);
+                expect(result).toBeTruthy();
             }
         });
 
@@ -789,7 +789,7 @@ describe("Monitor UI Helpers", () => {
 
             // Property: Previously cached keys should no longer exist
             for (const key of cacheKeys) {
-                expect(AppCaches.uiHelpers.has(key)).toBe(false);
+                expect(AppCaches.uiHelpers.has(key)).toBeFalsy();
             }
         });
 
@@ -801,13 +801,13 @@ describe("Monitor UI Helpers", () => {
 
             // Property: All functions should return fallback values on error
             const analyticsResult = await monitorUiHelpers.supportsAdvancedAnalytics(monitorType as any);
-            expect(analyticsResult).toBe(false);
+            expect(analyticsResult).toBeFalsy();
 
             const responseTimeResult = await monitorUiHelpers.supportsResponseTime(monitorType as any);
-            expect(responseTimeResult).toBe(false);
+            expect(responseTimeResult).toBeFalsy();
 
             const showUrlResult = await monitorUiHelpers.shouldShowUrl(monitorType as any);
-            expect(showUrlResult).toBe(false);
+            expect(showUrlResult).toBeFalsy();
 
             const analyticsLabel = await monitorUiHelpers.getAnalyticsLabel(monitorType as any);
             expect(analyticsLabel).toBe(`${monitorType.toUpperCase()} Response Time`);

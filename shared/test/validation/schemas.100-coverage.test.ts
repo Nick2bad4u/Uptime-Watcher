@@ -57,7 +57,7 @@ describe("Schemas - 100% Coverage Tests", () => {
             const result = validateMonitorData("http", invalidData);
 
             // Should have validation errors but not succeed
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
@@ -90,7 +90,7 @@ describe("Schemas - 100% Coverage Tests", () => {
 
             // The validation should handle this and potentially categorize as warnings
             expect(typeof result).toBe("object");
-            expect("success" in result).toBe(true);
+            expect("success" in result).toBeTruthy();
         });
 
         test("should handle complex validation scenarios", ({
@@ -119,9 +119,9 @@ describe("Schemas - 100% Coverage Tests", () => {
             const result = validateMonitorData("port", complexInvalidData);
 
             // Should categorize different types of errors appropriately
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             if (!result.success) {
-                expect(Array.isArray(result.errors)).toBe(true);
+                expect(Array.isArray(result.errors)).toBeTruthy();
             }
         });
     });

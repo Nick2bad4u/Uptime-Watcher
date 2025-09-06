@@ -481,6 +481,6 @@ describe("Settings Component", () => {
         unmount();
 
         // Should not throw errors
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 });

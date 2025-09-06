@@ -133,7 +133,7 @@ describe('Chart Utils Property-Based Tests', () => {
 
                     // If the axis exists in the config, should return exists=true
                     if (config.scales && config.scales[axis]) {
-                        expect(result.exists).toBe(true);
+                        expect(result.exists).toBeTruthy();
                         expect(typeof result.config).toBe('object');
                     }
                 }
@@ -147,7 +147,7 @@ describe('Chart Utils Property-Based Tests', () => {
                 (config, axis) => {
                     const result = getScaleConfigSafe(config, axis);
 
-                    expect(result.exists).toBe(false);
+                    expect(result.exists).toBeFalsy();
                     expect(result.config).toEqual({});
                 }
             ));
@@ -241,7 +241,7 @@ describe('Chart Utils Property-Based Tests', () => {
                     expect(result).toHaveProperty('validPath');
                     expect(result).toHaveProperty('value');
                     expect(typeof result.exists).toBe('boolean');
-                    expect(Array.isArray(result.validPath)).toBe(true);
+                    expect(Array.isArray(result.validPath)).toBeTruthy();
 
                     // Valid path should contain valid path parts
                     if (result.exists) {
@@ -263,7 +263,7 @@ describe('Chart Utils Property-Based Tests', () => {
                 (config, axis, path) => {
                     const result = getNestedScalePropertySafe(config, axis, path);
 
-                    expect(result.exists).toBe(false);
+                    expect(result.exists).toBeFalsy();
                     expect(result.validPath).toEqual([]);
                     expect(result.value).toBeUndefined();
                 }
@@ -283,14 +283,14 @@ describe('Chart Utils Property-Based Tests', () => {
                         if (config.scales && config.scales[axis]) {
                             // The function splits "" into [""] and tries to find a property named ""
                             // This is actually the expected behavior - empty string is not a valid path
-                            expect(result.exists).toBe(false);
+                            expect(result.exists).toBeFalsy();
                         } else {
-                            expect(result.exists).toBe(false);
+                            expect(result.exists).toBeFalsy();
                         }
                     } else {
                         // Invalid paths should return exists=false
                         expect(typeof result.exists).toBe('boolean');
-                        expect(Array.isArray(result.validPath)).toBe(true);
+                        expect(Array.isArray(result.validPath)).toBeTruthy();
                     }
                 }
             ));
@@ -455,7 +455,7 @@ describe('Chart Utils Property-Based Tests', () => {
                     // Should handle circular references without infinite loops
                     expect(() => {
                         const result = getScaleConfigSafe(circular, 'x');
-                        expect(result.exists).toBe(true);
+                        expect(result.exists).toBeTruthy();
                     }).not.toThrow();
                 }
             ));

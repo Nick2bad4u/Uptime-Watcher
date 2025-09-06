@@ -19,7 +19,7 @@ import {
 } from "../../utils/environment";
 
 describe("Environment utilities fuzzing tests", () => {
-    describe("getEnvVar", () => {
+    describe(getEnvVar, () => {
         test.prop([
             fc.constantFrom("NODE_ENV", "CODECOV_TOKEN"),
             fc.oneof(fc.constant(undefined), fc.string())
@@ -77,7 +77,7 @@ describe("Environment utilities fuzzing tests", () => {
         });
     });
 
-    describe("getEnvironment", () => {
+    describe(getEnvironment, () => {
         test.prop([
             fc.oneof(
                 fc.constant(undefined),
@@ -119,7 +119,7 @@ describe("Environment utilities fuzzing tests", () => {
         });
     });
 
-    describe("getNodeEnv", () => {
+    describe(getNodeEnv, () => {
         test.prop([
             fc.oneof(
                 fc.constant(undefined),
@@ -161,7 +161,7 @@ describe("Environment utilities fuzzing tests", () => {
         });
     });
 
-    describe("isBrowserEnvironment", () => {
+    describe(isBrowserEnvironment, () => {
         test.prop([
             fc.oneof(fc.constant(undefined), fc.record({})),
             fc.oneof(fc.constant(undefined), fc.record({}))
@@ -199,7 +199,7 @@ describe("Environment utilities fuzzing tests", () => {
         });
     });
 
-    describe("isDevelopment", () => {
+    describe(isDevelopment, () => {
         test.prop([
             fc.oneof(
                 fc.constant(undefined),
@@ -229,14 +229,14 @@ describe("Environment utilities fuzzing tests", () => {
             delete (globalThis as any).process;
 
             const result = isDevelopment();
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
 
             // Restore original process
             globalThis.process = originalProcess;
         });
     });
 
-    describe("isNodeEnvironment", () => {
+    describe(isNodeEnvironment, () => {
         test.prop([
             fc.oneof(
                 fc.constant(undefined),
@@ -271,7 +271,7 @@ describe("Environment utilities fuzzing tests", () => {
         });
     });
 
-    describe("isProduction", () => {
+    describe(isProduction, () => {
         test.prop([
             fc.oneof(
                 fc.constant(undefined),
@@ -301,14 +301,14 @@ describe("Environment utilities fuzzing tests", () => {
             delete (globalThis as any).process;
 
             const result = isProduction();
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
 
             // Restore original process
             globalThis.process = originalProcess;
         });
     });
 
-    describe("isTest", () => {
+    describe(isTest, () => {
         test.prop([
             fc.oneof(
                 fc.constant(undefined),
@@ -338,7 +338,7 @@ describe("Environment utilities fuzzing tests", () => {
             delete (globalThis as any).process;
 
             const result = isTest();
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
 
             // Restore original process
             globalThis.process = originalProcess;

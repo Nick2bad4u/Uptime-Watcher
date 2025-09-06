@@ -40,7 +40,7 @@ vi.mock("../../../utils/operationalHooks");
 vi.mock("../../../utils/logger");
 vi.mock("../../../electronUtils");
 
-describe("HistoryRepository", () => {
+describe(HistoryRepository, () => {
     let historyRepository: HistoryRepository;
     let mockDatabaseService: DatabaseService;
     let mockDatabase: Database;
@@ -717,9 +717,9 @@ describe("HistoryRepository", () => {
                         fc.string({ minLength: 1, maxLength: 50 }),
                         fc.array(
                             fc.record({
-                                timestamp: fc.integer({ min: Date.now() - 86400000, max: Date.now() }),
+                                timestamp: fc.integer({ min: Date.now() - 86_400_000, max: Date.now() }),
                                 status: fc.constantFrom("up", "down"),
-                                responseTime: fc.integer({ min: 0, max: 10000 }),
+                                responseTime: fc.integer({ min: 0, max: 10_000 }),
                                 details: fc.oneof(
                                     fc.string({ maxLength: 200 }),
                                     fc.constant(null),
@@ -740,14 +740,14 @@ describe("HistoryRepository", () => {
                             expect(mockedAddHistoryEntry).toHaveBeenCalledTimes(historyEntries.length);
 
                             // Verify each call had proper parameters
-                            historyEntries.forEach((entry, index) => {
+                            for (const [index, entry] of historyEntries.entries()) {
                                 expect(mockedAddHistoryEntry).toHaveBeenNthCalledWith(
                                     index + 1,
                                     mockDatabase,
                                     monitorId,
                                     entry
                                 );
-                            });
+                            }
                         }
                     )
                 );
@@ -796,7 +796,7 @@ describe("HistoryRepository", () => {
                             const mockedFindHistoryByMonitorId = vi.mocked(historyQuery.findHistoryByMonitorId);
 
                             const mockHistoryData = Array.from({ length: Math.min(limit, 100) }, (_, i) => ({
-                                timestamp: Date.now() - (i * 60000),
+                                timestamp: Date.now() - (i * 60_000),
                                 status: (i % 2 === 0 ? "up" : "down") as const,
                                 responseTime: 100 + (i * 10)
                             }));
@@ -828,9 +828,9 @@ describe("HistoryRepository", () => {
                         fc.string({ minLength: 1, maxLength: 50 }),
                         fc.array(
                             fc.record({
-                                timestamp: fc.integer({ min: Date.now() - 604800000, max: Date.now() }),
+                                timestamp: fc.integer({ min: Date.now() - 604_800_000, max: Date.now() }),
                                 status: fc.constantFrom("up", "down"),
-                                responseTime: fc.integer({ min: 0, max: 30000 }),
+                                responseTime: fc.integer({ min: 0, max: 30_000 }),
                                 details: fc.oneof(
                                     fc.string({ maxLength: 300 }),
                                     fc.constant(null)
@@ -877,7 +877,7 @@ describe("HistoryRepository", () => {
                                     mockDatabase,
                                     monitorId
                                 );
-                                expect(result).toBe(true);
+                                expect(result).toBeTruthy();
                             }
 
                             expect(mockedDeleteHistoryByMonitorId).toHaveBeenCalledTimes(monitorIds.length);
@@ -892,7 +892,7 @@ describe("HistoryRepository", () => {
                         fc.array(
                             fc.record({
                                 monitorId: fc.string({ minLength: 1, maxLength: 50 }),
-                                expectedCount: fc.integer({ min: 0, max: 100000 })
+                                expectedCount: fc.integer({ min: 0, max: 100_000 })
                             }),
                             { minLength: 1, maxLength: 8 }
                         ),
@@ -920,7 +920,7 @@ describe("HistoryRepository", () => {
                 await fc.assert(
                     fc.asyncProperty(
                         fc.string({ minLength: 1, maxLength: 50 }),
-                        fc.integer({ min: 1, max: 10000 }),
+                        fc.integer({ min: 1, max: 10_000 }),
                         async (monitorId, keepCount) => {
                             const mockedPruneHistoryForMonitor = vi.mocked(historyManipulation.pruneHistoryForMonitor);
                             mockedPruneHistoryForMonitor.mockResolvedValue(keepCount);
@@ -946,9 +946,9 @@ describe("HistoryRepository", () => {
                         fc.oneof(
                             fc.constant(undefined), // No latest entry
                             fc.record({
-                                timestamp: fc.integer({ min: Date.now() - 3600000, max: Date.now() }),
+                                timestamp: fc.integer({ min: Date.now() - 3_600_000, max: Date.now() }),
                                 status: fc.constantFrom("up", "down"),
-                                responseTime: fc.integer({ min: 1, max: 10000 }),
+                                responseTime: fc.integer({ min: 1, max: 10_000 }),
                                 details: fc.oneof(
                                     fc.string({ maxLength: 100 }),
                                     fc.constant(null)

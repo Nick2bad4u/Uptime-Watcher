@@ -6,7 +6,7 @@
 import { describe, expect, it } from "vitest";
 import { calculateMaxDuration } from "../../utils/duration";
 
-describe("calculateMaxDuration", () => {
+describe(calculateMaxDuration, () => {
     describe("Basic Calculations", () => {
         it("should calculate duration correctly with no retries", async ({
             task,

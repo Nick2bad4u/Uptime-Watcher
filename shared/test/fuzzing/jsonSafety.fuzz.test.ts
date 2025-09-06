@@ -66,7 +66,7 @@ test.prop([
         const result = safeJsonParse(invalidJson, alwaysTrue);
 
         if (shouldBeInvalid) {
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.error).toBeDefined();
             expect(typeof result.error).toBe("string");
             expect(result.data).toBeUndefined();
@@ -75,7 +75,7 @@ test.prop([
             expect(result.error).toMatch(/JSON parsing failed:/);
         } else {
             // If it's accidentally valid JSON, just ensure safeJsonParse handles it correctly
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toBeDefined();
             expect(result.error).toBeUndefined();
         }
@@ -99,7 +99,7 @@ test.prop([
 
     const result = safeJsonParseArray(validJsonString, alwaysFailValidator);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
     expect(result.error).toBeDefined();
     expect(typeof result.error).toBe("string");
     expect(result.data).toBeUndefined();
@@ -162,7 +162,7 @@ test.prop([
     const result = safeJsonStringify(problematicValue);
 
     // Should handle the error gracefully
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
     expect(result.error).toBeDefined();
     expect(typeof result.error).toBe("string");
     expect(result.data).toBeUndefined();
@@ -189,7 +189,7 @@ test("Circular references trigger ensureError handling", () => {
 
     const result = safeJsonStringify(obj);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
     expect(result.error).toBeDefined();
     expect(typeof result.error).toBe("string");
     expect(result.data).toBeUndefined();
@@ -216,7 +216,7 @@ test.prop([
     const alwaysTrue = (_data: unknown): _data is unknown => true;
     const result = safeJsonParse(malformedJson, alwaysTrue);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
     expect(result.error).toBeDefined();
     expect(typeof result.error).toBe("string");
     expect(result.data).toBeUndefined();
@@ -239,7 +239,7 @@ test.prop([
 
     const result = safeJsonParse(validJson, throwingValidator);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBeFalsy();
     expect(result.error).toBeDefined();
     expect(typeof result.error).toBe("string");
     expect(result.data).toBeUndefined();

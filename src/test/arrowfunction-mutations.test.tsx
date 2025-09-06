@@ -279,7 +279,7 @@ describe("ArrowFunction Mutations", () => {
             expect(firstEven).toBe(2);
 
             const hasOdd = numbers.some((n) => n % 2 === 1);
-            expect(hasOdd).toBe(true);
+            expect(hasOdd).toBeTruthy();
 
             // With mutations (() => undefined), all these would fail or return incorrect results
         });

@@ -105,7 +105,7 @@ describe("SettingsRepository Coverage Tests", () => {
                 databaseService: mockDatabaseService,
             });
             await repository.get("test-setting");
-            expect(true).toBe(true); // Test passes if no error thrown
+            expect(true).toBeTruthy(); // Test passes if no error thrown
         } catch (error) {
             // Database operations might fail in test environment
             expect(error).toBeInstanceOf(Error);
@@ -126,7 +126,7 @@ describe("SettingsRepository Coverage Tests", () => {
                 databaseService: mockDatabaseService,
             });
             await repository.set("test-setting", "test-value");
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -146,7 +146,7 @@ describe("SettingsRepository Coverage Tests", () => {
                 databaseService: mockDatabaseService,
             });
             await repository.delete("test-setting");
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -166,7 +166,7 @@ describe("SettingsRepository Coverage Tests", () => {
                 databaseService: mockDatabaseService,
             });
             await repository.getAll();
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -189,7 +189,7 @@ describe("SettingsRepository Coverage Tests", () => {
                 setting1: "value1",
                 setting2: "value2",
             });
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -209,7 +209,7 @@ describe("SettingsRepository Coverage Tests", () => {
                 databaseService: mockDatabaseService,
             });
             await repository.deleteAll();
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -261,7 +261,7 @@ describe("SettingsRepository Coverage Tests", () => {
             await repository.getAll();
             await repository.bulkInsert({ test: "value" });
 
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }
@@ -285,7 +285,7 @@ describe("SettingsRepository Coverage Tests", () => {
             await repository.bulkInsert({ bulk1: "value1", bulk2: "value2" });
             await repository.getAll();
 
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }

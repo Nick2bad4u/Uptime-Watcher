@@ -68,7 +68,7 @@ describe("Application Constants", () => {
             await annotate("Type: Export Operation", "type");
 
             expect(FALLBACK_MONITOR_TYPE_OPTIONS).toBeDefined();
-            expect(Array.isArray(FALLBACK_MONITOR_TYPE_OPTIONS)).toBe(true);
+            expect(Array.isArray(FALLBACK_MONITOR_TYPE_OPTIONS)).toBeTruthy();
             expect(FALLBACK_MONITOR_TYPE_OPTIONS.length).toBeGreaterThan(0);
         });
 
@@ -142,7 +142,7 @@ describe("Application Constants", () => {
             await annotate("Type: Export Operation", "type");
 
             expect(FONT_FAMILY_MONO).toBeDefined();
-            expect(Array.isArray(FONT_FAMILY_MONO)).toBe(true);
+            expect(Array.isArray(FONT_FAMILY_MONO)).toBeTruthy();
             expect(FONT_FAMILY_MONO.length).toBeGreaterThan(0);
         });
 
@@ -156,7 +156,7 @@ describe("Application Constants", () => {
             await annotate("Type: Export Operation", "type");
 
             expect(FONT_FAMILY_SANS).toBeDefined();
-            expect(Array.isArray(FONT_FAMILY_SANS)).toBe(true);
+            expect(Array.isArray(FONT_FAMILY_SANS)).toBeTruthy();
             expect(FONT_FAMILY_SANS.length).toBeGreaterThan(0);
         });
 
@@ -196,8 +196,8 @@ describe("Application Constants", () => {
             const lowercaseMonoFonts = FONT_FAMILY_MONO.map((f) =>
                 f.toLowerCase()
             );
-            expect(lowercaseMonoFonts.some((f) => f.includes("mono"))).toBe(
-                true
+            expect(lowercaseMonoFonts.some((f) => f.includes("mono"))).toBeTruthy(
+                
             );
 
             const lowercaseSansFonts = FONT_FAMILY_SANS.map((f) =>
@@ -207,7 +207,7 @@ describe("Application Constants", () => {
                 lowercaseSansFonts.some(
                     (f) => f.includes("inter") || f.includes("system")
                 )
-            ).toBe(true);
+            ).toBeTruthy();
         });
     });
 
@@ -222,7 +222,7 @@ describe("Application Constants", () => {
             await annotate("Type: Export Operation", "type");
 
             expect(CHECK_INTERVALS).toBeDefined();
-            expect(Array.isArray(CHECK_INTERVALS)).toBe(true);
+            expect(Array.isArray(CHECK_INTERVALS)).toBeTruthy();
             expect(CHECK_INTERVALS.length).toBeGreaterThan(0);
         });
 
@@ -363,7 +363,7 @@ describe("Application Constants", () => {
             await annotate("Type: Export Operation", "type");
 
             expect(HISTORY_LIMIT_OPTIONS).toBeDefined();
-            expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBe(true);
+            expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBeTruthy();
             expect(HISTORY_LIMIT_OPTIONS.length).toBeGreaterThan(0);
         });
 
@@ -593,7 +593,7 @@ describe("Application Constants", () => {
             await annotate("Type: Export Operation", "type");
 
             expect(CHART_TIME_RANGES).toBeDefined();
-            expect(Array.isArray(CHART_TIME_RANGES)).toBe(true);
+            expect(Array.isArray(CHART_TIME_RANGES)).toBeTruthy();
             expect(CHART_TIME_RANGES.length).toBeGreaterThan(0);
         });
 
@@ -688,7 +688,7 @@ describe("Application Constants", () => {
 
             // Ensure all fallback types are unique
             const uniqueTypes = [...new Set(fallbackTypes)];
-            expect(uniqueTypes.length).toBe(fallbackTypes.length);
+            expect(uniqueTypes).toHaveLength(fallbackTypes.length);
         });
 
         it("should have reasonable animation timing", async ({
@@ -867,7 +867,7 @@ describe("Application Constants", () => {
             (randomNumbers) => {
                 // The constant CHECK_INTERVALS should always be sorted
                 expect(CHECK_INTERVALS).toBeDefined();
-                expect(Array.isArray(CHECK_INTERVALS)).toBe(true);
+                expect(Array.isArray(CHECK_INTERVALS)).toBeTruthy();
 
                 const sortedIntervals = [...CHECK_INTERVALS].sort((a, b) => a.value - b.value);
                 expect(CHECK_INTERVALS).toEqual(sortedIntervals);
@@ -887,8 +887,8 @@ describe("Application Constants", () => {
         test.prop([fc.string()])(
             "should have consistent font family structure",
             () => {
-                expect(Array.isArray(FONT_FAMILY_MONO)).toBe(true);
-                expect(Array.isArray(FONT_FAMILY_SANS)).toBe(true);
+                expect(Array.isArray(FONT_FAMILY_MONO)).toBeTruthy();
+                expect(Array.isArray(FONT_FAMILY_SANS)).toBeTruthy();
 
                 // All font family entries should be non-empty strings
                 for (const font of FONT_FAMILY_MONO) {
@@ -906,7 +906,7 @@ describe("Application Constants", () => {
         test.prop([fc.constantFrom("value", "label")])(
             "should have valid monitor type option structure",
             (property) => {
-                expect(Array.isArray(FALLBACK_MONITOR_TYPE_OPTIONS)).toBe(true);
+                expect(Array.isArray(FALLBACK_MONITOR_TYPE_OPTIONS)).toBeTruthy();
                 expect(FALLBACK_MONITOR_TYPE_OPTIONS.length).toBeGreaterThan(0);
 
                 for (const option of FALLBACK_MONITOR_TYPE_OPTIONS) {
@@ -941,7 +941,7 @@ describe("Application Constants", () => {
         test.prop([fc.integer({ min: 1, max: 100 })])(
             "should have consistent history limit options",
             (multiplier) => {
-                expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBe(true);
+                expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBeTruthy();
                 expect(HISTORY_LIMIT_OPTIONS.length).toBeGreaterThan(0);
 
                 // All options should have valid structure

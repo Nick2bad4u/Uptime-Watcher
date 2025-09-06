@@ -16,7 +16,7 @@ import {
 } from "./testHelpers";
 
 describe("testHelpers", () => {
-    describe("createValidMonitor", () => {
+    describe(createValidMonitor, () => {
         it("should create a valid monitor with default values", async ({
             task,
             annotate,
@@ -34,7 +34,7 @@ describe("testHelpers", () => {
             expect(monitor.host).toBe("example.com");
             expect(monitor.type).toBe("http");
             expect(monitor.status).toBe("up");
-            expect(monitor.monitoring).toBe(true);
+            expect(monitor.monitoring).toBeTruthy();
             expect(monitor.checkInterval).toBe(30_000);
             expect(monitor.timeout).toBe(5000);
             expect(monitor.responseTime).toBe(100);
@@ -81,7 +81,7 @@ describe("testHelpers", () => {
             expect(customMonitor.host).toBe("custom.example.com");
             expect(customMonitor.status).toBe("down");
             expect(customMonitor.port).toBe(443);
-            expect(customMonitor.monitoring).toBe(false);
+            expect(customMonitor.monitoring).toBeFalsy();
         });
 
         it("should handle all monitor statuses", async ({ task, annotate }) => {
@@ -171,7 +171,7 @@ describe("testHelpers", () => {
         });
     });
 
-    describe("createValidStatusHistory", () => {
+    describe(createValidStatusHistory, () => {
         it("should create a valid status history with default values", async ({
             task,
             annotate,
@@ -258,7 +258,7 @@ describe("testHelpers", () => {
         });
     });
 
-    describe("createValidMonitors", () => {
+    describe(createValidMonitors, () => {
         it("should create the specified number of monitors", async ({
             task,
             annotate,
@@ -367,7 +367,7 @@ describe("testHelpers", () => {
 
             for (const monitor of monitors) {
                 expect(monitor.type).toBe("port");
-                expect(monitor.monitoring).toBe(false);
+                expect(monitor.monitoring).toBeFalsy();
             }
             expect(monitors[0]!.url).toBe("https://example-0.com");
             expect(monitors[1]!.url).toBe("https://example-1.com");

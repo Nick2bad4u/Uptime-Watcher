@@ -36,7 +36,7 @@ describe("Store Utilities 100% Coverage", () => {
         vi.useRealTimers();
     });
 
-    describe("createBaseStore", () => {
+    describe(createBaseStore, () => {
         it("should create base store with proper initial values", () => {
             const setState = vi.fn();
             const baseStore = createBaseStore(setState);
@@ -98,7 +98,7 @@ describe("Store Utilities 100% Coverage", () => {
         });
     });
 
-    describe("debounce", () => {
+    describe(debounce, () => {
         it("should debounce function calls per argument set", () => {
             const mockFunction = vi.fn();
             const debouncedFunction = debounce(mockFunction, 100);
@@ -222,7 +222,7 @@ describe("Store Utilities 100% Coverage", () => {
         });
     });
 
-    describe("logStoreAction", () => {
+    describe(logStoreAction, () => {
         it("should log store action in development", async () => {
             const { isDevelopment } = await import("@shared/utils/environment");
             const { logger } = await import("../services/logger");

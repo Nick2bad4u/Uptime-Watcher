@@ -64,7 +64,7 @@ describe("TimeoutUtils Property-Based Tests", () => {
         fc.constant(Number.NaN)
     );
 
-    describe("clampTimeoutMs", () => {
+    describe(clampTimeoutMs, () => {
         test.prop([validTimeoutMs])(
             "should return input unchanged for valid timeout values",
             (validTimeout) => {
@@ -108,12 +108,12 @@ describe("TimeoutUtils Property-Based Tests", () => {
                 expect(() => clampTimeoutMs(specialValue)).not.toThrow();
                 const result = clampTimeoutMs(specialValue);
                 // For NaN, Math.max/min behavior is to return NaN, but we want to verify behavior
-                expect(Number.isFinite(result) || Number.isNaN(result)).toBe(true);
+                expect(Number.isFinite(result) || Number.isNaN(result)).toBeTruthy();
             }
         );
     });
 
-    describe("clampTimeoutSeconds", () => {
+    describe(clampTimeoutSeconds, () => {
         test.prop([validTimeoutSeconds])(
             "should return input unchanged for valid timeout values",
             (validTimeout) => {
@@ -151,7 +151,7 @@ describe("TimeoutUtils Property-Based Tests", () => {
         );
     });
 
-    describe("timeoutMsToSeconds", () => {
+    describe(timeoutMsToSeconds, () => {
         test.prop([fc.double({ noNaN: true })])(
             "should correctly convert milliseconds to seconds",
             (timeoutMs) => {
@@ -187,7 +187,7 @@ describe("TimeoutUtils Property-Based Tests", () => {
         );
     });
 
-    describe("timeoutSecondsToMs", () => {
+    describe(timeoutSecondsToMs, () => {
         test.prop([fc.double({ noNaN: true })])(
             "should correctly convert seconds to milliseconds",
             (timeoutSeconds) => {
@@ -243,7 +243,7 @@ describe("TimeoutUtils Property-Based Tests", () => {
         );
     });
 
-    describe("getTimeoutSeconds", () => {
+    describe(getTimeoutSeconds, () => {
         test.prop([validTimeoutMs])(
             "should convert valid millisecond timeouts to seconds",
             (timeoutMs) => {
@@ -281,12 +281,12 @@ describe("TimeoutUtils Property-Based Tests", () => {
         );
     });
 
-    describe("isValidTimeoutMs", () => {
+    describe(isValidTimeoutMs, () => {
         test.prop([validTimeoutMs])(
             "should return true for all valid timeout values in milliseconds",
             (validTimeout) => {
                 const result = isValidTimeoutMs(validTimeout);
-                expect(result).toBe(true);
+                expect(result).toBeTruthy();
             }
         );
 
@@ -296,32 +296,32 @@ describe("TimeoutUtils Property-Based Tests", () => {
                 // Skip NaN case as NaN comparisons are always false
                 fc.pre(!Number.isNaN(invalidTimeout));
                 const result = isValidTimeoutMs(invalidTimeout);
-                expect(result).toBe(false);
+                expect(result).toBeFalsy();
             }
         );
 
         test("should return false for NaN", () => {
             const result = isValidTimeoutMs(Number.NaN);
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         test("should return true for exact boundary values", () => {
-            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN)).toBe(true);
-            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX)).toBe(true);
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN)).toBeTruthy();
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX)).toBeTruthy();
         });
 
         test("should return false for just outside boundary values", () => {
-            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN - 1)).toBe(false);
-            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX + 1)).toBe(false);
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN - 1)).toBeFalsy();
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX + 1)).toBeFalsy();
         });
     });
 
-    describe("isValidTimeoutSeconds", () => {
+    describe(isValidTimeoutSeconds, () => {
         test.prop([validTimeoutSeconds])(
             "should return true for all valid timeout values in seconds",
             (validTimeout) => {
                 const result = isValidTimeoutSeconds(validTimeout);
-                expect(result).toBe(true);
+                expect(result).toBeTruthy();
             }
         );
 
@@ -331,23 +331,23 @@ describe("TimeoutUtils Property-Based Tests", () => {
                 // Skip NaN case as NaN comparisons are always false
                 fc.pre(!Number.isNaN(invalidTimeout));
                 const result = isValidTimeoutSeconds(invalidTimeout);
-                expect(result).toBe(false);
+                expect(result).toBeFalsy();
             }
         );
 
         test("should return false for NaN", () => {
             const result = isValidTimeoutSeconds(Number.NaN);
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         test("should return true for exact boundary values", () => {
-            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN)).toBe(true);
-            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX)).toBe(true);
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN)).toBeTruthy();
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX)).toBeTruthy();
         });
 
         test("should return false for just outside boundary values", () => {
-            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN - 0.1)).toBe(false);
-            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX + 0.1)).toBe(false);
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN - 0.1)).toBeFalsy();
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX + 0.1)).toBeFalsy();
         });
     });
 
@@ -358,8 +358,8 @@ describe("TimeoutUtils Property-Based Tests", () => {
                 const clampedMs = clampTimeoutMs(timeout * 1000);
                 const clampedSeconds = clampTimeoutSeconds(timeout);
 
-                expect(isValidTimeoutMs(clampedMs)).toBe(true);
-                expect(isValidTimeoutSeconds(clampedSeconds)).toBe(true);
+                expect(isValidTimeoutMs(clampedMs)).toBeTruthy();
+                expect(isValidTimeoutSeconds(clampedSeconds)).toBeTruthy();
             }
         );
 
@@ -396,15 +396,15 @@ describe("TimeoutUtils Property-Based Tests", () => {
         test("should handle zero timeout conversions", () => {
             expect(timeoutSecondsToMs(0)).toBe(0);
             expect(timeoutMsToSeconds(0)).toBe(0);
-            expect(isValidTimeoutMs(0)).toBe(false); // Zero is below minimum
-            expect(isValidTimeoutSeconds(0)).toBe(false); // Zero is below minimum
+            expect(isValidTimeoutMs(0)).toBeFalsy(); // Zero is below minimum
+            expect(isValidTimeoutSeconds(0)).toBeFalsy(); // Zero is below minimum
         });
 
         test("should handle negative timeout conversions", () => {
             expect(timeoutSecondsToMs(-5)).toBe(-5000);
             expect(timeoutMsToSeconds(-5000)).toBe(-5);
-            expect(isValidTimeoutMs(-5000)).toBe(false);
-            expect(isValidTimeoutSeconds(-5)).toBe(false);
+            expect(isValidTimeoutMs(-5000)).toBeFalsy();
+            expect(isValidTimeoutSeconds(-5)).toBeFalsy();
         });
 
         test("should handle fractional seconds correctly", () => {

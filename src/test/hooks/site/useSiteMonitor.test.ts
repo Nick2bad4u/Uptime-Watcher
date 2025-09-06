@@ -128,7 +128,7 @@ describe("useSiteMonitor Hook", () => {
             expect(result.current.monitor).toBeUndefined();
             expect(result.current.monitorIds).toEqual([]);
             expect(result.current.status).toBe("pending"); // DEFAULT_MONITOR_STATUS
-            expect(result.current.isMonitoring).toBe(false);
+            expect(result.current.isMonitoring).toBeFalsy();
         });
 
         it("should use site from store if available", async ({
@@ -191,7 +191,7 @@ describe("useSiteMonitor Hook", () => {
 
             expect(result.current.status).toBe("up");
             expect(result.current.responseTime).toBe(250);
-            expect(result.current.isMonitoring).toBe(true);
+            expect(result.current.isMonitoring).toBeTruthy();
         });
 
         it("should return correct history from selected monitor", async ({
@@ -228,7 +228,7 @@ describe("useSiteMonitor Hook", () => {
 
             expect(result.current.filteredHistory).toEqual([]);
             expect(result.current.status).toBe("down");
-            expect(result.current.isMonitoring).toBe(false);
+            expect(result.current.isMonitoring).toBeFalsy();
         });
 
         it("should handle non-existent monitor selection", async ({
@@ -251,7 +251,7 @@ describe("useSiteMonitor Hook", () => {
             expect(result.current.monitor).toBeUndefined();
             expect(result.current.status).toBe("pending");
             expect(result.current.responseTime).toBeUndefined();
-            expect(result.current.isMonitoring).toBe(false);
+            expect(result.current.isMonitoring).toBeFalsy();
         });
     });
 
@@ -395,7 +395,7 @@ describe("useSiteMonitor Hook", () => {
             );
 
             // Should default to true when monitoring is undefined
-            expect(result.current.isMonitoring).toBe(true);
+            expect(result.current.isMonitoring).toBeTruthy();
         });
 
         it("should handle monitor with monitoring explicitly false", async ({
@@ -431,7 +431,7 @@ describe("useSiteMonitor Hook", () => {
                 useSiteMonitor(siteWithDisabledMonitoring)
             );
 
-            expect(result.current.isMonitoring).toBe(false);
+            expect(result.current.isMonitoring).toBeFalsy();
         });
     });
 
@@ -513,8 +513,8 @@ describe("useSiteMonitor Hook", () => {
                 "function"
             );
             expect(typeof result.current.isMonitoring).toBe("boolean");
-            expect(Array.isArray(result.current.filteredHistory)).toBe(true);
-            expect(Array.isArray(result.current.monitorIds)).toBe(true);
+            expect(Array.isArray(result.current.filteredHistory)).toBeTruthy();
+            expect(Array.isArray(result.current.monitorIds)).toBeTruthy();
         });
     });
 });

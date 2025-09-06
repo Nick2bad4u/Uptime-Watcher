@@ -43,7 +43,7 @@ describe("SiteValidator - Comprehensive Coverage", () => {
             await annotate("Type: Constructor", "type");
 
             expect(siteValidator).toBeInstanceOf(SiteValidator);
-            expect(MonitorValidator).toHaveBeenCalledOnce();
+            expect(MonitorValidator).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -65,7 +65,7 @@ describe("SiteValidator - Comprehensive Coverage", () => {
             };
 
             const result = siteValidator.shouldIncludeInExport(site);
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return false for empty string identifier", async ({
@@ -85,7 +85,7 @@ describe("SiteValidator - Comprehensive Coverage", () => {
             };
 
             const result = siteValidator.shouldIncludeInExport(site);
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -129,7 +129,7 @@ describe("SiteValidator - Comprehensive Coverage", () => {
 
             const result = siteValidator.validateSiteConfiguration(site);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.errors).toEqual([]);
         });
 
@@ -151,7 +151,7 @@ describe("SiteValidator - Comprehensive Coverage", () => {
 
             const result = siteValidator.validateSiteConfiguration(site);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors).toContain("Site monitors must be an array");
         });
     });

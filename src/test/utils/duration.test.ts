@@ -14,7 +14,7 @@ import { test, fc } from "@fast-check/vitest";
 import { calculateMaxDuration } from "../../utils/duration";
 
 describe("Duration Utilities", () => {
-    describe("calculateMaxDuration", () => {
+    describe(calculateMaxDuration, () => {
         describe("Basic functionality", () => {
             it("should calculate duration with no retry attempts", async ({
                 task,

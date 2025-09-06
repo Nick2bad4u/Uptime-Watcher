@@ -8,7 +8,7 @@ describe("Monitor Identifiers", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 });

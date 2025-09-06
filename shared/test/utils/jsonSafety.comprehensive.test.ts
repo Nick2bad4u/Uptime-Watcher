@@ -13,7 +13,7 @@ import {
 } from "../../utils/jsonSafety";
 
 describe("JSON Safety Utilities - Comprehensive Coverage", () => {
-    describe("safeJsonParse", () => {
+    describe(safeJsonParse, () => {
         it("should parse valid JSON and validate with type guard", async ({
             task,
             annotate,
@@ -29,7 +29,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 typeof (data as any).name === "string";
 
             const result = safeJsonParse('{"name":"test"}', validator);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data?.name).toBe("test");
             expect(result.error).toBeUndefined();
         });
@@ -46,7 +46,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             const validator = (_data: unknown): _data is any => true;
             const result = safeJsonParse("invalid json", validator);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.data).toBeUndefined();
             expect(result.error).toContain("JSON parsing failed");
         });
@@ -66,7 +66,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 typeof (data as any).name === "string";
 
             const result = safeJsonParse('{"value":123}', validator);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.data).toBeUndefined();
             expect(result.error).toBe(
                 "Parsed data does not match expected type"
@@ -82,7 +82,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             const validator = (data: unknown): data is null => data === null;
             const result = safeJsonParse("null", validator);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toBe(null);
         });
 
@@ -96,8 +96,8 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 typeof data === "boolean";
             const result = safeJsonParse("true", validator);
 
-            expect(result.success).toBe(true);
-            expect(result.data).toBe(true);
+            expect(result.success).toBeTruthy();
+            expect(result.data).toBeTruthy();
         });
 
         it("should handle number JSON values", async ({ task, annotate }) => {
@@ -110,7 +110,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 typeof data === "number";
             const result = safeJsonParse("42", validator);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toBe(42);
         });
 
@@ -125,7 +125,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 data.every((item) => typeof item === "number");
             const result = safeJsonParse("[1,2,3]", validator);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toEqual([
                 1,
                 2,
@@ -134,7 +134,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         });
     });
 
-    describe("safeJsonParseArray", () => {
+    describe(safeJsonParseArray, () => {
         it("should parse valid JSON array with element validation", async ({
             task,
             annotate,
@@ -153,7 +153,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 '[{"id":1},{"id":2}]',
                 elementValidator
             );
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toHaveLength(2);
             if (result.success && result.data) {
                 expect(result.data[0]!.id).toBe(1);
@@ -173,7 +173,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             const elementValidator = (_data: unknown): _data is any => true;
             const result = safeJsonParseArray("invalid json", elementValidator);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.error).toContain("JSON parsing failed");
         });
 
@@ -192,7 +192,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 elementValidator
             );
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.error).toBe("Parsed data is not an array");
         });
 
@@ -216,7 +216,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 '[{"name":"valid"},{"id":123}]',
                 elementValidator
             );
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.error).toContain("Array element at index 1");
         });
 
@@ -229,7 +229,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             const elementValidator = (_data: unknown): _data is any => true;
             const result = safeJsonParseArray("[]", elementValidator);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toEqual([]);
         });
 
@@ -249,7 +249,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 elementValidator
             );
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toEqual([
                 "a",
                 "b",
@@ -258,7 +258,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         });
     });
 
-    describe("safeJsonStringifyWithFallback", () => {
+    describe(safeJsonStringifyWithFallback, () => {
         it("should stringify simple objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
@@ -491,7 +491,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         });
     });
 
-    describe("safeJsonParseWithFallback", () => {
+    describe(safeJsonParseWithFallback, () => {
         it("should return parsed data on successful parsing", async ({
             task,
             annotate,
@@ -593,7 +593,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         });
     });
 
-    describe("safeJsonStringify", () => {
+    describe(safeJsonStringify, () => {
         it("should stringify simple objects successfully", async ({
             task,
             annotate,
@@ -605,7 +605,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
 
             const obj = { name: "test", value: 42 };
             const result = safeJsonStringify(obj);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toBe('{"name":"test","value":42}');
             expect(result.error).toBeUndefined();
         });
@@ -626,7 +626,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 "test",
             ];
             const result = safeJsonStringify(arr);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toBe('[1,2,3,"test"]');
         });
 
@@ -637,7 +637,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = safeJsonStringify(null);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toBe("null");
         });
 
@@ -660,7 +660,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = safeJsonStringify(undefined);
-            expect(result.success).toBe(false); // JSON.stringify(undefined) returns undefined, not a string
+            expect(result.success).toBeFalsy(); // JSON.stringify(undefined) returns undefined, not a string
             expect(result.error).toContain(
                 "Value cannot be serialized to JSON"
             );
@@ -675,7 +675,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             const obj: any = { name: "test" };
             obj.self = obj;
             const result = safeJsonStringify(obj);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.error).toContain("JSON stringification failed");
         });
 
@@ -694,7 +694,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 number: 42,
             };
             const result = safeJsonStringify(obj);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toContain("42");
             expect(result.data).not.toContain("func");
         });
@@ -707,7 +707,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
 
             const obj = { bigInt: BigInt(123) };
             const result = safeJsonStringify(obj);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.error).toContain("JSON stringification failed");
         });
 
@@ -722,7 +722,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
 
             const obj = { a: 1, b: 2 };
             const result = safeJsonStringify(obj, 2);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toContain("\n");
             expect(result.data).toContain("  ");
         });
@@ -738,7 +738,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
 
             const obj = { a: 1 };
             const result = safeJsonStringify(obj, "\t");
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toContain("\t");
         });
 
@@ -752,11 +752,11 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const emptyObj = safeJsonStringify({});
-            expect(emptyObj.success).toBe(true);
+            expect(emptyObj.success).toBeTruthy();
             expect(emptyObj.data).toBe("{}");
 
             const emptyArr = safeJsonStringify([]);
-            expect(emptyArr.success).toBe(true);
+            expect(emptyArr.success).toBeTruthy();
             expect(emptyArr.data).toBe("[]");
         });
 
@@ -774,7 +774,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 },
             };
             const result = safeJsonStringify(nested);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toBe('{"level1":{"level2":{"value":"deep"}}}');
         });
 
@@ -786,7 +786,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
 
             const date = new Date("2023-01-01T00:00:00.000Z");
             const result = safeJsonStringify(date);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toContain("2023-01-01");
         });
 
@@ -806,7 +806,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
                 safe: "value",
             };
             const result = safeJsonStringify(obj);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.error).toContain("JSON stringification failed");
         });
     });

@@ -73,7 +73,7 @@ describe("Schema Property-Based Tests", () => {
                 console.log("Validation issues:", result.error.issues);
             }
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
         });
     });
 
@@ -86,7 +86,7 @@ describe("Schema Property-Based Tests", () => {
                 console.log("HTTP validation issues:", result.error.issues);
             }
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
         });
     });
 });

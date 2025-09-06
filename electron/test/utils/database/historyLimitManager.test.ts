@@ -70,7 +70,7 @@ describe("historyLimitManager", () => {
         vi.restoreAllMocks();
     });
 
-    describe("setHistoryLimit", () => {
+    describe(setHistoryLimit, () => {
         it("should set history limit with valid positive value", async ({
             task,
             annotate,
@@ -328,7 +328,7 @@ describe("historyLimitManager", () => {
         });
     });
 
-    describe("getHistoryLimit", () => {
+    describe(getHistoryLimit, () => {
         it("should return current history limit from callback", async ({
             task,
             annotate,
@@ -346,7 +346,7 @@ describe("historyLimitManager", () => {
             const result = getHistoryLimit(getHistoryLimitCallback);
 
             expect(result).toBe(expectedLimit);
-            expect(getHistoryLimitCallback).toHaveBeenCalledOnce();
+            expect(getHistoryLimitCallback).toHaveBeenCalledTimes(1);
         });
 
         it("should return zero limit", async ({ task, annotate }) => {
@@ -363,7 +363,7 @@ describe("historyLimitManager", () => {
             const result = getHistoryLimit(getHistoryLimitCallback);
 
             expect(result).toBe(expectedLimit);
-            expect(getHistoryLimitCallback).toHaveBeenCalledOnce();
+            expect(getHistoryLimitCallback).toHaveBeenCalledTimes(1);
         });
 
         it("should return negative limit if callback returns one", async ({
@@ -383,7 +383,7 @@ describe("historyLimitManager", () => {
             const result = getHistoryLimit(getHistoryLimitCallback);
 
             expect(result).toBe(expectedLimit);
-            expect(getHistoryLimitCallback).toHaveBeenCalledOnce();
+            expect(getHistoryLimitCallback).toHaveBeenCalledTimes(1);
         });
 
         it("should return large limit values", async ({ task, annotate }) => {
@@ -400,7 +400,7 @@ describe("historyLimitManager", () => {
             const result = getHistoryLimit(getHistoryLimitCallback);
 
             expect(result).toBe(expectedLimit);
-            expect(getHistoryLimitCallback).toHaveBeenCalledOnce();
+            expect(getHistoryLimitCallback).toHaveBeenCalledTimes(1);
         });
 
         it("should work with callback that returns undefined", async ({
@@ -417,7 +417,7 @@ describe("historyLimitManager", () => {
             const result = getHistoryLimit(getHistoryLimitCallback);
 
             expect(result).toBeUndefined();
-            expect(getHistoryLimitCallback).toHaveBeenCalledOnce();
+            expect(getHistoryLimitCallback).toHaveBeenCalledTimes(1);
         });
     });
 

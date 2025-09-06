@@ -65,7 +65,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             ).toBe(123_456_789);
         });
     });
-    describe("safeNumberConversion", () => {
+    describe(safeNumberConversion, () => {
         it("should return numbers as-is", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -120,7 +120,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeNumberConversion(null, -1)).toBe(-1);
         });
     });
-    describe("safeParseCheckInterval", () => {
+    describe(safeParseCheckInterval, () => {
         it("should return values >= 1000", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -157,7 +157,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParseCheckInterval("invalid", 1500)).toBe(1500);
         });
     });
-    describe("safeParseFloat", () => {
+    describe(safeParseFloat, () => {
         it("should parse valid float strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -194,7 +194,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParseFloat(null)).toBe(0);
         });
     });
-    describe("safeParseInt", () => {
+    describe(safeParseInt, () => {
         it("should parse valid integer strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -232,7 +232,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParseInt(undefined)).toBe(0);
         });
     });
-    describe("safeParsePercentage", () => {
+    describe(safeParsePercentage, () => {
         it("should return percentage values within 0-100", async ({
             task,
             annotate,
@@ -277,7 +277,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParsePercentage(null)).toBe(0);
         });
     });
-    describe("safeParsePort", () => {
+    describe(safeParsePort, () => {
         it("should return valid port numbers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -316,7 +316,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParsePort("invalid", 3000)).toBe(3000);
         });
     });
-    describe("safeParsePositiveInt", () => {
+    describe(safeParsePositiveInt, () => {
         it("should return positive integers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -353,7 +353,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParsePositiveInt("invalid", 10)).toBe(10);
         });
     });
-    describe("safeParseRetryAttempts", () => {
+    describe(safeParseRetryAttempts, () => {
         it("should return retry attempts within valid range", async ({
             task,
             annotate,
@@ -394,7 +394,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParseRetryAttempts(null)).toBe(3);
         });
     });
-    describe("safeParseTimeout", () => {
+    describe(safeParseTimeout, () => {
         it("should return positive timeout values", async ({
             task,
             annotate,
@@ -437,7 +437,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParseTimeout(null)).toBe(10_000);
         });
     });
-    describe("safeParseTimestamp", () => {
+    describe(safeParseTimestamp, () => {
         it("should return valid timestamps", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -517,7 +517,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
 
                 // Result should always be a number
                 expect(typeof result).toBe('number');
-                expect(Number.isNaN(result)).toBe(false);
+                expect(Number.isNaN(result)).toBeFalsy();
 
                 if (typeof input === 'number' && !Number.isNaN(input)) {
                     expect(result).toBe(input);
@@ -577,7 +577,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                 const result = safeParseFloat(input, defaultVal);
 
                 expect(typeof result).toBe('number');
-                expect(Number.isNaN(result)).toBe(false);
+                expect(Number.isNaN(result)).toBeFalsy();
 
                 if (typeof input === 'number' && !Number.isNaN(input)) {
                     expect(result).toBe(input);
@@ -599,8 +599,8 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                 const result = safeParseInt(input, defaultVal);
 
                 expect(typeof result).toBe('number');
-                expect(Number.isInteger(result)).toBe(true);
-                expect(Number.isNaN(result)).toBe(false);
+                expect(Number.isInteger(result)).toBeTruthy();
+                expect(Number.isNaN(result)).toBeFalsy();
 
                 if (typeof input === 'number' && !Number.isNaN(input)) {
                     expect(result).toBe(Math.floor(input));
@@ -649,7 +649,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                 expect(typeof result).toBe('number');
                 expect(result).toBeGreaterThanOrEqual(1);
                 expect(result).toBeLessThanOrEqual(65_535);
-                expect(Number.isInteger(result)).toBe(true);
+                expect(Number.isInteger(result)).toBeTruthy();
 
                 const intValue = typeof input === 'number' ? Math.floor(input)
                                : typeof input === 'string' ? Number.parseInt(input, 10)
@@ -669,7 +669,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
 
                 expect(typeof result).toBe('number');
                 expect(result).toBeGreaterThan(0);
-                expect(Number.isInteger(result)).toBe(true);
+                expect(Number.isInteger(result)).toBeTruthy();
 
                 const intValue = typeof input === 'number' ? Math.floor(input)
                                : typeof input === 'string' ? Number.parseInt(input, 10)
@@ -690,7 +690,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                 expect(typeof result).toBe('number');
                 expect(result).toBeGreaterThanOrEqual(0); // Changed from 1 to 0 based on implementation
                 expect(result).toBeLessThanOrEqual(10);
-                expect(Number.isInteger(result)).toBe(true);
+                expect(Number.isInteger(result)).toBeTruthy();
 
                 const intValue = typeof input === 'number' ? Math.floor(input)
                                : typeof input === 'string' ? Number.parseInt(input, 10)
@@ -731,7 +731,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                     const result = safeParseTimestamp(input, defaultVal);
 
                     expect(typeof result).toBe('number');
-                    expect(Number.isInteger(result)).toBe(true);
+                    expect(Number.isInteger(result)).toBeTruthy();
                     expect(result).toBeGreaterThan(0); // Must be positive
 
                     const now = Date.now();
@@ -798,20 +798,20 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
 
                 for (const result of results) {
                     expect(typeof result).toBe('number');
-                    expect(Number.isNaN(result)).toBe(false);
-                    expect(Number.isFinite(result)).toBe(true);
+                    expect(Number.isNaN(result)).toBeFalsy();
+                    expect(Number.isFinite(result)).toBeTruthy();
                 }
 
                 // Integer functions should return integers
-                expect(Number.isInteger(safeParseInt(input, defaultInt))).toBe(true);
-                expect(Number.isInteger(safeParsePort(input, 8080))).toBe(true);
-                expect(Number.isInteger(safeParsePositiveInt(input, 1))).toBe(true);
-                expect(Number.isInteger(safeParseRetryAttempts(input, 3))).toBe(true);
+                expect(Number.isInteger(safeParseInt(input, defaultInt))).toBeTruthy();
+                expect(Number.isInteger(safeParsePort(input, 8080))).toBeTruthy();
+                expect(Number.isInteger(safeParsePositiveInt(input, 1))).toBeTruthy();
+                expect(Number.isInteger(safeParseRetryAttempts(input, 3))).toBeTruthy();
                 // Note: safeParseTimestamp doesn't guarantee integer results for all valid inputs
                 // it uses safeNumberConversion which can return floats for valid timestamp ranges
                 const timestampResult = safeParseTimestamp(input, Date.now());
                 expect(typeof timestampResult).toBe('number');
-                expect(Number.isFinite(timestampResult)).toBe(true);
+                expect(Number.isFinite(timestampResult)).toBeTruthy();
             }));
         });
     });

@@ -83,7 +83,7 @@ describe("Schemas - Missing Coverage", () => {
 
             const result = validateMonitorData("http", invalidMonitorData);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
             // This should have hit the path.length > 0 condition
         });
@@ -158,12 +158,12 @@ describe("Schemas - Missing Coverage", () => {
 
             const result = validateMonitorData("http", invalidData);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
 
             // Verify we have error categorization
-            expect(Array.isArray(result.errors)).toBe(true);
-            expect(Array.isArray(result.warnings)).toBe(true);
+            expect(Array.isArray(result.errors)).toBeTruthy();
+            expect(Array.isArray(result.warnings)).toBeTruthy();
         });
 
         test("should handle edge cases in ZodError issue processing", ({
@@ -212,7 +212,7 @@ describe("Schemas - Missing Coverage", () => {
 
             for (const { name: _name, data } of edgeCases) {
                 const result = validateMonitorData("http", data);
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
                 expect(result.errors.length).toBeGreaterThan(0);
             }
         });

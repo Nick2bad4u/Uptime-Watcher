@@ -32,7 +32,7 @@ beforeEach(() => {
 });
 
 describe("useTheme Hooks - Working Tests", () => {
-    describe("useAvailabilityColors", () => {
+    describe(useAvailabilityColors, () => {
         it("should return availability color functions", async ({
             task,
             annotate,
@@ -108,7 +108,7 @@ describe("useTheme Hooks - Working Tests", () => {
         });
     });
 
-    describe("useStatusColors", () => {
+    describe(useStatusColors, () => {
         it("should return status colors from current theme", async ({
             task,
             annotate,
@@ -131,7 +131,7 @@ describe("useTheme Hooks - Working Tests", () => {
         });
     });
 
-    describe("useThemeClasses", () => {
+    describe(useThemeClasses, () => {
         it("should return CSS class generation functions", async ({
             task,
             annotate,
@@ -176,7 +176,7 @@ describe("useTheme Hooks - Working Tests", () => {
         });
     });
 
-    describe("useThemeValue", () => {
+    describe(useThemeValue, () => {
         it("should extract value from theme using selector", async ({
             task,
             annotate,
@@ -212,7 +212,7 @@ describe("useTheme Hooks - Working Tests", () => {
         });
     });
 
-    describe("useTheme", () => {
+    describe(useTheme, () => {
         it("should return theme-related functions", async ({
             task,
             annotate,

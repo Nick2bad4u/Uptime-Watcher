@@ -38,7 +38,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
 
             const result = validateMonitorData("http", dataWithUndefinedField);
             // Should succeed but exercise the warning detection branch
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
         });
 
         it("should handle validation with empty path in Zod issues", async ({
@@ -54,7 +54,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             const invalidData = null; // This will cause a root-level validation error
 
             const result = validateMonitorData("http", invalidData);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
@@ -69,7 +69,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
 
             // This tests the String(error) branch in the catch block
             const result = validateSiteData(Symbol("invalid")); // Symbol will cause a different type of error
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
     });
@@ -90,7 +90,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
                 "url",
                 "https://example.com"
             );
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
         });
 
         it("should test validateFieldWithSchema with base schema fallback", async ({
@@ -108,7 +108,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
                 "checkInterval",
                 30_000
             );
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
         });
 
         it("should test validateFieldWithSchema with unknown field error", async ({
@@ -137,7 +137,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
 
             // Test invalid timeout to trigger field-specific Zod error
             const result = validateMonitorField("http", "timeout", 100); // Too low
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
     });
@@ -166,7 +166,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
                 history: [],
             };
             const httpResult = validateMonitorData("http", httpData);
-            expect(httpResult.success).toBe(true);
+            expect(httpResult.success).toBeTruthy();
 
             // Test port monitor
             const portData = {
@@ -183,7 +183,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
                 history: [],
             };
             const portResult = validateMonitorData("port", portData);
-            expect(portResult.success).toBe(true);
+            expect(portResult.success).toBeTruthy();
 
             // Test ping monitor
             const pingData = {
@@ -199,11 +199,11 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
                 history: [],
             };
             const pingResult = validateMonitorData("ping", pingData);
-            expect(pingResult.success).toBe(true);
+            expect(pingResult.success).toBeTruthy();
 
             // Test unknown monitor type
             const unknownResult = validateMonitorData("unknown", {});
-            expect(unknownResult.success).toBe(false);
+            expect(unknownResult.success).toBeFalsy();
             expect(unknownResult.errors).toContain(
                 "Unknown monitor type: unknown"
             );
@@ -234,7 +234,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             };
 
             const result = validateMonitorData("http", validData);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.metadata).toHaveProperty("monitorType", "http");
             expect(result.metadata).toHaveProperty("validatedDataSize");
             expect(typeof result.metadata!["validatedDataSize"]).toBe("number");
@@ -270,7 +270,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             };
 
             const result = validateSiteData(siteData);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.metadata).toHaveProperty("monitorCount", 1);
             expect(result.metadata).toHaveProperty(
                 "siteIdentifier",
@@ -303,7 +303,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             };
 
             const result = validateMonitorData("http", complexInvalidData);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
 
             // Just verify we have errors, not specific path format since Zod might format differently
@@ -321,7 +321,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
 
             // Test validation that could generate empty path
             const result = validateMonitorData("http", "not-an-object");
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
     });
@@ -338,10 +338,10 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
 
             // Test both branches of the error instanceof Error check
             const result1 = validateSiteData(null);
-            expect(result1.success).toBe(false);
+            expect(result1.success).toBeFalsy();
 
             const result2 = validateMonitorField("unknown", "field", "value");
-            expect(result2.success).toBe(false);
+            expect(result2.success).toBeFalsy();
         });
     });
 
@@ -372,8 +372,8 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             expect(validResult).toHaveProperty("errors");
             expect(validResult).toHaveProperty("warnings");
             expect(validResult).toHaveProperty("metadata");
-            expect(Array.isArray(validResult.errors)).toBe(true);
-            expect(Array.isArray(validResult.warnings)).toBe(true);
+            expect(Array.isArray(validResult.errors)).toBeTruthy();
+            expect(Array.isArray(validResult.warnings)).toBeTruthy();
             expect(typeof validResult.metadata).toBe("object");
 
             const invalidResult = validateMonitorData("unknown", {});

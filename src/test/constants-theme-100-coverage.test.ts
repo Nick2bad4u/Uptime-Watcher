@@ -59,7 +59,7 @@ describe("Constants and Configuration 100% Coverage", () => {
     describe("Monitor Type Options", () => {
         it("should export fallback monitor type options", () => {
             expect(FALLBACK_MONITOR_TYPE_OPTIONS).toBeDefined();
-            expect(Array.isArray(FALLBACK_MONITOR_TYPE_OPTIONS)).toBe(true);
+            expect(Array.isArray(FALLBACK_MONITOR_TYPE_OPTIONS)).toBeTruthy();
         });
 
         it("should have valid monitor type option structure", () => {
@@ -82,7 +82,7 @@ describe("Constants and Configuration 100% Coverage", () => {
             expect(values).toContain("http");
             expect(values).toContain("port");
             expect(values).toContain("ping");
-            expect(values.length).toBe(3);
+            expect(values).toHaveLength(3);
         });
 
         it("should have unique values", () => {
@@ -91,7 +91,7 @@ describe("Constants and Configuration 100% Coverage", () => {
             );
             const uniqueValues = [...new Set(values)];
 
-            expect(values.length).toBe(uniqueValues.length);
+            expect(values).toHaveLength(uniqueValues.length);
         });
 
         it("should have unique labels", () => {
@@ -100,14 +100,14 @@ describe("Constants and Configuration 100% Coverage", () => {
             );
             const uniqueLabels = [...new Set(labels)];
 
-            expect(labels.length).toBe(uniqueLabels.length);
+            expect(labels).toHaveLength(uniqueLabels.length);
         });
     });
 
     describe("Check Intervals", () => {
         it("should export CHECK_INTERVALS array", () => {
             expect(CHECK_INTERVALS).toBeDefined();
-            expect(Array.isArray(CHECK_INTERVALS)).toBe(true);
+            expect(Array.isArray(CHECK_INTERVALS)).toBeTruthy();
             expect(CHECK_INTERVALS.length).toBeGreaterThan(0);
         });
 
@@ -126,9 +126,9 @@ describe("Constants and Configuration 100% Coverage", () => {
             const labels = CHECK_INTERVALS.map((i) => i.label);
 
             // Should contain seconds, minutes, and hours
-            expect(labels.some((l) => l.includes("second"))).toBe(true);
-            expect(labels.some((l) => l.includes("minute"))).toBe(true);
-            expect(labels.some((l) => l.includes("hour"))).toBe(true);
+            expect(labels.some((l) => l.includes("second"))).toBeTruthy();
+            expect(labels.some((l) => l.includes("minute"))).toBeTruthy();
+            expect(labels.some((l) => l.includes("hour"))).toBeTruthy();
         });
 
         it("should have ascending values", () => {
@@ -155,13 +155,13 @@ describe("Constants and Configuration 100% Coverage", () => {
     describe("Font Families", () => {
         it("should export FONT_FAMILY_MONO array", () => {
             expect(FONT_FAMILY_MONO).toBeDefined();
-            expect(Array.isArray(FONT_FAMILY_MONO)).toBe(true);
+            expect(Array.isArray(FONT_FAMILY_MONO)).toBeTruthy();
             expect(FONT_FAMILY_MONO.length).toBeGreaterThan(0);
         });
 
         it("should export FONT_FAMILY_SANS array", () => {
             expect(FONT_FAMILY_SANS).toBeDefined();
-            expect(Array.isArray(FONT_FAMILY_SANS)).toBe(true);
+            expect(Array.isArray(FONT_FAMILY_SANS)).toBeTruthy();
             expect(FONT_FAMILY_SANS.length).toBeGreaterThan(0);
         });
 
@@ -220,8 +220,8 @@ describe("Constants and Configuration 100% Coverage", () => {
                 })
             );
 
-            expect(selectOptions.length).toBe(3);
-            expect(selectOptions.some((opt) => opt.selected)).toBe(true);
+            expect(selectOptions).toHaveLength(3);
+            expect(selectOptions.some((opt) => opt.selected)).toBeTruthy();
         });
 
         it("should handle interval options in form contexts", () => {
@@ -232,7 +232,7 @@ describe("Constants and Configuration 100% Coverage", () => {
             }));
 
             expect(formOptions.length).toBeGreaterThan(0);
-            expect(formOptions.some((opt) => opt.selected)).toBe(true);
+            expect(formOptions.some((opt) => opt.selected)).toBeTruthy();
         });
     });
 
@@ -249,8 +249,8 @@ describe("Constants and Configuration 100% Coverage", () => {
             const originalLength = FALLBACK_MONITOR_TYPE_OPTIONS.length;
 
             // Test that it's a readonly array in TypeScript context
-            expect(FALLBACK_MONITOR_TYPE_OPTIONS.length).toBe(originalLength);
-            expect(Array.isArray(FALLBACK_MONITOR_TYPE_OPTIONS)).toBe(true);
+            expect(FALLBACK_MONITOR_TYPE_OPTIONS).toHaveLength(originalLength);
+            expect(Array.isArray(FALLBACK_MONITOR_TYPE_OPTIONS)).toBeTruthy();
 
             // Should still behave like an array for reading
             expect(FALLBACK_MONITOR_TYPE_OPTIONS[0]).toBeDefined();
@@ -272,7 +272,7 @@ describe("Constants and Configuration 100% Coverage", () => {
         it("should handle special characters in font names", () => {
             for (const font of [...FONT_FAMILY_MONO, ...FONT_FAMILY_SANS]) {
                 // Should not contain only whitespace
-                expect(font.trim().length).toBe(font.length);
+                expect(font.trim()).toHaveLength(font.length);
 
                 // Should be reasonable length
                 expect(font.length).toBeLessThan(50);
@@ -383,15 +383,15 @@ describe("Constants and Configuration 100% Coverage", () => {
                 (o) => o.label
             );
 
-            expect(monitorKeys.length).toBe(3);
-            expect(monitorLabels.length).toBe(3);
+            expect(monitorKeys).toHaveLength(3);
+            expect(monitorLabels).toHaveLength(3);
 
             // Test intervals
             const intervalValues = CHECK_INTERVALS.map((i) => i.value);
             const intervalLabels = CHECK_INTERVALS.map((i) => i.label);
 
             expect(intervalValues.length).toBeGreaterThan(0);
-            expect(intervalLabels.length).toBe(intervalValues.length);
+            expect(intervalLabels).toHaveLength(intervalValues.length);
         });
 
         it("should work with array methods", () => {
@@ -405,8 +405,8 @@ describe("Constants and Configuration 100% Coverage", () => {
                 (opt) => opt.value === "http"
             );
 
-            expect(mapped.length).toBe(FALLBACK_MONITOR_TYPE_OPTIONS.length);
-            expect(filtered.length).toBe(FALLBACK_MONITOR_TYPE_OPTIONS.length);
+            expect(mapped).toHaveLength(FALLBACK_MONITOR_TYPE_OPTIONS.length);
+            expect(filtered).toHaveLength(FALLBACK_MONITOR_TYPE_OPTIONS.length);
             expect(found).toBeDefined();
             expect(found?.value).toBe("http");
         });
@@ -425,8 +425,8 @@ describe("Constants and Configuration 100% Coverage", () => {
                 i.label.includes("minute")
             );
 
-            expect(allPositive).toBe(true);
-            expect(hasMinutes).toBe(true);
+            expect(allPositive).toBeTruthy();
+            expect(hasMinutes).toBeTruthy();
         });
     });
 });

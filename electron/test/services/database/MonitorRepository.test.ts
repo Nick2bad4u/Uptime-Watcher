@@ -18,7 +18,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { MonitorRepository } from "../../../services/database/MonitorRepository";
 
-describe("MonitorRepository", () => {
+describe(MonitorRepository, () => {
     let repository: MonitorRepository;
     let mockDatabaseService: any;
 

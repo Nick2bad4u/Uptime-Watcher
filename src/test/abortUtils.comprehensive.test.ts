@@ -47,17 +47,17 @@ describe('abortUtils.ts - Comprehensive Coverage', () => {
         vi.useRealTimers();
     });
 
-    describe('createCombinedAbortSignal', () => {
+    describe(createCombinedAbortSignal, () => {
         it('should return a new signal when no options provided', () => {
             const signal = createCombinedAbortSignal();
             expect(signal).toBeInstanceOf(AbortSignal);
-            expect(signal.aborted).toBe(false);
+            expect(signal.aborted).toBeFalsy();
         });
 
         it('should return a new signal when empty options object provided', () => {
             const signal = createCombinedAbortSignal({});
             expect(signal).toBeInstanceOf(AbortSignal);
-            expect(signal.aborted).toBe(false);
+            expect(signal.aborted).toBeFalsy();
         });
 
         it('should create timeout signal when timeoutMs provided', () => {
@@ -68,13 +68,13 @@ describe('abortUtils.ts - Comprehensive Coverage', () => {
         it('should ignore timeoutMs when it is 0', () => {
             const signal = createCombinedAbortSignal({ timeoutMs: 0 });
             expect(signal).toBeInstanceOf(AbortSignal);
-            expect(signal.aborted).toBe(false);
+            expect(signal.aborted).toBeFalsy();
         });
 
         it('should ignore timeoutMs when it is negative', () => {
             const signal = createCombinedAbortSignal({ timeoutMs: -100 });
             expect(signal).toBeInstanceOf(AbortSignal);
-            expect(signal.aborted).toBe(false);
+            expect(signal.aborted).toBeFalsy();
         });
 
         it('should include additional signals when provided', () => {
@@ -141,7 +141,7 @@ describe('abortUtils.ts - Comprehensive Coverage', () => {
         });
     });
 
-    describe('createAbortableOperation', () => {
+    describe(createAbortableOperation, () => {
         it('should execute operation and return result', async () => {
             const result = 'test result';
             const operation = vi.fn().mockResolvedValue(result);
@@ -158,7 +158,7 @@ describe('abortUtils.ts - Comprehensive Coverage', () => {
 
             await createAbortableOperation(operation, { cleanup });
 
-            expect(cleanup).toHaveBeenCalledOnce();
+            expect(cleanup).toHaveBeenCalledTimes(1);
         });
 
         it('should call cleanup function even when operation throws', async () => {
@@ -168,7 +168,7 @@ describe('abortUtils.ts - Comprehensive Coverage', () => {
             await expect(createAbortableOperation(operation, { cleanup }))
                 .rejects.toThrow('Test error');
 
-            expect(cleanup).toHaveBeenCalledOnce();
+            expect(cleanup).toHaveBeenCalledTimes(1);
         });
 
         it('should pass combined signal to operation', async () => {
@@ -192,7 +192,7 @@ describe('abortUtils.ts - Comprehensive Coverage', () => {
         });
     });
 
-    describe('sleep', () => {
+    describe(sleep, () => {
         beforeEach(() => {
             vi.useFakeTimers();
         });
@@ -241,7 +241,7 @@ describe('abortUtils.ts - Comprehensive Coverage', () => {
         });
     });
 
-    describe('retryWithAbort', () => {
+    describe(retryWithAbort, () => {
         beforeEach(() => {
             vi.useFakeTimers();
         });
@@ -252,7 +252,7 @@ describe('abortUtils.ts - Comprehensive Coverage', () => {
             const result = await retryWithAbort(operation);
 
             expect(result).toBe('success');
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
 
         it('should retry on failure and eventually succeed', async () => {
@@ -376,61 +376,61 @@ describe('abortUtils.ts - Comprehensive Coverage', () => {
                 maxRetries: 0
             })).rejects.toThrow('Fails');
 
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
     });
 
-    describe('isAbortError', () => {
+    describe(isAbortError, () => {
         it('should return true for AbortError', () => {
             const error = new Error('Aborted');
             error.name = 'AbortError';
 
-            expect(isAbortError(error)).toBe(true);
+            expect(isAbortError(error)).toBeTruthy();
         });
 
         it('should return true for TimeoutError', () => {
             const error = new Error('Timeout');
             error.name = 'TimeoutError';
 
-            expect(isAbortError(error)).toBe(true);
+            expect(isAbortError(error)).toBeTruthy();
         });
 
         it('should return true for errors with "aborted" in message', () => {
             const error = new Error('Request was aborted');
 
-            expect(isAbortError(error)).toBe(true);
+            expect(isAbortError(error)).toBeTruthy();
         });
 
         it('should return true for errors with "cancelled" in message', () => {
             const error = new Error('Operation was cancelled');
 
-            expect(isAbortError(error)).toBe(true);
+            expect(isAbortError(error)).toBeTruthy();
         });
 
         it('should return false for regular errors', () => {
             const error = new Error('Regular error');
 
-            expect(isAbortError(error)).toBe(false);
+            expect(isAbortError(error)).toBeFalsy();
         });
 
         it('should return false for non-Error objects', () => {
-            expect(isAbortError('string')).toBe(false);
-            expect(isAbortError(123)).toBe(false);
-            expect(isAbortError(null)).toBe(false);
-            expect(isAbortError(undefined)).toBe(false);
-            expect(isAbortError({})).toBe(false);
+            expect(isAbortError('string')).toBeFalsy();
+            expect(isAbortError(123)).toBeFalsy();
+            expect(isAbortError(null)).toBeFalsy();
+            expect(isAbortError(undefined)).toBeFalsy();
+            expect(isAbortError({})).toBeFalsy();
         });
 
         it('should handle errors with mixed case messages', () => {
             const error1 = new Error('Request was ABORTED');
             const error2 = new Error('Operation was CANCELLED');
 
-            expect(isAbortError(error1)).toBe(true);
-            expect(isAbortError(error2)).toBe(true);
+            expect(isAbortError(error1)).toBeTruthy();
+            expect(isAbortError(error2)).toBeTruthy();
         });
     });
 
-    describe('raceWithAbort', () => {
+    describe(raceWithAbort, () => {
         beforeEach(() => {
             vi.useFakeTimers();
         });

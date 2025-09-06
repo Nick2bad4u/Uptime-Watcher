@@ -96,8 +96,8 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             const results = await Promise.allSettled(asyncOperations);
 
             expect(results).toHaveLength(5);
-            expect(results.some((r) => r.status === "fulfilled")).toBe(true);
-            expect(results.some((r) => r.status === "rejected")).toBe(true);
+            expect(results.some((r) => r.status === "fulfilled")).toBeTruthy();
+            expect(results.some((r) => r.status === "rejected")).toBeTruthy();
         });
     });
 
@@ -138,7 +138,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                             timeout: 5000,
                             retries: 3,
                         };
-                        expect(defaultConfig.enabled).toBe(true);
+                        expect(defaultConfig.enabled).toBeTruthy();
                         return;
                     }
 
@@ -210,13 +210,13 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
 
                     if (Array.isArray(data)) {
                         const processed = data.filter(Boolean);
-                        expect(Array.isArray(processed)).toBe(true);
+                        expect(Array.isArray(processed)).toBeTruthy();
                         return;
                     }
 
                     if (typeof data === "object") {
                         const entries = Object.entries(data);
-                        expect(Array.isArray(entries)).toBe(true);
+                        expect(Array.isArray(entries)).toBeTruthy();
                         return;
                     }
 
@@ -240,14 +240,14 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             const result2 = false;
 
             expect(typeof result1).toBe("boolean");
-            expect(result1).toBe(true);
+            expect(result1).toBeTruthy();
 
             expect(typeof result2).toBe("boolean");
-            expect(result2).toBe(false);
+            expect(result2).toBeFalsy();
 
             // Test validation logic exists
             const hasValidationLogic = typeof Boolean === "function";
-            expect(hasValidationLogic).toBe(true);
+            expect(hasValidationLogic).toBeTruthy();
         });
     });
 
@@ -275,8 +275,8 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             const results = await Promise.all(operations);
 
             expect(results).toHaveLength(50);
-            expect(results.every((result) => typeof result === "string")).toBe(
-                true
+            expect(results.every((result) => typeof result === "string")).toBeTruthy(
+                
             );
             expect(
                 results.every(
@@ -284,7 +284,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                         typeof result === "string" &&
                         String(result).startsWith("result-")
                 )
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should handle mixed success/failure scenarios", async ({
@@ -306,8 +306,8 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             const results = await Promise.allSettled(mixedOperations);
 
             expect(results).toHaveLength(20);
-            expect(results.some((r) => r.status === "fulfilled")).toBe(true);
-            expect(results.some((r) => r.status === "rejected")).toBe(true);
+            expect(results.some((r) => r.status === "fulfilled")).toBeTruthy();
+            expect(results.some((r) => r.status === "rejected")).toBeTruthy();
         });
     });
 
@@ -538,7 +538,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                     if (typeof event === "string" && event) {
                         listeners.set(event, []);
                         const eventListeners = listeners.get(event);
-                        expect(Array.isArray(eventListeners)).toBe(true);
+                        expect(Array.isArray(eventListeners)).toBeTruthy();
                     }
                 }).not.toThrow();
             }

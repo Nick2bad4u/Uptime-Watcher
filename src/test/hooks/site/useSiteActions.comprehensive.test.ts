@@ -111,7 +111,7 @@ describe("useSiteActions Hook", () => {
             });
 
             // Should call the action without throwing
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle start monitoring without monitor", async ({
@@ -132,7 +132,7 @@ describe("useSiteActions Hook", () => {
             });
 
             // Should handle gracefully
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle start site monitoring", async ({
@@ -153,7 +153,7 @@ describe("useSiteActions Hook", () => {
             });
 
             // Should call the action without throwing
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 
@@ -176,7 +176,7 @@ describe("useSiteActions Hook", () => {
             });
 
             // Should call the action without throwing
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle stop monitoring with disabled monitoring", async ({
@@ -199,7 +199,7 @@ describe("useSiteActions Hook", () => {
             });
 
             // Should handle gracefully
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle stop site monitoring", async ({ task, annotate }) => {
@@ -217,7 +217,7 @@ describe("useSiteActions Hook", () => {
             });
 
             // Should call the action without throwing
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 
@@ -237,7 +237,7 @@ describe("useSiteActions Hook", () => {
             });
 
             // Should call the action without throwing
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle card click without monitor", async ({
@@ -258,7 +258,7 @@ describe("useSiteActions Hook", () => {
             });
 
             // Should handle gracefully
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 
@@ -278,7 +278,7 @@ describe("useSiteActions Hook", () => {
             });
 
             // Should call the action without throwing
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle check now with different monitor types", async ({
@@ -302,7 +302,7 @@ describe("useSiteActions Hook", () => {
             });
 
             // Should handle different configurations
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 
@@ -327,7 +327,7 @@ describe("useSiteActions Hook", () => {
                 result.current.handleCheckNow();
             });
 
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle null/undefined inputs", async ({
@@ -350,7 +350,7 @@ describe("useSiteActions Hook", () => {
                 result.current.handleCheckNow();
             });
 
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 
@@ -498,7 +498,7 @@ describe("useSiteActions Hook", () => {
                 }
             });
 
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle concurrent operations", async ({
@@ -520,7 +520,7 @@ describe("useSiteActions Hook", () => {
                 result.current.handleCardClick();
             });
 
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 });

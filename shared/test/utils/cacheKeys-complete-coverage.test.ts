@@ -360,10 +360,10 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            expect(isStandardizedCacheKey("config:setting")).toBe(true);
-            expect(isStandardizedCacheKey("monitor:id-123")).toBe(true);
-            expect(isStandardizedCacheKey("site:site-456")).toBe(true);
-            expect(isStandardizedCacheKey("validation:test-123")).toBe(true);
+            expect(isStandardizedCacheKey("config:setting")).toBeTruthy();
+            expect(isStandardizedCacheKey("monitor:id-123")).toBeTruthy();
+            expect(isStandardizedCacheKey("site:site-456")).toBeTruthy();
+            expect(isStandardizedCacheKey("validation:test-123")).toBeTruthy();
         });
 
         it("should validate correct 3-part keys", async ({
@@ -378,14 +378,14 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            expect(isStandardizedCacheKey("config:validation:setting")).toBe(
-                true
+            expect(isStandardizedCacheKey("config:validation:setting")).toBeTruthy(
+                
             );
-            expect(isStandardizedCacheKey("monitor:site:site-123")).toBe(true);
-            expect(isStandardizedCacheKey("site:loading:site-456")).toBe(true);
+            expect(isStandardizedCacheKey("monitor:site:site-123")).toBeTruthy();
+            expect(isStandardizedCacheKey("site:loading:site-456")).toBeTruthy();
             expect(
                 isStandardizedCacheKey("validation:monitor:config-789")
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should reject keys with invalid part counts", async ({
@@ -400,11 +400,11 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isStandardizedCacheKey("")).toBe(false);
-            expect(isStandardizedCacheKey("single")).toBe(false);
-            expect(isStandardizedCacheKey("one:two:three:four")).toBe(false);
-            expect(isStandardizedCacheKey("too:many:parts:here:now")).toBe(
-                false
+            expect(isStandardizedCacheKey("")).toBeFalsy();
+            expect(isStandardizedCacheKey("single")).toBeFalsy();
+            expect(isStandardizedCacheKey("one:two:three:four")).toBeFalsy();
+            expect(isStandardizedCacheKey("too:many:parts:here:now")).toBeFalsy(
+                
             );
         });
 
@@ -420,8 +420,8 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isStandardizedCacheKey(":identifier")).toBe(false);
-            expect(isStandardizedCacheKey(":operation:identifier")).toBe(false);
+            expect(isStandardizedCacheKey(":identifier")).toBeFalsy();
+            expect(isStandardizedCacheKey(":operation:identifier")).toBeFalsy();
         });
 
         it("should reject keys with invalid prefixes", async ({
@@ -436,11 +436,11 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isStandardizedCacheKey("invalid:identifier")).toBe(false);
-            expect(isStandardizedCacheKey("wrong:operation:identifier")).toBe(
-                false
+            expect(isStandardizedCacheKey("invalid:identifier")).toBeFalsy();
+            expect(isStandardizedCacheKey("wrong:operation:identifier")).toBeFalsy(
+                
             );
-            expect(isStandardizedCacheKey("unknown:test")).toBe(false);
+            expect(isStandardizedCacheKey("unknown:test")).toBeFalsy();
         });
 
         it("should handle edge cases", async ({ task, annotate }) => {
@@ -452,8 +452,8 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isStandardizedCacheKey("monitor::")).toBe(false); // empty operation in 3-part
-            expect(isStandardizedCacheKey("site::identifier")).toBe(false); // empty operation
+            expect(isStandardizedCacheKey("monitor::")).toBeFalsy(); // empty operation in 3-part
+            expect(isStandardizedCacheKey("site::identifier")).toBeFalsy(); // empty operation
         });
     });
 
@@ -660,7 +660,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             ];
 
             for (const key of keys) {
-                expect(isStandardizedCacheKey(key)).toBe(true);
+                expect(isStandardizedCacheKey(key)).toBeTruthy();
                 const parsed = parseCacheKey(key);
                 expect(parsed.prefix).toBeDefined();
                 expect(parsed.identifier).toBeDefined();
@@ -692,7 +692,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
 
             // Validate all keys
             for (const key of keys) {
-                expect(isStandardizedCacheKey(key)).toBe(true);
+                expect(isStandardizedCacheKey(key)).toBeTruthy();
                 const parsed = parseCacheKey(key as StandardizedCacheKey);
                 expect(parsed).toBeDefined();
             }

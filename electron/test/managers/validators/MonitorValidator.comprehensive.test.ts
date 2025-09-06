@@ -89,7 +89,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             const monitor = createMockMonitor({ checkInterval: 0 });
 
             const result = validator.shouldApplyDefaultInterval(monitor);
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return false when checkInterval is not 0", async ({
@@ -104,7 +104,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             const monitor = createMockMonitor({ checkInterval: 30_000 });
 
             const result = validator.shouldApplyDefaultInterval(monitor);
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when checkInterval is a positive number", async ({
@@ -119,7 +119,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             const monitor = createMockMonitor({ checkInterval: 60_000 });
 
             const result = validator.shouldApplyDefaultInterval(monitor);
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should return false when checkInterval is negative", async ({
@@ -134,7 +134,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             const monitor = createMockMonitor({ checkInterval: -1000 });
 
             const result = validator.shouldApplyDefaultInterval(monitor);
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -156,7 +156,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             const result = validator.validateMonitorConfiguration(monitor);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.errors).toHaveLength(0);
         });
 
@@ -179,7 +179,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             const result = validator.validateMonitorConfiguration(monitor);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.errors).toHaveLength(0);
         });
 
@@ -200,7 +200,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             const result = validator.validateMonitorConfiguration(monitor);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors).toHaveLength(1);
             expect(result.errors[0]).toContain("Invalid monitor type");
             expect(result.errors[0]).toContain("Available types:");
@@ -223,7 +223,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             const result = validator.validateMonitorConfiguration(monitor);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors).toHaveLength(1);
             expect(result.errors[0]).toBe(
                 "url: Must be a valid HTTP or HTTPS URL"
@@ -253,7 +253,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
                 });
 
                 const result = validator.validateMonitorConfiguration(monitor);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
             }
         });
 
@@ -275,7 +275,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
                 });
 
                 const result = validator.validateMonitorConfiguration(monitor);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
             }
         });
 
@@ -294,7 +294,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             });
 
             const result = validator.validateMonitorConfiguration(monitor);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
         });
 
         it("should handle monitors with different responseTime values", async ({
@@ -321,7 +321,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
                 });
 
                 const result = validator.validateMonitorConfiguration(monitor);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
             }
         });
     });
@@ -341,7 +341,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             // This calls validateMonitorTypeSpecific internally
             const result =
                 validator.validateMonitorConfiguration(validHttpMonitor);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
         });
 
         it("should provide list of available types in error message", async ({
@@ -360,7 +360,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             const result =
                 validator.validateMonitorConfiguration(invalidMonitor);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors[0]).toContain("http, port");
         });
 
@@ -380,7 +380,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             const result =
                 validator.validateMonitorConfiguration(monitorWithBadData);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors).toContain(
                 "Invalid monitor type `invalid`. Available types: `http, port`"
             );
@@ -397,7 +397,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             const emptyMonitor = {} as Site["monitors"][0];
 
             const result = validator.validateMonitorConfiguration(emptyMonitor);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
@@ -424,7 +424,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             const result =
                 validator.validateMonitorConfiguration(nullPropsMonitor);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
@@ -478,7 +478,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
                 delete (monitor as any).url; // Remove URL for port monitor
 
                 const result = validator.validateMonitorConfiguration(monitor);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
             }
         });
 
@@ -506,7 +506,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
                 });
 
                 const result = validator.validateMonitorConfiguration(monitor);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
             }
         });
     });

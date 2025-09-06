@@ -28,6 +28,6 @@ describe("Debug Availability Function Source", () => {
         expect(criticalResult).toBeDefined();
 
         // This will help understand the actual logic
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 });

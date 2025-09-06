@@ -31,14 +31,14 @@ describe("Schemas - Final Final Coverage", () => {
                     "test-value"
                 );
                 // Should return errors instead of throwing
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
                 expect(
                     result.errors.some(
                         (err) =>
                             err.includes("Unknown field") ||
                             err.includes("unknownField")
                     )
-                ).toBe(true);
+                ).toBeTruthy();
             } catch (error) {
                 // If it throws, it should be the "Unknown field" error
                 expect(error).toBeInstanceOf(Error);
@@ -65,7 +65,7 @@ describe("Schemas - Final Final Coverage", () => {
                     "nonExistentField",
                     "value"
                 );
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
                 expect(result.errors.length).toBeGreaterThan(0);
             } catch (error) {
                 expect(error).toBeInstanceOf(Error);
@@ -93,7 +93,7 @@ describe("Schemas - Final Final Coverage", () => {
                 userAgent: undefined, // This might trigger the optional field logic
             });
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
@@ -167,7 +167,7 @@ describe("Schemas - Final Final Coverage", () => {
                 "someField",
                 "someValue"
             );
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors).toContain(
                 "Unknown monitor type: invalid-type"
             );

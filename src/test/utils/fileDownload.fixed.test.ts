@@ -750,7 +750,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
                     await handleSQLiteBackupDownload(mockDownloadFunction);
 
-                    expect(mockDownloadFunction).toHaveBeenCalledOnce();
+                    expect(mockDownloadFunction).toHaveBeenCalledTimes(1);
                     expect(globalThis.Blob).toHaveBeenCalledWith([mockDataArray], {
                         type: "application/x-sqlite3",
                     });
@@ -774,7 +774,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
                         handleSQLiteBackupDownload(mockDownloadFunction)
                     ).rejects.toThrow(errorMessage);
 
-                    expect(mockDownloadFunction).toHaveBeenCalledOnce();
+                    expect(mockDownloadFunction).toHaveBeenCalledTimes(1);
                 }
             );
 

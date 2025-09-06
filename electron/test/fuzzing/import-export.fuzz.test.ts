@@ -95,9 +95,9 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                             // If it succeeds, should return valid structure
                             expect(result).toHaveProperty("sites");
                             expect(result).toHaveProperty("settings");
-                            expect(Array.isArray(result.sites)).toBe(true);
-                            expect(typeof result.settings === "object").toBe(
-                                true
+                            expect(Array.isArray(result.sites)).toBeTruthy();
+                            expect(typeof result.settings === "object").toBeTruthy(
+                                
                             );
                         } catch (error) {
                             // Should throw meaningful errors, not crash
@@ -219,7 +219,7 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                             // Validate result structure
                             expect(result).toHaveProperty("sites");
                             expect(result).toHaveProperty("settings");
-                            expect(Array.isArray(result.sites)).toBe(true);
+                            expect(Array.isArray(result.sites)).toBeTruthy();
 
                             // Should not have extra properties in result
                             expect(result).not.toHaveProperty("maliciousData");
@@ -335,13 +335,13 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                         expect(parsed).toHaveProperty("exportedAt");
 
                         // Sites should be array
-                        expect(Array.isArray(parsed.sites)).toBe(true);
+                        expect(Array.isArray(parsed.sites)).toBeTruthy();
 
                         // Settings should be object
-                        expect(typeof parsed.settings === "object").toBe(true);
+                        expect(typeof parsed.settings === "object").toBeTruthy();
 
                         // Version should be string
-                        expect(typeof parsed.version === "string").toBe(true);
+                        expect(typeof parsed.version === "string").toBeTruthy();
 
                         // ExportedAt should be valid ISO date
                         expect(() =>
@@ -427,14 +427,14 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                             expect(importResult.settings).toBeDefined();
 
                             // Sites should be an array
-                            expect(Array.isArray(importResult.sites)).toBe(
-                                true
+                            expect(Array.isArray(importResult.sites)).toBeTruthy(
+                                
                             );
 
                             // Settings should be an object
                             expect(
                                 typeof importResult.settings === "object"
-                            ).toBe(true);
+                            ).toBeTruthy();
 
                             // Site identifiers should be preserved
                             const originalIdentifiers = originalData.sites

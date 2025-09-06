@@ -68,11 +68,11 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
             ).toBe("validation:monitor-type:http");
 
             // Test utility functions
-            expect(cacheKeysModule.isStandardizedCacheKey("config:test")).toBe(
-                true
+            expect(cacheKeysModule.isStandardizedCacheKey("config:test")).toBeTruthy(
+                
             );
-            expect(cacheKeysModule.isStandardizedCacheKey("invalid")).toBe(
-                false
+            expect(cacheKeysModule.isStandardizedCacheKey("invalid")).toBeFalsy(
+                
             );
 
             const parsedKey = cacheKeysModule.parseCacheKey(
@@ -111,8 +111,8 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
 
             // Test environment variable access
             const envVar = environmentModule.getEnvVar("NODE_ENV");
-            expect(typeof envVar === "string" || envVar === undefined).toBe(
-                true
+            expect(typeof envVar === "string" || envVar === undefined).toBeTruthy(
+                
             );
         });
     });
@@ -140,10 +140,10 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
             // Test isKnownErrorMessage function
             expect(
                 errorCatalogModule.isKnownErrorMessage("Site not found")
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 errorCatalogModule.isKnownErrorMessage("Unknown error")
-            ).toBe(false);
+            ).toBeFalsy();
 
             // Test ERROR_CATALOG access
             expect(
@@ -180,7 +180,7 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
             ];
 
             for (const key of complexKeys) {
-                expect(cacheKeysModule.isStandardizedCacheKey(key)).toBe(true);
+                expect(cacheKeysModule.isStandardizedCacheKey(key)).toBeTruthy();
             }
 
             // Error message formatting scenarios with proper typing

@@ -195,7 +195,7 @@ describe("High-Impact Branch Coverage Tests", () => {
                             "invalid-type" as any,
                             {}
                         );
-                    expect(invalidTypeResult.success).toBe(false);
+                    expect(invalidTypeResult.success).toBeFalsy();
                     expect(invalidTypeResult.errors.length).toBeGreaterThan(0);
 
                     // Test null data
@@ -203,35 +203,35 @@ describe("High-Impact Branch Coverage Tests", () => {
                         "http",
                         null
                     );
-                    expect(nullResult.success).toBe(false);
+                    expect(nullResult.success).toBeFalsy();
 
                     // Test undefined data
                     const undefinedResult =
                         validationModule.validateMonitorData("http", undefined);
-                    expect(undefinedResult.success).toBe(false);
+                    expect(undefinedResult.success).toBeFalsy();
 
                     // Test with Symbol (non-serializable)
                     const symbolResult = validationModule.validateMonitorData(
                         "http",
                         Symbol("test")
                     );
-                    expect(symbolResult.success).toBe(false);
+                    expect(symbolResult.success).toBeFalsy();
                 }
 
                 if (validationModule.validateSiteData) {
                     // Test various invalid site data
                     const nullSiteResult =
                         validationModule.validateSiteData(null);
-                    expect(nullSiteResult.success).toBe(false);
+                    expect(nullSiteResult.success).toBeFalsy();
 
                     const invalidSiteResult =
                         validationModule.validateSiteData("string");
-                    expect(invalidSiteResult.success).toBe(false);
+                    expect(invalidSiteResult.success).toBeFalsy();
 
                     const symbolSiteResult = validationModule.validateSiteData(
                         Symbol("invalid")
                     );
-                    expect(symbolSiteResult.success).toBe(false);
+                    expect(symbolSiteResult.success).toBeFalsy();
                 }
 
                 if (validationModule.validateMonitorField) {
@@ -242,7 +242,7 @@ describe("High-Impact Branch Coverage Tests", () => {
                             "unknownField",
                             "value"
                         );
-                    expect(unknownFieldResult.success).toBe(false);
+                    expect(unknownFieldResult.success).toBeFalsy();
 
                     const invalidValueResult =
                         validationModule.validateMonitorField(
@@ -250,7 +250,7 @@ describe("High-Impact Branch Coverage Tests", () => {
                             "url",
                             null
                         );
-                    expect(invalidValueResult.success).toBe(false);
+                    expect(invalidValueResult.success).toBeFalsy();
                 }
             } catch (importError) {
                 expect(importError).toBeDefined();
@@ -283,7 +283,7 @@ describe("High-Impact Branch Coverage Tests", () => {
                         "{invalid json",
                         validator
                     );
-                    expect(invalidResult.success).toBe(false);
+                    expect(invalidResult.success).toBeFalsy();
                     expect(invalidResult.error).toBeDefined();
 
                     // Test valid JSON with validator
@@ -291,11 +291,11 @@ describe("High-Impact Branch Coverage Tests", () => {
                         '"valid"',
                         validator
                     );
-                    expect(validResult.success).toBe(true);
+                    expect(validResult.success).toBeTruthy();
 
                     const invalidValidationResult =
                         jsonSafetyModule.safeJsonParse("123", validator);
-                    expect(invalidValidationResult.success).toBe(false);
+                    expect(invalidValidationResult.success).toBeFalsy();
                 }
 
                 if (jsonSafetyModule.safeJsonStringify) {
@@ -305,14 +305,14 @@ describe("High-Impact Branch Coverage Tests", () => {
 
                     const circularResult =
                         jsonSafetyModule.safeJsonStringify(circular);
-                    expect(circularResult.success).toBe(false);
+                    expect(circularResult.success).toBeFalsy();
                     expect(circularResult.error).toBeDefined();
                     expect(
                         circularResult.error!.includes("circular") ||
                             circularResult.error!.includes(
                                 "Converting circular"
                             )
-                    ).toBe(true);
+                    ).toBeTruthy();
 
                     // Test objects with getters that throw
                     const problematic = {
@@ -324,13 +324,13 @@ describe("High-Impact Branch Coverage Tests", () => {
 
                     const problematicResult =
                         jsonSafetyModule.safeJsonStringify(problematic);
-                    expect(problematicResult.success).toBe(false);
+                    expect(problematicResult.success).toBeFalsy();
 
                     // Test successful case
                     const goodResult = jsonSafetyModule.safeJsonStringify({
                         test: "value",
                     });
-                    expect(goodResult.success).toBe(true);
+                    expect(goodResult.success).toBeTruthy();
                     expect(goodResult.data).toContain("test");
                 }
             } catch (importError) {
@@ -358,26 +358,26 @@ describe("High-Impact Branch Coverage Tests", () => {
 
                 if (typeGuardsModule.isError) {
                     // Test Error instances
-                    expect(typeGuardsModule.isError(new Error("test"))).toBe(
-                        true
+                    expect(typeGuardsModule.isError(new Error("test"))).toBeTruthy(
+                        
                     );
                     expect(
                         typeGuardsModule.isError(new TypeError("type error"))
-                    ).toBe(true);
+                    ).toBeTruthy();
                     expect(
                         typeGuardsModule.isError(
                             new ReferenceError("ref error")
                         )
-                    ).toBe(true);
+                    ).toBeTruthy();
 
                     // Test non-Error objects
-                    expect(typeGuardsModule.isError("error")).toBe(false);
-                    expect(typeGuardsModule.isError({ message: "error" })).toBe(
-                        false
+                    expect(typeGuardsModule.isError("error")).toBeFalsy();
+                    expect(typeGuardsModule.isError({ message: "error" })).toBeFalsy(
+                        
                     );
-                    expect(typeGuardsModule.isError(null)).toBe(false);
-                    expect(typeGuardsModule.isError(undefined)).toBe(false);
-                    expect(typeGuardsModule.isError([])).toBe(false);
+                    expect(typeGuardsModule.isError(null)).toBeFalsy();
+                    expect(typeGuardsModule.isError(undefined)).toBeFalsy();
+                    expect(typeGuardsModule.isError([])).toBeFalsy();
 
                     // Test custom Error subclasses
                     class CustomError extends Error {
@@ -386,55 +386,55 @@ describe("High-Impact Branch Coverage Tests", () => {
                             this.name = "CustomError";
                         }
                     }
-                    expect(typeGuardsModule.isError(new CustomError())).toBe(
-                        true
+                    expect(typeGuardsModule.isError(new CustomError())).toBeTruthy(
+                        
                     );
                 }
 
                 if (typeGuardsModule.isDate) {
                     // Test Date instances
-                    expect(typeGuardsModule.isDate(new Date())).toBe(true);
+                    expect(typeGuardsModule.isDate(new Date())).toBeTruthy();
                     expect(
                         typeGuardsModule.isDate(new Date("2023-01-01"))
-                    ).toBe(true);
+                    ).toBeTruthy();
 
                     // Test invalid dates
-                    expect(typeGuardsModule.isDate(new Date("invalid"))).toBe(
-                        false
+                    expect(typeGuardsModule.isDate(new Date("invalid"))).toBeFalsy(
+                        
                     );
-                    expect(typeGuardsModule.isDate(Date.prototype)).toBe(false);
+                    expect(typeGuardsModule.isDate(Date.prototype)).toBeFalsy();
 
                     // Test non-Date objects
-                    expect(typeGuardsModule.isDate("2023-01-01")).toBe(false);
-                    expect(typeGuardsModule.isDate(1_672_531_200_000)).toBe(
-                        false
+                    expect(typeGuardsModule.isDate("2023-01-01")).toBeFalsy();
+                    expect(typeGuardsModule.isDate(1_672_531_200_000)).toBeFalsy(
+                        
                     );
                     expect(
                         typeGuardsModule.isDate({ getTime: () => Date.now() })
-                    ).toBe(false);
+                    ).toBeFalsy();
                 }
 
                 if (typeGuardsModule.isFiniteNumber) {
                     // Test valid numbers
-                    expect(typeGuardsModule.isFiniteNumber(42)).toBe(true);
-                    expect(typeGuardsModule.isFiniteNumber(0)).toBe(true);
-                    expect(typeGuardsModule.isFiniteNumber(-42)).toBe(true);
-                    expect(typeGuardsModule.isFiniteNumber(3.14)).toBe(true);
+                    expect(typeGuardsModule.isFiniteNumber(42)).toBeTruthy();
+                    expect(typeGuardsModule.isFiniteNumber(0)).toBeTruthy();
+                    expect(typeGuardsModule.isFiniteNumber(-42)).toBeTruthy();
+                    expect(typeGuardsModule.isFiniteNumber(3.14)).toBeTruthy();
 
                     // Test invalid numbers
-                    expect(typeGuardsModule.isFiniteNumber(Infinity)).toBe(
-                        false
+                    expect(typeGuardsModule.isFiniteNumber(Infinity)).toBeFalsy(
+                        
                     );
-                    expect(typeGuardsModule.isFiniteNumber(-Infinity)).toBe(
-                        false
+                    expect(typeGuardsModule.isFiniteNumber(-Infinity)).toBeFalsy(
+                        
                     );
-                    expect(typeGuardsModule.isFiniteNumber(Number.NaN)).toBe(
-                        false
+                    expect(typeGuardsModule.isFiniteNumber(Number.NaN)).toBeFalsy(
+                        
                     );
-                    expect(typeGuardsModule.isFiniteNumber("42")).toBe(false);
-                    expect(typeGuardsModule.isFiniteNumber(null)).toBe(false);
-                    expect(typeGuardsModule.isFiniteNumber(undefined)).toBe(
-                        false
+                    expect(typeGuardsModule.isFiniteNumber("42")).toBeFalsy();
+                    expect(typeGuardsModule.isFiniteNumber(null)).toBeFalsy();
+                    expect(typeGuardsModule.isFiniteNumber(undefined)).toBeFalsy(
+                        
                     );
                 }
             } catch (importError) {
@@ -657,19 +657,19 @@ describe("High-Impact Branch Coverage Tests", () => {
                     // Test valid categories and events
                     expect(
                         eventTypesModule.isEventOfCategory("site:added", "SITE")
-                    ).toBe(true);
+                    ).toBeTruthy();
                     expect(
                         eventTypesModule.isEventOfCategory(
                             "monitor:up",
                             "MONITOR"
                         )
-                    ).toBe(true);
+                    ).toBeTruthy();
                     expect(
                         eventTypesModule.isEventOfCategory(
                             "system:error",
                             "SYSTEM"
                         )
-                    ).toBe(true);
+                    ).toBeTruthy();
 
                     // Test invalid combinations
                     expect(
@@ -677,16 +677,16 @@ describe("High-Impact Branch Coverage Tests", () => {
                             "site:added",
                             "MONITOR"
                         )
-                    ).toBe(false);
+                    ).toBeFalsy();
                     expect(
                         eventTypesModule.isEventOfCategory("monitor:up", "SITE")
-                    ).toBe(false);
+                    ).toBeFalsy();
                     expect(
                         eventTypesModule.isEventOfCategory(
                             "unknown:event",
                             "SITE"
                         )
-                    ).toBe(false);
+                    ).toBeFalsy();
 
                     // Test edge cases with null/undefined (these will test the default case)
                     expect(
@@ -694,16 +694,16 @@ describe("High-Impact Branch Coverage Tests", () => {
                             null as any,
                             null as any
                         )
-                    ).toBe(false);
+                    ).toBeFalsy();
                     expect(
                         eventTypesModule.isEventOfCategory(
                             undefined as any,
                             undefined as any
                         )
-                    ).toBe(false);
+                    ).toBeFalsy();
                     expect(
                         eventTypesModule.isEventOfCategory("", "" as any)
-                    ).toBe(false);
+                    ).toBeFalsy();
                 }
 
                 if (eventTypesModule.getEventPriority) {

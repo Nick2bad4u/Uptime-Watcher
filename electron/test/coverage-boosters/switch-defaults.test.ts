@@ -98,8 +98,8 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                 }
             };
 
-            expect(getEnvironmentConfig("production").debug).toBe(false);
-            expect(getEnvironmentConfig("development").debug).toBe(true);
+            expect(getEnvironmentConfig("production").debug).toBeFalsy();
+            expect(getEnvironmentConfig("development").debug).toBeTruthy();
             expect(getEnvironmentConfig("test").logging).toBe("none");
             expect(getEnvironmentConfig("staging").logging).toBe("warn"); // Default case
         });
@@ -318,17 +318,17 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                     "b",
                     "c",
                 ])
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 isStringArray([
                     1,
                     2,
                     3,
                 ])
-            ).toBe(false);
-            expect(isStringArray([])).toBe(true);
-            expect(isStringArray("not array")).toBe(false);
-            expect(isStringArray(["a", 1])).toBe(false);
+            ).toBeFalsy();
+            expect(isStringArray([])).toBeTruthy();
+            expect(isStringArray("not array")).toBeFalsy();
+            expect(isStringArray(["a", 1])).toBeFalsy();
 
             expect(
                 isNumberArray([
@@ -336,10 +336,10 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                     2,
                     3,
                 ])
-            ).toBe(true);
-            expect(isNumberArray(["a", "b"])).toBe(false);
-            expect(isNumberArray([])).toBe(true);
-            expect(isNumberArray([1, "a"])).toBe(false);
+            ).toBeTruthy();
+            expect(isNumberArray(["a", "b"])).toBeFalsy();
+            expect(isNumberArray([])).toBeTruthy();
+            expect(isNumberArray([1, "a"])).toBeFalsy();
         });
     });
     describe("Fallback value patterns", () => {
@@ -376,7 +376,7 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             expect(getWithFallback(testObj, "b", "fallback")).toBe("fallback");
             expect(getWithFallback(testObj, "c", "fallback")).toBe("fallback");
             expect(getWithFallback(testObj, "d", "fallback")).toBe(0);
-            expect(getWithFallback(testObj, "e", "fallback")).toBe(false);
+            expect(getWithFallback(testObj, "e", "fallback")).toBeFalsy();
             expect(getWithFallback(testObj, "missing", "fallback")).toBe(
                 "fallback"
             );

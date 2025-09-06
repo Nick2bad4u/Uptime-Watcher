@@ -11,7 +11,7 @@ import {
 import type { MonitorType } from "../../../../shared/types.js";
 
 describe("Monitor Types Utility", () => {
-    describe("getBaseMonitorTypes", () => {
+    describe(getBaseMonitorTypes, () => {
         it("should return array of base monitor types", async ({
             task,
             annotate,
@@ -23,7 +23,7 @@ describe("Monitor Types Utility", () => {
 
             const types = getBaseMonitorTypes();
 
-            expect(Array.isArray(types)).toBe(true);
+            expect(Array.isArray(types)).toBeTruthy();
             expect(types.length).toBeGreaterThan(0);
         });
 
@@ -110,7 +110,7 @@ describe("Monitor Types Utility", () => {
         });
     });
 
-    describe("isBaseMonitorType", () => {
+    describe(isBaseMonitorType, () => {
         it("should return true for valid base monitor types", async ({
             task,
             annotate,
@@ -120,8 +120,8 @@ describe("Monitor Types Utility", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            expect(isBaseMonitorType("http")).toBe(true);
-            expect(isBaseMonitorType("port")).toBe(true);
+            expect(isBaseMonitorType("http")).toBeTruthy();
+            expect(isBaseMonitorType("port")).toBeTruthy();
         });
 
         it("should return false for invalid monitor types", async ({
@@ -133,8 +133,8 @@ describe("Monitor Types Utility", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            expect(isBaseMonitorType("invalid")).toBe(false);
-            expect(isBaseMonitorType("tcp")).toBe(false);
+            expect(isBaseMonitorType("invalid")).toBeFalsy();
+            expect(isBaseMonitorType("tcp")).toBeFalsy();
         });
 
         it("should return false for empty string", async ({
@@ -146,7 +146,7 @@ describe("Monitor Types Utility", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isBaseMonitorType("")).toBe(false);
+            expect(isBaseMonitorType("")).toBeFalsy();
         });
 
         it("should return false for null and undefined", async ({
@@ -158,8 +158,8 @@ describe("Monitor Types Utility", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isBaseMonitorType(null as any)).toBe(false);
-            expect(isBaseMonitorType(undefined as any)).toBe(false);
+            expect(isBaseMonitorType(null as any)).toBeFalsy();
+            expect(isBaseMonitorType(undefined as any)).toBeFalsy();
         });
 
         it("should return false for non-string types", async ({
@@ -171,10 +171,10 @@ describe("Monitor Types Utility", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isBaseMonitorType(123 as any)).toBe(false);
-            expect(isBaseMonitorType(true as any)).toBe(false);
-            expect(isBaseMonitorType({} as any)).toBe(false);
-            expect(isBaseMonitorType([] as any)).toBe(false);
+            expect(isBaseMonitorType(123 as any)).toBeFalsy();
+            expect(isBaseMonitorType(true as any)).toBeFalsy();
+            expect(isBaseMonitorType({} as any)).toBeFalsy();
+            expect(isBaseMonitorType([] as any)).toBeFalsy();
         });
 
         it("should be case sensitive", async ({ task, annotate }) => {
@@ -183,10 +183,10 @@ describe("Monitor Types Utility", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isBaseMonitorType("HTTP")).toBe(false);
-            expect(isBaseMonitorType("Http")).toBe(false);
-            expect(isBaseMonitorType("PORT")).toBe(false);
-            expect(isBaseMonitorType("Port")).toBe(false);
+            expect(isBaseMonitorType("HTTP")).toBeFalsy();
+            expect(isBaseMonitorType("Http")).toBeFalsy();
+            expect(isBaseMonitorType("PORT")).toBeFalsy();
+            expect(isBaseMonitorType("Port")).toBeFalsy();
         });
 
         it("should handle whitespace correctly", async ({ task, annotate }) => {
@@ -195,10 +195,10 @@ describe("Monitor Types Utility", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isBaseMonitorType(" http")).toBe(false);
-            expect(isBaseMonitorType("http ")).toBe(false);
-            expect(isBaseMonitorType(" http ")).toBe(false);
-            expect(isBaseMonitorType("\thttp\n")).toBe(false);
+            expect(isBaseMonitorType(" http")).toBeFalsy();
+            expect(isBaseMonitorType("http ")).toBeFalsy();
+            expect(isBaseMonitorType(" http ")).toBeFalsy();
+            expect(isBaseMonitorType("\thttp\n")).toBeFalsy();
         });
 
         it("should work with all base monitor types", async ({
@@ -213,7 +213,7 @@ describe("Monitor Types Utility", () => {
             const baseTypes = getBaseMonitorTypes();
 
             for (const type of baseTypes) {
-                expect(isBaseMonitorType(type)).toBe(true);
+                expect(isBaseMonitorType(type)).toBeTruthy();
             }
         });
 
@@ -308,7 +308,7 @@ describe("Monitor Types Utility", () => {
 
             // All returned types should be valid according to isBaseMonitorType
             for (const type of baseTypes) {
-                expect(isBaseMonitorType(type)).toBe(true);
+                expect(isBaseMonitorType(type)).toBeTruthy();
             }
         });
 
@@ -325,15 +325,15 @@ describe("Monitor Types Utility", () => {
 
             // Test that isBaseMonitorType works for all base types
             for (const type of baseTypes) {
-                expect(isBaseMonitorType(type)).toBe(true);
+                expect(isBaseMonitorType(type)).toBeTruthy();
 
                 // Test case sensitivity for each type
-                expect(isBaseMonitorType(type.toUpperCase())).toBe(false);
+                expect(isBaseMonitorType(type.toUpperCase())).toBeFalsy();
                 expect(
                     isBaseMonitorType(
                         type.charAt(0).toUpperCase() + type.slice(1)
                     )
-                ).toBe(false);
+                ).toBeFalsy();
             }
         });
 
@@ -375,7 +375,7 @@ describe("Monitor Types Utility", () => {
             ];
 
             for (const input of malformedInputs) {
-                expect(isBaseMonitorType(input)).toBe(false);
+                expect(isBaseMonitorType(input)).toBeFalsy();
             }
         });
 
@@ -396,7 +396,7 @@ describe("Monitor Types Utility", () => {
             ];
 
             for (const input of specialInputs) {
-                expect(isBaseMonitorType(input)).toBe(false);
+                expect(isBaseMonitorType(input)).toBeFalsy();
             }
         });
 
@@ -407,7 +407,7 @@ describe("Monitor Types Utility", () => {
             await annotate("Type: Business Logic", "type");
 
             const longString = `http${"x".repeat(1000)}`;
-            expect(isBaseMonitorType(longString)).toBe(false);
+            expect(isBaseMonitorType(longString)).toBeFalsy();
         });
 
         it("should handle numeric strings that might look like types", async ({
@@ -419,9 +419,9 @@ describe("Monitor Types Utility", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isBaseMonitorType("80")).toBe(false);
-            expect(isBaseMonitorType("443")).toBe(false);
-            expect(isBaseMonitorType("8080")).toBe(false);
+            expect(isBaseMonitorType("80")).toBeFalsy();
+            expect(isBaseMonitorType("443")).toBeFalsy();
+            expect(isBaseMonitorType("8080")).toBeFalsy();
         });
     });
 
@@ -437,8 +437,8 @@ describe("Monitor Types Utility", () => {
 
             // Test that repeated calls don't cause issues
             for (let i = 0; i < 100; i++) {
-                expect(isBaseMonitorType("http")).toBe(true);
-                expect(isBaseMonitorType("invalid")).toBe(false);
+                expect(isBaseMonitorType("http")).toBeTruthy();
+                expect(isBaseMonitorType("invalid")).toBeFalsy();
             }
         });
 
@@ -481,7 +481,7 @@ describe("Monitor Types Utility", () => {
             // Type guard example
             if (isBaseMonitorType("http")) {
                 // TypeScript knows this is a valid MonitorType
-                expect(true).toBe(true);
+                expect(true).toBeTruthy();
             }
         });
 

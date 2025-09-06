@@ -21,7 +21,7 @@ import { describe, expect, it } from "vitest";
 type MonitorType = "http" | "ping" | "port";
 
 describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
-    describe("getDefaultMonitorFields", () => {
+    describe(getDefaultMonitorFields, () => {
         it("should return default HTTP monitor fields", async ({
             task,
             annotate,
@@ -148,7 +148,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
         });
     });
 
-    describe("isHttpMonitorFields", () => {
+    describe(isHttpMonitorFields, () => {
         it("should return true for valid HTTP monitor fields", async ({
             task,
             annotate,
@@ -169,7 +169,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 headers: {},
             };
 
-            expect(isHttpMonitorFields(httpFields)).toBe(true);
+            expect(isHttpMonitorFields(httpFields)).toBeTruthy();
         });
 
         it("should return false for ping monitor fields", async ({
@@ -188,7 +188,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 host: "example.com",
             };
 
-            expect(isHttpMonitorFields(pingFields)).toBe(false);
+            expect(isHttpMonitorFields(pingFields)).toBeFalsy();
         });
 
         it("should return false for port monitor fields", async ({
@@ -212,7 +212,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 },
             };
 
-            expect(isHttpMonitorFields(portFields)).toBe(false);
+            expect(isHttpMonitorFields(portFields)).toBeFalsy();
         });
 
         it("should handle fields with both url and host (edge case)", async ({
@@ -233,7 +233,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             } as MonitorFormFields;
 
             // Should return false because host is present
-            expect(isHttpMonitorFields(mixedFields)).toBe(false);
+            expect(isHttpMonitorFields(mixedFields)).toBeFalsy();
         });
 
         it("should handle minimal HTTP fields", async ({ task, annotate }) => {
@@ -246,11 +246,11 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 url: "https://example.com",
             } as MonitorFormFields;
 
-            expect(isHttpMonitorFields(minimalFields)).toBe(true);
+            expect(isHttpMonitorFields(minimalFields)).toBeTruthy();
         });
     });
 
-    describe("isPingMonitorFields", () => {
+    describe(isPingMonitorFields, () => {
         it("should return true for valid ping monitor fields", async ({
             task,
             annotate,
@@ -267,7 +267,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 host: "example.com",
             };
 
-            expect(isPingMonitorFields(pingFields)).toBe(true);
+            expect(isPingMonitorFields(pingFields)).toBeTruthy();
         });
 
         it("should return false for HTTP monitor fields", async ({
@@ -290,7 +290,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 headers: {},
             };
 
-            expect(isPingMonitorFields(httpFields)).toBe(false);
+            expect(isPingMonitorFields(httpFields)).toBeFalsy();
         });
 
         it("should return false for port monitor fields", async ({
@@ -314,7 +314,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 },
             };
 
-            expect(isPingMonitorFields(portFields)).toBe(false);
+            expect(isPingMonitorFields(portFields)).toBeFalsy();
         });
 
         it("should validate host is a string", async ({ task, annotate }) => {
@@ -328,7 +328,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 checkInterval: 300_000,
             } as unknown as MonitorFormFields;
 
-            expect(isPingMonitorFields(invalidPingFields)).toBe(false);
+            expect(isPingMonitorFields(invalidPingFields)).toBeFalsy();
         });
 
         it("should return false when host is present but url is also present", async ({
@@ -345,7 +345,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 url: "https://example.com",
             } as MonitorFormFields;
 
-            expect(isPingMonitorFields(mixedFields)).toBe(false);
+            expect(isPingMonitorFields(mixedFields)).toBeFalsy();
         });
 
         it("should handle minimal ping fields", async ({ task, annotate }) => {
@@ -358,11 +358,11 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 host: "example.com",
             } as MonitorFormFields;
 
-            expect(isPingMonitorFields(minimalFields)).toBe(true);
+            expect(isPingMonitorFields(minimalFields)).toBeTruthy();
         });
     });
 
-    describe("isPortMonitorFields", () => {
+    describe(isPortMonitorFields, () => {
         it("should return true for valid port monitor fields", async ({
             task,
             annotate,
@@ -384,7 +384,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 },
             };
 
-            expect(isPortMonitorFields(portFields)).toBe(true);
+            expect(isPortMonitorFields(portFields)).toBeTruthy();
         });
 
         it("should return false for HTTP monitor fields", async ({
@@ -407,7 +407,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 headers: {},
             };
 
-            expect(isPortMonitorFields(httpFields)).toBe(false);
+            expect(isPortMonitorFields(httpFields)).toBeFalsy();
         });
 
         it("should return false for ping monitor fields", async ({
@@ -426,7 +426,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 host: "example.com",
             };
 
-            expect(isPortMonitorFields(pingFields)).toBe(false);
+            expect(isPortMonitorFields(pingFields)).toBeFalsy();
         });
 
         it("should validate both host and port are correct types", async ({
@@ -448,8 +448,8 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 port: "80",
             } as unknown as MonitorFormFields;
 
-            expect(isPortMonitorFields(invalidHostFields)).toBe(false);
-            expect(isPortMonitorFields(invalidPortFields)).toBe(false);
+            expect(isPortMonitorFields(invalidHostFields)).toBeFalsy();
+            expect(isPortMonitorFields(invalidPortFields)).toBeFalsy();
         });
 
         it("should return false when only host is present (missing port)", async ({
@@ -465,7 +465,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 host: "example.com",
             } as MonitorFormFields;
 
-            expect(isPortMonitorFields(incompleteFields)).toBe(false);
+            expect(isPortMonitorFields(incompleteFields)).toBeFalsy();
         });
 
         it("should return false when only port is present (missing host)", async ({
@@ -481,7 +481,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 port: 80,
             } as MonitorFormFields;
 
-            expect(isPortMonitorFields(incompleteFields)).toBe(false);
+            expect(isPortMonitorFields(incompleteFields)).toBeFalsy();
         });
 
         it("should handle minimal port fields", async ({ task, annotate }) => {
@@ -495,7 +495,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 port: 80,
             } as MonitorFormFields;
 
-            expect(isPortMonitorFields(minimalFields)).toBe(true);
+            expect(isPortMonitorFields(minimalFields)).toBeTruthy();
         });
     });
 
@@ -515,17 +515,17 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 { host: "example.com", port: 80 } as PortMonitorFields,
             ];
 
-            expect(isHttpMonitorFields(fields[0]!)).toBe(true);
-            expect(isPingMonitorFields(fields[0]!)).toBe(false);
-            expect(isPortMonitorFields(fields[0]!)).toBe(false);
+            expect(isHttpMonitorFields(fields[0]!)).toBeTruthy();
+            expect(isPingMonitorFields(fields[0]!)).toBeFalsy();
+            expect(isPortMonitorFields(fields[0]!)).toBeFalsy();
 
-            expect(isHttpMonitorFields(fields[1]!)).toBe(false);
-            expect(isPingMonitorFields(fields[1]!)).toBe(true);
-            expect(isPortMonitorFields(fields[1]!)).toBe(false);
+            expect(isHttpMonitorFields(fields[1]!)).toBeFalsy();
+            expect(isPingMonitorFields(fields[1]!)).toBeTruthy();
+            expect(isPortMonitorFields(fields[1]!)).toBeFalsy();
 
-            expect(isHttpMonitorFields(fields[2]!)).toBe(false);
-            expect(isPingMonitorFields(fields[2]!)).toBe(false);
-            expect(isPortMonitorFields(fields[2]!)).toBe(true);
+            expect(isHttpMonitorFields(fields[2]!)).toBeFalsy();
+            expect(isPingMonitorFields(fields[2]!)).toBeFalsy();
+            expect(isPortMonitorFields(fields[2]!)).toBeTruthy();
         });
 
         it("should handle edge cases with empty objects", async ({
@@ -539,9 +539,9 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
 
             const emptyFields = {} as MonitorFormFields;
 
-            expect(isHttpMonitorFields(emptyFields)).toBe(false);
-            expect(isPingMonitorFields(emptyFields)).toBe(false);
-            expect(isPortMonitorFields(emptyFields)).toBe(false);
+            expect(isHttpMonitorFields(emptyFields)).toBeFalsy();
+            expect(isPingMonitorFields(emptyFields)).toBeFalsy();
+            expect(isPortMonitorFields(emptyFields)).toBeFalsy();
         });
     });
 

@@ -75,7 +75,7 @@ describe("Monitor Configuration Types", () => {
             };
 
             expect(config.dataRetention?.aggregatedDataDays).toBe(365);
-            expect(config.dataRetention?.autoCleanup).toBe(true);
+            expect(config.dataRetention?.autoCleanup).toBeTruthy();
             expect(config.dataRetention?.detailedHistoryDays).toBe(90);
         });
 
@@ -179,7 +179,7 @@ describe("Monitor Configuration Types", () => {
             };
 
             expect(config.checkInterval).toBe(300_000);
-            expect(config.enabled).toBe(true);
+            expect(config.enabled).toBeTruthy();
             expect(config.id).toBe("monitor-123");
             expect(config.name).toBe("Test Monitor");
             expect(config.retryAttempts).toBe(3);
@@ -248,7 +248,7 @@ describe("Monitor Configuration Types", () => {
             expect(config.type).toBe("http");
             expect(config.url).toBe("https://example.com");
             expect(config.expectedStatusCodes).toEqual([200, 201]);
-            expect(config.followRedirects).toBe(true);
+            expect(config.followRedirects).toBeTruthy();
             expect(config.method).toBe("GET");
         });
 
@@ -314,7 +314,7 @@ describe("Monitor Configuration Types", () => {
                 },
             };
 
-            expect(config.certificate?.ignoreSslErrors).toBe(false);
+            expect(config.certificate?.ignoreSslErrors).toBeFalsy();
             expect(config.certificate?.caPath).toBe("/path/to/ca.pem");
             expect(config.certificate?.certPath).toBe("/path/to/cert.pem");
             expect(config.certificate?.keyPath).toBe("/path/to/key.pem");
@@ -522,7 +522,7 @@ describe("Monitor Configuration Types", () => {
             };
 
             expect(config.ipVersion).toBe("ipv4");
-            expect(config.protocol?.useTls).toBe(true);
+            expect(config.protocol?.useTls).toBeTruthy();
             expect(config.protocol?.sendData).toBe(
                 "GET / HTTP/1.1\r\nHost: secure.example.com\r\n\r\n"
             );
@@ -712,9 +712,9 @@ describe("Monitor Configuration Types", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isHttpMonitorConfig(httpConfig)).toBe(true);
-            expect(isHttpMonitorConfig(pingConfig)).toBe(false);
-            expect(isHttpMonitorConfig(portConfig)).toBe(false);
+            expect(isHttpMonitorConfig(httpConfig)).toBeTruthy();
+            expect(isHttpMonitorConfig(pingConfig)).toBeFalsy();
+            expect(isHttpMonitorConfig(portConfig)).toBeFalsy();
         });
 
         it("should correctly identify ping configurations", async ({
@@ -726,9 +726,9 @@ describe("Monitor Configuration Types", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPingMonitorConfig(pingConfig)).toBe(true);
-            expect(isPingMonitorConfig(httpConfig)).toBe(false);
-            expect(isPingMonitorConfig(portConfig)).toBe(false);
+            expect(isPingMonitorConfig(pingConfig)).toBeTruthy();
+            expect(isPingMonitorConfig(httpConfig)).toBeFalsy();
+            expect(isPingMonitorConfig(portConfig)).toBeFalsy();
         });
 
         it("should correctly identify port configurations", async ({
@@ -740,9 +740,9 @@ describe("Monitor Configuration Types", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPortMonitorConfig(portConfig)).toBe(true);
-            expect(isPortMonitorConfig(httpConfig)).toBe(false);
-            expect(isPortMonitorConfig(pingConfig)).toBe(false);
+            expect(isPortMonitorConfig(portConfig)).toBeTruthy();
+            expect(isPortMonitorConfig(httpConfig)).toBeFalsy();
+            expect(isPortMonitorConfig(pingConfig)).toBeFalsy();
         });
 
         it("should provide type narrowing", async ({ task, annotate }) => {
@@ -782,9 +782,9 @@ describe("Monitor Configuration Types", () => {
 
             expect(defaults.type).toBe("http");
             expect(defaults.checkInterval).toBe(300_000);
-            expect(defaults.enabled).toBe(true);
+            expect(defaults.enabled).toBeTruthy();
             expect(defaults.expectedStatusCodes).toEqual([200]);
-            expect(defaults.followRedirects).toBe(true);
+            expect(defaults.followRedirects).toBeTruthy();
             expect(defaults.method).toBe("GET");
             expect(defaults.retryAttempts).toBe(3);
             expect(defaults.timeout).toBe(30_000);
@@ -800,7 +800,7 @@ describe("Monitor Configuration Types", () => {
 
             expect(defaults.type).toBe("ping");
             expect(defaults.checkInterval).toBe(300_000);
-            expect(defaults.enabled).toBe(true);
+            expect(defaults.enabled).toBeTruthy();
             expect(defaults.maxPacketLoss).toBe(0);
             expect(defaults.packetCount).toBe(4);
             expect(defaults.packetSize).toBe(32);
@@ -819,7 +819,7 @@ describe("Monitor Configuration Types", () => {
             expect(defaults.type).toBe("port");
             expect(defaults.checkInterval).toBe(300_000);
             expect(defaults.connectionTimeout).toBe(10_000);
-            expect(defaults.enabled).toBe(true);
+            expect(defaults.enabled).toBeTruthy();
             expect(defaults.retryAttempts).toBe(3);
             expect(defaults.timeout).toBe(30_000);
         });
@@ -939,15 +939,15 @@ describe("Monitor Configuration Types", () => {
             for (const config of configs) {
                 switch (config.type) {
                     case "http": {
-                        expect(isHttpMonitorConfig(config)).toBe(true);
+                        expect(isHttpMonitorConfig(config)).toBeTruthy();
                         break;
                     }
                     case "ping": {
-                        expect(isPingMonitorConfig(config)).toBe(true);
+                        expect(isPingMonitorConfig(config)).toBeTruthy();
                         break;
                     }
                     case "port": {
-                        expect(isPortMonitorConfig(config)).toBe(true);
+                        expect(isPortMonitorConfig(config)).toBeTruthy();
                         break;
                     }
                     default: {

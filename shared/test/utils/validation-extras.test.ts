@@ -16,7 +16,7 @@ import {
 } from "@shared/utils/validation";
 import type { Monitor, MonitorType, Site } from "../../types";
 
-describe("validateMonitorType", () => {
+describe(validateMonitorType, () => {
     const validTypes: MonitorType[] = [
         "http",
         "port",
@@ -26,7 +26,7 @@ describe("validateMonitorType", () => {
 
     for (const type of validTypes) {
         it(`should return true for valid type '${type}'`, () => {
-            expect(validateMonitorType(type)).toBe(true);
+            expect(validateMonitorType(type)).toBeTruthy();
         });
     }
 
@@ -36,7 +36,7 @@ describe("validateMonitorType", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(validateMonitorType(null)).toBe(false);
+        expect(validateMonitorType(null)).toBeFalsy();
     });
 
     it("should return false for undefined", async ({ task, annotate }) => {
@@ -45,7 +45,7 @@ describe("validateMonitorType", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(validateMonitorType(undefined)).toBe(false);
+        expect(validateMonitorType(undefined)).toBeFalsy();
     });
 
     it("should return false for non-string values", async ({
@@ -57,10 +57,10 @@ describe("validateMonitorType", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(validateMonitorType(123)).toBe(false);
-        expect(validateMonitorType(true)).toBe(false);
-        expect(validateMonitorType({})).toBe(false);
-        expect(validateMonitorType([])).toBe(false);
+        expect(validateMonitorType(123)).toBeFalsy();
+        expect(validateMonitorType(true)).toBeFalsy();
+        expect(validateMonitorType({})).toBeFalsy();
+        expect(validateMonitorType([])).toBeFalsy();
     });
 
     it("should return false for invalid type strings", async ({
@@ -72,11 +72,11 @@ describe("validateMonitorType", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(validateMonitorType("tcp")).toBe(false);
-        expect(validateMonitorType("ssh")).toBe(false);
-        expect(validateMonitorType("ftp")).toBe(false);
-        expect(validateMonitorType("unknown")).toBe(false);
-        expect(validateMonitorType("")).toBe(false);
+        expect(validateMonitorType("tcp")).toBeFalsy();
+        expect(validateMonitorType("ssh")).toBeFalsy();
+        expect(validateMonitorType("ftp")).toBeFalsy();
+        expect(validateMonitorType("unknown")).toBeFalsy();
+        expect(validateMonitorType("")).toBeFalsy();
     });
 
     it("should return false for case variations", async ({
@@ -88,11 +88,11 @@ describe("validateMonitorType", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(validateMonitorType("HTTP")).toBe(false);
-        expect(validateMonitorType("Http")).toBe(false);
-        expect(validateMonitorType("PORT")).toBe(false);
-        expect(validateMonitorType("PING")).toBe(false);
-        expect(validateMonitorType("DNS")).toBe(false);
+        expect(validateMonitorType("HTTP")).toBeFalsy();
+        expect(validateMonitorType("Http")).toBeFalsy();
+        expect(validateMonitorType("PORT")).toBeFalsy();
+        expect(validateMonitorType("PING")).toBeFalsy();
+        expect(validateMonitorType("DNS")).toBeFalsy();
     });
 
     it("should return false for whitespace variations", async ({
@@ -104,13 +104,13 @@ describe("validateMonitorType", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(validateMonitorType(" http ")).toBe(false);
-        expect(validateMonitorType("http ")).toBe(false);
-        expect(validateMonitorType(" ping")).toBe(false);
+        expect(validateMonitorType(" http ")).toBeFalsy();
+        expect(validateMonitorType("http ")).toBeFalsy();
+        expect(validateMonitorType(" ping")).toBeFalsy();
     });
 });
 
-describe("getMonitorValidationErrors", () => {
+describe(getMonitorValidationErrors, () => {
     const createBaseMonitor = (): Partial<Monitor> => ({
         id: "test-monitor",
         type: "http",
@@ -1063,7 +1063,7 @@ describe("getMonitorValidationErrors", () => {
     });
 });
 
-describe("validateSite", () => {
+describe(validateSite, () => {
     const createValidSite = (): Site => ({
         identifier: "test-site",
         name: "Test Site",
@@ -1078,7 +1078,7 @@ describe("validateSite", () => {
         await annotate("Type: Business Logic", "type");
 
         const site = createValidSite();
-        expect(validateSite(site)).toBe(true);
+        expect(validateSite(site)).toBeTruthy();
     });
 
     it("should return false for null", async ({ task, annotate }) => {
@@ -1087,7 +1087,7 @@ describe("validateSite", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(validateSite(null as any)).toBe(false);
+        expect(validateSite(null as any)).toBeFalsy();
     });
 
     it("should return false for undefined", async ({ task, annotate }) => {
@@ -1096,7 +1096,7 @@ describe("validateSite", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(validateSite(undefined as any)).toBe(false);
+        expect(validateSite(undefined as any)).toBeFalsy();
     });
 
     it("should return false for non-object values", async ({
@@ -1108,10 +1108,10 @@ describe("validateSite", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(validateSite("string" as any)).toBe(false);
-        expect(validateSite(123 as any)).toBe(false);
-        expect(validateSite(true as any)).toBe(false);
-        expect(validateSite([] as any)).toBe(false);
+        expect(validateSite("string" as any)).toBeFalsy();
+        expect(validateSite(123 as any)).toBeFalsy();
+        expect(validateSite(true as any)).toBeFalsy();
+        expect(validateSite([] as any)).toBeFalsy();
     });
 
     describe("identifier validation", () => {
@@ -1126,7 +1126,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             delete (site as any).identifier;
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
 
         it("should return false for non-string identifier", async ({
@@ -1140,7 +1140,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             (site as any).identifier = 123;
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
 
         it("should return false for empty identifier", async ({
@@ -1154,7 +1154,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             site.identifier = "";
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
 
         it("should accept non-empty string identifier", async ({
@@ -1168,7 +1168,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             site.identifier = "valid-id";
-            expect(validateSite(site)).toBe(true);
+            expect(validateSite(site)).toBeTruthy();
         });
     });
 
@@ -1184,7 +1184,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             delete (site as any).name;
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
 
         it("should return false for non-string name", async ({
@@ -1198,7 +1198,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             (site as any).name = 123;
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
 
         it("should return false for empty name", async ({ task, annotate }) => {
@@ -1209,7 +1209,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             site.name = "";
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
 
         it("should accept non-empty string name", async ({
@@ -1223,7 +1223,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             site.name = "Valid Name";
-            expect(validateSite(site)).toBe(true);
+            expect(validateSite(site)).toBeTruthy();
         });
     });
 
@@ -1239,7 +1239,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             delete (site as any).monitoring;
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
 
         it("should return false for non-boolean monitoring", async ({
@@ -1253,7 +1253,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             (site as any).monitoring = "true";
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
 
         it("should accept true monitoring", async ({ task, annotate }) => {
@@ -1264,7 +1264,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             site.monitoring = true;
-            expect(validateSite(site)).toBe(true);
+            expect(validateSite(site)).toBeTruthy();
         });
 
         it("should accept false monitoring", async ({ task, annotate }) => {
@@ -1275,7 +1275,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             site.monitoring = false;
-            expect(validateSite(site)).toBe(true);
+            expect(validateSite(site)).toBeTruthy();
         });
     });
 
@@ -1291,7 +1291,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             delete (site as any).monitors;
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
 
         it("should return false for non-array monitors", async ({
@@ -1305,7 +1305,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             (site as any).monitors = "not-array";
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
 
         it("should accept empty monitors array", async ({ task, annotate }) => {
@@ -1316,7 +1316,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             site.monitors = [];
-            expect(validateSite(site)).toBe(true);
+            expect(validateSite(site)).toBeTruthy();
         });
 
         it("should validate each monitor in the array", async ({
@@ -1343,7 +1343,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             site.monitors = [validMonitor];
-            expect(validateSite(site)).toBe(true);
+            expect(validateSite(site)).toBeTruthy();
         });
 
         it("should return false if any monitor is invalid", async ({
@@ -1362,7 +1362,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             site.monitors = [invalidMonitor as any];
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
 
         it("should handle mixed valid and invalid monitors", async ({
@@ -1393,7 +1393,7 @@ describe("validateSite", () => {
 
             const site = createValidSite();
             site.monitors = [validMonitor, invalidMonitor as any];
-            expect(validateSite(site)).toBe(false);
+            expect(validateSite(site)).toBeFalsy();
         });
     });
 
@@ -1406,20 +1406,20 @@ describe("validateSite", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(validateSite({})).toBe(false);
-        expect(validateSite({ identifier: "test" })).toBe(false);
+        expect(validateSite({})).toBeFalsy();
+        expect(validateSite({ identifier: "test" })).toBeFalsy();
         expect(
             validateSite({
                 identifier: "test",
                 name: "Test",
             })
-        ).toBe(false);
+        ).toBeFalsy();
         expect(
             validateSite({
                 identifier: "test",
                 name: "Test",
                 monitoring: true,
             })
-        ).toBe(false);
+        ).toBeFalsy();
     });
 });

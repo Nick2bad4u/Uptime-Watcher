@@ -338,19 +338,19 @@ describe("100% Coverage Edge Cases", () => {
 
     describe("Fallback Utilities Edge Cases", () => {
         it("should identify null values", () => {
-            expect(isNullOrUndefined(null)).toBe(true);
+            expect(isNullOrUndefined(null)).toBeTruthy();
         });
 
         it("should identify undefined values", () => {
-            expect(isNullOrUndefined(undefined)).toBe(true);
+            expect(isNullOrUndefined(undefined)).toBeTruthy();
         });
 
         it("should identify non-null/undefined values", () => {
-            expect(isNullOrUndefined("")).toBe(false);
-            expect(isNullOrUndefined(0)).toBe(false);
-            expect(isNullOrUndefined(false)).toBe(false);
-            expect(isNullOrUndefined([])).toBe(false);
-            expect(isNullOrUndefined({})).toBe(false);
+            expect(isNullOrUndefined("")).toBeFalsy();
+            expect(isNullOrUndefined(0)).toBeFalsy();
+            expect(isNullOrUndefined(false)).toBeFalsy();
+            expect(isNullOrUndefined([])).toBeFalsy();
+            expect(isNullOrUndefined({})).toBeFalsy();
         });
 
         it("should handle async error wrapper", () => {

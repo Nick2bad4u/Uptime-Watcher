@@ -427,7 +427,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             // This should work without errors
             const result = await databaseManager.refreshSites();
-            expect(Array.isArray(result)).toBe(true);
+            expect(Array.isArray(result)).toBeTruthy();
         });
 
         it("should return sites from cache during successful refreshSites", async ({
@@ -448,7 +448,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             await databaseManager.initialize();
             const result = await databaseManager.refreshSites();
 
-            expect(Array.isArray(result)).toBe(true);
+            expect(Array.isArray(result)).toBeTruthy();
         });
     });
 
@@ -558,7 +558,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 .mockRejectedValueOnce(new Error("Event emission failed"));
 
             const result = await databaseManager.importData('{"sites": []}');
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should handle successful importData flow", async ({
@@ -592,7 +592,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 '{"sites": [{"identifier": "site1"}], "settings": []}'
             );
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(mockExecute).toHaveBeenCalled();
         });
     });

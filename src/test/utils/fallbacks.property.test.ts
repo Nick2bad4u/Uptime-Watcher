@@ -102,7 +102,7 @@ describe('Fallback Utils Property-Based Tests', () => {
                 fc.oneof(fc.constant(null), fc.constant(undefined)),
                 (value) => {
                     const result = isNullOrUndefined(value);
-                    expect(result).toBe(true);
+                    expect(result).toBeTruthy();
                 }
             ));
         });
@@ -122,7 +122,7 @@ describe('Fallback Utils Property-Based Tests', () => {
                 ),
                 (value) => {
                     const result = isNullOrUndefined(value);
-                    expect(result).toBe(false);
+                    expect(result).toBeFalsy();
                 }
             ));
         });
@@ -130,7 +130,7 @@ describe('Fallback Utils Property-Based Tests', () => {
         it('should handle edge case falsy values correctly', () => {
             const falsyValues = [0, '', false, Number.NaN];
             for (const value of falsyValues) {
-                expect(isNullOrUndefined(value)).toBe(false);
+                expect(isNullOrUndefined(value)).toBeFalsy();
             }
         });
     });
@@ -493,7 +493,7 @@ describe('Fallback Utils Property-Based Tests', () => {
                     const result = getMonitorTypeDisplayLabel(unknownType);
                     expect(typeof result).toBe('string');
                     expect(result.length).toBeGreaterThan(0);
-                    expect(result.endsWith('Monitor')).toBe(true);
+                    expect(result.endsWith('Monitor')).toBeTruthy();
                 }
             ));
         });
@@ -558,7 +558,7 @@ describe('Fallback Utils Property-Based Tests', () => {
                 fc.integer({ min: 1, max: 50 }),
                 (str, maxLength) => {
                     const result = truncateForLogging(str, maxLength);
-                    expect(result.length).toBe(maxLength);
+                    expect(result).toHaveLength(maxLength);
                     expect(result).toBe(str.slice(0, maxLength));
                 }
             ));
@@ -569,7 +569,7 @@ describe('Fallback Utils Property-Based Tests', () => {
                 fc.string({ minLength: 51, maxLength: 1000 }),
                 (str) => {
                     const result = truncateForLogging(str);
-                    expect(result.length).toBe(50);
+                    expect(result).toHaveLength(50);
                     expect(result).toBe(str.slice(0, 50));
                 }
             ));
@@ -589,7 +589,7 @@ describe('Fallback Utils Property-Based Tests', () => {
                     const result = truncateForLogging(unicodeStr, maxLength);
                     expect(result.length).toBeLessThanOrEqual(maxLength);
                     if (unicodeStr.length > maxLength) {
-                        expect(result.length).toBe(maxLength);
+                        expect(result).toHaveLength(maxLength);
                     } else {
                         expect(result).toBe(unicodeStr);
                     }
@@ -607,7 +607,7 @@ describe('Fallback Utils Property-Based Tests', () => {
 
             for (const str of specialStrings) {
                 const result = truncateForLogging(str, 30);
-                expect(result.length).toBe(30);
+                expect(result).toHaveLength(30);
                 expect(result).toBe(str.slice(0, 30));
             }
         });
@@ -671,7 +671,7 @@ describe('Fallback Utils Property-Based Tests', () => {
 
             for (const input of nullInputs) {
                 // These should handle null/undefined gracefully
-                expect(isNullOrUndefined(input)).toBe(true);
+                expect(isNullOrUndefined(input)).toBeTruthy();
                 expect(withFallback(input, 'fallback')).toBe('fallback');
                 expect(() => getMonitorDisplayIdentifier(input as any, 'fallback')).not.toThrow();
                 expect(() => getMonitorTypeDisplayLabel(input as any)).not.toThrow();

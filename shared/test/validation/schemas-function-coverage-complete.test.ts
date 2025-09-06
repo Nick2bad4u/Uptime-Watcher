@@ -46,7 +46,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
 
             const result = validateSiteData(validSite);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.errors).toEqual([]);
             expect(result.metadata?.siteIdentifier).toBe("test-site");
             expect(result.metadata?.monitorCount).toBe(1);
@@ -86,7 +86,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
 
             const result = validateSiteData(validSiteMinimal);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.metadata?.monitorCount).toBe(1);
         });
     });
@@ -119,7 +119,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
 
             const result = validateMonitorData("http", validHttpMonitor);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.errors).toEqual([]);
         });
 
@@ -152,7 +152,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
 
             const result = validateMonitorData("dns", validDnsMonitor);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.errors).toEqual([]);
         });
 
@@ -184,7 +184,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
 
             const result = validateMonitorData("port", validPortMonitor);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.errors).toEqual([]);
         });
     });
@@ -208,7 +208,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 "url",
                 "https://example.com"
             );
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.metadata?.fieldName).toBe("url");
         });
 
@@ -232,7 +232,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
 
             for (const { field, value } of dnsFields) {
                 const result = validateMonitorField("dns", field, value);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 expect(result.metadata?.fieldName).toBe(field);
             }
         });
@@ -256,7 +256,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
 
             for (const { field, value } of portFields) {
                 const result = validateMonitorField("port", field, value);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 expect(result.metadata?.fieldName).toBe(field);
             }
         });
@@ -295,7 +295,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                         field,
                         value
                     );
-                    expect(result.success).toBe(true);
+                    expect(result.success).toBeTruthy();
                     expect(result.metadata?.fieldName).toBe(field);
                 }
 
@@ -305,7 +305,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                     "type",
                     monitorType
                 );
-                expect(validationResult.success).toBe(true);
+                expect(validationResult.success).toBeTruthy();
                 expect(validationResult.metadata?.fieldName).toBe("type");
             }
         });
@@ -345,7 +345,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 ],
             };
             const siteResult = validateSiteData(site);
-            expect(siteResult.success).toBe(true);
+            expect(siteResult.success).toBeTruthy();
 
             // Test validateMonitorData success path
             const monitor = {
@@ -361,7 +361,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 responseTime: 150,
             };
             const monitorResult = validateMonitorData("http", monitor);
-            expect(monitorResult.success).toBe(true);
+            expect(monitorResult.success).toBeTruthy();
 
             // Test validateMonitorField success path
             const fieldResult = validateMonitorField(
@@ -369,7 +369,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 "url",
                 "https://test.com"
             );
-            expect(fieldResult.success).toBe(true);
+            expect(fieldResult.success).toBeTruthy();
         });
     });
 });

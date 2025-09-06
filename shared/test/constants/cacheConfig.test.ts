@@ -27,12 +27,12 @@ describe("Cache Configuration Constants", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(Object.isFrozen(CACHE_CONFIG)).toBe(true);
-            expect(Object.isFrozen(CACHE_CONFIG.SITES)).toBe(true);
-            expect(Object.isFrozen(CACHE_CONFIG.MONITORS)).toBe(true);
-            expect(Object.isFrozen(CACHE_CONFIG.SETTINGS)).toBe(true);
-            expect(Object.isFrozen(CACHE_CONFIG.VALIDATION)).toBe(true);
-            expect(Object.isFrozen(CACHE_CONFIG.TEMPORARY)).toBe(true);
+            expect(Object.isFrozen(CACHE_CONFIG)).toBeTruthy();
+            expect(Object.isFrozen(CACHE_CONFIG.SITES)).toBeTruthy();
+            expect(Object.isFrozen(CACHE_CONFIG.MONITORS)).toBeTruthy();
+            expect(Object.isFrozen(CACHE_CONFIG.SETTINGS)).toBeTruthy();
+            expect(Object.isFrozen(CACHE_CONFIG.VALIDATION)).toBeTruthy();
+            expect(Object.isFrozen(CACHE_CONFIG.TEMPORARY)).toBeTruthy();
         });
 
         it("should have all required cache types", async ({
@@ -90,7 +90,7 @@ describe("Cache Configuration Constants", () => {
             expect(CACHE_CONFIG.SITES.name).toBe("sites");
             expect(CACHE_CONFIG.SITES.defaultTTL).toBe(600_000); // 10 minutes
             expect(CACHE_CONFIG.SITES.maxSize).toBe(500);
-            expect(CACHE_CONFIG.SITES.enableStats).toBe(true);
+            expect(CACHE_CONFIG.SITES.enableStats).toBeTruthy();
         });
 
         it("should have reasonable TTL for site management operations", async ({
@@ -122,7 +122,7 @@ describe("Cache Configuration Constants", () => {
             expect(CACHE_CONFIG.MONITORS.name).toBe("monitors");
             expect(CACHE_CONFIG.MONITORS.defaultTTL).toBe(300_000); // 5 minutes
             expect(CACHE_CONFIG.MONITORS.maxSize).toBe(1000);
-            expect(CACHE_CONFIG.MONITORS.enableStats).toBe(true);
+            expect(CACHE_CONFIG.MONITORS.enableStats).toBeTruthy();
         });
 
         it("should have shorter TTL for real-time monitoring", async ({
@@ -153,7 +153,7 @@ describe("Cache Configuration Constants", () => {
             expect(CACHE_CONFIG.SETTINGS.name).toBe("settings");
             expect(CACHE_CONFIG.SETTINGS.defaultTTL).toBe(1_800_000); // 30 minutes
             expect(CACHE_CONFIG.SETTINGS.maxSize).toBe(100);
-            expect(CACHE_CONFIG.SETTINGS.enableStats).toBe(true);
+            expect(CACHE_CONFIG.SETTINGS.enableStats).toBeTruthy();
         });
 
         it("should have longest TTL for infrequently changing data", async ({
@@ -187,7 +187,7 @@ describe("Cache Configuration Constants", () => {
             expect(CACHE_CONFIG.VALIDATION.name).toBe("validation-results");
             expect(CACHE_CONFIG.VALIDATION.defaultTTL).toBe(300_000); // 5 minutes
             expect(CACHE_CONFIG.VALIDATION.maxSize).toBe(200);
-            expect(CACHE_CONFIG.VALIDATION.enableStats).toBe(true);
+            expect(CACHE_CONFIG.VALIDATION.enableStats).toBeTruthy();
         });
 
         it("should have moderate TTL for validation accuracy", async ({
@@ -218,7 +218,7 @@ describe("Cache Configuration Constants", () => {
             expect(CACHE_CONFIG.TEMPORARY.name).toBe("temporary");
             expect(CACHE_CONFIG.TEMPORARY.defaultTTL).toBe(300_000); // 5 minutes
             expect(CACHE_CONFIG.TEMPORARY.maxSize).toBe(1000);
-            expect(CACHE_CONFIG.TEMPORARY.enableStats).toBe(false); // Disabled for performance
+            expect(CACHE_CONFIG.TEMPORARY.enableStats).toBeFalsy(); // Disabled for performance
         });
 
         it("should have stats disabled for performance", async ({
@@ -230,7 +230,7 @@ describe("Cache Configuration Constants", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(CACHE_CONFIG.TEMPORARY.enableStats).toBe(false);
+            expect(CACHE_CONFIG.TEMPORARY.enableStats).toBeFalsy();
         });
     });
 
@@ -326,7 +326,7 @@ describe("Cache Naming Functions", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(Object.isFrozen(CACHE_NAMES)).toBe(true);
+            expect(Object.isFrozen(CACHE_NAMES)).toBeTruthy();
         });
 
         it("should have all required naming functions", async ({

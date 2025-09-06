@@ -102,38 +102,38 @@ describe("Working Utility Coverage Tests", () => {
             const testFunc = () => {};
 
             // Test object property checks
-            expect(hasProperties(testObj, ["test"])).toBe(true);
-            expect(hasProperties(testObj, ["nonexistent"])).toBe(false);
-            expect(hasProperty(testObj, "test")).toBe(true);
-            expect(hasProperty(testObj, "nonexistent")).toBe(false);
+            expect(hasProperties(testObj, ["test"])).toBeTruthy();
+            expect(hasProperties(testObj, ["nonexistent"])).toBeFalsy();
+            expect(hasProperty(testObj, "test")).toBeTruthy();
+            expect(hasProperty(testObj, "nonexistent")).toBeFalsy();
 
             // Test type checks
-            expect(isArray(testArray)).toBe(true);
-            expect(isArray(testObj)).toBe(false);
-            expect(isBoolean(true)).toBe(true);
-            expect(isBoolean("true")).toBe(false);
-            expect(isDate(testDate)).toBe(true);
-            expect(isDate("2023-01-01")).toBe(false);
-            expect(isError(testError)).toBe(true);
-            expect(isError("error")).toBe(false);
-            expect(isFunction(testFunc)).toBe(true);
-            expect(isFunction(testObj)).toBe(false);
+            expect(isArray(testArray)).toBeTruthy();
+            expect(isArray(testObj)).toBeFalsy();
+            expect(isBoolean(true)).toBeTruthy();
+            expect(isBoolean("true")).toBeFalsy();
+            expect(isDate(testDate)).toBeTruthy();
+            expect(isDate("2023-01-01")).toBeFalsy();
+            expect(isError(testError)).toBeTruthy();
+            expect(isError("error")).toBeFalsy();
+            expect(isFunction(testFunc)).toBeTruthy();
+            expect(isFunction(testObj)).toBeFalsy();
 
             // Test number validations
-            expect(isFiniteNumber(42)).toBe(true);
-            expect(isFiniteNumber(Infinity)).toBe(false);
-            expect(isNonNegativeNumber(0)).toBe(true);
-            expect(isNonNegativeNumber(-1)).toBe(false);
-            expect(isPositiveNumber(1)).toBe(true);
-            expect(isPositiveNumber(0)).toBe(false);
-            expect(isValidPort(80)).toBe(true);
-            expect(isValidPort(70_000)).toBe(false);
-            expect(isValidTimestamp(Date.now())).toBe(true);
-            expect(isValidTimestamp(-1)).toBe(false);
+            expect(isFiniteNumber(42)).toBeTruthy();
+            expect(isFiniteNumber(Infinity)).toBeFalsy();
+            expect(isNonNegativeNumber(0)).toBeTruthy();
+            expect(isNonNegativeNumber(-1)).toBeFalsy();
+            expect(isPositiveNumber(1)).toBeTruthy();
+            expect(isPositiveNumber(0)).toBeFalsy();
+            expect(isValidPort(80)).toBeTruthy();
+            expect(isValidPort(70_000)).toBeFalsy();
+            expect(isValidTimestamp(Date.now())).toBeTruthy();
+            expect(isValidTimestamp(-1)).toBeFalsy();
 
             // Test object checks
-            expect(isNonNullObject(testObj)).toBe(true);
-            expect(isNonNullObject(null)).toBe(false);
+            expect(isNonNullObject(testObj)).toBeTruthy();
+            expect(isNonNullObject(null)).toBeFalsy();
         });
     });
 
@@ -154,16 +154,16 @@ describe("Working Utility Coverage Tests", () => {
                 typeof data === "object" && data !== null && "test" in data;
 
             const parseResult = safeJsonParse('{"test":"value"}', validator);
-            expect(parseResult.success).toBe(true);
+            expect(parseResult.success).toBeTruthy();
 
             const badParseResult = safeJsonParse("invalid json", validator);
-            expect(badParseResult.success).toBe(false);
+            expect(badParseResult.success).toBeFalsy();
 
             // Test safeJsonParseArray
             const arrayValidator = (item: unknown): item is number =>
                 typeof item === "number";
             const arrayResult = safeJsonParseArray("[1,2,3]", arrayValidator);
-            expect(arrayResult.success).toBe(true);
+            expect(arrayResult.success).toBeTruthy();
 
             // Test safeJsonParseWithFallback
             const fallbackResult = safeJsonParseWithFallback(
@@ -175,7 +175,7 @@ describe("Working Utility Coverage Tests", () => {
 
             // Test safeJsonStringify
             const stringifyResult = safeJsonStringify({ test: "value" });
-            expect(stringifyResult.success).toBe(true);
+            expect(stringifyResult.success).toBeTruthy();
 
             // Test safeJsonStringifyWithFallback
             const stringifyFallback = safeJsonStringifyWithFallback(
@@ -199,11 +199,11 @@ describe("Working Utility Coverage Tests", () => {
             annotate("Type: Validation", "type");
 
             // Test validateMonitorType
-            expect(validateMonitorType("http")).toBe(true);
-            expect(validateMonitorType("port")).toBe(true);
-            expect(validateMonitorType("ping")).toBe(true);
-            expect(validateMonitorType("dns")).toBe(true);
-            expect(validateMonitorType("invalid")).toBe(false);
+            expect(validateMonitorType("http")).toBeTruthy();
+            expect(validateMonitorType("port")).toBeTruthy();
+            expect(validateMonitorType("ping")).toBeTruthy();
+            expect(validateMonitorType("dns")).toBeTruthy();
+            expect(validateMonitorType("invalid")).toBeFalsy();
         });
     });
 

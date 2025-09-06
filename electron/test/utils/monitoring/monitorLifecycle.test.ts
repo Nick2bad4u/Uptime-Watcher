@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { determineMonitorStatus } from "../../../services/monitoring/utils/httpStatusUtils";
 
 describe("HTTP Status Utils", () => {
-    describe("determineMonitorStatus", () => {
+    describe(determineMonitorStatus, () => {
         it('should return "up" for 1xx informational responses', async ({
             task,
             annotate,

@@ -76,7 +76,7 @@ vi.mock("react-icons/md", () => ({
     MdExpandMore: () => <div data-testid="expand-more-icon">ExpandMore</div>,
 }));
 
-describe("SiteDetailsHeader", () => {
+describe(SiteDetailsHeader, () => {
     const mockSite: Site = {
         identifier: "site-1",
         name: "Test Site",
@@ -630,7 +630,7 @@ describe("SiteDetailsHeader", () => {
                 await user.click(button);
             });
 
-            expect(onToggleCollapse).toHaveBeenCalledOnce();
+            expect(onToggleCollapse).toHaveBeenCalledTimes(1);
         });
 
         it("should not render collapse button when onToggleCollapse is not provided", ({

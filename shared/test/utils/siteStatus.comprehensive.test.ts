@@ -33,7 +33,7 @@ function createTestSite(
     };
 }
 
-describe("calculateSiteMonitoringStatus", () => {
+describe(calculateSiteMonitoringStatus, () => {
     it("should return 'stopped' for sites with no monitors", async ({
         task,
         annotate,
@@ -131,7 +131,7 @@ describe("calculateSiteMonitoringStatus", () => {
     });
 });
 
-describe("calculateSiteStatus", () => {
+describe(calculateSiteStatus, () => {
     it("should return 'unknown' for sites with no monitors", async ({
         task,
         annotate,
@@ -250,7 +250,7 @@ describe("calculateSiteStatus", () => {
     });
 });
 
-describe("getSiteDisplayStatus", () => {
+describe(getSiteDisplayStatus, () => {
     it("should return 'unknown' for sites with no monitors", async ({
         task,
         annotate,
@@ -373,7 +373,7 @@ describe("getSiteDisplayStatus", () => {
     });
 });
 
-describe("getSiteStatusDescription", () => {
+describe(getSiteStatusDescription, () => {
     it("should describe unknown status for no monitors", async ({
         task,
         annotate,
@@ -528,7 +528,7 @@ describe("getSiteStatusDescription", () => {
     });
 });
 
-describe("getSiteStatusVariant", () => {
+describe(getSiteStatusVariant, () => {
     it("should return 'error' for 'down' status", async ({
         task,
         annotate,

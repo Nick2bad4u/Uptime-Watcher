@@ -28,7 +28,7 @@ vi.mock("../../../utils/logger", () => ({
     },
 }));
 
-describe("NotificationService", () => {
+describe(NotificationService, () => {
     let notificationService: NotificationService;
     let mockNotification: any;
     let logger: any;
@@ -321,7 +321,7 @@ describe("NotificationService", () => {
             await annotate("Component: types", "component");
 
             (Notification as any).isSupported.mockReturnValue(true);
-            expect(notificationService.isSupported()).toBe(true);
+            expect(notificationService.isSupported()).toBeTruthy();
         });
         it("should return false when notifications are not supported", async ({
             task,
@@ -331,7 +331,7 @@ describe("NotificationService", () => {
             await annotate("Component: types", "component");
 
             (Notification as any).isSupported.mockReturnValue(false);
-            expect(notificationService.isSupported()).toBe(false);
+            expect(notificationService.isSupported()).toBeFalsy();
         });
     });
 });

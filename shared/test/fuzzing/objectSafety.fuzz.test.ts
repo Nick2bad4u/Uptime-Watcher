@@ -33,7 +33,7 @@ import {
 type ValidatorFunction = (val: unknown) => val is unknown;
 
 describe("objectSafety.ts fuzzing tests", () => {
-    describe("safeObjectAccess", () => {
+    describe(safeObjectAccess, () => {
         test.prop([
             fc.anything(),
             fc.oneof(fc.string(), fc.constantFrom(Symbol("test"), Symbol.for("test"))),
@@ -112,7 +112,7 @@ describe("objectSafety.ts fuzzing tests", () => {
         );
     });
 
-    describe("safeObjectIteration", () => {
+    describe(safeObjectIteration, () => {
         test.prop([fc.anything()])(
             "should handle non-objects gracefully",
             (nonObject) => {
@@ -191,7 +191,7 @@ describe("objectSafety.ts fuzzing tests", () => {
         );
     });
 
-    describe("safeObjectOmit", () => {
+    describe(safeObjectOmit, () => {
         test.prop([fc.constantFrom(null, undefined), fc.array(fc.string())])(
             "should return empty object for null/undefined input",
             (nullishInput, keys) => {
@@ -213,7 +213,7 @@ describe("objectSafety.ts fuzzing tests", () => {
 
             // Check that omitted keys are not present
             for (const key of keysToOmit) {
-                expect(Object.hasOwn(result, key)).toBe(false);
+                expect(Object.hasOwn(result, key)).toBeFalsy();
             }
 
             // Check that other keys are preserved
@@ -238,7 +238,7 @@ describe("objectSafety.ts fuzzing tests", () => {
 
             expect(result).toHaveProperty("stringKey", "value");
             expect(result[keepSymbol]).toBe("keep this");
-            expect(Object.hasOwn(result, omitSymbol)).toBe(false);
+            expect(Object.hasOwn(result, omitSymbol)).toBeFalsy();
         });
 
         test.prop([
@@ -260,7 +260,7 @@ describe("objectSafety.ts fuzzing tests", () => {
         });
     });
 
-    describe("safeObjectPick", () => {
+    describe(safeObjectPick, () => {
         test.prop([
             fc.record({
                 keep1: fc.string(),
@@ -281,7 +281,7 @@ describe("objectSafety.ts fuzzing tests", () => {
 
             // Check that result only has picked keys
             for (const key of Object.keys(result)) {
-                expect((keysToPick as unknown as string[]).includes(key)).toBe(true);
+                expect((keysToPick as unknown as string[])).toContain(key);
             }
         });
 
@@ -304,11 +304,11 @@ describe("objectSafety.ts fuzzing tests", () => {
             const result = safeObjectPick(obj, ["existing", "missing"] as (keyof typeof obj)[]);
 
             expect(result).toEqual({ existing: "value" });
-            expect(Object.hasOwn(result, "missing")).toBe(false);
+            expect(Object.hasOwn(result, "missing")).toBeFalsy();
         });
     });
 
-    describe("typedObjectEntries", () => {
+    describe(typedObjectEntries, () => {
         test.prop([
             fc.record({
                 str: fc.string(),
@@ -350,7 +350,7 @@ describe("objectSafety.ts fuzzing tests", () => {
         });
     });
 
-    describe("typedObjectKeys", () => {
+    describe(typedObjectKeys, () => {
         test.prop([
             fc.record({
                 a: fc.anything(),
@@ -387,12 +387,12 @@ describe("objectSafety.ts fuzzing tests", () => {
 
                 const keys = typedObjectKeys(obj);
 
-                expect((keys as string[]).includes("nonEnum")).toBe(false);
+                expect((keys as string[])).not.toContain("nonEnum");
             }
         );
     });
 
-    describe("typedObjectValues", () => {
+    describe(typedObjectValues, () => {
         test.prop([
             fc.record({
                 str: fc.string(),
@@ -415,7 +415,7 @@ describe("objectSafety.ts fuzzing tests", () => {
                 expect(values).toHaveLength(objValues.length);
 
                 for (const value of values) {
-                    expect(objValues.includes(value)).toBe(true);
+                    expect(objValues).toContain(value);
                 }
             }
         );

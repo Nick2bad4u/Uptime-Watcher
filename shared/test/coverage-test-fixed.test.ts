@@ -80,7 +80,7 @@ describe("Fixed Coverage Tests", () => {
             };
 
             const result = isValidHistoryRow(invalidHistoryRow);
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -163,7 +163,7 @@ describe("Fixed Coverage Tests", () => {
                 "checkInterval",
                 "not-a-number"
             );
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
         });
     });

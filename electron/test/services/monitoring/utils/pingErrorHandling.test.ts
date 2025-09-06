@@ -32,7 +32,7 @@ describe("pingErrorHandling", () => {
     afterEach(() => {
         vi.resetAllMocks();
     });
-    describe("handlePingCheckError", () => {
+    describe(handlePingCheckError, () => {
         it("should handle Error objects correctly", async ({
             task,
             annotate,

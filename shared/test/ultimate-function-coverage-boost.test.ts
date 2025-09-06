@@ -141,7 +141,7 @@ describe("Ultimate Function Coverage Boost", () => {
                     }
 
                     // Ensure we at least attempted to call the function
-                    expect(functionCalled).toBe(true);
+                    expect(functionCalled).toBeTruthy();
                 }
             }
         }
@@ -169,17 +169,17 @@ describe("Ultimate Function Coverage Boost", () => {
         annotate("Type: Business Logic", "type");
 
         // Test specific functions we know exist
-        expect(types.isComputedSiteStatus("mixed")).toBe(true);
-        expect(types.isComputedSiteStatus("unknown")).toBe(true);
-        expect(types.isComputedSiteStatus("up")).toBe(false);
+        expect(types.isComputedSiteStatus("mixed")).toBeTruthy();
+        expect(types.isComputedSiteStatus("unknown")).toBeTruthy();
+        expect(types.isComputedSiteStatus("up")).toBeFalsy();
 
-        expect(types.isMonitorStatus("up" as any)).toBe(true);
-        expect(types.isMonitorStatus("down" as any)).toBe(true);
-        expect(types.isMonitorStatus("mixed" as any)).toBe(false);
+        expect(types.isMonitorStatus("up" as any)).toBeTruthy();
+        expect(types.isMonitorStatus("down" as any)).toBeTruthy();
+        expect(types.isMonitorStatus("mixed" as any)).toBeFalsy();
 
-        expect(types.isSiteStatus("up" as any)).toBe(true);
-        expect(types.isSiteStatus("mixed" as any)).toBe(true);
-        expect(types.isSiteStatus("unknown" as any)).toBe(true);
+        expect(types.isSiteStatus("up" as any)).toBeTruthy();
+        expect(types.isSiteStatus("mixed" as any)).toBeTruthy();
+        expect(types.isSiteStatus("unknown" as any)).toBeTruthy();
 
         // Test validateMonitor with proper typing
         const mockMonitor = {
@@ -195,7 +195,7 @@ describe("Ultimate Function Coverage Boost", () => {
         // Just call the function - validation might be strict
         const result = types.validateMonitor(mockMonitor);
         expect(typeof result).toBe("boolean");
-        expect(types.validateMonitor({})).toBe(false);
+        expect(types.validateMonitor({})).toBeFalsy();
     });
 
     it("should specifically test errorCatalog exports", ({
@@ -266,7 +266,7 @@ describe("Ultimate Function Coverage Boost", () => {
         annotate("Type: Validation", "type");
 
         // Test the actual functions that exist
-        expect(validationUtils.validateMonitorType("http")).toBe(true);
+        expect(validationUtils.validateMonitorType("http")).toBeTruthy();
         expect(validationUtils.getMonitorValidationErrors({})).toBeDefined();
         expect(validationUtils.validateSite({})).toBeDefined();
     });
@@ -353,6 +353,6 @@ describe("Ultimate Function Coverage Boost", () => {
         }
 
         // Test passes if we get here without major errors
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 });

@@ -68,7 +68,7 @@ vi.mock("../../types/ipc", () => ({
 // Access the global electronAPI mock
 const mockElectronAPI = (globalThis as any).electronAPI;
 
-describe("createSiteOperationsActions", () => {
+describe(createSiteOperationsActions, () => {
     let mockDeps: SiteOperationsDependencies;
     let mockSite: Site;
     let mockMonitor: Monitor;

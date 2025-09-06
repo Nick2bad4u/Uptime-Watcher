@@ -19,7 +19,7 @@ import {
 } from "@shared/utils/safeConversions";
 
 describe("safeConversions - Complete Function Coverage", () => {
-    describe("safeNumberConversion", () => {
+    describe(safeNumberConversion, () => {
         it("should test safeNumberConversion function", async ({
             task,
             annotate,
@@ -37,7 +37,7 @@ describe("safeConversions - Complete Function Coverage", () => {
         });
     });
 
-    describe("safeParseCheckInterval", () => {
+    describe(safeParseCheckInterval, () => {
         it("should test safeParseCheckInterval function", async ({
             task,
             annotate,
@@ -55,7 +55,7 @@ describe("safeConversions - Complete Function Coverage", () => {
         });
     });
 
-    describe("safeParseFloat", () => {
+    describe(safeParseFloat, () => {
         it("should test safeParseFloat function", async ({
             task,
             annotate,
@@ -73,7 +73,7 @@ describe("safeConversions - Complete Function Coverage", () => {
         });
     });
 
-    describe("safeParseInt", () => {
+    describe(safeParseInt, () => {
         it("should test safeParseInt function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: safeConversions", "component");
@@ -89,7 +89,7 @@ describe("safeConversions - Complete Function Coverage", () => {
         });
     });
 
-    describe("safeParsePercentage", () => {
+    describe(safeParsePercentage, () => {
         it("should test safeParsePercentage function", async ({
             task,
             annotate,
@@ -108,7 +108,7 @@ describe("safeConversions - Complete Function Coverage", () => {
         });
     });
 
-    describe("safeParsePort", () => {
+    describe(safeParsePort, () => {
         it("should test safeParsePort function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: safeConversions", "component");
@@ -124,7 +124,7 @@ describe("safeConversions - Complete Function Coverage", () => {
         });
     });
 
-    describe("safeParsePositiveInt", () => {
+    describe(safeParsePositiveInt, () => {
         it("should test safeParsePositiveInt function", async ({
             task,
             annotate,
@@ -143,7 +143,7 @@ describe("safeConversions - Complete Function Coverage", () => {
         });
     });
 
-    describe("safeParseRetryAttempts", () => {
+    describe(safeParseRetryAttempts, () => {
         it("should test safeParseRetryAttempts function", async ({
             task,
             annotate,
@@ -162,7 +162,7 @@ describe("safeConversions - Complete Function Coverage", () => {
         });
     });
 
-    describe("safeParseTimeout", () => {
+    describe(safeParseTimeout, () => {
         it("should test safeParseTimeout function", async ({
             task,
             annotate,
@@ -182,7 +182,7 @@ describe("safeConversions - Complete Function Coverage", () => {
         });
     });
 
-    describe("safeParseTimestamp", () => {
+    describe(safeParseTimestamp, () => {
         it("should test safeParseTimestamp function", async ({
             task,
             annotate,
@@ -201,9 +201,9 @@ describe("safeConversions - Complete Function Coverage", () => {
             const dateResult = safeParseTimestamp(dateObject);
             expect(dateResult).toBeGreaterThanOrEqual(now - 1);
             expect(dateResult).toBeLessThanOrEqual(now + 1);
-            expect(safeParseTimestamp(-1) > 0).toBe(true); // negative returns current time
+            expect(safeParseTimestamp(-1)).toBeGreaterThan(0); // negative returns current time
             expect(safeParseTimestamp("invalid", now)).toBe(now);
-            expect(safeParseTimestamp(null) > 0).toBe(true); // null returns current time
+            expect(safeParseTimestamp(null)).toBeGreaterThan(0); // null returns current time
         });
     });
 });

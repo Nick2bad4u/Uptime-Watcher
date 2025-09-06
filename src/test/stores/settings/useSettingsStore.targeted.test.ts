@@ -404,7 +404,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             const { syncFromBackend } = useSettingsStore.getState();
             const result = await syncFromBackend();
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.message).toBe("Settings synchronized from backend");
         });
 

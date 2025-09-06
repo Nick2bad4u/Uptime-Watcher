@@ -243,7 +243,7 @@ describe("Electron Types", () => {
             expect(site.identifier).toBe("test-site-789");
             expect(site.name).toBe("Test Website");
             expect(site.monitors).toHaveLength(2);
-            expect(site.monitoring).toBe(true);
+            expect(site.monitoring).toBeTruthy();
         });
 
         it("should validate minimal site object", async ({ annotate }) => {
@@ -303,7 +303,7 @@ describe("Electron Types", () => {
             };
 
             expect(site.monitors).toEqual([]);
-            expect(site.monitoring).toBe(false);
+            expect(site.monitoring).toBeFalsy();
         });
     });
 

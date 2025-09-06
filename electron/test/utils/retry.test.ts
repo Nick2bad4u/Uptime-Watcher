@@ -29,7 +29,7 @@ vi.mock("../../utils/logger", () => ({
     },
 }));
 
-describe("withRetry", () => {
+describe(withRetry, () => {
     let originalHandlers: any;
 
     beforeEach(() => {
@@ -338,7 +338,7 @@ describe("withRetry", () => {
         expect(operation).toHaveBeenCalledTimes(3);
     });
 });
-describe("withDbRetry", () => {
+describe(withDbRetry, () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.useFakeTimers();

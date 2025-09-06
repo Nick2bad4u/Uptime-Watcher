@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import { getStatusIcon, formatStatusWithIcon } from "../utils/status";
 
 describe("Status Utils", () => {
-    describe("getStatusIcon", () => {
+    describe(getStatusIcon, () => {
         it("returns correct icons for known statuses", async ({
             task,
             annotate,
@@ -61,7 +61,7 @@ describe("Status Utils", () => {
         });
     });
 
-    describe("formatStatusWithIcon", () => {
+    describe(formatStatusWithIcon, () => {
         it("formats status with correct icon and capitalization", async ({
             task,
             annotate,

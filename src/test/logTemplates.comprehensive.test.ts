@@ -269,7 +269,7 @@ describe('logTemplates.ts - Comprehensive Coverage', () => {
         });
     });
 
-    describe('interpolateLogTemplate', () => {
+    describe(interpolateLogTemplate, () => {
         it('should interpolate single variable', () => {
             const template = 'Hello {name}!';
             const variables = { name: 'World' };
@@ -388,7 +388,7 @@ describe('logTemplates.ts - Comprehensive Coverage', () => {
         });
     });
 
-    describe('createTemplateLogger', () => {
+    describe(createTemplateLogger, () => {
         let mockLogger: {
             debug: ReturnType<typeof vi.fn>;
             error: ReturnType<typeof vi.fn>;

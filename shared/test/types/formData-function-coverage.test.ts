@@ -11,7 +11,7 @@ import {
 } from "../../types/formData";
 
 describe("FormData Types - Complete Function Coverage", () => {
-    describe("isHttpFormData", () => {
+    describe(isHttpFormData, () => {
         it("should return true for valid HTTP form data", async ({
             task,
             annotate,
@@ -33,7 +33,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 method: "GET" as const,
                 expectedStatusCode: 200,
             };
-            expect(isHttpFormData(validData)).toBe(true);
+            expect(isHttpFormData(validData)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -45,7 +45,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isHttpFormData(null as any)).toBe(false);
+            expect(isHttpFormData(null as any)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -57,7 +57,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isHttpFormData(undefined as any)).toBe(false);
+            expect(isHttpFormData(undefined as any)).toBeFalsy();
         });
 
         it("should return false for wrong type", async ({ task, annotate }) => {
@@ -76,7 +76,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
             };
-            expect(isHttpFormData(data as any)).toBe(false);
+            expect(isHttpFormData(data as any)).toBeFalsy();
         });
     });
 
@@ -100,7 +100,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
             };
-            expect(isPingFormData(validData)).toBe(true);
+            expect(isPingFormData(validData)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -112,7 +112,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPingFormData(null as any)).toBe(false);
+            expect(isPingFormData(null as any)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -124,7 +124,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPingFormData(undefined as any)).toBe(false);
+            expect(isPingFormData(undefined as any)).toBeFalsy();
         });
 
         it("should return false for non-object", async ({ task, annotate }) => {
@@ -136,7 +136,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPingFormData("string" as any)).toBe(false);
+            expect(isPingFormData("string" as any)).toBeFalsy();
         });
 
         it("should return false for wrong type", async ({ task, annotate }) => {
@@ -155,7 +155,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
             };
-            expect(isPingFormData(data as any)).toBe(false);
+            expect(isPingFormData(data as any)).toBeFalsy();
         });
 
         it("should return false for missing host", async ({
@@ -176,7 +176,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
             };
-            expect(isPingFormData(data as any)).toBe(false);
+            expect(isPingFormData(data as any)).toBeFalsy();
         });
 
         it("should return false for non-string host", async ({
@@ -198,7 +198,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
             };
-            expect(isPingFormData(data as any)).toBe(false);
+            expect(isPingFormData(data as any)).toBeFalsy();
         });
 
         it("should return false for non-number checkInterval", async ({
@@ -220,7 +220,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
             };
-            expect(isPingFormData(data as any)).toBe(false);
+            expect(isPingFormData(data as any)).toBeFalsy();
         });
 
         it("should return false for non-number retryAttempts", async ({
@@ -242,7 +242,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: "3",
                 timeout: 5000,
             };
-            expect(isPingFormData(data as any)).toBe(false);
+            expect(isPingFormData(data as any)).toBeFalsy();
         });
 
         it("should return false for non-number timeout", async ({
@@ -264,7 +264,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: "5000",
             };
-            expect(isPingFormData(data as any)).toBe(false);
+            expect(isPingFormData(data as any)).toBeFalsy();
         });
     });
 
@@ -289,7 +289,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
             };
-            expect(isPortFormData(validData)).toBe(true);
+            expect(isPortFormData(validData)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -301,7 +301,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPortFormData(null as any)).toBe(false);
+            expect(isPortFormData(null as any)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -313,7 +313,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPortFormData(undefined as any)).toBe(false);
+            expect(isPortFormData(undefined as any)).toBeFalsy();
         });
 
         it("should return false for non-object", async ({ task, annotate }) => {
@@ -325,7 +325,7 @@ describe("FormData Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPortFormData("string" as any)).toBe(false);
+            expect(isPortFormData("string" as any)).toBeFalsy();
         });
 
         it("should return false for wrong type", async ({ task, annotate }) => {
@@ -345,7 +345,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
             };
-            expect(isPortFormData(data as any)).toBe(false);
+            expect(isPortFormData(data as any)).toBeFalsy();
         });
 
         it("should return false for missing host", async ({
@@ -367,7 +367,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
             };
-            expect(isPortFormData(data as any)).toBe(false);
+            expect(isPortFormData(data as any)).toBeFalsy();
         });
 
         it("should return false for non-string host", async ({
@@ -390,7 +390,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
             };
-            expect(isPortFormData(data as any)).toBe(false);
+            expect(isPortFormData(data as any)).toBeFalsy();
         });
 
         it("should return false for missing port", async ({
@@ -412,7 +412,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
             };
-            expect(isPortFormData(data as any)).toBe(false);
+            expect(isPortFormData(data as any)).toBeFalsy();
         });
 
         it("should return false for non-number port", async ({
@@ -435,7 +435,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
             };
-            expect(isPortFormData(data as any)).toBe(false);
+            expect(isPortFormData(data as any)).toBeFalsy();
         });
 
         it("should return false for non-number checkInterval", async ({
@@ -458,7 +458,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
             };
-            expect(isPortFormData(data as any)).toBe(false);
+            expect(isPortFormData(data as any)).toBeFalsy();
         });
 
         it("should return false for non-number retryAttempts", async ({
@@ -481,7 +481,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: "3",
                 timeout: 5000,
             };
-            expect(isPortFormData(data as any)).toBe(false);
+            expect(isPortFormData(data as any)).toBeFalsy();
         });
 
         it("should return false for non-number timeout", async ({
@@ -504,7 +504,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: "5000",
             };
-            expect(isPortFormData(data as any)).toBe(false);
+            expect(isPortFormData(data as any)).toBeFalsy();
         });
     });
 
@@ -532,7 +532,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                     method: "GET" as const,
                     expectedStatusCode: 200,
                 })
-            ).toBe(true);
+            ).toBeTruthy();
 
             // Test ping form data
             expect(
@@ -543,7 +543,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                     retryAttempts: 3,
                     timeout: 5000,
                 })
-            ).toBe(true);
+            ).toBeTruthy();
 
             // Test port form data
             expect(
@@ -555,7 +555,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                     retryAttempts: 3,
                     timeout: 5000,
                 })
-            ).toBe(true);
+            ).toBeTruthy();
         });
     });
 });

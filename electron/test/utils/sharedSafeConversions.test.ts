@@ -18,7 +18,7 @@ import {
 } from "../../../shared/utils/safeConversions";
 
 describe("Shared Safe Conversions - Backend Coverage", () => {
-    describe("safeNumberConversion", () => {
+    describe(safeNumberConversion, () => {
         it("should return numbers as-is", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -73,7 +73,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeNumberConversion(null, -1)).toBe(-1);
         });
     });
-    describe("safeParseCheckInterval", () => {
+    describe(safeParseCheckInterval, () => {
         it("should return values >= 1000", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -110,7 +110,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParseCheckInterval("invalid", 1500)).toBe(1500);
         });
     });
-    describe("safeParseFloat", () => {
+    describe(safeParseFloat, () => {
         it("should parse valid float strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -147,7 +147,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParseFloat(null)).toBe(0);
         });
     });
-    describe("safeParseInt", () => {
+    describe(safeParseInt, () => {
         it("should parse valid integer strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -185,7 +185,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParseInt(undefined)).toBe(0);
         });
     });
-    describe("safeParsePercentage", () => {
+    describe(safeParsePercentage, () => {
         it("should return percentage values within 0-100", async ({
             task,
             annotate,
@@ -230,7 +230,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParsePercentage(null)).toBe(0);
         });
     });
-    describe("safeParsePort", () => {
+    describe(safeParsePort, () => {
         it("should return valid port numbers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -269,7 +269,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParsePort("invalid", 3000)).toBe(3000);
         });
     });
-    describe("safeParsePositiveInt", () => {
+    describe(safeParsePositiveInt, () => {
         it("should return positive integers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -306,7 +306,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParsePositiveInt("invalid", 10)).toBe(10);
         });
     });
-    describe("safeParseRetryAttempts", () => {
+    describe(safeParseRetryAttempts, () => {
         it("should return retry attempts within valid range", async ({
             task,
             annotate,
@@ -347,7 +347,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParseRetryAttempts(null)).toBe(3);
         });
     });
-    describe("safeParseTimeout", () => {
+    describe(safeParseTimeout, () => {
         it("should return positive timeout values", async ({
             task,
             annotate,
@@ -390,7 +390,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParseTimeout(null)).toBe(10_000);
         });
     });
-    describe("safeParseTimestamp", () => {
+    describe(safeParseTimestamp, () => {
         it("should return valid timestamps", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(

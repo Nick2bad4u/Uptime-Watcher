@@ -100,7 +100,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         // - Clearing timeout if it exists (lines 60-61)
         // - Removing portal if it exists (lines 67-68)
 
-        expect(true).toBe(true); // If we get here without errors, cleanup worked
+        expect(true).toBeTruthy(); // If we get here without errors, cleanup worked
     });
 
     it("should handle hover timeout creation and cleanup", ({
@@ -175,7 +175,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
         // The cleanup should have run without throwing errors (this tests the cleanup path)
         // The component's useEffect cleanup is designed to handle its own portal references
-        expect(true).toBe(true); // If we get here, cleanup worked correctly
+        expect(true).toBeTruthy(); // If we get here, cleanup worked correctly
     });
 
     it("should handle click event and log user action", ({

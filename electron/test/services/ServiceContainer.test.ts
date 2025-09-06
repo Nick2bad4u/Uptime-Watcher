@@ -10,7 +10,7 @@ import {
     ServiceContainerConfig,
 } from "../../services/ServiceContainer";
 
-describe("ServiceContainer", () => {
+describe(ServiceContainer, () => {
     let container: ServiceContainer;
 
     beforeEach(() => {
@@ -354,9 +354,9 @@ describe("ServiceContainer", () => {
             const status = container.getInitializationStatus();
             expect(status).toBeDefined();
             expect(typeof status).toBe("object");
-            expect(status["DatabaseService"]).toBe(true);
-            expect(status["NotificationService"]).toBe(true);
-            expect(status["UptimeOrchestrator"]).toBe(false); // Not initialized yet
+            expect(status["DatabaseService"]).toBeTruthy();
+            expect(status["NotificationService"]).toBeTruthy();
+            expect(status["UptimeOrchestrator"]).toBeFalsy(); // Not initialized yet
         });
         it("should provide list of initialized services", async ({
             task,
@@ -370,7 +370,7 @@ describe("ServiceContainer", () => {
             container.getNotificationService();
 
             const services = container.getInitializedServices();
-            expect(Array.isArray(services)).toBe(true);
+            expect(Array.isArray(services)).toBeTruthy();
             expect(services.length).toBeGreaterThan(0);
 
             // Should include the services we initialized
@@ -420,7 +420,7 @@ describe("ServiceContainer", () => {
             ]);
 
             expect(services).toBeDefined();
-            expect(services.length).toBe(3);
+            expect(services).toHaveLength(3);
         });
     });
     describe("Configuration Edge Cases", () => {
@@ -568,7 +568,7 @@ describe("ServiceContainer", () => {
             const statusAfter = container.getInitializationStatus();
 
             // Status should reflect the change
-            expect(statusAfter["DatabaseService"]).toBe(true);
+            expect(statusAfter["DatabaseService"]).toBeTruthy();
             expect(Object.keys(statusAfter).length).toBeGreaterThan(0);
         });
         it("should handle debug logging configuration", async ({

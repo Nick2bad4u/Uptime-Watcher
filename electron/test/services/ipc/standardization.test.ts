@@ -54,7 +54,7 @@ describe("IPC Standardization Concepts", () => {
 
         // Optional warnings should be string array
         if (response.warnings) {
-            expect(Array.isArray(response.warnings)).toBe(true);
+            expect(Array.isArray(response.warnings)).toBeTruthy();
             // eslint-disable-next-line unicorn/no-array-for-each
             response.warnings.forEach((warning: any) => {
                 expect(typeof warning).toBe("string");
@@ -131,7 +131,7 @@ describe("IPC Standardization Concepts", () => {
             const response = await mockHandler("test-data");
 
             validateIpcResponse(response);
-            expect(response.success).toBe(true);
+            expect(response.success).toBeTruthy();
             expect(response.data).toEqual({ result: "test-data" });
             expect(response.metadata?.["handler"]).toBe("mock-handler");
             expect(response.metadata?.["duration"]).toBeTypeOf("number");
@@ -153,7 +153,7 @@ describe("IPC Standardization Concepts", () => {
             const response = await mockHandler();
 
             validateIpcResponse(response);
-            expect(response.success).toBe(false);
+            expect(response.success).toBeFalsy();
             expect(response.error).toBe("Test error");
             expect(response.metadata?.["handler"]).toBe("mock-handler");
             expect(response.metadata?.["duration"]).toBeTypeOf("number");
@@ -183,7 +183,7 @@ describe("IPC Standardization Concepts", () => {
             const response = await mockHandler(123); // Invalid parameter
 
             validateIpcResponse(response);
-            expect(response.success).toBe(false);
+            expect(response.success).toBeFalsy();
             expect(response.error).toBe("Parameter validation failed");
             expect(response.metadata?.["validationErrors"]).toEqual([
                 "Parameter must be string",
@@ -320,7 +320,7 @@ describe("IPC Standardization Concepts", () => {
                 const response = await mockHandler();
 
                 validateIpcResponse(response);
-                expect(response.success).toBe(false);
+                expect(response.success).toBeFalsy();
                 expect(typeof response.error).toBe("string");
                 expect(response.error!.length).toBeGreaterThan(0);
             }
@@ -374,7 +374,7 @@ describe("IPC Standardization Concepts", () => {
             const response = await slowHandler();
 
             validateIpcResponse(response);
-            expect(response.success).toBe(true);
+            expect(response.success).toBeTruthy();
             expect(response.metadata?.["duration"]).toBeGreaterThan(5); // Should take at least 5ms
         });
 
@@ -395,7 +395,7 @@ describe("IPC Standardization Concepts", () => {
             const response = await errorHandler();
 
             validateIpcResponse(response);
-            expect(response.success).toBe(false);
+            expect(response.success).toBeFalsy();
             expect(response.metadata?.["duration"]).toBeGreaterThan(3); // Should include processing time
         });
     });
@@ -427,7 +427,7 @@ describe("IPC Standardization Concepts", () => {
                 console.log(`${index + 1}. ${guideline}`);
             }
 
-            expect(guidelines.length).toBe(8);
+            expect(guidelines).toHaveLength(8);
         });
 
         it("should demonstrate handler registration pattern", async ({
@@ -525,7 +525,7 @@ registerStandardizedIpcHandler(
                 console.log(`  Example: ${example}`);
             }
 
-            expect(testingApproaches.length).toBe(5);
+            expect(testingApproaches).toHaveLength(5);
         });
     });
 });

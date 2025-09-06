@@ -65,7 +65,7 @@ if ((globalThis as any).electronAPI) {
     });
 }
 
-describe("useSettingsStore", () => {
+describe(useSettingsStore, () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
@@ -174,7 +174,7 @@ describe("useSettingsStore", () => {
             });
 
             expect(result.current.settings.theme).toBe("dark");
-            expect(result.current.settings.notifications).toBe(false);
+            expect(result.current.settings.notifications).toBeFalsy();
             expect(result.current.settings.historyLimit).toBe(500); // unchanged - using correct DEFAULT_HISTORY_LIMIT
         });
 
@@ -191,7 +191,7 @@ describe("useSettingsStore", () => {
             });
 
             expect(result.current.settings.theme).toBe("light");
-            expect(result.current.settings.notifications).toBe(true); // unchanged
+            expect(result.current.settings.notifications).toBeTruthy(); // unchanged
         });
 
         it("should handle reset to defaults", async ({ task, annotate }) => {
@@ -802,7 +802,7 @@ describe("useSettingsStore", () => {
             });
 
             expect(result.current.settings.theme).toBe("light");
-            expect(result.current.settings.notifications).toBe(true); // unchanged
+            expect(result.current.settings.notifications).toBeTruthy(); // unchanged
             expect(result.current.settings.historyLimit).toBe(500); // default value
         });
     });

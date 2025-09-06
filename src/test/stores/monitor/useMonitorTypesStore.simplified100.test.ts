@@ -91,8 +91,8 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
             expect(result.current.monitorTypes).toEqual([]);
             expect(result.current.fieldConfigs).toEqual({});
-            expect(result.current.isLoaded).toBe(false);
-            expect(result.current.isLoading).toBe(false);
+            expect(result.current.isLoaded).toBeFalsy();
+            expect(result.current.isLoading).toBeFalsy();
             expect(result.current.lastError).toBeUndefined();
         });
 
@@ -130,8 +130,8 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             expect(result.current.fieldConfigs["http"]).toEqual(
                 mockConfigs[0]!.fields
             );
-            expect(result.current.isLoaded).toBe(true);
-            expect(result.current.isLoading).toBe(false);
+            expect(result.current.isLoaded).toBeTruthy();
+            expect(result.current.isLoading).toBeFalsy();
             expect(result.current.lastError).toBeUndefined();
         });
     });
@@ -154,7 +154,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             });
 
             expect(result.current.lastError).toBe("Loading failed");
-            expect(result.current.isLoading).toBe(false);
+            expect(result.current.isLoading).toBeFalsy();
         });
 
         it("should filter out invalid configurations", async () => {
@@ -203,7 +203,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             });
 
             expect(result.current.monitorTypes).toEqual([]);
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
         });
     });
 
@@ -258,7 +258,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 );
             });
 
-            expect(validationResult!.success).toBe(false);
+            expect(validationResult!.success).toBeFalsy();
             expect(validationResult!.errors).toEqual(["URL required"]);
             expect(validationResult!.warnings).toEqual([]); // Should default to empty array
             expect(validationResult!.metadata).toEqual({}); // Should default to empty object
@@ -393,13 +393,13 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 result.current.setLoading(true);
             });
 
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
 
             act(() => {
                 result.current.setLoading(false);
             });
 
-            expect(result.current.isLoading).toBe(false);
+            expect(result.current.isLoading).toBeFalsy();
         });
 
         it("should handle getFieldConfig", () => {
@@ -454,7 +454,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             });
 
             expect(result.current.monitorTypes).toEqual(mockConfigs);
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
         });
 
         it("should skip loading if already loaded and no error", async () => {
@@ -599,7 +599,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
             expect(result.current.monitorTypes).toHaveLength(100);
             expect(Object.keys(result.current.fieldConfigs)).toHaveLength(100);
-            expect(result.current.isLoaded).toBe(true);
+            expect(result.current.isLoaded).toBeTruthy();
         });
 
         it("should handle special character types and fields", async () => {

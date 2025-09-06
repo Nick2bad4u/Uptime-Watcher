@@ -166,7 +166,7 @@ describe("useTheme - Complete Coverage", () => {
 
             const { result } = renderHook(() => useTheme());
 
-            expect(Array.isArray(result.current.availableThemes)).toBe(true);
+            expect(Array.isArray(result.current.availableThemes)).toBeTruthy();
             expect(result.current.availableThemes.length).toBeGreaterThan(0);
         });
 

@@ -124,7 +124,7 @@ describe("OperationHelpers", () => {
         vi.resetAllMocks();
     });
 
-    describe("getSiteById", () => {
+    describe(getSiteById, () => {
         it("should return site when found", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationHelpers", "component");
@@ -167,7 +167,7 @@ describe("OperationHelpers", () => {
         });
     });
 
-    describe("updateMonitorAndSave", () => {
+    describe(updateMonitorAndSave, () => {
         it("should update monitor and save successfully", async ({
             task,
             annotate,
@@ -238,7 +238,7 @@ describe("OperationHelpers", () => {
         });
     });
 
-    describe("withSiteOperation", () => {
+    describe(withSiteOperation, () => {
         it("should execute operation with sync by default", async ({
             task,
             annotate,
@@ -383,7 +383,7 @@ describe("OperationHelpers", () => {
         });
     });
 
-    describe("withSiteOperationReturning", () => {
+    describe(withSiteOperationReturning, () => {
         it("should execute operation with sync by default and return result", async ({
             task,
             annotate,
@@ -585,7 +585,7 @@ describe("OperationHelpers", () => {
                 mockDeps,
                 false
             );
-            expect(booleanResult).toBe(true);
+            expect(booleanResult).toBeTruthy();
 
             // Test with array result
             const arrayOperation = vi.fn().mockResolvedValue([

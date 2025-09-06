@@ -43,6 +43,6 @@ describe("Debug Availability Description", () => {
         }
 
         // This should help us see what the actual function is doing
-        expect(true).toBe(true); // Just pass the test
+        expect(true).toBeTruthy(); // Just pass the test
     });
 });

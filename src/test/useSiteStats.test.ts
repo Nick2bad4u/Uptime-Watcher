@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 import { useSiteStats } from "../hooks/site/useSiteStats";
 import { StatusHistory } from "@shared/types";
 
-describe("useSiteStats", () => {
+describe(useSiteStats, () => {
     describe("Basic Functionality", () => {
         it("should return zero stats for empty history", async ({
             task,

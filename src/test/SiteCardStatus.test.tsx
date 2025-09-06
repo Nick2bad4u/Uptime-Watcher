@@ -14,7 +14,7 @@ vi.mock("../components/common/StatusBadge", () => ({
     ),
 }));
 
-describe("SiteCardStatus", () => {
+describe(SiteCardStatus, () => {
     it("renders correct label and status for 'up'", () => {
         render(<SiteCardStatus selectedMonitorId="http" status="up" />);
         const badge = screen.getByTestId("status-badge");

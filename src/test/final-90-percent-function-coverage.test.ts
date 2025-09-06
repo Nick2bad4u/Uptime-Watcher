@@ -36,7 +36,7 @@ describe("Final 90% Function Coverage Push", () => {
             expect(testValue3).toBeNull();
             expect(testValue4).toBeUndefined();
             expect(typeof testValue5).toBe("object");
-            expect(Array.isArray(testValue6)).toBe(true);
+            expect(Array.isArray(testValue6)).toBeTruthy();
         });
 
         it("should test validation helper functions", async ({
@@ -123,9 +123,9 @@ describe("Final 90% Function Coverage Push", () => {
             const isIntervalValid =
                 formData.checkInterval && formData.checkInterval >= 1000;
 
-            expect(isNameValid).toBe(true);
-            expect(isUrlValid).toBe(true);
-            expect(isIntervalValid).toBe(true);
+            expect(isNameValid).toBeTruthy();
+            expect(isUrlValid).toBeTruthy();
+            expect(isIntervalValid).toBeTruthy();
         });
 
         it("should test status calculation helpers", async ({
@@ -254,8 +254,8 @@ describe("Final 90% Function Coverage Push", () => {
             const getTimeDiff = (start: number, end: number) => end - start;
 
             expect(formatDate(now)).toContain("T");
-            expect(isValidDate(now)).toBe(true);
-            expect(isValidDate(-1)).toBe(false);
+            expect(isValidDate(now)).toBeTruthy();
+            expect(isValidDate(-1)).toBeFalsy();
             expect(getTimeDiff(1000, 2000)).toBe(1000);
         });
 
@@ -445,7 +445,7 @@ describe("Final 90% Function Coverage Push", () => {
 
             expect(merged.timeout).toBe(10_000);
             expect(merged.retries).toBe(3);
-            expect(isValid).toBe(true);
+            expect(isValid).toBeTruthy();
         });
 
         it("should test environment detection functions", async ({
@@ -477,9 +477,9 @@ describe("Final 90% Function Coverage Push", () => {
             });
 
             // Since we're in test environment
-            expect(isTest()).toBe(true);
-            expect(isDevelopment()).toBe(false);
-            expect(isProduction()).toBe(false);
+            expect(isTest()).toBeTruthy();
+            expect(isDevelopment()).toBeFalsy();
+            expect(isProduction()).toBeFalsy();
 
             const browserInfo = getBrowserInfo();
             expect(browserInfo.userAgent).toContain("jsdom"); // Running in jsdom environment

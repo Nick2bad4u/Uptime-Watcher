@@ -18,7 +18,7 @@ describe("Final Coverage Analysis", () => {
         annotate("Type: Business Logic", "type");
 
         // Test that the new store structure is properly set up
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 
     it("should handle loading state", ({ task, annotate }) => {
@@ -33,6 +33,6 @@ describe("Final Coverage Analysis", () => {
         annotate("Type: Data Loading", "type");
 
         // Test that all stores are properly isolated
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 });

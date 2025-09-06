@@ -125,7 +125,7 @@ describe("Database Operations Fuzzing Tests", () => {
                         }
 
                         // Either it succeeded and called the database, or it failed early (which is good)
-                        expect(true).toBe(true); // Test that we can run without crashing
+                        expect(true).toBeTruthy(); // Test that we can run without crashing
                     }
                 ),
                 { numRuns: 20 }
@@ -157,7 +157,7 @@ describe("Database Operations Fuzzing Tests", () => {
                             // Should be null or undefined for non-existent items
                             expect(
                                 result === null || result === undefined
-                            ).toBe(true); // null or undefined
+                            ).toBeTruthy(); // null or undefined
                         } catch (error) {
                             // Method may throw for invalid identifiers, which is acceptable
                         }
@@ -210,7 +210,7 @@ describe("Database Operations Fuzzing Tests", () => {
                         expect(typeof result).toBe("boolean");
                     } catch (error) {
                         // Method may throw for invalid identifiers, which is acceptable
-                        expect(true).toBe(true); // Test passes if it throws or succeeds
+                        expect(true).toBeTruthy(); // Test passes if it throws or succeeds
                     }
                 }),
                 { numRuns: 20 }
@@ -274,8 +274,8 @@ describe("Database Operations Fuzzing Tests", () => {
                         const result =
                             await monitorRepository.findByIdentifier(monitorId);
                         // Should be null or undefined for non-existent monitors
-                        expect(result === null || result === undefined).toBe(
-                            true
+                        expect(result === null || result === undefined).toBeTruthy(
+                            
                         ); // null or undefined
                     } catch (error) {
                         // Method may throw for invalid IDs, which is acceptable
@@ -301,7 +301,7 @@ describe("Database Operations Fuzzing Tests", () => {
                                 await monitorRepository.findBySiteIdentifier(
                                     siteIdentifier
                                 );
-                            expect(Array.isArray(result)).toBe(true);
+                            expect(Array.isArray(result)).toBeTruthy();
                         } catch (error) {
                             // Method may throw for invalid identifiers, which is acceptable
                         }

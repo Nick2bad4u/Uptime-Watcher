@@ -17,7 +17,7 @@ import {
 } from "../../shared/types/database";
 
 describe("Shared Database Types - Complete Coverage", () => {
-    describe("isValidHistoryRow", () => {
+    describe(isValidHistoryRow, () => {
         it("should validate correct history row with all required fields", async ({
             task,
             annotate,
@@ -35,7 +35,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 details: "All systems operational",
             };
 
-            expect(isValidHistoryRow(validRow)).toBe(true);
+            expect(isValidHistoryRow(validRow)).toBeTruthy();
         });
 
         it("should validate minimal valid history row", async ({
@@ -53,7 +53,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: 1_640_995_200_000,
             };
 
-            expect(isValidHistoryRow(validRow)).toBe(true);
+            expect(isValidHistoryRow(validRow)).toBeTruthy();
         });
 
         it("should accept 'up' status", async ({ task, annotate }) => {
@@ -68,7 +68,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: 12_345,
             };
 
-            expect(isValidHistoryRow(row)).toBe(true);
+            expect(isValidHistoryRow(row)).toBeTruthy();
         });
 
         it("should accept 'down' status", async ({ task, annotate }) => {
@@ -83,7 +83,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: 12_345,
             };
 
-            expect(isValidHistoryRow(row)).toBe(true);
+            expect(isValidHistoryRow(row)).toBeTruthy();
         });
 
         it("should accept numeric timestamp", async ({ task, annotate }) => {
@@ -98,7 +98,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: 1_640_995_200_000,
             };
 
-            expect(isValidHistoryRow(row)).toBe(true);
+            expect(isValidHistoryRow(row)).toBeTruthy();
         });
 
         it("should accept string timestamp that can be converted to number", async ({
@@ -116,7 +116,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: "1640995200000",
             };
 
-            expect(isValidHistoryRow(row)).toBe(true);
+            expect(isValidHistoryRow(row)).toBeTruthy();
         });
 
         // Test all rejection cases
@@ -126,7 +126,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidHistoryRow(null)).toBe(false);
+            expect(isValidHistoryRow(null)).toBeFalsy();
         });
 
         it("should reject undefined input", async ({ task, annotate }) => {
@@ -135,7 +135,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidHistoryRow(undefined)).toBe(false);
+            expect(isValidHistoryRow(undefined)).toBeFalsy();
         });
 
         it("should reject string input", async ({ task, annotate }) => {
@@ -144,7 +144,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidHistoryRow("not-an-object")).toBe(false);
+            expect(isValidHistoryRow("not-an-object")).toBeFalsy();
         });
 
         it("should reject number input", async ({ task, annotate }) => {
@@ -153,7 +153,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidHistoryRow(123)).toBe(false);
+            expect(isValidHistoryRow(123)).toBeFalsy();
         });
 
         it("should reject array input", async ({ task, annotate }) => {
@@ -162,7 +162,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidHistoryRow([])).toBe(false);
+            expect(isValidHistoryRow([])).toBeFalsy();
         });
 
         it("should reject empty object", async ({ task, annotate }) => {
@@ -171,7 +171,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidHistoryRow({})).toBe(false);
+            expect(isValidHistoryRow({})).toBeFalsy();
         });
 
         it("should reject object missing monitorId", async ({
@@ -188,7 +188,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: 12_345,
             };
 
-            expect(isValidHistoryRow(row)).toBe(false);
+            expect(isValidHistoryRow(row)).toBeFalsy();
         });
 
         it("should reject object missing status", async ({
@@ -205,7 +205,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: 12_345,
             };
 
-            expect(isValidHistoryRow(row)).toBe(false);
+            expect(isValidHistoryRow(row)).toBeFalsy();
         });
 
         it("should reject object missing timestamp", async ({
@@ -222,7 +222,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 status: "up",
             };
 
-            expect(isValidHistoryRow(row)).toBe(false);
+            expect(isValidHistoryRow(row)).toBeFalsy();
         });
 
         it("should reject object with undefined monitorId", async ({
@@ -240,7 +240,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: 12_345,
             };
 
-            expect(isValidHistoryRow(row)).toBe(false);
+            expect(isValidHistoryRow(row)).toBeFalsy();
         });
 
         it("should reject object with undefined status", async ({
@@ -258,7 +258,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: 12_345,
             };
 
-            expect(isValidHistoryRow(row)).toBe(false);
+            expect(isValidHistoryRow(row)).toBeFalsy();
         });
 
         it("should reject object with undefined timestamp", async ({
@@ -276,7 +276,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: undefined,
             };
 
-            expect(isValidHistoryRow(row)).toBe(false);
+            expect(isValidHistoryRow(row)).toBeFalsy();
         });
 
         it("should reject object with non-string monitorId", async ({
@@ -294,7 +294,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: 12_345,
             };
 
-            expect(isValidHistoryRow(row)).toBe(false);
+            expect(isValidHistoryRow(row)).toBeFalsy();
         });
 
         it("should reject object with invalid status", async ({
@@ -312,7 +312,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: 12_345,
             };
 
-            expect(isValidHistoryRow(row)).toBe(false);
+            expect(isValidHistoryRow(row)).toBeFalsy();
         });
 
         it("should reject object with invalid timestamp (NaN)", async ({
@@ -330,7 +330,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: Number.NaN,
             };
 
-            expect(isValidHistoryRow(row)).toBe(false);
+            expect(isValidHistoryRow(row)).toBeFalsy();
         });
 
         it("should reject object with invalid string timestamp", async ({
@@ -348,11 +348,11 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: "not-a-number",
             };
 
-            expect(isValidHistoryRow(row)).toBe(false);
+            expect(isValidHistoryRow(row)).toBeFalsy();
         });
     });
 
-    describe("isValidMonitorRow", () => {
+    describe(isValidMonitorRow, () => {
         it("should validate correct monitor row with numeric id", async ({
             task,
             annotate,
@@ -372,7 +372,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 monitoring: 1,
             };
 
-            expect(isValidMonitorRow(validRow)).toBe(true);
+            expect(isValidMonitorRow(validRow)).toBeTruthy();
         });
 
         it("should validate correct monitor row with number id", async ({
@@ -392,7 +392,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 port: 8080,
             };
 
-            expect(isValidMonitorRow(validRow)).toBe(true);
+            expect(isValidMonitorRow(validRow)).toBeTruthy();
         });
 
         it("should validate minimal valid monitor row", async ({
@@ -410,7 +410,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 type: "ping",
             };
 
-            expect(isValidMonitorRow(validRow)).toBe(true);
+            expect(isValidMonitorRow(validRow)).toBeTruthy();
         });
 
         // Test all rejection cases
@@ -420,7 +420,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidMonitorRow(null)).toBe(false);
+            expect(isValidMonitorRow(null)).toBeFalsy();
         });
 
         it("should reject undefined input", async ({ task, annotate }) => {
@@ -429,7 +429,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidMonitorRow(undefined)).toBe(false);
+            expect(isValidMonitorRow(undefined)).toBeFalsy();
         });
 
         it("should reject string input", async ({ task, annotate }) => {
@@ -438,7 +438,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidMonitorRow("not-an-object")).toBe(false);
+            expect(isValidMonitorRow("not-an-object")).toBeFalsy();
         });
 
         it("should reject number input", async ({ task, annotate }) => {
@@ -447,7 +447,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidMonitorRow(456)).toBe(false);
+            expect(isValidMonitorRow(456)).toBeFalsy();
         });
 
         it("should reject array input", async ({ task, annotate }) => {
@@ -462,7 +462,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                     2,
                     3,
                 ])
-            ).toBe(false);
+            ).toBeFalsy();
         });
 
         it("should reject empty object", async ({ task, annotate }) => {
@@ -471,7 +471,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidMonitorRow({})).toBe(false);
+            expect(isValidMonitorRow({})).toBeFalsy();
         });
 
         it("should reject object missing id", async ({ task, annotate }) => {
@@ -485,7 +485,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 type: "http",
             };
 
-            expect(isValidMonitorRow(row)).toBe(false);
+            expect(isValidMonitorRow(row)).toBeFalsy();
         });
 
         it("should reject object missing site_identifier", async ({
@@ -502,7 +502,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 type: "http",
             };
 
-            expect(isValidMonitorRow(row)).toBe(false);
+            expect(isValidMonitorRow(row)).toBeFalsy();
         });
 
         it("should reject object missing type", async ({ task, annotate }) => {
@@ -516,7 +516,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 site_identifier: "test-site",
             };
 
-            expect(isValidMonitorRow(row)).toBe(false);
+            expect(isValidMonitorRow(row)).toBeFalsy();
         });
 
         it("should reject object with undefined id", async ({
@@ -534,7 +534,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 type: "http",
             };
 
-            expect(isValidMonitorRow(row)).toBe(false);
+            expect(isValidMonitorRow(row)).toBeFalsy();
         });
 
         it("should reject object with undefined site_identifier", async ({
@@ -552,7 +552,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 type: "http",
             };
 
-            expect(isValidMonitorRow(row)).toBe(false);
+            expect(isValidMonitorRow(row)).toBeFalsy();
         });
 
         it("should reject object with undefined type", async ({
@@ -570,7 +570,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 type: undefined,
             };
 
-            expect(isValidMonitorRow(row)).toBe(false);
+            expect(isValidMonitorRow(row)).toBeFalsy();
         });
 
         it("should reject object with invalid id type (boolean)", async ({
@@ -588,7 +588,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 type: "http",
             };
 
-            expect(isValidMonitorRow(row)).toBe(false);
+            expect(isValidMonitorRow(row)).toBeFalsy();
         });
 
         it("should reject object with invalid site_identifier type", async ({
@@ -606,7 +606,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 type: "http",
             };
 
-            expect(isValidMonitorRow(row)).toBe(false);
+            expect(isValidMonitorRow(row)).toBeFalsy();
         });
 
         it("should reject object with invalid type field type", async ({
@@ -624,11 +624,11 @@ describe("Shared Database Types - Complete Coverage", () => {
                 type: 456,
             };
 
-            expect(isValidMonitorRow(row)).toBe(false);
+            expect(isValidMonitorRow(row)).toBeFalsy();
         });
     });
 
-    describe("isValidSettingsRow", () => {
+    describe(isValidSettingsRow, () => {
         it("should validate correct settings row", async ({
             task,
             annotate,
@@ -643,7 +643,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 value: "dark",
             };
 
-            expect(isValidSettingsRow(validRow)).toBe(true);
+            expect(isValidSettingsRow(validRow)).toBeTruthy();
         });
 
         it("should validate minimal valid settings row", async ({
@@ -659,7 +659,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 key: "enabled",
             };
 
-            expect(isValidSettingsRow(validRow)).toBe(true);
+            expect(isValidSettingsRow(validRow)).toBeTruthy();
         });
 
         it("should validate settings row with long key", async ({
@@ -676,7 +676,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 value: "some-value",
             };
 
-            expect(isValidSettingsRow(validRow)).toBe(true);
+            expect(isValidSettingsRow(validRow)).toBeTruthy();
         });
 
         // Test all rejection cases
@@ -686,7 +686,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow(null)).toBe(false);
+            expect(isValidSettingsRow(null)).toBeFalsy();
         });
 
         it("should reject undefined input", async ({ task, annotate }) => {
@@ -695,7 +695,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow(undefined)).toBe(false);
+            expect(isValidSettingsRow(undefined)).toBeFalsy();
         });
 
         it("should reject string input", async ({ task, annotate }) => {
@@ -704,7 +704,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow("not-an-object")).toBe(false);
+            expect(isValidSettingsRow("not-an-object")).toBeFalsy();
         });
 
         it("should reject number input", async ({ task, annotate }) => {
@@ -713,7 +713,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow(789)).toBe(false);
+            expect(isValidSettingsRow(789)).toBeFalsy();
         });
 
         it("should reject array input", async ({ task, annotate }) => {
@@ -722,7 +722,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow(["key", "value"])).toBe(false);
+            expect(isValidSettingsRow(["key", "value"])).toBeFalsy();
         });
 
         it("should reject empty object", async ({ task, annotate }) => {
@@ -731,7 +731,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow({})).toBe(false);
+            expect(isValidSettingsRow({})).toBeFalsy();
         });
 
         it("should reject object missing key", async ({ task, annotate }) => {
@@ -744,7 +744,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 value: "some-value",
             };
 
-            expect(isValidSettingsRow(row)).toBe(false);
+            expect(isValidSettingsRow(row)).toBeFalsy();
         });
 
         it("should reject object with undefined key", async ({
@@ -761,7 +761,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 value: "some-value",
             };
 
-            expect(isValidSettingsRow(row)).toBe(false);
+            expect(isValidSettingsRow(row)).toBeFalsy();
         });
 
         it("should reject object with null key", async ({ task, annotate }) => {
@@ -775,7 +775,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 value: "some-value",
             };
 
-            expect(isValidSettingsRow(row)).toBe(false);
+            expect(isValidSettingsRow(row)).toBeFalsy();
         });
 
         it("should reject object with non-string key", async ({
@@ -792,7 +792,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 value: "some-value",
             };
 
-            expect(isValidSettingsRow(row)).toBe(false);
+            expect(isValidSettingsRow(row)).toBeFalsy();
         });
 
         it("should reject object with empty string key", async ({
@@ -809,7 +809,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 value: "some-value",
             };
 
-            expect(isValidSettingsRow(row)).toBe(false);
+            expect(isValidSettingsRow(row)).toBeFalsy();
         });
 
         it("should reject object with whitespace-only key", async ({
@@ -828,11 +828,11 @@ describe("Shared Database Types - Complete Coverage", () => {
 
             // Note: The actual implementation accepts whitespace-only strings as valid
             // after String() conversion and length check, so this test is updated to match
-            expect(isValidSettingsRow(row)).toBe(true);
+            expect(isValidSettingsRow(row)).toBeTruthy();
         });
     });
 
-    describe("isValidSiteRow", () => {
+    describe(isValidSiteRow, () => {
         it("should validate correct site row", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
@@ -844,7 +844,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 name: "Test Site",
             };
 
-            expect(isValidSiteRow(validRow)).toBe(true);
+            expect(isValidSiteRow(validRow)).toBeTruthy();
         });
 
         it("should validate minimal valid site row", async ({
@@ -860,7 +860,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 identifier: "minimal-site",
             };
 
-            expect(isValidSiteRow(validRow)).toBe(true);
+            expect(isValidSiteRow(validRow)).toBeTruthy();
         });
 
         it("should validate site row with identifier containing special characters", async ({
@@ -877,7 +877,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 name: "Special Site",
             };
 
-            expect(isValidSiteRow(validRow)).toBe(true);
+            expect(isValidSiteRow(validRow)).toBeTruthy();
         });
 
         // Test all rejection cases
@@ -887,7 +887,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow(null)).toBe(false);
+            expect(isValidSiteRow(null)).toBeFalsy();
         });
 
         it("should reject undefined input", async ({ task, annotate }) => {
@@ -896,7 +896,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow(undefined)).toBe(false);
+            expect(isValidSiteRow(undefined)).toBeFalsy();
         });
 
         it("should reject string input", async ({ task, annotate }) => {
@@ -905,7 +905,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow("not-an-object")).toBe(false);
+            expect(isValidSiteRow("not-an-object")).toBeFalsy();
         });
 
         it("should reject number input", async ({ task, annotate }) => {
@@ -914,7 +914,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow(999)).toBe(false);
+            expect(isValidSiteRow(999)).toBeFalsy();
         });
 
         it("should reject array input", async ({ task, annotate }) => {
@@ -923,7 +923,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow(["identifier", "name"])).toBe(false);
+            expect(isValidSiteRow(["identifier", "name"])).toBeFalsy();
         });
 
         it("should reject empty object", async ({ task, annotate }) => {
@@ -932,7 +932,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow({})).toBe(false);
+            expect(isValidSiteRow({})).toBeFalsy();
         });
 
         it("should reject object missing identifier", async ({
@@ -948,7 +948,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 name: "Some Site",
             };
 
-            expect(isValidSiteRow(row)).toBe(false);
+            expect(isValidSiteRow(row)).toBeFalsy();
         });
 
         it("should reject object with undefined identifier", async ({
@@ -965,7 +965,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 name: "Some Site",
             };
 
-            expect(isValidSiteRow(row)).toBe(false);
+            expect(isValidSiteRow(row)).toBeFalsy();
         });
 
         it("should reject object with null identifier", async ({
@@ -982,7 +982,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 name: "Some Site",
             };
 
-            expect(isValidSiteRow(row)).toBe(false);
+            expect(isValidSiteRow(row)).toBeFalsy();
         });
 
         it("should reject object with non-string identifier", async ({
@@ -999,7 +999,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 name: "Some Site",
             };
 
-            expect(isValidSiteRow(row)).toBe(false);
+            expect(isValidSiteRow(row)).toBeFalsy();
         });
 
         it("should reject object with empty string identifier", async ({
@@ -1016,7 +1016,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 name: "Some Site",
             };
 
-            expect(isValidSiteRow(row)).toBe(false);
+            expect(isValidSiteRow(row)).toBeFalsy();
         });
 
         it("should reject object with whitespace-only identifier", async ({
@@ -1033,11 +1033,11 @@ describe("Shared Database Types - Complete Coverage", () => {
                 name: "Some Site",
             };
 
-            expect(isValidSiteRow(row)).toBe(false);
+            expect(isValidSiteRow(row)).toBeFalsy();
         });
     });
 
-    describe("safeGetRowProperty", () => {
+    describe(safeGetRowProperty, () => {
         it("should return property value when property exists and is not undefined", async ({
             task,
             annotate,
@@ -1067,7 +1067,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 "hello"
             );
             expect(safeGetRowProperty(row, "numberProp", 0)).toBe(42);
-            expect(safeGetRowProperty(row, "booleanProp", false)).toBe(true);
+            expect(safeGetRowProperty(row, "booleanProp", false)).toBeTruthy();
             expect(safeGetRowProperty(row, "objectProp", {})).toEqual({
                 nested: "value",
             });
@@ -1078,7 +1078,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             ]);
             expect(safeGetRowProperty(row, "nullProp", "default")).toBe(null);
             expect(safeGetRowProperty(row, "zeroProp", 999)).toBe(0);
-            expect(safeGetRowProperty(row, "falseProp", true)).toBe(false);
+            expect(safeGetRowProperty(row, "falseProp", true)).toBeFalsy();
             expect(safeGetRowProperty(row, "emptyStringProp", "default")).toBe(
                 ""
             );
@@ -1101,8 +1101,8 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(safeGetRowProperty(row, "anotherMissingProp", 123)).toBe(
                 123
             );
-            expect(safeGetRowProperty(row, "missingBoolProp", false)).toBe(
-                false
+            expect(safeGetRowProperty(row, "missingBoolProp", false)).toBeFalsy(
+                
             );
         });
 
@@ -1137,7 +1137,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 "default"
             );
             expect(safeGetRowProperty(row, "anotherProp", 42)).toBe(42);
-            expect(safeGetRowProperty(row, "boolProp", true)).toBe(true);
+            expect(safeGetRowProperty(row, "boolProp", true)).toBeTruthy();
         });
 
         it("should work with complex default values", async ({
@@ -1238,13 +1238,13 @@ describe("Shared Database Types - Complete Coverage", () => {
             // These tests ensure the internal RowValidationUtils functions are exercised
 
             // Test the isValidObject check through different validation functions
-            expect(isValidHistoryRow(null)).toBe(false); // tests isValidObject(null)
-            expect(isValidHistoryRow([])).toBe(false); // tests isValidObject(array)
-            expect(isValidHistoryRow("string")).toBe(false); // tests isValidObject(string)
-            expect(isValidHistoryRow(123)).toBe(false); // tests isValidObject(number)
+            expect(isValidHistoryRow(null)).toBeFalsy(); // tests isValidObject(null)
+            expect(isValidHistoryRow([])).toBeFalsy(); // tests isValidObject(array)
+            expect(isValidHistoryRow("string")).toBeFalsy(); // tests isValidObject(string)
+            expect(isValidHistoryRow(123)).toBeFalsy(); // tests isValidObject(number)
 
             // Valid object should pass isValidObject but may fail other validations
-            expect(isValidHistoryRow({})).toBe(false); // tests isValidObject returns true but missing required fields
+            expect(isValidHistoryRow({})).toBeFalsy(); // tests isValidObject returns true but missing required fields
         });
     });
 
@@ -1264,14 +1264,14 @@ describe("Shared Database Types - Complete Coverage", () => {
                 status: "up",
                 timestamp: 12_345,
             };
-            expect(isValidHistoryRow(validUpRow)).toBe(true);
+            expect(isValidHistoryRow(validUpRow)).toBeTruthy();
 
             const validDownRow = {
                 monitorId: "test",
                 status: "down",
                 timestamp: 12_345,
             };
-            expect(isValidHistoryRow(validDownRow)).toBe(true);
+            expect(isValidHistoryRow(validDownRow)).toBeTruthy();
 
             // Test invalid status values
             const invalidStatusRow = {
@@ -1279,14 +1279,14 @@ describe("Shared Database Types - Complete Coverage", () => {
                 status: "invalid",
                 timestamp: 12_345,
             };
-            expect(isValidHistoryRow(invalidStatusRow)).toBe(false);
+            expect(isValidHistoryRow(invalidStatusRow)).toBeFalsy();
 
             const nullStatusRow = {
                 monitorId: "test",
                 status: null,
                 timestamp: 12_345,
             };
-            expect(isValidHistoryRow(nullStatusRow)).toBe(false);
+            expect(isValidHistoryRow(nullStatusRow)).toBeFalsy();
         });
     });
 
@@ -1306,7 +1306,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 status: "up",
                 timestamp: 1_640_995_200_000,
             };
-            expect(isValidHistoryRow(validNumberRow)).toBe(true);
+            expect(isValidHistoryRow(validNumberRow)).toBeTruthy();
 
             // Invalid numeric timestamp (NaN)
             const nanRow = {
@@ -1314,7 +1314,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 status: "up",
                 timestamp: Number.NaN,
             };
-            expect(isValidHistoryRow(nanRow)).toBe(false);
+            expect(isValidHistoryRow(nanRow)).toBeFalsy();
         });
 
         it("should cover internal isValidTimestamp validation for strings", async ({
@@ -1332,7 +1332,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 status: "up",
                 timestamp: "1640995200000",
             };
-            expect(isValidHistoryRow(validStringRow)).toBe(true);
+            expect(isValidHistoryRow(validStringRow)).toBeTruthy();
 
             // Invalid string timestamp that cannot be converted
             const invalidStringRow = {
@@ -1340,7 +1340,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 status: "up",
                 timestamp: "not-a-number",
             };
-            expect(isValidHistoryRow(invalidStringRow)).toBe(false);
+            expect(isValidHistoryRow(invalidStringRow)).toBeFalsy();
 
             // Empty string timestamp should be accepted (converts to number 0)
             const emptyStringRow = {
@@ -1348,7 +1348,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 status: "up",
                 timestamp: "",
             };
-            expect(isValidHistoryRow(emptyStringRow)).toBe(true);
+            expect(isValidHistoryRow(emptyStringRow)).toBeTruthy();
         });
 
         it("should cover internal isValidTimestamp validation for other types", async ({
@@ -1366,21 +1366,21 @@ describe("Shared Database Types - Complete Coverage", () => {
                 status: "up",
                 timestamp: true,
             };
-            expect(isValidHistoryRow(booleanRow)).toBe(false);
+            expect(isValidHistoryRow(booleanRow)).toBeFalsy();
 
             const objectRow = {
                 monitorId: "test",
                 status: "up",
                 timestamp: {},
             };
-            expect(isValidHistoryRow(objectRow)).toBe(false);
+            expect(isValidHistoryRow(objectRow)).toBeFalsy();
 
             const arrayRow = {
                 monitorId: "test",
                 status: "up",
                 timestamp: [],
             };
-            expect(isValidHistoryRow(arrayRow)).toBe(false);
+            expect(isValidHistoryRow(arrayRow)).toBeFalsy();
         });
     });
 });

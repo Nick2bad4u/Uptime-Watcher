@@ -31,7 +31,7 @@ describe("Database Types - Complete Function Coverage", () => {
                 key: "historyLimit",
                 value: "100",
             };
-            expect(isValidSettingsRow(validRow)).toBe(true);
+            expect(isValidSettingsRow(validRow)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -43,7 +43,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow(null)).toBe(false);
+            expect(isValidSettingsRow(null)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -55,7 +55,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow(undefined)).toBe(false);
+            expect(isValidSettingsRow(undefined)).toBeFalsy();
         });
 
         it("should return false for non-object", async ({ task, annotate }) => {
@@ -67,8 +67,8 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow("string")).toBe(false);
-            expect(isValidSettingsRow(123)).toBe(false);
+            expect(isValidSettingsRow("string")).toBeFalsy();
+            expect(isValidSettingsRow(123)).toBeFalsy();
         });
 
         it("should return false for object without key", async ({
@@ -83,7 +83,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow({ value: "test" })).toBe(false);
+            expect(isValidSettingsRow({ value: "test" })).toBeFalsy();
         });
 
         it("should return false for object with null key", async ({
@@ -98,7 +98,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow({ key: null })).toBe(false);
+            expect(isValidSettingsRow({ key: null })).toBeFalsy();
         });
 
         it("should return false for object with undefined key", async ({
@@ -113,7 +113,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow({ key: undefined })).toBe(false);
+            expect(isValidSettingsRow({ key: undefined })).toBeFalsy();
         });
 
         it("should return false for object with non-string key", async ({
@@ -128,7 +128,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow({ key: 123 })).toBe(false);
+            expect(isValidSettingsRow({ key: 123 })).toBeFalsy();
         });
 
         it("should return false for object with empty key", async ({
@@ -143,7 +143,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSettingsRow({ key: "" })).toBe(false);
+            expect(isValidSettingsRow({ key: "" })).toBeFalsy();
         });
     });
 
@@ -165,7 +165,7 @@ describe("Database Types - Complete Function Coverage", () => {
                 name: "Test Site",
                 url: "https://test.com",
             };
-            expect(isValidSiteRow(validRow)).toBe(true);
+            expect(isValidSiteRow(validRow)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -177,7 +177,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow(null)).toBe(false);
+            expect(isValidSiteRow(null)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -189,7 +189,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow(undefined)).toBe(false);
+            expect(isValidSiteRow(undefined)).toBeFalsy();
         });
 
         it("should return false for non-object", async ({ task, annotate }) => {
@@ -201,8 +201,8 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow("string")).toBe(false);
-            expect(isValidSiteRow(42)).toBe(false);
+            expect(isValidSiteRow("string")).toBeFalsy();
+            expect(isValidSiteRow(42)).toBeFalsy();
         });
 
         it("should return false for object without identifier", async ({
@@ -217,7 +217,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow({ name: "Test" })).toBe(false);
+            expect(isValidSiteRow({ name: "Test" })).toBeFalsy();
         });
 
         it("should return false for object with null identifier", async ({
@@ -232,7 +232,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow({ identifier: null })).toBe(false);
+            expect(isValidSiteRow({ identifier: null })).toBeFalsy();
         });
 
         it("should return false for object with undefined identifier", async ({
@@ -247,7 +247,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow({ identifier: undefined })).toBe(false);
+            expect(isValidSiteRow({ identifier: undefined })).toBeFalsy();
         });
 
         it("should return false for object with non-string identifier", async ({
@@ -262,7 +262,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow({ identifier: 123 })).toBe(false);
+            expect(isValidSiteRow({ identifier: 123 })).toBeFalsy();
         });
 
         it("should return false for object with empty identifier", async ({
@@ -277,7 +277,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow({ identifier: "" })).toBe(false);
+            expect(isValidSiteRow({ identifier: "" })).toBeFalsy();
         });
 
         it("should return false for object with whitespace-only identifier", async ({
@@ -292,7 +292,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow({ identifier: "   " })).toBe(false);
+            expect(isValidSiteRow({ identifier: "   " })).toBeFalsy();
         });
     });
 
@@ -592,7 +592,7 @@ describe("Database Types - Complete Function Coverage", () => {
                     status: "up",
                     responseTime: 100,
                 })
-            ).toBe(true);
+            ).toBeTruthy();
 
             expect(
                 isValidMonitorRow({
@@ -600,19 +600,19 @@ describe("Database Types - Complete Function Coverage", () => {
                     site_identifier: "site-1",
                     type: "http",
                 })
-            ).toBe(true);
+            ).toBeTruthy();
 
             expect(
                 isValidSettingsRow({
                     key: "test-setting",
                 })
-            ).toBe(true);
+            ).toBeTruthy();
 
             expect(
                 isValidSiteRow({
                     identifier: "test-site",
                 })
-            ).toBe(true);
+            ).toBeTruthy();
 
             expect(
                 safeGetRowProperty({ test: "value" }, "test", "default")

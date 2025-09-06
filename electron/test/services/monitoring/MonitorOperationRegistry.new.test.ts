@@ -33,7 +33,7 @@ vi.stubGlobal("crypto", {
     randomUUID: mockRandomUUID,
 });
 
-describe("MonitorOperationRegistry", () => {
+describe(MonitorOperationRegistry, () => {
     let registry: MonitorOperationRegistry;
     const mockMonitorId = "monitor-123";
 
@@ -61,8 +61,8 @@ describe("MonitorOperationRegistry", () => {
 
             expect(result.operationId).toBe("test-uuid-1");
             expect(result.signal).toBeInstanceOf(AbortSignal);
-            expect(result.signal.aborted).toBe(false);
-            expect(mockRandomUUID).toHaveBeenCalledOnce();
+            expect(result.signal.aborted).toBeFalsy();
+            expect(mockRandomUUID).toHaveBeenCalledTimes(1);
             expect(logger.debug).toHaveBeenCalledWith(
                 `Initiated operation test-uuid-1 for monitor ${mockMonitorId}`
             );
@@ -192,7 +192,7 @@ describe("MonitorOperationRegistry", () => {
             expect(result.signal).toBeInstanceOf(AbortSignal);
             // Note: We can't easily test the timeout without waiting or mocking AbortSignal.timeout
             // but we can verify the signal is properly created
-            expect(result.signal.aborted).toBe(false);
+            expect(result.signal.aborted).toBeFalsy();
         });
 
         it("should support additional signals", async ({ task, annotate }) => {
@@ -207,13 +207,13 @@ describe("MonitorOperationRegistry", () => {
             });
 
             expect(result.signal).toBeInstanceOf(AbortSignal);
-            expect(result.signal.aborted).toBe(false);
+            expect(result.signal.aborted).toBeFalsy();
 
             // Abort the external signal
             externalController.abort();
 
             // The combined signal should now be aborted
-            expect(result.signal.aborted).toBe(true);
+            expect(result.signal.aborted).toBeTruthy();
         });
     });
 
@@ -279,7 +279,7 @@ describe("MonitorOperationRegistry", () => {
 
             const isValid = registry.validateOperation(result.operationId);
 
-            expect(isValid).toBe(true);
+            expect(isValid).toBeTruthy();
         });
 
         it("should return false for non-existent operation", async ({
@@ -293,7 +293,7 @@ describe("MonitorOperationRegistry", () => {
 
             const isValid = registry.validateOperation("non-existent-id");
 
-            expect(isValid).toBe(false);
+            expect(isValid).toBeFalsy();
         });
 
         it("should return false for aborted operation", async ({
@@ -312,7 +312,7 @@ describe("MonitorOperationRegistry", () => {
 
             const isValid = registry.validateOperation(result.operationId);
 
-            expect(isValid).toBe(false);
+            expect(isValid).toBeFalsy();
         });
 
         it("should return false for empty operation ID", async ({
@@ -326,7 +326,7 @@ describe("MonitorOperationRegistry", () => {
 
             const isValid = registry.validateOperation("");
 
-            expect(isValid).toBe(false);
+            expect(isValid).toBeFalsy();
         });
     });
 
@@ -347,11 +347,11 @@ describe("MonitorOperationRegistry", () => {
             registry.cancelOperations(mockMonitorId);
 
             // Operations for target monitor should be aborted
-            expect(result1.signal.aborted).toBe(true);
-            expect(result2.signal.aborted).toBe(true);
+            expect(result1.signal.aborted).toBeTruthy();
+            expect(result2.signal.aborted).toBeTruthy();
 
             // Operation for other monitor should not be affected
-            expect(result3.signal.aborted).toBe(false);
+            expect(result3.signal.aborted).toBeFalsy();
 
             // Should log the cancellation
             expect(logger.debug).toHaveBeenCalledWith(
@@ -387,7 +387,7 @@ describe("MonitorOperationRegistry", () => {
 
             registry.cancelOperations("");
 
-            expect(result.signal.aborted).toBe(true);
+            expect(result.signal.aborted).toBeTruthy();
         });
 
         it("should cancel only one operation when only one exists", async ({
@@ -403,7 +403,7 @@ describe("MonitorOperationRegistry", () => {
 
             registry.cancelOperations(mockMonitorId);
 
-            expect(result.signal.aborted).toBe(true);
+            expect(result.signal.aborted).toBeTruthy();
             expect(logger.debug).toHaveBeenCalledWith(
                 "Cancelled 1 operations for monitor monitor-123"
             );
@@ -421,11 +421,11 @@ describe("MonitorOperationRegistry", () => {
             const result = registry.initiateCheck(mockMonitorId);
 
             registry.cancelOperations(mockMonitorId);
-            expect(registry.validateOperation(result.operationId)).toBe(false);
+            expect(registry.validateOperation(result.operationId)).toBeFalsy();
 
             // Cancelling again should not change anything or cause issues
             registry.cancelOperations(mockMonitorId);
-            expect(registry.validateOperation(result.operationId)).toBe(false);
+            expect(registry.validateOperation(result.operationId)).toBeFalsy();
         });
     });
 
@@ -443,13 +443,13 @@ describe("MonitorOperationRegistry", () => {
 
             // Verify operation exists and signal is not aborted
             expect(registry.getOperation(result.operationId)).toBeDefined();
-            expect(result.signal.aborted).toBe(false);
+            expect(result.signal.aborted).toBeFalsy();
 
             registry.completeOperation(result.operationId);
 
             // Operation should be removed and signal should be aborted
             expect(registry.getOperation(result.operationId)).toBeUndefined();
-            expect(result.signal.aborted).toBe(true);
+            expect(result.signal.aborted).toBeTruthy();
             expect(logger.debug).toHaveBeenCalledWith(
                 "Completed operation test-uuid-1 for monitor monitor-123"
             );
@@ -501,7 +501,7 @@ describe("MonitorOperationRegistry", () => {
 
             // Cancel then complete
             registry.cancelOperations(mockMonitorId);
-            expect(result.signal.aborted).toBe(true);
+            expect(result.signal.aborted).toBeTruthy();
 
             registry.completeOperation(result.operationId);
 
@@ -541,8 +541,8 @@ describe("MonitorOperationRegistry", () => {
             const activeOps = registry.getActiveOperations();
 
             expect(activeOps.size).toBe(2);
-            expect(activeOps.has(result1.operationId)).toBe(true);
-            expect(activeOps.has(result2.operationId)).toBe(true);
+            expect(activeOps.has(result1.operationId)).toBeTruthy();
+            expect(activeOps.has(result2.operationId)).toBeTruthy();
             expect(activeOps.get(result1.operationId)?.monitorId).toBe(
                 mockMonitorId
             );
@@ -567,7 +567,7 @@ describe("MonitorOperationRegistry", () => {
 
             // Should NOT be the same reference (defensive copy)
             expect(activeOps1).not.toBe(activeOps2);
-            expect(activeOps1.has(result.operationId)).toBe(true);
+            expect(activeOps1.has(result.operationId)).toBeTruthy();
             // Mutating returned map should not affect registry
             activeOps1.clear();
             const stillPresent = registry.getOperation(result.operationId);
@@ -609,8 +609,8 @@ describe("MonitorOperationRegistry", () => {
 
             const activeOps = registry.getActiveOperations();
             expect(activeOps.size).toBe(1);
-            expect(activeOps.get(result.operationId)?.signal.aborted).toBe(
-                true
+            expect(activeOps.get(result.operationId)?.signal.aborted).toBeTruthy(
+                
             );
         });
     });
@@ -631,23 +631,23 @@ describe("MonitorOperationRegistry", () => {
             const op3 = registry.initiateCheck("monitor-1");
 
             // Verify all are active
-            expect(registry.validateOperation(op1.operationId)).toBe(true);
-            expect(registry.validateOperation(op2.operationId)).toBe(true);
-            expect(registry.validateOperation(op3.operationId)).toBe(true);
+            expect(registry.validateOperation(op1.operationId)).toBeTruthy();
+            expect(registry.validateOperation(op2.operationId)).toBeTruthy();
+            expect(registry.validateOperation(op3.operationId)).toBeTruthy();
             expect(registry.getActiveOperations().size).toBe(3);
 
             // Cancel operations for monitor-1
             registry.cancelOperations("monitor-1");
 
             // Only monitor-2 operation should still be valid
-            expect(registry.validateOperation(op1.operationId)).toBe(false);
-            expect(registry.validateOperation(op2.operationId)).toBe(true);
-            expect(registry.validateOperation(op3.operationId)).toBe(false);
+            expect(registry.validateOperation(op1.operationId)).toBeFalsy();
+            expect(registry.validateOperation(op2.operationId)).toBeTruthy();
+            expect(registry.validateOperation(op3.operationId)).toBeFalsy();
 
             // Verify signals are aborted appropriately
-            expect(op1.signal.aborted).toBe(true);
-            expect(op2.signal.aborted).toBe(false);
-            expect(op3.signal.aborted).toBe(true);
+            expect(op1.signal.aborted).toBeTruthy();
+            expect(op2.signal.aborted).toBeFalsy();
+            expect(op3.signal.aborted).toBeTruthy();
 
             // Complete all operations
             registry.completeOperation(op1.operationId);
@@ -727,7 +727,7 @@ describe("MonitorOperationRegistry", () => {
             registry.cancelOperations(mockMonitorId);
 
             // Same reference should now have aborted signal
-            expect(operation!.signal.aborted).toBe(true);
+            expect(operation!.signal.aborted).toBeTruthy();
             expect(operation!.id).toBe(originalId);
             expect(operation!.initiatedAt).toBe(originalInitiatedAt);
             expect(operation!.monitorId).toBe(mockMonitorId);
@@ -826,7 +826,7 @@ describe("MonitorOperationRegistry", () => {
 
             const result = registry.initiateCheck(mockMonitorId);
 
-            expect(result.signal.aborted).toBe(false);
+            expect(result.signal.aborted).toBeFalsy();
 
             // Add event listener to test abort event
             let abortEventFired = false;
@@ -836,8 +836,8 @@ describe("MonitorOperationRegistry", () => {
 
             registry.cancelOperations(mockMonitorId);
 
-            expect(result.signal.aborted).toBe(true);
-            expect(abortEventFired).toBe(true);
+            expect(result.signal.aborted).toBeTruthy();
+            expect(abortEventFired).toBeTruthy();
         });
 
         it("should combine timeout and additional signals correctly", async ({
@@ -855,12 +855,12 @@ describe("MonitorOperationRegistry", () => {
                 additionalSignals: [externalController.signal],
             });
 
-            expect(result.signal.aborted).toBe(false);
+            expect(result.signal.aborted).toBeFalsy();
 
             // External signal should trigger abort
             externalController.abort();
 
-            expect(result.signal.aborted).toBe(true);
+            expect(result.signal.aborted).toBeTruthy();
         });
     });
 });

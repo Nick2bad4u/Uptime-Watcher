@@ -36,7 +36,7 @@ vi.mock("../../../services/monitoring/utils/monitorTypeGuards", () => ({
     ),
 }));
 
-describe("PingMonitor", () => {
+describe(PingMonitor, () => {
     let pingMonitor: PingMonitor;
     const defaultConfig: MonitorConfig = {
         timeout: 5000,

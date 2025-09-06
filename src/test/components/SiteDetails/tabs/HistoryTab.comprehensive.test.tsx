@@ -88,7 +88,7 @@ vi.mock("../../../../components/common/MonitorUiComponents", () => ({
 const mockUseSettingsStore = vi.mocked(useSettingsStore);
 const mockUseTheme = vi.mocked(useTheme);
 
-describe("HistoryTab", () => {
+describe(HistoryTab, () => {
     const mockFormatFullTimestamp = vi.fn((timestamp: number) =>
         new Date(timestamp).toISOString()
     );

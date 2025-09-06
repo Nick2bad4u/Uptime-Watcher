@@ -357,7 +357,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 "monitor-1"
             );
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(mockMonitorRepository.update).toHaveBeenCalledWith(
                 "monitor-1",
                 {
@@ -391,7 +391,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 "monitor-1"
             );
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should handle successful monitoring start with event emission", async ({
@@ -411,7 +411,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 "monitor-2"
             );
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
                 "internal:monitor:started",
                 expect.objectContaining({
@@ -443,7 +443,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 "monitor-1"
             );
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -475,7 +475,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                     monitoring: false,
                 }
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should handle successful stop with event emission", async ({
@@ -495,7 +495,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 "monitor-2"
             );
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
                 "internal:monitor:stopped",
                 expect.objectContaining({
@@ -528,7 +528,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 "monitor-1"
             );
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -553,7 +553,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             expect(mockOperationRegistry.cancelOperations).toHaveBeenCalledWith(
                 "monitor-3"
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should cover repository integration", async ({
@@ -580,7 +580,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                     monitoring: false,
                 }
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
     });
 

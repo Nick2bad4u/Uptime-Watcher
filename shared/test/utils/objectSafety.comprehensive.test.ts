@@ -31,7 +31,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
         [symbolKey]: "symbol value",
     };
 
-    describe("safeObjectAccess", () => {
+    describe(safeObjectAccess, () => {
         it("should return the property value when it exists and matches type", async ({
             task,
             annotate,
@@ -43,7 +43,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
 
             expect(safeObjectAccess(testObj, "string", "default")).toBe("test");
             expect(safeObjectAccess(testObj, "number", 0)).toBe(42);
-            expect(safeObjectAccess(testObj, "boolean", false)).toBe(true);
+            expect(safeObjectAccess(testObj, "boolean", false)).toBeTruthy();
         });
 
         it("should return fallback when object is not an object", async ({
@@ -203,7 +203,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
         });
     });
 
-    describe("safeObjectIteration", () => {
+    describe(safeObjectIteration, () => {
         it("should iterate over object entries successfully", async ({
             task,
             annotate,
@@ -358,7 +358,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
         });
     });
 
-    describe("safeObjectOmit", () => {
+    describe(safeObjectOmit, () => {
         it("should omit specified keys from object", async ({
             task,
             annotate,
@@ -453,7 +453,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
         });
     });
 
-    describe("safeObjectPick", () => {
+    describe(safeObjectPick, () => {
         it("should pick specified keys from object", async ({
             task,
             annotate,
@@ -568,7 +568,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
         });
     });
 
-    describe("typedObjectEntries", () => {
+    describe(typedObjectEntries, () => {
         it("should return properly typed entries", async ({
             task,
             annotate,
@@ -629,7 +629,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(entries).toHaveLength(5);
             expect(entries.find(([key]) => key === "str")?.[1]).toBe("string");
             expect(entries.find(([key]) => key === "num")?.[1]).toBe(123);
-            expect(entries.find(([key]) => key === "bool")?.[1]).toBe(false);
+            expect(entries.find(([key]) => key === "bool")?.[1]).toBeFalsy();
         });
 
         it("should not include symbol keys", async ({ task, annotate }) => {
@@ -645,7 +645,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
         });
     });
 
-    describe("typedObjectKeys", () => {
+    describe(typedObjectKeys, () => {
         it("should return properly typed keys", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
@@ -714,7 +714,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
         });
     });
 
-    describe("typedObjectValues", () => {
+    describe(typedObjectValues, () => {
         it("should return properly typed values", async ({
             task,
             annotate,

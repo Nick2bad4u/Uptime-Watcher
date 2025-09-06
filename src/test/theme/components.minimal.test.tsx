@@ -28,7 +28,7 @@ describe("Theme Components - Basic Functionality", () => {
         vi.clearAllMocks();
     });
 
-    describe("ThemedBox", () => {
+    describe(ThemedBox, () => {
         it("should render with content", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components", "component");
@@ -61,7 +61,7 @@ describe("Theme Components - Basic Functionality", () => {
         });
     });
 
-    describe("ThemedButton", () => {
+    describe(ThemedButton, () => {
         it("should render with text", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components", "component");
@@ -96,7 +96,7 @@ describe("Theme Components - Basic Functionality", () => {
         });
     });
 
-    describe("ThemedInput", () => {
+    describe(ThemedInput, () => {
         it("should render input field", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components", "component");
@@ -131,7 +131,7 @@ describe("Theme Components - Basic Functionality", () => {
         });
     });
 
-    describe("ThemedText", () => {
+    describe(ThemedText, () => {
         it("should render text content", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components", "component");
@@ -148,7 +148,7 @@ describe("Theme Components - Basic Functionality", () => {
         });
     });
 
-    describe("ThemedCheckbox", () => {
+    describe(ThemedCheckbox, () => {
         it("should render checkbox", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components", "component");
@@ -181,7 +181,7 @@ describe("Theme Components - Basic Functionality", () => {
         });
     });
 
-    describe("ThemedSelect", () => {
+    describe(ThemedSelect, () => {
         it("should render select with options", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components", "component");
@@ -203,7 +203,7 @@ describe("Theme Components - Basic Functionality", () => {
         });
     });
 
-    describe("ThemedCard", () => {
+    describe(ThemedCard, () => {
         it("should render card content", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components", "component");
@@ -240,7 +240,7 @@ describe("Theme Components - Basic Functionality", () => {
         });
     });
 
-    describe("ThemedBadge", () => {
+    describe(ThemedBadge, () => {
         it("should render badge content", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components", "component");
@@ -257,7 +257,7 @@ describe("Theme Components - Basic Functionality", () => {
         });
     });
 
-    describe("StatusIndicator", () => {
+    describe(StatusIndicator, () => {
         it("should render status indicator", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components", "component");

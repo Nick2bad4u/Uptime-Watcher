@@ -8,7 +8,7 @@ import { describe, it, expect } from "vitest";
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("shared/utils/stringConversion.ts - Complete Function Coverage", () => {
-    describe("safeStringify", () => {
+    describe(safeStringify, () => {
         it("should return empty string for null", async ({
             task,
             annotate,

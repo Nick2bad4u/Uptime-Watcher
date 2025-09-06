@@ -447,7 +447,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
             });
             expect(validResult.errors).toEqual([]);
             expect(validResult.warnings).toEqual([]);
-            expect(validResult.isValid).toBe(true);
+            expect(validResult.isValid).toBeTruthy();
 
             // Test data that generates warning
             const warningResult = validateFormData({
@@ -458,7 +458,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
             expect(warningResult.warnings).toEqual([
                 "URL should start with http or https",
             ]);
-            expect(warningResult.isValid).toBe(true);
+            expect(warningResult.isValid).toBeTruthy();
 
             // Test invalid data
             const invalidResult = validateFormData({});
@@ -467,7 +467,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
                 "URL is required",
             ]);
             expect(invalidResult.warnings).toEqual([]);
-            expect(invalidResult.isValid).toBe(false);
+            expect(invalidResult.isValid).toBeFalsy();
 
             // If arrays were mutated to start with ["Stryker was here"],
             // validation would be broken
@@ -489,7 +489,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
             });
             expect(mutatedResult.errors).toContain("Stryker was here");
             expect(mutatedResult.warnings).toContain("Stryker was here");
-            expect(mutatedResult.isValid).toBe(false); // Would always be false due to pollution
+            expect(mutatedResult.isValid).toBeFalsy(); // Would always be false due to pollution
 
             // Correct validation vs mutated validation should be different
             expect(validResult.errors).not.toEqual(mutatedResult.errors);

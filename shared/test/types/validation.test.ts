@@ -18,7 +18,7 @@ import {
 } from "../../types/validation";
 
 describe("Validation Types and Functions", () => {
-    describe("createFailureResult", () => {
+    describe(createFailureResult, () => {
         it("should create a failure result with errors", async ({
             task,
             annotate,
@@ -82,7 +82,7 @@ describe("Validation Types and Functions", () => {
         });
     });
 
-    describe("createSuccessResult", () => {
+    describe(createSuccessResult, () => {
         it("should create a success result without data or warnings", async ({
             task,
             annotate,
@@ -193,7 +193,7 @@ describe("Validation Types and Functions", () => {
 
             // Test with boolean
             const booleanResult = createSuccessResult(true);
-            expect(booleanResult.data).toBe(true);
+            expect(booleanResult.data).toBeTruthy();
 
             // Test with null
             const nullResult = createSuccessResult(null);
@@ -201,7 +201,7 @@ describe("Validation Types and Functions", () => {
         });
     });
 
-    describe("isValidationResult", () => {
+    describe(isValidationResult, () => {
         it("should return true for valid BaseValidationResult", async ({
             task,
             annotate,
@@ -216,7 +216,7 @@ describe("Validation Types and Functions", () => {
                 success: true,
             };
 
-            expect(isValidationResult(validResult)).toBe(true);
+            expect(isValidationResult(validResult)).toBeTruthy();
         });
 
         it("should return true for BaseValidationResult with warnings", async ({
@@ -234,7 +234,7 @@ describe("Validation Types and Functions", () => {
                 warnings: ["Some warning"],
             };
 
-            expect(isValidationResult(validResult)).toBe(true);
+            expect(isValidationResult(validResult)).toBeTruthy();
         });
 
         it("should return true for FormValidationResult", async ({
@@ -255,7 +255,7 @@ describe("Validation Types and Functions", () => {
                 },
             };
 
-            expect(isValidationResult(validResult)).toBe(true);
+            expect(isValidationResult(validResult)).toBeTruthy();
         });
 
         it("should return true for MonitorConfigValidationResult", async ({
@@ -276,7 +276,7 @@ describe("Validation Types and Functions", () => {
                 },
             };
 
-            expect(isValidationResult(validResult)).toBe(true);
+            expect(isValidationResult(validResult)).toBeTruthy();
         });
 
         it("should return true for ThemeValidationResult", async ({
@@ -295,7 +295,7 @@ describe("Validation Types and Functions", () => {
                 themeErrors: ["Invalid color format"],
             };
 
-            expect(isValidationResult(validResult)).toBe(true);
+            expect(isValidationResult(validResult)).toBeTruthy();
         });
 
         it("should return true for ValidationResult", async ({
@@ -317,7 +317,7 @@ describe("Validation Types and Functions", () => {
                 },
             };
 
-            expect(isValidationResult(validResult)).toBe(true);
+            expect(isValidationResult(validResult)).toBeTruthy();
         });
 
         it("should return false for null", async ({ task, annotate }) => {
@@ -326,7 +326,7 @@ describe("Validation Types and Functions", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidationResult(null)).toBe(false);
+            expect(isValidationResult(null)).toBeFalsy();
         });
 
         it("should return false for undefined", async ({ task, annotate }) => {
@@ -335,7 +335,7 @@ describe("Validation Types and Functions", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidationResult(undefined)).toBe(false);
+            expect(isValidationResult(undefined)).toBeFalsy();
         });
 
         it("should return false for non-object types", async ({
@@ -347,10 +347,10 @@ describe("Validation Types and Functions", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidationResult("string")).toBe(false);
-            expect(isValidationResult(123)).toBe(false);
-            expect(isValidationResult(true)).toBe(false);
-            expect(isValidationResult([])).toBe(false);
+            expect(isValidationResult("string")).toBeFalsy();
+            expect(isValidationResult(123)).toBeFalsy();
+            expect(isValidationResult(true)).toBeFalsy();
+            expect(isValidationResult([])).toBeFalsy();
         });
 
         it("should return false for object missing required properties", async ({
@@ -362,9 +362,9 @@ describe("Validation Types and Functions", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidationResult({})).toBe(false);
-            expect(isValidationResult({ errors: [] })).toBe(false);
-            expect(isValidationResult({ success: true })).toBe(false);
+            expect(isValidationResult({})).toBeFalsy();
+            expect(isValidationResult({ errors: [] })).toBeFalsy();
+            expect(isValidationResult({ success: true })).toBeFalsy();
         });
 
         it("should return false for object with invalid property types", async ({
@@ -381,21 +381,21 @@ describe("Validation Types and Functions", () => {
                     errors: "not an array",
                     success: true,
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 isValidationResult({
                     errors: [],
                     success: "not a boolean",
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 isValidationResult({
                     errors: null,
                     success: true,
                 })
-            ).toBe(false);
+            ).toBeFalsy();
         });
 
         it("should return true for object with extra properties", async ({
@@ -414,7 +414,7 @@ describe("Validation Types and Functions", () => {
                 anotherExtra: 42,
             };
 
-            expect(isValidationResult(objectWithExtra)).toBe(true);
+            expect(isValidationResult(objectWithExtra)).toBeTruthy();
         });
     });
 
@@ -435,7 +435,7 @@ describe("Validation Types and Functions", () => {
             };
 
             expect(baseResult.errors).toEqual(["Error message"]);
-            expect(baseResult.success).toBe(false);
+            expect(baseResult.success).toBeFalsy();
             expect(baseResult.warnings).toEqual(["Warning message"]);
         });
 
@@ -619,7 +619,7 @@ describe("Validation Types and Functions", () => {
 
             const result = createSuccessResult(complexData);
             expect(result.data).toEqual(complexData);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
         });
 
         it("should validate results created by helper functions", async ({
@@ -632,10 +632,10 @@ describe("Validation Types and Functions", () => {
             await annotate("Type: Constructor", "type");
 
             const successResult = createSuccessResult({ test: true });
-            expect(isValidationResult(successResult)).toBe(true);
+            expect(isValidationResult(successResult)).toBeTruthy();
 
             const failureResult = createFailureResult(["Error"]);
-            expect(isValidationResult(failureResult)).toBe(true);
+            expect(isValidationResult(failureResult)).toBeTruthy();
         });
     });
 });

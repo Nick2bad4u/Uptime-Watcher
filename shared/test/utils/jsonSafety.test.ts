@@ -14,7 +14,7 @@ import {
 } from "../../utils/jsonSafety";
 
 describe("jsonSafety utilities", () => {
-    describe("safeJsonParse", () => {
+    describe(safeJsonParse, () => {
         interface TestUser {
             id: string;
             name: string;
@@ -40,7 +40,7 @@ describe("jsonSafety utilities", () => {
             const validJson = '{"id":"123","name":"John","age":30}';
             const result = safeJsonParse(validJson, isValidUser);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toEqual({ id: "123", name: "John", age: 30 });
             expect(result.error).toBeUndefined();
         });
@@ -57,7 +57,7 @@ describe("jsonSafety utilities", () => {
             const invalidJson = '{"id":"123","name":"John",age:}';
             const result = safeJsonParse(invalidJson, isValidUser);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.data).toBeUndefined();
             expect(result.error).toContain("JSON parsing failed:");
         });
@@ -74,7 +74,7 @@ describe("jsonSafety utilities", () => {
             const validJsonInvalidType = '{"id":"123","name":"John"}'; // missing age
             const result = safeJsonParse(validJsonInvalidType, isValidUser);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.data).toBeUndefined();
             expect(result.error).toBe(
                 "Parsed data does not match expected type"
@@ -90,7 +90,7 @@ describe("jsonSafety utilities", () => {
             const nullJson = "null";
             const result = safeJsonParse(nullJson, isValidUser);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.data).toBeUndefined();
             expect(result.error).toBe(
                 "Parsed data does not match expected type"
@@ -106,7 +106,7 @@ describe("jsonSafety utilities", () => {
             const emptyJson = "";
             const result = safeJsonParse(emptyJson, isValidUser);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.data).toBeUndefined();
             expect(result.error).toContain("JSON parsing failed:");
         });
@@ -128,7 +128,7 @@ describe("jsonSafety utilities", () => {
 
             const result = safeJsonParse('{"test": true}', isValidUser);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.error).toBe("JSON parsing failed: string error");
 
             // Restore original
@@ -136,7 +136,7 @@ describe("jsonSafety utilities", () => {
         });
     });
 
-    describe("safeJsonParseArray", () => {
+    describe(safeJsonParseArray, () => {
         interface TestItem {
             id: string;
             value: number;
@@ -161,7 +161,7 @@ describe("jsonSafety utilities", () => {
                 '[{"id":"1","value":10},{"id":"2","value":20}]';
             const result = safeJsonParseArray(validJsonArray, isValidItem);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toEqual([
                 { id: "1", value: 10 },
                 { id: "2", value: 20 },
@@ -181,7 +181,7 @@ describe("jsonSafety utilities", () => {
             const invalidJson = '[{"id":"1","value":10},{"id":"2",value:}]';
             const result = safeJsonParseArray(invalidJson, isValidItem);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.data).toBeUndefined();
             expect(result.error).toContain("JSON parsing failed:");
         });
@@ -198,7 +198,7 @@ describe("jsonSafety utilities", () => {
             const notArrayJson = '{"id":"1","value":10}';
             const result = safeJsonParseArray(notArrayJson, isValidItem);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.data).toBeUndefined();
             expect(result.error).toBe("Parsed data is not an array");
         });
@@ -215,7 +215,7 @@ describe("jsonSafety utilities", () => {
             const invalidElementJson = '[{"id":"1","value":10},{"id":"2"}]'; // missing value
             const result = safeJsonParseArray(invalidElementJson, isValidItem);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.data).toBeUndefined();
             expect(result.error).toBe(
                 "Array element at index 1 does not match expected type"
@@ -231,7 +231,7 @@ describe("jsonSafety utilities", () => {
             const emptyArrayJson = "[]";
             const result = safeJsonParseArray(emptyArrayJson, isValidItem);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toEqual([]);
             expect(result.error).toBeUndefined();
         });
@@ -248,7 +248,7 @@ describe("jsonSafety utilities", () => {
             const nullElementJson = '[{"id":"1","value":10},null]';
             const result = safeJsonParseArray(nullElementJson, isValidItem);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.error).toBe(
                 "Array element at index 1 does not match expected type"
             );
@@ -271,7 +271,7 @@ describe("jsonSafety utilities", () => {
 
             const result = safeJsonParseArray('[{"test": true}]', isValidItem);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.error).toBe("JSON parsing failed: custom error");
 
             // Restore original
@@ -279,7 +279,7 @@ describe("jsonSafety utilities", () => {
         });
     });
 
-    describe("safeJsonParseWithFallback", () => {
+    describe(safeJsonParseWithFallback, () => {
         interface TestConfig {
             timeout: number;
             retries: number;
@@ -386,7 +386,7 @@ describe("jsonSafety utilities", () => {
         });
     });
 
-    describe("safeJsonStringify", () => {
+    describe(safeJsonStringify, () => {
         it("should successfully stringify valid objects", async ({
             task,
             annotate,
@@ -399,7 +399,7 @@ describe("jsonSafety utilities", () => {
             const data = { name: "John", age: 30 };
             const result = safeJsonStringify(data);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toBe('{"name":"John","age":30}');
             expect(result.error).toBeUndefined();
         });
@@ -416,7 +416,7 @@ describe("jsonSafety utilities", () => {
             const data = { name: "John", age: 30 };
             const result = safeJsonStringify(data, 2);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toBe('{\n  "name": "John",\n  "age": 30\n}');
             expect(result.error).toBeUndefined();
         });
@@ -433,7 +433,7 @@ describe("jsonSafety utilities", () => {
             const data = { name: "John" };
             const result = safeJsonStringify(data, "\t");
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toBe('{\n\t"name": "John"\n}');
             expect(result.error).toBeUndefined();
         });
@@ -454,7 +454,7 @@ describe("jsonSafety utilities", () => {
             ];
             const result = safeJsonStringify(data);
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toBe("[1,2,3]");
             expect(result.error).toBeUndefined();
         });
@@ -469,19 +469,19 @@ describe("jsonSafety utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const stringResult = safeJsonStringify("hello");
-            expect(stringResult.success).toBe(true);
+            expect(stringResult.success).toBeTruthy();
             expect(stringResult.data).toBe('"hello"');
 
             const numberResult = safeJsonStringify(42);
-            expect(numberResult.success).toBe(true);
+            expect(numberResult.success).toBeTruthy();
             expect(numberResult.data).toBe("42");
 
             const booleanResult = safeJsonStringify(true);
-            expect(booleanResult.success).toBe(true);
+            expect(booleanResult.success).toBeTruthy();
             expect(booleanResult.data).toBe("true");
 
             const nullResult = safeJsonStringify(null);
-            expect(nullResult.success).toBe(true);
+            expect(nullResult.success).toBeTruthy();
             expect(nullResult.data).toBe("null");
         });
 
@@ -496,7 +496,7 @@ describe("jsonSafety utilities", () => {
 
             const result = safeJsonStringify(circular);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.data).toBeUndefined();
             expect(result.error).toContain("JSON stringification failed:");
         });
@@ -509,7 +509,7 @@ describe("jsonSafety utilities", () => {
 
             const result = safeJsonStringify(undefined);
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.data).toBeUndefined();
             expect(result.error).toBe("Value cannot be serialized to JSON");
         });
@@ -522,7 +522,7 @@ describe("jsonSafety utilities", () => {
 
             const result = safeJsonStringify(() => {});
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.data).toBeUndefined();
             expect(result.error).toBe("Value cannot be serialized to JSON");
         });
@@ -535,7 +535,7 @@ describe("jsonSafety utilities", () => {
 
             const result = safeJsonStringify(Symbol("test"));
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.data).toBeUndefined();
             expect(result.error).toBe("Value cannot be serialized to JSON");
         });
@@ -557,7 +557,7 @@ describe("jsonSafety utilities", () => {
 
             const result = safeJsonStringify({ test: true });
 
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.error).toBe(
                 "JSON stringification failed: string error"
             );
@@ -567,7 +567,7 @@ describe("jsonSafety utilities", () => {
         });
     });
 
-    describe("safeJsonStringifyWithFallback", () => {
+    describe(safeJsonStringifyWithFallback, () => {
         const fallbackString = "{}";
 
         it("should return stringified data for valid objects", async ({
@@ -710,7 +710,7 @@ describe("jsonSafety utilities", () => {
                 data: "test data",
             };
 
-            expect(successResult.success).toBe(true);
+            expect(successResult.success).toBeTruthy();
             expect(successResult.data).toBe("test data");
             expect(successResult.error).toBeUndefined();
         });
@@ -726,7 +726,7 @@ describe("jsonSafety utilities", () => {
                 error: "test error",
             };
 
-            expect(errorResult.success).toBe(false);
+            expect(errorResult.success).toBeFalsy();
             expect(errorResult.error).toBe("test error");
             expect(errorResult.data).toBeUndefined();
         });
@@ -782,7 +782,7 @@ describe("jsonSafety utilities", () => {
                 const isAny = (_data: unknown): _data is unknown => true;
                 const result = safeJsonParseArray(serialized, isAny);
 
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 expect(result.data).toEqual(arrayValue);
                 expect(result.error).toBeUndefined();
             }));
@@ -829,7 +829,7 @@ describe("jsonSafety utilities", () => {
                         typeof data === "object" && data !== null;
 
                     const parsed = safeJsonParse(result.data, isObject);
-                    expect(parsed.success).toBe(true);
+                    expect(parsed.success).toBeTruthy();
                     expect(parsed.data).toEqual(complexObject);
                 }
             }));
@@ -849,7 +849,7 @@ describe("jsonSafety utilities", () => {
                     typeof (data as any).value === "number";
 
                 const result = safeJsonParseArray(stringified, isTypedObject);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 expect(result.data).toEqual(objectArray);
             }));
         });
@@ -877,7 +877,7 @@ describe("jsonSafety utilities", () => {
                 const isAny = (_data: unknown): _data is unknown => true;
                 const result = safeJsonParse(malformedJson, isAny);
 
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
                 expect(typeof result.error).toBe("string");
                 expect(result.error!).toMatch(/JSON parsing failed:/);
             }));
@@ -914,7 +914,7 @@ describe("jsonSafety utilities", () => {
                 fc.pre(Number.isFinite(number));
 
                 const result = safeJsonStringify(number);
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
 
                 if (result.success && result.data) {
                     const parsed = JSON.parse(result.data);
@@ -956,7 +956,7 @@ describe("jsonSafety utilities", () => {
                     const isObject = (data: unknown): data is object =>
                         typeof data === "object" && data !== null;
                     const parsed = safeJsonParse(result.data, isObject);
-                    expect(parsed.success).toBe(true);
+                    expect(parsed.success).toBeTruthy();
                 }
             }));
         });

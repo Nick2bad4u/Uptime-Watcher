@@ -39,7 +39,7 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                     expect(config.maxSize).toBeLessThanOrEqual(10_000); // Reasonable upper limit
 
                     // Max size should be an integer
-                    expect(Number.isInteger(config.maxSize)).toBe(true);
+                    expect(Number.isInteger(config.maxSize)).toBeTruthy();
                 })
             );
         });
@@ -120,7 +120,7 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                     (suffix) => {
                         const result = CACHE_NAMES.monitors(suffix);
                         expect(result).toBe(`monitors-${suffix}`);
-                        expect(result.startsWith("monitors-")).toBe(true);
+                        expect(result.startsWith("monitors-")).toBeTruthy();
                     }
                 )
             );
@@ -258,8 +258,8 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                     (operation) => {
                         const result = CACHE_NAMES.temporary(operation);
                         expect(result).toBe(`temporary-${operation}`);
-                        expect(result.startsWith("temporary-")).toBe(true);
-                        expect(result.endsWith(operation)).toBe(true);
+                        expect(result.startsWith("temporary-")).toBeTruthy();
+                        expect(result.endsWith(operation)).toBeTruthy();
                     }
                 )
             );
@@ -277,7 +277,7 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                     (operation) => {
                         const result = CACHE_NAMES.temporary(operation);
                         expect(result).toBe(`temporary-${operation}`);
-                        expect(result.includes("temporary-")).toBe(true);
+                        expect(result).toContain("temporary-");
                     }
                 )
             );
@@ -314,10 +314,10 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                         expect(uniqueNames.size).toBe(names.length);
 
                         // Each should start with their respective prefix
-                        expect(monitorsName.startsWith("monitors")).toBe(true);
-                        expect(settingsName.startsWith("settings")).toBe(true);
-                        expect(sitesName.startsWith("sites")).toBe(true);
-                        expect(temporaryName.startsWith("temporary")).toBe(true);
+                        expect(monitorsName.startsWith("monitors")).toBeTruthy();
+                        expect(settingsName.startsWith("settings")).toBeTruthy();
+                        expect(sitesName.startsWith("sites")).toBeTruthy();
+                        expect(temporaryName.startsWith("temporary")).toBeTruthy();
                     }
                 )
             );

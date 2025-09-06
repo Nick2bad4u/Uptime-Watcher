@@ -259,9 +259,9 @@ describe("Shared Utilities Fuzzing Tests", () => {
                             );
 
                             // Property: values should be finite
-                            expect(Number.isFinite(result.timeout)).toBe(true);
-                            expect(Number.isFinite(result.retries)).toBe(true);
-                            expect(Number.isFinite(result.interval)).toBe(true);
+                            expect(Number.isFinite(result.timeout)).toBeTruthy();
+                            expect(Number.isFinite(result.retries)).toBeTruthy();
+                            expect(Number.isFinite(result.interval)).toBeTruthy();
                         }).not.toThrow();
                     }
                 )
@@ -450,7 +450,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
                             const result = getValidStrings(input);
 
                             // Property: result should always be an array
-                            expect(Array.isArray(result)).toBe(true);
+                            expect(Array.isArray(result)).toBeTruthy();
 
                             // Property: all items should be non-empty strings
                             for (const item of result) {

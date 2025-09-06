@@ -53,7 +53,7 @@ const normalizeNegativeZero = (obj: any): any => {
 
 describe("JSON Safety Property-Based Tests", () => {
 
-    describe("safeJsonStringify", () => {
+    describe(safeJsonStringify, () => {
         test.prop([fc.jsonValue()])(
             "should stringify valid JSON values without throwing",
             (validJson) => {
@@ -113,7 +113,7 @@ describe("JSON Safety Property-Based Tests", () => {
             };
 
             const result = safeJsonStringify(objWithFunctions);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
 
             if (result.success && result.data) {
                 const parsed = JSON.parse(result.data);
@@ -121,8 +121,8 @@ describe("JSON Safety Property-Based Tests", () => {
                 expect(parsed.validProp).toBe("valid");
                 expect(parsed.nested.nullProp).toBe(null);
                 // Functions and undefined should be omitted by JSON.stringify
-                expect("fn" in parsed).toBe(false);
-                expect("undefinedProp" in parsed).toBe(false);
+                expect("fn" in parsed).toBeFalsy();
+                expect("undefinedProp" in parsed).toBeFalsy();
             }
         });
 
@@ -137,7 +137,7 @@ describe("JSON Safety Property-Based Tests", () => {
             };
 
             const result = safeJsonStringify(objWithSpecialNumbers);
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
 
             if (result.success && result.data) {
                 const parsed = JSON.parse(result.data);
@@ -177,7 +177,7 @@ describe("JSON Safety Property-Based Tests", () => {
         });
     });
 
-    describe("safeJsonStringifyWithFallback", () => {
+    describe(safeJsonStringifyWithFallback, () => {
         test.prop([fc.jsonValue(), fc.string()])(
             "should return stringified JSON for valid inputs",
             (validJson, fallback) => {
@@ -207,7 +207,7 @@ describe("JSON Safety Property-Based Tests", () => {
                     } catch {
                         return result === fallback;
                     }
-                })).toBe(true);
+                })).toBeTruthy();
             }
         );
 
@@ -224,7 +224,7 @@ describe("JSON Safety Property-Based Tests", () => {
         });
     });
 
-    describe("safeJsonParse", () => {
+    describe(safeJsonParse, () => {
         test.prop([fc.jsonValue()])(
             "should parse valid JSON strings successfully",
             (validJson) => {
@@ -235,7 +235,7 @@ describe("JSON Safety Property-Based Tests", () => {
 
                 const result = safeJsonParse(stringified, validator);
 
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 if (result.success) {
                     // JSON.stringify(-0) becomes "0", and JSON.parse("0") becomes +0
                     // This is expected JSON round-trip behavior - compare stringified forms
@@ -263,7 +263,7 @@ describe("JSON Safety Property-Based Tests", () => {
 
                 // Should not throw, should return error result
                 expect(() => result).not.toThrow();
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
                 if (!result.success) {
                     expect(result.error).toBeDefined();
                     expect(typeof result.error).toBe("string");
@@ -281,14 +281,14 @@ describe("JSON Safety Property-Based Tests", () => {
                        typeof (data as any).name === "string";
 
             const validResult = safeJsonParse(validUserJson, userValidator);
-            expect(validResult.success).toBe(true);
+            expect(validResult.success).toBeTruthy();
             if (validResult.success && validResult.data) {
                 expect(validResult.data.id).toBe("123");
                 expect(validResult.data.name).toBe("John");
             }
 
             const invalidResult = safeJsonParse(invalidUserJson, userValidator);
-            expect(invalidResult.success).toBe(false);
+            expect(invalidResult.success).toBeFalsy();
         });
 
         it("should handle malformed JSON strings", () => {
@@ -306,7 +306,7 @@ describe("JSON Safety Property-Based Tests", () => {
 
             for (const input of malformedInputs) {
                 const result = safeJsonParse(input, anyValidator);
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
                 if (!result.success) {
                     expect(result.error).toBeDefined();
                 }
@@ -321,7 +321,7 @@ describe("JSON Safety Property-Based Tests", () => {
 
                 const result = safeJsonParse(stringified, validator);
 
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 if (result.success) {
                     // Apply normalization to handle -0/+0 differences
                     const normalizedData = normalizeNegativeZero(result.data);
@@ -337,7 +337,7 @@ describe("JSON Safety Property-Based Tests", () => {
 
             for (const input of emptyInputs) {
                 const result = safeJsonParse(input, validator);
-                expect(result.success).toBe(false);
+                expect(result.success).toBeFalsy();
                 if (!result.success) {
                     expect(result.error).toContain("Unexpected end");
                 }
@@ -345,7 +345,7 @@ describe("JSON Safety Property-Based Tests", () => {
         });
     });
 
-    describe("safeJsonParseArray", () => {
+    describe(safeJsonParseArray, () => {
         test.prop([fc.array(fc.jsonValue())])(
             "should parse valid JSON arrays successfully",
             (validArray) => {
@@ -354,13 +354,13 @@ describe("JSON Safety Property-Based Tests", () => {
 
                 const result = safeJsonParseArray(stringified, elementValidator);
 
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 if (result.success) {
                     // Normalize -0/+0 differences for JSON round-trip consistency
                     const normalizedResult = normalizeNegativeZero(result.data);
                     const normalizedOriginal = normalizeNegativeZero(validArray);
                     expect(normalizedResult).toEqual(normalizedOriginal);
-                    expect(Array.isArray(result.data)).toBe(true);
+                    expect(Array.isArray(result.data)).toBeTruthy();
                 }
             }
         );
@@ -372,13 +372,13 @@ describe("JSON Safety Property-Based Tests", () => {
             const numberValidator = (item: unknown): item is number => typeof item === "number";
 
             const validResult = safeJsonParseArray(validNumberArrayJson, numberValidator);
-            expect(validResult.success).toBe(true);
+            expect(validResult.success).toBeTruthy();
             if (validResult.success) {
                 expect(validResult.data).toEqual([1, 2, 3, 4, 5]);
             }
 
             const invalidResult = safeJsonParseArray(invalidNumberArrayJson, numberValidator);
-            expect(invalidResult.success).toBe(false);
+            expect(invalidResult.success).toBeFalsy();
             if (!invalidResult.success) {
                 expect(invalidResult.error).toContain("index 2");
             }
@@ -389,7 +389,7 @@ describe("JSON Safety Property-Based Tests", () => {
             const elementValidator = (_item: unknown): _item is any => true;
 
             const result = safeJsonParseArray(nonArrayJson, elementValidator);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             if (!result.success) {
                 expect(result.error).toContain("not an array");
             }
@@ -403,7 +403,7 @@ describe("JSON Safety Property-Based Tests", () => {
 
                 const result = safeJsonParseArray(stringified, stringValidator);
 
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 if (result.success && result.data) {
                     expect(result.data).toEqual(stringArray);
                     for (const item of result.data) {
@@ -414,7 +414,7 @@ describe("JSON Safety Property-Based Tests", () => {
         );
     });
 
-    describe("safeJsonParseWithFallback", () => {
+    describe(safeJsonParseWithFallback, () => {
         test.prop([fc.jsonValue()])(
             "should parse valid JSON and return data",
             (validJson) => {
@@ -473,12 +473,12 @@ describe("JSON Safety Property-Based Tests", () => {
                 const start = performance.now();
 
                 const stringifyResult = safeJsonStringify(largeArray);
-                expect(stringifyResult.success).toBe(true);
+                expect(stringifyResult.success).toBeTruthy();
 
                 if (stringifyResult.success && stringifyResult.data) {
                     const validator = (_data: unknown): _data is typeof largeArray => Array.isArray(_data);
                     const parseResult = safeJsonParse(stringifyResult.data, validator);
-                    expect(parseResult.success).toBe(true);
+                    expect(parseResult.success).toBeTruthy();
                 }
 
                 const end = performance.now();
@@ -497,12 +497,12 @@ describe("JSON Safety Property-Based Tests", () => {
 
             expect(() => {
                 const stringifyResult = safeJsonStringify(deepObj);
-                expect(stringifyResult.success).toBe(true);
+                expect(stringifyResult.success).toBeTruthy();
 
                 if (stringifyResult.success && stringifyResult.data) {
                     const validator = (_data: unknown): _data is any => true;
                     const parseResult = safeJsonParse(stringifyResult.data, validator);
-                    expect(parseResult.success).toBe(true);
+                    expect(parseResult.success).toBeTruthy();
                 }
             }).not.toThrow();
         });
@@ -520,12 +520,12 @@ describe("JSON Safety Property-Based Tests", () => {
             };
 
             const stringifyResult = safeJsonStringify(obj);
-            expect(stringifyResult.success).toBe(true);
+            expect(stringifyResult.success).toBeTruthy();
 
             if (stringifyResult.success && stringifyResult.data) {
                 const validator = (_data: unknown): _data is typeof obj => typeof _data === "object" && _data !== null && "description" in _data;
                 const parseResult = safeJsonParse(stringifyResult.data, validator);
-                expect(parseResult.success).toBe(true);
+                expect(parseResult.success).toBeTruthy();
                 if (parseResult.success) {
                     expect((parseResult.data as any).description).toBe(largeString);
                 }
@@ -568,7 +568,7 @@ describe("JSON Safety Property-Based Tests", () => {
 
                 // Should handle without crashing
                 expect(() => result).not.toThrow();
-                expect(result.success).toBe(true);
+                expect(result.success).toBeTruthy();
                 if (result.success) {
                     expect((result.data as any).data).toBe(largeString);
                 }
@@ -586,12 +586,12 @@ describe("JSON Safety Property-Based Tests", () => {
             };
 
             const stringifyResult = safeJsonStringify(obj);
-            expect(stringifyResult.success).toBe(true);
+            expect(stringifyResult.success).toBeTruthy();
 
             if (stringifyResult.success && stringifyResult.data) {
                 const validator = (_data: unknown): _data is typeof obj => true;
                 const parseResult = safeJsonParse(stringifyResult.data, validator);
-                expect(parseResult.success).toBe(true);
+                expect(parseResult.success).toBeTruthy();
             }
         });
     });
@@ -601,12 +601,12 @@ describe("JSON Safety Property-Based Tests", () => {
             "JSON round-trip should preserve data",
             (originalData) => {
                 const stringifyResult = safeJsonStringify(originalData);
-                expect(stringifyResult.success).toBe(true);
+                expect(stringifyResult.success).toBeTruthy();
 
                 if (stringifyResult.success && stringifyResult.data) {
                     const validator = (_data: unknown): _data is typeof originalData => true;
                     const parseResult = safeJsonParse(stringifyResult.data, validator);
-                    expect(parseResult.success).toBe(true);
+                    expect(parseResult.success).toBeTruthy();
 
                     if (parseResult.success) {
                         // Normalize -0 to 0 for JSON round-trip consistency
@@ -631,12 +631,12 @@ describe("JSON Safety Property-Based Tests", () => {
             "Complex objects should maintain structure through round-trip",
             (complexObject) => {
                 const stringifyResult = safeJsonStringify(complexObject);
-                expect(stringifyResult.success).toBe(true);
+                expect(stringifyResult.success).toBeTruthy();
 
                 if (stringifyResult.success && stringifyResult.data) {
                     const validator = (_data: unknown): _data is typeof complexObject => typeof _data === "object" && _data !== null;
                     const parseResult = safeJsonParse(stringifyResult.data, validator);
-                    expect(parseResult.success).toBe(true);
+                    expect(parseResult.success).toBeTruthy();
 
                     if (parseResult.success) {
                         const normalizedOriginal = normalizeNegativeZero(complexObject);
@@ -646,7 +646,7 @@ describe("JSON Safety Property-Based Tests", () => {
                         expect(typeof (parseResult.data as any).string).toBe("string");
                         expect(typeof (parseResult.data as any).number).toBe("number");
                         expect(typeof (parseResult.data as any).boolean).toBe("boolean");
-                        expect(Array.isArray((parseResult.data as any).array)).toBe(true);
+                        expect(Array.isArray((parseResult.data as any).array)).toBeTruthy();
                         expect(typeof (parseResult.data as any).object).toBe("object");
                     }
                 }

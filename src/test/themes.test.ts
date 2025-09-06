@@ -19,7 +19,7 @@ describe("Theme Definitions", () => {
 
             expect(lightTheme).toBeDefined();
             expect(lightTheme.name).toBe("light");
-            expect(lightTheme.isDark).toBe(false);
+            expect(lightTheme.isDark).toBeFalsy();
             expect(lightTheme.colors).toBeDefined();
             expect(lightTheme.colors.background).toBeDefined();
             expect(lightTheme.colors.text).toBeDefined();
@@ -75,7 +75,7 @@ describe("Theme Definitions", () => {
 
             expect(darkTheme).toBeDefined();
             expect(darkTheme.name).toBe("dark");
-            expect(darkTheme.isDark).toBe(true);
+            expect(darkTheme.isDark).toBeTruthy();
             expect(darkTheme.colors).toBeDefined();
             expect(darkTheme.colors.background).toBeDefined();
             expect(darkTheme.colors.text).toBeDefined();

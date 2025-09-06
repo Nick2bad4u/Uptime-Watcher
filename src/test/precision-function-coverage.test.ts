@@ -123,12 +123,12 @@ describe("Precision Function Coverage - Targeted Functions", () => {
             return true;
         };
 
-        expect(validateConfig({})).toBe(true);
-        expect(validateConfig({ key: "value" })).toBe(true);
-        expect(validateConfig(null)).toBe(false);
-        expect(validateConfig(undefined)).toBe(false);
-        expect(validateConfig([])).toBe(false);
-        expect(validateConfig("string")).toBe(false);
+        expect(validateConfig({})).toBeTruthy();
+        expect(validateConfig({ key: "value" })).toBeTruthy();
+        expect(validateConfig(null)).toBeFalsy();
+        expect(validateConfig(undefined)).toBeFalsy();
+        expect(validateConfig([])).toBeFalsy();
+        expect(validateConfig("string")).toBeFalsy();
     });
 
     it("should test array utility functions", async ({ task, annotate }) => {

@@ -243,7 +243,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             }
 
             // Should complete without errors
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
         it("should handle event listener registration", async () => {
             const callback = vi.fn();
@@ -284,7 +284,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             }
 
             // Should handle memory pressure gracefully
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
         it("should handle listener cleanup during app shutdown", async () => {
             const callback = vi.fn();
@@ -296,7 +296,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             exposedAPI.events.removeAllListeners("monitor-up");
 
             // Should cleanup gracefully
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
     describe("API Exposure Verification", () => {

@@ -60,7 +60,7 @@ const createMockLogger = () => ({
     error: vi.fn(),
 });
 
-describe("DataBackupService", () => {
+describe(DataBackupService, () => {
     let mockEventEmitter: ReturnType<typeof createMockEventEmitter>;
     let mockLogger: ReturnType<typeof createMockLogger>;
     let dataBackupService: DataBackupService;

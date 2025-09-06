@@ -13,7 +13,7 @@ import {
 import type { Site } from "../../shared/types";
 
 describe("siteStatus utilities - Uncovered Lines", () => {
-    describe("calculateSiteStatus", () => {
+    describe(calculateSiteStatus, () => {
         it("should return unknown for site with no monitors", async ({
             task,
             annotate,
@@ -203,7 +203,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
         });
     });
 
-    describe("calculateSiteMonitoringStatus", () => {
+    describe(calculateSiteMonitoringStatus, () => {
         it("should return stopped for site with no monitors", async ({
             task,
             annotate,
@@ -360,7 +360,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
         });
     });
 
-    describe("getSiteDisplayStatus", () => {
+    describe(getSiteDisplayStatus, () => {
         it("should return unknown for site with no monitors", async ({
             task,
             annotate,
@@ -505,7 +505,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
         });
     });
 
-    describe("getSiteStatusDescription", () => {
+    describe(getSiteStatusDescription, () => {
         it("should return unknown description for site with no monitors", async ({
             task,
             annotate,
@@ -788,7 +788,7 @@ describe("siteStatus utilities - Uncovered Lines", () => {
         });
     });
 
-    describe("getSiteStatusVariant", () => {
+    describe(getSiteStatusVariant, () => {
         it("should return success variant for up status", async ({
             task,
             annotate,

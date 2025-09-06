@@ -36,7 +36,7 @@ describe("Cache Utilities", () => {
         clearAllCaches();
     });
 
-    describe("TypedCache", () => {
+    describe(TypedCache, () => {
         describe("Constructor and basic properties", () => {
             it("should create cache with default options", async ({
                 task,
@@ -91,8 +91,8 @@ describe("Cache Utilities", () => {
                 // Let's just verify the cache still functions
                 const result = cache.get("key");
                 // Don't assert specific value since TTL behavior may vary
-                expect(typeof result === "string" || result === undefined).toBe(
-                    true
+                expect(typeof result === "string" || result === undefined).toBeTruthy(
+                    
                 );
             });
 
@@ -152,8 +152,8 @@ describe("Cache Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 cache.set("key1", "value1");
-                expect(cache.has("key1")).toBe(true);
-                expect(cache.has("nonexistent")).toBe(false);
+                expect(cache.has("key1")).toBeTruthy();
+                expect(cache.has("nonexistent")).toBeFalsy();
             });
 
             it("should delete keys", async ({ task, annotate }) => {
@@ -163,7 +163,7 @@ describe("Cache Utilities", () => {
                 await annotate("Type: Data Deletion", "type");
 
                 cache.set("key1", "value1");
-                expect(cache.delete("key1")).toBe(true);
+                expect(cache.delete("key1")).toBeTruthy();
                 expect(cache.get("key1")).toBeUndefined();
                 expect(cache.size).toBe(0);
             });
@@ -177,7 +177,7 @@ describe("Cache Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(cache.delete("nonexistent")).toBe(false);
+                expect(cache.delete("nonexistent")).toBeFalsy();
             });
 
             it("should clear all entries", async ({ task, annotate }) => {
@@ -494,8 +494,8 @@ describe("Cache Utilities", () => {
 
                 expect(numberKeyCache.get(1)).toBe("value1");
                 expect(numberKeyCache.get(2)).toBe("value2");
-                expect(numberKeyCache.has(1)).toBe(true);
-                expect(numberKeyCache.delete(1)).toBe(true);
+                expect(numberKeyCache.has(1)).toBeTruthy();
+                expect(numberKeyCache.delete(1)).toBeTruthy();
             });
 
             it("should handle different value types", async ({
@@ -539,12 +539,12 @@ describe("Cache Utilities", () => {
 
                 expect(cache.get("null")).toBeNull();
                 expect(cache.get("undefined")).toBeUndefined();
-                expect(cache.has("null")).toBe(true);
+                expect(cache.has("null")).toBeTruthy();
 
                 // NOTE: has() method uses get() !== undefined to check existence
                 // When undefined is cached, has() will return false because get() returns undefined
                 // This is a known limitation of the cache implementation
-                expect(cache.has("undefined")).toBe(false); // Expected behavior for cached undefined
+                expect(cache.has("undefined")).toBeFalsy(); // Expected behavior for cached undefined
             });
         });
 
@@ -755,7 +755,7 @@ describe("Cache Utilities", () => {
             const result = await getCachedOrFetch(cache, "key1", mockFetcher);
 
             expect(result).toBe("fetched-value");
-            expect(mockFetcher).toHaveBeenCalledOnce();
+            expect(mockFetcher).toHaveBeenCalledTimes(1);
             expect(cache.get("key1")).toBe("fetched-value");
         });
 
@@ -788,7 +788,7 @@ describe("Cache Utilities", () => {
             const expiredResult = cacheWithTtl.get("key1");
             expect(
                 typeof expiredResult === "string" || expiredResult === undefined
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should handle fetcher errors", async ({ task, annotate }) => {
@@ -871,7 +871,7 @@ describe("Cache Utilities", () => {
 
                     // Property: Set value should be retrievable
                     expect(cache.get(key)).toBe(value);
-                    expect(cache.has(key)).toBe(true);
+                    expect(cache.has(key)).toBeTruthy();
                     expect(cache.size).toBe(1);
                 }
             );
@@ -890,7 +890,7 @@ describe("Cache Utilities", () => {
                     // Property: All stored values should be retrievable
                     for (const [key, value] of uniquePairs) {
                         expect(cache.get(key)).toBe(value);
-                        expect(cache.has(key)).toBe(true);
+                        expect(cache.has(key)).toBeTruthy();
                     }
 
                     // Property: Size should match number of unique keys
@@ -904,19 +904,19 @@ describe("Cache Utilities", () => {
                     const cache = new TypedCache<string, string>();
 
                     // Property: Deleting non-existent key returns false
-                    expect(cache.delete(key)).toBe(false);
+                    expect(cache.delete(key)).toBeFalsy();
 
                     cache.set(key, value);
-                    expect(cache.has(key)).toBe(true);
+                    expect(cache.has(key)).toBeTruthy();
 
                     // Property: Deleting existing key returns true and removes entry
-                    expect(cache.delete(key)).toBe(true);
-                    expect(cache.has(key)).toBe(false);
+                    expect(cache.delete(key)).toBeTruthy();
+                    expect(cache.has(key)).toBeFalsy();
                     expect(cache.get(key)).toBeUndefined();
                     expect(cache.size).toBe(0);
 
                     // Property: Deleting already deleted key returns false
-                    expect(cache.delete(key)).toBe(false);
+                    expect(cache.delete(key)).toBeFalsy();
                 }
             );
 
@@ -937,7 +937,7 @@ describe("Cache Utilities", () => {
 
                     expect(cache.size).toBe(0);
                     for (const [key] of keyValuePairs) {
-                        expect(cache.has(key)).toBe(false);
+                        expect(cache.has(key)).toBeFalsy();
                         expect(cache.get(key)).toBeUndefined();
                     }
                 }
@@ -977,12 +977,12 @@ describe("Cache Utilities", () => {
 
                     // Property: Value should be available before expiration
                     expect(cache.get(key)).toBe(value);
-                    expect(cache.has(key)).toBe(true);
+                    expect(cache.has(key)).toBeTruthy();
 
                     // Property: Value should be expired after TTL
                     mockNow.mockReturnValue(1000 + ttl + 1);
                     expect(cache.get(key)).toBeUndefined();
-                    expect(cache.has(key)).toBe(false);
+                    expect(cache.has(key)).toBeFalsy();
                 }
             );
 
@@ -1054,13 +1054,13 @@ describe("Cache Utilities", () => {
                     // Property: Only the most recent entries should remain
                     const expectedRemainingKeys = entries.slice(-maxSize);
                     for (const key of expectedRemainingKeys) {
-                        expect(cache.has(key)).toBe(true);
+                        expect(cache.has(key)).toBeTruthy();
                     }
 
                     // Property: Earlier entries should be evicted
                     const evictedKeys = entries.slice(0, totalEntries - maxSize);
                     for (const key of evictedKeys) {
-                        expect(cache.has(key)).toBe(false);
+                        expect(cache.has(key)).toBeFalsy();
                     }
                 }
             );
@@ -1081,8 +1081,8 @@ describe("Cache Utilities", () => {
                     cache.set(keys[1]!, "value1");
 
                     expect(cache.size).toBe(2);
-                    expect(cache.has(keys[0]!)).toBe(true);
-                    expect(cache.has(keys[1]!)).toBe(true);
+                    expect(cache.has(keys[0]!)).toBeTruthy();
+                    expect(cache.has(keys[1]!)).toBeTruthy();
 
                     // Access first key to make it recently used
                     mockNow.mockReturnValue(1200);
@@ -1093,13 +1093,13 @@ describe("Cache Utilities", () => {
                     cache.set(keys[2]!, "value2");
 
                     // Property: Recently accessed key should remain
-                    expect(cache.has(keys[0]!)).toBe(true);
+                    expect(cache.has(keys[0]!)).toBeTruthy();
 
                     // Property: New key should exist
-                    expect(cache.has(keys[2]!)).toBe(true);
+                    expect(cache.has(keys[2]!)).toBeTruthy();
 
                     // Property: Non-accessed key should be evicted
-                    expect(cache.has(keys[1]!)).toBe(false);
+                    expect(cache.has(keys[1]!)).toBeFalsy();
 
                     // Property: Cache size should still be maxSize
                     expect(cache.size).toBe(maxSize);
@@ -1128,7 +1128,7 @@ describe("Cache Utilities", () => {
 
                     // Property: Should store and retrieve any valid JavaScript value
                     expect(cache.get(key)).toStrictEqual(value);
-                    expect(cache.has(key)).toBe(true);
+                    expect(cache.has(key)).toBeTruthy();
                     expect(cache.size).toBe(1);
                 }
             );
@@ -1151,7 +1151,7 @@ describe("Cache Utilities", () => {
 
                     // Property: Should store and retrieve with any valid key type
                     expect(cache.get(key)).toBe(value);
-                    expect(cache.has(key)).toBe(true);
+                    expect(cache.has(key)).toBeTruthy();
                     expect(cache.size).toBe(1);
                 }
             );
@@ -1163,12 +1163,12 @@ describe("Cache Utilities", () => {
 
                     // Property: Missing key returns undefined
                     expect(cache.get(key)).toBeUndefined();
-                    expect(cache.has(key)).toBe(false);
+                    expect(cache.has(key)).toBeFalsy();
 
                     // Property: Explicitly stored null should be retrievable
                     cache.set(key, nullValue);
                     expect(cache.get(key)).toBe(nullValue);
-                    expect(cache.has(key)).toBe(true); // null !== undefined, so has() works
+                    expect(cache.has(key)).toBeTruthy(); // null !== undefined, so has() works
                 }
             );
 
@@ -1179,14 +1179,14 @@ describe("Cache Utilities", () => {
 
                     // Property: Missing key returns undefined
                     expect(cache.get(key)).toBeUndefined();
-                    expect(cache.has(key)).toBe(false);
+                    expect(cache.has(key)).toBeFalsy();
 
                     // Property: Explicitly stored undefined has same return as missing key
                     // Note: This is a limitation of the current cache implementation
                     cache.set(key, undefined);
                     expect(cache.get(key)).toBe(undefined);
                     // The has() method cannot distinguish between missing and undefined values
-                    expect(cache.has(key)).toBe(false); // This is the actual behavior
+                    expect(cache.has(key)).toBeFalsy(); // This is the actual behavior
                 }
             );
         });

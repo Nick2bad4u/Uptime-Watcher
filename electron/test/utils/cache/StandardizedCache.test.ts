@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 
-describe("StandardizedCache", () => {
+describe(StandardizedCache, () => {
     let cache: StandardizedCache<string>;
 
     beforeEach(() => {
@@ -48,8 +48,8 @@ describe("StandardizedCache", () => {
             await annotate("Type: Business Logic", "type");
 
             cache.set("key1", "value1");
-            expect(cache.has("key1")).toBe(true);
-            expect(cache.has("nonexistent")).toBe(false);
+            expect(cache.has("key1")).toBeTruthy();
+            expect(cache.has("nonexistent")).toBeFalsy();
         });
 
         it("should delete keys", async ({ task, annotate }) => {
@@ -59,9 +59,9 @@ describe("StandardizedCache", () => {
             await annotate("Type: Data Deletion", "type");
 
             cache.set("key1", "value1");
-            expect(cache.delete("key1")).toBe(true);
-            expect(cache.has("key1")).toBe(false);
-            expect(cache.delete("nonexistent")).toBe(false);
+            expect(cache.delete("key1")).toBeTruthy();
+            expect(cache.has("key1")).toBeFalsy();
+            expect(cache.delete("nonexistent")).toBeFalsy();
         });
 
         it("should clear all entries", async ({ task, annotate }) => {
@@ -99,7 +99,7 @@ describe("StandardizedCache", () => {
 
             limitedCache.set("key3", "value3"); // Should evict oldest
             expect(limitedCache.size).toBe(2);
-            expect(limitedCache.has("key1")).toBe(false); // Oldest should be evicted
+            expect(limitedCache.has("key1")).toBeFalsy(); // Oldest should be evicted
         });
 
         it("should handle TTL expiration", async ({ task, annotate }) => {
@@ -171,8 +171,8 @@ describe("StandardizedCache", () => {
 
             cache.invalidate("key1");
 
-            expect(cache.has("key1")).toBe(false);
-            expect(cache.has("key2")).toBe(true);
+            expect(cache.has("key1")).toBeFalsy();
+            expect(cache.has("key2")).toBeTruthy();
         });
 
         it("should invalidate all entries", async ({ task, annotate }) => {

@@ -45,7 +45,7 @@ describe("ElectronUtils", () => {
         vi.restoreAllMocks();
     });
 
-    describe("isDev", () => {
+    describe(isDev, () => {
         it("should return true when both isDevelopment is true and app is not packaged", async ({
             task,
             annotate,
@@ -63,8 +63,8 @@ describe("ElectronUtils", () => {
             const result = isDev();
 
             // Assert
-            expect(result).toBe(true);
-            expect(isDevelopment).toHaveBeenCalledOnce();
+            expect(result).toBeTruthy();
+            expect(isDevelopment).toHaveBeenCalledTimes(1);
         });
 
         it("should return false when isDevelopment is true but app is packaged", async ({
@@ -84,8 +84,8 @@ describe("ElectronUtils", () => {
             const result = isDev();
 
             // Assert
-            expect(result).toBe(false);
-            expect(isDevelopment).toHaveBeenCalledOnce();
+            expect(result).toBeFalsy();
+            expect(isDevelopment).toHaveBeenCalledTimes(1);
         });
 
         it("should return false when isDevelopment is false and app is not packaged", async ({
@@ -105,8 +105,8 @@ describe("ElectronUtils", () => {
             const result = isDev();
 
             // Assert
-            expect(result).toBe(false);
-            expect(isDevelopment).toHaveBeenCalledOnce();
+            expect(result).toBeFalsy();
+            expect(isDevelopment).toHaveBeenCalledTimes(1);
         });
 
         it("should return false when both isDevelopment is false and app is packaged", async ({
@@ -126,8 +126,8 @@ describe("ElectronUtils", () => {
             const result = isDev();
 
             // Assert
-            expect(result).toBe(false);
-            expect(isDevelopment).toHaveBeenCalledOnce();
+            expect(result).toBeFalsy();
+            expect(isDevelopment).toHaveBeenCalledTimes(1);
         });
 
         it("should always call isDevelopment function", async ({
@@ -147,7 +147,7 @@ describe("ElectronUtils", () => {
             isDev();
 
             // Assert
-            expect(isDevelopment).toHaveBeenCalledOnce();
+            expect(isDevelopment).toHaveBeenCalledTimes(1);
             expect(isDevelopment).toHaveBeenCalledWith();
         });
 
@@ -169,7 +169,7 @@ describe("ElectronUtils", () => {
 
             // Assert
             expect(typeof result).toBe("boolean");
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should return consistent results for same input conditions", async ({
@@ -193,7 +193,7 @@ describe("ElectronUtils", () => {
             // Assert
             expect(result1).toBe(result2);
             expect(result2).toBe(result3);
-            expect(result1).toBe(true);
+            expect(result1).toBeTruthy();
         });
 
         it("should properly use logical AND operation", async ({
@@ -256,11 +256,11 @@ describe("ElectronUtils", () => {
             // Test with different truthy values
             vi.mocked(isDevelopment).mockReturnValue(true);
             (app as any).isPackaged = false;
-            expect(isDev()).toBe(true);
+            expect(isDev()).toBeTruthy();
 
             // Test with falsy values
             vi.mocked(isDevelopment).mockReturnValue(false);
-            expect(isDev()).toBe(false);
+            expect(isDev()).toBeFalsy();
         });
 
         it("should handle app.isPackaged with different truthy/falsy values", async ({
@@ -277,11 +277,11 @@ describe("ElectronUtils", () => {
 
             // Test with false (not packaged)
             (app as any).isPackaged = false;
-            expect(isDev()).toBe(true);
+            expect(isDev()).toBeTruthy();
 
             // Test with true (packaged)
             (app as any).isPackaged = true;
-            expect(isDev()).toBe(false);
+            expect(isDev()).toBeFalsy();
         });
     });
 
@@ -303,7 +303,7 @@ describe("ElectronUtils", () => {
             const result = isDev();
 
             // Assert
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             // Verify that we're actually checking the app.isPackaged property
             expect(app.isPackaged).toBeDefined();
         });
@@ -325,8 +325,8 @@ describe("ElectronUtils", () => {
             const result = isDev();
 
             // Assert
-            expect(result).toBe(true);
-            expect(isDevelopment).toHaveBeenCalledOnce();
+            expect(result).toBeTruthy();
+            expect(isDevelopment).toHaveBeenCalledTimes(1);
         });
 
         it("should return boolean type for all valid inputs", async ({
@@ -377,7 +377,7 @@ describe("ElectronUtils", () => {
             const result = isDev();
             const endTime = Date.now();
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(endTime - startTime).toBeLessThan(10); // Should complete in under 10ms
         });
 
@@ -402,7 +402,7 @@ describe("ElectronUtils", () => {
 
             // Assert
             expect(results).toHaveLength(100);
-            expect(results.every((result) => result === true)).toBe(true);
+            expect(results.every((result) => result === true)).toBeTruthy();
             expect(isDevelopment).toHaveBeenCalledTimes(100);
         });
     });

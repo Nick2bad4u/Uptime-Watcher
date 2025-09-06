@@ -39,11 +39,11 @@ describe("Error Handling Utils", () => {
             );
 
             expect(result).toBe("success");
-            expect(mockFrontendStore.clearError).toHaveBeenCalledOnce();
+            expect(mockFrontendStore.clearError).toHaveBeenCalledTimes(1);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(true);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(false);
             expect(mockFrontendStore.setError).not.toHaveBeenCalled();
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
 
         it("should handle operation failure with Error object", async ({
@@ -62,13 +62,13 @@ describe("Error Handling Utils", () => {
                 withErrorHandling(operation, mockFrontendStore)
             ).rejects.toThrow("Test error");
 
-            expect(mockFrontendStore.clearError).toHaveBeenCalledOnce();
+            expect(mockFrontendStore.clearError).toHaveBeenCalledTimes(1);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(true);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(false);
             expect(mockFrontendStore.setError).toHaveBeenCalledWith(
                 "Test error"
             );
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
 
         it("should handle operation failure with string error", async ({
@@ -87,13 +87,13 @@ describe("Error Handling Utils", () => {
                 withErrorHandling(operation, mockFrontendStore)
             ).rejects.toBe("String error");
 
-            expect(mockFrontendStore.clearError).toHaveBeenCalledOnce();
+            expect(mockFrontendStore.clearError).toHaveBeenCalledTimes(1);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(true);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(false);
             expect(mockFrontendStore.setError).toHaveBeenCalledWith(
                 "String error"
             );
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
 
         it("should handle operation failure with unknown error", async ({
@@ -112,13 +112,13 @@ describe("Error Handling Utils", () => {
                 withErrorHandling(operation, mockFrontendStore)
             ).rejects.toEqual({ custom: "error" });
 
-            expect(mockFrontendStore.clearError).toHaveBeenCalledOnce();
+            expect(mockFrontendStore.clearError).toHaveBeenCalledTimes(1);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(true);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(false);
             expect(mockFrontendStore.setError).toHaveBeenCalledWith(
                 "[object Object]"
             );
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
 
         it("should set loading to false even if clearError throws", async ({
@@ -174,7 +174,7 @@ describe("Error Handling Utils", () => {
 
             expect(result).toBe("success");
             expect(mockLogger.error).not.toHaveBeenCalled();
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
 
         it("should handle operation failure and log error with operation name", async ({
@@ -197,7 +197,7 @@ describe("Error Handling Utils", () => {
                 "Failed to testOperation",
                 error
             );
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
 
         it("should handle operation failure and log error without operation name", async ({
@@ -221,7 +221,7 @@ describe("Error Handling Utils", () => {
                 "Async operation failed",
                 error
             );
-            expect(operation).toHaveBeenCalledOnce();
+            expect(operation).toHaveBeenCalledTimes(1);
         });
 
         it("should preserve original error type and details", async ({
@@ -247,7 +247,7 @@ describe("Error Handling Utils", () => {
             expect(caughtError).toBe(originalError);
             expect(caughtError.message).toBe("Type error");
             expect(caughtError.stack).toBe("original stack trace");
-            expect(caughtError instanceof TypeError).toBe(true);
+            expect(caughtError instanceof TypeError).toBeTruthy();
         });
     });
 

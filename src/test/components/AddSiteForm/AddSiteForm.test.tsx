@@ -121,7 +121,7 @@ vi.mock("../../../theme/components", () => ({
 // Import the component under test
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
-describe("AddSiteForm", () => {
+describe(AddSiteForm, () => {
     it("should render without crashing", ({ task, annotate }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: AddSiteForm", "component");

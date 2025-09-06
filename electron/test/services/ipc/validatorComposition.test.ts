@@ -263,7 +263,7 @@ describe("Validator Composition Utilities", () => {
 
             // Error case
             const errors = validator([""]);
-            expect(Array.isArray(errors)).toBe(true);
+            expect(Array.isArray(errors)).toBeTruthy();
             expect(errors?.length).toBeGreaterThan(0);
         });
         it("should be compatible with existing IpcParameterValidator interface", async ({
@@ -281,7 +281,7 @@ describe("Validator Composition Utilities", () => {
 
             // Should match the IpcParameterValidator type signature
             const result = validator(["test"]);
-            expect(result === null || Array.isArray(result)).toBe(true);
+            expect(result === null || Array.isArray(result)).toBeTruthy();
         });
     });
 });

@@ -24,12 +24,12 @@ describe("Shared Module - 100% Function Coverage", () => {
             );
 
             // Ensure hasPlugins function is called
-            expect(chartConfigModule.hasPlugins({})).toBe(false);
-            expect(chartConfigModule.hasPlugins({ plugins: {} })).toBe(true);
+            expect(chartConfigModule.hasPlugins({})).toBeFalsy();
+            expect(chartConfigModule.hasPlugins({ plugins: {} })).toBeTruthy();
 
             // Ensure hasScales function is called
-            expect(chartConfigModule.hasScales({})).toBe(false);
-            expect(chartConfigModule.hasScales({ scales: {} })).toBe(true);
+            expect(chartConfigModule.hasScales({})).toBeFalsy();
+            expect(chartConfigModule.hasScales({ scales: {} })).toBeTruthy();
 
             // Ensure DEFAULT_CHART_THEMES constant is accessed
             expect(chartConfigModule.DEFAULT_CHART_THEMES).toBeDefined();
@@ -92,16 +92,16 @@ describe("Shared Module - 100% Function Coverage", () => {
             const failureResult = validationModule.createFailureResult([
                 "test error",
             ]);
-            expect(failureResult.success).toBe(false);
+            expect(failureResult.success).toBeFalsy();
 
             const successResult = validationModule.createSuccessResult();
-            expect(successResult.success).toBe(true);
+            expect(successResult.success).toBeTruthy();
 
-            expect(validationModule.isValidationResult(failureResult)).toBe(
-                true
+            expect(validationModule.isValidationResult(failureResult)).toBeTruthy(
+                
             );
-            expect(validationModule.isValidationResult(successResult)).toBe(
-                true
+            expect(validationModule.isValidationResult(successResult)).toBeTruthy(
+                
             );
         });
     });
@@ -133,10 +133,10 @@ describe("Shared Module - 100% Function Coverage", () => {
                 success: "#00cc66",
             };
 
-            expect(themeConfigModule.isColorPalette(validColorPalette)).toBe(
-                true
+            expect(themeConfigModule.isColorPalette(validColorPalette)).toBeTruthy(
+                
             );
-            expect(themeConfigModule.isColorPalette(null)).toBe(false);
+            expect(themeConfigModule.isColorPalette(null)).toBeFalsy();
 
             const validThemeColors = {
                 background: {
@@ -239,10 +239,10 @@ describe("Shared Module - 100% Function Coverage", () => {
                 },
             };
 
-            expect(themeConfigModule.isThemeConfig(validThemeConfig)).toBe(
-                true
+            expect(themeConfigModule.isThemeConfig(validThemeConfig)).toBeTruthy(
+                
             );
-            expect(themeConfigModule.isThemeConfig(null)).toBe(false);
+            expect(themeConfigModule.isThemeConfig(null)).toBeFalsy();
         });
     });
 
@@ -274,7 +274,7 @@ describe("Shared Module - 100% Function Coverage", () => {
             objectSafetyModule.safeObjectIteration(testObj, (key, value) => {
                 iterationResult.push(`${key}:${value}`);
             });
-            expect(iterationResult.length).toBe(3);
+            expect(iterationResult).toHaveLength(3);
 
             expect(objectSafetyModule.safeObjectOmit(testObj, ["a"])).toEqual({
                 b: 2,
@@ -364,30 +364,30 @@ describe("Shared Module - 100% Function Coverage", () => {
             const guardUtilsModule = await import("../../utils/typeGuards.js");
 
             // Call all exported functions
-            expect(guardUtilsModule.hasProperties({ a: 1 }, ["a"])).toBe(true);
-            expect(guardUtilsModule.hasProperty({ a: 1 }, "a")).toBe(true);
+            expect(guardUtilsModule.hasProperties({ a: 1 }, ["a"])).toBeTruthy();
+            expect(guardUtilsModule.hasProperty({ a: 1 }, "a")).toBeTruthy();
             expect(
                 guardUtilsModule.isArray([
                     1,
                     2,
                     3,
                 ])
-            ).toBe(true);
-            expect(guardUtilsModule.isBoolean(true)).toBe(true);
-            expect(guardUtilsModule.isDate(new Date())).toBe(true);
-            expect(guardUtilsModule.isError(new Error("test error"))).toBe(
-                true
+            ).toBeTruthy();
+            expect(guardUtilsModule.isBoolean(true)).toBeTruthy();
+            expect(guardUtilsModule.isDate(new Date())).toBeTruthy();
+            expect(guardUtilsModule.isError(new Error("test error"))).toBeTruthy(
+                
             );
-            expect(guardUtilsModule.isFiniteNumber(123)).toBe(true);
-            expect(guardUtilsModule.isFunction(() => {})).toBe(true);
-            expect(guardUtilsModule.isNonNegativeNumber(0)).toBe(true);
-            expect(guardUtilsModule.isNonNullObject({})).toBe(true);
-            expect(guardUtilsModule.isNumber(123)).toBe(true);
-            expect(guardUtilsModule.isObject({})).toBe(true);
-            expect(guardUtilsModule.isPositiveNumber(1)).toBe(true);
-            expect(guardUtilsModule.isString("test")).toBe(true);
-            expect(guardUtilsModule.isValidPort(8080)).toBe(true);
-            expect(guardUtilsModule.isValidTimestamp(Date.now())).toBe(true);
+            expect(guardUtilsModule.isFiniteNumber(123)).toBeTruthy();
+            expect(guardUtilsModule.isFunction(() => {})).toBeTruthy();
+            expect(guardUtilsModule.isNonNegativeNumber(0)).toBeTruthy();
+            expect(guardUtilsModule.isNonNullObject({})).toBeTruthy();
+            expect(guardUtilsModule.isNumber(123)).toBeTruthy();
+            expect(guardUtilsModule.isObject({})).toBeTruthy();
+            expect(guardUtilsModule.isPositiveNumber(1)).toBeTruthy();
+            expect(guardUtilsModule.isString("test")).toBeTruthy();
+            expect(guardUtilsModule.isValidPort(8080)).toBeTruthy();
+            expect(guardUtilsModule.isValidTimestamp(Date.now())).toBeTruthy();
         });
     });
 
@@ -416,8 +416,8 @@ describe("Shared Module - 100% Function Coverage", () => {
                     2,
                     3,
                 ])
-            ).toBe(true);
-            expect(helperUtilsModule.isRecord({})).toBe(true);
+            ).toBeTruthy();
+            expect(helperUtilsModule.isRecord({})).toBeTruthy();
             expect(helperUtilsModule.safePropertyAccess({ a: 1 }, "a")).toBe(1);
             expect(
                 helperUtilsModule.validateAndConvert(
@@ -519,13 +519,13 @@ describe("Shared Module - 100% Function Coverage", () => {
                 '{"test":"data"}',
                 validator
             );
-            expect(parseResult.success).toBe(true);
+            expect(parseResult.success).toBeTruthy();
 
             const parseArrayResult = jsonSafetyModule.safeJsonParseArray(
                 '[{"test":"data"}]',
                 validator
             );
-            expect(parseArrayResult.success).toBe(true);
+            expect(parseArrayResult.success).toBeTruthy();
 
             const parseWithFallbackResult =
                 jsonSafetyModule.safeJsonParseWithFallback(
@@ -570,10 +570,10 @@ describe("Shared Module - 100% Function Coverage", () => {
             ).toBeDefined();
             expect(
                 errorCatalogModule.isKnownErrorMessage("Site not found")
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 errorCatalogModule.isKnownErrorMessage("Unknown error message")
-            ).toBe(false);
+            ).toBeFalsy();
 
             // Access error catalogs
             expect(errorCatalogModule.ERROR_CATALOG).toBeDefined();
@@ -697,8 +697,8 @@ describe("Shared Module - 100% Function Coverage", () => {
                 cacheKeysModule.CacheKeys.validation.monitorType("test")
             ).toBeDefined();
 
-            expect(cacheKeysModule.isStandardizedCacheKey("config:test")).toBe(
-                true
+            expect(cacheKeysModule.isStandardizedCacheKey("config:test")).toBeTruthy(
+                
             );
             expect(cacheKeysModule.parseCacheKey("config:test")).toEqual({
                 prefix: "config",
@@ -726,20 +726,20 @@ describe("Shared Module - 100% Function Coverage", () => {
             );
 
             // Call all exported functions
-            expect(validatorUtilsModule.isNonEmptyString("test")).toBe(true);
-            expect(validatorUtilsModule.isValidFQDN("example.com")).toBe(true);
-            expect(validatorUtilsModule.isValidIdentifier("test_id")).toBe(
-                true
+            expect(validatorUtilsModule.isNonEmptyString("test")).toBeTruthy();
+            expect(validatorUtilsModule.isValidFQDN("example.com")).toBeTruthy();
+            expect(validatorUtilsModule.isValidIdentifier("test_id")).toBeTruthy(
+                
             );
             expect(
                 validatorUtilsModule.isValidIdentifierArray(["test1", "test2"])
-            ).toBe(true);
-            expect(validatorUtilsModule.isValidInteger("123")).toBe(true);
-            expect(validatorUtilsModule.isValidNumeric("123.45")).toBe(true);
-            expect(validatorUtilsModule.isValidHost("localhost")).toBe(true);
-            expect(validatorUtilsModule.isValidPort(8080)).toBe(true);
-            expect(validatorUtilsModule.isValidUrl("https://example.com")).toBe(
-                true
+            ).toBeTruthy();
+            expect(validatorUtilsModule.isValidInteger("123")).toBeTruthy();
+            expect(validatorUtilsModule.isValidNumeric("123.45")).toBeTruthy();
+            expect(validatorUtilsModule.isValidHost("localhost")).toBeTruthy();
+            expect(validatorUtilsModule.isValidPort(8080)).toBeTruthy();
+            expect(validatorUtilsModule.isValidUrl("https://example.com")).toBeTruthy(
+                
             );
             expect(validatorUtilsModule.safeInteger("123", 0, 0, 1000)).toBe(
                 123
@@ -780,14 +780,14 @@ describe("Shared Module - 100% Function Coverage", () => {
                 "http",
                 httpMonitor
             );
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
 
             const fieldResult = schemasModule.validateMonitorField(
                 "http",
                 "url",
                 "https://example.com"
             );
-            expect(fieldResult.success).toBe(true);
+            expect(fieldResult.success).toBeTruthy();
 
             const siteData = {
                 identifier: "test-site",
@@ -797,7 +797,7 @@ describe("Shared Module - 100% Function Coverage", () => {
             };
 
             const siteResult = schemasModule.validateSiteData(siteData);
-            expect(siteResult.success).toBe(true);
+            expect(siteResult.success).toBeTruthy();
         });
     });
 });

@@ -453,7 +453,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     before
                 );
                 expect(result.metadata.createdAt).toBeLessThanOrEqual(after);
-                expect(Number.isInteger(result.metadata.createdAt)).toBe(true);
+                expect(Number.isInteger(result.metadata.createdAt)).toBeTruthy();
             });
         });
         describe("createDatabaseBackup - Type safety and interface compliance", () => {
@@ -471,7 +471,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 const result = await createDatabaseBackup(testDbPath);
 
                 // Type checks
-                expect(Buffer.isBuffer(result.buffer)).toBe(true);
+                expect(Buffer.isBuffer(result.buffer)).toBeTruthy();
                 expect(typeof result.fileName).toBe("string");
                 expect(typeof result.metadata).toBe("object");
                 expect(typeof result.metadata.createdAt).toBe("number");
@@ -638,7 +638,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                             expect(result.metadata.timestamp).toBeLessThanOrEqual(afterTimestamp);
 
                             // Verify buffer size matches metadata
-                            expect(result.buffer.length).toBe(result.metadata.sizeBytes);
+                            expect(result.buffer).toHaveLength(result.metadata.sizeBytes);
                         }
                     )
                 );
@@ -698,7 +698,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                             expect(result.metadata).toHaveProperty("timestamp");
 
                             // Verify type invariants
-                            expect(Buffer.isBuffer(result.buffer)).toBe(true);
+                            expect(Buffer.isBuffer(result.buffer)).toBeTruthy();
                             expect(typeof result.metadata.filename).toBe("string");
                             expect(typeof result.metadata.originalPath).toBe("string");
                             expect(typeof result.metadata.sizeBytes).toBe("number");

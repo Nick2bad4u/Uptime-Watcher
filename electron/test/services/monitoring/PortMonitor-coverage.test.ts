@@ -276,7 +276,7 @@ describe("PortMonitor Coverage Tests", () => {
 
             portMonitor.updateConfig({ userAgent: "Custom Agent/1.0" });
             // Should not throw
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should handle empty config update", async ({ task, annotate }) => {
@@ -287,7 +287,7 @@ describe("PortMonitor Coverage Tests", () => {
 
             portMonitor.updateConfig({});
             // Should not throw for empty config
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
 
         it("should allow updating with empty object", async ({
@@ -301,7 +301,7 @@ describe("PortMonitor Coverage Tests", () => {
 
             portMonitor.updateConfig({});
             // Should not throw
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         });
     });
 
@@ -387,11 +387,11 @@ describe("PortMonitor Coverage Tests", () => {
 
             const { host, ...monitorWithoutHost } = validPortMonitor;
 
-            expect(
-                await portMonitor.check(
+            await expect(
+                portMonitor.check(
                     monitorWithoutHost as Site["monitors"][0]
                 )
-            ).toBeDefined();
+            ).resolves.toBeDefined();
 
             expect(vi.mocked(createMonitorErrorResult)).toHaveBeenCalledWith(
                 "Port monitor missing valid host or port",
@@ -410,11 +410,11 @@ describe("PortMonitor Coverage Tests", () => {
 
             const { port, ...monitorWithoutPort } = validPortMonitor;
 
-            expect(
-                await portMonitor.check(
+            await expect(
+                portMonitor.check(
                     monitorWithoutPort as Site["monitors"][0]
                 )
-            ).toBeDefined();
+            ).resolves.toBeDefined();
 
             expect(vi.mocked(createMonitorErrorResult)).toHaveBeenCalledWith(
                 "Port monitor missing valid host or port",

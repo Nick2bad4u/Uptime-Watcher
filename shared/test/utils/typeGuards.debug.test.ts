@@ -20,11 +20,11 @@ describe("typeGuards Debug Test", () => {
         const result5 = isObject(123);
         const result6 = isObject(undefined);
 
-        expect(result1).toBe(true);
-        expect(result2).toBe(false);
-        expect(result3).toBe(false);
-        expect(result4).toBe(false);
-        expect(result5).toBe(false);
-        expect(result6).toBe(false);
+        expect(result1).toBeTruthy();
+        expect(result2).toBeFalsy();
+        expect(result3).toBeFalsy();
+        expect(result4).toBeFalsy();
+        expect(result5).toBeFalsy();
+        expect(result6).toBeFalsy();
     });
 });

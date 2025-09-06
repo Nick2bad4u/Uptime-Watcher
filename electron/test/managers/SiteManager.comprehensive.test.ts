@@ -542,7 +542,7 @@ describe("SiteManager - Comprehensive", () => {
             // This test requires complex mock setup that creates circular dependencies
             // Note: Simplify SiteManager to improve testability
             expect.hasAssertions();
-            expect(true).toBe(true); // Placeholder assertion
+            expect(true).toBeTruthy(); // Placeholder assertion
         });
 
         it("should handle initialization errors", async ({
@@ -580,7 +580,7 @@ describe("SiteManager - Comprehensive", () => {
             // This test requires complex mock setup that creates circular dependencies
             // Note: Simplify SiteManager to improve testability
             expect.hasAssertions();
-            expect(true).toBe(true); // Placeholder assertion
+            expect(true).toBeTruthy(); // Placeholder assertion
         });
 
         it("should handle monitor deletion failure", async ({
@@ -601,7 +601,7 @@ describe("SiteManager - Comprehensive", () => {
                 "monitor-1"
             );
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should handle deletion errors", async ({ task, annotate }) => {
@@ -631,7 +631,7 @@ describe("SiteManager - Comprehensive", () => {
             // This test requires complex mock setup that creates circular dependencies
             // Note: Simplify SiteManager to improve testability
             expect.hasAssertions();
-            expect(true).toBe(true); // Placeholder assertion
+            expect(true).toBeTruthy(); // Placeholder assertion
         });
     });
 
@@ -649,7 +649,7 @@ describe("SiteManager - Comprehensive", () => {
             // This test requires complex mock setup that creates circular dependencies
             // Note: Simplify SiteManager to improve testability
             expect.hasAssertions();
-            expect(true).toBe(true); // Placeholder assertion
+            expect(true).toBeTruthy(); // Placeholder assertion
         });
 
         it("should handle site not found in cache", async ({
@@ -664,7 +664,7 @@ describe("SiteManager - Comprehensive", () => {
             // This test requires complex mock setup that creates circular dependencies
             // Note: Simplify SiteManager to improve testability
             expect.hasAssertions();
-            expect(true).toBe(true); // Placeholder assertion
+            expect(true).toBeTruthy(); // Placeholder assertion
         });
 
         it("should handle deletion failure", async ({ task, annotate }) => {
@@ -689,7 +689,7 @@ describe("SiteManager - Comprehensive", () => {
 
             const result = await siteManager.removeSite("site-1");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             // Should not emit events when deletion fails
             expect(mockDeps.eventEmitter.emitTyped).not.toHaveBeenCalled();
         });
@@ -1074,7 +1074,7 @@ describe("SiteManager - Comprehensive", () => {
             expect(
                 mockMonitoringOperations.startMonitoringForSite
             ).toHaveBeenCalledWith("site-1", "monitor-1");
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should call stopMonitoring successfully", async ({
@@ -1093,7 +1093,7 @@ describe("SiteManager - Comprehensive", () => {
             expect(
                 mockMonitoringOperations.stopMonitoringForSite
             ).toHaveBeenCalledWith("site-1", "monitor-1");
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
     });
 
@@ -1305,7 +1305,7 @@ describe("SiteManager - Comprehensive", () => {
             expect(mockDeps.monitorRepository.delete).toHaveBeenCalledWith(
                 "monitor-1"
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should handle deletion failure", async ({ task, annotate }) => {
@@ -1321,7 +1321,7 @@ describe("SiteManager - Comprehensive", () => {
             const result =
                 await siteManager["executeMonitorDeletion"]("monitor-1");
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
     });
 
@@ -1376,7 +1376,7 @@ describe("SiteManager - Comprehensive", () => {
             vi.mocked(mockCache.get).mockReturnValue(updatedSite);
             vi.mocked(mockSiteWriterService.deleteSite).mockResolvedValue(true);
             const removed = await siteManager.removeSite("site-1");
-            expect(removed).toBe(true);
+            expect(removed).toBeTruthy();
         });
     });
 });

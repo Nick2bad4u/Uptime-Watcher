@@ -39,7 +39,7 @@ describe("historyMapper utilities", () => {
         vi.restoreAllMocks();
     });
 
-    describe("historyEntryToRow", () => {
+    describe(historyEntryToRow, () => {
         it("should convert StatusHistory to database row format", async ({
             task,
             annotate,
@@ -144,7 +144,7 @@ describe("historyMapper utilities", () => {
         });
     });
 
-    describe("isValidHistoryRow", () => {
+    describe(isValidHistoryRow, () => {
         it("should return true for valid row with all required fields", async ({
             task,
             annotate,
@@ -161,7 +161,7 @@ describe("historyMapper utilities", () => {
                 responseTime: 150,
             };
 
-            expect(isValidHistoryRow(validRow)).toBe(true);
+            expect(isValidHistoryRow(validRow)).toBeTruthy();
         });
 
         it("should return true for valid row with down status", async ({
@@ -180,7 +180,7 @@ describe("historyMapper utilities", () => {
                 responseTime: 0,
             };
 
-            expect(isValidHistoryRow(validRow)).toBe(true);
+            expect(isValidHistoryRow(validRow)).toBeTruthy();
         });
 
         it("should return false when monitorId is undefined", async ({
@@ -198,7 +198,7 @@ describe("historyMapper utilities", () => {
                 responseTime: 150,
             } as any;
 
-            expect(isValidHistoryRow(invalidRow)).toBe(false);
+            expect(isValidHistoryRow(invalidRow)).toBeFalsy();
         });
 
         it("should return false when status is undefined", async ({
@@ -216,7 +216,7 @@ describe("historyMapper utilities", () => {
                 responseTime: 150,
             } as any;
 
-            expect(isValidHistoryRow(invalidRow)).toBe(false);
+            expect(isValidHistoryRow(invalidRow)).toBeFalsy();
         });
 
         it("should return false when timestamp is undefined", async ({
@@ -234,7 +234,7 @@ describe("historyMapper utilities", () => {
                 responseTime: 150,
             } as any;
 
-            expect(isValidHistoryRow(invalidRow)).toBe(false);
+            expect(isValidHistoryRow(invalidRow)).toBeFalsy();
         });
 
         it("should return false when monitorId is not a string", async ({
@@ -253,7 +253,7 @@ describe("historyMapper utilities", () => {
                 responseTime: 150,
             } as any;
 
-            expect(isValidHistoryRow(invalidRow)).toBe(false);
+            expect(isValidHistoryRow(invalidRow)).toBeFalsy();
         });
 
         it("should return false when status is invalid", async ({
@@ -272,7 +272,7 @@ describe("historyMapper utilities", () => {
                 responseTime: 150,
             } as any;
 
-            expect(isValidHistoryRow(invalidRow)).toBe(false);
+            expect(isValidHistoryRow(invalidRow)).toBeFalsy();
         });
 
         it("should return false when timestamp is NaN", async ({
@@ -291,7 +291,7 @@ describe("historyMapper utilities", () => {
                 responseTime: 150,
             } as any;
 
-            expect(isValidHistoryRow(invalidRow)).toBe(false);
+            expect(isValidHistoryRow(invalidRow)).toBeFalsy();
         });
 
         it("should handle optional details field", async ({
@@ -311,11 +311,11 @@ describe("historyMapper utilities", () => {
                 details: "Success",
             };
 
-            expect(isValidHistoryRow(validRowWithDetails)).toBe(true);
+            expect(isValidHistoryRow(validRowWithDetails)).toBeTruthy();
         });
     });
 
-    describe("rowsToHistoryEntries", () => {
+    describe(rowsToHistoryEntries, () => {
         it("should convert array of rows to array of StatusHistory objects", async ({
             task,
             annotate,
@@ -393,7 +393,7 @@ describe("historyMapper utilities", () => {
         });
     });
 
-    describe("rowToHistoryEntry", () => {
+    describe(rowToHistoryEntry, () => {
         it("should convert valid row to StatusHistory object", async ({
             task,
             annotate,
@@ -698,7 +698,7 @@ describe("historyMapper utilities", () => {
         });
     });
 
-    describe("rowToHistoryEntryOrUndefined", () => {
+    describe(rowToHistoryEntryOrUndefined, () => {
         it("should return StatusHistory when row is provided", async ({
             task,
             annotate,
@@ -819,7 +819,7 @@ describe("historyMapper utilities", () => {
                 responseTime: 150,
             };
 
-            expect(isValidHistoryRow(validRow)).toBe(true);
+            expect(isValidHistoryRow(validRow)).toBeTruthy();
 
             const entry = rowToHistoryEntry(validRow);
             expect(entry.status).toBe("up");

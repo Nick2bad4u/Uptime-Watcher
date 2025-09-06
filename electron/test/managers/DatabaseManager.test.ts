@@ -165,7 +165,7 @@ vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
     },
 }));
 
-describe("DatabaseManager", () => {
+describe(DatabaseManager, () => {
     let databaseManager: DatabaseManager;
     let dependencies: DatabaseManagerDependencies;
 
@@ -418,7 +418,7 @@ describe("DatabaseManager", () => {
             const testData = '{"invalid": "data"}';
             const result = await databaseManager.importData(testData);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:data-imported",
                 {
@@ -470,7 +470,7 @@ describe("DatabaseManager", () => {
             const testData = '{"sites": []}';
             const result = await databaseManager.importData(testData);
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:data-imported",
                 expect.objectContaining({

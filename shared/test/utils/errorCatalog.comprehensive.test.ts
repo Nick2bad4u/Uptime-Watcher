@@ -8,7 +8,7 @@ import {
 } from "../../utils/errorCatalog";
 
 describe("errorCatalog utilities", () => {
-    describe("formatErrorMessage", () => {
+    describe(formatErrorMessage, () => {
         it("should format error message with basic interpolation", async ({
             task,
             annotate,
@@ -280,7 +280,7 @@ describe("errorCatalog utilities", () => {
         });
     });
 
-    describe("isKnownErrorMessage", () => {
+    describe(isKnownErrorMessage, () => {
         it("should return true for known error messages from the catalog", async ({
             task,
             annotate,
@@ -291,15 +291,15 @@ describe("errorCatalog utilities", () => {
             await annotate("Type: Error Handling", "type");
 
             // Test with actual error messages from the catalog
-            expect(isKnownErrorMessage("Site not found")).toBe(true);
-            expect(isKnownErrorMessage("Monitor not found")).toBe(true);
-            expect(isKnownErrorMessage("Database connection failed")).toBe(
-                true
+            expect(isKnownErrorMessage("Site not found")).toBeTruthy();
+            expect(isKnownErrorMessage("Monitor not found")).toBeTruthy();
+            expect(isKnownErrorMessage("Database connection failed")).toBeTruthy(
+                
             );
-            expect(isKnownErrorMessage("Network connection failed")).toBe(true);
-            expect(isKnownErrorMessage("This field is required")).toBe(true);
-            expect(isKnownErrorMessage("Access denied")).toBe(true);
-            expect(isKnownErrorMessage("Operation failed")).toBe(true);
+            expect(isKnownErrorMessage("Network connection failed")).toBeTruthy();
+            expect(isKnownErrorMessage("This field is required")).toBeTruthy();
+            expect(isKnownErrorMessage("Access denied")).toBeTruthy();
+            expect(isKnownErrorMessage("Operation failed")).toBeTruthy();
         });
 
         it("should return false for unknown error messages", async ({
@@ -320,7 +320,7 @@ describe("errorCatalog utilities", () => {
 
             for (const message of unknownMessages) {
                 const result = isKnownErrorMessage(message);
-                expect(result).toBe(false);
+                expect(result).toBeFalsy();
             }
         });
 
@@ -331,7 +331,7 @@ describe("errorCatalog utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = isKnownErrorMessage("");
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
         });
 
         it("should handle case sensitivity", async ({ task, annotate }) => {
@@ -341,9 +341,9 @@ describe("errorCatalog utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test that the function is case sensitive
-            expect(isKnownErrorMessage("Site not found")).toBe(true);
-            expect(isKnownErrorMessage("SITE NOT FOUND")).toBe(false);
-            expect(isKnownErrorMessage("site not found")).toBe(false);
+            expect(isKnownErrorMessage("Site not found")).toBeTruthy();
+            expect(isKnownErrorMessage("SITE NOT FOUND")).toBeFalsy();
+            expect(isKnownErrorMessage("site not found")).toBeFalsy();
         });
 
         it("should handle whitespace sensitivity", async ({
@@ -355,9 +355,9 @@ describe("errorCatalog utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isKnownErrorMessage("Site not found")).toBe(true);
-            expect(isKnownErrorMessage(" Site not found ")).toBe(false);
-            expect(isKnownErrorMessage("Site  not  found")).toBe(false);
+            expect(isKnownErrorMessage("Site not found")).toBeTruthy();
+            expect(isKnownErrorMessage(" Site not found ")).toBeFalsy();
+            expect(isKnownErrorMessage("Site  not  found")).toBeFalsy();
         });
 
         it("should handle partial matches", async ({ task, annotate }) => {
@@ -366,9 +366,9 @@ describe("errorCatalog utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isKnownErrorMessage("Site not found")).toBe(true);
-            expect(isKnownErrorMessage("Site not")).toBe(false);
-            expect(isKnownErrorMessage("not found")).toBe(false);
+            expect(isKnownErrorMessage("Site not found")).toBeTruthy();
+            expect(isKnownErrorMessage("Site not")).toBeFalsy();
+            expect(isKnownErrorMessage("not found")).toBeFalsy();
         });
 
         it("should work with all error categories", async ({
@@ -381,18 +381,18 @@ describe("errorCatalog utilities", () => {
             await annotate("Type: Error Handling", "type");
 
             // Test messages from different categories
-            expect(isKnownErrorMessage("Failed to add site")).toBe(true); // SITE_ERRORS
+            expect(isKnownErrorMessage("Failed to add site")).toBeTruthy(); // SITE_ERRORS
             expect(
                 isKnownErrorMessage("Monitor configuration is invalid")
-            ).toBe(true); // MONITOR_ERRORS
-            expect(isKnownErrorMessage("Field format is invalid")).toBe(true); // VALIDATION_ERRORS
-            expect(isKnownErrorMessage("Internal error")).toBe(false); // Should be "An internal error occurred"
-            expect(isKnownErrorMessage("An internal error occurred")).toBe(
-                true
+            ).toBeTruthy(); // MONITOR_ERRORS
+            expect(isKnownErrorMessage("Field format is invalid")).toBeTruthy(); // VALIDATION_ERRORS
+            expect(isKnownErrorMessage("Internal error")).toBeFalsy(); // Should be "An internal error occurred"
+            expect(isKnownErrorMessage("An internal error occurred")).toBeTruthy(
+                
             ); // SYSTEM_ERRORS
-            expect(isKnownErrorMessage("Authentication failed")).toBe(true); // NETWORK_ERRORS
-            expect(isKnownErrorMessage("Database query failed")).toBe(true); // DATABASE_ERRORS
-            expect(isKnownErrorMessage("Operation failed")).toBe(true); // IPC_ERRORS
+            expect(isKnownErrorMessage("Authentication failed")).toBeTruthy(); // NETWORK_ERRORS
+            expect(isKnownErrorMessage("Database query failed")).toBeTruthy(); // DATABASE_ERRORS
+            expect(isKnownErrorMessage("Operation failed")).toBeTruthy(); // IPC_ERRORS
         });
 
         it("should handle special characters in error messages", async ({
@@ -405,10 +405,10 @@ describe("errorCatalog utilities", () => {
             await annotate("Type: Error Handling", "type");
 
             // Test messages that contain special characters
-            expect(isKnownErrorMessage("SSL/TLS connection failed")).toBe(true);
+            expect(isKnownErrorMessage("SSL/TLS connection failed")).toBeTruthy();
             expect(
                 isKnownErrorMessage("Port number must be between 1 and 65535")
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should return false for non-string inputs by type safety", async ({
@@ -422,12 +422,12 @@ describe("errorCatalog utilities", () => {
 
             // The function signature requires a string, so TypeScript would catch these
             // But for runtime safety, we test the behavior
-            expect(isKnownErrorMessage(123 as any)).toBe(false);
-            expect(isKnownErrorMessage(true as any)).toBe(false);
-            expect(isKnownErrorMessage({} as any)).toBe(false);
-            expect(isKnownErrorMessage([] as any)).toBe(false);
-            expect(isKnownErrorMessage(null as any)).toBe(false);
-            expect(isKnownErrorMessage(undefined as any)).toBe(false);
+            expect(isKnownErrorMessage(123 as any)).toBeFalsy();
+            expect(isKnownErrorMessage(true as any)).toBeFalsy();
+            expect(isKnownErrorMessage({} as any)).toBeFalsy();
+            expect(isKnownErrorMessage([] as any)).toBeFalsy();
+            expect(isKnownErrorMessage(null as any)).toBeFalsy();
+            expect(isKnownErrorMessage(undefined as any)).toBeFalsy();
         });
     });
 

@@ -288,7 +288,7 @@ describe("DatabaseCommands", () => {
         });
     });
 
-    describe("DatabaseCommandExecutor", () => {
+    describe(DatabaseCommandExecutor, () => {
         let executor: DatabaseCommandExecutor;
         let mockCommand: IDatabaseCommand<string>;
 
@@ -512,7 +512,7 @@ describe("DatabaseCommands", () => {
         });
     });
 
-    describe("DownloadBackupCommand", () => {
+    describe(DownloadBackupCommand, () => {
         let command: DownloadBackupCommand;
         let mockBackupService: any;
 
@@ -616,7 +616,7 @@ describe("DatabaseCommands", () => {
         });
     });
 
-    describe("ExportDataCommand", () => {
+    describe(ExportDataCommand, () => {
         let command: ExportDataCommand;
         let mockImportExportService: any;
 
@@ -714,7 +714,7 @@ describe("DatabaseCommands", () => {
         });
     });
 
-    describe("ImportDataCommand", () => {
+    describe(ImportDataCommand, () => {
         let command: ImportDataCommand;
         let mockImportExportService: any;
         let mockSiteRepositoryService: any;
@@ -763,7 +763,7 @@ describe("DatabaseCommands", () => {
 
             const result = await command.execute();
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(
                 mockImportExportService.importDataFromJson
             ).toHaveBeenCalledWith('{"sites": [], "settings": {}}');
@@ -927,7 +927,7 @@ describe("DatabaseCommands", () => {
 
             const result = await invalidCommand.validate();
 
-            expect(result.isValid).toBe(false);
+            expect(result.isValid).toBeFalsy();
             expect(result.errors).toContain("Import data cannot be empty");
         });
 
@@ -957,7 +957,7 @@ describe("DatabaseCommands", () => {
         });
     });
 
-    describe("LoadSitesCommand", () => {
+    describe(LoadSitesCommand, () => {
         let command: LoadSitesCommand;
         let mockSiteRepositoryService: any;
 

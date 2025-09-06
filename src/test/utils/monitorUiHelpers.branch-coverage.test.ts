@@ -65,7 +65,7 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             // Verify that responseTime condition was evaluated
             expect(getAvailableMonitorTypes).toHaveBeenCalled();
             // Result depends on error handling wrapper, but we've exercised the branch
-            expect(Array.isArray(result)).toBe(true);
+            expect(Array.isArray(result)).toBeTruthy();
         });
 
         it("should hit advancedAnalytics branch in ternary operator", async ({
@@ -108,7 +108,7 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             // Verify that advancedAnalytics condition was evaluated
             expect(getAvailableMonitorTypes).toHaveBeenCalled();
             // Result depends on error handling wrapper, but we've exercised the branch
-            expect(Array.isArray(result)).toBe(true);
+            expect(Array.isArray(result)).toBeTruthy();
         });
 
         it("should handle both branches with mixed support", async ({
@@ -155,7 +155,7 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             // Test responseTime branch
             const responseTimeResult =
                 await getTypesWithFeature("responseTime");
-            expect(Array.isArray(responseTimeResult)).toBe(true);
+            expect(Array.isArray(responseTimeResult)).toBeTruthy();
 
             // Reset mock for second test
             getAvailableMonitorTypes.mockResolvedValue([
@@ -185,7 +185,7 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             // Test advancedAnalytics branch
             const analyticsResult =
                 await getTypesWithFeature("advancedAnalytics");
-            expect(Array.isArray(analyticsResult)).toBe(true);
+            expect(Array.isArray(analyticsResult)).toBeTruthy();
 
             // Verify both calls were made
             expect(getAvailableMonitorTypes).toHaveBeenCalledTimes(2);

@@ -339,10 +339,10 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         }
 
                         if (middlewareCount <= 5) {
-                            expect(threwError).toBe(false);
+                            expect(threwError).toBeFalsy();
                             expect(registeredCount).toBe(middlewareCount);
                         } else {
-                            expect(threwError).toBe(true);
+                            expect(threwError).toBeTruthy();
                             expect(registeredCount).toBeLessThan(
                                 middlewareCount
                             );
@@ -519,7 +519,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         }
 
                         // Should not crash during rapid listener manipulation
-                        expect(true).toBe(true);
+                        expect(true).toBeTruthy();
 
                         // Should still be able to emit events
                         await expect(

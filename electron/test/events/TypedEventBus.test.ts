@@ -26,7 +26,7 @@ interface TestEvents {
     [key: symbol]: unknown;
 }
 
-describe("TypedEventBus", () => {
+describe(TypedEventBus, () => {
     let eventBus: TypedEventBus<TestEvents>;
 
     beforeEach(() => {

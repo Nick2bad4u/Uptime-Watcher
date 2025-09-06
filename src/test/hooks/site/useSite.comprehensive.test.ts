@@ -295,7 +295,7 @@ describe("useSite Hook", () => {
 
             const { result } = renderHook(() => useSite(mockSite));
 
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
         });
     });
 
@@ -528,7 +528,7 @@ describe("useSite Hook", () => {
 
             const { result } = renderHook(() => useSite(mockSite));
 
-            expect(result.current.isLoading).toBe(true);
+            expect(result.current.isLoading).toBeTruthy();
         });
     });
 });

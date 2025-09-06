@@ -18,14 +18,14 @@ describe("ValidatorUtils - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test non-string types to hit the return false on line 203
-            expect(isValidHost(123)).toBe(false);
-            expect(isValidHost(null)).toBe(false);
-            expect(isValidHost(undefined)).toBe(false);
-            expect(isValidHost({})).toBe(false);
-            expect(isValidHost([])).toBe(false);
-            expect(isValidHost(true)).toBe(false);
-            expect(isValidHost(Symbol("test"))).toBe(false);
-            expect(isValidHost(() => {})).toBe(false);
+            expect(isValidHost(123)).toBeFalsy();
+            expect(isValidHost(null)).toBeFalsy();
+            expect(isValidHost(undefined)).toBeFalsy();
+            expect(isValidHost({})).toBeFalsy();
+            expect(isValidHost([])).toBeFalsy();
+            expect(isValidHost(true)).toBeFalsy();
+            expect(isValidHost(Symbol("test"))).toBeFalsy();
+            expect(isValidHost(() => {})).toBeFalsy();
         });
 
         it("should validate valid hosts", async ({ task, annotate }) => {
@@ -35,16 +35,16 @@ describe("ValidatorUtils - Complete Coverage", () => {
             await annotate("Type: Validation", "type");
 
             // Valid IP addresses
-            expect(isValidHost("127.0.0.1")).toBe(true);
-            expect(isValidHost("192.168.1.1")).toBe(true);
-            expect(isValidHost("::1")).toBe(true);
+            expect(isValidHost("127.0.0.1")).toBeTruthy();
+            expect(isValidHost("192.168.1.1")).toBeTruthy();
+            expect(isValidHost("::1")).toBeTruthy();
 
             // Valid FQDNs
-            expect(isValidHost("example.com")).toBe(true);
-            expect(isValidHost("sub.domain.com")).toBe(true);
+            expect(isValidHost("example.com")).toBeTruthy();
+            expect(isValidHost("sub.domain.com")).toBeTruthy();
 
             // Localhost special case
-            expect(isValidHost("localhost")).toBe(true);
+            expect(isValidHost("localhost")).toBeTruthy();
         });
 
         it("should reject invalid string hosts", async ({ task, annotate }) => {
@@ -54,10 +54,10 @@ describe("ValidatorUtils - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Invalid hostnames that are strings but not valid hosts
-            expect(isValidHost("")).toBe(false);
-            expect(isValidHost("invalid..host")).toBe(false);
-            expect(isValidHost("too-many..dots")).toBe(false);
-            expect(isValidHost("_underscore")).toBe(false);
+            expect(isValidHost("")).toBeFalsy();
+            expect(isValidHost("invalid..host")).toBeFalsy();
+            expect(isValidHost("too-many..dots")).toBeFalsy();
+            expect(isValidHost("_underscore")).toBeFalsy();
         });
     });
 
@@ -72,16 +72,16 @@ describe("ValidatorUtils - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test various non-number, non-string types to hit line 253 (return false)
-            expect(isValidPort(null)).toBe(false);
-            expect(isValidPort(undefined)).toBe(false);
-            expect(isValidPort({})).toBe(false);
-            expect(isValidPort([])).toBe(false);
-            expect(isValidPort(true)).toBe(false);
-            expect(isValidPort(false)).toBe(false);
-            expect(isValidPort(Symbol("test"))).toBe(false);
-            expect(isValidPort(() => {})).toBe(false);
-            expect(isValidPort(/regex/)).toBe(false);
-            expect(isValidPort(new Date())).toBe(false);
+            expect(isValidPort(null)).toBeFalsy();
+            expect(isValidPort(undefined)).toBeFalsy();
+            expect(isValidPort({})).toBeFalsy();
+            expect(isValidPort([])).toBeFalsy();
+            expect(isValidPort(true)).toBeFalsy();
+            expect(isValidPort(false)).toBeFalsy();
+            expect(isValidPort(Symbol("test"))).toBeFalsy();
+            expect(isValidPort(() => {})).toBeFalsy();
+            expect(isValidPort(/regex/)).toBeFalsy();
+            expect(isValidPort(new Date())).toBeFalsy();
         });
 
         it("should validate number ports", async ({ task, annotate }) => {
@@ -91,15 +91,15 @@ describe("ValidatorUtils - Complete Coverage", () => {
             await annotate("Type: Validation", "type");
 
             // Valid number ports (line 249)
-            expect(isValidPort(80)).toBe(true);
-            expect(isValidPort(443)).toBe(true);
-            expect(isValidPort(3000)).toBe(true);
-            expect(isValidPort(65_535)).toBe(true);
+            expect(isValidPort(80)).toBeTruthy();
+            expect(isValidPort(443)).toBeTruthy();
+            expect(isValidPort(3000)).toBeTruthy();
+            expect(isValidPort(65_535)).toBeTruthy();
 
             // Invalid number ports
-            expect(isValidPort(0)).toBe(false);
-            expect(isValidPort(-1)).toBe(false);
-            expect(isValidPort(70_000)).toBe(false);
+            expect(isValidPort(0)).toBeFalsy();
+            expect(isValidPort(-1)).toBeFalsy();
+            expect(isValidPort(70_000)).toBeFalsy();
         });
 
         it("should validate string ports", async ({ task, annotate }) => {
@@ -109,17 +109,17 @@ describe("ValidatorUtils - Complete Coverage", () => {
             await annotate("Type: Validation", "type");
 
             // Valid string ports (line 251)
-            expect(isValidPort("80")).toBe(true);
-            expect(isValidPort("443")).toBe(true);
-            expect(isValidPort("3000")).toBe(true);
-            expect(isValidPort("65535")).toBe(true);
+            expect(isValidPort("80")).toBeTruthy();
+            expect(isValidPort("443")).toBeTruthy();
+            expect(isValidPort("3000")).toBeTruthy();
+            expect(isValidPort("65535")).toBeTruthy();
 
             // Invalid string ports
-            expect(isValidPort("0")).toBe(false);
-            expect(isValidPort("-1")).toBe(false);
-            expect(isValidPort("70000")).toBe(false);
-            expect(isValidPort("invalid")).toBe(false);
-            expect(isValidPort("")).toBe(false);
+            expect(isValidPort("0")).toBeFalsy();
+            expect(isValidPort("-1")).toBeFalsy();
+            expect(isValidPort("70000")).toBeFalsy();
+            expect(isValidPort("invalid")).toBeFalsy();
+            expect(isValidPort("")).toBeFalsy();
         });
 
         it("should handle edge case port values", async ({
@@ -132,11 +132,11 @@ describe("ValidatorUtils - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test edge cases that might behave differently
-            expect(isValidPort(1)).toBe(true);
-            expect(isValidPort("1")).toBe(true);
-            expect(isValidPort(Number.NaN)).toBe(false);
-            expect(isValidPort(Infinity)).toBe(false);
-            expect(isValidPort(-Infinity)).toBe(false);
+            expect(isValidPort(1)).toBeTruthy();
+            expect(isValidPort("1")).toBeTruthy();
+            expect(isValidPort(Number.NaN)).toBeFalsy();
+            expect(isValidPort(Infinity)).toBeFalsy();
+            expect(isValidPort(-Infinity)).toBeFalsy();
         });
     });
 
@@ -170,10 +170,10 @@ describe("ValidatorUtils - Complete Coverage", () => {
             };
 
             // These should still return false because they're objects, not strings/numbers
-            expect(isValidPort(customStringObj)).toBe(false);
-            expect(isValidPort(customNumberObj)).toBe(false);
-            expect(isValidHost(customStringObj)).toBe(false);
-            expect(isValidHost(customNumberObj)).toBe(false);
+            expect(isValidPort(customStringObj)).toBeFalsy();
+            expect(isValidPort(customNumberObj)).toBeFalsy();
+            expect(isValidHost(customStringObj)).toBeFalsy();
+            expect(isValidHost(customNumberObj)).toBeFalsy();
         });
 
         it("should handle primitive wrapper objects", async ({
@@ -186,9 +186,9 @@ describe("ValidatorUtils - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Primitive wrappers are objects, not primitives
-            expect(isValidPort(Number(80))).toBe(true);
-            expect(isValidPort(String("80"))).toBe(true);
-            expect(isValidHost(String("localhost"))).toBe(true);
+            expect(isValidPort(Number(80))).toBeTruthy();
+            expect(isValidPort(String("80"))).toBeTruthy();
+            expect(isValidHost(String("localhost"))).toBeTruthy();
         });
     });
 });

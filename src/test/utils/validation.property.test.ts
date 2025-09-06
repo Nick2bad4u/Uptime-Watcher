@@ -47,11 +47,11 @@ import type { MonitorType } from "../../../shared/types";
 describe("Validation Utils Property-Based Tests", () => {
     describe("isNonEmptyString function", () => {
         fcTest.prop([fc.string({ minLength: 1 })])("should accept non-empty strings", (str) => {
-            expect(isNonEmptyString(str)).toBe(true);
+            expect(isNonEmptyString(str)).toBeTruthy();
         });
 
         fcTest.prop([fc.constantFrom("", "   ", "\t", "\n", "  \n  ")])("should reject empty or whitespace-only strings", (str) => {
-            expect(isNonEmptyString(str)).toBe(false);
+            expect(isNonEmptyString(str)).toBeFalsy();
         });
 
         fcTest.prop([
@@ -65,13 +65,13 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.record({})
             )
         ])("should reject non-string values", (value) => {
-            expect(isNonEmptyString(value)).toBe(false);
+            expect(isNonEmptyString(value)).toBeFalsy();
         });
 
         fcTest.prop([
             fc.string().filter(s => s.trim().length > 0)
         ])("should accept strings with non-whitespace content", (str) => {
-            expect(isNonEmptyString(str)).toBe(true);
+            expect(isNonEmptyString(str)).toBeTruthy();
         });
     });
 
@@ -86,7 +86,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 ).map(([subdomain, tld]) => `${subdomain}.${tld}`)
             )
         ])("should accept valid FQDNs", (fqdn) => {
-            expect(isValidFQDN(fqdn)).toBe(true);
+            expect(isValidFQDN(fqdn)).toBeTruthy();
         });
 
         fcTest.prop([
@@ -95,7 +95,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.string().filter(s => s.includes("..") || s.startsWith(".") || s.endsWith("."))
             )
         ])("should reject invalid domain formats", (invalidDomain) => {
-            expect(isValidFQDN(invalidDomain)).toBe(false);
+            expect(isValidFQDN(invalidDomain)).toBeFalsy();
         });
 
         fcTest.prop([
@@ -107,7 +107,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.array(fc.string())
             )
         ])("should reject non-string values", (value) => {
-            expect(isValidFQDN(value)).toBe(false);
+            expect(isValidFQDN(value)).toBeFalsy();
         });
     });
 
@@ -118,7 +118,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.constantFrom("abc", "test123", "valid-identifier", "under_score", "mixed-123_valid")
             )
         ])("should accept valid identifiers", (identifier) => {
-            expect(isValidIdentifier(identifier)).toBe(true);
+            expect(isValidIdentifier(identifier)).toBeTruthy();
         });
 
         fcTest.prop([
@@ -127,7 +127,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.string().filter(s => s.includes(" ") || s.includes("@") || s.includes("!") || s.replaceAll(/[_-]/g, "").length === 0)
             )
         ])("should reject invalid identifiers", (invalid) => {
-            expect(isValidIdentifier(invalid)).toBe(false);
+            expect(isValidIdentifier(invalid)).toBeFalsy();
         });
 
         fcTest.prop([
@@ -138,7 +138,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.constant(undefined)
             )
         ])("should reject non-string values", (value) => {
-            expect(isValidIdentifier(value)).toBe(false);
+            expect(isValidIdentifier(value)).toBeFalsy();
         });
     });
 
@@ -149,7 +149,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 { minLength: 0, maxLength: 10 }
             )
         ])("should accept arrays of valid identifiers", (identifiers) => {
-            expect(isValidIdentifierArray(identifiers)).toBe(true);
+            expect(isValidIdentifierArray(identifiers)).toBeTruthy();
         });
 
         fcTest.prop([
@@ -159,7 +159,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.array(fc.constantFrom("", "   ", "___"))
             ).filter(arr => arr.length > 0)
         ])("should reject arrays with invalid identifiers", (invalidArray) => {
-            expect(isValidIdentifierArray(invalidArray)).toBe(false);
+            expect(isValidIdentifierArray(invalidArray)).toBeFalsy();
         });
 
         fcTest.prop([
@@ -171,13 +171,13 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.constant(undefined)
             )
         ])("should reject non-array values", (value) => {
-            expect(isValidIdentifierArray(value)).toBe(false);
+            expect(isValidIdentifierArray(value)).toBeFalsy();
         });
     });
 
     describe("isValidInteger function", () => {
         fcTest.prop([fc.integer()])("should accept valid integer strings", (num) => {
-            expect(isValidInteger(num.toString())).toBe(true);
+            expect(isValidInteger(num.toString())).toBeTruthy();
         });
 
         fcTest.prop([
@@ -186,7 +186,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.double().filter(d => d !== Math.floor(d)).map(d => d.toString())
             )
         ])("should reject non-integer strings", (invalid) => {
-            expect(isValidInteger(invalid)).toBe(false);
+            expect(isValidInteger(invalid)).toBeFalsy();
         });
 
         fcTest.prop([
@@ -198,13 +198,13 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.constant(undefined)
             )
         ])("should reject non-string values", (value) => {
-            expect(isValidInteger(value)).toBe(false);
+            expect(isValidInteger(value)).toBeFalsy();
         });
 
         fcTest.prop([
             fc.integer({ min: 10, max: 100 })
         ])("should respect bounds when provided", (num) => {
-            expect(isValidInteger(num.toString(), { min: 10, max: 100 })).toBe(true);
+            expect(isValidInteger(num.toString(), { min: 10, max: 100 })).toBeTruthy();
             expect(isValidInteger((num - 20).toString(), { min: 10, max: 100 })).toBe(num >= 30);
             expect(isValidInteger((num + 20).toString(), { min: 10, max: 100 })).toBe(num <= 80);
         });
@@ -217,13 +217,13 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.double({ noNaN: true, noDefaultInfinity: true }).map(d => d.toString())
             )
         ])("should accept valid numeric strings", (numStr) => {
-            expect(isValidNumeric(numStr)).toBe(true);
+            expect(isValidNumeric(numStr)).toBeTruthy();
         });
 
         fcTest.prop([
             fc.constantFrom("abc", "", "  ", "123abc", "12.34.56", "infinity")
         ])("should reject non-numeric strings", (invalid) => {
-            expect(isValidNumeric(invalid)).toBe(false);
+            expect(isValidNumeric(invalid)).toBeFalsy();
         });
 
         fcTest.prop([
@@ -235,7 +235,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.constant(undefined)
             )
         ])("should reject non-string values", (value) => {
-            expect(isValidNumeric(value)).toBe(false);
+            expect(isValidNumeric(value)).toBeFalsy();
         });
     });
 
@@ -250,7 +250,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.constant("localhost")
             )
         ])("should accept valid hosts", (host) => {
-            expect(isValidHost(host)).toBe(true);
+            expect(isValidHost(host)).toBeTruthy();
         });
 
         fcTest.prop([
@@ -259,7 +259,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.string().filter(s => s.includes("..") || s.includes(" "))
             )
         ])("should reject invalid hosts", (invalidHost) => {
-            expect(isValidHost(invalidHost)).toBe(false);
+            expect(isValidHost(invalidHost)).toBeFalsy();
         });
 
         fcTest.prop([
@@ -270,14 +270,14 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.constant(undefined)
             )
         ])("should reject non-string values", (value) => {
-            expect(isValidHost(value)).toBe(false);
+            expect(isValidHost(value)).toBeFalsy();
         });
     });
 
     describe("isValidPort function", () => {
         fcTest.prop([fc.integer({ min: 1, max: 65_535 })])("should accept valid port numbers", (port) => {
-            expect(isValidPort(port)).toBe(true);
-            expect(isValidPort(port.toString())).toBe(true);
+            expect(isValidPort(port)).toBeTruthy();
+            expect(isValidPort(port.toString())).toBeTruthy();
         });
 
         fcTest.prop([
@@ -288,7 +288,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.integer({ min: -100, max: -1 })
             )
         ])("should reject invalid port numbers", (invalidPort) => {
-            expect(isValidPort(invalidPort)).toBe(false);
+            expect(isValidPort(invalidPort)).toBeFalsy();
         });
 
         fcTest.prop([
@@ -299,7 +299,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.constant(undefined)
             )
         ])("should reject non-numeric values", (value) => {
-            expect(isValidPort(value)).toBe(false);
+            expect(isValidPort(value)).toBeFalsy();
         });
     });
 
@@ -315,7 +315,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 )
             )
         ])("should accept valid URLs", (url) => {
-            expect(isValidUrl(url)).toBe(true);
+            expect(isValidUrl(url)).toBeTruthy();
         });
 
         fcTest.prop([
@@ -324,7 +324,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.string().filter(s => !s.startsWith("http"))
             )
         ])("should reject invalid URLs", (invalidUrl) => {
-            expect(isValidUrl(invalidUrl)).toBe(false);
+            expect(isValidUrl(invalidUrl)).toBeFalsy();
         });
 
         fcTest.prop([
@@ -335,7 +335,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.constant(undefined)
             )
         ])("should reject non-string values", (value) => {
-            expect(isValidUrl(value)).toBe(false);
+            expect(isValidUrl(value)).toBeFalsy();
         });
     });
 
@@ -390,7 +390,7 @@ describe("Validation Utils Property-Based Tests", () => {
         fcTest.prop([
             fc.constantFrom("http", "port", "ping", "dns")
         ])("should accept valid monitor types", (type) => {
-            expect(validateMonitorType(type)).toBe(true);
+            expect(validateMonitorType(type)).toBeTruthy();
         });
 
         fcTest.prop([
@@ -402,7 +402,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc.constant(undefined)
             )
         ])("should reject invalid monitor types", (invalidType) => {
-            expect(validateMonitorType(invalidType)).toBe(false);
+            expect(validateMonitorType(invalidType)).toBeFalsy();
         });
     });
 
@@ -454,11 +454,11 @@ describe("Validation Utils Property-Based Tests", () => {
             )
         ])("should return no errors for valid basic monitor data", (monitor) => {
             const errors = getMonitorValidationErrors(monitor);
-            expect(Array.isArray(errors)).toBe(true);
+            expect(Array.isArray(errors)).toBeTruthy();
 
             // Should not have basic field errors
-            expect(errors.some(e => e.includes("is required"))).toBe(false);
-            expect(errors.some(e => e.includes("Invalid monitor"))).toBe(false);
+            expect(errors.some(e => e.includes("is required"))).toBeFalsy();
+            expect(errors.some(e => e.includes("Invalid monitor"))).toBeFalsy();
         });
 
         fcTest.prop([
@@ -486,7 +486,7 @@ describe("Validation Utils Property-Based Tests", () => {
             })
         ])("should return errors for invalid monitor data", (monitor) => {
             const errors = getMonitorValidationErrors(monitor);
-            expect(Array.isArray(errors)).toBe(true);
+            expect(Array.isArray(errors)).toBeTruthy();
 
             // Should have at least one error for invalid data
             if (!monitor.id || !monitor.type || !monitor.status) {
@@ -505,7 +505,7 @@ describe("Validation Utils Property-Based Tests", () => {
             const errors = getMonitorValidationErrors(httpMonitor);
 
             // Should not have URL-related errors for valid HTTP monitors
-            expect(errors.some(e => e.includes("URL is required"))).toBe(false);
+            expect(errors.some(e => e.includes("URL is required"))).toBeFalsy();
         });
 
         fcTest.prop([
@@ -520,8 +520,8 @@ describe("Validation Utils Property-Based Tests", () => {
             const errors = getMonitorValidationErrors(portMonitor);
 
             // Should not have host/port-related errors for valid port monitors
-            expect(errors.some(e => e.includes("Host is required"))).toBe(false);
-            expect(errors.some(e => e.includes("port number"))).toBe(false);
+            expect(errors.some(e => e.includes("Host is required"))).toBeFalsy();
+            expect(errors.some(e => e.includes("port number"))).toBeFalsy();
         });
     });
 
@@ -536,10 +536,10 @@ describe("Validation Utils Property-Based Tests", () => {
             )
         ])("should handle empty/null/whitespace inputs consistently", (emptyInput) => {
             // All validation functions should handle empty inputs gracefully
-            expect(isNonEmptyString(emptyInput)).toBe(false);
-            expect(isValidFQDN(emptyInput)).toBe(false);
-            expect(isValidIdentifier(emptyInput)).toBe(false);
-            expect(isValidUrl(emptyInput)).toBe(false);
+            expect(isNonEmptyString(emptyInput)).toBeFalsy();
+            expect(isValidFQDN(emptyInput)).toBeFalsy();
+            expect(isValidIdentifier(emptyInput)).toBeFalsy();
+            expect(isValidUrl(emptyInput)).toBeFalsy();
         });
 
         fcTest.prop([

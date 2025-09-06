@@ -37,11 +37,11 @@ describe("Function Coverage Validation", () => {
         };
 
         // Call functions to register coverage
-        expect(chartConfig.hasPlugins(configWithPlugins)).toBe(true);
-        expect(chartConfig.hasPlugins(configWithoutPlugins)).toBe(false);
-        expect(chartConfig.hasPlugins(null)).toBe(false);
-        expect(chartConfig.hasPlugins(undefined)).toBe(false);
-        expect(chartConfig.hasPlugins("string")).toBe(false);
+        expect(chartConfig.hasPlugins(configWithPlugins)).toBeTruthy();
+        expect(chartConfig.hasPlugins(configWithoutPlugins)).toBeFalsy();
+        expect(chartConfig.hasPlugins(null)).toBeFalsy();
+        expect(chartConfig.hasPlugins(undefined)).toBeFalsy();
+        expect(chartConfig.hasPlugins("string")).toBeFalsy();
 
         // Test hasScales function
         const configWithScales = {
@@ -56,11 +56,11 @@ describe("Function Coverage Validation", () => {
         };
 
         // Call functions to register coverage
-        expect(chartConfig.hasScales(configWithScales)).toBe(true);
-        expect(chartConfig.hasScales(configWithoutScales)).toBe(false);
-        expect(chartConfig.hasScales(null)).toBe(false);
-        expect(chartConfig.hasScales(undefined)).toBe(false);
-        expect(chartConfig.hasScales("string")).toBe(false);
+        expect(chartConfig.hasScales(configWithScales)).toBeTruthy();
+        expect(chartConfig.hasScales(configWithoutScales)).toBeFalsy();
+        expect(chartConfig.hasScales(null)).toBeFalsy();
+        expect(chartConfig.hasScales(undefined)).toBeFalsy();
+        expect(chartConfig.hasScales("string")).toBeFalsy();
 
         // Test DEFAULT_CHART_THEMES access for coverage
         expect(chartConfig.DEFAULT_CHART_THEMES).toBeDefined();
@@ -72,18 +72,18 @@ describe("Function Coverage Validation", () => {
             Array.isArray(
                 chartConfig.DEFAULT_CHART_THEMES.dark.backgroundColors
             )
-        ).toBe(true);
+        ).toBeTruthy();
         expect(
             Array.isArray(chartConfig.DEFAULT_CHART_THEMES.dark.borderColors)
-        ).toBe(true);
+        ).toBeTruthy();
         expect(
             Array.isArray(
                 chartConfig.DEFAULT_CHART_THEMES.light.backgroundColors
             )
-        ).toBe(true);
+        ).toBeTruthy();
         expect(
             Array.isArray(chartConfig.DEFAULT_CHART_THEMES.light.borderColors)
-        ).toBe(true);
+        ).toBeTruthy();
 
         // Verify theme properties exist
         expect(

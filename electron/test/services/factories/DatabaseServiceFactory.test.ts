@@ -45,7 +45,7 @@ vi.mock("../../../utils/logger", () => ({
     },
 }));
 
-describe("DatabaseServiceFactory", () => {
+describe(DatabaseServiceFactory, () => {
     let factory: DatabaseServiceFactory;
     let mockDependencies: DatabaseServiceFactoryDependencies;
     let mockEventEmitter: TypedEventBus<UptimeEvents>;

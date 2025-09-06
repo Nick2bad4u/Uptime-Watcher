@@ -12,6 +12,6 @@ describe("useSitesStore - Comprehensive Tests", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 });

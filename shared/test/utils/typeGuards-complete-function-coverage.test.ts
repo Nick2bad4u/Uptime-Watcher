@@ -29,201 +29,201 @@ describe("TypeGuards - Complete Function Coverage", () => {
 
             // Test isObject function
             expect(typeof guardsTestModule.isObject).toBe("function");
-            expect(guardsTestModule.isObject({})).toBe(true);
-            expect(guardsTestModule.isObject({ key: "value" })).toBe(true);
-            expect(guardsTestModule.isObject(null)).toBe(false);
-            expect(guardsTestModule.isObject([])).toBe(false);
-            expect(guardsTestModule.isObject("string")).toBe(false);
-            expect(guardsTestModule.isObject(123)).toBe(false);
-            expect(guardsTestModule.isObject(undefined)).toBe(false);
+            expect(guardsTestModule.isObject({})).toBeTruthy();
+            expect(guardsTestModule.isObject({ key: "value" })).toBeTruthy();
+            expect(guardsTestModule.isObject(null)).toBeFalsy();
+            expect(guardsTestModule.isObject([])).toBeFalsy();
+            expect(guardsTestModule.isObject("string")).toBeFalsy();
+            expect(guardsTestModule.isObject(123)).toBeFalsy();
+            expect(guardsTestModule.isObject(undefined)).toBeFalsy();
 
             // Test isNumber function
             expect(typeof guardsTestModule.isNumber).toBe("function");
-            expect(guardsTestModule.isNumber(123)).toBe(true);
-            expect(guardsTestModule.isNumber(0)).toBe(true);
-            expect(guardsTestModule.isNumber(-456)).toBe(true);
-            expect(guardsTestModule.isNumber(3.14)).toBe(true);
-            expect(guardsTestModule.isNumber(Number.NaN)).toBe(false);
-            expect(guardsTestModule.isNumber("123")).toBe(false);
-            expect(guardsTestModule.isNumber(null)).toBe(false);
-            expect(guardsTestModule.isNumber(undefined)).toBe(false);
+            expect(guardsTestModule.isNumber(123)).toBeTruthy();
+            expect(guardsTestModule.isNumber(0)).toBeTruthy();
+            expect(guardsTestModule.isNumber(-456)).toBeTruthy();
+            expect(guardsTestModule.isNumber(3.14)).toBeTruthy();
+            expect(guardsTestModule.isNumber(Number.NaN)).toBeFalsy();
+            expect(guardsTestModule.isNumber("123")).toBeFalsy();
+            expect(guardsTestModule.isNumber(null)).toBeFalsy();
+            expect(guardsTestModule.isNumber(undefined)).toBeFalsy();
 
             // Test hasProperties function
             expect(typeof guardsTestModule.hasProperties).toBe("function");
             const obj = { a: 1, b: 2, c: 3 };
-            expect(guardsTestModule.hasProperties(obj, ["a", "b"])).toBe(true);
+            expect(guardsTestModule.hasProperties(obj, ["a", "b"])).toBeTruthy();
             expect(
                 guardsTestModule.hasProperties(obj, [
                     "a",
                     "b",
                     "c",
                 ])
-            ).toBe(true);
-            expect(guardsTestModule.hasProperties(obj, ["a", "d"])).toBe(false);
-            expect(guardsTestModule.hasProperties(obj, [])).toBe(true);
-            expect(guardsTestModule.hasProperties(null, ["a"])).toBe(false);
-            expect(guardsTestModule.hasProperties("not object", ["a"])).toBe(
-                false
+            ).toBeTruthy();
+            expect(guardsTestModule.hasProperties(obj, ["a", "d"])).toBeFalsy();
+            expect(guardsTestModule.hasProperties(obj, [])).toBeTruthy();
+            expect(guardsTestModule.hasProperties(null, ["a"])).toBeFalsy();
+            expect(guardsTestModule.hasProperties("not object", ["a"])).toBeFalsy(
+                
             );
 
             // Test hasProperty function
             expect(typeof guardsTestModule.hasProperty).toBe("function");
-            expect(guardsTestModule.hasProperty(obj, "a")).toBe(true);
-            expect(guardsTestModule.hasProperty(obj, "z")).toBe(false);
-            expect(guardsTestModule.hasProperty(null, "a")).toBe(false);
-            expect(guardsTestModule.hasProperty("string", "length")).toBe(
-                false
+            expect(guardsTestModule.hasProperty(obj, "a")).toBeTruthy();
+            expect(guardsTestModule.hasProperty(obj, "z")).toBeFalsy();
+            expect(guardsTestModule.hasProperty(null, "a")).toBeFalsy();
+            expect(guardsTestModule.hasProperty("string", "length")).toBeFalsy(
+                
             ); // isObject excludes strings
-            expect(guardsTestModule.hasProperty([], "length")).toBe(false); // isObject excludes arrays
+            expect(guardsTestModule.hasProperty([], "length")).toBeFalsy(); // isObject excludes arrays
 
             // Test isArray function
             expect(typeof guardsTestModule.isArray).toBe("function");
-            expect(guardsTestModule.isArray([])).toBe(true);
+            expect(guardsTestModule.isArray([])).toBeTruthy();
             expect(
                 guardsTestModule.isArray([
                     1,
                     2,
                     3,
                 ])
-            ).toBe(true);
-            expect(guardsTestModule.isArray({})).toBe(false);
-            expect(guardsTestModule.isArray("string")).toBe(false);
-            expect(guardsTestModule.isArray(null)).toBe(false);
-            expect(guardsTestModule.isArray(undefined)).toBe(false);
+            ).toBeTruthy();
+            expect(guardsTestModule.isArray({})).toBeFalsy();
+            expect(guardsTestModule.isArray("string")).toBeFalsy();
+            expect(guardsTestModule.isArray(null)).toBeFalsy();
+            expect(guardsTestModule.isArray(undefined)).toBeFalsy();
 
             // Test isBoolean function
             expect(typeof guardsTestModule.isBoolean).toBe("function");
-            expect(guardsTestModule.isBoolean(true)).toBe(true);
-            expect(guardsTestModule.isBoolean(false)).toBe(true);
-            expect(guardsTestModule.isBoolean(0)).toBe(false);
-            expect(guardsTestModule.isBoolean(1)).toBe(false);
-            expect(guardsTestModule.isBoolean("true")).toBe(false);
-            expect(guardsTestModule.isBoolean(null)).toBe(false);
+            expect(guardsTestModule.isBoolean(true)).toBeTruthy();
+            expect(guardsTestModule.isBoolean(false)).toBeTruthy();
+            expect(guardsTestModule.isBoolean(0)).toBeFalsy();
+            expect(guardsTestModule.isBoolean(1)).toBeFalsy();
+            expect(guardsTestModule.isBoolean("true")).toBeFalsy();
+            expect(guardsTestModule.isBoolean(null)).toBeFalsy();
 
             // Test isDate function
             expect(typeof guardsTestModule.isDate).toBe("function");
             const date = new Date();
-            expect(guardsTestModule.isDate(date)).toBe(true);
-            expect(guardsTestModule.isDate(new Date("2023-01-01"))).toBe(true);
-            expect(guardsTestModule.isDate("2023-01-01")).toBe(false);
-            expect(guardsTestModule.isDate(1_672_531_200_000)).toBe(false);
-            expect(guardsTestModule.isDate({})).toBe(false);
-            expect(guardsTestModule.isDate(null)).toBe(false);
+            expect(guardsTestModule.isDate(date)).toBeTruthy();
+            expect(guardsTestModule.isDate(new Date("2023-01-01"))).toBeTruthy();
+            expect(guardsTestModule.isDate("2023-01-01")).toBeFalsy();
+            expect(guardsTestModule.isDate(1_672_531_200_000)).toBeFalsy();
+            expect(guardsTestModule.isDate({})).toBeFalsy();
+            expect(guardsTestModule.isDate(null)).toBeFalsy();
 
             // Test isError function
             expect(typeof guardsTestModule.isError).toBe("function");
             const error = new Error("test");
-            expect(guardsTestModule.isError(error)).toBe(true);
-            expect(guardsTestModule.isError(new TypeError("type error"))).toBe(
-                true
+            expect(guardsTestModule.isError(error)).toBeTruthy();
+            expect(guardsTestModule.isError(new TypeError("type error"))).toBeTruthy(
+                
             );
             expect(
                 guardsTestModule.isError(new RangeError("range error"))
-            ).toBe(true);
-            expect(guardsTestModule.isError("error string")).toBe(false);
-            expect(guardsTestModule.isError({ message: "error" })).toBe(false);
-            expect(guardsTestModule.isError(null)).toBe(false);
+            ).toBeTruthy();
+            expect(guardsTestModule.isError("error string")).toBeFalsy();
+            expect(guardsTestModule.isError({ message: "error" })).toBeFalsy();
+            expect(guardsTestModule.isError(null)).toBeFalsy();
 
             // Test isFiniteNumber function
             expect(typeof guardsTestModule.isFiniteNumber).toBe("function");
-            expect(guardsTestModule.isFiniteNumber(123)).toBe(true);
-            expect(guardsTestModule.isFiniteNumber(0)).toBe(true);
-            expect(guardsTestModule.isFiniteNumber(-456)).toBe(true);
-            expect(guardsTestModule.isFiniteNumber(3.14)).toBe(true);
-            expect(guardsTestModule.isFiniteNumber(Infinity)).toBe(false);
-            expect(guardsTestModule.isFiniteNumber(-Infinity)).toBe(false);
-            expect(guardsTestModule.isFiniteNumber(Number.NaN)).toBe(false);
-            expect(guardsTestModule.isFiniteNumber("123")).toBe(false);
+            expect(guardsTestModule.isFiniteNumber(123)).toBeTruthy();
+            expect(guardsTestModule.isFiniteNumber(0)).toBeTruthy();
+            expect(guardsTestModule.isFiniteNumber(-456)).toBeTruthy();
+            expect(guardsTestModule.isFiniteNumber(3.14)).toBeTruthy();
+            expect(guardsTestModule.isFiniteNumber(Infinity)).toBeFalsy();
+            expect(guardsTestModule.isFiniteNumber(-Infinity)).toBeFalsy();
+            expect(guardsTestModule.isFiniteNumber(Number.NaN)).toBeFalsy();
+            expect(guardsTestModule.isFiniteNumber("123")).toBeFalsy();
 
             // Test isFunction function
             expect(typeof guardsTestModule.isFunction).toBe("function");
             const fn = () => {};
             const namedFn = function namedFn() {};
             const asyncFn = async () => {};
-            expect(guardsTestModule.isFunction(fn)).toBe(true);
-            expect(guardsTestModule.isFunction(namedFn)).toBe(true);
-            expect(guardsTestModule.isFunction(asyncFn)).toBe(true);
-            expect(guardsTestModule.isFunction(Math.max)).toBe(true);
-            expect(guardsTestModule.isFunction("function")).toBe(false);
-            expect(guardsTestModule.isFunction({})).toBe(false);
-            expect(guardsTestModule.isFunction(null)).toBe(false);
+            expect(guardsTestModule.isFunction(fn)).toBeTruthy();
+            expect(guardsTestModule.isFunction(namedFn)).toBeTruthy();
+            expect(guardsTestModule.isFunction(asyncFn)).toBeTruthy();
+            expect(guardsTestModule.isFunction(Math.max)).toBeTruthy();
+            expect(guardsTestModule.isFunction("function")).toBeFalsy();
+            expect(guardsTestModule.isFunction({})).toBeFalsy();
+            expect(guardsTestModule.isFunction(null)).toBeFalsy();
 
             // Test isNonNegativeNumber function
             expect(typeof guardsTestModule.isNonNegativeNumber).toBe(
                 "function"
             );
-            expect(guardsTestModule.isNonNegativeNumber(0)).toBe(true);
-            expect(guardsTestModule.isNonNegativeNumber(123)).toBe(true);
-            expect(guardsTestModule.isNonNegativeNumber(3.14)).toBe(true);
-            expect(guardsTestModule.isNonNegativeNumber(-1)).toBe(false);
-            expect(guardsTestModule.isNonNegativeNumber(-0.1)).toBe(false);
-            expect(guardsTestModule.isNonNegativeNumber(Number.NaN)).toBe(
-                false
+            expect(guardsTestModule.isNonNegativeNumber(0)).toBeTruthy();
+            expect(guardsTestModule.isNonNegativeNumber(123)).toBeTruthy();
+            expect(guardsTestModule.isNonNegativeNumber(3.14)).toBeTruthy();
+            expect(guardsTestModule.isNonNegativeNumber(-1)).toBeFalsy();
+            expect(guardsTestModule.isNonNegativeNumber(-0.1)).toBeFalsy();
+            expect(guardsTestModule.isNonNegativeNumber(Number.NaN)).toBeFalsy(
+                
             );
-            expect(guardsTestModule.isNonNegativeNumber("0")).toBe(false);
+            expect(guardsTestModule.isNonNegativeNumber("0")).toBeFalsy();
 
             // Test isNonNullObject function
             expect(typeof guardsTestModule.isNonNullObject).toBe("function");
-            expect(guardsTestModule.isNonNullObject({})).toBe(true);
-            expect(guardsTestModule.isNonNullObject({ key: "value" })).toBe(
-                true
+            expect(guardsTestModule.isNonNullObject({})).toBeTruthy();
+            expect(guardsTestModule.isNonNullObject({ key: "value" })).toBeTruthy(
+                
             );
-            expect(guardsTestModule.isNonNullObject([])).toBe(false); // Arrays excluded by isObject
-            expect(guardsTestModule.isNonNullObject(new Date())).toBe(true);
-            expect(guardsTestModule.isNonNullObject(null)).toBe(false);
-            expect(guardsTestModule.isNonNullObject("string")).toBe(false);
-            expect(guardsTestModule.isNonNullObject(123)).toBe(false);
-            expect(guardsTestModule.isNonNullObject(undefined)).toBe(false);
+            expect(guardsTestModule.isNonNullObject([])).toBeFalsy(); // Arrays excluded by isObject
+            expect(guardsTestModule.isNonNullObject(new Date())).toBeTruthy();
+            expect(guardsTestModule.isNonNullObject(null)).toBeFalsy();
+            expect(guardsTestModule.isNonNullObject("string")).toBeFalsy();
+            expect(guardsTestModule.isNonNullObject(123)).toBeFalsy();
+            expect(guardsTestModule.isNonNullObject(undefined)).toBeFalsy();
 
             // Test isPositiveNumber function
             expect(typeof guardsTestModule.isPositiveNumber).toBe("function");
-            expect(guardsTestModule.isPositiveNumber(1)).toBe(true);
-            expect(guardsTestModule.isPositiveNumber(123)).toBe(true);
-            expect(guardsTestModule.isPositiveNumber(0.1)).toBe(true);
-            expect(guardsTestModule.isPositiveNumber(0)).toBe(false);
-            expect(guardsTestModule.isPositiveNumber(-1)).toBe(false);
-            expect(guardsTestModule.isPositiveNumber(Number.NaN)).toBe(false);
-            expect(guardsTestModule.isPositiveNumber("1")).toBe(false);
+            expect(guardsTestModule.isPositiveNumber(1)).toBeTruthy();
+            expect(guardsTestModule.isPositiveNumber(123)).toBeTruthy();
+            expect(guardsTestModule.isPositiveNumber(0.1)).toBeTruthy();
+            expect(guardsTestModule.isPositiveNumber(0)).toBeFalsy();
+            expect(guardsTestModule.isPositiveNumber(-1)).toBeFalsy();
+            expect(guardsTestModule.isPositiveNumber(Number.NaN)).toBeFalsy();
+            expect(guardsTestModule.isPositiveNumber("1")).toBeFalsy();
 
             // Test isString function
             expect(typeof guardsTestModule.isString).toBe("function");
-            expect(guardsTestModule.isString("")).toBe(true);
-            expect(guardsTestModule.isString("hello")).toBe(true);
-            expect(guardsTestModule.isString("123")).toBe(true);
-            expect(guardsTestModule.isString(123)).toBe(false);
-            expect(guardsTestModule.isString(null)).toBe(false);
-            expect(guardsTestModule.isString(undefined)).toBe(false);
-            expect(guardsTestModule.isString({})).toBe(false);
+            expect(guardsTestModule.isString("")).toBeTruthy();
+            expect(guardsTestModule.isString("hello")).toBeTruthy();
+            expect(guardsTestModule.isString("123")).toBeTruthy();
+            expect(guardsTestModule.isString(123)).toBeFalsy();
+            expect(guardsTestModule.isString(null)).toBeFalsy();
+            expect(guardsTestModule.isString(undefined)).toBeFalsy();
+            expect(guardsTestModule.isString({})).toBeFalsy();
 
             // Test isValidPort function
             expect(typeof guardsTestModule.isValidPort).toBe("function");
-            expect(guardsTestModule.isValidPort(80)).toBe(true);
-            expect(guardsTestModule.isValidPort(443)).toBe(true);
-            expect(guardsTestModule.isValidPort(1)).toBe(true);
-            expect(guardsTestModule.isValidPort(65_535)).toBe(true);
-            expect(guardsTestModule.isValidPort(0)).toBe(false);
-            expect(guardsTestModule.isValidPort(65_536)).toBe(false);
-            expect(guardsTestModule.isValidPort(-1)).toBe(false);
-            expect(guardsTestModule.isValidPort(3.14)).toBe(false);
-            expect(guardsTestModule.isValidPort("80")).toBe(false);
-            expect(guardsTestModule.isValidPort(Number.NaN)).toBe(false);
+            expect(guardsTestModule.isValidPort(80)).toBeTruthy();
+            expect(guardsTestModule.isValidPort(443)).toBeTruthy();
+            expect(guardsTestModule.isValidPort(1)).toBeTruthy();
+            expect(guardsTestModule.isValidPort(65_535)).toBeTruthy();
+            expect(guardsTestModule.isValidPort(0)).toBeFalsy();
+            expect(guardsTestModule.isValidPort(65_536)).toBeFalsy();
+            expect(guardsTestModule.isValidPort(-1)).toBeFalsy();
+            expect(guardsTestModule.isValidPort(3.14)).toBeFalsy();
+            expect(guardsTestModule.isValidPort("80")).toBeFalsy();
+            expect(guardsTestModule.isValidPort(Number.NaN)).toBeFalsy();
 
             // Test isValidTimestamp function
             expect(typeof guardsTestModule.isValidTimestamp).toBe("function");
             const now = Date.now();
-            expect(guardsTestModule.isValidTimestamp(now)).toBe(true);
-            expect(guardsTestModule.isValidTimestamp(now - 86_400_000)).toBe(
-                true
+            expect(guardsTestModule.isValidTimestamp(now)).toBeTruthy();
+            expect(guardsTestModule.isValidTimestamp(now - 86_400_000)).toBeTruthy(
+                
             ); // 1 day ago
-            expect(guardsTestModule.isValidTimestamp(1_672_531_200_000)).toBe(
-                true
+            expect(guardsTestModule.isValidTimestamp(1_672_531_200_000)).toBeTruthy(
+                
             ); // Valid past timestamp
-            expect(guardsTestModule.isValidTimestamp(0)).toBe(false); // Must be > 0
-            expect(guardsTestModule.isValidTimestamp(-1)).toBe(false);
-            expect(guardsTestModule.isValidTimestamp(3.14)).toBe(true); // Decimal numbers are valid
-            expect(guardsTestModule.isValidTimestamp(Number.NaN)).toBe(false);
-            expect(guardsTestModule.isValidTimestamp("timestamp")).toBe(false);
-            expect(guardsTestModule.isValidTimestamp(null)).toBe(false);
+            expect(guardsTestModule.isValidTimestamp(0)).toBeFalsy(); // Must be > 0
+            expect(guardsTestModule.isValidTimestamp(-1)).toBeFalsy();
+            expect(guardsTestModule.isValidTimestamp(3.14)).toBeTruthy(); // Decimal numbers are valid
+            expect(guardsTestModule.isValidTimestamp(Number.NaN)).toBeFalsy();
+            expect(guardsTestModule.isValidTimestamp("timestamp")).toBeFalsy();
+            expect(guardsTestModule.isValidTimestamp(null)).toBeFalsy();
         });
 
         it("should handle edge cases for complex type guards", async ({
@@ -256,30 +256,30 @@ describe("TypeGuards - Complete Function Coverage", () => {
                     "d",
                     "e",
                 ])
-            ).toBe(true);
+            ).toBeTruthy();
             expect(
                 guardsTestModule.hasProperties(complexObj, ["a", "nonexistent"])
-            ).toBe(false);
+            ).toBeFalsy();
 
             // Test with array-like objects
             const arrayLike = { 0: "a", 1: "b", length: 2 };
-            expect(guardsTestModule.hasProperty(arrayLike, "length")).toBe(
-                true
+            expect(guardsTestModule.hasProperty(arrayLike, "length")).toBeTruthy(
+                
             );
-            expect(guardsTestModule.hasProperty(arrayLike, "0")).toBe(true);
+            expect(guardsTestModule.hasProperty(arrayLike, "0")).toBeTruthy();
             expect(
                 guardsTestModule.hasProperties(arrayLike, [
                     "0",
                     "1",
                     "length",
                 ])
-            ).toBe(true);
+            ).toBeTruthy();
 
             // Test with inherited properties - Object.hasOwn only checks own properties
             const obj = Object.create({ inherited: "prop" });
             obj.own = "value";
-            expect(guardsTestModule.hasProperty(obj, "own")).toBe(true);
-            expect(guardsTestModule.hasProperty(obj, "inherited")).toBe(false); // Object.hasOwn excludes inherited
+            expect(guardsTestModule.hasProperty(obj, "own")).toBeTruthy();
+            expect(guardsTestModule.hasProperty(obj, "inherited")).toBeFalsy(); // Object.hasOwn excludes inherited
         });
 
         it("should properly handle numeric edge cases", async ({
@@ -295,47 +295,47 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test isNumber with special numeric values
-            expect(guardsTestModule.isNumber(Number.MAX_VALUE)).toBe(true);
-            expect(guardsTestModule.isNumber(Number.MIN_VALUE)).toBe(true);
-            expect(guardsTestModule.isNumber(Number.POSITIVE_INFINITY)).toBe(
-                true
+            expect(guardsTestModule.isNumber(Number.MAX_VALUE)).toBeTruthy();
+            expect(guardsTestModule.isNumber(Number.MIN_VALUE)).toBeTruthy();
+            expect(guardsTestModule.isNumber(Number.POSITIVE_INFINITY)).toBeTruthy(
+                
             );
-            expect(guardsTestModule.isNumber(Number.NEGATIVE_INFINITY)).toBe(
-                true
+            expect(guardsTestModule.isNumber(Number.NEGATIVE_INFINITY)).toBeTruthy(
+                
             );
-            expect(guardsTestModule.isNumber(Number.NaN)).toBe(false);
+            expect(guardsTestModule.isNumber(Number.NaN)).toBeFalsy();
 
             // Test isFiniteNumber with same values
-            expect(guardsTestModule.isFiniteNumber(Number.MAX_VALUE)).toBe(
-                true
+            expect(guardsTestModule.isFiniteNumber(Number.MAX_VALUE)).toBeTruthy(
+                
             );
-            expect(guardsTestModule.isFiniteNumber(Number.MIN_VALUE)).toBe(
-                true
+            expect(guardsTestModule.isFiniteNumber(Number.MIN_VALUE)).toBeTruthy(
+                
             );
             expect(
                 guardsTestModule.isFiniteNumber(Number.POSITIVE_INFINITY)
-            ).toBe(false);
+            ).toBeFalsy();
             expect(
                 guardsTestModule.isFiniteNumber(Number.NEGATIVE_INFINITY)
-            ).toBe(false);
+            ).toBeFalsy();
 
             // Test isValidPort with edge values
-            expect(guardsTestModule.isValidPort(1)).toBe(true);
-            expect(guardsTestModule.isValidPort(65_535)).toBe(true);
-            expect(guardsTestModule.isValidPort(0)).toBe(false);
-            expect(guardsTestModule.isValidPort(65_536)).toBe(false);
-            expect(guardsTestModule.isValidPort(1.5)).toBe(false);
+            expect(guardsTestModule.isValidPort(1)).toBeTruthy();
+            expect(guardsTestModule.isValidPort(65_535)).toBeTruthy();
+            expect(guardsTestModule.isValidPort(0)).toBeFalsy();
+            expect(guardsTestModule.isValidPort(65_536)).toBeFalsy();
+            expect(guardsTestModule.isValidPort(1.5)).toBeFalsy();
 
             // Test isValidTimestamp with edge values (must be positive and not future)
             const now = Date.now();
-            expect(guardsTestModule.isValidTimestamp(now)).toBe(true);
-            expect(guardsTestModule.isValidTimestamp(now - 1000)).toBe(true); // Past timestamp
-            expect(guardsTestModule.isValidTimestamp(0)).toBe(false); // Must be > 0
+            expect(guardsTestModule.isValidTimestamp(now)).toBeTruthy();
+            expect(guardsTestModule.isValidTimestamp(now - 1000)).toBeTruthy(); // Past timestamp
+            expect(guardsTestModule.isValidTimestamp(0)).toBeFalsy(); // Must be > 0
             expect(
                 guardsTestModule.isValidTimestamp(Number.MAX_SAFE_INTEGER)
-            ).toBe(false); // Too far in future
-            expect(guardsTestModule.isValidTimestamp(-1)).toBe(false);
-            expect(guardsTestModule.isValidTimestamp(1.5)).toBe(true); // Decimal numbers are valid
+            ).toBeFalsy(); // Too far in future
+            expect(guardsTestModule.isValidTimestamp(-1)).toBeFalsy();
+            expect(guardsTestModule.isValidTimestamp(1.5)).toBeTruthy(); // Decimal numbers are valid
         });
 
         it("should handle type guard consistency", async ({

@@ -39,7 +39,7 @@ describe("shared/types/database additional function coverage", () => {
                 error_message: null,
             };
 
-            expect(isValidHistoryRow(invalidTimestampRow)).toBe(false);
+            expect(isValidHistoryRow(invalidTimestampRow)).toBeFalsy();
         });
 
         it("should handle non-numeric string timestamps", async ({
@@ -62,7 +62,7 @@ describe("shared/types/database additional function coverage", () => {
                 error_message: null,
             };
 
-            expect(isValidHistoryRow(nonNumericRow)).toBe(false);
+            expect(isValidHistoryRow(nonNumericRow)).toBeFalsy();
         });
 
         it("should handle empty string timestamp", async ({
@@ -85,7 +85,7 @@ describe("shared/types/database additional function coverage", () => {
                 error_message: null,
             };
 
-            expect(isValidHistoryRow(emptyTimestampRow)).toBe(false);
+            expect(isValidHistoryRow(emptyTimestampRow)).toBeFalsy();
         });
     });
 
@@ -118,7 +118,7 @@ describe("shared/types/database additional function coverage", () => {
                 error_message: null,
             };
 
-            expect(isValidMonitorRow(invalidTimestampRow)).toBe(false);
+            expect(isValidMonitorRow(invalidTimestampRow)).toBeFalsy();
         });
 
         it("should handle various invalid timestamp formats", async ({
@@ -158,7 +158,7 @@ describe("shared/types/database additional function coverage", () => {
                     error_message: null,
                 };
 
-                expect(isValidMonitorRow(invalidRow)).toBe(false);
+                expect(isValidMonitorRow(invalidRow)).toBeFalsy();
             }
         });
     });
@@ -183,7 +183,7 @@ describe("shared/types/database additional function coverage", () => {
                 notification_settings: "{}",
             };
 
-            expect(isValidSiteRow(invalidTimestampRow)).toBe(false);
+            expect(isValidSiteRow(invalidTimestampRow)).toBeFalsy();
         });
 
         it("should handle edge case string timestamps", async ({
@@ -216,7 +216,7 @@ describe("shared/types/database additional function coverage", () => {
                     notification_settings: "{}",
                 };
 
-                expect(isValidSiteRow(invalidRow)).toBe(false);
+                expect(isValidSiteRow(invalidRow)).toBeFalsy();
             }
         });
     });
@@ -288,8 +288,8 @@ describe("shared/types/database additional function coverage", () => {
                 "text"
             );
             expect(safeGetRowProperty(mixedRow, "numberProp", -1)).toBe(42);
-            expect(safeGetRowProperty(mixedRow, "booleanProp", false)).toBe(
-                true
+            expect(safeGetRowProperty(mixedRow, "booleanProp", false)).toBeTruthy(
+                
             );
             expect(safeGetRowProperty(mixedRow, "arrayProp", [])).toEqual([
                 1,
@@ -311,7 +311,7 @@ describe("shared/types/database additional function coverage", () => {
             expect(
                 safeGetRowProperty(mixedRow, "emptyStringProp", "default")
             ).toBe("");
-            expect(safeGetRowProperty(mixedRow, "falseProp", true)).toBe(false);
+            expect(safeGetRowProperty(mixedRow, "falseProp", true)).toBeFalsy();
         });
 
         it("should handle empty and invalid row objects", async ({
@@ -447,7 +447,7 @@ describe("shared/types/database additional function coverage", () => {
                 "string"
             );
             expect(safeGetRowProperty(emptyRow, "missing", 42)).toBe(42);
-            expect(safeGetRowProperty(emptyRow, "missing", true)).toBe(true);
+            expect(safeGetRowProperty(emptyRow, "missing", true)).toBeTruthy();
             expect(safeGetRowProperty(emptyRow, "missing", [])).toEqual([]);
             expect(safeGetRowProperty(emptyRow, "missing", {})).toEqual({});
             expect(safeGetRowProperty(emptyRow, "missing", null)).toBe(null);
@@ -502,10 +502,10 @@ describe("shared/types/database additional function coverage", () => {
                 monitoring: 1,
             };
 
-            expect(isValidHistoryRow(validHistoryRow)).toBe(true);
-            expect(isValidMonitorRow(validMonitorRow)).toBe(true);
-            expect(isValidSettingsRow(validSettingsRow)).toBe(true);
-            expect(isValidSiteRow(validSiteRow)).toBe(true);
+            expect(isValidHistoryRow(validHistoryRow)).toBeTruthy();
+            expect(isValidMonitorRow(validMonitorRow)).toBeTruthy();
+            expect(isValidSettingsRow(validSettingsRow)).toBeTruthy();
+            expect(isValidSiteRow(validSiteRow)).toBeTruthy();
         });
 
         it("should handle mixed valid and invalid data", async ({

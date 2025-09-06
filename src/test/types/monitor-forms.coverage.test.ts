@@ -103,7 +103,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
                     method: method as any,
                 };
 
-                expect(validMethods.includes(httpFields.method)).toBe(true);
+                expect(validMethods).toContain(httpFields.method);
             }
         });
 
@@ -194,7 +194,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
 
             const result = booleanHandler("followRedirects", true);
             expect(result.fieldName).toBe("followRedirects");
-            expect(result.value).toBe(true);
+            expect(result.value).toBeTruthy();
             expect(result.type).toBe("boolean");
         });
 
@@ -267,7 +267,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
 
             for (const type of monitorTypes) {
                 expect(typeof type).toBe("string");
-                expect(["http", "port"].includes(type)).toBe(true);
+                expect(["http", "port"]).toContain(type);
             }
         });
 
@@ -294,7 +294,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             ];
 
             for (const { field, value, type } of testCases) {
-                expect(validateField(field, value, type)).toBe(true);
+                expect(validateField(field, value, type)).toBeTruthy();
             }
         });
     });
@@ -403,7 +403,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(defaultValues.retryAttempts).toBe(3);
             expect(defaultValues.method).toBe("GET");
             expect(defaultValues.expectedStatusCode).toBe(200);
-            expect(defaultValues.followRedirects).toBe(true);
+            expect(defaultValues.followRedirects).toBeTruthy();
         });
     });
 
@@ -483,7 +483,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
                     "POST",
                     "PUT",
                 ].includes(method);
-                expect(isValid).toBe(true);
+                expect(isValid).toBeTruthy();
             }
         });
 
@@ -508,7 +508,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
                     "POST",
                     "PUT",
                 ].includes(method);
-                expect(isValid).toBe(false);
+                expect(isValid).toBeFalsy();
             }
         });
     });
@@ -539,9 +539,9 @@ describe("Monitor Forms Types Coverage Tests", () => {
             const numberResult = numberHandler("timeout", 5000);
             const booleanResult = booleanHandler("followRedirects", true);
 
-            expect(stringResult.isCorrectType).toBe(true);
-            expect(numberResult.isCorrectType).toBe(true);
-            expect(booleanResult.isCorrectType).toBe(true);
+            expect(stringResult.isCorrectType).toBeTruthy();
+            expect(numberResult.isCorrectType).toBeTruthy();
+            expect(booleanResult.isCorrectType).toBeTruthy();
         });
     });
 });

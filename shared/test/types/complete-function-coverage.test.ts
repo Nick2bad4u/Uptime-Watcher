@@ -19,9 +19,9 @@ describe("Types Complete Function Coverage", () => {
             const result2 = chartConfig.hasPlugins(null);
             const result3 = chartConfig.hasPlugins({ notPlugins: true });
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
-            expect(result3).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
+            expect(result3).toBeFalsy();
         });
 
         it("should call hasScales function", async ({ task, annotate }) => {
@@ -37,9 +37,9 @@ describe("Types Complete Function Coverage", () => {
             const result2 = chartConfig.hasScales(null);
             const result3 = chartConfig.hasScales({ notScales: true });
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
-            expect(result3).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
+            expect(result3).toBeFalsy();
         });
     });
 
@@ -68,9 +68,9 @@ describe("Types Complete Function Coverage", () => {
             const result2 = themeConfig.isColorPalette({});
             const result3 = themeConfig.isColorPalette(null);
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
-            expect(result3).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
+            expect(result3).toBeFalsy();
         });
 
         it("should call isThemeConfig function", async ({ task, annotate }) => {
@@ -95,9 +95,9 @@ describe("Types Complete Function Coverage", () => {
             const result2 = themeConfig.isThemeConfig({});
             const result3 = themeConfig.isThemeConfig(null);
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
-            expect(result3).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
+            expect(result3).toBeFalsy();
         });
     });
 
@@ -123,9 +123,9 @@ describe("Types Complete Function Coverage", () => {
             const result2 = database.isValidHistoryRow({});
             const result3 = database.isValidHistoryRow(null);
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
-            expect(result3).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
+            expect(result3).toBeFalsy();
         });
 
         it("should call isValidMonitorRow function", async ({
@@ -144,8 +144,8 @@ describe("Types Complete Function Coverage", () => {
             const result1 = database.isValidMonitorRow(validRow);
             const result2 = database.isValidMonitorRow({});
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
         });
 
         it("should call isValidSettingsRow function", async ({
@@ -164,8 +164,8 @@ describe("Types Complete Function Coverage", () => {
             const result1 = database.isValidSettingsRow(validRow);
             const result2 = database.isValidSettingsRow({});
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
         });
 
         it("should call isValidSiteRow function", async ({
@@ -184,8 +184,8 @@ describe("Types Complete Function Coverage", () => {
             const result1 = database.isValidSiteRow(validRow);
             const result2 = database.isValidSiteRow({});
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
         });
 
         it("should call safeGetRowProperty function", async ({
@@ -230,7 +230,7 @@ describe("Types Complete Function Coverage", () => {
                 "Error 1",
                 "Error 2",
             ]);
-            expect(result.success).toBe(false);
+            expect(result.success).toBeFalsy();
             expect(result.errors).toEqual(["Error 1", "Error 2"]);
         });
 
@@ -247,7 +247,7 @@ describe("Types Complete Function Coverage", () => {
             await annotate("Type: Constructor", "type");
 
             const result = validation.createSuccessResult();
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.errors).toEqual([]);
         });
 
@@ -268,9 +268,9 @@ describe("Types Complete Function Coverage", () => {
             const result2 = validation.isValidationResult({});
             const result3 = validation.isValidationResult(null);
 
-            expect(result1).toBe(true);
-            expect(result2).toBe(false);
-            expect(result3).toBe(false);
+            expect(result1).toBeTruthy();
+            expect(result2).toBeFalsy();
+            expect(result3).toBeFalsy();
         });
     });
 });

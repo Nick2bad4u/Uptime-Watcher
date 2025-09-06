@@ -17,7 +17,7 @@ import {
 } from "../../../shared/types/database.js";
 
 describe("Shared Database Types - Backend Coverage", () => {
-    describe("isValidHistoryRow", () => {
+    describe(isValidHistoryRow, () => {
         it("should validate correct history row", async ({
             task,
             annotate,
@@ -36,7 +36,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                 details: "Success",
             };
 
-            expect(isValidHistoryRow(validRow)).toBe(true);
+            expect(isValidHistoryRow(validRow)).toBeTruthy();
         });
         it("should validate minimal valid history row", async ({
             task,
@@ -54,7 +54,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                 timestamp: 1_640_995_200_000,
             };
 
-            expect(isValidHistoryRow(validRow)).toBe(true);
+            expect(isValidHistoryRow(validRow)).toBeTruthy();
         });
         it("should reject invalid history rows", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -63,15 +63,15 @@ describe("Shared Database Types - Backend Coverage", () => {
                 "component"
             );
 
-            expect(isValidHistoryRow(null)).toBe(false);
-            expect(isValidHistoryRow(undefined)).toBe(false);
-            expect(isValidHistoryRow("string")).toBe(false);
-            expect(isValidHistoryRow({})).toBe(false);
+            expect(isValidHistoryRow(null)).toBeFalsy();
+            expect(isValidHistoryRow(undefined)).toBeFalsy();
+            expect(isValidHistoryRow("string")).toBeFalsy();
+            expect(isValidHistoryRow({})).toBeFalsy();
 
             // Missing required fields
-            expect(isValidHistoryRow({ monitorId: "test" })).toBe(false);
-            expect(isValidHistoryRow({ status: "up" })).toBe(false);
-            expect(isValidHistoryRow({ timestamp: Date.now() })).toBe(false);
+            expect(isValidHistoryRow({ monitorId: "test" })).toBeFalsy();
+            expect(isValidHistoryRow({ status: "up" })).toBeFalsy();
+            expect(isValidHistoryRow({ timestamp: Date.now() })).toBeFalsy();
 
             // Invalid field types
             expect(
@@ -80,7 +80,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                     status: "up",
                     timestamp: Date.now(),
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 isValidHistoryRow({
@@ -88,7 +88,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                     status: "invalid",
                     timestamp: Date.now(),
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 isValidHistoryRow({
@@ -96,7 +96,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                     status: "up",
                     timestamp: "not-a-number",
                 })
-            ).toBe(false);
+            ).toBeFalsy();
         });
         it("should handle NaN timestamp", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -111,10 +111,10 @@ describe("Shared Database Types - Backend Coverage", () => {
                 timestamp: Number.NaN,
             };
 
-            expect(isValidHistoryRow(invalidRow)).toBe(false);
+            expect(isValidHistoryRow(invalidRow)).toBeFalsy();
         });
     });
-    describe("isValidMonitorRow", () => {
+    describe(isValidMonitorRow, () => {
         it("should validate correct monitor row", async ({
             task,
             annotate,
@@ -141,7 +141,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                 updated_at: Date.now(),
             };
 
-            expect(isValidMonitorRow(validRow)).toBe(true);
+            expect(isValidMonitorRow(validRow)).toBeTruthy();
         });
         it("should validate minimal valid monitor row", async ({
             task,
@@ -159,7 +159,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                 type: "port",
             };
 
-            expect(isValidMonitorRow(validRow)).toBe(true);
+            expect(isValidMonitorRow(validRow)).toBeTruthy();
         });
         it("should reject invalid monitor rows", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -168,15 +168,15 @@ describe("Shared Database Types - Backend Coverage", () => {
                 "component"
             );
 
-            expect(isValidMonitorRow(null)).toBe(false);
-            expect(isValidMonitorRow(undefined)).toBe(false);
-            expect(isValidMonitorRow("string")).toBe(false);
-            expect(isValidMonitorRow({})).toBe(false);
+            expect(isValidMonitorRow(null)).toBeFalsy();
+            expect(isValidMonitorRow(undefined)).toBeFalsy();
+            expect(isValidMonitorRow("string")).toBeFalsy();
+            expect(isValidMonitorRow({})).toBeFalsy();
 
             // Missing required fields
-            expect(isValidMonitorRow({ id: 1 })).toBe(false);
-            expect(isValidMonitorRow({ site_identifier: "test" })).toBe(false);
-            expect(isValidMonitorRow({ type: "http" })).toBe(false);
+            expect(isValidMonitorRow({ id: 1 })).toBeFalsy();
+            expect(isValidMonitorRow({ site_identifier: "test" })).toBeFalsy();
+            expect(isValidMonitorRow({ type: "http" })).toBeFalsy();
 
             // Invalid field types
             expect(
@@ -185,7 +185,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                     site_identifier: "test",
                     type: "http",
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 isValidMonitorRow({
@@ -193,7 +193,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                     site_identifier: 123,
                     type: "http",
                 })
-            ).toBe(false);
+            ).toBeFalsy();
 
             expect(
                 isValidMonitorRow({
@@ -201,10 +201,10 @@ describe("Shared Database Types - Backend Coverage", () => {
                     site_identifier: "test",
                     type: null,
                 })
-            ).toBe(false);
+            ).toBeFalsy();
         });
     });
-    describe("isValidSettingsRow", () => {
+    describe(isValidSettingsRow, () => {
         it("should validate correct settings row", async ({
             task,
             annotate,
@@ -221,7 +221,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                 id: 1,
             };
 
-            expect(isValidSettingsRow(validRow)).toBe(true);
+            expect(isValidSettingsRow(validRow)).toBeTruthy();
         });
         it("should validate minimal valid settings row", async ({
             task,
@@ -237,7 +237,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                 key: "setting-key",
             };
 
-            expect(isValidSettingsRow(validRow)).toBe(true);
+            expect(isValidSettingsRow(validRow)).toBeTruthy();
         });
         it("should reject invalid settings rows", async ({
             task,
@@ -249,20 +249,20 @@ describe("Shared Database Types - Backend Coverage", () => {
                 "component"
             );
 
-            expect(isValidSettingsRow(null)).toBe(false);
-            expect(isValidSettingsRow(undefined)).toBe(false);
-            expect(isValidSettingsRow("string")).toBe(false);
-            expect(isValidSettingsRow({})).toBe(false);
+            expect(isValidSettingsRow(null)).toBeFalsy();
+            expect(isValidSettingsRow(undefined)).toBeFalsy();
+            expect(isValidSettingsRow("string")).toBeFalsy();
+            expect(isValidSettingsRow({})).toBeFalsy();
 
             // Missing or invalid key
-            expect(isValidSettingsRow({ value: "test" })).toBe(false);
-            expect(isValidSettingsRow({ key: undefined })).toBe(false);
-            expect(isValidSettingsRow({ key: null })).toBe(false);
-            expect(isValidSettingsRow({ key: 123 })).toBe(false);
-            expect(isValidSettingsRow({ key: "" })).toBe(false);
+            expect(isValidSettingsRow({ value: "test" })).toBeFalsy();
+            expect(isValidSettingsRow({ key: undefined })).toBeFalsy();
+            expect(isValidSettingsRow({ key: null })).toBeFalsy();
+            expect(isValidSettingsRow({ key: 123 })).toBeFalsy();
+            expect(isValidSettingsRow({ key: "" })).toBeFalsy();
         });
     });
-    describe("isValidSiteRow", () => {
+    describe(isValidSiteRow, () => {
         it("should validate correct site row", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -277,7 +277,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                 id: 1,
             };
 
-            expect(isValidSiteRow(validRow)).toBe(true);
+            expect(isValidSiteRow(validRow)).toBeTruthy();
         });
         it("should validate minimal valid site row", async ({
             task,
@@ -293,7 +293,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                 identifier: "test-site",
             };
 
-            expect(isValidSiteRow(validRow)).toBe(true);
+            expect(isValidSiteRow(validRow)).toBeTruthy();
         });
         it("should reject invalid site rows", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -302,21 +302,21 @@ describe("Shared Database Types - Backend Coverage", () => {
                 "component"
             );
 
-            expect(isValidSiteRow(null)).toBe(false);
-            expect(isValidSiteRow(undefined)).toBe(false);
-            expect(isValidSiteRow("string")).toBe(false);
-            expect(isValidSiteRow({})).toBe(false);
+            expect(isValidSiteRow(null)).toBeFalsy();
+            expect(isValidSiteRow(undefined)).toBeFalsy();
+            expect(isValidSiteRow("string")).toBeFalsy();
+            expect(isValidSiteRow({})).toBeFalsy();
 
             // Missing or invalid identifier
-            expect(isValidSiteRow({ name: "Test" })).toBe(false);
-            expect(isValidSiteRow({ identifier: undefined })).toBe(false);
-            expect(isValidSiteRow({ identifier: null })).toBe(false);
-            expect(isValidSiteRow({ identifier: 123 })).toBe(false);
-            expect(isValidSiteRow({ identifier: "" })).toBe(false);
-            expect(isValidSiteRow({ identifier: "   " })).toBe(false);
+            expect(isValidSiteRow({ name: "Test" })).toBeFalsy();
+            expect(isValidSiteRow({ identifier: undefined })).toBeFalsy();
+            expect(isValidSiteRow({ identifier: null })).toBeFalsy();
+            expect(isValidSiteRow({ identifier: 123 })).toBeFalsy();
+            expect(isValidSiteRow({ identifier: "" })).toBeFalsy();
+            expect(isValidSiteRow({ identifier: "   " })).toBeFalsy();
         });
     });
-    describe("safeGetRowProperty", () => {
+    describe(safeGetRowProperty, () => {
         it("should return property value when it exists", async ({
             task,
             annotate,
@@ -343,7 +343,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                 "https://example.com"
             );
             expect(safeGetRowProperty(row, "count", -1)).toBe(0);
-            expect(safeGetRowProperty(row, "flag", true)).toBe(false);
+            expect(safeGetRowProperty(row, "flag", true)).toBeFalsy();
         });
         it("should return default value when property does not exist", async ({
             task,
@@ -363,7 +363,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                 "default"
             );
             expect(safeGetRowProperty(row, "nonexistent", 42)).toBe(42);
-            expect(safeGetRowProperty(row, "absent", true)).toBe(true);
+            expect(safeGetRowProperty(row, "absent", true)).toBeTruthy();
         });
         it("should return default value when property is undefined", async ({
             task,
@@ -411,7 +411,7 @@ describe("Shared Database Types - Backend Coverage", () => {
                 "hello"
             );
             expect(safeGetRowProperty(row, "numberProp", 0)).toBe(123);
-            expect(safeGetRowProperty(row, "booleanProp", false)).toBe(true);
+            expect(safeGetRowProperty(row, "booleanProp", false)).toBeTruthy();
             expect(safeGetRowProperty(row, "objectProp", {})).toEqual({
                 nested: "value",
             });

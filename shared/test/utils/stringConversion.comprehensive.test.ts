@@ -8,7 +8,7 @@ import { test, fc } from "@fast-check/vitest";
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion Utilities - Comprehensive Coverage", () => {
-    describe("safeStringify", () => {
+    describe(safeStringify, () => {
         it("should return empty string for null", async ({
             task,
             annotate,
@@ -471,7 +471,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             (str) => {
                 const result = safeStringify(str);
                 expect(result).toBe(str);
-                expect(result.length).toBe(str.length);
+                expect(result).toHaveLength(str.length);
             }
         );
 

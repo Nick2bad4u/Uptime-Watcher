@@ -161,12 +161,12 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             const isArray = (value: unknown): value is unknown[] =>
                 Array.isArray(value);
 
-            expect(isString("hello")).toBe(true);
-            expect(isString(123)).toBe(false);
-            expect(isNumber(123)).toBe(true);
-            expect(isNumber("hello")).toBe(false);
-            expect(isArray([])).toBe(true);
-            expect(isArray("hello")).toBe(false);
+            expect(isString("hello")).toBeTruthy();
+            expect(isString(123)).toBeFalsy();
+            expect(isNumber(123)).toBeTruthy();
+            expect(isNumber("hello")).toBeFalsy();
+            expect(isArray([])).toBeTruthy();
+            expect(isArray("hello")).toBeFalsy();
         });
 
         it("should handle formatters", ({ task, annotate }) => {
@@ -450,10 +450,10 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             const cache = new Cache();
             cache.set("key", "value", 1000);
             expect(cache.get("key")).toBe("value");
-            expect(cache.has("key")).toBe(true);
+            expect(cache.has("key")).toBeTruthy();
 
             cache.delete("key");
-            expect(cache.has("key")).toBe(false);
+            expect(cache.has("key")).toBeFalsy();
         });
 
         it("should handle URL parsing", ({ task, annotate }) => {
@@ -1002,10 +1002,10 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
             const resource = createResource();
             expect(resource.use()).toBe("resource data");
-            expect(resource.isDestroyed()).toBe(false);
+            expect(resource.isDestroyed()).toBeFalsy();
 
             resource.destroy();
-            expect(resource.isDestroyed()).toBe(true);
+            expect(resource.isDestroyed()).toBeTruthy();
             expect(() => resource.use()).toThrow("Resource is destroyed");
         });
 

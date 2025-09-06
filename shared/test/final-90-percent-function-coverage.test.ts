@@ -93,7 +93,7 @@ describe("Final 90% Function Coverage Push", () => {
             });
         }
 
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 
     it("should call ALL exported functions from chartConfig", ({
@@ -130,7 +130,7 @@ describe("Final 90% Function Coverage Push", () => {
             }
         }
 
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 
     it("should call ALL exported functions from formData", ({
@@ -167,7 +167,7 @@ describe("Final 90% Function Coverage Push", () => {
             }
         }
 
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 
     it("should call ALL exported functions from monitorConfig", ({
@@ -204,7 +204,7 @@ describe("Final 90% Function Coverage Push", () => {
             }
         }
 
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 
     it("should call ALL exported functions from themeConfig", ({
@@ -241,7 +241,7 @@ describe("Final 90% Function Coverage Push", () => {
             }
         }
 
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 
     it("should call ALL exported functions from validation types", ({
@@ -302,7 +302,7 @@ describe("Final 90% Function Coverage Push", () => {
             validation.isValidationResult(undefined);
         }
 
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 
     // Helper function for testing module functions to reduce complexity
@@ -444,7 +444,7 @@ describe("Final 90% Function Coverage Push", () => {
             func({ identifier: "test", name: "test", monitors: [] });
         });
 
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 
     it("should call ALL exported functions from validation modules", ({
@@ -496,7 +496,7 @@ describe("Final 90% Function Coverage Push", () => {
             }
         }
 
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 
     it("should call remaining utility functions systematically", ({
@@ -584,7 +584,7 @@ describe("Final 90% Function Coverage Push", () => {
             }
         }
 
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 
     it("should ensure complete function coverage with edge cases", async ({
@@ -727,6 +727,6 @@ describe("Final 90% Function Coverage Push", () => {
         // Process each module
         await Promise.all(allModules.map((module) => processModule(module)));
 
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 });

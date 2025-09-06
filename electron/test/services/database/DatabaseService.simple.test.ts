@@ -79,7 +79,7 @@ describe("DatabaseService Coverage Tests", () => {
         try {
             const instance = DatabaseService.getInstance();
             await instance.initialize();
-            expect(true).toBe(true); // Test passes if no error thrown
+            expect(true).toBeTruthy(); // Test passes if no error thrown
         } catch (error) {
             // Some initialization errors are expected in test environment
             expect(error).toBeInstanceOf(Error);
@@ -110,7 +110,7 @@ describe("DatabaseService Coverage Tests", () => {
                 // Mock transaction operation
                 Promise.resolve("success")
             );
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             // Transaction might fail in test environment
             expect(error).toBeInstanceOf(Error);
@@ -124,7 +124,7 @@ describe("DatabaseService Coverage Tests", () => {
         try {
             const instance = DatabaseService.getInstance();
             instance.close();
-            expect(true).toBe(true);
+            expect(true).toBeTruthy();
         } catch (error) {
             // Cleanup might fail if database wasn't initialized
             expect(error).toBeInstanceOf(Error);

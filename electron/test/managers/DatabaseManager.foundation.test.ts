@@ -273,7 +273,7 @@ describe("DatabaseManager Foundation Tests", () => {
             const testData = '{"sites": [], "settings": []}';
             const result = await databaseManager.importData(testData);
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
 
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:data-imported",

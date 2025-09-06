@@ -12,6 +12,6 @@ describe("AddSiteForm Component", () => {
         annotate("Category: Component", "category");
         annotate("Type: Business Logic", "type");
 
-        expect(true).toBe(true);
+        expect(true).toBeTruthy();
     });
 });

@@ -26,7 +26,7 @@ import {
 } from "../../validation/validatorUtils";
 
 describe("validatorUtils", () => {
-    describe("isNonEmptyString", () => {
+    describe(isNonEmptyString, () => {
         it("should return true for non-empty strings", async ({
             task,
             annotate,
@@ -36,11 +36,11 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonEmptyString("hello")).toBe(true);
-            expect(isNonEmptyString("world")).toBe(true);
-            expect(isNonEmptyString("123")).toBe(true);
-            expect(isNonEmptyString("test string")).toBe(true);
-            expect(isNonEmptyString("a")).toBe(true);
+            expect(isNonEmptyString("hello")).toBeTruthy();
+            expect(isNonEmptyString("world")).toBeTruthy();
+            expect(isNonEmptyString("123")).toBeTruthy();
+            expect(isNonEmptyString("test string")).toBeTruthy();
+            expect(isNonEmptyString("a")).toBeTruthy();
         });
 
         it("should return false for empty strings", async ({
@@ -52,11 +52,11 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonEmptyString("")).toBe(false);
-            expect(isNonEmptyString("   ")).toBe(false);
-            expect(isNonEmptyString("\t")).toBe(false);
-            expect(isNonEmptyString("\n")).toBe(false);
-            expect(isNonEmptyString("\r\n")).toBe(false);
+            expect(isNonEmptyString("")).toBeFalsy();
+            expect(isNonEmptyString("   ")).toBeFalsy();
+            expect(isNonEmptyString("\t")).toBeFalsy();
+            expect(isNonEmptyString("\n")).toBeFalsy();
+            expect(isNonEmptyString("\r\n")).toBeFalsy();
         });
 
         it("should return false for non-string values", async ({
@@ -68,12 +68,12 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonEmptyString(null)).toBe(false);
-            expect(isNonEmptyString(undefined)).toBe(false);
-            expect(isNonEmptyString(123)).toBe(false);
-            expect(isNonEmptyString(true)).toBe(false);
-            expect(isNonEmptyString([])).toBe(false);
-            expect(isNonEmptyString({})).toBe(false);
+            expect(isNonEmptyString(null)).toBeFalsy();
+            expect(isNonEmptyString(undefined)).toBeFalsy();
+            expect(isNonEmptyString(123)).toBeFalsy();
+            expect(isNonEmptyString(true)).toBeFalsy();
+            expect(isNonEmptyString([])).toBeFalsy();
+            expect(isNonEmptyString({})).toBeFalsy();
         });
 
         it("should trim whitespace correctly", async ({ task, annotate }) => {
@@ -82,24 +82,24 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonEmptyString("  hello  ")).toBe(true);
-            expect(isNonEmptyString("\thello\t")).toBe(true);
-            expect(isNonEmptyString("\nhello\n")).toBe(true);
+            expect(isNonEmptyString("  hello  ")).toBeTruthy();
+            expect(isNonEmptyString("\thello\t")).toBeTruthy();
+            expect(isNonEmptyString("\nhello\n")).toBeTruthy();
         });
     });
 
-    describe("isValidFQDN", () => {
+    describe(isValidFQDN, () => {
         it("should return true for valid FQDNs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidFQDN("example.com")).toBe(true);
-            expect(isValidFQDN("subdomain.example.com")).toBe(true);
-            expect(isValidFQDN("test.org")).toBe(true);
-            expect(isValidFQDN("my-site.net")).toBe(true);
-            expect(isValidFQDN("deep.sub.domain.example.com")).toBe(true);
+            expect(isValidFQDN("example.com")).toBeTruthy();
+            expect(isValidFQDN("subdomain.example.com")).toBeTruthy();
+            expect(isValidFQDN("test.org")).toBeTruthy();
+            expect(isValidFQDN("my-site.net")).toBeTruthy();
+            expect(isValidFQDN("deep.sub.domain.example.com")).toBeTruthy();
         });
 
         it("should return false for invalid FQDNs", async ({
@@ -111,11 +111,11 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidFQDN("localhost")).toBe(false); // No TLD by default
-            expect(isValidFQDN("invalid..domain")).toBe(false);
-            expect(isValidFQDN("")).toBe(false);
-            expect(isValidFQDN(".com")).toBe(false);
-            expect(isValidFQDN("example.")).toBe(false);
+            expect(isValidFQDN("localhost")).toBeFalsy(); // No TLD by default
+            expect(isValidFQDN("invalid..domain")).toBeFalsy();
+            expect(isValidFQDN("")).toBeFalsy();
+            expect(isValidFQDN(".com")).toBeFalsy();
+            expect(isValidFQDN("example.")).toBeFalsy();
         });
 
         it("should return false for non-string values", async ({
@@ -127,12 +127,12 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidFQDN(null)).toBe(false);
-            expect(isValidFQDN(undefined)).toBe(false);
-            expect(isValidFQDN(123)).toBe(false);
-            expect(isValidFQDN(true)).toBe(false);
-            expect(isValidFQDN([])).toBe(false);
-            expect(isValidFQDN({})).toBe(false);
+            expect(isValidFQDN(null)).toBeFalsy();
+            expect(isValidFQDN(undefined)).toBeFalsy();
+            expect(isValidFQDN(123)).toBeFalsy();
+            expect(isValidFQDN(true)).toBeFalsy();
+            expect(isValidFQDN([])).toBeFalsy();
+            expect(isValidFQDN({})).toBeFalsy();
         });
 
         it("should respect options parameter", async ({ task, annotate }) => {
@@ -142,14 +142,14 @@ describe("validatorUtils", () => {
             await annotate("Type: Business Logic", "type");
 
             // Allow localhost with require_tld: false
-            expect(isValidFQDN("localhost", { require_tld: false })).toBe(true);
-            expect(isValidFQDN("local-server", { require_tld: false })).toBe(
-                true
+            expect(isValidFQDN("localhost", { require_tld: false })).toBeTruthy();
+            expect(isValidFQDN("local-server", { require_tld: false })).toBeTruthy(
+                
             );
         });
     });
 
-    describe("isValidIdentifier", () => {
+    describe(isValidIdentifier, () => {
         it("should return true for valid identifiers", async ({
             task,
             annotate,
@@ -159,14 +159,14 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidIdentifier("abc123")).toBe(true);
-            expect(isValidIdentifier("abc-123")).toBe(true);
-            expect(isValidIdentifier("abc_123")).toBe(true);
-            expect(isValidIdentifier("abc-123_def")).toBe(true);
-            expect(isValidIdentifier("test_id")).toBe(true);
-            expect(isValidIdentifier("my-component")).toBe(true);
-            expect(isValidIdentifier("123")).toBe(true);
-            expect(isValidIdentifier("a")).toBe(true);
+            expect(isValidIdentifier("abc123")).toBeTruthy();
+            expect(isValidIdentifier("abc-123")).toBeTruthy();
+            expect(isValidIdentifier("abc_123")).toBeTruthy();
+            expect(isValidIdentifier("abc-123_def")).toBeTruthy();
+            expect(isValidIdentifier("test_id")).toBeTruthy();
+            expect(isValidIdentifier("my-component")).toBeTruthy();
+            expect(isValidIdentifier("123")).toBeTruthy();
+            expect(isValidIdentifier("a")).toBeTruthy();
         });
 
         it("should return false for invalid identifiers", async ({
@@ -178,12 +178,12 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidIdentifier("abc@123")).toBe(false);
-            expect(isValidIdentifier("abc.123")).toBe(false);
-            expect(isValidIdentifier("abc 123")).toBe(false);
-            expect(isValidIdentifier("abc#123")).toBe(false);
-            expect(isValidIdentifier("abc%123")).toBe(false);
-            expect(isValidIdentifier("abc+123")).toBe(false);
+            expect(isValidIdentifier("abc@123")).toBeFalsy();
+            expect(isValidIdentifier("abc.123")).toBeFalsy();
+            expect(isValidIdentifier("abc 123")).toBeFalsy();
+            expect(isValidIdentifier("abc#123")).toBeFalsy();
+            expect(isValidIdentifier("abc%123")).toBeFalsy();
+            expect(isValidIdentifier("abc+123")).toBeFalsy();
         });
 
         it("should return false for empty or whitespace strings", async ({
@@ -195,10 +195,10 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidIdentifier("")).toBe(false);
-            expect(isValidIdentifier("   ")).toBe(false);
-            expect(isValidIdentifier("\t")).toBe(false);
-            expect(isValidIdentifier("\n")).toBe(false);
+            expect(isValidIdentifier("")).toBeFalsy();
+            expect(isValidIdentifier("   ")).toBeFalsy();
+            expect(isValidIdentifier("\t")).toBeFalsy();
+            expect(isValidIdentifier("\n")).toBeFalsy();
         });
 
         it("should return false for non-string values", async ({
@@ -210,12 +210,12 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidIdentifier(null)).toBe(false);
-            expect(isValidIdentifier(undefined)).toBe(false);
-            expect(isValidIdentifier(123)).toBe(false);
-            expect(isValidIdentifier(true)).toBe(false);
-            expect(isValidIdentifier([])).toBe(false);
-            expect(isValidIdentifier({})).toBe(false);
+            expect(isValidIdentifier(null)).toBeFalsy();
+            expect(isValidIdentifier(undefined)).toBeFalsy();
+            expect(isValidIdentifier(123)).toBeFalsy();
+            expect(isValidIdentifier(true)).toBeFalsy();
+            expect(isValidIdentifier([])).toBeFalsy();
+            expect(isValidIdentifier({})).toBeFalsy();
         });
 
         it("should handle mixed alphanumeric with hyphens and underscores", async ({
@@ -227,14 +227,14 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidIdentifier("test-123_abc")).toBe(true);
-            expect(isValidIdentifier("_underscore")).toBe(true);
-            expect(isValidIdentifier("-hyphen")).toBe(true);
-            expect(isValidIdentifier("test_-_test")).toBe(true);
+            expect(isValidIdentifier("test-123_abc")).toBeTruthy();
+            expect(isValidIdentifier("_underscore")).toBeTruthy();
+            expect(isValidIdentifier("-hyphen")).toBeTruthy();
+            expect(isValidIdentifier("test_-_test")).toBeTruthy();
         });
     });
 
-    describe("isValidIdentifierArray", () => {
+    describe(isValidIdentifierArray, () => {
         it("should return true for arrays of valid identifiers", async ({
             task,
             annotate,
@@ -244,17 +244,17 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidIdentifierArray(["abc", "def-123"])).toBe(true);
-            expect(isValidIdentifierArray(["test_1", "test_2"])).toBe(true);
-            expect(isValidIdentifierArray(["single"])).toBe(true);
-            expect(isValidIdentifierArray([])).toBe(true); // Empty array is valid
+            expect(isValidIdentifierArray(["abc", "def-123"])).toBeTruthy();
+            expect(isValidIdentifierArray(["test_1", "test_2"])).toBeTruthy();
+            expect(isValidIdentifierArray(["single"])).toBeTruthy();
+            expect(isValidIdentifierArray([])).toBeTruthy(); // Empty array is valid
             expect(
                 isValidIdentifierArray([
                     "a",
                     "b",
                     "c",
                 ])
-            ).toBe(true);
+            ).toBeTruthy();
         });
 
         it("should return false for arrays containing invalid identifiers", async ({
@@ -266,11 +266,11 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidIdentifierArray(["abc", 123])).toBe(false);
-            expect(isValidIdentifierArray(["abc", ""])).toBe(false);
-            expect(isValidIdentifierArray(["valid", "in@valid"])).toBe(false);
-            expect(isValidIdentifierArray(["valid", null])).toBe(false);
-            expect(isValidIdentifierArray(["valid", undefined])).toBe(false);
+            expect(isValidIdentifierArray(["abc", 123])).toBeFalsy();
+            expect(isValidIdentifierArray(["abc", ""])).toBeFalsy();
+            expect(isValidIdentifierArray(["valid", "in@valid"])).toBeFalsy();
+            expect(isValidIdentifierArray(["valid", null])).toBeFalsy();
+            expect(isValidIdentifierArray(["valid", undefined])).toBeFalsy();
         });
 
         it("should return false for non-array values", async ({
@@ -282,12 +282,12 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidIdentifierArray(null)).toBe(false);
-            expect(isValidIdentifierArray(undefined)).toBe(false);
-            expect(isValidIdentifierArray("string")).toBe(false);
-            expect(isValidIdentifierArray(123)).toBe(false);
-            expect(isValidIdentifierArray(true)).toBe(false);
-            expect(isValidIdentifierArray({})).toBe(false);
+            expect(isValidIdentifierArray(null)).toBeFalsy();
+            expect(isValidIdentifierArray(undefined)).toBeFalsy();
+            expect(isValidIdentifierArray("string")).toBeFalsy();
+            expect(isValidIdentifierArray(123)).toBeFalsy();
+            expect(isValidIdentifierArray(true)).toBeFalsy();
+            expect(isValidIdentifierArray({})).toBeFalsy();
         });
 
         it("should handle mixed valid identifier formats", async ({
@@ -306,11 +306,11 @@ describe("validatorUtils", () => {
                     "test_456",
                     "789",
                 ])
-            ).toBe(true);
+            ).toBeTruthy();
         });
     });
 
-    describe("isValidInteger", () => {
+    describe(isValidInteger, () => {
         it("should return true for valid integer strings", async ({
             task,
             annotate,
@@ -320,10 +320,10 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidInteger("123")).toBe(true);
-            expect(isValidInteger("0")).toBe(true);
-            expect(isValidInteger("-123")).toBe(true);
-            expect(isValidInteger("999999")).toBe(true);
+            expect(isValidInteger("123")).toBeTruthy();
+            expect(isValidInteger("0")).toBeTruthy();
+            expect(isValidInteger("-123")).toBeTruthy();
+            expect(isValidInteger("999999")).toBeTruthy();
         });
 
         it("should return false for non-integer strings", async ({
@@ -335,11 +335,11 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidInteger("123.45")).toBe(false);
-            expect(isValidInteger("abc")).toBe(false);
-            expect(isValidInteger("12.0")).toBe(false);
-            expect(isValidInteger("1e10")).toBe(false);
-            expect(isValidInteger("")).toBe(false);
+            expect(isValidInteger("123.45")).toBeFalsy();
+            expect(isValidInteger("abc")).toBeFalsy();
+            expect(isValidInteger("12.0")).toBeFalsy();
+            expect(isValidInteger("1e10")).toBeFalsy();
+            expect(isValidInteger("")).toBeFalsy();
         });
 
         it("should return false for non-string values", async ({
@@ -351,12 +351,12 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidInteger(123)).toBe(false);
-            expect(isValidInteger(null)).toBe(false);
-            expect(isValidInteger(undefined)).toBe(false);
-            expect(isValidInteger(true)).toBe(false);
-            expect(isValidInteger([])).toBe(false);
-            expect(isValidInteger({})).toBe(false);
+            expect(isValidInteger(123)).toBeFalsy();
+            expect(isValidInteger(null)).toBeFalsy();
+            expect(isValidInteger(undefined)).toBeFalsy();
+            expect(isValidInteger(true)).toBeFalsy();
+            expect(isValidInteger([])).toBeFalsy();
+            expect(isValidInteger({})).toBeFalsy();
         });
 
         it("should respect options parameter", async ({ task, annotate }) => {
@@ -366,9 +366,9 @@ describe("validatorUtils", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test with min/max bounds
-            expect(isValidInteger("50", { min: 0, max: 100 })).toBe(true);
-            expect(isValidInteger("-5", { min: 0, max: 100 })).toBe(false);
-            expect(isValidInteger("150", { min: 0, max: 100 })).toBe(false);
+            expect(isValidInteger("50", { min: 0, max: 100 })).toBeTruthy();
+            expect(isValidInteger("-5", { min: 0, max: 100 })).toBeFalsy();
+            expect(isValidInteger("150", { min: 0, max: 100 })).toBeFalsy();
         });
 
         it("should handle edge cases", async ({ task, annotate }) => {
@@ -377,12 +377,12 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidInteger("+123")).toBe(true);
-            expect(isValidInteger("  123  ")).toBe(false); // Whitespace not allowed
+            expect(isValidInteger("+123")).toBeTruthy();
+            expect(isValidInteger("  123  ")).toBeFalsy(); // Whitespace not allowed
         });
     });
 
-    describe("isValidNumeric", () => {
+    describe(isValidNumeric, () => {
         it("should return true for valid numeric strings", async ({
             task,
             annotate,
@@ -392,12 +392,12 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidNumeric("123")).toBe(true);
-            expect(isValidNumeric("123.45")).toBe(true);
-            expect(isValidNumeric("-123.45")).toBe(true);
-            expect(isValidNumeric("0")).toBe(true);
-            expect(isValidNumeric("0.5")).toBe(true);
-            expect(isValidNumeric(".5")).toBe(true);
+            expect(isValidNumeric("123")).toBeTruthy();
+            expect(isValidNumeric("123.45")).toBeTruthy();
+            expect(isValidNumeric("-123.45")).toBeTruthy();
+            expect(isValidNumeric("0")).toBeTruthy();
+            expect(isValidNumeric("0.5")).toBeTruthy();
+            expect(isValidNumeric(".5")).toBeTruthy();
         });
 
         it("should return false for non-numeric strings", async ({
@@ -409,10 +409,10 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidNumeric("abc")).toBe(false);
-            expect(isValidNumeric("")).toBe(false);
-            expect(isValidNumeric("12abc")).toBe(false);
-            expect(isValidNumeric("1.2.3")).toBe(false);
+            expect(isValidNumeric("abc")).toBeFalsy();
+            expect(isValidNumeric("")).toBeFalsy();
+            expect(isValidNumeric("12abc")).toBeFalsy();
+            expect(isValidNumeric("1.2.3")).toBeFalsy();
         });
 
         it("should return false for non-string values", async ({
@@ -424,12 +424,12 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidNumeric(123)).toBe(false);
-            expect(isValidNumeric(null)).toBe(false);
-            expect(isValidNumeric(undefined)).toBe(false);
-            expect(isValidNumeric(true)).toBe(false);
-            expect(isValidNumeric([])).toBe(false);
-            expect(isValidNumeric({})).toBe(false);
+            expect(isValidNumeric(123)).toBeFalsy();
+            expect(isValidNumeric(null)).toBeFalsy();
+            expect(isValidNumeric(undefined)).toBeFalsy();
+            expect(isValidNumeric(true)).toBeFalsy();
+            expect(isValidNumeric([])).toBeFalsy();
+            expect(isValidNumeric({})).toBeFalsy();
         });
 
         it("should respect options parameter", async ({ task, annotate }) => {
@@ -439,9 +439,9 @@ describe("validatorUtils", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test with min/max bounds
-            expect(isValidNumeric("50.5", { min: 0, max: 100 })).toBe(true);
-            expect(isValidNumeric("-5.5", { min: 0, max: 100 })).toBe(false);
-            expect(isValidNumeric("150.5", { min: 0, max: 100 })).toBe(false);
+            expect(isValidNumeric("50.5", { min: 0, max: 100 })).toBeTruthy();
+            expect(isValidNumeric("-5.5", { min: 0, max: 100 })).toBeFalsy();
+            expect(isValidNumeric("150.5", { min: 0, max: 100 })).toBeFalsy();
         });
 
         it("should handle scientific notation", async ({ task, annotate }) => {
@@ -450,13 +450,13 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidNumeric("1e10")).toBe(true);
-            expect(isValidNumeric("1E10")).toBe(true);
-            expect(isValidNumeric("1.5e-10")).toBe(true);
+            expect(isValidNumeric("1e10")).toBeTruthy();
+            expect(isValidNumeric("1E10")).toBeTruthy();
+            expect(isValidNumeric("1.5e-10")).toBeTruthy();
         });
     });
 
-    describe("isValidHost", () => {
+    describe(isValidHost, () => {
         it("should return true for valid IP addresses", async ({
             task,
             annotate,
@@ -466,11 +466,11 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidHost("192.168.1.1")).toBe(true);
-            expect(isValidHost("127.0.0.1")).toBe(true);
-            expect(isValidHost("10.0.0.1")).toBe(true);
-            expect(isValidHost("255.255.255.255")).toBe(true);
-            expect(isValidHost("2001:db8::1")).toBe(true); // IPv6
+            expect(isValidHost("192.168.1.1")).toBeTruthy();
+            expect(isValidHost("127.0.0.1")).toBeTruthy();
+            expect(isValidHost("10.0.0.1")).toBeTruthy();
+            expect(isValidHost("255.255.255.255")).toBeTruthy();
+            expect(isValidHost("2001:db8::1")).toBeTruthy(); // IPv6
         });
 
         it("should return true for valid FQDNs", async ({ task, annotate }) => {
@@ -479,10 +479,10 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidHost("example.com")).toBe(true);
-            expect(isValidHost("subdomain.example.com")).toBe(true);
-            expect(isValidHost("test.org")).toBe(true);
-            expect(isValidHost("my-site.net")).toBe(true);
+            expect(isValidHost("example.com")).toBeTruthy();
+            expect(isValidHost("subdomain.example.com")).toBeTruthy();
+            expect(isValidHost("test.org")).toBeTruthy();
+            expect(isValidHost("my-site.net")).toBeTruthy();
         });
 
         it("should return true for localhost", async ({ task, annotate }) => {
@@ -491,7 +491,7 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidHost("localhost")).toBe(true);
+            expect(isValidHost("localhost")).toBeTruthy();
         });
 
         it("should return false for invalid hosts", async ({
@@ -503,11 +503,11 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidHost("invalid..domain")).toBe(false);
-            expect(isValidHost("")).toBe(false);
-            expect(isValidHost(".com")).toBe(false);
-            expect(isValidHost("256.256.256.256")).toBe(false); // Invalid IP
-            expect(isValidHost("local")).toBe(false); // No TLD and not localhost
+            expect(isValidHost("invalid..domain")).toBeFalsy();
+            expect(isValidHost("")).toBeFalsy();
+            expect(isValidHost(".com")).toBeFalsy();
+            expect(isValidHost("256.256.256.256")).toBeFalsy(); // Invalid IP
+            expect(isValidHost("local")).toBeFalsy(); // No TLD and not localhost
         });
 
         it("should return false for non-string values", async ({
@@ -519,12 +519,12 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidHost(null)).toBe(false);
-            expect(isValidHost(undefined)).toBe(false);
-            expect(isValidHost(123)).toBe(false);
-            expect(isValidHost(true)).toBe(false);
-            expect(isValidHost([])).toBe(false);
-            expect(isValidHost({})).toBe(false);
+            expect(isValidHost(null)).toBeFalsy();
+            expect(isValidHost(undefined)).toBeFalsy();
+            expect(isValidHost(123)).toBeFalsy();
+            expect(isValidHost(true)).toBeFalsy();
+            expect(isValidHost([])).toBeFalsy();
+            expect(isValidHost({})).toBeFalsy();
         });
 
         it("should handle edge cases", async ({ task, annotate }) => {
@@ -533,12 +533,12 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidHost("test_underscore.com")).toBe(false); // Underscores not allowed in FQDN
-            expect(isValidHost("*.example.com")).toBe(false); // Wildcards not allowed
+            expect(isValidHost("test_underscore.com")).toBeFalsy(); // Underscores not allowed in FQDN
+            expect(isValidHost("*.example.com")).toBeFalsy(); // Wildcards not allowed
         });
     });
 
-    describe("isValidPort", () => {
+    describe(isValidPort, () => {
         it("should return true for valid port numbers", async ({
             task,
             annotate,
@@ -548,11 +548,11 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort(80)).toBe(true);
-            expect(isValidPort(443)).toBe(true);
-            expect(isValidPort(1)).toBe(true);
-            expect(isValidPort(65_535)).toBe(true);
-            expect(isValidPort(8080)).toBe(true);
+            expect(isValidPort(80)).toBeTruthy();
+            expect(isValidPort(443)).toBeTruthy();
+            expect(isValidPort(1)).toBeTruthy();
+            expect(isValidPort(65_535)).toBeTruthy();
+            expect(isValidPort(8080)).toBeTruthy();
         });
 
         it("should return true for valid port strings", async ({
@@ -564,11 +564,11 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort("80")).toBe(true);
-            expect(isValidPort("443")).toBe(true);
-            expect(isValidPort("1")).toBe(true);
-            expect(isValidPort("65535")).toBe(true);
-            expect(isValidPort("8080")).toBe(true);
+            expect(isValidPort("80")).toBeTruthy();
+            expect(isValidPort("443")).toBeTruthy();
+            expect(isValidPort("1")).toBeTruthy();
+            expect(isValidPort("65535")).toBeTruthy();
+            expect(isValidPort("8080")).toBeTruthy();
         });
 
         it("should return false for port 0", async ({ task, annotate }) => {
@@ -577,8 +577,8 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort(0)).toBe(false);
-            expect(isValidPort("0")).toBe(false);
+            expect(isValidPort(0)).toBeFalsy();
+            expect(isValidPort("0")).toBeFalsy();
         });
 
         it("should return false for invalid port numbers", async ({
@@ -590,9 +590,9 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort(-1)).toBe(false);
-            expect(isValidPort(65_536)).toBe(false);
-            expect(isValidPort(70_000)).toBe(false);
+            expect(isValidPort(-1)).toBeFalsy();
+            expect(isValidPort(65_536)).toBeFalsy();
+            expect(isValidPort(70_000)).toBeFalsy();
         });
 
         it("should return false for invalid port strings", async ({
@@ -604,11 +604,11 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort("-1")).toBe(false);
-            expect(isValidPort("65536")).toBe(false);
-            expect(isValidPort("abc")).toBe(false);
-            expect(isValidPort("")).toBe(false);
-            expect(isValidPort("80.5")).toBe(false);
+            expect(isValidPort("-1")).toBeFalsy();
+            expect(isValidPort("65536")).toBeFalsy();
+            expect(isValidPort("abc")).toBeFalsy();
+            expect(isValidPort("")).toBeFalsy();
+            expect(isValidPort("80.5")).toBeFalsy();
         });
 
         it("should return false for non-number and non-string values", async ({
@@ -620,11 +620,11 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort(null)).toBe(false);
-            expect(isValidPort(undefined)).toBe(false);
-            expect(isValidPort(true)).toBe(false);
-            expect(isValidPort([])).toBe(false);
-            expect(isValidPort({})).toBe(false);
+            expect(isValidPort(null)).toBeFalsy();
+            expect(isValidPort(undefined)).toBeFalsy();
+            expect(isValidPort(true)).toBeFalsy();
+            expect(isValidPort([])).toBeFalsy();
+            expect(isValidPort({})).toBeFalsy();
         });
 
         it("should handle edge cases", async ({ task, annotate }) => {
@@ -633,22 +633,22 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort(1.5)).toBe(false); // Non-integer number
-            expect(isValidPort("  80  ")).toBe(false); // Whitespace not allowed
+            expect(isValidPort(1.5)).toBeFalsy(); // Non-integer number
+            expect(isValidPort("  80  ")).toBeFalsy(); // Whitespace not allowed
         });
     });
 
-    describe("isValidUrl", () => {
+    describe(isValidUrl, () => {
         it("should return true for valid URLs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl("https://example.com")).toBe(true);
-            expect(isValidUrl("https://subdomain.example.com")).toBe(true);
-            expect(isValidUrl("https://example.com/path")).toBe(true);
-            expect(isValidUrl("https://example.com:8080")).toBe(true);
+            expect(isValidUrl("https://example.com")).toBeTruthy();
+            expect(isValidUrl("https://subdomain.example.com")).toBeTruthy();
+            expect(isValidUrl("https://example.com/path")).toBeTruthy();
+            expect(isValidUrl("https://example.com:8080")).toBeTruthy();
         });
 
         it("should return true for localhost URLs", async ({
@@ -660,9 +660,9 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl("http://localhost")).toBe(true);
-            expect(isValidUrl("https://localhost:3000")).toBe(true);
-            expect(isValidUrl("http://localhost:8080/path")).toBe(true);
+            expect(isValidUrl("http://localhost")).toBeTruthy();
+            expect(isValidUrl("https://localhost:3000")).toBeTruthy();
+            expect(isValidUrl("http://localhost:8080/path")).toBeTruthy();
         });
 
         it("should return true for valid HTTP URLs in test contexts", async ({
@@ -676,7 +676,7 @@ describe("validatorUtils", () => {
 
             // Testing HTTP URLs for validation completeness
 
-            expect(isValidUrl("http://example.com")).toBe(true);
+            expect(isValidUrl("http://example.com")).toBeTruthy();
         });
 
         it("should return false for invalid URLs", async ({
@@ -688,10 +688,10 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl("not-a-url")).toBe(false);
-            expect(isValidUrl("http://")).toBe(false);
-            expect(isValidUrl("")).toBe(false);
-            expect(isValidUrl("//example.com")).toBe(false); // Protocol relative not allowed by default
+            expect(isValidUrl("not-a-url")).toBeFalsy();
+            expect(isValidUrl("http://")).toBeFalsy();
+            expect(isValidUrl("")).toBeFalsy();
+            expect(isValidUrl("//example.com")).toBeFalsy(); // Protocol relative not allowed by default
         });
 
         it("should return false for non-string values", async ({
@@ -703,12 +703,12 @@ describe("validatorUtils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl(null)).toBe(false);
-            expect(isValidUrl(undefined)).toBe(false);
-            expect(isValidUrl(123)).toBe(false);
-            expect(isValidUrl(true)).toBe(false);
-            expect(isValidUrl([])).toBe(false);
-            expect(isValidUrl({})).toBe(false);
+            expect(isValidUrl(null)).toBeFalsy();
+            expect(isValidUrl(undefined)).toBeFalsy();
+            expect(isValidUrl(123)).toBeFalsy();
+            expect(isValidUrl(true)).toBeFalsy();
+            expect(isValidUrl([])).toBeFalsy();
+            expect(isValidUrl({})).toBeFalsy();
         });
 
         it("should respect options parameter", async ({ task, annotate }) => {
@@ -722,15 +722,15 @@ describe("validatorUtils", () => {
                 isValidUrl("//example.com", {
                     allow_protocol_relative_urls: true,
                 })
-            ).toBe(false); // Still false due to require_protocol: true
+            ).toBeFalsy(); // Still false due to require_protocol: true
 
             // Require TLD
-            expect(isValidUrl("http://localhost", { require_tld: true })).toBe(
-                false
+            expect(isValidUrl("http://localhost", { require_tld: true })).toBeFalsy(
+                
             );
 
             // Custom protocols - FTP is invalid in our validation (HTTP/HTTPS only)
-            expect(isValidUrl("ftp://example.com")).toBe(false);
+            expect(isValidUrl("ftp://example.com")).toBeFalsy();
         });
 
         it("should handle complex URLs", async ({ task, annotate }) => {
@@ -743,12 +743,12 @@ describe("validatorUtils", () => {
                 isValidUrl(
                     "https://user:pass@example.com:443/path?query=value#hash"
                 )
-            ).toBe(true);
-            expect(isValidUrl("https://192.168.1.1:8080")).toBe(true);
+            ).toBeTruthy();
+            expect(isValidUrl("https://192.168.1.1:8080")).toBeTruthy();
         });
     });
 
-    describe("safeInteger", () => {
+    describe(safeInteger, () => {
         it("should return converted integer for valid integer strings", async ({
             task,
             annotate,

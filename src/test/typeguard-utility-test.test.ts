@@ -28,8 +28,8 @@ describe("TypeGuard Utility Coverage Test", () => {
             3,
         ];
 
-        expect(hasProperties(testObj, ["test"])).toBe(true);
-        expect(hasProperty(testObj, "test")).toBe(true);
-        expect(isArray(testArray)).toBe(true);
+        expect(hasProperties(testObj, ["test"])).toBeTruthy();
+        expect(hasProperty(testObj, "test")).toBeTruthy();
+        expect(isArray(testArray)).toBeTruthy();
     });
 });

@@ -126,7 +126,7 @@ const mockTheme: Theme = {
     },
 };
 
-describe("ChartConfigService", () => {
+describe(ChartConfigService, () => {
     let chartService: ChartConfigService;
 
     beforeEach(() => {
@@ -173,8 +173,8 @@ describe("ChartConfigService", () => {
             const config = chartService.getLineChartConfig();
 
             expect(config).toBeDefined();
-            expect(config.maintainAspectRatio).toBe(false);
-            expect(config.responsive).toBe(true);
+            expect(config.maintainAspectRatio).toBeFalsy();
+            expect(config.responsive).toBeTruthy();
         });
 
         it("should have correct interaction settings", async ({
@@ -189,7 +189,7 @@ describe("ChartConfigService", () => {
             const config = chartService.getLineChartConfig();
 
             expect(config.interaction?.mode).toBe("index");
-            expect(config.interaction?.intersect).toBe(false);
+            expect(config.interaction?.intersect).toBeFalsy();
         });
 
         it("should have zoom configuration", async ({ task, annotate }) => {
@@ -200,11 +200,11 @@ describe("ChartConfigService", () => {
 
             const config = chartService.getLineChartConfig();
 
-            expect(config.plugins?.zoom?.pan?.enabled).toBe(true);
+            expect(config.plugins?.zoom?.pan?.enabled).toBeTruthy();
             expect(config.plugins?.zoom?.pan?.mode).toBe("x");
             expect(config.plugins?.zoom?.zoom?.mode).toBe("x");
-            expect(config.plugins?.zoom?.zoom?.pinch?.enabled).toBe(true);
-            expect(config.plugins?.zoom?.zoom?.wheel?.enabled).toBe(true);
+            expect(config.plugins?.zoom?.zoom?.pinch?.enabled).toBeTruthy();
+            expect(config.plugins?.zoom?.zoom?.wheel?.enabled).toBeTruthy();
         });
 
         it("should have correct scale configuration", async ({
@@ -233,8 +233,8 @@ describe("ChartConfigService", () => {
                     "time.displayFormats.minute"
                 )
             ).toBe("HH:mm");
-            expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBe(
-                true
+            expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBeTruthy(
+                
             );
             expect(getNestedScaleProperty(config, "y", "title.text")).toBe(
                 "Response Time (ms)"
@@ -250,7 +250,7 @@ describe("ChartConfigService", () => {
             const config = chartService.getLineChartConfig();
 
             expect(config.plugins?.title?.text).toBe("Response Time Over Time");
-            expect(config.plugins?.title?.display).toBe(true);
+            expect(config.plugins?.title?.display).toBeTruthy();
         });
 
         it("should apply theme colors", async ({ task, annotate }) => {
@@ -317,8 +317,8 @@ describe("ChartConfigService", () => {
             const config = chartService.getBarChartConfig();
 
             expect(config).toBeDefined();
-            expect(config.maintainAspectRatio).toBe(false);
-            expect(config.responsive).toBe(true);
+            expect(config.maintainAspectRatio).toBeFalsy();
+            expect(config.responsive).toBeTruthy();
         });
 
         it("should hide legend for bar chart", async ({ task, annotate }) => {
@@ -329,7 +329,7 @@ describe("ChartConfigService", () => {
 
             const config = chartService.getBarChartConfig();
 
-            expect(config.plugins?.legend?.display).toBe(false);
+            expect(config.plugins?.legend?.display).toBeFalsy();
         });
 
         it("should have correct title", async ({ task, annotate }) => {
@@ -341,7 +341,7 @@ describe("ChartConfigService", () => {
             const config = chartService.getBarChartConfig();
 
             expect(config.plugins?.title?.text).toBe("Status Distribution");
-            expect(config.plugins?.title?.display).toBe(true);
+            expect(config.plugins?.title?.display).toBeTruthy();
         });
 
         it("should have correct scale configuration", async ({
@@ -355,14 +355,14 @@ describe("ChartConfigService", () => {
 
             const config = chartService.getBarChartConfig();
 
-            expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBe(
-                true
+            expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBeTruthy(
+                
             );
             expect(getNestedScaleProperty(config, "y", "title.text")).toBe(
                 "Count"
             );
-            expect(getNestedScaleProperty(config, "y", "title.display")).toBe(
-                true
+            expect(getNestedScaleProperty(config, "y", "title.display")).toBeTruthy(
+                
             );
         });
 
@@ -412,8 +412,8 @@ describe("ChartConfigService", () => {
             const config = chartService.getDoughnutChartConfig(100);
 
             expect(config).toBeDefined();
-            expect(config.maintainAspectRatio).toBe(false);
-            expect(config.responsive).toBe(true);
+            expect(config.maintainAspectRatio).toBeFalsy();
+            expect(config.responsive).toBeTruthy();
         });
 
         it("should have correct title", async ({ task, annotate }) => {
@@ -425,7 +425,7 @@ describe("ChartConfigService", () => {
             const config = chartService.getDoughnutChartConfig(100);
 
             expect(config.plugins?.title?.text).toBe("Uptime Distribution");
-            expect(config.plugins?.title?.display).toBe(true);
+            expect(config.plugins?.title?.display).toBeTruthy();
         });
 
         it("should position legend at bottom", async ({ task, annotate }) => {
@@ -554,13 +554,13 @@ describe("ChartConfigService", () => {
             const doughnutConfig = chartService.getDoughnutChartConfig(100);
 
             // All charts should have consistent base settings
-            expect(lineConfig.maintainAspectRatio).toBe(false);
-            expect(barConfig.maintainAspectRatio).toBe(false);
-            expect(doughnutConfig.maintainAspectRatio).toBe(false);
+            expect(lineConfig.maintainAspectRatio).toBeFalsy();
+            expect(barConfig.maintainAspectRatio).toBeFalsy();
+            expect(doughnutConfig.maintainAspectRatio).toBeFalsy();
 
-            expect(lineConfig.responsive).toBe(true);
-            expect(barConfig.responsive).toBe(true);
-            expect(doughnutConfig.responsive).toBe(true);
+            expect(lineConfig.responsive).toBeTruthy();
+            expect(barConfig.responsive).toBeTruthy();
+            expect(doughnutConfig.responsive).toBeTruthy();
         });
 
         it("should apply consistent tooltip styling", async ({
@@ -617,7 +617,7 @@ describe("ChartConfigService", () => {
     });
 });
 
-describe("createChartConfigs", () => {
+describe(createChartConfigs, () => {
     it("should return all chart configuration objects", async ({
         task,
         annotate,
@@ -649,9 +649,9 @@ describe("createChartConfigs", () => {
         expect(configs.barChartOptions).toBeDefined();
         expect(configs.doughnutOptions).toBeDefined();
 
-        expect(configs.lineChartOptions.responsive).toBe(true);
-        expect(configs.barChartOptions.responsive).toBe(true);
-        expect(configs.doughnutOptions.responsive).toBe(true);
+        expect(configs.lineChartOptions.responsive).toBeTruthy();
+        expect(configs.barChartOptions.responsive).toBeTruthy();
+        expect(configs.doughnutOptions.responsive).toBeTruthy();
     });
 
     it("should pass totalChecks to doughnut configuration", async ({

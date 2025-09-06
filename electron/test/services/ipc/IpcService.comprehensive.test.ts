@@ -620,8 +620,8 @@ describe("IpcService - Comprehensive Coverage", () => {
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent);
 
-            expect(result.success).toBe(true);
-            expect(Array.isArray(result.data)).toBe(true);
+            expect(result.success).toBeTruthy();
+            expect(Array.isArray(result.data)).toBeTruthy();
             expect(result.data).toHaveLength(2);
 
             // Check serialized config structure
@@ -633,8 +633,8 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(httpConfig.description).toBe("HTTP endpoint monitoring");
             expect(httpConfig.version).toBe("1.0.0");
             expect(httpConfig.uiConfig).toBeDefined();
-            expect(httpConfig.uiConfig.supportsAdvancedAnalytics).toBe(true);
-            expect(httpConfig.uiConfig.supportsResponseTime).toBe(true);
+            expect(httpConfig.uiConfig.supportsAdvancedAnalytics).toBeTruthy();
+            expect(httpConfig.uiConfig.supportsResponseTime).toBeTruthy();
 
             // Check that non-serializable properties are excluded
             expect(httpConfig.serviceFactory).toBeUndefined();
@@ -802,7 +802,7 @@ describe("IpcService - Comprehensive Coverage", () => {
                 url: "https://example.com",
             });
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result).toEqual({
                 success: true,
                 data: {
@@ -837,7 +837,7 @@ describe("IpcService - Comprehensive Coverage", () => {
                 invalid: true,
             });
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result).toEqual({
                 success: true,
                 data: {
@@ -872,7 +872,7 @@ describe("IpcService - Comprehensive Coverage", () => {
                 data: "test",
             });
 
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toEqual({
                 errors: [],
                 warnings: ["Warning message"],
@@ -1124,7 +1124,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent);
 
             expect(mockUptimeOrchestrator.getSites).toHaveBeenCalled();
-            expect(result.success).toBe(true);
+            expect(result.success).toBeTruthy();
             expect(result.data).toEqual({
                 lastSync: expect.any(Number),
                 siteCount: 1,

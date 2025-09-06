@@ -60,7 +60,7 @@ describe("pingRetry utilities", () => {
     afterEach(() => {
         vi.resetAllMocks();
     });
-    describe("performSinglePingCheck", () => {
+    describe(performSinglePingCheck, () => {
         const successfulPingResult = {
             alive: true,
             time: 25.5,
@@ -240,7 +240,7 @@ describe("pingRetry utilities", () => {
             expect(callArgs).not.toHaveProperty("deadline");
         });
     });
-    describe("performPingCheckWithRetry", () => {
+    describe(performPingCheckWithRetry, () => {
         const mockSingleCheckResult: MonitorCheckResult = {
             status: "up",
             responseTime: 50,

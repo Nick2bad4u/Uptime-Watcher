@@ -29,7 +29,7 @@ import {
 type ValidatorFunction = (val: unknown) => val is unknown;
 
 describe("TypeHelpers utilities fuzzing tests", () => {
-    describe("castIpcResponse", () => {
+    describe(castIpcResponse, () => {
         test.prop([fc.anything()])(
             "should return input when no validator provided",
             (response) => {
@@ -89,18 +89,18 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         });
     });
 
-    describe("isArray", () => {
+    describe(isArray, () => {
         test.prop([fc.array(fc.anything())])(
             "should return true for all arrays",
             (arr) => {
-                expect(isArray(arr)).toBe(true);
+                expect(isArray(arr)).toBeTruthy();
             }
         );
 
         test.prop([fc.anything().filter(x => !Array.isArray(x))])(
             "should return false for non-arrays",
             (nonArray) => {
-                expect(isArray(nonArray)).toBe(false);
+                expect(isArray(nonArray)).toBeFalsy();
             }
         );
 
@@ -113,30 +113,30 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         );
 
         it("should handle edge cases", () => {
-            expect(isArray([])).toBe(true);
-            expect(isArray(null)).toBe(false);
-            expect(isArray(undefined)).toBe(false);
-            expect(isArray({})).toBe(false);
-            expect(isArray("")).toBe(false);
-            expect(isArray(0)).toBe(false);
-            expect(isArray([])).toBe(true);
-            expect(isArray([])).toBe(true);
+            expect(isArray([])).toBeTruthy();
+            expect(isArray(null)).toBeFalsy();
+            expect(isArray(undefined)).toBeFalsy();
+            expect(isArray({})).toBeFalsy();
+            expect(isArray("")).toBeFalsy();
+            expect(isArray(0)).toBeFalsy();
+            expect(isArray([])).toBeTruthy();
+            expect(isArray([])).toBeTruthy();
         });
 
         test.prop([fc.integer({ min: 0, max: 100 })])(
             "should work with arrays of any length",
             (length) => {
                 const arr = Array.from({ length });
-                expect(isArray(arr)).toBe(true);
+                expect(isArray(arr)).toBeTruthy();
             }
         );
     });
 
-    describe("isRecord", () => {
+    describe(isRecord, () => {
         test.prop([fc.record({})])(
             "should return true for all records",
             (record) => {
-                expect(isRecord(record)).toBe(true);
+                expect(isRecord(record)).toBeTruthy();
             }
         );
 
@@ -145,7 +145,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         )])(
             "should return false for non-records",
             (nonRecord) => {
-                expect(isRecord(nonRecord)).toBe(false);
+                expect(isRecord(nonRecord)).toBeFalsy();
             }
         );
 
@@ -158,26 +158,26 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         );
 
         it("should handle edge cases", () => {
-            expect(isRecord({})).toBe(true);
-            expect(isRecord({ a: 1 })).toBe(true);
-            expect(isRecord(null)).toBe(false);
-            expect(isRecord(undefined)).toBe(false);
-            expect(isRecord([])).toBe(false);
-            expect(isRecord("")).toBe(false);
-            expect(isRecord(0)).toBe(false);
-            expect(isRecord(new Date())).toBe(true);
-            expect(isRecord(new Error("Test error"))).toBe(true);
+            expect(isRecord({})).toBeTruthy();
+            expect(isRecord({ a: 1 })).toBeTruthy();
+            expect(isRecord(null)).toBeFalsy();
+            expect(isRecord(undefined)).toBeFalsy();
+            expect(isRecord([])).toBeFalsy();
+            expect(isRecord("")).toBeFalsy();
+            expect(isRecord(0)).toBeFalsy();
+            expect(isRecord(new Date())).toBeTruthy();
+            expect(isRecord(new Error("Test error"))).toBeTruthy();
         });
 
         test.prop([fc.record({})])(
             "should work with empty records",
             (record) => {
-                expect(isRecord(record)).toBe(true);
+                expect(isRecord(record)).toBeTruthy();
             }
         );
     });
 
-    describe("safePropertyAccess", () => {
+    describe(safePropertyAccess, () => {
         test.prop([
             fc.string(),
             fc.anything()
@@ -245,7 +245,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         });
     });
 
-    describe("validateAndConvert", () => {
+    describe(validateAndConvert, () => {
         test.prop([fc.anything()])(
             "should return value when validator returns true",
             (value) => {
@@ -308,7 +308,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
 
                 // TypeScript should know result is a string
                 expect(typeof result).toBe("string");
-                expect(result.length).toBe(str.length);
+                expect(result).toHaveLength(str.length);
             }
         );
     });
@@ -331,7 +331,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
 
                 // Arrays and records are mutually exclusive
                 if (arrayResult) {
-                    expect(recordResult).toBe(false);
+                    expect(recordResult).toBeFalsy();
                 }
             }
         );
@@ -363,12 +363,12 @@ describe("TypeHelpers utilities fuzzing tests", () => {
                 undefinedValue: undefined
             };
 
-            expect(isRecord(complex)).toBe(true);
-            expect(isRecord(complex.level1)).toBe(true);
-            expect(isRecord(complex.level1.level2)).toBe(true);
-            expect(isArray(complex.level1.level2.level3)).toBe(true);
-            expect(isArray(complex.array)).toBe(true);
-            expect(isRecord(complex.array[0])).toBe(true);
+            expect(isRecord(complex)).toBeTruthy();
+            expect(isRecord(complex.level1)).toBeTruthy();
+            expect(isRecord(complex.level1.level2)).toBeTruthy();
+            expect(isArray(complex.level1.level2.level3)).toBeTruthy();
+            expect(isArray(complex.array)).toBeTruthy();
+            expect(isRecord(complex.array[0])).toBeTruthy();
 
             expect(safePropertyAccess(complex, "level1")).toBe(complex.level1);
             expect(safePropertyAccess(complex, "nonexistent")).toBeUndefined();

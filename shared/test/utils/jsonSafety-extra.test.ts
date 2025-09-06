@@ -41,7 +41,7 @@ describe("shared/utils/jsonSafety Function Coverage Validation", () => {
                 validJson,
                 isRecord
             );
-            expect(parseResult.success).toBe(true);
+            expect(parseResult.success).toBeTruthy();
             expect(parseResult.data).toEqual({ key: "value" });
 
             const invalidJson = "invalid json";
@@ -49,7 +49,7 @@ describe("shared/utils/jsonSafety Function Coverage Validation", () => {
                 invalidJson,
                 isRecord
             );
-            expect(failResult.success).toBe(false);
+            expect(failResult.success).toBeFalsy();
 
             // Test safeJsonParseArray function
             const validArrayJson = "[1, 2, 3]";
@@ -57,7 +57,7 @@ describe("shared/utils/jsonSafety Function Coverage Validation", () => {
                 validArrayJson,
                 (item): item is number => typeof item === "number"
             );
-            expect(arrayResult.success).toBe(true);
+            expect(arrayResult.success).toBeTruthy();
             expect(arrayResult.data).toEqual([
                 1,
                 2,
@@ -69,7 +69,7 @@ describe("shared/utils/jsonSafety Function Coverage Validation", () => {
                 invalidArrayJson,
                 isArray
             );
-            expect(arrayFailResult.success).toBe(false);
+            expect(arrayFailResult.success).toBeFalsy();
 
             // Test safeJsonParseWithFallback function
             const fallbackResult = jsonSafetyModule.safeJsonParseWithFallback(
@@ -91,14 +91,14 @@ describe("shared/utils/jsonSafety Function Coverage Validation", () => {
             const stringifyResult = jsonSafetyModule.safeJsonStringify({
                 key: "value",
             });
-            expect(stringifyResult.success).toBe(true);
+            expect(stringifyResult.success).toBeTruthy();
             expect(stringifyResult.data).toBe('{"key":"value"}');
 
             // Test with circular reference
             const circular: any = { a: 1 };
             circular.self = circular;
             const circularResult = jsonSafetyModule.safeJsonStringify(circular);
-            expect(circularResult.success).toBe(false);
+            expect(circularResult.success).toBeFalsy();
 
             // Test safeJsonStringifyWithFallback function
             const fallbackStringifyResult =

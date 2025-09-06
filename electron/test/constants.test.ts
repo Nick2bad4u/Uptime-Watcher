@@ -203,7 +203,7 @@ describe("Electron Constants", () => {
             expect(CACHE_TTL.VALIDATION_RESULTS).toBe(300_000); // 5 minutes
 
             // Verify object is frozen
-            expect(Object.isFrozen(CACHE_TTL)).toBe(true);
+            expect(Object.isFrozen(CACHE_TTL)).toBeTruthy();
         });
 
         it("should export CACHE_SIZE_LIMITS with correct structure and values", async ({
@@ -226,7 +226,7 @@ describe("Electron Constants", () => {
             expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBe(200);
 
             // Verify object is frozen
-            expect(Object.isFrozen(CACHE_SIZE_LIMITS)).toBe(true);
+            expect(Object.isFrozen(CACHE_SIZE_LIMITS)).toBeTruthy();
         });
 
         it("should have reasonable cache TTL values", async ({ annotate }) => {
@@ -324,8 +324,8 @@ describe("Electron Constants", () => {
                 "compliance"
             );
 
-            expect(DB_FILE_NAME.endsWith(".sqlite")).toBe(true);
-            expect(BACKUP_DB_FILE_NAME.endsWith(".sqlite")).toBe(true);
+            expect(DB_FILE_NAME.endsWith(".sqlite")).toBeTruthy();
+            expect(BACKUP_DB_FILE_NAME.endsWith(".sqlite")).toBeTruthy();
         });
 
         it("should have different main and backup database file names", async ({
@@ -401,7 +401,7 @@ describe("Electron Constants", () => {
                 expect(
                     type === "string" || type === "number" || type === "object",
                     `Constant ${name} should be a primitive or object`
-                ).toBe(true);
+                ).toBeTruthy();
             }
         });
     });

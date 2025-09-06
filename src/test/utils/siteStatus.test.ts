@@ -170,7 +170,7 @@ describe("siteStatus Property-based Tests", () => {
         monitors: fc.array(monitorArb, { minLength: 0, maxLength: 10 }),
     }) as fc.Arbitrary<SiteForStatus>;
 
-    describe("calculateSiteMonitoringStatus", () => {
+    describe(calculateSiteMonitoringStatus, () => {
         test.prop([siteForStatusArb])("should return correct monitoring status for any site configuration", (site) => {
             const result = calculateSiteMonitoringStatus(site);
 
@@ -208,7 +208,7 @@ describe("siteStatus Property-based Tests", () => {
         });
     });
 
-    describe("calculateSiteStatus", () => {
+    describe(calculateSiteStatus, () => {
         test.prop([siteForStatusArb])("should return correct operational status for any site configuration", (site) => {
             const result = calculateSiteStatus(site);
 
@@ -255,7 +255,7 @@ describe("siteStatus Property-based Tests", () => {
         });
     });
 
-    describe("getSiteDisplayStatus", () => {
+    describe(getSiteDisplayStatus, () => {
         test.prop([siteForStatusArb])("should return appropriate display status based on monitoring and operational status", (site) => {
             const result = getSiteDisplayStatus(site);
 
@@ -295,7 +295,7 @@ describe("siteStatus Property-based Tests", () => {
         });
     });
 
-    describe("getSiteStatusDescription", () => {
+    describe(getSiteStatusDescription, () => {
         test.prop([siteForStatusArb])("should return descriptive string for any site configuration", (site) => {
             const result = getSiteStatusDescription(site);
 
@@ -324,7 +324,7 @@ describe("siteStatus Property-based Tests", () => {
         });
     });
 
-    describe("getSiteStatusVariant", () => {
+    describe(getSiteStatusVariant, () => {
         test.prop([siteStatusArb])("should return valid variant for any site status", (status) => {
             const result = getSiteStatusVariant(status);
 

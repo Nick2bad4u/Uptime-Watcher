@@ -329,7 +329,7 @@ describe("SiteWriterService Coverage Tests", () => {
                 mockDb,
                 "test-site"
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "Site removed successfully: test-site"
             );
@@ -361,7 +361,7 @@ describe("SiteWriterService Coverage Tests", () => {
                 mockMonitorRepository.deleteBySiteIdentifierInternal
             ).toHaveBeenCalled();
             expect(mockSiteRepository.deleteInternal).toHaveBeenCalled();
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(mockLogger.warn).toHaveBeenCalledWith(
                 "Site not found in cache for removal: nonexistent-site"
             );
@@ -454,7 +454,7 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
             expect(mockSiteRepository.upsertInternal).toHaveBeenCalled();
             expect(result.name).toBe("Updated Site Name");
-            expect(result.monitoring).toBe(true);
+            expect(result.monitoring).toBeTruthy();
         });
 
         it("should create new monitors when updating", async ({

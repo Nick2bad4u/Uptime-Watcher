@@ -40,18 +40,18 @@ describe("cacheKeys Direct Function Coverage", () => {
 
     it("should test isStandardizedCacheKey function", () => {
         // Test valid keys
-        expect(isStandardizedCacheKey("config:test")).toBe(true);
-        expect(isStandardizedCacheKey("monitor:site:test")).toBe(true);
-        expect(isStandardizedCacheKey("site:bulk")).toBe(true);
-        expect(isStandardizedCacheKey("validation:monitor:test")).toBe(true);
+        expect(isStandardizedCacheKey("config:test")).toBeTruthy();
+        expect(isStandardizedCacheKey("monitor:site:test")).toBeTruthy();
+        expect(isStandardizedCacheKey("site:bulk")).toBeTruthy();
+        expect(isStandardizedCacheKey("validation:monitor:test")).toBeTruthy();
 
         // Test invalid keys
-        expect(isStandardizedCacheKey("")).toBe(false);
-        expect(isStandardizedCacheKey("invalid")).toBe(false);
-        expect(isStandardizedCacheKey("too:many:parts:here")).toBe(false);
-        expect(isStandardizedCacheKey("invalid:")).toBe(false);
-        expect(isStandardizedCacheKey(":invalid")).toBe(false);
-        expect(isStandardizedCacheKey("invalid::double")).toBe(false);
+        expect(isStandardizedCacheKey("")).toBeFalsy();
+        expect(isStandardizedCacheKey("invalid")).toBeFalsy();
+        expect(isStandardizedCacheKey("too:many:parts:here")).toBeFalsy();
+        expect(isStandardizedCacheKey("invalid:")).toBeFalsy();
+        expect(isStandardizedCacheKey(":invalid")).toBeFalsy();
+        expect(isStandardizedCacheKey("invalid::double")).toBeFalsy();
     });
 
     it("should test parseCacheKey function", () => {

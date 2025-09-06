@@ -22,7 +22,7 @@ describe("MonitorFactory - Fixed", () => {
         };
     });
 
-    describe("getMonitor", () => {
+    describe(getMonitor, () => {
         it("should get a ping monitor", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorFactory", "component");

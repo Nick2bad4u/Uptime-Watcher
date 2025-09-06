@@ -47,7 +47,7 @@ describe("Store Utils", () => {
         vi.clearAllMocks();
     });
 
-    describe("logStoreAction", () => {
+    describe(logStoreAction, () => {
         it("should log action without payload in development", async ({
             task,
             annotate,
