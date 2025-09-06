@@ -560,3 +560,4 @@ repomix-output.xml
 reports/stryker-incremental.json
 stryker_prompts_by_mutator/
 stryker-issues.json
+.eslint-config-inspector/

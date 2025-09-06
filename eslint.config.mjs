@@ -31,9 +31,11 @@ import pluginMicrosoftSdl from "@microsoft/eslint-plugin-sdl";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tseslintParser from "@typescript-eslint/parser";
 import vitest from "@vitest/eslint-plugin";
+import gitignore from 'eslint-config-flat-gitignore'
 import eslintConfigPrettier from "eslint-config-prettier";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 import arrayFunc from "eslint-plugin-array-func";
+import pluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
 import pluginBoundaries from "eslint-plugin-boundaries";
 import pluginCanonical from "eslint-plugin-canonical";
 import * as pluginCleanCode from "eslint-plugin-clean-code";
@@ -139,8 +141,6 @@ import jsoncEslintParser from "jsonc-eslint-parser";
 import path from "node:path";
 import tomlEslintParser from "toml-eslint-parser";
 import yamlEslintParser from "yaml-eslint-parser";
-import gitignore from 'eslint-config-flat-gitignore'
-import pluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
 
 
 // Unused and Uninstalled Plugins:
@@ -313,6 +313,7 @@ export default [
     // YAML/YML files
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "YAML/YML files",
         files: ["**/*.{yaml,yml}"],
         ignores: [],
         languageOptions: {
@@ -358,6 +359,7 @@ export default [
     // HTML files
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "HTML files",
         files: ["**/*.{html,htm,xhtml}"],
         ignores: ["report/**"],
         languageOptions: {
@@ -385,6 +387,7 @@ export default [
     // HTML in JS/TS files (HTML Literals)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "HTML in JS/TS files",
         files: ["**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: ["report/**"],
         plugins: {
@@ -410,6 +413,7 @@ export default [
     // ═══════════════════════════════════════════════════════════════════════════════
 
     // {
+    //     name: "Package.json files Publint",
     //     files: ["**/package.json"],
     //     languageOptions: {
     //         parser: publintParser,
@@ -437,6 +441,7 @@ export default [
     // Package.json Linting
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "Package.json files",
         files: ["**/package.json"],
         languageOptions: {
             parser: jsoncEslintParser,
@@ -467,6 +472,7 @@ export default [
     // MDX Eslint Rules (mdx/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "MDX files",
         files: ["**/*.mdx"],
         plugins: { mdx: mdx },
 
@@ -495,6 +501,7 @@ export default [
     // MD Eslint Rules (md/*, markdown/*, markup/*, atom/*, rss/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "Markdown files",
         files: ["**/*.{md,markup,atom,rss,markdown}"],
         language: "markdown/gfm",
         plugins: {
@@ -525,6 +532,7 @@ export default [
     // CSS Eslint Rules (css/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "CSS files",
         files: ["**/*.css"],
         ignores: [
             "docs/**",
@@ -551,6 +559,7 @@ export default [
     // JSONC Eslint Rules (jsonc/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "JSONC files",
         files: [
             "**/*.jsonc",
             ".vscode/*.json",
@@ -580,6 +589,7 @@ export default [
     // JSON Eslint Rules (json/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "JSON files",
         files: ["**/*.json"],
         language: "json/json",
         plugins: {
@@ -595,6 +605,7 @@ export default [
     // JSON5 Eslint Rules (json5/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "JSON files",
         files: ["**/*.json5"],
         language: "json/json5",
         plugins: {
@@ -610,6 +621,7 @@ export default [
     // TOML Eslint Rules (toml/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "TOML files",
         files: ["**/*.toml"],
         ignores: ["lychee.toml"],
         languageOptions: {
@@ -642,6 +654,7 @@ export default [
     // TSX/JSX Eslint Rules (tsx/*, jsx/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "TSX/JSX files",
         files: ["**/*.{tsx,jsx}"],
         ignores: [],
         languageOptions: {
@@ -667,17 +680,23 @@ export default [
             },
         },
         plugins: {
+            "better-tailwindcss": pluginBetterTailwindcss,
             css: css,
             "no-hardcoded-strings": pluginNoHardcoded,
             tailwind: tailwind,
             "undefined-css-classes": pluginUndefinedCss,
-            "better-tailwindcss": pluginBetterTailwindcss,
         },
         rules: {
             // TypeScript rules
             ...css.configs.recommended.rules,
             ...pluginUndefinedCss.configs["with-tailwind"].rules,
             ...pluginBetterTailwindcss.configs.correctness.rules,
+            "better-tailwindcss/no-unregistered-classes": [
+                "off",
+                {
+                    detectComponentClasses: true,
+                },
+            ],
             // No Hardcoded Strings Plugin Rules (no-hardcoded-strings/*)
             // "no-hardcoded-strings/no-hardcoded-strings": [
             //     "warn",
@@ -703,12 +722,6 @@ export default [
                 "warn",
                 {
                     skipClassAttribute: true,
-                },
-            ],
-            "better-tailwindcss/no-unregistered-classes": [
-                "warn",
-                {
-                    detectComponentClasses: true,
                 },
             ],
             "tailwind/no-unnecessary-arbitrary-value": "warn",
@@ -780,6 +793,7 @@ export default [
     // Docusaurus Eslint Rules (docusaurus/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "Docusaurus files",
         files: ["docs/docusaurus/**/*.{ts,tsx,mjs,cjs,js,jsx,mts,cts}"],
         ignores: [
             "docs/docusaurus/docs/**",
@@ -833,7 +847,7 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
+            // @ts-ignore -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -1852,6 +1866,7 @@ export default [
 
     // Docusaurus CSS
     {
+        name: "Docusaurus CSS",
         files: ["docs/docusaurus/**/*.css"],
         ignores: [
             "docs/docusaurus/docs/**",
@@ -1901,6 +1916,7 @@ export default [
 
     // TypeScript frontend files (React + Zustand)
     {
+        name: "TypeScript Frontend (React + Zustand)",
         files: ["src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: [
             "**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -1930,7 +1946,6 @@ export default [
             },
         },
         plugins: {
-            "better-tailwindcss": pluginBetterTailwindcss,
             "@arthurgeron/react-usememo": pluginUseMemo2,
             "@eslint-react": eslintReact,
             "@eslint-react/dom": eslintReactDom,
@@ -1942,6 +1957,7 @@ export default [
             "@microsoft/sdl": pluginMicrosoftSdl,
             "@typescript-eslint": tseslint,
             "array-func": arrayFunc,
+            "better-tailwindcss": pluginBetterTailwindcss,
             boundaries: pluginBoundaries,
             canonical: pluginCanonical,
             "clean-code": pluginCleanCode,
@@ -1954,7 +1970,7 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
+            // @ts-ignore -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -2348,6 +2364,12 @@ export default [
             "@typescript-eslint/unbound-method": "warn",
             "@typescript-eslint/unified-signatures": "warn",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
+            "better-tailwindcss/no-unregistered-classes": [
+                "off",
+                {
+                    detectComponentClasses: true,
+                },
+            ],
             // Code organization and architecture
             "boundaries/element-types": [
                 "error",
@@ -2420,8 +2442,8 @@ export default [
             "canonical/destructuring-property-newline": "off",
             "canonical/export-specifier-newline": "off",
             "canonical/filename-match-exported": "warn",
-            "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
 
+            "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
             "canonical/filename-no-index": "error",
             "canonical/import-specifier-newline": "off",
             "canonical/no-barrel-import": "error",
@@ -2541,8 +2563,8 @@ export default [
                 },
             ],
             "functional/immutable-data": "off",
-            "functional/no-let": "off", // Let is necessary in many React patterns
 
+            "functional/no-let": "off", // Let is necessary in many React patterns
             "granular-selectors/granular-selectors": "error",
             "id-length": "off",
             // CSS
@@ -3044,30 +3066,6 @@ export default [
             "regexp/prefer-named-backreference": "warn",
             "regexp/prefer-named-capture-group": "warn",
             "regexp/prefer-named-replacement": "warn",
-            // // Tailwind CSS
-            // "tailwind/classnames-order": "warn",
-            // "tailwind/enforces-negative-arbitrary-values": "warn",
-            // "tailwind/enforces-shorthand": "warn",
-            // "tailwind/migration-from-tailwind-2": "warn",
-            // "tailwind/no-arbitrary-value": "warn",
-            // "tailwind/no-contradicting-classname": "warn",
-            /**
-            * Performance issue with the plugin, somewhat mitigated setting cssFiles to an empty array.
-            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
-            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
-            */
-            "tailwind/no-custom-classname": [
-                "warn",
-                {
-                    skipClassAttribute: true,
-                },
-            ],
-            "better-tailwindcss/no-unregistered-classes": [
-                "warn",
-                {
-                    detectComponentClasses: true,
-                },
-            ],
             // "tailwind/no-unnecessary-arbitrary-value": "warn",
             "regexp/prefer-plus-quantifier": "warn",
             "regexp/prefer-quantifier": "warn",
@@ -3119,6 +3117,24 @@ export default [
             "ssr-friendly/no-dom-globals-in-module-scope": "error",
             "ssr-friendly/no-dom-globals-in-react-cc-render": "error",
             "ssr-friendly/no-dom-globals-in-react-fc": "error",
+            // // Tailwind CSS
+            // "tailwind/classnames-order": "warn",
+            // "tailwind/enforces-negative-arbitrary-values": "warn",
+            // "tailwind/enforces-shorthand": "warn",
+            // "tailwind/migration-from-tailwind-2": "warn",
+            // "tailwind/no-arbitrary-value": "warn",
+            // "tailwind/no-contradicting-classname": "warn",
+            /**
+            * Performance issue with the plugin, somewhat mitigated setting cssFiles to an empty array.
+            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
+            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
+            */
+            "tailwind/no-custom-classname": [
+                "warn",
+                {
+                    skipClassAttribute: true,
+                },
+            ],
             "total-functions/no-partial-division": "off",
             "total-functions/no-partial-url-constructor": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
@@ -3255,6 +3271,7 @@ export default [
 
     // Electron backend files
     {
+        name: "Electron Backend",
         files: ["electron/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: [
             "electron/**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -3311,7 +3328,7 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
+            // @ts-ignore -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -4328,6 +4345,7 @@ export default [
 
     // TypeScript Shared (React and non-React)
     {
+        name: "TypeScript Shared (React and non-React)",
         files: ["shared/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: [
             "**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -4382,7 +4400,7 @@ export default [
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
+            // @ts-ignore -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -5470,24 +5488,6 @@ export default [
             "regexp/prefer-named-backreference": "warn",
             "regexp/prefer-named-capture-group": "warn",
             "regexp/prefer-named-replacement": "warn",
-            // // Tailwind CSS
-            // "tailwind/classnames-order": "warn",
-            // "tailwind/enforces-negative-arbitrary-values": "warn",
-            // "tailwind/enforces-shorthand": "warn",
-            // "tailwind/migration-from-tailwind-2": "warn",
-            // "tailwind/no-arbitrary-value": "warn",
-            // "tailwind/no-contradicting-classname": "warn",
-            /**
-            * Performance issue with the plugin, somewhat mitigated setting cssFiles to an empty array.
-            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
-            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
-            */
-            "tailwind/no-custom-classname": [
-                "warn",
-                {
-                    skipClassAttribute: true,
-                },
-            ],
             // "tailwind/no-unnecessary-arbitrary-value": "warn",
             "regexp/prefer-plus-quantifier": "warn",
             "regexp/prefer-quantifier": "warn",
@@ -5539,6 +5539,24 @@ export default [
             "ssr-friendly/no-dom-globals-in-module-scope": "error",
             "ssr-friendly/no-dom-globals-in-react-cc-render": "error",
             "ssr-friendly/no-dom-globals-in-react-fc": "error",
+            // // Tailwind CSS
+            // "tailwind/classnames-order": "warn",
+            // "tailwind/enforces-negative-arbitrary-values": "warn",
+            // "tailwind/enforces-shorthand": "warn",
+            // "tailwind/migration-from-tailwind-2": "warn",
+            // "tailwind/no-arbitrary-value": "warn",
+            // "tailwind/no-contradicting-classname": "warn",
+            /**
+            * Performance issue with the plugin, somewhat mitigated setting cssFiles to an empty array.
+            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
+            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
+            */
+            "tailwind/no-custom-classname": [
+                "warn",
+                {
+                    skipClassAttribute: true,
+                },
+            ],
             "total-functions/no-partial-division": "off",
             "total-functions/no-partial-url-constructor": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
@@ -5599,6 +5617,10 @@ export default [
             "zod/require-strict": "error",
         },
         settings: {
+            "better-tailwindcss": {
+                // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
+                "entryPoint": "./src/index.css",
+            },
             "boundaries/elements": [
                 {
                     capture: ["constant"],
@@ -5659,15 +5681,12 @@ export default [
                 // @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
                 cssFiles: ['./src/index.css'],
             },
-            "better-tailwindcss": {
-                // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
-                "entryPoint": "./src/index.css",
-            },
         },
     },
 
     // Test files (Frontend)
     {
+        name: "Tests (Frontend)",
         files: [
             "src/**/*.{spec,test}.*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "src/**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -5730,6 +5749,35 @@ export default [
             ...pluginComments.configs.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
+
+            "vitest/no-commented-out-tests": "warn",
+            "vitest/no-disabled-tests": "warn",
+            "vitest/no-test-prefixes": "warn",
+            "vitest/no-focused-tests": "warn",
+            "vitest/no-alias-methods": "warn",
+            "vitest/no-identical-title": "warn",
+            "vitest/no-import-node-test": "warn",
+            "vitest/no-interpolation-in-snapshots": "warn",
+            "vitest/prefer-called-once": "warn",
+            "vitest/prefer-called-times": "warn",
+            "vitest/prefer-called-with": "warn",
+            "vitest/prefer-comparison-matcher": "warn",
+            "vitest/prefer-describe-function-title": "warn",
+            "vitest/prefer-expect-resolves": "warn",
+            "vitest/prefer-spy-on": "warn",
+            "vitest/prefer-strict-boolean-matchers": "warn",
+            "vitest/prefer-to-be": "off",
+            "vitest/prefer-to-be-falsy": "warn",
+            "vitest/prefer-to-be-object": "warn",
+            "vitest/prefer-to-be-truthy": "warn",
+            "vitest/prefer-to-contain": "warn",
+            "vitest/prefer-to-have-length": "warn",
+            "vitest/prefer-todo": "warn",
+            "vitest/prefer-vi-mocked": "warn",
+            "vitest/require-mock-type-parameters": "off",
+            "vitest/valid-expect": "warn",
+            "vitest/valid-title": "warn",
+
             // Relaxed function rules for tests (explicit for clarity)
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
 
@@ -5848,6 +5896,7 @@ export default [
 
     // Test files (Backend)
     {
+        name: "Tests (Backend)",
         files: [
             "electron/**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "electron/test/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -5903,6 +5952,35 @@ export default [
             ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
+
+            "vitest/no-commented-out-tests": "warn",
+            "vitest/no-disabled-tests": "warn",
+            "vitest/no-test-prefixes": "warn",
+            "vitest/no-focused-tests": "warn",
+            "vitest/no-alias-methods": "warn",
+            "vitest/no-identical-title": "warn",
+            "vitest/no-import-node-test": "warn",
+            "vitest/no-interpolation-in-snapshots": "warn",
+            "vitest/prefer-called-once": "warn",
+            "vitest/prefer-called-times": "warn",
+            "vitest/prefer-called-with": "warn",
+            "vitest/prefer-comparison-matcher": "warn",
+            "vitest/prefer-describe-function-title": "warn",
+            "vitest/prefer-expect-resolves": "warn",
+            "vitest/prefer-spy-on": "warn",
+            "vitest/prefer-strict-boolean-matchers": "warn",
+            "vitest/prefer-to-be": "off",
+            "vitest/prefer-to-be-falsy": "warn",
+            "vitest/prefer-to-be-object": "warn",
+            "vitest/prefer-to-be-truthy": "warn",
+            "vitest/prefer-to-contain": "warn",
+            "vitest/prefer-to-have-length": "warn",
+            "vitest/prefer-todo": "warn",
+            "vitest/prefer-vi-mocked": "warn",
+            "vitest/require-mock-type-parameters": "off",
+            "vitest/valid-expect": "warn",
+            "vitest/valid-title": "warn",
+
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
 
             "@typescript-eslint/no-explicit-any": "off",
@@ -6020,6 +6098,7 @@ export default [
 
     // Shared Test Files
     {
+        name: "Tests (Shared)",
         files: [
             "shared/**/*.{spec,test}.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
             "shared/test/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
@@ -6078,6 +6157,35 @@ export default [
             ...pluginComments.configs.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
+
+            "vitest/no-commented-out-tests": "warn",
+            "vitest/no-disabled-tests": "warn",
+            "vitest/no-test-prefixes": "warn",
+            "vitest/no-focused-tests": "warn",
+            "vitest/no-alias-methods": "warn",
+            "vitest/no-identical-title": "warn",
+            "vitest/no-import-node-test": "warn",
+            "vitest/no-interpolation-in-snapshots": "warn",
+            "vitest/prefer-called-once": "warn",
+            "vitest/prefer-called-times": "warn",
+            "vitest/prefer-called-with": "warn",
+            "vitest/prefer-comparison-matcher": "warn",
+            "vitest/prefer-describe-function-title": "warn",
+            "vitest/prefer-expect-resolves": "warn",
+            "vitest/prefer-spy-on": "warn",
+            "vitest/prefer-strict-boolean-matchers": "warn",
+            "vitest/prefer-to-be": "off",
+            "vitest/prefer-to-be-falsy": "warn",
+            "vitest/prefer-to-be-object": "warn",
+            "vitest/prefer-to-be-truthy": "warn",
+            "vitest/prefer-to-contain": "warn",
+            "vitest/prefer-to-have-length": "warn",
+            "vitest/prefer-todo": "warn",
+            "vitest/prefer-vi-mocked": "warn",
+            "vitest/require-mock-type-parameters": "off",
+            "vitest/valid-expect": "warn",
+            "vitest/valid-title": "warn",
+
             // Relaxed function rules for tests (explicit for clarity)
 
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
@@ -6172,6 +6280,7 @@ export default [
 
     // Benchmark files
     {
+        name: "Benchmarks",
         files: [
             "benchmarks/**/*.bench.*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "benchmarks/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
@@ -6353,6 +6462,7 @@ export default [
 
     // TypeScript Config files using Electron Test TSConfig
     {
+        name: "TypeScript Config Files",
         files: [
             "**/*.config.{ts,tsx,mts,cts}", // Configuration files
             "**/*.config.**.*.{ts,tsx,mts,cts}",
@@ -6912,6 +7022,7 @@ export default [
 
     // Script files
     {
+        name: "Script Files",
         files: [
             "scripts/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
             "scripts/download-docs-template.mjs",
@@ -7068,6 +7179,7 @@ export default [
 
     // JS/MJS Configuration files
     {
+        name: "JS/MJS Config Files",
         files: [
             "**/*.config.{js,mjs,cts,cjs}",
             "**/*.config.**.*.{js,mjs,cts,cjs}",
@@ -7192,6 +7304,7 @@ export default [
 
     // Strict Test files (Frontend)
     {
+        name: "Strict Test Files (Frontend)",
         files: [
             "shared/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "src/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -7212,6 +7325,7 @@ export default [
 
     // Theme components override - disable react-perf rule for inline styling
     {
+        name: "Theme Components Override",
         files: ["src/theme/**/*.{ts,tsx,cts,mts}"],
         rules: {
             // Theme components legitimately need inline styles for dynamic theming
@@ -7221,6 +7335,7 @@ export default [
 
     // YAML/YML disable empty key for github workflows (false positive)
     {
+        name: "YAML/YML Github Workflows Disable Empty Key",
         files: [
             "**/.github/workflows/**/*.{yaml,yml}",
             "config/tools/flatpak-build.yml",

@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect } from "vitest";
+import { test, fc } from "@fast-check/vitest";
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion Utilities - Comprehensive Coverage", () => {
@@ -135,7 +136,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(safeStringify(() => {})).toBe("[Function]");
-            expect(safeStringify(function test() {})).toBe("[Function]");
+            expect(safeStringify(function namedFunction() {})).toBe("[Function]");
             expect(safeStringify(async () => {})).toBe("[Function]");
         });
 
@@ -352,5 +353,140 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             const result = safeStringify(weakSet);
             expect(result).toBeDefined();
         });
+    });
+
+    describe("Property-based tests for safeStringify", () => {
+        test.prop([fc.string()])(
+            "should always return a string for string inputs",
+            (input) => {
+                const result = safeStringify(input);
+                expect(typeof result).toBe("string");
+                expect(result).toBe(input);
+            }
+        );
+
+        test.prop([fc.integer()])(
+            "should handle all integer values consistently",
+            (num) => {
+                const result = safeStringify(num);
+                expect(typeof result).toBe("string");
+                expect(result).toBe(String(num));
+
+                // Should be parseable back to the same number
+                expect(Number.parseInt(result, 10)).toBe(num);
+            }
+        );
+
+        test.prop([fc.float()])(
+            "should handle all float values consistently",
+            (num) => {
+                const result = safeStringify(num);
+                expect(typeof result).toBe("string");
+                expect(result).toBe(String(num));
+            }
+        );
+
+        test.prop([fc.boolean()])(
+            "should handle boolean values consistently",
+            (bool) => {
+                const result = safeStringify(bool);
+                expect(typeof result).toBe("string");
+                expect(result).toBe(String(bool));
+                expect(["true", "false"]).toContain(result);
+            }
+        );
+
+        test.prop([fc.array(fc.anything())])(
+            "should handle arrays of any content",
+            (arr) => {
+                const result = safeStringify(arr);
+                expect(typeof result).toBe("string");
+
+                // Should either be a JSON string or fallback
+                if (result.startsWith("[") && result.endsWith("]")) {
+                    expect(() => JSON.parse(result)).not.toThrow();
+                }
+            }
+        );
+
+        test.prop([fc.dictionary(fc.string(), fc.anything())])(
+            "should handle objects with arbitrary keys and values",
+            (obj) => {
+                const result = safeStringify(obj);
+                expect(typeof result).toBe("string");
+
+                // Should either be a JSON string or fallback
+                if (result.startsWith("{") && result.endsWith("}")) {
+                    expect(() => JSON.parse(result)).not.toThrow();
+                }
+            }
+        );
+
+        test.prop([fc.constantFrom(null, undefined)])(
+            "should handle null and undefined consistently",
+            (nullish) => {
+                const result = safeStringify(nullish);
+                expect(result).toBe("");
+            }
+        );
+
+        test.prop([fc.oneof(fc.string(), fc.integer(), fc.boolean(), fc.constant(null), fc.constant(undefined))])(
+            "should never throw for any primitive input",
+            (input) => {
+                expect(() => {
+                    const result = safeStringify(input);
+                    expect(typeof result).toBe("string");
+                }).not.toThrow();
+            }
+        );
+
+        test.prop([fc.array(fc.jsonValue(), { minLength: 0, maxLength: 10 })])(
+            "should round-trip serialize valid JSON arrays",
+            (jsonArray) => {
+                const stringified = safeStringify(jsonArray);
+                expect(typeof stringified).toBe("string");
+
+                // Should be valid JSON that parses back correctly
+                const parsed = JSON.parse(stringified);
+                expect(parsed).toEqual(jsonArray);
+            }
+        );
+
+        test.prop([fc.dictionary(fc.string(), fc.jsonValue())])(
+            "should round-trip serialize valid JSON objects",
+            (jsonObj) => {
+                const stringified = safeStringify(jsonObj);
+                expect(typeof stringified).toBe("string");
+
+                if (stringified !== "") {
+                    // Should be valid JSON that parses back correctly
+                    const parsed = JSON.parse(stringified);
+                    expect(parsed).toEqual(jsonObj);
+                }
+            }
+        );
+
+        test.prop([fc.string().filter(s => s.length > 0)])(
+            "should preserve non-empty string content exactly",
+            (str) => {
+                const result = safeStringify(str);
+                expect(result).toBe(str);
+                expect(result.length).toBe(str.length);
+            }
+        );
+
+        test.prop([fc.oneof(
+            fc.constant(() => {}),
+            fc.constant(Symbol("test")),
+            fc.constant(BigInt(123))
+        )])(
+            "should handle non-JSON-serializable values gracefully",
+            (input) => {
+                const result = safeStringify(input);
+                expect(typeof result).toBe("string");
+                expect(result.length).toBeGreaterThanOrEqual(0);
+                // Should not throw, result should be a reasonable fallback
+            }
+        );
     });
 });

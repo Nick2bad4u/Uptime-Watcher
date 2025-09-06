@@ -4,6 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+import { test, fc } from "@fast-check/vitest";
 import {
     TRANSITION_ALL,
     FALLBACK_MONITOR_TYPE_OPTIONS,
@@ -858,5 +859,184 @@ describe("Application Constants", () => {
             expect(DEFAULT_CHECK_INTERVAL).toBeGreaterThan(5000); // At least 5 seconds
             expect(DEFAULT_CHECK_INTERVAL).toBeLessThan(3_600_000); // Less than 1 hour
         });
+    });
+
+    describe("Property-based tests for constants validation", () => {
+        test.prop([fc.array(fc.integer(), { minLength: 1 })])(
+            "should maintain CHECK_INTERVALS ordering properties",
+            (randomNumbers) => {
+                // The constant CHECK_INTERVALS should always be sorted
+                expect(CHECK_INTERVALS).toBeDefined();
+                expect(Array.isArray(CHECK_INTERVALS)).toBe(true);
+
+                const sortedIntervals = [...CHECK_INTERVALS].sort((a, b) => a.value - b.value);
+                expect(CHECK_INTERVALS).toEqual(sortedIntervals);
+
+                // All intervals should have valid structure
+                for (const interval of CHECK_INTERVALS) {
+                    expect(interval).toHaveProperty("value");
+                    expect(interval).toHaveProperty("label");
+                    expect(typeof interval.value).toBe("number");
+                    expect(typeof interval.label).toBe("string");
+                    expect(interval.value).toBeGreaterThan(0);
+                    expect(interval.label.length).toBeGreaterThan(0);
+                }
+            }
+        );
+
+        test.prop([fc.string()])(
+            "should have consistent font family structure",
+            () => {
+                expect(Array.isArray(FONT_FAMILY_MONO)).toBe(true);
+                expect(Array.isArray(FONT_FAMILY_SANS)).toBe(true);
+
+                // All font family entries should be non-empty strings
+                for (const font of FONT_FAMILY_MONO) {
+                    expect(typeof font).toBe("string");
+                    expect(font.length).toBeGreaterThan(0);
+                }
+
+                for (const font of FONT_FAMILY_SANS) {
+                    expect(typeof font).toBe("string");
+                    expect(font.length).toBeGreaterThan(0);
+                }
+            }
+        );
+
+        test.prop([fc.constantFrom("value", "label")])(
+            "should have valid monitor type option structure",
+            (property) => {
+                expect(Array.isArray(FALLBACK_MONITOR_TYPE_OPTIONS)).toBe(true);
+                expect(FALLBACK_MONITOR_TYPE_OPTIONS.length).toBeGreaterThan(0);
+
+                for (const option of FALLBACK_MONITOR_TYPE_OPTIONS) {
+                    expect(option).toHaveProperty(property);
+                    expect(typeof option[property as keyof typeof option]).toBe("string");
+                    expect((option[property as keyof typeof option] as string).length).toBeGreaterThan(0);
+                }
+            }
+        );
+
+        test.prop([fc.constantFrom("MIN", "MAX", "STEP")])(
+            "should maintain timeout constraint invariants",
+            (constraintType) => {
+                expect(TIMEOUT_CONSTRAINTS).toBeDefined();
+                expect(TIMEOUT_CONSTRAINTS_MS).toBeDefined();
+
+                // Verify constraints are logically consistent
+                expect(TIMEOUT_CONSTRAINTS.MIN).toBeLessThanOrEqual(TIMEOUT_CONSTRAINTS.MAX);
+                expect(TIMEOUT_CONSTRAINTS_MS.MIN).toBeLessThanOrEqual(TIMEOUT_CONSTRAINTS_MS.MAX);
+
+                // All values should be positive
+                expect(TIMEOUT_CONSTRAINTS[constraintType]).toBeGreaterThan(0);
+                expect(TIMEOUT_CONSTRAINTS_MS[constraintType]).toBeGreaterThan(0);
+
+                // MS values should be 1000x the second values (except STEP)
+                if (constraintType === "MIN" || constraintType === "MAX") {
+                    expect(TIMEOUT_CONSTRAINTS_MS[constraintType]).toBe(TIMEOUT_CONSTRAINTS[constraintType] * 1000);
+                }
+            }
+        );
+
+        test.prop([fc.integer({ min: 1, max: 100 })])(
+            "should have consistent history limit options",
+            (multiplier) => {
+                expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBe(true);
+                expect(HISTORY_LIMIT_OPTIONS.length).toBeGreaterThan(0);
+
+                // All options should have valid structure
+                for (const option of HISTORY_LIMIT_OPTIONS) {
+                    expect(typeof option.value).toBe("number");
+                    expect(option.value).toBeGreaterThan(0);
+                    expect(typeof option.label).toBe("string");
+                    expect(option.label.length).toBeGreaterThan(0);
+                }
+
+                // Should be sorted in ascending order by value
+                const sortedOptions = [...HISTORY_LIMIT_OPTIONS].sort((a, b) => a.value - b.value);
+                expect(HISTORY_LIMIT_OPTIONS).toEqual(sortedOptions);
+
+                // Default should be within the available options
+                const defaultOption = HISTORY_LIMIT_OPTIONS.find(option => option.value === DEFAULT_HISTORY_LIMIT);
+                expect(defaultOption).toBeDefined();
+            }
+        );
+
+        test.prop([fc.constantFrom("SUCCESS", "ERROR", "WARNING", "INFO")])(
+            "should have valid ARIA_LABEL structure",
+            (level) => {
+                expect(ARIA_LABEL).toBeDefined();
+                expect(typeof ARIA_LABEL).toBe("string");
+                expect(ARIA_LABEL.length).toBeGreaterThan(0);
+                expect(ARIA_LABEL).toBe("aria-label");
+
+                // Verify it's a valid HTML attribute name
+                expect(ARIA_LABEL).toMatch(/^aria-[a-z]+$/);
+            }
+        );
+
+        test.prop([fc.constantFrom("retry", "attempts", "delay")])(
+            "should maintain retry constraint consistency",
+            (constraintType) => {
+                expect(RETRY_CONSTRAINTS).toBeDefined();
+
+                // All retry values should be numbers
+                for (const [key, value] of Object.entries(RETRY_CONSTRAINTS)) {
+                    expect(typeof value).toBe("number");
+                    expect(value).toBeGreaterThanOrEqual(0); // MIN can be 0
+                }
+
+                // Verify specific constraints
+                expect(RETRY_CONSTRAINTS.DEFAULT).toBeGreaterThan(0);
+                expect(RETRY_CONSTRAINTS.MAX).toBeGreaterThan(RETRY_CONSTRAINTS.DEFAULT);
+                expect(RETRY_CONSTRAINTS.MIN).toBe(0); // MIN should be exactly 0
+
+                // Max attempts should be reasonable
+                expect(RETRY_CONSTRAINTS.MAX).toBeLessThanOrEqual(20);
+            }
+        );
+
+        test.prop([fc.integer({ min: 1, max: 1000 })])(
+            "should have consistent UI delay values",
+            (testValue) => {
+                expect(UI_DELAYS).toBeDefined();
+
+                // All UI delays should be numbers and non-negative
+                for (const [key, value] of Object.entries(UI_DELAYS)) {
+                    expect(typeof value).toBe("number");
+                    expect(value).toBeGreaterThanOrEqual(0); // STATE_UPDATE_DEFER can be 0
+                    expect(value).toBeLessThan(10_000); // Should be reasonable for UI
+                }
+
+                // Specific validation for known delays
+                expect(UI_DELAYS.LOADING_BUTTON).toBeGreaterThan(0);
+                expect(UI_DELAYS.LOADING_OVERLAY).toBeGreaterThan(0);
+                expect(UI_DELAYS.STATE_UPDATE_DEFER).toBe(0); // Should be exactly 0
+            }
+        );
+
+        test.prop([fc.constantFrom("hours", "days", "weeks")])(
+            "should have valid chart time periods structure",
+            (periodType) => {
+                expect(CHART_TIME_PERIODS).toBeDefined();
+                expect(CHART_TIME_RANGES).toBeDefined();
+
+                // Chart periods should be numbers (milliseconds)
+                for (const [key, period] of Object.entries(CHART_TIME_PERIODS)) {
+                    expect(typeof key).toBe("string");
+                    expect(typeof period).toBe("number");
+                    expect(period).toBeGreaterThan(0);
+                    expect(key.length).toBeGreaterThan(0);
+                }
+
+                // Chart ranges should be valid strings
+                for (const range of CHART_TIME_RANGES) {
+                    expect(typeof range).toBe("string");
+                    expect(range.length).toBeGreaterThan(0);
+                    // Should exist in CHART_TIME_PERIODS
+                    expect(CHART_TIME_PERIODS).toHaveProperty(range);
+                }
+            }
+        );
     });
 });

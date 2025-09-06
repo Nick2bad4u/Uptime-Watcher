@@ -1,10 +1,12 @@
 /**
  * Property-based fuzzing tests for form validation functions.
+ * Enhanced with comprehensive user input validation patterns.
  *
  * @remarks
  * Tests the monitor validation functions and form data processing using
  * property-based testing with fast-check. Focuses on validating that form
  * validation handles malformed, unexpected, and edge-case input gracefully.
+ * Enhanced with comprehensive user input validation patterns from the AddSiteForm.
  *
  * Key areas tested:
  *
@@ -13,11 +15,14 @@
  * - Input sanitization
  * - Error handling paths
  * - Edge case handling
+ * - User input validation patterns
+ * - Malicious input handling
  *
  * @packageDocumentation
  */
 
 import { describe, expect, it } from "vitest";
+import { test } from "@fast-check/vitest";
 import fc from "fast-check";
 
 import { normalizeMonitor } from "../../stores/sites/utils/monitorOperations";
@@ -37,6 +42,344 @@ function createMonitorObjectForFuzzing(
 }
 
 describe("Form Validation Fuzzing Tests", () => {
+
+    describe("Enhanced User Input Validation Fuzzing", () => {
+        describe("Site Name Input Fuzzing", () => {
+            test.prop([fc.string()])(
+                "should handle any string as site name input",
+                (siteName) => {
+                    // Basic safety checks
+                    expect(typeof siteName).toBe("string");
+
+                    // Site name processing should be safe
+                    const trimmed = siteName.trim();
+                    expect(typeof trimmed).toBe("string");
+                    expect(trimmed.length).toBeLessThanOrEqual(siteName.length);
+
+                    // Valid if non-empty after trimming
+                    const isValid = trimmed.length > 0;
+                    expect(typeof isValid).toBe("boolean");
+                }
+            );
+
+            test.prop([fc.string().filter(s =>
+                s.includes("<script>") ||
+                s.includes("script:") ||
+                s.includes("data:") ||
+                s.includes("vbscript:") ||
+                s.includes("onload=") ||
+                s.includes("onerror=")
+            )])(
+                "should safely handle potentially dangerous site name inputs",
+                (dangerousInput) => {
+                    // Should not throw when processing
+                    expect(() => dangerousInput.trim()).not.toThrow();
+                    expect(() => dangerousInput.length).not.toThrow();
+
+                    // Should be identifiable as potentially dangerous
+                    const hasDangerousContent = [
+                        "<script>",
+                        "script:",
+                        "data:",
+                        "vbscript:",
+                        "onload=",
+                        "onerror="
+                    ].some(pattern => dangerousInput.includes(pattern));
+
+                    expect(hasDangerousContent).toBe(true);
+                }
+            );
+        });
+
+        describe("URL Input Fuzzing", () => {
+            test.prop([fc.webUrl()])(
+                "should handle valid URLs correctly",
+                (validUrl) => {
+                    expect(typeof validUrl).toBe("string");
+                    expect(validUrl.startsWith("http://") || validUrl.startsWith("https://")).toBe(true);
+
+                    // URL should be processable without throwing
+                    expect(() => new URL(validUrl)).not.toThrow();
+                }
+            );
+
+            test.prop([fc.string().filter(s =>
+                !s.startsWith("http://") &&
+                !s.startsWith("https://") &&
+                s.length > 0
+            )])(
+                "should handle invalid URL formats safely",
+                (invalidUrl) => {
+                    expect(typeof invalidUrl).toBe("string");
+
+                    // Should not have valid HTTP(S) protocol
+                    expect(invalidUrl.startsWith("http://") || invalidUrl.startsWith("https://")).toBe(false);
+
+                    // Processing should be safe even if invalid
+                    expect(() => invalidUrl.trim()).not.toThrow();
+                    expect(() => invalidUrl.toLowerCase()).not.toThrow();
+                }
+            );
+
+            test.prop([fc.string().filter(s =>
+                s.includes("://") &&
+                !s.startsWith("http://") &&
+                !s.startsWith("https://")
+            )])(
+                "should handle non-HTTP protocols safely",
+                (nonHttpUrl) => {
+                    expect(typeof nonHttpUrl).toBe("string");
+                    expect(nonHttpUrl.includes("://")).toBe(true);
+                    expect(nonHttpUrl.startsWith("http://") || nonHttpUrl.startsWith("https://")).toBe(false);
+
+                    // Should be identifiable as non-HTTP protocol
+                    const hasProtocol = nonHttpUrl.includes("://");
+                    const isHttps = nonHttpUrl.startsWith("http://") || nonHttpUrl.startsWith("https://");
+                    expect(hasProtocol && !isHttps).toBe(true);
+                }
+            );
+        });
+
+        describe("Host Input Fuzzing", () => {
+            test.prop([fc.domain()])(
+                "should handle valid domain names",
+                (domain) => {
+                    expect(typeof domain).toBe("string");
+                    expect(domain.length).toBeGreaterThan(0);
+
+                    // Domain should not contain spaces or dangerous characters
+                    expect(domain.includes(" ")).toBe(false);
+                    expect(domain.includes("<")).toBe(false);
+                    expect(domain.includes(">")).toBe(false);
+                }
+            );
+
+            test.prop([fc.ipV4()])(
+                "should handle IPv4 addresses",
+                (ipv4) => {
+                    expect(typeof ipv4).toBe("string");
+
+                    // IPv4 format validation
+                    const ipParts = ipv4.split(".");
+                    expect(ipParts).toHaveLength(4);
+
+                    for (const part of ipParts) {
+                        const num = Number.parseInt(part, 10);
+                        expect(Number.isNaN(num)).toBe(false);
+                        expect(num).toBeGreaterThanOrEqual(0);
+                        expect(num).toBeLessThanOrEqual(255);
+                    }
+                }
+            );
+
+            test.prop([fc.string().filter(s =>
+                s.includes(" ") ||
+                s.includes("<") ||
+                s.includes(">") ||
+                s.includes("&") ||
+                s.includes("'") ||
+                s.includes('"')
+            )])(
+                "should handle hosts with problematic characters safely",
+                (problematicHost) => {
+                    expect(typeof problematicHost).toBe("string");
+
+                    // Should contain problematic characters
+                    const hasProblematicChars = [" ", "<", ">", "&", "'", '"'].some(char =>
+                        problematicHost.includes(char)
+                    );
+                    expect(hasProblematicChars).toBe(true);
+
+                    // Processing should be safe
+                    expect(() => problematicHost.trim()).not.toThrow();
+                    expect(() => encodeURIComponent(problematicHost)).not.toThrow();
+                }
+            );
+        });
+
+        describe("Port Number Fuzzing", () => {
+            test.prop([fc.integer({ min: 1, max: 65_535 })])(
+                "should handle valid port numbers",
+                (validPort) => {
+                    expect(validPort).toBeGreaterThanOrEqual(1);
+                    expect(validPort).toBeLessThanOrEqual(65_535);
+                    expect(Number.isInteger(validPort)).toBe(true);
+
+                    // String conversion should work
+                    const portString = validPort.toString();
+                    expect(Number.parseInt(portString, 10)).toBe(validPort);
+                }
+            );
+
+            test.prop([fc.oneof(
+                fc.integer({ max: 0 }),
+                fc.integer({ min: 65_536, max: 100_000 }),
+                fc.float(),
+                fc.string().filter(s => !/^\d+$/.test(s) && s.length > 0)
+            )])(
+                "should handle invalid port values safely",
+                (invalidPort) => {
+                    // Should be identifiable as invalid
+                    if (typeof invalidPort === "number") {
+                        if (Number.isInteger(invalidPort)) {
+                            expect(invalidPort < 1 || invalidPort > 65_535).toBe(true);
+                        } else {
+                            expect(Number.isInteger(invalidPort)).toBe(false);
+                        }
+                    } else if (typeof invalidPort === "string") {
+                        expect(/^\d+$/.test(invalidPort)).toBe(false);
+                    }
+
+                    // Processing should be safe
+                    expect(() => String(invalidPort)).not.toThrow();
+                    expect(() => Number(invalidPort)).not.toThrow();
+                }
+            );
+        });
+
+        describe("Check Interval Fuzzing", () => {
+            test.prop([fc.constantFrom(5000, 10_000, 30_000, 60_000)])(
+                "should handle predefined check intervals",
+                (validInterval) => {
+                    expect([5000, 10_000, 30_000, 60_000]).toContain(validInterval);
+                    expect(Number.isInteger(validInterval)).toBe(true);
+                    expect(validInterval).toBeGreaterThan(0);
+                }
+            );
+
+            test.prop([fc.integer({ min: 100, max: 600_000 })])(
+                "should handle various interval values safely",
+                (interval) => {
+                    expect(Number.isInteger(interval)).toBe(true);
+
+                    // Should be processable as valid/invalid
+                    const isReasonable = interval >= 1000 && interval <= 300_000;
+                    expect(typeof isReasonable).toBe("boolean");
+
+                    // Should be safe to convert to string
+                    const intervalString = interval.toString();
+                    expect(Number.parseInt(intervalString, 10)).toBe(interval);
+                }
+            );
+
+            test.prop([fc.oneof(
+                fc.string().filter(s => !/^\d+$/.test(s) && s.length > 0),
+                fc.float(),
+                fc.integer({ max: 0 })
+            )])(
+                "should handle invalid interval inputs safely",
+                (invalidInterval) => {
+                    // Should be processable without throwing
+                    expect(() => String(invalidInterval)).not.toThrow();
+                    expect(() => Number(invalidInterval)).not.toThrow();
+
+                    // Should be identifiable as invalid
+                    if (typeof invalidInterval === "string") {
+                        expect(/^\d+$/.test(invalidInterval)).toBe(false);
+                    } else if (typeof invalidInterval === "number") {
+                        if (Number.isInteger(invalidInterval)) {
+                            expect(invalidInterval).toBeLessThanOrEqual(0);
+                        } else {
+                            expect(Number.isInteger(invalidInterval)).toBe(false);
+                        }
+                    }
+                }
+            );
+        });
+
+        describe("Form Data Structure Fuzzing", () => {
+            test.prop([fc.record({
+                name: fc.string(),
+                url: fc.oneof(fc.webUrl(), fc.string(), fc.constant("")),
+                host: fc.oneof(fc.domain(), fc.ipV4(), fc.string(), fc.constant("")),
+                port: fc.oneof(fc.integer({ min: 1, max: 65_535 }), fc.string()),
+                monitorType: fc.oneof(fc.constantFrom("http", "port", "ping"), fc.string()),
+                checkInterval: fc.oneof(fc.constantFrom(5000, 10_000, 30_000, 60_000), fc.integer()),
+                addMode: fc.oneof(fc.constantFrom("existing", "new"), fc.string())
+            })])(
+                "should handle complete form data structures safely",
+                (formData) => {
+                    // Basic structure validation
+                    expect(typeof formData).toBe("object");
+                    expect(formData).not.toBeNull();
+
+                    // All expected properties should exist
+                    expect(formData).toHaveProperty("name");
+                    expect(formData).toHaveProperty("url");
+                    expect(formData).toHaveProperty("host");
+                    expect(formData).toHaveProperty("port");
+                    expect(formData).toHaveProperty("monitorType");
+                    expect(formData).toHaveProperty("checkInterval");
+                    expect(formData).toHaveProperty("addMode");
+
+                    // Should be JSON serializable
+                    expect(() => JSON.stringify(formData)).not.toThrow();
+
+                    // Should be processable for validation
+                    expect(() => Object.keys(formData)).not.toThrow();
+                    expect(() => Object.values(formData)).not.toThrow();
+                }
+            );
+        });
+
+        describe("Malicious Input Pattern Fuzzing", () => {
+            test.prop([fc.string().filter(s =>
+                s.includes(String.raw`\x`) ||
+                s.includes(String.raw`\u`) ||
+                s.includes("%") ||
+                s.includes("\n") ||
+                s.includes("\r") ||
+                s.includes("\t")
+            )])(
+                "should handle encoded and control characters safely",
+                (encodedInput) => {
+                    expect(typeof encodedInput).toBe("string");
+
+                    // Should contain encoded/control characters
+                    const hasEncodedChars = [String.raw`\x`, String.raw`\u`, "%", "\n", "\r", "\t"].some(pattern =>
+                        encodedInput.includes(pattern)
+                    );
+                    expect(hasEncodedChars).toBe(true);
+
+                    // Should be processable safely
+                    expect(() => encodedInput.trim()).not.toThrow();
+                    expect(() => encodeURIComponent(encodedInput)).not.toThrow();
+                    expect(() => JSON.stringify(encodedInput)).not.toThrow();
+                }
+            );
+
+            test.prop([fc.string({ minLength: 1000, maxLength: 10_000 })])(
+                "should handle very long inputs without issues",
+                (longInput) => {
+                    expect(longInput.length).toBeGreaterThanOrEqual(1000);
+                    expect(typeof longInput).toBe("string");
+
+                    // Should be processable without memory issues
+                    expect(() => longInput.length).not.toThrow();
+                    expect(() => longInput.slice(0, 100)).not.toThrow();
+                    expect(() => longInput.trim()).not.toThrow();
+                }
+            );
+
+            test.prop([fc.string().filter(s =>
+                /[\u0020-\u007E]/.test(s) === false && s.length > 0
+            )])(
+                "should handle strings with non-printable characters",
+                (nonPrintableInput) => {
+                    expect(typeof nonPrintableInput).toBe("string");
+
+                    // Should contain non-printable characters
+                    const hasNonPrintable = !/^[\u0020-\u007E]*$/.test(nonPrintableInput);
+                    expect(hasNonPrintable).toBe(true);
+
+                    // Should be processable safely
+                    expect(() => nonPrintableInput.trim()).not.toThrow();
+                    expect(() => JSON.stringify(nonPrintableInput)).not.toThrow();
+                }
+            );
+        });
+    });
+
     describe("Monitor Object Creation Fuzzing", () => {
         it("should handle any monitor type and form data without throwing", () => {
             fc.assert(

@@ -2,7 +2,8 @@
  * Comprehensive 100% coverage tests for jsonSafety.ts utilities
  */
 
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, test } from "vitest";
+import { fc } from "@fast-check/vitest";
 import {
     type SafeJsonResult,
     safeJsonParse,
@@ -728,6 +729,236 @@ describe("jsonSafety utilities", () => {
             expect(errorResult.success).toBe(false);
             expect(errorResult.error).toBe("test error");
             expect(errorResult.data).toBeUndefined();
+        });
+    });
+
+    describe("Property-based tests for JSON safety", () => {
+        // Helper function for property tests
+        const isValidJson = (str: string): boolean => {
+            try {
+                JSON.parse(str);
+                return true;
+            } catch {
+                return false;
+            }
+        };
+
+        test("should handle all JSON-serializable values consistently", () => {
+            fc.assert(fc.property(fc.jsonValue(), (jsonValue) => {
+                const result = safeJsonStringify(jsonValue);
+                expect(typeof result.success).toBe("boolean");
+
+                if (result.success && result.data) {
+                    // If stringify succeeded, parsing should also succeed
+                    const parsed = JSON.parse(result.data);
+                    expect(parsed).toEqual(jsonValue);
+                }
+            }));
+        });
+
+        test("should handle all possible string inputs to safeJsonParse", () => {
+            fc.assert(fc.property(fc.string(), (inputString) => {
+                const isString = (data: unknown): data is string => typeof data === "string";
+                const result = safeJsonParse(inputString, isString);
+
+                // Result should always be well-formed
+                expect(typeof result.success).toBe("boolean");
+
+                if (result.success) {
+                    expect(result.data).toBeDefined();
+                    expect(result.error).toBeUndefined();
+                    expect(typeof result.data).toBe("string");
+                } else {
+                    expect(result.data).toBeUndefined();
+                    expect(typeof result.error).toBe("string");
+                    expect(result.error!.length).toBeGreaterThan(0);
+                }
+            }));
+        });
+
+        test("should handle all possible arrays in safeJsonParseArray", () => {
+            fc.assert(fc.property(fc.array(fc.jsonValue()), (arrayValue) => {
+                const serialized = JSON.stringify(arrayValue);
+                const isAny = (_data: unknown): _data is unknown => true;
+                const result = safeJsonParseArray(serialized, isAny);
+
+                expect(result.success).toBe(true);
+                expect(result.data).toEqual(arrayValue);
+                expect(result.error).toBeUndefined();
+            }));
+        });
+
+        test("should gracefully handle invalid JSON inputs", () => {
+            fc.assert(fc.property(fc.oneof(
+                fc.constant(""),
+                fc.constant("invalid json"),
+                fc.constant("{"),
+                fc.constant("}"),
+                fc.constant("["),
+                fc.constant("]")
+            ), (invalidJson) => {
+                const isAny = (_data: unknown): _data is unknown => true;
+                const result = safeJsonParse(invalidJson, isAny);
+
+                // Should never throw, should always return a well-formed result
+                expect(typeof result.success).toBe("boolean");
+
+                if (!result.success) {
+                    expect(typeof result.error).toBe("string");
+                    expect(result.error!.length).toBeGreaterThan(0);
+                    expect(result.data).toBeUndefined();
+                }
+            }));
+        });
+
+        test("should round-trip complex objects through stringify and parse", () => {
+            fc.assert(fc.property(fc.record({
+                key: fc.string(),
+                value: fc.jsonValue(),
+                nested: fc.record({
+                    prop: fc.jsonValue()
+                })
+            }), (complexObject) => {
+                const result = safeJsonStringify(complexObject);
+                expect(typeof result.success).toBe("boolean");
+
+                if (result.success && result.data) {
+                    expect(result.data.length).toBeGreaterThan(0);
+
+                    const isObject = (data: unknown): data is object =>
+                        typeof data === "object" && data !== null;
+
+                    const parsed = safeJsonParse(result.data, isObject);
+                    expect(parsed.success).toBe(true);
+                    expect(parsed.data).toEqual(complexObject);
+                }
+            }));
+        });
+
+        test("should handle arrays of typed objects consistently", () => {
+            fc.assert(fc.property(fc.array(fc.record({
+                id: fc.string(),
+                value: fc.integer()
+            })), (objectArray) => {
+                const stringified = JSON.stringify(objectArray);
+
+                const isTypedObject = (data: unknown): data is { id: string; value: number } =>
+                    typeof data === "object" &&
+                    data !== null &&
+                    typeof (data as any).id === "string" &&
+                    typeof (data as any).value === "number";
+
+                const result = safeJsonParseArray(stringified, isTypedObject);
+                expect(result.success).toBe(true);
+                expect(result.data).toEqual(objectArray);
+            }));
+        });
+
+        test("should handle arbitrary JavaScript values in safeJsonStringify", () => {
+            fc.assert(fc.property(fc.anything(), (arbitraryValue) => {
+                // Should never throw
+                const result = safeJsonStringify(arbitraryValue);
+                expect(typeof result.success).toBe("boolean");
+
+                if (result.success && result.data) {
+                    expect(result.data.length).toBeGreaterThanOrEqual(0);
+                }
+            }));
+        });
+
+        test("should handle malformed JSON strings gracefully", () => {
+            fc.assert(fc.property(fc.oneof(
+                fc.constant("not json"),
+                fc.constant('{"unclosed": '),
+                fc.constant('{key: "value"}'), // invalid JSON (unquoted key)
+                fc.constant('[1, 2, 3,]'), // trailing comma
+                fc.constant('{"test": undefined}') // undefined is not JSON
+            ), (malformedJson) => {
+                const isAny = (_data: unknown): _data is unknown => true;
+                const result = safeJsonParse(malformedJson, isAny);
+
+                expect(result.success).toBe(false);
+                expect(typeof result.error).toBe("string");
+                expect(result.error!).toMatch(/JSON parsing failed:/);
+            }));
+        });
+
+        test("should use fallback when safeJsonStringifyWithFallback fails", () => {
+            fc.assert(fc.property(fc.jsonValue(), fc.string(), (value, fallback) => {
+                const result = safeJsonStringifyWithFallback(value, fallback);
+                expect(typeof result).toBe("string");
+
+                // Result should either be valid JSON or the fallback
+                if (result === fallback) {
+                    // Fallback was used
+                    expect(result).toBe(fallback);
+                } else {
+                    // JSON stringification succeeded
+                    expect(() => JSON.parse(result)).not.toThrow();
+                }
+            }));
+        });
+
+        test("should use fallback when safeJsonParseWithFallback fails", () => {
+            fc.assert(fc.property(fc.string(), fc.jsonValue(), (inputJson, fallback) => {
+                fc.pre(!isValidJson(inputJson)); // Only test with invalid JSON
+
+                const isAny = (_data: unknown): _data is unknown => true;
+                const result = safeJsonParseWithFallback(inputJson, isAny, fallback);
+                expect(result).toEqual(fallback);
+            }));
+        });
+
+        test("should handle all finite numbers correctly", () => {
+            fc.assert(fc.property(fc.float({ noNaN: true }), (number) => {
+                fc.pre(Number.isFinite(number));
+
+                const result = safeJsonStringify(number);
+                expect(result.success).toBe(true);
+
+                if (result.success && result.data) {
+                    const parsed = JSON.parse(result.data);
+                    expect(parsed).toBe(number);
+                }
+            }));
+        });
+
+        test("should preserve JSON stringify behavior for edge cases", () => {
+            fc.assert(fc.property(fc.oneof(
+                fc.constant(undefined),
+                fc.constant(Symbol("test")),
+                fc.constant(() => {}),
+                fc.constant(BigInt(123))
+            ), (edgeCaseValue) => {
+                const result = safeJsonStringify(edgeCaseValue);
+
+                // These values typically can't be JSON stringified
+                if (!result.success) {
+                    expect(typeof result.error).toBe("string");
+                    expect(result.data).toBeUndefined();
+                }
+            }));
+        });
+
+        test("should handle deeply nested structures", () => {
+            fc.assert(fc.property(fc.letrec(tie => ({
+                leaf: fc.jsonValue(),
+                node: fc.record({
+                    value: fc.jsonValue(),
+                    children: fc.array(tie("leaf"), { maxLength: 2 })
+                })
+            })).node, (deepStructure) => {
+                const result = safeJsonStringify(deepStructure);
+                expect(typeof result.success).toBe("boolean");
+
+                if (result.success && result.data) {
+                    // Should be able to parse it back
+                    const isObject = (data: unknown): data is object =>
+                        typeof data === "object" && data !== null;
+                    const parsed = safeJsonParse(result.data, isObject);
+                    expect(parsed.success).toBe(true);
+                }
+            }));
         });
     });
 });

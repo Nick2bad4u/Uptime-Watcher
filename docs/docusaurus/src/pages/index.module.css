@@ -1519,6 +1519,40 @@
     }
 }
 
+/* Scroll Reveal Animation Classes */
+.scrollReveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease-out;
+
+    &.revealed {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.scrollRevealLeft {
+    opacity: 0;
+    transform: translateX(-30px);
+    transition: all 0.6s ease-out;
+
+    &.revealed {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.scrollRevealRight {
+    opacity: 0;
+    transform: translateX(30px);
+    transition: all 0.6s ease-out;
+
+    &.revealed {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 [data-theme="light"] .modalInput {
     border: 1px solid #dee2e6;
     background: #f8f9fa;

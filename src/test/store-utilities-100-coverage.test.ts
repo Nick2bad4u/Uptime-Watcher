@@ -441,7 +441,8 @@ describe("Integration Tests", () => {
 describe("Edge Cases and Error Conditions", () => {
     it("should handle createBaseStore with null setState", () => {
         // The function doesn't validate input, so it won't throw
-        // @ts-expect-error Testing error condition - intentionally passing null
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Conflicting benchmark typecheck
+        // @ts-ignore Testing error condition - intentionally passing null
         const result = createBaseStore(null);
         expect(result).toHaveProperty("clearError");
         expect(result).toHaveProperty("setError");
@@ -450,7 +451,8 @@ describe("Edge Cases and Error Conditions", () => {
 
     it("should handle debounce with null function", () => {
         // The function doesn't validate input, so it won't throw immediately
-        // @ts-expect-error Testing error condition - intentionally passing null
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Conflicting benchmark typecheck
+        // @ts-ignore Testing error condition - intentionally passing null
         const result = debounce(null, 100);
         expect(typeof result).toBe("function");
     });

@@ -16,6 +16,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { fc } from "@fast-check/vitest";
 import { SiteRepository } from "../../../services/database/SiteRepository";
 
 describe("SiteRepository", () => {
@@ -390,6 +391,266 @@ describe("SiteRepository", () => {
             const result = await repository.exportAll();
 
             expect(result).toEqual(mockSites);
+        });
+    });
+
+    describe("Property-Based SiteRepository Tests", () => {
+        it("should handle various site creation scenarios", async () => {
+            await fc.assert(
+                fc.asyncProperty(
+                    fc.record({
+                        url: fc.webUrl(),
+                        name: fc.string({ minLength: 1, maxLength: 100 }),
+                        type: fc.constantFrom("http", "ping", "tcp"),
+                        config: fc.record({
+                            timeout: fc.integer({ min: 1000, max: 30_000 }),
+                            retries: fc.integer({ min: 0, max: 5 })
+                        })
+                    }),
+                    async (siteData) => {
+                        const expectedSite = {
+                            id: 1,
+                            ...siteData,
+                            createdAt: expect.any(Number),
+                            updatedAt: expect.any(Number)
+                        };
+
+                        mockDatabase.run.mockReturnValue({
+                            changes: 1,
+                            lastInsertRowid: 1
+                        });
+                        mockDatabase.get.mockReturnValue(expectedSite);
+
+                        const result = await repository.createSite(siteData);
+
+                        expect(result).toMatchObject({
+                            id: 1,
+                            url: siteData.url,
+                            name: siteData.name,
+                            type: siteData.type
+                        });
+                        expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+                        expect(mockDatabase.run).toHaveBeenCalledWith(
+                            expect.stringContaining("INSERT INTO sites"),
+                            expect.arrayContaining([
+                                siteData.url,
+                                siteData.name,
+                                siteData.type,
+                                expect.any(String), // JSON config
+                                expect.any(Number), // timestamp
+                                expect.any(Number)  // timestamp
+                            ])
+                        );
+                    }
+                )
+            );
+        });
+
+        it("should handle various site updates", async () => {
+            await fc.assert(
+                fc.asyncProperty(
+                    fc.integer({ min: 1, max: 1000 }),
+                    fc.record({
+                        url: fc.webUrl(),
+                        name: fc.string({ minLength: 1, maxLength: 100 }),
+                        type: fc.constantFrom("http", "ping", "tcp"),
+                        config: fc.record({
+                            timeout: fc.integer({ min: 1000, max: 30_000 }),
+                            retries: fc.integer({ min: 0, max: 5 })
+                        })
+                    }),
+                    async (siteId, updateData) => {
+                        const updatedSite = {
+                            id: siteId,
+                            ...updateData,
+                            createdAt: Date.now() - 86_400_000,
+                            updatedAt: Date.now()
+                        };
+
+                        mockDatabase.run.mockReturnValue({ changes: 1 });
+                        mockDatabase.get.mockReturnValue(updatedSite);
+
+                        const result = await repository.update(siteId, updateData);
+
+                        expect(result).toMatchObject({
+                            id: siteId,
+                            url: updateData.url,
+                            name: updateData.name,
+                            type: updateData.type
+                        });
+                        expect(mockDatabase.run).toHaveBeenCalledWith(
+                            expect.stringContaining("UPDATE sites SET"),
+                            expect.arrayContaining([
+                                updateData.url,
+                                updateData.name,
+                                updateData.type,
+                                expect.any(String), // JSON config
+                                expect.any(Number), // updated timestamp
+                                siteId
+                            ])
+                        );
+                    }
+                )
+            );
+        });
+
+        it("should handle various site deletion scenarios", async () => {
+            await fc.assert(
+                fc.asyncProperty(
+                    fc.array(
+                        fc.integer({ min: 1, max: 100 }),
+                        { minLength: 1, maxLength: 10 }
+                    ),
+                    async (siteIds) => {
+                        for (const siteId of siteIds) {
+                            mockDatabase.run.mockReturnValue({ changes: 1 });
+
+                            const result = await repository.delete(siteId);
+
+                            expect(result).toBe(true);
+                            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+                            expect(mockDatabase.run).toHaveBeenCalledWith(
+                                "DELETE FROM sites WHERE id = ?",
+                                [siteId]
+                            );
+                        }
+                    }
+                )
+            );
+        });
+
+        it("should handle various findById scenarios", async () => {
+            await fc.assert(
+                fc.asyncProperty(
+                    fc.oneof(
+                        fc.constant(null), // Site not found
+                        fc.record({
+                            id: fc.integer({ min: 1, max: 1000 }),
+                            url: fc.webUrl(),
+                            name: fc.string({ minLength: 1, maxLength: 100 }),
+                            type: fc.constantFrom("http", "ping", "tcp"),
+                            config: fc.record({
+                                timeout: fc.integer({ min: 1000, max: 30_000 })
+                            }),
+                            createdAt: fc.integer({ min: Date.now() - 86_400_000, max: Date.now() }),
+                            updatedAt: fc.integer({ min: Date.now() - 86_400_000, max: Date.now() })
+                        })
+                    ),
+                    fc.integer({ min: 1, max: 1000 }),
+                    async (mockSite, searchId) => {
+                        mockDatabase.get.mockReturnValue(mockSite);
+
+                        const result = await repository.findById(searchId);
+
+                        if (mockSite) {
+                            expect(result).toEqual(mockSite);
+                        } else {
+                            expect(result).toBeNull();
+                        }
+                        expect(mockDatabase.get).toHaveBeenCalledWith(
+                            "SELECT * FROM sites WHERE id = ?",
+                            [searchId]
+                        );
+                    }
+                )
+            );
+        });
+
+        it("should handle various findAll scenarios", async () => {
+            await fc.assert(
+                fc.asyncProperty(
+                    fc.array(
+                        fc.record({
+                            id: fc.integer({ min: 1, max: 1000 }),
+                            url: fc.webUrl(),
+                            name: fc.string({ minLength: 1, maxLength: 100 }),
+                            type: fc.constantFrom("http", "ping", "tcp"),
+                            config: fc.record({
+                                timeout: fc.integer({ min: 1000, max: 30_000 })
+                            }),
+                            createdAt: fc.integer({ min: Date.now() - 86_400_000, max: Date.now() }),
+                            updatedAt: fc.integer({ min: Date.now() - 86_400_000, max: Date.now() })
+                        }),
+                        { minLength: 0, maxLength: 20 }
+                    ),
+                    async (mockSites) => {
+                        mockDatabase.all.mockReturnValue(mockSites);
+
+                        const result = await repository.findAll();
+
+                        expect(result).toEqual(mockSites);
+                        expect(mockDatabase.all).toHaveBeenCalledWith(
+                            "SELECT * FROM sites ORDER BY createdAt ASC"
+                        );
+                    }
+                )
+            );
+        });
+
+        it("should handle database errors consistently", async () => {
+            await fc.assert(
+                fc.asyncProperty(
+                    fc.oneof(
+                        fc.constantFrom("SQLITE_BUSY", "SQLITE_LOCKED", "SQLITE_CONSTRAINT"),
+                        fc.string({ minLength: 5, maxLength: 50 })
+                    ),
+                    fc.record({
+                        url: fc.webUrl(),
+                        name: fc.string({ minLength: 1, maxLength: 50 }),
+                        type: fc.constantFrom("http", "ping", "tcp")
+                    }),
+                    async (errorMessage, siteData) => {
+                        const dbError = new Error(errorMessage);
+                        mockDatabase.run.mockImplementation(() => {
+                            throw dbError;
+                        });
+
+                        await expect(repository.create(siteData)).rejects.toThrow(errorMessage);
+                    }
+                )
+            );
+        });
+
+        it("should validate site data structures consistently", async () => {
+            await fc.assert(
+                fc.asyncProperty(
+                    fc.record({
+                        id: fc.integer({ min: 1, max: 1000 }),
+                        url: fc.webUrl(),
+                        name: fc.string({ minLength: 1, maxLength: 100 }),
+                        type: fc.constantFrom("http", "ping", "tcp"),
+                        config: fc.oneof(
+                            fc.record({ timeout: fc.integer({ min: 1000, max: 30_000 }) }),
+                            fc.record({
+                                timeout: fc.integer({ min: 1000, max: 30_000 }),
+                                retries: fc.integer({ min: 0, max: 5 })
+                            })
+                        ),
+                        createdAt: fc.integer({ min: 0, max: Date.now() }),
+                        updatedAt: fc.integer({ min: 0, max: Date.now() })
+                    }),
+                    async (siteData) => {
+                        mockDatabase.get.mockReturnValue(siteData);
+
+                        const result = await repository.findById(siteData.id);
+
+                        expect(result).toBeDefined();
+                        if (result) {
+                            expect(typeof result.id).toBe("number");
+                            expect(typeof result.url).toBe("string");
+                            expect(typeof result.name).toBe("string");
+                            expect(typeof result.type).toBe("string");
+                            expect(typeof result.config).toBe("object");
+                            expect(typeof result.createdAt).toBe("number");
+                            expect(typeof result.updatedAt).toBe("number");
+                            expect(result.id).toBeGreaterThan(0);
+                            expect(result.url.length).toBeGreaterThan(0);
+                            expect(result.name.length).toBeGreaterThan(0);
+                            expect(["http", "ping", "tcp"]).toContain(result.type);
+                        }
+                    }
+                )
+            );
         });
     });
 });

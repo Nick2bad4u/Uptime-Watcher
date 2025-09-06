@@ -2,9 +2,11 @@
  * @version 1.0.0
  *
  * @file Comprehensive tests for form utility functions
+ * Enhanced with property-based testing for robust user input validation
  */
 
 import { describe, expect, it, vi } from "vitest";
+import { test, fc } from "@fast-check/vitest";
 import type React from "react";
 import {
     createInputChangeHandler,
@@ -14,6 +16,370 @@ import {
 } from "../../../components/shared/formUtils";
 
 describe("Form Utilities", () => {
+
+    describe("Property-Based Form Input Validation", () => {
+        describe("Input Handler with Various Inputs", () => {
+            test.prop([fc.string()])(
+                "should handle any string input without validation",
+                (inputValue) => {
+                    const setValue = vi.fn();
+                    const handler = createInputChangeHandler(setValue);
+
+                    const mockEvent = {
+                        target: { value: inputValue },
+                    } as React.ChangeEvent<HTMLInputElement>;
+
+                    handler(mockEvent);
+                    expect(setValue).toHaveBeenCalledWith(inputValue);
+                }
+            );
+
+            test.prop([fc.oneof(
+                fc.string({ minLength: 1 }),
+                fc.string().filter(s => s.trim().length === 0),
+                fc.constant("")
+            )])(
+                "should respect validation function results for all string inputs",
+                (inputValue) => {
+                    const setValue = vi.fn();
+                    const mockValidator = vi.fn().mockReturnValue(inputValue.trim().length > 0);
+                    const handler = createInputChangeHandler(setValue, mockValidator);
+
+                    const mockEvent = {
+                        target: { value: inputValue },
+                    } as React.ChangeEvent<HTMLInputElement>;
+
+                    handler(mockEvent);
+
+                    expect(mockValidator).toHaveBeenCalledWith(inputValue);
+                    if (inputValue.trim().length > 0) {
+                        expect(setValue).toHaveBeenCalledWith(inputValue);
+                    } else {
+                        expect(setValue).not.toHaveBeenCalled();
+                    }
+                }
+            );
+
+            test.prop([fc.string({ minLength: 1, maxLength: 1000 })])(
+                "should handle various character sets and encodings",
+                (complexInput) => {
+                    const setValue = vi.fn();
+                    const handler = createInputChangeHandler(setValue);
+
+                    const mockEvent = {
+                        target: { value: complexInput },
+                    } as React.ChangeEvent<HTMLInputElement>;
+
+                    handler(mockEvent);
+                    expect(setValue).toHaveBeenCalledWith(complexInput);
+                    expect(typeof complexInput).toBe("string");
+                }
+            );
+
+            test.prop([fc.integer({ min: 0, max: 100 })])(
+                "should handle numeric strings consistently",
+                (numValue) => {
+                    const setValue = vi.fn();
+                    const handler = createInputChangeHandler<string>(setValue);
+                    const stringValue = numValue.toString();
+
+                    const mockEvent = {
+                        target: { value: stringValue },
+                    } as React.ChangeEvent<HTMLInputElement>;
+
+                    handler(mockEvent);
+                    expect(setValue).toHaveBeenCalledWith(stringValue);
+                }
+            );
+        });
+
+        describe("Select Handler with Various Options", () => {
+            test.prop([fc.string()])(
+                "should handle any string option without conversion",
+                (optionValue) => {
+                    const setValue = vi.fn();
+                    const handler = createSelectChangeHandler(setValue);
+
+                    const mockEvent = {
+                        target: { value: optionValue },
+                    } as React.ChangeEvent<HTMLSelectElement>;
+
+                    handler(mockEvent);
+                    expect(setValue).toHaveBeenCalledWith(optionValue);
+                }
+            );
+
+            test.prop([fc.integer({ min: -1000, max: 1000 })])(
+                "should convert numeric string options to numbers",
+                (numValue) => {
+                    const setValue = vi.fn();
+                    const converter = (value: string) => Number.parseInt(value, 10);
+                    const handler = createSelectChangeHandler(setValue, converter);
+                    const stringValue = numValue.toString();
+
+                    const mockEvent = {
+                        target: { value: stringValue },
+                    } as React.ChangeEvent<HTMLSelectElement>;
+
+                    handler(mockEvent);
+                    expect(setValue).toHaveBeenCalledWith(numValue);
+                }
+            );
+
+            test.prop([fc.constantFrom("true", "false", "1", "0", "yes", "no")])(
+                "should handle boolean-like string conversions",
+                (booleanLikeValue) => {
+                    const setValue = vi.fn();
+                    const converter = (value: string) =>
+                        value === "true" || value === "1" || value === "yes";
+                    const handler = createSelectChangeHandler(setValue, converter);
+
+                    const mockEvent = {
+                        target: { value: booleanLikeValue },
+                    } as React.ChangeEvent<HTMLSelectElement>;
+
+                    handler(mockEvent);
+
+                    const expectedBoolean = ["true", "1", "yes"].includes(booleanLikeValue);
+                    expect(setValue).toHaveBeenCalledWith(expectedBoolean);
+                }
+            );
+
+            test.prop([fc.string().filter(s => !/^\d+$/.test(s) && s.length > 0)])(
+                "should handle non-numeric strings in numeric conversion",
+                (nonNumericValue) => {
+                    const setValue = vi.fn();
+                    const converter = (value: string) => Number.parseInt(value, 10);
+                    const handler = createSelectChangeHandler(setValue, converter);
+
+                    const mockEvent = {
+                        target: { value: nonNumericValue },
+                    } as React.ChangeEvent<HTMLSelectElement>;
+
+                    handler(mockEvent);
+
+                    const convertedValue = Number.parseInt(nonNumericValue, 10);
+                    expect(setValue).toHaveBeenCalledWith(convertedValue);
+                    // Should be NaN for non-numeric strings
+                    if (!/^\d+/.test(nonNumericValue)) {
+                        expect(Number.isNaN(convertedValue)).toBe(true);
+                    }
+                }
+            );
+        });
+
+        describe("Checkbox Handler with Various States", () => {
+            test.prop([fc.boolean()])(
+                "should handle any boolean checkbox state",
+                (checkedState) => {
+                    const setValue = vi.fn();
+                    const handler = createCheckboxChangeHandler(setValue);
+
+                    const mockEvent = {
+                        target: { checked: checkedState },
+                    } as React.ChangeEvent<HTMLInputElement>;
+
+                    handler(mockEvent);
+                    expect(setValue).toHaveBeenCalledWith(checkedState);
+                }
+            );
+
+            test.prop([fc.boolean()])(
+                "should maintain type safety for checkbox values",
+                (checkedState) => {
+                    const setValue = vi.fn();
+                    const handler = createCheckboxChangeHandler(setValue);
+
+                    const mockEvent = {
+                        target: { checked: checkedState },
+                    } as React.ChangeEvent<HTMLInputElement>;
+
+                    handler(mockEvent);
+
+                    const [[calledValue]] = setValue.mock.calls;
+                    expect(typeof calledValue).toBe("boolean");
+                    expect(calledValue).toBe(checkedState);
+                }
+            );
+        });
+
+        describe("Validation Patterns Property Testing", () => {
+            test.prop([fc.string({ minLength: 1 })])(
+                "should validate non-empty strings correctly",
+                (nonEmptyString) => {
+                    const isValid = validationPatterns.nonEmptyString(nonEmptyString);
+                    if (nonEmptyString.trim().length > 0) {
+                        expect(isValid).toBe(true);
+                    } else {
+                        expect(isValid).toBe(false);
+                    }
+                }
+            );
+
+            test.prop([fc.oneof(
+                fc.constant(""),
+                fc.string().filter(s => s.trim().length === 0)
+            )])(
+                "should reject empty and whitespace-only strings",
+                (emptyString) => {
+                    const isValid = validationPatterns.nonEmptyString(emptyString);
+                    expect(isValid).toBe(false);
+                }
+            );
+
+            test.prop([fc.integer({ min: 1, max: 65_535 })])(
+                "should validate port number ranges correctly",
+                (portNumber) => {
+                    const validator = validationPatterns.numberInRange(1, 65_535);
+                    const isValid = validator(portNumber);
+                    expect(isValid).toBe(true);
+                }
+            );
+
+            test.prop([fc.oneof(
+                fc.integer({ max: 0 }),
+                fc.integer({ min: 65_536 })
+            )])(
+                "should reject invalid port number ranges",
+                (invalidPort) => {
+                    const validator = validationPatterns.numberInRange(1, 65_535);
+                    const isValid = validator(invalidPort);
+                    expect(isValid).toBe(false);
+                }
+            );
+
+            test.prop([fc.constantFrom(5000, 10_000, 30_000, 60_000)])(
+                "should validate allowed check intervals",
+                (allowedInterval) => {
+                    const validator = validationPatterns.oneOfNumbers([5000, 10_000, 30_000, 60_000]);
+                    const isValid = validator(allowedInterval);
+                    expect(isValid).toBe(true);
+                }
+            );
+
+            test.prop([fc.integer({ min: 1, max: 100_000 }).filter(n =>
+                ![5000, 10_000, 30_000, 60_000].includes(n)
+            )])(
+                "should reject non-allowed check intervals",
+                (disallowedInterval) => {
+                    const validator = validationPatterns.oneOfNumbers([5000, 10_000, 30_000, 60_000]);
+                    const isValid = validator(disallowedInterval);
+                    expect(isValid).toBe(false);
+                }
+            );
+
+            test.prop([fc.constantFrom("http", "port", "ping")])(
+                "should validate allowed monitor types",
+                (allowedType) => {
+                    const validator = validationPatterns.oneOfStrings(["http", "port", "ping"]);
+                    const isValid = validator(allowedType);
+                    expect(isValid).toBe(true);
+                }
+            );
+
+            test.prop([fc.string().filter(s => !["http", "port", "ping"].includes(s) && s.length > 0)])(
+                "should reject non-allowed monitor types",
+                (disallowedType) => {
+                    const validator = validationPatterns.oneOfStrings(["http", "port", "ping"]);
+                    const isValid = validator(disallowedType);
+                    expect(isValid).toBe(false);
+                }
+            );
+
+            test.prop([fc.string({ minLength: 1, maxLength: 50 })])(
+                "should test pattern consistency across different inputs",
+                (inputString) => {
+                    // Test that nonEmptyString pattern behaves consistently
+                    const result1 = validationPatterns.nonEmptyString(inputString);
+                    const result2 = validationPatterns.nonEmptyString(inputString);
+                    expect(result1).toBe(result2); // Consistency check
+                    expect(typeof result1).toBe("boolean");
+
+                    // Test numberInRange pattern consistency (example with port range)
+                    const portValidator = validationPatterns.numberInRange(1, 65_535);
+                    const testNumber = inputString.length; // Use length as test number
+                    const numResult1 = portValidator(testNumber);
+                    const numResult2 = portValidator(testNumber);
+                    expect(numResult1).toBe(numResult2);
+                    expect(typeof numResult1).toBe("boolean");
+
+                    // Test oneOfStrings pattern consistency
+                    const stringValidator = validationPatterns.oneOfStrings(["test", "demo", "sample"]);
+                    const stringResult1 = stringValidator(inputString);
+                    const stringResult2 = stringValidator(inputString);
+                    expect(stringResult1).toBe(stringResult2);
+                    expect(typeof stringResult1).toBe("boolean");
+                }
+            );
+        });
+
+        describe("Edge Case Input Handling", () => {
+            test.prop([fc.oneof(
+                fc.constant(""),
+                fc.constant(" "),
+                fc.constant("\n"),
+                fc.constant("\t"),
+                fc.constant("\r\n"),
+                fc.string().filter(s => s.trim().length === 0 && s.length > 0)
+            )])(
+                "should handle whitespace and empty inputs consistently",
+                (whitespaceInput) => {
+                    const setValue = vi.fn();
+                    const handler = createInputChangeHandler(setValue);
+
+                    const mockEvent = {
+                        target: { value: whitespaceInput },
+                    } as React.ChangeEvent<HTMLInputElement>;
+
+                    handler(mockEvent);
+                    expect(setValue).toHaveBeenCalledWith(whitespaceInput);
+
+                    // Verify whitespace properties
+                    expect(whitespaceInput.trim().length).toBe(0);
+                }
+            );
+
+            test.prop([fc.string({ minLength: 1000, maxLength: 5000 })])(
+                "should handle very long input strings",
+                (longInput) => {
+                    const setValue = vi.fn();
+                    const handler = createInputChangeHandler(setValue);
+
+                    const mockEvent = {
+                        target: { value: longInput },
+                    } as React.ChangeEvent<HTMLInputElement>;
+
+                    handler(mockEvent);
+                    expect(setValue).toHaveBeenCalledWith(longInput);
+                    expect(longInput.length).toBeGreaterThanOrEqual(1000);
+                }
+            );
+
+            test.prop([fc.string().filter(s =>
+                s.includes("<") || s.includes(">") || s.includes("&") || s.includes("'") || s.includes('"')
+            )])(
+                "should handle HTML-like characters in inputs",
+                (htmlLikeInput) => {
+                    const setValue = vi.fn();
+                    const handler = createInputChangeHandler(setValue);
+
+                    const mockEvent = {
+                        target: { value: htmlLikeInput },
+                    } as React.ChangeEvent<HTMLInputElement>;
+
+                    handler(mockEvent);
+                    expect(setValue).toHaveBeenCalledWith(htmlLikeInput);
+
+                    // Verify it contains HTML-like characters
+                    const hasHtmlChars = ["<", ">", "&", "'", '"'].some(char =>
+                        htmlLikeInput.includes(char)
+                    );
+                    expect(hasHtmlChars).toBe(true);
+                }
+            );
+        });
+    });
+
     describe("createInputChangeHandler", () => {
         it("should create handler that sets value without validation", async ({
             task,

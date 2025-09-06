@@ -762,7 +762,7 @@ export default defineConfig(({ mode }) => {
             poolOptions: {
                 threads: {
                     isolate: true, // Isolate tests for better reliability
-                    maxThreads: 8, // Reduced from 24 to prevent resource contention in multi-project setup
+                    maxThreads: 24, // Reduced from 24 to prevent resource contention in multi-project setup
                     minThreads: 1, // Ensure at least one thread
                     singleThread: false, // Enable multi-threading
                     useAtomics: true,

@@ -3,6 +3,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { test, fc } from "@fast-check/vitest";
 
 import { generateUuid } from "../utils/data/generateUuid";
 
@@ -341,7 +342,7 @@ describe("UUID Generation", () => {
             // Remove crypto to force fallback
             vi.stubGlobal("crypto", undefined);
 
-            const ids = [];
+            const ids: string[] = [];
             for (let i = 0; i < 10; i++) {
                 ids.push(generateUuid());
             }
@@ -412,7 +413,7 @@ describe("UUID Generation", () => {
                 randomUUID: vi.fn(() => `rapid-test-${Date.now()}`),
             });
 
-            const uuids = [];
+            const uuids: string[] = [];
             for (let i = 0; i < 5; i++) {
                 uuids.push(generateUuid());
             }
@@ -438,7 +439,7 @@ describe("UUID Generation", () => {
             // Remove crypto to force fallback
             vi.stubGlobal("crypto", undefined);
 
-            const uuids = [];
+            const uuids: string[] = [];
             for (let i = 0; i < 5; i++) {
                 uuids.push(generateUuid());
             }
@@ -488,5 +489,117 @@ describe("UUID Generation", () => {
                 getRandomValues: vi.fn(),
             });
         });
+    });
+
+    describe("Property-based tests for UUID generation", () => {
+        test.prop([fc.integer({ min: 1, max: 1000 })])(
+            "should generate unique UUIDs for any number of iterations",
+            (iterations) => {
+                const uuids = new Set<string>();
+
+                for (let i = 0; i < iterations; i++) {
+                    const uuid = generateUuid();
+                    uuids.add(uuid);
+                }
+
+                // All UUIDs should be unique
+                expect(uuids.size).toBe(iterations);
+            }
+        );
+
+        test.prop([fc.constant(undefined)])(
+            "should always return a non-empty string",
+            () => {
+                const uuid = generateUuid();
+
+                expect(typeof uuid).toBe("string");
+                expect(uuid.length).toBeGreaterThan(0);
+            }
+        );
+
+        test.prop([fc.boolean()])(
+            "should handle crypto availability consistently",
+            (cryptoAvailable) => {
+                if (cryptoAvailable) {
+                    vi.stubGlobal("crypto", {
+                        randomUUID: vi.fn(() => "test-uuid-123"),
+                    });
+                } else {
+                    vi.stubGlobal("crypto", undefined);
+                }
+
+                const uuid = generateUuid();
+                expect(typeof uuid).toBe("string");
+                expect(uuid.length).toBeGreaterThan(0);
+
+                if (cryptoAvailable && crypto && typeof crypto.randomUUID === "function") {
+                    // Should use crypto UUID format
+                    expect(uuid).toBe("test-uuid-123");
+                } else {
+                    // Should use fallback format
+                    expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
+                }
+            }
+        );
+
+        test.prop([fc.array(fc.constant(null), { minLength: 10, maxLength: 100 })])(
+            "should maintain uniqueness under concurrent generation",
+            (requests) => {
+                const uuids = requests.map(() => generateUuid());
+                const uniqueUuids = new Set(uuids);
+
+                expect(uniqueUuids.size).toBe(uuids.length);
+            }
+        );
+
+        test.prop([fc.constantFrom("undefined", "null", "object")])(
+            "should handle various crypto states gracefully",
+            (cryptoState) => {
+                switch (cryptoState) {
+                    case "undefined": {
+                        vi.stubGlobal("crypto", undefined);
+                        break;
+                    }
+                    case "null": {
+                        vi.stubGlobal("crypto", null);
+                        break;
+                    }
+                    case "object": {
+                        vi.stubGlobal("crypto", {});
+                        break;
+                    }
+                }
+
+                const uuid = generateUuid();
+                expect(typeof uuid).toBe("string");
+                expect(uuid.length).toBeGreaterThan(0);
+
+                // Should always fall back to site-* format when crypto is not available
+                if (cryptoState !== "object" || !crypto || typeof crypto.randomUUID !== "function") {
+                    expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
+                }
+            }
+        );
+
+        test.prop([fc.integer({ min: 1000, max: 2_000_000_000 })])(
+            "should include reasonable timestamp in fallback mode",
+            (mockNow) => {
+                vi.stubGlobal("crypto", undefined);
+                vi.spyOn(Date, "now").mockReturnValue(mockNow);
+
+                const uuid = generateUuid();
+                expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
+
+                const timestampMatch = /(?<timestamp>\d+)$/.exec(uuid);
+                expect(timestampMatch).toBeTruthy();
+
+                if (timestampMatch?.groups) {
+                    const extractedTimestamp = Number.parseInt(timestampMatch.groups["timestamp"], 10);
+                    expect(extractedTimestamp).toBe(mockNow);
+                }
+
+                vi.restoreAllMocks();
+            }
+        );
     });
 });

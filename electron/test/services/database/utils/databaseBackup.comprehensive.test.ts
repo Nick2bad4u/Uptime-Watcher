@@ -3,6 +3,7 @@
  * functionality with all edge cases and error scenarios
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { fc } from "@fast-check/vitest";
 import {
     createDatabaseBackup,
     type DatabaseBackupResult,
@@ -533,6 +534,184 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     expect(result.buffer).toBe(testCase);
                     expect(result.metadata.sizeBytes).toBe(testCase.length);
                 }
+            });
+        });
+
+        describe("Property-Based Database Backup Tests", () => {
+            it("should handle various database file paths", async () => {
+                await fc.assert(
+                    fc.asyncProperty(
+                        fc.string({ minLength: 1, maxLength: 100 }).map(s =>
+                            s.replaceAll(/["*:<>?|]/g, "_") // Remove invalid path characters
+                        ),
+                        fc.string({ minLength: 1, maxLength: 50 }).map(s =>
+                            s.replaceAll(/["*/:<>?\\|]/g, "_") // Remove invalid filename characters
+                        ),
+                        async (directory, filename) => {
+                            const testPath = `/${directory}/${filename}.sqlite`;
+                            const mockData = Buffer.from(`test data for ${filename}`);
+
+                            mockFs.readFile.mockResolvedValue(mockData);
+
+                            const result = await createDatabaseBackup(testPath);
+
+                            expect(result).toBeDefined();
+                            expect(result.buffer).toBe(mockData);
+                            expect(result.metadata.sizeBytes).toBe(mockData.length);
+                            expect(result.metadata.filename).toBe(BACKUP_DB_FILE_NAME);
+                            expect(result.metadata.originalPath).toBe(testPath);
+                            expect(result.metadata.timestamp).toBeTypeOf("number");
+                            expect(result.metadata.timestamp).toBeGreaterThan(0);
+                            expect(mockFs.readFile).toHaveBeenCalledWith(testPath);
+                        }
+                    )
+                );
+            });
+
+            it("should handle various buffer sizes and contents", async () => {
+                await fc.assert(
+                    fc.asyncProperty(
+                        fc.uint8Array({ minLength: 0, maxLength: 10_000 }),
+                        async (dataArray) => {
+                            const testPath = "/test/database.sqlite";
+                            const mockData = Buffer.from(dataArray);
+
+                            mockFs.readFile.mockResolvedValue(mockData);
+
+                            const result = await createDatabaseBackup(testPath);
+
+                            expect(result).toBeDefined();
+                            expect(result.buffer).toBe(mockData);
+                            expect(result.metadata.sizeBytes).toBe(mockData.length);
+                            expect(result.metadata.sizeBytes).toBe(dataArray.length);
+
+                            // Verify buffer contents match
+                            expect(Buffer.compare(result.buffer, mockData)).toBe(0);
+                        }
+                    )
+                );
+            });
+
+            it("should handle various error scenarios", async () => {
+                await fc.assert(
+                    fc.asyncProperty(
+                        fc.string({ minLength: 1, maxLength: 200 }),
+                        fc.oneof(
+                            fc.constantFrom("ENOENT", "EACCES", "EISDIR", "EMFILE", "ENOMEM"),
+                            fc.string({ minLength: 5, maxLength: 50 })
+                        ),
+                        async (testPath, errorCode) => {
+                            const error = new Error(`Mock error: ${errorCode}`);
+                            (error as any).code = errorCode;
+
+                            mockFs.readFile.mockRejectedValue(error);
+
+                            await expect(createDatabaseBackup(testPath)).rejects.toThrow();
+                            expect(logger.error).toHaveBeenCalledWith(
+                                expect.stringContaining("Failed to create database backup"),
+                                error
+                            );
+                        }
+                    )
+                );
+            });
+
+            it("should generate consistent metadata with various timestamps", async () => {
+                await fc.assert(
+                    fc.asyncProperty(
+                        fc.string({ minLength: 5, maxLength: 100 }),
+                        fc.integer({ min: 1000, max: 5000 }),
+                        async (dbPath, dataSize) => {
+                            const mockData = Buffer.alloc(dataSize, "x");
+                            const beforeTimestamp = Date.now();
+
+                            mockFs.readFile.mockResolvedValue(mockData);
+
+                            const result = await createDatabaseBackup(dbPath);
+                            const afterTimestamp = Date.now();
+
+                            // Verify metadata consistency
+                            expect(result.metadata.sizeBytes).toBe(dataSize);
+                            expect(result.metadata.originalPath).toBe(dbPath);
+                            expect(result.metadata.filename).toBe(BACKUP_DB_FILE_NAME);
+                            expect(result.metadata.timestamp).toBeGreaterThanOrEqual(beforeTimestamp);
+                            expect(result.metadata.timestamp).toBeLessThanOrEqual(afterTimestamp);
+
+                            // Verify buffer size matches metadata
+                            expect(result.buffer.length).toBe(result.metadata.sizeBytes);
+                        }
+                    )
+                );
+            });
+
+            it("should handle edge case buffer patterns", async () => {
+                await fc.assert(
+                    fc.asyncProperty(
+                        fc.oneof(
+                            fc.constant(Buffer.alloc(0)), // Empty buffer
+                            fc.constant(Buffer.alloc(1, 0)), // Single null byte
+                            fc.constant(Buffer.alloc(1000, 255)), // All 0xFF bytes
+                            fc.constant(Buffer.from("SQLite format 3\0")), // SQLite header
+                            fc.uint8Array({ minLength: 1, maxLength: 100 }).map(arr => Buffer.from(arr))
+                        ),
+                        async (testBuffer) => {
+                            const testPath = "/edge/case/database.sqlite";
+
+                            mockFs.readFile.mockResolvedValue(testBuffer);
+
+                            const result = await createDatabaseBackup(testPath);
+
+                            expect(result).toBeDefined();
+                            expect(result.buffer).toBe(testBuffer);
+                            expect(result.metadata.sizeBytes).toBe(testBuffer.length);
+
+                            // Verify buffer integrity
+                            expect(Buffer.compare(result.buffer, testBuffer)).toBe(0);
+
+                            // Verify logging for successful backup
+                            expect(logger.info).toHaveBeenCalledWith(
+                                expect.stringContaining("Database backup created successfully")
+                            );
+                        }
+                    )
+                );
+            });
+
+            it("should verify database backup result structure invariants", async () => {
+                await fc.assert(
+                    fc.asyncProperty(
+                        fc.string({ minLength: 1, maxLength: 200 }),
+                        fc.uint8Array({ minLength: 0, maxLength: 1000 }),
+                        async (dbPath, dataArray) => {
+                            const mockData = Buffer.from(dataArray);
+
+                            mockFs.readFile.mockResolvedValue(mockData);
+
+                            const result = await createDatabaseBackup(dbPath);
+
+                            // Verify result structure invariants
+                            expect(result).toHaveProperty("buffer");
+                            expect(result).toHaveProperty("metadata");
+                            expect(result.metadata).toHaveProperty("filename");
+                            expect(result.metadata).toHaveProperty("originalPath");
+                            expect(result.metadata).toHaveProperty("sizeBytes");
+                            expect(result.metadata).toHaveProperty("timestamp");
+
+                            // Verify type invariants
+                            expect(Buffer.isBuffer(result.buffer)).toBe(true);
+                            expect(typeof result.metadata.filename).toBe("string");
+                            expect(typeof result.metadata.originalPath).toBe("string");
+                            expect(typeof result.metadata.sizeBytes).toBe("number");
+                            expect(typeof result.metadata.timestamp).toBe("number");
+
+                            // Verify value invariants
+                            expect(result.metadata.sizeBytes).toBeGreaterThanOrEqual(0);
+                            expect(result.metadata.timestamp).toBeGreaterThan(0);
+                            expect(result.metadata.filename.length).toBeGreaterThan(0);
+                            expect(result.metadata.originalPath.length).toBeGreaterThan(0);
+                        }
+                    )
+                );
             });
         });
     });
