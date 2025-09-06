@@ -74,7 +74,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
     describe("formatErrorMessage", () => {
         test.prop([
             fc.string(),
-            fc.record({}, { withDeletedKeys: true })
+            fc.record({}, { requiredKeys: [] })
         ])("should handle any template and params without throwing", (template, params) => {
             expect(() => formatErrorMessage(template, params)).not.toThrow();
         });
@@ -147,7 +147,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
         test.prop([
             fc.string(),
             fc.array(fc.string(), { minLength: 1, maxLength: 3 }),
-            fc.record({}, { withDeletedKeys: true })
+            fc.record({}, { requiredKeys: [] })
         ])("should handle missing parameters gracefully", (template, keys, params) => {
             let templateWithPlaceholders = template;
             for (const key of keys) {
@@ -198,15 +198,14 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([
-            fc.constantFrom(...Object.keys(ERROR_CATALOG)),
-            fc.constantFrom(...Object.keys(SITE_ERRORS))
-        ])("should return true for all catalog error messages", (category, errorKey) => {
-            const errorCategory = ERROR_CATALOG[category as keyof typeof ERROR_CATALOG];
-            const errorValue = (errorCategory as any)[errorKey];
-
-            if (errorValue && typeof errorValue === "string") {
-                expect(isKnownErrorMessage(errorValue)).toBe(true);
+        test("should return true for all catalog error messages", () => {
+            // Test all error messages from all categories
+            for (const [categoryName, category] of Object.entries(ERROR_CATALOG)) {
+                for (const [errorKey, errorValue] of Object.entries(category)) {
+                    if (typeof errorValue === "string") {
+                        expect(isKnownErrorMessage(errorValue)).toBe(true);
+                    }
+                }
             }
         });
 
@@ -291,8 +290,8 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
             for (const category of Object.values(ERROR_CATALOG)) {
                 for (const message of Object.values(category)) {
                     expect(typeof message).toBe("string");
-                    expect(message.length).toBeGreaterThan(0);
-                    expect(message.trim()).toBe(message); // No leading/trailing whitespace
+                    expect((message as string).length).toBeGreaterThan(0);
+                    expect((message as string).trim()).toBe(message); // No leading/trailing whitespace
                 }
             }
         });
@@ -301,9 +300,9 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
             for (const category of Object.values(ERROR_CATALOG)) {
                 for (const message of Object.values(category)) {
                     // Messages should start with capital letter
-                    expect(message[0]).toMatch(/[A-Z]/);
+                    expect((message as string)[0]).toMatch(/[A-Z]/);
                     // Messages should be well-formed sentences (can end with periods)
-                    expect(message).toMatch(/^[A-Z].*[\d.A-Za-z]$/);
+                    expect(message as string).toMatch(/^[A-Z].*[\d.A-Za-z]$/);
                 }
             }
         });

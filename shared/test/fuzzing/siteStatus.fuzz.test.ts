@@ -110,7 +110,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
         test.prop([fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 })])(
             "should return same status when all monitors have same status",
             (monitors) => {
-                const status = fc.sample(monitorStatusArbitrary, 1)[0];
+                const [status] = fc.sample(monitorStatusArbitrary, 1);
                 const sameStatusMonitors = monitors.map(m => ({ ...m, status }));
                 const site = { monitors: sameStatusMonitors };
 

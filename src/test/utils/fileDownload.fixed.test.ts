@@ -4,6 +4,8 @@
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { test } from "@fast-check/vitest";
+import * as fc from "fast-check";
 import {
     downloadFile,
     generateBackupFileName,
@@ -248,6 +250,80 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             downloadFile({ buffer, fileName });
             expect(mockAnchor.click).toHaveBeenCalled();
         });
+
+        describe("Property-based Tests", () => {
+            test.prop([
+                fc.uint8Array({ minLength: 0, maxLength: 1000 }),
+                fc.string({ minLength: 1, maxLength: 100 }).filter((s) => s.trim().length > 0),
+                fc.string({ minLength: 1, maxLength: 50 }).filter((s) => s.includes("/"))
+            ])(
+                "should handle various buffer, filename, and MIME type combinations",
+                (uint8Array, fileName, mimeType) => {
+                    const buffer = uint8Array.buffer;
+
+                    downloadFile({ buffer, fileName, mimeType });
+
+                    expect(globalThis.Blob).toHaveBeenCalledWith([buffer], {
+                        type: mimeType,
+                    });
+                    expect(mockAnchor.download).toBe(fileName);
+                    expect(mockAnchor.click).toHaveBeenCalled();
+                    expect(mockAnchor.remove).toHaveBeenCalled();
+                }
+            );
+
+            test.prop([
+                fc.uint8Array({ minLength: 0, maxLength: 500 }),
+                fc.string({ minLength: 1, maxLength: 50 })
+                    .filter((s) => s.trim().length > 0)
+                    .filter((s) => !s.includes("/") && !s.includes("\\"))
+            ])(
+                "should use default MIME type when not specified",
+                (uint8Array, fileName) => {
+                    const buffer = uint8Array.buffer;
+
+                    downloadFile({ buffer, fileName });
+
+                    expect(globalThis.Blob).toHaveBeenCalledWith([buffer], {
+                        type: "application/octet-stream",
+                    });
+                    expect(mockAnchor.download).toBe(fileName);
+                    expect(globalThis.URL.createObjectURL).toHaveBeenCalled();
+                }
+            );
+
+            test.prop([
+                fc.uint8Array({ minLength: 1, maxLength: 100 })
+            ])(
+                "should handle various buffer sizes and always create blob URL",
+                (uint8Array) => {
+                    const buffer = uint8Array.buffer;
+                    const fileName = "test-file.bin";
+
+                    downloadFile({ buffer, fileName });
+
+                    expect(globalThis.URL.createObjectURL).toHaveBeenCalled();
+                    expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledWith("mock-object-url");
+                    expect(mockAnchor.href).toBe("mock-object-url");
+                }
+            );
+
+            test.prop([
+                fc.string({ minLength: 1, maxLength: 200 })
+                    .filter((s) => s.trim().length > 0)
+            ])(
+                "should handle various filename lengths and formats",
+                (fileName) => {
+                    const buffer = new ArrayBuffer(10);
+
+                    downloadFile({ buffer, fileName });
+
+                    expect(mockAnchor.download).toBe(fileName);
+                    expect(globalThis.document.body.append).toHaveBeenCalledWith(mockAnchor);
+                    expect(mockAnchor.click).toHaveBeenCalled();
+                }
+            );
+        });
     });
 
     describe("generateBackupFileName Function", () => {
@@ -327,6 +403,77 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
             const result = generateBackupFileName("test-app", "db.sqlite");
             expect(result).toMatch(/^test-app-\d{4}-\d{2}-\d{2}\.db\.sqlite$/);
+        });
+
+        describe("Property-based Tests", () => {
+            test.prop([
+                fc.string({ maxLength: 50 }).filter((s) => !s.includes("-")),
+                fc.string({ maxLength: 20 }).filter((s) => !s.includes(".") && s.length > 0)
+            ])(
+                "should generate filename with custom prefix and extension",
+                (prefix, extension) => {
+                    const result = generateBackupFileName(prefix, extension);
+                    const escapedPrefix = prefix.replaceAll(/[$()*+.?[\\\]^{|}]/g, String.raw`\$&`);
+                    const escapedExtension = extension.replaceAll(/[$()*+.?[\\\]^{|}]/g, String.raw`\$&`);
+                    const expectedPattern = new RegExp(String.raw`^${escapedPrefix}-\d{4}-\d{2}-\d{2}\.${escapedExtension}$`);
+                    expect(result).toMatch(expectedPattern);
+                }
+            );
+
+            test.prop([fc.string({ maxLength: 30 })])(
+                "should always include timestamp in YYYY-MM-DD format",
+                (prefix) => {
+                    const result = generateBackupFileName(prefix);
+
+                    // Extract the timestamp part
+                    const timestampMatch = result.match(/-(?<timestamp>\d{4}-\d{2}-\d{2})\./);
+                    expect(timestampMatch).not.toBeNull();
+
+                    if (timestampMatch?.groups) {
+                        const { timestamp } = timestampMatch.groups;
+                        const [year, month, day] = timestamp.split('-');
+
+                        // Validate timestamp format
+                        expect(Number(year)).toBeGreaterThanOrEqual(2000);
+                        expect(Number(year)).toBeLessThanOrEqual(3000);
+                        expect(Number(month)).toBeGreaterThanOrEqual(1);
+                        expect(Number(month)).toBeLessThanOrEqual(12);
+                        expect(Number(day)).toBeGreaterThanOrEqual(1);
+                        expect(Number(day)).toBeLessThanOrEqual(31);
+                    }
+                }
+            );
+
+            test.prop([fc.string({ maxLength: 10 })])(
+                "should handle various prefix lengths and always return string",
+                (prefix) => {
+                    const result = generateBackupFileName(prefix);
+
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeGreaterThan(0);
+                    expect(result).toMatch(/-\d{4}-\d{2}-\d{2}\./);
+                }
+            );
+
+            test.prop([
+                fc.string({ maxLength: 15 }),
+                fc.string({ maxLength: 15 })
+            ])(
+                "should produce consistent format regardless of input",
+                (prefix, extension) => {
+                    const result = generateBackupFileName(prefix, extension);
+
+                    expect(typeof result).toBe("string");
+
+                    // Should contain exactly one timestamp
+                    const timestampMatches = result.match(/-\d{4}-\d{2}-\d{2}\./g);
+                    expect(timestampMatches).toHaveLength(1);
+
+                    // Should start with prefix (or empty) and end with extension (or default)
+                    const parts = result.split('-');
+                    expect(parts.length).toBeGreaterThanOrEqual(4); // prefix, year, month, day+extension
+                }
+            );
         });
     });
 
@@ -589,6 +736,86 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
                 type: "application/x-sqlite3",
             });
             expect(mockAnchor.click).toHaveBeenCalled();
+        });
+
+        describe("Property-based Tests", () => {
+            test.prop([
+                fc.uint8Array({ minLength: 1, maxLength: 10_000 })
+            ])(
+                "should handle various backup data sizes",
+                async (mockDataArray) => {
+                    const mockDownloadFunction = vi.fn().mockResolvedValue(mockDataArray);
+
+                    await handleSQLiteBackupDownload(mockDownloadFunction);
+
+                    expect(mockDownloadFunction).toHaveBeenCalledOnce();
+                    expect(globalThis.Blob).toHaveBeenCalledWith([mockDataArray], {
+                        type: "application/x-sqlite3",
+                    });
+                    expect(mockAnchor.download).toMatch(
+                        /^uptime-watcher-\d{4}-\d{2}-\d{2}\.db$/
+                    );
+                    expect(mockAnchor.click).toHaveBeenCalled();
+                }
+            );
+
+            test.prop([
+                fc.string({ minLength: 1, maxLength: 100 })
+            ])(
+                "should handle download function rejections with various error messages",
+                async (errorMessage) => {
+                    const mockDownloadFunction = vi
+                        .fn()
+                        .mockRejectedValue(new Error(errorMessage));
+
+                    await expect(
+                        handleSQLiteBackupDownload(mockDownloadFunction)
+                    ).rejects.toThrow(errorMessage);
+
+                    expect(mockDownloadFunction).toHaveBeenCalledOnce();
+                }
+            );
+
+            test.prop([
+                fc.uint8Array({ minLength: 0, maxLength: 1000 })
+            ])(
+                "should always use SQLite MIME type and generate proper filename",
+                async (backupData) => {
+                    const mockDownloadFunction = vi.fn().mockResolvedValue(backupData);
+
+                    await handleSQLiteBackupDownload(mockDownloadFunction);
+
+                    expect(globalThis.Blob).toHaveBeenCalledWith([backupData], {
+                        type: "application/x-sqlite3",
+                    });
+
+                    // Verify filename format
+                    const filename = mockAnchor.download;
+                    expect(filename).toMatch(/^uptime-watcher-\d{4}-\d{2}-\d{2}\.db$/);
+
+                    // Verify proper cleanup
+                    expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledWith(
+                        "mock-object-url"
+                    );
+                }
+            );
+
+            test.prop([
+                fc.array(fc.integer({ min: 0, max: 255 }), { minLength: 10, maxLength: 500 })
+            ])(
+                "should handle integer array conversion to Uint8Array",
+                async (intArray) => {
+                    const uint8Data = new Uint8Array(intArray);
+                    const mockDownloadFunction = vi.fn().mockResolvedValue(uint8Data);
+
+                    await handleSQLiteBackupDownload(mockDownloadFunction);
+
+                    expect(globalThis.Blob).toHaveBeenCalledWith([uint8Data], {
+                        type: "application/x-sqlite3",
+                    });
+                    expect(mockAnchor.href).toBe("mock-object-url");
+                }
+            );
         });
     });
 

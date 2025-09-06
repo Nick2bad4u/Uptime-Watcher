@@ -411,7 +411,7 @@ describe("Cache Keys - Property-Based Tests", () => {
                     fc.oneof(
                         fc.constant(""), // Empty identifier
                         fc.string({ minLength: 200, maxLength: 300 }).filter(s => !s.includes(":")), // Very long identifier without colons
-                        fc.string({ minLength: 1, maxLength: 10 }).map(s => "  " + s + "  ") // Identifier with leading/trailing spaces
+                        fc.string({ minLength: 1, maxLength: 10 }).map(s => `  ${  s  }  `) // Identifier with leading/trailing spaces
                     ),
                     (prefix, identifier) => {
                         // For invalid identifiers, parseCacheKey should throw
@@ -472,7 +472,7 @@ describe("Cache Keys - Property-Based Tests", () => {
                             CacheKeys.site.bulkOperation(),
                         ];
 
-                        keys.forEach(key => {
+                        for (const key of keys) {
                             // Each key should be valid
                             expect(isStandardizedCacheKey(key)).toBe(true);
 
@@ -482,14 +482,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                             expect(parsed.identifier).toBeDefined();
 
                             // Reconstruction should match original
-                            let reconstructed: string;
-                            if (parsed.operation) {
-                                reconstructed = `${parsed.prefix}:${parsed.operation}:${parsed.identifier}`;
-                            } else {
-                                reconstructed = `${parsed.prefix}:${parsed.identifier}`;
-                            }
+                            const reconstructed = parsed.operation ? `${parsed.prefix}:${parsed.operation}:${parsed.identifier}` : `${parsed.prefix}:${parsed.identifier}`;
                             expect(reconstructed).toBe(key);
-                        });
+                        }
 
                         return true;
                     }

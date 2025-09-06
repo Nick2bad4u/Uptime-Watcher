@@ -216,7 +216,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.float({ min: 101 })])(
+        test.prop([fc.float({ min: 101, noNaN: true })])(
             "should clamp values above 100",
             (value) => {
                 const result = safeParsePercentage(value);
@@ -356,7 +356,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
     });
 
     describe("safeParseTimeout", () => {
-        test.prop([fc.float({ min: Math.fround(0.1) })])(
+        test.prop([fc.float({ min: Math.fround(0.1), noNaN: true })])(
             "should return positive timeouts unchanged",
             (timeout) => {
                 const result = safeParseTimeout(timeout);

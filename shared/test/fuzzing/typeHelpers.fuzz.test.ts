@@ -113,7 +113,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         test.prop([fc.integer({ min: 0, max: 100 })])(
             "should work with arrays of any length",
             (length) => {
-                const arr = new Array(length);
+                const arr = Array.from({ length });
                 expect(isArray(arr)).toBe(true);
             }
         );
@@ -153,7 +153,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
             expect(isRecord("")).toBe(false);
             expect(isRecord(0)).toBe(false);
             expect(isRecord(new Date())).toBe(true);
-            expect(isRecord(new Error())).toBe(true);
+            expect(isRecord(new Error("Test error"))).toBe(true);
         });
 
         test.prop([fc.record({}, { withDeletedKeys: true })])(

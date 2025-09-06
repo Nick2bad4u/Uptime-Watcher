@@ -33,7 +33,7 @@ describe('abortUtils.ts - Comprehensive Coverage', () => {
                 for (const signal of signals) {
                     if (signal.aborted) {
                         controller.abort();
-                        continue;
+                        break;
                     }
                     signal.addEventListener('abort', () => controller.abort(), { once: true });
                 }

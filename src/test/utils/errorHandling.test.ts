@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { test, fc } from "@fast-check/vitest";
 import {
     ensureError,
     withUtilityErrorHandling,
@@ -785,6 +786,87 @@ describe("Error Handling Utilities", () => {
                     withUtilityErrorHandling(operation, "", undefined, false)
                 ).rejects.toThrow(" failed and no fallback value provided");
             });
+        });
+    });
+
+    /**
+     * Fast-check property-based tests for comprehensive edge case coverage.
+     * These tests systematically explore error handling behavior under
+     * various conditions including arbitrary error types, different fallback
+     * values, operation results, and edge cases in error conversion patterns.
+     */
+    describe("Property-based tests", () => {
+        describe("ensureError function", () => {
+            test.prop([fc.string()])(
+                "should convert strings to Error instances",
+                (input) => {
+                    const result = ensureError(input);
+                    expect(result).toBeInstanceOf(Error);
+                    expect(result.message).toBe(input);
+                }
+            );
+
+            test.prop([fc.integer()])(
+                "should convert numbers to Error instances",
+                (input) => {
+                    const result = ensureError(input);
+                    expect(result).toBeInstanceOf(Error);
+                    expect(result.message).toBe(String(input));
+                }
+            );
+
+            test.prop([fc.string().map(msg => new Error(msg))])(
+                "should return Error instances unchanged",
+                (error) => {
+                    const result = ensureError(error);
+                    expect(result).toBe(error);
+                    expect(result.message).toBe(error.message);
+                }
+            );
+        });
+
+        describe("withUtilityErrorHandling function", () => {
+            test.prop([fc.string()])(
+                "should return operation result on success",
+                async (expectedResult) => {
+                    const operation = vi.fn().mockResolvedValue(expectedResult);
+                    const result = await withUtilityErrorHandling(operation, "test");
+                    expect(result).toBe(expectedResult);
+                    expect(operation).toHaveBeenCalledOnce();
+                }
+            );
+
+            test.prop([fc.string().filter(s => s.length > 0), fc.string()])(
+                "should return fallback on error",
+                async (operationName, fallbackValue) => {
+                    const error = new Error("Test error");
+                    const operation = vi.fn().mockRejectedValue(error);
+
+                    const result = await withUtilityErrorHandling(
+                        operation,
+                        operationName,
+                        fallbackValue,
+                        false
+                    );
+
+                    expect(result).toBe(fallbackValue);
+                    expect(operation).toHaveBeenCalledOnce();
+                }
+            );
+
+            test.prop([fc.string().filter(s => s.length > 0)])(
+                "should throw when shouldThrow is true",
+                async (operationName) => {
+                    const error = new Error("Test error");
+                    const operation = vi.fn().mockRejectedValue(error);
+
+                    await expect(
+                        withUtilityErrorHandling(operation, operationName, undefined, true)
+                    ).rejects.toBe(error);
+
+                    expect(operation).toHaveBeenCalledOnce();
+                }
+            );
         });
     });
 });

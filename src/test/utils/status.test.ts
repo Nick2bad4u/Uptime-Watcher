@@ -1,10 +1,15 @@
 /**
  * Comprehensive tests for status utility functions. Tests formatting and icon
  * selection for all status types.
+ *
+ * @remarks
+ * Enhanced with fast-check property-based testing to systematically explore
+ * edge cases and validate invariants across all status utility functions.
  */
 
 import { describe, expect, it } from "vitest";
-import { formatStatusWithIcon, getStatusIcon } from "../../utils/status";
+import { test, fc } from "@fast-check/vitest";
+import { formatStatusWithIcon, getStatusIcon, createStatusIdentifier } from "../../utils/status";
 
 describe("Status Utilities", () => {
     describe("getStatusIcon", () => {
@@ -682,6 +687,326 @@ describe("Status Utilities", () => {
             for (const variation of variations) {
                 expect(formatStatusWithIcon(variation)).toBe("✅ Up");
             }
+        });
+    });
+
+    /**
+     * Fast-check property-based tests for comprehensive status utility validation.
+     * These tests use property-based testing to systematically explore edge cases
+     * and validate invariants across all status utility functions.
+     */
+    describe("Property-Based Fuzzing Tests", () => {
+        describe("getStatusIcon property tests", () => {
+            // Known status values for property testing
+            const knownStatuses = ["down", "mixed", "paused", "pending", "unknown", "up"];
+            const statusIcons = {
+                "down": "❌",
+                "mixed": "🔄",
+                "paused": "⏸️",
+                "pending": "⏳",
+                "unknown": "❓",
+                "up": "✅"
+            };
+
+            test.prop([fc.constantFrom(...knownStatuses)])(
+                "should return correct icons for known statuses",
+                (status) => {
+                    const result = getStatusIcon(status);
+
+                    // Property: Should return the expected icon for known status
+                    expect(result).toBe(statusIcons[status as keyof typeof statusIcons]);
+
+                    // Property: Result should be a non-empty string
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeGreaterThan(0);
+                }
+            );
+
+            test.prop([fc.constantFrom(...knownStatuses)])(
+                "should be case-insensitive for known statuses",
+                (status) => {
+                    const lowercase = status.toLowerCase();
+                    const uppercase = status.toUpperCase();
+                    const mixedCase = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+
+                    const lowercaseResult = getStatusIcon(lowercase);
+                    const uppercaseResult = getStatusIcon(uppercase);
+                    const mixedCaseResult = getStatusIcon(mixedCase);
+
+                    // Property: All case variations should return same icon
+                    expect(lowercaseResult).toBe(uppercaseResult);
+                    expect(uppercaseResult).toBe(mixedCaseResult);
+                    expect(lowercaseResult).toBe(statusIcons[status as keyof typeof statusIcons]);
+                }
+            );
+
+            test.prop([fc.string().filter(s => !knownStatuses.includes(s.toLowerCase()))])(
+                "should return default icon for unknown statuses",
+                (unknownStatus) => {
+                    const result = getStatusIcon(unknownStatus);
+
+                    // Property: Unknown statuses should return default icon
+                    expect(result).toBe("⚪");
+                }
+            );
+
+            test.prop([fc.oneof(fc.constant(""), fc.constant("   "), fc.constant("\t\n"))])(
+                "should handle empty/whitespace strings gracefully",
+                (emptyStatus) => {
+                    const result = getStatusIcon(emptyStatus);
+
+                    // Property: Empty/whitespace should return default icon
+                    expect(result).toBe("⚪");
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeGreaterThan(0);
+                }
+            );
+
+            test.prop([fc.string()])(
+                "should always return a non-empty string",
+                (status) => {
+                    const result = getStatusIcon(status);
+
+                    // Property: Result must always be a non-empty string
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeGreaterThan(0);
+                }
+            );
+        });
+
+        describe("formatStatusWithIcon property tests", () => {
+            const knownStatuses = ["down", "mixed", "paused", "pending", "unknown", "up"];
+
+            test.prop([fc.constantFrom(...knownStatuses)])(
+                "should format known statuses correctly",
+                (status) => {
+                    const result = formatStatusWithIcon(status);
+                    const expectedIcon = getStatusIcon(status);
+                    const expectedText = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+                    const expected = `${expectedIcon} ${expectedText}`;
+
+                    // Property: Should match expected format
+                    expect(result).toBe(expected);
+
+                    // Property: Should contain both icon and text
+                    expect(result).toContain(expectedIcon);
+                    expect(result).toContain(expectedText);
+
+                    // Property: Should have proper spacing
+                    expect(result).toMatch(/^.+ .+$/);
+                }
+            );
+
+            test.prop([fc.string({ minLength: 1 }).filter(s => s.trim().length > 0)])(
+                "should always format with icon and capitalized text",
+                (status) => {
+                    const result = formatStatusWithIcon(status);
+
+                    // Property: Should always contain an icon and text separated by space
+                    expect(result).toMatch(/^.+ .+$/);
+
+                    // Property: Should contain expected icon
+                    const expectedIcon = getStatusIcon(status);
+                    expect(result.startsWith(expectedIcon)).toBe(true);
+
+                    // Property: Text portion should be properly formatted
+                    // The text part is: first char uppercase + rest lowercase
+                    const expectedText = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+                    expect(result).toContain(expectedText);
+                }
+            );
+
+            test.prop([fc.constantFrom(...knownStatuses)])(
+                "should be consistent with getStatusIcon",
+                (status) => {
+                    const formattedResult = formatStatusWithIcon(status);
+                    const iconResult = getStatusIcon(status);
+
+                    // Property: Formatted result should start with the icon from getStatusIcon
+                    expect(formattedResult.startsWith(iconResult)).toBe(true);
+                }
+            );
+
+            test.prop([fc.string().filter(s => s.length > 0)])(
+                "should handle case variations consistently",
+                (status) => {
+                    const lowercase = status.toLowerCase();
+                    const uppercase = status.toUpperCase();
+
+                    const lowercaseResult = formatStatusWithIcon(lowercase);
+                    const uppercaseResult = formatStatusWithIcon(uppercase);
+
+                    // Property: Different cases should produce same formatted output
+                    // (since formatting normalizes the text part)
+                    const lowercaseParts = lowercaseResult.split(" ");
+                    const uppercaseParts = uppercaseResult.split(" ");
+
+                    expect(lowercaseParts[0]).toBe(uppercaseParts[0]); // Same icon
+
+                    // For text comparison, we need to be flexible about spacing issues
+                    // Both should produce the same capitalized text
+                    const lowercaseText = lowercaseParts.slice(1).join(" ");
+                    const uppercaseText = uppercaseParts.slice(1).join(" ");
+                    expect(lowercaseText).toBe(uppercaseText);
+                }
+            );
+        });
+
+        describe("createStatusIdentifier property tests", () => {
+            test.prop([fc.string({ minLength: 1, maxLength: 30 }).filter(s => {
+                // Filter to valid inputs that produce valid camelCase
+                if (!/^[a-zA-Z\s_-]+$/u.test(s)) return false;
+                if (s.trim().length === 0) return false;
+
+                // Test that the function would produce valid camelCase
+                const words = s.toLowerCase().split(/[\s_-]+/);
+                const camelCased = words
+                    .map((word, index) =>
+                        index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)
+                    )
+                    .join('');
+
+                // Must produce valid camelCase: non-empty and starts with lowercase
+                return camelCased.length > 0 && /^[a-z][\dA-Za-z]*$/u.test(camelCased);
+            })])(
+                "should create valid camelCase identifiers",
+                (statusText) => {
+                    const result = createStatusIdentifier(statusText);
+
+                    // Property: Result should be a non-empty string
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeGreaterThan(0);
+
+                    // Property: Result should be valid camelCase (starts with lowercase, no spaces/special chars)
+                    expect(result).toMatch(/^[a-z][\dA-Za-z]*$/);
+
+                    // Property: Should not contain original separators
+                    expect(result).not.toContain(" ");
+                    expect(result).not.toContain("-");
+                    expect(result).not.toContain("_");
+                }
+            );
+
+            test.prop([fc.constantFrom("status check", "monitor down", "service up", "health ok")])(
+                "should handle common status phrases correctly",
+                (phrase) => {
+                    const result = createStatusIdentifier(phrase);
+
+                    // Property: Should create valid identifier
+                    expect(result).toMatch(/^[a-z][\dA-Za-z]*$/);
+
+                    // Property: Should start with lowercase
+                    expect(result[0]).toBe(result[0].toLowerCase());
+
+                    // Property: Should be longer than any single word (compound identifier)
+                    if (phrase.includes(" ")) {
+                        expect(result.length).toBeGreaterThan(Math.max(...phrase.split(" ").map(w => w.length)));
+                    }
+                }
+            );
+
+            test.prop([fc.constantFrom("status", "monitor", "check", "service")])(
+                "should handle single words correctly",
+                (word) => {
+                    const result = createStatusIdentifier(word);
+
+                    // Property: Single word should remain lowercase
+                    expect(result).toBe(word.toLowerCase());
+                }
+            );
+
+            test.prop([fc.string({ minLength: 1, maxLength: 20 }).filter(s => /^[a-zA-Z]+$/u.test(s))])(
+                "should handle alphabetic strings without separators",
+                (text) => {
+                    const result = createStatusIdentifier(text);
+
+                    // Property: Should convert to lowercase for single word
+                    expect(result).toBe(text.toLowerCase());
+                }
+            );
+
+            test.prop([fc.array(fc.string({ minLength: 1, maxLength: 10 }).filter(s => /^[a-zA-Z]+$/u.test(s)), { minLength: 2, maxLength: 5 })])(
+                "should combine multiple words into camelCase",
+                (words) => {
+                    const phrase = words.join(" ");
+                    const result = createStatusIdentifier(phrase);
+
+                    // Property: Should start with lowercase first word
+                    expect(result.startsWith(words[0].toLowerCase())).toBe(true);
+
+                    // Property: Should not contain spaces
+                    expect(result).not.toContain(" ");
+
+                    // Property: Should be camelCase pattern
+                    expect(result).toMatch(/^[a-z][\dA-Za-z]*$/);
+                }
+            );
+        });
+
+        describe("Cross-function property tests", () => {
+            const knownStatuses = ["down", "mixed", "paused", "pending", "unknown", "up"];
+
+            test.prop([fc.constantFrom(...knownStatuses)])(
+                "getStatusIcon and formatStatusWithIcon should be consistent",
+                (status) => {
+                    const icon = getStatusIcon(status);
+                    const formatted = formatStatusWithIcon(status);
+
+                    // Property: Formatted string should start with the icon
+                    expect(formatted.startsWith(icon)).toBe(true);
+
+                    // Property: Both functions should handle same input consistently
+                    expect(typeof icon).toBe("string");
+                    expect(typeof formatted).toBe("string");
+                    expect(icon.length).toBeGreaterThan(0);
+                    expect(formatted.length).toBeGreaterThan(icon.length);
+                }
+            );
+
+            test.prop([fc.string()])(
+                "all status functions should handle arbitrary input gracefully",
+                (status) => {
+                    // Property: None of these should throw
+                    expect(() => getStatusIcon(status)).not.toThrow();
+                    expect(() => formatStatusWithIcon(status)).not.toThrow();
+
+                    // Property: All should return non-empty strings
+                    const icon = getStatusIcon(status);
+                    const formatted = formatStatusWithIcon(status);
+
+                    expect(icon.length).toBeGreaterThan(0);
+                    expect(formatted.length).toBeGreaterThan(0);
+                }
+            );
+
+            test.prop([fc.string({ minLength: 1 }).filter(s => {
+                // Filter to valid inputs that produce valid camelCase
+                if (!/^[a-zA-Z\s_-]+$/u.test(s)) return false;
+                if (s.trim().length === 0) return false;
+
+                // Test that the function would produce valid camelCase
+                const words = s.toLowerCase().split(/[\s_-]+/);
+                const camelCased = words
+                    .map((word, index) =>
+                        index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)
+                    )
+                    .join('');
+
+                // Must produce valid camelCase: non-empty and starts with lowercase
+                return camelCased.length > 0 && /^[a-z][\dA-Za-z]*$/u.test(camelCased);
+            })])(
+                "createStatusIdentifier should handle valid text input gracefully",
+                (text) => {
+                    // Property: Should not throw with valid text input
+                    expect(() => createStatusIdentifier(text)).not.toThrow();
+
+                    const result = createStatusIdentifier(text);
+
+                    // Property: Should produce valid identifier
+                    expect(result).toMatch(/^[a-z][\dA-Za-z]*$/);
+                    expect(result.length).toBeGreaterThan(0);
+                }
+            );
         });
     });
 });

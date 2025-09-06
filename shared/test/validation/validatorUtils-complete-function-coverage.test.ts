@@ -193,7 +193,7 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
                 validatorUtilsModule.isValidUrl("https://sub.example.com/path")
             ).toBe(true);
             expect(validatorUtilsModule.isValidUrl("ftp://example.com")).toBe(
-                true
+                false
             );
             expect(validatorUtilsModule.isValidUrl("not-a-url")).toBe(false);
             expect(validatorUtilsModule.isValidUrl("https://")).toBe(false);

@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { fc, test } from "@fast-check/vitest";
 import * as monitorUiHelpers from "../../utils/monitorUiHelpers";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import { AppCaches } from "../../utils/cache";
@@ -591,6 +592,222 @@ describe("Monitor UI Helpers", () => {
             // Next call should fetch again
             await monitorUiHelpers.supportsResponseTime("http");
             expect(vi.mocked(getMonitorTypeConfig)).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe("Property-based Tests", () => {
+        beforeEach(() => {
+            vi.clearAllMocks();
+            AppCaches.uiHelpers.clear();
+        });
+
+        test.prop([
+            fc.array(fc.string({ minLength: 1, maxLength: 20 }), { minLength: 0, maxLength: 10 })
+        ])("should handle getDefaultMonitorId with various array configurations", (monitorIds) => {
+            // Property: First element should be returned for non-empty arrays, empty string for empty arrays
+            const result = monitorUiHelpers.getDefaultMonitorId(monitorIds);
+
+            if (monitorIds.length === 0) {
+                expect(result).toBe("");
+            } else {
+                expect(result).toBe(monitorIds[0]);
+            }
+
+            // Property: Function should be deterministic for same input
+            const result2 = monitorUiHelpers.getDefaultMonitorId(monitorIds);
+            expect(result2).toBe(result);
+        });
+
+        test.prop([
+            fc.record({
+                supportsAdvancedAnalytics: fc.boolean(),
+                supportsResponseTime: fc.boolean(),
+                showUrl: fc.boolean(),
+            })
+        ])("should handle monitor feature support queries with various configurations", async (features) => {
+            // Clear cache before each test run to prevent interference
+            AppCaches.uiHelpers.clear();
+
+            const mockConfig = createMockConfig({
+                type: "http",
+                uiConfig: {
+                    supportsAdvancedAnalytics: features.supportsAdvancedAnalytics,
+                    supportsResponseTime: features.supportsResponseTime,
+                    display: { showUrl: features.showUrl },
+                },
+            });
+
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(mockConfig);
+
+            // Property: Feature support should match configuration exactly
+            const analyticsResult = await monitorUiHelpers.supportsAdvancedAnalytics("http");
+            expect(analyticsResult).toBe(features.supportsAdvancedAnalytics);
+
+            const responseTimeResult = await monitorUiHelpers.supportsResponseTime("http");
+            expect(responseTimeResult).toBe(features.supportsResponseTime);
+
+            const showUrlResult = await monitorUiHelpers.shouldShowUrl("http");
+            expect(showUrlResult).toBe(features.showUrl);
+        });
+
+        test.prop([
+            fc.array(fc.constantFrom("http", "port", "dns", "ping"), { minLength: 0, maxLength: 5 })
+        ])("should handle allSupportsAdvancedAnalytics with various monitor type arrays", async (monitorTypes) => {
+            // Mock all types to support advanced analytics
+            vi.mocked(getMonitorTypeConfig).mockImplementation(async (type) =>
+                createMockConfig({
+                    type,
+                    uiConfig: { supportsAdvancedAnalytics: true },
+                })
+            );
+
+            const result = await monitorUiHelpers.allSupportsAdvancedAnalytics(monitorTypes as any);
+
+            // Property: Empty array should return true (vacuous truth)
+            if (monitorTypes.length === 0) {
+                expect(result).toBe(true);
+            } else {
+                // Property: All types supporting analytics should return true
+                expect(result).toBe(true);
+            }
+        });
+
+        test.prop([
+            fc.array(fc.constantFrom("http", "port", "dns", "ping"), { minLength: 1, maxLength: 5 })
+        ])("should handle allSupportsResponseTime with mixed support configurations", async (monitorTypes) => {
+            // Mock some types to support response time, others not
+            vi.mocked(getMonitorTypeConfig).mockImplementation(async (type) => {
+                const supports = type === "http" || type === "port"; // Only HTTP and port support response time
+                return createMockConfig({
+                    type,
+                    uiConfig: { supportsResponseTime: supports },
+                });
+            });
+
+            const result = await monitorUiHelpers.allSupportsResponseTime(monitorTypes as any);
+
+            // Property: Should only return true if all types are http or port
+            const expectedResult = monitorTypes.every(type => type === "http" || type === "port");
+            expect(result).toBe(expectedResult);
+        });
+
+        test.prop([
+            fc.constantFrom("http", "port", "dns", "ping"),
+            fc.string({ minLength: 1, maxLength: 50 }).filter(str => str.trim().length > 0)
+        ])("should handle getAnalyticsLabel with various monitor types", async (monitorType, customLabel) => {
+            // Clear cache before each test
+            AppCaches.uiHelpers.clear();
+
+            const config = createMockConfig({
+                type: monitorType,
+                uiConfig: {
+                    detailFormats: {
+                        analyticsLabel: customLabel,
+                    },
+                },
+            });
+
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(config);
+
+            const result = await monitorUiHelpers.getAnalyticsLabel(monitorType as any);
+
+            // Property: Should return custom label when configured
+            expect(result).toBe(customLabel);
+        });
+
+        test.prop([
+            fc.constantFrom("http", "port", "dns", "ping")
+        ])("should handle getAnalyticsLabel fallback with undefined config", async (monitorType) => {
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
+
+            const result = await monitorUiHelpers.getAnalyticsLabel(monitorType as any);
+
+            // Property: Should return fallback format when config is undefined
+            const expectedFallback = `${monitorType.toUpperCase()} Response Time`;
+            expect(result).toBe(expectedFallback);
+        });
+
+        test.prop([
+            fc.record({
+                primary: fc.option(fc.string({ minLength: 1, maxLength: 100 }), { nil: undefined }),
+                secondary: fc.option(fc.string({ minLength: 1, maxLength: 100 }), { nil: undefined }),
+            })
+        ])("should handle getMonitorHelpTexts with various help text configurations", async (helpTexts) => {
+            // Clear cache before each test
+            AppCaches.uiHelpers.clear();
+
+            const config = createMockConfig({
+                type: "http",
+                uiConfig: {
+                    helpTexts: helpTexts,
+                },
+            });
+
+            vi.mocked(getMonitorTypeConfig).mockResolvedValue(config);
+
+            const result = await monitorUiHelpers.getMonitorHelpTexts("http");
+
+            // Property: Should return configured help texts or match structure
+            if (helpTexts.primary !== undefined || helpTexts.secondary !== undefined) {
+                // If we have defined values, they should be preserved
+                if (helpTexts.primary !== undefined) {
+                    expect(result.primary).toBe(helpTexts.primary);
+                }
+                if (helpTexts.secondary !== undefined) {
+                    expect(result.secondary).toBe(helpTexts.secondary);
+                }
+            } else {
+                // If all values are undefined, result could be empty object
+                expect(typeof result).toBe("object");
+            }
+        });
+
+        test.prop([
+            fc.array(fc.string({ minLength: 1, maxLength: 20 }), { minLength: 0, maxLength: 20 })
+        ])("should handle clearConfigCache with various cache states", async (cacheKeys) => {
+            // Populate cache with test data using valid MonitorTypeConfig objects
+            for (const key of cacheKeys) {
+                AppCaches.uiHelpers.set(key, createMockConfig({ type: "http" }));
+            }
+
+            // Property: Cache should have content before clearing
+            if (cacheKeys.length > 0) {
+                expect(AppCaches.uiHelpers.size).toBeGreaterThan(0);
+            }
+
+            // Clear cache
+            monitorUiHelpers.clearConfigCache();
+
+            // Property: Cache should be empty after clearing
+            expect(AppCaches.uiHelpers.size).toBe(0);
+
+            // Property: Previously cached keys should no longer exist
+            for (const key of cacheKeys) {
+                expect(AppCaches.uiHelpers.has(key)).toBe(false);
+            }
+        });
+
+        test.prop([
+            fc.constantFrom("http", "port", "dns", "ping")
+        ])("should handle error scenarios gracefully", async (monitorType) => {
+            const testError = new Error("Configuration fetch failed");
+            vi.mocked(getMonitorTypeConfig).mockRejectedValue(testError);
+
+            // Property: All functions should return fallback values on error
+            const analyticsResult = await monitorUiHelpers.supportsAdvancedAnalytics(monitorType as any);
+            expect(analyticsResult).toBe(false);
+
+            const responseTimeResult = await monitorUiHelpers.supportsResponseTime(monitorType as any);
+            expect(responseTimeResult).toBe(false);
+
+            const showUrlResult = await monitorUiHelpers.shouldShowUrl(monitorType as any);
+            expect(showUrlResult).toBe(false);
+
+            const analyticsLabel = await monitorUiHelpers.getAnalyticsLabel(monitorType as any);
+            expect(analyticsLabel).toBe(`${monitorType.toUpperCase()} Response Time`);
+
+            const helpTexts = await monitorUiHelpers.getMonitorHelpTexts(monitorType as any);
+            expect(helpTexts).toEqual({});
         });
     });
 });

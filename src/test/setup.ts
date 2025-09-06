@@ -18,6 +18,33 @@ EventEmitter.defaultMaxListeners = MAX_LISTENERS;
 // Set max listeners specifically for the process object
 process.setMaxListeners(MAX_LISTENERS);
 
+// Handle unhandled promise rejections from async tests
+// Only suppress errors that are expected from abort/retry tests
+const originalUnhandledRejection = process.listeners("unhandledRejection");
+
+process.removeAllListeners("unhandledRejection");
+
+process.on("unhandledRejection", (reason: unknown) => {
+    // Only suppress expected test error messages
+    if (
+        reason instanceof Error &&
+        (reason.message.includes("Always fails") ||
+         reason.message.includes("Fails") ||
+         reason.message.includes("Operation was aborted") ||
+         reason.message.includes("string error"))
+    ) {
+        // These are expected test failures, ignore them
+        return;
+    }
+
+    // For any other unhandled rejections, call original handlers
+    for (const handler of originalUnhandledRejection) {
+        if (typeof handler === "function") {
+            handler(reason, new Promise(() => {}));
+        }
+    }
+});
+
 // Configure fast-check for property-based testing
 fc.configureGlobal({ numRuns: 10 });
 

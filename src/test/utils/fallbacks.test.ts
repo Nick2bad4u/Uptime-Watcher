@@ -6,6 +6,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { test } from "@fast-check/vitest";
+import * as fc from "fast-check";
 import {
     isNullOrUndefined,
     withAsyncErrorHandling,
@@ -167,6 +169,44 @@ describe("Fallback Utilities", () => {
                 expect(isNullOrUndefined(() => {})).toBe(false);
             });
         });
+
+        describe("Property-based Tests", () => {
+            test.prop([fc.oneof(fc.constant(null), fc.constant(undefined))])(
+                "should always return true for null or undefined values",
+                (nullOrUndef) => {
+                    expect(isNullOrUndefined(nullOrUndef)).toBe(true);
+                }
+            );
+
+            test.prop([
+                fc.oneof(
+                    fc.string(),
+                    fc.integer(),
+                    fc.float({ min: Math.fround(-1000), max: Math.fround(1000) }),
+                    fc.boolean(),
+                    fc.array(fc.anything()),
+                    fc.object(),
+                    fc.func(fc.anything()),
+                    fc.constant(0),
+                    fc.constant(false),
+                    fc.constant(""),
+                    fc.constant([]),
+                    fc.constant({})
+                )
+            ])(
+                "should always return false for non-null/undefined values including falsy ones",
+                (value) => {
+                    expect(isNullOrUndefined(value)).toBe(false);
+                }
+            );
+
+            test.prop([fc.anything().filter((v) => v !== null && v !== undefined)])(
+                "should return false for any defined value",
+                (value) => {
+                    expect(isNullOrUndefined(value)).toBe(false);
+                }
+            );
+        });
     });
 
     describe("withAsyncErrorHandling", () => {
@@ -252,6 +292,49 @@ describe("Fallback Utilities", () => {
             expect(typeof handler1).toBe("function");
             expect(typeof handler2).toBe("function");
             expect(handler1).not.toBe(handler2); // Different instances
+        });
+
+        describe("Property-based Tests", () => {
+            test.prop([fc.string().filter((s) => s.trim().length > 0)])(
+                "should create handler function for any valid operation name",
+                (operationName) => {
+                    const mockAsyncOp = vi.fn().mockResolvedValue("result");
+                    const handler = withAsyncErrorHandling(mockAsyncOp, operationName);
+
+                    expect(typeof handler).toBe("function");
+                    expect(handler()).toBeUndefined(); // Returns void
+                }
+            );
+
+            test.prop([fc.anything()])(
+                "should handle async operations returning any value type",
+                async (returnValue) => {
+                    const mockAsyncOp = vi.fn().mockResolvedValue(returnValue);
+                    const handler = withAsyncErrorHandling(mockAsyncOp, "test");
+
+                    // Should not throw when handler is called
+                    expect(() => handler()).not.toThrow();
+
+                    // Wait a bit to allow async operation to complete
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                    expect(mockAsyncOp).toHaveBeenCalledOnce();
+                }
+            );
+
+            test.prop([fc.string().filter((s) => s.trim().length > 0)])(
+                "should handle async operations that throw with any error message",
+                async (errorMessage) => {
+                    const mockAsyncOp = vi.fn().mockRejectedValue(new Error(errorMessage));
+                    const handler = withAsyncErrorHandling(mockAsyncOp, "test");
+
+                    // Should not throw when handler is called, even if async op fails
+                    expect(() => handler()).not.toThrow();
+
+                    // Wait a bit to allow async operation to complete
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                    expect(mockAsyncOp).toHaveBeenCalledOnce();
+                }
+            );
         });
     });
 
@@ -421,6 +504,69 @@ describe("Fallback Utilities", () => {
                 );
             });
         });
+
+        describe("Property-based Tests", () => {
+            test.prop([fc.anything(), fc.anything()])(
+                "should return operation result when operation succeeds",
+                (mockResult, fallbackValue) => {
+                    const operation = vi.fn().mockReturnValue(mockResult);
+
+                    const result = withSyncErrorHandling(
+                        operation,
+                        "test operation",
+                        fallbackValue
+                    );
+
+                    expect(result).toBe(mockResult);
+                    expect(operation).toHaveBeenCalledOnce();
+                }
+            );
+
+            test.prop([
+                fc.string().filter((s) => s.trim().length > 0),
+                fc.anything()
+            ])(
+                "should return fallback value when operation throws",
+                async (operationName, fallbackValue) => {
+                    const logger = await import("../../services/logger");
+                    const operation = vi.fn().mockImplementation(() => {
+                        throw new Error("Test error");
+                    });
+
+                    const result = withSyncErrorHandling(
+                        operation,
+                        operationName,
+                        fallbackValue
+                    );
+
+                    expect(result).toBe(fallbackValue);
+                    expect(operation).toHaveBeenCalledOnce();
+                    expect(logger.logger.error).toHaveBeenCalled();
+                }
+            );
+
+            test.prop([
+                fc.oneof(fc.string(), fc.integer(), fc.constant(null), fc.constant({})),
+                fc.anything()
+            ])(
+                "should handle operations throwing various error types",
+                async (errorToThrow, fallbackValue) => {
+                    const logger = await import("../../services/logger");
+                    const operation = vi.fn().mockImplementation(() => {
+                        throw errorToThrow;
+                    });
+
+                    const result = withSyncErrorHandling(
+                        operation,
+                        "test operation",
+                        fallbackValue
+                    );
+
+                    expect(result).toBe(fallbackValue);
+                    expect(logger.logger.error).toHaveBeenCalled();
+                }
+            );
+        });
     });
 
     describe("withFallback", () => {
@@ -489,6 +635,49 @@ describe("Fallback Utilities", () => {
                 expect(withFallback(original, fallback)).toBe(original);
                 expect(withFallback(null, fallback)).toBe(fallback);
             });
+        });
+
+        describe("Property-based Tests", () => {
+            test.prop([
+                fc.oneof(fc.constant(null), fc.constant(undefined)),
+                fc.anything()
+            ])(
+                "should always return fallback for null or undefined values",
+                (nullOrUndef, fallback) => {
+                    expect(withFallback(nullOrUndef, fallback)).toBe(fallback);
+                }
+            );
+
+            test.prop([
+                fc.anything().filter((v) => v !== null && v !== undefined),
+                fc.anything()
+            ])(
+                "should return original value when not null or undefined",
+                (value, fallback) => {
+                    expect(withFallback(value, fallback)).toBe(value);
+                }
+            );
+
+            test.prop([
+                fc.oneof(
+                    fc.string(),
+                    fc.integer(),
+                    fc.boolean(),
+                    fc.constant(0),
+                    fc.constant(false),
+                    fc.constant(""),
+                    fc.array(fc.anything()),
+                    fc.object()
+                ),
+                fc.anything()
+            ])(
+                "should preserve falsy but defined values",
+                (falsyValue, fallback) => {
+                    // Skip null/undefined as they should use fallback
+                    fc.pre(falsyValue !== null && falsyValue !== undefined);
+                    expect(withFallback(falsyValue, fallback)).toBe(falsyValue);
+                }
+            );
         });
     });
 
@@ -782,6 +971,87 @@ describe("Fallback Utilities", () => {
                 expect(result).toBe("Error Fallback");
             });
         });
+
+        describe("Property-based Tests", () => {
+            const createMonitorArbitrary = (type: string) =>
+                fc.record({
+                    id: fc.string().filter((s) => s.trim().length > 0),
+                    type: fc.constant(type),
+                    host: fc.option(fc.domain()),
+                    url: fc.option(fc.webUrl()),
+                    port: fc.option(fc.integer({ min: 1, max: 65_535 })),
+                    checkInterval: fc.integer({ min: 1000, max: 3_600_000 }),
+                    monitoring: fc.boolean(),
+                    responseTime: fc.integer({ min: -1, max: 10_000 }),
+                    retryAttempts: fc.integer({ min: 0, max: 10 }),
+                    status: fc.constantFrom("up", "down", "pending", "paused"),
+                    timeout: fc.integer({ min: 1000, max: 60_000 }),
+                    history: fc.constant([])
+                }) as fc.Arbitrary<Monitor>;
+
+            test.prop([
+                createMonitorArbitrary("http"),
+                fc.string().filter((s) => s.trim().length > 0)
+            ])(
+                "should prefer URL over fallback for HTTP monitors with URL",
+                (monitor, fallback) => {
+                    fc.pre(Boolean(monitor.url));
+                    const result = getMonitorDisplayIdentifier(monitor, fallback);
+                    expect(result).toBe(monitor.url);
+                }
+            );
+
+            test.prop([
+                createMonitorArbitrary("port"),
+                fc.string().filter((s) => s.trim().length > 0)
+            ])(
+                "should create host:port identifier for port monitors",
+                (monitor, fallback) => {
+                    fc.pre(Boolean(monitor.host) && Boolean(monitor.port));
+                    const result = getMonitorDisplayIdentifier(monitor, fallback);
+                    expect(result).toBe(`${monitor.host}:${monitor.port}`);
+                }
+            );
+
+            test.prop([
+                createMonitorArbitrary("ping"),
+                fc.string().filter((s) => s.trim().length > 0)
+            ])(
+                "should use host for ping monitors with host",
+                (monitor, fallback) => {
+                    fc.pre(Boolean(monitor.host));
+                    const result = getMonitorDisplayIdentifier(monitor, fallback);
+                    expect(result).toBe(monitor.host);
+                }
+            );
+
+            test.prop([
+                fc.record({
+                    id: fc.string().filter((s) => s.trim().length > 0),
+                    type: fc.constantFrom("http", "port", "ping", "dns"),
+                    checkInterval: fc.integer({ min: 1000, max: 3_600_000 }),
+                    monitoring: fc.boolean(),
+                    responseTime: fc.integer({ min: -1, max: 10_000 }),
+                    retryAttempts: fc.integer({ min: 0, max: 10 }),
+                    status: fc.constantFrom("up", "down", "pending", "paused"),
+                    timeout: fc.integer({ min: 1000, max: 60_000 }),
+                    history: fc.constant([])
+                }) as fc.Arbitrary<Monitor>,
+                fc.string().filter((s) => s.trim().length > 0)
+            ])(
+                "should return fallback when monitor lacks identifying properties",
+                (monitor, fallback) => {
+                    // Ensure monitor lacks identifying properties
+                    const cleanMonitor = { ...monitor };
+                    delete cleanMonitor.url;
+                    delete cleanMonitor.host;
+                    delete cleanMonitor.port;
+
+                    const result = getMonitorDisplayIdentifier(cleanMonitor, fallback);
+                    expect(result).toBe(fallback);
+                }
+            );
+        });
     });
 
     describe("getMonitorTypeDisplayLabel", () => {
@@ -963,6 +1233,65 @@ describe("Fallback Utilities", () => {
                     `${longType.charAt(0).toUpperCase()}${longType.slice(1)} Monitor`
                 );
             });
+        });
+
+        describe("Property-based Tests", () => {
+            test.prop([fc.constantFrom("http", "port", "ping", "dns")])(
+                "should return consistent labels for known monitor types",
+                (monitorType) => {
+                    const result = getMonitorTypeDisplayLabel(monitorType);
+
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeGreaterThan(0);
+
+                    // Should not return the fallback "Monitor Configuration"
+                    expect(result).not.toBe("Monitor Configuration");
+                }
+            );
+
+            test.prop([
+                fc.string({ minLength: 1, maxLength: 50 })
+                    .filter((s) => !["http", "port", "ping", "dns"].includes(s))
+                    .filter((s) => s.trim().length > 0)
+            ])(
+                "should format unknown monitor types with proper capitalization",
+                (unknownType) => {
+                    const result = getMonitorTypeDisplayLabel(unknownType);
+
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeGreaterThan(0);
+                    expect(result.endsWith(" Monitor")).toBe(true);
+
+                    // First character should be uppercase
+                    expect(result.charAt(0)).toBe(result.charAt(0).toUpperCase());
+                }
+            );
+
+            test.prop([fc.oneof(fc.constant(null), fc.constant(undefined), fc.constant(""))])(
+                "should return default label for invalid inputs",
+                (invalidInput) => {
+                    const result = getMonitorTypeDisplayLabel(invalidInput as any);
+                    expect(result).toBe("Monitor Configuration");
+                }
+            );
+
+            test.prop([
+                fc.string({ minLength: 1 })
+                    .filter((s) => s.includes("_") || s.includes("-") || /[A-Z]/.test(s))
+                    .filter((s) => s.trim().length > 0)
+            ])(
+                "should handle various string formats (camelCase, snake_case, kebab-case)",
+                (formattedString) => {
+                    const result = getMonitorTypeDisplayLabel(formattedString);
+
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeGreaterThan(0);
+                    expect(result.endsWith(" Monitor")).toBe(true);
+
+                    // Should contain some capitalization
+                    expect(/[A-Z]/.test(result)).toBe(true);
+                }
+            );
         });
     });
 
@@ -1160,6 +1489,73 @@ describe("Fallback Utilities", () => {
                 );
             });
         });
+
+        describe("Property-based Tests", () => {
+            test.prop([
+                fc.string(),
+                fc.integer({ min: 0, max: 1000 })
+            ])(
+                "should always return string with length <= maxLength",
+                (text, maxLength) => {
+                    const result = truncateForLogging(text, maxLength);
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeLessThanOrEqual(maxLength);
+                }
+            );
+
+            test.prop([
+                fc.string().filter((s) => s.length > 0),
+                fc.integer({ min: 1, max: 20 })
+            ])(
+                "should preserve start of string when truncating",
+                (text, maxLength) => {
+                    const result = truncateForLogging(text, maxLength);
+                    if (text.length <= maxLength) {
+                        expect(result).toBe(text);
+                    } else {
+                        expect(result).toBe(text.slice(0, maxLength));
+                    }
+                }
+            );
+
+            test.prop([fc.string()])(
+                "should return original string when shorter than default max",
+                (text) => {
+                    // Default maxLength should be large enough for most strings
+                    const result = truncateForLogging(text);
+                    if (text.length <= 100) { // Assuming default max is >= 100
+                        expect(result).toBe(text);
+                    }
+                    expect(result.length).toBeLessThanOrEqual(text.length);
+                }
+            );
+
+            test.prop([
+                fc.string({ minLength: 100 }),
+                fc.integer({ min: 10, max: 50 })
+            ])(
+                "should truncate long strings to specified length",
+                (longText, maxLength) => {
+                    const result = truncateForLogging(longText, maxLength);
+                    expect(result.length).toBe(maxLength);
+                    expect(result).toBe(longText.slice(0, maxLength));
+                }
+            );
+
+            test.prop([fc.integer({ min: 0, max: 10 })])(
+                "should handle zero and small maxLength values",
+                (maxLength) => {
+                    const text = "sample text";
+                    const result = truncateForLogging(text, maxLength);
+                    expect(result.length).toBe(maxLength);
+                    if (maxLength === 0) {
+                        expect(result).toBe("");
+                    } else {
+                        expect(result).toBe(text.slice(0, maxLength));
+                    }
+                }
+            );
+        });
     });
 
     describe("Default values", () => {
@@ -1288,6 +1684,44 @@ describe("Fallback Utilities", () => {
                 (SiteDefaults as any).monitoring = false;
                 // The object should be treated as readonly in TypeScript
             });
+        });
+
+        describe("Property-based Tests", () => {
+            test.prop([fc.string().filter((s) => s.trim().length > 0)])(
+                "should validate UiDefaults properties maintain consistent types",
+                (propertyName) => {
+                    // Test that UiDefaults is a consistent object
+                    expect(UiDefaults).toEqual(expect.any(Object));
+                    expect(typeof UiDefaults).toBe("object");
+                    expect(UiDefaults).not.toBeNull();
+                }
+            );
+
+            test.prop([fc.string().filter((s) => s.trim().length > 0)])(
+                "should validate MonitorDefaults maintains correct type structure",
+                (propertyName) => {
+                    // Test that MonitorDefaults has expected numeric properties
+                    expect(typeof MonitorDefaults.checkInterval).toBe("number");
+                    expect(typeof MonitorDefaults.responseTime).toBe("number");
+                    expect(typeof MonitorDefaults.retryAttempts).toBe("number");
+                    expect(typeof MonitorDefaults.timeout).toBe("number");
+                    expect(typeof MonitorDefaults.status).toBe("string");
+
+                    // Verify reasonable ranges
+                    expect(MonitorDefaults.checkInterval).toBeGreaterThan(0);
+                    expect(MonitorDefaults.retryAttempts).toBeGreaterThanOrEqual(0);
+                    expect(MonitorDefaults.timeout).toBeGreaterThan(0);
+                }
+            );
+
+            test.prop([fc.string().filter((s) => s.trim().length > 0)])(
+                "should validate SiteDefaults has consistent boolean monitoring property",
+                (propertyName) => {
+                    expect(typeof SiteDefaults.monitoring).toBe("boolean");
+                    expect(SiteDefaults).toEqual(expect.any(Object));
+                    expect(SiteDefaults).not.toBeNull();
+                }
+            );
         });
     });
 });

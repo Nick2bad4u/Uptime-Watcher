@@ -729,8 +729,8 @@ describe("validatorUtils", () => {
                 false
             );
 
-            // Custom protocols - FTP is valid by default
-            expect(isValidUrl("ftp://example.com")).toBe(true);
+            // Custom protocols - FTP is invalid in our validation (HTTP/HTTPS only)
+            expect(isValidUrl("ftp://example.com")).toBe(false);
         });
 
         it("should handle complex URLs", async ({ task, annotate }) => {

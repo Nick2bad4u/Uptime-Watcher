@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { test, fc } from "@fast-check/vitest";
 import {
     formatDuration,
     formatFullTimestamp,
@@ -746,6 +747,427 @@ describe("Time Utilities", () => {
 
             const result2 = formatDuration(999.9999); // Should floor to 999ms = 0s
             expect(result2).toBe("0s");
+        });
+    });
+
+    /**
+     * Fast-check property-based tests for comprehensive time utility validation.
+     * These tests use property-based testing to systematically explore edge cases
+     * and validate invariants across all time formatting functions.
+     */
+    describe("Property-Based Fuzzing Tests", () => {
+        describe("formatDuration property tests", () => {
+            test.prop([fc.integer({ min: 0, max: 1_000_000_000 })])(
+                "should always return a valid time format string",
+                (ms) => {
+                    const result = formatDuration(ms);
+
+                    // Property: Result should be a non-empty string
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeGreaterThan(0);
+
+                    // Property: Should match expected format patterns
+                    const patterns = [
+                        /^\d+s$/, // seconds only
+                        /^\d+m \d+s$/, // minutes and seconds
+                        /^\d+h \d+m$/ // hours and minutes
+                    ];
+                    expect(patterns.some(pattern => pattern.test(result))).toBe(true);
+
+                    // Property: No negative values should appear in output
+                    expect(result).not.toMatch(/-\d/);
+                }
+            );
+
+            test.prop([fc.integer({ min: 0, max: 59_999 })])(
+                "should format seconds only for durations under 1 minute",
+                (ms) => {
+                    const result = formatDuration(ms);
+                    expect(result).toMatch(/^\d+s$/);
+
+                    // Property: Seconds value should match floor division
+                    const expectedSeconds = Math.floor(ms / 1000);
+                    expect(result).toBe(`${expectedSeconds}s`);
+                }
+            );
+
+            test.prop([fc.integer({ min: 60_000, max: 3_599_999 })])(
+                "should format minutes and seconds for durations 1min-1hr",
+                (ms) => {
+                    const result = formatDuration(ms);
+                    expect(result).toMatch(/^\d+m \d+s$/);
+
+                    // Property: Minutes should be between 1-59
+                    const minutesMatch = result.match(/^(?<minutes>\d+)m/);
+                    expect(minutesMatch).toBeTruthy();
+                    const minutes = Number.parseInt(minutesMatch![1], 10);
+                    expect(minutes).toBeGreaterThanOrEqual(1);
+                    expect(minutes).toBeLessThanOrEqual(59);
+
+                    // Property: Seconds should be between 0-59
+                    const secondsMatch = result.match(/(?<seconds>\d+)s$/);
+                    expect(secondsMatch).toBeTruthy();
+                    const seconds = Number.parseInt(secondsMatch![1], 10);
+                    expect(seconds).toBeGreaterThanOrEqual(0);
+                    expect(seconds).toBeLessThanOrEqual(59);
+                }
+            );
+
+            test.prop([fc.integer({ min: 3_600_000, max: 86_400_000 })])(
+                "should format hours and minutes for durations >= 1 hour",
+                (ms) => {
+                    const result = formatDuration(ms);
+                    expect(result).toMatch(/^\d+h \d+m$/);
+
+                    // Property: Hours should be at least 1
+                    const hoursMatch = result.match(/^(?<hours>\d+)h/);
+                    expect(hoursMatch).toBeTruthy();
+                    const hours = Number.parseInt(hoursMatch![1], 10);
+                    expect(hours).toBeGreaterThanOrEqual(1);
+
+                    // Property: Minutes should be between 0-59
+                    const minutesMatch = result.match(/(?<minutes>\d+)m$/);
+                    expect(minutesMatch).toBeTruthy();
+                    const minutes = Number.parseInt(minutesMatch![1], 10);
+                    expect(minutes).toBeGreaterThanOrEqual(0);
+                    expect(minutes).toBeLessThanOrEqual(59);
+                }
+            );
+        });
+
+        describe("formatFullTimestamp property tests", () => {
+            test.prop([fc.integer({ min: 0, max: Date.now() + 86_400_000 })])(
+                "should return valid locale string for valid timestamps",
+                (timestamp) => {
+                    const result = formatFullTimestamp(timestamp);
+
+                    // Property: Result should be a non-empty string
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeGreaterThan(0);
+
+                    // Property: Should not throw and produce valid date string
+                    expect(() => new Date(timestamp).toLocaleString()).not.toThrow();
+                    expect(result).toBe(new Date(timestamp).toLocaleString());
+                }
+            );
+
+            test.prop([fc.oneof(fc.constant(Number.NaN), fc.constant(Infinity), fc.constant(-Infinity))])(
+                "should handle special timestamp values gracefully",
+                (timestamp) => {
+                    const result = formatFullTimestamp(timestamp);
+
+                    // Property: Should not throw with special values
+                    expect(typeof result).toBe("string");
+                    expect(result.length).toBeGreaterThan(0);
+                }
+            );
+        });
+
+        describe("formatIntervalDuration property tests", () => {
+            test.prop([fc.integer({ min: 0, max: 59_999 })])(
+                "should format seconds for intervals < 1 minute",
+                (ms) => {
+                    const result = formatIntervalDuration(ms);
+
+                    expect(result).toMatch(/^\d+s$/);
+                    const expectedSeconds = Math.round(ms / 1000);
+                    expect(result).toBe(`${expectedSeconds}s`);
+                }
+            );
+
+            test.prop([fc.integer({ min: 60_000, max: 3_599_999 })])(
+                "should format minutes for intervals 1min-1hr",
+                (ms) => {
+                    const result = formatIntervalDuration(ms);
+
+                    expect(result).toMatch(/^\d+m$/);
+                    const expectedMinutes = Math.round(ms / 60_000);
+                    expect(result).toBe(`${expectedMinutes}m`);
+                }
+            );
+
+            test.prop([fc.integer({ min: 3_600_000, max: 86_400_000 })])(
+                "should format hours for intervals >= 1 hour",
+                (ms) => {
+                    const result = formatIntervalDuration(ms);
+
+                    expect(result).toMatch(/^\d+h$/);
+                    const expectedHours = Math.round(ms / 3_600_000);
+                    expect(result).toBe(`${expectedHours}h`);
+                }
+            );
+        });
+
+        describe("formatRelativeTimestamp property tests", () => {
+            test.prop([fc.integer({ min: 0, max: 30_000 })])(
+                "should return 'Just now' for recent timestamps (< 30s ago)",
+                (offset) => {
+                    vi.useFakeTimers();
+                    const now = 1_000_000_000_000; // Fixed timestamp
+                    vi.setSystemTime(now);
+
+                    const timestamp = now - offset;
+                    const result = formatRelativeTimestamp(timestamp);
+
+                    if (offset <= 30_000) {
+                        expect(result).toBe("Just now");
+                    }
+
+                    vi.useRealTimers();
+                }
+            );
+
+            test.prop([fc.integer({ min: 31_000, max: 3_599_000 })])(
+                "should format seconds or minutes for recent timestamps",
+                (offset) => {
+                    vi.useFakeTimers();
+                    const now = 1_000_000_000_000;
+                    vi.setSystemTime(now);
+
+                    const timestamp = now - offset;
+                    const result = formatRelativeTimestamp(timestamp);
+
+                    // Property: Should contain time units
+                    expect(result).toMatch(/(?:second|minute)s? ago$/);
+
+                    // Property: Should not be negative
+                    expect(result).not.toMatch(/-\d/);
+
+                    vi.useRealTimers();
+                }
+            );
+
+            test.prop([fc.integer({ min: 3_600_000, max: 86_400_000 - 1 })])(
+                "should format hours for timestamps 1-24 hours ago",
+                (offset) => {
+                    vi.useFakeTimers();
+                    const now = 1_000_000_000_000;
+                    vi.setSystemTime(now);
+
+                    const timestamp = now - offset;
+                    const result = formatRelativeTimestamp(timestamp);
+
+                    expect(result).toMatch(/^\d+ hours? ago$/);
+
+                    vi.useRealTimers();
+                }
+            );
+
+            test.prop([fc.integer({ min: 86_400_000, max: 2_592_000_000 })])(
+                "should format days for timestamps > 24 hours ago",
+                (offset) => {
+                    vi.useFakeTimers();
+                    const now = 1_000_000_000_000;
+                    vi.setSystemTime(now);
+
+                    const timestamp = now - offset;
+                    const result = formatRelativeTimestamp(timestamp);
+
+                    expect(result).toMatch(/^\d+ days? ago$/);
+
+                    vi.useRealTimers();
+                }
+            );
+        });
+
+        describe("formatResponseDuration property tests", () => {
+            test.prop([fc.integer({ min: 0, max: 999 })])(
+                "should format milliseconds for values < 1000ms",
+                (ms) => {
+                    const result = formatResponseDuration(ms);
+
+                    expect(result).toMatch(/^\d+ms$/);
+                    expect(result).toBe(`${ms}ms`);
+                }
+            );
+
+            test.prop([fc.integer({ min: 1000, max: 59_999 })])(
+                "should format seconds for values 1s-59s",
+                (ms) => {
+                    const result = formatResponseDuration(ms);
+
+                    expect(result).toMatch(/^\d+s$/);
+                    const expectedSeconds = Math.round(ms / 1000);
+                    expect(result).toBe(`${expectedSeconds}s`);
+                }
+            );
+
+            test.prop([fc.integer({ min: 60_000, max: 3_599_999 })])(
+                "should format minutes for values 1m-59m",
+                (ms) => {
+                    const result = formatResponseDuration(ms);
+
+                    expect(result).toMatch(/^\d+m$/);
+                    const expectedMinutes = Math.round(ms / 60_000);
+                    expect(result).toBe(`${expectedMinutes}m`);
+                }
+            );
+
+            test.prop([fc.integer({ min: 3_600_000, max: 86_400_000 })])(
+                "should format hours for values >= 1h",
+                (ms) => {
+                    const result = formatResponseDuration(ms);
+
+                    expect(result).toMatch(/^\d+h$/);
+                    const expectedHours = Math.round(ms / 3_600_000);
+                    expect(result).toBe(`${expectedHours}h`);
+                }
+            );
+        });
+
+        describe("formatResponseTime property tests", () => {
+            test.prop([fc.integer({ min: 0, max: 999 })])(
+                "should format milliseconds for times < 1000ms",
+                (time) => {
+                    const result = formatResponseTime(time);
+
+                    expect(result).toBe(`${time}ms`);
+                }
+            );
+
+            test.prop([fc.integer({ min: 1000, max: 60_000 })])(
+                "should format seconds with decimals for times >= 1000ms",
+                (time) => {
+                    const result = formatResponseTime(time);
+
+                    expect(result).toMatch(/^\d+\.\d{2}s$/);
+                    const expectedValue = (time / 1000).toFixed(2);
+                    expect(result).toBe(`${expectedValue}s`);
+                }
+            );
+
+            test.prop([fc.oneof(fc.constant(undefined))])(
+                "should return fallback for invalid values",
+                (time) => {
+                    const result = formatResponseTime(time);
+
+                    // Property: Should return the fallback message (N/A)
+                    expect(result).toBe("N/A");
+                }
+            );
+
+            test.prop([fc.constant(0)])(
+                "should handle zero correctly",
+                (time) => {
+                    const result = formatResponseTime(time);
+
+                    // Property: Zero should be formatted as 0ms, not fallback
+                    expect(result).toBe("0ms");
+                }
+            );
+        });
+
+        describe("formatRetryAttemptsText property tests", () => {
+            test.prop([fc.constant(0)])(
+                "should handle zero attempts correctly",
+                (attempts) => {
+                    const result = formatRetryAttemptsText(attempts);
+
+                    expect(result).toBe("(Retry disabled - immediate failure detection)");
+                }
+            );
+
+            test.prop([fc.constant(1)])(
+                "should use singular 'time' for one attempt",
+                (attempts) => {
+                    const result = formatRetryAttemptsText(attempts);
+
+                    expect(result).toBe("(Retry 1 time before marking down)");
+                }
+            );
+
+            test.prop([fc.integer({ min: 2, max: 20 })])(
+                "should use plural 'times' for multiple attempts",
+                (attempts) => {
+                    const result = formatRetryAttemptsText(attempts);
+
+                    expect(result).toBe(`(Retry ${attempts} times before marking down)`);
+                }
+            );
+
+            test.prop([fc.integer({ min: -10, max: -1 })])(
+                "should handle negative attempts gracefully",
+                (attempts) => {
+                    const result = formatRetryAttemptsText(attempts);
+
+                    // Property: Should format negative values as-is with plural
+                    expect(result).toBe(`(Retry ${attempts} times before marking down)`);
+                }
+            );
+        });
+
+        describe("getIntervalLabel property tests", () => {
+            test.prop([fc.integer({ min: 1000, max: 3_600_000 })])(
+                "should format numeric intervals using formatIntervalDuration",
+                (interval) => {
+                    const result = getIntervalLabel(interval);
+                    const expected = formatIntervalDuration(interval);
+
+                    expect(result).toBe(expected);
+                }
+            );
+
+            test.prop([fc.record({
+                value: fc.integer({ min: 1000, max: 3_600_000 }),
+                label: fc.string({ minLength: 1, maxLength: 20 })
+            })])(
+                "should return custom label when provided",
+                (interval) => {
+                    const result = getIntervalLabel(interval);
+
+                    expect(result).toBe(interval.label);
+                }
+            );
+
+            test.prop([fc.record({
+                value: fc.integer({ min: 1000, max: 3_600_000 })
+            })])(
+                "should format value when no label provided in object",
+                (interval) => {
+                    const result = getIntervalLabel(interval);
+                    const expected = formatIntervalDuration(interval.value);
+
+                    expect(result).toBe(expected);
+                }
+            );
+        });
+
+        describe("Cross-function property tests", () => {
+            test.prop([fc.integer({ min: 0, max: 86_400_000 })])(
+                "formatDuration and formatResponseDuration should handle same inputs consistently",
+                (ms) => {
+                    const duration = formatDuration(ms);
+                    const response = formatResponseDuration(ms);
+
+                    // Property: Both should return non-empty strings
+                    expect(duration.length).toBeGreaterThan(0);
+                    expect(response.length).toBeGreaterThan(0);
+
+                    // Property: Both should not contain negative values
+                    expect(duration).not.toMatch(/-\d/);
+                    expect(response).not.toMatch(/-\d/);
+                }
+            );
+
+            test.prop([fc.integer({ min: 0, max: 1000 })])(
+                "TIME_PERIOD_LABELS should have consistent structure",
+                () => {
+                    const labels = TIME_PERIOD_LABELS;
+
+                    // Property: All values should be non-empty strings
+                    for (const label of Object.values(labels)) {
+                        expect(typeof label).toBe("string");
+                        expect(label.length).toBeGreaterThan(0);
+                    }
+
+                    // Property: Should have expected keys
+                    expect(labels).toHaveProperty("1h");
+                    expect(labels).toHaveProperty("12h");
+                    expect(labels).toHaveProperty("24h");
+                    expect(labels).toHaveProperty("7d");
+                    expect(labels).toHaveProperty("30d");
+                }
+            );
         });
     });
 });

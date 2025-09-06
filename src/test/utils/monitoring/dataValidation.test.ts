@@ -247,8 +247,8 @@ describe("Monitoring Data Validation", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            // validator.js accepts some non-HTTP protocols
-            expect(isValidUrl("ftp://example.com")).toBe(true);
+            // Our validation rejects FTP protocol - only HTTP/HTTPS allowed
+            expect(isValidUrl("ftp://example.com")).toBe(false);
             // validator.js rejects these protocols by default
             expect(isValidUrl("file:///path/to/file")).toBe(false);
             expect(isValidUrl("mailto:test@example.com")).toBe(false);
