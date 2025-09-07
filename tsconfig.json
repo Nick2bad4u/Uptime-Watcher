@@ -1,14 +1,24 @@
 {
     "$schema": "https://www.schemastore.org/tsconfig.json",
     "compilerOptions": {
+        "allowJs": false,
+        "allowSyntheticDefaultImports": true,
+        "allowUmdGlobalAccess": false,
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "alwaysStrict": true,
         "baseUrl": ".",
+        "declaration": true,
+        "declarationMap": true,
+        "disableSizeLimit": true,
+        "downlevelIteration": true,
+        "esModuleInterop": true,
+        "exactOptionalPropertyTypes": true,
+        "forceConsistentCasingInFileNames": true,
+        "incremental": true,
+        "isolatedDeclarations": true,
+        "isolatedModules": true,
         "jsx": "react-jsx",
-        "module": "ESNext",
-        "moduleDetection": "auto",
-        "moduleResolution": "bundler",
-        "outDir": "dist",
-        "target": "ES2024",
-        "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
         "lib": [
             "DOM.Iterable",
             "DOM",
@@ -25,48 +35,9 @@
             "ES7",
             "ESNext"
         ],
-        "paths": {
-            "@shared/*": [
-                "shared/*"
-            ],
-            "@electron/*": [
-                "electron/*"
-            ],
-            "@app/*": [
-                "src/*"
-            ]
-        },
-        "plugins": [
-            {
-                "name": "@styled/typescript-styled-plugin"
-            }
-        ],
-        "types": [
-            "@testing-library/jest-dom",
-            "electron",
-            "node",
-            "react-dom",
-            "react",
-            "vite/client",
-            "vitest/globals"
-        ],
-        "allowJs": false,
-        "allowSyntheticDefaultImports": true,
-        "allowUmdGlobalAccess": false,
-        "allowUnreachableCode": false,
-        "allowUnusedLabels": false,
-        "alwaysStrict": true,
-        "declaration": true,
-        "declarationMap": true,
-        "disableSizeLimit": true,
-        "downlevelIteration": true,
-        "esModuleInterop": true,
-        "exactOptionalPropertyTypes": true,
-        "forceConsistentCasingInFileNames": true,
-        "incremental": true,
-        "isolatedDeclarations": true,
-        "isolatedModules": true,
-        "removeComments": false,
+        "module": "ESNext",
+        "moduleDetection": "auto",
+        "moduleResolution": "bundler",
         "noCheck": false,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
@@ -79,7 +50,25 @@
         "noUncheckedSideEffectImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
+        "outDir": "dist",
+        "paths": {
+            "@app/*": [
+                "src/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
+        },
+        "plugins": [
+            {
+                "name": "@styled/typescript-styled-plugin"
+            }
+        ],
         "pretty": true,
+        "removeComments": false,
         "resolveJsonModule": true,
         "resolvePackageJsonExports": true,
         "resolvePackageJsonImports": true,
@@ -92,6 +81,17 @@
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
+        "target": "ES2024",
+        "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+        "types": [
+            "@testing-library/jest-dom",
+            "electron",
+            "node",
+            "react-dom",
+            "react",
+            "vite/client",
+            "vitest/globals"
+        ],
         "useDefineForClassFields": true,
         "useUnknownInCatchVariables": true
     },

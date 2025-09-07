@@ -1,38 +1,53 @@
 {
     "$schema": "https://json.schemastore.org/tsconfig",
-    "extends": "./tsconfig.typedoc.json",
     "compilerOptions": {
         "allowJs": true,
+        "allowSyntheticDefaultImports": true,
+        "baseUrl": ".",
         "checkJs": false,
+        "declaration": false,
+        "declarationMap": false,
+        "emitDeclarationOnly": false,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
         "jsx": "react-jsx",
-        "module": "ESNext",
-        "moduleDetection": "auto",
-        "moduleResolution": "bundler",
-        "target": "ESNext",
         "lib": [
             "DOM",
             "DOM.Iterable",
             "ES6",
             "ESNext"
         ],
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
-        "strict": true,
-        "skipLibCheck": true,
-        "resolveJsonModule": true,
-        "declaration": false,
-        "declarationMap": false,
-        "emitDeclarationOnly": false,
-        "sourceMap": false,
+        "module": "ESNext",
+        "moduleDetection": "auto",
+        "moduleResolution": "bundler",
         "noEmit": true,
-        "baseUrl": ".",
         "paths": {
-            "@site/*": ["./*"],
-            "@theme/*": ["./.docusaurus/theme/*"],
-            "@docusaurus/*": ["./.docusaurus/docusaurus/*"]
-        }
+            "@docusaurus/*": [
+                "./.docusaurus/docusaurus/*"
+            ],
+            "@site/*": [
+                "./*"
+            ],
+            "@theme/*": [
+                "./.docusaurus/theme/*"
+            ]
+        },
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "sourceMap": false,
+        "strict": true,
+        "target": "ESNext"
     },
+    "exclude": [
+        "node_modules/**",
+        "dist/**",
+        "build/**",
+        ".docusaurus/**",
+        "docs/**",
+        "**/*.test.*",
+        "**/*.spec.*"
+    ],
+    "extends": "./tsconfig.typedoc.json",
     "include": [
         "**/*.ts",
         "**/*.tsx",
@@ -47,14 +62,5 @@
         "**/*.md",
         "**/*.mdx",
         "**/*.mjs"
-    ],
-    "exclude": [
-        "node_modules/**",
-        "dist/**",
-        "build/**",
-        ".docusaurus/**",
-        "docs/**",
-        "**/*.test.*",
-        "**/*.spec.*"
     ]
 }

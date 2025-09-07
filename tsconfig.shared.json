@@ -1,22 +1,21 @@
 {
     "$schema": "https://www.schemastore.org/tsconfig.json",
-    "extends": "./tsconfig.json",
     "compilerOptions": {
+        "composite": true,
+        "incremental": true,
         "outDir": "dist-shared",
-        "tsBuildInfoFile": "./dist-shared/tsconfig.shared.tsbuildinfo",
         "paths": {
-            "@shared/*": [
-                "shared/*"
+            "@app/*": [
+                "src/*"
             ],
             "@electron/*": [
                 "electron/*"
             ],
-            "@app/*": [
-                "src/*"
+            "@shared/*": [
+                "shared/*"
             ]
         },
-        "composite": true,
-        "incremental": true
+        "tsBuildInfoFile": "./dist-shared/tsconfig.shared.tsbuildinfo"
     },
     "exclude": [
         "shared/**/*.spec.ts",
@@ -27,6 +26,7 @@
         "src/**/*",
         "**/scripts/**"
     ],
+    "extends": "./tsconfig.json",
     "include": [
         "shared/**/*.css",
         "shared/**/*.ts",

@@ -1,25 +1,14 @@
 {
     "$schema": "https://json.schemastore.org/tsconfig",
-    "extends": "./tsconfig.typedoc.json",
     "compilerOptions": {
-        "checkJs": false,
-        "jsx": "react-jsx",
-        "module": "ESNext",
-        "moduleDetection": "auto",
-        "moduleResolution": "bundler",
-        "target": "ESNext",
-        "lib": [
-            "DOM",
-            "DOM.Iterable",
-            "ES6",
-            "ESNext"
-        ],
         "allowJs": false,
         "allowSyntheticDefaultImports": true,
         "allowUmdGlobalAccess": false,
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
         "alwaysStrict": true,
+        "baseUrl": ".",
+        "checkJs": false,
         "declaration": true,
         "declarationMap": true,
         "disableSizeLimit": true,
@@ -30,6 +19,16 @@
         "incremental": true,
         "isolatedDeclarations": true,
         "isolatedModules": true,
+        "jsx": "react-jsx",
+        "lib": [
+            "DOM",
+            "DOM.Iterable",
+            "ES6",
+            "ESNext"
+        ],
+        "module": "ESNext",
+        "moduleDetection": "auto",
+        "moduleResolution": "bundler",
         "noCheck": false,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
@@ -42,6 +41,17 @@
         "noUncheckedSideEffectImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
+        "paths": {
+            "@docusaurus/*": [
+                "./.docusaurus/docusaurus/*"
+            ],
+            "@site/*": [
+                "./*"
+            ],
+            "@theme/*": [
+                "./.docusaurus/theme/*"
+            ]
+        },
         "pretty": true,
         "resolveJsonModule": true,
         "resolvePackageJsonExports": true,
@@ -55,15 +65,20 @@
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
+        "target": "ESNext",
         "useDefineForClassFields": true,
-        "useUnknownInCatchVariables": true,
-        "baseUrl": ".",
-        "paths": {
-            "@site/*": ["./*"],
-            "@theme/*": ["./.docusaurus/theme/*"],
-            "@docusaurus/*": ["./.docusaurus/docusaurus/*"]
-        }
+        "useUnknownInCatchVariables": true
     },
+    "exclude": [
+        "node_modules/**",
+        "dist/**",
+        "build/**",
+        ".docusaurus/**",
+        "docs/**",
+        "**/*.test.*",
+        "**/*.spec.*"
+    ],
+    "extends": "./tsconfig.typedoc.json",
     "include": [
         "**/*.ts",
         "**/*.tsx",
@@ -73,14 +88,5 @@
         "static/**/*",
         "sidebars.ts",
         "docusaurus.config.ts"
-    ],
-    "exclude": [
-        "node_modules/**",
-        "dist/**",
-        "build/**",
-        ".docusaurus/**",
-        "docs/**",
-        "**/*.test.*",
-        "**/*.spec.*"
     ]
 }

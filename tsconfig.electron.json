@@ -1,9 +1,9 @@
 {
     "$schema": "https://www.schemastore.org/tsconfig.json",
-    "extends": "./tsconfig.json",
     "compilerOptions": {
+        "composite": true,
+        "incremental": true,
         "outDir": "dist-electron",
-        "tsBuildInfoFile": "./dist-electron/tsconfig.electron.tsbuildinfo",
         "paths": {
             "@app/*": [
                 "src/*"
@@ -15,8 +15,7 @@
                 "shared/*"
             ]
         },
-        "composite": true,
-        "incremental": true
+        "tsBuildInfoFile": "./dist-electron/tsconfig.electron.tsbuildinfo"
     },
     "exclude": [
         "electron/**/*.spec.ts",
@@ -28,6 +27,7 @@
         "shared/test/**/*",
         "**/scripts/**"
     ],
+    "extends": "./tsconfig.json",
     "include": [
         "electron/**/*.css",
         "electron/**/*.ts",

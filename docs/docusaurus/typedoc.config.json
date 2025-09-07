@@ -53,6 +53,12 @@
     "expandObjects": true,
     "expandParameters": true,
     "externalSymbolLinkMappings": {
+        "@testing-library/react": {
+            "fireEvent": "https://testing-library.com/docs/dom-testing-library/api-events",
+            "render": "https://testing-library.com/docs/react-testing-library/api#render",
+            "screen": "https://testing-library.com/docs/queries/about#screen",
+            "waitFor": "https://testing-library.com/docs/dom-testing-library/api-async#waitfor"
+        },
         "@types/react": {
             "React.Component.render": "https://react.dev/reference/react/Component#render",
             "React.Component.setState": "https://react.dev/reference/react/Component#setstate",
@@ -60,199 +66,193 @@
             "React.NewLifecycle.getSnapshotBeforeUpdate": "https://react.dev/reference/react/Component#getsnapshotbeforeupdate",
             "React.StaticLifecycle.getDerivedStateFromProps": "https://react.dev/reference/react/Component#getderivedstatefromprops"
         },
-        "react": {
-            "Component": "https://react.dev/reference/react/Component",
-            "useState": "https://react.dev/reference/react/useState",
-            "useEffect": "https://react.dev/reference/react/useEffect",
-            "useCallback": "https://react.dev/reference/react/useCallback",
-            "useMemo": "https://react.dev/reference/react/useMemo",
-            "useRef": "https://react.dev/reference/react/useRef",
-            "useContext": "https://react.dev/reference/react/useContext",
-            "useReducer": "https://react.dev/reference/react/useReducer",
-            "ReactNode": "https://react.dev/reference/react/Children#react-node-type",
-            "JSX": "https://react.dev/learn/writing-markup-with-jsx"
-        },
-        "vite": {
-            "defineConfig": "https://vitejs.dev/config/",
-            "UserConfig": "https://vitejs.dev/config/",
-            "Plugin": "https://vitejs.dev/guide/api-plugin.html"
-        },
-        "zustand": {
-            "create": "https://docs.pmnd.rs/zustand/getting-started/introduction",
-            "StateCreator": "https://docs.pmnd.rs/zustand/guides/typescript#state-creator",
-            "StoreApi": "https://docs.pmnd.rs/zustand/guides/typescript#store-api"
-        },
-        "electron": {
-            "BrowserWindow": "https://www.electronjs.org/docs/latest/api/browser-window",
-            "app": "https://www.electronjs.org/docs/latest/api/app",
-            "ipcMain": "https://www.electronjs.org/docs/latest/api/ipc-main",
-            "ipcRenderer": "https://www.electronjs.org/docs/latest/api/ipc-renderer",
-            "Menu": "https://www.electronjs.org/docs/latest/api/menu",
-            "Tray": "https://www.electronjs.org/docs/latest/api/tray",
-            "Notification": "https://www.electronjs.org/docs/latest/api/notification",
-            "dialog": "https://www.electronjs.org/docs/latest/api/dialog",
-            "shell": "https://www.electronjs.org/docs/latest/api/shell",
-            "webContents": "https://www.electronjs.org/docs/latest/api/web-contents"
-        },
-        "node": {
-            "fs": "https://nodejs.org/docs/latest/api/fs.html",
-            "path": "https://nodejs.org/docs/latest/api/path.html",
-            "os": "https://nodejs.org/docs/latest/api/os.html",
-            "events": "https://nodejs.org/docs/latest/api/events.html",
-            "EventEmitter": "https://nodejs.org/docs/latest/api/events.html#class-eventemitter",
-            "Buffer": "https://nodejs.org/docs/latest/api/buffer.html#class-buffer",
-            "process": "https://nodejs.org/docs/latest/api/process.html",
-            "url": "https://nodejs.org/docs/latest/api/url.html",
-            "crypto": "https://nodejs.org/docs/latest/api/crypto.html",
-            "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"
-        },
         "axios": {
-            "AxiosResponse": "https://axios-http.com/docs/res_schema",
+            "AxiosAdapter": "https://axios-http.com/docs/adapters",
             "AxiosError": "https://axios-http.com/docs/handling_errors",
+            "AxiosHeaders": "https://axios-http.com/docs/req_config#request-headers",
             "AxiosInstance": "https://axios-http.com/docs/instance",
             "AxiosRequestConfig": "https://axios-http.com/docs/req_config",
-            "AxiosAdapter": "https://axios-http.com/docs/adapters",
-            "AxiosHeaders": "https://axios-http.com/docs/req_config#request-headers"
-        },
-        "node-sqlite3-wasm": {
-            "Database": "https://github.com/tndrle/node-sqlite3-wasm#database",
-            "\"node-sqlite3-wasm\".Database": "https://github.com/tndrle/node-sqlite3-wasm#database",
-            "Statement": "https://github.com/tndrle/node-sqlite3-wasm#statement"
-        },
-        "zod": {
-            "z": "https://zod.dev/",
-            "z.ZodError": "https://zod.dev/?id=error-handling",
-            "ZodSchema": "https://zod.dev/?id=basic-usage",
-            "ZodError": "https://zod.dev/?id=error-handling",
-            "ZodType": "https://zod.dev/?id=basic-usage",
-            "ZodString": "https://zod.dev/?id=strings",
-            "ZodNumber": "https://zod.dev/?id=numbers",
-            "ZodBoolean": "https://zod.dev/?id=booleans",
-            "ZodObject": "https://zod.dev/?id=objects",
-            "ZodArray": "https://zod.dev/?id=arrays",
-            "ZodOptional": "https://zod.dev/?id=optionals",
-            "ZodUnion": "https://zod.dev/?id=unions"
+            "AxiosResponse": "https://axios-http.com/docs/res_schema"
         },
         "chart.js": {
             "Chart": "https://www.chartjs.org/docs/latest/getting-started/",
+            "ChartConfiguration": "https://www.chartjs.org/docs/latest/configuration/",
             "ChartData": "https://www.chartjs.org/docs/latest/general/data-structures.html",
             "ChartOptions": "https://www.chartjs.org/docs/latest/configuration/",
-            "ChartConfiguration": "https://www.chartjs.org/docs/latest/configuration/",
+            "InteractionItem": "https://www.chartjs.org/docs/latest/configuration/interactions.html",
             "Plugin": "https://www.chartjs.org/docs/developers/plugins.html",
-            "TooltipItem": "https://www.chartjs.org/docs/latest/configuration/tooltip.html",
-            "InteractionItem": "https://www.chartjs.org/docs/latest/configuration/interactions.html"
-        },
-        "react-chartjs-2": {
-            "Bar": "https://react-chartjs-2.js.org/components/bar",
-            "Line": "https://react-chartjs-2.js.org/components/line",
-            "Doughnut": "https://react-chartjs-2.js.org/components/doughnut",
-            "Pie": "https://react-chartjs-2.js.org/components/pie",
-            "Radar": "https://react-chartjs-2.js.org/components/radar",
-            "Scatter": "https://react-chartjs-2.js.org/components/scatter"
-        },
-        "chartjs-plugin-zoom": {
-            "Zoom": "https://www.chartjs.org/chartjs-plugin-zoom/latest/"
+            "TooltipItem": "https://www.chartjs.org/docs/latest/configuration/tooltip.html"
         },
         "chartjs-adapter-date-fns": {
             "DateAdapter": "https://www.chartjs.org/docs/latest/axes/cartesian/time.html#date-adapters"
         },
-        "validator": {
-            "isURL": "https://github.com/validatorjs/validator.js#validators",
-            "isEmail": "https://github.com/validatorjs/validator.js#validators",
-            "isPort": "https://github.com/validatorjs/validator.js#validators",
-            "isIP": "https://github.com/validatorjs/validator.js#validators"
+        "chartjs-plugin-zoom": {
+            "Zoom": "https://www.chartjs.org/chartjs-plugin-zoom/latest/"
+        },
+        "electron": {
+            "BrowserWindow": "https://www.electronjs.org/docs/latest/api/browser-window",
+            "Menu": "https://www.electronjs.org/docs/latest/api/menu",
+            "Notification": "https://www.electronjs.org/docs/latest/api/notification",
+            "Tray": "https://www.electronjs.org/docs/latest/api/tray",
+            "app": "https://www.electronjs.org/docs/latest/api/app",
+            "dialog": "https://www.electronjs.org/docs/latest/api/dialog",
+            "ipcMain": "https://www.electronjs.org/docs/latest/api/ipc-main",
+            "ipcRenderer": "https://www.electronjs.org/docs/latest/api/ipc-renderer",
+            "shell": "https://www.electronjs.org/docs/latest/api/shell",
+            "webContents": "https://www.electronjs.org/docs/latest/api/web-contents"
+        },
+        "electron-log": {
+            "LogLevel": "https://github.com/megahertz/electron-log#log-level",
+            "Logger": "https://github.com/megahertz/electron-log#logger"
+        },
+        "electron-updater": {
+            "UpdateInfo": "https://www.electron.build/auto-update#updateinfo",
+            "autoUpdater": "https://www.electron.build/auto-update"
         },
         "is-port-reachable": {
-            "isPortReachable": "https://github.com/sindresorhus/is-port-reachable",
-            "\"is-port-reachable\"": "https://github.com/sindresorhus/is-port-reachable"
+            "\"is-port-reachable\"": "https://github.com/sindresorhus/is-port-reachable",
+            "isPortReachable": "https://github.com/sindresorhus/is-port-reachable"
+        },
+        "javascript": {
+            "Array": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
+            "Boolean": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+            "Date": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date",
+            "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+            "Map": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map",
+            "Number": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+            "Object": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+            "Promise": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+            "RegExp": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp",
+            "Set": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set",
+            "String": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+            "WeakMap": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap",
+            "WeakSet": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet"
+        },
+        "node": {
+            "Buffer": "https://nodejs.org/docs/latest/api/buffer.html#class-buffer",
+            "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+            "EventEmitter": "https://nodejs.org/docs/latest/api/events.html#class-eventemitter",
+            "crypto": "https://nodejs.org/docs/latest/api/crypto.html",
+            "events": "https://nodejs.org/docs/latest/api/events.html",
+            "fs": "https://nodejs.org/docs/latest/api/fs.html",
+            "os": "https://nodejs.org/docs/latest/api/os.html",
+            "path": "https://nodejs.org/docs/latest/api/path.html",
+            "process": "https://nodejs.org/docs/latest/api/process.html",
+            "url": "https://nodejs.org/docs/latest/api/url.html"
+        },
+        "node-sqlite3-wasm": {
+            "\"node-sqlite3-wasm\".Database": "https://github.com/tndrle/node-sqlite3-wasm#database",
+            "Database": "https://github.com/tndrle/node-sqlite3-wasm#database",
+            "Statement": "https://github.com/tndrle/node-sqlite3-wasm#statement"
         },
         "ping": {
             "ping": "https://github.com/danielzzz/node-ping"
         },
-        "electron-log": {
-            "Logger": "https://github.com/megahertz/electron-log#logger",
-            "LogLevel": "https://github.com/megahertz/electron-log#log-level"
+        "postcss": {
+            "Plugin": "https://postcss.org/api/#plugin"
         },
-        "electron-updater": {
-            "autoUpdater": "https://www.electron.build/auto-update",
-            "UpdateInfo": "https://www.electron.build/auto-update#updateinfo"
+        "react": {
+            "Component": "https://react.dev/reference/react/Component",
+            "JSX": "https://react.dev/learn/writing-markup-with-jsx",
+            "ReactNode": "https://react.dev/reference/react/Children#react-node-type",
+            "useCallback": "https://react.dev/reference/react/useCallback",
+            "useContext": "https://react.dev/reference/react/useContext",
+            "useEffect": "https://react.dev/reference/react/useEffect",
+            "useMemo": "https://react.dev/reference/react/useMemo",
+            "useReducer": "https://react.dev/reference/react/useReducer",
+            "useRef": "https://react.dev/reference/react/useRef",
+            "useState": "https://react.dev/reference/react/useState"
+        },
+        "react-chartjs-2": {
+            "Bar": "https://react-chartjs-2.js.org/components/bar",
+            "Doughnut": "https://react-chartjs-2.js.org/components/doughnut",
+            "Line": "https://react-chartjs-2.js.org/components/line",
+            "Pie": "https://react-chartjs-2.js.org/components/pie",
+            "Radar": "https://react-chartjs-2.js.org/components/radar",
+            "Scatter": "https://react-chartjs-2.js.org/components/scatter"
         },
         "react-icons": {
             "IconType": "https://react-icons.github.io/react-icons/"
         },
-        "typescript": {
-            "Partial": "https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype",
-            "Required": "https://www.typescriptlang.org/docs/handbook/utility-types.html#requiredtype",
-            "Pick": "https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys",
-            "Omit": "https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys",
-            "Record": "https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type",
-            "Exclude": "https://www.typescriptlang.org/docs/handbook/utility-types.html#excludetype-excludedunion",
-            "Extract": "https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype-union",
-            "NonNullable": "https://www.typescriptlang.org/docs/handbook/utility-types.html#nonnullabletype",
-            "ReturnType": "https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype",
-            "Parameters": "https://www.typescriptlang.org/docs/handbook/utility-types.html#parameterstype",
-            "Promise": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
-        },
-        "javascript": {
-            "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
-            "Promise": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
-            "Array": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
-            "Object": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
-            "String": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
-            "Number": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
-            "Boolean": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
-            "Date": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date",
-            "RegExp": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp",
-            "Map": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map",
-            "Set": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set",
-            "WeakMap": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap",
-            "WeakSet": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet"
-        },
         "tailwindcss": {
             "Config": "https://tailwindcss.com/docs/configuration"
         },
-        "postcss": {
-            "Plugin": "https://postcss.org/api/#plugin"
-        },
-        "vitest": {
-            "describe": "https://vitest.dev/api/#describe",
-            "test": "https://vitest.dev/api/#test",
-            "it": "https://vitest.dev/api/#test",
-            "expect": "https://vitest.dev/api/#expect",
-            "beforeEach": "https://vitest.dev/api/#beforeeach",
-            "afterEach": "https://vitest.dev/api/#aftereach",
-            "beforeAll": "https://vitest.dev/api/#beforeall",
-            "afterAll": "https://vitest.dev/api/#afterall"
-        },
-        "@testing-library/react": {
-            "render": "https://testing-library.com/docs/react-testing-library/api#render",
-            "screen": "https://testing-library.com/docs/queries/about#screen",
-            "fireEvent": "https://testing-library.com/docs/dom-testing-library/api-events",
-            "waitFor": "https://testing-library.com/docs/dom-testing-library/api-async#waitfor"
+        "typescript": {
+            "Exclude": "https://www.typescriptlang.org/docs/handbook/utility-types.html#excludetype-excludedunion",
+            "Extract": "https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype-union",
+            "NonNullable": "https://www.typescriptlang.org/docs/handbook/utility-types.html#nonnullabletype",
+            "Omit": "https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys",
+            "Parameters": "https://www.typescriptlang.org/docs/handbook/utility-types.html#parameterstype",
+            "Partial": "https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype",
+            "Pick": "https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys",
+            "Promise": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+            "Record": "https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type",
+            "Required": "https://www.typescriptlang.org/docs/handbook/utility-types.html#requiredtype",
+            "ReturnType": "https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype"
         },
         "uptime-watcher": {
-            "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
-            "ValidationResult": "#",
-            "ServiceContainer": "#",
-            "SiteManager": "#",
+            "AxiosError": "https://axios-http.com/docs/handling_errors",
             "ConfigurationManager": "#",
-            "TypedEventBus.emitTyped": "#",
+            "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+            "Logger": "#",
             "MigrationOrchestrator": "#",
-            "VersionManager": "#",
+            "Monitor": "#",
             "MonitorOperationRegistry.registerOperation": "#",
-            "OperationTimeoutManager.createTimeout": "#",
             "MonitorStatusUpdateService.updateStatus": "#",
             "MonitorTypeRegistry.getAllTypes": "#",
             "MonitorTypeRegistry.isValidType": "#",
-            "validateMonitorHost": "#",
-            "hasValidHost": "#",
-            "getMonitorTimeout": "#",
-            "getMonitorRetryAttempts": "#",
-            "Monitor": "#",
-            "Logger": "#",
+            "OperationTimeoutManager.createTimeout": "#",
             "PortCheckError": "#",
+            "ServiceContainer": "#",
+            "SiteManager": "#",
+            "TypedEventBus.emitTyped": "#",
+            "ValidationResult": "#",
+            "VersionManager": "#",
+            "getMonitorRetryAttempts": "#",
+            "getMonitorTimeout": "#",
             "getMonitorTypeConfig": "#",
-            "AxiosError": "https://axios-http.com/docs/handling_errors"
+            "hasValidHost": "#",
+            "validateMonitorHost": "#"
+        },
+        "validator": {
+            "isEmail": "https://github.com/validatorjs/validator.js#validators",
+            "isIP": "https://github.com/validatorjs/validator.js#validators",
+            "isPort": "https://github.com/validatorjs/validator.js#validators",
+            "isURL": "https://github.com/validatorjs/validator.js#validators"
+        },
+        "vite": {
+            "Plugin": "https://vitejs.dev/guide/api-plugin.html",
+            "UserConfig": "https://vitejs.dev/config/",
+            "defineConfig": "https://vitejs.dev/config/"
+        },
+        "vitest": {
+            "afterAll": "https://vitest.dev/api/#afterall",
+            "afterEach": "https://vitest.dev/api/#aftereach",
+            "beforeAll": "https://vitest.dev/api/#beforeall",
+            "beforeEach": "https://vitest.dev/api/#beforeeach",
+            "describe": "https://vitest.dev/api/#describe",
+            "expect": "https://vitest.dev/api/#expect",
+            "it": "https://vitest.dev/api/#test",
+            "test": "https://vitest.dev/api/#test"
+        },
+        "zod": {
+            "ZodArray": "https://zod.dev/?id=arrays",
+            "ZodBoolean": "https://zod.dev/?id=booleans",
+            "ZodError": "https://zod.dev/?id=error-handling",
+            "ZodNumber": "https://zod.dev/?id=numbers",
+            "ZodObject": "https://zod.dev/?id=objects",
+            "ZodOptional": "https://zod.dev/?id=optionals",
+            "ZodSchema": "https://zod.dev/?id=basic-usage",
+            "ZodString": "https://zod.dev/?id=strings",
+            "ZodType": "https://zod.dev/?id=basic-usage",
+            "ZodUnion": "https://zod.dev/?id=unions",
+            "z": "https://zod.dev/",
+            "z.ZodError": "https://zod.dev/?id=error-handling"
+        },
+        "zustand": {
+            "StateCreator": "https://docs.pmnd.rs/zustand/guides/typescript#state-creator",
+            "StoreApi": "https://docs.pmnd.rs/zustand/guides/typescript#store-api",
+            "create": "https://docs.pmnd.rs/zustand/getting-started/introduction"
         }
     },
     "favicon": "../../icons/favicon.ico",
@@ -264,10 +264,10 @@
     "includeDocCommentReferences": false,
     "includeVersion": true,
     "jsDocCompatibility": {
-        "exampleTag": true,
         "defaultTag": true,
-        "inheritDocTag": true,
-        "ignoreUnescapedBraces": true
+        "exampleTag": true,
+        "ignoreUnescapedBraces": true,
+        "inheritDocTag": true
     },
     "kindSortOrder": [
         "Document",
@@ -317,8 +317,8 @@
     ],
     "readme": "../../README.md",
     "replaceText": {
-        "inCodeCommentText": true,
         "inCodeCommentTags": true,
+        "inCodeCommentText": true,
         "inMarkdownText": false,
         "replacements": [
             {
@@ -351,8 +351,8 @@
     "sanitizeComments": false,
     "searchGroupBoosts": {
         "Classes": 1.5,
-        "Interfaces": 1.3,
         "Functions": 1.2,
+        "Interfaces": 1.3,
         "Types": 1.1
     },
     "searchInComments": true,
@@ -368,18 +368,18 @@
     "useHTMLAnchors": true,
     "useTsLinkResolution": true,
     "validation": {
-        "notExported": false,
         "invalidLink": true,
-        "rewrittenLink": true,
         "notDocumented": false,
+        "notExported": false,
+        "rewrittenLink": true,
         "unusedMergeModuleWith": true
     },
     "visibilityFilters": {
-        "protected": false,
-        "private": false,
-        "inherited": true,
-        "external": false,
         "@alpha": false,
-        "@beta": false
+        "@beta": false,
+        "external": false,
+        "inherited": true,
+        "private": false,
+        "protected": false
     }
 }

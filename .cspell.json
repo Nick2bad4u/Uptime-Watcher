@@ -42,24 +42,24 @@
     ],
     "dictionaryDefinitions": [
         {
+            "addWords": true,
+            "description": "Words used in the Uptime-Watcher project",
             "name": "Uptime-Watcher Project Dictionary",
             "path": "./custom-words.txt",
-            "description": "Words used in the Uptime-Watcher project",
-            "addWords": true,
             "scope": "folder"
         },
         {
+            "addWords": true,
+            "description": "User-specific words for Uptime-Watcher",
             "name": "Uptime-Watcher User Dictionary",
             "path": "./custom-words.txt",
-            "description": "User-specific words for Uptime-Watcher",
-            "addWords": true,
             "scope": "user"
         },
         {
+            "addWords": true,
+            "description": "VSCode workspace dictionary",
             "name": "Uptime-Watcher Folder Dictionary",
             "path": "./custom-words.txt",
-            "description": "VSCode workspace dictionary",
-            "addWords": true,
             "scope": "folder"
         }
     ],
@@ -131,7 +131,6 @@
     "language": "en",
     "languageSettings": [
         {
-            "languageId": "typescript,javascript,typescriptreact,javascriptreact",
             "allowCompoundWords": true,
             "caseSensitive": false,
             "ignoreRegExpList": [
@@ -143,17 +142,17 @@
                 "/class\\s+[A-Z][a-zA-Z0-9]*\\s*{/g",
                 "/interface\\s+[A-Z][a-zA-Z0-9]*\\s*{/g",
                 "/type\\s+[A-Z][a-zA-Z0-9]*\\s*=/g"
-            ]
+            ],
+            "languageId": "typescript,javascript,typescriptreact,javascriptreact"
         },
         {
-            "languageId": "json,jsonc",
             "ignoreRegExpList": [
                 "/\"[^\"]*\"\\s*:/g",
                 "/\"\\$schema\"\\s*:\\s*\"[^\"]*\"/g"
-            ]
+            ],
+            "languageId": "json,jsonc"
         },
         {
-            "languageId": "markdown",
             "ignoreRegExpList": [
                 "/\\[.*?\\]\\(.*?\\)/g",
                 "/!\\[.*?\\]\\(.*?\\)/g",
@@ -161,25 +160,26 @@
                 "/`[^`]*`/g",
                 "/#{1,6}\\s+.+$/gm",
                 "/^\\s*[-*+]\\s+/gm"
-            ]
+            ],
+            "languageId": "markdown"
         },
         {
-            "languageId": "css,scss,sass,less",
             "ignoreRegExpList": [
                 "/@[a-z-]+/g",
                 "/\\.[a-z-]+[a-z0-9-]*/gi",
                 "/#[a-z-]+[a-z0-9-]*/gi",
                 "/--[a-z-]+[a-z0-9-]*/gi"
-            ]
+            ],
+            "languageId": "css,scss,sass,less"
         },
         {
-            "languageId": "html",
             "ignoreRegExpList": [
                 "/<[^>]*>/g",
                 "/class=\"[^\"]*\"/g",
                 "/id=\"[^\"]*\"/g",
                 "/data-[a-z-]+=\"[^\"]*\"/g"
-            ]
+            ],
+            "languageId": "html"
         }
     ],
     "maxDuplicateProblems": 5,

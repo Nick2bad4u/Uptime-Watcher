@@ -1,38 +1,19 @@
 {
-    "name": "docs-docusaurus",
-    "version": "0.0.0",
-    "private": true,
     "author": "Nick2bad4u",
-    "description": "Documentation site for Uptime Watcher using Docusaurus",
-    "keywords": [
-        "docusaurus",
-        "documentation",
-        "uptime",
-        "monitoring",
-        "electron"
-    ],
+    "browserslist": {
+        "development": [
+            "last 3 chrome version",
+            "last 3 firefox version",
+            "last 5 safari version"
+        ],
+        "production": [
+            ">0.5%",
+            "not dead",
+            "not op_mini all"
+        ]
+    },
     "bugs": {
         "url": "https://github.com/Nick2bad4u/Uptime-Watcher/issues"
-    },
-    "scripts": {
-        "docusaurus": "docusaurus",
-        "start": "docusaurus start",
-        "build": "npm run generate-docs && docusaurus build",
-        "build:fast": "docusaurus build",
-        "generate-docs": "typedoc --options typedoc.config.json && node ../../scripts/fix-mdx-typedoc-unified.js",
-        "generate-docs:app": "typedoc --options ../../typedoc.json",
-        "generate-docs:electron": "typedoc --options ../../typedoc.electron.json",
-        "swizzle": "docusaurus swizzle",
-        "deploy": "docusaurus deploy",
-        "clear": "docusaurus clear",
-        "serve": "docusaurus serve",
-        "write-translations": "docusaurus write-translations",
-        "write-heading-ids": "docusaurus write-heading-ids",
-        "typecheck": "tsc --project tsconfig.json --noEmit",
-        "lint": "cd ../../ && eslint --cache docs/docusaurus",
-        "lint:fix": "cd ../../ && eslint --cache docs/docusaurus --fix",
-        "lint:css": "stylelint . --cache --config stylelint.config.mjs --ignore-path .stylelintignore --cache-strategy content --cache-location stylelintcache --formatter=verbose",
-        "lint:css:fix": "stylelint . --cache --config stylelint.config.mjs --ignore-path .stylelintignore --cache-strategy content --cache-location stylelintcache --formatter=verbose --fix"
     },
     "dependencies": {
         "@docusaurus/core": "3.8.1",
@@ -47,6 +28,7 @@
         "react-dom": "^19.1.1",
         "react-github-btn": "^1.4.0"
     },
+    "description": "Documentation site for Uptime Watcher using Docusaurus",
     "devDependencies": {
         "@docusaurus/module-type-aliases": "3.8.1",
         "@docusaurus/tsconfig": "3.8.1",
@@ -55,19 +37,37 @@
         "typedoc-plugin-markdown": "^4.8.1",
         "typescript": "~5.9.2"
     },
-    "browserslist": {
-        "production": [
-            ">0.5%",
-            "not dead",
-            "not op_mini all"
-        ],
-        "development": [
-            "last 3 chrome version",
-            "last 3 firefox version",
-            "last 5 safari version"
-        ]
-    },
     "engines": {
         "node": ">=18.0"
-    }
+    },
+    "keywords": [
+        "docusaurus",
+        "documentation",
+        "uptime",
+        "monitoring",
+        "electron"
+    ],
+    "name": "docs-docusaurus",
+    "private": true,
+    "scripts": {
+        "build": "npm run generate-docs && docusaurus build",
+        "build:fast": "docusaurus build",
+        "clear": "docusaurus clear",
+        "deploy": "docusaurus deploy",
+        "docusaurus": "docusaurus",
+        "generate-docs": "typedoc --options typedoc.config.json && node ../../scripts/fix-mdx-typedoc-unified.js",
+        "generate-docs:app": "typedoc --options ../../typedoc.json",
+        "generate-docs:electron": "typedoc --options ../../typedoc.electron.json",
+        "lint": "cd ../../ && eslint --cache docs/docusaurus",
+        "lint:css": "stylelint . --cache --config stylelint.config.mjs --ignore-path .stylelintignore --cache-strategy content --cache-location stylelintcache --formatter=verbose",
+        "lint:css:fix": "stylelint . --cache --config stylelint.config.mjs --ignore-path .stylelintignore --cache-strategy content --cache-location stylelintcache --formatter=verbose --fix",
+        "lint:fix": "cd ../../ && eslint --cache docs/docusaurus --fix",
+        "serve": "docusaurus serve",
+        "start": "docusaurus start",
+        "swizzle": "docusaurus swizzle",
+        "typecheck": "tsc --project tsconfig.json --noEmit",
+        "write-heading-ids": "docusaurus write-heading-ids",
+        "write-translations": "docusaurus write-translations"
+    },
+    "version": "0.0.0"
 }

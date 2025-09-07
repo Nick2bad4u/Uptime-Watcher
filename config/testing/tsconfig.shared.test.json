@@ -1,13 +1,12 @@
 {
     "$schema": "https://www.schemastore.org/tsconfig.json",
-    "extends": "../../tsconfig.shared.json",
     "compilerOptions": {
-        "rootDir": "../..",
-        "outDir": "../../dist-shared-test",
-        "tsBuildInfoFile": "../../dist-shared-test/tsconfig.shared.test.tsbuildinfo",
         "composite": true,
         "incremental": true,
         "isolatedDeclarations": false,
+        "outDir": "../../dist-shared-test",
+        "rootDir": "../..",
+        "tsBuildInfoFile": "../../dist-shared-test/tsconfig.shared.test.tsbuildinfo",
         "types": [
             "node",
             "vitest/globals"
@@ -18,6 +17,7 @@
         "../../electron/**/*",
         "../../src/**/*"
     ],
+    "extends": "../../tsconfig.shared.json",
     "include": [
         "../../shared/**/*.spec.ts",
         "../../shared/**/*.spec.mts",

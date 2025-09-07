@@ -1,13 +1,15 @@
 {
     "$schema": "https://json.schemastore.org/tsconfig",
     "compilerOptions": {
+        "allowJs": true,
+        "allowSyntheticDefaultImports": true,
+        "checkJs": false,
+        "declaration": true,
+        "declarationMap": true,
+        "emitDeclarationOnly": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
         "jsx": "react-jsx",
-        "module": "ESNext",
-        "moduleDetection": "auto",
-        "moduleResolution": "bundler",
-        "outDir": "dist",
-        "target": "ESNext",
-        "tsBuildInfoFile": "./dist/typedoc.tsbuildinfo",
         "lib": [
             "DOM.Iterable",
             "DOM",
@@ -24,45 +26,29 @@
             "ES7",
             "ESNext"
         ],
+        "module": "ESNext",
+        "moduleDetection": "auto",
+        "moduleResolution": "bundler",
+        "noEmit": false,
+        "outDir": "dist",
         "paths": {
-            "@shared/*": [
-                "../../shared/*"
+            "@app/*": [
+                "../../src/*"
             ],
             "@electron/*": [
                 "../../electron/*"
             ],
-            "@app/*": [
-                "../../src/*"
+            "@shared/*": [
+                "../../shared/*"
             ]
         },
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
-        "strict": true,
-        "skipLibCheck": true,
         "resolveJsonModule": true,
-        "declaration": true,
-        "declarationMap": true,
-        "emitDeclarationOnly": true,
+        "skipLibCheck": true,
         "sourceMap": true,
-        "noEmit": false,
-        "allowJs": true,
-        "checkJs": false
+        "strict": true,
+        "target": "ESNext",
+        "tsBuildInfoFile": "./dist/typedoc.tsbuildinfo"
     },
-    "include": [
-        "../../src/**/*.ts",
-        "../../src/**/*.tsx",
-        "../../src/**/*.js",
-        "../../src/**/*.jsx",
-        "../../electron/**/*.ts",
-        "../../electron/**/*.tsx",
-        "../../electron/**/*.js",
-        "../../electron/**/*.jsx",
-        "../../shared/**/*.ts",
-        "../../shared/**/*.tsx",
-        "../../shared/**/*.js",
-        "../../shared/**/*.jsx"
-    ],
     "exclude": [
         "../../node_modules/**",
         "../../dist/**",
@@ -107,5 +93,19 @@
         "../../electron/dist/**",
         "../../src/services/dist/**",
         "../../src/theme/dist/**"
+    ],
+    "include": [
+        "../../src/**/*.ts",
+        "../../src/**/*.tsx",
+        "../../src/**/*.js",
+        "../../src/**/*.jsx",
+        "../../electron/**/*.ts",
+        "../../electron/**/*.tsx",
+        "../../electron/**/*.js",
+        "../../electron/**/*.jsx",
+        "../../shared/**/*.ts",
+        "../../shared/**/*.tsx",
+        "../../shared/**/*.js",
+        "../../shared/**/*.jsx"
     ]
 }

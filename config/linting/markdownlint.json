@@ -28,10 +28,10 @@
         "style": "one_or_ordered"
     },
     "MD030": {
-        "ul_single": 1,
+        "ol_multi": 1,
         "ol_single": 1,
         "ul_multi": 1,
-        "ol_multi": 1
+        "ul_single": 1
     },
     "MD033": {
         "allowed_elements": [

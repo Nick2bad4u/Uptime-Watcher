@@ -1,35 +1,44 @@
 {
     "$schema": "https://www.schemastore.org/tsconfig.json",
-    "extends": "../../tsconfig.shared.json",
     "compilerOptions": {
-        "rootDir": "../..",
         "baseUrl": "../..",
-        "outDir": "../../dist-bench",
-        "tsBuildInfoFile": "../../dist-bench/tsconfig.bench.tsbuildinfo",
         "composite": true,
+        "exactOptionalPropertyTypes": false,
         "incremental": true,
         "isolatedDeclarations": false,
-        "exactOptionalPropertyTypes": false,
+        "noImplicitAny": false,
+        "noPropertyAccessFromIndexSignature": false,
         "noUncheckedIndexedAccess": false,
         "noUnusedLocals": false,
         "noUnusedParameters": false,
-        "noPropertyAccessFromIndexSignature": false,
-        "noImplicitAny": false,
-        "useUnknownInCatchVariables": false,
-        "strictNullChecks": false,
-        "strictPropertyInitialization": false,
+        "outDir": "../../dist-bench",
         "paths": {
-            "@shared/*": [
-                "shared/*"
+            "@app/*": [
+                "src/*"
             ],
             "@electron/*": [
                 "electron/*"
             ],
-            "@app/*": [
-                "src/*"
+            "@shared/*": [
+                "shared/*"
             ]
-        }
+        },
+        "rootDir": "../..",
+        "strictNullChecks": false,
+        "strictPropertyInitialization": false,
+        "tsBuildInfoFile": "../../dist-bench/tsconfig.bench.tsbuildinfo",
+        "useUnknownInCatchVariables": false
     },
+    "exclude": [
+        "node_modules",
+        "dist",
+        "dist-*",
+        "coverage",
+        "**/*.d.ts",
+        "**/*.js",
+        "**/*.mjs"
+    ],
+    "extends": "../../tsconfig.shared.json",
     "include": [
         "../../benchmarks/**/*.ts",
         "../../benchmarks/**/*.mts",
@@ -48,15 +57,6 @@
         "../../src/**/*.mts",
         "../../src/**/*.cts",
         "../../src/**/*.tsx"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist",
-        "dist-*",
-        "coverage",
-        "**/*.d.ts",
-        "**/*.js",
-        "**/*.mjs"
     ],
     "ts-node": {
         "esm": true,

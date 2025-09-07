@@ -1,9 +1,6 @@
 {
     "$schema": "https://repomix.com/schemas/latest/schema.json",
-
     "ignore": {
-        "useGitignore": true,
-        "useDefaultPatterns": true,
         "customPatterns": [
             "**/node_modules/**",
             "**/dist/**",
@@ -145,9 +142,10 @@
             "**/vagrant/**",
             "**/Vagrantfile",
             "**/.vagrant/**"
-        ]
+        ],
+        "useDefaultPatterns": true,
+        "useGitignore": true
     },
-
     "include": [
         "src/**/*",
         "electron/**/*",
@@ -167,37 +165,33 @@
         "src/**/*.{ts,tsx,css}",
         "docs/**/*.md"
     ],
-
     "input": {
         "maxFileSize": 52428800
     },
-
     "output": {
-        "filePath": "repomix-output.xml",
-        "style": "xml",
-        "parsableStyle": false,
         "compress": true,
-        "headerText": "Uptime Watcher - Electron Desktop Application for Website Monitoring",
-        "fileSummary": true,
+        "copyToClipboard": false,
         "directoryStructure": true,
+        "filePath": "repomix-output.xml",
+        "fileSummary": true,
         "files": true,
+        "git": {
+            "includeDiffs": false,
+            "sortByChanges": true,
+            "sortByChangesMaxCommits": 200
+        },
+        "headerText": "Uptime Watcher - Electron Desktop Application for Website Monitoring",
+        "includeEmptyDirectories": false,
+        "parsableStyle": false,
         "removeComments": false,
         "removeEmptyLines": true,
-        "topFilesLength": 10,
         "showLineNumbers": false,
-        "copyToClipboard": false,
-        "includeEmptyDirectories": false,
-        "git": {
-            "sortByChanges": true,
-            "sortByChangesMaxCommits": 200,
-            "includeDiffs": false
-        }
+        "style": "xml",
+        "topFilesLength": 10
     },
-
     "security": {
         "enableSecurityCheck": true
     },
-
     "tokenCount": {
         "encoding": "o200k_base"
     }

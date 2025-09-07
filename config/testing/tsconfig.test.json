@@ -1,10 +1,9 @@
 {
     "$schema": "https://www.schemastore.org/tsconfig.json",
-    "extends": "../../tsconfig.json",
     "compilerOptions": {
         "baseUrl": "../..",
-        "rootDir": "../..",
-        "tsBuildInfoFile": "../../dist-electron/tsconfig.test.tsbuildinfo",
+        "composite": true,
+        "incremental": true,
         "paths": {
             "@app/*": [
                 "src/*"
@@ -16,13 +15,14 @@
                 "shared/*"
             ]
         },
-        "composite": true,
-        "incremental": true
+        "rootDir": "../..",
+        "tsBuildInfoFile": "../../dist-electron/tsconfig.test.tsbuildinfo"
     },
     "exclude": [
         "../../electron/**/*.test.ts",
         "../../electron/**/*.test.tsx"
     ],
+    "extends": "../../tsconfig.json",
     "include": [
         "../../*.config.js",
         "../../*.config.mjs",

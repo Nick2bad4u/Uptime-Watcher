@@ -155,17 +155,17 @@
         "!**/coverage/**"
     ],
     "rules": {
-        "files": "error",
+        "classMembers": "warn",
         "dependencies": "error",
         "devDependencies": "error",
-        "unlisted": "error",
-        "exports": "warn",
-        "nsExports": "warn",
-        "classMembers": "warn",
-        "types": "warn",
-        "nsTypes": "warn",
+        "duplicates": "error",
         "enumMembers": "warn",
-        "duplicates": "error"
+        "exports": "warn",
+        "files": "error",
+        "nsExports": "warn",
+        "nsTypes": "warn",
+        "types": "warn",
+        "unlisted": "error"
     },
     "workspaces": {
         ".": {

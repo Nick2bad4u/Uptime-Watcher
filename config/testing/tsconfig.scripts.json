@@ -1,17 +1,14 @@
 {
     "$schema": "https://www.schemastore.org/tsconfig.json",
-    "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "baseUrl": "../../",
-        "outDir": "dist-scripts",
-        "tsBuildInfoFile": "./dist-scripts/tsconfig.scripts.tsbuildinfo",
         "allowJs": true,
-        "checkJs": true,
         "allowSyntheticDefaultImports": true,
         "allowUmdGlobalAccess": false,
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
         "alwaysStrict": true,
+        "baseUrl": "../../",
+        "checkJs": true,
         "declaration": true,
         "declarationMap": true,
         "disableSizeLimit": true,
@@ -22,7 +19,6 @@
         "incremental": true,
         "isolatedDeclarations": false,
         "isolatedModules": true,
-        "removeComments": false,
         "noCheck": false,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": false,
@@ -35,7 +31,9 @@
         "noUncheckedSideEffectImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
+        "outDir": "dist-scripts",
         "pretty": true,
+        "removeComments": false,
         "resolveJsonModule": true,
         "resolvePackageJsonExports": true,
         "resolvePackageJsonImports": true,
@@ -48,20 +46,13 @@
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
-        "useDefineForClassFields": true,
-        "useUnknownInCatchVariables": true,
+        "tsBuildInfoFile": "./dist-scripts/tsconfig.scripts.tsbuildinfo",
         "types": [
             "node"
-        ]
+        ],
+        "useDefineForClassFields": true,
+        "useUnknownInCatchVariables": true
     },
-    "include": [
-        "../../scripts/**/*.mjs",
-        "../../scripts/**/*.cjs",
-        "../../scripts/**/*.js",
-        "../../scripts/**/*.ts",
-        "../../scripts/**/*.tsx",
-        "../../scripts/**/*.jsx"
-    ],
     "exclude": [
         "../../scripts/download**",
         "node_modules",
@@ -72,6 +63,15 @@
         "**/dist-scripts/**",
         "**/coverage/**",
         "**/release/**"
+    ],
+    "extends": "../../tsconfig.json",
+    "include": [
+        "../../scripts/**/*.mjs",
+        "../../scripts/**/*.cjs",
+        "../../scripts/**/*.js",
+        "../../scripts/**/*.ts",
+        "../../scripts/**/*.tsx",
+        "../../scripts/**/*.jsx"
     ],
     "references": []
 }

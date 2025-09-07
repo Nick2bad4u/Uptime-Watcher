@@ -1,18 +1,16 @@
 {
     "$schema": "https://biomejs.dev/schemas/2.0.5/schema.json",
-
     "assist": {
-        "enabled": true,
         "actions": {
             "source": {
                 "recommended": true
             }
-        }
+        },
+        "enabled": true
     },
-
     "css": {
-        "parser": {
-            "cssModules": false
+        "assist": {
+            "enabled": true
         },
         "formatter": {
             "enabled": true,
@@ -24,21 +22,11 @@
         "linter": {
             "enabled": true
         },
-        "assist": {
-            "enabled": true
+        "parser": {
+            "cssModules": false
         }
     },
-
     "files": {
-        "ignoreUnknown": false,
-        "maxSize": 2097152,
-        "includes": [
-            "src/**/*",
-            "electron/**/*",
-            "shared/**/*",
-            "scripts/**/*",
-            "*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,json,jsonc,css,html,md}"
-        ],
         "experimentalScannerIgnores": [
             "node_modules",
             "dist",
@@ -48,29 +36,39 @@
             ".git",
             ".cache",
             "html"
-        ]
+        ],
+        "ignoreUnknown": false,
+        "includes": [
+            "src/**/*",
+            "electron/**/*",
+            "shared/**/*",
+            "scripts/**/*",
+            "*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,json,jsonc,css,html,md}"
+        ],
+        "maxSize": 2097152
     },
-
     "formatter": {
-        "enabled": true,
-        "formatWithErrors": false,
-        "indentStyle": "space",
-        "indentWidth": 4,
-        "lineEnding": "lf",
-        "lineWidth": 120,
         "attributePosition": "auto",
         "bracketSpacing": true,
-        "useEditorconfig": true,
+        "enabled": true,
         "expand": "auto",
+        "formatWithErrors": false,
         "includes": [
             "src/**/*",
             "electron/**/*",
             "shared/**/*",
             "scripts/**/*"
-        ]
+        ],
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineEnding": "lf",
+        "lineWidth": 120,
+        "useEditorconfig": true
     },
-
     "graphql": {
+        "assist": {
+            "enabled": true
+        },
         "formatter": {
             "enabled": false,
             "indentStyle": "space",
@@ -80,40 +78,34 @@
         },
         "linter": {
             "enabled": true
-        },
-        "assist": {
-            "enabled": true
         }
     },
-
     "html": {
         "formatter": {
+            "attributePosition": "auto",
+            "bracketSameLine": false,
             "enabled": false,
+            "indentScriptAndStyle": true,
             "indentStyle": "space",
             "indentWidth": 4,
             "lineWidth": 120,
-            "attributePosition": "auto",
-            "bracketSameLine": false,
-            "indentScriptAndStyle": true,
             "selfCloseVoidElements": "never"
         }
     },
-
     "javascript": {
-        "parser": {
-            "unsafeParameterDecoratorsEnabled": false,
-            "jsxEverywhere": true
+        "assist": {
+            "enabled": true
         },
         "formatter": {
+            "arrowParentheses": "always",
+            "attributePosition": "auto",
+            "bracketSameLine": false,
+            "bracketSpacing": true,
             "jsxQuoteStyle": "double",
             "quoteProperties": "asNeeded",
-            "trailingCommas": "es5",
-            "semicolons": "always",
-            "arrowParentheses": "always",
-            "bracketSameLine": false,
             "quoteStyle": "double",
-            "attributePosition": "auto",
-            "bracketSpacing": true
+            "semicolons": "always",
+            "trailingCommas": "es5"
         },
         "globals": [
             "window",
@@ -130,32 +122,31 @@
         "linter": {
             "enabled": true
         },
-        "assist": {
-            "enabled": true
+        "parser": {
+            "jsxEverywhere": true,
+            "unsafeParameterDecoratorsEnabled": false
         }
     },
-
     "json": {
-        "parser": {
-            "allowComments": true,
-            "allowTrailingCommas": true
+        "assist": {
+            "enabled": true
         },
         "formatter": {
             "enabled": true,
+            "expand": "always",
             "indentStyle": "space",
             "indentWidth": 4,
             "lineWidth": 120,
-            "trailingCommas": "none",
-            "expand": "always"
+            "trailingCommas": "none"
         },
         "linter": {
             "enabled": true
         },
-        "assist": {
-            "enabled": true
+        "parser": {
+            "allowComments": true,
+            "allowTrailingCommas": true
         }
     },
-
     "linter": {
         "enabled": true,
         "includes": [
@@ -165,93 +156,87 @@
             "scripts/**/*"
         ],
         "rules": {
-            "recommended": true,
-
+            "a11y": {
+                "noAccessKey": "warn",
+                "noAriaUnsupportedElements": "error",
+                "noRedundantAlt": "warn",
+                "useAltText": "error",
+                "useButtonType": "error",
+                "useFocusableInteractive": "warn",
+                "useIframeTitle": "error",
+                "useKeyWithClickEvents": "warn",
+                "useValidAnchor": "error",
+                "useValidAriaProps": "error",
+                "useValidAriaRole": "error",
+                "useValidAriaValues": "error"
+            },
+            "complexity": {
+                "noForEach": "warn",
+                "useFlatMap": "error",
+                "useLiteralKeys": "warn",
+                "useOptionalChain": "warn",
+                "useSimpleNumberKeys": "warn"
+            },
             "correctness": {
-                "noUnusedVariables": "error",
-                "noUnusedImports": "error",
-                "useExhaustiveDependencies": "warn",
+                "noSelfAssign": "error",
                 "noUndeclaredVariables": "error",
                 "noUnreachable": "error",
-                "noSelfAssign": "error",
-                "useValidForDirection": "error",
-                "noVoidTypeReturn": "error"
+                "noUnusedImports": "error",
+                "noUnusedVariables": "error",
+                "noVoidTypeReturn": "error",
+                "useExhaustiveDependencies": "warn",
+                "useValidForDirection": "error"
             },
-
+            "nursery": {
+                "recommended": false,
+                "useSortedClasses": "warn"
+            },
+            "performance": {
+                "noAccumulatingSpread": "warn",
+                "noBarrelFile": "warn",
+                "noDelete": "error",
+                "noReExportAll": "warn"
+            },
+            "recommended": true,
+            "security": {
+                "noDangerouslySetInnerHtml": "error",
+                "noGlobalEval": "error"
+            },
+            "style": {
+                "useConst": "error",
+                "useEnumInitializers": "warn",
+                "useExponentiationOperator": "error",
+                "useImportType": "error",
+                "useNodejsImportProtocol": "warn",
+                "useNumberNamespace": "error",
+                "useSingleVarDeclarator": "warn",
+                "useTemplate": "error"
+            },
             "suspicious": {
-                "noExplicitAny": "warn",
                 "noArrayIndexKey": "warn",
-                "noEmptyBlockStatements": "error",
                 "noConfusingVoidType": "warn",
                 "noDebugger": "error",
                 "noDuplicateCase": "error",
+                "noEmptyBlockStatements": "error",
+                "noExplicitAny": "warn",
                 "noFallthroughSwitchClause": "error",
                 "noMisleadingCharacterClass": "error",
                 "noRedundantUseStrict": "error",
                 "noSelfCompare": "error",
                 "noSparseArray": "error"
-            },
-
-            "style": {
-                "useConst": "error",
-                "useTemplate": "error",
-                "useExponentiationOperator": "error",
-                "useEnumInitializers": "warn",
-                "useImportType": "error",
-                "useNodejsImportProtocol": "warn",
-                "useNumberNamespace": "error",
-                "useSingleVarDeclarator": "warn"
-            },
-
-            "complexity": {
-                "useFlatMap": "error",
-                "noForEach": "warn",
-                "useOptionalChain": "warn",
-                "useSimpleNumberKeys": "warn",
-                "useLiteralKeys": "warn"
-            },
-
-            "performance": {
-                "noDelete": "error",
-                "noAccumulatingSpread": "warn",
-                "noBarrelFile": "warn",
-                "noReExportAll": "warn"
-            },
-
-            "security": {
-                "noDangerouslySetInnerHtml": "error",
-                "noGlobalEval": "error"
-            },
-
-            "a11y": {
-                "useValidAnchor": "error",
-                "useAltText": "error",
-                "useButtonType": "error",
-                "useKeyWithClickEvents": "warn",
-                "useValidAriaProps": "error",
-                "useValidAriaRole": "error",
-                "useValidAriaValues": "error",
-                "noAccessKey": "warn",
-                "noAriaUnsupportedElements": "error",
-                "noRedundantAlt": "warn",
-                "useFocusableInteractive": "warn",
-                "useIframeTitle": "error"
-            },
-
-            "nursery": {
-                "recommended": false,
-                "useSortedClasses": "warn"
             }
         }
     },
-
     "overrides": [
         {
-            "includes": ["*.md", "*.mdx"],
             "formatter": {
-                "lineWidth": 100,
-                "indentWidth": 2
-            }
+                "indentWidth": 2,
+                "lineWidth": 100
+            },
+            "includes": [
+                "*.md",
+                "*.mdx"
+            ]
         },
         {
             "includes": [
@@ -260,43 +245,45 @@
             ],
             "linter": {
                 "rules": {
-                    "suspicious": {
-                        "noExplicitAny": "off"
+                    "complexity": {
+                        "noForEach": "off"
                     },
                     "correctness": {
                         "noUnusedVariables": "warn"
                     },
-                    "complexity": {
-                        "noForEach": "off"
+                    "suspicious": {
+                        "noExplicitAny": "off"
                     }
                 }
             }
         },
         {
+            "formatter": {
+                "enabled": false
+            },
             "includes": [
                 "**/package.json",
                 "**/package-lock.json",
                 "**/pnpm-lock.yaml"
-            ],
-            "formatter": {
-                "enabled": false
-            }
+            ]
         },
         {
+            "formatter": {
+                "enabled": false
+            },
             "includes": [
                 "**/node_modules/**",
                 "**/dist/**",
                 "**/dist-electron/**"
             ],
-            "formatter": {
-                "enabled": false
-            },
             "linter": {
                 "enabled": false
             }
         },
         {
-            "includes": ["electron/**/*.ts"],
+            "includes": [
+                "electron/**/*.ts"
+            ],
             "javascript": {
                 "globals": [
                     "app",
@@ -314,7 +301,9 @@
             }
         },
         {
-            "includes": ["src/**/*.{ts,tsx}"],
+            "includes": [
+                "src/**/*.{ts,tsx}"
+            ],
             "javascript": {
                 "globals": [
                     "React",
@@ -323,7 +312,10 @@
             }
         },
         {
-            "includes": [".vscode/**/*.json", "**/.vscode/**/*.json"],
+            "includes": [
+                ".vscode/**/*.json",
+                "**/.vscode/**/*.json"
+            ],
             "json": {
                 "parser": {
                     "allowComments": true,
@@ -333,9 +325,9 @@
         }
     ],
     "vcs": {
-        "enabled": true,
         "clientKind": "git",
-        "useIgnoreFile": true,
-        "defaultBranch": "main"
+        "defaultBranch": "main",
+        "enabled": true,
+        "useIgnoreFile": true
     }
 }
