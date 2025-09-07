@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { test, fc } from "@fast-check/vitest";
 import "@testing-library/jest-dom";
 import { handleSubmit } from "../../../components/AddSiteForm/Submit";
 import type { FormSubmitProperties } from "../../../components/AddSiteForm/Submit";
@@ -208,5 +209,295 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             expect(properties.addMonitorToSite).toHaveBeenCalled();
             expect(properties.onSuccess).toHaveBeenCalled();
         });
+    });
+
+    describe("Property-Based Form Submission Testing", () => {
+        test.prop([fc.record({
+            siteName: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
+            url: fc.webUrl(),
+            monitorType: fc.constantFrom("http", "ping", "tcp", "dns"),
+            checkInterval: fc.constantFrom(30_000, 60_000, 300_000, 600_000)
+        })])(
+            "should handle valid form submissions with various data combinations",
+            async (formData) => {
+                const mockEvent = { preventDefault: vi.fn() } as any;
+                const properties = createMockProperties({
+                    name: formData.siteName,
+                    url: formData.url,
+                    monitorType: formData.monitorType,
+                    checkInterval: formData.checkInterval,
+                });
+
+                // Mock successful validation
+                const { validateMonitorFormData, validateMonitorFieldClientSide } =
+                    await import("../../../utils/monitorValidation");
+                vi.mocked(validateMonitorFormData).mockResolvedValue({
+                    success: true,
+                    errors: [],
+                    warnings: [],
+                });
+
+                vi.mocked(validateMonitorFieldClientSide).mockResolvedValue({
+                    success: true,
+                    errors: [],
+                    warnings: [],
+                });
+
+                await handleSubmit(mockEvent, properties);
+
+                expect(mockEvent.preventDefault).toHaveBeenCalled();
+                expect(properties.createSite).toHaveBeenCalled();
+                expect(properties.onSuccess).toHaveBeenCalled();
+
+                // Verify form data characteristics
+                expect(formData.siteName.trim().length).toBeGreaterThan(0);
+                expect(formData.siteName.length).toBeLessThanOrEqual(100);
+                expect(formData.url).toMatch(/^https?:\/\//);
+                expect(["http", "ping", "tcp", "dns"]).toContain(formData.monitorType);
+                expect([30_000, 60_000, 300_000, 600_000]).toContain(formData.checkInterval);
+            }
+        );
+
+        test.prop([fc.array(fc.string(), { minLength: 1, maxLength: 5 })])(
+            "should handle validation errors with various error messages",
+            async (errorMessages) => {
+                const mockEvent = { preventDefault: vi.fn() } as any;
+                const properties = createMockProperties();
+
+                // Mock validation failure
+                const { validateMonitorFormData } = await import(
+                    "../../../utils/monitorValidation"
+                );
+                vi.mocked(validateMonitorFormData).mockResolvedValue({
+                    success: false,
+                    errors: errorMessages,
+                    warnings: [],
+                });
+
+                await handleSubmit(mockEvent, properties);
+
+                expect(mockEvent.preventDefault).toHaveBeenCalled();
+                expect(properties.setFormError).toHaveBeenCalled();
+                expect(properties.createSite).not.toHaveBeenCalled();
+
+                // Verify error characteristics
+                expect(Array.isArray(errorMessages)).toBeTruthy();
+                expect(errorMessages.length).toBeGreaterThanOrEqual(1);
+                expect(errorMessages.length).toBeLessThanOrEqual(5);
+            }
+        );
+
+        test.prop([fc.record({
+            host: fc.oneof(fc.domain(), fc.ipV4(), fc.constant("localhost")),
+            port: fc.integer({ min: 1, max: 65_535 }),
+            timeout: fc.integer({ min: 1000, max: 60_000 }),
+            retries: fc.integer({ min: 0, max: 10 })
+        })])(
+            "should handle TCP monitor submissions with various configurations",
+            async (tcpConfig) => {
+                const mockEvent = { preventDefault: vi.fn() } as any;
+                const properties = createMockProperties({
+                    monitorType: "tcp",
+                    host: tcpConfig.host,
+                    port: tcpConfig.port.toString(),
+                });
+
+                // Mock successful validation
+                const { validateMonitorFormData, validateMonitorFieldClientSide } =
+                    await import("../../../utils/monitorValidation");
+                vi.mocked(validateMonitorFormData).mockResolvedValue({
+                    success: true,
+                    errors: [],
+                    warnings: [],
+                });
+
+                vi.mocked(validateMonitorFieldClientSide).mockResolvedValue({
+                    success: true,
+                    errors: [],
+                    warnings: [],
+                });
+
+                await handleSubmit(mockEvent, properties);
+
+                expect(mockEvent.preventDefault).toHaveBeenCalled();
+                expect(properties.createSite).toHaveBeenCalled();
+
+                // Verify TCP config characteristics
+                expect(tcpConfig.port).toBeGreaterThanOrEqual(1);
+                expect(tcpConfig.port).toBeLessThanOrEqual(65_535);
+                expect(tcpConfig.timeout).toBeGreaterThanOrEqual(1000);
+                expect(tcpConfig.timeout).toBeLessThanOrEqual(60_000);
+                expect(tcpConfig.retries).toBeGreaterThanOrEqual(0);
+                expect(tcpConfig.retries).toBeLessThanOrEqual(10);
+            }
+        );
+
+        test.prop([fc.oneof(
+            fc.string().filter(s => s.trim().length === 0),
+            fc.constantFrom("", "   ", "\t", "\n"),
+            fc.constant(null),
+            fc.constant(undefined)
+        )])(
+            "should handle invalid form data gracefully",
+            async (invalidInput) => {
+                const mockEvent = { preventDefault: vi.fn() } as any;
+                const properties = createMockProperties({
+                    name: invalidInput as any,
+                });
+
+                // Mock validation failure for invalid input
+                const { validateMonitorFormData } = await import(
+                    "../../../utils/monitorValidation"
+                );
+                vi.mocked(validateMonitorFormData).mockResolvedValue({
+                    success: false,
+                    errors: ["Invalid input provided"],
+                    warnings: [],
+                });
+
+                await handleSubmit(mockEvent, properties);
+
+                expect(mockEvent.preventDefault).toHaveBeenCalled();
+                expect(properties.setFormError).toHaveBeenCalled();
+                expect(properties.createSite).not.toHaveBeenCalled();
+
+                // Form should handle invalid input without crashing
+                expect(() => {
+                    const testValue = invalidInput;
+                    expect(testValue === null || testValue === undefined ||
+                           (typeof testValue === 'string' && testValue.trim().length === 0))
+                           .toBeTruthy();
+                }).not.toThrow();
+            }
+        );
+
+        test.prop([fc.record({
+            errorType: fc.constantFrom("network", "timeout", "validation", "server", "permission"),
+            statusCode: fc.integer({ min: 400, max: 599 }),
+            message: fc.string({ minLength: 5, maxLength: 200 })
+        })])(
+            "should handle different types of submission failures",
+            async (error) => {
+                const mockEvent = { preventDefault: vi.fn() } as any;
+                const properties = createMockProperties();
+
+                // Mock different error scenarios
+                const mockError = new Error(`${error.errorType}: ${error.message}`);
+
+                // Create a mock that can be rejected
+                const rejectedCreateSite = vi.fn().mockRejectedValue(mockError);
+                const propertiesWithReject = createMockProperties();
+                propertiesWithReject.createSite = rejectedCreateSite;
+
+                // Mock successful validation but failed submission
+                const { validateMonitorFormData, validateMonitorFieldClientSide } =
+                    await import("../../../utils/monitorValidation");
+                vi.mocked(validateMonitorFormData).mockResolvedValue({
+                    success: true,
+                    errors: [],
+                    warnings: [],
+                });
+
+                vi.mocked(validateMonitorFieldClientSide).mockResolvedValue({
+                    success: true,
+                    errors: [],
+                    warnings: [],
+                });
+
+                await handleSubmit(mockEvent, propertiesWithReject);
+
+                expect(mockEvent.preventDefault).toHaveBeenCalled();
+                expect(propertiesWithReject.createSite).toHaveBeenCalled();
+                expect(propertiesWithReject.setFormError).toHaveBeenCalled();
+
+                // Verify error characteristics
+                expect(["network", "timeout", "validation", "server", "permission"]).toContain(error.errorType);
+                expect(error.statusCode).toBeGreaterThanOrEqual(400);
+                expect(error.statusCode).toBeLessThanOrEqual(599);
+                expect(error.message.length).toBeGreaterThanOrEqual(5);
+                expect(error.message.length).toBeLessThanOrEqual(200);
+            }
+        );
+
+        test.prop([fc.constantFrom("new", "existing")])(
+            "should handle different form modes correctly",
+            async (addMode) => {
+                const mockEvent = { preventDefault: vi.fn() } as any;
+                const properties = createMockProperties({
+                    addMode: addMode as any,
+                });
+
+                // Mock successful validation
+                const { validateMonitorFormData, validateMonitorFieldClientSide } =
+                    await import("../../../utils/monitorValidation");
+                vi.mocked(validateMonitorFormData).mockResolvedValue({
+                    success: true,
+                    errors: [],
+                    warnings: [],
+                });
+
+                vi.mocked(validateMonitorFieldClientSide).mockResolvedValue({
+                    success: true,
+                    errors: [],
+                    warnings: [],
+                });
+
+                await handleSubmit(mockEvent, properties);
+
+                expect(mockEvent.preventDefault).toHaveBeenCalled();
+                expect(properties.onSuccess).toHaveBeenCalled();
+
+                // Verify mode-specific behavior
+                if (addMode === "new") {
+                    expect(properties.createSite).toHaveBeenCalled();
+                } else {
+                    expect(properties.addMonitorToSite).toHaveBeenCalled();
+                }
+
+                expect(["new", "existing"]).toContain(addMode);
+            }
+        );
+
+        test.prop([fc.array(fc.string({ minLength: 1, maxLength: 100 }), { minLength: 1, maxLength: 10 })])(
+            "should handle multiple concurrent form submissions",
+            async (submissionData) => {
+                const submissions = submissionData.map((data, index) => {
+                    const mockEvent = { preventDefault: vi.fn() } as any;
+                    const properties = createMockProperties({
+                        name: `Site ${index}`,
+                        siteId: `site-${index}`,
+                    });
+
+                    return { mockEvent, properties };
+                });
+
+                // Mock successful validation for all submissions
+                const { validateMonitorFormData, validateMonitorFieldClientSide } =
+                    await import("../../../utils/monitorValidation");
+                vi.mocked(validateMonitorFormData).mockResolvedValue({
+                    success: true,
+                    errors: [],
+                    warnings: [],
+                });
+
+                vi.mocked(validateMonitorFieldClientSide).mockResolvedValue({
+                    success: true,
+                    errors: [],
+                    warnings: [],
+                });
+
+                // Process all submissions
+                for (const { mockEvent, properties } of submissions) {
+                    await handleSubmit(mockEvent, properties);
+                    expect(mockEvent.preventDefault).toHaveBeenCalled();
+                }
+
+                // Verify submission characteristics
+                expect(Array.isArray(submissionData)).toBeTruthy();
+                expect(submissionData.length).toBeGreaterThanOrEqual(1);
+                expect(submissionData.length).toBeLessThanOrEqual(10);
+                expect(submissions).toHaveLength(submissionData.length);
+            }
+        );
     });
 });

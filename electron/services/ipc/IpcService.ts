@@ -637,7 +637,7 @@ export class IpcService {
             DataHandlerValidators.updateHistoryLimit,
             this.registeredIpcHandlers
         );
-        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after validated IPC argument type conversion */
 
         // Get history limit handler (no parameters)
         registerStandardizedIpcHandler(
@@ -744,7 +744,7 @@ export class IpcService {
             MonitoringHandlerValidators.checkSiteNow,
             this.registeredIpcHandlers
         );
-        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable type assertion checks after controlled cast for registered handlers */
     }
 
     /**
@@ -863,7 +863,7 @@ export class IpcService {
             MonitorTypeHandlerValidators.validateMonitorData,
             this.registeredIpcHandlers
         );
-        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable type assertion checks after controlled cast for monitor type handlers */
     }
 
     /**
@@ -928,7 +928,7 @@ export class IpcService {
             SiteHandlerValidators.removeMonitor,
             this.registeredIpcHandlers
         );
-        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable type assertion checks after controlled cast for site handlers */
     }
 
     /**

@@ -95,7 +95,7 @@ class SimpleRateLimiter {
                 break;
             }
             const waitFor = needDelay ? this.minIntervalMs - since : 25;
-            // eslint-disable-next-line no-await-in-loop
+            // eslint-disable-next-line no-await-in-loop -- Rate limiting requires sequential delays in monitoring loop
             await sleep(waitFor);
         }
         this.active += 1;

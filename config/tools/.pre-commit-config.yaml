@@ -163,14 +163,12 @@ repos:
             name: "🌳 git · Detect conflict markers"
 
           - args:
-                [
-                    "--branch",
-                    "main",
-                    "--branch",
-                    "master",
-                    "--branch",
-                    "develop",
-                ]
+                - "--branch"
+                - "main"
+                - "--branch"
+                - "master"
+                - "--branch"
+                - "develop"
 
             id: no-commit-to-branch
             name: "🌳 git · Protect main branches"
@@ -232,13 +230,12 @@ repos:
 
     # PNG optimization
     - hooks:
-          - args: [
-                    "-o",
-                    "4", # Optimization level
-                    "--strip",
-                    "safe", # Strip metadata safely
-                    "--alpha",
-                ] # Optimize alpha channel
+          - args:
+                - "-o"
+                - "4" # Optimization level
+                - "--strip"
+                - "safe" # Strip metadata safely
+                - "--alpha" # Optimize alpha channel
 
             id: oxipng
             name: "🖼️ images · Optimize PNG files"
@@ -282,10 +279,8 @@ repos:
 
           # Package.json script validation
           - args:
-                [
-                    "-e",
-                    "const pkg = require('./package.json'); console.log('✅ Package.json is valid')",
-                ]
+                - "-e"
+                - "const pkg = require('./package.json'); console.log('✅ Package.json is valid')"
             entry: node
             files: '^package\.json$'
             id: package-scripts-check

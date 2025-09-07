@@ -21,13 +21,13 @@ Type-fest utilities provide enterprise-grade type safety and developer experienc
 
 ## Pattern 1: UnknownRecord Replacement
 
-### When to Apply
+### UnknownRecord - When to Apply
 
 - Replace all instances of `Record<string, unknown>` with `UnknownRecord`
 - Use for type-safe property access without index signature issues
 - Apply in interfaces, function parameters, and return types
 
-### Before/After Examples
+### UnknownRecord - Before/After Examples
 
 #### Example 1: Interface Properties
 
@@ -77,7 +77,7 @@ export function isObject(value: unknown): value is UnknownRecord {
 }
 ```
 
-### Benefits
+### UnknownRecord - Benefits
 
 - Avoids TypeScript index signature issues
 - Better type safety for property access
@@ -86,14 +86,14 @@ export function isObject(value: unknown): value is UnknownRecord {
 
 ## Pattern 2: LiteralUnion Enhancement
 
-### When to Apply
+### LiteralUnion - When to Apply
 
 - String literal union types that need extensibility
 - Theme values, status types, configuration options
 - Any fixed set of values that might need custom extensions
 - Component size, variant, and styling properties
 
-### Before/After Examples
+### LiteralUnion - Before/After Examples
 
 #### Example 1: Theme Component Types (Real Implementation)
 
@@ -167,7 +167,7 @@ export type BadgeSize = LiteralUnion<"lg" | "md" | "sm" | "xs", string>;
 <ThemedBadge size="custom-xl" /> // ✅ Custom value allowed
 ```
 
-### Benefits
+### LiteralUnion - Benefits
 
 - Provides autocomplete for known values
 - Allows custom values for extensibility
@@ -177,13 +177,13 @@ export type BadgeSize = LiteralUnion<"lg" | "md" | "sm" | "xs", string>;
 
 ## Pattern 3: Simplify Union Types
 
-### When to Apply
+### Simplify - When to Apply
 
 - Complex union types with many branches
 - Types that would benefit from flattened IntelliSense
 - Cache value types, configuration unions
 
-### Before/After Examples
+### Simplify - Before/After Examples
 
 #### Example 1: Cache Value Types
 
@@ -231,7 +231,7 @@ export type MonitorFormData = Simplify<
 >;
 ```
 
-### Benefits
+### Simplify - Benefits
 
 - Cleaner IntelliSense display
 - Better type resolution
@@ -240,13 +240,13 @@ export type MonitorFormData = Simplify<
 
 ## Pattern 4: SetOptional API Design
 
-### When to Apply
+### SetOptional - When to Apply
 
 - Interfaces where some properties should be optional
 - Function parameter objects with defaults
 - Configuration objects with optional settings
 
-### Before/After Examples
+### SetOptional - Before/After Examples
 
 #### Example 1: Configuration with Defaults
 
@@ -289,7 +289,7 @@ function createDefaultFormData(): SetOptional<FormData, "enabled" | "interval">;
 function createDefaultFormData(data: Partial<FormData>): FormData;
 ```
 
-### Benefits
+### SetOptional - Benefits
 
 - Better API design with logical defaults
 - Type-safe optional parameter handling

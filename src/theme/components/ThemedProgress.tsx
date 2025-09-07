@@ -161,22 +161,26 @@ const ThemedProgressComponent = ({
         []
     );
 
+    // Extract labels JSX to avoid IIFE pattern
+    const labelsJSX =
+        showLabel || label ? (
+            <div style={labelContainerStyle}>
+                {label ? (
+                    <ThemedText size="sm" variant="secondary">
+                        {label}
+                    </ThemedText>
+                ) : null}
+                {showLabel ? (
+                    <ThemedText size="sm" variant="secondary">
+                        {percentage.toFixed(1)}%
+                    </ThemedText>
+                ) : null}
+            </div>
+        ) : null;
+
     return (
         <div className={`themed-progress ${className}`}>
-            {showLabel || label ? (
-                <div style={labelContainerStyle}>
-                    {label ? (
-                        <ThemedText size="sm" variant="secondary">
-                            {label}
-                        </ThemedText>
-                    ) : null}
-                    {showLabel ? (
-                        <ThemedText size="sm" variant="secondary">
-                            {percentage.toFixed(1)}%
-                        </ThemedText>
-                    ) : null}
-                </div>
-            ) : null}
+            {labelsJSX}
             <progress max={max} style={hiddenProgressStyle} value={value} />
             <div aria-hidden="true" style={containerStyles}>
                 <div style={progressStyles} />

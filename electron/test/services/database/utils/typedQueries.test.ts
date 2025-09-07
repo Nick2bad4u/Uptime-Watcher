@@ -338,17 +338,21 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             ])(
                 "should handle multiple sequential inserts",
                 (insertOperations) => {
+                    // Reset mock for this property-based test iteration
+                    mockGet.mockClear();
+
                     // Act & Assert
+                    let callCount = 0;
                     for (const operation of insertOperations) {
                         mockGet.mockReturnValue(operation.result);
 
                         const result = insertWithReturning(mockDb, operation.query, operation.params);
 
                         expect(result).toEqual(operation.result);
-                        expect(mockGet).toHaveBeenCalledWith(operation.query, operation.params);
+                        callCount++;
+                        expect(mockGet).toHaveBeenCalledTimes(callCount);
+                        expect(mockGet).toHaveBeenNthCalledWith(callCount, operation.query, operation.params);
                     }
-
-                    expect(mockGet).toHaveBeenCalledTimes(insertOperations.length);
                 }
             );
         });
@@ -508,7 +512,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     expect(result).toBeDefined();
                     expect(result!.count).toBe(expectedCount);
                     expect(typeof result!.count).toBe("number");
-                    expect(mockGet).toHaveBeenCalledWith(query, []);
+                    expect(mockGet).toHaveBeenCalledWith(query, undefined);
                 }
             );
 
@@ -579,7 +583,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     // Assert
                     expect(result).toBeDefined();
                     expect(result!.count).toBe(count);
-                    expect(mockGet).toHaveBeenCalledWith(query, []);
+                    expect(mockGet).toHaveBeenCalledWith(query, undefined);
 
                     // Verify structure
                     expect(Object.keys(result!)).toEqual(["count"]);
@@ -751,7 +755,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         expect(typeof item.id).toBe("number");
                     }
 
-                    expect(mockAll).toHaveBeenCalledWith(query, []);
+                    expect(mockAll).toHaveBeenCalledWith(query, undefined);
                 }
             );
 
@@ -1015,7 +1019,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     expect(result).toEqual(expectedRecords);
                     expect(Array.isArray(result)).toBeTruthy();
                     expect(result).toHaveLength(expectedRecords.length);
-                    expect(mockAll).toHaveBeenCalledWith(query, []);
+                    expect(mockAll).toHaveBeenCalledWith(query, undefined);
                 }
             );
 
@@ -1305,7 +1309,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     expect(result).toEqual(expectedRecord);
                     expect(typeof result).toBe("object");
                     expect(result).not.toBeNull();
-                    expect(mockGet).toHaveBeenCalledWith(query, []);
+                    expect(mockGet).toHaveBeenCalledWith(query, undefined);
                 }
             );
 
@@ -1363,7 +1367,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
                     // Assert
                     expect(result).toBeNull();
-                    expect(mockGet).toHaveBeenCalledWith(queryReturningNull, []);
+                    expect(mockGet).toHaveBeenCalledWith(queryReturningNull, undefined);
                 }
             );
 
@@ -1385,17 +1389,21 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             ])(
                 "should handle multiple sequential single record queries",
                 (queryOperations) => {
+                    // Reset mock for this property-based test iteration
+                    mockGet.mockClear();
+
                     // Act & Assert
+                    let callCount = 0;
                     for (const operation of queryOperations) {
                         mockGet.mockReturnValue(operation.expectedResult);
 
                         const result = queryForSingleRecord(mockDb, operation.query, operation.params);
 
                         expect(result).toEqual(operation.expectedResult);
-                        expect(mockGet).toHaveBeenCalledWith(operation.query, operation.params);
+                        callCount++;
+                        expect(mockGet).toHaveBeenCalledTimes(callCount);
+                        expect(mockGet).toHaveBeenNthCalledWith(callCount, operation.query, operation.params);
                     }
-
-                    expect(mockGet).toHaveBeenCalledTimes(queryOperations.length);
                 }
             );
         });

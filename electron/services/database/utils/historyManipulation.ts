@@ -271,11 +271,13 @@ export function pruneHistoryForMonitor(
         const excess = db.all(
             HISTORY_MANIPULATION_QUERIES.SELECT_EXCESS_ENTRIES,
             [monitorId, limit]
-        ) as Array<{
-            id: number;
-        }>;
+        ) as
+            | Array<{
+                  id: number;
+              }>
+            | undefined;
 
-        if (excess.length > 0) {
+        if (excess && excess.length > 0) {
             // Convert numeric IDs to ensure type safety and validate they are
             // numbers
             const excessIds = excess

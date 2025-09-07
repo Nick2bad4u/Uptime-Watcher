@@ -82,6 +82,24 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
             ]
         );
 
+        // Extract URL JSX to avoid IIFE pattern
+        const urlJSX =
+            !isCollapsed &&
+            selectedMonitor?.type === "http" &&
+            selectedMonitor.url ? (
+                <a
+                    aria-label={`Open ${selectedMonitor.url} in browser`}
+                    className="site-details-url truncate"
+                    href={selectedMonitor.url}
+                    onClick={handleUrlClick}
+                    rel="noopener noreferrer"
+                    tabIndex={0}
+                    target="_blank"
+                >
+                    {selectedMonitor.url}
+                </a>
+            ) : null;
+
         return (
             <div style={styles.headerStyle}>
                 <div style={styles.overlayStyle} />
@@ -115,21 +133,7 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
                                     {site.name}
                                 </ThemedText>
                                 {/* Show clickable URL for HTTP monitors that have a URL */}
-                                {!isCollapsed &&
-                                selectedMonitor?.type === "http" &&
-                                selectedMonitor.url ? (
-                                    <a
-                                        aria-label={`Open ${selectedMonitor.url} in browser`}
-                                        className="site-details-url truncate"
-                                        href={selectedMonitor.url}
-                                        onClick={handleUrlClick}
-                                        rel="noopener noreferrer"
-                                        tabIndex={0}
-                                        target="_blank"
-                                    >
-                                        {selectedMonitor.url}
-                                    </a>
-                                ) : null}
+                                {urlJSX}
                                 {/* Fallback if no monitor is available */}
                                 {!isCollapsed && !selectedMonitor && (
                                     <ThemedText size="base" variant="warning">

@@ -1,4 +1,4 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
+// eslint-disable-next-line eslint-comments/disable-enable-pair -- file operations require disable-enable pattern for controlled violations
 /* eslint-disable n/no-unsupported-features/node-builtins -- using node above 24.0.0 so URL.revokeObjectURL is supported */
 /**
  * File backup utility for handling file download operations. Provides utilities
@@ -129,7 +129,7 @@ function tryFallbackDownload(
                 ? fallbackError
                 : new Error(String(fallbackError))
         );
-        throw new Error("File download failed");
+        throw new Error("File download failed", { cause: fallbackError });
     }
 }
 
@@ -293,7 +293,8 @@ export async function handleSQLiteBackupDownload(
             );
             // Re-throw with more context
             throw new Error(
-                `Download trigger failed: ${clickError instanceof Error ? clickError.message : "Unknown error"}`
+                `Download trigger failed: ${clickError instanceof Error ? clickError.message : "Unknown error"}`,
+                { cause: clickError }
             );
         }
     } finally {

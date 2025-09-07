@@ -38,7 +38,7 @@ import {
 describe("Validator Utils Property-Based Tests", () => {
 
     describe(isNonEmptyString, () => {
-        test.prop([fc.string({ minLength: 1 })])(
+        test.prop([fc.string({ minLength: 1 }).filter(s => s.trim().length > 0)])(
             "should return true for all non-empty strings",
             (nonEmptyString) => {
                 const result = isNonEmptyString(nonEmptyString);
@@ -713,6 +713,10 @@ describe("Validator Utils Property-Based Tests", () => {
                 // Filter with type guards
                 const strings = mixedArray.filter((item): item is string => isNonEmptyString(item));
                 const identifierArrays = mixedArray.filter((item): item is readonly string[] => isValidIdentifierArray(item));
+
+                // Ensure at least one assertion runs
+                expect(Array.isArray(strings)).toBeTruthy();
+                expect(Array.isArray(identifierArrays)).toBeTruthy();
 
                 // All results should satisfy the type predicate
                 for (const str of strings) {

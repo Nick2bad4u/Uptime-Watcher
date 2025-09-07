@@ -40,7 +40,7 @@ export function calculateSiteMonitoringStatus(
 ): "partial" | "running" | "stopped" {
     const { monitors } = site;
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- monitors may be undefined from input parameters
     if (!monitors || monitors.length === 0) {
         return "stopped";
     }
@@ -97,7 +97,7 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
     // Single status - all monitors have the same status
     if (statuses.length === 1) {
         // Type assertion is safe as we know all monitors have the same status
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- safe assertion for single uniform status
         return statuses[0] as SiteStatus;
     }
 

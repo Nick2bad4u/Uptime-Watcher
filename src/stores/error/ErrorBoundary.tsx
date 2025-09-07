@@ -139,8 +139,8 @@ class ErrorBoundaryBase extends Component<
             retryCount: 0,
         };
     }
-    /* eslint-enable react-prefer-function-component/react-prefer-function-component */
-    /* eslint-enable no-constructor-bind/no-constructor-state  */
+    /* eslint-enable react-prefer-function-component/react-prefer-function-component -- Error boundaries must be class components */
+    /* eslint-enable no-constructor-bind/no-constructor-state -- Class component requires constructor state initialization */
 
     public override componentDidCatch(
         error: Error,

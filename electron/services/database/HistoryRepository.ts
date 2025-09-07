@@ -407,7 +407,7 @@ export class HistoryRepository {
                             HISTORY_QUERIES.SELECT_EXCESS_ENTRIES,
                             [String(monitor.id), limit]
                         ) as Array<{ id: number }>;
-                        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+                        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- re-enable unsafe type assertion warnings */
                         if (excessEntries.length > 0) {
                             // Convert numeric IDs to ensure type safety and
                             // validate they are numbers

@@ -129,18 +129,35 @@ describe("Database Schema", () => {
                         }
 
                         // Assert that database operations scale correctly
-                        expect(testDatabase.run).toHaveBeenCalledTimes(callCount * 2); // sites + history tables
+                        expect(testDatabase.run).toHaveBeenCalledTimes(callCount * 6); // sites + monitors + history + settings + stats + logs tables
 
                         // Verify each call included the required table creations
                         for (let i = 0; i < callCount; i++) {
-                            const callIndex = i * 2;
+                            const callIndex = i * 6;
+                            // Verify that sites, monitors, history, settings, stats, and logs tables are created
                             expect(testDatabase.run).toHaveBeenNthCalledWith(
                                 callIndex + 1,
                                 expect.stringContaining("CREATE TABLE IF NOT EXISTS sites")
                             );
                             expect(testDatabase.run).toHaveBeenNthCalledWith(
                                 callIndex + 2,
+                                expect.stringContaining("CREATE TABLE IF NOT EXISTS monitors")
+                            );
+                            expect(testDatabase.run).toHaveBeenNthCalledWith(
+                                callIndex + 3,
                                 expect.stringContaining("CREATE TABLE IF NOT EXISTS history")
+                            );
+                            expect(testDatabase.run).toHaveBeenNthCalledWith(
+                                callIndex + 4,
+                                expect.stringContaining("CREATE TABLE IF NOT EXISTS settings")
+                            );
+                            expect(testDatabase.run).toHaveBeenNthCalledWith(
+                                callIndex + 5,
+                                expect.stringContaining("CREATE TABLE IF NOT EXISTS stats")
+                            );
+                            expect(testDatabase.run).toHaveBeenNthCalledWith(
+                                callIndex + 6,
+                                expect.stringContaining("CREATE TABLE IF NOT EXISTS logs")
                             );
                         }
                     }

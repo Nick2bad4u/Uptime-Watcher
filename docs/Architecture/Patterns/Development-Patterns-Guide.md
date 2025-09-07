@@ -16,7 +16,7 @@ This guide documents the established architectural patterns used throughout the 
 
 ## Repository Pattern
 
-### Overview
+### Repository Pattern Overview
 
 All database access uses the Repository Pattern with comprehensive transaction handling, race condition prevention, and production-grade reliability.
 
@@ -29,7 +29,7 @@ All database access uses the Repository Pattern with comprehensive transaction h
 - **Race condition immunity**: Synchronous database operations (node-sqlite3-wasm) eliminate race conditions
 - **Memory management**: Proper resource cleanup and connection management
 
-### Implementation Template
+### Repository Implementation Template
 
 ```typescript
 export interface ExampleRepositoryDependencies {
@@ -77,7 +77,7 @@ export class ExampleRepository {
 }
 ```
 
-### Usage Guidelines
+### Repository Usage Guidelines
 
 - ✅ Use dual methods for operations that might be called within transactions
 - ✅ Wrap all mutations in `withDatabaseOperation()`
@@ -88,7 +88,7 @@ export class ExampleRepository {
 
 ## Event-Driven Communication
 
-### Overview
+### Event-Driven Communication Overview
 
 The application uses a TypedEventBus for decoupled communication between components with compile-time type safety.
 
@@ -99,7 +99,7 @@ The application uses a TypedEventBus for decoupled communication between compone
 - **Action**: Specific action in past tense for completed events
 - **Consistency**: Use kebab-case for multi-word actions
 
-### Implementation Template
+### Event-Driven Implementation Template
 
 ```typescript
 // 1. Define event interfaces
@@ -151,7 +151,7 @@ eventBus.onTyped("domain:action-completed", (data) => {
 });
 ```
 
-### Usage Guidelines
+### Event-Driven Usage Guidelines
 
 - ✅ Use typed events with proper interfaces
 - ✅ Include timestamps in all events
@@ -162,7 +162,7 @@ eventBus.onTyped("domain:action-completed", (data) => {
 
 ## Error Handling Patterns
 
-### Overview
+### Error Handling Overview
 
 Multi-layered error handling ensures system stability and provides consistent error reporting across all application layers.
 
@@ -249,7 +249,7 @@ try {
 }
 ```
 
-### Usage Guidelines
+### Error Handling Usage Guidelines
 
 - ✅ Always re-throw errors after handling (logging/state management)
 - ✅ Use appropriate error handling utility for the context
@@ -260,7 +260,7 @@ try {
 
 ## Frontend State Management
 
-### Overview
+### State Management Overview
 
 Zustand-based state management with modular composition for complex stores and type safety throughout.
 
@@ -382,7 +382,7 @@ export const useUIStore = create<UIStore>()(
 );
 ```
 
-### Usage Guidelines
+### State Management Usage Guidelines
 
 - ✅ Use modular composition for complex stores
 - ✅ Include action logging for debugging
@@ -393,7 +393,7 @@ export const useUIStore = create<UIStore>()(
 
 ## IPC Communication
 
-### Overview
+### IPC Communication Overview
 
 Standardized IPC protocol using contextBridge with type safety, validation, and consistent error handling.
 
@@ -460,7 +460,7 @@ declare global {
 }
 ```
 
-### Usage Guidelines
+### IPC Communication Usage Guidelines
 
 - ✅ Use domain-specific grouping for handlers
 - ✅ Include validation for all parameterized operations
@@ -543,7 +543,7 @@ describe("ExampleRepository", () => {
 });
 ```
 
-### Usage Guidelines
+### Testing Usage Guidelines
 
 - ✅ Reset state in beforeEach for store tests
 - ✅ Use act() for state updates in React tests
@@ -554,11 +554,11 @@ describe("ExampleRepository", () => {
 
 ## Standardized Cache Configuration
 
-### Overview
+### Cache Configuration Overview
 
 All caching in the application uses standardized configurations to ensure consistent performance, predictable behavior, and maintainable cache management across all managers and services.
 
-### Key Characteristics
+### Cache Configuration Key Characteristics
 
 - **Centralized configuration**: All cache settings defined in `shared/constants/cacheConfig.ts`
 - **Domain-specific configs**: Separate configurations for SITES, MONITORS, SETTINGS, VALIDATION, and TEMPORARY caches
@@ -595,7 +595,7 @@ const tempCache = new StandardizedCache<Site>({
 | **VALIDATION** | 5 min  | 200      | Validation result caching  | ✓             |
 | **TEMPORARY**  | 5 min  | 1000     | Short-term operations      | ✗             |
 
-### Implementation Template
+### Cache Configuration Implementation Template
 
 ```typescript
 import { StandardizedCache } from "@electron/utils/cache/StandardizedCache";
@@ -622,7 +622,7 @@ export class ExampleManager {
 }
 ```
 
-### Usage Guidelines
+### Cache Configuration Usage Guidelines
 
 - ✅ Always use `CACHE_CONFIG` constants instead of hardcoded values
 - ✅ Use `CACHE_NAMES` functions for consistent naming
@@ -667,7 +667,7 @@ export class ExampleManager {
 
 ## Memory Management
 
-### Overview
+### Memory Management Overview
 
 Comprehensive memory management patterns to prevent leaks and ensure optimal performance in long-running Electron applications.
 
@@ -785,7 +785,7 @@ class StandardizedCache<T> {
 }
 ```
 
-### Usage Guidelines
+### Memory Management Usage Guidelines
 
 - ✅ Always provide cleanup functions for event listeners
 - ✅ Clear timeouts and intervals on component unmount
@@ -796,7 +796,7 @@ class StandardizedCache<T> {
 
 ## Race Condition Prevention
 
-### Overview
+### Race Condition Prevention Overview
 
 Comprehensive patterns to prevent race conditions in async operations, particularly in monitoring and database operations.
 
@@ -951,7 +951,7 @@ class OperationQueue {
 }
 ```
 
-### Usage Guidelines
+### Race Condition Prevention Usage Guidelines
 
 - ✅ Use operation correlation for async operations that can be cancelled
 - ✅ Implement atomic state updates for cache management

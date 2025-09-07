@@ -215,7 +215,10 @@ describe(generateUuid, () => {
             expect(parts).toHaveLength(3);
             expect(parts[0]).toBe("site");
 
-            const extractedTimestamp = Number.parseInt(parts[2]!, 10);
+            // Extract timestamp by removing last 3 digits (microseconds) from parts[2]
+            const fullTimestampString = parts[2]!;
+            const timestampString = fullTimestampString.slice(0, -3);
+            const extractedTimestamp = Number.parseInt(timestampString, 10);
             expect(extractedTimestamp).toBeGreaterThanOrEqual(beforeTimestamp);
             expect(extractedTimestamp).toBeLessThanOrEqual(afterTimestamp);
         });
@@ -273,7 +276,7 @@ describe(generateUuid, () => {
 
             const result = generateUuid();
 
-            expect(result).toMatch(/^site-[\da-z]+-9{13}$/);
+            expect(result).toMatch(/^site-[\da-z]+-9{13}\d{3}$/);
             expect(result).toContain("9999999999999");
 
             mockNow.mockRestore();
@@ -296,8 +299,8 @@ describe(generateUuid, () => {
 
             const result = generateUuid();
 
-            expect(result).toMatch(/^site-[\da-z]+-0$/);
-            expect(result.endsWith("-0")).toBeTruthy();
+            expect(result).toMatch(/^site-[\da-z]+-0\d{3}$/);
+            expect(result.split("-")[2]).toMatch(/^0\d{3}$/); // Should start with 0 followed by 3-digit microseconds
 
             mockNow.mockRestore();
             globalThis.crypto = originalCrypto;

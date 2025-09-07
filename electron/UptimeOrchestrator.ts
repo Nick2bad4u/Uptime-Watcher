@@ -1321,19 +1321,19 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Set up database manager event handlers.
      */
     private setupDatabaseEventHandlers(): void {
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Database event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:database:update-sites-cache-requested",
             this.handleUpdateSitesCacheRequestedEvent
         );
 
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Database event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:database:get-sites-from-cache-requested",
             this.handleGetSitesFromCacheRequestedEvent
         );
 
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Database event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:database:initialized",
             this.handleDatabaseInitializedEvent
@@ -1344,13 +1344,13 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Set up event forwarding from internal events to public frontend events.
      */
     private setupEventForwarding(): void {
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Event forwarding listeners are intentionally persistent for the lifetime of the orchestrator
         this.on("internal:site:added", this.handleSiteAddedEvent);
 
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Event forwarding listeners are intentionally persistent for the lifetime of the orchestrator
         this.on("internal:site:removed", this.handleSiteRemovedEvent);
 
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Event forwarding listeners are intentionally persistent for the lifetime of the orchestrator
         this.on("internal:site:updated", this.handleSiteUpdatedEvent);
     }
 
@@ -1371,8 +1371,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Extracted from constructor for clarity and maintainability.
      */
     private setupMiddleware(): void {
-        this.use(createErrorHandlingMiddleware({ continueOnError: true }));
-        this.use(
+        this.addMiddleware(
+            createErrorHandlingMiddleware({ continueOnError: true })
+        );
+        this.addMiddleware(
             createLoggingMiddleware({ includeData: false, level: "info" })
         );
     }
@@ -1381,10 +1383,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Set up monitoring event handlers.
      */
     private setupMonitoringEventHandlers(): void {
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Monitoring event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on("internal:monitor:started", this.handleMonitorStartedEvent);
 
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Monitoring event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on("internal:monitor:stopped", this.handleMonitorStoppedEvent);
     }
 
@@ -1392,25 +1394,25 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Set up site manager event handlers.
      */
     private setupSiteEventHandlers(): void {
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Site management event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:site:start-monitoring-requested",
             this.handleStartMonitoringRequestedEvent
         );
 
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Site management event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:site:stop-monitoring-requested",
             this.handleStopMonitoringRequestedEvent
         );
 
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Site management event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:site:is-monitoring-active-requested",
             this.handleIsMonitoringActiveRequestedEvent
         );
 
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Site management event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
             "internal:site:restart-monitoring-requested",
             this.handleRestartMonitoringRequestedEvent

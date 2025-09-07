@@ -184,7 +184,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 "component"
             );
 
-            eventBus.use(mockMiddleware);
+            eventBus.registerMiddleware(mockMiddleware);
             const diagnostics = eventBus.getDiagnostics();
             expect(diagnostics.middlewareCount).toBe(1);
             expect(diagnostics.middlewareUtilization).toBe(5); // 1/20 * 100
@@ -208,8 +208,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 }
             );
 
-            eventBus.use(middleware1);
-            eventBus.use(middleware2);
+            eventBus.registerMiddleware(middleware1);
+            eventBus.registerMiddleware(middleware2);
             eventBus.onTyped("string-event", mockListener);
 
             await eventBus.emitTyped("string-event", "test");
@@ -245,10 +245,10 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             const bus = new TypedEventBus<TestEvents>("test", {
                 maxMiddleware: 2,
             });
-            bus.use(mockMiddleware);
-            bus.use(mockMiddleware2);
+            bus.registerMiddleware(mockMiddleware);
+            bus.registerMiddleware(mockMiddleware2);
 
-            expect(() => bus.use(vi.fn())).toThrow(
+            expect(() => bus.registerMiddleware(vi.fn())).toThrow(
                 "Maximum middleware limit (2) exceeded. Consider increasing maxMiddleware or combining middleware functions."
             );
         });
@@ -256,8 +256,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             const errorMiddleware: EventMiddleware = vi.fn(async () => {
                 throw new Error("Middleware error");
             });
-            eventBus.use(errorMiddleware);
-            eventBus.use(mockMiddleware2); // This should not be called
+            eventBus.registerMiddleware(errorMiddleware);
+            eventBus.registerMiddleware(mockMiddleware2); // This should not be called
             eventBus.onTyped("string-event", mockListener);
 
             await expect(
@@ -275,7 +275,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 }
             );
 
-            eventBus.use(syncMiddleware);
+            eventBus.registerMiddleware(syncMiddleware);
             eventBus.onTyped("string-event", mockListener);
 
             await eventBus.emitTyped("string-event", "test");
@@ -290,8 +290,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 "component"
             );
 
-            eventBus.use(mockMiddleware);
-            eventBus.use(mockMiddleware2);
+            eventBus.registerMiddleware(mockMiddleware);
+            eventBus.registerMiddleware(mockMiddleware2);
 
             expect(eventBus.getDiagnostics().middlewareCount).toBe(2);
 
@@ -309,7 +309,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 "component"
             );
 
-            eventBus.use(mockMiddleware);
+            eventBus.registerMiddleware(mockMiddleware);
             const nonExistentMiddleware = vi.fn();
 
             const removed = eventBus.removeMiddleware(nonExistentMiddleware);
@@ -323,8 +323,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 "component"
             );
 
-            eventBus.use(mockMiddleware);
-            eventBus.use(mockMiddleware2);
+            eventBus.registerMiddleware(mockMiddleware);
+            eventBus.registerMiddleware(mockMiddleware2);
 
             expect(eventBus.getDiagnostics().middlewareCount).toBe(2);
 
@@ -531,8 +531,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             eventBus.onTyped("string-event", listener2);
             eventBus.onTyped("number-event", listener1);
 
-            eventBus.use(mockMiddleware);
-            eventBus.use(mockMiddleware2);
+            eventBus.registerMiddleware(mockMiddleware);
+            eventBus.registerMiddleware(mockMiddleware2);
 
             const diagnostics: EventBusDiagnostics = eventBus.getDiagnostics();
 
@@ -579,8 +579,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             const bus = new TypedEventBus<TestEvents>("test", {
                 maxMiddleware: 4,
             });
-            bus.use(mockMiddleware);
-            bus.use(mockMiddleware2);
+            bus.registerMiddleware(mockMiddleware);
+            bus.registerMiddleware(mockMiddleware2);
 
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.middlewareUtilization).toBe(50); // 2/4 * 100
@@ -610,7 +610,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle middleware that doesn't call next", async () => {
             const badMiddleware: EventMiddleware = vi.fn(); // Doesn't call next()
 
-            eventBus.use(badMiddleware);
+            eventBus.registerMiddleware(badMiddleware);
             eventBus.onTyped("string-event", mockListener);
 
             await eventBus.emitTyped("string-event", "test");
@@ -619,7 +619,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(mockListener).toHaveBeenCalled(); // Should still be called
         });
         it("should handle undefined/null middleware in chain", async () => {
-            eventBus.use(mockMiddleware);
+            eventBus.registerMiddleware(mockMiddleware);
 
             // Manually insert null middleware to test the safety check
             (eventBus as any).middlewares.push(undefined);
@@ -844,7 +844,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 }
             );
 
-            eventBus.use(modifyingMiddleware);
+            eventBus.registerMiddleware(modifyingMiddleware);
             eventBus.onTyped("string-event", mockListener);
 
             await eventBus.emitTyped("string-event", "test");
@@ -877,7 +877,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             const badMiddleware: EventMiddleware = vi.fn(async () => {
                 throw "String error"; // Non-Error thrown
             });
-            eventBus.use(badMiddleware);
+            eventBus.registerMiddleware(badMiddleware);
             eventBus.onTyped("string-event", mockListener);
 
             await expect(
@@ -1004,8 +1004,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 }
             );
 
-            eventBus.use(syncMiddleware);
-            eventBus.use(asyncMiddleware);
+            eventBus.registerMiddleware(syncMiddleware);
+            eventBus.registerMiddleware(asyncMiddleware);
             eventBus.onTyped("string-event", mockListener);
 
             await eventBus.emitTyped("string-event", "test");
@@ -1026,9 +1026,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             const duplicateMiddleware = vi.fn();
 
-            eventBus.use(duplicateMiddleware);
-            eventBus.use(mockMiddleware);
-            eventBus.use(duplicateMiddleware); // Same middleware again
+            eventBus.registerMiddleware(duplicateMiddleware);
+            eventBus.registerMiddleware(mockMiddleware);
+            eventBus.registerMiddleware(duplicateMiddleware); // Same middleware again
 
             expect(eventBus.getDiagnostics().middlewareCount).toBe(3);
 
@@ -1043,7 +1043,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         });
         it("should handle middleware processing with empty middleware array", async () => {
             // Start with middleware, then clear it
-            eventBus.use(mockMiddleware);
+            eventBus.registerMiddleware(mockMiddleware);
             eventBus.clearMiddleware();
 
             eventBus.onTyped("string-event", mockListener);
@@ -1095,12 +1095,12 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 maxMiddleware: 1,
             });
             // Test 100% utilization
-            bus.use(mockMiddleware);
+            bus.registerMiddleware(mockMiddleware);
             expect(bus.getDiagnostics().middlewareUtilization).toBe(100);
 
             // Test overflow protection (should cap at 100)
             try {
-                bus.use(mockMiddleware2);
+                bus.registerMiddleware(mockMiddleware2);
             } catch {
                 // Expected to throw due to limit
             }

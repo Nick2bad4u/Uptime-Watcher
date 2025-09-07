@@ -132,7 +132,7 @@ export function createSelectChangeHandler<T = string>(
         const rawValue = event.target.value;
 
         // If no converter provided, assume T is string and use identity
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- generic type assertion when no converter provided
         const finalValue = converter ? converter(rawValue) : (rawValue as T);
         setValue(finalValue);
     };
@@ -221,7 +221,7 @@ export function createInputChangeHandler<T = string>(
         const { value } = event.target;
 
         // For string types (default), pass the value directly
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- generic type assertion for input value
         const finalValue = value as T;
 
         if (!validator || validator(finalValue)) {

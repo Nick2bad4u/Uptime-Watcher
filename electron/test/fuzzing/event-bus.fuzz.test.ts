@@ -240,39 +240,46 @@ describe("TypedEventBus Fuzzing Tests", () => {
                             index,
                             config,
                         ] of middlewareConfigs.entries()) {
-                            eventBus.use(async (_eventName, _data, next) => {
-                                executionOrder.push(
-                                    `middleware-${index}-start`
-                                );
+                            eventBus.registerMiddleware(
+                                async (_eventName, _data, next) => {
+                                    executionOrder.push(
+                                        `middleware-${index}-start`
+                                    );
 
-                                switch (config.behavior) {
-                                    case "delay": {
-                                        await new Promise((resolve) =>
-                                            setTimeout(resolve, config.delay)
-                                        );
-                                        break;
+                                    switch (config.behavior) {
+                                        case "delay": {
+                                            await new Promise((resolve) =>
+                                                setTimeout(
+                                                    resolve,
+                                                    config.delay
+                                                )
+                                            );
+                                            break;
+                                        }
+                                        case "throw": {
+                                            throw new Error(
+                                                `Middleware ${index} error`
+                                            );
+                                        }
+                                        case "async-throw": {
+                                            await Promise.reject(
+                                                new Error(
+                                                    `Async middleware ${index} error`
+                                                )
+                                            );
+                                            break;
+                                        }
                                     }
-                                    case "throw": {
-                                        throw new Error(
-                                            `Middleware ${index} error`
-                                        );
+
+                                    if (config.shouldCallNext) {
+                                        await next();
                                     }
-                                    case "async-throw": {
-                                        await Promise.reject(
-                                            new Error(
-                                                `Async middleware ${index} error`
-                                            )
-                                        );
-                                        break;
-                                    }
+
+                                    executionOrder.push(
+                                        `middleware-${index}-end`
+                                    );
                                 }
-
-                                if (config.shouldCallNext) {
-                                    await next();
-                                }
-
-                                executionOrder.push(`middleware-${index}-end`);
-                            });
+                            );
                         }
 
                         const receivedEvents: any[] = [];
@@ -327,7 +334,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
 
                         try {
                             for (let i = 0; i < middlewareCount; i++) {
-                                busWithLimit.use(
+                                busWithLimit.registerMiddleware(
                                     async (_eventName, _data, next) => {
                                         await next();
                                     }

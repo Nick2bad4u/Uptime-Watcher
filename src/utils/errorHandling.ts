@@ -39,7 +39,7 @@ export function convertError(error: unknown): ErrorConversionResult {
     }
 
     // Safely convert to string with fallback for problematic objects
-    // eslint-disable-next-line @typescript-eslint/init-declarations
+    // eslint-disable-next-line @typescript-eslint/init-declarations -- initialized in try-catch below
     let errorMessage: string;
     try {
         errorMessage = String(error);
@@ -104,7 +104,8 @@ export async function withUtilityErrorHandling<T>(
 
         if (fallbackValue === undefined) {
             throw new Error(
-                `${operationName} failed and no fallback value provided`
+                `${operationName} failed and no fallback value provided`,
+                { cause: error }
             );
         }
 

@@ -117,7 +117,7 @@ export default {
         "selector-max-id": 1,
         "selector-max-specificity": "0,4,1",
 
-        /* eslint-disable sonarjs/todo-tag */
+        /* eslint-disable sonarjs/todo-tag -- TODO comment is intentionally left for future theming implementation */
         // @todo: Will re-enable for theming eventually
         // "scale-unlimited/declaration-strict-value": [
         //     ["/color$/", "z-index", "font-size"]

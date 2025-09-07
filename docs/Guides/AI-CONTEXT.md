@@ -20,7 +20,7 @@
 
 - **Version**: 10.1.0
 - **License**: Unlicense
-- **Repository**: https://github.com/Nick2bad4u/Uptime-Watcher
+- **Repository**: <https://github.com/Nick2bad4u/Uptime-Watcher>
 - **Main Entry**: dist-electron/main.js
 - **Development Server**: Vite on port 5173
 

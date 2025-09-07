@@ -203,6 +203,34 @@ const ThemedCardComponent = ({
         []
     );
 
+    // Extract header JSX to avoid IIFE pattern
+    const headerJSX =
+        (title ?? subtitle ?? icon) ? (
+            <div className="themed-card__header" style={headerStyle}>
+                {icon ? (
+                    <span style={iconStyle}>
+                        {renderColoredIcon(icon, iconColor ?? "primary")}
+                    </span>
+                ) : null}
+                <div style={titleContainerStyle}>
+                    {title ? (
+                        <ThemedText
+                            size="lg"
+                            variant="primary"
+                            weight="semibold"
+                        >
+                            {title}
+                        </ThemedText>
+                    ) : null}
+                    {subtitle ? (
+                        <ThemedText size="sm" variant="secondary">
+                            {subtitle}
+                        </ThemedText>
+                    ) : null}
+                </div>
+            </div>
+        ) : null;
+
     return (
         <ThemedBox
             className={`themed-card ${hoverable ? "themed-card--hoverable" : ""} ${clickable ? "themed-card--clickable" : ""} ${className}`}
@@ -216,31 +244,7 @@ const ThemedCardComponent = ({
             {...(onMouseEnter && { onMouseEnter })}
             {...(onMouseLeave && { onMouseLeave })}
         >
-            {(title ?? subtitle ?? icon) ? (
-                <div className="themed-card__header" style={headerStyle}>
-                    {icon ? (
-                        <span style={iconStyle}>
-                            {renderColoredIcon(icon, iconColor ?? "primary")}
-                        </span>
-                    ) : null}
-                    <div style={titleContainerStyle}>
-                        {title ? (
-                            <ThemedText
-                                size="lg"
-                                variant="primary"
-                                weight="semibold"
-                            >
-                                {title}
-                            </ThemedText>
-                        ) : null}
-                        {subtitle ? (
-                            <ThemedText size="sm" variant="secondary">
-                                {subtitle}
-                            </ThemedText>
-                        ) : null}
-                    </div>
-                </div>
-            ) : null}
+            {headerJSX}
             <div className="themed-card__content">{children}</div>
         </ThemedBox>
     );

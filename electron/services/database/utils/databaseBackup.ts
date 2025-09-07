@@ -122,7 +122,9 @@ export async function createDatabaseBackup(
                 importError instanceof Error
                     ? importError.message
                     : "Unknown import error";
-            throw new Error(`Failed to import fs/promises: ${errorMessage}`);
+            throw new Error(`Failed to import fs/promises: ${errorMessage}`, {
+                cause: importError,
+            });
         }
 
         const buffer = await fs.readFile(dbPath);

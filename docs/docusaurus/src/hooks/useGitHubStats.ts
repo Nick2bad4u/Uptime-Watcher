@@ -1,5 +1,5 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable @typescript-eslint/dot-notation */
+/* eslint-disable eslint-comments/disable-enable-pair -- This hook has multiple unrelated eslint rules that cannot be properly paired */
+/* eslint-disable @typescript-eslint/dot-notation -- Using bracket notation for GitHub API response properties */
 
 import { useEffect, useState } from "react";
 

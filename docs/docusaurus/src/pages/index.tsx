@@ -1,11 +1,11 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable tailwind/no-custom-classname -- not tailwind */
+/* eslint-disable eslint-comments/disable-enable-pair -- This page contains multiple unrelated eslint rules that cannot be properly paired */
+/* eslint-disable tailwind/no-custom-classname -- Using Docusaurus CSS classes, not Tailwind */
 
-/* eslint-disable @typescript-eslint/dot-notation -- Required for Strict TS */
-/* eslint-disable deprecation/deprecation */
-/* eslint-disable etc/no-deprecated */
-/* eslint-disable sonarjs/deprecation */
-/* eslint-disable @typescript-eslint/no-deprecated */
+/* eslint-disable @typescript-eslint/dot-notation -- Required for strict TypeScript configuration and dynamic property access */
+/* eslint-disable deprecation/deprecation -- Using legacy APIs that are still required for compatibility */
+/* eslint-disable etc/no-deprecated -- Legacy code patterns needed for Docusaurus compatibility */
+/* eslint-disable sonarjs/deprecation -- SonarJS deprecation warnings are acceptable in documentation context */
+/* eslint-disable @typescript-eslint/no-deprecated -- TypeScript deprecated APIs are still required here */
 
 import Heading from "@theme/Heading";
 import HomepageFeatures from "@site/src/components/HomepageFeatures";
@@ -44,11 +44,11 @@ const handleCopyCode = async (): Promise<void> => {
     if (
         typeof window !== "undefined" &&
         "navigator" in window &&
-        // eslint-disable-next-line n/no-unsupported-features/node-builtins, @typescript-eslint/no-unnecessary-condition
+        // eslint-disable-next-line n/no-unsupported-features/node-builtins, @typescript-eslint/no-unnecessary-condition -- Browser API access requires runtime checks
         window.navigator.clipboard
     ) {
         try {
-            // eslint-disable-next-line n/no-unsupported-features/node-builtins
+            // eslint-disable-next-line n/no-unsupported-features/node-builtins -- Browser clipboard API is required for copy functionality
             await window.navigator.clipboard.writeText(code);
             // Simple feedback
             const button = document.activeElement;
@@ -82,7 +82,7 @@ const handleCopyCode = async (): Promise<void> => {
  * Wrapper for handleCopyCode to handle the async function in onClick.
  */
 const handleCopyCodeClick = (): void => {
-    // eslint-disable-next-line promise/prefer-await-to-then
+    // eslint-disable-next-line promise/prefer-await-to-then -- Using Promise.then for error handling pattern in this context
     void handleCopyCode().catch((error: unknown) => {
         console.error("Failed to copy code:", error);
     });
@@ -93,7 +93,7 @@ const handleCopyCodeClick = (): void => {
  */
 const handleDemoButtonClick = (): void => {
     // Show a simple demo message
-    // eslint-disable-next-line no-alert
+    // eslint-disable-next-line no-alert -- Alert is acceptable for user feedback in documentation context
     alert(
         "🎯 Demo Feature!\n\nThis is just a UI demonstration. The Add Site button is not functional in the documentation."
     );
@@ -368,7 +368,7 @@ const HomepageHeader = (): JSX.Element => (
                                     >
                                         📋 Copy
                                     </button>
-                                    {/* eslint-disable-next-line @docusaurus/no-html-links */}
+                                    {/* eslint-disable-next-line @docusaurus/no-html-links -- External GitHub link requires standard HTML anchor */}
                                     <a
                                         href="https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/package.json"
                                         target="_blank"
@@ -429,7 +429,7 @@ export default function Home(): JSX.Element {
     );
 }
 
-/* eslint-enable deprecation/deprecation */
-/* eslint-enable etc/no-deprecated */
-/* eslint-enable sonarjs/deprecation */
-/* eslint-enable @typescript-eslint/no-deprecated */
+/* eslint-enable deprecation/deprecation -- re-enable deprecation warnings after legacy code section */
+/* eslint-enable etc/no-deprecated -- re-enable deprecated feature detection */
+/* eslint-enable sonarjs/deprecation -- re-enable SonarJS deprecation analysis */
+/* eslint-enable @typescript-eslint/no-deprecated -- re-enable TypeScript deprecation warnings */

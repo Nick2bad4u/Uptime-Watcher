@@ -756,7 +756,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
         // Return the monitor with type assertion back to Monitor interface
         return mutableMonitor as unknown as Monitor;
     }
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable type assertion checks after controlled cast back to Monitor interface */
 
     // Log warning if monitor type config is missing to prevent silent field loss
     dbLogger.warn(

@@ -574,7 +574,7 @@ export function isColorPalette(obj: unknown): obj is ColorPalette {
     }
 
     // Safe assertion after type and null checks
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion is safe after runtime type validation of object structure
     const palette = obj as UnknownRecord;
     const requiredColors = [
         "error",
@@ -606,7 +606,7 @@ export function isThemeConfig(obj: unknown): obj is ThemeConfig {
     }
 
     // Safe assertion after type and null checks
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion is safe after runtime type validation of theme structure
     const theme = obj as UnknownRecord;
     const requiredProps = [
         "animation",
@@ -874,31 +874,31 @@ export function createDeepThemeOverride(
 ): ThemeConfig {
     // Deep merge implementation - in production, consider using a library like lodash.merge
     // Use of 'any' is necessary for flexible object merging
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Deep merge utility requires 'any' type for flexible object property handling
     const deepMerge = (target: any, source: any): any => {
         if (source === null || source === undefined) return target;
         if (typeof source !== "object") return source;
 
         // Safe assignment with any for flexible merging
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Deep merge utility requires 'any' type assignment for flexible object property handling
         const result = { ...target };
         for (const key in source) {
             if (
                 // Safe member access for dynamic property checking
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Dynamic property access requires bypassing type safety for flexible object traversal
                 source[key] !== null &&
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Dynamic property access requires bypassing type safety for flexible object traversal
                 typeof source[key] === "object" &&
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Dynamic property access requires bypassing type safety for flexible object traversal
                 !Array.isArray(source[key])
             ) {
                 // Recursive merge with safe assignment and member access
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- Recursive deep merge requires unsafe operations for dynamic object traversal and assignment
                 result[key] = deepMerge(target[key] ?? {}, source[key]);
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- Dynamic property access requires bypassing type safety for flexible object traversal
             } else if (source[key] !== undefined) {
                 // Safe assignment of source values
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- Direct value assignment requires unsafe operations for dynamic object property handling
                 result[key] = source[key];
             }
         }
@@ -906,6 +906,6 @@ export function createDeepThemeOverride(
     };
 
     // Safe return as ThemeConfig is expected type
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- Deep merge result is guaranteed to be ThemeConfig type by function contract
     return deepMerge(baseTheme, deepOverrides);
 }

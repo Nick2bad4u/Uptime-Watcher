@@ -34,6 +34,7 @@ import vitest from "@vitest/eslint-plugin";
 import gitignore from 'eslint-config-flat-gitignore'
 import eslintConfigPrettier from "eslint-config-prettier";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import antfu from "eslint-plugin-antfu";
 import arrayFunc from "eslint-plugin-array-func";
 import pluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
 import pluginBoundaries from "eslint-plugin-boundaries";
@@ -180,15 +181,15 @@ const ROOT_DIR = import.meta.dirname;
 
 export default [
     gitignore({
-        root: true
-      }),
+        name: "Global .gitignore Rules",
+        root: true,
+    }),
     // Global Configs and Rules
     importX.flatConfigs.typescript,
     progress.configs.recommended,
     noBarrelFiles.flat,
     // @ts-expect-error: nitpick.configs.recommended may not have correct types, but runtime usage is verified and safe
     nitpick.configs.recommended,
-
     // ═══════════════════════════════════════════════════════════════════════════════
     // Global Ignore Patterns
     // Add patterns here to ignore files and directories globally
@@ -243,6 +244,7 @@ export default [
             // "vite.config.ts", // Ignore vite config due to parsing issues
             // "vitest.config.ts", // Ignore vitest config due to parsing issues
         ],
+        name: "Global Ignore Patterns **/**",
     },
     // ═══════════════════════════════════════════════════════════════════════════════
     // Global Language Options
@@ -273,12 +275,14 @@ export default [
                 window: "readonly",
             },
         },
+        name: "Global Language Options **/**",
     },
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // Global Settings
     // ═══════════════════════════════════════════════════════════════════════════════
     {
+        name: "Global Settings Options **/**",
         settings: {
             "import-x/resolver": {
                 node: true,
@@ -322,21 +326,24 @@ export default [
                 defaultYAMLVersion: "1.2",
             },
         },
-        name: "YAML/YML files",
+        name: "YAML/YML - **/*.{YAML,YML}",
         plugins: {
             "json-schema-validator": eslintPluginJsonSchemaValidator,
             yml: eslintPluginYml,
         },
         rules: {
             "json-schema-validator/no-invalid": "error",
+            "yml/block-mapping": "warn",
             "yml/block-mapping-colon-indicator-newline": "error",
             "yml/block-mapping-question-indicator-newline": "error",
+            "yml/block-sequence": "warn",
             "yml/block-sequence-hyphen-indicator-newline": "error",
             "yml/file-extension": "off",
             "yml/flow-mapping-curly-newline": "error",
             "yml/flow-mapping-curly-spacing": "error",
             "yml/flow-sequence-bracket-newline": "error",
             "yml/flow-sequence-bracket-spacing": "error",
+            "yml/indent": "off",
             "yml/key-name-casing": "off",
             "yml/key-spacing": "error",
             "yml/no-empty-document": "error",
@@ -352,6 +359,8 @@ export default [
             "yml/require-string-key": "error",
             "yml/sort-keys": "error",
             "yml/sort-sequence-values": "off",
+            "yml/spaced-comment": "warn",
+            "yml/vue-custom-block/no-parsing-error": "warn",
         },
     },
 
@@ -364,22 +373,59 @@ export default [
         languageOptions: {
             parser: htmlParser,
         },
-        name: "HTML files",
+        name: "HTML - **/*.{HTML,HTM,XHTML}",
         plugins: {
             html: html,
         },
         rules: {
             ...html.configs.recommended.rules,
-            // HTML Eslint Plugin Rules (html/*)
+            "html/id-naming-convention": "warn",
             "html/indent": "error",
+            "html/lowercase": "warn",
+            "html/max-element-depth": "warn",
+            "html/no-abstract-roles": "warn",
+            "html/no-accesskey-attrs": "warn",
+            "html/no-aria-hidden-body": "warn",
+            "html/no-aria-hidden-on-focusable": "warn",
+            "html/no-duplicate-class": "warn",
+            "html/no-empty-headings": "warn",
             "html/no-extra-spacing-attrs": [
                 "error",
                 { enforceBeforeSelfClose: true },
             ],
+            "html/no-extra-spacing-text": "warn",
+            "html/no-heading-inside-button": "warn",
+            "html/no-ineffective-attrs": "warn",
+            // HTML Eslint Plugin Rules (html/*)
+            "html/no-inline-styles": "warn",
+            "html/no-invalid-entity": "warn",
+            "html/no-invalid-role": "warn",
+            "html/no-multiple-empty-lines": "warn",
+            "html/no-nested-interactive": "warn",
+            "html/no-non-scalable-viewport": "warn",
+            "html/no-positive-tabindex": "warn",
+            "html/no-restricted-attr-values": "warn",
+            "html/no-restricted-attrs": "warn",
+            "html/no-script-style-type": "warn",
+            "html/no-skip-heading-levels": "warn",
+            "html/no-target-blank": "warn",
+            "html/no-trailing-spaces": "warn",
+            "html/prefer-https": "warn",
+            "html/require-attrs": "warn",
+            "html/require-button-type": "warn",
             "html/require-closing-tags": [
                 "error",
                 { selfClosing: "always" },
             ],
+            "html/require-explicit-size": "warn",
+            "html/require-form-method": "warn",
+            "html/require-frame-title": "warn",
+            "html/require-input-label": "warn",
+            "html/require-meta-charset": "warn",
+            "html/require-meta-description": "warn",
+            "html/require-meta-viewport": "warn",
+            "html/require-open-graph-protocol": "warn",
+            "html/sort-attrs": "warn",
         },
     },
 
@@ -389,7 +435,7 @@ export default [
     {
         files: ["**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: ["report/**"],
-        name: "HTML in JS/TS files",
+        name: "HTML in JS/TS - **/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             html: html,
         },
@@ -413,7 +459,7 @@ export default [
     // ═══════════════════════════════════════════════════════════════════════════════
 
     // {
-    //     name: "Package.json files Publint",
+    //     name: "Package - **/Package.json - Publint",
     //     files: ["**/package.json"],
     //     languageOptions: {
     //         parser: publintParser,
@@ -446,25 +492,53 @@ export default [
             parser: jsoncEslintParser,
             parserOptions: { jsonSyntax: "JSON" },
         },
-        name: "Package.json files",
+        name: "Package - **/Package.json",
         plugins: { json: json, "package-json": packageJson },
         rules: {
             ...json.configs.recommended.rules,
+            "package-json/no-empty-fields": "warn",
             // Package.json Plugin Rules (package-json/*)
             "package-json/no-redundant-files": "warn",
+            "package-json/order-properties": "warn",
+            "package-json/repository-shorthand": "warn",
             "package-json/require-author": "warn",
             "package-json/require-bugs": "warn",
             "package-json/require-bundleDependencies": "off",
             "package-json/require-dependencies": "warn",
+            "package-json/require-description": "warn",
             "package-json/require-devDependencies": "warn",
             "package-json/require-engines": "warn",
             "package-json/require-files": "off", // Not needed for Electron applications
             "package-json/require-keywords": "warn",
+            "package-json/require-name": "warn",
             "package-json/require-optionalDependencies": "off", // Not needed for Electron applications
             "package-json/require-peerDependencies": "off",
+            "package-json/require-type": "warn",
             "package-json/require-types": "off", // Not needed for Electron applications
+            "package-json/require-version": "warn",
             "package-json/restrict-dependency-ranges": "warn",
+            "package-json/sort-collections": "warn",
+            "package-json/unique-dependencies": "warn",
+            "package-json/valid-author": "warn",
+            "package-json/valid-bin": "warn",
+            "package-json/valid-bundleDependencies": "warn",
+            "package-json/valid-config": "warn",
+            "package-json/valid-cpu": "warn",
+            "package-json/valid-dependencies": "warn",
+            "package-json/valid-description": "warn",
+            "package-json/valid-devDependencies": "warn",
+            "package-json/valid-directories": "warn",
+            "package-json/valid-exports": "warn",
+            "package-json/valid-license": "warn",
             "package-json/valid-local-dependency": "off",
+            "package-json/valid-name": "warn",
+            "package-json/valid-optionalDependencies": "warn",
+            "package-json/valid-package-definition": "warn",
+            "package-json/valid-peerDependencies": "warn",
+            "package-json/valid-repository-directory": "warn",
+            "package-json/valid-scripts": "warn",
+            "package-json/valid-type": "warn",
+            "package-json/valid-version": "warn",
         },
     },
 
@@ -473,7 +547,7 @@ export default [
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.mdx"],
-        name: "MDX files",
+        name: "MDX - **/*.MDX",
         plugins: { mdx: mdx },
 
         rules: {
@@ -503,28 +577,32 @@ export default [
     {
         files: ["**/*.{md,markup,atom,rss,markdown}"],
         language: "markdown/gfm",
-        name: "Markdown files",
+        name: "MD, Markup, Atom, RSS, Markdown - **/*.{MD,MARKUP,ATOM,RSS,MARKDOWN}",
         plugins: {
             markdown: markdown,
         },
         rules: {
             // Markdown Plugin Eslint Rules (markdown/*)
-            "markdown/fenced-code-language": "error",
-            "markdown/heading-increment": "error",
-            "markdown/no-duplicate-definitions": "error",
-            "markdown/no-empty-definitions": "error",
-            "markdown/no-empty-images": "error",
-            "markdown/no-empty-links": "error",
-            "markdown/no-invalid-label-refs": "error",
-            "markdown/no-missing-atx-heading-space": "error",
-            "markdown/no-missing-label-refs": "error",
-            "markdown/no-missing-link-fragments": "error",
-            "markdown/no-multiple-h1": "error",
-            "markdown/no-reversed-media-syntax": "error",
-            "markdown/no-space-in-emphasis": "error",
-            "markdown/no-unused-definitions": "error",
-            "markdown/require-alt-text": "error",
-            "markdown/table-column-count": "error",
+
+            "markdown/fenced-code-language": "warn",
+            "markdown/heading-increment": "warn",
+            "markdown/no-bare-urls": "warn",
+            "markdown/no-duplicate-definitions": "warn",
+            "markdown/no-duplicate-headings": "warn",
+            "markdown/no-empty-definitions": "warn",
+            "markdown/no-empty-images": "warn",
+            "markdown/no-empty-links": "warn",
+            "markdown/no-html": "off",
+            "markdown/no-invalid-label-refs": "warn",
+            "markdown/no-missing-atx-heading-space": "warn",
+            "markdown/no-missing-label-refs": "warn",
+            "markdown/no-missing-link-fragments": "warn",
+            "markdown/no-multiple-h1": "warn",
+            "markdown/no-reversed-media-syntax": "warn",
+            "markdown/no-space-in-emphasis": "warn",
+            "markdown/no-unused-definitions": "warn",
+            "markdown/require-alt-text": "warn",
+            "markdown/table-column-count": "warn",
         },
     },
 
@@ -541,7 +619,7 @@ export default [
         languageOptions: {
             tolerant: true,
         },
-        name: "CSS files",
+        name: "CSS - **/*.CSS",
         plugins: {
             css: css,
         },
@@ -551,7 +629,10 @@ export default [
             "css/no-empty-blocks": "error",
             "css/no-invalid-at-rules": "off",
             "css/no-invalid-properties": "off",
+            "css/prefer-logical-properties": "warn",
+            "css/relative-font-units": "warn",
             "css/use-baseline": "off",
+            "css/use-layers": "off",
         },
     },
 
@@ -564,7 +645,7 @@ export default [
             ".vscode/*.json",
         ],
         ignores: [],
-        name: "JSONC files",
+        name: "JSONC - **/*.JSONC",
         plugins: {
             eslintPluginJsonc: eslintPluginJsonc,
             json: json,
@@ -582,6 +663,67 @@ export default [
         },
         rules: {
             ...json.configs.recommended.rules,
+            "jsonc/array-bracket-newline": "warn",
+            "jsonc/array-bracket-spacing": "warn",
+            "jsonc/array-element-newline": "warn",
+            "jsonc/auto": "warn",
+            "jsonc/comma-dangle": "warn",
+            "jsonc/comma-style": "warn",
+            "jsonc/indent": "off", // Handled by Prettier
+            "jsonc/key-name-casing": "off",
+            "jsonc/key-spacing": "warn",
+            "jsonc/no-bigint-literals": "warn",
+            "jsonc/no-binary-expression": "warn",
+            "jsonc/no-binary-numeric-literals": "warn",
+            "jsonc/no-comments": "warn",
+            "jsonc/no-dupe-keys": "warn",
+            "jsonc/no-escape-sequence-in-identifier": "warn",
+            "jsonc/no-floating-decimal": "warn",
+            "jsonc/no-hexadecimal-numeric-literals": "warn",
+            "jsonc/no-infinity": "warn",
+            "jsonc/no-irregular-whitespace": "warn",
+            "jsonc/no-multi-str": "warn",
+            "jsonc/no-nan": "warn",
+            "jsonc/no-number-props": "warn",
+            "jsonc/no-numeric-separators": "warn",
+            "jsonc/no-octal": "warn",
+            "jsonc/no-octal-escape": "warn",
+            "jsonc/no-octal-numeric-literals": "warn",
+            "jsonc/no-parenthesized": "warn",
+            "jsonc/no-plus-sign": "warn",
+            "jsonc/no-regexp-literals": "warn",
+            "jsonc/no-sparse-arrays": "warn",
+            "jsonc/no-template-literals": "warn",
+            "jsonc/no-undefined-value": "warn",
+            "jsonc/no-unicode-codepoint-escapes": "warn",
+            "jsonc/no-useless-escape": "warn",
+            "jsonc/object-curly-newline": "warn",
+            "jsonc/object-curly-spacing": "warn",
+            "jsonc/object-property-newline": "warn",
+            "jsonc/quote-props": "warn",
+            "jsonc/quotes": "warn",
+            "jsonc/sort-array-values": ["error",
+                {
+                    "order": { "type": "asc" },
+                    "pathPattern": "^files$"  // Hits the files property
+                },
+                {
+                    "order": [
+                        "eslint",
+                        "eslintplugin",
+                        "eslint-plugin",
+                        {
+                            // Fallback order
+                            "order": { "type": "asc" }
+                        }
+                    ],
+                    "pathPattern": "^keywords$" // Hits the keywords property
+                }
+            ],
+            "jsonc/sort-keys": "warn",
+            "jsonc/space-unary-ops": "warn",
+            "jsonc/valid-json-number": "warn",
+            "jsonc/vue-custom-block/no-parsing-error": "warn"
         },
     },
 
@@ -591,7 +733,7 @@ export default [
     {
         files: ["**/*.json"],
         language: "json/json",
-        name: "JSON files",
+        name: "JSON - **/*.JSON",
         plugins: {
             json: json,
             "json-schema-validator": eslintPluginJsonSchemaValidator,
@@ -607,7 +749,7 @@ export default [
     {
         files: ["**/*.json5"],
         language: "json/json5",
-        name: "JSON files",
+        name: "JSON5 - **/*.JSON5",
         plugins: {
             json: json,
             "json-schema-validator": eslintPluginJsonSchemaValidator,
@@ -627,7 +769,7 @@ export default [
             parser: tomlEslintParser,
             parserOptions: { tomlVersion: "1.0.0" },
         },
-        name: "TOML files",
+        name: "TOML - **/*.TOML",
         plugins: { toml: eslintPluginToml },
         rules: {
             // TOML Eslint Plugin Rules (toml/*)
@@ -639,6 +781,8 @@ export default [
             "toml/inline-table-curly-spacing": "warn",
             "toml/key-spacing": "warn",
             "toml/keys-order": "warn",
+            "toml/no-mixed-type-in-array": "warn",
+            "toml/no-non-decimal-integer": "warn",
             "toml/no-space-dots": "warn",
             "toml/no-unreadable-number-separator": "warn",
             "toml/padding-line-between-pairs": "warn",
@@ -646,7 +790,11 @@ export default [
             "toml/precision-of-fractional-seconds": "warn",
             "toml/precision-of-integer": "warn",
             "toml/quoted-keys": "warn",
+            "toml/space-eq-sign": "warn",
             "toml/spaced-comment": "warn",
+            "toml/table-bracket-spacing": "warn",
+            "toml/tables-order": "warn",
+            "toml/vue-custom-block/no-parsing-error": "warn"
         },
     },
 
@@ -678,7 +826,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
-        name: "TSX/JSX files",
+        name: "TSX/JSX - **/*.{TSX,JSX}",
         plugins: {
             "better-tailwindcss": pluginBetterTailwindcss,
             css: css,
@@ -691,6 +839,15 @@ export default [
             ...css.configs.recommended.rules,
             ...pluginUndefinedCss.configs["with-tailwind"].rules,
             ...pluginBetterTailwindcss.configs.correctness.rules,
+            "better-tailwindcss/enforce-consistent-class-order": "warn",
+            "better-tailwindcss/enforce-consistent-important-position": "warn",
+            "better-tailwindcss/enforce-consistent-line-wrapping": "off",
+            "better-tailwindcss/enforce-consistent-variable-syntax": "warn",
+            "better-tailwindcss/enforce-shorthand-classes": "off",
+            "better-tailwindcss/no-deprecated-classes": "warn",
+            "better-tailwindcss/no-duplicate-classes": "warn",
+            "better-tailwindcss/no-restricted-classes": "warn",
+            "better-tailwindcss/no-unnecessary-whitespace": "warn",
             "better-tailwindcss/no-unregistered-classes": [
                 "off",
                 {
@@ -732,7 +889,7 @@ export default [
             "better-tailwindcss": {
                 // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
                 "entryPoint": "./src/index.css",
-              },
+            },
             "boundaries/elements": [
                 { pattern: "src/App.tsx", type: "app" },
                 { pattern: "src/main.tsx", type: "main" },
@@ -822,7 +979,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
-        name: "Docusaurus files",
+        name: "Docusaurus - docs/docusaurus/**/*.{TS,TSX,MJS,CJS,JS,JSX,MTS,CTS}",
         plugins: {
             "@docusaurus": pluginDocusaurus,
             "@eslint-react": eslintReact,
@@ -954,9 +1111,44 @@ export default [
             "@docusaurus/no-untranslated-text": "off",
             "@docusaurus/prefer-docusaurus-heading": "warn",
             "@docusaurus/string-literal-i18n-messages": "off",
+            "@eslint-react/avoid-shorthand-boolean": "off",
+            "@eslint-react/avoid-shorthand-fragment": "warn",
+            /* DOM subplugin */
+            "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
+            "@eslint-react/ensure-forward-ref-using-ref": "warn",
+            "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks": "warn",
+            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
+            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
+            /* Hooks extra subplugin */
+            "@eslint-react/hooks-extra/no-direct-set-state-in-use-layout-effect": "warn",
+            "@eslint-react/hooks-extra/no-redundant-custom-hook": "warn",
+            "@eslint-react/hooks-extra/no-unnecessary-use-callback": "off",
+            "@eslint-react/hooks-extra/no-unnecessary-use-memo": "off",
+            "@eslint-react/hooks-extra/no-useless-custom-hooks": "warn",
+            "@eslint-react/jsx-no-iife": "warn",
+            "@eslint-react/jsx-no-undef": "warn",
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
+            /* Naming convention subplugin */
+            "@eslint-react/naming-convention/filename": "off",
+            "@eslint-react/naming-convention/filename-extension": "off",
             "@eslint-react/naming-convention/use-state": "warn",
+            "@eslint-react/no-children-prop": "warn",
+            "@eslint-react/no-class-component": "warn",
+            "@eslint-react/no-complex-conditional-rendering": "warn",
+            "@eslint-react/no-complicated-conditional-rendering": "warn",
+            "@eslint-react/no-duplicate-jsx-props": "warn",
+            "@eslint-react/no-leaked-conditional-rendering": "warn",
+            "@eslint-react/no-missing-component-display-name": "warn",
+            "@eslint-react/no-missing-context-display-name": "warn",
+            "@eslint-react/no-nested-components": "warn",
+            "@eslint-react/no-useless-fragment": "warn",
+            "@eslint-react/prefer-destructuring-assignment": "warn",
+            "@eslint-react/prefer-react-namespace-import": "off",
+            "@eslint-react/prefer-read-only-props": "warn",
+            "@eslint-react/prefer-shorthand-boolean": "off",
+            "@eslint-react/prefer-shorthand-fragment": "warn",
+            "@eslint-react/use-jsx-vars": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
                 {
@@ -1006,6 +1198,26 @@ export default [
                 },
             ],
             "@metamask/design-tokens/prefer-theme-color-classnames": "error",
+            "@microsoft/sdl/no-angular-bypass-sanitizer": "warn",
+            "@microsoft/sdl/no-angular-sanitization-trusted-urls": "warn",
+            "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
+
+            "@microsoft/sdl/no-angularjs-enable-svg": "warn",
+
+            "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
+            "@microsoft/sdl/no-cookies": "warn",
+            "@microsoft/sdl/no-document-domain": "warn",
+            "@microsoft/sdl/no-document-write": "warn",
+            "@microsoft/sdl/no-electron-node-integration": "warn",
+            "@microsoft/sdl/no-html-method": "warn",
+            "@microsoft/sdl/no-inner-html": "warn",
+            "@microsoft/sdl/no-insecure-random": "off",
+
+            "@microsoft/sdl/no-insecure-url": "warn",
+            "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
+            "@microsoft/sdl/no-postmessage-star-origin": "warn",
+            "@microsoft/sdl/no-unsafe-alloc": "warn",
+            "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
             "@typescript-eslint/array-type": [
                 "error",
@@ -1321,6 +1533,9 @@ export default [
                     ],
                 },
             ],
+            // Core quality rules
+
+            camelcase: "off",
             "canonical/destructuring-property-newline": "off",
             "canonical/export-specifier-newline": "off",
             "canonical/filename-match-exported": "off",
@@ -1371,9 +1586,6 @@ export default [
                     tabSize: 2,
                 },
             ],
-            // Core quality rules
-            // eslint-disable-next-line perfectionist/sort-objects -- Keep Together
-            camelcase: "off",
             complexity: "off",
             // "no-console": "warn", // Allow in development, but warn - DISABLED FOR NOW
             "consistent-return": "warn",
@@ -1389,6 +1601,10 @@ export default [
                 "error",
                 "always",
             ],
+            "eslint-comments/no-restricted-disable": "warn",
+            "eslint-comments/no-unused-disable": "warn",
+            "eslint-comments/no-use": "off",
+            "eslint-comments/require-description": "warn",
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
             "eslint-plugin-toplevel/no-toplevel-let": "error",
             "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
@@ -1399,7 +1615,9 @@ export default [
             "etc/no-t": "off",
             "etc/prefer-interface": "off",
             "etc/throw-error": "warn",
+            "ex/might-throw": "off",
             "ex/no-unhandled": "warn",
+            "ex/use-error-cause": "warn",
             "format-sql/format": "warn",
             "func-style": "off",
             "function-name/starts-with-verb": [
@@ -1494,7 +1712,7 @@ export default [
             "import-x/no-webpack-loader-syntax": "warn",
             "import-x/order": "off", // Conflicts with other rules
             "import-x/prefer-default-export": "off",
-            "import-x/prefer-namespace-import": "warn",
+            "import-x/prefer-namespace-import": "off",
             "import-x/unambiguous": "warn",
             "import-zod/prefer-zod-namespace": "error",
             "init-declarations": "off",
@@ -1876,7 +2094,7 @@ export default [
         languageOptions: {
             tolerant: true,
         },
-        name: "Docusaurus CSS",
+        name: "Docusaurus CSS - docs/docusaurus/**/*.CSS",
         plugins: {
             "@docusaurus": pluginDocusaurus,
             css: css,
@@ -1944,7 +2162,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
-        name: "TypeScript Frontend (React + Zustand)",
+        name: "TypeScript Frontend - src/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@arthurgeron/react-usememo": pluginUseMemo2,
             "@eslint-react": eslintReact,
@@ -1956,6 +2174,7 @@ export default [
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
             "@typescript-eslint": tseslint,
+            antfu: antfu,
             "array-func": arrayFunc,
             "better-tailwindcss": pluginBetterTailwindcss,
             boundaries: pluginBoundaries,
@@ -2093,9 +2312,44 @@ export default [
             "@arthurgeron/react-usememo/require-memo": "off",
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "off",
+            "@eslint-react/avoid-shorthand-boolean": "off",
+            "@eslint-react/avoid-shorthand-fragment": "warn",
+            /* DOM subplugin */
+            "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
+            "@eslint-react/ensure-forward-ref-using-ref": "warn",
+            "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks": "warn",
+            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
+            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
+            /* Hooks extra subplugin */
+            "@eslint-react/hooks-extra/no-direct-set-state-in-use-layout-effect": "warn",
+            "@eslint-react/hooks-extra/no-redundant-custom-hook": "warn",
+            "@eslint-react/hooks-extra/no-unnecessary-use-callback": "off",
+            "@eslint-react/hooks-extra/no-unnecessary-use-memo": "off",
+            "@eslint-react/hooks-extra/no-useless-custom-hooks": "warn",
+            "@eslint-react/jsx-no-iife": "warn",
+            "@eslint-react/jsx-no-undef": "warn",
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
+            /* Naming convention subplugin */
+            "@eslint-react/naming-convention/filename": "off",
+            "@eslint-react/naming-convention/filename-extension": "off",
             "@eslint-react/naming-convention/use-state": "warn",
+            "@eslint-react/no-children-prop": "warn",
+            "@eslint-react/no-class-component": "warn",
+            "@eslint-react/no-complex-conditional-rendering": "warn",
+            "@eslint-react/no-complicated-conditional-rendering": "warn",
+            "@eslint-react/no-duplicate-jsx-props": "warn",
+            "@eslint-react/no-leaked-conditional-rendering": "warn",
+            "@eslint-react/no-missing-component-display-name": "warn",
+            "@eslint-react/no-missing-context-display-name": "warn",
+            "@eslint-react/no-nested-components": "warn",
+            "@eslint-react/no-useless-fragment": "warn",
+            "@eslint-react/prefer-destructuring-assignment": "warn",
+            "@eslint-react/prefer-react-namespace-import": "off",
+            "@eslint-react/prefer-read-only-props": "warn",
+            "@eslint-react/prefer-shorthand-boolean": "off",
+            "@eslint-react/prefer-shorthand-fragment": "warn",
+            "@eslint-react/use-jsx-vars": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
                 {
@@ -2144,6 +2398,26 @@ export default [
                 },
             ],
             "@metamask/design-tokens/prefer-theme-color-classnames": "error",
+            "@microsoft/sdl/no-angular-bypass-sanitizer": "warn",
+            "@microsoft/sdl/no-angular-sanitization-trusted-urls": "warn",
+            "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
+
+            "@microsoft/sdl/no-angularjs-enable-svg": "warn",
+
+            "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
+            "@microsoft/sdl/no-cookies": "warn",
+            "@microsoft/sdl/no-document-domain": "warn",
+            "@microsoft/sdl/no-document-write": "warn",
+            "@microsoft/sdl/no-electron-node-integration": "warn",
+            "@microsoft/sdl/no-html-method": "warn",
+            "@microsoft/sdl/no-inner-html": "warn",
+            "@microsoft/sdl/no-insecure-random": "off",
+
+            "@microsoft/sdl/no-insecure-url": "warn",
+            "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
+            "@microsoft/sdl/no-postmessage-star-origin": "warn",
+            "@microsoft/sdl/no-unsafe-alloc": "warn",
+            "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
             "@typescript-eslint/array-type": [
                 "error",
@@ -2152,6 +2426,7 @@ export default [
             "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
             "@typescript-eslint/ban-ts-comment": "warn",
             "@typescript-eslint/ban-tslint-comment": "warn",
+
             "@typescript-eslint/class-literal-property-style": "warn",
             "@typescript-eslint/class-methods-use-this": "off",
             "@typescript-eslint/consistent-generic-constructors": "warn",
@@ -2282,15 +2557,12 @@ export default [
             "@typescript-eslint/no-unnecessary-type-arguments": "warn",
             // Enhanced type safety for backend services
             "@typescript-eslint/no-unnecessary-type-assertion": "error", // Remove redundant type assertions
-
             "@typescript-eslint/no-unnecessary-type-constraint": "warn",
             "@typescript-eslint/no-unnecessary-type-conversion": "warn",
             "@typescript-eslint/no-unnecessary-type-parameters": "warn",
             "@typescript-eslint/no-unsafe-argument": "warn", // Warn on passing any to typed parameters
             "@typescript-eslint/no-unsafe-assignment": "warn", // Warn on unsafe assignments to any
-
             "@typescript-eslint/no-unsafe-call": "warn", // Warn on calling any-typed functions
-
             "@typescript-eslint/no-unsafe-declaration-merging": "warn",
             "@typescript-eslint/no-unsafe-enum-comparison": "warn",
             "@typescript-eslint/no-unsafe-function-type": "error",
@@ -2300,6 +2572,7 @@ export default [
             "@typescript-eslint/no-unsafe-unary-minus": "warn",
             "@typescript-eslint/no-unused-expressions": "warn",
             "@typescript-eslint/no-unused-vars": "warn",
+
             // Disabled: Function declarations are hoisted in JS/TS, and this rule creates unnecessary constraints
             // For Electron projects that often organize helper functions after main functions for better readability
             "@typescript-eslint/no-use-before-define": "warn",
@@ -2307,7 +2580,9 @@ export default [
             "@typescript-eslint/no-useless-empty-export": "warn",
             "@typescript-eslint/no-wrapper-object-types": "error",
             "@typescript-eslint/non-nullable-type-assertion-style": "warn",
+
             "@typescript-eslint/only-throw-error": "warn",
+
             "@typescript-eslint/parameter-properties": "warn",
             "@typescript-eslint/prefer-as-const": "warn",
             "@typescript-eslint/prefer-destructuring": "warn",
@@ -2350,7 +2625,6 @@ export default [
             "@typescript-eslint/related-getter-setter-pairs": "warn",
             "@typescript-eslint/require-array-sort-compare": "warn",
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
-
             "@typescript-eslint/restrict-plus-operands": "warn",
             "@typescript-eslint/restrict-template-expressions": "warn",
             "@typescript-eslint/return-await": [
@@ -2359,11 +2633,32 @@ export default [
             ], // Proper await handling in try-catch
             "@typescript-eslint/strict-boolean-expressions": "off",
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
-
             "@typescript-eslint/triple-slash-reference": "warn",
             "@typescript-eslint/unbound-method": "warn",
             "@typescript-eslint/unified-signatures": "warn",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
+            "antfu/consistent-chaining": "warn",
+            "antfu/consistent-list-newline": "off",
+            "antfu/curly": "error",
+            "antfu/if-newline": "off",
+            "antfu/import-dedupe": "error",
+            "antfu/indent-unindent": "error",
+
+            "antfu/no-import-dist": "error",
+            "antfu/no-import-node-modules-by-path": "error",
+            "antfu/no-top-level-await": "error",
+            "antfu/no-ts-export-equal": "error",
+            "antfu/top-level-function": "off",
+
+            "better-tailwindcss/enforce-consistent-class-order": "warn",
+            "better-tailwindcss/enforce-consistent-important-position": "warn",
+            "better-tailwindcss/enforce-consistent-line-wrapping": "off",
+            "better-tailwindcss/enforce-consistent-variable-syntax": "warn",
+            "better-tailwindcss/enforce-shorthand-classes": "off",
+            "better-tailwindcss/no-deprecated-classes": "warn",
+            "better-tailwindcss/no-duplicate-classes": "warn",
+            "better-tailwindcss/no-restricted-classes": "warn",
+            "better-tailwindcss/no-unnecessary-whitespace": "warn",
             "better-tailwindcss/no-unregistered-classes": [
                 "off",
                 {
@@ -2442,11 +2737,11 @@ export default [
             "canonical/destructuring-property-newline": "off",
             "canonical/export-specifier-newline": "off",
             "canonical/filename-match-exported": "warn",
-
             "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
             "canonical/filename-no-index": "error",
             "canonical/import-specifier-newline": "off",
             "canonical/no-barrel-import": "error",
+
             "canonical/no-export-all": "error",
             "canonical/no-re-export": "warn",
             "canonical/no-reassign-imports": "error",
@@ -2506,6 +2801,10 @@ export default [
                 "error",
                 "always",
             ],
+            "eslint-comments/no-restricted-disable": "warn",
+            "eslint-comments/no-unused-disable": "warn",
+            "eslint-comments/no-use": "off",
+            "eslint-comments/require-description": "warn",
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
             "eslint-plugin-toplevel/no-toplevel-let": "error",
             "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
@@ -2525,7 +2824,9 @@ export default [
             //     },
             // ],
             "etc/throw-error": "warn",
+            "ex/might-throw": "off",
             "ex/no-unhandled": "warn",
+            "ex/use-error-cause": "warn",
             "format-sql/format": "warn",
             "func-style": "off",
             "function-name/starts-with-verb": [
@@ -2599,7 +2900,7 @@ export default [
             "import-x/no-webpack-loader-syntax": "warn",
             "import-x/order": "off", // Conflicts with other rules
             "import-x/prefer-default-export": "off",
-            "import-x/prefer-namespace-import": "warn",
+            "import-x/prefer-namespace-import": "off",
             "import-x/unambiguous": "warn",
             "import-zod/prefer-zod-namespace": "error",
             "init-declarations": "off",
@@ -3304,7 +3605,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
-        name: "Electron Backend",
+        name: "Electron Backend -  - electron/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@eslint-react": eslintReact,
             "@eslint-react/dom": eslintReactDom,
@@ -3315,6 +3616,7 @@ export default [
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
             "@typescript-eslint": tseslint,
+            antfu: antfu,
             "array-func": arrayFunc,
             boundaries: pluginBoundaries,
             canonical: pluginCanonical,
@@ -3432,9 +3734,45 @@ export default [
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
+
+            "@eslint-react/avoid-shorthand-boolean": "off",
+            "@eslint-react/avoid-shorthand-fragment": "warn",
+            /* DOM subplugin */
+            "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
+            "@eslint-react/ensure-forward-ref-using-ref": "warn",
+            "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks": "warn",
+            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
+            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
+            /* Hooks extra subplugin */
+            "@eslint-react/hooks-extra/no-direct-set-state-in-use-layout-effect": "warn",
+            "@eslint-react/hooks-extra/no-redundant-custom-hook": "warn",
+            "@eslint-react/hooks-extra/no-unnecessary-use-callback": "off",
+            "@eslint-react/hooks-extra/no-unnecessary-use-memo": "off",
+            "@eslint-react/hooks-extra/no-useless-custom-hooks": "warn",
+            "@eslint-react/jsx-no-iife": "warn",
+            "@eslint-react/jsx-no-undef": "warn",
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
+            /* Naming convention subplugin */
+            "@eslint-react/naming-convention/filename": "off",
+            "@eslint-react/naming-convention/filename-extension": "off",
             "@eslint-react/naming-convention/use-state": "warn",
+            "@eslint-react/no-children-prop": "warn",
+            "@eslint-react/no-class-component": "warn",
+            "@eslint-react/no-complex-conditional-rendering": "warn",
+            "@eslint-react/no-complicated-conditional-rendering": "warn",
+            "@eslint-react/no-duplicate-jsx-props": "warn",
+            "@eslint-react/no-leaked-conditional-rendering": "warn",
+            "@eslint-react/no-missing-component-display-name": "warn",
+            "@eslint-react/no-missing-context-display-name": "warn",
+            "@eslint-react/no-nested-components": "warn",
+            "@eslint-react/no-useless-fragment": "warn",
+            "@eslint-react/prefer-destructuring-assignment": "warn",
+            "@eslint-react/prefer-react-namespace-import": "off",
+            "@eslint-react/prefer-read-only-props": "warn",
+            "@eslint-react/prefer-shorthand-boolean": "off",
+            "@eslint-react/prefer-shorthand-fragment": "warn",
+            "@eslint-react/use-jsx-vars": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
                 {
@@ -3483,6 +3821,26 @@ export default [
                 },
             ],
             "@metamask/design-tokens/prefer-theme-color-classnames": "error",
+            "@microsoft/sdl/no-angular-bypass-sanitizer": "warn",
+            "@microsoft/sdl/no-angular-sanitization-trusted-urls": "warn",
+            "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
+            "@microsoft/sdl/no-angularjs-enable-svg": "warn",
+
+            "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
+
+            "@microsoft/sdl/no-cookies": "warn",
+            "@microsoft/sdl/no-document-domain": "warn",
+            "@microsoft/sdl/no-document-write": "warn",
+            "@microsoft/sdl/no-electron-node-integration": "warn",
+            "@microsoft/sdl/no-html-method": "warn",
+            "@microsoft/sdl/no-inner-html": "warn",
+            "@microsoft/sdl/no-insecure-random": "off",
+            "@microsoft/sdl/no-insecure-url": "warn",
+
+            "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
+            "@microsoft/sdl/no-postmessage-star-origin": "warn",
+            "@microsoft/sdl/no-unsafe-alloc": "warn",
+            "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
             "@typescript-eslint/array-type": [
                 "error",
@@ -3494,6 +3852,7 @@ export default [
             "@typescript-eslint/class-literal-property-style": "warn",
             "@typescript-eslint/class-methods-use-this": "off",
             "@typescript-eslint/consistent-generic-constructors": "warn",
+
             "@typescript-eslint/consistent-indexed-object-style": "warn",
             "@typescript-eslint/consistent-return": "warn",
             // Function and type safety rules (same as frontend)
@@ -3558,7 +3917,6 @@ export default [
             // Can be resolved incrementally as warnings.
             "@typescript-eslint/no-import-type-side-effects": "warn",
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
-
             "@typescript-eslint/no-invalid-this": "warn",
             "@typescript-eslint/no-invalid-void-type": "warn",
             "@typescript-eslint/no-loop-func": "warn",
@@ -3586,6 +3944,7 @@ export default [
             // "clean-code/exception-handling": "error",
             "@typescript-eslint/no-redundant-type-constituents": "warn",
             "@typescript-eslint/no-require-imports": "warn",
+
             "@typescript-eslint/no-restricted-imports": "warn",
             "@typescript-eslint/no-restricted-types": [
                 "error",
@@ -3623,9 +3982,7 @@ export default [
             "@typescript-eslint/no-unnecessary-type-conversion": "warn",
             "@typescript-eslint/no-unnecessary-type-parameters": "warn",
             "@typescript-eslint/no-unsafe-argument": "warn", // Warn on passing any to typed parameters
-
             "@typescript-eslint/no-unsafe-assignment": "warn", // Warn on unsafe assignments to any
-
             "@typescript-eslint/no-unsafe-call": "warn", // Warn on calling any-typed functions
             "@typescript-eslint/no-unsafe-declaration-merging": "warn",
             "@typescript-eslint/no-unsafe-enum-comparison": "warn",
@@ -3642,7 +3999,9 @@ export default [
             "@typescript-eslint/no-useless-constructor": "warn",
             "@typescript-eslint/no-useless-empty-export": "warn",
             "@typescript-eslint/no-wrapper-object-types": "error",
+
             "@typescript-eslint/non-nullable-type-assertion-style": "warn",
+
             "@typescript-eslint/only-throw-error": "warn",
             "@typescript-eslint/parameter-properties": "warn",
             "@typescript-eslint/prefer-as-const": "warn",
@@ -3698,6 +4057,17 @@ export default [
             "@typescript-eslint/unbound-method": "warn",
             "@typescript-eslint/unified-signatures": "warn",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
+            "antfu/consistent-chaining": "warn",
+            "antfu/consistent-list-newline": "off",
+            "antfu/curly": "error",
+            "antfu/if-newline": "off",
+            "antfu/import-dedupe": "error",
+            "antfu/indent-unindent": "error",
+            "antfu/no-import-dist": "error",
+            "antfu/no-import-node-modules-by-path": "error",
+            "antfu/no-top-level-await": "error",
+            "antfu/no-ts-export-equal": "error",
+            "antfu/top-level-function": "off",
             // Architecture boundaries for Electron
             "boundaries/element-types": [
                 "error",
@@ -3827,6 +4197,10 @@ export default [
                 "error",
                 "always",
             ],
+            "eslint-comments/no-restricted-disable": "warn",
+            "eslint-comments/no-unused-disable": "warn",
+            "eslint-comments/no-use": "off",
+            "eslint-comments/require-description": "warn",
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
             "eslint-plugin-toplevel/no-toplevel-let": "error",
             "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
@@ -3837,7 +4211,9 @@ export default [
             "etc/no-t": "off",
             "etc/prefer-interface": "off",
             "etc/throw-error": "warn",
+            "ex/might-throw": "off",
             "ex/no-unhandled": "warn",
+            "ex/use-error-cause": "warn",
             "format-sql/format": "warn",
             "func-style": "off",
             "function-name/starts-with-verb": [
@@ -3932,7 +4308,7 @@ export default [
             "import-x/no-webpack-loader-syntax": "warn",
             "import-x/order": "off", // Conflicts with other rules
             "import-x/prefer-default-export": "off",
-            "import-x/prefer-namespace-import": "warn",
+            "import-x/prefer-namespace-import": "off",
             "import-x/unambiguous": "warn",
             "import-zod/prefer-zod-namespace": "error",
             "init-declarations": "off",
@@ -4375,7 +4751,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
-        name: "TypeScript Shared (React and non-React)",
+        name: "TypeScript Shared - shared/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@arthurgeron/react-usememo": pluginUseMemo2,
             "@eslint-react": eslintReact,
@@ -4387,6 +4763,7 @@ export default [
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
             "@typescript-eslint": tseslint,
+            antfu: antfu,
             "array-func": arrayFunc,
             boundaries: pluginBoundaries,
             canonical: pluginCanonical,
@@ -4518,12 +4895,48 @@ export default [
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
+
             "@arthurgeron/react-usememo/require-memo": "warn",
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "warn",
+            "@eslint-react/avoid-shorthand-boolean": "off",
+            "@eslint-react/avoid-shorthand-fragment": "warn",
+            /* DOM subplugin */
+            "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
+            "@eslint-react/ensure-forward-ref-using-ref": "warn",
+            "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks": "warn",
+            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
+            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
+            /* Hooks extra subplugin */
+            "@eslint-react/hooks-extra/no-direct-set-state-in-use-layout-effect": "warn",
+            "@eslint-react/hooks-extra/no-redundant-custom-hook": "warn",
+            "@eslint-react/hooks-extra/no-unnecessary-use-callback": "off",
+            "@eslint-react/hooks-extra/no-unnecessary-use-memo": "off",
+            "@eslint-react/hooks-extra/no-useless-custom-hooks": "warn",
+            "@eslint-react/jsx-no-iife": "warn",
+            "@eslint-react/jsx-no-undef": "warn",
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
+            /* Naming convention subplugin */
+            "@eslint-react/naming-convention/filename": "off",
+            "@eslint-react/naming-convention/filename-extension": "off",
             "@eslint-react/naming-convention/use-state": "warn",
+            "@eslint-react/no-children-prop": "warn",
+            "@eslint-react/no-class-component": "warn",
+            "@eslint-react/no-complex-conditional-rendering": "warn",
+            "@eslint-react/no-complicated-conditional-rendering": "warn",
+            "@eslint-react/no-duplicate-jsx-props": "warn",
+            "@eslint-react/no-leaked-conditional-rendering": "warn",
+            "@eslint-react/no-missing-component-display-name": "warn",
+            "@eslint-react/no-missing-context-display-name": "warn",
+            "@eslint-react/no-nested-components": "warn",
+            "@eslint-react/no-useless-fragment": "warn",
+            "@eslint-react/prefer-destructuring-assignment": "warn",
+            "@eslint-react/prefer-react-namespace-import": "off",
+            "@eslint-react/prefer-read-only-props": "warn",
+            "@eslint-react/prefer-shorthand-boolean": "off",
+            "@eslint-react/prefer-shorthand-fragment": "warn",
+            "@eslint-react/use-jsx-vars": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
                 {
@@ -4572,6 +4985,26 @@ export default [
                 },
             ],
             "@metamask/design-tokens/prefer-theme-color-classnames": "error",
+            "@microsoft/sdl/no-angular-bypass-sanitizer": "warn",
+            "@microsoft/sdl/no-angular-sanitization-trusted-urls": "warn",
+            "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
+
+            "@microsoft/sdl/no-angularjs-enable-svg": "warn",
+
+            "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
+            "@microsoft/sdl/no-cookies": "warn",
+            "@microsoft/sdl/no-document-domain": "warn",
+            "@microsoft/sdl/no-document-write": "warn",
+            "@microsoft/sdl/no-electron-node-integration": "warn",
+            "@microsoft/sdl/no-html-method": "warn",
+            "@microsoft/sdl/no-inner-html": "warn",
+            "@microsoft/sdl/no-insecure-random": "off",
+
+            "@microsoft/sdl/no-insecure-url": "warn",
+            "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
+            "@microsoft/sdl/no-postmessage-star-origin": "warn",
+            "@microsoft/sdl/no-unsafe-alloc": "warn",
+            "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
             "@typescript-eslint/array-type": [
                 "error",
@@ -4580,6 +5013,7 @@ export default [
             "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
             "@typescript-eslint/ban-ts-comment": "warn",
             "@typescript-eslint/ban-tslint-comment": "warn",
+
             "@typescript-eslint/class-literal-property-style": "warn",
             "@typescript-eslint/class-methods-use-this": "off",
             "@typescript-eslint/consistent-generic-constructors": "warn",
@@ -4710,15 +5144,12 @@ export default [
             "@typescript-eslint/no-unnecessary-type-arguments": "warn",
             // Enhanced type safety for backend services
             "@typescript-eslint/no-unnecessary-type-assertion": "error", // Remove redundant type assertions
-
             "@typescript-eslint/no-unnecessary-type-constraint": "warn",
             "@typescript-eslint/no-unnecessary-type-conversion": "warn",
             "@typescript-eslint/no-unnecessary-type-parameters": "warn",
             "@typescript-eslint/no-unsafe-argument": "warn", // Warn on passing any to typed parameters
             "@typescript-eslint/no-unsafe-assignment": "warn", // Warn on unsafe assignments to any
-
             "@typescript-eslint/no-unsafe-call": "warn", // Warn on calling any-typed functions
-
             "@typescript-eslint/no-unsafe-declaration-merging": "warn",
             "@typescript-eslint/no-unsafe-enum-comparison": "warn",
             "@typescript-eslint/no-unsafe-function-type": "error",
@@ -4728,6 +5159,7 @@ export default [
             "@typescript-eslint/no-unsafe-unary-minus": "warn",
             "@typescript-eslint/no-unused-expressions": "warn",
             "@typescript-eslint/no-unused-vars": "warn",
+
             // Disabled: Function declarations are hoisted in JS/TS, and this rule creates unnecessary constraints
             // For Electron projects that often organize helper functions after main functions for better readability
             "@typescript-eslint/no-use-before-define": "warn",
@@ -4735,7 +5167,9 @@ export default [
             "@typescript-eslint/no-useless-empty-export": "warn",
             "@typescript-eslint/no-wrapper-object-types": "error",
             "@typescript-eslint/non-nullable-type-assertion-style": "warn",
+
             "@typescript-eslint/only-throw-error": "warn",
+
             "@typescript-eslint/parameter-properties": "warn",
             "@typescript-eslint/prefer-as-const": "warn",
             "@typescript-eslint/prefer-destructuring": "warn",
@@ -4778,7 +5212,6 @@ export default [
             "@typescript-eslint/related-getter-setter-pairs": "warn",
             "@typescript-eslint/require-array-sort-compare": "warn",
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
-
             "@typescript-eslint/restrict-plus-operands": "warn",
             "@typescript-eslint/restrict-template-expressions": "warn",
             "@typescript-eslint/return-await": [
@@ -4787,11 +5220,23 @@ export default [
             ], // Proper await handling in try-catch
             "@typescript-eslint/strict-boolean-expressions": "off",
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
-
             "@typescript-eslint/triple-slash-reference": "warn",
             "@typescript-eslint/unbound-method": "warn",
             "@typescript-eslint/unified-signatures": "warn",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
+            "antfu/consistent-chaining": "warn",
+            "antfu/consistent-list-newline": "off",
+            "antfu/curly": "error",
+            "antfu/if-newline": "off",
+            "antfu/import-dedupe": "error",
+            "antfu/indent-unindent": "error",
+
+            "antfu/no-import-dist": "error",
+            "antfu/no-import-node-modules-by-path": "error",
+            "antfu/no-top-level-await": "error",
+            "antfu/no-ts-export-equal": "error",
+            "antfu/top-level-function": "off",
+
             // Code organization and architecture
             "boundaries/element-types": [
                 "error",
@@ -4865,11 +5310,11 @@ export default [
             "canonical/export-specifier-newline": "off",
             "canonical/filename-match-exported": "warn",
             "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
-
             "canonical/filename-no-index": "error",
             "canonical/import-specifier-newline": "off",
             "canonical/no-barrel-import": "error",
             "canonical/no-export-all": "error",
+
             "canonical/no-re-export": "warn",
             "canonical/no-reassign-imports": "error",
             "canonical/prefer-import-alias": [
@@ -4928,6 +5373,10 @@ export default [
                 "error",
                 "always",
             ],
+            "eslint-comments/no-restricted-disable": "warn",
+            "eslint-comments/no-unused-disable": "warn",
+            "eslint-comments/no-use": "off",
+            "eslint-comments/require-description": "warn",
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
             "eslint-plugin-toplevel/no-toplevel-let": "error",
             "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
@@ -4947,7 +5396,9 @@ export default [
             //     },
             // ],
             "etc/throw-error": "warn",
+            "ex/might-throw": "off",
             "ex/no-unhandled": "warn",
+            "ex/use-error-cause": "warn",
             "format-sql/format": "warn",
             "func-style": "off",
             "function-name/starts-with-verb": [
@@ -5021,7 +5472,7 @@ export default [
             "import-x/no-webpack-loader-syntax": "warn",
             "import-x/order": "off", // Conflicts with other rules
             "import-x/prefer-default-export": "off",
-            "import-x/prefer-namespace-import": "warn",
+            "import-x/prefer-namespace-import": "off",
             "import-x/unambiguous": "warn",
             "import-zod/prefer-zod-namespace": "error",
             "init-declarations": "off",
@@ -5722,7 +6173,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
-        name: "Tests (Frontend)",
+        name: "Tests (Frontend) - src/**/*.{spec,test}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
             "eslint-comments": pluginComments,
@@ -5928,7 +6379,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
-        name: "Tests (Backend)",
+        name: "Tests (Backend) - electron/**/*.{spec,test}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
             "import-x": importX,
@@ -6130,7 +6581,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
-        name: "Tests (Shared)",
+        name: "Tests (Shared) - shared/**/*.{spec,test}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
             "eslint-comments": pluginComments,
@@ -6314,7 +6765,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
-        name: "Benchmarks",
+        name: "Benchmarks - benchmarks/**/*.{bench}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
             "eslint-comments": pluginComments,
@@ -6492,7 +6943,7 @@ export default [
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
-        name: "TypeScript Config Files",
+        name: "TypeScript Configs - **/*.config.{TS,TSX,MTS,CTS}",
         plugins: {
             "@typescript-eslint": tseslint,
             "array-func": arrayFunc,
@@ -6709,7 +7160,9 @@ export default [
             "default-case": "off",
             "depend/ban-dependencies": "error",
             "dot-notation": "off",
+            "ex/might-throw": "off",
             "ex/no-unhandled": "warn",
+            "ex/use-error-cause": "warn",
             "func-names": "off",
             "func-style": "off",
             "functional/functional-parameters": "off",
@@ -6773,7 +7226,7 @@ export default [
             "import-x/no-webpack-loader-syntax": "warn",
             "import-x/order": "off",
             "import-x/prefer-default-export": "off",
-            "import-x/prefer-namespace-import": "warn",
+            "import-x/prefer-namespace-import": "off",
             "import-x/unambiguous": "warn",
             "init-declarations": "off",
             // Accessibility (jsx-a11y)
@@ -7042,7 +7495,7 @@ export default [
                 require: "readonly",
             },
         },
-        name: "Script Files",
+        name: "Scripts - scripts/**/*.{TS,TSX,CTS,MTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
             "eslint-comments": pluginComments,
@@ -7193,7 +7646,7 @@ export default [
                 require: "readonly",
             },
         },
-        name: "JS/MJS Config Files",
+        name: "JS/MJS Config - **/*.config.{JS,MJS,CTS,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
             compat: pluginCompat,
@@ -7302,14 +7755,14 @@ export default [
         },
     },
 
-    // Strict Test files (Frontend)
+    // Strict Test files
     {
         files: [
             "shared/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "src/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "electron/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
         ],
-        name: "Strict Test Files (Frontend)",
+        name: "Strict Test Files - **/test/StrictTests/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             vitest: vitest,
         },
@@ -7326,7 +7779,7 @@ export default [
     // Theme components override - disable react-perf rule for inline styling
     {
         files: ["src/theme/**/*.{ts,tsx,cts,mts}"],
-        name: "Theme Components Override",
+        name: "Theme Components Override - src/theme/**/*.{TS,TSX,CTS,MTS}",
         rules: {
             // Theme components legitimately need inline styles for dynamic theming
             "react-perf/jsx-no-new-object-as-prop": "warn",
@@ -7342,7 +7795,7 @@ export default [
             "**/.spellcheck.yml",
             "**/.pre-commit-config.yaml",
         ],
-        name: "YAML/YML Github Workflows Disable Empty Key",
+        name: "YAML/YML Github Workflows - Disables",
         rules: {
             "yml/block-mapping-colon-indicator-newline": "off",
             "yml/no-empty-key": "off",

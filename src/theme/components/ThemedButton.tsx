@@ -80,14 +80,14 @@ import { CSS_CLASSES } from "./types";
  */
 export type ThemedButtonProperties = ComponentProperties<
     StandardButtonProperties,
-    {
+    Readonly<{
         /** Click handler for the button */
-        readonly onClick?: EventHandlers.ClickWithEvent<HTMLButtonElement>;
+        onClick?: EventHandlers.ClickWithEvent<HTMLButtonElement>;
         /** Size variant for the button */
-        readonly size?: ButtonSize;
+        size?: ButtonSize;
         /** Visual variant for the button styling */
-        readonly variant?: ButtonVariant;
-    }
+        variant?: ButtonVariant;
+    }>
 >;
 
 // Default styles object to prevent infinite render loops
@@ -181,11 +181,13 @@ const ThemedButtonComponent = ({
                 return iconElement;
             }
             return iconPosition === "left" ? (
+                // eslint-disable-next-line @eslint-react/avoid-shorthand-fragment -- Conflicting ESLint rules: @eslint-react/prefer-shorthand-fragment vs @eslint-react/avoid-shorthand-fragment
                 <>
                     {iconElement}
                     <span>{children}</span>
                 </>
             ) : (
+                // eslint-disable-next-line @eslint-react/avoid-shorthand-fragment -- Conflicting ESLint rules: @eslint-react/prefer-shorthand-fragment vs @eslint-react/avoid-shorthand-fragment
                 <>
                     <span>{children}</span>
                     {iconElement}

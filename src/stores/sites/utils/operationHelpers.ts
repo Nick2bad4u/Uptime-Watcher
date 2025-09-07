@@ -64,7 +64,7 @@ export const updateMonitorAndSave = async (
             error.message.includes(ERROR_CATALOG.sites.NOT_FOUND as string)
         ) {
             console.error(`Failed to find site with ID ${siteId}:`, error);
-            throw new Error(`Site not found: ${siteId}`);
+            throw new Error(`Site not found: ${siteId}`, { cause: error });
         }
         // Re-throw other errors
         throw error;
@@ -131,11 +131,11 @@ export const withSiteOperationReturning = async <T>(
                 return operation();
             }
 
-            /* eslint-disable nitpick/no-redundant-vars */
+            /* eslint-disable nitpick/no-redundant-vars -- Variable needed for sync operation sequencing */
             const result = await operation();
             await deps.syncSitesFromBackend();
             return result;
-            /* eslint-enable nitpick/no-redundant-vars */
+            /* eslint-enable nitpick/no-redundant-vars -- Re-enable after sync operation sequencing */
         },
         createStoreErrorHandler("sites-operations", operationName)
     );

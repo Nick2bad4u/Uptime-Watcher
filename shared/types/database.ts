@@ -361,7 +361,7 @@ export function safeGetRowProperty<T>(
     defaultValue: T
 ): T {
     // Handle null/undefined row objects - this check is needed despite the type
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Runtime safety check for database row objects that may be null/undefined despite types
     if (!row || typeof row !== "object") {
         return defaultValue;
     }
@@ -369,7 +369,7 @@ export function safeGetRowProperty<T>(
     // First check for exact property name match (including properties with dots)
     if (property in row && row[property] !== undefined) {
         // We can't safely assert the type here, so we need to trust the caller
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion required for dynamic property access on generic database row objects
         return row[property] as T;
     }
 
@@ -394,7 +394,7 @@ export function safeGetRowProperty<T>(
         }
 
         // We can't safely assert the type here, so we need to trust the caller
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion required for nested property access on dynamic database row objects
         return current as T;
     }
 

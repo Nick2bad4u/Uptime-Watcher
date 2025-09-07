@@ -308,7 +308,8 @@ export function getMonitorValidationErrors(
  * @returns Type predicate indicating if the site is valid
  */
 export function validateSite(site: Partial<Site>): site is Site {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // Defensive null/undefined check is necessary for runtime safety with user input
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Defensive check needed for runtime type safety with potentially malformed user data
     if (typeof site !== "object" || !site) {
         return false;
     }

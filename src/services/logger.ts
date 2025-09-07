@@ -127,7 +127,7 @@ function getLogTransport<K extends keyof LogTransports>(
 
     return undefined;
 }
-/* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+/* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe log level parsing from unknown input */
 
 // Configure electron-log for renderer process
 // The /renderer import is specifically chosen because:

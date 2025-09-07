@@ -704,7 +704,7 @@ export class MonitorRepository {
             row as unknown as UnknownRecord,
             monitor
         );
-        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after monitor field mapping with validated types */
 
         if (updateFields.length === 0) {
             if (isDev()) {

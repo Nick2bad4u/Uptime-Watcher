@@ -219,7 +219,7 @@ class MigrationOrchestrator {
                         )
                     );
 
-                    // eslint-disable-next-line no-await-in-loop
+                    // eslint-disable-next-line no-await-in-loop -- Sequential migration transformations must be applied in order
                     currentData = await migration.transform(currentData);
                     appliedMigrations.push(
                         `${migration.fromVersion}_to_${migration.toVersion}`
@@ -404,7 +404,7 @@ class MigrationRegistry {
             visitedVersions.add(currentVersion);
 
             // Additional safeguard: limit the number of migration steps
-            if (path.length >= maxMigrationSteps) {
+            if (maxMigrationSteps <= path.length) {
                 throw new Error(
                     `Migration path too long for ${monitorType}: ${path.length} steps exceeded maximum of ${maxMigrationSteps}. ` +
                         `This may indicate a circular dependency or design issue.`
@@ -491,7 +491,7 @@ class MigrationRegistry {
             const partB = versionB[i] ?? 0;
 
             if (partA < partB) return -1;
-            if (partA > partB) return 1;
+            if (partB < partA) return 1;
         }
 
         return 0;
@@ -540,7 +540,7 @@ class MigrationRegistry {
             if (
                 Number.isNaN(part) ||
                 part < 0 ||
-                part > Number.MAX_SAFE_INTEGER
+                Number.MAX_SAFE_INTEGER < part
             ) {
                 throw new Error(
                     `${parameterName} "${version}" contains invalid numeric parts`

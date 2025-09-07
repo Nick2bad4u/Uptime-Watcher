@@ -272,6 +272,99 @@ export const SiteDetails = ({
         void handleSaveInterval();
     }, [handleSaveInterval]);
 
+    // Extract tab JSX to avoid IIFE pattern and complex conditional rendering
+    const monitorOverviewTab =
+        activeSiteDetailsTab === "monitor-overview" && selectedMonitor ? (
+            <OverviewTab
+                avgResponseTime={analytics.avgResponseTime}
+                fastestResponse={analytics.fastestResponse}
+                formatResponseTime={formatResponseTime}
+                handleIntervalChange={handleIntervalChange}
+                handleRemoveMonitor={handleRemoveMonitor}
+                handleSaveInterval={handleSaveInterval}
+                handleSaveTimeout={handleSaveTimeout}
+                handleTimeoutChange={handleTimeoutChange}
+                intervalChanged={intervalChanged}
+                isLoading={isLoading}
+                localCheckInterval={localCheckInterval}
+                localTimeout={localTimeout}
+                onCheckNow={handleCheckNowClick}
+                selectedMonitor={selectedMonitor}
+                slowestResponse={analytics.slowestResponse}
+                timeoutChanged={timeoutChanged}
+                totalChecks={analytics.totalChecks}
+                uptime={analytics.uptime}
+            />
+        ) : null;
+
+    const analyticsTab =
+        activeSiteDetailsTab === `${selectedMonitorId}-analytics` &&
+        selectedMonitor ? (
+            <AnalyticsTab
+                avgResponseTime={analytics.avgResponseTime}
+                barChartData={barChartData}
+                barChartOptions={barChartOptions}
+                doughnutOptions={doughnutOptions}
+                downCount={analytics.downCount}
+                downtimePeriods={analytics.downtimePeriods}
+                formatDuration={formatDuration}
+                formatResponseTime={formatResponseTime}
+                getAvailabilityDescription={getAvailabilityDescription}
+                lineChartData={lineChartData}
+                lineChartOptions={lineChartOptions}
+                monitorType={selectedMonitor.type}
+                mttr={analytics.mttr}
+                p50={analytics.p50}
+                p95={analytics.p95}
+                p99={analytics.p99}
+                setShowAdvancedMetrics={setShowAdvancedMetrics}
+                setSiteDetailsChartTimeRange={setSiteDetailsChartTimeRange}
+                showAdvancedMetrics={showAdvancedMetrics}
+                siteDetailsChartTimeRange={siteDetailsChartTimeRange}
+                totalChecks={analytics.totalChecks}
+                totalDowntime={analytics.totalDowntime}
+                upCount={analytics.upCount}
+                uptime={analytics.uptime}
+                uptimeChartData={doughnutChartData}
+            />
+        ) : null;
+
+    const historyTab =
+        activeSiteDetailsTab === "history" && selectedMonitor ? (
+            <HistoryTab
+                formatFullTimestamp={formatFullTimestamp}
+                formatResponseTime={formatResponseTime}
+                formatStatusWithIcon={formatStatusWithIcon}
+                selectedMonitor={selectedMonitor}
+            />
+        ) : null;
+
+    const settingsTab =
+        activeSiteDetailsTab === "settings" && selectedMonitor ? (
+            <SettingsTab
+                currentSite={currentSite}
+                handleIntervalChange={handleIntervalChange}
+                handleRemoveSite={handleRemoveSite}
+                handleRetryAttemptsChange={handleRetryAttemptsChange}
+                handleSaveInterval={handleSaveIntervalClick}
+                handleSaveName={handleSaveName}
+                handleSaveRetryAttempts={handleSaveRetryAttempts}
+                handleSaveTimeout={handleSaveTimeout}
+                handleTimeoutChange={handleTimeoutChange}
+                hasUnsavedChanges={hasUnsavedChanges}
+                intervalChanged={intervalChanged}
+                isLoading={isLoading}
+                localCheckInterval={localCheckInterval}
+                localName={localName}
+                localRetryAttempts={localRetryAttempts}
+                localTimeout={localTimeout}
+                retryAttemptsChanged={retryAttemptsChanged}
+                selectedMonitor={selectedMonitor}
+                setLocalName={setLocalName}
+                timeoutChanged={timeoutChanged}
+            />
+        ) : null;
+
     // Don't render if site doesn't exist
     if (!siteExists) {
         return null;
@@ -341,107 +434,13 @@ export const SiteDetails = ({
                             />
                         )}
 
-                        {activeSiteDetailsTab === "monitor-overview" &&
-                        selectedMonitor ? (
-                            <OverviewTab
-                                avgResponseTime={analytics.avgResponseTime}
-                                fastestResponse={analytics.fastestResponse}
-                                formatResponseTime={formatResponseTime}
-                                handleIntervalChange={handleIntervalChange}
-                                handleRemoveMonitor={handleRemoveMonitor}
-                                handleSaveInterval={handleSaveInterval}
-                                handleSaveTimeout={handleSaveTimeout}
-                                handleTimeoutChange={handleTimeoutChange}
-                                intervalChanged={intervalChanged}
-                                isLoading={isLoading}
-                                localCheckInterval={localCheckInterval}
-                                localTimeout={localTimeout}
-                                onCheckNow={handleCheckNowClick}
-                                selectedMonitor={selectedMonitor}
-                                slowestResponse={analytics.slowestResponse}
-                                timeoutChanged={timeoutChanged}
-                                totalChecks={analytics.totalChecks}
-                                uptime={analytics.uptime}
-                            />
-                        ) : null}
+                        {monitorOverviewTab}
 
-                        {activeSiteDetailsTab ===
-                            `${selectedMonitorId}-analytics` &&
-                        selectedMonitor ? (
-                            <AnalyticsTab
-                                avgResponseTime={analytics.avgResponseTime}
-                                barChartData={barChartData}
-                                barChartOptions={barChartOptions}
-                                doughnutOptions={doughnutOptions}
-                                downCount={analytics.downCount}
-                                downtimePeriods={analytics.downtimePeriods}
-                                formatDuration={formatDuration}
-                                formatResponseTime={formatResponseTime}
-                                getAvailabilityDescription={
-                                    getAvailabilityDescription
-                                }
-                                lineChartData={lineChartData}
-                                lineChartOptions={lineChartOptions}
-                                monitorType={selectedMonitor.type}
-                                mttr={analytics.mttr}
-                                p50={analytics.p50}
-                                p95={analytics.p95}
-                                p99={analytics.p99}
-                                setShowAdvancedMetrics={setShowAdvancedMetrics}
-                                setSiteDetailsChartTimeRange={
-                                    setSiteDetailsChartTimeRange
-                                }
-                                showAdvancedMetrics={showAdvancedMetrics}
-                                siteDetailsChartTimeRange={
-                                    siteDetailsChartTimeRange
-                                }
-                                totalChecks={analytics.totalChecks}
-                                totalDowntime={analytics.totalDowntime}
-                                upCount={analytics.upCount}
-                                uptime={analytics.uptime}
-                                uptimeChartData={doughnutChartData}
-                            />
-                        ) : null}
+                        {analyticsTab}
 
-                        {activeSiteDetailsTab === "history" &&
-                        selectedMonitor ? (
-                            <HistoryTab
-                                formatFullTimestamp={formatFullTimestamp}
-                                formatResponseTime={formatResponseTime}
-                                formatStatusWithIcon={formatStatusWithIcon}
-                                selectedMonitor={selectedMonitor}
-                            />
-                        ) : null}
+                        {historyTab}
 
-                        {activeSiteDetailsTab === "settings" &&
-                        selectedMonitor ? (
-                            <SettingsTab
-                                currentSite={currentSite}
-                                handleIntervalChange={handleIntervalChange}
-                                handleRemoveSite={handleRemoveSite}
-                                handleRetryAttemptsChange={
-                                    handleRetryAttemptsChange
-                                }
-                                handleSaveInterval={handleSaveIntervalClick}
-                                handleSaveName={handleSaveName}
-                                handleSaveRetryAttempts={
-                                    handleSaveRetryAttempts
-                                }
-                                handleSaveTimeout={handleSaveTimeout}
-                                handleTimeoutChange={handleTimeoutChange}
-                                hasUnsavedChanges={hasUnsavedChanges}
-                                intervalChanged={intervalChanged}
-                                isLoading={isLoading}
-                                localCheckInterval={localCheckInterval}
-                                localName={localName}
-                                localRetryAttempts={localRetryAttempts}
-                                localTimeout={localTimeout}
-                                retryAttemptsChanged={retryAttemptsChanged}
-                                selectedMonitor={selectedMonitor}
-                                setLocalName={setLocalName}
-                                timeoutChanged={timeoutChanged}
-                            />
-                        ) : null}
+                        {settingsTab}
                     </ThemedBox>
                 </ThemedBox>
             </dialog>
@@ -449,4 +448,4 @@ export const SiteDetails = ({
     );
 };
 
-/* eslint-enable tailwind/no-arbitrary-value */
+/* eslint-enable tailwind/no-arbitrary-value -- Re-enable after custom CSS values for dynamic positioning */

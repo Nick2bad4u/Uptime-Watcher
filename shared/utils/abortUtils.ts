@@ -82,7 +82,7 @@ export function createCombinedAbortSignal(
     }
 
     // Add additional signals (handle null/undefined additionalSignals)
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- additionalSignals may be undefined from function parameter
     if (additionalSignals) {
         signals.push(...additionalSignals.filter(Boolean));
     }
@@ -236,7 +236,7 @@ export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
  *
  * @public
  */
-// eslint-disable-next-line sonarjs/cognitive-complexity
+// eslint-disable-next-line sonarjs/cognitive-complexity -- retry logic requires multiple conditions and branches
 export async function retryWithAbort<T>(
     operation: () => Promise<T>,
     options: RetryWithAbortOptions = {}
@@ -259,7 +259,7 @@ export async function retryWithAbort<T>(
         }
 
         try {
-            // eslint-disable-next-line no-await-in-loop
+            // eslint-disable-next-line no-await-in-loop -- retry operations require sequential awaits
             return await operation();
         } catch (error) {
             lastError =
@@ -272,13 +272,15 @@ export async function retryWithAbort<T>(
 
             // Wait with exponential backoff
             try {
-                // eslint-disable-next-line no-await-in-loop
+                // eslint-disable-next-line no-await-in-loop -- retry delay requires sequential awaits
                 await sleep(delay, signal);
             } catch (sleepError) {
                 if (signal?.aborted) {
-                    throw new Error("Operation was aborted");
+                    throw new Error("Operation was aborted", {
+                        cause: sleepError,
+                    });
                 }
-                throw sleepError;
+                throw new Error("Operation was aborted", { cause: sleepError });
             }
             delay = Math.min(delay * backoffMultiplier, maxDelay);
         }

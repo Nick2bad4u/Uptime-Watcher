@@ -1,4 +1,4 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
+// eslint-disable-next-line eslint-comments/disable-enable-pair -- project-wide disable pattern for build configs
 /* eslint-disable regexp/require-unicode-sets-regexp, array-func/from-map  */
 /**
  * Vite configuration for the Uptime Watcher Electron application. Configures

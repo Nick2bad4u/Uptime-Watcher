@@ -226,7 +226,30 @@ export const ScreenshotThumbnail = ({
     // Generate accessible aria-label, handling empty URLs
     const ariaLabel = url.trim() ? `Open ${url} in browser` : "Open in browser";
 
+    // Extract portal JSX to avoid complex conditional rendering
+    const portalJSX =
+        hovered && portalContainer
+            ? createPortal(
+                  <div
+                      className={`site-details-thumbnail-portal-overlay theme-${themeName}`}
+                      ref={portalReference}
+                      style={overlayVariables}
+                  >
+                      <div className="site-details-thumbnail-portal-img-wrapper">
+                          <img
+                              alt={`Large screenshot of ${siteName}`}
+                              className="site-details-thumbnail-img-portal"
+                              loading="lazy"
+                              src={screenshotUrl}
+                          />
+                      </div>
+                  </div>,
+                  portalContainer
+              )
+            : null;
+
     return (
+        // eslint-disable-next-line @eslint-react/avoid-shorthand-fragment -- Return wrapper needs fragment for single JSX element without wrapper
         <>
             <a
                 aria-label={ariaLabel}
@@ -250,25 +273,7 @@ export const ScreenshotThumbnail = ({
                     Preview: {siteName}
                 </span>
             </a>
-            {hovered && portalContainer
-                ? createPortal(
-                      <div
-                          className={`site-details-thumbnail-portal-overlay theme-${themeName}`}
-                          ref={portalReference}
-                          style={overlayVariables}
-                      >
-                          <div className="site-details-thumbnail-portal-img-wrapper">
-                              <img
-                                  alt={`Large screenshot of ${siteName}`}
-                                  className="site-details-thumbnail-img-portal"
-                                  loading="lazy"
-                                  src={screenshotUrl}
-                              />
-                          </div>
-                      </div>,
-                      portalContainer
-                  )
-                : null}
+            {portalJSX}
         </>
     );
 };

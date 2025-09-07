@@ -114,7 +114,8 @@ export async function performSinglePingCheck(
             error instanceof Error ? error.message : String(error);
 
         throw new Error(
-            `Ping failed: ${errorMessage} (response time: ${responseTime}ms)`
+            `Ping failed: ${errorMessage} (response time: ${responseTime}ms)`,
+            { cause: error }
         );
     }
 }

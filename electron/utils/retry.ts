@@ -65,7 +65,7 @@ export async function withRetry<T>(
 
     for (const attempt of Array.from({ length: maxRetries }, (_, i) => i)) {
         try {
-            // eslint-disable-next-line no-await-in-loop
+            // eslint-disable-next-line no-await-in-loop -- retry operations require sequential awaits
             return await operation();
         } catch (error) {
             errors.push(error);
@@ -80,7 +80,7 @@ export async function withRetry<T>(
             }
 
             if (attempt < maxRetries - 1) {
-                // eslint-disable-next-line no-await-in-loop
+                // eslint-disable-next-line no-await-in-loop -- retry delay requires sequential awaits
                 await new Promise<void>((resolve) => {
                     setTimeout(() => {
                         resolve();

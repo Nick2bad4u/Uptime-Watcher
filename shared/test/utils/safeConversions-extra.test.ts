@@ -383,8 +383,8 @@ describe(safeParseInt, () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(safeParseInt(Infinity)).toBe(Infinity); // Infinity is a number, Math.floor(Infinity) = Infinity
-        expect(safeParseInt(-Infinity)).toBe(-Infinity); // -Infinity is a number, Math.floor(-Infinity) = -Infinity
+        expect(safeParseInt(Infinity)).toBe(0); // Infinity should use default value for safety
+        expect(safeParseInt(-Infinity)).toBe(0); // -Infinity should use default value for safety
         expect(safeParseInt(Number.NaN)).toBe(0); // NaN should use default
     });
 });

@@ -1,8 +1,7 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable tailwind/no-custom-classname -- not tailwind */
-
-/* eslint-disable @typescript-eslint/dot-notation */
-/* eslint-disable react/require-default-props */
+/* eslint-disable eslint-comments/disable-enable-pair -- This file contains multiple unrelated eslint rules that cannot be properly paired */
+/* eslint-disable tailwind/no-custom-classname -- Using Docusaurus CSS classes, not Tailwind */
+/* eslint-disable @typescript-eslint/dot-notation -- Using bracket notation for dynamic property access in feature descriptions */
+/* eslint-disable @eslint-react/avoid-shorthand-fragment -- Conflicting with prefer-shorthand-fragment rule; using shorthand <> syntax */
 
 import Heading from "@theme/Heading";
 import type { CSSProperties, FC, ReactNode } from "react";
@@ -16,10 +15,15 @@ interface FeatureItem {
 }
 
 interface FeatureProps extends FeatureItem {
-    style?: CSSProperties;
+    readonly style?: CSSProperties;
 }
 
-const Feature: FC<FeatureProps> = ({ description, icon, style, title }) => (
+const Feature: FC<FeatureProps> = ({
+    description,
+    icon,
+    style,
+    title,
+}: Readonly<FeatureProps>) => (
     <div className={clsx("col col--4")} style={style}>
         {}
         <div className={clsx("text--center", styles["featureCard"])}>
@@ -126,13 +130,12 @@ export default function HomepageFeatures(): ReactNode {
                     {FeatureList.map((props, idx) => {
                         const featureProps: FeatureProps = {
                             ...props,
+                            ...(idx < 3 && {
+                                style: {
+                                    marginBottom: "1rem",
+                                },
+                            }),
                         };
-
-                        if (idx < 3) {
-                            featureProps.style = {
-                                marginBottom: "1rem",
-                            };
-                        }
 
                         return <Feature key={props.title} {...featureProps} />;
                     })}

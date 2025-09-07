@@ -210,7 +210,7 @@ export const AnalyticsTab = ({
             return "Poor"; // Fallback descriptions
         }
     };
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe performance score type conversion */
 
     // Icon colors configuration
     const getIconColors = (): {

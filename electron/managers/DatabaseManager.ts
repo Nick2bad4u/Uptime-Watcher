@@ -517,7 +517,7 @@ export class DatabaseManager {
         // limits
         const historyRules =
             this.configurationManager.getHistoryRetentionRules();
-        if (limit > historyRules.maxLimit) {
+        if (historyRules.maxLimit < limit) {
             throw new RangeError(
                 `[DatabaseManager.setHistoryLimit] History limit too large (max: ${historyRules.maxLimit}), received: ${limit}`
             );

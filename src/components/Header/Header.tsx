@@ -339,6 +339,7 @@ export const Header = (): JSX.Element => {
                             </div>
 
                             {/* Total Sites Badge */}
+                            {/* eslint-disable @eslint-react/avoid-shorthand-fragment -- Badge wrapper needs fragment for multiple sibling elements */}
                             {totalMonitors > 0 && (
                                 <>
                                     <div className="h-8 w-px bg-current opacity-20" />
@@ -363,6 +364,7 @@ export const Header = (): JSX.Element => {
                                     </div>
                                 </>
                             )}
+                            {/* eslint-enable @eslint-react/avoid-shorthand-fragment -- Re-enable rule from above */}
                         </ThemedBox>
                     </div>
 

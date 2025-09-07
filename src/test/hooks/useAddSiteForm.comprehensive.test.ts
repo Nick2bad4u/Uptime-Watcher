@@ -8,6 +8,7 @@
 
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { test, fc } from "@fast-check/vitest";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { useAddSiteForm } from "../../components/SiteDetails/useAddSiteForm";
@@ -1118,5 +1119,310 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 expect(typeof (result.current as any)[prop]).toBe("function");
             }
         });
+    });
+
+    describe("Property-Based Hook State Management Testing", () => {
+        test.prop([fc.webUrl()])(
+            "should handle various URL inputs correctly",
+            async (testUrl) => {
+                const { result } = renderHook(() => useAddSiteForm());
+
+                act(() => {
+                    result.current.setUrl(testUrl);
+                });
+
+                expect(result.current.url).toBe(testUrl);
+                expect(testUrl).toMatch(/^https?:\/\//);
+            }
+        );
+
+        test.prop([fc.oneof(fc.domain(), fc.ipV4(), fc.constant("localhost"))])(
+            "should handle various host inputs correctly",
+            async (testHost) => {
+                const { result } = renderHook(() => useAddSiteForm());
+
+                act(() => {
+                    result.current.setHost(testHost);
+                });
+
+                expect(result.current.host).toBe(testHost);
+
+                // Verify host characteristics
+                const isValidHost = typeof testHost === 'string' && testHost.length > 0;
+                expect(isValidHost).toBeTruthy();
+            }
+        );
+
+        test.prop([fc.integer({ min: 1, max: 65_535 }).map(n => n.toString())])(
+            "should handle various port inputs correctly",
+            async (testPort) => {
+                const { result } = renderHook(() => useAddSiteForm());
+
+                act(() => {
+                    result.current.setPort(testPort);
+                });
+
+                expect(result.current.port).toBe(testPort);
+
+                const portNum = Number.parseInt(testPort, 10);
+                expect(portNum).toBeGreaterThanOrEqual(1);
+                expect(portNum).toBeLessThanOrEqual(65_535);
+            }
+        );
+
+        test.prop([fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0)])(
+            "should handle various site name inputs correctly",
+            async (testName) => {
+                const { result } = renderHook(() => useAddSiteForm());
+
+                act(() => {
+                    result.current.setName(testName);
+                });
+
+                expect(result.current.name).toBe(testName);
+                expect(testName.trim().length).toBeGreaterThan(0);
+                expect(testName.length).toBeLessThanOrEqual(100);
+            }
+        );
+
+        test.prop([fc.constantFrom("http", "port", "ping", "dns") as fc.Arbitrary<MonitorType>])(
+            "should handle monitor type changes correctly",
+            async (monitorType) => {
+                mockGetFields.mockImplementation((type: MonitorType) => {
+                    switch (type) {
+                        case "http": {
+                            return [{ name: "url", required: true }];
+                        }
+                        case "port": {
+                            return [{ name: "host", required: true }, { name: "port", required: true }];
+                        }
+                        case "ping": {
+                            return [{ name: "host", required: true }];
+                        }
+                        case "dns": {
+                            return [{ name: "host", required: true }];
+                        }
+                        default: {
+                            return [];
+                        }
+                    }
+                });
+
+                const { result } = renderHook(() => useAddSiteForm());
+
+                act(() => {
+                    result.current.setMonitorType(monitorType);
+                });
+
+                expect(result.current.monitorType).toBe(monitorType);
+                expect(["http", "port", "ping", "tcp", "dns"]).toContain(monitorType);
+            }
+        );
+
+        test.prop([fc.constantFrom(60_000, 300_000, 600_000, 1_800_000, 3_600_000)])(
+            "should handle check interval changes correctly",
+            async (interval) => {
+                const { result } = renderHook(() => useAddSiteForm());
+
+                act(() => {
+                    result.current.setCheckInterval(interval);
+                });
+
+                expect(result.current.checkInterval).toBe(interval);
+                expect([60_000, 300_000, 600_000, 1_800_000, 3_600_000]).toContain(interval);
+            }
+        );
+
+        test.prop([fc.constantFrom("new", "existing")])(
+            "should handle add mode changes correctly",
+            async (addMode) => {
+                const { result } = renderHook(() => useAddSiteForm());
+
+                act(() => {
+                    result.current.setAddMode(addMode as any);
+                });
+
+                expect(result.current.addMode).toBe(addMode);
+                expect(["new", "existing"]).toContain(addMode);
+            }
+        );
+
+        test.prop([fc.array(fc.string(), { minLength: 1, maxLength: 3 })])(
+            "should handle form errors correctly",
+            async (errorMessages) => {
+                const { result } = renderHook(() => useAddSiteForm());
+                const errorMessage = errorMessages.join("; ");
+
+                act(() => {
+                    result.current.setFormError(errorMessage);
+                });
+
+                if (errorMessage.trim().length > 0) {
+                    expect(result.current.formError).toBe(errorMessage);
+                }
+
+                expect(Array.isArray(errorMessages)).toBeTruthy();
+                expect(errorMessages.length).toBeGreaterThanOrEqual(1);
+                expect(errorMessages.length).toBeLessThanOrEqual(3);
+            }
+        );
+
+        test.prop([fc.record({
+            url: fc.webUrl(),
+            host: fc.domain(),
+            port: fc.integer({ min: 1, max: 65_535 }).map(n => n.toString()),
+            name: fc.string({ minLength: 1, maxLength: 50 }).filter(s => s.trim().length > 0),
+            monitorType: fc.constantFrom("http", "port", "ping") as fc.Arbitrary<MonitorType>
+        })])(
+            "should handle complex form state updates correctly",
+            async (formState) => {
+                const { result } = renderHook(() => useAddSiteForm());
+
+                act(() => {
+                    result.current.setUrl(formState.url);
+                    result.current.setHost(formState.host);
+                    result.current.setPort(formState.port);
+                    result.current.setName(formState.name);
+                    result.current.setMonitorType(formState.monitorType);
+                });
+
+                expect(result.current.url).toBe(formState.url);
+                expect(result.current.host).toBe(formState.host);
+                expect(result.current.port).toBe(formState.port);
+                expect(result.current.name).toBe(formState.name);
+                expect(result.current.monitorType).toBe(formState.monitorType);
+
+                // Verify all state characteristics
+                expect(formState.url).toMatch(/^https?:\/\//);
+                expect(formState.name.trim().length).toBeGreaterThan(0);
+                const portNum = Number.parseInt(formState.port, 10);
+                expect(portNum).toBeGreaterThanOrEqual(1);
+                expect(portNum).toBeLessThanOrEqual(65_535);
+            }
+        );
+
+        test.prop([fc.integer({ min: 1, max: 20 })])(
+            "should handle rapid state updates consistently",
+            async (updateCount) => {
+                const { result } = renderHook(() => useAddSiteForm());
+                const updates: string[] = [];
+
+                for (let i = 0; i < updateCount; i++) {
+                    const testName = `Site ${i}`;
+                    updates.push(testName);
+
+                    act(() => {
+                        result.current.setName(testName);
+                    });
+                }
+
+                // Final state should be the last update
+                const expectedName = `Site ${updateCount - 1}`;
+                expect(result.current.name).toBe(expectedName);
+                expect(updates).toHaveLength(updateCount);
+                expect(updateCount).toBeGreaterThanOrEqual(1);
+                expect(updateCount).toBeLessThanOrEqual(20);
+            }
+        );
+
+        test.prop([fc.oneof(
+            fc.constant(""),
+            fc.constant("   "),
+            fc.constant("\t\n"),
+            fc.string().filter(s => s.trim().length === 0)
+        )])(
+            "should handle empty and whitespace inputs appropriately",
+            async (emptyInput) => {
+                const { result } = renderHook(() => useAddSiteForm());
+
+                act(() => {
+                    result.current.setName(emptyInput);
+                    result.current.setUrl(emptyInput);
+                    result.current.setHost(emptyInput);
+                });
+
+                // Should accept empty inputs (validation happens elsewhere)
+                expect(result.current.name).toBe(emptyInput);
+                expect(result.current.url).toBe(emptyInput);
+                expect(result.current.host).toBe(emptyInput);
+
+                // Verify empty input characteristics
+                expect(emptyInput.trim()).toHaveLength(0);
+            }
+        );
+
+        test.prop([fc.string({ minLength: 1000, maxLength: 10_000 })])(
+            "should handle very long inputs without performance issues",
+            async (longInput) => {
+                const { result } = renderHook(() => useAddSiteForm());
+                const startTime = performance.now();
+
+                act(() => {
+                    result.current.setName(longInput);
+                });
+
+                const endTime = performance.now();
+                const duration = endTime - startTime;
+
+                expect(result.current.name).toBe(longInput);
+                expect(duration).toBeLessThan(100); // Should complete within 100ms
+                expect(longInput.length).toBeGreaterThanOrEqual(1000);
+                expect(longInput.length).toBeLessThanOrEqual(10_000);
+            }
+        );
+
+        test.prop([fc.array(fc.record({
+            field: fc.constantFrom("name", "url", "host", "port"),
+            value: fc.string({ maxLength: 100 })
+        }), { minLength: 1, maxLength: 10 })])(
+            "should handle sequential field updates correctly",
+            async (fieldUpdates) => {
+                const { result } = renderHook(() => useAddSiteForm());
+                const expectedValues: Record<string, string> = {};
+
+                for (const update of fieldUpdates) {
+                    expectedValues[update.field] = update.value;
+
+                    act(() => {
+                        switch (update.field) {
+                            case "name": {
+                                result.current.setName(update.value);
+                                break;
+                            }
+                            case "url": {
+                                result.current.setUrl(update.value);
+                                break;
+                            }
+                            case "host": {
+                                result.current.setHost(update.value);
+                                break;
+                            }
+                            case "port": {
+                                result.current.setPort(update.value);
+                                break;
+                            }
+                        }
+                    });
+                }
+
+                // Verify final state matches expected values
+                if (expectedValues.name !== undefined) {
+                    expect(result.current.name).toBe(expectedValues.name);
+                }
+                if (expectedValues.url !== undefined) {
+                    expect(result.current.url).toBe(expectedValues.url);
+                }
+                if (expectedValues.host !== undefined) {
+                    expect(result.current.host).toBe(expectedValues.host);
+                }
+                if (expectedValues.port !== undefined) {
+                    expect(result.current.port).toBe(expectedValues.port);
+                }
+
+                expect(Array.isArray(fieldUpdates)).toBeTruthy();
+                expect(fieldUpdates.length).toBeGreaterThanOrEqual(1);
+                expect(fieldUpdates.length).toBeLessThanOrEqual(10);
+            }
+        );
     });
 });

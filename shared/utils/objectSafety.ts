@@ -58,7 +58,7 @@ export function safeObjectAccess<T>(
     // If no validator provided, check if value matches fallback type
     if (typeof value === typeof fallback) {
         // Type assertion is safe as we've checked the type matches
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast after typeof comparison ensures matching types
         return value as T;
     }
 
@@ -125,20 +125,20 @@ export function safeObjectOmit<
     // Handle null/undefined inputs by returning empty object
     if (obj === null || obj === undefined) {
         // Type assertion is safe as we're creating an empty object to match the expected structure
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for empty object creation with omitted keys
         return {} as Omit<T, K>;
     }
 
     const keysToOmit = new Set(keys);
 
     // Type assertion is safe as we're creating an empty object to match the expected structure
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for result object initialization with omitted key structure
     const result = {} as Omit<T, K>;
 
     // Copy enumerable string/number properties
     for (const [key, value] of Object.entries(obj)) {
         // Type assertion is safe as we're checking string keys from Object.entries
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for string key from Object.entries to generic key type
         if (!keysToOmit.has(key as K)) {
             (result as Record<PropertyKey, unknown>)[key] = value;
         }
@@ -147,7 +147,7 @@ export function safeObjectOmit<
     // Copy symbol properties
     for (const symbol of Object.getOwnPropertySymbols(obj)) {
         // Type assertion is safe as we're checking symbol keys
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for symbol key to generic key type for omit operation
         if (!keysToOmit.has(symbol as K)) {
             (result as Record<PropertyKey, unknown>)[symbol] = obj[symbol];
         }
@@ -182,7 +182,7 @@ export function safeObjectPick<
     K extends keyof T,
 >(obj: T, keys: readonly K[]): Pick<T, K> {
     // Type assertion is safe as we're creating an empty object to match the expected structure
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for empty object initialization with picked keys structure
     const result = {} as Pick<T, K>;
 
     for (const key of keys) {
@@ -219,7 +219,7 @@ export function typedObjectEntries<T extends Record<PropertyKey, unknown>>(
     obj: T
 ): Array<[keyof T, T[keyof T]]> {
     // Type assertion is safe as Object.entries returns correct key-value pairs for the object
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for Object.entries result to preserve key types
     return Object.entries(obj) as Array<[keyof T, T[keyof T]]>;
 }
 
@@ -277,6 +277,6 @@ export function typedObjectValues<T extends Record<PropertyKey, unknown>>(
     obj: T
 ): Array<T[keyof T]> {
     // Type assertion is safe as Object.values returns correct values for the object
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for Object.values result to preserve value types
     return Object.values(obj) as Array<T[keyof T]>;
 }

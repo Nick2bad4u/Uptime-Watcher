@@ -830,7 +830,20 @@ describe("jsonSafety utilities", () => {
 
                     const parsed = safeJsonParse(result.data, isObject);
                     expect(parsed.success).toBeTruthy();
-                    expect(parsed.data).toEqual(complexObject);
+
+                    // Normalize -0 to 0 in both objects for comparison since JSON.stringify converts -0 to "0"
+                    const normalizeZero = (obj: unknown): unknown => {
+                        if (Object.is(obj, -0)) return 0;
+                        if (Array.isArray(obj)) return obj.map((item: unknown) => normalizeZero(item));
+                        if (obj && typeof obj === 'object') {
+                            return Object.fromEntries(
+                                Object.entries(obj).map(([k, v]) => [k, normalizeZero(v)])
+                            );
+                        }
+                        return obj;
+                    };
+
+                    expect(normalizeZero(parsed.data)).toEqual(normalizeZero(complexObject));
                 }
             }));
         });

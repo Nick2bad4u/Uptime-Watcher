@@ -486,7 +486,7 @@ export class DnsMonitor implements IMonitorService {
      *
      * @returns Formatted result with success flag and details
      */
-    // eslint-disable-next-line sonarjs/cognitive-complexity
+    // eslint-disable-next-line sonarjs/cognitive-complexity -- DNS result formatting requires complex parsing logic for different record types
     private formatDnsResult(
         result: unknown,
         recordType: string,

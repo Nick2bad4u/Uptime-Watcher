@@ -329,7 +329,7 @@ export class ChartConfigService {
             },
         } as ChartOptions<"line">;
     }
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe Chart.js configuration type assertion */
 
     /**
      * Get common axis title configuration

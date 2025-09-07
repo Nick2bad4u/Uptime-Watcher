@@ -56,9 +56,9 @@ export const createBaseStore = <T extends BaseStore>(
     },
     setLoading: (loading: boolean): void => {
         set({ isLoading: loading } as Partial<T>);
-        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
     },
 });
+/* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe generic store utility operations */
 
 /**
  * Creates a persistence configuration for Zustand store persistence.
@@ -214,7 +214,7 @@ export async function waitForElectronAPI(
         (_, index) => index
     )) {
         try {
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Runtime API availability check during initialization
             if (typeof window.electronAPI?.sites?.getSites === "function") {
                 return; // API is ready
             }

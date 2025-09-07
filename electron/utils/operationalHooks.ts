@@ -163,7 +163,7 @@ function generateOperationId(): string {
             "[OperationalHooks] crypto.randomUUID() not available, using fallback",
             error
         );
-        // eslint-disable-next-line sonarjs/pseudo-random
+        // eslint-disable-next-line sonarjs/pseudo-random -- fallback when crypto.randomUUID unavailable
         return `op_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
     }
 }
@@ -393,9 +393,9 @@ export async function withOperationalHooks<T>(
                 }
             );
 
-            // eslint-disable-next-line no-await-in-loop
+            // eslint-disable-next-line no-await-in-loop -- retry operations require sequential awaits
             const result = await operation();
-            // eslint-disable-next-line no-await-in-loop
+            // eslint-disable-next-line no-await-in-loop -- success handling requires sequential await
             return await handleSuccess(
                 result,
                 config,
@@ -430,7 +430,7 @@ export async function withOperationalHooks<T>(
             }
 
             // Handle retry - intentionally sequential for retry logic
-            // eslint-disable-next-line no-await-in-loop
+            // eslint-disable-next-line no-await-in-loop -- retry handling requires sequential await
             await handleRetry(
                 lastError,
                 config,

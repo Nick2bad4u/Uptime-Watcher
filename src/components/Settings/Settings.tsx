@@ -88,7 +88,7 @@ export interface SettingsProperties {
  * - react/no-unstable-nested-components forbids components in render
  * These requirements are mutually exclusive for complex forms.
  */
-/* eslint-disable @arthurgeron/react-usememo/require-usememo, react/no-unstable-nested-components */
+/* eslint-disable @arthurgeron/react-usememo/require-usememo, react/no-unstable-nested-components -- Performance vs clean code tradeoff: Form validation requires memoization but also needs nested components for dynamic validation rules */
 
 /**
  * Settings component providing comprehensive application configuration.
@@ -280,7 +280,7 @@ export const Settings = ({
         downloadSQLiteBackup,
         setError,
     ]);
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe file system operations */
 
     // Click handlers for buttons
     const handleSyncNowClick = useCallback(() => {
@@ -334,6 +334,7 @@ export const Settings = ({
                     />
                 ) : null}
                 {/* Sync Success Display */}
+                {/* eslint-disable-next-line @eslint-react/no-complex-conditional-rendering, @eslint-react/no-complicated-conditional-rendering -- success message should only show when no error present */}
                 {syncSuccess && !lastError ? (
                     <ThemedBox
                         className="success-alert"
@@ -619,4 +620,4 @@ export const Settings = ({
     );
 };
 
-/* eslint-enable @arthurgeron/react-usememo/require-usememo, react/no-unstable-nested-components */
+/* eslint-enable @arthurgeron/react-usememo/require-usememo, react/no-unstable-nested-components -- Re-enable rules after complex form component */

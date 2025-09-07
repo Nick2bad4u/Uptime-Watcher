@@ -161,7 +161,7 @@ class Main {
      * Named event handler for safe cleanup on process exit.
      */
     private readonly handleProcessExit = (): void => {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- applicationService may be undefined during shutdown
         if (!this.cleanedUp && this.applicationService?.cleanup) {
             this.cleanedUp = true;
             void (async (): Promise<void> => {
@@ -179,7 +179,7 @@ class Main {
      * Named event handler for safe cleanup on app quit.
      */
     private readonly handleAppQuit = (): void => {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- applicationService may be undefined during shutdown
         if (!this.cleanedUp && this.applicationService?.cleanup) {
             this.cleanedUp = true;
             void (async (): Promise<void> => {

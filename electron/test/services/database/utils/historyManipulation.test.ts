@@ -33,19 +33,19 @@ vi.mock("../../../../utils/logger", () => ({
 
 vi.mock("../../../../../shared/utils/logTemplates", () => ({
     interpolateLogTemplate: vi.fn(
-        (template, data) => `${template} ${JSON.stringify(data)}`
+        (template, data) => template.replaceAll(/{(?<key>\w+)}/g, (match, key) => String(data[key] ?? match))
     ),
     LOG_TEMPLATES: {
         debug: {
-            HISTORY_ENTRY_ADDED: "HISTORY_ENTRY_ADDED",
+            HISTORY_ENTRY_ADDED: "[HistoryManipulation] Added history entry for monitor: {monitorId} - Status: {status}",
         },
         services: {
-            HISTORY_BULK_INSERT: "HISTORY_BULK_INSERT",
+            HISTORY_BULK_INSERT: "[HistoryManipulation] Bulk inserted {count} history entries for monitor: {monitorId}",
         },
         errors: {
-            HISTORY_ADD_FAILED: "HISTORY_ADD_FAILED",
-            HISTORY_BULK_INSERT_FAILED: "HISTORY_BULK_INSERT_FAILED",
-            HISTORY_PRUNE_FAILED: "HISTORY_PRUNE_FAILED",
+            HISTORY_ADD_FAILED: "[HistoryManipulation] Failed to add history entry for monitor: {monitorId}",
+            HISTORY_BULK_INSERT_FAILED: "[HistoryManipulation] Failed to bulk insert history for monitor: {monitorId}",
+            HISTORY_PRUNE_FAILED: "[HistoryManipulation] Failed to prune history for monitor: {monitorId}",
         },
     },
 }));
@@ -168,7 +168,7 @@ describe("History Manipulation Utilities", () => {
 
             // Assert
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                'HISTORY_ENTRY_ADDED {"monitorId":"test-monitor-123","status":"up"}'
+                '[HistoryManipulation] Added history entry for monitor: test-monitor-123 - Status: up'
             );
         });
 
@@ -213,7 +213,7 @@ describe("History Manipulation Utilities", () => {
             ).toThrow("Database connection failed");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                'HISTORY_ADD_FAILED {"monitorId":"test-monitor-123"}',
+                '[HistoryManipulation] Failed to add history entry for monitor: test-monitor-123',
                 dbError
             );
         });
@@ -412,7 +412,7 @@ describe("History Manipulation Utilities", () => {
 
             expect(mockStmt.finalize).toHaveBeenCalledTimes(1);
             expect(mockLogger.info).toHaveBeenCalledWith(
-                'HISTORY_BULK_INSERT {"count":3,"monitorId":"test-monitor-123"}'
+                '[HistoryManipulation] Bulk inserted 3 history entries for monitor: test-monitor-123'
             );
         });
 
@@ -443,7 +443,7 @@ describe("History Manipulation Utilities", () => {
 
             expect(mockStmt.finalize).toHaveBeenCalledTimes(1);
             expect(mockLogger.error).toHaveBeenCalledWith(
-                'HISTORY_BULK_INSERT_FAILED {"monitorId":"test-monitor-123"}',
+                '[HistoryManipulation] Failed to bulk insert history for monitor: test-monitor-123',
                 runError
             );
         });
@@ -470,7 +470,7 @@ describe("History Manipulation Utilities", () => {
             ).toThrow("Failed to prepare statement");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                'HISTORY_BULK_INSERT_FAILED {"monitorId":"test-monitor-123"}',
+                '[HistoryManipulation] Failed to bulk insert history for monitor: test-monitor-123',
                 prepareError
             );
         });
@@ -769,7 +769,7 @@ describe("History Manipulation Utilities", () => {
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                'HISTORY_PRUNE_FAILED {"monitorId":"test-monitor-123"}',
+                '[HistoryManipulation] Failed to prune history for monitor: test-monitor-123',
                 dbError
             );
         });
@@ -840,7 +840,7 @@ describe("History Manipulation Utilities", () => {
                     expect(() => deleteHistoryByMonitorId(mockDb, testMonitorId)).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
-                        `HISTORY_PRUNE_FAILED {"monitorId":"${testMonitorId}"}`,
+                        `[HistoryManipulation] Failed to prune history for monitor: ${testMonitorId}`,
                         dbError
                     );
                 }
@@ -1061,7 +1061,7 @@ describe("History Manipulation Utilities", () => {
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                'HISTORY_PRUNE_FAILED {"monitorId":"test-monitor-123"}',
+                '[HistoryManipulation] Failed to prune history for monitor: test-monitor-123',
                 selectError
             );
         });
@@ -1090,7 +1090,7 @@ describe("History Manipulation Utilities", () => {
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                'HISTORY_PRUNE_FAILED {"monitorId":"test-monitor-123"}',
+                '[HistoryManipulation] Failed to prune history for monitor: test-monitor-123',
                 deleteError
             );
         });
@@ -1222,7 +1222,7 @@ describe("History Manipulation Utilities", () => {
                     expect(() => pruneHistoryForMonitor(mockDb, testMonitorId, limit)).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
-                        `HISTORY_PRUNE_FAILED {"monitorId":"${testMonitorId}"}`,
+                        `[HistoryManipulation] Failed to prune history for monitor: ${testMonitorId}`,
                         selectError
                     );
                 }
@@ -1253,7 +1253,7 @@ describe("History Manipulation Utilities", () => {
                     expect(() => pruneHistoryForMonitor(mockDb, testMonitorId, limit)).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
-                        `HISTORY_PRUNE_FAILED {"monitorId":"${testMonitorId}"}`,
+                        `[HistoryManipulation] Failed to prune history for monitor: ${testMonitorId}`,
                         deleteError
                     );
                 }

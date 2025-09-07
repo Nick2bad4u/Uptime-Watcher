@@ -123,12 +123,14 @@ export const MonitoringStatusDisplay: NamedExoticComponent<MonitoringStatusDispl
                                     variant="secondary"
                                 >
                                     {/* Display appropriate connection info based on monitor type */}
+                                    {/* eslint-disable-next-line @eslint-react/no-complex-conditional-rendering, @eslint-react/no-complicated-conditional-rendering -- monitor type specific display logic */}
                                     {monitor.type === "http" && monitor.url ? (
                                         <span className="block truncate">
                                             {safeGetHostname(monitor.url) ||
                                                 monitor.url}
                                         </span>
                                     ) : null}
+                                    {/* eslint-disable-next-line @eslint-react/no-complex-conditional-rendering, @eslint-react/no-complicated-conditional-rendering -- port monitor display requires multiple condition checks */}
                                     {monitor.type === "port" &&
                                     monitor.host &&
                                     monitor.port ? (

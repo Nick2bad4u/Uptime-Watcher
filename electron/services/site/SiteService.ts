@@ -110,7 +110,8 @@ export class SiteService {
                             );
                         } catch (error) {
                             throw new Error(
-                                `Failed to delete history for monitor ${monitor.id} in site ${identifier}: ${error instanceof Error ? error.message : String(error)}`
+                                `Failed to delete history for monitor ${monitor.id} in site ${identifier}: ${error instanceof Error ? error.message : String(error)}`,
+                                { cause: error }
                             );
                         }
                     });
@@ -127,7 +128,8 @@ export class SiteService {
                         );
                     } catch (error) {
                         throw new Error(
-                            `Failed to delete monitors for site ${identifier}: ${error instanceof Error ? error.message : String(error)}`
+                            `Failed to delete monitors for site ${identifier}: ${error instanceof Error ? error.message : String(error)}`,
+                            { cause: error }
                         );
                     }
                     logger.debug(
@@ -183,7 +185,7 @@ export class SiteService {
                     await this.siteRepository.findByIdentifier(identifier);
                 if (!siteRow) {
                     logger.debug(`[SiteService] Site not found: ${identifier}`);
-                    // eslint-disable-next-line unicorn/no-useless-undefined
+                    // eslint-disable-next-line unicorn/no-useless-undefined -- Explicitly returning undefined for clarity in this public API method
                     return undefined;
                 }
 

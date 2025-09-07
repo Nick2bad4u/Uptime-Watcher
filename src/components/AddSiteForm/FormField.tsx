@@ -106,6 +106,7 @@ export const FormField: NamedExoticComponent<FormFieldProperties> = memo(
                         </ThemedText>
                     </div>
                 ) : null}
+                {/* eslint-disable-next-line @eslint-react/no-complex-conditional-rendering, @eslint-react/no-complicated-conditional-rendering -- help text should only show when no error present */}
                 {helpText && !error ? (
                     <div id={`${id}-help`}>
                         <ThemedText

@@ -116,7 +116,14 @@ export function safeParseFloat(value: unknown, defaultValue = 0): number {
  */
 export function safeParseInt(value: unknown, defaultValue = 0): number {
     if (isNumber(value)) {
-        return Number.isInteger(value) ? value : Math.floor(value);
+        // Handle finite numbers only - Infinity/-Infinity should use default
+        if (Number.isInteger(value) && Number.isFinite(value)) {
+            return value;
+        }
+        if (Number.isFinite(value)) {
+            return Math.floor(value);
+        }
+        return defaultValue;
     }
 
     if (isString(value)) {

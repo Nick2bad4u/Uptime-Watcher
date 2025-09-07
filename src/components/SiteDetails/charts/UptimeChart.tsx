@@ -76,16 +76,18 @@ ChartJS.register(ArcElement, Legend, Tooltip);
  *
  * @public
  */
-export const UptimeChart: NamedExoticComponent<{
-    readonly data: UptimeChartData;
-    readonly options: ChartOptions<"doughnut">;
-}> = memo(function UptimeChart({
+export const UptimeChart: NamedExoticComponent<
+    Readonly<{
+        data: UptimeChartData;
+        options: ChartOptions<"doughnut">;
+    }>
+> = memo(function UptimeChart({
     data,
     options,
-}: {
-    readonly data: UptimeChartData;
-    readonly options: ChartOptions<"doughnut">;
-}) {
+}: Readonly<{
+    data: UptimeChartData;
+    options: ChartOptions<"doughnut">;
+}>) {
     return <Doughnut data={data} options={options} />;
 });
 

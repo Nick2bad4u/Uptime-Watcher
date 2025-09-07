@@ -66,7 +66,7 @@ function copyDynamicFields(
             (monitor as any)[key] = value;
         }
     }
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable type assertion rules after dynamic monitor mapping */
 }
 
 /**
@@ -205,7 +205,7 @@ export function buildMonitorParameters(
             }
             return value as DbValue;
         });
-        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion, sonarjs/function-return-type */
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion, sonarjs/function-return-type -- Re-enable rules after database value mapping with appropriate type conversion */
     } catch (error) {
         logger.error(LOG_TEMPLATES.errors.MONITOR_MAPPER_FAILED, {
             error,

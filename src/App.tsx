@@ -286,6 +286,12 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         setShowSiteDetails(false);
     }, [setShowSiteDetails]);
 
+    // Extract SiteDetails JSX to avoid complex conditional rendering
+    const siteDetailsJSX =
+        showSiteDetails && selectedSite ? (
+            <SiteDetails onClose={handleCloseSiteDetails} site={selectedSite} />
+        ) : null;
+
     return (
         <ErrorBoundary>
             <ThemeProvider>
@@ -325,6 +331,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     ) : null}
 
                     {/* Update Notification */}
+                    {/* eslint-disable-next-line @eslint-react/no-complex-conditional-rendering, @eslint-react/no-complicated-conditional-rendering -- update notification requires complex state-based rendering logic */}
                     {(updateStatus === "available" ||
                         updateStatus === "downloading" ||
                         updateStatus === "downloaded" ||
@@ -451,12 +458,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     ) : null}
 
                     {/* Site Details Modal */}
-                    {showSiteDetails && selectedSite ? (
-                        <SiteDetails
-                            onClose={handleCloseSiteDetails}
-                            site={selectedSite}
-                        />
-                    ) : null}
+                    {siteDetailsJSX}
                 </div>
             </ThemeProvider>
         </ErrorBoundary>

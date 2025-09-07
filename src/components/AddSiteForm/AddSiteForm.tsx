@@ -448,6 +448,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                     </ThemedButton>
 
                     {/* Error Message */}
+                    {/* eslint-disable-next-line @eslint-react/no-complex-conditional-rendering, @eslint-react/no-complicated-conditional-rendering -- error display requires fallback logic */}
                     {(lastError ?? formError) ? (
                         <ErrorAlert
                             message={formError ?? lastError ?? ""}

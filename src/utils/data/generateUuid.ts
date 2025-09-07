@@ -36,8 +36,14 @@ export function generateUuid(): string {
     }
 
     // Fallback implementation for environments without crypto.randomUUID
+    // Generate multiple random components for better uniqueness
     // eslint-disable-next-line sonarjs/pseudo-random -- Math.random() is acceptable for UUID generation fallback; cryptographic randomness is preferred but not required for site IDs
-    const randomPart = Math.random().toString(36).slice(2, 11);
+    const randomPart1 = Math.random().toString(36).slice(2, 8); // 6 chars
+    // eslint-disable-next-line sonarjs/pseudo-random -- Multiple calls to Math.random() for better entropy
+    const randomPart2 = Math.random().toString(36).slice(2, 8); // 6 chars
     const timestamp = Date.now();
-    return `site-${randomPart}-${timestamp}`;
+    // eslint-disable-next-line sonarjs/pseudo-random -- Additional randomness to prevent timestamp collisions
+    const microseconds = Math.floor(Math.random() * 1000); // 0-999 for sub-millisecond uniqueness
+    const paddedMicroseconds = microseconds.toString().padStart(3, "0"); // Always 3 digits
+    return `site-${randomPart1}${randomPart2}-${timestamp}${paddedMicroseconds}`;
 }

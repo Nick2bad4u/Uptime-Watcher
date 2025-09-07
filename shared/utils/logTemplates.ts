@@ -431,7 +431,7 @@ export function interpolateLogTemplate(
         /{(?<variableName>[$_a-z][\w$]*)}/gi,
         (match, key) => {
             // Type assertion is safe here as we're accessing with a string key
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for string key from regex match to access object properties
             const value = variables[key as keyof typeof variables];
             return value === undefined || value === null
                 ? match

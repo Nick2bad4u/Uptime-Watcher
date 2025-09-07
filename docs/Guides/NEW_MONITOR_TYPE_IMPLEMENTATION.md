@@ -228,10 +228,10 @@ All new monitor types must integrate with the **production-grade unified archite
 
 ### **📋 Architectural Requirements (ADR Compliance)**
 
-✅ **Repository Pattern (ADR-001)**: Database operations use dual-method pattern with transaction safety  
-✅ **Event-Driven Architecture (ADR-002)**: TypedEventBus integration with correlation tracking  
-✅ **Error Handling Strategy (ADR-003)**: Comprehensive error handling with operation correlation  
-✅ **Frontend State Management (ADR-004)**: Zustand stores with proper cleanup  
+✅ **Repository Pattern (ADR-001)**: Database operations use dual-method pattern with transaction safety
+✅ **Event-Driven Architecture (ADR-002)**: TypedEventBus integration with correlation tracking
+✅ **Error Handling Strategy (ADR-003)**: Comprehensive error handling with operation correlation
+✅ **Frontend State Management (ADR-004)**: Zustand stores with proper cleanup
 ✅ **IPC Communication Protocol (ADR-005)**: Standardized IPC with type safety
 
 ### **✨ Enhanced Monitoring System Integration**
@@ -786,11 +786,11 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
     async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
      // Implementation must return standardized result
     }
-   
+
     updateConfig(config: Partial<MonitorConfig>): void {
      // Runtime configuration updates
     }
-   
+
     getType(): Site["monitors"][0]["type"] {
      return "your-type";
     }
@@ -882,7 +882,7 @@ export const BASE_MONITOR_TYPES = [
 
 ## 📊 **2. Database Layer**
 
-### **🔹 Required Files to Modify:**
+### **🔹 Database Layer - Required Files to Modify:**
 
 #### `electron/services/database/MonitorRepository.ts`
 
@@ -1134,7 +1134,7 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
 
 **⚠️ Must Use**: Always use `getMonitorTimeout()` and `getMonitorRetryAttempts()` utilities to safely extract values with fallbacks.
 
-### **🔹 Required Files to Modify:**
+### **🔹 Monitor System - Required Files to Modify:**
 
 #### `electron/services/monitoring/MonitorTypeRegistry.ts`
 
@@ -1546,7 +1546,7 @@ describe("DNS Monitor Details", () => {
 
 ## 🔄 **6. IPC Communication**
 
-### **🔹 Files that Auto-Update (No Changes Required):**
+### **🔹 IPC Communication - Files that Auto-Update (No Changes Required):**
 
 The IPC layer automatically supports new monitor types:
 
@@ -1637,13 +1637,13 @@ export const DNS_RESOLVERS = ["8.8.8.8", "1.1.1.1"];
 
 ### **📋 Critical Requirements Met:**
 
-✅ **Repository Pattern (ADR-001)**: Database operations use dual-method pattern with transaction safety  
-✅ **Event-Driven Architecture (ADR-002)**: TypedEventBus integration with correlation and cleanup  
-✅ **Error Handling Strategy (ADR-003)**: Comprehensive error handling with operation correlation  
-✅ **Memory Management**: Automatic cleanup, timeout management, and leak prevention  
-✅ **Race Condition Prevention**: Operation correlation with unique IDs  
-✅ **Type Safety**: Complete TypeScript interfaces with TSDoc documentation  
-✅ **Testing Coverage**: Unit, integration, and performance tests  
+✅ **Repository Pattern (ADR-001)**: Database operations use dual-method pattern with transaction safety
+✅ **Event-Driven Architecture (ADR-002)**: TypedEventBus integration with correlation and cleanup
+✅ **Error Handling Strategy (ADR-003)**: Comprehensive error handling with operation correlation
+✅ **Memory Management**: Automatic cleanup, timeout management, and leak prevention
+✅ **Race Condition Prevention**: Operation correlation with unique IDs
+✅ **Type Safety**: Complete TypeScript interfaces with TSDoc documentation
+✅ **Testing Coverage**: Unit, integration, and performance tests
 ✅ **Production Monitoring**: Full observability with logging and metrics
 
 ### **🏗️ Architecture Benefits Realized:**

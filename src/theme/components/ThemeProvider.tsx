@@ -43,7 +43,7 @@ const ThemeProviderComponent = ({
     // Initialize theme system on mount to ensure theme context is available
     useTheme();
 
-    // eslint-disable-next-line react/jsx-no-useless-fragment
+    // eslint-disable-next-line @eslint-react/avoid-shorthand-fragment, react/jsx-no-useless-fragment -- Conflicting rule: children passthrough requires fragments, but rule conflicts with @eslint-react/prefer-shorthand-fragment, required for children passthrough pattern
     return <>{children}</>;
 };
 

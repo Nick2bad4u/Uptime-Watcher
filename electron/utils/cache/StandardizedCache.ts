@@ -151,7 +151,7 @@ export class StandardizedCache<T> {
         const cleanedKeys: string[] = [];
 
         for (const [key, entry] of this.cache.entries()) {
-            if (entry.expiresAt && now > entry.expiresAt) {
+            if (entry.expiresAt && entry.expiresAt < now) {
                 this.cache.delete(key);
                 cleanedKeys.push(key);
                 cleaned++;
@@ -221,7 +221,7 @@ export class StandardizedCache<T> {
 
         for (const [key, entry] of this.cache.entries()) {
             // Skip expired entries
-            if (entry.expiresAt && now > entry.expiresAt) {
+            if (entry.expiresAt && entry.expiresAt < now) {
                 this.cache.delete(key);
                 expiredKeys.push(key);
             } else {
@@ -253,7 +253,7 @@ export class StandardizedCache<T> {
         }
 
         // Check expiration
-        if (entry.expiresAt && Date.now() > entry.expiresAt) {
+        if (entry.expiresAt && entry.expiresAt < Date.now()) {
             this.cache.delete(key);
             this.updateSize();
             this.recordMiss();
@@ -280,7 +280,7 @@ export class StandardizedCache<T> {
 
         for (const [key, entry] of this.cache.entries()) {
             // Skip expired entries
-            if (entry.expiresAt && now > entry.expiresAt) {
+            if (entry.expiresAt && entry.expiresAt < now) {
                 this.cache.delete(key);
                 expiredKeys.push(key);
             } else {
@@ -316,7 +316,7 @@ export class StandardizedCache<T> {
         }
 
         // Check expiration
-        if (entry.expiresAt && Date.now() > entry.expiresAt) {
+        if (entry.expiresAt && entry.expiresAt < Date.now()) {
             this.cache.delete(key);
             this.updateSize();
             this.notifyInvalidation(key);
@@ -363,7 +363,7 @@ export class StandardizedCache<T> {
 
         for (const [key, entry] of this.cache.entries()) {
             // Skip expired entries
-            if (entry.expiresAt && now > entry.expiresAt) {
+            if (entry.expiresAt && entry.expiresAt < now) {
                 this.cache.delete(key);
                 expiredKeys.push(key);
             } else {
@@ -414,7 +414,7 @@ export class StandardizedCache<T> {
      */
     public set(key: string, data: T, ttl?: number): void {
         // Evict if at capacity and this is a new key
-        if (this.cache.size >= this.config.maxSize && !this.cache.has(key)) {
+        if (this.config.maxSize <= this.cache.size && !this.cache.has(key)) {
             this.evictLRU();
         }
 

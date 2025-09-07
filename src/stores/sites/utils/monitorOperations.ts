@@ -53,7 +53,7 @@ function validateMonitorType(type: unknown): MonitorType {
         BASE_MONITOR_TYPES.includes(type as MonitorType)
         ? (type as MonitorType)
         : BASE_MONITOR_TYPES[0];
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Safe type assertion after runtime type validation */
 }
 
 /**
@@ -368,7 +368,7 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
 
     return baseMonitor;
 }
-/* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+/* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe monitor configuration type assertions */
 
 /**
  * Creates a default monitor for a site

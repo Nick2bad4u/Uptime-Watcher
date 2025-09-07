@@ -5,6 +5,7 @@
 
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { test, fc } from "@fast-check/vitest";
 
 import { FALLBACK_MONITOR_TYPE_OPTIONS } from "../../constants";
 import { logger } from "../../services/logger";
@@ -653,5 +654,253 @@ describe("useMonitorTypes Hook", () => {
             expect(refreshPromise).toBeInstanceOf(Promise);
             await refreshPromise;
         });
+    });
+
+    describe("Property-Based Testing with Fast-Check", () => {
+        test.prop([fc.array(fc.record({
+            label: fc.string({ minLength: 1, maxLength: 50 }),
+            value: fc.string({ minLength: 1, maxLength: 20 }).filter(s => /^[\w-]+$/.test(s))
+        }), { minLength: 0, maxLength: 10 })])(
+            "should handle various monitor type option configurations",
+            async (monitorOptions) => {
+                mockGetMonitorTypeOptions.mockResolvedValue(monitorOptions);
+
+                const { result } = renderHook(() => useMonitorTypes());
+
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                });
+
+                expect(result.current.options).toEqual(monitorOptions);
+                expect(Array.isArray(result.current.options)).toBeTruthy();
+                expect(result.current.error).toBeNull();
+
+                // Verify monitor options properties
+                expect(monitorOptions.length).toBeLessThanOrEqual(10);
+                for (const option of monitorOptions) {
+                    expect(typeof option.label).toBe("string");
+                    expect(option.label.length).toBeGreaterThan(0);
+                    expect(option.label.length).toBeLessThanOrEqual(50);
+                    expect(typeof option.value).toBe("string");
+                    expect(option.value.length).toBeGreaterThan(0);
+                    expect(option.value.length).toBeLessThanOrEqual(20);
+                    expect(/^[\w-]+$/.test(option.value)).toBeTruthy();
+                }
+            }
+        );
+
+        test.prop([fc.oneof(
+            fc.string().map(msg => new Error(msg)),
+            fc.record({ message: fc.string() }).map(obj => new Error(obj.message)),
+            fc.constantFrom(
+                new Error("Network error"),
+                new Error("API unavailable"),
+                new Error("Timeout"),
+                new Error("Unknown error")
+            )
+        )])(
+            "should handle various error types gracefully",
+            async (testError) => {
+                mockGetMonitorTypeOptions.mockRejectedValue(testError);
+
+                const { result } = renderHook(() => useMonitorTypes());
+
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                });
+
+                expect(result.current.error).toBe(testError);
+                expect(result.current.options).toEqual(FALLBACK_MONITOR_TYPE_OPTIONS);
+                expect(mockLogger.error).toHaveBeenCalledWith("Failed to load monitor type options:", testError);
+
+                // Verify error properties
+                expect(testError).toBeInstanceOf(Error);
+                expect(typeof testError.message).toBe("string");
+            }
+        );
+
+        test.prop([fc.integer({ min: 0, max: 20 })])(
+            "should handle different monitor type counts correctly",
+            async (optionCount) => {
+                const monitorOptions = Array.from({ length: optionCount }, (_, i) => ({
+                    label: `Monitor Type ${i + 1}`,
+                    value: `type-${i + 1}`
+                }));
+
+                mockGetMonitorTypeOptions.mockResolvedValue(monitorOptions);
+
+                const { result } = renderHook(() => useMonitorTypes());
+
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                });
+
+                expect(result.current.options).toHaveLength(optionCount);
+                expect(result.current.error).toBeNull();
+
+                // Verify option count properties
+                expect(optionCount).toBeGreaterThanOrEqual(0);
+                expect(optionCount).toBeLessThanOrEqual(20);
+                expect(result.current.options).toHaveLength(optionCount);
+            }
+        );
+
+        test.prop([fc.array(fc.oneof(
+            fc.record({
+                label: fc.string({ minLength: 1, maxLength: 30 }),
+                value: fc.string({ minLength: 1, maxLength: 15 })
+            }),
+            fc.record({
+                label: fc.string(),
+                value: fc.string(),
+                extraProperty: fc.string()
+            }),
+            fc.record({
+                label: fc.constant(""),
+                value: fc.string({ minLength: 1 })
+            }),
+            fc.record({
+                label: fc.string({ minLength: 1 }),
+                value: fc.constant("")
+            })
+        ), { minLength: 1, maxLength: 5 })])(
+            "should handle various option formats and edge cases",
+            async (mixedOptions) => {
+                mockGetMonitorTypeOptions.mockResolvedValue(mixedOptions as any);
+
+                const { result } = renderHook(() => useMonitorTypes());
+
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                });
+
+                expect(result.current.options).toEqual(mixedOptions);
+                expect(result.current.error).toBeNull();
+
+                // Verify mixed options array properties
+                expect(Array.isArray(mixedOptions)).toBeTruthy();
+                expect(mixedOptions.length).toBeGreaterThanOrEqual(1);
+                expect(mixedOptions.length).toBeLessThanOrEqual(5);
+            }
+        );
+
+        test.prop([fc.integer({ min: 1, max: 5 })])(
+            "should handle multiple refresh calls correctly",
+            async (refreshCount) => {
+                const mockOptions = [{ label: "Test", value: "test" }];
+                mockGetMonitorTypeOptions.mockResolvedValue(mockOptions);
+
+                const { result } = renderHook(() => useMonitorTypes());
+
+                // Wait for initial load
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                });
+
+                // Perform multiple refreshes
+                const refreshPromises = Array.from({ length: refreshCount }, () =>
+                    result.current.refresh()
+                );
+
+                await Promise.all(refreshPromises);
+
+                expect(result.current.options).toEqual(mockOptions);
+                expect(result.current.error).toBeNull();
+                expect(mockGetMonitorTypeOptions).toHaveBeenCalledTimes(refreshCount + 1); // +1 for initial load
+
+                // Verify refresh count properties
+                expect(refreshCount).toBeGreaterThanOrEqual(1);
+                expect(refreshCount).toBeLessThanOrEqual(5);
+            }
+        );
+
+        test.prop([fc.record({
+            successOptions: fc.array(fc.record({
+                label: fc.string({ minLength: 1, maxLength: 20 }),
+                value: fc.string({ minLength: 1, maxLength: 10 })
+            }), { minLength: 1, maxLength: 3 }),
+            errorMessage: fc.string({ minLength: 1, maxLength: 100 })
+        })])(
+            "should handle alternating success and error scenarios",
+            async ({ successOptions, errorMessage }) => {
+                // First call succeeds
+                mockGetMonitorTypeOptions.mockResolvedValueOnce(successOptions);
+
+                const { result } = renderHook(() => useMonitorTypes());
+
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                });
+
+                expect(result.current.options).toEqual(successOptions);
+                expect(result.current.error).toBeNull();
+
+                // Second call (refresh) fails
+                mockGetMonitorTypeOptions.mockRejectedValueOnce(new Error(errorMessage));
+
+                await result.current.refresh();
+
+                expect(typeof result.current.error).toBe("string");
+                expect(result.current.error).toBe(`Monitor types loading failed: ${errorMessage}. Using fallback options.`);
+                expect(result.current.options).toEqual(FALLBACK_MONITOR_TYPE_OPTIONS);
+
+                // Verify scenario properties
+                expect(Array.isArray(successOptions)).toBeTruthy();
+                expect(successOptions.length).toBeGreaterThanOrEqual(1);
+                expect(successOptions.length).toBeLessThanOrEqual(3);
+                expect(typeof errorMessage).toBe("string");
+                expect(errorMessage.length).toBeGreaterThan(0);
+                expect(errorMessage.length).toBeLessThanOrEqual(100);
+            }
+        );
+
+        test.prop([fc.constantFrom(null, undefined, [], {}, "invalid", 123)])(
+            "should handle invalid API responses gracefully",
+            async (invalidResponse) => {
+                mockGetMonitorTypeOptions.mockResolvedValue(invalidResponse as any);
+
+                const { result } = renderHook(() => useMonitorTypes());
+
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                });
+
+                // Should accept the invalid response as-is (validation happens elsewhere)
+                expect(result.current.options).toEqual(invalidResponse);
+                expect(result.current.error).toBeNull();
+            }
+        );
+
+        test.prop([fc.integer({ min: 100, max: 2000 })])(
+            "should handle loading state timing correctly",
+            async (delayMs) => {
+                const mockOptions = [{ label: "Delayed", value: "delayed" }];
+
+                mockGetMonitorTypeOptions.mockImplementation(() =>
+                    new Promise(resolve =>
+                        setTimeout(() => resolve(mockOptions), delayMs)
+                    )
+                );
+
+                const { result } = renderHook(() => useMonitorTypes());
+
+                // Should be loading initially
+                expect(result.current.isLoading).toBeTruthy();
+                expect(result.current.options).toEqual([]);
+                expect(result.current.error).toBeNull();
+
+                // Wait for completion
+                await waitFor(() => {
+                    expect(result.current.isLoading).toBeFalsy();
+                }, { timeout: delayMs + 1000 });
+
+                expect(result.current.options).toEqual(mockOptions);
+                expect(result.current.error).toBeNull();
+
+                // Verify delay properties
+                expect(delayMs).toBeGreaterThanOrEqual(100);
+                expect(delayMs).toBeLessThanOrEqual(2000);
+            }
+        );
     });
 });

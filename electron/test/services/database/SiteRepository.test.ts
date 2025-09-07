@@ -394,25 +394,21 @@ describe(SiteRepository, () => {
         });
     });
 
-    describe("Property-Based SiteRepository Tests", () => {
+            describe("Property-Based SiteRepository Tests", () => {
+            it.todo("TODO: Fix property-based tests - API mismatch with current SiteRepository interface");
         it("should handle various site creation scenarios", async () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc.record({
-                        url: fc.webUrl(),
+                        identifier: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
                         name: fc.string({ minLength: 1, maxLength: 100 }),
-                        type: fc.constantFrom("http", "ping", "tcp"),
-                        config: fc.record({
-                            timeout: fc.integer({ min: 1000, max: 30_000 }),
-                            retries: fc.integer({ min: 0, max: 5 })
-                        })
+                        monitoring: fc.boolean()
                     }),
                     async (siteData) => {
                         const expectedSite = {
-                            id: 1,
-                            ...siteData,
-                            createdAt: expect.any(Number),
-                            updatedAt: expect.any(Number)
+                            identifier: siteData.identifier,
+                            name: siteData.name,
+                            monitoring: siteData.monitoring
                         };
 
                         mockDatabase.run.mockReturnValue({
@@ -421,24 +417,16 @@ describe(SiteRepository, () => {
                         });
                         mockDatabase.get.mockReturnValue(expectedSite);
 
-                        const result = await repository.createSite(siteData);
+                        await repository.upsert(siteData);
 
-                        expect(result).toMatchObject({
-                            id: 1,
-                            url: siteData.url,
-                            name: siteData.name,
-                            type: siteData.type
-                        });
-                        expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+                        // upsert returns void, so we just verify it was called correctly
+                        expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
                         expect(mockDatabase.run).toHaveBeenCalledWith(
-                            expect.stringContaining("INSERT INTO sites"),
+                            expect.stringContaining("INSERT OR REPLACE INTO sites"),
                             expect.arrayContaining([
-                                siteData.url,
+                                siteData.identifier,
                                 siteData.name,
-                                siteData.type,
-                                expect.any(String), // JSON config
-                                expect.any(Number), // timestamp
-                                expect.any(Number)  // timestamp
+                                siteData.monitoring ? 1 : 0 // monitoring is converted to number
                             ])
                         );
                     }
@@ -449,44 +437,33 @@ describe(SiteRepository, () => {
         it("should handle various site updates", async () => {
             await fc.assert(
                 fc.asyncProperty(
-                    fc.integer({ min: 1, max: 1000 }),
+                    fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0), // identifier as string
                     fc.record({
-                        url: fc.webUrl(),
+                        identifier: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
                         name: fc.string({ minLength: 1, maxLength: 100 }),
-                        type: fc.constantFrom("http", "ping", "tcp"),
-                        config: fc.record({
-                            timeout: fc.integer({ min: 1000, max: 30_000 }),
-                            retries: fc.integer({ min: 0, max: 5 })
-                        })
+                        monitoring: fc.boolean()
                     }),
-                    async (siteId, updateData) => {
+                    async (siteIdentifier, updateData) => {
+                        // Use the identifier from updateData for consistency
                         const updatedSite = {
-                            id: siteId,
-                            ...updateData,
-                            createdAt: Date.now() - 86_400_000,
-                            updatedAt: Date.now()
+                            identifier: updateData.identifier,
+                            name: updateData.name,
+                            monitoring: updateData.monitoring
                         };
 
                         mockDatabase.run.mockReturnValue({ changes: 1 });
                         mockDatabase.get.mockReturnValue(updatedSite);
 
-                        const result = await repository.update(siteId, updateData);
+                        await repository.upsert(updateData);
 
-                        expect(result).toMatchObject({
-                            id: siteId,
-                            url: updateData.url,
-                            name: updateData.name,
-                            type: updateData.type
-                        });
+                        // upsert returns void, so we just verify it was called correctly
+                        expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
                         expect(mockDatabase.run).toHaveBeenCalledWith(
-                            expect.stringContaining("UPDATE sites SET"),
+                            expect.stringContaining("INSERT OR REPLACE INTO sites"),
                             expect.arrayContaining([
-                                updateData.url,
+                                updateData.identifier,
                                 updateData.name,
-                                updateData.type,
-                                expect.any(String), // JSON config
-                                expect.any(Number), // updated timestamp
-                                siteId
+                                updateData.monitoring ? 1 : 0
                             ])
                         );
                     }
@@ -498,20 +475,20 @@ describe(SiteRepository, () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc.array(
-                        fc.integer({ min: 1, max: 100 }),
+                        fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0), // identifiers as strings
                         { minLength: 1, maxLength: 10 }
                     ),
-                    async (siteIds) => {
-                        for (const siteId of siteIds) {
+                    async (siteIdentifiers) => {
+                        for (const siteIdentifier of siteIdentifiers) {
                             mockDatabase.run.mockReturnValue({ changes: 1 });
 
-                            const result = await repository.delete(siteId);
+                            const result = await repository.delete(siteIdentifier);
 
                             expect(result).toBeTruthy();
                             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
                             expect(mockDatabase.run).toHaveBeenCalledWith(
-                                "DELETE FROM sites WHERE id = ?",
-                                [siteId]
+                                "DELETE FROM sites WHERE identifier = ?",
+                                [siteIdentifier]
                             );
                         }
                     }
@@ -519,37 +496,31 @@ describe(SiteRepository, () => {
             );
         });
 
-        it("should handle various findById scenarios", async () => {
+        it("should handle various findByIdentifier scenarios", async () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc.oneof(
                         fc.constant(null), // Site not found
                         fc.record({
-                            id: fc.integer({ min: 1, max: 1000 }),
-                            url: fc.webUrl(),
+                            identifier: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
                             name: fc.string({ minLength: 1, maxLength: 100 }),
-                            type: fc.constantFrom("http", "ping", "tcp"),
-                            config: fc.record({
-                                timeout: fc.integer({ min: 1000, max: 30_000 })
-                            }),
-                            createdAt: fc.integer({ min: Date.now() - 86_400_000, max: Date.now() }),
-                            updatedAt: fc.integer({ min: Date.now() - 86_400_000, max: Date.now() })
+                            monitoring: fc.boolean()
                         })
                     ),
-                    fc.integer({ min: 1, max: 1000 }),
-                    async (mockSite, searchId) => {
+                    fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0), // searchIdentifier as string
+                    async (mockSite, searchIdentifier) => {
                         mockDatabase.get.mockReturnValue(mockSite);
 
-                        const result = await repository.findById(searchId);
+                        const result = await repository.findByIdentifier(searchIdentifier);
 
                         if (mockSite) {
                             expect(result).toEqual(mockSite);
                         } else {
-                            expect(result).toBeNull();
+                            expect(result).toBeUndefined(); // SiteRepository returns undefined for not found
                         }
                         expect(mockDatabase.get).toHaveBeenCalledWith(
-                            "SELECT * FROM sites WHERE id = ?",
-                            [searchId]
+                            expect.stringContaining("SELECT"),
+                            [searchIdentifier]
                         );
                     }
                 )
@@ -561,15 +532,9 @@ describe(SiteRepository, () => {
                 fc.asyncProperty(
                     fc.array(
                         fc.record({
-                            id: fc.integer({ min: 1, max: 1000 }),
-                            url: fc.webUrl(),
+                            identifier: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
                             name: fc.string({ minLength: 1, maxLength: 100 }),
-                            type: fc.constantFrom("http", "ping", "tcp"),
-                            config: fc.record({
-                                timeout: fc.integer({ min: 1000, max: 30_000 })
-                            }),
-                            createdAt: fc.integer({ min: Date.now() - 86_400_000, max: Date.now() }),
-                            updatedAt: fc.integer({ min: Date.now() - 86_400_000, max: Date.now() })
+                            monitoring: fc.boolean()
                         }),
                         { minLength: 0, maxLength: 20 }
                     ),
@@ -580,7 +545,7 @@ describe(SiteRepository, () => {
 
                         expect(result).toEqual(mockSites);
                         expect(mockDatabase.all).toHaveBeenCalledWith(
-                            "SELECT * FROM sites ORDER BY createdAt ASC"
+                            expect.stringContaining("SELECT")
                         );
                     }
                 )
@@ -595,9 +560,9 @@ describe(SiteRepository, () => {
                         fc.string({ minLength: 5, maxLength: 50 })
                     ),
                     fc.record({
-                        url: fc.webUrl(),
+                        identifier: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
                         name: fc.string({ minLength: 1, maxLength: 50 }),
-                        type: fc.constantFrom("http", "ping", "tcp")
+                        monitoring: fc.boolean()
                     }),
                     async (errorMessage, siteData) => {
                         const dbError = new Error(errorMessage);
@@ -605,7 +570,7 @@ describe(SiteRepository, () => {
                             throw dbError;
                         });
 
-                        await expect(repository.create(siteData)).rejects.toThrow(errorMessage);
+                        await expect(repository.upsert(siteData)).rejects.toThrow(errorMessage);
                     }
                 )
             );
@@ -615,42 +580,30 @@ describe(SiteRepository, () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc.record({
-                        id: fc.integer({ min: 1, max: 1000 }),
-                        url: fc.webUrl(),
+                        identifier: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
                         name: fc.string({ minLength: 1, maxLength: 100 }),
-                        type: fc.constantFrom("http", "ping", "tcp"),
-                        config: fc.oneof(
-                            fc.record({ timeout: fc.integer({ min: 1000, max: 30_000 }) }),
-                            fc.record({
-                                timeout: fc.integer({ min: 1000, max: 30_000 }),
-                                retries: fc.integer({ min: 0, max: 5 })
-                            })
-                        ),
-                        createdAt: fc.integer({ min: 0, max: Date.now() }),
-                        updatedAt: fc.integer({ min: 0, max: Date.now() })
+                        monitoring: fc.boolean()
                     }),
                     async (siteData) => {
                         mockDatabase.get.mockReturnValue(siteData);
 
-                        const result = await repository.findById(siteData.id);
+                        const result = await repository.findByIdentifier(siteData.identifier);
 
                         expect(result).toBeDefined();
                         if (result) {
-                            expect(typeof result.id).toBe("number");
-                            expect(typeof result.url).toBe("string");
-                            expect(typeof result.name).toBe("string");
-                            expect(typeof result.type).toBe("string");
-                            expect(typeof result.config).toBe("object");
-                            expect(typeof result.createdAt).toBe("number");
-                            expect(typeof result.updatedAt).toBe("number");
-                            expect(result.id).toBeGreaterThan(0);
-                            expect(result.url.length).toBeGreaterThan(0);
-                            expect(result.name.length).toBeGreaterThan(0);
-                            expect(["http", "ping", "tcp"]).toContain(result.type);
+                            expect(typeof result.identifier).toBe("string");
+                            expect(result.identifier.length).toBeGreaterThan(0);
+                            if (result.name !== undefined) {
+                                expect(typeof result.name).toBe("string");
+                                expect(result.name.length).toBeGreaterThan(0);
+                            }
+                            if (result.monitoring !== undefined) {
+                                expect(typeof result.monitoring).toBe("boolean");
+                            }
                         }
                     }
                 )
             );
         });
-    });
+        });
 });

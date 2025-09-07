@@ -26,7 +26,6 @@ import type { SiteRepository } from "../../services/database/SiteRepository";
 import type { Logger } from "../interfaces";
 
 import { withDatabaseOperation } from "../operationalHooks";
-import { SiteLoadingError } from "./interfaces";
 
 /**
  * Configuration for data import/export operations.
@@ -133,10 +132,7 @@ export class DataImportExportService {
                 }
             );
 
-            throw new SiteLoadingError(
-                message,
-                error instanceof Error ? error : undefined
-            );
+            throw new Error(`Data export failed: ${message}`, { cause: error });
         }
     }
 
@@ -179,10 +175,9 @@ export class DataImportExportService {
                 }
             );
 
-            throw new SiteLoadingError(
-                message,
-                error instanceof Error ? error : undefined
-            );
+            throw new Error(`Data import parsing failed: ${message}`, {
+                cause: error,
+            });
         }
     }
 

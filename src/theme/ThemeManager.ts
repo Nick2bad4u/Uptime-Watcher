@@ -10,7 +10,7 @@
  * Note: Empty constructor and no-op functions are intentional design patterns.
  */
 
-/* eslint-disable @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- Defensive programming for test edge cases and cross-environment compatibility */
 // Defensive programming for test edge cases and cross-environment compatibility
 
 import type { SystemThemePreference } from "./components/types";
@@ -245,7 +245,7 @@ export class ThemeManager {
                     variables.push(`  --color-${category}: ${colors};`);
                 }
             }
-            /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+            /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe theme color processing */
         }
     }
 
@@ -380,7 +380,7 @@ export class ThemeManager {
                     ]);
                 }
             }
-            /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+            /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe CSS property value processing */
 
             // Apply all properties at once to prevent flickering
             for (const [property, value] of properties) {
@@ -551,4 +551,4 @@ export class ThemeManager {
  */
 export const themeManager: ThemeManager = ThemeManager.getInstance();
 
-/* eslint-enable @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison */
+/* eslint-enable @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- Re-enable after defensive programming section */

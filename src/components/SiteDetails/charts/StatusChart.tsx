@@ -91,16 +91,18 @@ ChartJS.register(
  *
  * @public
  */
-export const StatusChart: NamedExoticComponent<{
-    readonly data: StatusBarChartData;
-    readonly options: ChartOptions<"bar">;
-}> = memo(function StatusChart({
+export const StatusChart: NamedExoticComponent<
+    Readonly<{
+        data: StatusBarChartData;
+        options: ChartOptions<"bar">;
+    }>
+> = memo(function StatusChart({
     data,
     options,
-}: {
-    readonly data: StatusBarChartData;
-    readonly options: ChartOptions<"bar">;
-}) {
+}: Readonly<{
+    data: StatusBarChartData;
+    options: ChartOptions<"bar">;
+}>) {
     return <Bar data={data} options={options} />;
 });
 

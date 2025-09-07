@@ -134,7 +134,7 @@ describe(generateUuid, () => {
             const result = generateUuid();
 
             // Assert
-            expect(result).toBe("site-4fzzzxjyl-1672531200000");
+            expect(result).toBe("site-4fzzzx4fzzzx-1672531200000123");
             expect(mockRandom).toHaveBeenCalled();
         });
 
@@ -160,7 +160,7 @@ describe(generateUuid, () => {
             const result = generateUuid();
 
             // Assert
-            expect(result).toBe("site-zk00000yt-1686832200000");
+            expect(result).toBe("site-zk0000zk0000-1686832200000987");
             expect(mockRandom).toHaveBeenCalled();
         });
 
@@ -188,7 +188,7 @@ describe(generateUuid, () => {
             const result = generateUuid();
 
             // Assert
-            expect(result).toBe("site-jzzzzysgp-1704067199999");
+            expect(result).toBe("site-jzzzzyjzzzzy-1704067199999555");
             expect(mockRandom).toHaveBeenCalled();
         });
 
@@ -222,7 +222,7 @@ describe(generateUuid, () => {
 
             // Assert
             expect(mockRandomUuid).toHaveBeenCalledTimes(1);
-            expect(result).toBe("site-3zzzzzraj-1678875330500");
+            expect(result).toBe("site-3zzzzz3zzzzz-1678875330500111");
             expect(mockRandom).toHaveBeenCalled();
         });
 
@@ -245,9 +245,18 @@ describe(generateUuid, () => {
             vi.setSystemTime(timeValue);
             const mockRandom = vi
                 .spyOn(Math, "random")
-                .mockReturnValueOnce(randomValue)
-                .mockReturnValueOnce(randomValue + 0.1)
-                .mockReturnValueOnce(randomValue + 0.2);
+                // First generateUuid() call: 3 Math.random() calls
+                .mockReturnValueOnce(0.1)    // randomPart1
+                .mockReturnValueOnce(0.2)    // randomPart2
+                .mockReturnValueOnce(0.3)    // microseconds
+                // Second generateUuid() call: 3 Math.random() calls
+                .mockReturnValueOnce(0.777_777_777)  // randomPart1
+                .mockReturnValueOnce(0.777_777_777)  // randomPart2
+                .mockReturnValueOnce(0.777_777_777)  // microseconds
+                // Third generateUuid() call: 3 Math.random() calls
+                .mockReturnValueOnce(0.259_259_259)  // randomPart1 - 'a' in base36
+                .mockReturnValueOnce(0.518_518_518)  // randomPart2 - 's' in base36
+                .mockReturnValueOnce(0.555_555_555); // microseconds
 
             // Act
             const result1 = generateUuid();
@@ -263,12 +272,12 @@ describe(generateUuid, () => {
             const result3 = generateUuid();
 
             // Assert
-            expect(result1).toBe("site-3llllllll-1640995200000");
-            expect(result2).toBe("site-777777777-1640995201000");
-            expect(result3).toBe("site-assssssss-1640995202000");
+            expect(result1).toBe("site-3lllll777777-1640995200000300");
+            expect(result2).toBe("site-rzzzzyrzzzzy-1640995201000777");
+            expect(result3).toBe("site-9bzzzzinzzzy-1640995202000555");
             expect(result1).not.toBe(result2);
             expect(result2).not.toBe(result3);
-            expect(mockRandom).toHaveBeenCalledTimes(3);
+            expect(mockRandom).toHaveBeenCalledTimes(9); // 3 generateUuid calls × 3 Math.random calls each
         });
     });
 
@@ -296,7 +305,7 @@ describe(generateUuid, () => {
             const result = generateUuid();
 
             // Assert
-            expect(result).toMatch(/^site-[\da-z]{9}-\d{13}$/);
+            expect(result).toMatch(/^site-[\da-z]{12}-\d{16}$/);
             expect(result.startsWith("site-")).toBeTruthy();
             expect(result).toContain("-1672531200000"); // timestamp part
         });
@@ -316,12 +325,12 @@ describe(generateUuid, () => {
             vi.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
 
             const testCases = [
-                { random: 0, expected: "site--1672531200000" },
+                { random: 0, expected: "site--1672531200000000" },
                 {
                     random: 0.999_999_999,
-                    expected: "site-zzzzzxtmw-1672531200000",
+                    expected: "site-zzzzzxzzzzzx-1672531200000999",
                 },
-                { random: 0.5, expected: "site-i-1672531200000" },
+                { random: 0.5, expected: "site-ii-1672531200000500" },
             ];
 
             for (const { random, expected } of testCases) {
@@ -364,7 +373,7 @@ describe(generateUuid, () => {
             const result = generateUuid();
 
             // Assert
-            expect(result.endsWith(`-${testTimestamp}`)).toBeTruthy();
+            expect(result.includes(`-${testTimestamp}`)).toBeTruthy();
             expect(result).toContain(testTimestamp.toString());
         });
     });
@@ -393,7 +402,7 @@ describe(generateUuid, () => {
             const result = generateUuid();
 
             // Assert
-            expect(result).toBe(`site-4feornbt3-${largeTimestamp}`);
+            expect(result).toBe(`site-4feorn4feorn-${largeTimestamp}123`);
             expect(result).toContain(largeTimestamp.toString());
         });
 
@@ -416,8 +425,8 @@ describe(generateUuid, () => {
             const result = generateUuid();
 
             // Assert
-            expect(result).toBe("site-i-0");
-            expect(result.endsWith("-0")).toBeTruthy();
+            expect(result).toBe("site-ii-0500");
+            expect(result.includes("-0")).toBeTruthy();
         });
 
         it("should handle Math.random returning exactly 0", async ({
@@ -441,7 +450,7 @@ describe(generateUuid, () => {
             const result = generateUuid();
 
             // Assert
-            expect(result).toBe("site--1000");
+            expect(result).toBe("site--1000000");
             expect(result).toContain("-1000");
         });
 
@@ -468,8 +477,8 @@ describe(generateUuid, () => {
             const result = generateUuid();
 
             // Assert
-            expect(result).toBe("site-zzzzzxtmw-1000");
-            expect(result).toContain("zzzzzxtmw");
+            expect(result).toBe("site-zzzzzxzzzzzx-1000999");
+            expect(result).toContain("zzzzzx");
         });
     });
 
@@ -708,7 +717,7 @@ describe(generateUuid, () => {
             const result = generateUuid();
 
             // Assert
-            expect(result).toBe("site-i-1234567890123");
+            expect(result).toBe("site-ii-1234567890123500");
             expect(mockNow).toHaveBeenCalled();
             expect(mockRandom).toHaveBeenCalled();
 
@@ -755,7 +764,7 @@ describe(generateUuid, () => {
             vi.spyOn(Math, "random").mockReturnValue(0.75);
 
             const result = generateUuid();
-            expect(result).toBe("site-r-1640995200000");
+            expect(result).toBe("site-rr-1640995200000750");
             expect(result.startsWith("site-")).toBeTruthy();
         });
 

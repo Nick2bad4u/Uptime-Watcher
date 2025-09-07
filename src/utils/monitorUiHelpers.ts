@@ -72,7 +72,7 @@ function isMonitorTypeConfig(value: unknown): value is MonitorTypeConfig {
         typeof (value as UnknownRecord)["displayName"] === "string" &&
         Array.isArray((value as UnknownRecord)["fields"])
     );
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion */
+    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe runtime type validation */
 }
 
 import { withUtilityErrorHandling } from "./errorHandling";

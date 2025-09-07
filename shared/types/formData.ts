@@ -253,13 +253,13 @@ export function isHttpFormData(
     formData: MonitorFormData
 ): formData is HttpFormData {
     // Runtime validation requires null/undefined checks despite type signature
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- Runtime type guard validation requires explicit null checks despite TypeScript type annotations
     if (formData === null || formData === undefined) {
         return false;
     }
     return (
         // Additional null check for defensive programming
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Defensive programming requires redundant null check for runtime safety
         formData &&
         typeof formData === "object" &&
         formData.type === "http" &&
@@ -283,13 +283,13 @@ export function isPingFormData(
     formData: MonitorFormData
 ): formData is PingFormData {
     // Runtime validation requires null/undefined checks despite type signature
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- Runtime type guard validation requires explicit null checks despite TypeScript type annotations
     if (formData === null || formData === undefined) {
         return false;
     }
     return (
         // Additional null check for defensive programming
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Defensive programming requires redundant null check for runtime safety
         formData &&
         typeof formData === "object" &&
         formData.type === "ping" &&
@@ -313,13 +313,13 @@ export function isPortFormData(
     formData: MonitorFormData
 ): formData is PortFormData {
     // Runtime validation requires null/undefined checks despite type signature
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- Runtime type guard validation requires explicit null checks despite TypeScript type annotations
     if (formData === null || formData === undefined) {
         return false;
     }
     return (
         // Additional null check for defensive programming
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Defensive programming requires redundant null check for runtime safety
         formData &&
         typeof formData === "object" &&
         formData.type === "port" &&

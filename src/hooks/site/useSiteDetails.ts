@@ -180,7 +180,7 @@ export interface UseSiteDetailsResult {
  * @returns Object containing all site details state and handlers
  */
 
-// eslint-disable-next-line complexity
+// eslint-disable-next-line complexity -- Complex hook that manages multiple site detail states and operations, breaking down would reduce cohesion
 export function useSiteDetails({
     site,
 }: UseSiteDetailsProperties): UseSiteDetailsResult {

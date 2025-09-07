@@ -935,7 +935,7 @@ export class EnhancedMonitorChecker {
                         monitor.id
                     );
 
-                if (currentCount > pruneThreshold) {
+                if (pruneThreshold < currentCount) {
                     await this.config.historyRepository.pruneHistory(
                         monitor.id,
                         historyLimit

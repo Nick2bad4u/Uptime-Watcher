@@ -34,7 +34,7 @@ export function castIpcResponse<T>(
     // This assertion is necessary for IPC boundaries where TypeScript can't
     // verify types Runtime validation via validator parameter provides
     // additional safety
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- safe assertion with runtime validation for IPC boundaries
     return response as T;
 }
 

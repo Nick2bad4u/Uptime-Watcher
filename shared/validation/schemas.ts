@@ -355,7 +355,7 @@ function getMonitorSchema(
     type: string
 ): (typeof monitorSchemas)[keyof typeof monitorSchemas] | undefined {
     // Type assertion is safe since we're checking if the property exists
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- safe type assertion for monitor schema lookup
     return monitorSchemas[type as keyof typeof monitorSchemas];
 }
 
@@ -390,7 +390,7 @@ function validateFieldWithSchema(
         // Use the specific schema's field definition
         // Type assertion is safe since we check field existence above
         const fieldSchema =
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- safe assertion for schema field lookup
             schema.shape[fieldName as keyof typeof schema.shape];
         return z
             .object({ [fieldName]: fieldSchema })
@@ -404,7 +404,7 @@ function validateFieldWithSchema(
         return z
             .object({
                 [fieldName]:
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- safe assertion for common field lookup
                     commonFields[fieldName as keyof typeof commonFields],
             })
             .strict()

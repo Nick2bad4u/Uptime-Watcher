@@ -558,10 +558,10 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                             expect(result).toBeDefined();
                             expect(result.buffer).toBe(mockData);
                             expect(result.metadata.sizeBytes).toBe(mockData.length);
-                            expect(result.metadata.filename).toBe(BACKUP_DB_FILE_NAME);
+                            expect(result.fileName).toBe(BACKUP_DB_FILE_NAME);
                             expect(result.metadata.originalPath).toBe(testPath);
-                            expect(result.metadata.timestamp).toBeTypeOf("number");
-                            expect(result.metadata.timestamp).toBeGreaterThan(0);
+                            expect(result.metadata.createdAt).toBeTypeOf("number");
+                            expect(result.metadata.createdAt).toBeGreaterThan(0);
                             expect(mockFs.readFile).toHaveBeenCalledWith(testPath);
                         }
                     )
@@ -608,8 +608,13 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                             await expect(createDatabaseBackup(testPath)).rejects.toThrow();
                             expect(logger.error).toHaveBeenCalledWith(
-                                expect.stringContaining("Failed to create database backup"),
-                                error
+                                "[DatabaseBackup] Failed to create database backup",
+                                expect.objectContaining({
+                                    dbPath: testPath,
+                                    error: `Mock error: ${errorCode}`,
+                                    fileName: BACKUP_DB_FILE_NAME,
+                                    stack: expect.any(String),
+                                })
                             );
                         }
                     )
@@ -633,9 +638,9 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                             // Verify metadata consistency
                             expect(result.metadata.sizeBytes).toBe(dataSize);
                             expect(result.metadata.originalPath).toBe(dbPath);
-                            expect(result.metadata.filename).toBe(BACKUP_DB_FILE_NAME);
-                            expect(result.metadata.timestamp).toBeGreaterThanOrEqual(beforeTimestamp);
-                            expect(result.metadata.timestamp).toBeLessThanOrEqual(afterTimestamp);
+                            expect(result.fileName).toBe(BACKUP_DB_FILE_NAME);
+                            expect(result.metadata.createdAt).toBeGreaterThanOrEqual(beforeTimestamp);
+                            expect(result.metadata.createdAt).toBeLessThanOrEqual(afterTimestamp);
 
                             // Verify buffer size matches metadata
                             expect(result.buffer).toHaveLength(result.metadata.sizeBytes);
@@ -670,7 +675,13 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                             // Verify logging for successful backup
                             expect(logger.info).toHaveBeenCalledWith(
-                                expect.stringContaining("Database backup created successfully")
+                                "[DatabaseBackup] Database backup created successfully",
+                                expect.objectContaining({
+                                    dbPath: testPath,
+                                    fileName: BACKUP_DB_FILE_NAME,
+                                    sizeBytes: testBuffer.length,
+                                    createdAt: expect.any(Number),
+                                })
                             );
                         }
                     )
@@ -691,23 +702,23 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                             // Verify result structure invariants
                             expect(result).toHaveProperty("buffer");
+                            expect(result).toHaveProperty("fileName");
                             expect(result).toHaveProperty("metadata");
-                            expect(result.metadata).toHaveProperty("filename");
+                            expect(result.metadata).toHaveProperty("createdAt");
                             expect(result.metadata).toHaveProperty("originalPath");
                             expect(result.metadata).toHaveProperty("sizeBytes");
-                            expect(result.metadata).toHaveProperty("timestamp");
 
                             // Verify type invariants
                             expect(Buffer.isBuffer(result.buffer)).toBeTruthy();
-                            expect(typeof result.metadata.filename).toBe("string");
+                            expect(typeof result.fileName).toBe("string");
                             expect(typeof result.metadata.originalPath).toBe("string");
                             expect(typeof result.metadata.sizeBytes).toBe("number");
-                            expect(typeof result.metadata.timestamp).toBe("number");
+                            expect(typeof result.metadata.createdAt).toBe("number");
 
                             // Verify value invariants
                             expect(result.metadata.sizeBytes).toBeGreaterThanOrEqual(0);
-                            expect(result.metadata.timestamp).toBeGreaterThan(0);
-                            expect(result.metadata.filename.length).toBeGreaterThan(0);
+                            expect(result.metadata.createdAt).toBeGreaterThan(0);
+                            expect(result.fileName.length).toBeGreaterThan(0);
                             expect(result.metadata.originalPath.length).toBeGreaterThan(0);
                         }
                     )

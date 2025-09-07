@@ -644,7 +644,7 @@ export function createRateLimitMiddleware(options: {
         const recent = times.filter((time) => now - time < 1000);
 
         // Check burst limit
-        if (recent.length >= burstLimit) {
+        if (burstLimit <= recent.length) {
             baseLogger.warn(
                 `[EventBus] Rate limit exceeded for event '${event}' (burst limit: ${burstLimit})`
             );
@@ -655,7 +655,7 @@ export function createRateLimitMiddleware(options: {
         }
 
         // Check rate limit
-        if (recent.length >= maxEventsPerSecond) {
+        if (maxEventsPerSecond <= recent.length) {
             baseLogger.warn(
                 `[EventBus] Rate limit exceeded for event '${event}' (rate limit: ${maxEventsPerSecond}/sec)`
             );
@@ -783,7 +783,8 @@ export function createValidationMiddleware<T extends UnknownRecord>(
                 }
             );
             throw new Error(
-                `Validator error for event '${event}': ${wrappedError.message}`
+                `Validator error for event '${event}': ${wrappedError.message}`,
+                { cause: wrappedError }
             );
         }
 

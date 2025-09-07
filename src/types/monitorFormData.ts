@@ -120,7 +120,7 @@ export function createDefaultFormData(
 export function createDefaultFormData(
     type: string
 ): SetOptional<BaseFormData, never> {
-    /* eslint-enable no-redeclare */
+    /* eslint-enable no-redeclare -- Re-enable after necessary function overloading for type safety */
     return {
         checkInterval: 300_000, // 5 minutes
         monitoring: true,

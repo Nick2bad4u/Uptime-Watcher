@@ -100,7 +100,8 @@ export const createSiteOperationsActions = (
                                 : new Error(String(error))
                         );
                         throw new Error(
-                            `Monitor normalization failed: ${error instanceof Error ? error.message : "Unknown error"}`
+                            `Monitor normalization failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+                            { cause: error }
                         );
                     }
                 });

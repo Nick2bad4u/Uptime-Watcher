@@ -102,16 +102,18 @@ ChartJS.register(
  *
  * @public
  */
-export const ResponseTimeChart: NamedExoticComponent<{
-    readonly data: ResponseTimeChartData;
-    readonly options: ChartOptions<"line">;
-}> = memo(function ResponseTimeChart({
+export const ResponseTimeChart: NamedExoticComponent<
+    Readonly<{
+        data: ResponseTimeChartData;
+        options: ChartOptions<"line">;
+    }>
+> = memo(function ResponseTimeChart({
     data,
     options,
-}: {
-    readonly data: ResponseTimeChartData;
-    readonly options: ChartOptions<"line">;
-}) {
+}: Readonly<{
+    data: ResponseTimeChartData;
+    options: ChartOptions<"line">;
+}>) {
     return <Line data={data} options={options} />;
 });
 
