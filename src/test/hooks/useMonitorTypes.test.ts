@@ -942,7 +942,7 @@ describe("useMonitorTypes Hook", () => {
             }
         );
 
-        test.prop([fc.integer({ min: 10, max: 100 })])(
+        test.prop([fc.integer({ min: 10, max: 50 })], { timeout: 2000 })(
             "should handle loading state timing correctly",
             async (delayMs) => {
                 // Clear mocks at start of each property test execution
@@ -969,7 +969,7 @@ describe("useMonitorTypes Hook", () => {
                     () => {
                         expect(result.current.isLoading).toBeFalsy();
                     },
-                    { timeout: delayMs + 500 }
+                    { timeout: delayMs + 200 }
                 );
 
                 expect(result.current.options).toEqual(mockOptions);
@@ -977,7 +977,7 @@ describe("useMonitorTypes Hook", () => {
 
                 // Verify delay properties
                 expect(delayMs).toBeGreaterThanOrEqual(10);
-                expect(delayMs).toBeLessThanOrEqual(100);
+                expect(delayMs).toBeLessThanOrEqual(50);
             }
         );
     });

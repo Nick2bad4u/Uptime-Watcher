@@ -72,13 +72,32 @@ export interface RetryWithAbortOptions {
 export function createCombinedAbortSignal(
     options: CombineSignalsOptions = {}
 ): AbortSignal {
-    const { additionalSignals = [], timeoutMs } = options;
+    const { additionalSignals = [], timeoutMs, reason } = options;
 
     const signals: AbortSignal[] = [];
 
     // Add timeout signal if specified
     if (timeoutMs !== undefined && timeoutMs > 0) {
-        signals.push(AbortSignal.timeout(timeoutMs));
+        if (reason) {
+            // Create custom timeout signal with reason
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => {
+                controller.abort(reason);
+            }, timeoutMs);
+
+            // Clean up timeout if signal is aborted by other means
+            controller.signal.addEventListener(
+                "abort",
+                () => {
+                    clearTimeout(timeoutId);
+                },
+                { once: true }
+            );
+
+            signals.push(controller.signal);
+        } else {
+            signals.push(AbortSignal.timeout(timeoutMs));
+        }
     }
 
     // Add additional signals (handle null/undefined additionalSignals)

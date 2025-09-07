@@ -50,6 +50,7 @@
     "build:prepublish": "npm run lint && npm run test && npm run build",
     "build:shared": "tsc --project tsconfig.shared.json",
     "build:eslint-inspector": "node scripts/build-eslint-inspector.mjs",
+    "build:eslint-inspector:local": "node scripts/build-eslint-inspector.mjs --local",
     "check-types": "npm run check:shared && npm run check:electron && npm run check:frontend",
     "check-types:all": "npm run check:shared && npm run check:electron && npm run check:frontend && npm run check:electron:test && npm run check:frontend:test && npm run check:benchmarks:test && npm run check:shared:test && npm run check:configs:test",
     "check:all": "npm run check:shared && npm run check:electron && npm run check:frontend",

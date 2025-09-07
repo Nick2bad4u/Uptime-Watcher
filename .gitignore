@@ -562,3 +562,4 @@ stryker_prompts_by_mutator/
 stryker-issues.json
 .eslint-config-inspector/
 docs/docusaurus/static/eslint-inspector/
+eslint-inspector-local-test/

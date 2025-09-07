@@ -52,6 +52,11 @@ export function convertError(error: unknown): ErrorConversionResult {
         }
     }
 
+    // Provide fallback for whitespace-only strings (but preserve truly empty strings)
+    if (errorMessage.trim().length === 0 && errorMessage.length > 0) {
+        errorMessage = `[whitespace-only ${typeof error}]`;
+    }
+
     return {
         error: new Error(errorMessage),
         originalType: typeof error,

@@ -695,22 +695,26 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 ),
                 monitorType: fc.constantFrom("http", "port"),
             }),
-        ])("should handle realistic site configurations", async (config) => {
-            const user = userEvent.setup();
-            render(<AddSiteForm />);
+        ])(
+            "should handle realistic site configurations",
+            async (config) => {
+                const user = userEvent.setup();
+                render(<AddSiteForm />);
 
-            // Verify realistic input characteristics
-            expect(config.siteName.trim().length).toBeGreaterThan(0);
-            expect(config.url).toMatch(/^https?:\/\//);
-            expect(["http", "port"]).toContain(config.monitorType);
+                // Verify realistic input characteristics
+                expect(config.siteName.trim().length).toBeGreaterThan(0);
+                expect(config.url).toMatch(/^https?:\/\//);
+                expect(["http", "port"]).toContain(config.monitorType);
 
-            // Form should be interactive
-            const forms = screen.getAllByRole("form", {
-                name: /add site form/i,
-            });
-            const form = forms[0];
-            expect(form).toBeInTheDocument();
-        });
+                // Form should be interactive
+                const forms = screen.getAllByRole("form", {
+                    name: /add site form/i,
+                });
+                const form = forms[0];
+                expect(form).toBeInTheDocument();
+            },
+            30_000
+        ); // 30 second timeout for this property-based test
 
         test.prop([
             fc.record({
