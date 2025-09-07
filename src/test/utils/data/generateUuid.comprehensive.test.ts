@@ -246,16 +246,16 @@ describe(generateUuid, () => {
             const mockRandom = vi
                 .spyOn(Math, "random")
                 // First generateUuid() call: 3 Math.random() calls
-                .mockReturnValueOnce(0.1)    // randomPart1
-                .mockReturnValueOnce(0.2)    // randomPart2
-                .mockReturnValueOnce(0.3)    // microseconds
+                .mockReturnValueOnce(0.1) // randomPart1
+                .mockReturnValueOnce(0.2) // randomPart2
+                .mockReturnValueOnce(0.3) // microseconds
                 // Second generateUuid() call: 3 Math.random() calls
-                .mockReturnValueOnce(0.777_777_777)  // randomPart1
-                .mockReturnValueOnce(0.777_777_777)  // randomPart2
-                .mockReturnValueOnce(0.777_777_777)  // microseconds
+                .mockReturnValueOnce(0.777_777_777) // randomPart1
+                .mockReturnValueOnce(0.777_777_777) // randomPart2
+                .mockReturnValueOnce(0.777_777_777) // microseconds
                 // Third generateUuid() call: 3 Math.random() calls
-                .mockReturnValueOnce(0.259_259_259)  // randomPart1 - 'a' in base36
-                .mockReturnValueOnce(0.518_518_518)  // randomPart2 - 's' in base36
+                .mockReturnValueOnce(0.259_259_259) // randomPart1 - 'a' in base36
+                .mockReturnValueOnce(0.518_518_518) // randomPart2 - 's' in base36
                 .mockReturnValueOnce(0.555_555_555); // microseconds
 
             // Act

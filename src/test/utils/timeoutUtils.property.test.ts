@@ -1,13 +1,13 @@
 /**
- * @fileoverview Comprehensive property-based tests for timeout utilities
+ * Uses fast-check to systematically test timeout conversion, validation, and
+ * clamping logic across all possible numeric inputs and edge cases. Validates
+ * mathematical properties, boundary conditions, and defensive handling of
+ * extreme values.
  *
- * @description
- * Uses fast-check to systematically test timeout conversion, validation,
- * and clamping logic across all possible numeric inputs and edge cases.
- * Validates mathematical properties, boundary conditions, and defensive
- * handling of extreme values.
+ * @file Comprehensive property-based tests for timeout utilities
  *
  * @author GitHub Copilot
+ *
  * @since 2025-09-05
  */
 
@@ -32,33 +32,49 @@ import {
 } from "../../constants";
 
 describe("TimeoutUtils Property-Based Tests", () => {
-
     /**
-     * Custom arbitraries for testing timeout values using doubles for better precision
+     * Custom arbitraries for testing timeout values using doubles for better
+     * precision
      */
     const validTimeoutSeconds = fc.double({
         min: TIMEOUT_CONSTRAINTS.MIN,
         max: TIMEOUT_CONSTRAINTS.MAX,
-        noNaN: true
+        noNaN: true,
     });
 
     const validTimeoutMs = fc.double({
         min: TIMEOUT_CONSTRAINTS_MS.MIN,
         max: TIMEOUT_CONSTRAINTS_MS.MAX,
-        noNaN: true
+        noNaN: true,
     });
 
     const invalidTimeoutSeconds = fc.oneof(
-        fc.double({ min: -1000, max: TIMEOUT_CONSTRAINTS.MIN - 0.1, noNaN: true }), // Below minimum
-        fc.double({ min: TIMEOUT_CONSTRAINTS.MAX + 0.1, max: 10_000, noNaN: true }), // Above maximum
+        fc.double({
+            min: -1000,
+            max: TIMEOUT_CONSTRAINTS.MIN - 0.1,
+            noNaN: true,
+        }), // Below minimum
+        fc.double({
+            min: TIMEOUT_CONSTRAINTS.MAX + 0.1,
+            max: 10_000,
+            noNaN: true,
+        }), // Above maximum
         fc.constant(Number.NEGATIVE_INFINITY),
         fc.constant(Number.POSITIVE_INFINITY),
         fc.constant(Number.NaN)
     );
 
     const invalidTimeoutMs = fc.oneof(
-        fc.double({ min: -1_000_000, max: TIMEOUT_CONSTRAINTS_MS.MIN - 1, noNaN: true }), // Below minimum
-        fc.double({ min: TIMEOUT_CONSTRAINTS_MS.MAX + 1, max: 10_000_000, noNaN: true }), // Above maximum
+        fc.double({
+            min: -1_000_000,
+            max: TIMEOUT_CONSTRAINTS_MS.MIN - 1,
+            noNaN: true,
+        }), // Below minimum
+        fc.double({
+            min: TIMEOUT_CONSTRAINTS_MS.MAX + 1,
+            max: 10_000_000,
+            noNaN: true,
+        }), // Above maximum
         fc.constant(Number.NEGATIVE_INFINITY),
         fc.constant(Number.POSITIVE_INFINITY),
         fc.constant(Number.NaN)
@@ -73,7 +89,13 @@ describe("TimeoutUtils Property-Based Tests", () => {
             }
         );
 
-        test.prop([fc.double({ min: -10_000_000, max: TIMEOUT_CONSTRAINTS_MS.MIN - 1, noNaN: true })])(
+        test.prop([
+            fc.double({
+                min: -10_000_000,
+                max: TIMEOUT_CONSTRAINTS_MS.MIN - 1,
+                noNaN: true,
+            }),
+        ])(
             "should return minimum value for inputs below minimum",
             (belowMin) => {
                 const result = clampTimeoutMs(belowMin);
@@ -81,7 +103,13 @@ describe("TimeoutUtils Property-Based Tests", () => {
             }
         );
 
-        test.prop([fc.double({ min: TIMEOUT_CONSTRAINTS_MS.MAX + 1, max: 10_000_000, noNaN: true })])(
+        test.prop([
+            fc.double({
+                min: TIMEOUT_CONSTRAINTS_MS.MAX + 1,
+                max: 10_000_000,
+                noNaN: true,
+            }),
+        ])(
             "should return maximum value for inputs above maximum",
             (aboveMax) => {
                 const result = clampTimeoutMs(aboveMax);
@@ -93,24 +121,33 @@ describe("TimeoutUtils Property-Based Tests", () => {
             "should always return a value within valid range",
             (anyTimeout) => {
                 // Skip NaN and Infinity cases for this test
-                fc.pre(!Number.isNaN(anyTimeout) && Number.isFinite(anyTimeout));
+                fc.pre(
+                    !Number.isNaN(anyTimeout) && Number.isFinite(anyTimeout)
+                );
 
                 const result = clampTimeoutMs(anyTimeout);
-                expect(result).toBeGreaterThanOrEqual(TIMEOUT_CONSTRAINTS_MS.MIN);
+                expect(result).toBeGreaterThanOrEqual(
+                    TIMEOUT_CONSTRAINTS_MS.MIN
+                );
                 expect(result).toBeLessThanOrEqual(TIMEOUT_CONSTRAINTS_MS.MAX);
             }
         );
 
-        test.prop([fc.oneof(fc.constant(Number.NaN), fc.constant(Number.POSITIVE_INFINITY), fc.constant(Number.NEGATIVE_INFINITY))])(
-            "should handle special numeric values",
-            (specialValue) => {
-                // Test that it doesn't crash on special values
-                expect(() => clampTimeoutMs(specialValue)).not.toThrow();
-                const result = clampTimeoutMs(specialValue);
-                // For NaN, Math.max/min behavior is to return NaN, but we want to verify behavior
-                expect(Number.isFinite(result) || Number.isNaN(result)).toBeTruthy();
-            }
-        );
+        test.prop([
+            fc.oneof(
+                fc.constant(Number.NaN),
+                fc.constant(Number.POSITIVE_INFINITY),
+                fc.constant(Number.NEGATIVE_INFINITY)
+            ),
+        ])("should handle special numeric values", (specialValue) => {
+            // Test that it doesn't crash on special values
+            expect(() => clampTimeoutMs(specialValue)).not.toThrow();
+            const result = clampTimeoutMs(specialValue);
+            // For NaN, Math.max/min behavior is to return NaN, but we want to verify behavior
+            expect(
+                Number.isFinite(result) || Number.isNaN(result)
+            ).toBeTruthy();
+        });
     });
 
     describe(clampTimeoutSeconds, () => {
@@ -122,7 +159,13 @@ describe("TimeoutUtils Property-Based Tests", () => {
             }
         );
 
-        test.prop([fc.double({ min: -10_000, max: TIMEOUT_CONSTRAINTS.MIN - 0.1, noNaN: true })])(
+        test.prop([
+            fc.double({
+                min: -10_000,
+                max: TIMEOUT_CONSTRAINTS.MIN - 0.1,
+                noNaN: true,
+            }),
+        ])(
             "should return minimum value for inputs below minimum",
             (belowMin) => {
                 const result = clampTimeoutSeconds(belowMin);
@@ -130,7 +173,13 @@ describe("TimeoutUtils Property-Based Tests", () => {
             }
         );
 
-        test.prop([fc.double({ min: TIMEOUT_CONSTRAINTS.MAX + 0.1, max: 10_000, noNaN: true })])(
+        test.prop([
+            fc.double({
+                min: TIMEOUT_CONSTRAINTS.MAX + 0.1,
+                max: 10_000,
+                noNaN: true,
+            }),
+        ])(
             "should return maximum value for inputs above maximum",
             (aboveMax) => {
                 const result = clampTimeoutSeconds(aboveMax);
@@ -142,7 +191,9 @@ describe("TimeoutUtils Property-Based Tests", () => {
             "should always return a value within valid range",
             (anyTimeout) => {
                 // Skip NaN and Infinity cases for this test
-                fc.pre(!Number.isNaN(anyTimeout) && Number.isFinite(anyTimeout));
+                fc.pre(
+                    !Number.isNaN(anyTimeout) && Number.isFinite(anyTimeout)
+                );
 
                 const result = clampTimeoutSeconds(anyTimeout);
                 expect(result).toBeGreaterThanOrEqual(TIMEOUT_CONSTRAINTS.MIN);
@@ -169,13 +220,10 @@ describe("TimeoutUtils Property-Based Tests", () => {
             }
         );
 
-        test.prop([fc.constant(0)])(
-            "should handle zero correctly",
-            (zero) => {
-                const result = timeoutMsToSeconds(zero);
-                expect(result).toBe(0);
-            }
-        );
+        test.prop([fc.constant(0)])("should handle zero correctly", (zero) => {
+            const result = timeoutMsToSeconds(zero);
+            expect(result).toBe(0);
+        });
 
         test.prop([fc.double({ min: 100, max: 5000, noNaN: true })])(
             "should be invertible with timeoutSecondsToMs for reasonable values",
@@ -205,13 +253,10 @@ describe("TimeoutUtils Property-Based Tests", () => {
             }
         );
 
-        test.prop([fc.constant(0)])(
-            "should handle zero correctly",
-            (zero) => {
-                const result = timeoutSecondsToMs(zero);
-                expect(result).toBe(0);
-            }
-        );
+        test.prop([fc.constant(0)])("should handle zero correctly", (zero) => {
+            const result = timeoutSecondsToMs(zero);
+            expect(result).toBe(0);
+        });
 
         test.prop([fc.double({ min: 0.1, max: 100, noNaN: true })])(
             "should be invertible with timeoutMsToSeconds for reasonable values",
@@ -263,15 +308,18 @@ describe("TimeoutUtils Property-Based Tests", () => {
             expect(result).toBe(DEFAULT_REQUEST_TIMEOUT_SECONDS);
         });
 
-        test.prop([fc.oneof(fc.constant(0), fc.constant(null), fc.constant(false))])(
-            "should return default for falsy values",
-            (falsyValue) => {
-                const result = getTimeoutSeconds(falsyValue as any);
-                expect(result).toBe(DEFAULT_REQUEST_TIMEOUT_SECONDS);
-            }
-        );
+        test.prop([
+            fc.oneof(fc.constant(0), fc.constant(null), fc.constant(false)),
+        ])("should return default for falsy values", (falsyValue) => {
+            const result = getTimeoutSeconds(falsyValue as any);
+            expect(result).toBe(DEFAULT_REQUEST_TIMEOUT_SECONDS);
+        });
 
-        test.prop([fc.double({ min: 1, max: 1_000_000, noNaN: true }).filter(n => n !== 0)])(
+        test.prop([
+            fc
+                .double({ min: 1, max: 1_000_000, noNaN: true })
+                .filter((n) => n !== 0),
+        ])(
             "should convert truthy numeric values correctly",
             (truthyTimeout) => {
                 const result = getTimeoutSeconds(truthyTimeout);
@@ -311,8 +359,12 @@ describe("TimeoutUtils Property-Based Tests", () => {
         });
 
         test("should return false for just outside boundary values", () => {
-            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN - 1)).toBeFalsy();
-            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX + 1)).toBeFalsy();
+            expect(
+                isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN - 1)
+            ).toBeFalsy();
+            expect(
+                isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX + 1)
+            ).toBeFalsy();
         });
     });
 
@@ -346,8 +398,12 @@ describe("TimeoutUtils Property-Based Tests", () => {
         });
 
         test("should return false for just outside boundary values", () => {
-            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN - 0.1)).toBeFalsy();
-            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX + 0.1)).toBeFalsy();
+            expect(
+                isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN - 0.1)
+            ).toBeFalsy();
+            expect(
+                isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX + 0.1)
+            ).toBeFalsy();
         });
     });
 

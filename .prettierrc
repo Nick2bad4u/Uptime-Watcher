@@ -93,7 +93,10 @@
             }
         },
         {
-            "files": "historyManipulation.test.ts, cache.test.ts",
+            "files": [
+                "historyManipulation.test.ts",
+                "cache.test.ts"
+            ],
             "options": {
                 "plugins": [
                     "prettier-plugin-multiline-arrays",

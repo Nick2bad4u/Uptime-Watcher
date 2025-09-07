@@ -182,7 +182,10 @@ describe("Fallback Utilities", () => {
                 fc.oneof(
                     fc.string(),
                     fc.integer(),
-                    fc.float({ min: Math.fround(-1000), max: Math.fround(1000) }),
+                    fc.float({
+                        min: Math.fround(-1000),
+                        max: Math.fround(1000),
+                    }),
                     fc.boolean(),
                     fc.array(fc.anything()),
                     fc.object(),
@@ -192,7 +195,7 @@ describe("Fallback Utilities", () => {
                     fc.constant(""),
                     fc.constant([]),
                     fc.constant({})
-                )
+                ),
             ])(
                 "should always return false for non-null/undefined values including falsy ones",
                 (value) => {
@@ -200,12 +203,11 @@ describe("Fallback Utilities", () => {
                 }
             );
 
-            test.prop([fc.anything().filter((v) => v !== null && v !== undefined)])(
-                "should return false for any defined value",
-                (value) => {
-                    expect(isNullOrUndefined(value)).toBeFalsy();
-                }
-            );
+            test.prop([
+                fc.anything().filter((v) => v !== null && v !== undefined),
+            ])("should return false for any defined value", (value) => {
+                expect(isNullOrUndefined(value)).toBeFalsy();
+            });
         });
     });
 
@@ -299,7 +301,10 @@ describe("Fallback Utilities", () => {
                 "should create handler function for any valid operation name",
                 (operationName) => {
                     const mockAsyncOp = vi.fn().mockResolvedValue("result");
-                    const handler = withAsyncErrorHandling(mockAsyncOp, operationName);
+                    const handler = withAsyncErrorHandling(
+                        mockAsyncOp,
+                        operationName
+                    );
 
                     expect(typeof handler).toBe("function");
                     expect(handler()).toBeUndefined(); // Returns void
@@ -316,7 +321,7 @@ describe("Fallback Utilities", () => {
                     expect(() => handler()).not.toThrow();
 
                     // Wait a bit to allow async operation to complete
-                    await new Promise(resolve => setTimeout(resolve, 0));
+                    await new Promise((resolve) => setTimeout(resolve, 0));
                     expect(mockAsyncOp).toHaveBeenCalledTimes(1);
                 }
             );
@@ -324,14 +329,16 @@ describe("Fallback Utilities", () => {
             test.prop([fc.string().filter((s) => s.trim().length > 0)])(
                 "should handle async operations that throw with any error message",
                 async (errorMessage) => {
-                    const mockAsyncOp = vi.fn().mockRejectedValue(new Error(errorMessage));
+                    const mockAsyncOp = vi
+                        .fn()
+                        .mockRejectedValue(new Error(errorMessage));
                     const handler = withAsyncErrorHandling(mockAsyncOp, "test");
 
                     // Should not throw when handler is called, even if async op fails
                     expect(() => handler()).not.toThrow();
 
                     // Wait a bit to allow async operation to complete
-                    await new Promise(resolve => setTimeout(resolve, 0));
+                    await new Promise((resolve) => setTimeout(resolve, 0));
                     expect(mockAsyncOp).toHaveBeenCalledTimes(1);
                 }
             );
@@ -524,7 +531,7 @@ describe("Fallback Utilities", () => {
 
             test.prop([
                 fc.string().filter((s) => s.trim().length > 0),
-                fc.anything()
+                fc.anything(),
             ])(
                 "should return fallback value when operation throws",
                 async (operationName, fallbackValue) => {
@@ -546,8 +553,13 @@ describe("Fallback Utilities", () => {
             );
 
             test.prop([
-                fc.oneof(fc.string(), fc.integer(), fc.constant(null), fc.constant({})),
-                fc.anything()
+                fc.oneof(
+                    fc.string(),
+                    fc.integer(),
+                    fc.constant(null),
+                    fc.constant({})
+                ),
+                fc.anything(),
             ])(
                 "should handle operations throwing various error types",
                 async (errorToThrow, fallbackValue) => {
@@ -640,7 +652,7 @@ describe("Fallback Utilities", () => {
         describe("Property-based Tests", () => {
             test.prop([
                 fc.oneof(fc.constant(null), fc.constant(undefined)),
-                fc.anything()
+                fc.anything(),
             ])(
                 "should always return fallback for null or undefined values",
                 (nullOrUndef, fallback) => {
@@ -650,7 +662,7 @@ describe("Fallback Utilities", () => {
 
             test.prop([
                 fc.anything().filter((v) => v !== null && v !== undefined),
-                fc.anything()
+                fc.anything(),
             ])(
                 "should return original value when not null or undefined",
                 (value, fallback) => {
@@ -669,7 +681,7 @@ describe("Fallback Utilities", () => {
                     fc.array(fc.anything()),
                     fc.object()
                 ),
-                fc.anything()
+                fc.anything(),
             ])(
                 "should preserve falsy but defined values",
                 (falsyValue, fallback) => {
@@ -986,41 +998,50 @@ describe("Fallback Utilities", () => {
                     retryAttempts: fc.integer({ min: 0, max: 10 }),
                     status: fc.constantFrom("up", "down", "pending", "paused"),
                     timeout: fc.integer({ min: 1000, max: 60_000 }),
-                    history: fc.constant([])
+                    history: fc.constant([]),
                 }) as fc.Arbitrary<Monitor>;
 
             test.prop([
                 createMonitorArbitrary("http"),
-                fc.string().filter((s) => s.trim().length > 0)
+                fc.string().filter((s) => s.trim().length > 0),
             ])(
                 "should prefer URL over fallback for HTTP monitors with URL",
                 (monitor, fallback) => {
                     fc.pre(Boolean(monitor.url));
-                    const result = getMonitorDisplayIdentifier(monitor, fallback);
+                    const result = getMonitorDisplayIdentifier(
+                        monitor,
+                        fallback
+                    );
                     expect(result).toBe(monitor.url);
                 }
             );
 
             test.prop([
                 createMonitorArbitrary("port"),
-                fc.string().filter((s) => s.trim().length > 0)
+                fc.string().filter((s) => s.trim().length > 0),
             ])(
                 "should create host:port identifier for port monitors",
                 (monitor, fallback) => {
                     fc.pre(Boolean(monitor.host) && Boolean(monitor.port));
-                    const result = getMonitorDisplayIdentifier(monitor, fallback);
+                    const result = getMonitorDisplayIdentifier(
+                        monitor,
+                        fallback
+                    );
                     expect(result).toBe(`${monitor.host}:${monitor.port}`);
                 }
             );
 
             test.prop([
                 createMonitorArbitrary("ping"),
-                fc.string().filter((s) => s.trim().length > 0)
+                fc.string().filter((s) => s.trim().length > 0),
             ])(
                 "should use host for ping monitors with host",
                 (monitor, fallback) => {
                     fc.pre(Boolean(monitor.host));
-                    const result = getMonitorDisplayIdentifier(monitor, fallback);
+                    const result = getMonitorDisplayIdentifier(
+                        monitor,
+                        fallback
+                    );
                     expect(result).toBe(monitor.host);
                 }
             );
@@ -1035,9 +1056,9 @@ describe("Fallback Utilities", () => {
                     retryAttempts: fc.integer({ min: 0, max: 10 }),
                     status: fc.constantFrom("up", "down", "pending", "paused"),
                     timeout: fc.integer({ min: 1000, max: 60_000 }),
-                    history: fc.constant([])
+                    history: fc.constant([]),
                 }) as fc.Arbitrary<Monitor>,
-                fc.string().filter((s) => s.trim().length > 0)
+                fc.string().filter((s) => s.trim().length > 0),
             ])(
                 "should return fallback when monitor lacks identifying properties",
                 (monitor, fallback) => {
@@ -1047,7 +1068,10 @@ describe("Fallback Utilities", () => {
                     delete cleanMonitor.host;
                     delete cleanMonitor.port;
 
-                    const result = getMonitorDisplayIdentifier(cleanMonitor, fallback);
+                    const result = getMonitorDisplayIdentifier(
+                        cleanMonitor,
+                        fallback
+                    );
                     expect(result).toBe(fallback);
                 }
             );
@@ -1250,9 +1274,18 @@ describe("Fallback Utilities", () => {
             );
 
             test.prop([
-                fc.string({ minLength: 1, maxLength: 50 })
-                    .filter((s) => !["http", "port", "ping", "dns"].includes(s))
-                    .filter((s) => s.trim().length > 0)
+                fc
+                    .string({ minLength: 1, maxLength: 50 })
+                    .filter(
+                        (s) =>
+                            ![
+                                "http",
+                                "port",
+                                "ping",
+                                "dns",
+                            ].includes(s)
+                    )
+                    .filter((s) => s.trim().length > 0),
             ])(
                 "should format unknown monitor types with proper capitalization",
                 (unknownType) => {
@@ -1263,22 +1296,38 @@ describe("Fallback Utilities", () => {
                     expect(result.endsWith(" Monitor")).toBeTruthy();
 
                     // First character should be uppercase
-                    expect(result.charAt(0)).toBe(result.charAt(0).toUpperCase());
+                    expect(result.charAt(0)).toBe(
+                        result.charAt(0).toUpperCase()
+                    );
                 }
             );
 
-            test.prop([fc.oneof(fc.constant(null), fc.constant(undefined), fc.constant(""))])(
+            test.prop([
+                fc.oneof(
+                    fc.constant(null),
+                    fc.constant(undefined),
+                    fc.constant("")
+                ),
+            ])(
                 "should return default label for invalid inputs",
                 (invalidInput) => {
-                    const result = getMonitorTypeDisplayLabel(invalidInput as any);
+                    const result = getMonitorTypeDisplayLabel(
+                        invalidInput as any
+                    );
                     expect(result).toBe("Monitor Configuration");
                 }
             );
 
             test.prop([
-                fc.string({ minLength: 1 })
-                    .filter((s) => s.includes("_") || s.includes("-") || /[A-Z]/.test(s))
-                    .filter((s) => s.trim().length > 0)
+                fc
+                    .string({ minLength: 1 })
+                    .filter(
+                        (s) =>
+                            s.includes("_") ||
+                            s.includes("-") ||
+                            /[A-Z]/.test(s)
+                    )
+                    .filter((s) => s.trim().length > 0),
             ])(
                 "should handle various string formats (camelCase, snake_case, kebab-case)",
                 (formattedString) => {
@@ -1491,10 +1540,7 @@ describe("Fallback Utilities", () => {
         });
 
         describe("Property-based Tests", () => {
-            test.prop([
-                fc.string(),
-                fc.integer({ min: 0, max: 1000 })
-            ])(
+            test.prop([fc.string(), fc.integer({ min: 0, max: 1000 })])(
                 "should always return string with length <= maxLength",
                 (text, maxLength) => {
                     const result = truncateForLogging(text, maxLength);
@@ -1505,7 +1551,7 @@ describe("Fallback Utilities", () => {
 
             test.prop([
                 fc.string().filter((s) => s.length > 0),
-                fc.integer({ min: 1, max: 20 })
+                fc.integer({ min: 1, max: 20 }),
             ])(
                 "should preserve start of string when truncating",
                 (text, maxLength) => {
@@ -1523,7 +1569,8 @@ describe("Fallback Utilities", () => {
                 (text) => {
                     // Default maxLength should be large enough for most strings
                     const result = truncateForLogging(text);
-                    if (text.length <= 100) { // Assuming default max is >= 100
+                    if (text.length <= 100) {
+                        // Assuming default max is >= 100
                         expect(result).toBe(text);
                     }
                     expect(result.length).toBeLessThanOrEqual(text.length);
@@ -1532,7 +1579,7 @@ describe("Fallback Utilities", () => {
 
             test.prop([
                 fc.string({ minLength: 100 }),
-                fc.integer({ min: 10, max: 50 })
+                fc.integer({ min: 10, max: 50 }),
             ])(
                 "should truncate long strings to specified length",
                 (longText, maxLength) => {
@@ -1709,7 +1756,9 @@ describe("Fallback Utilities", () => {
 
                     // Verify reasonable ranges
                     expect(MonitorDefaults.checkInterval).toBeGreaterThan(0);
-                    expect(MonitorDefaults.retryAttempts).toBeGreaterThanOrEqual(0);
+                    expect(
+                        MonitorDefaults.retryAttempts
+                    ).toBeGreaterThanOrEqual(0);
                     expect(MonitorDefaults.timeout).toBeGreaterThan(0);
                 }
             );

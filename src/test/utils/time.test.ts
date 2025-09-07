@@ -751,9 +751,10 @@ describe("Time Utilities", () => {
     });
 
     /**
-     * Fast-check property-based tests for comprehensive time utility validation.
-     * These tests use property-based testing to systematically explore edge cases
-     * and validate invariants across all time formatting functions.
+     * Fast-check property-based tests for comprehensive time utility
+     * validation. These tests use property-based testing to systematically
+     * explore edge cases and validate invariants across all time formatting
+     * functions.
      */
     describe("Property-Based Fuzzing Tests", () => {
         describe("formatDuration property tests", () => {
@@ -770,9 +771,11 @@ describe("Time Utilities", () => {
                     const patterns = [
                         /^\d+s$/, // seconds only
                         /^\d+m \d+s$/, // minutes and seconds
-                        /^\d+h \d+m$/ // hours and minutes
+                        /^\d+h \d+m$/, // hours and minutes
                     ];
-                    expect(patterns.some(pattern => pattern.test(result))).toBeTruthy();
+                    expect(
+                        patterns.some((pattern) => pattern.test(result))
+                    ).toBeTruthy();
 
                     // Property: No negative values should appear in output
                     expect(result).not.toMatch(/-\d/);
@@ -802,7 +805,9 @@ describe("Time Utilities", () => {
                     expect(minutesMatch).toBeTruthy();
                     const minutesCapture = minutesMatch![1];
                     if (!minutesCapture) {
-                        throw new Error('Expected minutes capture group to be defined');
+                        throw new Error(
+                            "Expected minutes capture group to be defined"
+                        );
                     }
                     const minutes = Number.parseInt(minutesCapture, 10);
                     expect(minutes).toBeGreaterThanOrEqual(1);
@@ -813,7 +818,9 @@ describe("Time Utilities", () => {
                     expect(secondsMatch).toBeTruthy();
                     const secondsCapture = secondsMatch![1];
                     if (!secondsCapture) {
-                        throw new Error('Expected seconds capture group to be defined');
+                        throw new Error(
+                            "Expected seconds capture group to be defined"
+                        );
                     }
                     const seconds = Number.parseInt(secondsCapture, 10);
                     expect(seconds).toBeGreaterThanOrEqual(0);
@@ -832,7 +839,9 @@ describe("Time Utilities", () => {
                     expect(hoursMatch).toBeTruthy();
                     const hoursCapture = hoursMatch![1];
                     if (!hoursCapture) {
-                        throw new Error('Expected hours capture group to be defined');
+                        throw new Error(
+                            "Expected hours capture group to be defined"
+                        );
                     }
                     const hours = Number.parseInt(hoursCapture, 10);
                     expect(hours).toBeGreaterThanOrEqual(1);
@@ -842,7 +851,9 @@ describe("Time Utilities", () => {
                     expect(minutesMatch).toBeTruthy();
                     const minutesCapture = minutesMatch![1];
                     if (!minutesCapture) {
-                        throw new Error('Expected minutes capture group to be defined');
+                        throw new Error(
+                            "Expected minutes capture group to be defined"
+                        );
                     }
                     const minutes = Number.parseInt(minutesCapture, 10);
                     expect(minutes).toBeGreaterThanOrEqual(0);
@@ -862,12 +873,20 @@ describe("Time Utilities", () => {
                     expect(result.length).toBeGreaterThan(0);
 
                     // Property: Should not throw and produce valid date string
-                    expect(() => new Date(timestamp).toLocaleString()).not.toThrow();
+                    expect(() =>
+                        new Date(timestamp).toLocaleString()
+                    ).not.toThrow();
                     expect(result).toBe(new Date(timestamp).toLocaleString());
                 }
             );
 
-            test.prop([fc.oneof(fc.constant(Number.NaN), fc.constant(Infinity), fc.constant(-Infinity))])(
+            test.prop([
+                fc.oneof(
+                    fc.constant(Number.NaN),
+                    fc.constant(Infinity),
+                    fc.constant(-Infinity)
+                ),
+            ])(
                 "should handle special timestamp values gracefully",
                 (timestamp) => {
                     const result = formatFullTimestamp(timestamp);
@@ -1079,7 +1098,9 @@ describe("Time Utilities", () => {
                 (attempts) => {
                     const result = formatRetryAttemptsText(attempts);
 
-                    expect(result).toBe("(Retry disabled - immediate failure detection)");
+                    expect(result).toBe(
+                        "(Retry disabled - immediate failure detection)"
+                    );
                 }
             );
 
@@ -1097,7 +1118,9 @@ describe("Time Utilities", () => {
                 (attempts) => {
                     const result = formatRetryAttemptsText(attempts);
 
-                    expect(result).toBe(`(Retry ${attempts} times before marking down)`);
+                    expect(result).toBe(
+                        `(Retry ${attempts} times before marking down)`
+                    );
                 }
             );
 
@@ -1107,7 +1130,9 @@ describe("Time Utilities", () => {
                     const result = formatRetryAttemptsText(attempts);
 
                     // Property: Should format negative values as-is with plural
-                    expect(result).toBe(`(Retry ${attempts} times before marking down)`);
+                    expect(result).toBe(
+                        `(Retry ${attempts} times before marking down)`
+                    );
                 }
             );
         });
@@ -1123,21 +1148,22 @@ describe("Time Utilities", () => {
                 }
             );
 
-            test.prop([fc.record({
-                value: fc.integer({ min: 1000, max: 3_600_000 }),
-                label: fc.string({ minLength: 1, maxLength: 20 })
-            })])(
-                "should return custom label when provided",
-                (interval) => {
-                    const result = getIntervalLabel(interval);
+            test.prop([
+                fc.record({
+                    value: fc.integer({ min: 1000, max: 3_600_000 }),
+                    label: fc.string({ minLength: 1, maxLength: 20 }),
+                }),
+            ])("should return custom label when provided", (interval) => {
+                const result = getIntervalLabel(interval);
 
-                    expect(result).toBe(interval.label);
-                }
-            );
+                expect(result).toBe(interval.label);
+            });
 
-            test.prop([fc.record({
-                value: fc.integer({ min: 1000, max: 3_600_000 })
-            })])(
+            test.prop([
+                fc.record({
+                    value: fc.integer({ min: 1000, max: 3_600_000 }),
+                }),
+            ])(
                 "should format value when no label provided in object",
                 (interval) => {
                     const result = getIntervalLabel(interval);

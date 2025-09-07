@@ -216,9 +216,9 @@ describe("Monitoring Data Validation", () => {
             expect(isValidUrl("https://www.example.com")).toBeTruthy();
             expect(isValidUrl("https://example.com:443")).toBeTruthy();
             expect(isValidUrl("https://example.com/path")).toBeTruthy();
-            expect(isValidUrl("https://example.com/path?query=value")).toBeTruthy(
-                
-            );
+            expect(
+                isValidUrl("https://example.com/path?query=value")
+            ).toBeTruthy();
             expect(isValidUrl("https://example.com#anchor")).toBeTruthy();
         });
 
@@ -314,9 +314,9 @@ describe("Monitoring Data Validation", () => {
             await annotate("Type: Business Logic", "type");
 
             // validator.js rejects URLs with unencoded spaces for security
-            expect(isValidUrl("https://example.com/path with spaces")).toBeFalsy(
-                
-            );
+            expect(
+                isValidUrl("https://example.com/path with spaces")
+            ).toBeFalsy();
             expect(
                 isValidUrl("https://example.com/path%20with%20encoded%20spaces")
             ).toBeTruthy();

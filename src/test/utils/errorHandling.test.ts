@@ -791,9 +791,9 @@ describe("Error Handling Utilities", () => {
 
     /**
      * Fast-check property-based tests for comprehensive edge case coverage.
-     * These tests systematically explore error handling behavior under
-     * various conditions including arbitrary error types, different fallback
-     * values, operation results, and edge cases in error conversion patterns.
+     * These tests systematically explore error handling behavior under various
+     * conditions including arbitrary error types, different fallback values,
+     * operation results, and edge cases in error conversion patterns.
      */
     describe("Property-based tests", () => {
         describe("ensureError function", () => {
@@ -815,7 +815,7 @@ describe("Error Handling Utilities", () => {
                 }
             );
 
-            test.prop([fc.string().map(msg => new Error(msg))])(
+            test.prop([fc.string().map((msg) => new Error(msg))])(
                 "should return Error instances unchanged",
                 (error) => {
                     const result = ensureError(error);
@@ -830,13 +830,16 @@ describe("Error Handling Utilities", () => {
                 "should return operation result on success",
                 async (expectedResult) => {
                     const operation = vi.fn().mockResolvedValue(expectedResult);
-                    const result = await withUtilityErrorHandling(operation, "test");
+                    const result = await withUtilityErrorHandling(
+                        operation,
+                        "test"
+                    );
                     expect(result).toBe(expectedResult);
                     expect(operation).toHaveBeenCalledTimes(1);
                 }
             );
 
-            test.prop([fc.string().filter(s => s.length > 0), fc.string()])(
+            test.prop([fc.string().filter((s) => s.length > 0), fc.string()])(
                 "should return fallback on error",
                 async (operationName, fallbackValue) => {
                     const error = new Error("Test error");
@@ -854,14 +857,19 @@ describe("Error Handling Utilities", () => {
                 }
             );
 
-            test.prop([fc.string().filter(s => s.length > 0)])(
+            test.prop([fc.string().filter((s) => s.length > 0)])(
                 "should throw when shouldThrow is true",
                 async (operationName) => {
                     const error = new Error("Test error");
                     const operation = vi.fn().mockRejectedValue(error);
 
                     await expect(
-                        withUtilityErrorHandling(operation, operationName, undefined, true)
+                        withUtilityErrorHandling(
+                            operation,
+                            operationName,
+                            undefined,
+                            true
+                        )
                     ).rejects.toBe(error);
 
                     expect(operation).toHaveBeenCalledTimes(1);

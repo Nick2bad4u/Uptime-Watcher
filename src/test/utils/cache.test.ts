@@ -2,10 +2,10 @@
  * Tests for caching utilities
  *
  * @file Comprehensive tests covering all branches and edge cases for the
- *   TypedCache implementation and helper functions.
- * Enhanced with fast-check property-based testing to systematically explore
- * cache behavior under various conditions including TTL expiration, LRU eviction,
- * concurrent operations, and edge cases with different data types and sizes.
+ *   TypedCache implementation and helper functions. Enhanced with fast-check
+ *   property-based testing to systematically explore cache behavior under
+ *   various conditions including TTL expiration, LRU eviction, concurrent
+ *   operations, and edge cases with different data types and sizes.
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
@@ -91,9 +91,9 @@ describe("Cache Utilities", () => {
                 // Let's just verify the cache still functions
                 const result = cache.get("key");
                 // Don't assert specific value since TTL behavior may vary
-                expect(typeof result === "string" || result === undefined).toBeTruthy(
-                    
-                );
+                expect(
+                    typeof result === "string" || result === undefined
+                ).toBeTruthy();
             });
 
             it("should create cache with both maxSize and TTL", async ({
@@ -857,8 +857,9 @@ describe("Cache Utilities", () => {
 
     /**
      * Fast-check property-based tests for comprehensive edge case coverage.
-     * These tests systematically explore cache behavior under various conditions
-     * including TTL expiration, LRU eviction, concurrent operations, and edge cases.
+     * These tests systematically explore cache behavior under various
+     * conditions including TTL expiration, LRU eviction, concurrent operations,
+     * and edge cases.
      */
     describe("Property-based tests", () => {
         describe("TypedCache core operations", () => {
@@ -876,7 +877,12 @@ describe("Cache Utilities", () => {
                 }
             );
 
-            test.prop([fc.array(fc.tuple(fc.string(), fc.string()), { minLength: 1, maxLength: 10 })])(
+            test.prop([
+                fc.array(fc.tuple(fc.string(), fc.string()), {
+                    minLength: 1,
+                    maxLength: 10,
+                }),
+            ])(
                 "should handle multiple key-value pairs correctly",
                 (keyValuePairs) => {
                     const cache = new TypedCache<string, string>();
@@ -920,30 +926,36 @@ describe("Cache Utilities", () => {
                 }
             );
 
-            test.prop([fc.array(fc.tuple(fc.string(), fc.string()), { minLength: 1, maxLength: 5 })])(
-                "should clear all entries correctly",
-                (keyValuePairs) => {
-                    const cache = new TypedCache<string, string>();
+            test.prop([
+                fc.array(fc.tuple(fc.string(), fc.string()), {
+                    minLength: 1,
+                    maxLength: 5,
+                }),
+            ])("should clear all entries correctly", (keyValuePairs) => {
+                const cache = new TypedCache<string, string>();
 
-                    // Set all values
-                    for (const [key, value] of keyValuePairs) {
-                        cache.set(key, value);
-                    }
-
-                    expect(cache.size).toBeGreaterThan(0);
-
-                    // Property: Clear should remove all entries
-                    cache.clear();
-
-                    expect(cache.size).toBe(0);
-                    for (const [key] of keyValuePairs) {
-                        expect(cache.has(key)).toBeFalsy();
-                        expect(cache.get(key)).toBeUndefined();
-                    }
+                // Set all values
+                for (const [key, value] of keyValuePairs) {
+                    cache.set(key, value);
                 }
-            );
 
-            test.prop([fc.string(), fc.string(), fc.string()])(
+                expect(cache.size).toBeGreaterThan(0);
+
+                // Property: Clear should remove all entries
+                cache.clear();
+
+                expect(cache.size).toBe(0);
+                for (const [key] of keyValuePairs) {
+                    expect(cache.has(key)).toBeFalsy();
+                    expect(cache.get(key)).toBeUndefined();
+                }
+            });
+
+            test.prop([
+                fc.string(),
+                fc.string(),
+                fc.string(),
+            ])(
                 "should handle key overwriting correctly",
                 (key, value1, value2) => {
                     fc.pre(value1 !== value2); // Only test when values are different
@@ -967,29 +979,32 @@ describe("Cache Utilities", () => {
                 mockNow.mockReturnValue(1000);
             });
 
-            test.prop([fc.string(), fc.string(), fc.integer({ min: 1, max: 5000 })])(
-                "should expire entries after TTL",
-                (key, value, ttl) => {
-                    const cache = new TypedCache<string, string>();
+            test.prop([
+                fc.string(),
+                fc.string(),
+                fc.integer({ min: 1, max: 5000 }),
+            ])("should expire entries after TTL", (key, value, ttl) => {
+                const cache = new TypedCache<string, string>();
 
-                    mockNow.mockReturnValue(1000);
-                    cache.set(key, value, ttl);
+                mockNow.mockReturnValue(1000);
+                cache.set(key, value, ttl);
 
-                    // Property: Value should be available before expiration
-                    expect(cache.get(key)).toBe(value);
-                    expect(cache.has(key)).toBeTruthy();
+                // Property: Value should be available before expiration
+                expect(cache.get(key)).toBe(value);
+                expect(cache.has(key)).toBeTruthy();
 
-                    // Property: Value should be expired after TTL
-                    mockNow.mockReturnValue(1000 + ttl + 1);
-                    expect(cache.get(key)).toBeUndefined();
-                    expect(cache.has(key)).toBeFalsy();
-                }
-            );
+                // Property: Value should be expired after TTL
+                mockNow.mockReturnValue(1000 + ttl + 1);
+                expect(cache.get(key)).toBeUndefined();
+                expect(cache.has(key)).toBeFalsy();
+            });
 
             test.prop([fc.integer({ min: 100, max: 2000 })])(
                 "should handle default TTL correctly",
                 (defaultTtl) => {
-                    const cache = new TypedCache<string, string>({ ttl: defaultTtl });
+                    const cache = new TypedCache<string, string>({
+                        ttl: defaultTtl,
+                    });
                     const key = "test-key";
                     const value = "test-value";
 
@@ -1005,37 +1020,58 @@ describe("Cache Utilities", () => {
                 }
             );
 
-            test.prop([fc.array(fc.tuple(fc.string(), fc.string(), fc.integer({ min: 100, max: 2000 })), { minLength: 2, maxLength: 5 })])(
-                "should handle cleanup of expired entries",
-                (entries) => {
-                    const cache = new TypedCache<string, string>();
-                    const uniqueEntries = [...new Map(entries.map(([k, v, t]) => [k, [v, t] as const]))];
+            test.prop([
+                fc.array(
+                    fc.tuple(
+                        fc.string(),
+                        fc.string(),
+                        fc.integer({ min: 100, max: 2000 })
+                    ),
+                    { minLength: 2, maxLength: 5 }
+                ),
+            ])("should handle cleanup of expired entries", (entries) => {
+                const cache = new TypedCache<string, string>();
+                const uniqueEntries = [
+                    ...new Map(
+                        entries.map(
+                            ([
+                                k,
+                                v,
+                                t,
+                            ]) => [k, [v, t] as const]
+                        )
+                    ),
+                ];
 
-                    // Set entries at time 1000
-                    mockNow.mockReturnValue(1000);
-                    for (const [key, [value, ttl]] of uniqueEntries) {
-                        cache.set(key, value, ttl);
-                    }
-
-                    expect(cache.size).toBe(uniqueEntries.length);
-
-                    // Advance time past all TTLs
-                    const maxTtl = Math.max(...uniqueEntries.map(([, [, ttl]]) => ttl));
-                    mockNow.mockReturnValue(1000 + maxTtl + 100);
-
-                    // Property: Cleanup should remove all expired entries
-                    cache.cleanup();
-
-                    expect(cache.size).toBe(0);
-                    for (const [key] of uniqueEntries) {
-                        expect(cache.get(key)).toBeUndefined();
-                    }
+                // Set entries at time 1000
+                mockNow.mockReturnValue(1000);
+                for (const [key, [value, ttl]] of uniqueEntries) {
+                    cache.set(key, value, ttl);
                 }
-            );
+
+                expect(cache.size).toBe(uniqueEntries.length);
+
+                // Advance time past all TTLs
+                const maxTtl = Math.max(
+                    ...uniqueEntries.map(([, [, ttl]]) => ttl)
+                );
+                mockNow.mockReturnValue(1000 + maxTtl + 100);
+
+                // Property: Cleanup should remove all expired entries
+                cache.cleanup();
+
+                expect(cache.size).toBe(0);
+                for (const [key] of uniqueEntries) {
+                    expect(cache.get(key)).toBeUndefined();
+                }
+            });
         });
 
         describe("LRU (Least Recently Used) eviction", () => {
-            test.prop([fc.integer({ min: 1, max: 5 }), fc.integer({ min: 6, max: 10 })])(
+            test.prop([
+                fc.integer({ min: 1, max: 5 }),
+                fc.integer({ min: 6, max: 10 }),
+            ])(
                 "should evict oldest entries when maxSize exceeded",
                 (maxSize, totalEntries) => {
                     const cache = new TypedCache<string, string>({ maxSize });
@@ -1058,7 +1094,10 @@ describe("Cache Utilities", () => {
                     }
 
                     // Property: Earlier entries should be evicted
-                    const evictedKeys = entries.slice(0, totalEntries - maxSize);
+                    const evictedKeys = entries.slice(
+                        0,
+                        totalEntries - maxSize
+                    );
                     for (const key of evictedKeys) {
                         expect(cache.has(key)).toBeFalsy();
                     }
@@ -1071,7 +1110,10 @@ describe("Cache Utilities", () => {
                     const maxSize = 2;
                     const cache = new TypedCache<string, string>({ maxSize });
 
-                    const keys = Array.from({ length: numKeys }, (_, i) => `key${i}`);
+                    const keys = Array.from(
+                        { length: numKeys },
+                        (_, i) => `key${i}`
+                    );
 
                     // Fill cache to capacity (2 entries) with controlled timing
                     mockNow.mockReturnValue(1000);
@@ -1116,45 +1158,42 @@ describe("Cache Utilities", () => {
                     fc.boolean(),
                     fc.constant(null),
                     fc.array(fc.string(), { maxLength: 3 }),
-                    fc.record({ name: fc.string(), age: fc.integer({ min: 0, max: 100 }) })
-                )
-            ])(
-                "should handle various value types correctly",
-                (value) => {
-                    const cache = new TypedCache<string, typeof value>();
-                    const key = "test-key";
+                    fc.record({
+                        name: fc.string(),
+                        age: fc.integer({ min: 0, max: 100 }),
+                    })
+                ),
+            ])("should handle various value types correctly", (value) => {
+                const cache = new TypedCache<string, typeof value>();
+                const key = "test-key";
 
-                    cache.set(key, value);
+                cache.set(key, value);
 
-                    // Property: Should store and retrieve any valid JavaScript value
-                    expect(cache.get(key)).toStrictEqual(value);
-                    expect(cache.has(key)).toBeTruthy();
-                    expect(cache.size).toBe(1);
-                }
-            );
+                // Property: Should store and retrieve any valid JavaScript value
+                expect(cache.get(key)).toStrictEqual(value);
+                expect(cache.has(key)).toBeTruthy();
+                expect(cache.size).toBe(1);
+            });
 
             test.prop([
                 fc.oneof(
                     fc.string(),
                     fc.integer(),
-                    fc.float().filter(n => !Number.isNaN(n)),
+                    fc.float().filter((n) => !Number.isNaN(n)),
                     fc.boolean(),
                     fc.array(fc.string(), { maxLength: 2 })
-                )
-            ])(
-                "should handle various key types correctly",
-                (key) => {
-                    const cache = new TypedCache<typeof key, string>();
-                    const value = "test-value";
+                ),
+            ])("should handle various key types correctly", (key) => {
+                const cache = new TypedCache<typeof key, string>();
+                const value = "test-value";
 
-                    cache.set(key, value);
+                cache.set(key, value);
 
-                    // Property: Should store and retrieve with any valid key type
-                    expect(cache.get(key)).toBe(value);
-                    expect(cache.has(key)).toBeTruthy();
-                    expect(cache.size).toBe(1);
-                }
-            );
+                // Property: Should store and retrieve with any valid key type
+                expect(cache.get(key)).toBe(value);
+                expect(cache.has(key)).toBeTruthy();
+                expect(cache.size).toBe(1);
+            });
 
             test.prop([fc.string(), fc.constant(null)])(
                 "should handle explicitly stored null values",
@@ -1211,7 +1250,11 @@ describe("Cache Utilities", () => {
                 }
             );
 
-            test.prop([fc.string(), fc.string(), fc.string()])(
+            test.prop([
+                fc.string(),
+                fc.string(),
+                fc.string(),
+            ])(
                 "should return cached value on cache hit",
                 async (key, cachedValue, fetchedValue) => {
                     fc.pre(cachedValue !== fetchedValue); // Ensure different values for meaningful test
@@ -1232,7 +1275,11 @@ describe("Cache Utilities", () => {
                 }
             );
 
-            test.prop([fc.string(), fc.string(), fc.integer({ min: 100, max: 1000 })])(
+            test.prop([
+                fc.string(),
+                fc.string(),
+                fc.integer({ min: 100, max: 1000 }),
+            ])(
                 "should respect TTL in getCachedOrFetch",
                 async (key, value, ttl) => {
                     const cache = new TypedCache<string, string>();
@@ -1241,18 +1288,33 @@ describe("Cache Utilities", () => {
                     mockNow.mockReturnValue(1000);
 
                     // First call should fetch and cache
-                    const result1 = await getCachedOrFetch(cache, key, fetcher, ttl);
+                    const result1 = await getCachedOrFetch(
+                        cache,
+                        key,
+                        fetcher,
+                        ttl
+                    );
                     expect(result1).toBe(value);
                     expect(fetcher).toHaveBeenCalledTimes(1);
 
                     // Second call within TTL should use cache
-                    const result2 = await getCachedOrFetch(cache, key, fetcher, ttl);
+                    const result2 = await getCachedOrFetch(
+                        cache,
+                        key,
+                        fetcher,
+                        ttl
+                    );
                     expect(result2).toBe(value);
                     expect(fetcher).toHaveBeenCalledTimes(1);
 
                     // Call after TTL expiration should fetch again
                     mockNow.mockReturnValue(1000 + ttl + 1);
-                    const result3 = await getCachedOrFetch(cache, key, fetcher, ttl);
+                    const result3 = await getCachedOrFetch(
+                        cache,
+                        key,
+                        fetcher,
+                        ttl
+                    );
                     expect(result3).toBe(value);
 
                     // Property: Should fetch again after TTL expiration
@@ -1262,49 +1324,72 @@ describe("Cache Utilities", () => {
         });
 
         describe("App-wide cache management", () => {
-            test.prop([fc.array(fc.tuple(fc.string(), fc.string()), { minLength: 1, maxLength: 5 })])(
-                "should clear all app caches correctly",
-                (entries) => {
-                    // Populate all app caches
-                    for (const [key, value] of entries) {
-                        AppCaches.general.set(key, value);
-                        AppCaches.monitorTypes.set(key, value);
-                        AppCaches.uiHelpers.set(key, value);
-                    }
-
-                    // Verify caches have content
-                    expect(AppCaches.general.size).toBeGreaterThan(0);
-                    expect(AppCaches.monitorTypes.size).toBeGreaterThan(0);
-                    expect(AppCaches.uiHelpers.size).toBeGreaterThan(0);
-
-                    // Property: clearAllCaches should empty all caches
-                    clearAllCaches();
-
-                    expect(AppCaches.general.size).toBe(0);
-                    expect(AppCaches.monitorTypes.size).toBe(0);
-                    expect(AppCaches.uiHelpers.size).toBe(0);
-
-                    for (const [key] of entries) {
-                        expect(AppCaches.general.get(key)).toBeUndefined();
-                        expect(AppCaches.monitorTypes.get(key)).toBeUndefined();
-                        expect(AppCaches.uiHelpers.get(key)).toBeUndefined();
-                    }
+            test.prop([
+                fc.array(fc.tuple(fc.string(), fc.string()), {
+                    minLength: 1,
+                    maxLength: 5,
+                }),
+            ])("should clear all app caches correctly", (entries) => {
+                // Populate all app caches
+                for (const [key, value] of entries) {
+                    AppCaches.general.set(key, value);
+                    AppCaches.monitorTypes.set(key, value);
+                    AppCaches.uiHelpers.set(key, value);
                 }
-            );
 
-            test.prop([fc.array(fc.tuple(fc.string(), fc.string(), fc.integer({ min: 100, max: 1000 })), { minLength: 1, maxLength: 3 })])(
+                // Verify caches have content
+                expect(AppCaches.general.size).toBeGreaterThan(0);
+                expect(AppCaches.monitorTypes.size).toBeGreaterThan(0);
+                expect(AppCaches.uiHelpers.size).toBeGreaterThan(0);
+
+                // Property: clearAllCaches should empty all caches
+                clearAllCaches();
+
+                expect(AppCaches.general.size).toBe(0);
+                expect(AppCaches.monitorTypes.size).toBe(0);
+                expect(AppCaches.uiHelpers.size).toBe(0);
+
+                for (const [key] of entries) {
+                    expect(AppCaches.general.get(key)).toBeUndefined();
+                    expect(AppCaches.monitorTypes.get(key)).toBeUndefined();
+                    expect(AppCaches.uiHelpers.get(key)).toBeUndefined();
+                }
+            });
+
+            test.prop([
+                fc.array(
+                    fc.tuple(
+                        fc.string(),
+                        fc.string(),
+                        fc.integer({ min: 100, max: 1000 })
+                    ),
+                    { minLength: 1, maxLength: 3 }
+                ),
+            ])(
                 "should cleanup expired entries from all app caches",
                 (entries) => {
                     mockNow.mockReturnValue(1000);
 
                     // Set entries with TTL in all caches
-                    for (const [key, value, ttl] of entries) {
+                    for (const [
+                        key,
+                        value,
+                        ttl,
+                    ] of entries) {
                         AppCaches.general.set(key, value, ttl);
                         AppCaches.monitorTypes.set(key, value, ttl);
                         AppCaches.uiHelpers.set(key, value, ttl);
                     }
 
-                    const maxTtl = Math.max(...entries.map(([, _value, ttlValue]) => ttlValue));
+                    const maxTtl = Math.max(
+                        ...entries.map(
+                            ([
+                                ,
+                                _value,
+                                ttlValue,
+                            ]) => ttlValue
+                        )
+                    );
 
                     // Advance time past all TTLs
                     mockNow.mockReturnValue(1000 + maxTtl + 100);
@@ -1322,10 +1407,17 @@ describe("Cache Utilities", () => {
         });
 
         describe("Cache consistency and invariants", () => {
-            test.prop([fc.array(fc.tuple(fc.string(), fc.string()), { minLength: 5, maxLength: 20 })])(
+            test.prop([
+                fc.array(fc.tuple(fc.string(), fc.string()), {
+                    minLength: 5,
+                    maxLength: 20,
+                }),
+            ])(
                 "should maintain size consistency across operations",
                 (entries) => {
-                    const cache = new TypedCache<string, string>({ maxSize: 100 });
+                    const cache = new TypedCache<string, string>({
+                        maxSize: 100,
+                    });
                     let expectedSize = 0;
 
                     for (const [key, value] of entries) {
@@ -1340,7 +1432,9 @@ describe("Cache Utilities", () => {
                     }
 
                     // Delete half the entries
-                    const keysToDelete = entries.slice(0, Math.floor(entries.length / 2)).map(([k]) => k);
+                    const keysToDelete = entries
+                        .slice(0, Math.floor(entries.length / 2))
+                        .map(([k]) => k);
                     for (const key of keysToDelete) {
                         if (cache.delete(key)) {
                             expectedSize--;
@@ -1360,7 +1454,9 @@ describe("Cache Utilities", () => {
                         cache.set(key, value);
 
                         // Property: has() and get() should be consistent
-                        expect(cache.has(key)).toBe(cache.get(key) !== undefined);
+                        expect(cache.has(key)).toBe(
+                            cache.get(key) !== undefined
+                        );
 
                         if (cache.has(key)) {
                             expect(cache.get(key)).toBe(value);

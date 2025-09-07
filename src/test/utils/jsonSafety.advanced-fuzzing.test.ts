@@ -29,6 +29,28 @@ import {
     safeJsonStringifyWithFallback,
 } from "../../../shared/utils/jsonSafety";
 
+/**
+ * Normalizes negative zero to positive zero for consistent JSON round-trip
+ * behavior. JSON.stringify converts -0 to "0", and JSON.parse converts "0" to
+ * +0.
+ */
+function normalizeNegativeZero(value: unknown): unknown {
+    if (Object.is(value, -0)) {
+        return 0;
+    }
+    if (Array.isArray(value)) {
+        return value.map((item) => normalizeNegativeZero(item));
+    }
+    if (value && typeof value === "object") {
+        const normalized: any = {};
+        for (const [key, val] of Object.entries(value)) {
+            normalized[key] = normalizeNegativeZero(val);
+        }
+        return normalized;
+    }
+    return value;
+}
+
 describe("JSON Safety Advanced Fuzzing Tests", () => {
     describe("safeJsonParse - Malformed Input Handling", () => {
         // Test with various malformed JSON strings
@@ -141,7 +163,9 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
 
             expect(result.success).toBeTruthy();
             if (result.success) {
-                expect(result.data).toEqual(complexObject);
+                expect(normalizeNegativeZero(result.data)).toEqual(
+                    normalizeNegativeZero(complexObject)
+                );
             }
         });
 
@@ -217,7 +241,9 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
 
             expect(result.success).toBeTruthy();
             if (result.success) {
-                expect(result.data).toEqual(mixedArray);
+                expect(normalizeNegativeZero(result.data)).toEqual(
+                    normalizeNegativeZero(mixedArray)
+                );
             }
         });
 
@@ -417,7 +443,9 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
             expect(result.success).toBeTruthy();
             if (result.success && result.data) {
                 const parsed = JSON.parse(result.data);
-                expect(parsed).toEqual(mixedArray);
+                expect(normalizeNegativeZero(parsed)).toEqual(
+                    normalizeNegativeZero(mixedArray)
+                );
             }
         });
     });

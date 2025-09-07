@@ -723,163 +723,253 @@ describe("monitorTypeHelper", () => {
     // Property-based Tests
     describe("Property-based Tests", () => {
         describe("clearMonitorTypeCache property tests", () => {
-            test.prop([
-                fc.constantFrom("test", "reset", "clear", "refresh")
-            ])("should always clear the cache regardless of input context", (_context) => {
-                // Setup some cache data
-                vi.mocked(AppCaches.monitorTypes.set).mockImplementation(() => {});
-                vi.mocked(AppCaches.monitorTypes.get).mockReturnValue([]);
-                vi.mocked(AppCaches.monitorTypes.clear).mockImplementation(() => {});
+            test.prop([fc.constantFrom("test", "reset", "clear", "refresh")])(
+                "should always clear the cache regardless of input context",
+                (_context) => {
+                    // Setup some cache data
+                    vi.mocked(AppCaches.monitorTypes.set).mockImplementation(
+                        () => {}
+                    );
+                    vi.mocked(AppCaches.monitorTypes.get).mockReturnValue([]);
+                    vi.mocked(AppCaches.monitorTypes.clear).mockImplementation(
+                        () => {}
+                    );
 
-                // Clear the cache
-                clearMonitorTypeCache();
+                    // Clear the cache
+                    clearMonitorTypeCache();
 
-                // Verify clear was called
-                expect(AppCaches.monitorTypes.clear).toHaveBeenCalled();
-            });
+                    // Verify clear was called
+                    expect(AppCaches.monitorTypes.clear).toHaveBeenCalled();
+                }
+            );
         });
 
         describe("getAvailableMonitorTypes property tests", () => {
             test.prop([
-                fc.array(fc.record({
-                    type: fc.string({ minLength: 1, maxLength: 20 }),
-                    displayName: fc.string({ minLength: 1, maxLength: 50 }),
-                    description: fc.string({ minLength: 5, maxLength: 200 }),
-                    fields: fc.array(fc.record({
-                        name: fc.string({ minLength: 1, maxLength: 30 }),
-                        type: fc.constantFrom("string", "number", "boolean"),
-                        required: fc.boolean(),
-                        label: fc.string({ minLength: 1, maxLength: 50 })
-                    }), { maxLength: 10 })
-                }), { minLength: 1, maxLength: 5 })
-            ])("should return monitor type configurations from cache or store", async (mockTypes) => {
-                // Setup mocks
-                vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(undefined);
-                vi.mocked(AppCaches.monitorTypes.set).mockImplementation(() => {});
-                vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(
-                    async (fn) => await fn()
-                );
+                fc.array(
+                    fc.record({
+                        type: fc.string({ minLength: 1, maxLength: 20 }),
+                        displayName: fc.string({ minLength: 1, maxLength: 50 }),
+                        description: fc.string({
+                            minLength: 5,
+                            maxLength: 200,
+                        }),
+                        fields: fc.array(
+                            fc.record({
+                                name: fc.string({
+                                    minLength: 1,
+                                    maxLength: 30,
+                                }),
+                                type: fc.constantFrom(
+                                    "string",
+                                    "number",
+                                    "boolean"
+                                ),
+                                required: fc.boolean(),
+                                label: fc.string({
+                                    minLength: 1,
+                                    maxLength: 50,
+                                }),
+                            }),
+                            { maxLength: 10 }
+                        ),
+                    }),
+                    { minLength: 1, maxLength: 5 }
+                ),
+            ])(
+                "should return monitor type configurations from cache or store",
+                async (mockTypes) => {
+                    // Setup mocks
+                    vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
+                        undefined
+                    );
+                    vi.mocked(AppCaches.monitorTypes.set).mockImplementation(
+                        () => {}
+                    );
+                    vi.mocked(
+                        errorHandling.withUtilityErrorHandling
+                    ).mockImplementation(async (fn) => await fn());
 
-                mockMonitorTypesStore.monitorTypes = mockTypes as any[];
-                mockMonitorTypesStore.isLoaded = true;
+                    mockMonitorTypesStore.monitorTypes = mockTypes as any[];
+                    mockMonitorTypesStore.isLoaded = true;
 
-                const result = await getAvailableMonitorTypes();
+                    const result = await getAvailableMonitorTypes();
 
-                expect(result).toEqual(mockTypes);
-                expect(AppCaches.monitorTypes.set).toHaveBeenCalled();
-            });
+                    expect(result).toEqual(mockTypes);
+                    expect(AppCaches.monitorTypes.set).toHaveBeenCalled();
+                }
+            );
 
             test.prop([
-                fc.array(fc.record({
-                    type: fc.string({ minLength: 1, maxLength: 20 }),
-                    displayName: fc.string({ minLength: 1, maxLength: 50 }),
-                    description: fc.string({ minLength: 5, maxLength: 200 })
-                }), { minLength: 0, maxLength: 3 })
-            ])("should return cached monitor types when available", async (cachedTypes) => {
-                // Setup cache to return data
-                vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(cachedTypes as any);
-                vi.mocked(AppCaches.monitorTypes.set).mockImplementation(() => {});
+                fc.array(
+                    fc.record({
+                        type: fc.string({ minLength: 1, maxLength: 20 }),
+                        displayName: fc.string({ minLength: 1, maxLength: 50 }),
+                        description: fc.string({
+                            minLength: 5,
+                            maxLength: 200,
+                        }),
+                    }),
+                    { minLength: 0, maxLength: 3 }
+                ),
+            ])(
+                "should return cached monitor types when available",
+                async (cachedTypes) => {
+                    // Setup cache to return data
+                    vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
+                        cachedTypes as any
+                    );
+                    vi.mocked(AppCaches.monitorTypes.set).mockImplementation(
+                        () => {}
+                    );
 
-                const result = await getAvailableMonitorTypes();
+                    const result = await getAvailableMonitorTypes();
 
-                expect(result).toEqual(cachedTypes);
-                // Should not call set since we used cached data
-                expect(AppCaches.monitorTypes.set).not.toHaveBeenCalled();
-            });
+                    expect(result).toEqual(cachedTypes);
+                    // Should not call set since we used cached data
+                    expect(AppCaches.monitorTypes.set).not.toHaveBeenCalled();
+                }
+            );
         });
 
         describe("getMonitorTypeConfig property tests", () => {
             test.prop([
-                fc.array(fc.record({
-                    type: fc.string({ minLength: 1, maxLength: 20 }),
-                    displayName: fc.string({ minLength: 1, maxLength: 50 }),
-                    description: fc.string({ minLength: 5, maxLength: 200 })
-                }), { minLength: 1, maxLength: 5 }),
-                fc.integer({ min: 0, max: 4 })
-            ])("should find monitor type config when type exists", async (mockTypes, targetIndex) => {
-                const targetType = mockTypes[targetIndex % mockTypes.length];
-                if (!targetType) {
-                    throw new Error('Expected target type to be defined');
+                fc.array(
+                    fc.record({
+                        type: fc.string({ minLength: 1, maxLength: 20 }),
+                        displayName: fc.string({ minLength: 1, maxLength: 50 }),
+                        description: fc.string({
+                            minLength: 5,
+                            maxLength: 200,
+                        }),
+                    }),
+                    { minLength: 1, maxLength: 5 }
+                ),
+                fc.integer({ min: 0, max: 4 }),
+            ])(
+                "should find monitor type config when type exists",
+                async (mockTypes, targetIndex) => {
+                    const targetType =
+                        mockTypes[targetIndex % mockTypes.length];
+                    if (!targetType) {
+                        throw new Error("Expected target type to be defined");
+                    }
+
+                    // Setup mocks to return the mock types
+                    vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
+                        mockTypes as any
+                    );
+
+                    const result = await getMonitorTypeConfig(targetType.type);
+
+                    expect(result).toEqual(targetType);
                 }
-
-                // Setup mocks to return the mock types
-                vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(mockTypes as any);
-
-                const result = await getMonitorTypeConfig(targetType.type);
-
-                expect(result).toEqual(targetType);
-            });
+            );
 
             test.prop([
-                fc.array(fc.record({
-                    type: fc.string({ minLength: 1, maxLength: 20 }),
-                    displayName: fc.string({ minLength: 1, maxLength: 50 }),
-                    description: fc.string({ minLength: 5, maxLength: 200 })
-                }), { minLength: 1, maxLength: 5 }),
-                fc.string({ minLength: 1, maxLength: 30 }).filter(_type => true) // We'll filter in the test
-            ])("should return undefined when monitor type not found", async (mockTypes, searchType) => {
-                // Ensure searchType doesn't match any existing type
-                const usedTypes = new Set(mockTypes.map(t => t.type));
-                if (usedTypes.has(searchType)) {
-                    return; // Skip this test case
+                fc.array(
+                    fc.record({
+                        type: fc.string({ minLength: 1, maxLength: 20 }),
+                        displayName: fc.string({ minLength: 1, maxLength: 50 }),
+                        description: fc.string({
+                            minLength: 5,
+                            maxLength: 200,
+                        }),
+                    }),
+                    { minLength: 1, maxLength: 5 }
+                ),
+                fc
+                    .string({ minLength: 1, maxLength: 30 })
+                    .filter((_type) => true), // We'll filter in the test
+            ])(
+                "should return undefined when monitor type not found",
+                async (mockTypes, searchType) => {
+                    // Ensure searchType doesn't match any existing type
+                    const usedTypes = new Set(mockTypes.map((t) => t.type));
+                    if (usedTypes.has(searchType)) {
+                        return; // Skip this test case
+                    }
+
+                    // Setup mocks to return the mock types
+                    vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
+                        mockTypes as any
+                    );
+
+                    const result = await getMonitorTypeConfig(searchType);
+
+                    expect(result).toBeUndefined();
                 }
-
-                // Setup mocks to return the mock types
-                vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(mockTypes as any);
-
-                const result = await getMonitorTypeConfig(searchType);
-
-                expect(result).toBeUndefined();
-            });
+            );
         });
 
         describe("getMonitorTypeOptions property tests", () => {
             test.prop([
-                fc.array(fc.record({
-                    type: fc.string({ minLength: 1, maxLength: 20 }),
-                    displayName: fc.string({ minLength: 1, maxLength: 50 }),
-                    description: fc.string({ minLength: 5, maxLength: 200 })
-                }), { minLength: 1, maxLength: 5 })
-            ])("should transform monitor types to option format", async (mockTypes) => {
-                // Setup mocks to return the mock types
-                vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(mockTypes as any);
-
-                const result = await getMonitorTypeOptions();
-
-                expect(result).toHaveLength(mockTypes.length);
-                for (const [index, option] of result.entries()) {
-                    const mockType = mockTypes[index];
-                    if (!mockType) {
-                        throw new Error(`Expected mockType at index ${index} to be defined`);
-                    }
-                    expect(option.label).toBe(mockType.displayName);
-                    expect(option.value).toBe(mockType.type);
-                }
-            });
-
-            test.prop([
-                fc.constantFrom(0, 1, 2, 3)
-            ])("should return empty array when no monitor types available", async (emptyCase) => {
-                // Setup mocks to return empty array in different ways
-                const emptyValues = [[], undefined, null, false];
-                vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(emptyValues[emptyCase] as any);
-
-                if (emptyCase > 0) {
-                    // For non-array cases, mock the store to return empty array
-                    mockMonitorTypesStore.monitorTypes = [];
-                    mockMonitorTypesStore.isLoaded = true;
-                    vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(
-                        async (fn) => await fn()
+                fc.array(
+                    fc.record({
+                        type: fc.string({ minLength: 1, maxLength: 20 }),
+                        displayName: fc.string({ minLength: 1, maxLength: 50 }),
+                        description: fc.string({
+                            minLength: 5,
+                            maxLength: 200,
+                        }),
+                    }),
+                    { minLength: 1, maxLength: 5 }
+                ),
+            ])(
+                "should transform monitor types to option format",
+                async (mockTypes) => {
+                    // Setup mocks to return the mock types
+                    vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
+                        mockTypes as any
                     );
-                }
 
-                const result = await getMonitorTypeOptions();
+                    const result = await getMonitorTypeOptions();
 
-                expect(Array.isArray(result)).toBeTruthy();
-                if (emptyCase === 0) {
-                    expect(result).toHaveLength(0);
+                    expect(result).toHaveLength(mockTypes.length);
+                    for (const [index, option] of result.entries()) {
+                        const mockType = mockTypes[index];
+                        if (!mockType) {
+                            throw new Error(
+                                `Expected mockType at index ${index} to be defined`
+                            );
+                        }
+                        expect(option.label).toBe(mockType.displayName);
+                        expect(option.value).toBe(mockType.type);
+                    }
                 }
-            });
+            );
+
+            test.prop([fc.constantFrom(0, 1, 2, 3)])(
+                "should return empty array when no monitor types available",
+                async (emptyCase) => {
+                    // Setup mocks to return empty array in different ways
+                    const emptyValues = [
+                        [],
+                        undefined,
+                        null,
+                        false,
+                    ];
+                    vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
+                        emptyValues[emptyCase] as any
+                    );
+
+                    if (emptyCase > 0) {
+                        // For non-array cases, mock the store to return empty array
+                        mockMonitorTypesStore.monitorTypes = [];
+                        mockMonitorTypesStore.isLoaded = true;
+                        vi.mocked(
+                            errorHandling.withUtilityErrorHandling
+                        ).mockImplementation(async (fn) => await fn());
+                    }
+
+                    const result = await getMonitorTypeOptions();
+
+                    expect(Array.isArray(result)).toBeTruthy();
+                    if (emptyCase === 0) {
+                        expect(result).toHaveLength(0);
+                    }
+                }
+            );
         });
     });
 });
