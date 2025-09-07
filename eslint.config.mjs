@@ -31,7 +31,7 @@ import pluginMicrosoftSdl from "@microsoft/eslint-plugin-sdl";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tseslintParser from "@typescript-eslint/parser";
 import vitest from "@vitest/eslint-plugin";
-import gitignore from 'eslint-config-flat-gitignore'
+import gitignore from "eslint-config-flat-gitignore";
 import eslintConfigPrettier from "eslint-config-prettier";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 import antfu from "eslint-plugin-antfu";
@@ -142,7 +142,6 @@ import jsoncEslintParser from "jsonc-eslint-parser";
 import path from "node:path";
 import tomlEslintParser from "toml-eslint-parser";
 import yamlEslintParser from "yaml-eslint-parser";
-
 
 // Unused and Uninstalled Plugins:
 // import putout from "eslint-plugin-putout";
@@ -431,10 +430,17 @@ export default [
             "html/require-open-graph-protocol": "warn",
             "html/sort-attrs": "warn",
             "styled-components-a11y/lang": "off",
-            "xss/no-mixed-html": ["off", {
-                "encoders": ["utils.htmlEncode()", "CSS.escape()", "Number()"],
-                "unsafe": [".html()"]
-            }],
+            "xss/no-mixed-html": [
+                "off",
+                {
+                    encoders: [
+                        "utils.htmlEncode()",
+                        "CSS.escape()",
+                        "Number()",
+                    ],
+                    unsafe: [".html()"],
+                },
+            ],
         },
     },
 
@@ -463,10 +469,17 @@ export default [
                 { selfClosing: "always" },
             ],
             "styled-components-a11y/lang": "off",
-            "xss/no-mixed-html": ["off", {
-                "encoders": ["utils.htmlEncode()", "CSS.escape()", "Number()"],
-                "unsafe": [".html()"]
-            }],
+            "xss/no-mixed-html": [
+                "off",
+                {
+                    encoders: [
+                        "utils.htmlEncode()",
+                        "CSS.escape()",
+                        "Number()",
+                    ],
+                    unsafe: [".html()"],
+                },
+            ],
         },
     },
 
@@ -592,8 +605,12 @@ export default [
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.{md,markup,atom,rss,markdown}"],
-        ignores: ["**/docs/packages/**", "**/docs/TSDoc/**"],
+        ignores: [
+            "**/docs/packages/**",
+            "**/docs/TSDoc/**",
+        ],
         language: "markdown/gfm",
+        name: "MD - **/*.{MD,MARKUP,ATOM,RSS,MARKDOWN}",
         plugins: {
             markdown: markdown,
         },
@@ -718,45 +735,48 @@ export default [
             "jsonc/object-property-newline": "warn",
             "jsonc/quote-props": "warn",
             "jsonc/quotes": "warn",
-            "jsonc/sort-array-values": ["error",
+            "jsonc/sort-array-values": [
+                "error",
                 {
-                    "order": { "type": "asc" },
-                    "pathPattern": "^files$"  // Hits the files property
+                    order: { type: "asc" },
+                    pathPattern: "^files$", // Hits the files property
                 },
                 {
-                    "order": [
+                    order: [
                         "eslint",
                         "eslintplugin",
                         "eslint-plugin",
                         {
                             // Fallback order
-                            "order": { "type": "asc" }
-                        }
+                            order: { type: "asc" },
+                        },
                     ],
-                    "pathPattern": "^keywords$" // Hits the keywords property
-                }
+                    pathPattern: "^keywords$", // Hits the keywords property
+                },
             ],
-            "jsonc/sort-keys": ["error",
+            "jsonc/sort-keys": [
+                "error",
                 // For example, a definition for package.json
                 {
-                    "order": [
+                    order: [
                         "name",
                         "version",
                         "private",
-                        "publishConfig"
+                        "publishConfig",
                         // ...
                     ],
-                    "pathPattern": "^$" // Hits the root properties
+                    pathPattern: "^$", // Hits the root properties
                 },
                 {
-                    "order": { "type": "asc" },
-                    "pathPattern": "^(?:dev|peer|optional|bundled)?[Dd]ependencies$"
-                }
+                    order: { type: "asc" },
+                    pathPattern:
+                        "^(?:dev|peer|optional|bundled)?[Dd]ependencies$",
+                },
                 // ...
             ],
             "jsonc/space-unary-ops": "warn",
             "jsonc/valid-json-number": "warn",
-            "jsonc/vue-custom-block/no-parsing-error": "warn"
+            "jsonc/vue-custom-block/no-parsing-error": "warn",
         },
     },
 
@@ -829,7 +849,7 @@ export default [
             "toml/spaced-comment": "warn",
             "toml/table-bracket-spacing": "warn",
             "toml/tables-order": "warn",
-            "toml/vue-custom-block/no-parsing-error": "warn"
+            "toml/vue-custom-block/no-parsing-error": "warn",
         },
     },
 
@@ -906,10 +926,13 @@ export default [
             "tailwind/no-arbitrary-value": "warn",
             "tailwind/no-contradicting-classname": "warn",
             /**
-            * Performance issue with the plugin, somewhat mitigated setting cssFiles to an empty array.
-            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276#issuecomment-2481272848
-            * @link https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
-            */
+             * Performance issue with the plugin, somewhat mitigated setting
+             * cssFiles to an empty array.
+             *
+             * @link https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
+             *
+             * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276#issuecomment-2481272848
+             */
             "tailwind/no-custom-classname": [
                 "warn",
                 {
@@ -923,7 +946,7 @@ export default [
         settings: {
             "better-tailwindcss": {
                 // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
-                "entryPoint": "./src/index.css",
+                entryPoint: "./src/index.css",
             },
             "boundaries/elements": [
                 { pattern: "src/App.tsx", type: "app" },
@@ -976,7 +999,7 @@ export default [
             tailwindcss: {
                 config: `${ROOT_DIR}/src/index.css`,
                 // @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276#issuecomment-2481272848
-                cssFiles: ['./src/index.css'],
+                cssFiles: ["./src/index.css"],
             },
         },
     },
@@ -1142,20 +1165,26 @@ export default [
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
+
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/no-untranslated-text": "off",
             "@docusaurus/prefer-docusaurus-heading": "warn",
             "@docusaurus/string-literal-i18n-messages": "off",
+
             "@eslint-react/avoid-shorthand-boolean": "off",
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
             "@eslint-react/ensure-forward-ref-using-ref": "warn",
-            "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks": "warn",
-            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
-            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
+            "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks":
+                "warn",
+            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps":
+                "off",
+            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
+                "off",
             /* Hooks extra subplugin */
-            "@eslint-react/hooks-extra/no-direct-set-state-in-use-layout-effect": "warn",
+            "@eslint-react/hooks-extra/no-direct-set-state-in-use-layout-effect":
+                "warn",
             "@eslint-react/hooks-extra/no-redundant-custom-hook": "warn",
             "@eslint-react/hooks-extra/no-unnecessary-use-callback": "off",
             "@eslint-react/hooks-extra/no-unnecessary-use-memo": "off",
@@ -1238,22 +1267,22 @@ export default [
             "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
             "@microsoft/sdl/no-angularjs-enable-svg": "warn",
             "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
-
             "@microsoft/sdl/no-cookies": "warn",
-
             "@microsoft/sdl/no-document-domain": "warn",
             "@microsoft/sdl/no-document-write": "warn",
             "@microsoft/sdl/no-electron-node-integration": "warn",
+
             "@microsoft/sdl/no-html-method": "warn",
+
             "@microsoft/sdl/no-inner-html": "warn",
             "@microsoft/sdl/no-insecure-random": "off",
             "@microsoft/sdl/no-insecure-url": "warn",
             "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
-
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
+
             "@typescript-eslint/array-type": [
                 "error",
                 { default: "array-simple" },
@@ -1289,7 +1318,10 @@ export default [
             "@typescript-eslint/explicit-member-accessibility": "warn",
             "@typescript-eslint/explicit-module-boundary-types": "warn",
             "@typescript-eslint/init-declarations": "warn",
-            "@typescript-eslint/max-params": "off",
+            "@typescript-eslint/max-params": ['warn', {
+                countVoidThis: false,
+                max: 20,
+            }],
             "@typescript-eslint/member-ordering": "off",
             "@typescript-eslint/method-signature-style": "warn",
             "@typescript-eslint/naming-convention": "off",
@@ -1462,7 +1494,6 @@ export default [
             "@typescript-eslint/unbound-method": "warn",
             "@typescript-eslint/unified-signatures": "warn",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
-            // Architecture boundaries for Frontend
             "boundaries/element-types": [
                 "error",
                 {
@@ -1565,16 +1596,18 @@ export default [
                     ],
                 },
             ],
+            // Architecture boundaries for Frontend
+            "boundaries/no-ignored": "warn",
             camelcase: "off",
             "canonical/destructuring-property-newline": "off",
             "canonical/export-specifier-newline": "off",
             "canonical/filename-match-exported": "off",
-            // Core quality rules
-
             "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
             "canonical/filename-no-index": "off",
             "canonical/import-specifier-newline": "off",
             "canonical/no-barrel-import": "error",
+            // Core quality rules
+
             "canonical/no-export-all": "error",
             "canonical/no-import-namespace-destructure": "warn",
             "canonical/no-re-export": "warn",
@@ -1713,7 +1746,6 @@ export default [
             "functional/prefer-immutable-types": "off",
             "granular-selectors/granular-selectors": "error",
             "id-length": "off",
-            // Import/Export Rules (import-x/*)
             "import-x/consistent-type-specifier-style": "off",
             "import-x/default": "warn",
             "import-x/dynamic-import-chunkname": "warn",
@@ -1723,6 +1755,8 @@ export default [
             "import-x/first": "warn",
             "import-x/group-exports": "off",
             "import-x/max-dependencies": "off",
+            // Import/Export Rules (import-x/*)
+            "import-x/named": "warn",
             "import-x/namespace": "warn",
             "import-x/newline-after-import": "warn",
             "import-x/no-absolute-path": "warn",
@@ -1801,10 +1835,20 @@ export default [
             "math/prefer-math-sum-precise": "warn",
             "max-classes-per-file": "off",
             "max-lines": "off",
-            "max-lines-per-function": "off",
+            // Sonar quality helpers
+            "max-lines-per-function": [
+                "error",
+                {
+                    "IIFEs": false,
+                    "max": 1000,
+                    "skipBlankLines": true,
+                    "skipComments": true,
+                },
+            ],
             "max-params": "off",
             "max-statements": "off",
             "module-interop/no-import-cjs": "off",
+
             "module-interop/no-require-esm": "off",
             // Node
             "n/callback-return": "warn",
@@ -1955,7 +1999,10 @@ export default [
                     type: "alphabetical",
                 },
             ],
-            "prefer-arrow-callback": "off",
+            "prefer-arrow-callback": [
+                "warn",
+                { allowNamedFunctions: true, allowUnboundThis: true },
+            ],
             "prefer-const": "error",
             "prefer-template": "warn",
             "prettier/prettier": [
@@ -2020,7 +2067,13 @@ export default [
             "security/detect-non-literal-regexp": "warn",
             "security/detect-non-literal-require": "error",
             "security/detect-object-injection": "off",
+            "sonarjs/cognitive-complexity": [
+                "warn",
+                30,
+            ],
             "sonarjs/function-return-type": "off", // Allow flexible return types in Docusaurus
+            "sonarjs/no-duplicate-string": "off",
+            "sonarjs/no-unused-function-argument": "warn",
             "sort-class-members/sort-class-members": [
                 "warn",
                 {
@@ -2359,19 +2412,26 @@ export default [
             ...etc.configs.recommended.rules,
             ...pluginBetterTailwindcss.configs.correctness.rules,
 
+            // Sonar quality helpers
+
             "@arthurgeron/react-usememo/require-memo": "off",
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "off",
             "@eslint-react/avoid-shorthand-boolean": "off",
+
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
             "@eslint-react/ensure-forward-ref-using-ref": "warn",
-            "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks": "warn",
-            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
-            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
+            "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks":
+                "warn",
+            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps":
+                "off",
+            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
+                "off",
             /* Hooks extra subplugin */
-            "@eslint-react/hooks-extra/no-direct-set-state-in-use-layout-effect": "warn",
+            "@eslint-react/hooks-extra/no-direct-set-state-in-use-layout-effect":
+                "warn",
             "@eslint-react/hooks-extra/no-redundant-custom-hook": "warn",
             "@eslint-react/hooks-extra/no-unnecessary-use-callback": "off",
             "@eslint-react/hooks-extra/no-unnecessary-use-memo": "off",
@@ -2453,22 +2513,22 @@ export default [
             "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
             "@microsoft/sdl/no-angularjs-enable-svg": "warn",
             "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
-
             "@microsoft/sdl/no-cookies": "warn",
-
             "@microsoft/sdl/no-document-domain": "warn",
             "@microsoft/sdl/no-document-write": "warn",
             "@microsoft/sdl/no-electron-node-integration": "warn",
+
             "@microsoft/sdl/no-html-method": "warn",
+
             "@microsoft/sdl/no-inner-html": "warn",
             "@microsoft/sdl/no-insecure-random": "off",
             "@microsoft/sdl/no-insecure-url": "warn",
             "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
-
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
+
             "@typescript-eslint/array-type": [
                 "error",
                 { default: "array-simple" },
@@ -2478,12 +2538,12 @@ export default [
             "@typescript-eslint/ban-tslint-comment": "warn",
             "@typescript-eslint/class-literal-property-style": "warn",
             "@typescript-eslint/class-methods-use-this": "off",
-
             "@typescript-eslint/consistent-generic-constructors": "warn",
             "@typescript-eslint/consistent-indexed-object-style": "warn",
             "@typescript-eslint/consistent-return": "warn",
             // Function and type safety rules
             "@typescript-eslint/consistent-type-assertions": "error",
+
             "@typescript-eslint/consistent-type-definitions": "warn",
             "@typescript-eslint/consistent-type-exports": "warn",
             "@typescript-eslint/consistent-type-imports": "warn",
@@ -2505,7 +2565,10 @@ export default [
             "@typescript-eslint/explicit-member-accessibility": "warn",
             "@typescript-eslint/explicit-module-boundary-types": "warn",
             "@typescript-eslint/init-declarations": "warn",
-            "@typescript-eslint/max-params": "off",
+            "@typescript-eslint/max-params": ['warn', {
+                countVoidThis: false,
+                max: 20,
+            }],
             "@typescript-eslint/member-ordering": "off",
             "@typescript-eslint/method-signature-style": "warn",
             "@typescript-eslint/naming-convention": "off",
@@ -2624,19 +2687,19 @@ export default [
             "@typescript-eslint/no-useless-constructor": "warn",
             "@typescript-eslint/no-useless-empty-export": "warn",
             "@typescript-eslint/no-wrapper-object-types": "error",
-
             "@typescript-eslint/non-nullable-type-assertion-style": "warn",
             "@typescript-eslint/only-throw-error": "warn",
             "@typescript-eslint/parameter-properties": "warn",
             "@typescript-eslint/prefer-as-const": "warn",
+
             "@typescript-eslint/prefer-destructuring": "warn",
-
             "@typescript-eslint/prefer-enum-initializers": "warn",
-
             "@typescript-eslint/prefer-find": "warn",
             "@typescript-eslint/prefer-for-of": "warn",
             "@typescript-eslint/prefer-function-type": "error",
+
             "@typescript-eslint/prefer-includes": "warn",
+
             "@typescript-eslint/prefer-literal-enum-member": "warn",
             "@typescript-eslint/prefer-namespace-keyword": "warn",
             "@typescript-eslint/prefer-nullish-coalescing": [
@@ -2693,17 +2756,17 @@ export default [
             "antfu/no-import-node-modules-by-path": "error",
             "antfu/no-top-level-await": "error",
             "antfu/no-ts-export-equal": "error",
-
             "antfu/top-level-function": "off",
             "better-tailwindcss/enforce-consistent-class-order": "warn",
             "better-tailwindcss/enforce-consistent-important-position": "warn",
             "better-tailwindcss/enforce-consistent-line-wrapping": "off",
-            "better-tailwindcss/enforce-consistent-variable-syntax": "warn",
 
+            "better-tailwindcss/enforce-consistent-variable-syntax": "warn",
             "better-tailwindcss/enforce-shorthand-classes": "off",
             "better-tailwindcss/no-deprecated-classes": "warn",
             "better-tailwindcss/no-duplicate-classes": "warn",
             "better-tailwindcss/no-restricted-classes": "warn",
+
             "better-tailwindcss/no-unnecessary-whitespace": "warn",
             "better-tailwindcss/no-unregistered-classes": [
                 "off",
@@ -2711,7 +2774,6 @@ export default [
                     detectComponentClasses: true,
                 },
             ],
-            // Code organization and architecture
             "boundaries/element-types": [
                 "error",
                 {
@@ -2779,6 +2841,8 @@ export default [
                     ],
                 },
             ],
+            // Code organization and architecture
+            "boundaries/no-ignored": "warn",
             camelcase: "off",
             "canonical/destructuring-property-newline": "off",
             "canonical/export-specifier-newline": "off",
@@ -2806,11 +2870,11 @@ export default [
                 },
             ],
             "canonical/prefer-inline-type-import": "off",
-
             "canonical/prefer-react-lazy": "off",
             "canonical/prefer-use-mount": "warn",
             "canonical/sort-react-dependencies": "warn",
             "capitalized-comments": "off",
+
             "class-methods-use-this": "off",
             "clean-code/exception-handling": "off",
             "clean-code/feature-envy": "off",
@@ -2925,12 +2989,12 @@ export default [
             "functional/immutable-data": "off",
             "functional/no-let": "off", // Let is necessary in many React patterns
             "granular-selectors/granular-selectors": "error",
-
             "id-length": "off",
             // CSS
             "import-x/no-extraneous-dependencies": "warn",
             "import-x/no-import-module-exports": "warn",
             "import-x/no-internal-modules": "off",
+
             "import-x/no-mutable-exports": "warn",
             "import-x/no-named-as-default": "warn",
             "import-x/no-named-as-default-member": "off",
@@ -3008,10 +3072,19 @@ export default [
             "math/prefer-math-sum-precise": "warn",
             "max-classes-per-file": "off",
             "max-lines": "off",
-            "max-lines-per-function": "off",
+            "max-lines-per-function": [
+                "error",
+                {
+                    "IIFEs": false,
+                    "max": 1000,
+                    "skipBlankLines": true,
+                    "skipComments": true,
+                },
+            ],
             "max-params": "off",
             "max-statements": "off",
             "module-interop/no-import-cjs": "off",
+
             "module-interop/no-require-esm": "off",
             // Node
             "n/callback-return": "warn",
@@ -3158,7 +3231,10 @@ export default [
                     type: "alphabetical",
                 },
             ],
-            "prefer-arrow-callback": "off",
+            "prefer-arrow-callback": [
+                "warn",
+                { allowNamedFunctions: true, allowUnboundThis: true },
+            ],
             "prefer-const": "error",
             "prefer-template": "warn",
             // Code style
@@ -3449,6 +3525,12 @@ export default [
             "security/detect-non-literal-regexp": "warn",
             "security/detect-non-literal-require": "error",
             "security/detect-object-injection": "off",
+            "sonarjs/cognitive-complexity": [
+                "warn",
+                30,
+            ],
+            "sonarjs/no-duplicate-string": "off",
+            "sonarjs/no-unused-function-argument": "warn",
             "sort-class-members/sort-class-members": [
                 "warn",
                 {
@@ -3488,10 +3570,12 @@ export default [
             // "tailwind/no-arbitrary-value": "warn",
             // "tailwind/no-contradicting-classname": "warn",
             /**
-            * Performance issue with the plugin, somewhat mitigated setting cssFiles to an empty array.
-            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
-            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
-            */
+             * Performance issue with the plugin, somewhat mitigated setting
+             * cssFiles to an empty array.
+             *
+             * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
+             * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
+             */
             "tailwind/no-custom-classname": [
                 "warn",
                 {
@@ -3563,7 +3647,7 @@ export default [
         settings: {
             "better-tailwindcss": {
                 // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
-                "entryPoint": "./src/index.css",
+                entryPoint: "./src/index.css",
             },
             "boundaries/elements": [
                 { capture: ["app"], pattern: "src/App.tsx", type: "app" },
@@ -3630,7 +3714,7 @@ export default [
             tailwindcss: {
                 config: `${ROOT_DIR}/src/index.css`,
                 // @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276#issuecomment-2481272848
-                cssFiles: ['./src/index.css'],
+                cssFiles: ["./src/index.css"],
             },
         },
     },
@@ -3805,11 +3889,16 @@ export default [
             /* DOM subplugin */
             "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
             "@eslint-react/ensure-forward-ref-using-ref": "warn",
-            "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks": "warn",
-            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
-            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
+
+            "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks":
+                "warn",
+            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps":
+                "off",
+            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
+                "off",
             /* Hooks extra subplugin */
-            "@eslint-react/hooks-extra/no-direct-set-state-in-use-layout-effect": "warn",
+            "@eslint-react/hooks-extra/no-direct-set-state-in-use-layout-effect":
+                "warn",
             "@eslint-react/hooks-extra/no-redundant-custom-hook": "warn",
             "@eslint-react/hooks-extra/no-unnecessary-use-callback": "off",
             "@eslint-react/hooks-extra/no-unnecessary-use-memo": "off",
@@ -3892,18 +3981,17 @@ export default [
             "@microsoft/sdl/no-angularjs-enable-svg": "warn",
             "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
             "@microsoft/sdl/no-cookies": "warn",
-
             "@microsoft/sdl/no-document-domain": "warn",
-
             "@microsoft/sdl/no-document-write": "warn",
             "@microsoft/sdl/no-electron-node-integration": "warn",
             "@microsoft/sdl/no-html-method": "warn",
+
             "@microsoft/sdl/no-inner-html": "warn",
+
             "@microsoft/sdl/no-insecure-random": "off",
             "@microsoft/sdl/no-insecure-url": "warn",
             "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
-
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
@@ -3911,6 +3999,7 @@ export default [
                 "error",
                 { default: "array-simple" },
             ], // Prefer T[] for simple types, Array<T> for complex types
+
             "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
             "@typescript-eslint/ban-ts-comment": "warn",
             "@typescript-eslint/ban-tslint-comment": "warn",
@@ -3919,12 +4008,12 @@ export default [
             "@typescript-eslint/consistent-generic-constructors": "warn",
             "@typescript-eslint/consistent-indexed-object-style": "warn",
             "@typescript-eslint/consistent-return": "warn",
-
             // Function and type safety rules (same as frontend)
             "@typescript-eslint/consistent-type-assertions": "error",
             "@typescript-eslint/consistent-type-definitions": "warn",
             "@typescript-eslint/consistent-type-exports": "warn",
             "@typescript-eslint/consistent-type-imports": "warn",
+
             "@typescript-eslint/default-param-last": "warn",
             "@typescript-eslint/dot-notation": "warn",
             "@typescript-eslint/explicit-function-return-type": [
@@ -3943,7 +4032,10 @@ export default [
             "@typescript-eslint/explicit-member-accessibility": "warn",
             "@typescript-eslint/explicit-module-boundary-types": "warn",
             "@typescript-eslint/init-declarations": "warn",
-            "@typescript-eslint/max-params": "off",
+            "@typescript-eslint/max-params": ['warn', {
+                countVoidThis: false,
+                max: 20,
+            }],
             "@typescript-eslint/member-ordering": "off",
             "@typescript-eslint/method-signature-style": "warn",
             "@typescript-eslint/naming-convention": "off",
@@ -4025,7 +4117,6 @@ export default [
             ],
             "@typescript-eslint/no-shadow": "warn",
             "@typescript-eslint/no-this-alias": "warn",
-
             "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
             // Null safety for backend operations
             "@typescript-eslint/no-unnecessary-condition": [
@@ -4037,6 +4128,7 @@ export default [
             "@typescript-eslint/no-unnecessary-parameter-property-assignment":
                 "warn",
             "@typescript-eslint/no-unnecessary-qualifier": "warn",
+
             "@typescript-eslint/no-unnecessary-template-expression": "warn",
             "@typescript-eslint/no-unnecessary-type-arguments": "warn",
             // Enhanced type safety for backend services
@@ -4066,14 +4158,14 @@ export default [
             "@typescript-eslint/only-throw-error": "warn",
             "@typescript-eslint/parameter-properties": "warn",
             "@typescript-eslint/prefer-as-const": "warn",
-
             "@typescript-eslint/prefer-destructuring": "warn",
-
             "@typescript-eslint/prefer-enum-initializers": "warn",
             "@typescript-eslint/prefer-find": "warn",
             // "write-good-comments/write-good-comments": "warn",
             "@typescript-eslint/prefer-for-of": "warn",
+
             "@typescript-eslint/prefer-function-type": "error",
+
             "@typescript-eslint/prefer-includes": "warn",
             "@typescript-eslint/prefer-literal-enum-member": "warn",
             "@typescript-eslint/prefer-namespace-keyword": "warn",
@@ -4131,7 +4223,6 @@ export default [
             "antfu/no-top-level-await": "error",
             "antfu/no-ts-export-equal": "error",
             "antfu/top-level-function": "off",
-            // Architecture boundaries for Electron
             "boundaries/element-types": [
                 "error",
                 {
@@ -4193,6 +4284,8 @@ export default [
                     ],
                 },
             ],
+            // Architecture boundaries for Electron
+            "boundaries/no-ignored": "warn",
             camelcase: "off",
             "canonical/destructuring-property-newline": "off",
             "canonical/export-specifier-newline": "off",
@@ -4339,7 +4432,6 @@ export default [
             "functional/prefer-immutable-types": "off",
             "granular-selectors/granular-selectors": "error",
             "id-length": "off",
-            // Import Rules
             "import-x/consistent-type-specifier-style": "off",
             "import-x/default": "warn",
             "import-x/dynamic-import-chunkname": "warn",
@@ -4349,6 +4441,8 @@ export default [
             "import-x/first": "warn",
             "import-x/group-exports": "off",
             "import-x/max-dependencies": "off",
+            // Import Rules
+            "import-x/named": "warn",
             "import-x/namespace": "warn",
             "import-x/newline-after-import": "warn",
             "import-x/no-absolute-path": "warn",
@@ -4427,19 +4521,29 @@ export default [
             "math/prefer-math-sum-precise": "warn",
             "max-classes-per-file": "off",
             "max-lines": "off",
-            "max-lines-per-function": "off",
+            // Sonar quality helpers
+            "max-lines-per-function": [
+                "error",
+                {
+                    "IIFEs": false,
+                    "max": 1000,
+                    "skipBlankLines": true,
+                    "skipComments": true,
+                },
+            ],
             "max-params": "off",
             "max-statements": "off",
             "module-interop/no-import-cjs": "off",
+
             "module-interop/no-require-esm": "off",
             // Node
             "n/callback-return": "warn",
             "n/exports-style": "warn",
             "n/file-extension-in-import": "off", // Allow missing file extensions for imports
-
             "n/global-require": "warn",
             "n/handle-callback-err": "warn",
             "n/no-callback-literal": "warn",
+
             "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
             "n/no-missing-import": "off", // Allow missing imports for dynamic imports
             "n/no-mixed-requires": "warn",
@@ -4578,7 +4682,10 @@ export default [
                     type: "alphabetical",
                 },
             ],
-            "prefer-arrow-callback": "off",
+            "prefer-arrow-callback": [
+                "warn",
+                { allowNamedFunctions: true, allowUnboundThis: true },
+            ],
             "prefer-const": "error",
             "prefer-template": "warn",
             "prettier/prettier": [
@@ -4624,6 +4731,12 @@ export default [
             "security/detect-non-literal-regexp": "warn",
             "security/detect-non-literal-require": "error",
             "security/detect-object-injection": "off",
+            "sonarjs/cognitive-complexity": [
+                "warn",
+                30,
+            ],
+            "sonarjs/no-duplicate-string": "off",
+            "sonarjs/no-unused-function-argument": "warn",
             "sort-class-members/sort-class-members": [
                 "warn",
                 {
@@ -4980,15 +5093,20 @@ export default [
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
+
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
             "@eslint-react/ensure-forward-ref-using-ref": "warn",
-            "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks": "warn",
-            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
-            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
+            "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks":
+                "warn",
+            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps":
+                "off",
+            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
+                "off",
             /* Hooks extra subplugin */
-            "@eslint-react/hooks-extra/no-direct-set-state-in-use-layout-effect": "warn",
+            "@eslint-react/hooks-extra/no-direct-set-state-in-use-layout-effect":
+                "warn",
             "@eslint-react/hooks-extra/no-redundant-custom-hook": "warn",
             "@eslint-react/hooks-extra/no-unnecessary-use-callback": "off",
             "@eslint-react/hooks-extra/no-unnecessary-use-memo": "off",
@@ -5070,22 +5188,22 @@ export default [
             "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
             "@microsoft/sdl/no-angularjs-enable-svg": "warn",
             "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
-
             "@microsoft/sdl/no-cookies": "warn",
-
             "@microsoft/sdl/no-document-domain": "warn",
             "@microsoft/sdl/no-document-write": "warn",
             "@microsoft/sdl/no-electron-node-integration": "warn",
+
             "@microsoft/sdl/no-html-method": "warn",
+
             "@microsoft/sdl/no-inner-html": "warn",
             "@microsoft/sdl/no-insecure-random": "off",
             "@microsoft/sdl/no-insecure-url": "warn",
             "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
-
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
+
             "@typescript-eslint/array-type": [
                 "error",
                 { default: "array-simple" },
@@ -5095,12 +5213,12 @@ export default [
             "@typescript-eslint/ban-tslint-comment": "warn",
             "@typescript-eslint/class-literal-property-style": "warn",
             "@typescript-eslint/class-methods-use-this": "off",
-
             "@typescript-eslint/consistent-generic-constructors": "warn",
             "@typescript-eslint/consistent-indexed-object-style": "warn",
             "@typescript-eslint/consistent-return": "warn",
             // Function and type safety rules
             "@typescript-eslint/consistent-type-assertions": "error",
+
             "@typescript-eslint/consistent-type-definitions": "warn",
             "@typescript-eslint/consistent-type-exports": "warn",
             "@typescript-eslint/consistent-type-imports": "warn",
@@ -5122,7 +5240,10 @@ export default [
             "@typescript-eslint/explicit-member-accessibility": "warn",
             "@typescript-eslint/explicit-module-boundary-types": "warn",
             "@typescript-eslint/init-declarations": "warn",
-            "@typescript-eslint/max-params": "off",
+            "@typescript-eslint/max-params": ['warn', {
+                countVoidThis: false,
+                max: 20,
+            }],
             "@typescript-eslint/member-ordering": "off",
             "@typescript-eslint/method-signature-style": "warn",
             "@typescript-eslint/naming-convention": "off",
@@ -5241,19 +5362,19 @@ export default [
             "@typescript-eslint/no-useless-constructor": "warn",
             "@typescript-eslint/no-useless-empty-export": "warn",
             "@typescript-eslint/no-wrapper-object-types": "error",
-
             "@typescript-eslint/non-nullable-type-assertion-style": "warn",
             "@typescript-eslint/only-throw-error": "warn",
             "@typescript-eslint/parameter-properties": "warn",
             "@typescript-eslint/prefer-as-const": "warn",
+
             "@typescript-eslint/prefer-destructuring": "warn",
-
             "@typescript-eslint/prefer-enum-initializers": "warn",
-
             "@typescript-eslint/prefer-find": "warn",
             "@typescript-eslint/prefer-for-of": "warn",
             "@typescript-eslint/prefer-function-type": "error",
+
             "@typescript-eslint/prefer-includes": "warn",
+
             "@typescript-eslint/prefer-literal-enum-member": "warn",
             "@typescript-eslint/prefer-namespace-keyword": "warn",
             "@typescript-eslint/prefer-nullish-coalescing": [
@@ -5310,9 +5431,7 @@ export default [
             "antfu/no-import-node-modules-by-path": "error",
             "antfu/no-top-level-await": "error",
             "antfu/no-ts-export-equal": "error",
-
             "antfu/top-level-function": "off",
-            // Code organization and architecture
             "boundaries/element-types": [
                 "error",
                 {
@@ -5380,14 +5499,17 @@ export default [
                     ],
                 },
             ],
+            // Code organization and architecture
+            "boundaries/no-ignored": "warn",
             camelcase: "off",
             "canonical/destructuring-property-newline": "off",
-            "canonical/export-specifier-newline": "off",
 
+            "canonical/export-specifier-newline": "off",
             "canonical/filename-match-exported": "warn",
             "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
             "canonical/filename-no-index": "error",
             "canonical/import-specifier-newline": "off",
+
             "canonical/no-barrel-import": "error",
             "canonical/no-export-all": "error",
             "canonical/no-import-namespace-destructure": "warn",
@@ -5409,11 +5531,11 @@ export default [
             ],
             "canonical/prefer-inline-type-import": "off",
             "canonical/prefer-react-lazy": "off",
-
             "canonical/prefer-use-mount": "warn",
             "canonical/sort-react-dependencies": "warn",
             "capitalized-comments": "off",
             "class-methods-use-this": "off",
+
             "clean-code/exception-handling": "off",
             "clean-code/feature-envy": "off",
             "comment-length/limit-multi-line-comments": [
@@ -5528,12 +5650,12 @@ export default [
             "functional/no-let": "off", // Let is necessary in many React patterns
             "granular-selectors/granular-selectors": "error",
             "id-length": "off",
-
             // CSS
             "import-x/no-extraneous-dependencies": "warn",
             "import-x/no-import-module-exports": "warn",
             "import-x/no-internal-modules": "off",
             "import-x/no-mutable-exports": "warn",
+
             "import-x/no-named-as-default": "warn",
             "import-x/no-named-as-default-member": "off",
             "import-x/no-named-default": "warn",
@@ -5610,10 +5732,20 @@ export default [
             "math/prefer-math-sum-precise": "warn",
             "max-classes-per-file": "off",
             "max-lines": "off",
-            "max-lines-per-function": "off",
+            // Sonar quality helpers
+            "max-lines-per-function": [
+                "error",
+                {
+                    "IIFEs": false,
+                    "max": 1000,
+                    "skipBlankLines": true,
+                    "skipComments": true,
+                },
+            ],
             "max-params": "off",
             "max-statements": "off",
             "module-interop/no-import-cjs": "off",
+
             "module-interop/no-require-esm": "off",
             // Node
             "n/callback-return": "warn",
@@ -5760,7 +5892,10 @@ export default [
                     type: "alphabetical",
                 },
             ],
-            "prefer-arrow-callback": "off",
+            "prefer-arrow-callback": [
+                "warn",
+                { allowNamedFunctions: true, allowUnboundThis: true },
+            ],
             "prefer-const": "error",
             "prefer-template": "warn",
             // Code style
@@ -6051,6 +6186,12 @@ export default [
             "security/detect-non-literal-regexp": "warn",
             "security/detect-non-literal-require": "error",
             "security/detect-object-injection": "off",
+            "sonarjs/cognitive-complexity": [
+                "warn",
+                30,
+            ],
+            "sonarjs/no-duplicate-string": "off",
+            "sonarjs/no-unused-function-argument": "warn",
             "sort-class-members/sort-class-members": [
                 "warn",
                 {
@@ -6090,10 +6231,12 @@ export default [
             // "tailwind/no-arbitrary-value": "warn",
             // "tailwind/no-contradicting-classname": "warn",
             /**
-            * Performance issue with the plugin, somewhat mitigated setting cssFiles to an empty array.
-            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
-            * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
-            */
+             * Performance issue with the plugin, somewhat mitigated setting
+             * cssFiles to an empty array.
+             *
+             * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
+             * @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/174
+             */
             "tailwind/no-custom-classname": [
                 "warn",
                 {
@@ -6165,7 +6308,7 @@ export default [
         settings: {
             "better-tailwindcss": {
                 // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
-                "entryPoint": "./src/index.css",
+                entryPoint: "./src/index.css",
             },
             "boundaries/elements": [
                 {
@@ -6225,7 +6368,7 @@ export default [
             tailwindcss: {
                 config: `${ROOT_DIR}/src/index.css`,
                 // @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
-                cssFiles: ['./src/index.css'],
+                cssFiles: ["./src/index.css"],
             },
         },
     },
@@ -6298,6 +6441,7 @@ export default [
 
             // Relaxed function rules for tests (explicit for clarity)
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
+
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "@typescript-eslint/no-non-null-assertion": "off",
@@ -6321,7 +6465,16 @@ export default [
             "max-classes-per-file": "off",
             "max-depth": "off",
             "max-lines": "off",
-            "max-lines-per-function": "off",
+            "max-lines-per-function": [
+                "error",
+                {
+                    "IIFEs": false,
+                    "max": 2000,
+                    "skipBlankLines": true,
+                    "skipComments": true,
+                },
+            ],
+
             "max-params": "off",
             "max-statements": "off",
 
@@ -6349,13 +6502,15 @@ export default [
             "no-void": "off",
             "object-shorthand": "off",
             "one-var": "off",
-            "prefer-arrow-callback": "off",
+            "prefer-arrow-callback": [
+                "warn",
+                { allowNamedFunctions: true, allowUnboundThis: true },
+            ],
             "prefer-destructuring": "off",
             "require-await": "off",
             "require-unicode-regexp": "off",
             "sort-imports": "off",
             "sort-keys": "off",
-
 
             "testing-library/await-async-queries": "error",
             "testing-library/no-await-sync-queries": "error",
@@ -6503,6 +6658,7 @@ export default [
             ...pluginTestingLibrary.configs["flat/react"].rules,
 
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
+
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "@typescript-eslint/no-non-null-assertion": "off",
@@ -6527,7 +6683,16 @@ export default [
             "max-classes-per-file": "off",
             "max-depth": "off",
             "max-lines": "off",
-            "max-lines-per-function": "off",
+            "max-lines-per-function": [
+                "error",
+                {
+                    "IIFEs": false,
+                    "max": 2000,
+                    "skipBlankLines": true,
+                    "skipComments": true,
+                },
+            ],
+
             "max-params": "off",
             "max-statements": "off",
 
@@ -6557,7 +6722,10 @@ export default [
             "no-void": "off",
             "object-shorthand": "off",
             "one-var": "off",
-            "prefer-arrow-callback": "off",
+            "prefer-arrow-callback": [
+                "warn",
+                { allowNamedFunctions: true, allowUnboundThis: true },
+            ],
             "prefer-destructuring": "off",
             "require-await": "off",
             "require-unicode-regexp": "off",
@@ -6710,6 +6878,7 @@ export default [
             ...pluginUnicorn.configs.all.rules,
 
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
+
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
@@ -6725,7 +6894,16 @@ export default [
             "max-classes-per-file": "off",
             "max-depth": "off",
             "max-lines": "off",
-            "max-lines-per-function": "off",
+            "max-lines-per-function": [
+                "error",
+                {
+                    "IIFEs": false,
+                    "max": 2000,
+                    "skipBlankLines": true,
+                    "skipComments": true,
+                },
+            ],
+
             "max-params": "off",
             "max-statements": "off",
             "no-console": "off",
@@ -6741,7 +6919,10 @@ export default [
 
             "object-shorthand": "off",
             "one-var": "off",
-            "prefer-arrow-callback": "off",
+            "prefer-arrow-callback": [
+                "warn",
+                { allowNamedFunctions: true, allowUnboundThis: true },
+            ],
             "require-await": "off",
             "require-unicode-regexp": "off",
             "sort-imports": "off",
@@ -6892,7 +7073,9 @@ export default [
             ...vitest.configs.recommended.rules,
             ...pluginComments.configs.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
+
             "@typescript-eslint/no-empty-function": "off",
+
             // Allow flexible patterns for benchmark mock implementations
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-floating-promises": "off", // Benchmarks may not await all promises
@@ -6920,7 +7103,16 @@ export default [
             "max-depth": "off",
             // Allow large files and classes for comprehensive benchmarks
             "max-lines": "off",
-            "max-lines-per-function": "off",
+            "max-lines-per-function": [
+                "error",
+                {
+                    "IIFEs": false,
+                    "max": 2000,
+                    "skipBlankLines": true,
+                    "skipComments": true,
+                },
+            ],
+
             "max-params": "off",
             "max-statements": "off",
             "new-cap": "off", // Allow new-cap for class constructors
@@ -6949,7 +7141,10 @@ export default [
             "no-void": "off",
             "object-shorthand": "off",
             "one-var": "off",
-            "prefer-arrow-callback": "off",
+            "prefer-arrow-callback": [
+                "warn",
+                { allowNamedFunctions: true, allowUnboundThis: true },
+            ],
             "prefer-destructuring": "off",
             "require-await": "off",
             "require-unicode-regexp": "off",
@@ -7107,11 +7302,11 @@ export default [
             ...pluginComments.configs.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...arrayFunc.configs.all.rules,
+
             "@typescript-eslint/array-type": [
                 "error",
                 { default: "array-simple" },
             ], // Prefer T[] for simple types, Array<T> for complex types
-
             "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
             "@typescript-eslint/no-empty-function": [
                 "error",
@@ -7120,8 +7315,10 @@ export default [
                 },
             ],
             "@typescript-eslint/no-empty-object-type": "error",
+
             // Allow more flexibility for backend patterns
             "@typescript-eslint/no-explicit-any": "warn",
+
             // Advanced type-checked rules for backend async safety and runtime error prevention
             "@typescript-eslint/no-floating-promises": [
                 "error",
@@ -7188,7 +7385,6 @@ export default [
                 "in-try-catch",
             ], // Proper await handling in try-catch
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
-            // Architecture boundaries for Electron
             "boundaries/element-types": [
                 "error",
                 {
@@ -7250,6 +7446,8 @@ export default [
                     ],
                 },
             ],
+            // Architecture boundaries for Electron
+            "boundaries/no-ignored": "warn",
             camelcase: "off",
             "canonical/destructuring-property-newline": "off",
             "canonical/export-specifier-newline": "off",
@@ -7274,21 +7472,20 @@ export default [
             "functional/immutable-data": "off",
             "functional/no-class-inheritance": "off", // Classes are common in Electron services
             "functional/no-classes": "off", // Classes are common in Electron services
-
             "functional/no-conditional-statement": "off",
             "functional/no-conditional-statements": "off",
             "functional/no-expression-statements": "off",
             "functional/no-let": "off",
+
             "functional/no-loop-statements": "off",
             "functional/no-mixed-types": "off", // Mixed types are common in Electron services
             "functional/no-return-void": "off",
             "functional/no-throw-statements": "off", // Throwing errors is common in Electron
-
             "functional/prefer-immutable-types": "off",
             "id-length": "off",
-            // Import Rules
             "import-x/consistent-type-specifier-style": "off",
             "import-x/default": "warn",
+
             "import-x/dynamic-import-chunkname": "warn",
             "import-x/export": "warn",
             "import-x/exports-last": "off",
@@ -7297,6 +7494,8 @@ export default [
             "import-x/first": "warn",
             "import-x/group-exports": "off",
             "import-x/max-dependencies": "off",
+            // Import Rules
+            "import-x/named": "warn",
             "import-x/namespace": "warn",
             "import-x/newline-after-import": "warn",
             "import-x/no-absolute-path": "warn",
@@ -7346,17 +7545,27 @@ export default [
             "max-classes-per-file": "off",
             "max-depth": "off",
             "max-lines": "off",
-            "max-lines-per-function": "off",
+            // Sonar quality helpers
+            "max-lines-per-function": [
+                "error",
+                {
+                    "IIFEs": false,
+                    "max": 1000,
+                    "skipBlankLines": true,
+                    "skipComments": true,
+                },
+            ],
             "max-params": "off",
             "max-statements": "off",
             // Node
             "n/callback-return": "warn",
+
             "n/exports-style": "warn",
             "n/file-extension-in-import": "off", // Allow missing file extensions for imports
-
             "n/global-require": "warn",
             "n/handle-callback-err": "warn",
             "n/no-callback-literal": "warn",
+
             "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
             "n/no-missing-import": "off", // Allow missing imports for dynamic imports
             "n/no-mixed-requires": "warn",
@@ -7405,7 +7614,10 @@ export default [
             "no-void": "off",
             "object-shorthand": "off",
             "one-var": "off",
-            "prefer-arrow-callback": "off",
+            "prefer-arrow-callback": [
+                "warn",
+                { allowNamedFunctions: true, allowUnboundThis: true },
+            ],
             "prefer-const": "error",
             "prefer-destructuring": "off",
             "prettier/prettier": [
@@ -7449,6 +7661,12 @@ export default [
             "security/detect-non-literal-regexp": "warn",
             "security/detect-non-literal-require": "error",
             "security/detect-object-injection": "off",
+            "sonarjs/cognitive-complexity": [
+                "warn",
+                30,
+            ],
+            "sonarjs/no-duplicate-string": "off",
+            "sonarjs/no-unused-function-argument": "warn",
             "sort-imports": "off",
             "sort-keys": "off",
             // Documentation
@@ -7622,6 +7840,7 @@ export default [
             ...pluginUnicorn.configs.all.rules,
 
             "@typescript-eslint/no-empty-function": "off",
+
             // Allow flexible patterns for benchmark mock implementations
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-floating-promises": "off", // Benchmarks may not await all promises
@@ -7649,7 +7868,16 @@ export default [
             "max-depth": "off",
             // Allow large files and classes for comprehensive benchmarks
             "max-lines": "off",
-            "max-lines-per-function": "off",
+            "max-lines-per-function": [
+                "error",
+                {
+                    "IIFEs": false,
+                    "max": 1000,
+                    "skipBlankLines": true,
+                    "skipComments": true,
+                },
+            ],
+
             "max-params": "off",
             "max-statements": "off",
             "new-cap": "off", // Allow new-cap for class constructors
@@ -7678,7 +7906,10 @@ export default [
             "no-void": "off",
             "object-shorthand": "off",
             "one-var": "off",
-            "prefer-arrow-callback": "off",
+            "prefer-arrow-callback": [
+                "warn",
+                { allowNamedFunctions: true, allowUnboundThis: true },
+            ],
             "prefer-destructuring": "off",
             "require-await": "off",
             "require-unicode-regexp": "off",
@@ -7799,19 +8030,31 @@ export default [
             ...pluginSecurity.configs.recommended.rules,
             ...nodePlugin.configs["flat/recommended"].rules,
             ...eslintPluginMath.configs.recommended.rules,
+
             camelcase: "off",
             "capitalized-comments": "off",
             "class-methods-use-this": "off",
             "depend/ban-dependencies": "error",
+
             "dot-notation": "off",
             "func-style": "off",
             "id-length": "off",
             "max-classes-per-file": "off",
             "max-lines": "off",
-            "max-lines-per-function": "off",
+            // Sonar quality helpers
+            "max-lines-per-function": [
+                "error",
+                {
+                    "IIFEs": false,
+                    "max": 1000,
+                    "skipBlankLines": true,
+                    "skipComments": true,
+                },
+            ],
             "max-params": "off",
             "max-statements": "off",
             "no-console": "off",
+
             "no-inline-comments": "off",
             "no-magic-numbers": "off",
             "no-plusplus": "off",
@@ -7821,9 +8064,18 @@ export default [
             "no-void": "off",
             "object-shorthand": "off",
             "one-var": "off",
-            "prefer-arrow-callback": "off",
+            "prefer-arrow-callback": [
+                "warn",
+                { allowNamedFunctions: true, allowUnboundThis: true },
+            ],
             "require-await": "off",
             "require-unicode-regexp": "off",
+            "sonarjs/cognitive-complexity": [
+                "warn",
+                30,
+            ],
+            "sonarjs/no-duplicate-string": "off",
+            "sonarjs/no-unused-function-argument": "warn",
             "sort-imports": "off",
             "sort-keys": "off",
             "unicorn/consistent-function-scoping": "off", // Configs often use different scoping
@@ -7875,10 +8127,14 @@ export default [
         rules: {
             ...vitest.configs.all.rules,
 
-            "testing-library/consistent-data-testid": ["warn", {
-                testIdAttribute: ['data-testid'],
-                testIdPattern: "^[a-z]+([A-Z][a-z]+)*(-[a-z]+([A-Z][a-z]+)*)*$", // kebab-case or camelCase
-            }],
+            "testing-library/consistent-data-testid": [
+                "warn",
+                {
+                    testIdAttribute: ["data-testid"],
+                    testIdPattern:
+                        "^[a-z]+([A-Z][a-z]+)*(-[a-z]+([A-Z][a-z]+)*)*$", // kebab-case or camelCase
+                },
+            ],
             "testing-library/no-test-id-queries": "warn",
             "testing-library/prefer-explicit-assert": "warn",
             "testing-library/prefer-implicit-assert": "warn",
@@ -7928,15 +8184,13 @@ export default [
         ],
         name: "JSON Files - Disables",
         rules: {
-            "json/sort-keys": "off"
+            "json/sort-keys": "off",
         },
     },
 
     // Global Disables
     {
-        files: [
-            "**/**"
-        ],
+        files: ["**/**"],
         name: "Global Disables",
         rules: {
             "@eslint-react/debug/class-component": "off", // Debugging not needed
@@ -8024,7 +8278,7 @@ export default [
             // unicorn (deprecated / replaced rules)
             "unicorn/no-instanceof-array": "off",
             "unicorn/no-length-as-slice-end": "off",
-            "write-good-comments/write-good-comments": "off" // Too strict
+            "write-good-comments/write-good-comments": "off", // Too strict
         },
     },
 
