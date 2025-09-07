@@ -786,11 +786,11 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
     async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
      // Implementation must return standardized result
     }
-
+   
     updateConfig(config: Partial<MonitorConfig>): void {
      // Runtime configuration updates
     }
-
+   
     getType(): Site["monitors"][0]["type"] {
      return "your-type";
     }
@@ -1009,27 +1009,22 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
 
 
 
-/** * DNS monitoring service with production-grade reliability and error handling. * * @remarks * Implements the IMonitorService interface with comprehensive error handling, * operation correlation for race condition prevention, and proper resource * management following ADR-003 error handling strategy. * * Features: * - Operation correlation prevents race conditions * - Memory-safe resource management * - Comprehensive error handling with correlation IDs * - Production-grade validation and logging * * @example * ```typescript * const monitor = new DnsMonitor(); * const result = await monitor.check(dnsConfig); * // Automatically integrates with enhanced monitoring system * ``` * * @public */import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";import { DEFAULT_RETRY_ATTEMPTS, DEFAULT_TIMEOUT } from "./constants";import { getMonitorRetryAttempts, getMonitorTimeout,} from "./utils/monitorTypeGuards";import { withErrorHandling } from "../../utils/errorHandling";import { generateCorrelationId } from "../../utils/correlation";import { logger } from "../../utils/logger";export class DnsMonitor implements IMonitorService { private config: MonitorConfig; private activeOperations = new Set<string>(); constructor(config: MonitorConfig = {}) {  this.config = {   timeout: DEFAULT_TIMEOUT, // Use consistent defaults   retryAttempts: DEFAULT_RETRY_ATTEMPTS,   ...config,  }; } /**  * Performs DNS monitoring check with comprehensive error handling and operation correlation.  *  * @param monitor - DNS monitor configuration with validated fields  * @returns Promise resolving to standardized MonitorCheckResult  * @throws Error with correlation ID for debugging and operation tracking  */ async check(monitor: Monitor): Promise<MonitorCheckResult> {  const correlationId = generateCorrelationId();  return await withErrorHandling(   async () => {    // Type validation    if (monitor.type !== "dns") {     throw new Error(`DnsMonitor cannot handle monitor type: ${monitor.type}`);    }    // Operation correlation for race condition prevention    this.activeOperations.add(correlationId);    try {     // Extract configuration using utility functions for consistency     const timeout = getMonitorTimeout(monitor, this.config.timeout);
-     const retryAttempts = getMonitorRetryAttempts(monitor, this.config.retryAttempts);
 
-     // Performance tracking
-     const startTime = performance.now();
 
-     // DNS resolution logic with timeout and retry
-     const result = await this.performDnsCheck(monitor, timeout, retryAttempts);
 
-     const responseTime = performance.now() - startTime;
 
-     return {
-      status: result.success ? "up" : "down",
-      responseTime: Math.round(responseTime),
-      details: result.details || `DNS check ${result.success ? "successful" : "failed"}`,
-      error: result.error,
-     };
-    } finally {
-     // Always cleanup operation tracking
-     this.activeOperations.delete(correlationId);
-    }
+
+
+
+
+
+
+
+
+
+
+
+/** * DNS monitoring service with production-grade reliability and error handling. * * @remarks * Implements the IMonitorService interface with comprehensive error handling, * operation correlation for race condition prevention, and proper resource * management following ADR-003 error handling strategy. * * Features: * - Operation correlation prevents race conditions * - Memory-safe resource management * - Comprehensive error handling with correlation IDs * - Production-grade validation and logging * * @example * ```typescript * const monitor = new DnsMonitor(); * const result = await monitor.check(dnsConfig); * // Automatically integrates with enhanced monitoring system * ``` * * @public */import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";import { DEFAULT_RETRY_ATTEMPTS, DEFAULT_TIMEOUT } from "./constants";import { getMonitorRetryAttempts, getMonitorTimeout,} from "./utils/monitorTypeGuards";import { withErrorHandling } from "../../utils/errorHandling";import { generateCorrelationId } from "../../utils/correlation";import { logger } from "../../utils/logger";export class DnsMonitor implements IMonitorService { private config: MonitorConfig; private activeOperations = new Set<string>(); constructor(config: MonitorConfig = {}) {  this.config = {   timeout: DEFAULT_TIMEOUT, // Use consistent defaults   retryAttempts: DEFAULT_RETRY_ATTEMPTS,   ...config,  }; } /**  * Performs DNS monitoring check with comprehensive error handling and operation correlation.  *  * @param monitor - DNS monitor configuration with validated fields  * @returns Promise resolving to standardized MonitorCheckResult  * @throws Error with correlation ID for debugging and operation tracking  */ async check(monitor: Monitor): Promise<MonitorCheckResult> {  const correlationId = generateCorrelationId();  return await withErrorHandling(   async () => {    // Type validation    if (monitor.type !== "dns") {     throw new Error(`DnsMonitor cannot handle monitor type: ${monitor.type}`);    }    // Operation correlation for race condition prevention    this.activeOperations.add(correlationId);    try {     // Extract configuration using utility functions for consistency     const timeout = getMonitorTimeout(monitor, this.config.timeout);     const retryAttempts = getMonitorRetryAttempts(monitor, this.config.retryAttempts);     // Performance tracking     const startTime = performance.now();     // DNS resolution logic with timeout and retry     const result = await this.performDnsCheck(monitor, timeout, retryAttempts);     const responseTime = performance.now() - startTime;     return {      status: result.success ? "up" : "down",      responseTime: Math.round(responseTime),      details: result.details || `DNS check ${result.success ? "successful" : "failed"}`,      error: result.error,     };    } finally {     // Always cleanup operation tracking     this.activeOperations.delete(correlationId);    }
    },
    {
     logger,
@@ -2145,27 +2140,22 @@ Test the Zod schema thoroughly:
 
 
 
-```typescriptdescribe("YourMonitor Schema Validation", () => { it("should validate correct monitor configuration", () => {  const validConfig = {   // Valid monitor configuration  };  const result = yourMonitorSchema.safeParse(validConfig);  expect(result.success).toBe(true); }); it("should reject invalid configurations", () => {  // Test various invalid configurations });});```---## 🎯 DNS Implementation Success Summary### **✅ Implementation Verified Complete**The DNS monitoring implementation has been **comprehensively verified** across all system layers and is **fully operational**. The systematic review confirms:**Backend Implementation (Electron)**:- ✅ `DnsMonitor.ts` - Complete service with all DNS record types (A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR, NAPTR, SOA, TLSA, ANY)- ✅ `MonitorTypeRegistry.ts` - Proper registration with UI configuration- ✅ Enhanced monitoring system integration**Shared Layer (TypeScript)**:- ✅ `schemas.ts` - Comprehensive Zod validation with discriminated unions- ✅ `validation.ts` - Runtime validation functions- ✅ `types.ts` - Updated BASE_MONITOR_TYPES array**Frontend Implementation (React)**:- ✅ `DynamicMonitorFields.tsx` - Dynamic UI with ANY record special handling- ✅ `Submit.tsx` - Safe string processing with safeTrim utility- ✅ `monitorTitleFormatters.ts` - DNS-specific title formatting**Quality Assurance**:- ✅ **7,613 tests passing** - Complete test suite validation- ✅ All critical patterns identified and documented- ✅ Production-grade error handling and validation- ✅ Memory management and resource cleanup### **🔑 Critical Patterns Documented**Based on the **real DNS implementation experience**, the following patterns are essential for any new monitor type:1. **Field Name Standardization** - Consistent naming across all layers prevents integration failures2. **Schema Synchronization** - Zod schemas, TypeScript unions, and validation must stay perfectly aligned3. **Special Semantics Handling** - Some monitor types require custom UI/backend behavior (like DNS ANY records)4. **Safe String Utilities** - Prevent undefined access errors with utilities like `safeTrim()`5. **Test Count Updates** - Base monitor type tests must be updated for new types6. **Type Safety Maintenance** - Discriminated unions ensure compile-time error prevention### **⚠️ Implementation Order Critical Success Factor**
-The verification revealed that implementation order is **absolutely critical**. The documented 6-phase approach prevents integration issues and ensures proper dependency resolution:
 
-1. **Foundation** → 2. **Core Implementation** → 3. **System Integration** → 4. **Quality Assurance** → 5. **UI Integration** → 6. **Production Validation**
 
-### **🚀 Production Architecture Benefits Realized**
 
-The DNS implementation demonstrates the power of the enhanced monitoring architecture:
 
-- **Zero Integration Complexity** - New monitor types integrate seamlessly through the registry system
-- **Automatic UI Generation** - Forms, validation, and displays are generated from configuration
-- **Type-Safe Operations** - Compile-time error prevention through discriminated unions
-- **Enterprise-Grade Reliability** - Comprehensive error handling, memory management, and testing
 
-### **📋 Developer Experience Excellence**
 
-The implementation proved that the architecture prioritizes developer experience:
 
-- **Minimal Code Changes** - Only 8 files required modification across the entire system
-- **Consistent Patterns** - Same patterns work for all monitor types
-- **Comprehensive Testing** - Existing test suite catches integration issues immediately
+
+
+
+
+
+
+
+
+```typescriptdescribe("YourMonitor Schema Validation", () => { it("should validate correct monitor configuration", () => {  const validConfig = {   // Valid monitor configuration  };  const result = yourMonitorSchema.safeParse(validConfig);  expect(result.success).toBe(true); }); it("should reject invalid configurations", () => {  // Test various invalid configurations });});```---## 🎯 DNS Implementation Success Summary### **✅ Implementation Verified Complete**The DNS monitoring implementation has been **comprehensively verified** across all system layers and is **fully operational**. The systematic review confirms:**Backend Implementation (Electron)**:- ✅ `DnsMonitor.ts` - Complete service with all DNS record types (A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR, NAPTR, SOA, TLSA, ANY)- ✅ `MonitorTypeRegistry.ts` - Proper registration with UI configuration- ✅ Enhanced monitoring system integration**Shared Layer (TypeScript)**:- ✅ `schemas.ts` - Comprehensive Zod validation with discriminated unions- ✅ `validation.ts` - Runtime validation functions- ✅ `types.ts` - Updated BASE_MONITOR_TYPES array**Frontend Implementation (React)**:- ✅ `DynamicMonitorFields.tsx` - Dynamic UI with ANY record special handling- ✅ `Submit.tsx` - Safe string processing with safeTrim utility- ✅ `monitorTitleFormatters.ts` - DNS-specific title formatting**Quality Assurance**:- ✅ **7,613 tests passing** - Complete test suite validation- ✅ All critical patterns identified and documented- ✅ Production-grade error handling and validation- ✅ Memory management and resource cleanup### **🔑 Critical Patterns Documented**Based on the **real DNS implementation experience**, the following patterns are essential for any new monitor type:1. **Field Name Standardization** - Consistent naming across all layers prevents integration failures2. **Schema Synchronization** - Zod schemas, TypeScript unions, and validation must stay perfectly aligned3. **Special Semantics Handling** - Some monitor types require custom UI/backend behavior (like DNS ANY records)4. **Safe String Utilities** - Prevent undefined access errors with utilities like `safeTrim()`5. **Test Count Updates** - Base monitor type tests must be updated for new types6. **Type Safety Maintenance** - Discriminated unions ensure compile-time error prevention### **⚠️ Implementation Order Critical Success Factor**The verification revealed that implementation order is **absolutely critical**. The documented 6-phase approach prevents integration issues and ensures proper dependency resolution:1. **Foundation** → 2. **Core Implementation** → 3. **System Integration** → 4. **Quality Assurance** → 5. **UI Integration** → 6. **Production Validation**### **🚀 Production Architecture Benefits Realized**The DNS implementation demonstrates the power of the enhanced monitoring architecture:- **Zero Integration Complexity** - New monitor types integrate seamlessly through the registry system- **Automatic UI Generation** - Forms, validation, and displays are generated from configuration- **Type-Safe Operations** - Compile-time error prevention through discriminated unions- **Enterprise-Grade Reliability** - Comprehensive error handling, memory management, and testing### **📋 Developer Experience Excellence**The implementation proved that the architecture prioritizes developer experience:- **Minimal Code Changes** - Only 8 files required modification across the entire system- **Consistent Patterns** - Same patterns work for all monitor types- **Comprehensive Testing** - Existing test suite catches integration issues immediately
 - **Clear Documentation** - Real implementation provides concrete examples for future work
 
 This guide has been updated with **real implementation insights** rather than theoretical examples, providing a battle-tested blueprint for adding new monitor types to the Uptime Watcher system.

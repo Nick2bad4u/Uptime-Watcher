@@ -358,9 +358,9 @@ describe("High-Impact Branch Coverage Tests", () => {
 
                 if (typeGuardsModule.isError) {
                     // Test Error instances
-                    expect(typeGuardsModule.isError(new Error("test"))).toBeTruthy(
-                        
-                    );
+                    expect(
+                        typeGuardsModule.isError(new Error("test"))
+                    ).toBeTruthy();
                     expect(
                         typeGuardsModule.isError(new TypeError("type error"))
                     ).toBeTruthy();
@@ -372,9 +372,9 @@ describe("High-Impact Branch Coverage Tests", () => {
 
                     // Test non-Error objects
                     expect(typeGuardsModule.isError("error")).toBeFalsy();
-                    expect(typeGuardsModule.isError({ message: "error" })).toBeFalsy(
-                        
-                    );
+                    expect(
+                        typeGuardsModule.isError({ message: "error" })
+                    ).toBeFalsy();
                     expect(typeGuardsModule.isError(null)).toBeFalsy();
                     expect(typeGuardsModule.isError(undefined)).toBeFalsy();
                     expect(typeGuardsModule.isError([])).toBeFalsy();
@@ -386,9 +386,9 @@ describe("High-Impact Branch Coverage Tests", () => {
                             this.name = "CustomError";
                         }
                     }
-                    expect(typeGuardsModule.isError(new CustomError())).toBeTruthy(
-                        
-                    );
+                    expect(
+                        typeGuardsModule.isError(new CustomError())
+                    ).toBeTruthy();
                 }
 
                 if (typeGuardsModule.isDate) {
@@ -399,16 +399,16 @@ describe("High-Impact Branch Coverage Tests", () => {
                     ).toBeTruthy();
 
                     // Test invalid dates
-                    expect(typeGuardsModule.isDate(new Date("invalid"))).toBeFalsy(
-                        
-                    );
+                    expect(
+                        typeGuardsModule.isDate(new Date("invalid"))
+                    ).toBeFalsy();
                     expect(typeGuardsModule.isDate(Date.prototype)).toBeFalsy();
 
                     // Test non-Date objects
                     expect(typeGuardsModule.isDate("2023-01-01")).toBeFalsy();
-                    expect(typeGuardsModule.isDate(1_672_531_200_000)).toBeFalsy(
-                        
-                    );
+                    expect(
+                        typeGuardsModule.isDate(1_672_531_200_000)
+                    ).toBeFalsy();
                     expect(
                         typeGuardsModule.isDate({ getTime: () => Date.now() })
                     ).toBeFalsy();
@@ -422,20 +422,20 @@ describe("High-Impact Branch Coverage Tests", () => {
                     expect(typeGuardsModule.isFiniteNumber(3.14)).toBeTruthy();
 
                     // Test invalid numbers
-                    expect(typeGuardsModule.isFiniteNumber(Infinity)).toBeFalsy(
-                        
-                    );
-                    expect(typeGuardsModule.isFiniteNumber(-Infinity)).toBeFalsy(
-                        
-                    );
-                    expect(typeGuardsModule.isFiniteNumber(Number.NaN)).toBeFalsy(
-                        
-                    );
+                    expect(
+                        typeGuardsModule.isFiniteNumber(Infinity)
+                    ).toBeFalsy();
+                    expect(
+                        typeGuardsModule.isFiniteNumber(-Infinity)
+                    ).toBeFalsy();
+                    expect(
+                        typeGuardsModule.isFiniteNumber(Number.NaN)
+                    ).toBeFalsy();
                     expect(typeGuardsModule.isFiniteNumber("42")).toBeFalsy();
                     expect(typeGuardsModule.isFiniteNumber(null)).toBeFalsy();
-                    expect(typeGuardsModule.isFiniteNumber(undefined)).toBeFalsy(
-                        
-                    );
+                    expect(
+                        typeGuardsModule.isFiniteNumber(undefined)
+                    ).toBeFalsy();
                 }
             } catch (importError) {
                 expect(importError).toBeDefined();

@@ -29,7 +29,9 @@ describe("Cache Keys - Error Coverage", () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(() => parseCacheKey("prefix:" as any)).toThrow("Invalid cache key format: prefix:");
+        expect(() => parseCacheKey("prefix:" as any)).toThrow(
+            "Invalid cache key format: prefix:"
+        );
     });
 
     it("should throw error for 3-part key with empty prefix (line 375)", async ({

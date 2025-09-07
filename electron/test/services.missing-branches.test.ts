@@ -275,9 +275,9 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             const results = await Promise.all(operations);
 
             expect(results).toHaveLength(50);
-            expect(results.every((result) => typeof result === "string")).toBeTruthy(
-                
-            );
+            expect(
+                results.every((result) => typeof result === "string")
+            ).toBeTruthy();
             expect(
                 results.every(
                     (result) =>

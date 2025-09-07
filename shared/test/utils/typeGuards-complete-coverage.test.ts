@@ -609,9 +609,9 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isError(new Error("test error"))).toBeTruthy();
             expect(isError(new Error("message"))).toBeTruthy();
             expect(isError(new TypeError("test type error"))).toBeTruthy();
-            expect(isError(new ReferenceError("test reference error"))).toBeTruthy(
-                
-            );
+            expect(
+                isError(new ReferenceError("test reference error"))
+            ).toBeTruthy();
             expect(isError(new SyntaxError("test syntax error"))).toBeTruthy();
         });
 
@@ -714,10 +714,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
 
             expect(isFunction(() => {})).toBeTruthy();
             expect(isFunction(function testFunction() {})).toBeTruthy();
-            expect(isFunction(async function testAsyncFunction() {})).toBeTruthy(
-                
-            );
-            expect(isFunction(function* testGeneratorFunction() {})).toBeTruthy();
+            expect(
+                isFunction(async function testAsyncFunction() {})
+            ).toBeTruthy();
+            expect(
+                isFunction(function* testGeneratorFunction() {})
+            ).toBeTruthy();
             expect(isFunction(Math.random)).toBeTruthy();
             expect(isFunction(console.log)).toBeTruthy();
         });

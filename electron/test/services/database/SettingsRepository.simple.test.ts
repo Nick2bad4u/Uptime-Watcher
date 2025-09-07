@@ -302,7 +302,7 @@ describe("SettingsRepository Coverage Tests", () => {
                         fc.boolean(),
                         fc.record({
                             theme: fc.constantFrom("light", "dark"),
-                            notifications: fc.boolean()
+                            notifications: fc.boolean(),
                         })
                     ),
                     async (settingKey, settingValue) => {
@@ -316,21 +316,24 @@ describe("SettingsRepository Coverage Tests", () => {
                             });
 
                             // Mock successful database operations
-                            const mockRun = vi.fn().mockReturnValue({ changes: 1 });
+                            const mockRun = vi
+                                .fn()
+                                .mockReturnValue({ changes: 1 });
                             const mockGet = vi.fn().mockReturnValue({
                                 key: settingKey,
                                 value: JSON.stringify(settingValue),
-                                updatedAt: Date.now()
+                                updatedAt: Date.now(),
                             });
 
                             mockDatabaseService.executeTransaction.mockImplementation(
-                                async (callback: any) => callback({
-                                    prepare: vi.fn(() => ({
-                                        run: mockRun,
-                                        get: mockGet,
-                                        finalize: vi.fn()
-                                    }))
-                                })
+                                async (callback: any) =>
+                                    callback({
+                                        prepare: vi.fn(() => ({
+                                            run: mockRun,
+                                            get: mockGet,
+                                            finalize: vi.fn(),
+                                        })),
+                                    })
                             );
 
                             // Should handle various setting types
@@ -352,9 +355,12 @@ describe("SettingsRepository Coverage Tests", () => {
                         {
                             theme: fc.constantFrom("light", "dark", "auto"),
                             notifications: fc.boolean(),
-                            checkInterval: fc.integer({ min: 30_000, max: 300_000 }),
+                            checkInterval: fc.integer({
+                                min: 30_000,
+                                max: 300_000,
+                            }),
                             retries: fc.integer({ min: 0, max: 10 }),
-                            timeout: fc.integer({ min: 5000, max: 60_000 })
+                            timeout: fc.integer({ min: 5000, max: 60_000 }),
                         },
                         { requiredKeys: [] }
                     ),
@@ -370,31 +376,48 @@ describe("SettingsRepository Coverage Tests", () => {
 
                             // Mock bulk operations
                             mockDatabaseService.executeTransaction.mockImplementation(
-                                async (callback: any) => callback({
-                                    prepare: vi.fn(() => ({
-                                        run: vi.fn().mockReturnValue({ changes: Object.keys(settingsObject).length }),
-                                        all: vi.fn().mockReturnValue(
-                                            Object.entries(settingsObject).map(([key, value]) => ({
-                                                key,
-                                                value: JSON.stringify(value),
-                                                updatedAt: Date.now()
-                                            }))
-                                        ),
-                                        finalize: vi.fn()
-                                    }))
-                                })
+                                async (callback: any) =>
+                                    callback({
+                                        prepare: vi.fn(() => ({
+                                            run: vi.fn().mockReturnValue({
+                                                changes:
+                                                    Object.keys(settingsObject)
+                                                        .length,
+                                            }),
+                                            all: vi.fn().mockReturnValue(
+                                                Object.entries(
+                                                    settingsObject
+                                                ).map(([key, value]) => ({
+                                                    key,
+                                                    value: JSON.stringify(
+                                                        value
+                                                    ),
+                                                    updatedAt: Date.now(),
+                                                }))
+                                            ),
+                                            finalize: vi.fn(),
+                                        })),
+                                    })
                             );
 
                             expect(repository).toBeDefined();
-                            expect(typeof repository.bulkInsert).toBe("function");
+                            expect(typeof repository.bulkInsert).toBe(
+                                "function"
+                            );
                             expect(typeof repository.getAll).toBe("function");
 
                             // Validate settings structure
-                            for (const [key, value] of Object.entries(settingsObject)) {
+                            for (const [key, value] of Object.entries(
+                                settingsObject
+                            )) {
                                 expect(key).toBeTypeOf("string");
                                 expect(key.length).toBeGreaterThan(0);
                                 if (typeof value === "string") {
-                                    expect(["light", "dark", "auto"]).toContain(value);
+                                    expect([
+                                        "light",
+                                        "dark",
+                                        "auto",
+                                    ]).toContain(value);
                                 } else if (typeof value === "number") {
                                     expect(value).toBeGreaterThanOrEqual(0);
                                 }
@@ -412,10 +435,18 @@ describe("SettingsRepository Coverage Tests", () => {
                 fc.asyncProperty(
                     fc.array(
                         fc.oneof(
-                            fc.string({ minLength: 1, maxLength: 50 }).map(s => `app.${s}`),
-                            fc.string({ minLength: 1, maxLength: 50 }).map(s => `user.${s}`),
-                            fc.string({ minLength: 1, maxLength: 50 }).map(s => `system.${s}`),
-                            fc.string({ minLength: 1, maxLength: 50 }).map(s => s.replaceAll(/[^\w.-]/g, "_"))
+                            fc
+                                .string({ minLength: 1, maxLength: 50 })
+                                .map((s) => `app.${s}`),
+                            fc
+                                .string({ minLength: 1, maxLength: 50 })
+                                .map((s) => `user.${s}`),
+                            fc
+                                .string({ minLength: 1, maxLength: 50 })
+                                .map((s) => `system.${s}`),
+                            fc
+                                .string({ minLength: 1, maxLength: 50 })
+                                .map((s) => s.replaceAll(/[^\w.-]/g, "_"))
                         ),
                         { minLength: 1, maxLength: 15 }
                     ),
@@ -434,16 +465,20 @@ describe("SettingsRepository Coverage Tests", () => {
                                 const mockGet = vi.fn().mockReturnValue({
                                     key,
                                     value: JSON.stringify(`value-for-${key}`),
-                                    updatedAt: Date.now()
+                                    updatedAt: Date.now(),
                                 });
 
-                                mockDatabaseService.getDatabase.mockReturnValue({
-                                    prepare: vi.fn(() => ({
-                                        get: mockGet,
-                                        run: vi.fn().mockReturnValue({ changes: 1 }),
-                                        finalize: vi.fn()
-                                    }))
-                                });
+                                mockDatabaseService.getDatabase.mockReturnValue(
+                                    {
+                                        prepare: vi.fn(() => ({
+                                            get: mockGet,
+                                            run: vi.fn().mockReturnValue({
+                                                changes: 1,
+                                            }),
+                                            finalize: vi.fn(),
+                                        })),
+                                    }
+                                );
 
                                 expect(repository).toBeDefined();
                                 expect(key.length).toBeGreaterThan(0);
@@ -474,8 +509,8 @@ describe("SettingsRepository Coverage Tests", () => {
                         fc.array(fc.integer(), { maxLength: 100 }),
                         fc.record({
                             nested: fc.record({
-                                deep: fc.string({ maxLength: 50 })
-                            })
+                                deep: fc.string({ maxLength: 50 }),
+                            }),
                         })
                     ),
                     async (settingKey, edgeValue) => {
@@ -490,17 +525,22 @@ describe("SettingsRepository Coverage Tests", () => {
 
                             // Mock serialization handling
                             mockDatabaseService.executeTransaction.mockImplementation(
-                                async (callback: any) => callback({
-                                    prepare: vi.fn(() => ({
-                                        run: vi.fn().mockReturnValue({ changes: 1 }),
-                                        get: vi.fn().mockReturnValue({
-                                            key: settingKey,
-                                            value: JSON.stringify(edgeValue),
-                                            updatedAt: Date.now()
-                                        }),
-                                        finalize: vi.fn()
-                                    }))
-                                })
+                                async (callback: any) =>
+                                    callback({
+                                        prepare: vi.fn(() => ({
+                                            run: vi.fn().mockReturnValue({
+                                                changes: 1,
+                                            }),
+                                            get: vi.fn().mockReturnValue({
+                                                key: settingKey,
+                                                value: JSON.stringify(
+                                                    edgeValue
+                                                ),
+                                                updatedAt: Date.now(),
+                                            }),
+                                            finalize: vi.fn(),
+                                        })),
+                                    })
                             );
 
                             expect(repository).toBeDefined();
@@ -527,8 +567,12 @@ describe("SettingsRepository Coverage Tests", () => {
                 fc.asyncProperty(
                     fc.oneof(
                         fc.constantFrom(
-                            "SQLITE_BUSY", "SQLITE_LOCKED", "SQLITE_CONSTRAINT",
-                            "SQLITE_READONLY", "SQLITE_IOERR", "ENOENT"
+                            "SQLITE_BUSY",
+                            "SQLITE_LOCKED",
+                            "SQLITE_CONSTRAINT",
+                            "SQLITE_READONLY",
+                            "SQLITE_IOERR",
+                            "ENOENT"
                         ),
                         fc.string({ minLength: 5, maxLength: 50 })
                     ),
@@ -545,7 +589,9 @@ describe("SettingsRepository Coverage Tests", () => {
                             });
 
                             // Mock database error
-                            const dbError = new Error(`Mock ${errorType} error`);
+                            const dbError = new Error(
+                                `Mock ${errorType} error`
+                            );
                             (dbError as any).code = errorType;
 
                             mockDatabaseService.executeTransaction.mockImplementation(
@@ -572,46 +618,54 @@ describe("SettingsRepository Coverage Tests", () => {
 
         it("should validate settings repository structure and methods", async () => {
             await fc.assert(
-                fc.asyncProperty(
-                    fc.boolean(),
-                    async (mockSuccessfully) => {
-                        const { SettingsRepository } = await import(
-                            "../../../services/database/SettingsRepository"
-                        );
+                fc.asyncProperty(fc.boolean(), async (mockSuccessfully) => {
+                    const { SettingsRepository } = await import(
+                        "../../../services/database/SettingsRepository"
+                    );
 
-                        try {
-                            const repository = new SettingsRepository({
-                                databaseService: mockDatabaseService,
-                            });
+                    try {
+                        const repository = new SettingsRepository({
+                            databaseService: mockDatabaseService,
+                        });
 
-                            // Validate repository interface
-                            expect(repository).toBeDefined();
-                            expect(typeof repository).toBe("object");
+                        // Validate repository interface
+                        expect(repository).toBeDefined();
+                        expect(typeof repository).toBe("object");
 
-                            // Check for expected methods
-                            const expectedMethods = [
-                                "get", "set", "getAll", "bulkInsert", "delete", "clear"
-                            ];
+                        // Check for expected methods
+                        const expectedMethods = [
+                            "get",
+                            "set",
+                            "getAll",
+                            "bulkInsert",
+                            "delete",
+                            "clear",
+                        ];
 
-                            for (const methodName of expectedMethods) {
-                                if (methodName in repository) {
-                                    expect(typeof (repository as any)[methodName]).toBe("function");
-                                }
+                        for (const methodName of expectedMethods) {
+                            if (methodName in repository) {
+                                expect(
+                                    typeof (repository as any)[methodName]
+                                ).toBe("function");
                             }
-
-                            // Mock success/failure scenarios
-                            if (mockSuccessfully) {
-                                mockDatabaseService.executeTransaction.mockResolvedValue(true);
-                            } else {
-                                mockDatabaseService.executeTransaction.mockRejectedValue(new Error("Mock error"));
-                            }
-
-                            expect(repository).toBeInstanceOf(SettingsRepository);
-                        } catch (error) {
-                            expect(error).toBeInstanceOf(Error);
                         }
+
+                        // Mock success/failure scenarios
+                        if (mockSuccessfully) {
+                            mockDatabaseService.executeTransaction.mockResolvedValue(
+                                true
+                            );
+                        } else {
+                            mockDatabaseService.executeTransaction.mockRejectedValue(
+                                new Error("Mock error")
+                            );
+                        }
+
+                        expect(repository).toBeInstanceOf(SettingsRepository);
+                    } catch (error) {
+                        expect(error).toBeInstanceOf(Error);
                     }
-                )
+                })
             );
         });
     });

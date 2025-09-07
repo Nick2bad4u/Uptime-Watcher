@@ -52,7 +52,9 @@ describe("cacheKeys utilities - Backend Coverage", () => {
             expect(cacheKeys.isStandardizedCacheKey(configKey)).toBeTruthy();
             expect(cacheKeys.isStandardizedCacheKey(monitorKey)).toBeTruthy();
             expect(cacheKeys.isStandardizedCacheKey(siteKey)).toBeTruthy();
-            expect(cacheKeys.isStandardizedCacheKey(validationKey)).toBeTruthy();
+            expect(
+                cacheKeys.isStandardizedCacheKey(validationKey)
+            ).toBeTruthy();
             expect(cacheKeys.isStandardizedCacheKey("invalid-key")).toBeFalsy();
 
             // Test parseCacheKey with all key types
@@ -310,11 +312,15 @@ describe("cacheKeys utilities - Backend Coverage", () => {
                 "component"
             );
 
-            expect(isStandardizedCacheKey("site:backend-site-123")).toBeTruthy();
-            expect(isStandardizedCacheKey("monitor:backend-monitor-456")).toBeTruthy(
-                
-            );
-            expect(isStandardizedCacheKey("config:backend-setting")).toBeTruthy();
+            expect(
+                isStandardizedCacheKey("site:backend-site-123")
+            ).toBeTruthy();
+            expect(
+                isStandardizedCacheKey("monitor:backend-monitor-456")
+            ).toBeTruthy();
+            expect(
+                isStandardizedCacheKey("config:backend-setting")
+            ).toBeTruthy();
         });
         it("should return true for valid three-part cache keys in backend", async ({
             task,
@@ -329,12 +335,12 @@ describe("cacheKeys utilities - Backend Coverage", () => {
             expect(
                 isStandardizedCacheKey("monitor:operation:backend-123")
             ).toBeTruthy();
-            expect(isStandardizedCacheKey("site:loading:backend-456")).toBeTruthy(
-                
-            );
-            expect(isStandardizedCacheKey("validation:monitor-type:http")).toBeTruthy(
-                
-            );
+            expect(
+                isStandardizedCacheKey("site:loading:backend-456")
+            ).toBeTruthy();
+            expect(
+                isStandardizedCacheKey("validation:monitor-type:http")
+            ).toBeTruthy();
         });
         it("should return false for invalid prefixes in backend context", async ({
             task,
@@ -362,9 +368,9 @@ describe("cacheKeys utilities - Backend Coverage", () => {
 
             expect(isStandardizedCacheKey("")).toBeFalsy();
             expect(isStandardizedCacheKey("single-part")).toBeFalsy();
-            expect(isStandardizedCacheKey("too:many:parts:here:invalid")).toBeFalsy(
-                
-            );
+            expect(
+                isStandardizedCacheKey("too:many:parts:here:invalid")
+            ).toBeFalsy();
         });
         it("should return false for non-string inputs by type safety", async ({
             task,
@@ -394,9 +400,9 @@ describe("cacheKeys utilities - Backend Coverage", () => {
             expect(
                 isStandardizedCacheKey(CacheKeys.config.byName("test"))
             ).toBeTruthy();
-            expect(isStandardizedCacheKey(CacheKeys.monitor.byId("test"))).toBeTruthy(
-                
-            );
+            expect(
+                isStandardizedCacheKey(CacheKeys.monitor.byId("test"))
+            ).toBeTruthy();
             expect(
                 isStandardizedCacheKey(CacheKeys.site.byIdentifier("test"))
             ).toBeTruthy();

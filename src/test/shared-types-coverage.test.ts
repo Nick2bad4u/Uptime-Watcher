@@ -96,7 +96,9 @@ describe("Shared Types Coverage", () => {
                 return true;
             };
 
-            expect(validateField(fieldValidations[0]!, "Test Site")).toBeTruthy();
+            expect(
+                validateField(fieldValidations[0]!, "Test Site")
+            ).toBeTruthy();
             expect(validateField(fieldValidations[0]!, "")).toBeFalsy();
             expect(
                 validateField(fieldValidations[1]!, "https://example.com")
@@ -494,9 +496,9 @@ describe("Shared Types Coverage", () => {
                 }
             };
 
-            expect(applyValidationRule(validationRules[0]!, "Test Site")).toBeTruthy(
-                
-            );
+            expect(
+                applyValidationRule(validationRules[0]!, "Test Site")
+            ).toBeTruthy();
             expect(applyValidationRule(validationRules[0]!, "")).toBeFalsy();
             expect(
                 applyValidationRule(validationRules[1]!, "https://example.com")

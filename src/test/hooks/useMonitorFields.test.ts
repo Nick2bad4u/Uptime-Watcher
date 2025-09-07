@@ -452,18 +452,18 @@ describe("useMonitorFields Hook", () => {
 
                 const result = await setupHookWithData();
 
-                expect(result.current.isFieldRequired("http", "url")).toBeTruthy(
-                    
-                );
-                expect(result.current.isFieldRequired("http", "timeout")).toBeTruthy(
-                    
-                );
-                expect(result.current.isFieldRequired("tcp", "host")).toBeTruthy(
-                    
-                );
-                expect(result.current.isFieldRequired("tcp", "port")).toBeTruthy(
-                    
-                );
+                expect(
+                    result.current.isFieldRequired("http", "url")
+                ).toBeTruthy();
+                expect(
+                    result.current.isFieldRequired("http", "timeout")
+                ).toBeTruthy();
+                expect(
+                    result.current.isFieldRequired("tcp", "host")
+                ).toBeTruthy();
+                expect(
+                    result.current.isFieldRequired("tcp", "port")
+                ).toBeTruthy();
             });
 
             it("should correctly identify optional fields", async ({
@@ -477,9 +477,9 @@ describe("useMonitorFields Hook", () => {
 
                 const result = await setupHookWithData();
 
-                expect(result.current.isFieldRequired("http", "method")).toBeFalsy(
-                    
-                );
+                expect(
+                    result.current.isFieldRequired("http", "method")
+                ).toBeFalsy();
             });
 
             it("should return false for non-existent fields", async ({
@@ -757,9 +757,9 @@ describe("useMonitorFields Hook", () => {
             });
 
             // Should handle gracefully - missing required defaults to false
-            expect(result.current.isFieldRequired("incomplete", "field1")).toBeFalsy(
-                
-            );
+            expect(
+                result.current.isFieldRequired("incomplete", "field1")
+            ).toBeFalsy();
             expect(result.current.getRequiredFields("incomplete")).toEqual([]);
         });
 

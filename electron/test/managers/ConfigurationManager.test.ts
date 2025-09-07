@@ -902,9 +902,9 @@ describe(ConfigurationManager, () => {
             expect(
                 configManager.shouldAutoStartMonitoring(siteWithoutMonitors)
             ).toBeFalsy();
-            expect(configManager.shouldAutoStartMonitoring(siteDisabled)).toBeFalsy(
-                
-            );
+            expect(
+                configManager.shouldAutoStartMonitoring(siteDisabled)
+            ).toBeFalsy();
         });
 
         it("should handle sites with complex monitor configurations", async ({
@@ -952,12 +952,14 @@ describe(ConfigurationManager, () => {
             expect(result).toEqual(expectedResult);
 
             // Verify that complex sites can be auto-started
-            expect(configManager.shouldAutoStartMonitoring(complexSite)).toBeTruthy(
-                
-            );
+            expect(
+                configManager.shouldAutoStartMonitoring(complexSite)
+            ).toBeTruthy();
 
             // Verify that complex sites can be included in export
-            expect(configManager.shouldIncludeInExport(complexSite)).toBeTruthy();
+            expect(
+                configManager.shouldIncludeInExport(complexSite)
+            ).toBeTruthy();
         });
     });
 });

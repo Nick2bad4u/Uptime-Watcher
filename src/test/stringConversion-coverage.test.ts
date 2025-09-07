@@ -1,6 +1,7 @@
 /**
- * @fileoverview Direct function call tests for stringConversion to ensure coverage
  * @module shared/utils/stringConversion.test
+ *
+ * @file Direct function call tests for stringConversion to ensure coverage
  */
 
 import { describe, expect, it } from "vitest";

@@ -340,9 +340,7 @@ describe("Settings Component Coverage Tests", () => {
             expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBeTruthy();
             expect(HISTORY_LIMIT_OPTIONS.length).toBeGreaterThan(0);
             expect(typeof DEFAULT_HISTORY_LIMIT).toBe("number");
-            expect(HISTORY_LIMIT_OPTIONS).toContain(
-                DEFAULT_HISTORY_LIMIT
-            );
+            expect(HISTORY_LIMIT_OPTIONS).toContain(DEFAULT_HISTORY_LIMIT);
 
             for (const limit of HISTORY_LIMIT_OPTIONS) {
                 expect(typeof limit).toBe("number");
@@ -425,13 +423,11 @@ describe("Settings Component Coverage Tests", () => {
 
             for (const theme of themeNames) {
                 expect(typeof theme).toBe("string");
-                expect(
-                    [
-                        "light",
-                        "dark",
-                        "system",
-                    ]
-                ).toContain(theme);
+                expect([
+                    "light",
+                    "dark",
+                    "system",
+                ]).toContain(theme);
             }
         });
 

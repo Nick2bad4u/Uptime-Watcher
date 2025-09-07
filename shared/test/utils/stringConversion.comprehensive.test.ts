@@ -136,7 +136,9 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(safeStringify(() => {})).toBe("[Function]");
-            expect(safeStringify(function namedFunction() {})).toBe("[Function]");
+            expect(safeStringify(function namedFunction() {})).toBe(
+                "[Function]"
+            );
             expect(safeStringify(async () => {})).toBe("[Function]");
         });
 
@@ -430,15 +432,20 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             }
         );
 
-        test.prop([fc.oneof(fc.string(), fc.integer(), fc.boolean(), fc.constant(null), fc.constant(undefined))])(
-            "should never throw for any primitive input",
-            (input) => {
-                expect(() => {
-                    const result = safeStringify(input);
-                    expect(typeof result).toBe("string");
-                }).not.toThrow();
-            }
-        );
+        test.prop([
+            fc.oneof(
+                fc.string(),
+                fc.integer(),
+                fc.boolean(),
+                fc.constant(null),
+                fc.constant(undefined)
+            ),
+        ])("should never throw for any primitive input", (input) => {
+            expect(() => {
+                const result = safeStringify(input);
+                expect(typeof result).toBe("string");
+            }).not.toThrow();
+        });
 
         test.prop([fc.array(fc.jsonValue(), { minLength: 0, maxLength: 10 })])(
             "should round-trip serialize valid JSON arrays",
@@ -466,7 +473,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             }
         );
 
-        test.prop([fc.string().filter(s => s.length > 0)])(
+        test.prop([fc.string().filter((s) => s.length > 0)])(
             "should preserve non-empty string content exactly",
             (str) => {
                 const result = safeStringify(str);
@@ -475,18 +482,17 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             }
         );
 
-        test.prop([fc.oneof(
-            fc.constant(() => {}),
-            fc.constant(Symbol("test")),
-            fc.constant(BigInt(123))
-        )])(
-            "should handle non-JSON-serializable values gracefully",
-            (input) => {
-                const result = safeStringify(input);
-                expect(typeof result).toBe("string");
-                expect(result.length).toBeGreaterThanOrEqual(0);
-                // Should not throw, result should be a reasonable fallback
-            }
-        );
+        test.prop([
+            fc.oneof(
+                fc.constant(() => {}),
+                fc.constant(Symbol("test")),
+                fc.constant(BigInt(123))
+            ),
+        ])("should handle non-JSON-serializable values gracefully", (input) => {
+            const result = safeStringify(input);
+            expect(typeof result).toBe("string");
+            expect(result.length).toBeGreaterThanOrEqual(0);
+            // Should not throw, result should be a reasonable fallback
+        });
     });
 });

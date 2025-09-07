@@ -609,9 +609,9 @@ describe(MonitorOperationRegistry, () => {
 
             const activeOps = registry.getActiveOperations();
             expect(activeOps.size).toBe(1);
-            expect(activeOps.get(result.operationId)?.signal.aborted).toBeTruthy(
-                
-            );
+            expect(
+                activeOps.get(result.operationId)?.signal.aborted
+            ).toBeTruthy();
         });
     });
 

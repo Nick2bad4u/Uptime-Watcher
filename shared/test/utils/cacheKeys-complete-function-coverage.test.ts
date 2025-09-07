@@ -113,15 +113,15 @@ describe("CacheKeys - Complete Function Coverage", () => {
             expect(typeof cacheKeysModule.parseCacheKey).toBe("function");
 
             // Test isStandardizedCacheKey function
-            expect(cacheKeysModule.isStandardizedCacheKey("config:test")).toBeTruthy(
-                
-            );
+            expect(
+                cacheKeysModule.isStandardizedCacheKey("config:test")
+            ).toBeTruthy();
             expect(
                 cacheKeysModule.isStandardizedCacheKey("monitor:operation:test")
             ).toBeTruthy();
-            expect(cacheKeysModule.isStandardizedCacheKey("invalid")).toBeFalsy(
-                
-            );
+            expect(
+                cacheKeysModule.isStandardizedCacheKey("invalid")
+            ).toBeFalsy();
             expect(
                 cacheKeysModule.isStandardizedCacheKey("invalid:too:many:parts")
             ).toBeFalsy();
@@ -162,7 +162,9 @@ describe("CacheKeys - Complete Function Coverage", () => {
                 cacheKeysModule.parseCacheKey(
                     "prefix:operation:identifier:extra" as any
                 )
-            ).toThrow("Invalid cache key format: prefix:operation:identifier:extra");
+            ).toThrow(
+                "Invalid cache key format: prefix:operation:identifier:extra"
+            );
 
             // Verify all major function paths are executed
             expect(cacheKeysModule.CacheKeys).toBeDefined();
@@ -225,16 +227,18 @@ describe("CacheKeys - Complete Function Coverage", () => {
             const validationKey =
                 cacheKeysModule.CacheKeys.validation.monitorType("http");
 
-            expect(cacheKeysModule.isStandardizedCacheKey(configKey)).toBeTruthy(
-                
-            );
-            expect(cacheKeysModule.isStandardizedCacheKey(monitorKey)).toBeTruthy(
-                
-            );
-            expect(cacheKeysModule.isStandardizedCacheKey(siteKey)).toBeTruthy();
-            expect(cacheKeysModule.isStandardizedCacheKey(validationKey)).toBeTruthy(
-                
-            );
+            expect(
+                cacheKeysModule.isStandardizedCacheKey(configKey)
+            ).toBeTruthy();
+            expect(
+                cacheKeysModule.isStandardizedCacheKey(monitorKey)
+            ).toBeTruthy();
+            expect(
+                cacheKeysModule.isStandardizedCacheKey(siteKey)
+            ).toBeTruthy();
+            expect(
+                cacheKeysModule.isStandardizedCacheKey(validationKey)
+            ).toBeTruthy();
 
             // Verify round-trip: generate -> parse -> validate
             const parsedConfig = cacheKeysModule.parseCacheKey(configKey);

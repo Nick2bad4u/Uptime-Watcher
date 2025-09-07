@@ -1,6 +1,7 @@
 /**
- * @fileoverview Direct function call tests for typeHelpers to ensure coverage
  * @module shared/utils/typeHelpers.test
+ *
+ * @file Direct function call tests for typeHelpers to ensure coverage
  */
 
 import { describe, expect, it } from "vitest";
@@ -9,7 +10,7 @@ import {
     isArray,
     isRecord,
     safePropertyAccess,
-    validateAndConvert
+    validateAndConvert,
 } from "@shared/utils/typeHelpers";
 
 describe("typeHelpers Direct Function Coverage", () => {
@@ -21,7 +22,13 @@ describe("typeHelpers Direct Function Coverage", () => {
 
     it("should call isArray function", () => {
         expect(isArray([])).toBeTruthy();
-        expect(isArray([1, 2, 3])).toBeTruthy();
+        expect(
+            isArray([
+                1,
+                2,
+                3,
+            ])
+        ).toBeTruthy();
         expect(isArray("not array")).toBeFalsy();
         expect(isArray({})).toBeFalsy();
     });
@@ -41,9 +48,12 @@ describe("typeHelpers Direct Function Coverage", () => {
     });
 
     it("should call validateAndConvert function", () => {
-        const validator = (val: unknown): val is string => typeof val === "string";
+        const validator = (val: unknown): val is string =>
+            typeof val === "string";
         expect(validateAndConvert("test", validator)).toBe("test");
         // The function throws on invalid input, so we need to test that
-        expect(() => validateAndConvert(123, validator)).toThrow("Type validation failed");
+        expect(() => validateAndConvert(123, validator)).toThrow(
+            "Type validation failed"
+        );
     });
 });

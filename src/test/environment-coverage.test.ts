@@ -1,6 +1,7 @@
 /**
- * @fileoverview Direct function call tests for environment to ensure coverage
  * @module shared/utils/environment.test
+ *
+ * @file Direct function call tests for environment to ensure coverage
  */
 
 import { describe, expect, it } from "vitest";
@@ -12,17 +13,21 @@ import {
     isDevelopment,
     isNodeEnvironment,
     isProduction,
-    isTest
+    isTest,
 } from "@shared/utils/environment";
 
 describe("environment Direct Function Coverage", () => {
     it("should call getEnvVar function", () => {
         // Call with valid keys
         const nodeEnv = getEnvVar("NODE_ENV");
-        expect(typeof nodeEnv === "string" || nodeEnv === undefined).toBeTruthy();
+        expect(
+            typeof nodeEnv === "string" || nodeEnv === undefined
+        ).toBeTruthy();
 
         const codecov = getEnvVar("CODECOV_TOKEN");
-        expect(typeof codecov === "string" || codecov === undefined).toBeTruthy();
+        expect(
+            typeof codecov === "string" || codecov === undefined
+        ).toBeTruthy();
     });
 
     it("should call getEnvironment function", () => {

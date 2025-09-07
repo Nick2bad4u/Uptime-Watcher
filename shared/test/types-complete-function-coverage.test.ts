@@ -101,7 +101,9 @@ describe("Shared Types - Complete Function Coverage", () => {
                 retryAttempts: 1,
                 history: [],
             };
-            expect(typesModule.validateMonitor(minimalValidMonitor)).toBeTruthy();
+            expect(
+                typesModule.validateMonitor(minimalValidMonitor)
+            ).toBeTruthy();
 
             // Test invalid monitors
             expect(typesModule.validateMonitor(null as any)).toBeFalsy();
@@ -389,9 +391,9 @@ describe("Shared Types - Complete Function Coverage", () => {
             ];
 
             for (const input of nonStringInputs) {
-                expect(typesModule.isComputedSiteStatus(input as any)).toBeFalsy(
-                    
-                );
+                expect(
+                    typesModule.isComputedSiteStatus(input as any)
+                ).toBeFalsy();
                 expect(typesModule.isMonitorStatus(input as any)).toBeFalsy();
                 expect(typesModule.isSiteStatus(input as any)).toBeFalsy();
             }

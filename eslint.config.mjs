@@ -1318,10 +1318,13 @@ export default [
             "@typescript-eslint/explicit-member-accessibility": "warn",
             "@typescript-eslint/explicit-module-boundary-types": "warn",
             "@typescript-eslint/init-declarations": "warn",
-            "@typescript-eslint/max-params": ['warn', {
-                countVoidThis: false,
-                max: 20,
-            }],
+            "@typescript-eslint/max-params": [
+                "warn",
+                {
+                    countVoidThis: false,
+                    max: 20,
+                },
+            ],
             "@typescript-eslint/member-ordering": "off",
             "@typescript-eslint/method-signature-style": "warn",
             "@typescript-eslint/naming-convention": "off",
@@ -1839,10 +1842,10 @@ export default [
             "max-lines-per-function": [
                 "error",
                 {
-                    "IIFEs": false,
-                    "max": 1000,
-                    "skipBlankLines": true,
-                    "skipComments": true,
+                    IIFEs: false,
+                    max: 1000,
+                    skipBlankLines: true,
+                    skipComments: true,
                 },
             ],
             "max-params": "off",
@@ -2565,10 +2568,13 @@ export default [
             "@typescript-eslint/explicit-member-accessibility": "warn",
             "@typescript-eslint/explicit-module-boundary-types": "warn",
             "@typescript-eslint/init-declarations": "warn",
-            "@typescript-eslint/max-params": ['warn', {
-                countVoidThis: false,
-                max: 20,
-            }],
+            "@typescript-eslint/max-params": [
+                "warn",
+                {
+                    countVoidThis: false,
+                    max: 20,
+                },
+            ],
             "@typescript-eslint/member-ordering": "off",
             "@typescript-eslint/method-signature-style": "warn",
             "@typescript-eslint/naming-convention": "off",
@@ -3075,10 +3081,10 @@ export default [
             "max-lines-per-function": [
                 "error",
                 {
-                    "IIFEs": false,
-                    "max": 1000,
-                    "skipBlankLines": true,
-                    "skipComments": true,
+                    IIFEs: false,
+                    max: 1000,
+                    skipBlankLines: true,
+                    skipComments: true,
                 },
             ],
             "max-params": "off",
@@ -4032,10 +4038,13 @@ export default [
             "@typescript-eslint/explicit-member-accessibility": "warn",
             "@typescript-eslint/explicit-module-boundary-types": "warn",
             "@typescript-eslint/init-declarations": "warn",
-            "@typescript-eslint/max-params": ['warn', {
-                countVoidThis: false,
-                max: 20,
-            }],
+            "@typescript-eslint/max-params": [
+                "warn",
+                {
+                    countVoidThis: false,
+                    max: 20,
+                },
+            ],
             "@typescript-eslint/member-ordering": "off",
             "@typescript-eslint/method-signature-style": "warn",
             "@typescript-eslint/naming-convention": "off",
@@ -4525,10 +4534,10 @@ export default [
             "max-lines-per-function": [
                 "error",
                 {
-                    "IIFEs": false,
-                    "max": 1000,
-                    "skipBlankLines": true,
-                    "skipComments": true,
+                    IIFEs: false,
+                    max: 1000,
+                    skipBlankLines: true,
+                    skipComments: true,
                 },
             ],
             "max-params": "off",
@@ -5240,10 +5249,13 @@ export default [
             "@typescript-eslint/explicit-member-accessibility": "warn",
             "@typescript-eslint/explicit-module-boundary-types": "warn",
             "@typescript-eslint/init-declarations": "warn",
-            "@typescript-eslint/max-params": ['warn', {
-                countVoidThis: false,
-                max: 20,
-            }],
+            "@typescript-eslint/max-params": [
+                "warn",
+                {
+                    countVoidThis: false,
+                    max: 20,
+                },
+            ],
             "@typescript-eslint/member-ordering": "off",
             "@typescript-eslint/method-signature-style": "warn",
             "@typescript-eslint/naming-convention": "off",
@@ -5736,10 +5748,10 @@ export default [
             "max-lines-per-function": [
                 "error",
                 {
-                    "IIFEs": false,
-                    "max": 1000,
-                    "skipBlankLines": true,
-                    "skipComments": true,
+                    IIFEs: false,
+                    max: 1000,
+                    skipBlankLines: true,
+                    skipComments: true,
                 },
             ],
             "max-params": "off",
@@ -6468,10 +6480,10 @@ export default [
             "max-lines-per-function": [
                 "error",
                 {
-                    "IIFEs": false,
-                    "max": 2000,
-                    "skipBlankLines": true,
-                    "skipComments": true,
+                    IIFEs: false,
+                    max: 2000,
+                    skipBlankLines: true,
+                    skipComments: true,
                 },
             ],
 
@@ -6686,10 +6698,10 @@ export default [
             "max-lines-per-function": [
                 "error",
                 {
-                    "IIFEs": false,
-                    "max": 2000,
-                    "skipBlankLines": true,
-                    "skipComments": true,
+                    IIFEs: false,
+                    max: 2000,
+                    skipBlankLines: true,
+                    skipComments: true,
                 },
             ],
 
@@ -6897,10 +6909,10 @@ export default [
             "max-lines-per-function": [
                 "error",
                 {
-                    "IIFEs": false,
-                    "max": 2000,
-                    "skipBlankLines": true,
-                    "skipComments": true,
+                    IIFEs: false,
+                    max: 2000,
+                    skipBlankLines: true,
+                    skipComments: true,
                 },
             ],
 
@@ -7106,10 +7118,10 @@ export default [
             "max-lines-per-function": [
                 "error",
                 {
-                    "IIFEs": false,
-                    "max": 2000,
-                    "skipBlankLines": true,
-                    "skipComments": true,
+                    IIFEs: false,
+                    max: 2000,
+                    skipBlankLines: true,
+                    skipComments: true,
                 },
             ],
 
@@ -7549,10 +7561,10 @@ export default [
             "max-lines-per-function": [
                 "error",
                 {
-                    "IIFEs": false,
-                    "max": 1000,
-                    "skipBlankLines": true,
-                    "skipComments": true,
+                    IIFEs: false,
+                    max: 1000,
+                    skipBlankLines: true,
+                    skipComments: true,
                 },
             ],
             "max-params": "off",
@@ -7871,10 +7883,10 @@ export default [
             "max-lines-per-function": [
                 "error",
                 {
-                    "IIFEs": false,
-                    "max": 1000,
-                    "skipBlankLines": true,
-                    "skipComments": true,
+                    IIFEs: false,
+                    max: 1000,
+                    skipBlankLines: true,
+                    skipComments: true,
                 },
             ],
 
@@ -8045,10 +8057,10 @@ export default [
             "max-lines-per-function": [
                 "error",
                 {
-                    "IIFEs": false,
-                    "max": 1000,
-                    "skipBlankLines": true,
-                    "skipComments": true,
+                    IIFEs: false,
+                    max: 1000,
+                    skipBlankLines: true,
+                    skipComments: true,
                 },
             ],
             "max-params": "off",

@@ -288,9 +288,9 @@ describe("shared/types/database additional function coverage", () => {
                 "text"
             );
             expect(safeGetRowProperty(mixedRow, "numberProp", -1)).toBe(42);
-            expect(safeGetRowProperty(mixedRow, "booleanProp", false)).toBeTruthy(
-                
-            );
+            expect(
+                safeGetRowProperty(mixedRow, "booleanProp", false)
+            ).toBeTruthy();
             expect(safeGetRowProperty(mixedRow, "arrayProp", [])).toEqual([
                 1,
                 2,

@@ -295,9 +295,9 @@ describe("Chart Config Utilities", () => {
             expect(
                 Array.isArray(DEFAULT_CHART_THEMES.dark.backgroundColors)
             ).toBeTruthy();
-            expect(Array.isArray(DEFAULT_CHART_THEMES.dark.borderColors)).toBeTruthy(
-                
-            );
+            expect(
+                Array.isArray(DEFAULT_CHART_THEMES.dark.borderColors)
+            ).toBeTruthy();
         });
 
         it("should have light theme configuration", async ({
@@ -315,9 +315,9 @@ describe("Chart Config Utilities", () => {
             expect(
                 Array.isArray(DEFAULT_CHART_THEMES.light.backgroundColors)
             ).toBeTruthy();
-            expect(Array.isArray(DEFAULT_CHART_THEMES.light.borderColors)).toBeTruthy(
-                
-            );
+            expect(
+                Array.isArray(DEFAULT_CHART_THEMES.light.borderColors)
+            ).toBeTruthy();
         });
 
         it("should have multiple colors in each theme", async ({

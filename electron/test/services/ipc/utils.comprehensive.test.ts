@@ -1396,7 +1396,9 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     "test-registration",
                     expect.any(Function)
                 );
-                expect(registeredHandlers.has("test-registration")).toBeTruthy();
+                expect(
+                    registeredHandlers.has("test-registration")
+                ).toBeTruthy();
             });
 
             it("should register handler with validation", async ({
@@ -1423,9 +1425,9 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     "validated-registration",
                     expect.any(Function)
                 );
-                expect(registeredHandlers.has("validated-registration")).toBeTruthy(
-                    
-                );
+                expect(
+                    registeredHandlers.has("validated-registration")
+                ).toBeTruthy();
             });
 
             it("should execute registered handler without validation", async ({

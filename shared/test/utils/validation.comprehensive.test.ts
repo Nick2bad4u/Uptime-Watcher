@@ -632,9 +632,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
                 const errors = getMonitorValidationErrors(monitor);
                 // Should not contain any port-related errors
-                expect(errors.some((error) => error.includes("port"))).toBeFalsy(
-                    
-                );
+                expect(
+                    errors.some((error) => error.includes("port"))
+                ).toBeFalsy();
             });
 
             it("should validate ping monitor with valid host", async ({
@@ -961,9 +961,9 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(validateSite(null as unknown as Partial<Site>)).toBeFalsy(
-                    
-                );
+                expect(
+                    validateSite(null as unknown as Partial<Site>)
+                ).toBeFalsy();
             });
 
             it("should return false for undefined", async ({
@@ -989,15 +989,15 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(validateSite("string" as unknown as Partial<Site>)).toBeFalsy(
-                    
-                );
-                expect(validateSite(123 as unknown as Partial<Site>)).toBeFalsy(
-                    
-                );
-                expect(validateSite([] as unknown as Partial<Site>)).toBeFalsy(
-                    
-                );
+                expect(
+                    validateSite("string" as unknown as Partial<Site>)
+                ).toBeFalsy();
+                expect(
+                    validateSite(123 as unknown as Partial<Site>)
+                ).toBeFalsy();
+                expect(
+                    validateSite([] as unknown as Partial<Site>)
+                ).toBeFalsy();
             });
 
             it("should return false for missing identifier", async ({

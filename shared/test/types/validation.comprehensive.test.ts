@@ -396,9 +396,9 @@ describe("Validation Types and Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isValidationResult([])).toBeFalsy();
-            expect(isValidationResult([{ errors: [], success: true }])).toBeFalsy(
-                
-            );
+            expect(
+                isValidationResult([{ errors: [], success: true }])
+            ).toBeFalsy();
         });
 
         it("should handle nested objects", async ({ task, annotate }) => {

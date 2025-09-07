@@ -69,7 +69,9 @@ describe("cacheKeys", () => {
 
             // Call core functions to register coverage
             const testKey = "config:test-key" as StandardizedCacheKey;
-            expect(cacheKeysModule.isStandardizedCacheKey(testKey)).toBeTruthy();
+            expect(
+                cacheKeysModule.isStandardizedCacheKey(testKey)
+            ).toBeTruthy();
 
             const parsed = cacheKeysModule.parseCacheKey(testKey);
             expect(parsed.prefix).toBe("config");
@@ -621,19 +623,23 @@ describe("cacheKeys", () => {
                 isStandardizedCacheKey("config:validation:monitor-config")
             ).toBeTruthy();
             expect(isStandardizedCacheKey("monitor:monitor-123")).toBeTruthy();
-            expect(isStandardizedCacheKey("monitor:site:site-456")).toBeTruthy();
+            expect(
+                isStandardizedCacheKey("monitor:site:site-456")
+            ).toBeTruthy();
             expect(
                 isStandardizedCacheKey("monitor:operation:monitor-789")
             ).toBeTruthy();
             expect(isStandardizedCacheKey("site:bulk")).toBeTruthy();
             expect(isStandardizedCacheKey("site:site-123")).toBeTruthy();
-            expect(isStandardizedCacheKey("site:loading:site-456")).toBeTruthy();
+            expect(
+                isStandardizedCacheKey("site:loading:site-456")
+            ).toBeTruthy();
             expect(
                 isStandardizedCacheKey("validation:monitor:config-123")
             ).toBeTruthy();
-            expect(isStandardizedCacheKey("validation:monitor-type:http")).toBeTruthy(
-                
-            );
+            expect(
+                isStandardizedCacheKey("validation:monitor-type:http")
+            ).toBeTruthy();
         });
 
         it("should return false for invalid prefixes", async ({
@@ -646,9 +652,9 @@ describe("cacheKeys", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isStandardizedCacheKey("invalid:key")).toBeFalsy();
-            expect(isStandardizedCacheKey("unknown:prefix:identifier")).toBeFalsy(
-                
-            );
+            expect(
+                isStandardizedCacheKey("unknown:prefix:identifier")
+            ).toBeFalsy();
             expect(isStandardizedCacheKey("random:key")).toBeFalsy();
             expect(isStandardizedCacheKey("test:operation:id")).toBeFalsy();
         });
@@ -665,9 +671,9 @@ describe("cacheKeys", () => {
             expect(isStandardizedCacheKey("")).toBeFalsy();
             expect(isStandardizedCacheKey("single-part")).toBeFalsy();
             expect(isStandardizedCacheKey("too:many:parts:in:key")).toBeFalsy();
-            expect(isStandardizedCacheKey("key:with:too:many:segments")).toBeFalsy(
-                
-            );
+            expect(
+                isStandardizedCacheKey("key:with:too:many:segments")
+            ).toBeFalsy();
         });
 
         it("should return false for keys with empty parts", async ({
@@ -682,9 +688,9 @@ describe("cacheKeys", () => {
             expect(isStandardizedCacheKey(":empty-prefix")).toBeFalsy();
             expect(isStandardizedCacheKey("config:")).toBeTruthy(); // 2-part key with empty identifier is valid
             expect(isStandardizedCacheKey("::")).toBeFalsy();
-            expect(isStandardizedCacheKey("config::empty-operation")).toBeFalsy(
-                
-            ); // empty operation is invalid
+            expect(
+                isStandardizedCacheKey("config::empty-operation")
+            ).toBeFalsy(); // empty operation is invalid
         });
 
         it("should handle edge cases", async ({ task, annotate }) => {
@@ -771,13 +777,18 @@ describe("cacheKeys", () => {
             });
         });
 
-        it("should throw error for empty identifiers", async ({ task, annotate }) => {
+        it("should throw error for empty identifiers", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: cacheKeys", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(() => parseCacheKey("config:" as StandardizedCacheKey)).toThrow("Invalid cache key format: config:");
+            expect(() =>
+                parseCacheKey("config:" as StandardizedCacheKey)
+            ).toThrow("Invalid cache key format: config:");
 
             expect(() =>
                 parseCacheKey("monitor:operation:" as StandardizedCacheKey)
@@ -883,24 +894,24 @@ describe("cacheKeys", () => {
             expect(
                 isStandardizedCacheKey(CacheKeys.config.validation("test"))
             ).toBeTruthy();
-            expect(isStandardizedCacheKey(CacheKeys.monitor.byId("test"))).toBeTruthy(
-                
-            );
+            expect(
+                isStandardizedCacheKey(CacheKeys.monitor.byId("test"))
+            ).toBeTruthy();
             expect(
                 isStandardizedCacheKey(CacheKeys.monitor.bySite("test"))
             ).toBeTruthy();
             expect(
                 isStandardizedCacheKey(CacheKeys.monitor.operation("test"))
             ).toBeTruthy();
-            expect(isStandardizedCacheKey(CacheKeys.site.bulkOperation())).toBeTruthy(
-                
-            );
+            expect(
+                isStandardizedCacheKey(CacheKeys.site.bulkOperation())
+            ).toBeTruthy();
             expect(
                 isStandardizedCacheKey(CacheKeys.site.byIdentifier("test"))
             ).toBeTruthy();
-            expect(isStandardizedCacheKey(CacheKeys.site.loading("test"))).toBeTruthy(
-                
-            );
+            expect(
+                isStandardizedCacheKey(CacheKeys.site.loading("test"))
+            ).toBeTruthy();
             expect(
                 isStandardizedCacheKey(
                     CacheKeys.validation.byType("type", "test")

@@ -97,12 +97,12 @@ describe("Shared Module - 100% Function Coverage", () => {
             const successResult = validationModule.createSuccessResult();
             expect(successResult.success).toBeTruthy();
 
-            expect(validationModule.isValidationResult(failureResult)).toBeTruthy(
-                
-            );
-            expect(validationModule.isValidationResult(successResult)).toBeTruthy(
-                
-            );
+            expect(
+                validationModule.isValidationResult(failureResult)
+            ).toBeTruthy();
+            expect(
+                validationModule.isValidationResult(successResult)
+            ).toBeTruthy();
         });
     });
 
@@ -133,9 +133,9 @@ describe("Shared Module - 100% Function Coverage", () => {
                 success: "#00cc66",
             };
 
-            expect(themeConfigModule.isColorPalette(validColorPalette)).toBeTruthy(
-                
-            );
+            expect(
+                themeConfigModule.isColorPalette(validColorPalette)
+            ).toBeTruthy();
             expect(themeConfigModule.isColorPalette(null)).toBeFalsy();
 
             const validThemeColors = {
@@ -239,9 +239,9 @@ describe("Shared Module - 100% Function Coverage", () => {
                 },
             };
 
-            expect(themeConfigModule.isThemeConfig(validThemeConfig)).toBeTruthy(
-                
-            );
+            expect(
+                themeConfigModule.isThemeConfig(validThemeConfig)
+            ).toBeTruthy();
             expect(themeConfigModule.isThemeConfig(null)).toBeFalsy();
         });
     });
@@ -364,7 +364,9 @@ describe("Shared Module - 100% Function Coverage", () => {
             const guardUtilsModule = await import("../../utils/typeGuards.js");
 
             // Call all exported functions
-            expect(guardUtilsModule.hasProperties({ a: 1 }, ["a"])).toBeTruthy();
+            expect(
+                guardUtilsModule.hasProperties({ a: 1 }, ["a"])
+            ).toBeTruthy();
             expect(guardUtilsModule.hasProperty({ a: 1 }, "a")).toBeTruthy();
             expect(
                 guardUtilsModule.isArray([
@@ -375,9 +377,9 @@ describe("Shared Module - 100% Function Coverage", () => {
             ).toBeTruthy();
             expect(guardUtilsModule.isBoolean(true)).toBeTruthy();
             expect(guardUtilsModule.isDate(new Date())).toBeTruthy();
-            expect(guardUtilsModule.isError(new Error("test error"))).toBeTruthy(
-                
-            );
+            expect(
+                guardUtilsModule.isError(new Error("test error"))
+            ).toBeTruthy();
             expect(guardUtilsModule.isFiniteNumber(123)).toBeTruthy();
             expect(guardUtilsModule.isFunction(() => {})).toBeTruthy();
             expect(guardUtilsModule.isNonNegativeNumber(0)).toBeTruthy();
@@ -697,9 +699,9 @@ describe("Shared Module - 100% Function Coverage", () => {
                 cacheKeysModule.CacheKeys.validation.monitorType("test")
             ).toBeDefined();
 
-            expect(cacheKeysModule.isStandardizedCacheKey("config:test")).toBeTruthy(
-                
-            );
+            expect(
+                cacheKeysModule.isStandardizedCacheKey("config:test")
+            ).toBeTruthy();
             expect(cacheKeysModule.parseCacheKey("config:test")).toEqual({
                 prefix: "config",
                 identifier: "test",
@@ -727,10 +729,12 @@ describe("Shared Module - 100% Function Coverage", () => {
 
             // Call all exported functions
             expect(validatorUtilsModule.isNonEmptyString("test")).toBeTruthy();
-            expect(validatorUtilsModule.isValidFQDN("example.com")).toBeTruthy();
-            expect(validatorUtilsModule.isValidIdentifier("test_id")).toBeTruthy(
-                
-            );
+            expect(
+                validatorUtilsModule.isValidFQDN("example.com")
+            ).toBeTruthy();
+            expect(
+                validatorUtilsModule.isValidIdentifier("test_id")
+            ).toBeTruthy();
             expect(
                 validatorUtilsModule.isValidIdentifierArray(["test1", "test2"])
             ).toBeTruthy();
@@ -738,9 +742,9 @@ describe("Shared Module - 100% Function Coverage", () => {
             expect(validatorUtilsModule.isValidNumeric("123.45")).toBeTruthy();
             expect(validatorUtilsModule.isValidHost("localhost")).toBeTruthy();
             expect(validatorUtilsModule.isValidPort(8080)).toBeTruthy();
-            expect(validatorUtilsModule.isValidUrl("https://example.com")).toBeTruthy(
-                
-            );
+            expect(
+                validatorUtilsModule.isValidUrl("https://example.com")
+            ).toBeTruthy();
             expect(validatorUtilsModule.safeInteger("123", 0, 0, 1000)).toBe(
                 123
             );

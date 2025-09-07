@@ -293,10 +293,12 @@ describe("errorCatalog utilities", () => {
             // Test with actual error messages from the catalog
             expect(isKnownErrorMessage("Site not found")).toBeTruthy();
             expect(isKnownErrorMessage("Monitor not found")).toBeTruthy();
-            expect(isKnownErrorMessage("Database connection failed")).toBeTruthy(
-                
-            );
-            expect(isKnownErrorMessage("Network connection failed")).toBeTruthy();
+            expect(
+                isKnownErrorMessage("Database connection failed")
+            ).toBeTruthy();
+            expect(
+                isKnownErrorMessage("Network connection failed")
+            ).toBeTruthy();
             expect(isKnownErrorMessage("This field is required")).toBeTruthy();
             expect(isKnownErrorMessage("Access denied")).toBeTruthy();
             expect(isKnownErrorMessage("Operation failed")).toBeTruthy();
@@ -387,9 +389,9 @@ describe("errorCatalog utilities", () => {
             ).toBeTruthy(); // MONITOR_ERRORS
             expect(isKnownErrorMessage("Field format is invalid")).toBeTruthy(); // VALIDATION_ERRORS
             expect(isKnownErrorMessage("Internal error")).toBeFalsy(); // Should be "An internal error occurred"
-            expect(isKnownErrorMessage("An internal error occurred")).toBeTruthy(
-                
-            ); // SYSTEM_ERRORS
+            expect(
+                isKnownErrorMessage("An internal error occurred")
+            ).toBeTruthy(); // SYSTEM_ERRORS
             expect(isKnownErrorMessage("Authentication failed")).toBeTruthy(); // NETWORK_ERRORS
             expect(isKnownErrorMessage("Database query failed")).toBeTruthy(); // DATABASE_ERRORS
             expect(isKnownErrorMessage("Operation failed")).toBeTruthy(); // IPC_ERRORS
@@ -405,7 +407,9 @@ describe("errorCatalog utilities", () => {
             await annotate("Type: Error Handling", "type");
 
             // Test messages that contain special characters
-            expect(isKnownErrorMessage("SSL/TLS connection failed")).toBeTruthy();
+            expect(
+                isKnownErrorMessage("SSL/TLS connection failed")
+            ).toBeTruthy();
             expect(
                 isKnownErrorMessage("Port number must be between 1 and 65535")
             ).toBeTruthy();

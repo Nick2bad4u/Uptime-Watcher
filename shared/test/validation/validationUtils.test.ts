@@ -125,7 +125,9 @@ describe("Shared Validation Utils", () => {
             await annotate("Type: Business Logic", "type");
 
             // By default, localhost might not be valid FQDN
-            expect(isValidFQDN("localhost", { require_tld: false })).toBeTruthy();
+            expect(
+                isValidFQDN("localhost", { require_tld: false })
+            ).toBeTruthy();
         });
     });
 

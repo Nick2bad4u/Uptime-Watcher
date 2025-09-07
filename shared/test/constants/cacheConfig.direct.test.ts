@@ -1,9 +1,8 @@
 /**
  * Direct function coverage tests for cache configuration.
  *
- * @fileoverview
- * Simple tests to ensure 100% function coverage for CACHE_NAMES functions
- * in shared/constants/cacheConfig.ts by directly calling each function.
+ * @file Simple tests to ensure 100% function coverage for CACHE_NAMES functions
+ *   in shared/constants/cacheConfig.ts by directly calling each function.
  */
 
 import { describe, expect, it } from "vitest";

@@ -142,10 +142,12 @@ describe("validatorUtils", () => {
             await annotate("Type: Business Logic", "type");
 
             // Allow localhost with require_tld: false
-            expect(isValidFQDN("localhost", { require_tld: false })).toBeTruthy();
-            expect(isValidFQDN("local-server", { require_tld: false })).toBeTruthy(
-                
-            );
+            expect(
+                isValidFQDN("localhost", { require_tld: false })
+            ).toBeTruthy();
+            expect(
+                isValidFQDN("local-server", { require_tld: false })
+            ).toBeTruthy();
         });
     });
 
@@ -725,9 +727,9 @@ describe("validatorUtils", () => {
             ).toBeFalsy(); // Still false due to require_protocol: true
 
             // Require TLD
-            expect(isValidUrl("http://localhost", { require_tld: true })).toBeFalsy(
-                
-            );
+            expect(
+                isValidUrl("http://localhost", { require_tld: true })
+            ).toBeFalsy();
 
             // Custom protocols - FTP is invalid in our validation (HTTP/HTTPS only)
             expect(isValidUrl("ftp://example.com")).toBeFalsy();

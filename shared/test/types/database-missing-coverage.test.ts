@@ -31,9 +31,9 @@ describe("Database Types - Missing Coverage", () => {
                 details: null,
             };
 
-            expect(isValidHistoryRow(historyRowWithInvalidTimestamp)).toBeFalsy(
-                
-            );
+            expect(
+                isValidHistoryRow(historyRowWithInvalidTimestamp)
+            ).toBeFalsy();
         });
 
         test("should handle invalid string timestamps through isValidMonitorRow", ({
@@ -68,9 +68,9 @@ describe("Database Types - Missing Coverage", () => {
                 updated_at: Date.now(),
             };
 
-            expect(isValidMonitorRow(monitorRowWithInvalidTimestamp)).toBeFalsy(
-                
-            );
+            expect(
+                isValidMonitorRow(monitorRowWithInvalidTimestamp)
+            ).toBeFalsy();
         });
 
         test("should handle invalid string timestamps through isValidSiteRow", ({

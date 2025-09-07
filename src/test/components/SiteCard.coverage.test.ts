@@ -166,7 +166,9 @@ describe("SiteCard Component Coverage Tests", () => {
                 };
 
                 expect(typeof useSiteResult.checkCount).toBe("number");
-                expect(Array.isArray(useSiteResult.filteredHistory)).toBeTruthy();
+                expect(
+                    Array.isArray(useSiteResult.filteredHistory)
+                ).toBeTruthy();
                 expect(typeof useSiteResult.handleCardClick).toBe("function");
                 expect(typeof useSiteResult.isLoading).toBe("boolean");
                 expect(typeof useSiteResult.isMonitoring).toBe("boolean");
@@ -466,9 +468,7 @@ describe("SiteCard Component Coverage Tests", () => {
                     "monitor-3",
                 ];
 
-                expect(availableMonitors).toContain(
-                    selectedMonitorId
-                );
+                expect(availableMonitors).toContain(selectedMonitorId);
                 expect(typeof selectedMonitorId).toBe("string");
             });
         });

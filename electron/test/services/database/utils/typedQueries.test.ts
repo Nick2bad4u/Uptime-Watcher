@@ -231,16 +231,19 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
         describe("Property-Based insertWithReturning Tests", () => {
             test.prop([
                 fc.string({ minLength: 10, maxLength: 200 }),
-                fc.array(fc.oneof(
-                    fc.string({ maxLength: 100 }),
-                    fc.integer({ min: -1000, max: 1000 }),
-                    fc.constant(null)
-                ), { minLength: 0, maxLength: 10 }),
+                fc.array(
+                    fc.oneof(
+                        fc.string({ maxLength: 100 }),
+                        fc.integer({ min: -1000, max: 1000 }),
+                        fc.constant(null)
+                    ),
+                    { minLength: 0, maxLength: 10 }
+                ),
                 fc.record({
                     id: fc.integer({ min: 1, max: 10_000 }),
                     name: fc.string({ maxLength: 50 }),
-                    timestamp: fc.integer({ min: 0, max: Date.now() })
-                })
+                    timestamp: fc.integer({ min: 0, max: Date.now() }),
+                }),
             ])(
                 "should handle various SQL queries and parameters",
                 (query, params, mockResult) => {
@@ -263,11 +266,14 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     "INSERT INTO monitors DEFAULT VALUES RETURNING *",
                     "INSERT INTO history (monitor_id, timestamp) VALUES (?, ?) RETURNING id"
                 ),
-                fc.array(fc.oneof(
-                    fc.string({ minLength: 1, maxLength: 100 }),
-                    fc.integer({ min: 0, max: 100_000 }),
-                    fc.float({ min: 0, max: 1000 })
-                ), { minLength: 0, maxLength: 5 })
+                fc.array(
+                    fc.oneof(
+                        fc.string({ minLength: 1, maxLength: 100 }),
+                        fc.integer({ min: 0, max: 100_000 }),
+                        fc.float({ min: 0, max: 1000 })
+                    ),
+                    { minLength: 0, maxLength: 5 }
+                ),
             ])(
                 "should handle realistic database INSERT queries",
                 (insertQuery, params) => {
@@ -275,12 +281,16 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     const expectedResult = {
                         id: Math.floor(Math.random() * 1000) + 1,
                         created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
+                        updated_at: new Date().toISOString(),
                     };
                     mockGet.mockReturnValue(expectedResult);
 
                     // Act
-                    const result = insertWithReturning(mockDb, insertQuery, params);
+                    const result = insertWithReturning(
+                        mockDb,
+                        insertQuery,
+                        params
+                    );
 
                     // Assert
                     expect(result).toEqual(expectedResult);
@@ -300,8 +310,8 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         fc.boolean(),
                         fc.constant(null)
                     ),
-                    created_at: fc.integer({ min: 0, max: Date.now() })
-                })
+                    created_at: fc.integer({ min: 0, max: Date.now() }),
+                }),
             ])(
                 "should return various result structures correctly",
                 (query, mockResult) => {
@@ -324,17 +334,27 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             );
 
             test.prop([
-                fc.array(fc.record({
-                    query: fc.string({ minLength: 30, maxLength: 100 }),
-                    params: fc.array(fc.oneof(
-                        fc.string({ maxLength: 50 }),
-                        fc.integer({ min: 0, max: 1000 })
-                    ), { maxLength: 5 }),
-                    result: fc.record({
-                        id: fc.integer({ min: 1, max: 1000 }),
-                        status: fc.constantFrom("success", "pending", "failed")
-                    })
-                }), { minLength: 1, maxLength: 5 })
+                fc.array(
+                    fc.record({
+                        query: fc.string({ minLength: 30, maxLength: 100 }),
+                        params: fc.array(
+                            fc.oneof(
+                                fc.string({ maxLength: 50 }),
+                                fc.integer({ min: 0, max: 1000 })
+                            ),
+                            { maxLength: 5 }
+                        ),
+                        result: fc.record({
+                            id: fc.integer({ min: 1, max: 1000 }),
+                            status: fc.constantFrom(
+                                "success",
+                                "pending",
+                                "failed"
+                            ),
+                        }),
+                    }),
+                    { minLength: 1, maxLength: 5 }
+                ),
             ])(
                 "should handle multiple sequential inserts",
                 (insertOperations) => {
@@ -346,12 +366,20 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     for (const operation of insertOperations) {
                         mockGet.mockReturnValue(operation.result);
 
-                        const result = insertWithReturning(mockDb, operation.query, operation.params);
+                        const result = insertWithReturning(
+                            mockDb,
+                            operation.query,
+                            operation.params
+                        );
 
                         expect(result).toEqual(operation.result);
                         callCount++;
                         expect(mockGet).toHaveBeenCalledTimes(callCount);
-                        expect(mockGet).toHaveBeenNthCalledWith(callCount, operation.query, operation.params);
+                        expect(mockGet).toHaveBeenNthCalledWith(
+                            callCount,
+                            operation.query,
+                            operation.params
+                        );
                     }
                 }
             );
@@ -496,7 +524,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     "SELECT COUNT(DISTINCT monitor_id) as count FROM history",
                     "SELECT COUNT(*) as count FROM monitors WHERE status = 'running'"
                 ),
-                fc.integer({ min: 0, max: 10_000 })
+                fc.integer({ min: 0, max: 10_000 }),
             ])(
                 "should return count results for various COUNT queries",
                 (query, expectedCount) => {
@@ -518,12 +546,15 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
             test.prop([
                 fc.string({ minLength: 20, maxLength: 150 }),
-                fc.array(fc.oneof(
-                    fc.string({ maxLength: 50 }),
-                    fc.integer({ min: 0, max: 1000 }),
-                    fc.constant(null)
-                ), { minLength: 0, maxLength: 5 }),
-                fc.integer({ min: 0, max: 100_000 })
+                fc.array(
+                    fc.oneof(
+                        fc.string({ maxLength: 50 }),
+                        fc.integer({ min: 0, max: 1000 }),
+                        fc.constant(null)
+                    ),
+                    { minLength: 0, maxLength: 5 }
+                ),
+                fc.integer({ min: 0, max: 100_000 }),
             ])(
                 "should handle COUNT queries with parameters",
                 (query, params, expectedCount) => {
@@ -543,7 +574,10 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             );
 
             test.prop([
-                fc.array(fc.integer({ min: 0, max: 1000 }), { minLength: 1, maxLength: 10 })
+                fc.array(fc.integer({ min: 0, max: 1000 }), {
+                    minLength: 1,
+                    maxLength: 10,
+                }),
             ])(
                 "should handle various count values including edge cases",
                 (countValues) => {
@@ -552,7 +586,10 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         const mockResult: CountResult = { count };
                         mockGet.mockReturnValue(mockResult);
 
-                        const result = queryForCount(mockDb, "SELECT COUNT(*) as count FROM test_table");
+                        const result = queryForCount(
+                            mockDb,
+                            "SELECT COUNT(*) as count FROM test_table"
+                        );
 
                         expect(result).toBeDefined();
                         expect(result!.count).toBe(count);
@@ -569,7 +606,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     "SELECT COUNT(*) as count FROM table1",
                     "SELECT COUNT(id) as count FROM table2",
                     "SELECT COUNT(DISTINCT column) as count FROM table3"
-                )
+                ),
             ])(
                 "should handle specific edge case count values",
                 (count, query) => {
@@ -735,7 +772,10 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     "SELECT id FROM monitors WHERE status = 'running'",
                     "SELECT DISTINCT monitor_id as id FROM history"
                 ),
-                fc.array(fc.record({ id: fc.integer({ min: 1, max: 1000 }) }), { minLength: 0, maxLength: 20 })
+                fc.array(fc.record({ id: fc.integer({ min: 1, max: 1000 }) }), {
+                    minLength: 0,
+                    maxLength: 20,
+                }),
             ])(
                 "should return arrays of ID objects for various queries",
                 (query, expectedIds) => {
@@ -761,14 +801,20 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
             test.prop([
                 fc.string({ minLength: 20, maxLength: 100 }),
-                fc.array(fc.oneof(
-                    fc.string({ maxLength: 50 }),
-                    fc.integer({ min: 0, max: 10_000 }),
-                    fc.constant(null)
-                ), { minLength: 0, maxLength: 5 }),
-                fc.array(fc.record({
-                    id: fc.integer({ min: 1, max: 10_000 })
-                }), { minLength: 0, maxLength: 15 })
+                fc.array(
+                    fc.oneof(
+                        fc.string({ maxLength: 50 }),
+                        fc.integer({ min: 0, max: 10_000 }),
+                        fc.constant(null)
+                    ),
+                    { minLength: 0, maxLength: 5 }
+                ),
+                fc.array(
+                    fc.record({
+                        id: fc.integer({ min: 1, max: 10_000 }),
+                    }),
+                    { minLength: 0, maxLength: 15 }
+                ),
             ])(
                 "should handle ID queries with parameters",
                 (query, params, expectedIds) => {
@@ -800,7 +846,10 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     mockAll.mockReturnValue([]);
 
                     // Act
-                    const result = queryForIds(mockDb, "SELECT id FROM empty_table");
+                    const result = queryForIds(
+                        mockDb,
+                        "SELECT id FROM empty_table"
+                    );
 
                     // Assert
                     expect(result).toEqual([]);
@@ -997,15 +1046,18 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     "SELECT monitor_id, status, timestamp FROM history ORDER BY timestamp DESC",
                     "SELECT * FROM sites WHERE url IS NOT NULL"
                 ),
-                fc.array(fc.record({
-                    id: fc.integer({ min: 1, max: 1000 }),
-                    name: fc.string({ maxLength: 50 }),
-                    value: fc.oneof(
-                        fc.string({ maxLength: 100 }),
-                        fc.integer({ min: 0, max: 1000 }),
-                        fc.constant(null)
-                    )
-                }), { minLength: 0, maxLength: 20 })
+                fc.array(
+                    fc.record({
+                        id: fc.integer({ min: 1, max: 1000 }),
+                        name: fc.string({ maxLength: 50 }),
+                        value: fc.oneof(
+                            fc.string({ maxLength: 100 }),
+                            fc.integer({ min: 0, max: 1000 }),
+                            fc.constant(null)
+                        ),
+                    }),
+                    { minLength: 0, maxLength: 20 }
+                ),
             ])(
                 "should return arrays of typed records for various queries",
                 (query, expectedRecords) => {
@@ -1025,21 +1077,31 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
             test.prop([
                 fc.string({ minLength: 20, maxLength: 120 }),
-                fc.array(fc.oneof(
-                    fc.string({ maxLength: 50 }),
-                    fc.integer({ min: 0, max: 5000 }),
-                    fc.constant(null)
-                ), { minLength: 0, maxLength: 5 }),
-                fc.array(fc.record({
-                    id: fc.integer({ min: 1, max: 1000 }),
-                    status: fc.constantFrom("active", "inactive", "pending"),
-                    timestamp: fc.integer({ min: 0, max: Date.now() }),
-                    optional_field: fc.oneof(
-                        fc.string({ maxLength: 100 }),
-                        fc.constant(null),
-                        fc.constant(undefined)
-                    )
-                }), { minLength: 0, maxLength: 15 })
+                fc.array(
+                    fc.oneof(
+                        fc.string({ maxLength: 50 }),
+                        fc.integer({ min: 0, max: 5000 }),
+                        fc.constant(null)
+                    ),
+                    { minLength: 0, maxLength: 5 }
+                ),
+                fc.array(
+                    fc.record({
+                        id: fc.integer({ min: 1, max: 1000 }),
+                        status: fc.constantFrom(
+                            "active",
+                            "inactive",
+                            "pending"
+                        ),
+                        timestamp: fc.integer({ min: 0, max: Date.now() }),
+                        optional_field: fc.oneof(
+                            fc.string({ maxLength: 100 }),
+                            fc.constant(null),
+                            fc.constant(undefined)
+                        ),
+                    }),
+                    { minLength: 0, maxLength: 15 }
+                ),
             ])(
                 "should handle record queries with parameters and optional fields",
                 (query, params, expectedRecords) => {
@@ -1071,7 +1133,10 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     mockAll.mockReturnValue([]);
 
                     // Act
-                    const result = queryForRecords(mockDb, "SELECT * FROM empty_records_table");
+                    const result = queryForRecords(
+                        mockDb,
+                        "SELECT * FROM empty_records_table"
+                    );
 
                     // Assert
                     expect(result).toEqual([]);
@@ -1294,8 +1359,8 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         fc.string({ maxLength: 200 }),
                         fc.integer({ min: 0, max: 10_000 }),
                         fc.constant(null)
-                    )
-                })
+                    ),
+                }),
             ])(
                 "should return single records for various queries",
                 (query, expectedRecord) => {
@@ -1315,19 +1380,22 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
             test.prop([
                 fc.string({ minLength: 30, maxLength: 150 }),
-                fc.array(fc.oneof(
-                    fc.string({ maxLength: 50 }),
-                    fc.integer({ min: 0, max: 10_000 }),
-                    fc.constant(null)
-                ), { minLength: 0, maxLength: 5 }),
+                fc.array(
+                    fc.oneof(
+                        fc.string({ maxLength: 50 }),
+                        fc.integer({ min: 0, max: 10_000 }),
+                        fc.constant(null)
+                    ),
+                    { minLength: 0, maxLength: 5 }
+                ),
                 fc.oneof(
                     fc.record({
                         id: fc.integer({ min: 1, max: 1000 }),
                         data: fc.string({ maxLength: 100 }),
-                        created_at: fc.integer({ min: 0, max: Date.now() })
+                        created_at: fc.integer({ min: 0, max: Date.now() }),
                     }),
                     fc.constant(null)
-                )
+                ),
             ])(
                 "should handle single record queries with parameters",
                 (query, params, expectedResult) => {
@@ -1355,7 +1423,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     "SELECT * FROM users WHERE id = 99999",
                     "SELECT * FROM sites WHERE deleted = 1",
                     "SELECT * FROM monitors WHERE non_existent_field IS NOT NULL"
-                )
+                ),
             ])(
                 "should handle null results from database",
                 (queryReturningNull) => {
@@ -1363,29 +1431,41 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     mockGet.mockReturnValue(null);
 
                     // Act
-                    const result = queryForSingleRecord(mockDb, queryReturningNull);
+                    const result = queryForSingleRecord(
+                        mockDb,
+                        queryReturningNull
+                    );
 
                     // Assert
                     expect(result).toBeNull();
-                    expect(mockGet).toHaveBeenCalledWith(queryReturningNull, undefined);
+                    expect(mockGet).toHaveBeenCalledWith(
+                        queryReturningNull,
+                        undefined
+                    );
                 }
             );
 
             test.prop([
-                fc.array(fc.record({
-                    query: fc.string({ minLength: 40, maxLength: 120 }),
-                    params: fc.array(fc.oneof(
-                        fc.string({ maxLength: 30 }),
-                        fc.integer({ min: 0, max: 1000 })
-                    ), { maxLength: 3 }),
-                    expectedResult: fc.oneof(
-                        fc.record({
-                            id: fc.integer({ min: 1, max: 100 }),
-                            name: fc.string({ maxLength: 50 })
-                        }),
-                        fc.constant(null)
-                    )
-                }), { minLength: 1, maxLength: 5 })
+                fc.array(
+                    fc.record({
+                        query: fc.string({ minLength: 40, maxLength: 120 }),
+                        params: fc.array(
+                            fc.oneof(
+                                fc.string({ maxLength: 30 }),
+                                fc.integer({ min: 0, max: 1000 })
+                            ),
+                            { maxLength: 3 }
+                        ),
+                        expectedResult: fc.oneof(
+                            fc.record({
+                                id: fc.integer({ min: 1, max: 100 }),
+                                name: fc.string({ maxLength: 50 }),
+                            }),
+                            fc.constant(null)
+                        ),
+                    }),
+                    { minLength: 1, maxLength: 5 }
+                ),
             ])(
                 "should handle multiple sequential single record queries",
                 (queryOperations) => {
@@ -1397,12 +1477,20 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     for (const operation of queryOperations) {
                         mockGet.mockReturnValue(operation.expectedResult);
 
-                        const result = queryForSingleRecord(mockDb, operation.query, operation.params);
+                        const result = queryForSingleRecord(
+                            mockDb,
+                            operation.query,
+                            operation.params
+                        );
 
                         expect(result).toEqual(operation.expectedResult);
                         callCount++;
                         expect(mockGet).toHaveBeenCalledTimes(callCount);
-                        expect(mockGet).toHaveBeenNthCalledWith(callCount, operation.query, operation.params);
+                        expect(mockGet).toHaveBeenNthCalledWith(
+                            callCount,
+                            operation.query,
+                            operation.params
+                        );
                     }
                 }
             );

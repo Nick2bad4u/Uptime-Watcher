@@ -51,7 +51,9 @@ describe("TypeGuards - Complete Function Coverage", () => {
             // Test hasProperties function
             expect(typeof guardsTestModule.hasProperties).toBe("function");
             const obj = { a: 1, b: 2, c: 3 };
-            expect(guardsTestModule.hasProperties(obj, ["a", "b"])).toBeTruthy();
+            expect(
+                guardsTestModule.hasProperties(obj, ["a", "b"])
+            ).toBeTruthy();
             expect(
                 guardsTestModule.hasProperties(obj, [
                     "a",
@@ -62,18 +64,18 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(guardsTestModule.hasProperties(obj, ["a", "d"])).toBeFalsy();
             expect(guardsTestModule.hasProperties(obj, [])).toBeTruthy();
             expect(guardsTestModule.hasProperties(null, ["a"])).toBeFalsy();
-            expect(guardsTestModule.hasProperties("not object", ["a"])).toBeFalsy(
-                
-            );
+            expect(
+                guardsTestModule.hasProperties("not object", ["a"])
+            ).toBeFalsy();
 
             // Test hasProperty function
             expect(typeof guardsTestModule.hasProperty).toBe("function");
             expect(guardsTestModule.hasProperty(obj, "a")).toBeTruthy();
             expect(guardsTestModule.hasProperty(obj, "z")).toBeFalsy();
             expect(guardsTestModule.hasProperty(null, "a")).toBeFalsy();
-            expect(guardsTestModule.hasProperty("string", "length")).toBeFalsy(
-                
-            ); // isObject excludes strings
+            expect(
+                guardsTestModule.hasProperty("string", "length")
+            ).toBeFalsy(); // isObject excludes strings
             expect(guardsTestModule.hasProperty([], "length")).toBeFalsy(); // isObject excludes arrays
 
             // Test isArray function
@@ -104,7 +106,9 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeof guardsTestModule.isDate).toBe("function");
             const date = new Date();
             expect(guardsTestModule.isDate(date)).toBeTruthy();
-            expect(guardsTestModule.isDate(new Date("2023-01-01"))).toBeTruthy();
+            expect(
+                guardsTestModule.isDate(new Date("2023-01-01"))
+            ).toBeTruthy();
             expect(guardsTestModule.isDate("2023-01-01")).toBeFalsy();
             expect(guardsTestModule.isDate(1_672_531_200_000)).toBeFalsy();
             expect(guardsTestModule.isDate({})).toBeFalsy();
@@ -114,9 +118,9 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeof guardsTestModule.isError).toBe("function");
             const error = new Error("test");
             expect(guardsTestModule.isError(error)).toBeTruthy();
-            expect(guardsTestModule.isError(new TypeError("type error"))).toBeTruthy(
-                
-            );
+            expect(
+                guardsTestModule.isError(new TypeError("type error"))
+            ).toBeTruthy();
             expect(
                 guardsTestModule.isError(new RangeError("range error"))
             ).toBeTruthy();
@@ -157,17 +161,17 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(guardsTestModule.isNonNegativeNumber(3.14)).toBeTruthy();
             expect(guardsTestModule.isNonNegativeNumber(-1)).toBeFalsy();
             expect(guardsTestModule.isNonNegativeNumber(-0.1)).toBeFalsy();
-            expect(guardsTestModule.isNonNegativeNumber(Number.NaN)).toBeFalsy(
-                
-            );
+            expect(
+                guardsTestModule.isNonNegativeNumber(Number.NaN)
+            ).toBeFalsy();
             expect(guardsTestModule.isNonNegativeNumber("0")).toBeFalsy();
 
             // Test isNonNullObject function
             expect(typeof guardsTestModule.isNonNullObject).toBe("function");
             expect(guardsTestModule.isNonNullObject({})).toBeTruthy();
-            expect(guardsTestModule.isNonNullObject({ key: "value" })).toBeTruthy(
-                
-            );
+            expect(
+                guardsTestModule.isNonNullObject({ key: "value" })
+            ).toBeTruthy();
             expect(guardsTestModule.isNonNullObject([])).toBeFalsy(); // Arrays excluded by isObject
             expect(guardsTestModule.isNonNullObject(new Date())).toBeTruthy();
             expect(guardsTestModule.isNonNullObject(null)).toBeFalsy();
@@ -212,12 +216,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeof guardsTestModule.isValidTimestamp).toBe("function");
             const now = Date.now();
             expect(guardsTestModule.isValidTimestamp(now)).toBeTruthy();
-            expect(guardsTestModule.isValidTimestamp(now - 86_400_000)).toBeTruthy(
-                
-            ); // 1 day ago
-            expect(guardsTestModule.isValidTimestamp(1_672_531_200_000)).toBeTruthy(
-                
-            ); // Valid past timestamp
+            expect(
+                guardsTestModule.isValidTimestamp(now - 86_400_000)
+            ).toBeTruthy(); // 1 day ago
+            expect(
+                guardsTestModule.isValidTimestamp(1_672_531_200_000)
+            ).toBeTruthy(); // Valid past timestamp
             expect(guardsTestModule.isValidTimestamp(0)).toBeFalsy(); // Must be > 0
             expect(guardsTestModule.isValidTimestamp(-1)).toBeFalsy();
             expect(guardsTestModule.isValidTimestamp(3.14)).toBeTruthy(); // Decimal numbers are valid
@@ -263,9 +267,9 @@ describe("TypeGuards - Complete Function Coverage", () => {
 
             // Test with array-like objects
             const arrayLike = { 0: "a", 1: "b", length: 2 };
-            expect(guardsTestModule.hasProperty(arrayLike, "length")).toBeTruthy(
-                
-            );
+            expect(
+                guardsTestModule.hasProperty(arrayLike, "length")
+            ).toBeTruthy();
             expect(guardsTestModule.hasProperty(arrayLike, "0")).toBeTruthy();
             expect(
                 guardsTestModule.hasProperties(arrayLike, [
@@ -297,21 +301,21 @@ describe("TypeGuards - Complete Function Coverage", () => {
             // Test isNumber with special numeric values
             expect(guardsTestModule.isNumber(Number.MAX_VALUE)).toBeTruthy();
             expect(guardsTestModule.isNumber(Number.MIN_VALUE)).toBeTruthy();
-            expect(guardsTestModule.isNumber(Number.POSITIVE_INFINITY)).toBeTruthy(
-                
-            );
-            expect(guardsTestModule.isNumber(Number.NEGATIVE_INFINITY)).toBeTruthy(
-                
-            );
+            expect(
+                guardsTestModule.isNumber(Number.POSITIVE_INFINITY)
+            ).toBeTruthy();
+            expect(
+                guardsTestModule.isNumber(Number.NEGATIVE_INFINITY)
+            ).toBeTruthy();
             expect(guardsTestModule.isNumber(Number.NaN)).toBeFalsy();
 
             // Test isFiniteNumber with same values
-            expect(guardsTestModule.isFiniteNumber(Number.MAX_VALUE)).toBeTruthy(
-                
-            );
-            expect(guardsTestModule.isFiniteNumber(Number.MIN_VALUE)).toBeTruthy(
-                
-            );
+            expect(
+                guardsTestModule.isFiniteNumber(Number.MAX_VALUE)
+            ).toBeTruthy();
+            expect(
+                guardsTestModule.isFiniteNumber(Number.MIN_VALUE)
+            ).toBeTruthy();
             expect(
                 guardsTestModule.isFiniteNumber(Number.POSITIVE_INFINITY)
             ).toBeFalsy();

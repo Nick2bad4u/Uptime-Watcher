@@ -1,10 +1,13 @@
 /**
- * @fileoverview Comprehensive property-based tests for JSON safety utilities
+ * This test suite provides extensive property-based testing for JSON
+ * serialization and deserialization utilities. It focuses on edge cases, type
+ * safety, and error handling using fast-check and @fast-check/vitest.
  *
- * @description
- * This test suite provides extensive property-based testing for JSON serialization
- * and deserialization utilities. It focuses on edge cases, type safety,
- * and error handling using fast-check and @fast-check/vitest.
+ * @file Comprehensive property-based tests for JSON safety utilities
+ *
+ * @author GitHub Copilot
+ *
+ * @since 2025-09-05
  *
  * @features
  * - Property-based testing for safe JSON operations
@@ -12,9 +15,6 @@
  * - Error handling and fallback mechanism testing
  * - Performance testing with complex objects
  * - Round-trip serialization/deserialization verification
- *
- * @author GitHub Copilot
- * @since 2025-09-05
  */
 
 import { describe, it, expect } from "vitest";
@@ -30,8 +30,8 @@ import {
 } from "@shared/utils/jsonSafety";
 
 /**
- * Normalize -0 to 0 to handle JSON round-trip behavior
- * JSON.stringify(-0) returns "0", and JSON.parse("0") returns 0
+ * Normalize -0 to 0 to handle JSON round-trip behavior JSON.stringify(-0)
+ * returns "0", and JSON.parse("0") returns 0
  */
 const normalizeNegativeZero = (obj: any): any => {
     if (typeof obj === "number" && Object.is(obj, -0)) {
@@ -52,7 +52,6 @@ const normalizeNegativeZero = (obj: any): any => {
 };
 
 describe("JSON Safety Property-Based Tests", () => {
-
     describe(safeJsonStringify, () => {
         test.prop([fc.jsonValue()])(
             "should stringify valid JSON values without throwing",
@@ -76,7 +75,9 @@ describe("JSON Safety Property-Based Tests", () => {
 
                 if (stringifyResult.success && stringifyResult.data) {
                     expect(() => {
-                        const parsed = JSON.parse(stringifyResult.data as string);
+                        const parsed = JSON.parse(
+                            stringifyResult.data as string
+                        );
                         expect(parsed).toBeDefined();
                     }).not.toThrow();
                 }
@@ -107,9 +108,11 @@ describe("JSON Safety Property-Based Tests", () => {
                 undefinedProp: undefined,
                 validProp: "valid",
                 nested: {
-                    anotherFn: function anotherFn() { return 42; },
+                    anotherFn: function anotherFn() {
+                        return 42;
+                    },
                     nullProp: null,
-                }
+                },
             };
 
             const result = safeJsonStringify(objWithFunctions);
@@ -160,7 +163,9 @@ describe("JSON Safety Property-Based Tests", () => {
 
                 if (result.success && result.data) {
                     // Should be parseable
-                    expect(() => JSON.parse(result.data as string)).not.toThrow();
+                    expect(() =>
+                        JSON.parse(result.data as string)
+                    ).not.toThrow();
                 }
             }
         );
@@ -181,7 +186,10 @@ describe("JSON Safety Property-Based Tests", () => {
         test.prop([fc.jsonValue(), fc.string()])(
             "should return stringified JSON for valid inputs",
             (validJson, fallback) => {
-                const result = safeJsonStringifyWithFallback(validJson, fallback);
+                const result = safeJsonStringifyWithFallback(
+                    validJson,
+                    fallback
+                );
 
                 expect(typeof result).toBe("string");
 
@@ -196,18 +204,28 @@ describe("JSON Safety Property-Based Tests", () => {
         test.prop([fc.anything(), fc.string()])(
             "should return fallback for problematic inputs when necessary",
             (arbitraryValue, fallback) => {
-                const result = safeJsonStringifyWithFallback(arbitraryValue, fallback);
+                const result = safeJsonStringifyWithFallback(
+                    arbitraryValue,
+                    fallback
+                );
 
                 expect(typeof result).toBe("string");
                 // Result should be a string - could be valid JSON or the fallback (including empty string)
                 // When fallback is provided, result should either be valid JSON or exactly the fallback
-                expect([fallback, JSON.stringify(arbitraryValue)].some(expected => {
-                    try {
-                        return result === expected || result === JSON.stringify(arbitraryValue);
-                    } catch {
-                        return result === fallback;
-                    }
-                })).toBeTruthy();
+                expect(
+                    [fallback, JSON.stringify(arbitraryValue)].some(
+                        (expected) => {
+                            try {
+                                return (
+                                    result === expected ||
+                                    result === JSON.stringify(arbitraryValue)
+                                );
+                            } catch {
+                                return result === fallback;
+                            }
+                        }
+                    )
+                ).toBeTruthy();
             }
         );
 
@@ -231,7 +249,8 @@ describe("JSON Safety Property-Based Tests", () => {
                 const stringified = JSON.stringify(validJson);
 
                 // Create a simple validator that accepts any JSON value
-                const validator = (_data: unknown): _data is typeof validJson => _data !== undefined;
+                const validator = (_data: unknown): _data is typeof validJson =>
+                    _data !== undefined;
 
                 const result = safeJsonParse(stringified, validator);
 
@@ -249,12 +268,20 @@ describe("JSON Safety Property-Based Tests", () => {
             "should handle invalid JSON strings gracefully",
             (invalidJson) => {
                 // Filter out strings that are actually valid JSON
-                if (invalidJson.trim() === "" ||
-                    invalidJson.trim().startsWith('{') ||
-                    invalidJson.trim().startsWith('[') ||
+                if (
+                    invalidJson.trim() === "" ||
+                    invalidJson.trim().startsWith("{") ||
+                    invalidJson.trim().startsWith("[") ||
                     invalidJson.trim().startsWith('"') ||
-                    /^-?\d+(?:\.\d+)?(?:[Ee][+-]?\d+)?$/.test(invalidJson.trim()) ||
-                    ["true", "false", "null"].includes(invalidJson.trim())) {
+                    /^-?\d+(?:\.\d+)?(?:[Ee][+-]?\d+)?$/.test(
+                        invalidJson.trim()
+                    ) ||
+                    [
+                        "true",
+                        "false",
+                        "null",
+                    ].includes(invalidJson.trim())
+                ) {
                     return; // Skip potentially valid JSON
                 }
 
@@ -275,10 +302,13 @@ describe("JSON Safety Property-Based Tests", () => {
             const validUserJson = '{"id": "123", "name": "John", "age": 30}';
             const invalidUserJson = '{"id": 123, "name": "John"}'; // id should be string
 
-            const userValidator = (data: unknown): data is { id: string; name: string; age?: number } => typeof data === "object" &&
-                       data !== null &&
-                       typeof (data as any).id === "string" &&
-                       typeof (data as any).name === "string";
+            const userValidator = (
+                data: unknown
+            ): data is { id: string; name: string; age?: number } =>
+                typeof data === "object" &&
+                data !== null &&
+                typeof (data as any).id === "string" &&
+                typeof (data as any).name === "string";
 
             const validResult = safeJsonParse(validUserJson, userValidator);
             expect(validResult.success).toBeTruthy();
@@ -297,9 +327,9 @@ describe("JSON Safety Property-Based Tests", () => {
                 '{"key": "value",}', // Trailing comma
                 '{key: "value"}', // Unquoted key
                 '{"key": "value"', // Missing closing brace
-                'undefined',
-                'function() {}',
-                '{a: 1, b: 2}', // Unquoted keys
+                "undefined",
+                "function() {}",
+                "{a: 1, b: 2}", // Unquoted keys
             ];
 
             const anyValidator = (_data: unknown): _data is any => true;
@@ -317,7 +347,9 @@ describe("JSON Safety Property-Based Tests", () => {
             "should maintain round-trip consistency with valid data",
             (originalValue) => {
                 const stringified = JSON.stringify(originalValue);
-                const validator = (_data: unknown): _data is typeof originalValue => true;
+                const validator = (
+                    _data: unknown
+                ): _data is typeof originalValue => true;
 
                 const result = safeJsonParse(stringified, validator);
 
@@ -325,14 +357,21 @@ describe("JSON Safety Property-Based Tests", () => {
                 if (result.success) {
                     // Apply normalization to handle -0/+0 differences
                     const normalizedData = normalizeNegativeZero(result.data);
-                    const normalizedOriginal = normalizeNegativeZero(originalValue);
+                    const normalizedOriginal =
+                        normalizeNegativeZero(originalValue);
                     expect(normalizedData).toEqual(normalizedOriginal);
                 }
             }
         );
 
         it("should handle empty and whitespace strings", () => {
-            const emptyInputs = ["", "   ", "\n", "\t", " \n \t "];
+            const emptyInputs = [
+                "",
+                "   ",
+                "\n",
+                "\t",
+                " \n \t ",
+            ];
             const validator = (_data: unknown): _data is any => true;
 
             for (const input of emptyInputs) {
@@ -352,13 +391,17 @@ describe("JSON Safety Property-Based Tests", () => {
                 const stringified = JSON.stringify(validArray);
                 const elementValidator = (_item: unknown): _item is any => true;
 
-                const result = safeJsonParseArray(stringified, elementValidator);
+                const result = safeJsonParseArray(
+                    stringified,
+                    elementValidator
+                );
 
                 expect(result.success).toBeTruthy();
                 if (result.success) {
                     // Normalize -0/+0 differences for JSON round-trip consistency
                     const normalizedResult = normalizeNegativeZero(result.data);
-                    const normalizedOriginal = normalizeNegativeZero(validArray);
+                    const normalizedOriginal =
+                        normalizeNegativeZero(validArray);
                     expect(normalizedResult).toEqual(normalizedOriginal);
                     expect(Array.isArray(result.data)).toBeTruthy();
                 }
@@ -367,17 +410,30 @@ describe("JSON Safety Property-Based Tests", () => {
 
         it("should validate array elements correctly", () => {
             const validNumberArrayJson = "[1, 2, 3, 4, 5]";
-            const invalidNumberArrayJson = "[1, 2, \"three\", 4, 5]";
+            const invalidNumberArrayJson = '[1, 2, "three", 4, 5]';
 
-            const numberValidator = (item: unknown): item is number => typeof item === "number";
+            const numberValidator = (item: unknown): item is number =>
+                typeof item === "number";
 
-            const validResult = safeJsonParseArray(validNumberArrayJson, numberValidator);
+            const validResult = safeJsonParseArray(
+                validNumberArrayJson,
+                numberValidator
+            );
             expect(validResult.success).toBeTruthy();
             if (validResult.success) {
-                expect(validResult.data).toEqual([1, 2, 3, 4, 5]);
+                expect(validResult.data).toEqual([
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                ]);
             }
 
-            const invalidResult = safeJsonParseArray(invalidNumberArrayJson, numberValidator);
+            const invalidResult = safeJsonParseArray(
+                invalidNumberArrayJson,
+                numberValidator
+            );
             expect(invalidResult.success).toBeFalsy();
             if (!invalidResult.success) {
                 expect(invalidResult.error).toContain("index 2");
@@ -399,7 +455,8 @@ describe("JSON Safety Property-Based Tests", () => {
             "should handle string arrays with type validation",
             (stringArray) => {
                 const stringified = JSON.stringify(stringArray);
-                const stringValidator = (item: unknown): item is string => typeof item === "string";
+                const stringValidator = (item: unknown): item is string =>
+                    typeof item === "string";
 
                 const result = safeJsonParseArray(stringified, stringValidator);
 
@@ -420,9 +477,14 @@ describe("JSON Safety Property-Based Tests", () => {
             (validJson) => {
                 const stringified = JSON.stringify(validJson);
                 const fallback = { default: "fallback" };
-                const validator = (_data: unknown): _data is typeof validJson => true;
+                const validator = (_data: unknown): _data is typeof validJson =>
+                    true;
 
-                const result = safeJsonParseWithFallback(stringified, validator, fallback);
+                const result = safeJsonParseWithFallback(
+                    stringified,
+                    validator,
+                    fallback
+                );
 
                 // Apply normalization to handle -0/+0 differences
                 const normalizedResult = normalizeNegativeZero(result);
@@ -435,17 +497,30 @@ describe("JSON Safety Property-Based Tests", () => {
             "should return fallback for invalid JSON",
             (invalidJson, fallback) => {
                 // Filter out potentially valid JSON strings
-                if (invalidJson.trim() === "" ||
-                    invalidJson.trim().startsWith('{') ||
-                    invalidJson.trim().startsWith('[') ||
+                if (
+                    invalidJson.trim() === "" ||
+                    invalidJson.trim().startsWith("{") ||
+                    invalidJson.trim().startsWith("[") ||
                     invalidJson.trim().startsWith('"') ||
-                    /^-?\d+(?:\.\d+)?(?:[Ee][+-]?\d+)?$/.test(invalidJson.trim()) ||
-                    ["true", "false", "null"].includes(invalidJson.trim())) {
+                    /^-?\d+(?:\.\d+)?(?:[Ee][+-]?\d+)?$/.test(
+                        invalidJson.trim()
+                    ) ||
+                    [
+                        "true",
+                        "false",
+                        "null",
+                    ].includes(invalidJson.trim())
+                ) {
                     return; // Skip potentially valid JSON
                 }
 
-                const validator = (_data: unknown): _data is typeof fallback => true;
-                const result = safeJsonParseWithFallback(invalidJson, validator, fallback);
+                const validator = (_data: unknown): _data is typeof fallback =>
+                    true;
+                const result = safeJsonParseWithFallback(
+                    invalidJson,
+                    validator,
+                    fallback
+                );
 
                 expect(result).toEqual(fallback);
             }
@@ -456,12 +531,17 @@ describe("JSON Safety Property-Based Tests", () => {
             const fallback = { id: "default", name: "Default User" };
 
             // Validator expects id to be string
-            const validator = (data: unknown): data is typeof fallback => typeof data === "object" &&
-                       data !== null &&
-                       typeof (data as any).id === "string" &&
-                       typeof (data as any).name === "string";
+            const validator = (data: unknown): data is typeof fallback =>
+                typeof data === "object" &&
+                data !== null &&
+                typeof (data as any).id === "string" &&
+                typeof (data as any).name === "string";
 
-            const result = safeJsonParseWithFallback(jsonWithWrongType, validator, fallback);
+            const result = safeJsonParseWithFallback(
+                jsonWithWrongType,
+                validator,
+                fallback
+            );
             expect(result).toEqual(fallback);
         });
     });
@@ -476,8 +556,13 @@ describe("JSON Safety Property-Based Tests", () => {
                 expect(stringifyResult.success).toBeTruthy();
 
                 if (stringifyResult.success && stringifyResult.data) {
-                    const validator = (_data: unknown): _data is typeof largeArray => Array.isArray(_data);
-                    const parseResult = safeJsonParse(stringifyResult.data, validator);
+                    const validator = (
+                        _data: unknown
+                    ): _data is typeof largeArray => Array.isArray(_data);
+                    const parseResult = safeJsonParse(
+                        stringifyResult.data,
+                        validator
+                    );
                     expect(parseResult.success).toBeTruthy();
                 }
 
@@ -501,7 +586,10 @@ describe("JSON Safety Property-Based Tests", () => {
 
                 if (stringifyResult.success && stringifyResult.data) {
                     const validator = (_data: unknown): _data is any => true;
-                    const parseResult = safeJsonParse(stringifyResult.data, validator);
+                    const parseResult = safeJsonParse(
+                        stringifyResult.data,
+                        validator
+                    );
                     expect(parseResult.success).toBeTruthy();
                 }
             }).not.toThrow();
@@ -523,11 +611,19 @@ describe("JSON Safety Property-Based Tests", () => {
             expect(stringifyResult.success).toBeTruthy();
 
             if (stringifyResult.success && stringifyResult.data) {
-                const validator = (_data: unknown): _data is typeof obj => typeof _data === "object" && _data !== null && "description" in _data;
-                const parseResult = safeJsonParse(stringifyResult.data, validator);
+                const validator = (_data: unknown): _data is typeof obj =>
+                    typeof _data === "object" &&
+                    _data !== null &&
+                    "description" in _data;
+                const parseResult = safeJsonParse(
+                    stringifyResult.data,
+                    validator
+                );
                 expect(parseResult.success).toBeTruthy();
                 if (parseResult.success) {
-                    expect((parseResult.data as any).description).toBe(largeString);
+                    expect((parseResult.data as any).description).toBe(
+                        largeString
+                    );
                 }
             }
         });
@@ -563,7 +659,10 @@ describe("JSON Safety Property-Based Tests", () => {
                 const largeObj = { data: largeString };
                 const largeJson = JSON.stringify(largeObj);
 
-                const validator = (_data: unknown): _data is typeof largeObj => typeof _data === "object" && _data !== null && "data" in _data;
+                const validator = (_data: unknown): _data is typeof largeObj =>
+                    typeof _data === "object" &&
+                    _data !== null &&
+                    "data" in _data;
                 const result = safeJsonParse(largeJson, validator);
 
                 // Should handle without crashing
@@ -590,7 +689,10 @@ describe("JSON Safety Property-Based Tests", () => {
 
             if (stringifyResult.success && stringifyResult.data) {
                 const validator = (_data: unknown): _data is typeof obj => true;
-                const parseResult = safeJsonParse(stringifyResult.data, validator);
+                const parseResult = safeJsonParse(
+                    stringifyResult.data,
+                    validator
+                );
                 expect(parseResult.success).toBeTruthy();
             }
         });
@@ -604,14 +706,22 @@ describe("JSON Safety Property-Based Tests", () => {
                 expect(stringifyResult.success).toBeTruthy();
 
                 if (stringifyResult.success && stringifyResult.data) {
-                    const validator = (_data: unknown): _data is typeof originalData => true;
-                    const parseResult = safeJsonParse(stringifyResult.data, validator);
+                    const validator = (
+                        _data: unknown
+                    ): _data is typeof originalData => true;
+                    const parseResult = safeJsonParse(
+                        stringifyResult.data,
+                        validator
+                    );
                     expect(parseResult.success).toBeTruthy();
 
                     if (parseResult.success) {
                         // Normalize -0 to 0 for JSON round-trip consistency
-                        const normalizedOriginal = normalizeNegativeZero(originalData);
-                        const normalizedParsed = normalizeNegativeZero(parseResult.data);
+                        const normalizedOriginal =
+                            normalizeNegativeZero(originalData);
+                        const normalizedParsed = normalizeNegativeZero(
+                            parseResult.data
+                        );
                         expect(normalizedParsed).toEqual(normalizedOriginal);
                     }
                 }
@@ -624,9 +734,14 @@ describe("JSON Safety Property-Based Tests", () => {
                 number: fc.float({ noNaN: true, noDefaultInfinity: true }), // Exclude NaN and Infinity for JSON round-trip consistency
                 boolean: fc.boolean(),
                 null: fc.constant(null),
-                array: fc.array(fc.jsonValue({ maxDepth: 2 }), { maxLength: 10 }), // Limit depth to avoid overly complex objects
-                object: fc.dictionary(fc.string(), fc.jsonValue({ maxDepth: 2 })) // Use dictionary instead of object to avoid undefined values
-            })
+                array: fc.array(fc.jsonValue({ maxDepth: 2 }), {
+                    maxLength: 10,
+                }), // Limit depth to avoid overly complex objects
+                object: fc.dictionary(
+                    fc.string(),
+                    fc.jsonValue({ maxDepth: 2 })
+                ), // Use dictionary instead of object to avoid undefined values
+            }),
         ])(
             "Complex objects should maintain structure through round-trip",
             (complexObject) => {
@@ -634,20 +749,39 @@ describe("JSON Safety Property-Based Tests", () => {
                 expect(stringifyResult.success).toBeTruthy();
 
                 if (stringifyResult.success && stringifyResult.data) {
-                    const validator = (_data: unknown): _data is typeof complexObject => typeof _data === "object" && _data !== null;
-                    const parseResult = safeJsonParse(stringifyResult.data, validator);
+                    const validator = (
+                        _data: unknown
+                    ): _data is typeof complexObject =>
+                        typeof _data === "object" && _data !== null;
+                    const parseResult = safeJsonParse(
+                        stringifyResult.data,
+                        validator
+                    );
                     expect(parseResult.success).toBeTruthy();
 
                     if (parseResult.success) {
-                        const normalizedOriginal = normalizeNegativeZero(complexObject);
-                        const normalizedParsed = normalizeNegativeZero(parseResult.data);
+                        const normalizedOriginal =
+                            normalizeNegativeZero(complexObject);
+                        const normalizedParsed = normalizeNegativeZero(
+                            parseResult.data
+                        );
 
                         expect(normalizedParsed).toEqual(normalizedOriginal);
-                        expect(typeof (parseResult.data as any).string).toBe("string");
-                        expect(typeof (parseResult.data as any).number).toBe("number");
-                        expect(typeof (parseResult.data as any).boolean).toBe("boolean");
-                        expect(Array.isArray((parseResult.data as any).array)).toBeTruthy();
-                        expect(typeof (parseResult.data as any).object).toBe("object");
+                        expect(typeof (parseResult.data as any).string).toBe(
+                            "string"
+                        );
+                        expect(typeof (parseResult.data as any).number).toBe(
+                            "number"
+                        );
+                        expect(typeof (parseResult.data as any).boolean).toBe(
+                            "boolean"
+                        );
+                        expect(
+                            Array.isArray((parseResult.data as any).array)
+                        ).toBeTruthy();
+                        expect(typeof (parseResult.data as any).object).toBe(
+                            "object"
+                        );
                     }
                 }
             }

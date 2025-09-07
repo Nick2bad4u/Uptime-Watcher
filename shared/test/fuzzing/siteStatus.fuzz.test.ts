@@ -1,6 +1,8 @@
 /**
- * @fileoverview Fuzzing tests for siteStatus utilities
+ * @file Fuzzing tests for siteStatus utilities
+ *
  * @author AI Generated
+ *
  * @since 2024
  */
 
@@ -17,8 +19,20 @@ import {
 import type { SiteForStatus } from "@shared/types";
 
 describe("SiteStatus utilities fuzzing tests", () => {
-    const monitorStatusArbitrary = fc.constantFrom("up", "down", "pending", "paused");
-    const siteStatusArbitrary = fc.constantFrom("up", "down", "pending", "paused", "mixed", "unknown");
+    const monitorStatusArbitrary = fc.constantFrom(
+        "up",
+        "down",
+        "pending",
+        "paused"
+    );
+    const siteStatusArbitrary = fc.constantFrom(
+        "up",
+        "down",
+        "pending",
+        "paused",
+        "mixed",
+        "unknown"
+    );
 
     const monitorArbitrary = fc.record({
         monitoring: fc.boolean(),
@@ -33,34 +47,56 @@ describe("SiteStatus utilities fuzzing tests", () => {
         test.prop([siteArbitrary])(
             "should return one of the three monitoring states",
             (site) => {
-                const result = calculateSiteMonitoringStatus(site as SiteForStatus);
-                expect(["running", "stopped", "partial"]).toContain(result);
+                const result = calculateSiteMonitoringStatus(
+                    site as SiteForStatus
+                );
+                expect([
+                    "running",
+                    "stopped",
+                    "partial",
+                ]).toContain(result);
             }
         );
 
-        test.prop([fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 })])(
+        test.prop([
+            fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 }),
+        ])(
             "should return running when all monitors are monitoring",
             (monitors) => {
-                const allMonitoring = monitors.map(m => ({ ...m, monitoring: true }));
+                const allMonitoring = monitors.map((m) => ({
+                    ...m,
+                    monitoring: true,
+                }));
                 const site = { monitors: allMonitoring };
 
-                const result = calculateSiteMonitoringStatus(site as SiteForStatus);
+                const result = calculateSiteMonitoringStatus(
+                    site as SiteForStatus
+                );
                 expect(result).toBe("running");
             }
         );
 
-        test.prop([fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 })])(
+        test.prop([
+            fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 }),
+        ])(
             "should return stopped when no monitors are monitoring",
             (monitors) => {
-                const noneMonitoring = monitors.map(m => ({ ...m, monitoring: false }));
+                const noneMonitoring = monitors.map((m) => ({
+                    ...m,
+                    monitoring: false,
+                }));
                 const site = { monitors: noneMonitoring };
 
-                const result = calculateSiteMonitoringStatus(site as SiteForStatus);
+                const result = calculateSiteMonitoringStatus(
+                    site as SiteForStatus
+                );
                 expect(result).toBe("stopped");
             }
         );
 
-        test.prop([fc.array(monitorArbitrary, { minLength: 2, maxLength: 10 })])(
+        test.prop([
+            fc.array(monitorArbitrary, { minLength: 2, maxLength: 10 }),
+        ])(
             "should return partial when some monitors are monitoring",
             (monitors) => {
                 fc.pre(monitors.length >= 2);
@@ -68,13 +104,18 @@ describe("SiteStatus utilities fuzzing tests", () => {
                 // Ensure at least one monitoring and one not monitoring
                 const mixedMonitors = monitors.map((m, index) => ({
                     ...m,
-                    monitoring: index === 0 ? true : index === 1 ? false : m.monitoring
+                    monitoring:
+                        index === 0 ? true : index === 1 ? false : m.monitoring,
                 }));
 
                 const site = { monitors: mixedMonitors };
-                const result = calculateSiteMonitoringStatus(site as SiteForStatus);
+                const result = calculateSiteMonitoringStatus(
+                    site as SiteForStatus
+                );
 
-                const monitoringCount = mixedMonitors.filter(m => m.monitoring).length;
+                const monitoringCount = mixedMonitors.filter(
+                    (m) => m.monitoring
+                ).length;
                 if (monitoringCount === 0) {
                     expect(result).toBe("stopped");
                 } else if (monitoringCount === mixedMonitors.length) {
@@ -103,15 +144,27 @@ describe("SiteStatus utilities fuzzing tests", () => {
             "should return valid site status",
             (site) => {
                 const result = calculateSiteStatus(site as SiteForStatus);
-                expect(["up", "down", "pending", "paused", "mixed", "unknown"]).toContain(result);
+                expect([
+                    "up",
+                    "down",
+                    "pending",
+                    "paused",
+                    "mixed",
+                    "unknown",
+                ]).toContain(result);
             }
         );
 
-        test.prop([fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 })])(
+        test.prop([
+            fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 }),
+        ])(
             "should return same status when all monitors have same status",
             (monitors) => {
                 const [status] = fc.sample(monitorStatusArbitrary, 1);
-                const sameStatusMonitors = monitors.map(m => ({ ...m, status }));
+                const sameStatusMonitors = monitors.map((m) => ({
+                    ...m,
+                    status,
+                }));
                 const site = { monitors: sameStatusMonitors };
 
                 const result = calculateSiteStatus(site as SiteForStatus);
@@ -119,7 +172,9 @@ describe("SiteStatus utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.array(monitorArbitrary, { minLength: 2, maxLength: 10 })])(
+        test.prop([
+            fc.array(monitorArbitrary, { minLength: 2, maxLength: 10 }),
+        ])(
             "should return mixed when monitors have different statuses",
             (monitors) => {
                 fc.pre(monitors.length >= 2);
@@ -127,13 +182,16 @@ describe("SiteStatus utilities fuzzing tests", () => {
                 // Ensure at least two different statuses
                 const mixedMonitors = monitors.map((m, index) => ({
                     ...m,
-                    status: index === 0 ? "up" : index === 1 ? "down" : m.status
+                    status:
+                        index === 0 ? "up" : index === 1 ? "down" : m.status,
                 }));
 
                 const site = { monitors: mixedMonitors };
                 const result = calculateSiteStatus(site as SiteForStatus);
 
-                const statuses = [...new Set(mixedMonitors.map(m => m.status))];
+                const statuses = [
+                    ...new Set(mixedMonitors.map((m) => m.status)),
+                ];
                 if (statuses.length === 1) {
                     expect(result).toBe(statuses[0]);
                 } else {
@@ -154,14 +212,26 @@ describe("SiteStatus utilities fuzzing tests", () => {
             "should return valid display status",
             (site) => {
                 const result = getSiteDisplayStatus(site as SiteForStatus);
-                expect(["up", "down", "pending", "paused", "mixed", "unknown"]).toContain(result);
+                expect([
+                    "up",
+                    "down",
+                    "pending",
+                    "paused",
+                    "mixed",
+                    "unknown",
+                ]).toContain(result);
             }
         );
 
-        test.prop([fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 })])(
+        test.prop([
+            fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 }),
+        ])(
             "should return paused when no monitors are monitoring",
             (monitors) => {
-                const noneMonitoring = monitors.map(m => ({ ...m, monitoring: false }));
+                const noneMonitoring = monitors.map((m) => ({
+                    ...m,
+                    monitoring: false,
+                }));
                 const site = { monitors: noneMonitoring };
 
                 const result = getSiteDisplayStatus(site as SiteForStatus);
@@ -169,31 +239,43 @@ describe("SiteStatus utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.array(monitorArbitrary, { minLength: 2, maxLength: 10 })])(
-            "should return mixed when monitoring is partial",
-            (monitors) => {
-                fc.pre(monitors.length >= 2);
+        test.prop([
+            fc.array(monitorArbitrary, { minLength: 2, maxLength: 10 }),
+        ])("should return mixed when monitoring is partial", (monitors) => {
+            fc.pre(monitors.length >= 2);
 
-                // Ensure partial monitoring
-                const partialMonitors = monitors.map((m, index) => ({
-                    ...m,
-                    monitoring: index === 0 ? true : index === 1 ? false : m.monitoring
-                }));
+            // Ensure partial monitoring
+            const partialMonitors = monitors.map((m, index) => ({
+                ...m,
+                monitoring:
+                    index === 0 ? true : index === 1 ? false : m.monitoring,
+            }));
 
-                const site = { monitors: partialMonitors };
-                const monitoringCount = partialMonitors.filter(m => m.monitoring).length;
+            const site = { monitors: partialMonitors };
+            const monitoringCount = partialMonitors.filter(
+                (m) => m.monitoring
+            ).length;
 
-                if (monitoringCount === 0) {
-                    expect(getSiteDisplayStatus(site as SiteForStatus)).toBe("paused");
-                } else if (monitoringCount === partialMonitors.length) {
-                    // All monitoring - should return operational status
-                    const result = getSiteDisplayStatus(site as SiteForStatus);
-                    expect(["up", "down", "pending", "paused", "mixed"]).toContain(result);
-                } else {
-                    expect(getSiteDisplayStatus(site as SiteForStatus)).toBe("mixed");
-                }
+            if (monitoringCount === 0) {
+                expect(getSiteDisplayStatus(site as SiteForStatus)).toBe(
+                    "paused"
+                );
+            } else if (monitoringCount === partialMonitors.length) {
+                // All monitoring - should return operational status
+                const result = getSiteDisplayStatus(site as SiteForStatus);
+                expect([
+                    "up",
+                    "down",
+                    "pending",
+                    "paused",
+                    "mixed",
+                ]).toContain(result);
+            } else {
+                expect(getSiteDisplayStatus(site as SiteForStatus)).toBe(
+                    "mixed"
+                );
             }
-        );
+        });
 
         it("should return unknown for empty monitors array", () => {
             const site = { monitors: [] };
@@ -212,28 +294,26 @@ describe("SiteStatus utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 })])(
-            "should include monitor count in description",
-            (monitors) => {
-                const site = { monitors };
-                const result = getSiteStatusDescription(site as SiteForStatus);
+        test.prop([
+            fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 }),
+        ])("should include monitor count in description", (monitors) => {
+            const site = { monitors };
+            const result = getSiteStatusDescription(site as SiteForStatus);
 
-                expect(result).toContain(monitors.length.toString());
+            expect(result).toContain(monitors.length.toString());
+        });
+
+        test.prop([
+            fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 }),
+        ])("should describe monitoring status correctly", (monitors) => {
+            const site = { monitors };
+            const runningCount = monitors.filter((m) => m.monitoring).length;
+            const result = getSiteStatusDescription(site as SiteForStatus);
+
+            if (runningCount < monitors.length) {
+                expect(result).toContain(`${runningCount}/${monitors.length}`);
             }
-        );
-
-        test.prop([fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 })])(
-            "should describe monitoring status correctly",
-            (monitors) => {
-                const site = { monitors };
-                const runningCount = monitors.filter(m => m.monitoring).length;
-                const result = getSiteStatusDescription(site as SiteForStatus);
-
-                if (runningCount < monitors.length) {
-                    expect(result).toContain(`${runningCount}/${monitors.length}`);
-                }
-            }
-        );
+        });
 
         it("should return specific message for no monitors", () => {
             const site = { monitors: [] };
@@ -241,16 +321,15 @@ describe("SiteStatus utilities fuzzing tests", () => {
             expect(result).toBe("No monitors configured");
         });
 
-        test.prop([fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 })])(
-            "should handle all possible display statuses",
-            (monitors) => {
-                const site = { monitors };
-                const result = getSiteStatusDescription(site as SiteForStatus);
+        test.prop([
+            fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 }),
+        ])("should handle all possible display statuses", (monitors) => {
+            const site = { monitors };
+            const result = getSiteStatusDescription(site as SiteForStatus);
 
-                // Should not return the default case
-                expect(result).not.toBe("Unknown status");
-            }
-        );
+            // Should not return the default case
+            expect(result).not.toBe("Unknown status");
+        });
     });
 
     describe(getSiteStatusVariant, () => {
@@ -258,7 +337,12 @@ describe("SiteStatus utilities fuzzing tests", () => {
             "should return valid color variant",
             (status) => {
                 const result = getSiteStatusVariant(status);
-                expect(["success", "error", "warning", "info"]).toContain(result);
+                expect([
+                    "success",
+                    "error",
+                    "warning",
+                    "info",
+                ]).toContain(result);
             }
         );
 
@@ -276,7 +360,12 @@ describe("SiteStatus utilities fuzzing tests", () => {
             (invalidStatus) => {
                 // Type assertion to test runtime behavior
                 const result = getSiteStatusVariant(invalidStatus as any);
-                expect(["success", "error", "warning", "info"]).toContain(result);
+                expect([
+                    "success",
+                    "error",
+                    "warning",
+                    "info",
+                ]).toContain(result);
             }
         );
     });
@@ -285,49 +374,66 @@ describe("SiteStatus utilities fuzzing tests", () => {
         test.prop([siteArbitrary])(
             "all functions should handle any site input without throwing",
             (site) => {
-                expect(() => calculateSiteMonitoringStatus(site as SiteForStatus)).not.toThrow();
-                expect(() => calculateSiteStatus(site as SiteForStatus)).not.toThrow();
-                expect(() => getSiteDisplayStatus(site as SiteForStatus)).not.toThrow();
-                expect(() => getSiteStatusDescription(site as SiteForStatus)).not.toThrow();
+                expect(() =>
+                    calculateSiteMonitoringStatus(site as SiteForStatus)
+                ).not.toThrow();
+                expect(() =>
+                    calculateSiteStatus(site as SiteForStatus)
+                ).not.toThrow();
+                expect(() =>
+                    getSiteDisplayStatus(site as SiteForStatus)
+                ).not.toThrow();
+                expect(() =>
+                    getSiteStatusDescription(site as SiteForStatus)
+                ).not.toThrow();
             }
         );
 
         test.prop([siteArbitrary])(
             "display status should be consistent with monitoring and operational status",
             (site) => {
-                const monitoringStatus = calculateSiteMonitoringStatus(site as SiteForStatus);
-                const operationalStatus = calculateSiteStatus(site as SiteForStatus);
-                const displayStatus = getSiteDisplayStatus(site as SiteForStatus);
+                const monitoringStatus = calculateSiteMonitoringStatus(
+                    site as SiteForStatus
+                );
+                const operationalStatus = calculateSiteStatus(
+                    site as SiteForStatus
+                );
+                const displayStatus = getSiteDisplayStatus(
+                    site as SiteForStatus
+                );
 
                 if (site.monitors.length === 0) {
                     expect(monitoringStatus).toBe("stopped");
                     expect(operationalStatus).toBe("unknown");
                     expect(displayStatus).toBe("unknown");
-                } else switch (monitoringStatus) {
- case "stopped": {
-                    expect(displayStatus).toBe("paused");
+                } else
+                    switch (monitoringStatus) {
+                        case "stopped": {
+                            expect(displayStatus).toBe("paused");
 
- break;
- }
- case "partial": {
-                    expect(displayStatus).toBe("mixed");
+                            break;
+                        }
+                        case "partial": {
+                            expect(displayStatus).toBe("mixed");
 
- break;
- }
- case "running": {
-                    expect(displayStatus).toBe(operationalStatus);
+                            break;
+                        }
+                        case "running": {
+                            expect(displayStatus).toBe(operationalStatus);
 
- break;
- }
- // No default
- }
+                            break;
+                        }
+                        // No default
+                    }
             }
         );
 
         test.prop([siteArbitrary])(
             "status variant should match display status",
             (site) => {
-                const displayStatus = getSiteDisplayStatus(site as SiteForStatus);
+                const displayStatus = getSiteDisplayStatus(
+                    site as SiteForStatus
+                );
                 const variant = getSiteStatusVariant(displayStatus);
 
                 switch (displayStatus) {
@@ -356,27 +462,30 @@ describe("SiteStatus utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.array(monitorArbitrary, { minLength: 1, maxLength: 100 })])(
-            "should perform well with large monitor arrays",
-            (monitors) => {
-                const site = { monitors };
-                const startTime = Date.now();
+        test.prop([
+            fc.array(monitorArbitrary, { minLength: 1, maxLength: 100 }),
+        ])("should perform well with large monitor arrays", (monitors) => {
+            const site = { monitors };
+            const startTime = Date.now();
 
-                calculateSiteMonitoringStatus(site as SiteForStatus);
-                calculateSiteStatus(site as SiteForStatus);
-                getSiteDisplayStatus(site as SiteForStatus);
-                getSiteStatusDescription(site as SiteForStatus);
+            calculateSiteMonitoringStatus(site as SiteForStatus);
+            calculateSiteStatus(site as SiteForStatus);
+            getSiteDisplayStatus(site as SiteForStatus);
+            getSiteStatusDescription(site as SiteForStatus);
 
-                const duration = Date.now() - startTime;
-                expect(duration).toBeLessThan(50); // Should complete within 50ms
-            }
-        );
+            const duration = Date.now() - startTime;
+            expect(duration).toBeLessThan(50); // Should complete within 50ms
+        });
 
         test.prop([siteArbitrary])(
             "monitoring status should be deterministic",
             (site) => {
-                const result1 = calculateSiteMonitoringStatus(site as SiteForStatus);
-                const result2 = calculateSiteMonitoringStatus(site as SiteForStatus);
+                const result1 = calculateSiteMonitoringStatus(
+                    site as SiteForStatus
+                );
+                const result2 = calculateSiteMonitoringStatus(
+                    site as SiteForStatus
+                );
                 expect(result1).toBe(result2);
             }
         );
@@ -384,16 +493,47 @@ describe("SiteStatus utilities fuzzing tests", () => {
         test.prop([siteArbitrary])(
             "all results should be valid enum values",
             (site) => {
-                const monitoringStatus = calculateSiteMonitoringStatus(site as SiteForStatus);
-                const operationalStatus = calculateSiteStatus(site as SiteForStatus);
-                const displayStatus = getSiteDisplayStatus(site as SiteForStatus);
+                const monitoringStatus = calculateSiteMonitoringStatus(
+                    site as SiteForStatus
+                );
+                const operationalStatus = calculateSiteStatus(
+                    site as SiteForStatus
+                );
+                const displayStatus = getSiteDisplayStatus(
+                    site as SiteForStatus
+                );
                 const variant = getSiteStatusVariant(displayStatus);
-                const description = getSiteStatusDescription(site as SiteForStatus);
+                const description = getSiteStatusDescription(
+                    site as SiteForStatus
+                );
 
-                expect(["running", "stopped", "partial"]).toContain(monitoringStatus);
-                expect(["up", "down", "pending", "paused", "mixed", "unknown"]).toContain(operationalStatus);
-                expect(["up", "down", "pending", "paused", "mixed", "unknown"]).toContain(displayStatus);
-                expect(["success", "error", "warning", "info"]).toContain(variant);
+                expect([
+                    "running",
+                    "stopped",
+                    "partial",
+                ]).toContain(monitoringStatus);
+                expect([
+                    "up",
+                    "down",
+                    "pending",
+                    "paused",
+                    "mixed",
+                    "unknown",
+                ]).toContain(operationalStatus);
+                expect([
+                    "up",
+                    "down",
+                    "pending",
+                    "paused",
+                    "mixed",
+                    "unknown",
+                ]).toContain(displayStatus);
+                expect([
+                    "success",
+                    "error",
+                    "warning",
+                    "info",
+                ]).toContain(variant);
                 expect(typeof description).toBe("string");
                 expect(description.length).toBeGreaterThan(0);
             }

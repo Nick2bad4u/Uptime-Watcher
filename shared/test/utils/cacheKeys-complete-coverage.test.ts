@@ -378,11 +378,15 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            expect(isStandardizedCacheKey("config:validation:setting")).toBeTruthy(
-                
-            );
-            expect(isStandardizedCacheKey("monitor:site:site-123")).toBeTruthy();
-            expect(isStandardizedCacheKey("site:loading:site-456")).toBeTruthy();
+            expect(
+                isStandardizedCacheKey("config:validation:setting")
+            ).toBeTruthy();
+            expect(
+                isStandardizedCacheKey("monitor:site:site-123")
+            ).toBeTruthy();
+            expect(
+                isStandardizedCacheKey("site:loading:site-456")
+            ).toBeTruthy();
             expect(
                 isStandardizedCacheKey("validation:monitor:config-789")
             ).toBeTruthy();
@@ -403,9 +407,9 @@ describe("CacheKeys - Complete Function Coverage", () => {
             expect(isStandardizedCacheKey("")).toBeFalsy();
             expect(isStandardizedCacheKey("single")).toBeFalsy();
             expect(isStandardizedCacheKey("one:two:three:four")).toBeFalsy();
-            expect(isStandardizedCacheKey("too:many:parts:here:now")).toBeFalsy(
-                
-            );
+            expect(
+                isStandardizedCacheKey("too:many:parts:here:now")
+            ).toBeFalsy();
         });
 
         it("should reject keys with empty prefix", async ({
@@ -437,9 +441,9 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isStandardizedCacheKey("invalid:identifier")).toBeFalsy();
-            expect(isStandardizedCacheKey("wrong:operation:identifier")).toBeFalsy(
-                
-            );
+            expect(
+                isStandardizedCacheKey("wrong:operation:identifier")
+            ).toBeFalsy();
             expect(isStandardizedCacheKey("unknown:test")).toBeFalsy();
         });
 
@@ -507,7 +511,9 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(() => parseCacheKey("site:" as StandardizedCacheKey)).toThrow("Invalid cache key format: site:");
+            expect(() =>
+                parseCacheKey("site:" as StandardizedCacheKey)
+            ).toThrow("Invalid cache key format: site:");
         });
 
         it("should throw error for invalid 2-part format with empty prefix", async ({
@@ -539,7 +545,9 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(() => parseCacheKey("config:" as StandardizedCacheKey)).toThrow("Invalid cache key format: config:");
+            expect(() =>
+                parseCacheKey("config:" as StandardizedCacheKey)
+            ).toThrow("Invalid cache key format: config:");
         });
 
         it("should throw error for invalid 3-part format with empty prefix", async ({

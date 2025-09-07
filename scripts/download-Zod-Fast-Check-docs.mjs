@@ -121,9 +121,7 @@ const CONFIG = {
     docName: "Zod-Fast-Check",
     baseUrl:
         "https://raw.githubusercontent.com/DavidTimms/zod-fast-check/refs/heads/main",
-    pages: [
-        "README.md",
-    ],
+    pages: ["README.md"],
 
     // Format configuration
     inputFormat: "gfm",
@@ -274,7 +272,11 @@ function showHelp() {
         const fd = process.stdout.fd;
         fsSync.writeFileSync(fd, msg + "\n");
     } catch (e) {
-        try { fsSync.writeFileSync(1, msg + "\n"); } catch { console.log(msg); }
+        try {
+            fsSync.writeFileSync(1, msg + "\n");
+        } catch {
+            console.log(msg);
+        }
     }
 }
 
@@ -593,11 +595,13 @@ async function rawDownload(url, timeoutMs) {
 
 /**
  * Download a single file with retry logic, caching & optional pandoc use.
+ *
  * @param {DownloadTask} task
  * @param {DownloadConfig} config
  * @param {Logger} logger
  * @param {Paths} paths
- * @param {Record<string,string>} previousHashes
+ * @param {Record<string, string>} previousHashes
+ *
  * @returns {Promise<DownloadResult>}
  */
 async function downloadFile(task, config, logger, paths, previousHashes) {
@@ -678,7 +682,10 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
             content = cleanContent(content, config, logger);
             await fs.writeFile(outputPath, content, "utf8");
 
-            const hash = crypto.createHash("sha256").update(content).digest("hex");
+            const hash = crypto
+                .createHash("sha256")
+                .update(content)
+                .digest("hex");
             logger.success(`Downloaded: ${page}`);
             return {
                 page,
@@ -723,14 +730,26 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
  *
  * @returns {Promise<DownloadResult[]>} Download results
  */
-async function downloadSequential(tasks, config, logger, paths, previousHashes) {
+async function downloadSequential(
+    tasks,
+    config,
+    logger,
+    paths,
+    previousHashes
+) {
     const results = [];
 
     for (let i = 0; i < tasks.length; i++) {
         const task = tasks[i];
         logger.progress(i + 1, tasks.length, task.page);
 
-    const result = await downloadFile(task, config, logger, paths, previousHashes);
+        const result = await downloadFile(
+            task,
+            config,
+            logger,
+            paths,
+            previousHashes
+        );
         results.push(result);
     }
 
@@ -760,7 +779,13 @@ async function downloadParallel(tasks, config, logger, paths, previousHashes) {
             inProgress.add(task.page);
 
             try {
-                return await downloadFile(task, config, logger, paths, previousHashes);
+                return await downloadFile(
+                    task,
+                    config,
+                    logger,
+                    paths,
+                    previousHashes
+                );
             } finally {
                 inProgress.delete(task.page);
                 completed++;
@@ -892,8 +917,20 @@ async function main() {
 
         // Execute downloads
         const results = config.enableParallel
-            ? await downloadParallel(downloadTasks, config, logger, paths, previousHashes)
-            : await downloadSequential(downloadTasks, config, logger, paths, previousHashes);
+            ? await downloadParallel(
+                  downloadTasks,
+                  config,
+                  logger,
+                  paths,
+                  previousHashes
+              )
+            : await downloadSequential(
+                  downloadTasks,
+                  config,
+                  logger,
+                  paths,
+                  previousHashes
+              );
 
         // Process results and generate report
         // @ts-ignore

@@ -1,6 +1,7 @@
 /**
- * @fileoverview Direct function call tests for objectSafety to ensure coverage
  * @module shared/utils/objectSafety.test
+ *
+ * @file Direct function call tests for objectSafety to ensure coverage
  */
 
 import { describe, expect, it } from "vitest";
@@ -11,7 +12,7 @@ import {
     safeObjectPick,
     typedObjectEntries,
     typedObjectKeys,
-    typedObjectValues
+    typedObjectValues,
 } from "@shared/utils/objectSafety";
 
 describe("objectSafety Direct Function Coverage", () => {

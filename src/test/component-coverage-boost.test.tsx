@@ -711,21 +711,21 @@ describe("Component Coverage Boost", () => {
             };
 
             // Test enabled state
-            expect(actionButtonLogic.shouldDisableButtons(baseProps)).toBeFalsy(
-                
-            );
+            expect(
+                actionButtonLogic.shouldDisableButtons(baseProps)
+            ).toBeFalsy();
 
             // Test disabled state
             const disabledProps = { ...baseProps, disabled: true };
-            expect(actionButtonLogic.shouldDisableButtons(disabledProps)).toBeTruthy(
-                
-            );
+            expect(
+                actionButtonLogic.shouldDisableButtons(disabledProps)
+            ).toBeTruthy();
 
             // Test loading state
             const loadingProps = { ...baseProps, isLoading: true };
-            expect(actionButtonLogic.shouldDisableButtons(loadingProps)).toBeTruthy(
-                
-            );
+            expect(
+                actionButtonLogic.shouldDisableButtons(loadingProps)
+            ).toBeTruthy();
 
             // Test monitoring states
             const monitoringProps = { ...baseProps, isMonitoring: true };

@@ -30,21 +30,23 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             expect(validatorUtilsModule.isNonEmptyString("")).toBeFalsy();
             expect(validatorUtilsModule.isNonEmptyString("   ")).toBeFalsy(); // Whitespace only
             expect(validatorUtilsModule.isNonEmptyString(null)).toBeFalsy();
-            expect(validatorUtilsModule.isNonEmptyString(undefined)).toBeFalsy(
-                
-            );
+            expect(
+                validatorUtilsModule.isNonEmptyString(undefined)
+            ).toBeFalsy();
             expect(validatorUtilsModule.isNonEmptyString(123)).toBeFalsy();
 
             // Test isValidFQDN function coverage
             expect(typeof validatorUtilsModule.isValidFQDN).toBe("function");
-            expect(validatorUtilsModule.isValidFQDN("example.com")).toBeTruthy();
-            expect(validatorUtilsModule.isValidFQDN("sub.example.com")).toBeTruthy(
-                
-            );
+            expect(
+                validatorUtilsModule.isValidFQDN("example.com")
+            ).toBeTruthy();
+            expect(
+                validatorUtilsModule.isValidFQDN("sub.example.com")
+            ).toBeTruthy();
             expect(validatorUtilsModule.isValidFQDN("localhost")).toBeFalsy(); // No TLD by default
-            expect(validatorUtilsModule.isValidFQDN("invalid..domain")).toBeFalsy(
-                
-            );
+            expect(
+                validatorUtilsModule.isValidFQDN("invalid..domain")
+            ).toBeFalsy();
             expect(validatorUtilsModule.isValidFQDN(123)).toBeFalsy();
             expect(validatorUtilsModule.isValidFQDN(null)).toBeFalsy();
             // Test with options
@@ -58,16 +60,18 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             expect(typeof validatorUtilsModule.isValidIdentifier).toBe(
                 "function"
             );
-            expect(validatorUtilsModule.isValidIdentifier("abc123")).toBeTruthy();
-            expect(validatorUtilsModule.isValidIdentifier("abc-123_def")).toBeTruthy(
-                
-            );
+            expect(
+                validatorUtilsModule.isValidIdentifier("abc123")
+            ).toBeTruthy();
+            expect(
+                validatorUtilsModule.isValidIdentifier("abc-123_def")
+            ).toBeTruthy();
             expect(
                 validatorUtilsModule.isValidIdentifier("valid_identifier")
             ).toBeTruthy();
-            expect(validatorUtilsModule.isValidIdentifier("abc@123")).toBeFalsy(
-                
-            );
+            expect(
+                validatorUtilsModule.isValidIdentifier("abc@123")
+            ).toBeFalsy();
             expect(validatorUtilsModule.isValidIdentifier("")).toBeFalsy();
             expect(validatorUtilsModule.isValidIdentifier("   ")).toBeFalsy(); // Whitespace only
             expect(validatorUtilsModule.isValidIdentifier(null)).toBeFalsy();
@@ -83,7 +87,9 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             expect(
                 validatorUtilsModule.isValidIdentifierArray(["valid_id"])
             ).toBeTruthy();
-            expect(validatorUtilsModule.isValidIdentifierArray([])).toBeTruthy(); // Empty array is valid
+            expect(
+                validatorUtilsModule.isValidIdentifierArray([])
+            ).toBeTruthy(); // Empty array is valid
             expect(
                 validatorUtilsModule.isValidIdentifierArray(["abc", 123])
             ).toBeFalsy();
@@ -99,9 +105,9 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             expect(
                 validatorUtilsModule.isValidIdentifierArray("not-array")
             ).toBeFalsy();
-            expect(validatorUtilsModule.isValidIdentifierArray(null)).toBeFalsy(
-                
-            );
+            expect(
+                validatorUtilsModule.isValidIdentifierArray(null)
+            ).toBeFalsy();
 
             // Test isValidInteger function coverage
             expect(typeof validatorUtilsModule.isValidInteger).toBe("function");
@@ -153,15 +159,19 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
 
             // Test isValidHost function coverage
             expect(typeof validatorUtilsModule.isValidHost).toBe("function");
-            expect(validatorUtilsModule.isValidHost("192.168.1.1")).toBeTruthy(); // IP address
-            expect(validatorUtilsModule.isValidHost("example.com")).toBeTruthy(); // FQDN
+            expect(
+                validatorUtilsModule.isValidHost("192.168.1.1")
+            ).toBeTruthy(); // IP address
+            expect(
+                validatorUtilsModule.isValidHost("example.com")
+            ).toBeTruthy(); // FQDN
             expect(validatorUtilsModule.isValidHost("localhost")).toBeTruthy(); // Special case
-            expect(validatorUtilsModule.isValidHost("sub.example.com")).toBeTruthy(
-                
-            );
-            expect(validatorUtilsModule.isValidHost("invalid..host")).toBeFalsy(
-                
-            );
+            expect(
+                validatorUtilsModule.isValidHost("sub.example.com")
+            ).toBeTruthy();
+            expect(
+                validatorUtilsModule.isValidHost("invalid..host")
+            ).toBeFalsy();
             expect(validatorUtilsModule.isValidHost("no-tld")).toBeFalsy();
             expect(validatorUtilsModule.isValidHost("")).toBeFalsy();
             expect(validatorUtilsModule.isValidHost(123)).toBeFalsy();
@@ -183,18 +193,18 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
 
             // Test isValidUrl function coverage
             expect(typeof validatorUtilsModule.isValidUrl).toBe("function");
-            expect(validatorUtilsModule.isValidUrl("https://example.com")).toBeTruthy(
-                
-            );
+            expect(
+                validatorUtilsModule.isValidUrl("https://example.com")
+            ).toBeTruthy();
             expect(
                 validatorUtilsModule.isValidUrl("http://localhost:3000")
             ).toBeTruthy();
             expect(
                 validatorUtilsModule.isValidUrl("https://sub.example.com/path")
             ).toBeTruthy();
-            expect(validatorUtilsModule.isValidUrl("ftp://example.com")).toBeFalsy(
-                
-            );
+            expect(
+                validatorUtilsModule.isValidUrl("ftp://example.com")
+            ).toBeFalsy();
             expect(validatorUtilsModule.isValidUrl("not-a-url")).toBeFalsy();
             expect(validatorUtilsModule.isValidUrl("https://")).toBeFalsy();
             expect(validatorUtilsModule.isValidUrl("")).toBeFalsy();
@@ -242,9 +252,9 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
 
             // Test isNonEmptyString with various whitespace
             expect(validatorUtilsModule.isNonEmptyString("\t\n")).toBeFalsy();
-            expect(validatorUtilsModule.isNonEmptyString("  hello  ")).toBeTruthy(
-                
-            ); // Non-empty after trim
+            expect(
+                validatorUtilsModule.isNonEmptyString("  hello  ")
+            ).toBeTruthy(); // Non-empty after trim
 
             // Test isValidFQDN with various options
             expect(
@@ -265,7 +275,9 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
 
             // Test isValidHost with IPv6
             expect(validatorUtilsModule.isValidHost("::1")).toBeTruthy(); // IPv6 localhost
-            expect(validatorUtilsModule.isValidHost("2001:db8::1")).toBeTruthy(); // IPv6 address
+            expect(
+                validatorUtilsModule.isValidHost("2001:db8::1")
+            ).toBeTruthy(); // IPv6 address
 
             // Test isValidPort boundary conditions
             expect(validatorUtilsModule.isValidPort("65535")).toBeTruthy(); // Max port
@@ -290,12 +302,12 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             await annotate("Type: Validation", "type");
 
             // Test isValidInteger with comprehensive range options
-            expect(validatorUtilsModule.isValidInteger("0", { min: 0 })).toBeTruthy(
-                
-            );
-            expect(validatorUtilsModule.isValidInteger("-1", { min: 0 })).toBeFalsy(
-                
-            );
+            expect(
+                validatorUtilsModule.isValidInteger("0", { min: 0 })
+            ).toBeTruthy();
+            expect(
+                validatorUtilsModule.isValidInteger("-1", { min: 0 })
+            ).toBeFalsy();
             expect(
                 validatorUtilsModule.isValidInteger("100", { max: 100 })
             ).toBeTruthy();
@@ -343,10 +355,12 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             // Verify that type guards work consistently
             const testValue = "test123";
 
-            expect(validatorUtilsModule.isNonEmptyString(testValue)).toBeTruthy();
-            expect(validatorUtilsModule.isValidIdentifier(testValue)).toBeTruthy(
-                
-            );
+            expect(
+                validatorUtilsModule.isNonEmptyString(testValue)
+            ).toBeTruthy();
+            expect(
+                validatorUtilsModule.isValidIdentifier(testValue)
+            ).toBeTruthy();
 
             // Test array consistency
             const validIds = [
@@ -354,9 +368,9 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
                 "id2-test",
                 "id_3",
             ];
-            expect(validatorUtilsModule.isValidIdentifierArray(validIds)).toBeTruthy(
-                
-            );
+            expect(
+                validatorUtilsModule.isValidIdentifierArray(validIds)
+            ).toBeTruthy();
             expect(
                 validIds.every((id) =>
                     validatorUtilsModule.isValidIdentifier(id)
@@ -372,12 +386,12 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
 
             // Test numeric validation consistency
             const numericString = "123";
-            expect(validatorUtilsModule.isValidInteger(numericString)).toBeTruthy(
-                
-            );
-            expect(validatorUtilsModule.isValidNumeric(numericString)).toBeTruthy(
-                
-            );
+            expect(
+                validatorUtilsModule.isValidInteger(numericString)
+            ).toBeTruthy();
+            expect(
+                validatorUtilsModule.isValidNumeric(numericString)
+            ).toBeTruthy();
             expect(validatorUtilsModule.safeInteger(numericString, 0)).toBe(
                 123
             );

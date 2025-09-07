@@ -1,6 +1,8 @@
 /**
- * @fileoverview Fuzzing tests for safeConversions utilities
+ * @file Fuzzing tests for safeConversions utilities
+ *
  * @author AI Generated
+ *
  * @since 2024
  */
 
@@ -22,7 +24,7 @@ import {
 
 describe("SafeConversions utilities fuzzing tests", () => {
     describe(safeNumberConversion, () => {
-        test.prop([fc.float().filter(n => !Number.isNaN(n))])(
+        test.prop([fc.float().filter((n) => !Number.isNaN(n))])(
             "should return numbers unchanged",
             (num) => {
                 const result = safeNumberConversion(num);
@@ -52,20 +54,21 @@ describe("SafeConversions utilities fuzzing tests", () => {
         test.prop([fc.anything(), fc.float()])(
             "should use default value for non-convertible values",
             (value, defaultValue) => {
-                fc.pre(typeof value !== "number" && (typeof value !== "string" || Number.isNaN(Number(value))));
+                fc.pre(
+                    typeof value !== "number" &&
+                        (typeof value !== "string" ||
+                            Number.isNaN(Number(value)))
+                );
 
                 const result = safeNumberConversion(value, defaultValue);
                 expect(result).toBe(defaultValue);
             }
         );
 
-        test.prop([fc.anything()])(
-            "should never throw errors",
-            (value) => {
-                expect(() => safeNumberConversion(value)).not.toThrow();
-                expect(typeof safeNumberConversion(value)).toBe("number");
-            }
-        );
+        test.prop([fc.anything()])("should never throw errors", (value) => {
+            expect(() => safeNumberConversion(value)).not.toThrow();
+            expect(typeof safeNumberConversion(value)).toBe("number");
+        });
 
         it("should handle edge cases", () => {
             expect(safeNumberConversion(null)).toBe(0);
@@ -119,35 +122,26 @@ describe("SafeConversions utilities fuzzing tests", () => {
     });
 
     describe(safeParseFloat, () => {
-        test.prop([fc.float()])(
-            "should return floats unchanged",
-            (num) => {
-                const result = safeParseFloat(num);
-                expect(result).toBe(num);
-            }
-        );
+        test.prop([fc.float()])("should return floats unchanged", (num) => {
+            const result = safeParseFloat(num);
+            expect(result).toBe(num);
+        });
 
-        test.prop([fc.string()])(
-            "should parse valid float strings",
-            (str) => {
-                const result = safeParseFloat(str);
-                const expected = Number.parseFloat(str);
+        test.prop([fc.string()])("should parse valid float strings", (str) => {
+            const result = safeParseFloat(str);
+            const expected = Number.parseFloat(str);
 
-                if (Number.isNaN(expected)) {
-                    expect(result).toBe(0);
-                } else {
-                    expect(result).toBe(expected);
-                }
+            if (Number.isNaN(expected)) {
+                expect(result).toBe(0);
+            } else {
+                expect(result).toBe(expected);
             }
-        );
+        });
 
-        test.prop([fc.anything()])(
-            "should never throw errors",
-            (value) => {
-                expect(() => safeParseFloat(value)).not.toThrow();
-                expect(typeof safeParseFloat(value)).toBe("number");
-            }
-        );
+        test.prop([fc.anything()])("should never throw errors", (value) => {
+            expect(() => safeParseFloat(value)).not.toThrow();
+            expect(typeof safeParseFloat(value)).toBe("number");
+        });
 
         it("should handle edge cases", () => {
             expect(safeParseFloat("123.45")).toBe(123.45);
@@ -159,19 +153,18 @@ describe("SafeConversions utilities fuzzing tests", () => {
     });
 
     describe(safeParseInt, () => {
-        test.prop([fc.integer()])(
-            "should return integers unchanged",
-            (num) => {
-                const result = safeParseInt(num);
-                expect(result).toBe(num);
-            }
-        );
+        test.prop([fc.integer()])("should return integers unchanged", (num) => {
+            const result = safeParseInt(num);
+            expect(result).toBe(num);
+        });
 
         test.prop([fc.float({ noNaN: true })])(
             "should floor non-integer numbers",
             (num) => {
                 const result = safeParseInt(num);
-                expect(result).toBe(Number.isInteger(num) ? num : Math.floor(num));
+                expect(result).toBe(
+                    Number.isInteger(num) ? num : Math.floor(num)
+                );
             }
         );
 
@@ -189,14 +182,11 @@ describe("SafeConversions utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.anything()])(
-            "should never throw errors",
-            (value) => {
-                expect(() => safeParseInt(value)).not.toThrow();
-                expect(typeof safeParseInt(value)).toBe("number");
-                expect(Number.isInteger(safeParseInt(value))).toBeTruthy();
-            }
-        );
+        test.prop([fc.anything()])("should never throw errors", (value) => {
+            expect(() => safeParseInt(value)).not.toThrow();
+            expect(typeof safeParseInt(value)).toBe("number");
+            expect(Number.isInteger(safeParseInt(value))).toBeTruthy();
+        });
 
         it("should handle edge cases", () => {
             expect(safeParseInt("123")).toBe(123);
@@ -258,7 +248,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.integer().filter(n => n < 1 || n > 65_535)])(
+        test.prop([fc.integer().filter((n) => n < 1 || n > 65_535)])(
             "should return default for invalid ports",
             (port) => {
                 const defaultValue = 80;
@@ -329,7 +319,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.integer().filter(n => n < 0 || n > 10)])(
+        test.prop([fc.integer().filter((n) => n < 0 || n > 10)])(
             "should return default for out-of-range values",
             (attempts) => {
                 const defaultValue = 3;

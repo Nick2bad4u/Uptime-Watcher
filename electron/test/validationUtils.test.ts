@@ -55,9 +55,9 @@ describe("Shared Validation Utils", () => {
 
             expect(isValidUrl("https://example.com")).toBeTruthy();
             expect(isValidUrl("https://sub.domain.com/path")).toBeTruthy();
-            expect(isValidUrl("https://api.example.com:8080/v1/test")).toBeTruthy(
-                
-            );
+            expect(
+                isValidUrl("https://api.example.com:8080/v1/test")
+            ).toBeTruthy();
         });
         it("should reject invalid URL formats", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -111,7 +111,9 @@ describe("Shared Validation Utils", () => {
             await annotate("Component: Shared Validation Utils", "component");
 
             // By default, localhost might not be valid FQDN
-            expect(isValidFQDN("localhost", { require_tld: false })).toBeTruthy();
+            expect(
+                isValidFQDN("localhost", { require_tld: false })
+            ).toBeTruthy();
         });
     });
     describe(isValidIdentifier, () => {
@@ -289,9 +291,9 @@ describe("Shared Validation Utils", () => {
                     "array",
                 ])
             ).toBeTruthy();
-            expect(isValidIdentifierArray(["test-123", "valid_name"])).toBeTruthy(
-                
-            );
+            expect(
+                isValidIdentifierArray(["test-123", "valid_name"])
+            ).toBeTruthy();
             expect(isValidIdentifierArray([])).toBeTruthy();
         });
         it("should reject invalid arrays", async ({ task, annotate }) => {

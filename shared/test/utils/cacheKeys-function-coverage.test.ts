@@ -39,10 +39,12 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
-            expect(isStandardizedCacheKey("site:loading:site-123")).toBeTruthy();
-            expect(isStandardizedCacheKey("monitor:checking:monitor-456")).toBeTruthy(
-                
-            );
+            expect(
+                isStandardizedCacheKey("site:loading:site-123")
+            ).toBeTruthy();
+            expect(
+                isStandardizedCacheKey("monitor:checking:monitor-456")
+            ).toBeTruthy();
         });
 
         it("should return false for keys with too few parts", async ({
@@ -72,9 +74,9 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isStandardizedCacheKey("site:loading:site-123:extra")).toBeFalsy(
-                
-            );
+            expect(
+                isStandardizedCacheKey("site:loading:site-123:extra")
+            ).toBeFalsy();
         });
 
         it("should return false for keys with empty prefix", async ({
@@ -175,7 +177,9 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(() => parseCacheKey("site:" as any)).toThrow("Invalid cache key format: site:");
+            expect(() => parseCacheKey("site:" as any)).toThrow(
+                "Invalid cache key format: site:"
+            );
         });
 
         it("should throw error for empty prefix in 2-part keys", async ({

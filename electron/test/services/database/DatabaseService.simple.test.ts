@@ -169,8 +169,8 @@ describe("DatabaseService Coverage Tests", () => {
         it("should handle various database paths", async () => {
             await fc.assert(
                 fc.asyncProperty(
-                    fc.string({ minLength: 1, maxLength: 100 }).map(s =>
-                        s.replaceAll(/["*:<>?|]/g, "_") // Remove invalid path characters
+                    fc.string({ minLength: 1, maxLength: 100 }).map(
+                        (s) => s.replaceAll(/["*:<>?|]/g, "_") // Remove invalid path characters
                     ),
                     async (mockPath) => {
                         // Mock the app.getPath to return our test path
@@ -184,8 +184,12 @@ describe("DatabaseService Coverage Tests", () => {
                         try {
                             const instance = DatabaseService.getInstance();
                             expect(instance).toBeDefined();
-                            expect(typeof instance.getDatabase).toBe("function");
-                            expect(typeof instance.executeTransaction).toBe("function");
+                            expect(typeof instance.getDatabase).toBe(
+                                "function"
+                            );
+                            expect(typeof instance.executeTransaction).toBe(
+                                "function"
+                            );
                         } catch (error) {
                             // Database initialization might fail with invalid paths
                             expect(error).toBeInstanceOf(Error);
@@ -200,9 +204,19 @@ describe("DatabaseService Coverage Tests", () => {
                 fc.asyncProperty(
                     fc.array(
                         fc.record({
-                            operation: fc.constantFrom("SELECT", "INSERT", "UPDATE", "DELETE"),
-                            table: fc.constantFrom("sites", "history", "monitors", "settings"),
-                            shouldSucceed: fc.boolean()
+                            operation: fc.constantFrom(
+                                "SELECT",
+                                "INSERT",
+                                "UPDATE",
+                                "DELETE"
+                            ),
+                            table: fc.constantFrom(
+                                "sites",
+                                "history",
+                                "monitors",
+                                "settings"
+                            ),
+                            shouldSucceed: fc.boolean(),
                         }),
                         { minLength: 1, maxLength: 5 }
                     ),
@@ -215,23 +229,33 @@ describe("DatabaseService Coverage Tests", () => {
                             const instance = DatabaseService.getInstance();
 
                             // Mock transaction behavior
-                            const mockCallback = vi.fn().mockImplementation(async (db) => {
-                                for (const op of operations) {
-                                    if (!op.shouldSucceed) {
-                                        throw new Error(`Mock ${op.operation} error on ${op.table}`);
+                            const mockCallback = vi
+                                .fn()
+                                .mockImplementation(async (db) => {
+                                    for (const op of operations) {
+                                        if (!op.shouldSucceed) {
+                                            throw new Error(
+                                                `Mock ${op.operation} error on ${op.table}`
+                                            );
+                                        }
                                     }
-                                }
-                                return "success";
-                            });
+                                    return "success";
+                                });
 
-                            const hasFailures = operations.some(op => !op.shouldSucceed);
+                            const hasFailures = operations.some(
+                                (op) => !op.shouldSucceed
+                            );
 
                             if (hasFailures) {
-                                await expect(instance.executeTransaction(mockCallback))
-                                    .rejects.toThrow();
+                                await expect(
+                                    instance.executeTransaction(mockCallback)
+                                ).rejects.toThrow();
                             } else {
                                 // All operations should succeed
-                                const result = await instance.executeTransaction(mockCallback);
+                                const result =
+                                    await instance.executeTransaction(
+                                        mockCallback
+                                    );
                                 expect(result).toBe("success");
                             }
                         } catch (error) {
@@ -248,7 +272,7 @@ describe("DatabaseService Coverage Tests", () => {
                     fc.record({
                         initialized: fc.boolean(),
                         shouldConnect: fc.boolean(),
-                        errorOnConnect: fc.boolean()
+                        errorOnConnect: fc.boolean(),
                     }),
                     async ({ initialized, shouldConnect, errorOnConnect }) => {
                         const { DatabaseService } = await import(
@@ -258,7 +282,11 @@ describe("DatabaseService Coverage Tests", () => {
                         try {
                             const instance = DatabaseService.getInstance();
 
-                            if (initialized && shouldConnect && !errorOnConnect) {
+                            if (
+                                initialized &&
+                                shouldConnect &&
+                                !errorOnConnect
+                            ) {
                                 // Normal operation path
                                 const db = instance.getDatabase();
                                 expect(db).toBeDefined();
@@ -285,7 +313,9 @@ describe("DatabaseService Coverage Tests", () => {
                         fc.constant(undefined),
                         fc.string({ minLength: 1, maxLength: 50 }),
                         fc.integer({ min: 0, max: 1000 }),
-                        fc.record({ result: fc.string({ minLength: 1, maxLength: 20 }) })
+                        fc.record({
+                            result: fc.string({ minLength: 1, maxLength: 20 }),
+                        })
                     ),
                     fc.boolean(),
                     async (returnValue, shouldThrow) => {
@@ -296,25 +326,35 @@ describe("DatabaseService Coverage Tests", () => {
                         try {
                             const instance = DatabaseService.getInstance();
 
-                            const mockCallback = vi.fn().mockImplementation(async (db) => {
-                                expect(db).toBeDefined();
+                            const mockCallback = vi
+                                .fn()
+                                .mockImplementation(async (db) => {
+                                    expect(db).toBeDefined();
 
-                                if (shouldThrow) {
-                                    throw new Error("Mock transaction error");
-                                }
+                                    if (shouldThrow) {
+                                        throw new Error(
+                                            "Mock transaction error"
+                                        );
+                                    }
 
-                                return returnValue;
-                            });
+                                    return returnValue;
+                                });
 
                             if (shouldThrow) {
-                                await expect(instance.executeTransaction(mockCallback))
-                                    .rejects.toThrow("Mock transaction error");
+                                await expect(
+                                    instance.executeTransaction(mockCallback)
+                                ).rejects.toThrow("Mock transaction error");
                             } else {
-                                const result = await instance.executeTransaction(mockCallback);
+                                const result =
+                                    await instance.executeTransaction(
+                                        mockCallback
+                                    );
                                 expect(result).toBe(returnValue);
                             }
 
-                            expect(mockCallback).toHaveBeenCalledWith(expect.anything());
+                            expect(mockCallback).toHaveBeenCalledWith(
+                                expect.anything()
+                            );
                         } catch (error) {
                             expect(error).toBeInstanceOf(Error);
                         }
@@ -328,9 +368,15 @@ describe("DatabaseService Coverage Tests", () => {
                 fc.asyncProperty(
                     fc.oneof(
                         fc.constantFrom(
-                            "SQLITE_BUSY", "SQLITE_LOCKED", "SQLITE_READONLY",
-                            "SQLITE_IOERR", "SQLITE_CORRUPT", "SQLITE_FULL",
-                            "ENOENT", "EACCES", "EPERM"
+                            "SQLITE_BUSY",
+                            "SQLITE_LOCKED",
+                            "SQLITE_READONLY",
+                            "SQLITE_IOERR",
+                            "SQLITE_CORRUPT",
+                            "SQLITE_FULL",
+                            "ENOENT",
+                            "EACCES",
+                            "EPERM"
                         ),
                         fc.string({ minLength: 5, maxLength: 50 })
                     ),
@@ -342,14 +388,19 @@ describe("DatabaseService Coverage Tests", () => {
                         try {
                             const instance = DatabaseService.getInstance();
 
-                            const mockCallback = vi.fn().mockImplementation(async () => {
-                                const error = new Error(`Mock ${errorType} error`);
-                                (error as any).code = errorType;
-                                throw error;
-                            });
+                            const mockCallback = vi
+                                .fn()
+                                .mockImplementation(async () => {
+                                    const error = new Error(
+                                        `Mock ${errorType} error`
+                                    );
+                                    (error as any).code = errorType;
+                                    throw error;
+                                });
 
-                            await expect(instance.executeTransaction(mockCallback))
-                                .rejects.toThrow();
+                            await expect(
+                                instance.executeTransaction(mockCallback)
+                            ).rejects.toThrow();
                         } catch (error) {
                             expect(error).toBeInstanceOf(Error);
                         }

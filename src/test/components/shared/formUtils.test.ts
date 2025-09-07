@@ -1,8 +1,8 @@
 /**
  * @version 1.0.0
  *
- * @file Comprehensive tests for form utility functions
- * Enhanced with property-based testing for robust user input validation
+ * @file Comprehensive tests for form utility functions Enhanced with
+ *   property-based testing for robust user input validation
  */
 
 import { describe, expect, it, vi } from "vitest";
@@ -16,7 +16,6 @@ import {
 } from "../../../components/shared/formUtils";
 
 describe("Form Utilities", () => {
-
     describe("Property-Based Form Input Validation", () => {
         describe("Input Handler with Various Inputs", () => {
             test.prop([fc.string()])(
@@ -34,16 +33,23 @@ describe("Form Utilities", () => {
                 }
             );
 
-            test.prop([fc.oneof(
-                fc.string({ minLength: 1 }),
-                fc.string().filter(s => s.trim().length === 0),
-                fc.constant("")
-            )])(
+            test.prop([
+                fc.oneof(
+                    fc.string({ minLength: 1 }),
+                    fc.string().filter((s) => s.trim().length === 0),
+                    fc.constant("")
+                ),
+            ])(
                 "should respect validation function results for all string inputs",
                 (inputValue) => {
                     const setValue = vi.fn();
-                    const mockValidator = vi.fn().mockReturnValue(inputValue.trim().length > 0);
-                    const handler = createInputChangeHandler(setValue, mockValidator);
+                    const mockValidator = vi
+                        .fn()
+                        .mockReturnValue(inputValue.trim().length > 0);
+                    const handler = createInputChangeHandler(
+                        setValue,
+                        mockValidator
+                    );
 
                     const mockEvent = {
                         target: { value: inputValue },
@@ -113,8 +119,12 @@ describe("Form Utilities", () => {
                 "should convert numeric string options to numbers",
                 (numValue) => {
                     const setValue = vi.fn();
-                    const converter = (value: string) => Number.parseInt(value, 10);
-                    const handler = createSelectChangeHandler(setValue, converter);
+                    const converter = (value: string) =>
+                        Number.parseInt(value, 10);
+                    const handler = createSelectChangeHandler(
+                        setValue,
+                        converter
+                    );
                     const stringValue = numValue.toString();
 
                     const mockEvent = {
@@ -126,13 +136,18 @@ describe("Form Utilities", () => {
                 }
             );
 
-            test.prop([fc.constantFrom("true", "false", "1", "0", "yes", "no")])(
+            test.prop([
+                fc.constantFrom("true", "false", "1", "0", "yes", "no"),
+            ])(
                 "should handle boolean-like string conversions",
                 (booleanLikeValue) => {
                     const setValue = vi.fn();
                     const converter = (value: string) =>
                         value === "true" || value === "1" || value === "yes";
-                    const handler = createSelectChangeHandler(setValue, converter);
+                    const handler = createSelectChangeHandler(
+                        setValue,
+                        converter
+                    );
 
                     const mockEvent = {
                         target: { value: booleanLikeValue },
@@ -140,17 +155,27 @@ describe("Form Utilities", () => {
 
                     handler(mockEvent);
 
-                    const expectedBoolean = ["true", "1", "yes"].includes(booleanLikeValue);
+                    const expectedBoolean = [
+                        "true",
+                        "1",
+                        "yes",
+                    ].includes(booleanLikeValue);
                     expect(setValue).toHaveBeenCalledWith(expectedBoolean);
                 }
             );
 
-            test.prop([fc.string().filter(s => !/^\d+$/.test(s) && s.length > 0)])(
+            test.prop([
+                fc.string().filter((s) => !/^\d+$/.test(s) && s.length > 0),
+            ])(
                 "should handle non-numeric strings in numeric conversion",
                 (nonNumericValue) => {
                     const setValue = vi.fn();
-                    const converter = (value: string) => Number.parseInt(value, 10);
-                    const handler = createSelectChangeHandler(setValue, converter);
+                    const converter = (value: string) =>
+                        Number.parseInt(value, 10);
+                    const handler = createSelectChangeHandler(
+                        setValue,
+                        converter
+                    );
 
                     const mockEvent = {
                         target: { value: nonNumericValue },
@@ -207,7 +232,8 @@ describe("Form Utilities", () => {
             test.prop([fc.string({ minLength: 1 })])(
                 "should validate non-empty strings correctly",
                 (nonEmptyString) => {
-                    const isValid = validationPatterns.nonEmptyString(nonEmptyString);
+                    const isValid =
+                        validationPatterns.nonEmptyString(nonEmptyString);
                     if (nonEmptyString.trim().length > 0) {
                         expect(isValid).toBeTruthy();
                     } else {
@@ -216,13 +242,16 @@ describe("Form Utilities", () => {
                 }
             );
 
-            test.prop([fc.oneof(
-                fc.constant(""),
-                fc.string().filter(s => s.trim().length === 0)
-            )])(
+            test.prop([
+                fc.oneof(
+                    fc.constant(""),
+                    fc.string().filter((s) => s.trim().length === 0)
+                ),
+            ])(
                 "should reject empty and whitespace-only strings",
                 (emptyString) => {
-                    const isValid = validationPatterns.nonEmptyString(emptyString);
+                    const isValid =
+                        validationPatterns.nonEmptyString(emptyString);
                     expect(isValid).toBeFalsy();
                 }
             );
@@ -230,39 +259,56 @@ describe("Form Utilities", () => {
             test.prop([fc.integer({ min: 1, max: 65_535 })])(
                 "should validate port number ranges correctly",
                 (portNumber) => {
-                    const validator = validationPatterns.numberInRange(1, 65_535);
+                    const validator = validationPatterns.numberInRange(
+                        1,
+                        65_535
+                    );
                     const isValid = validator(portNumber);
                     expect(isValid).toBeTruthy();
                 }
             );
 
-            test.prop([fc.oneof(
-                fc.integer({ max: 0 }),
-                fc.integer({ min: 65_536 })
-            )])(
-                "should reject invalid port number ranges",
-                (invalidPort) => {
-                    const validator = validationPatterns.numberInRange(1, 65_535);
-                    const isValid = validator(invalidPort);
-                    expect(isValid).toBeFalsy();
-                }
-            );
+            test.prop([
+                fc.oneof(fc.integer({ max: 0 }), fc.integer({ min: 65_536 })),
+            ])("should reject invalid port number ranges", (invalidPort) => {
+                const validator = validationPatterns.numberInRange(1, 65_535);
+                const isValid = validator(invalidPort);
+                expect(isValid).toBeFalsy();
+            });
 
             test.prop([fc.constantFrom(5000, 10_000, 30_000, 60_000)])(
                 "should validate allowed check intervals",
                 (allowedInterval) => {
-                    const validator = validationPatterns.oneOfNumbers([5000, 10_000, 30_000, 60_000]);
+                    const validator = validationPatterns.oneOfNumbers([
+                        5000,
+                        10_000,
+                        30_000,
+                        60_000,
+                    ]);
                     const isValid = validator(allowedInterval);
                     expect(isValid).toBeTruthy();
                 }
             );
 
-            test.prop([fc.integer({ min: 1, max: 100_000 }).filter(n =>
-                ![5000, 10_000, 30_000, 60_000].includes(n)
-            )])(
+            test.prop([
+                fc.integer({ min: 1, max: 100_000 }).filter(
+                    (n) =>
+                        ![
+                            5000,
+                            10_000,
+                            30_000,
+                            60_000,
+                        ].includes(n)
+                ),
+            ])(
                 "should reject non-allowed check intervals",
                 (disallowedInterval) => {
-                    const validator = validationPatterns.oneOfNumbers([5000, 10_000, 30_000, 60_000]);
+                    const validator = validationPatterns.oneOfNumbers([
+                        5000,
+                        10_000,
+                        30_000,
+                        60_000,
+                    ]);
                     const isValid = validator(disallowedInterval);
                     expect(isValid).toBeFalsy();
                 }
@@ -271,32 +317,51 @@ describe("Form Utilities", () => {
             test.prop([fc.constantFrom("http", "port", "ping")])(
                 "should validate allowed monitor types",
                 (allowedType) => {
-                    const validator = validationPatterns.oneOfStrings(["http", "port", "ping"]);
+                    const validator = validationPatterns.oneOfStrings([
+                        "http",
+                        "port",
+                        "ping",
+                    ]);
                     const isValid = validator(allowedType);
                     expect(isValid).toBeTruthy();
                 }
             );
 
-            test.prop([fc.string().filter(s => !["http", "port", "ping"].includes(s) && s.length > 0)])(
-                "should reject non-allowed monitor types",
-                (disallowedType) => {
-                    const validator = validationPatterns.oneOfStrings(["http", "port", "ping"]);
-                    const isValid = validator(disallowedType);
-                    expect(isValid).toBeFalsy();
-                }
-            );
+            test.prop([
+                fc.string().filter(
+                    (s) =>
+                        ![
+                            "http",
+                            "port",
+                            "ping",
+                        ].includes(s) && s.length > 0
+                ),
+            ])("should reject non-allowed monitor types", (disallowedType) => {
+                const validator = validationPatterns.oneOfStrings([
+                    "http",
+                    "port",
+                    "ping",
+                ]);
+                const isValid = validator(disallowedType);
+                expect(isValid).toBeFalsy();
+            });
 
             test.prop([fc.string({ minLength: 1, maxLength: 50 })])(
                 "should test pattern consistency across different inputs",
                 (inputString) => {
                     // Test that nonEmptyString pattern behaves consistently
-                    const result1 = validationPatterns.nonEmptyString(inputString);
-                    const result2 = validationPatterns.nonEmptyString(inputString);
+                    const result1 =
+                        validationPatterns.nonEmptyString(inputString);
+                    const result2 =
+                        validationPatterns.nonEmptyString(inputString);
                     expect(result1).toBe(result2); // Consistency check
                     expect(typeof result1).toBe("boolean");
 
                     // Test numberInRange pattern consistency (example with port range)
-                    const portValidator = validationPatterns.numberInRange(1, 65_535);
+                    const portValidator = validationPatterns.numberInRange(
+                        1,
+                        65_535
+                    );
                     const testNumber = inputString.length; // Use length as test number
                     const numResult1 = portValidator(testNumber);
                     const numResult2 = portValidator(testNumber);
@@ -304,7 +369,11 @@ describe("Form Utilities", () => {
                     expect(typeof numResult1).toBe("boolean");
 
                     // Test oneOfStrings pattern consistency
-                    const stringValidator = validationPatterns.oneOfStrings(["test", "demo", "sample"]);
+                    const stringValidator = validationPatterns.oneOfStrings([
+                        "test",
+                        "demo",
+                        "sample",
+                    ]);
                     const stringResult1 = stringValidator(inputString);
                     const stringResult2 = stringValidator(inputString);
                     expect(stringResult1).toBe(stringResult2);
@@ -314,14 +383,18 @@ describe("Form Utilities", () => {
         });
 
         describe("Edge Case Input Handling", () => {
-            test.prop([fc.oneof(
-                fc.constant(""),
-                fc.constant(" "),
-                fc.constant("\n"),
-                fc.constant("\t"),
-                fc.constant("\r\n"),
-                fc.string().filter(s => s.trim().length === 0 && s.length > 0)
-            )])(
+            test.prop([
+                fc.oneof(
+                    fc.constant(""),
+                    fc.constant(" "),
+                    fc.constant("\n"),
+                    fc.constant("\t"),
+                    fc.constant("\r\n"),
+                    fc
+                        .string()
+                        .filter((s) => s.trim().length === 0 && s.length > 0)
+                ),
+            ])(
                 "should handle whitespace and empty inputs consistently",
                 (whitespaceInput) => {
                     const setValue = vi.fn();
@@ -355,9 +428,18 @@ describe("Form Utilities", () => {
                 }
             );
 
-            test.prop([fc.string().filter(s =>
-                s.includes("<") || s.includes(">") || s.includes("&") || s.includes("'") || s.includes('"')
-            )])(
+            test.prop([
+                fc
+                    .string()
+                    .filter(
+                        (s) =>
+                            s.includes("<") ||
+                            s.includes(">") ||
+                            s.includes("&") ||
+                            s.includes("'") ||
+                            s.includes('"')
+                    ),
+            ])(
                 "should handle HTML-like characters in inputs",
                 (htmlLikeInput) => {
                     const setValue = vi.fn();
@@ -371,9 +453,13 @@ describe("Form Utilities", () => {
                     expect(setValue).toHaveBeenCalledWith(htmlLikeInput);
 
                     // Verify it contains HTML-like characters
-                    const hasHtmlChars = ["<", ">", "&", "'", '"'].some(char =>
-                        htmlLikeInput.includes(char)
-                    );
+                    const hasHtmlChars = [
+                        "<",
+                        ">",
+                        "&",
+                        "'",
+                        '"',
+                    ].some((char) => htmlLikeInput.includes(char));
                     expect(hasHtmlChars).toBeTruthy();
                 }
             );
@@ -739,9 +825,9 @@ describe("Form Utilities", () => {
 
                 expect(validationPatterns.nonEmptyString("hello")).toBeTruthy();
                 expect(validationPatterns.nonEmptyString("a")).toBeTruthy();
-                expect(validationPatterns.nonEmptyString("   content   ")).toBeTruthy(
-                    
-                );
+                expect(
+                    validationPatterns.nonEmptyString("   content   ")
+                ).toBeTruthy();
             });
 
             it("should return false for empty strings", async ({

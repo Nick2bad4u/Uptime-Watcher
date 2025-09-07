@@ -221,12 +221,12 @@ describe("shared/types.ts - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            expect(validateMonitor({ ...validMonitor, id: 123 as any })).toBeFalsy(
-                
-            );
-            expect(validateMonitor({ ...validMonitor, id: null as any })).toBeFalsy(
-                
-            );
+            expect(
+                validateMonitor({ ...validMonitor, id: 123 as any })
+            ).toBeFalsy();
+            expect(
+                validateMonitor({ ...validMonitor, id: null as any })
+            ).toBeFalsy();
         });
 
         it("should return false for monitor with invalid type", async ({
@@ -241,9 +241,9 @@ describe("shared/types.ts - Complete Function Coverage", () => {
             expect(
                 validateMonitor({ ...validMonitor, type: "invalid" as any })
             ).toBeFalsy();
-            expect(validateMonitor({ ...validMonitor, type: 123 as any })).toBeFalsy(
-                
-            );
+            expect(
+                validateMonitor({ ...validMonitor, type: 123 as any })
+            ).toBeFalsy();
         });
 
         it("should return false for monitor with invalid status", async ({

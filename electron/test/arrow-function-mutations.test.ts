@@ -341,12 +341,12 @@ describe("Backend Arrow Function Mutation Tests", () => {
             );
 
             expect(successResults).toHaveLength(2);
-            expect(successResults.every((r) => r.status === "fulfilled")).toBeTruthy(
-                
-            );
-            expect(successResults.every((r) => r.value?.success === true)).toBeTruthy(
-                
-            );
+            expect(
+                successResults.every((r) => r.status === "fulfilled")
+            ).toBeTruthy();
+            expect(
+                successResults.every((r) => r.value?.success === true)
+            ).toBeTruthy();
         });
     });
 
@@ -390,7 +390,9 @@ describe("Backend Arrow Function Mutation Tests", () => {
             ];
 
             for (const testCase of testCases) {
-                const originalResult = (testCase.original as any)(testCase.input);
+                const originalResult = (testCase.original as any)(
+                    testCase.input
+                );
                 const mutatedResult = testCase.mutated();
 
                 expect(originalResult).toBe(testCase.expectedOriginal);

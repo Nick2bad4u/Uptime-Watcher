@@ -1,19 +1,19 @@
 /**
- * @fileoverview Fuzzing tests for objectSafety utilities
- *         test.prop([
-            fc.anything(),
-            fc.anything(),
-            fc.anything()
-        ])("should use validator when provided", (key, value, fallback) => {
-            const obj = { [key]: value };
-            const [validatorResult] = fc.sample(fc.boolean(), 1);
-            const validator = vi.fn().mockReturnValue(validatorResult as boolean) as unknown as ValidatorFunction;
-
-            const result = safeObjectAccess(obj, key, fallback, validator);
-
-            expect(validator).toHaveBeenCalledWith(value);
-            expect(result).toBe(validatorResult ? value : fallback);
-        });erated
+ * @file Fuzzing tests for objectSafety utilities test.prop([ fc.anything(),
+ *   fc.anything(), fc.anything() ])("should use validator when provided", (key,
+ *   value, fallback) => { const obj = { [key]: value }; const [validatorResult]
+ *   = fc.sample(fc.boolean(), 1); const validator =
+ *   vi.fn().mockReturnValue(validatorResult as boolean) as unknown as
+ *   ValidatorFunction;
+ *
+ *   ```
+ *         const result = safeObjectAccess(obj, key, fallback, validator);
+ *
+ *       expect(validator).toHaveBeenCalledWith(value);
+ *       expect(result).toBe(validatorResult ? value : fallback);
+ *   });erated
+ * ```
+ *
  * @since 2024
  */
 
@@ -27,7 +27,7 @@ import {
     safeObjectPick,
     typedObjectEntries,
     typedObjectKeys,
-    typedObjectValues
+    typedObjectValues,
 } from "../../utils/objectSafety";
 
 type ValidatorFunction = (val: unknown) => val is unknown;
@@ -36,58 +36,81 @@ describe("objectSafety.ts fuzzing tests", () => {
     describe(safeObjectAccess, () => {
         test.prop([
             fc.anything(),
-            fc.oneof(fc.string(), fc.constantFrom(Symbol("test"), Symbol.for("test"))),
-            fc.anything()
-        ])("should return fallback for non-objects", (nonObject, key, fallback) => {
-            fc.pre(nonObject === null || typeof nonObject !== "object" || Array.isArray(nonObject));
+            fc.oneof(
+                fc.string(),
+                fc.constantFrom(Symbol("test"), Symbol.for("test"))
+            ),
+            fc.anything(),
+        ])(
+            "should return fallback for non-objects",
+            (nonObject, key, fallback) => {
+                fc.pre(
+                    nonObject === null ||
+                        typeof nonObject !== "object" ||
+                        Array.isArray(nonObject)
+                );
 
-            const result = safeObjectAccess(nonObject, key, fallback);
-            expect(result).toBe(fallback);
-        });
+                const result = safeObjectAccess(nonObject, key, fallback);
+                expect(result).toBe(fallback);
+            }
+        );
 
         test.prop([
             fc.record({}),
             fc.string(),
-            fc.anything()
-        ])("should return fallback for missing properties", (obj, key, fallback) => {
-            fc.pre(!Object.hasOwn(obj, key));
+            fc.anything(),
+        ])(
+            "should return fallback for missing properties",
+            (obj, key, fallback) => {
+                fc.pre(!Object.hasOwn(obj, key));
 
-            const result = safeObjectAccess(obj, key, fallback);
-            expect(result).toBe(fallback);
-        });
+                const result = safeObjectAccess(obj, key, fallback);
+                expect(result).toBe(fallback);
+            }
+        );
 
         test.prop([
             fc.string(),
             fc.string(),
-            fc.string()
-        ])("should return actual value when property exists and types match", (key, value, fallback) => {
-            fc.pre(typeof value === typeof fallback);
+            fc.string(),
+        ])(
+            "should return actual value when property exists and types match",
+            (key, value, fallback) => {
+                fc.pre(typeof value === typeof fallback);
 
-            const obj = { [key]: value };
-            const result = safeObjectAccess(obj, key, fallback);
-            expect(result).toBe(value);
-        });
+                const obj = { [key]: value };
+                const result = safeObjectAccess(obj, key, fallback);
+                expect(result).toBe(value);
+            }
+        );
 
         test.prop([
             fc.string(),
             fc.integer(),
-            fc.string()
-        ])("should return fallback when property exists but types don't match", (key, value, fallback) => {
-            fc.pre(typeof value !== typeof fallback);
+            fc.string(),
+        ])(
+            "should return fallback when property exists but types don't match",
+            (key, value, fallback) => {
+                fc.pre(typeof value !== typeof fallback);
 
-            const obj = { [key]: value };
-            const result = safeObjectAccess(obj, key, fallback);
-            expect(result).toBe(fallback);
-        });
+                const obj = { [key]: value };
+                const result = safeObjectAccess(obj, key, fallback);
+                expect(result).toBe(fallback);
+            }
+        );
 
         test.prop([
             fc.string(),
             fc.anything(),
-            fc.anything()
+            fc.anything(),
         ])("should use validator when provided", (key, value, fallback) => {
             const obj = { [key]: value };
             const [validatorResult] = fc.sample(fc.boolean(), 1);
-            const validator = vi.fn().mockReturnValue(validatorResult as boolean) as unknown as ValidatorFunction;
+            const validator = vi
+                .fn()
+                .mockReturnValue(
+                    validatorResult as boolean
+                ) as unknown as ValidatorFunction;
 
             const result = safeObjectAccess(obj, key, fallback, validator);
 
@@ -116,9 +139,15 @@ describe("objectSafety.ts fuzzing tests", () => {
         test.prop([fc.anything()])(
             "should handle non-objects gracefully",
             (nonObject) => {
-                fc.pre(nonObject === null || typeof nonObject !== "object" || Array.isArray(nonObject));
+                fc.pre(
+                    nonObject === null ||
+                        typeof nonObject !== "object" ||
+                        Array.isArray(nonObject)
+                );
 
-                const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+                const consoleSpy = vi
+                    .spyOn(console, "warn")
+                    .mockImplementation(() => {});
                 const callback = vi.fn();
 
                 safeObjectIteration(nonObject, callback);
@@ -133,11 +162,14 @@ describe("objectSafety.ts fuzzing tests", () => {
         );
 
         test.prop([
-            fc.record({
-                key1: fc.anything(),
-                key2: fc.anything(),
-                key3: fc.anything()
-            }, { requiredKeys: [] })
+            fc.record(
+                {
+                    key1: fc.anything(),
+                    key2: fc.anything(),
+                    key3: fc.anything(),
+                },
+                { requiredKeys: [] }
+            ),
         ])("should iterate over object entries", (obj) => {
             const callback = vi.fn();
 
@@ -154,7 +186,9 @@ describe("objectSafety.ts fuzzing tests", () => {
         test.prop([fc.record({ key: fc.string() })])(
             "should handle callback errors gracefully",
             (obj) => {
-                const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+                const consoleSpy = vi
+                    .spyOn(console, "error")
+                    .mockImplementation(() => {});
                 const callback = vi.fn().mockImplementation(() => {
                     throw new Error("Callback error");
                 });
@@ -173,7 +207,9 @@ describe("objectSafety.ts fuzzing tests", () => {
         test.prop([fc.record({ key: fc.string() }), fc.string()])(
             "should use custom context in error messages",
             (obj, context) => {
-                const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+                const consoleSpy = vi
+                    .spyOn(console, "error")
+                    .mockImplementation(() => {});
                 const callback = vi.fn().mockImplementation(() => {
                     throw new Error("Test error");
                 });
@@ -201,13 +237,16 @@ describe("objectSafety.ts fuzzing tests", () => {
         );
 
         test.prop([
-            fc.record({
-                keep1: fc.string(),
-                keep2: fc.integer(),
-                omit1: fc.boolean(),
-                omit2: fc.anything()
-            }, { requiredKeys: [] }),
-            fc.constantFrom(["omit1"], ["omit2"], ["omit1", "omit2"])
+            fc.record(
+                {
+                    keep1: fc.string(),
+                    keep2: fc.integer(),
+                    omit1: fc.boolean(),
+                    omit2: fc.anything(),
+                },
+                { requiredKeys: [] }
+            ),
+            fc.constantFrom(["omit1"], ["omit2"], ["omit1", "omit2"]),
         ])("should omit specified string keys", (obj, keysToOmit) => {
             const result = safeObjectOmit(obj, keysToOmit);
 
@@ -219,7 +258,10 @@ describe("objectSafety.ts fuzzing tests", () => {
             // Check that other keys are preserved
             for (const key of Object.keys(obj)) {
                 if (!(keysToOmit as unknown as string[]).includes(key)) {
-                    expect(result).toHaveProperty(key, obj[key as keyof typeof obj]);
+                    expect(result).toHaveProperty(
+                        key,
+                        obj[key as keyof typeof obj]
+                    );
                 }
             }
         });
@@ -231,7 +273,7 @@ describe("objectSafety.ts fuzzing tests", () => {
             const obj = {
                 stringKey: "value",
                 [keepSymbol]: "keep this",
-                [omitSymbol]: "omit this"
+                [omitSymbol]: "omit this",
             };
 
             const result = safeObjectOmit(obj, [omitSymbol]);
@@ -245,9 +287,9 @@ describe("objectSafety.ts fuzzing tests", () => {
             fc.record({
                 prop1: fc.anything(),
                 prop2: fc.anything(),
-                prop3: fc.anything()
+                prop3: fc.anything(),
             }),
-            fc.array(fc.constantFrom("prop1", "prop2", "prop3"))
+            fc.array(fc.constantFrom("prop1", "prop2", "prop3")),
         ])("should maintain immutability", (obj, keys) => {
             const originalKeys = Object.keys(obj);
             const result = safeObjectOmit(obj, keys);
@@ -262,13 +304,16 @@ describe("objectSafety.ts fuzzing tests", () => {
 
     describe(safeObjectPick, () => {
         test.prop([
-            fc.record({
-                keep1: fc.string(),
-                keep2: fc.integer(),
-                ignore1: fc.boolean(),
-                ignore2: fc.anything()
-            }, { requiredKeys: [] }),
-            fc.constantFrom(["keep1"], ["keep2"], ["keep1", "keep2"])
+            fc.record(
+                {
+                    keep1: fc.string(),
+                    keep2: fc.integer(),
+                    ignore1: fc.boolean(),
+                    ignore2: fc.anything(),
+                },
+                { requiredKeys: [] }
+            ),
+            fc.constantFrom(["keep1"], ["keep2"], ["keep1", "keep2"]),
         ])("should pick only specified keys", (obj, keysToPick) => {
             const result = safeObjectPick(obj, keysToPick);
 
@@ -281,13 +326,13 @@ describe("objectSafety.ts fuzzing tests", () => {
 
             // Check that result only has picked keys
             for (const key of Object.keys(result)) {
-                expect((keysToPick as unknown as string[])).toContain(key);
+                expect(keysToPick as unknown as string[]).toContain(key);
             }
         });
 
         test.prop([
             fc.record({ a: fc.string(), b: fc.integer() }),
-            fc.array(fc.constantFrom("a", "b")).filter(arr => arr.length > 0)
+            fc.array(fc.constantFrom("a", "b")).filter((arr) => arr.length > 0),
         ])("should maintain immutability", (obj, keys) => {
             const originalKeys = Object.keys(obj);
             const result = safeObjectPick(obj, keys);
@@ -301,7 +346,10 @@ describe("objectSafety.ts fuzzing tests", () => {
 
         test("should handle missing keys gracefully", () => {
             const obj = { existing: "value" };
-            const result = safeObjectPick(obj, ["existing", "missing"] as (keyof typeof obj)[]);
+            const result = safeObjectPick(obj, [
+                "existing",
+                "missing",
+            ] as (keyof typeof obj)[]);
 
             expect(result).toEqual({ existing: "value" });
             expect(Object.hasOwn(result, "missing")).toBeFalsy();
@@ -310,11 +358,14 @@ describe("objectSafety.ts fuzzing tests", () => {
 
     describe(typedObjectEntries, () => {
         test.prop([
-            fc.record({
-                str: fc.string(),
-                num: fc.integer(),
-                bool: fc.boolean()
-            }, { requiredKeys: [] })
+            fc.record(
+                {
+                    str: fc.string(),
+                    num: fc.integer(),
+                    bool: fc.boolean(),
+                },
+                { requiredKeys: [] }
+            ),
         ])("should return all object entries", (obj) => {
             const result = typedObjectEntries(obj);
             const expected = Object.entries(obj);
@@ -341,7 +392,7 @@ describe("objectSafety.ts fuzzing tests", () => {
             const symbolKey = Symbol("test");
             const obj = {
                 stringKey: "value",
-                [symbolKey]: "symbol value"
+                [symbolKey]: "symbol value",
             };
 
             const entries = typedObjectEntries(obj);
@@ -352,11 +403,14 @@ describe("objectSafety.ts fuzzing tests", () => {
 
     describe(typedObjectKeys, () => {
         test.prop([
-            fc.record({
-                a: fc.anything(),
-                b: fc.anything(),
-                c: fc.anything()
-            }, { requiredKeys: [] })
+            fc.record(
+                {
+                    a: fc.anything(),
+                    b: fc.anything(),
+                    c: fc.anything(),
+                },
+                { requiredKeys: [] }
+            ),
         ])("should return all object keys", (obj) => {
             const result = typedObjectKeys(obj);
             const expected = Object.keys(obj);
@@ -368,7 +422,7 @@ describe("objectSafety.ts fuzzing tests", () => {
             const symbolKey = Symbol("test");
             const obj = {
                 stringKey: "value",
-                [symbolKey]: "symbol value"
+                [symbolKey]: "symbol value",
             };
 
             const keys = typedObjectKeys(obj);
@@ -382,23 +436,26 @@ describe("objectSafety.ts fuzzing tests", () => {
                 // Add a non-enumerable property
                 Object.defineProperty(obj, "nonEnum", {
                     value: "test",
-                    enumerable: false
+                    enumerable: false,
                 });
 
                 const keys = typedObjectKeys(obj);
 
-                expect((keys as string[])).not.toContain("nonEnum");
+                expect(keys as string[]).not.toContain("nonEnum");
             }
         );
     });
 
     describe(typedObjectValues, () => {
         test.prop([
-            fc.record({
-                str: fc.string(),
-                num: fc.integer(),
-                bool: fc.boolean()
-            }, { requiredKeys: [] })
+            fc.record(
+                {
+                    str: fc.string(),
+                    num: fc.integer(),
+                    bool: fc.boolean(),
+                },
+                { requiredKeys: [] }
+            ),
         ])("should return all object values", (obj) => {
             const result = typedObjectValues(obj);
             const expected = Object.values(obj);
@@ -424,7 +481,7 @@ describe("objectSafety.ts fuzzing tests", () => {
             const symbolKey = Symbol("test");
             const obj = {
                 stringKey: "string value",
-                [symbolKey]: "symbol value"
+                [symbolKey]: "symbol value",
             };
 
             const values = typedObjectValues(obj);

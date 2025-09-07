@@ -382,9 +382,9 @@ describe("Monitoring Service Constants", () => {
 
             // Time intervals should also be integers (milliseconds/seconds)
             expect(Number.isInteger(MIN_CHECK_INTERVAL)).toBeTruthy();
-            expect(Number.isInteger(DEFAULT_MONITOR_TIMEOUT_SECONDS)).toBeTruthy(
-                
-            );
+            expect(
+                Number.isInteger(DEFAULT_MONITOR_TIMEOUT_SECONDS)
+            ).toBeTruthy();
             expect(Number.isInteger(MONITOR_TIMEOUT_BUFFER_MS)).toBeTruthy();
         });
     });

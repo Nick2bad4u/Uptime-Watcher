@@ -426,9 +426,9 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(download.blob).toBeInstanceOf(Blob);
             expect(download.url).toContain("test.json");
             expect(mockFileDownload.validateFilename("test.json")).toBeTruthy();
-            expect(mockFileDownload.validateFilename("invalid/file")).toBeFalsy(
-                
-            );
+            expect(
+                mockFileDownload.validateFilename("invalid/file")
+            ).toBeFalsy();
             expect(mockFileDownload.getFileExtension("test.json")).toBe("json");
         });
     });

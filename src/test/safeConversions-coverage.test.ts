@@ -1,6 +1,7 @@
 /**
- * @fileoverview Direct function call tests for safeConversions to ensure coverage
  * @module shared/utils/safeConversions.test
+ *
+ * @file Direct function call tests for safeConversions to ensure coverage
  */
 
 import { describe, expect, it } from "vitest";
@@ -14,7 +15,7 @@ import {
     safeParsePositiveInt,
     safeParseRetryAttempts,
     safeParseTimeout,
-    safeParseTimestamp
+    safeParseTimestamp,
 } from "@shared/utils/safeConversions";
 
 describe("safeConversions Direct Function Coverage", () => {

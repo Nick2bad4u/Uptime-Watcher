@@ -96,9 +96,9 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                             expect(result).toHaveProperty("sites");
                             expect(result).toHaveProperty("settings");
                             expect(Array.isArray(result.sites)).toBeTruthy();
-                            expect(typeof result.settings === "object").toBeTruthy(
-                                
-                            );
+                            expect(
+                                typeof result.settings === "object"
+                            ).toBeTruthy();
                         } catch (error) {
                             // Should throw meaningful errors, not crash
                             expect(error).toBeInstanceOf(Error);
@@ -338,7 +338,9 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                         expect(Array.isArray(parsed.sites)).toBeTruthy();
 
                         // Settings should be object
-                        expect(typeof parsed.settings === "object").toBeTruthy();
+                        expect(
+                            typeof parsed.settings === "object"
+                        ).toBeTruthy();
 
                         // Version should be string
                         expect(typeof parsed.version === "string").toBeTruthy();
@@ -427,9 +429,9 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                             expect(importResult.settings).toBeDefined();
 
                             // Sites should be an array
-                            expect(Array.isArray(importResult.sites)).toBeTruthy(
-                                
-                            );
+                            expect(
+                                Array.isArray(importResult.sites)
+                            ).toBeTruthy();
 
                             // Settings should be an object
                             expect(

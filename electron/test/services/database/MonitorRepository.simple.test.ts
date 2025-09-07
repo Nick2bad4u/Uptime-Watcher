@@ -411,8 +411,8 @@ describe("MonitorRepository Coverage Tests", () => {
                         enabled: fc.boolean(),
                         config: fc.record({
                             timeout: fc.integer({ min: 1000, max: 30_000 }),
-                            retries: fc.integer({ min: 0, max: 5 })
-                        })
+                            retries: fc.integer({ min: 0, max: 5 }),
+                        }),
                     }),
                     async (monitorData) => {
                         const { MonitorRepository } = await import(
@@ -425,27 +425,33 @@ describe("MonitorRepository Coverage Tests", () => {
                             });
 
                             // Mock successful database operations
-                            const mockRun = vi.fn().mockReturnValue({ changes: 1, lastInsertRowid: 1 });
+                            const mockRun = vi.fn().mockReturnValue({
+                                changes: 1,
+                                lastInsertRowid: 1,
+                            });
                             const mockGet = vi.fn().mockReturnValue({
                                 id: 1,
                                 ...monitorData,
                                 createdAt: Date.now(),
-                                updatedAt: Date.now()
+                                updatedAt: Date.now(),
                             });
 
                             mockDatabaseService.executeTransaction.mockImplementation(
-                                async (callback: any) => callback({
-                                    prepare: vi.fn(() => ({
-                                        run: mockRun,
-                                        get: mockGet,
-                                        finalize: vi.fn()
-                                    }))
-                                })
+                                async (callback: any) =>
+                                    callback({
+                                        prepare: vi.fn(() => ({
+                                            run: mockRun,
+                                            get: mockGet,
+                                            finalize: vi.fn(),
+                                        })),
+                                    })
                             );
 
                             // Should not throw for valid monitor data
                             expect(repository).toBeDefined();
-                            expect(typeof repository.createMonitor).toBe("function");
+                            expect(typeof repository.createMonitor).toBe(
+                                "function"
+                            );
                         } catch (error) {
                             expect(error).toBeInstanceOf(Error);
                         }
@@ -457,10 +463,10 @@ describe("MonitorRepository Coverage Tests", () => {
         it("should handle various monitor ID patterns", async () => {
             await fc.assert(
                 fc.asyncProperty(
-                    fc.array(
-                        fc.string({ minLength: 1, maxLength: 100 }),
-                        { minLength: 1, maxLength: 10 }
-                    ),
+                    fc.array(fc.string({ minLength: 1, maxLength: 100 }), {
+                        minLength: 1,
+                        maxLength: 10,
+                    }),
                     async (monitorIds) => {
                         const { MonitorRepository } = await import(
                             "../../../services/database/MonitorRepository"
@@ -480,24 +486,28 @@ describe("MonitorRepository Coverage Tests", () => {
                                             name: `Monitor ${monitorId}`,
                                             type: "http",
                                             url: "https://example.com",
-                                            enabled: true
+                                            enabled: true,
                                         }),
-                                        finalize: vi.fn()
-                                    }))
+                                        finalize: vi.fn(),
+                                    })),
                                 }));
 
-                                mockDatabaseService.getDatabase.mockReturnValue({
-                                    prepare: vi.fn(() => ({
-                                        get: vi.fn(),
-                                        all: vi.fn(),
-                                        run: vi.fn(),
-                                        finalize: vi.fn()
-                                    }))
-                                });
+                                mockDatabaseService.getDatabase.mockReturnValue(
+                                    {
+                                        prepare: vi.fn(() => ({
+                                            get: vi.fn(),
+                                            all: vi.fn(),
+                                            run: vi.fn(),
+                                            finalize: vi.fn(),
+                                        })),
+                                    }
+                                );
 
                                 // Should handle various ID formats
                                 expect(repository).toBeDefined();
-                                expect(typeof repository.getMonitorById).toBe("function");
+                                expect(typeof repository.getMonitorById).toBe(
+                                    "function"
+                                );
                             }
                         } catch (error) {
                             expect(error).toBeInstanceOf(Error);
@@ -512,14 +522,18 @@ describe("MonitorRepository Coverage Tests", () => {
                 fc.asyncProperty(
                     fc.oneof(
                         fc.constantFrom(
-                            "SQLITE_BUSY", "SQLITE_LOCKED", "SQLITE_CONSTRAINT",
-                            "SQLITE_READONLY", "SQLITE_IOERR", "SQLITE_CORRUPT"
+                            "SQLITE_BUSY",
+                            "SQLITE_LOCKED",
+                            "SQLITE_CONSTRAINT",
+                            "SQLITE_READONLY",
+                            "SQLITE_IOERR",
+                            "SQLITE_CORRUPT"
                         ),
                         fc.string({ minLength: 5, maxLength: 50 })
                     ),
                     fc.record({
                         id: fc.string({ minLength: 1, maxLength: 20 }),
-                        name: fc.string({ minLength: 1, maxLength: 50 })
+                        name: fc.string({ minLength: 1, maxLength: 50 }),
                     }),
                     async (errorType, monitorData) => {
                         const { MonitorRepository } = await import(
@@ -532,7 +546,9 @@ describe("MonitorRepository Coverage Tests", () => {
                             });
 
                             // Mock database error
-                            const dbError = new Error(`Mock ${errorType} error`);
+                            const dbError = new Error(
+                                `Mock ${errorType} error`
+                            );
                             (dbError as any).code = errorType;
 
                             mockDatabaseService.executeTransaction.mockImplementation(
@@ -546,7 +562,9 @@ describe("MonitorRepository Coverage Tests", () => {
 
                             // Test error handling in database operations
                             try {
-                                await repository.createMonitor(monitorData as any);
+                                await repository.createMonitor(
+                                    monitorData as any
+                                );
                             } catch (error) {
                                 expect(error).toBeInstanceOf(Error);
                             }
@@ -571,13 +589,13 @@ describe("MonitorRepository Coverage Tests", () => {
                             fc.constant({}),
                             fc.record({
                                 "User-Agent": fc.string({ maxLength: 100 }),
-                                "Authorization": fc.string({ maxLength: 200 })
+                                Authorization: fc.string({ maxLength: 200 }),
                             })
                         ),
                         expectedStatus: fc.oneof(
                             fc.constant(200),
                             fc.integer({ min: 100, max: 599 })
-                        )
+                        ),
                     }),
                     async (config) => {
                         const { MonitorRepository } = await import(
@@ -592,14 +610,16 @@ describe("MonitorRepository Coverage Tests", () => {
                             // Mock successful config handling
                             mockDatabaseService.getDatabase.mockReturnValue({
                                 prepare: vi.fn(() => ({
-                                    run: vi.fn().mockReturnValue({ changes: 1 }),
+                                    run: vi
+                                        .fn()
+                                        .mockReturnValue({ changes: 1 }),
                                     get: vi.fn().mockReturnValue({
                                         id: "test-monitor",
-                                        config: JSON.stringify(config)
+                                        config: JSON.stringify(config),
                                     }),
                                     all: vi.fn().mockReturnValue([]),
-                                    finalize: vi.fn()
-                                }))
+                                    finalize: vi.fn(),
+                                })),
                             });
 
                             // Configuration should be handled properly
@@ -622,10 +642,18 @@ describe("MonitorRepository Coverage Tests", () => {
                 fc.asyncProperty(
                     fc.array(
                         fc.record({
-                            monitorId: fc.string({ minLength: 1, maxLength: 50 }),
+                            monitorId: fc.string({
+                                minLength: 1,
+                                maxLength: 50,
+                            }),
                             enabled: fc.boolean(),
                             lastCheck: fc.integer({ min: 0, max: Date.now() }),
-                            status: fc.constantFrom("up", "down", "pending", "unknown")
+                            status: fc.constantFrom(
+                                "up",
+                                "down",
+                                "pending",
+                                "unknown"
+                            ),
                         }),
                         { minLength: 1, maxLength: 8 }
                     ),
@@ -642,27 +670,39 @@ describe("MonitorRepository Coverage Tests", () => {
                             for (const state of monitorStates) {
                                 // Mock state updates
                                 mockDatabaseService.executeTransaction.mockImplementation(
-                                    async (callback: any) => callback({
-                                        prepare: vi.fn(() => ({
-                                            run: vi.fn().mockReturnValue({ changes: 1 }),
-                                            get: vi.fn().mockReturnValue({
-                                                id: state.monitorId,
-                                                enabled: state.enabled,
-                                                status: state.status,
-                                                lastCheck: state.lastCheck
-                                            }),
-                                            finalize: vi.fn()
-                                        }))
-                                    })
+                                    async (callback: any) =>
+                                        callback({
+                                            prepare: vi.fn(() => ({
+                                                run: vi.fn().mockReturnValue({
+                                                    changes: 1,
+                                                }),
+                                                get: vi.fn().mockReturnValue({
+                                                    id: state.monitorId,
+                                                    enabled: state.enabled,
+                                                    status: state.status,
+                                                    lastCheck: state.lastCheck,
+                                                }),
+                                                finalize: vi.fn(),
+                                            })),
+                                        })
                                 );
 
                                 expect(repository).toBeDefined();
-                                expect(typeof repository.updateMonitor).toBe("function");
+                                expect(typeof repository.updateMonitor).toBe(
+                                    "function"
+                                );
 
                                 // Validate state values
                                 expect(typeof state.enabled).toBe("boolean");
-                                expect(["up", "down", "pending", "unknown"]).toContain(state.status);
-                                expect(state.lastCheck).toBeGreaterThanOrEqual(0);
+                                expect([
+                                    "up",
+                                    "down",
+                                    "pending",
+                                    "unknown",
+                                ]).toContain(state.status);
+                                expect(state.lastCheck).toBeGreaterThanOrEqual(
+                                    0
+                                );
                             }
                         } catch (error) {
                             expect(error).toBeInstanceOf(Error);
@@ -692,13 +732,19 @@ describe("MonitorRepository Coverage Tests", () => {
 
                             // Check for expected methods (these might not all exist)
                             const expectedMethods = [
-                                "createMonitor", "updateMonitor", "deleteMonitor",
-                                "getMonitorById", "getAllMonitors", "getActiveMonitors"
+                                "createMonitor",
+                                "updateMonitor",
+                                "deleteMonitor",
+                                "getMonitorById",
+                                "getAllMonitors",
+                                "getActiveMonitors",
                             ];
 
                             for (const methodName of expectedMethods) {
                                 if (methodName in repository) {
-                                    expect(typeof (repository as any)[methodName]).toBe("function");
+                                    expect(
+                                        typeof (repository as any)[methodName]
+                                    ).toBe("function");
                                 }
                             }
                         } catch (error) {

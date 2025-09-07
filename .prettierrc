@@ -91,6 +91,15 @@
             "options": {
                 "requirePragma": true
             }
+        },
+        {
+            "files": "historyManipulation.test.ts, cache.test.ts",
+            "options": {
+                "plugins": [
+                    "prettier-plugin-multiline-arrays",
+                    "prettier-plugin-jsdoc"
+                ]
+            }
         }
     ],
     "plugins": [

@@ -1,7 +1,7 @@
 /**
  * @file Comprehensive tests for historyManipulation utility functions Testing
- *   all database manipulation functions with proper mocking
- * Enhanced with property-based testing for robust data validation coverage
+ *   all database manipulation functions with proper mocking Enhanced with
+ *   property-based testing for robust data validation coverage
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
@@ -32,20 +32,27 @@ vi.mock("../../../../utils/logger", () => ({
 }));
 
 vi.mock("../../../../../shared/utils/logTemplates", () => ({
-    interpolateLogTemplate: vi.fn(
-        (template, data) => template.replaceAll(/{(?<key>\w+)}/g, (match, key) => String(data[key] ?? match))
+    interpolateLogTemplate: vi.fn((template, data) =>
+        template.replaceAll(/{(?<key>\w+)}/g, (match, key) =>
+            String(data[key] ?? match)
+        )
     ),
     LOG_TEMPLATES: {
         debug: {
-            HISTORY_ENTRY_ADDED: "[HistoryManipulation] Added history entry for monitor: {monitorId} - Status: {status}",
+            HISTORY_ENTRY_ADDED:
+                "[HistoryManipulation] Added history entry for monitor: {monitorId} - Status: {status}",
         },
         services: {
-            HISTORY_BULK_INSERT: "[HistoryManipulation] Bulk inserted {count} history entries for monitor: {monitorId}",
+            HISTORY_BULK_INSERT:
+                "[HistoryManipulation] Bulk inserted {count} history entries for monitor: {monitorId}",
         },
         errors: {
-            HISTORY_ADD_FAILED: "[HistoryManipulation] Failed to add history entry for monitor: {monitorId}",
-            HISTORY_BULK_INSERT_FAILED: "[HistoryManipulation] Failed to bulk insert history for monitor: {monitorId}",
-            HISTORY_PRUNE_FAILED: "[HistoryManipulation] Failed to prune history for monitor: {monitorId}",
+            HISTORY_ADD_FAILED:
+                "[HistoryManipulation] Failed to add history entry for monitor: {monitorId}",
+            HISTORY_BULK_INSERT_FAILED:
+                "[HistoryManipulation] Failed to bulk insert history for monitor: {monitorId}",
+            HISTORY_PRUNE_FAILED:
+                "[HistoryManipulation] Failed to prune history for monitor: {monitorId}",
         },
     },
 }));
@@ -168,7 +175,7 @@ describe("History Manipulation Utilities", () => {
 
             // Assert
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                '[HistoryManipulation] Added history entry for monitor: test-monitor-123 - Status: up'
+                "[HistoryManipulation] Added history entry for monitor: test-monitor-123 - Status: up"
             );
         });
 
@@ -213,7 +220,7 @@ describe("History Manipulation Utilities", () => {
             ).toThrow("Database connection failed");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                '[HistoryManipulation] Failed to add history entry for monitor: test-monitor-123',
+                "[HistoryManipulation] Failed to add history entry for monitor: test-monitor-123",
                 dbError
             );
         });
@@ -243,66 +250,84 @@ describe("History Manipulation Utilities", () => {
                 }
             );
 
-            test.prop([fc.record({
-                timestamp: fc.integer({ min: 0, max: Date.now() + 1_000_000 }),
-                status: fc.constantFrom("up", "down"),
-                responseTime: fc.integer({ min: -1, max: 30_000 })
-            })])(
-                "should handle various history entries",
-                (historyEntry) => {
-                    // Arrange
-                    mockDb.run = vi.fn();
-                    mockIsDev.mockReturnValue(false);
+            test.prop([
+                fc.record({
+                    timestamp: fc.integer({
+                        min: 0,
+                        max: Date.now() + 1_000_000,
+                    }),
+                    status: fc.constantFrom("up", "down"),
+                    responseTime: fc.integer({ min: -1, max: 30_000 }),
+                }),
+            ])("should handle various history entries", (historyEntry) => {
+                // Arrange
+                mockDb.run = vi.fn();
+                mockIsDev.mockReturnValue(false);
 
-                    // Act
-                    addHistoryEntry(mockDb, monitorId, historyEntry);
+                // Act
+                addHistoryEntry(mockDb, monitorId, historyEntry);
 
-                    // Assert
-                    expect(mockDb.run).toHaveBeenCalledWith(
-                        "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
-                        [
-                            monitorId,
-                            historyEntry.timestamp,
-                            historyEntry.status,
-                            historyEntry.responseTime,
-                            null,
-                        ]
-                    );
-                }
-            );
+                // Assert
+                expect(mockDb.run).toHaveBeenCalledWith(
+                    "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
+                    [
+                        monitorId,
+                        historyEntry.timestamp,
+                        historyEntry.status,
+                        historyEntry.responseTime,
+                        null,
+                    ]
+                );
+            });
 
-            test.prop([fc.oneof(fc.string(), fc.constant(null), fc.constant(undefined))])(
-                "should handle various details values",
-                (details) => {
-                    // Arrange
-                    mockDb.run = vi.fn();
-                    mockIsDev.mockReturnValue(false);
-                    const expectedDetails = details === undefined ? null : details;
+            test.prop([
+                fc.oneof(
+                    fc.string(),
+                    fc.constant(null),
+                    fc.constant(undefined)
+                ),
+            ])("should handle various details values", (details) => {
+                // Arrange
+                mockDb.run = vi.fn();
+                mockIsDev.mockReturnValue(false);
+                const expectedDetails = details === undefined ? null : details;
 
-                    // Act
-                    addHistoryEntry(mockDb, monitorId, sampleStatusHistory, details as string);
+                // Act
+                addHistoryEntry(
+                    mockDb,
+                    monitorId,
+                    sampleStatusHistory,
+                    details as string
+                );
 
-                    // Assert
-                    expect(mockDb.run).toHaveBeenCalledWith(
-                        "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
-                        [
-                            monitorId,
-                            sampleStatusHistory.timestamp,
-                            sampleStatusHistory.status,
-                            sampleStatusHistory.responseTime,
-                            expectedDetails,
-                        ]
-                    );
-                }
-            );
+                // Assert
+                expect(mockDb.run).toHaveBeenCalledWith(
+                    "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
+                    [
+                        monitorId,
+                        sampleStatusHistory.timestamp,
+                        sampleStatusHistory.status,
+                        sampleStatusHistory.responseTime,
+                        expectedDetails,
+                    ]
+                );
+            });
 
-            test.prop([fc.array(fc.record({
-                monitorId: fc.string({ minLength: 1, maxLength: 30 }),
-                timestamp: fc.integer({ min: 0, max: Date.now() }),
-                status: fc.constantFrom("up", "down"),
-                responseTime: fc.integer({ min: -1, max: 30_000 }),
-                details: fc.oneof(fc.string({ maxLength: 100 }), fc.constant(null))
-            }), { minLength: 1, maxLength: 10 })])(
+            test.prop([
+                fc.array(
+                    fc.record({
+                        monitorId: fc.string({ minLength: 1, maxLength: 30 }),
+                        timestamp: fc.integer({ min: 0, max: Date.now() }),
+                        status: fc.constantFrom("up", "down"),
+                        responseTime: fc.integer({ min: -1, max: 30_000 }),
+                        details: fc.oneof(
+                            fc.string({ maxLength: 100 }),
+                            fc.constant(null)
+                        ),
+                    }),
+                    { minLength: 1, maxLength: 10 }
+                ),
+            ])(
                 "should handle multiple sequential history additions",
                 (historyBatch) => {
                     // Arrange
@@ -311,15 +336,22 @@ describe("History Manipulation Utilities", () => {
 
                     // Act
                     for (const entry of historyBatch) {
-                        addHistoryEntry(mockDb, entry.monitorId, {
-                            timestamp: entry.timestamp,
-                            status: entry.status,
-                            responseTime: entry.responseTime
-                        }, entry.details ?? undefined);
+                        addHistoryEntry(
+                            mockDb,
+                            entry.monitorId,
+                            {
+                                timestamp: entry.timestamp,
+                                status: entry.status,
+                                responseTime: entry.responseTime,
+                            },
+                            entry.details ?? undefined
+                        );
                     }
 
                     // Assert
-                    expect(mockDb.run).toHaveBeenCalledTimes(historyBatch.length);
+                    expect(mockDb.run).toHaveBeenCalledTimes(
+                        historyBatch.length
+                    );
 
                     for (const [index, entry] of historyBatch.entries()) {
                         expect(mockDb.run).toHaveBeenNthCalledWith(
@@ -412,7 +444,7 @@ describe("History Manipulation Utilities", () => {
 
             expect(mockStmt.finalize).toHaveBeenCalledTimes(1);
             expect(mockLogger.info).toHaveBeenCalledWith(
-                '[HistoryManipulation] Bulk inserted 3 history entries for monitor: test-monitor-123'
+                "[HistoryManipulation] Bulk inserted 3 history entries for monitor: test-monitor-123"
             );
         });
 
@@ -443,7 +475,7 @@ describe("History Manipulation Utilities", () => {
 
             expect(mockStmt.finalize).toHaveBeenCalledTimes(1);
             expect(mockLogger.error).toHaveBeenCalledWith(
-                '[HistoryManipulation] Failed to bulk insert history for monitor: test-monitor-123',
+                "[HistoryManipulation] Failed to bulk insert history for monitor: test-monitor-123",
                 runError
             );
         });
@@ -470,7 +502,7 @@ describe("History Manipulation Utilities", () => {
             ).toThrow("Failed to prepare statement");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                '[HistoryManipulation] Failed to bulk insert history for monitor: test-monitor-123',
+                "[HistoryManipulation] Failed to bulk insert history for monitor: test-monitor-123",
                 prepareError
             );
         });
@@ -478,18 +510,21 @@ describe("History Manipulation Utilities", () => {
         describe("Property-Based bulkInsertHistory Tests", () => {
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
-                fc.array(fc.record({
-                    timestamp: fc.integer({ min: 0, max: Date.now() }),
-                    status: fc.constantFrom("up", "down"),
-                    responseTime: fc.integer({ min: -1, max: 60_000 })
-                }), { minLength: 1, maxLength: 20 })
+                fc.array(
+                    fc.record({
+                        timestamp: fc.integer({ min: 0, max: Date.now() }),
+                        status: fc.constantFrom("up", "down"),
+                        responseTime: fc.integer({ min: -1, max: 60_000 }),
+                    }),
+                    { minLength: 1, maxLength: 20 }
+                ),
             ])(
                 "should handle bulk insert with various data",
                 (monitorId, historyEntries) => {
                     // Arrange
                     const mockPrepare = vi.fn().mockReturnValue({
                         run: vi.fn(),
-                        finalize: vi.fn()
+                        finalize: vi.fn(),
                     });
                     mockDb.prepare = mockPrepare;
                     mockIsDev.mockReturnValue(false);
@@ -501,14 +536,16 @@ describe("History Manipulation Utilities", () => {
                     expect(mockPrepare).toHaveBeenCalledWith(
                         "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)"
                     );
-                    expect(mockPrepare().run).toHaveBeenCalledTimes(historyEntries.length);
+                    expect(mockPrepare().run).toHaveBeenCalledTimes(
+                        historyEntries.length
+                    );
                     expect(mockPrepare().finalize).toHaveBeenCalledTimes(1);
                 }
             );
 
             test.prop([
                 fc.string({ minLength: 1, maxLength: 30 }),
-                fc.integer({ min: 0, max: 100 })
+                fc.integer({ min: 0, max: 100 }),
             ])(
                 "should handle bulk insert with empty arrays",
                 (monitorId, emptyArraySize) => {
@@ -529,25 +566,31 @@ describe("History Manipulation Utilities", () => {
 
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
-                fc.array(fc.record({
-                    timestamp: fc.oneof(
-                        fc.integer({ min: 0, max: Date.now() }),
-                        fc.integer({ min: -1_000_000, max: 0 }), // Negative timestamps
-                        fc.integer({ min: Date.now(), max: Date.now() + 1_000_000 }) // Future timestamps
-                    ),
-                    status: fc.constantFrom("up", "down"),
-                    responseTime: fc.oneof(
-                        fc.integer({ min: -1, max: 10 }),
-                        fc.integer({ min: 30_000, max: 300_000 }) // Very high response times
-                    )
-                }), { minLength: 1, maxLength: 5 })
+                fc.array(
+                    fc.record({
+                        timestamp: fc.oneof(
+                            fc.integer({ min: 0, max: Date.now() }),
+                            fc.integer({ min: -1_000_000, max: 0 }), // Negative timestamps
+                            fc.integer({
+                                min: Date.now(),
+                                max: Date.now() + 1_000_000,
+                            }) // Future timestamps
+                        ),
+                        status: fc.constantFrom("up", "down"),
+                        responseTime: fc.oneof(
+                            fc.integer({ min: -1, max: 10 }),
+                            fc.integer({ min: 30_000, max: 300_000 }) // Very high response times
+                        ),
+                    }),
+                    { minLength: 1, maxLength: 5 }
+                ),
             ])(
                 "should handle edge case timestamps and response times",
                 (monitorId, historyEntries) => {
                     // Arrange
                     const mockStatement = {
                         run: vi.fn(),
-                        finalize: vi.fn()
+                        finalize: vi.fn(),
                     };
                     const mockPrepare = vi.fn().mockReturnValue(mockStatement);
                     mockDb.prepare = mockPrepare;
@@ -557,12 +600,20 @@ describe("History Manipulation Utilities", () => {
                     bulkInsertHistory(mockDb, monitorId, historyEntries);
 
                     // Assert
-                    expect(mockStatement.run).toHaveBeenCalledTimes(historyEntries.length);
+                    expect(mockStatement.run).toHaveBeenCalledTimes(
+                        historyEntries.length
+                    );
 
                     for (const [index, entry] of historyEntries.entries()) {
                         expect(mockStatement.run).toHaveBeenNthCalledWith(
                             index + 1,
-                            [monitorId, entry.timestamp, entry.status, entry.responseTime, null]
+                            [
+                                monitorId,
+                                entry.timestamp,
+                                entry.status,
+                                entry.responseTime,
+                                null,
+                            ]
                         );
                     }
                 }
@@ -570,18 +621,21 @@ describe("History Manipulation Utilities", () => {
 
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
-                fc.array(fc.record({
-                    timestamp: fc.integer({ min: 0, max: Date.now() }),
-                    status: fc.constantFrom("up", "down"),
-                    responseTime: fc.integer({ min: 0, max: 5000 })
-                }), { minLength: 50, maxLength: 200 })
+                fc.array(
+                    fc.record({
+                        timestamp: fc.integer({ min: 0, max: Date.now() }),
+                        status: fc.constantFrom("up", "down"),
+                        responseTime: fc.integer({ min: 0, max: 5000 }),
+                    }),
+                    { minLength: 50, maxLength: 200 }
+                ),
             ])(
                 "should handle large bulk inserts efficiently",
                 (monitorId, largeHistoryArray) => {
                     // Arrange
                     const mockStatement = {
                         run: vi.fn(),
-                        finalize: vi.fn()
+                        finalize: vi.fn(),
                     };
                     const mockPrepare = vi.fn().mockReturnValue(mockStatement);
                     mockDb.prepare = mockPrepare;
@@ -594,7 +648,9 @@ describe("History Manipulation Utilities", () => {
 
                     // Assert
                     expect(mockPrepare).toHaveBeenCalledTimes(1);
-                    expect(mockStatement.run).toHaveBeenCalledTimes(largeHistoryArray.length);
+                    expect(mockStatement.run).toHaveBeenCalledTimes(
+                        largeHistoryArray.length
+                    );
                     expect(mockStatement.finalize).toHaveBeenCalledTimes(1);
 
                     // Performance assertion - should complete quickly
@@ -604,18 +660,21 @@ describe("History Manipulation Utilities", () => {
 
             test.prop([
                 fc.string({ minLength: 1, maxLength: 30 }),
-                fc.array(fc.record({
-                    timestamp: fc.integer({ min: 0, max: Date.now() }),
-                    status: fc.constantFrom("up", "down"),
-                    responseTime: fc.integer({ min: 0, max: 10_000 })
-                }), { minLength: 1, maxLength: 10 })
+                fc.array(
+                    fc.record({
+                        timestamp: fc.integer({ min: 0, max: Date.now() }),
+                        status: fc.constantFrom("up", "down"),
+                        responseTime: fc.integer({ min: 0, max: 10_000 }),
+                    }),
+                    { minLength: 1, maxLength: 10 }
+                ),
             ])(
                 "should properly clean up prepared statements",
                 (monitorId, historyEntries) => {
                     // Arrange
                     const mockStatement = {
                         run: vi.fn(),
-                        finalize: vi.fn()
+                        finalize: vi.fn(),
                     };
                     const mockPrepare = vi.fn().mockReturnValue(mockStatement);
                     mockDb.prepare = mockPrepare;
@@ -769,7 +828,7 @@ describe("History Manipulation Utilities", () => {
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                '[HistoryManipulation] Failed to prune history for monitor: test-monitor-123',
+                "[HistoryManipulation] Failed to prune history for monitor: test-monitor-123",
                 dbError
             );
         });
@@ -795,7 +854,7 @@ describe("History Manipulation Utilities", () => {
 
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
-                fc.boolean()
+                fc.boolean(),
             ])(
                 "should handle debug logging based on environment",
                 (testMonitorId, isDevEnvironment) => {
@@ -825,7 +884,7 @@ describe("History Manipulation Utilities", () => {
                     fc.constant("Monitor not found"),
                     fc.constant("Constraint violation"),
                     fc.string({ minLength: 5, maxLength: 100 })
-                )
+                ),
             ])(
                 "should handle various database errors",
                 (testMonitorId, errorMessage) => {
@@ -837,7 +896,9 @@ describe("History Manipulation Utilities", () => {
                     mockLogger.error = vi.fn();
 
                     // Act & Assert
-                    expect(() => deleteHistoryByMonitorId(mockDb, testMonitorId)).toThrow(errorMessage);
+                    expect(() =>
+                        deleteHistoryByMonitorId(mockDb, testMonitorId)
+                    ).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
                         `[HistoryManipulation] Failed to prune history for monitor: ${testMonitorId}`,
@@ -847,7 +908,10 @@ describe("History Manipulation Utilities", () => {
             );
 
             test.prop([
-                fc.array(fc.string({ minLength: 1, maxLength: 30 }), { minLength: 1, maxLength: 10 })
+                fc.array(fc.string({ minLength: 1, maxLength: 30 }), {
+                    minLength: 1,
+                    maxLength: 10,
+                }),
             ])(
                 "should handle sequential deletions for multiple monitors",
                 (monitorIds) => {
@@ -1061,7 +1125,7 @@ describe("History Manipulation Utilities", () => {
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                '[HistoryManipulation] Failed to prune history for monitor: test-monitor-123',
+                "[HistoryManipulation] Failed to prune history for monitor: test-monitor-123",
                 selectError
             );
         });
@@ -1090,7 +1154,7 @@ describe("History Manipulation Utilities", () => {
             );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                '[HistoryManipulation] Failed to prune history for monitor: test-monitor-123',
+                "[HistoryManipulation] Failed to prune history for monitor: test-monitor-123",
                 deleteError
             );
         });
@@ -1098,7 +1162,7 @@ describe("History Manipulation Utilities", () => {
         describe("Property-Based pruneHistoryForMonitor Tests", () => {
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
-                fc.integer({ min: 0, max: 5 })
+                fc.integer({ min: 0, max: 5 }),
             ])(
                 "should handle zero and small positive limits correctly",
                 (testMonitorId, limit) => {
@@ -1129,18 +1193,21 @@ describe("History Manipulation Utilities", () => {
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
                 fc.integer({ min: 1, max: 100 }),
-                fc.array(fc.record({
-                    id: fc.oneof(
-                        fc.integer({ min: 1, max: 1000 }),
-                        fc.constant(null),
-                        fc.constant(undefined),
-                        fc.constant(0),
-                        fc.integer({ min: -1000, max: -1 }),
-                        fc.constant(Number.POSITIVE_INFINITY),
-                        fc.constant(Number.NEGATIVE_INFINITY),
-                        fc.constant(Number.NaN)
-                    )
-                }), { minLength: 1, maxLength: 20 })
+                fc.array(
+                    fc.record({
+                        id: fc.oneof(
+                            fc.integer({ min: 1, max: 1000 }),
+                            fc.constant(null),
+                            fc.constant(undefined),
+                            fc.constant(0),
+                            fc.integer({ min: -1000, max: -1 }),
+                            fc.constant(Number.POSITIVE_INFINITY),
+                            fc.constant(Number.NEGATIVE_INFINITY),
+                            fc.constant(Number.NaN)
+                        ),
+                    }),
+                    { minLength: 1, maxLength: 20 }
+                ),
             ])(
                 "should filter out invalid IDs and only delete valid ones",
                 (testMonitorId, limit, historyEntries) => {
@@ -1151,15 +1218,20 @@ describe("History Manipulation Utilities", () => {
 
                     // Calculate expected valid IDs
                     const validIds = historyEntries
-                        .map(entry => entry.id)
-                        .filter(id => typeof id === 'number' && Number.isFinite(id) && id > 0);
+                        .map((entry) => entry.id)
+                        .filter(
+                            (id) =>
+                                typeof id === "number" &&
+                                Number.isFinite(id) &&
+                                id > 0
+                        );
 
                     // Act
                     pruneHistoryForMonitor(mockDb, testMonitorId, limit);
 
                     // Assert
                     if (validIds.length > 0) {
-                        const placeholders = validIds.map(() => '?').join(',');
+                        const placeholders = validIds.map(() => "?").join(",");
                         expect(mockDb.run).toHaveBeenCalledWith(
                             `DELETE FROM history WHERE id IN (${placeholders})`,
                             validIds
@@ -1174,12 +1246,16 @@ describe("History Manipulation Utilities", () => {
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
                 fc.integer({ min: 1, max: 50 }),
-                fc.boolean()
+                fc.boolean(),
             ])(
                 "should handle debug logging based on environment",
                 (testMonitorId, limit, isDevEnvironment) => {
                     // Arrange
-                    const validEntries = [{ id: 1 }, { id: 2 }, { id: 3 }];
+                    const validEntries = [
+                        { id: 1 },
+                        { id: 2 },
+                        { id: 3 },
+                    ];
                     mockDb.all = vi.fn().mockReturnValue(validEntries);
                     mockDb.run = vi.fn();
                     mockIsDev.mockReturnValue(isDevEnvironment);
@@ -1207,7 +1283,7 @@ describe("History Manipulation Utilities", () => {
                     fc.constant("Table not found"),
                     fc.constant("Permission denied"),
                     fc.string({ minLength: 5, maxLength: 100 })
-                )
+                ),
             ])(
                 "should handle various database errors during selection",
                 (testMonitorId, limit, errorMessage) => {
@@ -1219,7 +1295,9 @@ describe("History Manipulation Utilities", () => {
                     mockLogger.error = vi.fn();
 
                     // Act & Assert
-                    expect(() => pruneHistoryForMonitor(mockDb, testMonitorId, limit)).toThrow(errorMessage);
+                    expect(() =>
+                        pruneHistoryForMonitor(mockDb, testMonitorId, limit)
+                    ).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
                         `[HistoryManipulation] Failed to prune history for monitor: ${testMonitorId}`,
@@ -1231,13 +1309,16 @@ describe("History Manipulation Utilities", () => {
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
                 fc.integer({ min: 1, max: 20 }),
-                fc.array(fc.record({ id: fc.integer({ min: 1, max: 1000 }) }), { minLength: 1, maxLength: 10 }),
+                fc.array(fc.record({ id: fc.integer({ min: 1, max: 1000 }) }), {
+                    minLength: 1,
+                    maxLength: 10,
+                }),
                 fc.oneof(
                     fc.constant("Cannot delete from history table"),
                     fc.constant("Foreign key constraint"),
                     fc.constant("Database locked"),
                     fc.string({ minLength: 5, maxLength: 100 })
-                )
+                ),
             ])(
                 "should handle various database errors during deletion",
                 (testMonitorId, limit, validEntries, errorMessage) => {
@@ -1250,7 +1331,9 @@ describe("History Manipulation Utilities", () => {
                     mockLogger.error = vi.fn();
 
                     // Act & Assert
-                    expect(() => pruneHistoryForMonitor(mockDb, testMonitorId, limit)).toThrow(errorMessage);
+                    expect(() =>
+                        pruneHistoryForMonitor(mockDb, testMonitorId, limit)
+                    ).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
                         `[HistoryManipulation] Failed to prune history for monitor: ${testMonitorId}`,
@@ -1261,7 +1344,7 @@ describe("History Manipulation Utilities", () => {
 
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
-                fc.integer({ min: 10, max: 1000 })
+                fc.integer({ min: 10, max: 1000 }),
             ])(
                 "should handle large limit values efficiently",
                 (testMonitorId, largeLimit) => {

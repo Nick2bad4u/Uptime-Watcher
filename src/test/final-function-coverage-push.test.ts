@@ -160,7 +160,9 @@ describe("Final Function Coverage Push", () => {
         expect(typeGuards.isNumber(Number.NaN)).toBeFalsy();
 
         // Test hasProperties
-        expect(typeGuards.hasProperties({ a: 1, b: 2 }, ["a", "b"])).toBeTruthy();
+        expect(
+            typeGuards.hasProperties({ a: 1, b: 2 }, ["a", "b"])
+        ).toBeTruthy();
         expect(typeGuards.hasProperties({ a: 1 }, ["a", "b"])).toBeFalsy();
         expect(typeGuards.hasProperties(null, ["a"])).toBeFalsy();
 

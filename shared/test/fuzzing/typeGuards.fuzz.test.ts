@@ -2,8 +2,9 @@
  * Comprehensive fast-check fuzzing tests for typeGuards utilities.
  *
  * @remarks
- * These property-based tests use fast-check to systematically explore edge cases
- * and verify type guard invariants across all possible JavaScript values.
+ * These property-based tests use fast-check to systematically explore edge
+ * cases and verify type guard invariants across all possible JavaScript
+ * values.
  *
  * @packageDocumentation
  */
@@ -87,8 +88,7 @@ describe("TypeGuards Fuzzing Tests", () => {
                     expect(Number.isNaN(value)).toBeFalsy();
                 } else {
                     const isValidFalse =
-                        typeof value !== "number" ||
-                        Number.isNaN(value);
+                        typeof value !== "number" || Number.isNaN(value);
                     expect(isValidFalse).toBeTruthy();
                 }
             }
@@ -118,7 +118,7 @@ describe("TypeGuards Fuzzing Tests", () => {
     describe(hasProperties, () => {
         test.prop([
             fc.anything(),
-            fc.array(fc.oneof(fc.string(), fc.constantFrom(Symbol("test"))))
+            fc.array(fc.oneof(fc.string(), fc.constantFrom(Symbol("test")))),
         ])(
             "should return true only when object has all specified properties",
             (value, properties) => {
@@ -131,12 +131,16 @@ describe("TypeGuards Fuzzing Tests", () => {
                     // If hasProperties returns true, value must be object with all props
                     expect(isObject(value)).toBeTruthy();
                     for (const prop of properties) {
-                        expect(Object.hasOwn(value as object, prop)).toBeTruthy();
+                        expect(
+                            Object.hasOwn(value as object, prop)
+                        ).toBeTruthy();
                     }
                 }
 
                 if (isObject(value)) {
-                    const allPropsExist = properties.every(prop => Object.hasOwn(value, prop));
+                    const allPropsExist = properties.every((prop) =>
+                        Object.hasOwn(value, prop)
+                    );
                     expect(result).toBe(allPropsExist);
                 } else {
                     // If value is not an object, result should always be false
@@ -150,7 +154,10 @@ describe("TypeGuards Fuzzing Tests", () => {
             (obj) => {
                 const existingProps = Object.keys(obj);
                 if (existingProps.length > 0) {
-                    const someProps = existingProps.slice(0, Math.min(3, existingProps.length));
+                    const someProps = existingProps.slice(
+                        0,
+                        Math.min(3, existingProps.length)
+                    );
                     expect(hasProperties(obj, someProps)).toBeTruthy();
                 }
             }
@@ -173,7 +180,9 @@ describe("TypeGuards Fuzzing Tests", () => {
 
                 if (result) {
                     expect(isObject(value)).toBeTruthy();
-                    expect(Object.hasOwn(value as object, property)).toBeTruthy();
+                    expect(
+                        Object.hasOwn(value as object, property)
+                    ).toBeTruthy();
                 } else {
                     // If not has property, either not an object or property doesn't exist
                     const isValidFalse =
@@ -214,7 +223,8 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.array(fc.string())])(
             "should validate array items when validator provided",
             (stringArray) => {
-                const isStringValidator = (item: unknown): item is string => typeof item === "string";
+                const isStringValidator = (item: unknown): item is string =>
+                    typeof item === "string";
                 expect(isArray(stringArray, isStringValidator)).toBeTruthy();
             }
         );
@@ -222,8 +232,9 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.array(fc.oneof(fc.string(), fc.integer()))])(
             "should return false when items don't match validator",
             (mixedArray) => {
-                fc.pre(mixedArray.some(item => typeof item !== "string")); // Ensure mixed types
-                const isStringValidator = (item: unknown): item is string => typeof item === "string";
+                fc.pre(mixedArray.some((item) => typeof item !== "string")); // Ensure mixed types
+                const isStringValidator = (item: unknown): item is string =>
+                    typeof item === "string";
                 expect(isArray(mixedArray, isStringValidator)).toBeFalsy();
             }
         );
@@ -287,16 +298,15 @@ describe("TypeGuards Fuzzing Tests", () => {
             }
         );
 
-        test.prop([fc.oneof(
-            fc.constant(new Error("test")),
-            fc.constant(new TypeError("test")),
-            fc.constant(new RangeError("test"))
-        )])(
-            "should return true for all Error types",
-            (error) => {
-                expect(isError(error)).toBeTruthy();
-            }
-        );
+        test.prop([
+            fc.oneof(
+                fc.constant(new Error("test")),
+                fc.constant(new TypeError("test")),
+                fc.constant(new RangeError("test"))
+            ),
+        ])("should return true for all Error types", (error) => {
+            expect(isError(error)).toBeTruthy();
+        });
     });
 
     describe(isFiniteNumber, () => {
@@ -320,13 +330,12 @@ describe("TypeGuards Fuzzing Tests", () => {
             }
         );
 
-        test.prop([fc.float({ min: Math.fround(-1e10), max: Math.fround(1e10) })])(
-            "should return true for finite numbers",
-            (finiteNum) => {
-                fc.pre(Number.isFinite(finiteNum) && !Number.isNaN(finiteNum));
-                expect(isFiniteNumber(finiteNum)).toBeTruthy();
-            }
-        );
+        test.prop([
+            fc.float({ min: Math.fround(-1e10), max: Math.fround(1e10) }),
+        ])("should return true for finite numbers", (finiteNum) => {
+            fc.pre(Number.isFinite(finiteNum) && !Number.isNaN(finiteNum));
+            expect(isFiniteNumber(finiteNum)).toBeTruthy();
+        });
 
         test.prop([fc.constantFrom(Infinity, -Infinity, Number.NaN)])(
             "should return false for infinite numbers and NaN",
@@ -382,13 +391,12 @@ describe("TypeGuards Fuzzing Tests", () => {
             }
         );
 
-        test.prop([fc.float({ min: Math.fround(-1e10), max: Math.fround(-0.001) })])(
-            "should return false for negative numbers",
-            (negative) => {
-                fc.pre(!Number.isNaN(negative) && negative < 0);
-                expect(isNonNegativeNumber(negative)).toBeFalsy();
-            }
-        );
+        test.prop([
+            fc.float({ min: Math.fround(-1e10), max: Math.fround(-0.001) }),
+        ])("should return false for negative numbers", (negative) => {
+            fc.pre(!Number.isNaN(negative) && negative < 0);
+            expect(isNonNegativeNumber(negative)).toBeFalsy();
+        });
     });
 
     describe(isNonNullObject, () => {
@@ -421,13 +429,12 @@ describe("TypeGuards Fuzzing Tests", () => {
             }
         );
 
-        test.prop([fc.float({ min: Math.fround(0.001), max: Math.fround(1e10) })])(
-            "should return true for positive numbers",
-            (positive) => {
-                fc.pre(!Number.isNaN(positive) && positive > 0);
-                expect(isPositiveNumber(positive)).toBeTruthy();
-            }
-        );
+        test.prop([
+            fc.float({ min: Math.fround(0.001), max: Math.fround(1e10) }),
+        ])("should return true for positive numbers", (positive) => {
+            fc.pre(!Number.isNaN(positive) && positive > 0);
+            expect(isPositiveNumber(positive)).toBeTruthy();
+        });
 
         test.prop([fc.float({ min: Math.fround(-1e10), max: 0 })])(
             "should return false for zero and negative numbers",
@@ -487,21 +494,22 @@ describe("TypeGuards Fuzzing Tests", () => {
             }
         );
 
-        test.prop([fc.oneof(
-            fc.integer({ min: -1000, max: 0 }),
-            fc.integer({ min: 65_536, max: 100_000 }),
-            fc.float()
-        )])(
-            "should return false for invalid ports",
-            (invalidPort) => {
-                fc.pre(
-                    typeof invalidPort === "number" &&
+        test.prop([
+            fc.oneof(
+                fc.integer({ min: -1000, max: 0 }),
+                fc.integer({ min: 65_536, max: 100_000 }),
+                fc.float()
+            ),
+        ])("should return false for invalid ports", (invalidPort) => {
+            fc.pre(
+                typeof invalidPort === "number" &&
                     !Number.isNaN(invalidPort) &&
-                    (invalidPort < 1 || invalidPort > 65_535 || !Number.isInteger(invalidPort))
-                );
-                expect(isValidPort(invalidPort)).toBeFalsy();
-            }
-        );
+                    (invalidPort < 1 ||
+                        invalidPort > 65_535 ||
+                        !Number.isInteger(invalidPort))
+            );
+            expect(isValidPort(invalidPort)).toBeFalsy();
+        });
     });
 
     describe(isValidTimestamp, () => {
@@ -539,15 +547,17 @@ describe("TypeGuards Fuzzing Tests", () => {
             expect(isValidTimestamp(Date.now())).toBeTruthy();
         });
 
-        test.prop([fc.oneof(
-            fc.integer({ min: -1000, max: 0 }),
-            fc.integer({ min: Date.now() + 86_400_000 + 1000, max: Date.now() + 86_400_000 * 30 }) // More than 1 day + buffer in future
-        )])(
-            "should return false for invalid timestamps",
-            (invalidTimestamp) => {
-                expect(isValidTimestamp(invalidTimestamp)).toBeFalsy();
-            }
-        );
+        test.prop([
+            fc.oneof(
+                fc.integer({ min: -1000, max: 0 }),
+                fc.integer({
+                    min: Date.now() + 86_400_000 + 1000,
+                    max: Date.now() + 86_400_000 * 30,
+                }) // More than 1 day + buffer in future
+            ),
+        ])("should return false for invalid timestamps", (invalidTimestamp) => {
+            expect(isValidTimestamp(invalidTimestamp)).toBeFalsy();
+        });
     });
 
     describe("Edge Cases and Invariants", () => {

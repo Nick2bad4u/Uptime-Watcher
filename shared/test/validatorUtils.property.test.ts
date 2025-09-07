@@ -1,10 +1,14 @@
 /**
- * @fileoverview Comprehensive property-based tests for validator utilities
- *
- * @description
  * This test suite provides extensive property-based testing for all validation
- * utility functions using fast-check and @fast-check/vitest. It covers edge cases,
- * boundary conditions, and invariant properties that should hold for all inputs.
+ * utility functions using fast-check and @fast-check/vitest. It covers edge
+ * cases, boundary conditions, and invariant properties that should hold for all
+ * inputs.
+ *
+ * @file Comprehensive property-based tests for validator utilities
+ *
+ * @author GitHub Copilot
+ *
+ * @since 2025-09-05
  *
  * @features
  * - Property-based testing for string validation functions
@@ -13,9 +17,6 @@
  * - Integer and numeric validation with format testing
  * - Array validation functions with type safety
  * - Performance testing with large inputs
- *
- * @author GitHub Copilot
- * @since 2025-09-05
  */
 
 import { describe, it, expect } from "vitest";
@@ -36,17 +37,20 @@ import {
 } from "@shared/validation/validatorUtils";
 
 describe("Validator Utils Property-Based Tests", () => {
-
     describe(isNonEmptyString, () => {
-        test.prop([fc.string({ minLength: 1 }).filter(s => s.trim().length > 0)])(
-            "should return true for all non-empty strings",
-            (nonEmptyString) => {
-                const result = isNonEmptyString(nonEmptyString);
-                expect(result).toBeTruthy();
-            }
-        );
+        test.prop([
+            fc.string({ minLength: 1 }).filter((s) => s.trim().length > 0),
+        ])("should return true for all non-empty strings", (nonEmptyString) => {
+            const result = isNonEmptyString(nonEmptyString);
+            expect(result).toBeTruthy();
+        });
 
-        test.prop([fc.oneof(fc.constant(""), fc.string().filter(s => s.trim() === ""))])(
+        test.prop([
+            fc.oneof(
+                fc.constant(""),
+                fc.string().filter((s) => s.trim() === "")
+            ),
+        ])(
             "should return false for empty or whitespace-only strings",
             (emptyString) => {
                 const result = isNonEmptyString(emptyString);
@@ -54,7 +58,7 @@ describe("Validator Utils Property-Based Tests", () => {
             }
         );
 
-        test.prop([fc.anything().filter(x => typeof x !== "string")])(
+        test.prop([fc.anything().filter((x) => typeof x !== "string")])(
             "should return false for non-string values",
             (nonString) => {
                 const result = isNonEmptyString(nonString);
@@ -110,8 +114,10 @@ describe("Validator Utils Property-Based Tests", () => {
                 fc.constant(".invalid-start"),
                 fc.constant("invalid-end."),
                 fc.constant("too-many...dots"),
-                fc.string({ minLength: 1, maxLength: 5 }).filter(s => !s.includes("."))
-            )
+                fc
+                    .string({ minLength: 1, maxLength: 5 })
+                    .filter((s) => !s.includes("."))
+            ),
         ])(
             "should return false for invalid domain formats",
             (invalidDomain) => {
@@ -120,7 +126,7 @@ describe("Validator Utils Property-Based Tests", () => {
             }
         );
 
-        test.prop([fc.anything().filter(x => typeof x !== "string")])(
+        test.prop([fc.anything().filter((x) => typeof x !== "string")])(
             "should return false for non-string inputs",
             (nonString) => {
                 const result = isValidFQDN(nonString);
@@ -159,7 +165,9 @@ describe("Validator Utils Property-Based Tests", () => {
 
         it("should respect FQDN options when provided", () => {
             // Test with require_tld: false to allow localhost
-            expect(isValidFQDN("localhost", { require_tld: false })).toBeTruthy();
+            expect(
+                isValidFQDN("localhost", { require_tld: false })
+            ).toBeTruthy();
             expect(isValidFQDN("localhost", { require_tld: true })).toBeFalsy();
         });
     });
@@ -167,22 +175,22 @@ describe("Validator Utils Property-Based Tests", () => {
     describe(isValidIdentifier, () => {
         test.prop([
             // Generate identifiers that must have at least one alphanumeric character
-            fc.string({ minLength: 1 })
-                .filter(s => /^[\dA-Za-z]+(?:[_-]*[\dA-Za-z]+)*$/.test(s))
-        ])(
-            "should return true for valid identifier patterns",
-            (identifier) => {
-                const result = isValidIdentifier(identifier);
-                expect(result).toBeTruthy();
-            }
-        );
+            fc
+                .string({ minLength: 1 })
+                .filter((s) => /^[\dA-Za-z]+(?:[_-]*[\dA-Za-z]+)*$/.test(s)),
+        ])("should return true for valid identifier patterns", (identifier) => {
+            const result = isValidIdentifier(identifier);
+            expect(result).toBeTruthy();
+        });
 
         test.prop([
             fc.oneof(
-                fc.string().filter(s => /[^\w-]/.test(s) && s.trim().length > 0),
+                fc
+                    .string()
+                    .filter((s) => /[^\w-]/.test(s) && s.trim().length > 0),
                 fc.constant(""),
-                fc.string().filter(s => s.trim().length === 0)
-            )
+                fc.string().filter((s) => s.trim().length === 0)
+            ),
         ])(
             "should return false for invalid identifier patterns",
             (invalidIdentifier) => {
@@ -191,7 +199,7 @@ describe("Validator Utils Property-Based Tests", () => {
             }
         );
 
-        test.prop([fc.anything().filter(x => typeof x !== "string")])(
+        test.prop([fc.anything().filter((x) => typeof x !== "string")])(
             "should return false for non-string inputs",
             (nonString) => {
                 const result = isValidIdentifier(nonString);
@@ -247,17 +255,16 @@ describe("Validator Utils Property-Based Tests", () => {
                 fc.constant("ftp://example.com"), // Wrong protocol
                 fc.constant("http://"), // No domain
                 fc.constant("//example.com"), // No protocol
-                fc.string({ minLength: 1, maxLength: 10 }).filter(s => !s.includes("://"))
-            )
-        ])(
-            "should return false for invalid URL formats",
-            (invalidUrl) => {
-                const result = isValidUrl(invalidUrl);
-                expect(result).toBeFalsy();
-            }
-        );
+                fc
+                    .string({ minLength: 1, maxLength: 10 })
+                    .filter((s) => !s.includes("://"))
+            ),
+        ])("should return false for invalid URL formats", (invalidUrl) => {
+            const result = isValidUrl(invalidUrl);
+            expect(result).toBeFalsy();
+        });
 
-        test.prop([fc.anything().filter(x => typeof x !== "string")])(
+        test.prop([fc.anything().filter((x) => typeof x !== "string")])(
             "should return false for non-string inputs",
             (nonString) => {
                 const result = isValidUrl(nonString);
@@ -299,13 +306,7 @@ describe("Validator Utils Property-Based Tests", () => {
     });
 
     describe(isValidHost, () => {
-        test.prop([
-            fc.oneof(
-                fc.domain(),
-                fc.ipV4(),
-                fc.constant("localhost")
-            )
-        ])(
+        test.prop([fc.oneof(fc.domain(), fc.ipV4(), fc.constant("localhost"))])(
             "should return true for valid host formats",
             (host) => {
                 const result = isValidHost(host);
@@ -319,17 +320,18 @@ describe("Validator Utils Property-Based Tests", () => {
                 fc.constant("invalid..host"),
                 fc.constant(".invalid"),
                 fc.constant("invalid."),
-                fc.string({ minLength: 1, maxLength: 5 }).filter(s =>
-                    /[^\d.A-Za-z-]/.test(s) && !/^(?:\d+\.){3}\d+$/.test(s)
-                )
-            )
-        ])(
-            "should return false for invalid host formats",
-            (invalidHost) => {
-                const result = isValidHost(invalidHost);
-                expect(result).toBeFalsy();
-            }
-        );
+                fc
+                    .string({ minLength: 1, maxLength: 5 })
+                    .filter(
+                        (s) =>
+                            /[^\d.A-Za-z-]/.test(s) &&
+                            !/^(?:\d+\.){3}\d+$/.test(s)
+                    )
+            ),
+        ])("should return false for invalid host formats", (invalidHost) => {
+            const result = isValidHost(invalidHost);
+            expect(result).toBeFalsy();
+        });
 
         it("should validate specific host cases", () => {
             const validHosts = [
@@ -376,16 +378,17 @@ describe("Validator Utils Property-Based Tests", () => {
             fc.oneof(
                 fc.integer({ min: -1000, max: 0 }),
                 fc.integer({ min: 65_536, max: 100_000 })
-            )
-        ])(
-            "should return false for invalid port numbers",
-            (invalidPort) => {
-                const result = isValidPort(invalidPort);
-                expect(result).toBeFalsy();
-            }
-        );
+            ),
+        ])("should return false for invalid port numbers", (invalidPort) => {
+            const result = isValidPort(invalidPort);
+            expect(result).toBeFalsy();
+        });
 
-        test.prop([fc.anything().filter(x => typeof x !== "number" && typeof x !== "string")])(
+        test.prop([
+            fc
+                .anything()
+                .filter((x) => typeof x !== "number" && typeof x !== "string"),
+        ])(
             "should return false for non-number/non-string inputs",
             (nonNumber) => {
                 const result = isValidPort(nonNumber);
@@ -394,8 +397,23 @@ describe("Validator Utils Property-Based Tests", () => {
         );
 
         it("should validate port boundary conditions", () => {
-            const validPorts = [1, 80, 443, 3000, 8080, 65_535];
-            const invalidPorts = [0, -1, 65_536, 70_000, Number.NaN, Infinity, -Infinity];
+            const validPorts = [
+                1,
+                80,
+                443,
+                3000,
+                8080,
+                65_535,
+            ];
+            const invalidPorts = [
+                0,
+                -1,
+                65_536,
+                70_000,
+                Number.NaN,
+                Infinity,
+                -Infinity,
+            ];
 
             for (const port of validPorts) {
                 expect(isValidPort(port)).toBeTruthy();
@@ -410,7 +428,11 @@ describe("Validator Utils Property-Based Tests", () => {
             "should return false for floating point numbers",
             (floatPort) => {
                 // Only integers should be valid ports
-                if (Number.isInteger(floatPort) && floatPort >= 1 && floatPort <= 65_535) {
+                if (
+                    Number.isInteger(floatPort) &&
+                    floatPort >= 1 &&
+                    floatPort <= 65_535
+                ) {
                     expect(isValidPort(floatPort)).toBeTruthy();
                 } else {
                     expect(isValidPort(floatPort)).toBeFalsy();
@@ -419,8 +441,21 @@ describe("Validator Utils Property-Based Tests", () => {
         );
 
         it("should handle string port numbers", () => {
-            const validStringPorts = ["1", "80", "443", "3000", "65535"];
-            const invalidStringPorts = ["0", "-1", "65536", "abc", "123.45", ""];
+            const validStringPorts = [
+                "1",
+                "80",
+                "443",
+                "3000",
+                "65535",
+            ];
+            const invalidStringPorts = [
+                "0",
+                "-1",
+                "65536",
+                "abc",
+                "123.45",
+                "",
+            ];
 
             for (const port of validStringPorts) {
                 expect(isValidPort(port)).toBeTruthy();
@@ -436,9 +471,10 @@ describe("Validator Utils Property-Based Tests", () => {
         test.prop([
             fc.array(
                 // Generate identifiers that must have at least one alphanumeric character
-                fc.string({ minLength: 1 })
-                    .filter(s => /^[\dA-Za-z]+(?:[_-]*[\dA-Za-z]+)*$/.test(s))
-            )
+                fc
+                    .string({ minLength: 1 })
+                    .filter((s) => /^[\dA-Za-z]+(?:[_-]*[\dA-Za-z]+)*$/.test(s))
+            ),
         ])(
             "should return true for arrays of valid identifiers",
             (identifierArray) => {
@@ -449,13 +485,16 @@ describe("Validator Utils Property-Based Tests", () => {
 
         test.prop([
             fc.oneof(
-                fc.array(fc.oneof(
-                    fc.string().filter(s => /[^\w-]/.test(s)),
-                    fc.constant(""),
-                    fc.anything().filter(x => typeof x !== "string")
-                ), { minLength: 1 }), // Ensure non-empty array for invalid case
-                fc.anything().filter(x => !Array.isArray(x))
-            )
+                fc.array(
+                    fc.oneof(
+                        fc.string().filter((s) => /[^\w-]/.test(s)),
+                        fc.constant(""),
+                        fc.anything().filter((x) => typeof x !== "string")
+                    ),
+                    { minLength: 1 }
+                ), // Ensure non-empty array for invalid case
+                fc.anything().filter((x) => !Array.isArray(x))
+            ),
         ])(
             "should return false for invalid identifier arrays",
             (invalidArray) => {
@@ -468,8 +507,16 @@ describe("Validator Utils Property-Based Tests", () => {
             const validArrays = [
                 [],
                 ["test"],
-                ["test1", "test2", "test3"],
-                ["valid_identifier", "another-identifier", "123"],
+                [
+                    "test1",
+                    "test2",
+                    "test3",
+                ],
+                [
+                    "valid_identifier",
+                    "another-identifier",
+                    "123",
+                ],
             ];
 
             const invalidArrays = [
@@ -479,7 +526,11 @@ describe("Validator Utils Property-Based Tests", () => {
                 ["valid", "invalid.identifier"],
                 ["valid", ""],
                 ["valid", null],
-                [1, 2, 3], // Numbers instead of strings
+                [
+                    1,
+                    2,
+                    3,
+                ], // Numbers instead of strings
             ];
 
             for (const arr of validArrays) {
@@ -493,7 +544,7 @@ describe("Validator Utils Property-Based Tests", () => {
     });
 
     describe(isValidInteger, () => {
-        test.prop([fc.integer().map(n => n.toString())])(
+        test.prop([fc.integer().map((n) => n.toString())])(
             "should return true for string representations of integers",
             (intString) => {
                 const result = isValidInteger(intString);
@@ -503,17 +554,17 @@ describe("Validator Utils Property-Based Tests", () => {
 
         test.prop([
             fc.oneof(
-                fc.float().filter(n => !Number.isInteger(n)).map(n => n.toString()),
-                fc.string().filter(s => Number.isNaN(Number(s))),
-                fc.anything().filter(x => typeof x !== "string")
-            )
-        ])(
-            "should return false for non-integer strings",
-            (nonIntString) => {
-                const result = isValidInteger(nonIntString);
-                expect(result).toBeFalsy();
-            }
-        );
+                fc
+                    .float()
+                    .filter((n) => !Number.isInteger(n))
+                    .map((n) => n.toString()),
+                fc.string().filter((s) => Number.isNaN(Number(s))),
+                fc.anything().filter((x) => typeof x !== "string")
+            ),
+        ])("should return false for non-integer strings", (nonIntString) => {
+            const result = isValidInteger(nonIntString);
+            expect(result).toBeFalsy();
+        });
 
         it("should validate integer strings with bounds", () => {
             expect(isValidInteger("50", { min: 0, max: 100 })).toBeTruthy();
@@ -523,7 +574,11 @@ describe("Validator Utils Property-Based Tests", () => {
     });
 
     describe(isValidNumeric, () => {
-        test.prop([fc.float({ noNaN: true, noDefaultInfinity: true }).map(n => n.toString())])(
+        test.prop([
+            fc
+                .float({ noNaN: true, noDefaultInfinity: true })
+                .map((n) => n.toString()),
+        ])(
             "should return true for string representations of numbers",
             (numString) => {
                 const result = isValidNumeric(numString);
@@ -533,16 +588,13 @@ describe("Validator Utils Property-Based Tests", () => {
 
         test.prop([
             fc.oneof(
-                fc.string().filter(s => Number.isNaN(Number(s)) && s !== ""),
-                fc.anything().filter(x => typeof x !== "string")
-            )
-        ])(
-            "should return false for non-numeric strings",
-            (nonNumString) => {
-                const result = isValidNumeric(nonNumString);
-                expect(result).toBeFalsy();
-            }
-        );
+                fc.string().filter((s) => Number.isNaN(Number(s)) && s !== ""),
+                fc.anything().filter((x) => typeof x !== "string")
+            ),
+        ])("should return false for non-numeric strings", (nonNumString) => {
+            const result = isValidNumeric(nonNumString);
+            expect(result).toBeFalsy();
+        });
 
         it("should validate numeric strings with bounds", () => {
             expect(isValidNumeric("50.5", { min: 0, max: 100 })).toBeTruthy();
@@ -555,15 +607,20 @@ describe("Validator Utils Property-Based Tests", () => {
         test.prop([
             fc.integer(),
             fc.integer(),
-            fc.integer().filter(x => x >= 0),
-            fc.integer().filter(x => x >= 0)
+            fc.integer().filter((x) => x >= 0),
+            fc.integer().filter((x) => x >= 0),
         ])(
             "should convert valid integers within bounds",
             (value, defaultValue, min, max) => {
                 const actualMax = Math.max(min, max);
                 const actualMin = Math.min(min, max);
 
-                const result = safeInteger(value.toString(), defaultValue, actualMin, actualMax);
+                const result = safeInteger(
+                    value.toString(),
+                    defaultValue,
+                    actualMin,
+                    actualMax
+                );
 
                 expect(typeof result).toBe("number");
                 expect(Number.isInteger(result)).toBeTruthy();
@@ -579,8 +636,11 @@ describe("Validator Utils Property-Based Tests", () => {
         );
 
         test.prop([
-            fc.oneof(fc.float().filter(n => !Number.isInteger(n)), fc.string().filter(s => Number.isNaN(Number(s)))),
-            fc.integer()
+            fc.oneof(
+                fc.float().filter((n) => !Number.isInteger(n)),
+                fc.string().filter((s) => Number.isNaN(Number(s)))
+            ),
+            fc.integer(),
         ])(
             "should return default value for invalid inputs",
             (invalidValue, defaultValue) => {
@@ -698,7 +758,9 @@ describe("Validator Utils Property-Based Tests", () => {
                 "another string",
             ];
 
-            const strings = mixedArray.filter((item): item is string => isNonEmptyString(item));
+            const strings = mixedArray.filter((item): item is string =>
+                isNonEmptyString(item)
+            );
 
             // All filtered items should be strings
             for (const item of strings) {
@@ -711,8 +773,13 @@ describe("Validator Utils Property-Based Tests", () => {
             "type guards should maintain type safety",
             (mixedArray) => {
                 // Filter with type guards
-                const strings = mixedArray.filter((item): item is string => isNonEmptyString(item));
-                const identifierArrays = mixedArray.filter((item): item is readonly string[] => isValidIdentifierArray(item));
+                const strings = mixedArray.filter((item): item is string =>
+                    isNonEmptyString(item)
+                );
+                const identifierArrays = mixedArray.filter(
+                    (item): item is readonly string[] =>
+                        isValidIdentifierArray(item)
+                );
 
                 // Ensure at least one assertion runs
                 expect(Array.isArray(strings)).toBeTruthy();

@@ -177,9 +177,9 @@ describe("monitorOperations", () => {
                 type: "http",
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
-                
-            );
+            expect(
+                validateMonitor(invalidMonitor as unknown as Monitor)
+            ).toBeFalsy();
         });
 
         it("should return false for invalid id type", async ({
@@ -199,9 +199,9 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
-                
-            );
+            expect(
+                validateMonitor(invalidMonitor as unknown as Monitor)
+            ).toBeFalsy();
         });
 
         it("should return false for missing type", async ({
@@ -220,9 +220,9 @@ describe("monitorOperations", () => {
                 status: "up" as const,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
-                
-            );
+            expect(
+                validateMonitor(invalidMonitor as unknown as Monitor)
+            ).toBeFalsy();
         });
 
         it("should return false for invalid type", async ({
@@ -242,9 +242,9 @@ describe("monitorOperations", () => {
                 type: 123,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
-                
-            );
+            expect(
+                validateMonitor(invalidMonitor as unknown as Monitor)
+            ).toBeFalsy();
         });
 
         it("should return false for missing status", async ({
@@ -263,9 +263,9 @@ describe("monitorOperations", () => {
                 type: "http",
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
-                
-            );
+            expect(
+                validateMonitor(invalidMonitor as unknown as Monitor)
+            ).toBeFalsy();
         });
 
         it("should return false for invalid status value", async ({
@@ -285,9 +285,9 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
-                
-            );
+            expect(
+                validateMonitor(invalidMonitor as unknown as Monitor)
+            ).toBeFalsy();
         });
 
         it("should return false for invalid status type", async ({
@@ -307,9 +307,9 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
-                
-            );
+            expect(
+                validateMonitor(invalidMonitor as unknown as Monitor)
+            ).toBeFalsy();
         });
 
         it("should return false for missing monitoring", async ({
@@ -328,9 +328,9 @@ describe("monitorOperations", () => {
                 type: "http",
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
-                
-            );
+            expect(
+                validateMonitor(invalidMonitor as unknown as Monitor)
+            ).toBeFalsy();
         });
 
         it("should return false for invalid monitoring type", async ({
@@ -350,9 +350,9 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
-                
-            );
+            expect(
+                validateMonitor(invalidMonitor as unknown as Monitor)
+            ).toBeFalsy();
         });
 
         it("should return false for missing history", async ({
@@ -371,9 +371,9 @@ describe("monitorOperations", () => {
                 type: "http",
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
-                
-            );
+            expect(
+                validateMonitor(invalidMonitor as unknown as Monitor)
+            ).toBeFalsy();
         });
 
         it("should return false for invalid history type", async ({
@@ -393,9 +393,9 @@ describe("monitorOperations", () => {
                 type: "http" as MonitorType,
             };
 
-            expect(validateMonitor(invalidMonitor as unknown as Monitor)).toBeFalsy(
-                
-            );
+            expect(
+                validateMonitor(invalidMonitor as unknown as Monitor)
+            ).toBeFalsy();
         });
 
         it("should validate all valid status values", async ({
@@ -426,9 +426,9 @@ describe("monitorOperations", () => {
                     timeout: 5000,
                     type: "http" as MonitorType,
                 };
-                expect(validateMonitor(monitor as unknown as Monitor)).toBeTruthy(
-                    
-                );
+                expect(
+                    validateMonitor(monitor as unknown as Monitor)
+                ).toBeTruthy();
             }
         });
     });

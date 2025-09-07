@@ -153,12 +153,12 @@ describe("Shared Validation - Backend Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(validateSite(null as unknown as Partial<Site>)).toBeFalsy();
-            expect(validateSite(undefined as unknown as Partial<Site>)).toBeFalsy(
-                
-            );
-            expect(validateSite("string" as unknown as Partial<Site>)).toBeFalsy(
-                
-            );
+            expect(
+                validateSite(undefined as unknown as Partial<Site>)
+            ).toBeFalsy();
+            expect(
+                validateSite("string" as unknown as Partial<Site>)
+            ).toBeFalsy();
         });
 
         it("should reject site with missing required fields", async ({

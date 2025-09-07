@@ -215,7 +215,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
         fcTest.prop([
             fc.oneof(
                 fc.integer({ min: 1 }),
-                fc.float({ min: 0.0001, noDefaultInfinity: true, noNaN: true }),
+                fc.float({ min: Math.fround(0.0001), noDefaultInfinity: true, noNaN: true }),
                 fc.constant(0),
                 fc.constant(-0),
                 fc.integer({ max: -1 }),

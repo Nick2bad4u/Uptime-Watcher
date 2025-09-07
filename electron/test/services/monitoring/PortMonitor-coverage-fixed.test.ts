@@ -447,9 +447,7 @@ describe("PortMonitor Coverage Tests", () => {
             const { host, ...monitorWithoutHost } = validPortMonitor;
 
             await expect(
-                portMonitor.check(
-                    monitorWithoutHost as Site["monitors"][0]
-                )
+                portMonitor.check(monitorWithoutHost as Site["monitors"][0])
             ).resolves.toBeDefined();
 
             expect(vi.mocked(createMonitorErrorResult)).toHaveBeenCalledWith(
@@ -473,9 +471,7 @@ describe("PortMonitor Coverage Tests", () => {
             const { port, ...monitorWithoutPort } = validPortMonitor;
 
             await expect(
-                portMonitor.check(
-                    monitorWithoutPort as Site["monitors"][0]
-                )
+                portMonitor.check(monitorWithoutPort as Site["monitors"][0])
             ).resolves.toBeDefined();
 
             expect(vi.mocked(createMonitorErrorResult)).toHaveBeenCalledWith(

@@ -54,7 +54,9 @@ describe("Ultimate Function Coverage - Error Handling", () => {
         // Test isKnownErrorMessage
         expect(isKnownErrorMessage("Network error occurred")).toBeTruthy();
         expect(isKnownErrorMessage("Request timeout")).toBeTruthy();
-        expect(isKnownErrorMessage("Connection refused by server")).toBeTruthy();
+        expect(
+            isKnownErrorMessage("Connection refused by server")
+        ).toBeTruthy();
         expect(isKnownErrorMessage("Unknown error type")).toBeFalsy();
         expect(isKnownErrorMessage("")).toBeFalsy();
     });

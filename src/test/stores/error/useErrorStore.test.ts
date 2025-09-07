@@ -282,7 +282,9 @@ describe(useErrorStore, () => {
                 result.current.setOperationLoading("fetchSites", true);
             });
 
-            expect(result.current.getOperationLoading("fetchSites")).toBeTruthy();
+            expect(
+                result.current.getOperationLoading("fetchSites")
+            ).toBeTruthy();
         });
 
         it("should get operation loading state", async ({ task, annotate }) => {
@@ -293,15 +295,17 @@ describe(useErrorStore, () => {
 
             const { result } = renderHook(() => useErrorStore());
 
-            expect(result.current.getOperationLoading("fetchSites")).toBeFalsy(
-                
-            );
+            expect(
+                result.current.getOperationLoading("fetchSites")
+            ).toBeFalsy();
 
             act(() => {
                 result.current.setOperationLoading("fetchSites", true);
             });
 
-            expect(result.current.getOperationLoading("fetchSites")).toBeTruthy();
+            expect(
+                result.current.getOperationLoading("fetchSites")
+            ).toBeTruthy();
         });
 
         it("should handle multiple operations", async ({ task, annotate }) => {
@@ -318,11 +322,13 @@ describe(useErrorStore, () => {
                 result.current.setOperationLoading("deleteSite", false);
             });
 
-            expect(result.current.getOperationLoading("fetchSites")).toBeTruthy();
+            expect(
+                result.current.getOperationLoading("fetchSites")
+            ).toBeTruthy();
             expect(result.current.getOperationLoading("saveSite")).toBeTruthy();
-            expect(result.current.getOperationLoading("deleteSite")).toBeFalsy(
-                
-            );
+            expect(
+                result.current.getOperationLoading("deleteSite")
+            ).toBeFalsy();
         });
 
         it("should handle operation keys with special characters", async ({
@@ -406,7 +412,9 @@ describe(useErrorStore, () => {
             });
 
             expect(result.current.storeErrors["sites"]).toBeUndefined();
-            expect(result.current.getOperationLoading("fetchSites")).toBeTruthy();
+            expect(
+                result.current.getOperationLoading("fetchSites")
+            ).toBeTruthy();
         });
 
         it("should handle simultaneous error and loading state changes", async ({
@@ -434,10 +442,12 @@ describe(useErrorStore, () => {
             expect(result.current.storeErrors["monitors"]).toBe(
                 "Monitors error"
             );
-            expect(result.current.getOperationLoading("fetchSites")).toBeTruthy();
-            expect(result.current.getOperationLoading("saveMonitor")).toBeTruthy(
-                
-            );
+            expect(
+                result.current.getOperationLoading("fetchSites")
+            ).toBeTruthy();
+            expect(
+                result.current.getOperationLoading("saveMonitor")
+            ).toBeTruthy();
             expect(result.current.isLoading).toBeTruthy();
         });
     });
@@ -520,23 +530,23 @@ describe(useErrorStore, () => {
             act(() => {
                 result.current.setOperationLoading("toggle-operation", true);
             });
-            expect(result.current.getOperationLoading("toggle-operation")).toBeTruthy(
-                
-            );
+            expect(
+                result.current.getOperationLoading("toggle-operation")
+            ).toBeTruthy();
 
             act(() => {
                 result.current.setOperationLoading("toggle-operation", false);
             });
-            expect(result.current.getOperationLoading("toggle-operation")).toBeFalsy(
-                
-            );
+            expect(
+                result.current.getOperationLoading("toggle-operation")
+            ).toBeFalsy();
 
             act(() => {
                 result.current.setOperationLoading("toggle-operation", true);
             });
-            expect(result.current.getOperationLoading("toggle-operation")).toBeTruthy(
-                
-            );
+            expect(
+                result.current.getOperationLoading("toggle-operation")
+            ).toBeTruthy();
         });
 
         it("should handle undefined store errors", async ({
@@ -642,9 +652,9 @@ describe(useErrorStore, () => {
 
             expect(result.current.lastError).toBe("Persistent error");
             expect(result.current.storeErrors["sites"]).toBe("Sites error");
-            expect(result.current.getOperationLoading("fetchSites")).toBeFalsy(
-                
-            );
+            expect(
+                result.current.getOperationLoading("fetchSites")
+            ).toBeFalsy();
         });
 
         it("should handle clearing errors while maintaining loading states", async ({
@@ -670,7 +680,9 @@ describe(useErrorStore, () => {
 
             expect(result.current.lastError).toBeUndefined();
             expect(result.current.storeErrors).toEqual({});
-            expect(result.current.getOperationLoading("fetchSites")).toBeTruthy();
+            expect(
+                result.current.getOperationLoading("fetchSites")
+            ).toBeTruthy();
         });
 
         it("should handle complex state transitions", async ({
@@ -712,7 +724,9 @@ describe(useErrorStore, () => {
             expect(result.current.storeErrors["monitors"]).toBe(
                 "Monitors error"
             );
-            expect(result.current.getOperationLoading("fetchSites")).toBeTruthy();
+            expect(
+                result.current.getOperationLoading("fetchSites")
+            ).toBeTruthy();
             expect(result.current.isLoading).toBeTruthy();
         });
     });

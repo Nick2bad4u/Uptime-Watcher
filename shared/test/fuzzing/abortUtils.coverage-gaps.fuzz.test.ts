@@ -17,35 +17,27 @@ import {
 describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
     beforeAll(() => {
         // Mock AbortSignal.timeout for fake timers compatibility
-        if (!AbortSignal.timeout) {
-            vi.spyOn(AbortSignal, "timeout").mockImplementation(
-                (delay: number) => {
-                    const controller = new AbortController();
-                    setTimeout(() => controller.abort(), delay);
-                    return controller.signal;
-                }
-            );
-        }
+        vi.spyOn(AbortSignal, "timeout").mockImplementation((delay: number) => {
+            const controller = new AbortController();
+            setTimeout(() => controller.abort(), delay);
+            return controller.signal;
+        });
 
-        if (!AbortSignal.any) {
-            vi.spyOn(AbortSignal, "any").mockImplementation(
-                (signals: AbortSignal[]) => {
-                    const controller = new AbortController();
-                    for (const signal of signals) {
-                        if (signal.aborted) {
-                            controller.abort();
-                            break;
-                        }
-                        signal.addEventListener(
-                            "abort",
-                            () => controller.abort(),
-                            { once: true }
-                        );
+        vi.spyOn(AbortSignal, "any").mockImplementation(
+            (signals: AbortSignal[]) => {
+                const controller = new AbortController();
+                for (const signal of signals) {
+                    if (signal.aborted) {
+                        controller.abort();
+                        break;
                     }
-                    return controller.signal;
+                    signal.addEventListener("abort", () => controller.abort(), {
+                        once: true,
+                    });
                 }
-            );
-        }
+                return controller.signal;
+            }
+        );
     });
 
     beforeEach(() => {

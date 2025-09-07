@@ -744,6 +744,26 @@ describe("jsonSafety utilities", () => {
         };
 
         test("should handle all JSON-serializable values consistently", () => {
+            // Normalize -0 to 0 to handle JSON round-trip behavior
+            // JSON.stringify(-0) returns "0", and JSON.parse("0") returns 0
+            const normalizeNegativeZero = (obj: any): any => {
+                if (typeof obj === "number" && Object.is(obj, -0)) {
+                    return 0;
+                }
+                if (Array.isArray(obj)) {
+                    // eslint-disable-next-line unicorn/no-array-callback-reference -- Need to handle nested -0 values
+                    return obj.map(normalizeNegativeZero);
+                }
+                if (typeof obj === "object" && obj !== null) {
+                    const normalized: any = {};
+                    for (const [key, value] of Object.entries(obj)) {
+                        normalized[key] = normalizeNegativeZero(value);
+                    }
+                    return normalized;
+                }
+                return obj;
+            };
+
             fc.assert(
                 fc.property(fc.jsonValue(), (jsonValue) => {
                     const result = safeJsonStringify(jsonValue);
@@ -752,7 +772,10 @@ describe("jsonSafety utilities", () => {
                     if (result.success && result.data) {
                         // If stringify succeeded, parsing should also succeed
                         const parsed = JSON.parse(result.data);
-                        expect(parsed).toEqual(jsonValue);
+                        // Normalize both values to handle -0/+0 differences from JSON round-trip
+                        expect(normalizeNegativeZero(parsed)).toEqual(
+                            normalizeNegativeZero(jsonValue)
+                        );
                     }
                 })
             );

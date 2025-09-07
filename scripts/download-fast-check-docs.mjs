@@ -165,7 +165,7 @@ const CONFIG = {
         "advanced/race-conditions.md",
         "advanced/model-based-testing.md",
         "advanced/fuzzing.md",
-        "advanced/fake-data.md"
+        "advanced/fake-data.md",
     ],
 
     // Format configuration
@@ -282,40 +282,40 @@ function parseArguments() {
  */
 function showHelp() {
     const msg = [
-        'Universal Documentation Downloader v2.0.0',
-        '',
-        'USAGE:',
-        '  node scripts/download-docs-template.mjs [OPTIONS]',
-        '',
-        'OPTIONS:',
-        '  --help, -h              Show this help message',
-        '  --cache                 Enable caching (default: true)',
-        '  --no-cache              Disable caching',
-        '  --parallel              Enable parallel processing (default: true)',
-        '  --no-parallel           Disable parallel processing',
-        '  --validate              Enable content validation (default: true)',
-        '  --no-validate           Disable content validation',
-        '  --retry <n>             Max retry attempts (default: 3)',
-        '  --force                 Ignore cache & force re-download',
-        '  --timeout <seconds>     Request timeout in seconds (default: 30)',
-        '  --concurrency <n>       Max concurrent downloads (default: 5)',
-        '  --doc-name <name>       Documentation set name',
-        '  --base-url <url>        Base URL for documentation',
-        '',
-        'ENVIRONMENT VARIABLES:',
-        '  DOCS_OUTPUT_DIR         Custom output directory',
-        '  DOC_DOWNLOADER_CACHE    Cache directory override',
-        '  DOC_DOWNLOADER_VERBOSE  Enable verbose logging',
-        '',
-        'EXAMPLES:',
-        '  node scripts/download-docs-template.mjs --cache --parallel',
-        '  node scripts/download-docs-template.mjs --retry=5 --timeout=60',
-        '  DOCS_OUTPUT_DIR=/tmp/docs node scripts/download-docs-template.mjs',
-        ''
-    ].join('\n');
+        "Universal Documentation Downloader v2.0.0",
+        "",
+        "USAGE:",
+        "  node scripts/download-docs-template.mjs [OPTIONS]",
+        "",
+        "OPTIONS:",
+        "  --help, -h              Show this help message",
+        "  --cache                 Enable caching (default: true)",
+        "  --no-cache              Disable caching",
+        "  --parallel              Enable parallel processing (default: true)",
+        "  --no-parallel           Disable parallel processing",
+        "  --validate              Enable content validation (default: true)",
+        "  --no-validate           Disable content validation",
+        "  --retry <n>             Max retry attempts (default: 3)",
+        "  --force                 Ignore cache & force re-download",
+        "  --timeout <seconds>     Request timeout in seconds (default: 30)",
+        "  --concurrency <n>       Max concurrent downloads (default: 5)",
+        "  --doc-name <name>       Documentation set name",
+        "  --base-url <url>        Base URL for documentation",
+        "",
+        "ENVIRONMENT VARIABLES:",
+        "  DOCS_OUTPUT_DIR         Custom output directory",
+        "  DOC_DOWNLOADER_CACHE    Cache directory override",
+        "  DOC_DOWNLOADER_VERBOSE  Enable verbose logging",
+        "",
+        "EXAMPLES:",
+        "  node scripts/download-docs-template.mjs --cache --parallel",
+        "  node scripts/download-docs-template.mjs --retry=5 --timeout=60",
+        "  DOCS_OUTPUT_DIR=/tmp/docs node scripts/download-docs-template.mjs",
+        "",
+    ].join("\n");
     try {
         const fd = process.stdout.fd;
-        fsSync.writeFileSync(fd, msg + '\n');
+        fsSync.writeFileSync(fd, msg + "\n");
     } catch {
         console.log(msg);
     }
@@ -621,7 +621,9 @@ async function rawDownload(url, timeoutMs) {
             res.on("end", () => resolve(data));
         });
         req.on("error", reject);
-        req.setTimeout(timeoutMs, () => req.destroy(new Error("Request timeout")));
+        req.setTimeout(timeoutMs, () =>
+            req.destroy(new Error("Request timeout"))
+        );
     });
 }
 
@@ -698,9 +700,19 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
             content = rewriteLinks(content, config.baseUrl, logger);
             content = cleanContent(content, config, logger);
             await fs.writeFile(outputPath, content, "utf8");
-            const hash = crypto.createHash("sha256").update(content).digest("hex");
+            const hash = crypto
+                .createHash("sha256")
+                .update(content)
+                .digest("hex");
             logger.success(`Downloaded: ${page}`);
-            return { page, outputPath, success: true, hash, size: content.length, attempts: attempt };
+            return {
+                page,
+                outputPath,
+                success: true,
+                hash,
+                size: content.length,
+                attempts: attempt,
+            };
         } catch (error) {
             lastError = error;
             logger.warn(
@@ -716,7 +728,13 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
     logger.error(
         `Failed to download ${page} after ${config.maxRetries} attempts: ${lastError?.message}`
     );
-    return { page, outputPath, success: false, error: lastError?.message || "Unknown error", attempts: config.maxRetries };
+    return {
+        page,
+        outputPath,
+        success: false,
+        error: lastError?.message || "Unknown error",
+        attempts: config.maxRetries,
+    };
 }
 
 /**
@@ -729,14 +747,26 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
  *
  * @returns {Promise<DownloadResult[]>} Download results
  */
-async function downloadSequential(tasks, config, logger, paths, previousHashes) {
+async function downloadSequential(
+    tasks,
+    config,
+    logger,
+    paths,
+    previousHashes
+) {
     const results = [];
 
     for (let i = 0; i < tasks.length; i++) {
         const task = tasks[i];
         logger.progress(i + 1, tasks.length, task.page);
 
-    const result = await downloadFile(task, config, logger, paths, previousHashes);
+        const result = await downloadFile(
+            task,
+            config,
+            logger,
+            paths,
+            previousHashes
+        );
         results.push(result);
     }
 
@@ -766,7 +796,13 @@ async function downloadParallel(tasks, config, logger, paths, previousHashes) {
             inProgress.add(task.page);
 
             try {
-                return await downloadFile(task, config, logger, paths, previousHashes);
+                return await downloadFile(
+                    task,
+                    config,
+                    logger,
+                    paths,
+                    previousHashes
+                );
             } finally {
                 inProgress.delete(task.page);
                 completed++;
@@ -898,8 +934,20 @@ async function main() {
 
         // Execute downloads
         const results = config.enableParallel
-            ? await downloadParallel(downloadTasks, config, logger, paths, previousHashes)
-            : await downloadSequential(downloadTasks, config, logger, paths, previousHashes);
+            ? await downloadParallel(
+                  downloadTasks,
+                  config,
+                  logger,
+                  paths,
+                  previousHashes
+              )
+            : await downloadSequential(
+                  downloadTasks,
+                  config,
+                  logger,
+                  paths,
+                  previousHashes
+              );
 
         // Process results and generate report
         // @ts-ignore

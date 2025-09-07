@@ -1330,9 +1330,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             expect(isValidTimestamp(3.14)).toBeTruthy(); // Decimal numbers are still valid
             expect(isValidTimestamp(currentTime + dayInMs - 1000)).toBeTruthy(); // Well under limit
-            expect(isValidTimestamp(currentTime + dayInMs + 10_000)).toBeFalsy(
-                
-            ); // Well over limit
+            expect(
+                isValidTimestamp(currentTime + dayInMs + 10_000)
+            ).toBeFalsy(); // Well over limit
         });
     });
 
@@ -1403,11 +1403,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(
                 isString("123") && !isNumber("123") && !isValidPort("123")
             ).toBeTruthy();
-            expect(!isString(123) && isNumber(123) && isValidPort(123)).toBeTruthy(
-                
-            );
+            expect(
+                !isString(123) && isNumber(123) && isValidPort(123)
+            ).toBeTruthy();
             expect(isArray([]) && !isObject([]) && !isString([])).toBeTruthy();
-            expect(!isArray({}) && isObject({}) && !isFunction({})).toBeTruthy();
+            expect(
+                !isArray({}) && isObject({}) && !isFunction({})
+            ).toBeTruthy();
 
             const testFn = () => {};
             expect(
@@ -1419,9 +1421,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
                 isDate(testDate) && isObject(testDate) && !isString(testDate)
             ).toBeTruthy();
 
-            expect(!isObject(null) && !isString(null) && !isNumber(null)).toBeTruthy(
-                
-            );
+            expect(
+                !isObject(null) && !isString(null) && !isNumber(null)
+            ).toBeTruthy();
         });
     });
 });

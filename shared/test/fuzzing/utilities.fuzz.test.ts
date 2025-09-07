@@ -259,9 +259,15 @@ describe("Shared Utilities Fuzzing Tests", () => {
                             );
 
                             // Property: values should be finite
-                            expect(Number.isFinite(result.timeout)).toBeTruthy();
-                            expect(Number.isFinite(result.retries)).toBeTruthy();
-                            expect(Number.isFinite(result.interval)).toBeTruthy();
+                            expect(
+                                Number.isFinite(result.timeout)
+                            ).toBeTruthy();
+                            expect(
+                                Number.isFinite(result.retries)
+                            ).toBeTruthy();
+                            expect(
+                                Number.isFinite(result.interval)
+                            ).toBeTruthy();
                         }).not.toThrow();
                     }
                 )

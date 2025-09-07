@@ -1,82 +1,119 @@
 /**
  * Property-based fuzzing tests for cache configuration constants.
  *
- * @fileoverview
- * Comprehensive fast-check fuzzing tests to achieve 100% function and branch
- * coverage for shared/constants/cacheConfig.ts. These tests use property-based
- * testing to validate all cache naming functions and configuration integrity.
+ * @file Comprehensive fast-check fuzzing tests to achieve 100% function and
+ *   branch coverage for shared/constants/cacheConfig.ts. These tests use
+ *   property-based testing to validate all cache naming functions and
+ *   configuration integrity.
  */
 
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
-import { CACHE_CONFIG, CACHE_NAMES, type CacheConfig, type CacheConfigKey } from "../../../shared/constants/cacheConfig";
+import {
+    CACHE_CONFIG,
+    CACHE_NAMES,
+    type CacheConfig,
+    type CacheConfigKey,
+} from "../../../shared/constants/cacheConfig";
 
 describe("cacheConfig - Property-Based Fuzzing Tests", () => {
     describe("CACHE_CONFIG validation", () => {
         it("should have valid TTL values for all cache configurations", () => {
             fc.assert(
-                fc.property(fc.constantFrom(...Object.keys(CACHE_CONFIG) as CacheConfigKey[]), (key) => {
-                    const config = CACHE_CONFIG[key];
+                fc.property(
+                    fc.constantFrom(
+                        ...(Object.keys(CACHE_CONFIG) as CacheConfigKey[])
+                    ),
+                    (key) => {
+                        const config = CACHE_CONFIG[key];
 
-                    // TTL should be positive and reasonable (1 second to 1 day)
-                    expect(config.defaultTTL).toBeGreaterThan(0);
-                    expect(config.defaultTTL).toBeLessThanOrEqual(86_400_000); // 1 day in ms
+                        // TTL should be positive and reasonable (1 second to 1 day)
+                        expect(config.defaultTTL).toBeGreaterThan(0);
+                        expect(config.defaultTTL).toBeLessThanOrEqual(
+                            86_400_000
+                        ); // 1 day in ms
 
-                    // TTL should be a multiple of 1000 (full seconds)
-                    expect(config.defaultTTL % 1000).toBe(0);
-                })
+                        // TTL should be a multiple of 1000 (full seconds)
+                        expect(config.defaultTTL % 1000).toBe(0);
+                    }
+                )
             );
         });
 
         it("should have valid maxSize values for all cache configurations", () => {
             fc.assert(
-                fc.property(fc.constantFrom(...Object.keys(CACHE_CONFIG) as CacheConfigKey[]), (key) => {
-                    const config = CACHE_CONFIG[key];
+                fc.property(
+                    fc.constantFrom(
+                        ...(Object.keys(CACHE_CONFIG) as CacheConfigKey[])
+                    ),
+                    (key) => {
+                        const config = CACHE_CONFIG[key];
 
-                    // Max size should be positive and reasonable
-                    expect(config.maxSize).toBeGreaterThan(0);
-                    expect(config.maxSize).toBeLessThanOrEqual(10_000); // Reasonable upper limit
+                        // Max size should be positive and reasonable
+                        expect(config.maxSize).toBeGreaterThan(0);
+                        expect(config.maxSize).toBeLessThanOrEqual(10_000); // Reasonable upper limit
 
-                    // Max size should be an integer
-                    expect(Number.isInteger(config.maxSize)).toBeTruthy();
-                })
+                        // Max size should be an integer
+                        expect(Number.isInteger(config.maxSize)).toBeTruthy();
+                    }
+                )
             );
         });
 
         it("should have non-empty names for all cache configurations", () => {
             fc.assert(
-                fc.property(fc.constantFrom(...Object.keys(CACHE_CONFIG) as CacheConfigKey[]), (key) => {
-                    const config = CACHE_CONFIG[key];
+                fc.property(
+                    fc.constantFrom(
+                        ...(Object.keys(CACHE_CONFIG) as CacheConfigKey[])
+                    ),
+                    (key) => {
+                        const config = CACHE_CONFIG[key];
 
-                    expect(config.name).toBeTruthy();
-                    expect(typeof config.name).toBe("string");
-                    expect(config.name.length).toBeGreaterThan(0);
-                    expect(config.name.trim()).toBe(config.name); // No leading/trailing whitespace
-                })
+                        expect(config.name).toBeTruthy();
+                        expect(typeof config.name).toBe("string");
+                        expect(config.name.length).toBeGreaterThan(0);
+                        expect(config.name.trim()).toBe(config.name); // No leading/trailing whitespace
+                    }
+                )
             );
         });
 
         it("should have boolean enableStats for all cache configurations", () => {
             fc.assert(
-                fc.property(fc.constantFrom(...Object.keys(CACHE_CONFIG) as CacheConfigKey[]), (key) => {
-                    const config = CACHE_CONFIG[key];
+                fc.property(
+                    fc.constantFrom(
+                        ...(Object.keys(CACHE_CONFIG) as CacheConfigKey[])
+                    ),
+                    (key) => {
+                        const config = CACHE_CONFIG[key];
 
-                    expect(typeof config.enableStats).toBe("boolean");
-                })
+                        expect(typeof config.enableStats).toBe("boolean");
+                    }
+                )
             );
         });
 
         it("should have consistent configuration structure", () => {
-            const expectedKeys = ["defaultTTL", "enableStats", "maxSize", "name"];
+            const expectedKeys = [
+                "defaultTTL",
+                "enableStats",
+                "maxSize",
+                "name",
+            ];
 
             fc.assert(
-                fc.property(fc.constantFrom(...Object.keys(CACHE_CONFIG) as CacheConfigKey[]), (key) => {
-                    const config = CACHE_CONFIG[key];
-                    const configKeys = Object.keys(config).sort();
+                fc.property(
+                    fc.constantFrom(
+                        ...(Object.keys(CACHE_CONFIG) as CacheConfigKey[])
+                    ),
+                    (key) => {
+                        const config = CACHE_CONFIG[key];
+                        const configKeys = Object.keys(config).sort();
 
-                    expect(configKeys).toEqual(expectedKeys);
-                })
+                        expect(configKeys).toEqual(expectedKeys);
+                    }
+                )
             );
         });
     });
@@ -90,7 +127,9 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
         it("should handle various suffix inputs correctly", () => {
             fc.assert(
                 fc.property(
-                    fc.option(fc.string({ minLength: 1, maxLength: 20 }), { nil: undefined }),
+                    fc.option(fc.string({ minLength: 1, maxLength: 20 }), {
+                        nil: undefined,
+                    }),
                     (suffix) => {
                         const result = CACHE_NAMES.monitors(suffix);
 
@@ -136,7 +175,9 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
         it("should handle various suffix inputs correctly", () => {
             fc.assert(
                 fc.property(
-                    fc.option(fc.string({ minLength: 1, maxLength: 20 }), { nil: undefined }),
+                    fc.option(fc.string({ minLength: 1, maxLength: 20 }), {
+                        nil: undefined,
+                    }),
                     (suffix) => {
                         const result = CACHE_NAMES.settings(suffix);
 
@@ -161,14 +202,11 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
 
         it("should handle numeric strings as suffix", () => {
             fc.assert(
-                fc.property(
-                    fc.integer({ min: 0, max: 9999 }),
-                    (num) => {
-                        const suffix = num.toString();
-                        const result = CACHE_NAMES.settings(suffix);
-                        expect(result).toBe(`settings-${suffix}`);
-                    }
-                )
+                fc.property(fc.integer({ min: 0, max: 9999 }), (num) => {
+                    const suffix = num.toString();
+                    const result = CACHE_NAMES.settings(suffix);
+                    expect(result).toBe(`settings-${suffix}`);
+                })
             );
         });
     });
@@ -182,7 +220,9 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
         it("should handle various suffix inputs correctly", () => {
             fc.assert(
                 fc.property(
-                    fc.option(fc.string({ minLength: 1, maxLength: 20 }), { nil: undefined }),
+                    fc.option(fc.string({ minLength: 1, maxLength: 20 }), {
+                        nil: undefined,
+                    }),
                     (suffix) => {
                         const result = CACHE_NAMES.sites(suffix);
 
@@ -215,20 +255,18 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
 
         it("should be consistent with the conditional logic", () => {
             fc.assert(
-                fc.property(
-                    fc.option(fc.string()),
-                    (suffix) => {
-                        const normalizedSuffix = suffix === null ? undefined : suffix;
-                        const result = CACHE_NAMES.sites(normalizedSuffix);
+                fc.property(fc.option(fc.string()), (suffix) => {
+                    const normalizedSuffix =
+                        suffix === null ? undefined : suffix;
+                    const result = CACHE_NAMES.sites(normalizedSuffix);
 
-                        // This tests the ternary operator: suffix === undefined ? "sites" : `sites-${suffix}`
-                        if (normalizedSuffix === undefined) {
-                            expect(result).toBe("sites");
-                        } else {
-                            expect(result).toBe(`sites-${normalizedSuffix}`);
-                        }
+                    // This tests the ternary operator: suffix === undefined ? "sites" : `sites-${suffix}`
+                    if (normalizedSuffix === undefined) {
+                        expect(result).toBe("sites");
+                    } else {
+                        expect(result).toBe(`sites-${normalizedSuffix}`);
                     }
-                )
+                })
             );
         });
     });
@@ -243,14 +281,23 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                         expect(result).toBe(`temporary-${operation}`);
                         expect(result).toMatch(/^temporary-.+$/);
                         expect(typeof result).toBe("string");
-                        expect(result.length).toBeGreaterThan("temporary-".length);
+                        expect(result.length).toBeGreaterThan(
+                            "temporary-".length
+                        );
                     }
                 )
             );
         });
 
         it("should handle various operation names", () => {
-            const commonOperations = ["import", "export", "sync", "backup", "restore", "migrate"];
+            const commonOperations = [
+                "import",
+                "export",
+                "sync",
+                "backup",
+                "restore",
+                "migrate",
+            ];
 
             fc.assert(
                 fc.property(
@@ -273,7 +320,7 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
         it("should handle special characters in operation names", () => {
             fc.assert(
                 fc.property(
-                    fc.string({ minLength: 1 }).filter(s => s.length > 0),
+                    fc.string({ minLength: 1 }).filter((s) => s.length > 0),
                     (operation) => {
                         const result = CACHE_NAMES.temporary(operation);
                         expect(result).toBe(`temporary-${operation}`);
@@ -285,14 +332,11 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
 
         it("should maintain consistency with no conditional logic", () => {
             fc.assert(
-                fc.property(
-                    fc.string(),
-                    (operation) => {
-                        const result = CACHE_NAMES.temporary(operation);
-                        // Unlike other functions, temporary always adds the operation
-                        expect(result).toBe(`temporary-${operation}`);
-                    }
-                )
+                fc.property(fc.string(), (operation) => {
+                    const result = CACHE_NAMES.temporary(operation);
+                    // Unlike other functions, temporary always adds the operation
+                    expect(result).toBe(`temporary-${operation}`);
+                })
             );
         });
     });
@@ -309,15 +353,26 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                         const temporaryName = CACHE_NAMES.temporary(suffix);
 
                         // All should be different when suffix is provided
-                        const names = [monitorsName, settingsName, sitesName, temporaryName];
+                        const names = [
+                            monitorsName,
+                            settingsName,
+                            sitesName,
+                            temporaryName,
+                        ];
                         const uniqueNames = new Set(names);
                         expect(uniqueNames.size).toBe(names.length);
 
                         // Each should start with their respective prefix
-                        expect(monitorsName.startsWith("monitors")).toBeTruthy();
-                        expect(settingsName.startsWith("settings")).toBeTruthy();
+                        expect(
+                            monitorsName.startsWith("monitors")
+                        ).toBeTruthy();
+                        expect(
+                            settingsName.startsWith("settings")
+                        ).toBeTruthy();
                         expect(sitesName.startsWith("sites")).toBeTruthy();
-                        expect(temporaryName.startsWith("temporary")).toBeTruthy();
+                        expect(
+                            temporaryName.startsWith("temporary")
+                        ).toBeTruthy();
                     }
                 )
             );
@@ -329,18 +384,15 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
             const configKeys = Object.keys(CACHE_CONFIG) as CacheConfigKey[];
 
             fc.assert(
-                fc.property(
-                    fc.constantFrom(...configKeys),
-                    (key) => {
-                        const config = CACHE_CONFIG[key];
+                fc.property(fc.constantFrom(...configKeys), (key) => {
+                    const config = CACHE_CONFIG[key];
 
-                        // Validate TypeScript types at runtime
-                        expect(typeof config.defaultTTL).toBe("number");
-                        expect(typeof config.enableStats).toBe("boolean");
-                        expect(typeof config.maxSize).toBe("number");
-                        expect(typeof config.name).toBe("string");
-                    }
-                )
+                    // Validate TypeScript types at runtime
+                    expect(typeof config.defaultTTL).toBe("number");
+                    expect(typeof config.enableStats).toBe("boolean");
+                    expect(typeof config.maxSize).toBe("number");
+                    expect(typeof config.name).toBe("string");
+                })
             );
         });
 
@@ -348,28 +400,27 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
             const configKeys = Object.keys(CACHE_CONFIG) as CacheConfigKey[];
 
             fc.assert(
-                fc.property(
-                    fc.constantFrom(...configKeys),
-                    (key) => {
-                        const config = CACHE_CONFIG[key];
+                fc.property(fc.constantFrom(...configKeys), (key) => {
+                    const config = CACHE_CONFIG[key];
 
-                        // Attempt to modify should fail (frozen objects)
-                        expect(() => {
-                            (config as any).defaultTTL = 999;
-                        }).toThrow();
+                    // Attempt to modify should fail (frozen objects)
+                    expect(() => {
+                        (config as any).defaultTTL = 999;
+                    }).toThrow();
 
-                        expect(() => {
-                            (config as any).name = "modified";
-                        }).toThrow();
-                    }
-                )
+                    expect(() => {
+                        (config as any).name = "modified";
+                    }).toThrow();
+                })
             );
         });
 
         it("should validate CacheConfig type compatibility", () => {
             fc.assert(
                 fc.property(
-                    fc.constantFrom(...Object.keys(CACHE_CONFIG) as CacheConfigKey[]),
+                    fc.constantFrom(
+                        ...(Object.keys(CACHE_CONFIG) as CacheConfigKey[])
+                    ),
                     (key) => {
                         const config: CacheConfig = CACHE_CONFIG[key];
 
@@ -386,25 +437,49 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
 
     describe("Edge cases and boundary conditions", () => {
         it("should handle extreme suffix values for all naming functions", () => {
-            const extremeValues = ["", " ", "\t", "\n", "a".repeat(1000), "123", "special-chars!@#$%^&*()"];
+            const extremeValues = [
+                "",
+                " ",
+                "\t",
+                "\n",
+                "a".repeat(1000),
+                "123",
+                "special-chars!@#$%^&*()",
+            ];
 
             fc.assert(
                 fc.property(
                     fc.constantFrom(...extremeValues),
                     (extremeValue) => {
                         // Test all optional suffix functions
-                        expect(() => CACHE_NAMES.monitors(extremeValue)).not.toThrow();
-                        expect(() => CACHE_NAMES.settings(extremeValue)).not.toThrow();
-                        expect(() => CACHE_NAMES.sites(extremeValue)).not.toThrow();
+                        expect(() =>
+                            CACHE_NAMES.monitors(extremeValue)
+                        ).not.toThrow();
+                        expect(() =>
+                            CACHE_NAMES.settings(extremeValue)
+                        ).not.toThrow();
+                        expect(() =>
+                            CACHE_NAMES.sites(extremeValue)
+                        ).not.toThrow();
 
                         // Test temporary function (required parameter)
-                        expect(() => CACHE_NAMES.temporary(extremeValue)).not.toThrow();
+                        expect(() =>
+                            CACHE_NAMES.temporary(extremeValue)
+                        ).not.toThrow();
 
                         // Verify results are strings
-                        expect(typeof CACHE_NAMES.monitors(extremeValue)).toBe("string");
-                        expect(typeof CACHE_NAMES.settings(extremeValue)).toBe("string");
-                        expect(typeof CACHE_NAMES.sites(extremeValue)).toBe("string");
-                        expect(typeof CACHE_NAMES.temporary(extremeValue)).toBe("string");
+                        expect(typeof CACHE_NAMES.monitors(extremeValue)).toBe(
+                            "string"
+                        );
+                        expect(typeof CACHE_NAMES.settings(extremeValue)).toBe(
+                            "string"
+                        );
+                        expect(typeof CACHE_NAMES.sites(extremeValue)).toBe(
+                            "string"
+                        );
+                        expect(typeof CACHE_NAMES.temporary(extremeValue)).toBe(
+                            "string"
+                        );
                     }
                 )
             );

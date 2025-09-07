@@ -196,9 +196,9 @@ describe("Application Constants", () => {
             const lowercaseMonoFonts = FONT_FAMILY_MONO.map((f) =>
                 f.toLowerCase()
             );
-            expect(lowercaseMonoFonts.some((f) => f.includes("mono"))).toBeTruthy(
-                
-            );
+            expect(
+                lowercaseMonoFonts.some((f) => f.includes("mono"))
+            ).toBeTruthy();
 
             const lowercaseSansFonts = FONT_FAMILY_SANS.map((f) =>
                 f.toLowerCase()
@@ -869,7 +869,9 @@ describe("Application Constants", () => {
                 expect(CHECK_INTERVALS).toBeDefined();
                 expect(Array.isArray(CHECK_INTERVALS)).toBeTruthy();
 
-                const sortedIntervals = [...CHECK_INTERVALS].sort((a, b) => a.value - b.value);
+                const sortedIntervals = [...CHECK_INTERVALS].sort(
+                    (a, b) => a.value - b.value
+                );
                 expect(CHECK_INTERVALS).toEqual(sortedIntervals);
 
                 // All intervals should have valid structure
@@ -906,13 +908,20 @@ describe("Application Constants", () => {
         test.prop([fc.constantFrom("value", "label")])(
             "should have valid monitor type option structure",
             (property) => {
-                expect(Array.isArray(FALLBACK_MONITOR_TYPE_OPTIONS)).toBeTruthy();
+                expect(
+                    Array.isArray(FALLBACK_MONITOR_TYPE_OPTIONS)
+                ).toBeTruthy();
                 expect(FALLBACK_MONITOR_TYPE_OPTIONS.length).toBeGreaterThan(0);
 
                 for (const option of FALLBACK_MONITOR_TYPE_OPTIONS) {
                     expect(option).toHaveProperty(property);
-                    expect(typeof option[property as keyof typeof option]).toBe("string");
-                    expect((option[property as keyof typeof option] as string).length).toBeGreaterThan(0);
+                    expect(typeof option[property as keyof typeof option]).toBe(
+                        "string"
+                    );
+                    expect(
+                        (option[property as keyof typeof option] as string)
+                            .length
+                    ).toBeGreaterThan(0);
                 }
             }
         );
@@ -924,16 +933,24 @@ describe("Application Constants", () => {
                 expect(TIMEOUT_CONSTRAINTS_MS).toBeDefined();
 
                 // Verify constraints are logically consistent
-                expect(TIMEOUT_CONSTRAINTS.MIN).toBeLessThanOrEqual(TIMEOUT_CONSTRAINTS.MAX);
-                expect(TIMEOUT_CONSTRAINTS_MS.MIN).toBeLessThanOrEqual(TIMEOUT_CONSTRAINTS_MS.MAX);
+                expect(TIMEOUT_CONSTRAINTS.MIN).toBeLessThanOrEqual(
+                    TIMEOUT_CONSTRAINTS.MAX
+                );
+                expect(TIMEOUT_CONSTRAINTS_MS.MIN).toBeLessThanOrEqual(
+                    TIMEOUT_CONSTRAINTS_MS.MAX
+                );
 
                 // All values should be positive
                 expect(TIMEOUT_CONSTRAINTS[constraintType]).toBeGreaterThan(0);
-                expect(TIMEOUT_CONSTRAINTS_MS[constraintType]).toBeGreaterThan(0);
+                expect(TIMEOUT_CONSTRAINTS_MS[constraintType]).toBeGreaterThan(
+                    0
+                );
 
                 // MS values should be 1000x the second values (except STEP)
                 if (constraintType === "MIN" || constraintType === "MAX") {
-                    expect(TIMEOUT_CONSTRAINTS_MS[constraintType]).toBe(TIMEOUT_CONSTRAINTS[constraintType] * 1000);
+                    expect(TIMEOUT_CONSTRAINTS_MS[constraintType]).toBe(
+                        TIMEOUT_CONSTRAINTS[constraintType] * 1000
+                    );
                 }
             }
         );
@@ -953,11 +970,15 @@ describe("Application Constants", () => {
                 }
 
                 // Should be sorted in ascending order by value
-                const sortedOptions = [...HISTORY_LIMIT_OPTIONS].sort((a, b) => a.value - b.value);
+                const sortedOptions = [...HISTORY_LIMIT_OPTIONS].sort(
+                    (a, b) => a.value - b.value
+                );
                 expect(HISTORY_LIMIT_OPTIONS).toEqual(sortedOptions);
 
                 // Default should be within the available options
-                const defaultOption = HISTORY_LIMIT_OPTIONS.find(option => option.value === DEFAULT_HISTORY_LIMIT);
+                const defaultOption = HISTORY_LIMIT_OPTIONS.find(
+                    (option) => option.value === DEFAULT_HISTORY_LIMIT
+                );
                 expect(defaultOption).toBeDefined();
             }
         );
@@ -988,7 +1009,9 @@ describe("Application Constants", () => {
 
                 // Verify specific constraints
                 expect(RETRY_CONSTRAINTS.DEFAULT).toBeGreaterThan(0);
-                expect(RETRY_CONSTRAINTS.MAX).toBeGreaterThan(RETRY_CONSTRAINTS.DEFAULT);
+                expect(RETRY_CONSTRAINTS.MAX).toBeGreaterThan(
+                    RETRY_CONSTRAINTS.DEFAULT
+                );
                 expect(RETRY_CONSTRAINTS.MIN).toBe(0); // MIN should be exactly 0
 
                 // Max attempts should be reasonable
@@ -1022,7 +1045,9 @@ describe("Application Constants", () => {
                 expect(CHART_TIME_RANGES).toBeDefined();
 
                 // Chart periods should be numbers (milliseconds)
-                for (const [key, period] of Object.entries(CHART_TIME_PERIODS)) {
+                for (const [key, period] of Object.entries(
+                    CHART_TIME_PERIODS
+                )) {
                     expect(typeof key).toBe("string");
                     expect(typeof period).toBe("number");
                     expect(period).toBeGreaterThan(0);

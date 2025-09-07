@@ -274,9 +274,9 @@ describe("Database Operations Fuzzing Tests", () => {
                         const result =
                             await monitorRepository.findByIdentifier(monitorId);
                         // Should be null or undefined for non-existent monitors
-                        expect(result === null || result === undefined).toBeTruthy(
-                            
-                        ); // null or undefined
+                        expect(
+                            result === null || result === undefined
+                        ).toBeTruthy(); // null or undefined
                     } catch (error) {
                         // Method may throw for invalid IDs, which is acceptable
                     }

@@ -233,9 +233,9 @@ describe(ChartConfigService, () => {
                     "time.displayFormats.minute"
                 )
             ).toBe("HH:mm");
-            expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBeTruthy(
-                
-            );
+            expect(
+                getNestedScaleProperty(config, "y", "beginAtZero")
+            ).toBeTruthy();
             expect(getNestedScaleProperty(config, "y", "title.text")).toBe(
                 "Response Time (ms)"
             );
@@ -355,15 +355,15 @@ describe(ChartConfigService, () => {
 
             const config = chartService.getBarChartConfig();
 
-            expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBeTruthy(
-                
-            );
+            expect(
+                getNestedScaleProperty(config, "y", "beginAtZero")
+            ).toBeTruthy();
             expect(getNestedScaleProperty(config, "y", "title.text")).toBe(
                 "Count"
             );
-            expect(getNestedScaleProperty(config, "y", "title.display")).toBeTruthy(
-                
-            );
+            expect(
+                getNestedScaleProperty(config, "y", "title.display")
+            ).toBeTruthy();
         });
 
         it("should apply theme colors", async ({ task, annotate }) => {

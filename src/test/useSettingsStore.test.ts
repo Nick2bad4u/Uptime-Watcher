@@ -548,31 +548,33 @@ describe(useSettingsStore, () => {
 
             // Test minimizeToTray
             store.updateSettings({ minimizeToTray: true });
-            expect(useSettingsStore.getState().settings.minimizeToTray).toBeTruthy(
-                
-            );
+            expect(
+                useSettingsStore.getState().settings.minimizeToTray
+            ).toBeTruthy();
             store.updateSettings({ minimizeToTray: false });
-            expect(useSettingsStore.getState().settings.minimizeToTray).toBeFalsy(
-                
-            );
+            expect(
+                useSettingsStore.getState().settings.minimizeToTray
+            ).toBeFalsy();
 
             // Test notifications
             store.updateSettings({ notifications: true });
-            expect(useSettingsStore.getState().settings.notifications).toBeTruthy(
-                
-            );
+            expect(
+                useSettingsStore.getState().settings.notifications
+            ).toBeTruthy();
             store.updateSettings({ notifications: false });
-            expect(useSettingsStore.getState().settings.notifications).toBeFalsy(
-                
-            );
+            expect(
+                useSettingsStore.getState().settings.notifications
+            ).toBeFalsy();
 
             // Test soundAlerts
             store.updateSettings({ soundAlerts: true });
-            expect(useSettingsStore.getState().settings.soundAlerts).toBeTruthy();
+            expect(
+                useSettingsStore.getState().settings.soundAlerts
+            ).toBeTruthy();
             store.updateSettings({ soundAlerts: false });
-            expect(useSettingsStore.getState().settings.soundAlerts).toBeFalsy(
-                
-            );
+            expect(
+                useSettingsStore.getState().settings.soundAlerts
+            ).toBeFalsy();
         });
     });
 });

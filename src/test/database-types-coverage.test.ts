@@ -1101,9 +1101,9 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(safeGetRowProperty(row, "anotherMissingProp", 123)).toBe(
                 123
             );
-            expect(safeGetRowProperty(row, "missingBoolProp", false)).toBeFalsy(
-                
-            );
+            expect(
+                safeGetRowProperty(row, "missingBoolProp", false)
+            ).toBeFalsy();
         });
 
         it("should return default value when property is undefined", async ({
