@@ -7,14 +7,258 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[5e54a97](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e54a97847bb5527c6b2b905a7e972b39f1292ff)...
-[5e54a97](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e54a97847bb5527c6b2b905a7e972b39f1292ff)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5e54a97847bb5527c6b2b905a7e972b39f1292ff...5e54a97847bb5527c6b2b905a7e972b39f1292ff))
+[[f0a21c2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f0a21c217dd5c193310d8f765355bdec4c117d37)...
+[f0a21c2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f0a21c217dd5c193310d8f765355bdec4c117d37)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f0a21c217dd5c193310d8f765355bdec4c117d37...f0a21c217dd5c193310d8f765355bdec4c117d37))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 13.8.0 [`(f0a21c2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f0a21c217dd5c193310d8f765355bdec4c117d37)
+
+
+
+
+
+
+## [13.8.0] - 2025-09-07
+
+
+[[5e54a97](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e54a97847bb5527c6b2b905a7e972b39f1292ff)...
+[66f6e37](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66f6e37cd6d4a9d12b1e616ae5ae1a2b3e717906)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5e54a97847bb5527c6b2b905a7e972b39f1292ff...66f6e37cd6d4a9d12b1e616ae5ae1a2b3e717906))
+
+
+### ✨ Features
+
+- ✨ [feat] Integrate ESLint Config Inspector into docs site
+
+Adds automated build and deployment workflow for ESLint Config Inspector as a static application within the documentation site, including new build and verification scripts, updated build and ignore rules, and seamless navbar navigation integration.
+
+Improves developer experience by enabling visual inspection of ESLint configuration, ensures correct linting exclusions for generated output, and enhances property-based testing with more robust fast-check configuration.
+
+Refactors monitor status logic to accurately exclude invalid monitors from health calculations, and updates test assertions for better reliability and coverage.
+
+ - Relates to improved documentation automation and enhanced test robustness.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(88f0a22)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/88f0a22d3116d1576751753fa46e281174739fbb)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Improve error handling, test coverage, and code clarity
+
+- Refines error propagation by consistently using error causes and improving diagnostic messages for better traceability and debugging.
+- Enhances ESLint configuration with new rules, more granular naming for overrides, and improved plugin coverage, including stricter code quality and formatting standards.
+- Updates conditional rendering patterns and disables/enables relevant lint rules contextually for maintainable and readable JSX.
+- Adds property-based and realistic test cases to strengthen coverage and ensure robustness across edge cases and complex scenarios.
+- Refactors middleware registration logic for event handling and replaces ambiguous or legacy patterns with clear, future-proof APIs.
+- Improves cache, database, and retry logic to correctly handle edge conditions, finite numbers, and expiration checks for increased reliability.
+- Modernizes documentation, comments, and code annotations to clarify rationale and intent, increasing maintainability and onboarding ease.
+Relates to stability, DX, and maintainability improvements.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d0b8dfb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d0b8dfb345c637ad1421b15e3eef7ff3eb8fe71f)
+
+
+- 🛠️ [fix] Improve test stability, error handling, and build config
+
+- Updates property-based test configs to reduce flakiness and speed up execution by lowering timeouts, retries, and delays. Adjusts abort logic for better predictability in tests.
+- Strengthens error handling: enhances error message formatting, adds defensive checks, and makes logger fallback more robust.
+- Revises cache key parsing and validation for stricter input handling, preventing malformed identifiers and keys.
+- Refines schema validation logic for field existence checks, increasing reliability.
+- Adjusts monitor config loading and monitor status updates for more precise filtering and error messaging.
+- Sets higher EventEmitter max listeners in all test environments to suppress memory leak warnings and improve test reliability.
+- Improves Vite and Vitest configuration: clarifies build targets, plugin docs, port usage, and test attachment handling; simplifies path aliasing and removes redundant glob patterns.
+- Adds lcov-result-merger for coverage reporting.
+- Updates comments and explanatory notes for maintainability and developer clarity.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(558dc57)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/558dc570715794dba26511af0c958fcaaf6d52f1)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update the github-actions group across 1 directory with 8 updates (#65) [`(abfbb4a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/abfbb4a2ac8f155912169cb6fac90057f9026295)
+
+
 - [dependency] Update version 13.7.0 [`(5e54a97)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e54a97847bb5527c6b2b905a7e972b39f1292ff)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Add automated docs sync and downloader scripts
+
+- Introduces new scripts for automated documentation downloading, processing, and syncing with upstream sources, featuring advanced options like caching, parallel/concurrent downloads, validation, and robust error handling.
+- Adds comprehensive documentation sync logs and hash tracking for Zod-Fast-Check, @fast-check-vitest, and Example-Package, improving traceability and reproducibility.
+- Populates package docs directories with updated README files and moves Example-Package docs to local permanent redirects, standardizing documentation structure and facilitating maintainability.
+- Enhances build pipeline flexibility by supporting forced updates, output customization, and environment variable overrides for documentation outputs.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(71d05de)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/71d05de4b3b64b2e751e244f80dbb8019e739e05)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improve test readability with consistent formatting
+
+- Updates formatting of test assertions and property-based test setups for improved clarity and maintainability.
+- Replaces single-line and nested calls with multi-line structures, ensuring better alignment and easier review.
+- Does not introduce logic changes; focuses solely on code style and readability for future contributors.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b6d9e45)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b6d9e450e22b6c240978a75aa0c8b144935750ac)
+
+
+- 🎨 [style] Standardizes test assertions and describe blocks
+
+- Replaces generic assertion methods (.toBe(true/false), .toHaveBeenCalled(), .toHaveBeenCalledOnce()) with more expressive and idiomatic matchers such as .toBeTruthy(), .toBeFalsy(), .toHaveBeenCalledWith(), and .toHaveBeenCalledTimes().
+- Updates test suite descriptions to use direct references to the tested subjects/functions for improved clarity and IDE navigation.
+- Enhances consistency, readability, and maintainability of the test codebase.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9c515d3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9c515d36cdc5bb27c1b57a62a79ed993267e4b32)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Improve property-based test coverage and consistency
+
+- Refines property-based test structure for better readability, determinism, and edge case handling across multiple utility modules
+- Expands arbitraries and test cases to systematically cover input variations, error scenarios, and performance boundaries
+- Ensures consistent assertion logic, clearer value parsing, and improved test isolation for cache-related and config-dependent helpers
+- Enhances robustness of tests for fallback utilities, monitor config helpers, chart utilities, duration calculations, and file download logic
+- Adopts uniform formatting, more granular arbitraries, and explicit checks for type consistency and result structure
+- Facilitates future maintenance and reliability of automated testing suites
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(66f6e37)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66f6e37cd6d4a9d12b1e616ae5ae1a2b3e717906)
+
+
+- 🧪 [test] Achieve 100% fuzz and branch coverage for core utilities
+
+- Adds advanced property-based fuzzing suites for error handling, JSON safety, and type guards to maximize branch and edge case coverage.
+- Extends test logic with large, nested, circular, and boundary-value structures, including Unicode and special numeric cases.
+- Improves reliability and maintainability by surfacing hidden defects and validating type safety under stress.
+- Refines build and deployment scripts to support local testing, asset path correction, and more robust Nuxt.js subdirectory handling.
+- Updates logic to handle whitespace-only error messages and BigInt/symbol conversion for error utilities.
+- Adjusts property-based test timeouts and boundaries to optimize test performance and stability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2f1214b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2f1214bff2b5926fac1848a37166f7a225c58e50)
+
+
+- 🧪 [test] Wrap user interactions in act for test reliability
+
+- Improves React test stability by wrapping all asynchronous user-event interactions in act, ensuring proper state updates and avoiding potential test warnings.
+- Updates ESLint config formatting and enhances rule clarity, including improved multi-line array/object formatting and consistent trailing commas.
+- Adds or refines max-lines-per-function, prefer-arrow-callback, and SonarJS rules for more precise quality control.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7edf7c4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7edf7c41e9bcf2c25b013cf0fba2c4dacb82cf66)
+
+
+- 🧪 [test] Add property-based tests for robust input validation
+
+- Enhances unit and fuzzing tests with property-based testing using fast-check
+- Validates a wide range of inputs, edge cases, and type invariants for form utilities, shared conversion functions, object safety, string handling, and core constants
+- Strengthens coverage for database-related logic, repository methods, and backup/schema utilities with randomized data scenarios
+- Improves resilience against malformed, unexpected, or malicious user input and ensures consistency across validation patterns
+- Updates dependencies and ESLint configuration for improved maintainability and testing standards
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(66d154f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66d154f555dde69a9705922c148fea8f9ace4e37)
+
+
+- 🧪 [test] Add comprehensive property-based test suites
+
+- Adds extensive property-based tests using Fast-Check for cache, chart, duration, error handling, fallback, monitor title, status, time, timeout, and validation utilities
+- Improves edge case coverage, invariants, and deterministic behavior checks for core utilities
+- Refactors test data generation to satisfy strict TypeScript and exact optional property types
+- Enhances robustness and performance validation across multiple domains
+- Updates some test cases for consistency, clarity, and modern idioms
+
+Relates to improved test reliability and coverage for future-proofing core logic
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7265205)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7265205b03ac1c545d88e9f09190f65d9fdcb548)
+
+
+- 🧪 [test] Add property-based tests for validation and utilities
+
+- Introduces extensive property-based fuzz testing for validation, schema, and utility modules using fast-check and @fast-check/vitest.
+- Ensures comprehensive edge case coverage for string, numeric, array, error handling, cache, chart, duration, download, monitor, status, and time utilities.
+- Refines some test logic for correctness and consistency, including protocol validation for URLs (restricts to HTTP/HTTPS).
+- Improves test performance and reliability by exploring a wide range of input scenarios and enforcing invariants.
+- Updates legacy tests to use modern fast-check property-based patterns.
+- Fixes minor issues in test assertions and aligns protocol validation rules across modules.
+
+Relates to enhanced robustness and reliability in testing.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(98d451a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/98d451a0f0d3aacf07d6fe875d10cc76058ca028)
+
+
+- 🧪 [test] Add comprehensive fast-check fuzzing for shared utils
+
+Expands test coverage by introducing property-based fuzzing using fast-check for core shared utility modules, including cache keys, environment, error handling, log templates, object safety, safe conversions, string conversion, type guards, and type helpers.
+
+Improves resilience and reliability by systematically covering edge cases and unreachable branches, achieving near-complete function and branch coverage on critical code paths.
+
+Updates strict and functional tests to enforce stricter error handling in cache key parsing for invalid and empty identifier scenarios.
+
+Refactors and enhances test descriptions for clarity, correctness, and maintainability, ensuring all major utility behaviors and failure modes are validated.
+
+Relates to quality improvement and coverage goals for the shared utility library.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b9ba8e8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b9ba8e8a90c70c6c55beec515db5051d103ee695)
+
+
+- 🧪 [test] Achieve 100% coverage with fast-check fuzzing and direct tests
+
+- Adds comprehensive property-based fuzzing and direct test suites for shared and src utilities, constants, and helpers to ensure full branch, statement, and function coverage.
+- Integrates fast-check and zod-fast-check for modern fuzzing, updates configs and dependencies, and introduces a CLI coverage analysis script.
+- Refactors coverage settings, improves exclusion logic, and updates related dependencies for enhanced accuracy and maintainability.
+- Fixes minor logic and typing issues in abort, log, and utility modules to support edge case coverage and robustness.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8b246c1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8b246c18cca2e40b6aa4872308cb2f52d95998f0)
+
+
+- 🧪 [test] Enhance property-based fuzz testing and coverage config
+
+- Updates all test setups to globally configure fast-check for consistent property-based testing runs.
+- Adds extensive fuzzing suites for event bus and data import/export, improving robustness against edge cases and malformed input.
+- Refines coverage and exclude configurations for all test environments, leveraging vitest defaults for maintainability.
+- Improves regex-based assertions in schema mutation tests for stronger snake_case validation.
+- Updates package dependencies to latest patch versions for test and build tooling.
+- Removes unused Stryker setup file to clean up project.
+- Ensures all property-based tests make assertions on results to satisfy test runner requirements.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d6ac036)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6ac036e7f792ba92e906741610567fc846cd872)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v13.7.0 [skip ci] [`(06a7841)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/06a784159cd5d12cab6f6f537edb917a0813dbab)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dev dependencies and add Stryker Vitest config
+
+- Upgrades multiple development dependencies for linting, formatting, mutation testing, and documentation to latest versions, improving reliability and compatibility.
+- Adds a comprehensive Vitest configuration for Stryker mutation testing targeting frontend, backend, and shared modules, with fine-grained exclusion of problematic tests to enhance mutation coverage and CI robustness.
+- Updates Docusaurus build scripts to ensure ESLint inspector build step runs before documentation build, streamlining documentation generation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7ecdbfa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ecdbfa6e9680feeaa61a6352fadde73f6bc87be)
+
+
+- 🔧 [build] Restructures config files for clarity and consistency
+
+- Reorders, deduplicates, and aligns keys in various config and JSON files to improve readability and maintainability.
+- Harmonizes the structure of TypeScript, ESLint, Biome, markdownlint, and other tool configs, enhancing consistency across environments.
+- Adjusts script definitions and disables/enables relevant lint rules for accuracy, flexibility, and future-proofing.
+- Improves test, lint, and install script clarity, grouping related commands and updating disables to match project needs.
+- Expands external documentation mappings for Typedoc to boost developer experience.
+- Facilitates easier updates, merges, and onboarding by standardizing configuration formatting and option order.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ef7fd61)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ef7fd617dbfd2ee709df8bc5bb864f0ab83d76d9)
 
 
 
