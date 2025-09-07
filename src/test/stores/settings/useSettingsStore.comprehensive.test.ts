@@ -809,14 +809,16 @@ describe(useSettingsStore, () => {
     });
 
     describe("Property-Based Testing with Fast-Check", () => {
-        test.prop([fc.record({
-            theme: fc.constantFrom("light", "dark", "system"),
-            autoStart: fc.boolean(),
-            minimizeToTray: fc.boolean(),
-            notifications: fc.boolean(),
-            soundAlerts: fc.boolean(),
-            historyLimit: fc.integer({ min: 100, max: 10_000 })
-        })])(
+        test.prop([
+            fc.record({
+                theme: fc.constantFrom("light", "dark", "system"),
+                autoStart: fc.boolean(),
+                minimizeToTray: fc.boolean(),
+                notifications: fc.boolean(),
+                soundAlerts: fc.boolean(),
+                historyLimit: fc.integer({ min: 100, max: 10_000 }),
+            }),
+        ])(
             "should handle various settings configurations correctly",
             async (testSettings) => {
                 const { result } = renderHook(() => useSettingsStore());
@@ -826,14 +828,28 @@ describe(useSettingsStore, () => {
                 });
 
                 expect(result.current.settings.theme).toBe(testSettings.theme);
-                expect(result.current.settings.autoStart).toBe(testSettings.autoStart);
-                expect(result.current.settings.minimizeToTray).toBe(testSettings.minimizeToTray);
-                expect(result.current.settings.notifications).toBe(testSettings.notifications);
-                expect(result.current.settings.soundAlerts).toBe(testSettings.soundAlerts);
-                expect(result.current.settings.historyLimit).toBe(testSettings.historyLimit);
+                expect(result.current.settings.autoStart).toBe(
+                    testSettings.autoStart
+                );
+                expect(result.current.settings.minimizeToTray).toBe(
+                    testSettings.minimizeToTray
+                );
+                expect(result.current.settings.notifications).toBe(
+                    testSettings.notifications
+                );
+                expect(result.current.settings.soundAlerts).toBe(
+                    testSettings.soundAlerts
+                );
+                expect(result.current.settings.historyLimit).toBe(
+                    testSettings.historyLimit
+                );
 
                 // Verify setting value constraints
-                expect(["light", "dark", "system"]).toContain(testSettings.theme);
+                expect([
+                    "light",
+                    "dark",
+                    "system",
+                ]).toContain(testSettings.theme);
                 expect(typeof testSettings.autoStart).toBe("boolean");
                 expect(typeof testSettings.minimizeToTray).toBe("boolean");
                 expect(typeof testSettings.notifications).toBe("boolean");
@@ -843,14 +859,26 @@ describe(useSettingsStore, () => {
             }
         );
 
-        test.prop([fc.array(fc.record({
-            setting: fc.constantFrom("theme", "autoStart", "minimizeToTray", "notifications", "soundAlerts", "historyLimit"),
-            value: fc.oneof(
-                fc.constantFrom("light", "dark", "system"),
-                fc.boolean(),
-                fc.integer({ min: 50, max: 20_000 })
-            )
-        }), { minLength: 1, maxLength: 6 })])(
+        test.prop([
+            fc.array(
+                fc.record({
+                    setting: fc.constantFrom(
+                        "theme",
+                        "autoStart",
+                        "minimizeToTray",
+                        "notifications",
+                        "soundAlerts",
+                        "historyLimit"
+                    ),
+                    value: fc.oneof(
+                        fc.constantFrom("light", "dark", "system"),
+                        fc.boolean(),
+                        fc.integer({ min: 50, max: 20_000 })
+                    ),
+                }),
+                { minLength: 1, maxLength: 6 }
+            ),
+        ])(
             "should handle sequential setting updates correctly",
             async (settingUpdates) => {
                 const { result } = renderHook(() => useSettingsStore());
@@ -867,8 +895,12 @@ describe(useSettingsStore, () => {
                 }
 
                 // Check that the final state contains all the updates
-                for (const [setting, expectedValue] of Object.entries(finalExpectedState)) {
-                    expect((result.current.settings as any)[setting]).toBe(expectedValue);
+                for (const [setting, expectedValue] of Object.entries(
+                    finalExpectedState
+                )) {
+                    expect((result.current.settings as any)[setting]).toBe(
+                        expectedValue
+                    );
                 }
 
                 // Verify updates array properties
@@ -876,7 +908,14 @@ describe(useSettingsStore, () => {
                 expect(settingUpdates.length).toBeGreaterThanOrEqual(1);
                 expect(settingUpdates.length).toBeLessThanOrEqual(6);
                 for (const update of settingUpdates) {
-                    expect(["theme", "autoStart", "minimizeToTray", "notifications", "soundAlerts", "historyLimit"]).toContain(update.setting);
+                    expect([
+                        "theme",
+                        "autoStart",
+                        "minimizeToTray",
+                        "notifications",
+                        "soundAlerts",
+                        "historyLimit",
+                    ]).toContain(update.setting);
                 }
             }
         );
@@ -887,15 +926,26 @@ describe(useSettingsStore, () => {
                 const { result } = renderHook(() => useSettingsStore());
 
                 // Test each boolean setting
-                const booleanSettings = ["autoStart", "minimizeToTray", "notifications", "soundAlerts"];
+                const booleanSettings = [
+                    "autoStart",
+                    "minimizeToTray",
+                    "notifications",
+                    "soundAlerts",
+                ];
 
                 for (const settingName of booleanSettings) {
                     act(() => {
-                        result.current.updateSettings({ [settingName]: boolValue });
+                        result.current.updateSettings({
+                            [settingName]: boolValue,
+                        });
                     });
 
-                    expect((result.current.settings as any)[settingName]).toBe(boolValue);
-                    expect(typeof (result.current.settings as any)[settingName]).toBe("boolean");
+                    expect((result.current.settings as any)[settingName]).toBe(
+                        boolValue
+                    );
+                    expect(
+                        typeof (result.current.settings as any)[settingName]
+                    ).toBe("boolean");
                 }
 
                 // Verify boolean properties
@@ -913,7 +963,9 @@ describe(useSettingsStore, () => {
                 });
 
                 expect(result.current.settings.historyLimit).toBe(historyLimit);
-                expect(typeof result.current.settings.historyLimit).toBe("number");
+                expect(typeof result.current.settings.historyLimit).toBe(
+                    "number"
+                );
 
                 // Verify history limit properties
                 expect(historyLimit).toBeGreaterThanOrEqual(0);
@@ -922,20 +974,22 @@ describe(useSettingsStore, () => {
             }
         );
 
-        test.prop([fc.oneof(
-            fc.record({
-                theme: fc.constantFrom("light", "dark", "system"),
-                autoStart: fc.boolean()
-            }),
-            fc.record({
-                notifications: fc.boolean(),
-                soundAlerts: fc.boolean(),
-                historyLimit: fc.integer({ min: 1, max: 5000 })
-            }),
-            fc.record({
-                minimizeToTray: fc.boolean()
-            })
-        )])(
+        test.prop([
+            fc.oneof(
+                fc.record({
+                    theme: fc.constantFrom("light", "dark", "system"),
+                    autoStart: fc.boolean(),
+                }),
+                fc.record({
+                    notifications: fc.boolean(),
+                    soundAlerts: fc.boolean(),
+                    historyLimit: fc.integer({ min: 1, max: 5000 }),
+                }),
+                fc.record({
+                    minimizeToTray: fc.boolean(),
+                })
+            ),
+        ])(
             "should handle partial settings updates correctly",
             async (partialSettings) => {
                 const { result } = renderHook(() => useSettingsStore());
@@ -953,9 +1007,13 @@ describe(useSettingsStore, () => {
                 }
 
                 // Check that non-updated fields remain unchanged
-                for (const [key, initialValue] of Object.entries(initialSettings)) {
+                for (const [key, initialValue] of Object.entries(
+                    initialSettings
+                )) {
                     if (!(key in partialSettings)) {
-                        expect((result.current.settings as any)[key]).toBe(initialValue);
+                        expect((result.current.settings as any)[key]).toBe(
+                            initialValue
+                        );
                     }
                 }
 
@@ -976,13 +1034,17 @@ describe(useSettingsStore, () => {
                     updates.push(newValue);
 
                     act(() => {
-                        result.current.updateSettings({ notifications: newValue });
+                        result.current.updateSettings({
+                            notifications: newValue,
+                        });
                     });
                 }
 
                 // Final state should match the last update
                 const expectedFinalValue = updates.at(-1);
-                expect(result.current.settings.notifications).toBe(expectedFinalValue);
+                expect(result.current.settings.notifications).toBe(
+                    expectedFinalValue
+                );
 
                 // Verify update count properties
                 expect(updateCount).toBeGreaterThanOrEqual(1);
@@ -991,17 +1053,27 @@ describe(useSettingsStore, () => {
             }
         );
 
-        test.prop([fc.record({
-            validSettings: fc.record({
-                theme: fc.constantFrom("light", "dark", "system"),
-                notifications: fc.boolean(),
-                historyLimit: fc.integer({ min: 100, max: 5000 })
+        test.prop([
+            fc.record({
+                validSettings: fc.record({
+                    theme: fc.constantFrom("light", "dark", "system"),
+                    notifications: fc.boolean(),
+                    historyLimit: fc.integer({ min: 100, max: 5000 }),
+                }),
+                invalidAttempts: fc.array(
+                    fc.record({
+                        invalidKey: fc.string({ maxLength: 20 }),
+                        invalidValue: fc.oneof(
+                            fc.string(),
+                            fc.integer(),
+                            fc.boolean(),
+                            fc.constant(null)
+                        ),
+                    }),
+                    { maxLength: 3 }
+                ),
             }),
-            invalidAttempts: fc.array(fc.record({
-                invalidKey: fc.string({ maxLength: 20 }),
-                invalidValue: fc.oneof(fc.string(), fc.integer(), fc.boolean(), fc.constant(null))
-            }), { maxLength: 3 })
-        })])(
+        ])(
             "should handle mixed valid and invalid settings gracefully",
             async ({ validSettings, invalidAttempts }) => {
                 const { result } = renderHook(() => useSettingsStore());
@@ -1012,15 +1084,20 @@ describe(useSettingsStore, () => {
                 });
 
                 expect(result.current.settings.theme).toBe(validSettings.theme);
-                expect(result.current.settings.notifications).toBe(validSettings.notifications);
-                expect(result.current.settings.historyLimit).toBe(validSettings.historyLimit);
+                expect(result.current.settings.notifications).toBe(
+                    validSettings.notifications
+                );
+                expect(result.current.settings.historyLimit).toBe(
+                    validSettings.historyLimit
+                );
 
                 // Attempt invalid updates (should not break the store)
                 for (const invalidAttempt of invalidAttempts) {
                     expect(() => {
                         act(() => {
                             result.current.updateSettings({
-                                [invalidAttempt.invalidKey]: invalidAttempt.invalidValue
+                                [invalidAttempt.invalidKey]:
+                                    invalidAttempt.invalidValue,
                             } as any);
                         });
                     }).not.toThrow();
@@ -1028,8 +1105,12 @@ describe(useSettingsStore, () => {
 
                 // Valid settings should still be intact
                 expect(result.current.settings.theme).toBe(validSettings.theme);
-                expect(result.current.settings.notifications).toBe(validSettings.notifications);
-                expect(result.current.settings.historyLimit).toBe(validSettings.historyLimit);
+                expect(result.current.settings.notifications).toBe(
+                    validSettings.notifications
+                );
+                expect(result.current.settings.historyLimit).toBe(
+                    validSettings.historyLimit
+                );
 
                 // Verify mixed settings properties
                 expect(typeof validSettings).toBe("object");
@@ -1048,26 +1129,40 @@ describe(useSettingsStore, () => {
                 });
 
                 expect(result.current.settings.theme).toBe(themeValue);
-                expect(["light", "dark", "system"]).toContain(result.current.settings.theme);
+                expect([
+                    "light",
+                    "dark",
+                    "system",
+                ]).toContain(result.current.settings.theme);
 
                 // Verify theme value properties
                 expect(typeof themeValue).toBe("string");
-                expect(["light", "dark", "system"]).toContain(themeValue);
+                expect([
+                    "light",
+                    "dark",
+                    "system",
+                ]).toContain(themeValue);
             }
         );
 
-        test.prop([fc.record({
-            settingsA: fc.record({
-                theme: fc.constantFrom("light", "dark"),
-                autoStart: fc.boolean(),
-                notifications: fc.boolean()
-            }),
-            settingsB: fc.record({
-                theme: fc.constantFrom("dark", "system"),
-                minimizeToTray: fc.boolean(),
-                historyLimit: fc.integer({ min: 200, max: 2000 })
-            })
-        })])(
+        test.prop([
+            fc
+                .tuple(
+                    fc.record({
+                        theme: fc.constantFrom("light"),
+                        autoStart: fc.boolean(),
+                        notifications: fc.boolean(),
+                    }),
+                    fc.record({
+                        theme: fc.constantFrom("dark", "system"),
+                        minimizeToTray: fc.boolean(),
+                        historyLimit: fc.integer({ min: 200, max: 2000 }),
+                    })
+                )
+                .chain(([settingsA, settingsB]) =>
+                    fc.constant({ settingsA, settingsB })
+                ),
+        ])(
             "should handle overlapping settings updates correctly",
             async ({ settingsA, settingsB }) => {
                 const { result } = renderHook(() => useSettingsStore());
@@ -1078,8 +1173,12 @@ describe(useSettingsStore, () => {
                 });
 
                 expect(result.current.settings.theme).toBe(settingsA.theme);
-                expect(result.current.settings.autoStart).toBe(settingsA.autoStart);
-                expect(result.current.settings.notifications).toBe(settingsA.notifications);
+                expect(result.current.settings.autoStart).toBe(
+                    settingsA.autoStart
+                );
+                expect(result.current.settings.notifications).toBe(
+                    settingsA.notifications
+                );
 
                 // Apply overlapping second set
                 act(() => {
@@ -1089,11 +1188,19 @@ describe(useSettingsStore, () => {
                 // Theme should be updated to settingsB value
                 expect(result.current.settings.theme).toBe(settingsB.theme);
                 // Non-overlapping fields from settingsA should remain
-                expect(result.current.settings.autoStart).toBe(settingsA.autoStart);
-                expect(result.current.settings.notifications).toBe(settingsA.notifications);
+                expect(result.current.settings.autoStart).toBe(
+                    settingsA.autoStart
+                );
+                expect(result.current.settings.notifications).toBe(
+                    settingsA.notifications
+                );
                 // New fields from settingsB should be set
-                expect(result.current.settings.minimizeToTray).toBe(settingsB.minimizeToTray);
-                expect(result.current.settings.historyLimit).toBe(settingsB.historyLimit);
+                expect(result.current.settings.minimizeToTray).toBe(
+                    settingsB.minimizeToTray
+                );
+                expect(result.current.settings.historyLimit).toBe(
+                    settingsB.historyLimit
+                );
 
                 // Verify overlapping settings properties
                 expect(typeof settingsA).toBe("object");

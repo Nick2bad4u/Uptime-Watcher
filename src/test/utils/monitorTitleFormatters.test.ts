@@ -1119,13 +1119,18 @@ describe("monitorTitleFormatters", () => {
                     retryAttempts: fc.integer({ min: 1, max: 10 }),
                     responseTime: fc.integer({ min: 0, max: 10_000 }),
                     status: fc.constantFrom("up", "down", "pending", "paused"),
-                    history: fc.constant([]) as fc.Arbitrary<any[]>
-                })
-            ])("should format HTTP monitor titles with valid URLs", (monitor) => {
-                const result = formatTitleSuffix(monitor as unknown as Monitor);
-                expect(result).toBe(` (${monitor.url})`);
-                expect(result).toContain(monitor.url);
-            });
+                    history: fc.constant([]) as fc.Arbitrary<any[]>,
+                }),
+            ])(
+                "should format HTTP monitor titles with valid URLs",
+                (monitor) => {
+                    const result = formatTitleSuffix(
+                        monitor as unknown as Monitor
+                    );
+                    expect(result).toBe(` (${monitor.url})`);
+                    expect(result).toContain(monitor.url);
+                }
+            );
 
             test.prop([
                 fc.record({
@@ -1139,41 +1144,32 @@ describe("monitorTitleFormatters", () => {
                     retryAttempts: fc.integer({ min: 1, max: 10 }),
                     responseTime: fc.integer({ min: 0, max: 10_000 }),
                     status: fc.constantFrom("up", "down", "pending", "paused"),
-                    history: fc.constant([]) as fc.Arbitrary<any[]>
-                })
-            ])("should format port monitor titles with host and port", (monitor) => {
-                const result = formatTitleSuffix(monitor as unknown as Monitor);
-                expect(result).toBe(` (${monitor.host}:${monitor.port})`);
-                expect(result).toContain(monitor.host);
-                expect(result).toContain(monitor.port.toString());
-            });
+                    history: fc.constant([]) as fc.Arbitrary<any[]>,
+                }),
+            ])(
+                "should format port monitor titles with host and port",
+                (monitor) => {
+                    const result = formatTitleSuffix(
+                        monitor as unknown as Monitor
+                    );
+                    expect(result).toBe(` (${monitor.host}:${monitor.port})`);
+                    expect(result).toContain(monitor.host);
+                    expect(result).toContain(monitor.port.toString());
+                }
+            );
 
             test.prop([
                 fc.record({
                     id: fc.string({ minLength: 1, maxLength: 50 }),
                     type: fc.constantFrom("dns"),
                     host: fc.domain(),
-                    recordType: fc.constantFrom("A", "AAAA", "CNAME", "MX", "TXT", "NS"),
-                    monitoring: fc.boolean(),
-                    checkInterval: fc.integer({ min: 1000, max: 300_000 }),
-                    timeout: fc.integer({ min: 1000, max: 30_000 }),
-                    retryAttempts: fc.integer({ min: 1, max: 10 }),
-                    responseTime: fc.integer({ min: 0, max: 10_000 }),
-                    status: fc.constantFrom("up", "down", "pending", "paused"),
-                    history: fc.constant([]) as fc.Arbitrary<any[]>
-                })
-            ])("should format DNS monitor titles with record type and host", (monitor) => {
-                const result = formatTitleSuffix(monitor as unknown as Monitor);
-                expect(result).toBe(` (${monitor.recordType} ${monitor.host})`);
-                expect(result).toContain(monitor.recordType);
-                expect(result).toContain(monitor.host);
-            });
-
-            test.prop([
-                fc.record({
-                    id: fc.string({ minLength: 1, maxLength: 50 }),
-                    type: fc.string({ minLength: 1, maxLength: 20 }).filter(type =>
-                        !["http", "port", "dns"].includes(type)
+                    recordType: fc.constantFrom(
+                        "A",
+                        "AAAA",
+                        "CNAME",
+                        "MX",
+                        "TXT",
+                        "NS"
                     ),
                     monitoring: fc.boolean(),
                     checkInterval: fc.integer({ min: 1000, max: 300_000 }),
@@ -1181,46 +1177,104 @@ describe("monitorTitleFormatters", () => {
                     retryAttempts: fc.integer({ min: 1, max: 10 }),
                     responseTime: fc.integer({ min: 0, max: 10_000 }),
                     status: fc.constantFrom("up", "down", "pending", "paused"),
-                    history: fc.constant([]) as fc.Arbitrary<any[]>
-                })
-            ])("should return empty string for unknown monitor types", (monitor) => {
-                const result = formatTitleSuffix(monitor as unknown as Monitor);
-                expect(result).toBe("");
-            });
+                    history: fc.constant([]) as fc.Arbitrary<any[]>,
+                }),
+            ])(
+                "should format DNS monitor titles with record type and host",
+                (monitor) => {
+                    const result = formatTitleSuffix(
+                        monitor as unknown as Monitor
+                    );
+                    expect(result).toBe(
+                        ` (${monitor.recordType} ${monitor.host})`
+                    );
+                    expect(result).toContain(monitor.recordType);
+                    expect(result).toContain(monitor.host);
+                }
+            );
+
+            test.prop([
+                fc.record({
+                    id: fc.string({ minLength: 1, maxLength: 50 }),
+                    type: fc.string({ minLength: 1, maxLength: 20 }).filter(
+                        (type) =>
+                            ![
+                                "http",
+                                "port",
+                                "dns",
+                            ].includes(type)
+                    ),
+                    monitoring: fc.boolean(),
+                    checkInterval: fc.integer({ min: 1000, max: 300_000 }),
+                    timeout: fc.integer({ min: 1000, max: 30_000 }),
+                    retryAttempts: fc.integer({ min: 1, max: 10 }),
+                    responseTime: fc.integer({ min: 0, max: 10_000 }),
+                    status: fc.constantFrom("up", "down", "pending", "paused"),
+                    history: fc.constant([]) as fc.Arbitrary<any[]>,
+                }),
+            ])(
+                "should return empty string for unknown monitor types",
+                (monitor) => {
+                    const result = formatTitleSuffix(
+                        monitor as unknown as Monitor
+                    );
+                    expect(result).toBe("");
+                }
+            );
         });
 
         describe("getTitleSuffixFormatter property tests", () => {
-            test.prop([
-                fc.constantFrom("http", "port", "dns")
-            ])("should return formatter functions for valid monitor types", (monitorType) => {
-                const formatter = getTitleSuffixFormatter(monitorType);
-                expect(formatter).toBeDefined();
-                expect(typeof formatter).toBe("function");
-            });
+            test.prop([fc.constantFrom("http", "port", "dns")])(
+                "should return formatter functions for valid monitor types",
+                (monitorType) => {
+                    const formatter = getTitleSuffixFormatter(monitorType);
+                    expect(formatter).toBeDefined();
+                    expect(typeof formatter).toBe("function");
+                }
+            );
 
             test.prop([
-                fc.string({ minLength: 1, maxLength: 50 }).filter(type =>
-                    !["http", "port", "dns"].includes(type)
-                )
-            ])("should return undefined for invalid monitor types", (monitorType) => {
-                const formatter = getTitleSuffixFormatter(monitorType);
-                expect(formatter).toBeUndefined();
-            });
+                fc.string({ minLength: 1, maxLength: 50 }).filter(
+                    (type) =>
+                        ![
+                            "http",
+                            "port",
+                            "dns",
+                        ].includes(type)
+                ),
+            ])(
+                "should return undefined for invalid monitor types",
+                (monitorType) => {
+                    const formatter = getTitleSuffixFormatter(monitorType);
+                    expect(formatter).toBeUndefined();
+                }
+            );
         });
 
         describe("registerTitleSuffixFormatter property tests", () => {
             test.prop([
-                fc.string({ minLength: 1, maxLength: 50 }),
-                fc.constant((monitor: Monitor) => ` (custom-${monitor.id})`)
-            ])("should register custom formatters that can be retrieved", (monitorType, formatter) => {
-                // Register the formatter
-                registerTitleSuffixFormatter(monitorType, formatter);
+                fc.string({ minLength: 1, maxLength: 50 }).filter(
+                    (str) =>
+                        ![
+                            "__proto__",
+                            "constructor",
+                            "prototype",
+                        ].includes(str)
+                ),
+                fc.constant((monitor: Monitor) => ` (custom-${monitor.id})`),
+            ])(
+                "should register custom formatters that can be retrieved",
+                (monitorType, formatter) => {
+                    // Register the formatter
+                    registerTitleSuffixFormatter(monitorType, formatter);
 
-                // Verify it can be retrieved
-                const retrievedFormatter = getTitleSuffixFormatter(monitorType);
-                expect(retrievedFormatter).toBeDefined();
-                expect(retrievedFormatter).toBe(formatter);
-            });
+                    // Verify it can be retrieved
+                    const retrievedFormatter =
+                        getTitleSuffixFormatter(monitorType);
+                    expect(retrievedFormatter).toBeDefined();
+                    expect(retrievedFormatter).toBe(formatter);
+                }
+            );
 
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
@@ -1233,31 +1287,43 @@ describe("monitorTitleFormatters", () => {
                     retryAttempts: fc.integer({ min: 1, max: 10 }),
                     responseTime: fc.integer({ min: 0, max: 10_000 }),
                     status: fc.constantFrom("up", "down", "pending", "paused"),
-                    history: fc.constant([]) as fc.Arbitrary<any[]>
-                })
-            ])("should register formatters that work with formatTitleSuffix", (monitorType, monitor) => {
-                const customFormatter = (m: Monitor) => ` (test-${m.id})`;
-                const testMonitor = { ...monitor, type: monitorType } as unknown as Monitor;
+                    history: fc.constant([]) as fc.Arbitrary<any[]>,
+                }),
+            ])(
+                "should register formatters that work with formatTitleSuffix",
+                (monitorType, monitor) => {
+                    const customFormatter = (m: Monitor) => ` (test-${m.id})`;
+                    const testMonitor = {
+                        ...monitor,
+                        type: monitorType,
+                    } as unknown as Monitor;
 
-                // Register custom formatter
-                registerTitleSuffixFormatter(monitorType, customFormatter);
+                    // Register custom formatter
+                    registerTitleSuffixFormatter(monitorType, customFormatter);
 
-                // Test that formatTitleSuffix uses the custom formatter
-                const result = formatTitleSuffix(testMonitor);
-                expect(result).toBe(` (test-${monitor.id})`);
-            });
+                    // Test that formatTitleSuffix uses the custom formatter
+                    const result = formatTitleSuffix(testMonitor);
+                    expect(result).toBe(` (test-${monitor.id})`);
+                }
+            );
 
             test.prop([
                 fc.constantFrom("http", "port", "dns"),
-                fc.constant((monitor: Monitor) => ` (overridden-${monitor.id})`)
-            ])("should allow overriding existing formatters", (monitorType, newFormatter) => {
-                // Register new formatter to override existing one
-                registerTitleSuffixFormatter(monitorType, newFormatter);
+                fc.constant(
+                    (monitor: Monitor) => ` (overridden-${monitor.id})`
+                ),
+            ])(
+                "should allow overriding existing formatters",
+                (monitorType, newFormatter) => {
+                    // Register new formatter to override existing one
+                    registerTitleSuffixFormatter(monitorType, newFormatter);
 
-                // Verify the new formatter is used
-                const retrievedFormatter = getTitleSuffixFormatter(monitorType);
-                expect(retrievedFormatter).toBe(newFormatter);
-            });
+                    // Verify the new formatter is used
+                    const retrievedFormatter =
+                        getTitleSuffixFormatter(monitorType);
+                    expect(retrievedFormatter).toBe(newFormatter);
+                }
+            );
         });
     });
 });

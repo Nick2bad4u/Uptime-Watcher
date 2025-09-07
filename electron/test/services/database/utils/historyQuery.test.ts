@@ -273,41 +273,51 @@ describe("historyQuery utilities", () => {
         describe("Property-Based findHistoryByMonitorId Tests", () => {
             test.prop([
                 fc.string({ minLength: 1, maxLength: 100 }),
-                fc.array(fc.record({
-                    timestamp: fc.integer({ min: 0, max: Date.now() }),
-                    status: fc.constantFrom("up", "down"),
-                    responseTime: fc.integer({ min: 0, max: 60_000 }),
-                    details: fc.oneof(
-                        fc.string({ maxLength: 200 }),
-                        fc.constant(null),
-                        fc.constant(undefined)
-                    )
-                }), { minLength: 0, maxLength: 20 })
+                fc.array(
+                    fc.record({
+                        timestamp: fc.integer({ min: 0, max: Date.now() }),
+                        status: fc.constantFrom("up", "down"),
+                        responseTime: fc.integer({ min: 0, max: 60_000 }),
+                        details: fc.oneof(
+                            fc.string({ maxLength: 200 }),
+                            fc.constant(null),
+                            fc.constant(undefined)
+                        ),
+                    }),
+                    { minLength: 0, maxLength: 20 }
+                ),
             ])(
                 "should handle various monitor IDs and history data",
                 (monitorId, historyRows) => {
                     // Arrange
-                    const mockRows: DatabaseHistoryRow[] = historyRows.map(row => ({
-                        ...row,
-                        monitorId
-                    })) as DatabaseHistoryRow[];
+                    const mockRows: DatabaseHistoryRow[] = historyRows.map(
+                        (row) => ({
+                            ...row,
+                            monitorId,
+                        })
+                    ) as DatabaseHistoryRow[];
 
-                    (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRows);
+                    (
+                        mockDb.all as unknown as ReturnType<typeof vi.fn>
+                    ).mockReturnValue(mockRows);
 
-                    const expectedMappedResults = historyRows.map(row => ({
+                    const expectedMappedResults = historyRows.map((row) => ({
                         status: row.status,
                         timestamp: row.timestamp,
                         responseTime: row.responseTime,
-                        ...(row.details && { details: row.details })
+                        ...(row.details && { details: row.details }),
                     }));
 
-                    (rowToHistoryEntry as ReturnType<typeof vi.fn>).mockImplementation((row: any) => {
-                        const { timestamp, status, responseTime, details } = row;
+                    (
+                        rowToHistoryEntry as ReturnType<typeof vi.fn>
+                    ).mockImplementation((row: any) => {
+                        const { timestamp, status, responseTime, details } =
+                            row;
                         return {
                             status,
                             timestamp,
                             responseTime,
-                            ...(details && { details })
+                            ...(details && { details }),
                         };
                     });
 
@@ -326,8 +336,12 @@ describe("historyQuery utilities", () => {
                     if (historyRows.length > 0) {
                         for (const [index, item] of result.entries()) {
                             expect(item.status).toBe(historyRows[index].status);
-                            expect(item.timestamp).toBe(historyRows[index].timestamp);
-                            expect(item.responseTime).toBe(historyRows[index].responseTime);
+                            expect(item.timestamp).toBe(
+                                historyRows[index].timestamp
+                            );
+                            expect(item.responseTime).toBe(
+                                historyRows[index].responseTime
+                            );
                         }
                     }
                 }
@@ -339,10 +353,15 @@ describe("historyQuery utilities", () => {
                     fc.pre(emptyLength === 0);
 
                     // Arrange
-                    (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue([]);
+                    (
+                        mockDb.all as unknown as ReturnType<typeof vi.fn>
+                    ).mockReturnValue([]);
 
                     // Act
-                    const result = findHistoryByMonitorId(mockDb, "non-existent-monitor");
+                    const result = findHistoryByMonitorId(
+                        mockDb,
+                        "non-existent-monitor"
+                    );
 
                     // Assert
                     expect(result).toEqual([]);
@@ -353,30 +372,43 @@ describe("historyQuery utilities", () => {
 
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
-                fc.array(fc.record({
-                    timestamp: fc.integer({ min: Date.now() - 1_000_000, max: Date.now() }),
-                    status: fc.constantFrom("up", "down"),
-                    responseTime: fc.oneof(
-                        fc.integer({ min: 0, max: 100 }),
-                        fc.integer({ min: 5000, max: 60_000 })
-                    ),
-                    details: fc.string({ maxLength: 100 })
-                }), { minLength: 1, maxLength: 15 })
+                fc.array(
+                    fc.record({
+                        timestamp: fc.integer({
+                            min: Date.now() - 1_000_000,
+                            max: Date.now(),
+                        }),
+                        status: fc.constantFrom("up", "down"),
+                        responseTime: fc.oneof(
+                            fc.integer({ min: 0, max: 100 }),
+                            fc.integer({ min: 5000, max: 60_000 })
+                        ),
+                        details: fc.string({ maxLength: 100 }),
+                    }),
+                    { minLength: 1, maxLength: 15 }
+                ),
             ])(
                 "should handle realistic history data with various timestamps",
                 (monitorId, historyData) => {
+                    // Clear previous calls for this property-based test iteration
+                    vi.clearAllMocks();
+
                     // Arrange
-                    const mockRows = historyData.map(row => ({
+                    const mockRows = historyData.map((row) => ({
                         ...row,
-                        monitorId
+                        monitorId,
                     })) as DatabaseHistoryRow[];
 
-                    (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRows);
-                    (rowToHistoryEntry as ReturnType<typeof vi.fn>).mockImplementation((row: any) => ({
+                    (
+                        mockDb.all as unknown as ReturnType<typeof vi.fn>
+                    ).mockReturnValue(mockRows);
+                    (
+                        rowToHistoryEntry as ReturnType<typeof vi.fn>
+                    ).mockImplementation((row: any) => ({
                         status: row.status,
                         timestamp: row.timestamp,
                         responseTime: row.responseTime,
-                        details: row.details
+                        details: row.details,
                     }));
 
                     // Act
@@ -384,7 +416,9 @@ describe("historyQuery utilities", () => {
 
                     // Assert
                     expect(result).toHaveLength(historyData.length);
-                    expect(rowToHistoryEntry).toHaveBeenCalledTimes(historyData.length);
+                    expect(rowToHistoryEntry).toHaveBeenCalledTimes(
+                        historyData.length
+                    );
 
                     // Verify all results are valid StatusHistory objects
                     for (const entry of result) {
@@ -396,15 +430,26 @@ describe("historyQuery utilities", () => {
             );
 
             test.prop([
-                fc.array(fc.string({ minLength: 1, maxLength: 30 }), { minLength: 1, maxLength: 5 })
+                fc.array(fc.string({ minLength: 1, maxLength: 30 }), {
+                    minLength: 1,
+                    maxLength: 5,
+                }),
             ])(
                 "should handle sequential queries for different monitors",
                 (monitorIds) => {
+                    // Clear previous calls for this property-based test iteration
+                    vi.clearAllMocks();
+
                     // Act & Assert
                     for (const monitorId of monitorIds) {
-                        (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue([]);
+                        (
+                            mockDb.all as unknown as ReturnType<typeof vi.fn>
+                        ).mockReturnValue([]);
 
-                        const result = findHistoryByMonitorId(mockDb, monitorId);
+                        const result = findHistoryByMonitorId(
+                            mockDb,
+                            monitorId
+                        );
 
                         expect(mockDb.all).toHaveBeenCalledWith(
                             "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
@@ -602,13 +647,15 @@ describe("historyQuery utilities", () => {
         describe("Property-Based getHistoryCount Tests", () => {
             test.prop([
                 fc.string({ minLength: 1, maxLength: 100 }),
-                fc.integer({ min: 0, max: 100_000 })
+                fc.integer({ min: 0, max: 100_000 }),
             ])(
                 "should return count for various monitor IDs and count values",
                 (monitorId, expectedCount) => {
                     // Arrange
                     const mockResult = { count: expectedCount };
-                    (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockResult);
+                    (
+                        mockDb.get as unknown as ReturnType<typeof vi.fn>
+                    ).mockReturnValue(mockResult);
 
                     // Act
                     const result = getHistoryCount(mockDb, monitorId);
@@ -625,17 +672,25 @@ describe("historyQuery utilities", () => {
             );
 
             test.prop([
-                fc.array(fc.record({
-                    monitorId: fc.string({ minLength: 1, maxLength: 50 }),
-                    count: fc.integer({ min: 0, max: 10_000 })
-                }), { minLength: 1, maxLength: 10 })
+                fc.array(
+                    fc.record({
+                        monitorId: fc.string({ minLength: 1, maxLength: 50 }),
+                        count: fc.integer({ min: 0, max: 10_000 }),
+                    }),
+                    { minLength: 1, maxLength: 10 }
+                ),
             ])(
                 "should handle sequential count queries for multiple monitors",
                 (monitorCountPairs) => {
+                    // Clear previous calls for this property-based test iteration
+                    vi.clearAllMocks();
+
                     // Act & Assert
                     for (const { monitorId, count } of monitorCountPairs) {
                         const mockResult = { count };
-                        (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockResult);
+                        (
+                            mockDb.get as unknown as ReturnType<typeof vi.fn>
+                        ).mockReturnValue(mockResult);
 
                         const result = getHistoryCount(mockDb, monitorId);
 
@@ -646,19 +701,23 @@ describe("historyQuery utilities", () => {
                         );
                     }
 
-                    expect(mockDb.get).toHaveBeenCalledTimes(monitorCountPairs.length);
+                    expect(mockDb.get).toHaveBeenCalledTimes(
+                        monitorCountPairs.length
+                    );
                 }
             );
 
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
-                fc.constantFrom(0, 1, 100, 1000, 50_000, 999_999)
+                fc.constantFrom(0, 1, 100, 1000, 50_000, 999_999),
             ])(
                 "should handle edge case count values correctly",
                 (monitorId, edgeCount) => {
                     // Arrange
                     const mockResult = { count: edgeCount };
-                    (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockResult);
+                    (
+                        mockDb.get as unknown as ReturnType<typeof vi.fn>
+                    ).mockReturnValue(mockResult);
 
                     // Act
                     const result = getHistoryCount(mockDb, monitorId);
@@ -677,18 +736,22 @@ describe("historyQuery utilities", () => {
                     fc.constant("Table does not exist"),
                     fc.constant("Permission denied"),
                     fc.string({ minLength: 5, maxLength: 100 })
-                )
+                ),
             ])(
                 "should handle various database errors",
                 (monitorId, errorMessage) => {
                     // Arrange
                     const dbError = new Error(errorMessage);
-                    (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => {
+                    (
+                        mockDb.get as unknown as ReturnType<typeof vi.fn>
+                    ).mockImplementation(() => {
                         throw dbError;
                     });
 
                     // Act & Assert
-                    expect(() => getHistoryCount(mockDb, monitorId)).toThrow(errorMessage);
+                    expect(() => getHistoryCount(mockDb, monitorId)).toThrow(
+                        errorMessage
+                    );
                     expect(logger.error).toHaveBeenCalledWith(
                         `[HistoryQuery] Failed to get history count for monitor: ${monitorId}`,
                         dbError
@@ -701,17 +764,24 @@ describe("historyQuery utilities", () => {
                     fc.constant(""),
                     fc.string({ maxLength: 0 }),
                     fc.constant("   "),
-                    fc.string({ minLength: 1, maxLength: 5 }).map(s => s.trim())
-                )
+                    fc
+                        .string({ minLength: 1, maxLength: 5 })
+                        .map((s) => s.trim())
+                ),
             ])(
                 "should handle empty or whitespace monitor IDs",
                 (problematicMonitorId) => {
                     // Arrange
                     const mockResult = { count: 0 };
-                    (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockResult);
+                    (
+                        mockDb.get as unknown as ReturnType<typeof vi.fn>
+                    ).mockReturnValue(mockResult);
 
                     // Act
-                    const result = getHistoryCount(mockDb, problematicMonitorId);
+                    const result = getHistoryCount(
+                        mockDb,
+                        problematicMonitorId
+                    );
 
                     // Assert
                     expect(mockDb.get).toHaveBeenCalledWith(
@@ -960,26 +1030,32 @@ describe("historyQuery utilities", () => {
                         fc.string({ maxLength: 200 }),
                         fc.constant(null),
                         fc.constant(undefined)
-                    )
-                })
+                    ),
+                }),
             ])(
                 "should return latest history entry for various monitor IDs and data",
                 (monitorId, mockRowData) => {
                     // Arrange
                     const mockRow: DatabaseHistoryRow = {
                         ...mockRowData,
-                        monitorId
+                        monitorId,
                     } as DatabaseHistoryRow;
 
                     const expectedMappedEntry: StatusHistory = {
                         timestamp: mockRowData.timestamp,
                         status: mockRowData.status,
                         responseTime: mockRowData.responseTime,
-                        ...(mockRowData.details && { details: mockRowData.details })
+                        ...(mockRowData.details && {
+                            details: mockRowData.details,
+                        }),
                     };
 
-                    (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRow);
-                    (rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>).mockReturnValue(expectedMappedEntry);
+                    (
+                        mockDb.get as unknown as ReturnType<typeof vi.fn>
+                    ).mockReturnValue(mockRow);
+                    (
+                        rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>
+                    ).mockReturnValue(expectedMappedEntry);
 
                     // Act
                     const result = getLatestHistoryEntry(mockDb, monitorId);
@@ -1000,13 +1076,13 @@ describe("historyQuery utilities", () => {
                 }
             );
 
-            test.prop([
-                fc.string({ minLength: 1, maxLength: 50 })
-            ])(
+            test.prop([fc.string({ minLength: 1, maxLength: 50 })])(
                 "should return undefined when no history entry exists",
                 (monitorId) => {
                     // Arrange
-                    (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(undefined);
+                    (
+                        mockDb.get as unknown as ReturnType<typeof vi.fn>
+                    ).mockReturnValue(undefined);
 
                     // Act
                     const result = getLatestHistoryEntry(mockDb, monitorId);
@@ -1028,18 +1104,22 @@ describe("historyQuery utilities", () => {
                     fc.constant("Table not found"),
                     fc.constant("Query timeout"),
                     fc.string({ minLength: 5, maxLength: 100 })
-                )
+                ),
             ])(
                 "should handle various database errors",
                 (monitorId, errorMessage) => {
                     // Arrange
                     const dbError = new Error(errorMessage);
-                    (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => {
+                    (
+                        mockDb.get as unknown as ReturnType<typeof vi.fn>
+                    ).mockImplementation(() => {
                         throw dbError;
                     });
 
                     // Act & Assert
-                    expect(() => getLatestHistoryEntry(mockDb, monitorId)).toThrow(errorMessage);
+                    expect(() =>
+                        getLatestHistoryEntry(mockDb, monitorId)
+                    ).toThrow(errorMessage);
                     expect(logger.error).toHaveBeenCalledWith(
                         `[HistoryQuery] Failed to get latest history entry for monitor: ${monitorId}`,
                         dbError
@@ -1048,31 +1128,49 @@ describe("historyQuery utilities", () => {
             );
 
             test.prop([
-                fc.array(fc.record({
-                    monitorId: fc.string({ minLength: 1, maxLength: 30 }),
-                    timestamp: fc.integer({ min: Date.now() - 1_000_000, max: Date.now() }),
-                    status: fc.constantFrom("up", "down"),
-                    responseTime: fc.integer({ min: 0, max: 5000 })
-                }), { minLength: 1, maxLength: 8 })
+                fc.array(
+                    fc.record({
+                        monitorId: fc.string({ minLength: 1, maxLength: 30 }),
+                        timestamp: fc.integer({
+                            min: Date.now() - 1_000_000,
+                            max: Date.now(),
+                        }),
+                        status: fc.constantFrom("up", "down"),
+                        responseTime: fc.integer({ min: 0, max: 5000 }),
+                    }),
+                    { minLength: 1, maxLength: 8 }
+                ),
             ])(
                 "should handle sequential queries for multiple monitors",
                 (monitorEntries) => {
+                    // Clear previous calls for this property-based test iteration
+                    vi.clearAllMocks();
+
                     // Act & Assert
                     for (const entry of monitorEntries) {
                         const mockRow: DatabaseHistoryRow = {
-                            ...entry
+                            ...entry,
                         } as DatabaseHistoryRow;
 
                         const expectedMappedEntry: StatusHistory = {
                             timestamp: entry.timestamp,
                             status: entry.status,
-                            responseTime: entry.responseTime
+                            responseTime: entry.responseTime,
                         };
 
-                        (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRow);
-                        (rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>).mockReturnValue(expectedMappedEntry);
+                        (
+                            mockDb.get as unknown as ReturnType<typeof vi.fn>
+                        ).mockReturnValue(mockRow);
+                        (
+                            rowToHistoryEntry as unknown as ReturnType<
+                                typeof vi.fn
+                            >
+                        ).mockReturnValue(expectedMappedEntry);
 
-                        const result = getLatestHistoryEntry(mockDb, entry.monitorId);
+                        const result = getLatestHistoryEntry(
+                            mockDb,
+                            entry.monitorId
+                        );
 
                         expect(result).toEqual(expectedMappedEntry);
                         expect(mockDb.get).toHaveBeenCalledWith(
@@ -1081,7 +1179,9 @@ describe("historyQuery utilities", () => {
                         );
                     }
 
-                    expect(mockDb.get).toHaveBeenCalledTimes(monitorEntries.length);
+                    expect(mockDb.get).toHaveBeenCalledTimes(
+                        monitorEntries.length
+                    );
                 }
             );
 
@@ -1091,32 +1191,39 @@ describe("historyQuery utilities", () => {
                     timestamp: fc.oneof(
                         fc.integer({ min: 0, max: 1000 }),
                         fc.integer({ min: Date.now() - 1000, max: Date.now() }),
-                        fc.integer({ min: Date.now(), max: Date.now() + 100_000 })
+                        fc.integer({
+                            min: Date.now(),
+                            max: Date.now() + 100_000,
+                        })
                     ),
                     status: fc.constantFrom("up", "down"),
                     responseTime: fc.oneof(
                         fc.integer({ min: 0, max: 0 }),
                         fc.integer({ min: 1, max: 100 }),
                         fc.integer({ min: 30_000, max: 60_000 })
-                    )
-                })
+                    ),
+                }),
             ])(
                 "should handle edge case timestamps and response times",
                 (monitorId, edgeData) => {
                     // Arrange
                     const mockRow: DatabaseHistoryRow = {
                         ...edgeData,
-                        monitorId
+                        monitorId,
                     } as DatabaseHistoryRow;
 
                     const expectedMappedEntry: StatusHistory = {
                         timestamp: edgeData.timestamp,
                         status: edgeData.status,
-                        responseTime: edgeData.responseTime
+                        responseTime: edgeData.responseTime,
                     };
 
-                    (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockRow);
-                    (rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>).mockReturnValue(expectedMappedEntry);
+                    (
+                        mockDb.get as unknown as ReturnType<typeof vi.fn>
+                    ).mockReturnValue(mockRow);
+                    (
+                        rowToHistoryEntry as unknown as ReturnType<typeof vi.fn>
+                    ).mockReturnValue(expectedMappedEntry);
 
                     // Act
                     const result = getLatestHistoryEntry(mockDb, monitorId);
@@ -1126,7 +1233,9 @@ describe("historyQuery utilities", () => {
 
                     if (result) {
                         expect(Number.isFinite(result.timestamp)).toBeTruthy();
-                        expect(Number.isFinite(result.responseTime)).toBeTruthy();
+                        expect(
+                            Number.isFinite(result.responseTime)
+                        ).toBeTruthy();
                         expect(result.timestamp).toBe(edgeData.timestamp);
                         expect(result.responseTime).toBe(edgeData.responseTime);
                     }

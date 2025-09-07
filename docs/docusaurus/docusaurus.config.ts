@@ -226,6 +226,11 @@ const config: Config = {
                     type: "docSidebar",
                 },
                 {
+                    href: "/Uptime-Watcher/eslint-inspector/",
+                    label: "ESLint Inspector",
+                    position: "left",
+                },
+                {
                     href: "https://github.com/Nick2bad4u/Uptime-Watcher",
                     label: "GitHub",
                     position: "right",

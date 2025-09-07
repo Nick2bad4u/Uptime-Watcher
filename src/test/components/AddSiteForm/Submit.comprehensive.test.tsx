@@ -13,7 +13,33 @@ vi.mock("../../../utils/monitorValidation", () => ({
 
 // Mock the error handling utility
 vi.mock("../../../utils/errorHandling", () => ({
-    withUtilityErrorHandling: vi.fn((fn) => fn()),
+    withUtilityErrorHandling: vi.fn(
+        async (
+            fn,
+            operationName,
+            fallbackValue = undefined,
+            shouldThrow = false
+        ) => {
+            try {
+                return await fn();
+            } catch (error) {
+                // Mock the logging behavior but don't actually log
+                // console.log(`${operationName} failed`, error);
+
+                if (shouldThrow) {
+                    throw error;
+                }
+
+                if (fallbackValue === undefined) {
+                    throw new Error(
+                        `${operationName} failed and no fallback value provided`
+                    );
+                }
+
+                return fallbackValue;
+            }
+        }
+    ),
 }));
 
 // Mock the fallbacks
@@ -212,12 +238,21 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
     });
 
     describe("Property-Based Form Submission Testing", () => {
-        test.prop([fc.record({
-            siteName: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
-            url: fc.webUrl(),
-            monitorType: fc.constantFrom("http", "ping", "tcp", "dns"),
-            checkInterval: fc.constantFrom(30_000, 60_000, 300_000, 600_000)
-        })])(
+        test.prop([
+            fc.record({
+                siteName: fc
+                    .string({ minLength: 1, maxLength: 100 })
+                    .filter((s) => s.trim().length > 0),
+                url: fc.webUrl(),
+                monitorType: fc.constantFrom("http", "port", "ping", "dns"),
+                checkInterval: fc.constantFrom(
+                    30_000,
+                    60_000,
+                    300_000,
+                    600_000
+                ),
+            }),
+        ])(
             "should handle valid form submissions with various data combinations",
             async (formData) => {
                 const mockEvent = { preventDefault: vi.fn() } as any;
@@ -229,8 +264,10 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 });
 
                 // Mock successful validation
-                const { validateMonitorFormData, validateMonitorFieldClientSide } =
-                    await import("../../../utils/monitorValidation");
+                const {
+                    validateMonitorFormData,
+                    validateMonitorFieldClientSide,
+                } = await import("../../../utils/monitorValidation");
                 vi.mocked(validateMonitorFormData).mockResolvedValue({
                     success: true,
                     errors: [],
@@ -253,8 +290,18 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 expect(formData.siteName.trim().length).toBeGreaterThan(0);
                 expect(formData.siteName.length).toBeLessThanOrEqual(100);
                 expect(formData.url).toMatch(/^https?:\/\//);
-                expect(["http", "ping", "tcp", "dns"]).toContain(formData.monitorType);
-                expect([30_000, 60_000, 300_000, 600_000]).toContain(formData.checkInterval);
+                expect([
+                    "http",
+                    "port",
+                    "ping",
+                    "dns",
+                ]).toContain(formData.monitorType);
+                expect([
+                    30_000,
+                    60_000,
+                    300_000,
+                    600_000,
+                ]).toContain(formData.checkInterval);
             }
         );
 
@@ -287,24 +334,32 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             }
         );
 
-        test.prop([fc.record({
-            host: fc.oneof(fc.domain(), fc.ipV4(), fc.constant("localhost")),
-            port: fc.integer({ min: 1, max: 65_535 }),
-            timeout: fc.integer({ min: 1000, max: 60_000 }),
-            retries: fc.integer({ min: 0, max: 10 })
-        })])(
-            "should handle TCP monitor submissions with various configurations",
-            async (tcpConfig) => {
+        test.prop([
+            fc.record({
+                host: fc.oneof(
+                    fc.domain(),
+                    fc.ipV4(),
+                    fc.constant("localhost")
+                ),
+                port: fc.integer({ min: 1, max: 65_535 }),
+                timeout: fc.integer({ min: 1000, max: 60_000 }),
+                retries: fc.integer({ min: 0, max: 10 }),
+            }),
+        ])(
+            "should handle Port monitor submissions with various configurations",
+            async (portConfig) => {
                 const mockEvent = { preventDefault: vi.fn() } as any;
                 const properties = createMockProperties({
-                    monitorType: "tcp",
-                    host: tcpConfig.host,
-                    port: tcpConfig.port.toString(),
+                    monitorType: "port",
+                    host: portConfig.host,
+                    port: portConfig.port.toString(),
                 });
 
                 // Mock successful validation
-                const { validateMonitorFormData, validateMonitorFieldClientSide } =
-                    await import("../../../utils/monitorValidation");
+                const {
+                    validateMonitorFormData,
+                    validateMonitorFieldClientSide,
+                } = await import("../../../utils/monitorValidation");
                 vi.mocked(validateMonitorFormData).mockResolvedValue({
                     success: true,
                     errors: [],
@@ -322,22 +377,24 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 expect(mockEvent.preventDefault).toHaveBeenCalled();
                 expect(properties.createSite).toHaveBeenCalled();
 
-                // Verify TCP config characteristics
-                expect(tcpConfig.port).toBeGreaterThanOrEqual(1);
-                expect(tcpConfig.port).toBeLessThanOrEqual(65_535);
-                expect(tcpConfig.timeout).toBeGreaterThanOrEqual(1000);
-                expect(tcpConfig.timeout).toBeLessThanOrEqual(60_000);
-                expect(tcpConfig.retries).toBeGreaterThanOrEqual(0);
-                expect(tcpConfig.retries).toBeLessThanOrEqual(10);
+                // Verify Port config characteristics
+                expect(portConfig.port).toBeGreaterThanOrEqual(1);
+                expect(portConfig.port).toBeLessThanOrEqual(65_535);
+                expect(portConfig.timeout).toBeGreaterThanOrEqual(1000);
+                expect(portConfig.timeout).toBeLessThanOrEqual(60_000);
+                expect(portConfig.retries).toBeGreaterThanOrEqual(0);
+                expect(portConfig.retries).toBeLessThanOrEqual(10);
             }
         );
 
-        test.prop([fc.oneof(
-            fc.string().filter(s => s.trim().length === 0),
-            fc.constantFrom("", "   ", "\t", "\n"),
-            fc.constant(null),
-            fc.constant(undefined)
-        )])(
+        test.prop([
+            fc.oneof(
+                fc.string().filter((s) => s.trim().length === 0),
+                fc.constantFrom("", "   ", "\t", "\n"),
+                fc.constant(null),
+                fc.constant(undefined)
+            ),
+        ])(
             "should handle invalid form data gracefully",
             async (invalidInput) => {
                 const mockEvent = { preventDefault: vi.fn() } as any;
@@ -364,25 +421,40 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 // Form should handle invalid input without crashing
                 expect(() => {
                     const testValue = invalidInput;
-                    expect(testValue === null || testValue === undefined ||
-                           (typeof testValue === 'string' && testValue.trim().length === 0))
-                           .toBeTruthy();
+                    expect(
+                        testValue === null ||
+                            testValue === undefined ||
+                            (typeof testValue === "string" &&
+                                testValue.trim().length === 0)
+                    ).toBeTruthy();
                 }).not.toThrow();
             }
         );
 
-        test.prop([fc.record({
-            errorType: fc.constantFrom("network", "timeout", "validation", "server", "permission"),
-            statusCode: fc.integer({ min: 400, max: 599 }),
-            message: fc.string({ minLength: 5, maxLength: 200 })
-        })])(
+        test.prop([
+            fc.record({
+                errorType: fc.constantFrom(
+                    "network",
+                    "timeout",
+                    "validation",
+                    "server",
+                    "permission"
+                ),
+                statusCode: fc.integer({ min: 400, max: 599 }),
+                message: fc
+                    .string({ minLength: 5, maxLength: 200 })
+                    .filter((s) => s.trim().length > 0),
+            }),
+        ])(
             "should handle different types of submission failures",
             async (error) => {
                 const mockEvent = { preventDefault: vi.fn() } as any;
                 const properties = createMockProperties();
 
                 // Mock different error scenarios
-                const mockError = new Error(`${error.errorType}: ${error.message}`);
+                const mockError = new Error(
+                    `${error.errorType}: ${error.message}`
+                );
 
                 // Create a mock that can be rejected
                 const rejectedCreateSite = vi.fn().mockRejectedValue(mockError);
@@ -390,8 +462,10 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 propertiesWithReject.createSite = rejectedCreateSite;
 
                 // Mock successful validation but failed submission
-                const { validateMonitorFormData, validateMonitorFieldClientSide } =
-                    await import("../../../utils/monitorValidation");
+                const {
+                    validateMonitorFormData,
+                    validateMonitorFieldClientSide,
+                } = await import("../../../utils/monitorValidation");
                 vi.mocked(validateMonitorFormData).mockResolvedValue({
                     success: true,
                     errors: [],
@@ -411,7 +485,13 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 expect(propertiesWithReject.setFormError).toHaveBeenCalled();
 
                 // Verify error characteristics
-                expect(["network", "timeout", "validation", "server", "permission"]).toContain(error.errorType);
+                expect([
+                    "network",
+                    "timeout",
+                    "validation",
+                    "server",
+                    "permission",
+                ]).toContain(error.errorType);
                 expect(error.statusCode).toBeGreaterThanOrEqual(400);
                 expect(error.statusCode).toBeLessThanOrEqual(599);
                 expect(error.message.length).toBeGreaterThanOrEqual(5);
@@ -425,11 +505,17 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 const mockEvent = { preventDefault: vi.fn() } as any;
                 const properties = createMockProperties({
                     addMode: addMode as any,
+                    // Provide valid selectedExistingSite for "existing" mode to pass validation
+                    ...(addMode === "existing" && {
+                        selectedExistingSite: "existing-site-id",
+                    }),
                 });
 
                 // Mock successful validation
-                const { validateMonitorFormData, validateMonitorFieldClientSide } =
-                    await import("../../../utils/monitorValidation");
+                const {
+                    validateMonitorFormData,
+                    validateMonitorFieldClientSide,
+                } = await import("../../../utils/monitorValidation");
                 vi.mocked(validateMonitorFormData).mockResolvedValue({
                     success: true,
                     errors: [],
@@ -458,7 +544,12 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             }
         );
 
-        test.prop([fc.array(fc.string({ minLength: 1, maxLength: 100 }), { minLength: 1, maxLength: 10 })])(
+        test.prop([
+            fc.array(fc.string({ minLength: 1, maxLength: 100 }), {
+                minLength: 1,
+                maxLength: 10,
+            }),
+        ])(
             "should handle multiple concurrent form submissions",
             async (submissionData) => {
                 const submissions = submissionData.map((data, index) => {
@@ -472,8 +563,10 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 });
 
                 // Mock successful validation for all submissions
-                const { validateMonitorFormData, validateMonitorFieldClientSide } =
-                    await import("../../../utils/monitorValidation");
+                const {
+                    validateMonitorFormData,
+                    validateMonitorFieldClientSide,
+                } = await import("../../../utils/monitorValidation");
                 vi.mocked(validateMonitorFormData).mockResolvedValue({
                     success: true,
                     errors: [],

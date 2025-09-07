@@ -61,27 +61,30 @@ const incrementCountByStatus = (
     counts: ReturnType<typeof initializeMonitorCounts>,
     status: string
 ): void => {
-    counts.total++;
     switch (status) {
         case "down": {
+            counts.total++;
             counts.down++;
             break;
         }
         case "paused": {
+            counts.total++;
             counts.paused++;
             break;
         }
         case "pending": {
+            counts.total++;
             counts.pending++;
             break;
         }
         case "up": {
+            counts.total++;
             counts.up++;
             break;
         }
         default: {
-            // Handle unknown status - treat as pending
-            counts.pending++;
+            // Handle unknown/invalid status - don't count in totals
+            // This ensures only valid monitors are included in health calculations
             break;
         }
     }

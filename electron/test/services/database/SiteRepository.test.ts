@@ -394,39 +394,44 @@ describe(SiteRepository, () => {
         });
     });
 
-            describe("Property-Based SiteRepository Tests", () => {
-            it.todo("TODO: Fix property-based tests - API mismatch with current SiteRepository interface");
+    describe("Property-Based SiteRepository Tests", () => {
         it("should handle various site creation scenarios", async () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc.record({
-                        identifier: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
+                        identifier: fc
+                            .string({ minLength: 1, maxLength: 100 })
+                            .filter((s) => s.trim().length > 0),
                         name: fc.string({ minLength: 1, maxLength: 100 }),
-                        monitoring: fc.boolean()
+                        monitoring: fc.boolean(),
                     }),
                     async (siteData) => {
                         const expectedSite = {
                             identifier: siteData.identifier,
                             name: siteData.name,
-                            monitoring: siteData.monitoring
+                            monitoring: siteData.monitoring,
                         };
 
                         mockDatabase.run.mockReturnValue({
                             changes: 1,
-                            lastInsertRowid: 1
+                            lastInsertRowid: 1,
                         });
                         mockDatabase.get.mockReturnValue(expectedSite);
 
                         await repository.upsert(siteData);
 
                         // upsert returns void, so we just verify it was called correctly
-                        expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
+                        expect(
+                            mockDatabaseService.getDatabase
+                        ).toHaveBeenCalled();
                         expect(mockDatabase.run).toHaveBeenCalledWith(
-                            expect.stringContaining("INSERT OR REPLACE INTO sites"),
+                            expect.stringContaining(
+                                "INSERT OR REPLACE INTO sites"
+                            ),
                             expect.arrayContaining([
                                 siteData.identifier,
                                 siteData.name,
-                                siteData.monitoring ? 1 : 0 // monitoring is converted to number
+                                siteData.monitoring ? 1 : 0, // monitoring is converted to number
                             ])
                         );
                     }
@@ -437,18 +442,22 @@ describe(SiteRepository, () => {
         it("should handle various site updates", async () => {
             await fc.assert(
                 fc.asyncProperty(
-                    fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0), // identifier as string
+                    fc
+                        .string({ minLength: 1, maxLength: 100 })
+                        .filter((s) => s.trim().length > 0), // identifier as string
                     fc.record({
-                        identifier: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
+                        identifier: fc
+                            .string({ minLength: 1, maxLength: 100 })
+                            .filter((s) => s.trim().length > 0),
                         name: fc.string({ minLength: 1, maxLength: 100 }),
-                        monitoring: fc.boolean()
+                        monitoring: fc.boolean(),
                     }),
                     async (siteIdentifier, updateData) => {
                         // Use the identifier from updateData for consistency
                         const updatedSite = {
                             identifier: updateData.identifier,
                             name: updateData.name,
-                            monitoring: updateData.monitoring
+                            monitoring: updateData.monitoring,
                         };
 
                         mockDatabase.run.mockReturnValue({ changes: 1 });
@@ -457,13 +466,17 @@ describe(SiteRepository, () => {
                         await repository.upsert(updateData);
 
                         // upsert returns void, so we just verify it was called correctly
-                        expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
+                        expect(
+                            mockDatabaseService.getDatabase
+                        ).toHaveBeenCalled();
                         expect(mockDatabase.run).toHaveBeenCalledWith(
-                            expect.stringContaining("INSERT OR REPLACE INTO sites"),
+                            expect.stringContaining(
+                                "INSERT OR REPLACE INTO sites"
+                            ),
                             expect.arrayContaining([
                                 updateData.identifier,
                                 updateData.name,
-                                updateData.monitoring ? 1 : 0
+                                updateData.monitoring ? 1 : 0,
                             ])
                         );
                     }
@@ -475,17 +488,22 @@ describe(SiteRepository, () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc.array(
-                        fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0), // identifiers as strings
+                        fc
+                            .string({ minLength: 1, maxLength: 100 })
+                            .filter((s) => s.trim().length > 0), // identifiers as strings
                         { minLength: 1, maxLength: 10 }
                     ),
                     async (siteIdentifiers) => {
                         for (const siteIdentifier of siteIdentifiers) {
                             mockDatabase.run.mockReturnValue({ changes: 1 });
 
-                            const result = await repository.delete(siteIdentifier);
+                            const result =
+                                await repository.delete(siteIdentifier);
 
                             expect(result).toBeTruthy();
-                            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+                            expect(
+                                mockDatabaseService.executeTransaction
+                            ).toHaveBeenCalled();
                             expect(mockDatabase.run).toHaveBeenCalledWith(
                                 "DELETE FROM sites WHERE identifier = ?",
                                 [siteIdentifier]
@@ -502,16 +520,21 @@ describe(SiteRepository, () => {
                     fc.oneof(
                         fc.constant(null), // Site not found
                         fc.record({
-                            identifier: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
+                            identifier: fc
+                                .string({ minLength: 1, maxLength: 100 })
+                                .filter((s) => s.trim().length > 0),
                             name: fc.string({ minLength: 1, maxLength: 100 }),
-                            monitoring: fc.boolean()
+                            monitoring: fc.boolean(),
                         })
                     ),
-                    fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0), // searchIdentifier as string
+                    fc
+                        .string({ minLength: 1, maxLength: 100 })
+                        .filter((s) => s.trim().length > 0), // searchIdentifier as string
                     async (mockSite, searchIdentifier) => {
                         mockDatabase.get.mockReturnValue(mockSite);
 
-                        const result = await repository.findByIdentifier(searchIdentifier);
+                        const result =
+                            await repository.findByIdentifier(searchIdentifier);
 
                         if (mockSite) {
                             expect(result).toEqual(mockSite);
@@ -532,9 +555,11 @@ describe(SiteRepository, () => {
                 fc.asyncProperty(
                     fc.array(
                         fc.record({
-                            identifier: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
+                            identifier: fc
+                                .string({ minLength: 1, maxLength: 100 })
+                                .filter((s) => s.trim().length > 0),
                             name: fc.string({ minLength: 1, maxLength: 100 }),
-                            monitoring: fc.boolean()
+                            monitoring: fc.boolean(),
                         }),
                         { minLength: 0, maxLength: 20 }
                     ),
@@ -556,13 +581,19 @@ describe(SiteRepository, () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc.oneof(
-                        fc.constantFrom("SQLITE_BUSY", "SQLITE_LOCKED", "SQLITE_CONSTRAINT"),
+                        fc.constantFrom(
+                            "SQLITE_BUSY",
+                            "SQLITE_LOCKED",
+                            "SQLITE_CONSTRAINT"
+                        ),
                         fc.string({ minLength: 5, maxLength: 50 })
                     ),
                     fc.record({
-                        identifier: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
+                        identifier: fc
+                            .string({ minLength: 1, maxLength: 100 })
+                            .filter((s) => s.trim().length > 0),
                         name: fc.string({ minLength: 1, maxLength: 50 }),
-                        monitoring: fc.boolean()
+                        monitoring: fc.boolean(),
                     }),
                     async (errorMessage, siteData) => {
                         const dbError = new Error(errorMessage);
@@ -570,7 +601,9 @@ describe(SiteRepository, () => {
                             throw dbError;
                         });
 
-                        await expect(repository.upsert(siteData)).rejects.toThrow(errorMessage);
+                        await expect(
+                            repository.upsert(siteData)
+                        ).rejects.toThrow(errorMessage);
                     }
                 )
             );
@@ -580,14 +613,18 @@ describe(SiteRepository, () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc.record({
-                        identifier: fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0),
+                        identifier: fc
+                            .string({ minLength: 1, maxLength: 100 })
+                            .filter((s) => s.trim().length > 0),
                         name: fc.string({ minLength: 1, maxLength: 100 }),
-                        monitoring: fc.boolean()
+                        monitoring: fc.boolean(),
                     }),
                     async (siteData) => {
                         mockDatabase.get.mockReturnValue(siteData);
 
-                        const result = await repository.findByIdentifier(siteData.identifier);
+                        const result = await repository.findByIdentifier(
+                            siteData.identifier
+                        );
 
                         expect(result).toBeDefined();
                         if (result) {
@@ -598,12 +635,14 @@ describe(SiteRepository, () => {
                                 expect(result.name.length).toBeGreaterThan(0);
                             }
                             if (result.monitoring !== undefined) {
-                                expect(typeof result.monitoring).toBe("boolean");
+                                expect(typeof result.monitoring).toBe(
+                                    "boolean"
+                                );
                             }
                         }
                     }
                 )
             );
         });
-        });
+    });
 });

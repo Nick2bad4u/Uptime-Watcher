@@ -1,6 +1,8 @@
 /**
- * @fileoverview Fuzzing tests for errorCatalog utilities
+ * @file Fuzzing tests for errorCatalog utilities
+ *
  * @author AI Generated
+ *
  * @since 2024
  */
 
@@ -45,7 +47,8 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
         test.prop([fc.constantFrom(...Object.keys(ERROR_CATALOG))])(
             "should have string values for all error messages",
             (category) => {
-                const errorCategory = ERROR_CATALOG[category as keyof typeof ERROR_CATALOG];
+                const errorCategory =
+                    ERROR_CATALOG[category as keyof typeof ERROR_CATALOG];
                 const errors = Object.values(errorCategory);
 
                 for (const error of errors) {
@@ -58,7 +61,8 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
         test.prop([fc.constantFrom(...Object.keys(ERROR_CATALOG))])(
             "should have consistent key naming conventions",
             (category) => {
-                const errorCategory = ERROR_CATALOG[category as keyof typeof ERROR_CATALOG];
+                const errorCategory =
+                    ERROR_CATALOG[category as keyof typeof ERROR_CATALOG];
                 const keys = Object.keys(errorCategory);
 
                 for (const key of keys) {
@@ -71,67 +75,100 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
     });
 
     describe(formatErrorMessage, () => {
-        test.prop([
-            fc.string(),
-            fc.record({}, { requiredKeys: [] })
-        ])("should handle any template and params without throwing", (template, params) => {
-            expect(() => formatErrorMessage(template, params)).not.toThrow();
-        });
+        test.prop([fc.string(), fc.record({}, { requiredKeys: [] })])(
+            "should handle any template and params without throwing",
+            (template, params) => {
+                expect(() =>
+                    formatErrorMessage(template, params)
+                ).not.toThrow();
+            }
+        );
 
         test.prop([
             fc.string(),
             fc.record({
                 key1: fc.oneof(fc.string(), fc.integer()),
-                key2: fc.oneof(fc.string(), fc.integer())
-            })
-        ])("should replace all placeholders with parameter values", (template, params) => {
-            // Create template with known placeholders
-            const templateWithPlaceholders = `${template} {key1} and {key2}`;
-            const result = formatErrorMessage(templateWithPlaceholders, params);
+                key2: fc.oneof(fc.string(), fc.integer()),
+            }),
+        ])(
+            "should replace all placeholders with parameter values",
+            (template, params) => {
+                // Create template with known placeholders
+                const templateWithPlaceholders = `${template} {key1} and {key2}`;
+                const result = formatErrorMessage(
+                    templateWithPlaceholders,
+                    params
+                );
 
-            expect(result).toContain(String(params.key1));
-            expect(result).toContain(String(params.key2));
-            expect(result).not.toContain("{key1}");
-            expect(result).not.toContain("{key2}");
-        });
-
-        test.prop([
-            fc.string(),
-            fc.string(),
-            fc.oneof(fc.string(), fc.integer())
-        ])("should handle single parameter replacement", (prefix, key, value) => {
-            const template = `${prefix} {${key}}`;
-            const params = { [key]: value };
-            const result = formatErrorMessage(template, params);
-
-            expect(result).toBe(`${prefix} ${String(value)}`);
-        });
+                expect(result).toContain(String(params.key1));
+                expect(result).toContain(String(params.key2));
+                expect(result).not.toContain("{key1}");
+                expect(result).not.toContain("{key2}");
+            }
+        );
 
         test.prop([
             fc.string(),
-            fc.array(fc.tuple(fc.string({ minLength: 1 }), fc.oneof(fc.string(), fc.integer())), { minLength: 0, maxLength: 5 })
-                .filter(pairs => {
+            fc.string(),
+            fc.oneof(fc.string(), fc.integer()),
+        ])(
+            "should handle single parameter replacement",
+            (prefix, key, value) => {
+                const template = `${prefix} {${key}}`;
+                const params = { [key]: value };
+                const result = formatErrorMessage(template, params);
+
+                expect(result).toBe(`${prefix} ${String(value)}`);
+            }
+        );
+
+        test.prop([
+            fc.string(),
+            fc
+                .array(
+                    fc.tuple(
+                        fc.string({ minLength: 1 }),
+                        fc.oneof(fc.string(), fc.integer())
+                    ),
+                    { minLength: 0, maxLength: 5 }
+                )
+                .filter((pairs) => {
                     // Ensure unique keys
                     const keys = pairs.map(([key]) => key);
                     return new Set(keys).size === keys.length;
-                })
-        ])("should handle multiple parameter replacements", (template, paramPairs) => {
-            let templateWithPlaceholders = template;
-            const params: Record<string, string | number> = {};
+                }),
+        ])(
+            "should handle multiple parameter replacements",
+            (template, paramPairs) => {
+                let templateWithPlaceholders = template;
+                const params: Record<string, string | number> = {};
 
-            for (const [key, value] of paramPairs) {
-                templateWithPlaceholders += ` {${key}}`;
-                params[key] = value;
+                for (const [key, value] of paramPairs) {
+                    templateWithPlaceholders += ` {${key}}`;
+                    params[key] = value;
+                }
+
+                const result = formatErrorMessage(
+                    templateWithPlaceholders,
+                    params
+                );
+
+                // All placeholders should be replaced (except dangerous ones like __proto__)
+                for (const [key, value] of paramPairs) {
+                    if (
+                        key !== "__proto__" &&
+                        key !== "constructor" &&
+                        key !== "prototype"
+                    ) {
+                        expect(result).toContain(String(value));
+                        expect(result).not.toContain(`{${key}}`);
+                    } else {
+                        // Dangerous keys should remain as placeholders for security
+                        expect(result).toContain(`{${key}}`);
+                    }
+                }
             }
-
-            const result = formatErrorMessage(templateWithPlaceholders, params);
-
-            // All placeholders should be replaced
-            for (const [key, value] of paramPairs) {
-                expect(result).toContain(String(value));
-                expect(result).not.toContain(`{${key}}`);
-            }
-        });
+        );
 
         test.prop([fc.string()])(
             "should leave template unchanged when no placeholders exist",
@@ -146,29 +183,37 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
         test.prop([
             fc.string(),
             fc.array(fc.string(), { minLength: 1, maxLength: 3 }),
-            fc.record({}, { requiredKeys: [] })
-        ])("should handle missing parameters gracefully", (template, keys, params) => {
-            let templateWithPlaceholders = template;
-            for (const key of keys) {
-                templateWithPlaceholders += ` {${key}}`;
-            }
+            fc.record({}, { requiredKeys: [] }),
+        ])(
+            "should handle missing parameters gracefully",
+            (template, keys, params) => {
+                let templateWithPlaceholders = template;
+                for (const key of keys) {
+                    templateWithPlaceholders += ` {${key}}`;
+                }
 
-            // formatErrorMessage should not throw even if params are missing
-            expect(() => formatErrorMessage(templateWithPlaceholders, params)).not.toThrow();
+                // formatErrorMessage should not throw even if params are missing
+                expect(() =>
+                    formatErrorMessage(templateWithPlaceholders, params)
+                ).not.toThrow();
 
-            const result = formatErrorMessage(templateWithPlaceholders, params);
+                const result = formatErrorMessage(
+                    templateWithPlaceholders,
+                    params
+                );
 
-            // Missing placeholders should remain as-is
-            for (const key of keys) {
-                if (!(key in params)) {
-                    expect(result).toContain(`{${key}}`);
+                // Missing placeholders should remain as-is
+                for (const key of keys) {
+                    if (!(key in params)) {
+                        expect(result).toContain(`{${key}}`);
+                    }
                 }
             }
-        });
+        );
 
         test.prop([
             fc.string({ minLength: 1 }),
-            fc.oneof(fc.string(), fc.integer())
+            fc.oneof(fc.string(), fc.integer()),
         ])("should handle special characters in values", (key, value) => {
             const template = `Error: {${key}}`;
             const params = { [key]: value };
@@ -199,8 +244,12 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
 
         test("should return true for all catalog error messages", () => {
             // Test all error messages from all categories
-            for (const [_categoryName, category] of Object.entries(ERROR_CATALOG)) {
-                for (const [_errorKey, errorValue] of Object.entries(category)) {
+            for (const [_categoryName, category] of Object.entries(
+                ERROR_CATALOG
+            )) {
+                for (const [_errorKey, errorValue] of Object.entries(
+                    category
+                )) {
                     if (typeof errorValue === "string") {
                         expect(isKnownErrorMessage(errorValue)).toBeTruthy();
                     }
@@ -209,13 +258,14 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
         });
 
         test.prop([
-            fc.string().filter(str => {
+            fc.string().filter((str) => {
                 // Generate strings that are definitely not in the catalog
-                const allMessages = Object.values(ERROR_CATALOG).flatMap(category =>
-                    Object.values(category as Record<string, string>)
+                const allMessages = Object.values(ERROR_CATALOG).flatMap(
+                    (category) =>
+                        Object.values(category as Record<string, string>)
                 );
                 return !allMessages.includes(str);
-            })
+            }),
         ])("should return false for unknown error messages", (message) => {
             expect(isKnownErrorMessage(message)).toBeFalsy();
         });
@@ -277,7 +327,8 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
         test.prop([fc.constantFrom(...Object.keys(ERROR_CATALOG))])(
             "should have unique error messages within each category",
             (category) => {
-                const errorCategory = ERROR_CATALOG[category as keyof typeof ERROR_CATALOG];
+                const errorCategory =
+                    ERROR_CATALOG[category as keyof typeof ERROR_CATALOG];
                 const messages = Object.values(errorCategory);
                 const uniqueMessages = new Set(messages);
 

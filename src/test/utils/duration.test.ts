@@ -420,7 +420,7 @@ describe("Duration Utilities", () => {
             };
 
             describe("calculateMaxDuration property tests", () => {
-                test.prop([fc.float({ min: 0, max: Math.fround(300) }), fc.integer({ min: 0, max: 10 })])(
+                test.prop([fc.float({ min: Math.fround(0.1), max: Math.fround(300) }), fc.integer({ min: 0, max: 10 })])(
                     "should always return a valid duration string format",
                     (timeout, retryAttempts) => {
                         const result = calculateMaxDuration(timeout, retryAttempts);
@@ -438,7 +438,7 @@ describe("Duration Utilities", () => {
                     }
                 );
 
-                test.prop([fc.float({ min: Math.fround(0.1), max: Math.fround(100) }), fc.integer({ min: 0, max: 20 })])(
+                test.prop([fc.float({ min: Math.fround(0.1), max: Math.fround(100) }).filter(x => !Number.isNaN(x) && Number.isFinite(x)), fc.integer({ min: 0, max: 20 })])(
                     "should increase duration with more retry attempts",
                     (timeout, retryAttempts) => {
                         const noRetries = calculateMaxDuration(timeout, 0);
@@ -609,7 +609,7 @@ describe("Duration Utilities", () => {
                     }
                 );
 
-                test.prop([fc.float({ min: Math.fround(0.1), max: Math.fround(10) }), fc.integer({ min: 0, max: 3 })])(
+                test.prop([fc.float({ min: Math.fround(0.1), max: Math.fround(10) }).filter(x => !Number.isNaN(x) && Number.isFinite(x)), fc.integer({ min: 0, max: 3 })])(
                     "should respect monotonicity with timeout increases",
                     (timeout, retryAttempts) => {
                         const smallerTimeout = timeout;

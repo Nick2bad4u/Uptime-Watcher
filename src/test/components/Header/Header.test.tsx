@@ -5,7 +5,7 @@
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 
 import { Header } from "../../../components/Header/Header";
@@ -82,16 +82,16 @@ describe("Header Component", () => {
         mockGetAvailabilityColor.mockReturnValue("success");
     });
 
+    afterEach(() => {
+        // Ensure DOM is cleaned up after each test
+        document.body.innerHTML = "";
+    });
+
     describe("Monitor Count Calculations", () => {
         it("should display correct counts with no sites", ({
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -112,11 +112,6 @@ describe("Header Component", () => {
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -178,11 +173,6 @@ describe("Header Component", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -212,11 +202,6 @@ describe("Header Component", () => {
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -256,11 +241,6 @@ describe("Header Component", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -288,11 +268,6 @@ describe("Header Component", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -312,11 +287,6 @@ describe("Header Component", () => {
         });
 
         it("should round percentage correctly", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -352,11 +322,6 @@ describe("Header Component", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             render(<Header />);
@@ -374,11 +339,6 @@ describe("Header Component", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             mockUseTheme.mockReturnValue(createMockTheme(true));
 
             render(<Header />);
@@ -391,11 +351,6 @@ describe("Header Component", () => {
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -423,11 +378,6 @@ describe("Header Component", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             render(<Header />);
 
             const settingsButton = screen.getByLabelText("Settings");
@@ -437,11 +387,6 @@ describe("Header Component", () => {
         });
 
         it("should display settings icon", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -459,11 +404,6 @@ describe("Header Component", () => {
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -501,11 +441,6 @@ describe("Header Component", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -522,10 +457,10 @@ describe("Header Component", () => {
             render(<Header />);
 
             // Unknown status should not be counted in any specific category
-            // Use more specific selectors to avoid ambiguity
+            // Invalid monitors are excluded from total count calculation
             const upBadge = screen.getByText("Up").closest("div");
             expect(upBadge).toContainElement(screen.getAllByText("1")[0]!); // Up count
-            expect(screen.getByText("50%")).toBeInTheDocument(); // 1 up out of 2 total
+            expect(screen.getByText("100%")).toBeInTheDocument(); // 1 up out of 1 total valid (invalid excluded)
         });
     });
 
@@ -534,11 +469,6 @@ describe("Header Component", () => {
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -556,11 +486,6 @@ describe("Header Component", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             render(<Header />);
 
             expect(screen.getByText("Uptime Watcher")).toBeInTheDocument();
@@ -572,11 +497,6 @@ describe("Header Component", () => {
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Data Retrieval", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -606,11 +526,6 @@ describe("Header Component", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -627,11 +542,6 @@ describe("Header Component", () => {
         });
 
         it("should handle 100% uptime correctly", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -660,11 +570,6 @@ describe("Header Component", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             render(<Header />);
 
             expect(screen.getByText("Uptime Watcher")).toBeInTheDocument();
@@ -675,11 +580,6 @@ describe("Header Component", () => {
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -699,11 +599,6 @@ describe("Header Component", () => {
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -751,11 +646,6 @@ describe("Header Component", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -778,11 +668,6 @@ describe("Header Component", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
             mockUseSitesStore.mockReturnValue({
                 sites: [
                     {
@@ -799,18 +684,14 @@ describe("Header Component", () => {
             render(<Header />);
 
             // Should still render but only count the valid status
-            expect(screen.getByText("50%")).toBeInTheDocument(); // 1 up out of 2 total
+            // Invalid monitors (without status) are excluded from total count
+            expect(screen.getByText("100%")).toBeInTheDocument(); // 1 up out of 1 total valid (no status excluded)
         });
 
         it("should handle sites with null/undefined monitors", ({
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Header", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -831,52 +712,81 @@ describe("Header Component", () => {
     });
 
     describe("Property-Based Testing with Fast-Check", () => {
-        test.prop([fc.array(fc.record({
-            id: fc.string({ minLength: 1, maxLength: 10 }),
-            name: fc.string({ minLength: 1, maxLength: 50 }),
-            monitors: fc.array(fc.record({
-                id: fc.string({ minLength: 1, maxLength: 10 }),
-                status: fc.constantFrom("up", "down", "pending")
-            }), { maxLength: 10 })
-        }), { maxLength: 20 })])(
+        test.prop([
+            fc.array(
+                fc.record({
+                    id: fc.string({ minLength: 1, maxLength: 10 }),
+                    name: fc.string({ minLength: 1, maxLength: 50 }),
+                    monitors: fc.array(
+                        fc.record({
+                            id: fc.string({ minLength: 1, maxLength: 10 }),
+                            status: fc.constantFrom("up", "down", "pending"),
+                        }),
+                        { maxLength: 10 }
+                    ),
+                }),
+                { maxLength: 20 }
+            ),
+        ])(
             "should correctly calculate status percentages for various site configurations",
             async (sites) => {
-                const totalMonitors = sites.flatMap(site => site.monitors || []).length;
-                const upMonitors = sites.flatMap(site => site.monitors || []).filter(m => m.status === "up").length;
-                const expectedPercentage = totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
+                const totalMonitors = sites.flatMap(
+                    (site) => site.monitors || []
+                ).length;
+                const upMonitors = sites
+                    .flatMap((site) => site.monitors || [])
+                    .filter((m) => m.status === "up").length;
+                const expectedPercentage =
+                    totalMonitors > 0
+                        ? Math.round((upMonitors / totalMonitors) * 100)
+                        : 0;
 
                 mockUseSitesStore.mockReturnValue({ sites } as any);
 
-                render(<Header />);
+                const { unmount } = render(<Header />);
 
-                if (totalMonitors > 0) {
-                    // Should display the calculated percentage
-                    expect(screen.getByText(`${expectedPercentage}%`)).toBeInTheDocument();
-                } else {
-                    // Should not display health indicator when no monitors
-                    expect(screen.queryByText("Health")).not.toBeInTheDocument();
-                }
+                try {
+                    if (totalMonitors > 0) {
+                        // Should display the calculated percentage
+                        expect(
+                            screen.getByText(`${expectedPercentage}%`)
+                        ).toBeInTheDocument();
+                    } else {
+                        // Should not display health indicator when no monitors
+                        expect(
+                            screen.queryByText("Health")
+                        ).not.toBeInTheDocument();
+                    }
 
-                // Verify site configuration properties
-                expect(Array.isArray(sites)).toBeTruthy();
-                expect(sites.length).toBeLessThanOrEqual(20);
-                for (const site of sites) {
-                    expect(typeof site.id).toBe("string");
-                    expect(site.id.length).toBeGreaterThan(0);
-                    expect(site.id.length).toBeLessThanOrEqual(10);
-                    expect(typeof site.name).toBe("string");
-                    expect(site.name.length).toBeGreaterThan(0);
-                    expect(site.name.length).toBeLessThanOrEqual(50);
+                    // Verify site configuration properties
+                    expect(Array.isArray(sites)).toBeTruthy();
+                    expect(sites.length).toBeLessThanOrEqual(20);
+                    for (const site of sites) {
+                        expect(typeof site.id).toBe("string");
+                        expect(site.id.length).toBeGreaterThan(0);
+                        expect(site.id.length).toBeLessThanOrEqual(10);
+                        expect(typeof site.name).toBe("string");
+                        expect(site.name.length).toBeGreaterThan(0);
+                        expect(site.name.length).toBeLessThanOrEqual(50);
 
-                    if (site.monitors) {
-                        expect(Array.isArray(site.monitors)).toBeTruthy();
-                        expect(site.monitors.length).toBeLessThanOrEqual(10);
-                        for (const monitor of site.monitors) {
-                            expect(typeof monitor.id).toBe("string");
-                            expect(monitor.id.length).toBeGreaterThan(0);
-                            expect(["up", "down", "pending"]).toContain(monitor.status);
+                        if (site.monitors) {
+                            expect(Array.isArray(site.monitors)).toBeTruthy();
+                            expect(site.monitors.length).toBeLessThanOrEqual(
+                                10
+                            );
+                            for (const monitor of site.monitors) {
+                                expect(typeof monitor.id).toBe("string");
+                                expect(monitor.id.length).toBeGreaterThan(0);
+                                expect([
+                                    "up",
+                                    "down",
+                                    "pending",
+                                ]).toContain(monitor.status);
+                            }
                         }
                     }
+                } finally {
+                    unmount();
                 }
             }
         );
@@ -887,165 +797,264 @@ describe("Header Component", () => {
                 const sites = Array.from({ length: siteCount }, (_, i) => ({
                     id: `site-${i}`,
                     name: `Site ${i}`,
-                    monitors: [
-                        { id: `monitor-${i}`, status: "up" as const }
-                    ]
+                    monitors: [{ id: `monitor-${i}`, status: "up" as const }],
                 }));
 
                 mockUseSitesStore.mockReturnValue({ sites } as any);
 
-                render(<Header />);
+                const { unmount } = render(<Header />);
 
-                if (siteCount > 0) {
-                    // Should show 100% since all monitors are "up"
-                    expect(screen.getByText("100%")).toBeInTheDocument();
-                } else {
-                    // No sites means no health indicator
-                    expect(screen.queryByText("Health")).not.toBeInTheDocument();
+                try {
+                    if (siteCount > 0) {
+                        // Should show 100% since all monitors are "up"
+                        expect(screen.getByText("100%")).toBeInTheDocument();
+                    } else {
+                        // No sites means no health indicator
+                        expect(
+                            screen.queryByText("Health")
+                        ).not.toBeInTheDocument();
+                    }
+
+                    expect(siteCount).toBeGreaterThanOrEqual(0);
+                    expect(siteCount).toBeLessThanOrEqual(50);
+                } finally {
+                    unmount();
                 }
-
-                expect(siteCount).toBeGreaterThanOrEqual(0);
-                expect(siteCount).toBeLessThanOrEqual(50);
             }
         );
 
-        test.prop([fc.array(fc.constantFrom("up", "down", "pending"), { minLength: 1, maxLength: 20 })])(
+        test.prop([
+            fc.array(fc.constantFrom("up", "down", "pending"), {
+                minLength: 1,
+                maxLength: 20,
+            }),
+        ])(
             "should correctly calculate percentages for various monitor status combinations",
             async (statuses) => {
-                const sites = [{
-                    id: "test-site",
-                    name: "Test Site",
-                    monitors: statuses.map((status, i) => ({
-                        id: `monitor-${i}`,
-                        status
-                    }))
-                }];
+                const sites = [
+                    {
+                        id: "test-site",
+                        name: "Test Site",
+                        monitors: statuses.map((status, i) => ({
+                            id: `monitor-${i}`,
+                            status,
+                        })),
+                    },
+                ];
 
-                const upCount = statuses.filter(s => s === "up").length;
-                const expectedPercentage = Math.round((upCount / statuses.length) * 100);
+                const upCount = statuses.filter((s) => s === "up").length;
+                const expectedPercentage = Math.round(
+                    (upCount / statuses.length) * 100
+                );
 
                 mockUseSitesStore.mockReturnValue({ sites } as any);
 
-                render(<Header />);
+                const { unmount } = render(<Header />);
 
-                expect(screen.getByText(`${expectedPercentage}%`)).toBeInTheDocument();
+                try {
+                    expect(
+                        screen.getByText(`${expectedPercentage}%`)
+                    ).toBeInTheDocument();
 
-                // Verify status array properties
-                expect(Array.isArray(statuses)).toBeTruthy();
-                expect(statuses.length).toBeGreaterThanOrEqual(1);
-                expect(statuses.length).toBeLessThanOrEqual(20);
-                for (const status of statuses) {
-                    expect(["up", "down", "pending"]).toContain(status);
+                    // Verify status array properties
+                    expect(Array.isArray(statuses)).toBeTruthy();
+                    expect(statuses.length).toBeGreaterThanOrEqual(1);
+                    expect(statuses.length).toBeLessThanOrEqual(20);
+                    for (const status of statuses) {
+                        expect([
+                            "up",
+                            "down",
+                            "pending",
+                        ]).toContain(status);
+                    }
+                } finally {
+                    unmount();
                 }
             }
         );
 
-        test.prop([fc.oneof(
-            fc.constant([]),
-            fc.array(fc.record({
-                id: fc.string(),
-                name: fc.string(),
-                monitors: fc.constant([])
-            }), { minLength: 1, maxLength: 5 }),
-            fc.array(fc.record({
-                id: fc.string(),
-                name: fc.string(),
-                monitors: fc.constant(null)
-            }), { minLength: 1, maxLength: 5 }),
-            fc.array(fc.record({
-                id: fc.string(),
-                name: fc.string(),
-                monitors: fc.constant(undefined)
-            }), { minLength: 1, maxLength: 5 })
-        )])(
+        test.prop([
+            fc.oneof(
+                fc.constant([]),
+                fc.array(
+                    fc.record({
+                        id: fc.string(),
+                        name: fc.string(),
+                        monitors: fc.constant([]),
+                    }),
+                    { minLength: 1, maxLength: 5 }
+                ),
+                fc.array(
+                    fc.record({
+                        id: fc.string(),
+                        name: fc.string(),
+                        monitors: fc.constant(null),
+                    }),
+                    { minLength: 1, maxLength: 5 }
+                ),
+                fc.array(
+                    fc.record({
+                        id: fc.string(),
+                        name: fc.string(),
+                        monitors: fc.constant(undefined),
+                    }),
+                    { minLength: 1, maxLength: 5 }
+                )
+            ),
+        ])(
             "should handle edge cases with no monitors gracefully",
             async (edgeCaseSites) => {
-                mockUseSitesStore.mockReturnValue({ sites: edgeCaseSites } as any);
+                mockUseSitesStore.mockReturnValue({
+                    sites: edgeCaseSites,
+                } as any);
 
-                expect(() => render(<Header />)).not.toThrow();
+                const { unmount } = render(<Header />);
 
-                // Should not display health indicator when no monitors
-                expect(screen.queryByText("Health")).not.toBeInTheDocument();
-                expect(screen.queryByText("Total")).not.toBeInTheDocument();
+                try {
+                    // Should not display health indicator when no monitors
+                    expect(
+                        screen.queryByText("Health")
+                    ).not.toBeInTheDocument();
+                    expect(screen.queryByText("Total")).not.toBeInTheDocument();
 
-                // Verify edge case properties
-                expect(Array.isArray(edgeCaseSites)).toBeTruthy();
+                    // Verify edge case properties
+                    expect(Array.isArray(edgeCaseSites)).toBeTruthy();
+                } finally {
+                    unmount();
+                }
             }
         );
 
-        test.prop([fc.record({
-            siteCount: fc.integer({ min: 1, max: 10 }),
-            monitorsPerSite: fc.integer({ min: 1, max: 5 }),
-            upProbability: fc.double({ min: 0, max: 1 })
-        })])(
+        test.prop([
+            fc.record({
+                siteCount: fc.integer({ min: 1, max: 10 }),
+                monitorsPerSite: fc.integer({ min: 1, max: 5 }),
+                upProbability: fc.double({ min: 0, max: 1 }),
+            }),
+        ])(
             "should handle complex monitoring scenarios correctly",
             async ({ siteCount, monitorsPerSite, upProbability }) => {
-                const sites = Array.from({ length: siteCount }, (_, siteIndex) => ({
-                    id: `site-${siteIndex}`,
-                    name: `Site ${siteIndex}`,
-                    monitors: Array.from({ length: monitorsPerSite }, (_, monitorIndex) => ({
-                        id: `monitor-${siteIndex}-${monitorIndex}`,
-                        status: Math.random() < upProbability ? "up" as const : "down" as const
-                    }))
-                }));
+                const sites = Array.from(
+                    { length: siteCount },
+                    (_, siteIndex) => ({
+                        id: `site-${siteIndex}`,
+                        name: `Site ${siteIndex}`,
+                        monitors: Array.from(
+                            { length: monitorsPerSite },
+                            (_, monitorIndex) => ({
+                                id: `monitor-${siteIndex}-${monitorIndex}`,
+                                status:
+                                    Math.random() < upProbability
+                                        ? ("up" as const)
+                                        : ("down" as const),
+                            })
+                        ),
+                    })
+                );
 
                 const totalMonitors = siteCount * monitorsPerSite;
-                const upMonitors = sites.flatMap(s => s.monitors).filter(m => m.status === "up").length;
-                const expectedPercentage = Math.round((upMonitors / totalMonitors) * 100);
+                const upMonitors = sites
+                    .flatMap((s) => s.monitors)
+                    .filter((m) => m.status === "up").length;
+                const expectedPercentage = Math.round(
+                    (upMonitors / totalMonitors) * 100
+                );
 
                 mockUseSitesStore.mockReturnValue({ sites } as any);
 
-                render(<Header />);
+                const { unmount } = render(<Header />);
 
-                expect(screen.getByText(`${expectedPercentage}%`)).toBeInTheDocument();
+                try {
+                    expect(
+                        screen.getByText(`${expectedPercentage}%`)
+                    ).toBeInTheDocument();
 
-                // Verify scenario properties
-                expect(siteCount).toBeGreaterThanOrEqual(1);
-                expect(siteCount).toBeLessThanOrEqual(10);
-                expect(monitorsPerSite).toBeGreaterThanOrEqual(1);
-                expect(monitorsPerSite).toBeLessThanOrEqual(5);
-                expect(upProbability).toBeGreaterThanOrEqual(0);
-                expect(upProbability).toBeLessThanOrEqual(1);
-                expect(totalMonitors).toBe(siteCount * monitorsPerSite);
+                    // Verify scenario properties
+                    expect(siteCount).toBeGreaterThanOrEqual(1);
+                    expect(siteCount).toBeLessThanOrEqual(10);
+                    expect(monitorsPerSite).toBeGreaterThanOrEqual(1);
+                    expect(monitorsPerSite).toBeLessThanOrEqual(5);
+                    expect(upProbability).toBeGreaterThanOrEqual(0);
+                    expect(upProbability).toBeLessThanOrEqual(1);
+                    expect(totalMonitors).toBe(siteCount * monitorsPerSite);
+                } finally {
+                    unmount();
+                }
             }
         );
 
-        test.prop([fc.array(fc.record({
-            id: fc.string(),
-            name: fc.string(),
-            monitors: fc.array(fc.record({
-                id: fc.string(),
-                status: fc.oneof(
-                    fc.constantFrom("up", "down", "pending"),
-                    fc.constant(null),
-                    fc.constant(undefined),
-                    fc.constant("invalid-status" as any)
-                )
-            }), { maxLength: 3 })
-        }), { minLength: 1, maxLength: 5 })])(
+        test.prop([
+            fc.array(
+                fc.record({
+                    id: fc.string(),
+                    name: fc.string(),
+                    monitors: fc.array(
+                        fc.record({
+                            id: fc.string(),
+                            status: fc.oneof(
+                                fc.constantFrom("up", "down", "pending"),
+                                fc.constant(null),
+                                fc.constant(undefined),
+                                fc.constant("invalid-status" as any)
+                            ),
+                        }),
+                        { maxLength: 3 }
+                    ),
+                }),
+                { minLength: 1, maxLength: 5 }
+            ),
+        ])(
             "should handle invalid monitor statuses gracefully",
             async (sitesWithInvalidStatuses) => {
-                mockUseSitesStore.mockReturnValue({ sites: sitesWithInvalidStatuses } as any);
+                mockUseSitesStore.mockReturnValue({
+                    sites: sitesWithInvalidStatuses,
+                } as any);
 
-                expect(() => render(<Header />)).not.toThrow();
+                const { unmount } = render(<Header />);
 
-                const validMonitors = sitesWithInvalidStatuses
-                    .flatMap(s => s.monitors || [])
-                    .filter(m => m.status && ["up", "down", "pending"].includes(m.status));
+                try {
+                    const validMonitors = sitesWithInvalidStatuses
+                        .flatMap((s) => s.monitors || [])
+                        .filter(
+                            (m) =>
+                                m.status &&
+                                [
+                                    "up",
+                                    "down",
+                                    "pending",
+                                ].includes(m.status)
+                        );
 
-                if (validMonitors.length > 0) {
-                    const upCount = validMonitors.filter(m => m.status === "up").length;
-                    const expectedPercentage = Math.round((upCount / validMonitors.length) * 100);
-                    expect(screen.getByText(`${expectedPercentage}%`)).toBeInTheDocument();
-                } else {
-                    // No valid monitors means no health indicator
-                    expect(screen.queryByText("Health")).not.toBeInTheDocument();
+                    if (validMonitors.length > 0) {
+                        const upCount = validMonitors.filter(
+                            (m) => m.status === "up"
+                        ).length;
+                        const expectedPercentage = Math.round(
+                            (upCount / validMonitors.length) * 100
+                        );
+                        expect(
+                            screen.getByText(`${expectedPercentage}%`)
+                        ).toBeInTheDocument();
+                    } else {
+                        // No valid monitors means no health indicator
+                        expect(
+                            screen.queryByText("Health")
+                        ).not.toBeInTheDocument();
+                    }
+
+                    // Verify sites array properties
+                    expect(
+                        Array.isArray(sitesWithInvalidStatuses)
+                    ).toBeTruthy();
+                    expect(
+                        sitesWithInvalidStatuses.length
+                    ).toBeGreaterThanOrEqual(1);
+                    expect(sitesWithInvalidStatuses.length).toBeLessThanOrEqual(
+                        5
+                    );
+                } finally {
+                    unmount();
                 }
-
-                // Verify sites array properties
-                expect(Array.isArray(sitesWithInvalidStatuses)).toBeTruthy();
-                expect(sitesWithInvalidStatuses.length).toBeGreaterThanOrEqual(1);
-                expect(sitesWithInvalidStatuses.length).toBeLessThanOrEqual(5);
             }
         );
 
@@ -1056,32 +1065,46 @@ describe("Header Component", () => {
                 const upMonitors = targetPercentage;
                 const downMonitors = totalMonitors - upMonitors;
 
-                const upMonitorList = Array.from({ length: upMonitors }, (_, i) => ({
-                    id: `up-${i}`,
-                    status: "up" as const
-                }));
+                const upMonitorList = Array.from(
+                    { length: upMonitors },
+                    (_, i) => ({
+                        id: `up-${i}`,
+                        status: "up" as const,
+                    })
+                );
 
-                const downMonitorList = Array.from({ length: downMonitors }, (_, i) => ({
-                    id: `down-${i}`,
-                    status: "down" as const
-                }));
+                const downMonitorList = Array.from(
+                    { length: downMonitors },
+                    (_, i) => ({
+                        id: `down-${i}`,
+                        status: "down" as const,
+                    })
+                );
 
-                const sites = [{
-                    id: "percentage-test",
-                    name: "Percentage Test Site",
-                    monitors: [...upMonitorList, ...downMonitorList]
-                }];
+                const sites = [
+                    {
+                        id: "percentage-test",
+                        name: "Percentage Test Site",
+                        monitors: [...upMonitorList, ...downMonitorList],
+                    },
+                ];
 
                 mockUseSitesStore.mockReturnValue({ sites } as any);
 
-                render(<Header />);
+                const { unmount } = render(<Header />);
 
-                expect(screen.getByText(`${targetPercentage}%`)).toBeInTheDocument();
+                try {
+                    expect(
+                        screen.getByText(`${targetPercentage}%`)
+                    ).toBeInTheDocument();
 
-                // Verify percentage properties
-                expect(targetPercentage).toBeGreaterThanOrEqual(0);
-                expect(targetPercentage).toBeLessThanOrEqual(100);
-                expect(upMonitors + downMonitors).toBe(totalMonitors);
+                    // Verify percentage properties
+                    expect(targetPercentage).toBeGreaterThanOrEqual(0);
+                    expect(targetPercentage).toBeLessThanOrEqual(100);
+                    expect(upMonitors + downMonitors).toBe(totalMonitors);
+                } finally {
+                    unmount();
+                }
             }
         );
     });

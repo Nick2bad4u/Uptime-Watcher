@@ -50,7 +50,7 @@
     "name": "docs-docusaurus",
     "private": true,
     "scripts": {
-        "build": "npm run generate-docs && docusaurus build",
+        "build": "npm run generate-docs && cd ../../ && npm run build:eslint-inspector && cd docs/docusaurus && docusaurus build",
         "build:fast": "docusaurus build",
         "clear": "docusaurus clear",
         "deploy": "docusaurus deploy",

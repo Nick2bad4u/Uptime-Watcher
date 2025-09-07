@@ -741,7 +741,9 @@ describe("App Additional Coverage Tests", () => {
 
         render(<App />);
 
-        expect(screen.getByText("⚙️ Settings")).toBeInTheDocument();
+        await expect(
+            screen.findByText("⚙️ Settings")
+        ).resolves.toBeInTheDocument();
     });
 
     it("should apply dark theme class when isDark is true", async ({

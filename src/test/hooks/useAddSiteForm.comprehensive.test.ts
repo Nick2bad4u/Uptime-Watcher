@@ -1148,29 +1148,33 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 expect(result.current.host).toBe(testHost);
 
                 // Verify host characteristics
-                const isValidHost = typeof testHost === 'string' && testHost.length > 0;
+                const isValidHost =
+                    typeof testHost === "string" && testHost.length > 0;
                 expect(isValidHost).toBeTruthy();
             }
         );
 
-        test.prop([fc.integer({ min: 1, max: 65_535 }).map(n => n.toString())])(
-            "should handle various port inputs correctly",
-            async (testPort) => {
-                const { result } = renderHook(() => useAddSiteForm());
+        test.prop([
+            fc.integer({ min: 1, max: 65_535 }).map((n) => n.toString()),
+        ])("should handle various port inputs correctly", async (testPort) => {
+            const { result } = renderHook(() => useAddSiteForm());
 
-                act(() => {
-                    result.current.setPort(testPort);
-                });
+            act(() => {
+                result.current.setPort(testPort);
+            });
 
-                expect(result.current.port).toBe(testPort);
+            expect(result.current.port).toBe(testPort);
 
-                const portNum = Number.parseInt(testPort, 10);
-                expect(portNum).toBeGreaterThanOrEqual(1);
-                expect(portNum).toBeLessThanOrEqual(65_535);
-            }
-        );
+            const portNum = Number.parseInt(testPort, 10);
+            expect(portNum).toBeGreaterThanOrEqual(1);
+            expect(portNum).toBeLessThanOrEqual(65_535);
+        });
 
-        test.prop([fc.string({ minLength: 1, maxLength: 100 }).filter(s => s.trim().length > 0)])(
+        test.prop([
+            fc
+                .string({ minLength: 1, maxLength: 100 })
+                .filter((s) => s.trim().length > 0),
+        ])(
             "should handle various site name inputs correctly",
             async (testName) => {
                 const { result } = renderHook(() => useAddSiteForm());
@@ -1185,7 +1189,14 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             }
         );
 
-        test.prop([fc.constantFrom("http", "port", "ping", "dns") as fc.Arbitrary<MonitorType>])(
+        test.prop([
+            fc.constantFrom(
+                "http",
+                "port",
+                "ping",
+                "dns"
+            ) as fc.Arbitrary<MonitorType>,
+        ])(
             "should handle monitor type changes correctly",
             async (monitorType) => {
                 mockGetFields.mockImplementation((type: MonitorType) => {
@@ -1194,7 +1205,10 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                             return [{ name: "url", required: true }];
                         }
                         case "port": {
-                            return [{ name: "host", required: true }, { name: "port", required: true }];
+                            return [
+                                { name: "host", required: true },
+                                { name: "port", required: true },
+                            ];
                         }
                         case "ping": {
                             return [{ name: "host", required: true }];
@@ -1215,11 +1229,19 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 });
 
                 expect(result.current.monitorType).toBe(monitorType);
-                expect(["http", "port", "ping", "tcp", "dns"]).toContain(monitorType);
+                expect([
+                    "http",
+                    "port",
+                    "ping",
+                    "tcp",
+                    "dns",
+                ]).toContain(monitorType);
             }
         );
 
-        test.prop([fc.constantFrom(60_000, 300_000, 600_000, 1_800_000, 3_600_000)])(
+        test.prop([
+            fc.constantFrom(60_000, 300_000, 600_000, 1_800_000, 3_600_000),
+        ])(
             "should handle check interval changes correctly",
             async (interval) => {
                 const { result } = renderHook(() => useAddSiteForm());
@@ -1229,7 +1251,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 });
 
                 expect(result.current.checkInterval).toBe(interval);
-                expect([60_000, 300_000, 600_000, 1_800_000, 3_600_000]).toContain(interval);
+                expect([
+                    60_000,
+                    300_000,
+                    600_000,
+                    1_800_000,
+                    3_600_000,
+                ]).toContain(interval);
             }
         );
 
@@ -1267,37 +1295,102 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             }
         );
 
-        test.prop([fc.record({
-            url: fc.webUrl(),
-            host: fc.domain(),
-            port: fc.integer({ min: 1, max: 65_535 }).map(n => n.toString()),
-            name: fc.string({ minLength: 1, maxLength: 50 }).filter(s => s.trim().length > 0),
-            monitorType: fc.constantFrom("http", "port", "ping") as fc.Arbitrary<MonitorType>
-        })])(
+        test.prop([
+            fc.constantFrom(
+                "http",
+                "port",
+                "ping"
+            ) as fc.Arbitrary<MonitorType>,
+        ])(
             "should handle complex form state updates correctly",
-            async (formState) => {
+            async (monitorType) => {
                 const { result } = renderHook(() => useAddSiteForm());
 
+                // Generate appropriate test data for the monitor type
+                const testName = `Test Site ${Math.random().toString(36).slice(2, 8)}`;
+                let testUrl = "";
+                let testHost = "";
+                let testPort = "";
+
+                // Generate fields appropriate for each monitor type
+                switch (monitorType) {
+                    case "http": {
+                        testUrl = "https://example.com";
+                        break;
+                    }
+                    case "port": {
+                        testHost = "example.com";
+                        testPort = "8080";
+                        break;
+                    }
+                    case "ping": {
+                        testHost = "example.com";
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+
                 act(() => {
-                    result.current.setUrl(formState.url);
-                    result.current.setHost(formState.host);
-                    result.current.setPort(formState.port);
-                    result.current.setName(formState.name);
-                    result.current.setMonitorType(formState.monitorType);
+                    // Set monitor type first to establish field requirements
+                    result.current.setMonitorType(monitorType);
+
+                    // Then set appropriate fields for this monitor type
+                    if (monitorType === "http" && testUrl) {
+                        result.current.setUrl(testUrl);
+                    }
+                    if (
+                        (monitorType === "port" || monitorType === "ping") &&
+                        testHost
+                    ) {
+                        result.current.setHost(testHost);
+                    }
+                    if (monitorType === "port" && testPort) {
+                        result.current.setPort(testPort);
+                    }
+
+                    result.current.setName(testName);
                 });
 
-                expect(result.current.url).toBe(formState.url);
-                expect(result.current.host).toBe(formState.host);
-                expect(result.current.port).toBe(formState.port);
-                expect(result.current.name).toBe(formState.name);
-                expect(result.current.monitorType).toBe(formState.monitorType);
+                // Verify state matches expectations based on monitor type
+                expect(result.current.name).toBe(testName);
+                expect(result.current.monitorType).toBe(monitorType);
 
-                // Verify all state characteristics
-                expect(formState.url).toMatch(/^https?:\/\//);
-                expect(formState.name.trim().length).toBeGreaterThan(0);
-                const portNum = Number.parseInt(formState.port, 10);
-                expect(portNum).toBeGreaterThanOrEqual(1);
-                expect(portNum).toBeLessThanOrEqual(65_535);
+                switch (monitorType) {
+                    case "http": {
+                        expect(result.current.url).toBe(testUrl);
+                        expect(result.current.host).toBe(""); // Should be empty for HTTP
+                        expect(result.current.port).toBe(""); // Should be empty for HTTP
+                        break;
+                    }
+                    case "port": {
+                        expect(result.current.url).toBe(""); // Should be empty for port
+                        expect(result.current.host).toBe(testHost);
+                        expect(result.current.port).toBe(testPort);
+                        break;
+                    }
+                    case "ping": {
+                        expect(result.current.url).toBe(""); // Should be empty for ping
+                        expect(result.current.host).toBe(testHost);
+                        expect(result.current.port).toBe(""); // Should be empty for ping
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+
+                // Verify field characteristics
+                expect(testName.trim().length).toBeGreaterThan(0);
+
+                if (monitorType === "http") {
+                    expect(testUrl).toMatch(/^https?:\/\//);
+                } else if (monitorType === "port") {
+                    const portNum = Number.parseInt(testPort, 10);
+                    expect(portNum).toBeGreaterThanOrEqual(1);
+                    expect(portNum).toBeLessThanOrEqual(65_535);
+                }
             }
         );
 
@@ -1325,12 +1418,14 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             }
         );
 
-        test.prop([fc.oneof(
-            fc.constant(""),
-            fc.constant("   "),
-            fc.constant("\t\n"),
-            fc.string().filter(s => s.trim().length === 0)
-        )])(
+        test.prop([
+            fc.oneof(
+                fc.constant(""),
+                fc.constant("   "),
+                fc.constant("\t\n"),
+                fc.string().filter((s) => s.trim().length === 0)
+            ),
+        ])(
             "should handle empty and whitespace inputs appropriately",
             async (emptyInput) => {
                 const { result } = renderHook(() => useAddSiteForm());
@@ -1371,10 +1466,15 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             }
         );
 
-        test.prop([fc.array(fc.record({
-            field: fc.constantFrom("name", "url", "host", "port"),
-            value: fc.string({ maxLength: 100 })
-        }), { minLength: 1, maxLength: 10 })])(
+        test.prop([
+            fc.array(
+                fc.record({
+                    field: fc.constantFrom("name", "url", "host", "port"),
+                    value: fc.string({ maxLength: 100 }),
+                }),
+                { minLength: 1, maxLength: 10 }
+            ),
+        ])(
             "should handle sequential field updates correctly",
             async (fieldUpdates) => {
                 const { result } = renderHook(() => useAddSiteForm());

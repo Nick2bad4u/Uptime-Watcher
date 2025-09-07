@@ -1371,10 +1371,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Extracted from constructor for clarity and maintainability.
      */
     private setupMiddleware(): void {
-        this.addMiddleware(
+        this.registerMiddleware(
             createErrorHandlingMiddleware({ continueOnError: true })
         );
-        this.addMiddleware(
+        this.registerMiddleware(
             createLoggingMiddleware({ includeData: false, level: "info" })
         );
     }

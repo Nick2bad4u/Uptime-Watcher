@@ -676,7 +676,9 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
-            expect(screen.getByTestId("settings-modal")).toBeInTheDocument();
+            await expect(
+                screen.findByTestId("settings-modal")
+            ).resolves.toBeInTheDocument();
         });
 
         it("should hide settings modal when showSettings is false", async ({
@@ -763,12 +765,12 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
-            expect(
-                screen.getByTestId("site-details-modal")
-            ).toBeInTheDocument();
-            expect(
-                screen.getByTestId("site-details-identifier")
-            ).toHaveTextContent("test-site-1");
+            await expect(
+                screen.findByTestId("site-details-modal")
+            ).resolves.toBeInTheDocument();
+            await expect(
+                screen.findByTestId("site-details-identifier")
+            ).resolves.toHaveTextContent("test-site-1");
         });
 
         it("should not show site details modal when showSiteDetails is true but no site is selected", async ({

@@ -47,6 +47,7 @@ import type { Logger } from "../interfaces";
 import type { MonitoringConfig, SiteLoadingConfig } from "./interfaces";
 
 import { DEFAULT_SITE_NAME } from "../../constants";
+import { SiteLoadingError } from "./interfaces";
 
 /**
  * Orchestrates the complete site loading process. Coordinates data loading with
@@ -194,9 +195,12 @@ export class SiteRepositoryService {
         } catch (error) {
             const message = `Failed to fetch sites from database: ${error instanceof Error ? error.message : String(error)}`;
             this.logger.error(message, error);
-            throw new Error(`Failed to fetch sites from database: ${message}`, {
-                cause: error,
-            });
+            throw new SiteLoadingError(
+                `Failed to fetch sites from database: ${message}`,
+                error instanceof Error
+                    ? error
+                    : new Error(String(error), { cause: error })
+            );
         }
     }
 
