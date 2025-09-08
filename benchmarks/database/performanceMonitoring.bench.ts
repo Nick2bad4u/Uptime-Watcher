@@ -312,10 +312,10 @@ describe("Database Performance Monitoring", () => {
                     avg:
                         values.reduce((sum, val) => sum + val, 0) /
                         values.length,
-                    p95: values.sort((a, b) => a - b)[
+                    p95: values.toSorted((a, b) => a - b)[
                         Math.floor(values.length * 0.95)
                     ],
-                    p99: values.sort((a, b) => a - b)[
+                    p99: values.toSorted((a, b) => a - b)[
                         Math.floor(values.length * 0.99)
                     ],
                 };
@@ -409,11 +409,11 @@ describe("Database Performance Monitoring", () => {
                         latencies.reduce((sum, val) => sum + val, 0) /
                             latencies.length || 0,
                     p95Latency:
-                        latencies.sort((a, b) => a - b)[
+                        latencies.toSorted((a, b) => a - b)[
                             Math.floor(latencies.length * 0.95)
                         ] || 0,
                     p99Latency:
-                        latencies.sort((a, b) => a - b)[
+                        latencies.toSorted((a, b) => a - b)[
                             Math.floor(latencies.length * 0.99)
                         ] || 0,
                     throughput:

@@ -62,7 +62,7 @@ class MockDatabase {
             all: () => {
                 if (sql.includes("ORDER BY timestamp DESC LIMIT")) {
                     return this.history
-                        .sort((a, b) => b.timestamp - a.timestamp)
+                        .toSorted((a, b) => b.timestamp - a.timestamp)
                         .slice(0, 100);
                 }
                 if (sql.includes("WHERE monitorId =")) {
@@ -232,7 +232,7 @@ class MockHistoryRepository {
     getResponseTimeStats(monitorId: number, hours: number = 24) {
         const cutoff = Date.now() - hours * 60 * 60 * 1000;
         const stmt = this.db.prepare(`
-            SELECT metadata FROM history 
+            SELECT metadata FROM history
             WHERE monitorId = ? AND timestamp > ? AND eventType = 'check_result'
         `);
         const records = stmt.all();

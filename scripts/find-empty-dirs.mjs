@@ -418,7 +418,7 @@ async function main() {
                         path: dir,
                         depth: dir.split(/[/\\]/).length,
                     }))
-                    .sort((a, b) => b.depth - a.depth)
+                    .toSorted((a, b) => b.depth - a.depth)
                     .map((item) => item.path);
 
                 for (const d of sortedDirs) {

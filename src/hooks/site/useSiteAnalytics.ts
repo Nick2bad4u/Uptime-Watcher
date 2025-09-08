@@ -187,7 +187,9 @@ function calculateResponseMetrics(filteredHistory: StatusHistory[]): {
         responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
 
     // Calculate percentiles
-    const sortedResponseTimes = Array.from(responseTimes).sort((a, b) => a - b);
+    const sortedResponseTimes = Array.from(responseTimes).toSorted(
+        (a, b) => a - b
+    );
     const getPercentile = (p: number): number => {
         // Ensure p is between 0 and 1
         const safeP = Math.max(0, Math.min(1, p));
@@ -235,7 +237,7 @@ function filterHistoryByTimeRange(
  */
 export function useChartData(monitor: Monitor, theme: Theme): ChartData {
     return useMemo(() => {
-        const sortedHistory = Array.from(monitor.history).sort(
+        const sortedHistory = Array.from(monitor.history).toSorted(
             (a, b) => a.timestamp - b.timestamp
         );
 

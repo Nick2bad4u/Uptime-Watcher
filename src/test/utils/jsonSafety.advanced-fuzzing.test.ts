@@ -185,7 +185,9 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
 
             expect(result.success).toBeTruthy();
             if (result.success) {
-                expect(result.data).toEqual(primitive);
+                // Handle JavaScript signed zero quirk where -0 becomes +0 through JSON
+                const expectedValue = Object.is(primitive, -0) ? 0 : primitive;
+                expect(result.data).toEqual(expectedValue);
             }
         });
 

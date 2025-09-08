@@ -869,7 +869,7 @@ describe("Application Constants", () => {
                 expect(CHECK_INTERVALS).toBeDefined();
                 expect(Array.isArray(CHECK_INTERVALS)).toBeTruthy();
 
-                const sortedIntervals = [...CHECK_INTERVALS].sort(
+                const sortedIntervals = CHECK_INTERVALS.toSorted(
                     (a, b) => a.value - b.value
                 );
                 expect(CHECK_INTERVALS).toEqual(sortedIntervals);
@@ -970,7 +970,7 @@ describe("Application Constants", () => {
                 }
 
                 // Should be sorted in ascending order by value
-                const sortedOptions = [...HISTORY_LIMIT_OPTIONS].sort(
+                const sortedOptions = HISTORY_LIMIT_OPTIONS.toSorted(
                     (a, b) => a.value - b.value
                 );
                 expect(HISTORY_LIMIT_OPTIONS).toEqual(sortedOptions);

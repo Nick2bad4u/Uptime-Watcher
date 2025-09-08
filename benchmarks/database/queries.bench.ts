@@ -117,7 +117,7 @@ class MockQueryExecutor {
                     ...monitor,
                     recentHistory: history
                         .filter((h) => h.monitorId === monitor.id)
-                        .sort((a, b) => b.timestamp - a.timestamp)
+                        .toSorted((a, b) => b.timestamp - a.timestamp)
                         .slice(0, 10),
                 })),
             };
@@ -183,7 +183,7 @@ class MockQueryExecutor {
 
         // Sort by timestamp and add row numbers within each monitor group
         const sortedHistory = history
-            .sort((a, b) => b.timestamp - a.timestamp)
+            .toSorted((a, b) => b.timestamp - a.timestamp)
             .map((record, index) => ({
                 ...record,
                 rowNumber: index + 1,
@@ -234,7 +234,7 @@ class MockQueryExecutor {
         const history = this.data.get("history") || [];
         const responseTimes = history
             .map((h) => h.responseTime)
-            .sort((a, b) => a - b);
+            .toSorted((a, b) => a - b);
 
         const median = responseTimes[Math.floor(responseTimes.length / 2)];
         const q1 = responseTimes[Math.floor(responseTimes.length * 0.25)];
@@ -264,7 +264,9 @@ class MockQueryExecutor {
     executePaginatedQuery(page: number, pageSize: number) {
         const history = this.data.get("history") || [];
         const offset = (page - 1) * pageSize;
-        const sortedHistory = history.sort((a, b) => b.timestamp - a.timestamp);
+        const sortedHistory = history.toSorted(
+            (a, b) => b.timestamp - a.timestamp
+        );
 
         return {
             data: sortedHistory.slice(offset, offset + pageSize),

@@ -230,7 +230,7 @@ class MockSiteRepository {
         sortBy: keyof Site,
         sortOrder: "asc" | "desc"
     ): Site[] {
-        return sites.sort((a, b) => {
+        return sites.toSorted((a, b) => {
             const aValue = a[sortBy];
             const bValue = b[sortBy];
 

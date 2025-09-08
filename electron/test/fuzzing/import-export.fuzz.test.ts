@@ -441,10 +441,10 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                             // Site identifiers should be preserved
                             const originalIdentifiers = originalData.sites
                                 .map((s) => s.identifier)
-                                .sort();
+                                .toSorted();
                             const importedIdentifiers = importResult.sites
                                 .map((s) => s.identifier)
-                                .sort();
+                                .toSorted();
                             expect(importedIdentifiers).toEqual(
                                 originalIdentifiers
                             );

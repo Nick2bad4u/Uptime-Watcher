@@ -455,7 +455,26 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
 
                 // Should be valid JSON that parses back correctly
                 const parsed = JSON.parse(stringified);
-                expect(parsed).toEqual(jsonArray);
+
+                // Normalize signed zeros to handle JavaScript JSON quirk where -0 becomes +0
+                const normalizeSignedZeros = (value: unknown): unknown => {
+                    if (Array.isArray(value)) {
+                        return value.map((item) => normalizeSignedZeros(item));
+                    } else if (value && typeof value === "object") {
+                        const normalized: Record<string, unknown> = {};
+                        for (const [key, val] of Object.entries(value)) {
+                            normalized[key] = normalizeSignedZeros(val);
+                        }
+                        return normalized;
+                    } else if (Object.is(value, -0)) {
+                        return 0; // Normalize -0 to +0
+                    }
+                    return value;
+                };
+
+                expect(normalizeSignedZeros(parsed)).toEqual(
+                    normalizeSignedZeros(jsonArray)
+                );
             }
         );
 
@@ -468,7 +487,28 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
                 if (stringified !== "") {
                     // Should be valid JSON that parses back correctly
                     const parsed = JSON.parse(stringified);
-                    expect(parsed).toEqual(jsonObj);
+
+                    // Normalize signed zeros to handle JavaScript JSON quirk where -0 becomes +0
+                    const normalizeSignedZeros = (value: unknown): unknown => {
+                        if (Array.isArray(value)) {
+                            return value.map((item) =>
+                                normalizeSignedZeros(item)
+                            );
+                        } else if (value && typeof value === "object") {
+                            const normalized: Record<string, unknown> = {};
+                            for (const [key, val] of Object.entries(value)) {
+                                normalized[key] = normalizeSignedZeros(val);
+                            }
+                            return normalized;
+                        } else if (Object.is(value, -0)) {
+                            return 0; // Normalize -0 to +0
+                        }
+                        return value;
+                    };
+
+                    expect(normalizeSignedZeros(parsed)).toEqual(
+                        normalizeSignedZeros(jsonObj)
+                    );
                 }
             }
         );

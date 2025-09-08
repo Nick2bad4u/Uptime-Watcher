@@ -561,7 +561,7 @@ describe("Notification Service Benchmarks", () => {
                     .filter(
                         (n) => n.priority === queue.priority && !n.processedAt
                     )
-                    .sort((a, b) => a.queuedAt - b.queuedAt)
+                    .toSorted((a, b) => a.queuedAt - b.queuedAt)
                     .slice(0, notificationsToProcess);
 
                 for (const notification of candidates) {

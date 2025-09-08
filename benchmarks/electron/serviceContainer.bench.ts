@@ -1089,7 +1089,7 @@ describe("Service Container Benchmarks", () => {
             );
             const resolutionTimes = resolutions
                 .map((r) => r.endTime - r.startTime)
-                .sort((a, b) => a - b);
+                .toSorted((a, b) => a - b);
             const p95Index = Math.floor(resolutionTimes.length * 0.95);
             const resolutionTimeP95 =
                 resolutionTimes.length > 0 ? resolutionTimes[p95Index] || 0 : 0;

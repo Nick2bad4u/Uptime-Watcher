@@ -14,7 +14,6 @@ import type { Logger } from "../interfaces";
 
 import { DB_FILE_NAME } from "../../constants";
 import { createDatabaseBackup } from "../../services/database/utils/databaseBackup";
-import { SiteLoadingError } from "./interfaces";
 
 /**
  * Configuration for data backup operations.
@@ -66,9 +65,11 @@ export class DataBackupService {
                 timestamp: Date.now(),
             });
 
-            throw new SiteLoadingError(
+            throw new Error(
                 `Failed to download backup: ${error instanceof Error ? error.message : String(error)}`,
-                error instanceof Error ? error : new Error(String(error))
+                {
+                    cause: error,
+                }
             );
         }
     }

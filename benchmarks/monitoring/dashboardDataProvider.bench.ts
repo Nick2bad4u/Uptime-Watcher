@@ -87,7 +87,7 @@ class MockDashboardDataProvider {
 
     getRecentActivity(limit: number = 50): any[] {
         return this.history
-            .sort((a, b) => b.timestamp - a.timestamp)
+            .toSorted((a, b) => b.timestamp - a.timestamp)
             .slice(0, limit);
     }
 

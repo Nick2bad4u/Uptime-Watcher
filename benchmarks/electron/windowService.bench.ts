@@ -493,7 +493,7 @@ describe("Window Service Benchmarks", () => {
                     // Random subset
                     const subsetSize = Math.floor(Math.random() * 10) + 3;
                     affectedWindows = windowPool
-                        .sort(() => Math.random() - 0.5)
+                        .toSorted(() => Math.random() - 0.5)
                         .slice(0, subsetSize)
                         .map((w) => w.id);
                 }

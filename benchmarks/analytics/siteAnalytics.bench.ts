@@ -114,7 +114,9 @@ function calculateResponseMetrics(filteredHistory: StatusHistory[]) {
     const slowestResponse =
         responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
 
-    const sortedResponseTimes = Array.from(responseTimes).sort((a, b) => a - b);
+    const sortedResponseTimes = Array.from(responseTimes).toSorted(
+        (a, b) => a - b
+    );
     const getPercentile = (p: number): number => {
         const safeP = Math.max(0, Math.min(1, p));
         const arrayLength = sortedResponseTimes.length;

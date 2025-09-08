@@ -20,7 +20,7 @@ class MockResponseTimeAnalyzer {
     calculateStats(responseTimes: number[]): any {
         if (responseTimes.length === 0) return null;
 
-        const sorted = responseTimes.sort((a, b) => a - b);
+        const sorted = responseTimes.toSorted((a, b) => a - b);
         const sum = responseTimes.reduce((a, b) => a + b, 0);
 
         return {

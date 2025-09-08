@@ -760,7 +760,8 @@ export function createValidationMiddleware<T extends UnknownRecord>(
                     }
                 );
                 throw new Error(
-                    `Validation failed for event '${event}': ${errorMsg}`
+                    `Validation failed for event '${event}': ${errorMsg}`,
+                    { cause: new Error(errorMsg) }
                 );
             }
         } catch (error) {
@@ -784,7 +785,7 @@ export function createValidationMiddleware<T extends UnknownRecord>(
             );
             throw new Error(
                 `Validator error for event '${event}': ${wrappedError.message}`,
-                { cause: wrappedError }
+                { cause: error }
             );
         }
 

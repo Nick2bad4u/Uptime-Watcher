@@ -516,7 +516,7 @@ class MockReactContext {
         // Group consumers by their subscription patterns
         for (const consumer of this.consumers.values()) {
             if (consumer.contextId === contextId) {
-                const pattern = consumer.subscribedKeys.sort().join(",");
+                const pattern = consumer.subscribedKeys.toSorted().join(",");
                 if (!consumerGroups.has(pattern)) {
                     consumerGroups.set(pattern, []);
                 }

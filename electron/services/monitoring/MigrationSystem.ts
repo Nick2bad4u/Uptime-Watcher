@@ -444,10 +444,12 @@ class MigrationRegistry {
 
         rules.push(rule);
 
-        // Sort by version
-        rules.sort((a, b) =>
+        // Sort by version using immutable operation
+        const sortedRules = rules.toSorted((a, b) =>
             this.compareVersions(a.fromVersion, b.fromVersion)
         );
+        rules.length = 0;
+        rules.push(...sortedRules);
 
         logger.info(
             interpolateLogTemplate(

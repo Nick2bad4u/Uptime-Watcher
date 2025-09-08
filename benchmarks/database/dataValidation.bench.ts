@@ -818,7 +818,7 @@ describe("Database Data Validation Benchmarks", () => {
                                     : 0,
                         };
                     })
-                    .sort((a, b) => a.averageScore - b.averageScore)
+                    .toSorted((a, b) => a.averageScore - b.averageScore)
                     .slice(0, 3),
             };
         });

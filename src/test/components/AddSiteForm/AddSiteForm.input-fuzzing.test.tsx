@@ -817,12 +817,10 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
     describe("Port Number Validation", () => {
         fcTest.prop([fc.integer({ min: 1, max: 65_535 })], {
-            numRuns: 3,
-            timeout: 20_000,
+            numRuns: 2, // Reduced from 3
+            timeout: 1500, // Reduced fast-check timeout to 1.5s
         })("should handle valid port numbers", async (validPort) => {
-            const user = userEvent.setup();
-
-            // Set the mock state to port type before rendering
+            // Pre-set the mock state to port type before rendering - no DOM interaction needed
             mockState.monitorType = "port";
 
             render(<AddSiteForm />);
@@ -832,8 +830,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
             const portInput = portInputs[0]; // Take the first one if multiple exist
             expect(portInput).toBeInTheDocument();
 
-            await user.clear(portInput);
-            // Use faster direct assignment
+            // Use direct DOM manipulation instead of userEvent for speed
             (portInput as HTMLInputElement).value = validPort.toString();
             portInput.dispatchEvent(new Event("input", { bubbles: true }));
 

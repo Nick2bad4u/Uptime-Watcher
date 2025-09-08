@@ -978,7 +978,7 @@ class ListSorter {
     ): ListItem[] {
         const multiplier = direction === "asc" ? 1 : -1;
 
-        return [...items].sort((a, b) => {
+        return items.toSorted((a, b) => {
             const aValue = this.getNestedValue(a, sortBy);
             const bValue = this.getNestedValue(b, sortBy);
 

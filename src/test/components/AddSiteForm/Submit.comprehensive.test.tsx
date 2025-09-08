@@ -32,7 +32,8 @@ vi.mock("../../../utils/errorHandling", () => ({
 
                 if (fallbackValue === undefined) {
                     throw new Error(
-                        `${operationName} failed and no fallback value provided`
+                        `${operationName} failed and no fallback value provided`,
+                        { cause: error }
                     );
                 }
 

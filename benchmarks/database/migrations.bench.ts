@@ -185,7 +185,7 @@ class MockMigrationSystem {
             operations: (() => Promise<void>)[];
         }[]
     ) {
-        const sortedMigrations = migrations.sort(
+        const sortedMigrations = migrations.toSorted(
             (a, b) => a.version - b.version
         );
 
@@ -221,7 +221,7 @@ class MockMigrationSystem {
     }
 
     getAppliedMigrations() {
-        return Array.from(this.appliedMigrations).sort((a, b) => a - b);
+        return Array.from(this.appliedMigrations).toSorted((a, b) => a - b);
     }
 
     getPendingMigrations(availableMigrations: number[]) {

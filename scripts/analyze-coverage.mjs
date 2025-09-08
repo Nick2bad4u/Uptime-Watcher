@@ -41,7 +41,7 @@ const coveragePath = path.join(
     "coverage",
     "coverage-final.json"
 );
- 
+
 const coverageData = JSON.parse(
     fs.readFileSync(coveragePath)
 );
@@ -206,9 +206,8 @@ for (const [filePath, data] of Object.entries(coverageData)) {
     });
 }
 
-// Sort by function coverage (lowest first)
-fileAnalysis.sort((a, b) => a.functions.percentage - b.functions.percentage);
-const sortedByFunctionCoverage = fileAnalysis;
+// Sort by function coverage (lowest first) using immutable operation
+const sortedByFunctionCoverage = fileAnalysis.toSorted((a, b) => a.functions.percentage - b.functions.percentage);
 
 // Get limit from CLI argument or environment variable
 const fileDisplayLimit = limitOverride ?? DEFAULTS.fileDisplayLimit;
@@ -307,8 +306,8 @@ function printCoverageSection(header, files) {
                 return pct >= 90
                     ? colors.green(text)
                     : pct >= 75
-                      ? colors.yellow(text)
-                      : colors.red(text);
+                        ? colors.yellow(text)
+                        : colors.red(text);
             };
             table.push([
                 ellipsize(f.file, DEFAULTS.truncateFilePath),
@@ -352,8 +351,8 @@ function printCoverageSection(header, files) {
                 pct >= 90
                     ? colors.green(padded)
                     : pct >= 75
-                      ? colors.yellow(padded)
-                      : colors.red(padded);
+                        ? colors.yellow(padded)
+                        : colors.red(padded);
             return colored;
         };
 
@@ -441,17 +440,15 @@ printCoverageSection(
     lowFunctionCoverage
 );
 
-// Sort by branch coverage
-fileAnalysis.sort((a, b) => a.branches.percentage - b.branches.percentage);
-const sortedByBranchCoverage = fileAnalysis;
+// Sort by branch coverage using immutable operation
+const sortedByBranchCoverage = fileAnalysis.toSorted((a, b) => a.branches.percentage - b.branches.percentage);
 const lowBranchCoverage = sortedByBranchCoverage.filter(
     (file) => file.branches.percentage < 90
 );
 printCoverageSection("FILES WITH LOWEST BRANCH COVERAGE", lowBranchCoverage);
 
-// Sort by statement coverage and show files with low statement coverage
-fileAnalysis.sort((a, b) => a.statements.percentage - b.statements.percentage);
-const sortedByStatementCoverage = fileAnalysis;
+// Sort by statement coverage using immutable operation
+const sortedByStatementCoverage = fileAnalysis.toSorted((a, b) => a.statements.percentage - b.statements.percentage);
 const lowStatementCoverage = sortedByStatementCoverage.filter(
     (file) => file.statements.percentage < 90
 );
@@ -460,11 +457,10 @@ printCoverageSection(
     lowStatementCoverage
 );
 
-// Sort by line coverage and show files with low line coverage
-fileAnalysis.sort(
+// Sort by line coverage using immutable operation
+const sortedByLineCoverage = fileAnalysis.toSorted(
     (a, b) => (a.lines?.percentage ?? 100) - (b.lines?.percentage ?? 100)
 );
-const sortedByLineCoverage = fileAnalysis;
 const lowLineCoverage = sortedByLineCoverage.filter(
     (file) => (file.lines?.percentage ?? 100) < 90
 );

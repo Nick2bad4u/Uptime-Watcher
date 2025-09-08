@@ -26,7 +26,6 @@ import type { SiteRepository } from "../../services/database/SiteRepository";
 import type { Logger } from "../interfaces";
 
 import { withDatabaseOperation } from "../operationalHooks";
-import { SiteLoadingError } from "./interfaces";
 
 /**
  * Configuration for data import/export operations.
@@ -133,10 +132,9 @@ export class DataImportExportService {
                 }
             );
 
-            throw new SiteLoadingError(
-                `Failed to export data: ${message}`,
-                error instanceof Error ? error : new Error(String(error))
-            );
+            throw new Error(`Failed to export data: ${message}`, {
+                cause: error,
+            });
         }
     }
 
@@ -152,7 +150,7 @@ export class DataImportExportService {
             const parseResult = safeJsonParse(jsonData, isImportData);
 
             if (!parseResult.success || !parseResult.data) {
-                throw new SiteLoadingError(
+                throw new Error(
                     `${ERROR_CATALOG.database.IMPORT_DATA_INVALID}: ${parseResult.error ?? "Unknown parsing error"}`
                 );
             }
@@ -179,10 +177,9 @@ export class DataImportExportService {
                 }
             );
 
-            throw new SiteLoadingError(
-                `Failed to parse import data: ${message}`,
-                error instanceof Error ? error : new Error(String(error))
-            );
+            throw new Error(`Failed to parse import data: ${message}`, {
+                cause: error,
+            });
         }
     }
 
@@ -256,7 +253,7 @@ export class DataImportExportService {
                 try {
                     // We know monitors exists and has content from the filter
                     if (!site.monitors) {
-                        throw new SiteLoadingError(
+                        throw new Error(
                             "Site monitors is unexpectedly undefined"
                         );
                     }

@@ -189,7 +189,11 @@ function aggregateSiteStatistics(sites: Site[]): Map<string, UptimeStats> {
         }
 
         // Sort by timestamp for accurate calculations
-        combinedHistory.sort((a, b) => b.timestamp - a.timestamp);
+        const sortedCombinedHistory = combinedHistory.toSorted(
+            (a, b) => b.timestamp - a.timestamp
+        );
+        combinedHistory.length = 0;
+        combinedHistory.push(...sortedCombinedHistory);
 
         const siteStats = calculateUptimeStatistics(combinedHistory);
         stats.set(site.identifier, siteStats);
@@ -206,9 +210,7 @@ function detectOutages(
     let currentOutageStart: number | null = null;
 
     // Sort history by timestamp for sequential processing
-    const sortedHistory = [...history].sort(
-        (a, b) => a.timestamp - b.timestamp
-    );
+    const sortedHistory = history.toSorted((a, b) => a.timestamp - b.timestamp);
 
     for (const entry of sortedHistory) {
         if (entry.status === "down") {

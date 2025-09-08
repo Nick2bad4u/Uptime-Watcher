@@ -201,7 +201,7 @@ class MockEventStore {
         for (const events of this.events.values()) {
             allEvents.push(...events);
         }
-        return allEvents.sort((a, b) => a.timestamp - b.timestamp);
+        return allEvents.toSorted((a, b) => a.timestamp - b.timestamp);
     }
 
     getEventCount(): number {

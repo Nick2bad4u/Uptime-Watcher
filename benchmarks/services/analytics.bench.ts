@@ -240,7 +240,7 @@ class MockMetricsStorage {
                 }
                 case "percentile": {
                     // Default to 95th percentile
-                    const sorted = [...values].sort((a, b) => a - b);
+                    const sorted = values.toSorted((a, b) => a - b);
                     const index = Math.ceil(sorted.length * 0.95) - 1;
                     value = sorted[index] || 0;
                     break;
@@ -418,11 +418,11 @@ class MockQueryCache {
 
     private generateKey(query: AnalyticsQuery): string {
         return JSON.stringify({
-            metrics: query.metricNames.sort(),
+            metrics: query.metricNames.toSorted(),
             timeRange: query.timeRange,
             aggregation: query.aggregation,
             filters: query.filters,
-            groupBy: query.groupBy?.sort(),
+            groupBy: query.groupBy?.toSorted(),
         });
     }
 

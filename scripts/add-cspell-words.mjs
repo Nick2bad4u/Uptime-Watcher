@@ -280,7 +280,7 @@ function isValidWord(word, config) {
         // Use case-insensitive matching for domain patterns, but case-sensitive for caps constants
         const flags =
             pattern.includes("(com|org|net|edu|gov)") ||
-            pattern.includes("(http|https|ftp|ssh)")
+                pattern.includes("(http|https|ftp|ssh)")
                 ? "i"
                 : "";
         if (new RegExp(pattern, flags).test(word)) {
@@ -407,7 +407,7 @@ async function runCSpell(config, logger) {
         }
         const errorMessage =
             error instanceof Error ? error.message : String(error);
-        throw new Error(`CSpell execution failed: ${errorMessage}`);
+        throw new Error(`CSpell execution failed: ${errorMessage}`, { cause: error });
     }
 }
 
@@ -438,7 +438,7 @@ function processFoundWords(cspellOutput, currentWords, config, logger) {
 
     logger.debug(`${validWords.length} words passed validation`);
 
-    return new Set(config.sortWords ? validWords.sort() : validWords);
+    return new Set(config.sortWords ? validWords.toSorted() : validWords);
 }
 
 /**

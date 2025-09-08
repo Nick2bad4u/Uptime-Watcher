@@ -596,7 +596,7 @@ describe("DNS Monitoring Performance Benchmarks", () => {
                 // Calculate percentiles
                 const responseTimes = results
                     .map((r) => r.responseTime)
-                    .sort((a, b) => a - b);
+                    .toSorted((a, b) => a - b);
                 const p95 =
                     responseTimes[Math.floor(responseTimes.length * 0.95)];
                 const p99 =

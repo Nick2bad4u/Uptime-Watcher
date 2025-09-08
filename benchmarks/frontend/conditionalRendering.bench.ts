@@ -181,7 +181,7 @@ class MockReactElementFactory {
         children: ReactElement[]
     ): string {
         const propsKey = Object.keys(props)
-            .sort()
+            .toSorted()
             .map((key) => `${key}:${typeof props[key]}`)
             .join(",");
         const childrenKey = children.map((child) => child.type).join(",");

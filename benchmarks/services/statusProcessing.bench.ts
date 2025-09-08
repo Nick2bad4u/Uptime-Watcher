@@ -114,7 +114,7 @@ class MockStatusProcessingService {
         }
 
         // Sort entries by timestamp for accurate calculations
-        const sortedEntries = [...entries].sort(
+        const sortedEntries = entries.toSorted(
             (a, b) => a.timestamp - b.timestamp
         );
 
@@ -208,7 +208,7 @@ class MockStatusProcessingService {
             minor: 300_000,
             major: 1_800_000,
         };
-        const sortedEntries = [...entries].sort(
+        const sortedEntries = entries.toSorted(
             (a, b) => a.timestamp - b.timestamp
         );
         const outages: OutageEvent[] = [];
@@ -677,7 +677,7 @@ function generateStatusEntries(
         });
     }
 
-    return entries.sort((a, b) => a.timestamp - b.timestamp);
+    return entries.toSorted((a, b) => a.timestamp - b.timestamp);
 }
 
 function generateSiteIds(count: number): string[] {

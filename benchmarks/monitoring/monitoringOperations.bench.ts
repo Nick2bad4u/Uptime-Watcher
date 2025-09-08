@@ -165,7 +165,7 @@ function aggregateResponseTimes(results: MonitorCheckResult[]): {
     const responseTimes = results
         .filter((r) => r.success)
         .map((r) => r.responseTime)
-        .sort((a, b) => a - b);
+        .toSorted((a, b) => a - b);
 
     if (responseTimes.length === 0) {
         return { average: 0, min: 0, max: 0, p95: 0 };

@@ -109,7 +109,7 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                     ),
                     (key) => {
                         const config = CACHE_CONFIG[key];
-                        const configKeys = Object.keys(config).sort();
+                        const configKeys = Object.keys(config).toSorted();
 
                         expect(configKeys).toEqual(expectedKeys);
                     }

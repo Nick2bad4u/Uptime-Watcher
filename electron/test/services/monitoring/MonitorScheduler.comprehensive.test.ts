@@ -296,7 +296,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             scheduler.startMonitor("site1", monitor2);
 
             expect(scheduler.getActiveCount()).toBe(2);
-            expect(scheduler.getActiveMonitors().sort()).toEqual([
+            expect(scheduler.getActiveMonitors().toSorted()).toEqual([
                 "site1|monitor1",
                 "site1|monitor2",
             ]);

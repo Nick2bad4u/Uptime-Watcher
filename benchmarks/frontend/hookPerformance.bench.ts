@@ -1039,7 +1039,7 @@ describe("React Hook Performance", () => {
                         .filter((item) =>
                             item.value.toString().includes(filter)
                         )
-                        .sort((a, b) => {
+                        .toSorted((a, b) => {
                             if (sortBy === "id") return a.id - b.id;
                             if (sortBy === "value") return a.value - b.value;
                             return 0;

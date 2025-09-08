@@ -335,7 +335,7 @@ class MockTypedEventBus {
         eventCount: number;
     } {
         const events = this.correlationTracker.get(correlationId) ?? [];
-        const sortedEvents = [...events].sort(
+        const sortedEvents = events.toSorted(
             (a, b) => a.timestamp - b.timestamp
         );
 
@@ -618,7 +618,7 @@ function generateMixedEvents(count: number, siteIds: string[]): BaseEvent[] {
         ...generateDatabaseEvents(Math.floor(count * 0.1)),
     ];
 
-    return events.sort((a, b) => a.timestamp - b.timestamp);
+    return events.toSorted((a, b) => a.timestamp - b.timestamp);
 }
 
 // Benchmark test suites

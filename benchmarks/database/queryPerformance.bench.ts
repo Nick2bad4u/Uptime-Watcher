@@ -215,7 +215,7 @@ describe("Database Query Performance Benchmarks", () => {
         const successfulSelects = selectOperations.filter((op) => op.success);
         const executionTimes = successfulSelects
             .map((op) => op.endTime - op.startTime)
-            .sort((a, b) => a - b);
+            .toSorted((a, b) => a - b);
 
         const selectMetrics: QueryMetrics = {
             totalQueries: selectOperations.length,
@@ -370,7 +370,7 @@ describe("Database Query Performance Benchmarks", () => {
         const successfulInserts = insertOperations.filter((op) => op.success);
         const insertTimes = successfulInserts
             .map((op) => op.endTime - op.startTime)
-            .sort((a, b) => a - b);
+            .toSorted((a, b) => a - b);
 
         const insertMetrics: QueryMetrics = {
             totalQueries: insertOperations.length,
@@ -548,7 +548,7 @@ describe("Database Query Performance Benchmarks", () => {
         const successfulUpdates = updateOperations.filter((op) => op.success);
         const updateTimes = successfulUpdates
             .map((op) => op.endTime - op.startTime)
-            .sort((a, b) => a - b);
+            .toSorted((a, b) => a - b);
 
         const updateMetrics: QueryMetrics = {
             totalQueries: updateOperations.length,
@@ -705,7 +705,7 @@ describe("Database Query Performance Benchmarks", () => {
         const successfulDeletes = deleteOperations.filter((op) => op.success);
         const deleteTimes = successfulDeletes
             .map((op) => op.endTime - op.startTime)
-            .sort((a, b) => a - b);
+            .toSorted((a, b) => a - b);
 
         const deleteMetrics: QueryMetrics = {
             totalQueries: deleteOperations.length,

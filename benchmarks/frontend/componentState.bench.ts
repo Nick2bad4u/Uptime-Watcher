@@ -188,7 +188,7 @@ class MockSiteListComponent {
                 );
             }
 
-            return filtered.sort((a, b) => {
+            return filtered.toSorted((a, b) => {
                 const modifier = sortOrder === "asc" ? 1 : -1;
                 return a.name.localeCompare(b.name) * modifier;
             });
