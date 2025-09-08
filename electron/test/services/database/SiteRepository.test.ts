@@ -452,7 +452,7 @@ describe(SiteRepository, () => {
                         name: fc.string({ minLength: 1, maxLength: 100 }),
                         monitoring: fc.boolean(),
                     }),
-                    async (siteIdentifier, updateData) => {
+                    async (_siteIdentifier, updateData) => {
                         // Use the identifier from updateData for consistency
                         const updatedSite = {
                             identifier: updateData.identifier,

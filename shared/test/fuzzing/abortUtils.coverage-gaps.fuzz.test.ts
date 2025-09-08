@@ -295,7 +295,7 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
 
                 // Abort one of the additional signals
                 if (controllers.length > 0) {
-                    controllers[0].abort();
+                    controllers[0]?.abort();
                     expect(signal.aborted).toBeTruthy();
                 }
             }

@@ -66,7 +66,6 @@ export function createMockEventBus(): Partial<TypedEventBus<UptimeEvents>> {
             middlewareCount: 0,
             middlewareUtilization: 0,
         })),
-        use: vi.fn(),
         clearMiddleware: vi.fn(),
         listenerCount: vi.fn(() => 0),
         eventNames: vi.fn(() => []),

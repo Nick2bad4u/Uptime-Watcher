@@ -64,7 +64,7 @@ describe("Database Schema", () => {
                         minLength: 1,
                         maxLength: 10,
                     }),
-                    (mockQueries) => {
+                    (_mockQueries) => {
                         const testDatabase = {
                             run: vi.fn(),
                         };

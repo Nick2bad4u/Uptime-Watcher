@@ -106,7 +106,7 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                         );
 
                         if (Object.hasOwn(obj, key)) {
-                            const value = obj[key];
+                            const value = obj[key as keyof typeof obj];
                             if (value === undefined) {
                                 expect(result).toBe(fallback);
                             } else if (typeof value === typeof fallback) {

@@ -716,22 +716,29 @@ describe(HistoryRepository, () => {
                     fc.asyncProperty(
                         fc.string({ minLength: 1, maxLength: 50 }),
                         fc.array(
-                            fc.record({
-                                timestamp: fc.integer({
-                                    min: Date.now() - 86_400_000,
-                                    max: Date.now(),
-                                }),
-                                status: fc.constantFrom("up", "down"),
-                                responseTime: fc.integer({
-                                    min: 0,
-                                    max: 10_000,
-                                }),
-                                details: fc.oneof(
-                                    fc.string({ maxLength: 200 }),
-                                    fc.constant(null),
-                                    fc.constant(undefined)
+                            fc
+                                .record({
+                                    timestamp: fc.integer({
+                                        min: Date.now() - 86_400_000,
+                                        max: Date.now(),
+                                    }),
+                                    status: fc.constantFrom("up", "down"),
+                                    responseTime: fc.integer({
+                                        min: 0,
+                                        max: 10_000,
+                                    }),
+                                })
+                                .chain((base) =>
+                                    fc.oneof(
+                                        fc.constant(base),
+                                        fc
+                                            .string({ maxLength: 200 })
+                                            .map((details) => ({
+                                                ...base,
+                                                details,
+                                            }))
+                                    )
                                 ),
-                            }),
                             { minLength: 1, maxLength: 50 }
                         ),
                         async (monitorId, historyEntries) => {
@@ -820,7 +827,7 @@ describe(HistoryRepository, () => {
                         fc.string({ minLength: 1, maxLength: 50 }),
                         fc.integer({ min: 1, max: 1000 }),
                         fc.integer({ min: 0, max: 500 }),
-                        async (monitorId, limit, offset) => {
+                        async (monitorId, limit, _offset) => {
                             const mockedFindHistoryByMonitorId = vi.mocked(
                                 historyQuery.findHistoryByMonitorId
                             );
@@ -860,21 +867,29 @@ describe(HistoryRepository, () => {
                     fc.asyncProperty(
                         fc.string({ minLength: 1, maxLength: 50 }),
                         fc.array(
-                            fc.record({
-                                timestamp: fc.integer({
-                                    min: Date.now() - 604_800_000,
-                                    max: Date.now(),
-                                }),
-                                status: fc.constantFrom("up", "down"),
-                                responseTime: fc.integer({
-                                    min: 0,
-                                    max: 30_000,
-                                }),
-                                details: fc.oneof(
-                                    fc.string({ maxLength: 300 }),
-                                    fc.constant(null)
+                            fc
+                                .record({
+                                    timestamp: fc.integer({
+                                        min: Date.now() - 604_800_000,
+                                        max: Date.now(),
+                                    }),
+                                    status: fc.constantFrom("up", "down"),
+                                    responseTime: fc.integer({
+                                        min: 0,
+                                        max: 30_000,
+                                    }),
+                                })
+                                .chain((base) =>
+                                    fc.oneof(
+                                        fc.constant(base),
+                                        fc
+                                            .string({ maxLength: 300 })
+                                            .map((details) => ({
+                                                ...base,
+                                                details,
+                                            }))
+                                    )
                                 ),
-                            }),
                             { minLength: 1, maxLength: 100 }
                         ),
                         async (monitorId, historyBatch) => {
@@ -1012,21 +1027,29 @@ describe(HistoryRepository, () => {
                         fc.string({ minLength: 1, maxLength: 50 }),
                         fc.oneof(
                             fc.constant(undefined), // No latest entry
-                            fc.record({
-                                timestamp: fc.integer({
-                                    min: Date.now() - 3_600_000,
-                                    max: Date.now(),
-                                }),
-                                status: fc.constantFrom("up", "down"),
-                                responseTime: fc.integer({
-                                    min: 1,
-                                    max: 10_000,
-                                }),
-                                details: fc.oneof(
-                                    fc.string({ maxLength: 100 }),
-                                    fc.constant(null)
-                                ),
-                            })
+                            fc
+                                .record({
+                                    timestamp: fc.integer({
+                                        min: Date.now() - 3_600_000,
+                                        max: Date.now(),
+                                    }),
+                                    status: fc.constantFrom("up", "down"),
+                                    responseTime: fc.integer({
+                                        min: 1,
+                                        max: 10_000,
+                                    }),
+                                })
+                                .chain((base) =>
+                                    fc.oneof(
+                                        fc.constant(base),
+                                        fc
+                                            .string({ maxLength: 100 })
+                                            .map((details) => ({
+                                                ...base,
+                                                details,
+                                            }))
+                                    )
+                                )
                         ),
                         async (monitorId, latestEntry) => {
                             const mockedGetLatestHistoryEntry = vi.mocked(

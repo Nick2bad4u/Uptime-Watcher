@@ -301,7 +301,7 @@ describe("historyQuery utilities", () => {
                         mockDb.all as unknown as ReturnType<typeof vi.fn>
                     ).mockReturnValue(mockRows);
 
-                    const expectedMappedResults = historyRows.map((row) => ({
+                    historyRows.map((row) => ({
                         status: row.status,
                         timestamp: row.timestamp,
                         responseTime: row.responseTime,
@@ -335,12 +335,14 @@ describe("historyQuery utilities", () => {
 
                     if (historyRows.length > 0) {
                         for (const [index, item] of result.entries()) {
-                            expect(item.status).toBe(historyRows[index].status);
+                            expect(item.status).toBe(
+                                historyRows[index]?.status
+                            );
                             expect(item.timestamp).toBe(
-                                historyRows[index].timestamp
+                                historyRows[index]?.timestamp
                             );
                             expect(item.responseTime).toBe(
-                                historyRows[index].responseTime
+                                historyRows[index]?.responseTime
                             );
                         }
                     }

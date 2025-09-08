@@ -33,7 +33,7 @@ vi.mock("../../../../utils/logger", () => ({
 
 vi.mock("../../../../../shared/utils/logTemplates", () => ({
     interpolateLogTemplate: vi.fn((template, data) =>
-        template.replaceAll(/{(?<key>\w+)}/g, (match, key) =>
+        template.replaceAll(/{(?<key>\w+)}/g, (match: string, key: string) =>
             String(data[key] ?? match)
         )
     ),

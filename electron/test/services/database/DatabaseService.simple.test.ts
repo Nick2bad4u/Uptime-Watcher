@@ -231,7 +231,7 @@ describe("DatabaseService Coverage Tests", () => {
                             // Mock transaction behavior
                             const mockCallback = vi
                                 .fn()
-                                .mockImplementation(async (db) => {
+                                .mockImplementation(async (_db) => {
                                     for (const op of operations) {
                                         if (!op.shouldSucceed) {
                                             throw new Error(

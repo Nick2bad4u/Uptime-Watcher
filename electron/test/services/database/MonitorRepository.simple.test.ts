@@ -430,7 +430,6 @@ describe("MonitorRepository Coverage Tests", () => {
                                 lastInsertRowid: 1,
                             });
                             const mockGet = vi.fn().mockReturnValue({
-                                id: 1,
                                 ...monitorData,
                                 createdAt: Date.now(),
                                 updatedAt: Date.now(),
@@ -449,9 +448,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
                             // Should not throw for valid monitor data
                             expect(repository).toBeDefined();
-                            expect(typeof repository.createMonitor).toBe(
-                                "function"
-                            );
+                            expect(typeof repository.create).toBe("function");
                         } catch (error) {
                             expect(error).toBeInstanceOf(Error);
                         }
@@ -479,7 +476,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
                             for (const monitorId of monitorIds) {
                                 // Mock database responses for different monitor IDs
-                                const mockGetDb = vi.fn(() => ({
+                                vi.fn(() => ({
                                     prepare: vi.fn(() => ({
                                         get: vi.fn().mockReturnValue({
                                             id: monitorId,
@@ -505,7 +502,7 @@ describe("MonitorRepository Coverage Tests", () => {
 
                                 // Should handle various ID formats
                                 expect(repository).toBeDefined();
-                                expect(typeof repository.getMonitorById).toBe(
+                                expect(typeof repository.findByIdentifier).toBe(
                                     "function"
                                 );
                             }
@@ -562,7 +559,8 @@ describe("MonitorRepository Coverage Tests", () => {
 
                             // Test error handling in database operations
                             try {
-                                await repository.createMonitor(
+                                await repository.create(
+                                    "test-site",
                                     monitorData as any
                                 );
                             } catch (error) {
@@ -688,7 +686,7 @@ describe("MonitorRepository Coverage Tests", () => {
                                 );
 
                                 expect(repository).toBeDefined();
-                                expect(typeof repository.updateMonitor).toBe(
+                                expect(typeof repository.update).toBe(
                                     "function"
                                 );
 
@@ -716,7 +714,7 @@ describe("MonitorRepository Coverage Tests", () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc.boolean(),
-                    async (shouldMockSuccessfully) => {
+                    async (_shouldMockSuccessfully) => {
                         const { MonitorRepository } = await import(
                             "../../../services/database/MonitorRepository"
                         );
