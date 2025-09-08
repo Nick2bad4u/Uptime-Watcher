@@ -43,7 +43,7 @@ describe("String Conversion - Unreachable Code Coverage", () => {
 
         // Test various edge cases to maximize coverage
         expect(safeStringify(Symbol("test"))).toBe("Symbol(test)");
-        expect(safeStringify(BigInt(123))).toBe("123");
+        expect(safeStringify(123n)).toBe("123");
         expect(safeStringify(() => {})).toBe("[Function]");
         expect(safeStringify(true)).toBe("true");
         expect(safeStringify(false)).toBe("false");

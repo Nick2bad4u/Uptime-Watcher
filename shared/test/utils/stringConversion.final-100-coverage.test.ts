@@ -81,7 +81,7 @@ describe("String Conversion - Final 100% Coverage", () => {
                 { value: {}, expected: "[object Object]" },
                 { value: [], expected: "" },
                 { value: () => {}, expected: "[object Object]" },
-                { value: BigInt(123), expected: "123" },
+                { value: 123n, expected: "123" },
             ];
 
             for (const { value, expected: _expected } of testCases) {

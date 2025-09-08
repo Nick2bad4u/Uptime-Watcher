@@ -30,25 +30,48 @@ import {
 } from "../../../shared/utils/jsonSafety";
 
 /**
- * Normalizes negative zero to positive zero for consistent JSON round-trip
- * behavior. JSON.stringify converts -0 to "0", and JSON.parse converts "0" to
- * +0.
+ * Normalizes data to match JSON serialization behavior. This handles the same
+ * transformations as JSON.stringify:
+ *
+ * - Removes properties with undefined values from objects
+ * - Converts undefined values in arrays to null
+ * - Handles nested structures recursively
  */
-function normalizeNegativeZero(value: unknown): unknown {
-    if (Object.is(value, -0)) {
-        return 0;
+function normalizeForJsonComparison(value: any): any {
+    if (value === undefined) {
+        return undefined; // Will be handled by caller
     }
-    if (Array.isArray(value)) {
-        return value.map((item) => normalizeNegativeZero(item));
-    }
-    if (value && typeof value === "object") {
-        const normalized: any = {};
-        for (const [key, val] of Object.entries(value)) {
-            normalized[key] = normalizeNegativeZero(val);
+    if (value === null || typeof value !== "object") {
+        // Handle special numeric values that don't serialize to JSON properly
+        if (typeof value === "number") {
+            if (!Number.isFinite(value)) {
+                return null; // Infinity/NaN become null in JSON
+            }
+            if (Object.is(value, -0)) {
+                return 0; // -0 becomes 0 in JSON
+            }
         }
-        return normalized;
+        return value; // Primitives pass through
     }
-    return value;
+
+    if (Array.isArray(value)) {
+        return value.map((item) =>
+            item === undefined ? null : normalizeForJsonComparison(item)
+        );
+    }
+
+    // For objects, remove undefined properties and handle special values
+    const normalized: any = {};
+    for (const [key, val] of Object.entries(value)) {
+        if (val !== undefined) {
+            const normalizedVal = normalizeForJsonComparison(val);
+            // Only include properties that would survive JSON serialization
+            if (normalizedVal !== undefined) {
+                normalized[key] = normalizedVal;
+            }
+        }
+    }
+    return normalized;
 }
 
 describe("JSON Safety Advanced Fuzzing Tests", () => {
@@ -56,13 +79,34 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
         // Test with various malformed JSON strings
         fcTest.prop([
             fc.oneof(
-                fc.string(), // Random strings that aren't JSON
-                fc.stringMatching(/[{[].*[}\]]/), // Looks like JSON but broken
-                fc.stringMatching(/.*".*:.*/), // Partial JSON-like strings
+                fc.string().filter((s) => {
+                    // Filter out strings that are actually valid JSON
+                    try {
+                        JSON.parse(s);
+                        return false; // If parsing succeeds, exclude this string
+                    } catch {
+                        return true; // If parsing fails, include this string
+                    }
+                }), // Random strings that aren't JSON
+                fc.stringMatching(/[[{].*[\]}]/).filter((s) => {
+                    try {
+                        JSON.parse(s);
+                        return false;
+                    } catch {
+                        return true;
+                    }
+                }), // Looks like JSON but broken
+                fc.stringMatching(/.*".*:.*/).filter((s) => {
+                    try {
+                        JSON.parse(s);
+                        return false;
+                    } catch {
+                        return true;
+                    }
+                }), // Partial JSON-like strings
                 fc.constant('{"incomplete":'),
                 fc.constant("{broken: json}"),
                 fc.constant('{"trailing": comma,}'),
-                fc.constant('{"duplicate": "key", "duplicate": "value"}'),
                 fc.constant("[1, 2, 3, extra]"),
                 fc.constant("undefined"),
                 fc.constant("null null"),
@@ -83,7 +127,7 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
         );
 
         // Test with extremely large JSON strings
-        fcTest.prop([fc.integer({ min: 1000, max: 50000 })])(
+        fcTest.prop([fc.integer({ min: 1000, max: 50_000 })])(
             "should handle very large JSON strings",
             (size) => {
                 const largeArray = Array.from({ length: size }, (_, i) => i);
@@ -163,9 +207,10 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
 
             expect(result.success).toBeTruthy();
             if (result.success) {
-                expect(normalizeNegativeZero(result.data)).toEqual(
-                    normalizeNegativeZero(complexObject)
-                );
+                // Compare with normalized version to account for undefined value removal
+                const normalizedOriginal =
+                    normalizeForJsonComparison(complexObject);
+                expect(result.data).toEqual(normalizedOriginal);
             }
         });
 
@@ -241,9 +286,10 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
 
             expect(result.success).toBeTruthy();
             if (result.success) {
-                expect(normalizeNegativeZero(result.data)).toEqual(
-                    normalizeNegativeZero(mixedArray)
-                );
+                // Compare with normalized version to account for undefined -> null conversion
+                const normalizedOriginal =
+                    normalizeForJsonComparison(mixedArray);
+                expect(result.data).toEqual(normalizedOriginal);
             }
         });
 
@@ -272,7 +318,28 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
     describe("safeJsonParseWithFallback - Fallback Behavior", () => {
         // Test fallback with various types
         fcTest.prop([
-            fc.string(), // Malformed JSON
+            fc.oneof(
+                fc.stringMatching(/^[^\d"[fnt{].*/), // Strings that don't start with valid JSON chars
+                fc.stringMatching(/.*[^\d\s"]fnt}]$/), // Strings that don't end with valid JSON chars
+                fc.constant('{"incomplete":'),
+                fc.constant("{broken: json}"),
+                fc.constant('{"trailing": comma,}'),
+                fc.constant("[1, 2, 3, extra]"),
+                fc.constant("undefined"),
+                fc.constant("null null"),
+                fc.constant("Infinity"),
+                fc.constant("-Infinity"),
+                fc.constant("NaN"),
+                fc.string().filter((s) => {
+                    // Filter out strings that are actually valid JSON
+                    try {
+                        JSON.parse(s);
+                        return false; // If parsing succeeds, exclude this string
+                    } catch {
+                        return true; // If parsing fails, include this string
+                    }
+                })
+            ), // Truly malformed JSON
             fc.oneof(
                 fc.string(),
                 fc.integer(),
@@ -305,6 +372,16 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
         ])(
             "should parse valid JSON instead of using fallback",
             (validData, fallbackData) => {
+                // Skip test if both objects would be identical
+                fc.pre(
+                    !JSON.stringify(validData).includes(
+                        JSON.stringify(fallbackData)
+                    ) &&
+                        !JSON.stringify(fallbackData).includes(
+                            JSON.stringify(validData)
+                        )
+                );
+
                 const jsonString = JSON.stringify(validData);
                 const validator = (data: unknown): data is typeof validData =>
                     typeof data === "object" && data !== null && "test" in data;
@@ -443,9 +520,10 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
             expect(result.success).toBeTruthy();
             if (result.success && result.data) {
                 const parsed = JSON.parse(result.data);
-                expect(normalizeNegativeZero(parsed)).toEqual(
-                    normalizeNegativeZero(mixedArray)
-                );
+                // Compare with normalized version to account for undefined -> null conversion
+                const normalizedOriginal =
+                    normalizeForJsonComparison(mixedArray);
+                expect(parsed).toEqual(normalizedOriginal);
             }
         });
     });

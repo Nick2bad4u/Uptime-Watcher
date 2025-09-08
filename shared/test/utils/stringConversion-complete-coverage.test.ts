@@ -94,7 +94,7 @@ describe("shared/utils/stringConversion.ts - Complete Function Coverage", () => 
             await annotate("Type: Business Logic", "type");
 
             expect(safeStringify(123n)).toBe("123");
-            expect(safeStringify(BigInt(456))).toBe("456");
+            expect(safeStringify(456n)).toBe("456");
             expect(safeStringify(0n)).toBe("0");
         });
 

@@ -1561,6 +1561,14 @@ describe("Monitor Validation Utilities", () => {
                     async (fn) => await fn()
                 );
 
+                // Mock sharedValidateMonitorField to return proper validation result
+                vi.mocked(sharedValidateMonitorField).mockReturnValue({
+                    success: true,
+                    errors: [],
+                    warnings: [],
+                    metadata: { fieldName: "url", monitorType: "http" },
+                });
+
                 const result = await validateMonitorFormData(
                     "http",
                     formData as any
@@ -1583,6 +1591,14 @@ describe("Monitor Validation Utilities", () => {
                 vi.mocked(withUtilityErrorHandling).mockImplementation(
                     async (fn) => await fn()
                 );
+
+                // Mock sharedValidateMonitorField to return proper validation results for host and port
+                vi.mocked(sharedValidateMonitorField).mockReturnValue({
+                    success: true,
+                    errors: [],
+                    warnings: [],
+                    metadata: { fieldName: "host", monitorType: "port" },
+                });
 
                 const result = await validateMonitorFormData(
                     "port",

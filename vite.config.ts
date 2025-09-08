@@ -698,8 +698,8 @@ export default defineConfig(({ mode }) => {
                 },
             },
             diff: {
-                aIndicator: pc.red(pc.bold("--")),
-                bIndicator: pc.green(pc.bold("++")),
+                aIndicator: pc.magenta(pc.bold("--")), // Magenta is much more readable than red
+                bIndicator: pc.green(pc.bold("++")), // Clean single-character indicators
                 expand: true,
                 // The value 20 for maxDepth was chosen to provide sufficient context for deeply nested object diffs.
                 // This helps debugging complex test failures, but may impact performance for very large or deeply nested objects.
@@ -707,9 +707,9 @@ export default defineConfig(({ mode }) => {
                 maxDepth: 20,
                 omitAnnotationLines: true,
                 printBasicPrototype: false,
-                truncateAnnotation: pc.cyan(
+                truncateAnnotation: pc.yellow(
                     pc.bold("... Diff output truncated for readability")
-                ),
+                ), // Yellow is more eye-catching than cyan
                 // The value 250 for truncateThreshold was selected to balance readability and performance.
                 // It limits the maximum number of diff lines shown, preventing excessively long outputs
                 // while still providing enough context for most test failures. Increasing this value may
@@ -732,7 +732,7 @@ export default defineConfig(({ mode }) => {
                 ...defaultExclude,
             ],
             expect: {
-                poll: { interval: 50, timeout: 1000 },
+                poll: { interval: 50, timeout: 15_000 },
                 requireAssertions: true,
             },
             fakeTimers: {

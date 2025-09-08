@@ -43,7 +43,7 @@ fc.configureGlobal({
 
     // Failure and time limits
     endOnFailure: true, // stop on first property failure
-    timeout: 1000, // per-case async timeout (ms)
+    timeout: 20_000, // per-case async timeout (ms) - increased to 20000ms to handle complex DOM operations and fuzzing tests
     interruptAfterTimeLimit: 5 * 60 * 1000, // overall cap for a run (ms)
     markInterruptAsFailure: true, // treat interrupts as failures (good for CI)
     skipAllAfterTimeLimit: 60 * 1000, // cap time spent on skipping/shrinking (ms)

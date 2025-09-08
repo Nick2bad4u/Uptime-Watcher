@@ -28,7 +28,7 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
             expect(safeStringify("test")).toBe("test");
             expect(safeStringify(123)).toBe("123");
             expect(safeStringify(true)).toBe("true");
-            expect(safeStringify(BigInt(123))).toBe("123");
+            expect(safeStringify(123n)).toBe("123");
             expect(safeStringify(Symbol("test"))).toContain("Symbol");
             expect(safeStringify(() => {})).toBe("[Function]");
             expect(safeStringify({})).toBe("{}");
@@ -95,7 +95,7 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
 
             // Test each case in the switch statement
             const testCases = [
-                { input: BigInt(123), expected: "123", type: "bigint" },
+                { input: 123n, expected: "123", type: "bigint" },
                 { input: true, expected: "true", type: "boolean" },
                 { input: () => {}, expected: "[Function]", type: "function" },
                 { input: 123, expected: "123", type: "number" },

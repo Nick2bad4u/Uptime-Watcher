@@ -21,7 +21,7 @@ describe("String Conversion - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test all normal cases
-            expect(safeStringify(BigInt(123))).toBe("123");
+            expect(safeStringify(123n)).toBe("123");
             expect(safeStringify(true)).toBe("true");
             expect(safeStringify(() => {})).toBe("[Function]");
             expect(safeStringify(123)).toBe("123");
@@ -177,9 +177,9 @@ describe("String Conversion - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test different bigint values
-            expect(safeStringify(BigInt(0))).toBe("0");
+            expect(safeStringify(0n)).toBe("0");
             expect(safeStringify(BigInt(-123))).toBe("-123");
-            expect(safeStringify(BigInt("999999999999999999"))).toBe(
+            expect(safeStringify(999_999_999_999_999_999n)).toBe(
                 "999999999999999999"
             );
         });

@@ -72,7 +72,7 @@ export interface RetryWithAbortOptions {
 export function createCombinedAbortSignal(
     options: CombineSignalsOptions = {}
 ): AbortSignal {
-    const { additionalSignals = [], timeoutMs, reason } = options;
+    const { additionalSignals = [], reason, timeoutMs } = options;
 
     const signals: AbortSignal[] = [];
 
@@ -255,7 +255,7 @@ export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
  *
  * @public
  */
-// eslint-disable-next-line sonarjs/cognitive-complexity -- retry logic requires multiple conditions and branches
+
 export async function retryWithAbort<T>(
     operation: () => Promise<T>,
     options: RetryWithAbortOptions = {}

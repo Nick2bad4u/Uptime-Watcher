@@ -56,6 +56,86 @@ const config: Config = {
     // TypeDoc documentation is generated via standalone TypeDoc (npm run docs:typedoc)
     // This uses our custom typedoc.config.json configuration for better docs
     plugins: [
+        "@docusaurus/theme-live-codeblock",
+        "@docusaurus/theme-mermaid",
+        "docusaurus-plugin-image-zoom",
+        [
+            "docusaurus-plugin-copy-page-button",
+            {
+                /*  customStyles: {
+                    button: {
+                        className: "my-custom-button",
+                        style: {
+                            backgroundColor: "#4CAF50",
+                            borderRadius: "8px",
+                            color: "white",
+                        },
+                    },
+                    container: {
+                        className: "my-button-container",
+                    },
+                    dropdown: {
+                        className: "my-custom-dropdown",
+                        style: {
+                            backgroundColor: "#f8f9fa",
+                            border: "2px solid #4CAF50",
+                        },
+                    },
+                    dropdownItem: {
+                        style: {
+                            fontSize: "16px",
+                            padding: "12px 20px",
+                        },
+                    },
+                }, */
+            },
+        ],
+        [
+            "@easyops-cn/docusaurus-search-local",
+            {
+                // Whether to index blog pages
+                blogDir: "blog",
+                // Whether to index docs pages
+                docsRouteBasePath: "docs",
+                // Language of your documentation, support "en", "zh", "ja", "ko", "ru"
+                hashed: true,
+                // For Docs-only mode, remove/set to false if you have blog
+                indexBlog: true,
+                indexDocs: true,
+                indexPages: false,
+                language: ["en"],
+                // Set to true if you have a multi-language site
+                removeDefaultStopWordFilter: false,
+                // Set to true for better Chinese search
+                useAllContextsWithNoSearchContext: false,
+            },
+        ],
+        [
+            "docusaurus-plugin-llms",
+            {
+                // Custom LLM files for specific documentation sections
+                customLLMFiles: [],
+                description:
+                    "Complete reference documentation for Uptime Watcher",
+                docsDir: "docs",
+                // Content cleaning options
+                excludeImports: true,
+                generateLLMsFullTxt: true,
+                // Options here
+                generateLLMsTxt: true,
+                // Generate individual markdown files following llmstxt.org specification
+                generateMarkdownFiles: true,
+                ignoreFiles: ["advanced/*", "private/*"],
+                includeBlog: true,
+                // Control documentation order
+                // includeOrder: [],
+                includeUnmatchedLast: true,
+                // Path transformation options
+                // pathTransformation: {},
+                removeDuplicateHeadings: true,
+                title: "Uptime Watcher Documentation",
+            },
+        ],
         // [
         //     "docusaurus-plugin-typedoc",
         //     {
@@ -80,8 +160,36 @@ const config: Config = {
         [
             "classic",
             {
-                blog: false, // Disable blog
+                blog: {
+                    authorsMapPath: "authors.yml", // file located at blog/authors.yml
+                    blogDescription: "Updates and posts about Uptime Watcher",
+                    blogSidebarCount: 5,
+                    blogSidebarTitle: "Recent posts",
+                    blogTitle: "Uptime Watcher Blog",
+                    editLocalizedFiles: false,
+                    editUrl:
+                        "https://github.com/Nick2bad4u/Uptime-Watcher/edit/main/docs/docusaurus/blog/",
+                    exclude: [
+                        "**/_*.{js,jsx,ts,tsx,md,mdx}",
+                        "**/_*/**",
+                        "**/*.test.{js,jsx,ts,tsx}",
+                        "**/__tests__/**",
+                    ],
+                    feedOptions: {
+                        description: "Uptime Watcher updates and changelogs",
+                        limit: 20,
+                        title: "Uptime Watcher Blog",
+                        type: ["rss", "atom"], // enable rss + atom
+                    },
+                    include: ["**/*.{md,mdx}"],
+                    path: "blog", // relative to site dir
+                    postsPerPage: 10,
+                    routeBasePath: "blog", // URL: /Uptime-Watcher/blog/
+                    showReadingTime: true,
+                },
+                debug: true,
                 docs: {
+                    breadcrumbs: true,
                     editUrl:
                         "https://github.com/Nick2bad4u/Uptime-Watcher/edit/main/docs/docusaurus/",
                     exclude: [
@@ -94,13 +202,51 @@ const config: Config = {
                     routeBasePath: "docs",
                     showLastUpdateAuthor: true,
                     showLastUpdateTime: true,
+                    sidebarCollapsed: false,
+                    sidebarCollapsible: true,
                     sidebarPath: "./sidebars.ts",
                 },
                 pages: {
+                    editUrl:
+                        "https://github.com/Nick2bad4u/Uptime-Watcher/edit/main/docs/docusaurus/src/pages/",
+                    include: ["**/*.{js,jsx,ts,tsx,md,mdx}"],
+                    mdxPageComponent: "@theme/MDXPage",
+                    path: "src/pages",
+                    routeBasePath: "/",
                     showLastUpdateAuthor: true,
                     showLastUpdateTime: true,
                 },
-                sitemap: { lastmod: "datetime" },
+                sitemap: {
+                    changefreq: "weekly",
+                    filename: "sitemap.xml",
+                    ignorePatterns: ["/tests/**"],
+                    lastmod: "datetime",
+                    priority: 0.5,
+                },
+                svgr: {
+                    svgrConfig: {
+                        dimensions: false, // remove width/height so CSS controls size
+                        expandProps: "start", // spread props at the start: <svg {...props}>
+                        icon: true, // treat SVGs as icons (scales via viewBox)
+                        memo: true, // wrap component with React.memo
+                        native: false, // produce web React components (not React Native)
+                        prettier: true, // run Prettier on output
+                        prettierConfig: "../../.prettierrc",
+                        replaceAttrValues: {
+                            "#000": "currentColor",
+                            "#000000": "currentColor",
+                        }, // inherit color
+                        svgo: true, // enable SVGO optimizations
+                        svgoConfig: {
+                            plugins: [
+                                { active: false, name: "removeViewBox" }, // keep viewBox for scalability
+                            ],
+                        },
+                        svgProps: { focusable: "false", role: "img" }, // default SVG props
+                        titleProp: true, // allow passing a title prop for accessibility
+                        typescript: true, // generate TypeScript-friendly output (.tsx)
+                    },
+                },
                 theme: {
                     customCss: "./src/css/custom.css",
                 },
@@ -132,7 +278,6 @@ const config: Config = {
             },
             versionPersistence: "localStorage",
         },
-
         footer: {
             copyright: `© ${new Date().getFullYear()} Nick2bad4u. 💻 Website Built and Powered by 🦖 Docusaurus.`,
             links: [
@@ -202,8 +347,16 @@ const config: Config = {
             ],
             style: "dark",
         },
-
         image: "img/uptime-watcher-social-card.jpg",
+
+        liveCodeBlock: {
+            /**
+             * The position of the live playground, above or under the editor
+             * Possible values: "top" | "bottom"
+             */
+            playgroundPosition: "bottom",
+        },
+
         metadata: [
             {
                 content:
@@ -226,11 +379,12 @@ const config: Config = {
                     type: "docSidebar",
                 },
                 {
-                    href: "/Uptime-Watcher/eslint-inspector/",
-                    label: "ESLint Inspector",
+                    href: "https://github.com/Nick2bad4u/Uptime-Watcher/eslint-inspector/",
+                    label: "ESLint",
                     position: "left",
                 },
                 {
+                    className: "persistent",
                     href: "https://github.com/Nick2bad4u/Uptime-Watcher",
                     label: "GitHub",
                     position: "right",
@@ -251,6 +405,7 @@ const config: Config = {
                     position: "right",
                 },
                 {
+                    className: "persistent",
                     href: "https://github.com/Nick2bad4u/Uptime-Watcher/releases",
                     label: "Download",
                     position: "right",
@@ -273,6 +428,16 @@ const config: Config = {
             darkTheme: prismThemes.dracula,
             defaultLanguage: "typescript",
             theme: prismThemes.github,
+        },
+        zoom: {
+            background: {
+                dark: "rgb(50, 50, 50)",
+                light: "rgb(255, 255, 255)",
+            },
+            config: {
+                // options you can specify via https://github.com/francoischalifour/medium-zoom#usage
+            },
+            selector: ".markdown > img",
         },
     } satisfies Preset.ThemeConfig,
 

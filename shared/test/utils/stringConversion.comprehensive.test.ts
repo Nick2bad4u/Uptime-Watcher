@@ -161,8 +161,8 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(safeStringify(BigInt(123))).toBe("123");
-            expect(safeStringify(BigInt(0))).toBe("0");
+            expect(safeStringify(123n)).toBe("123");
+            expect(safeStringify(0n)).toBe("0");
             expect(safeStringify(BigInt(-456))).toBe("-456");
         });
 
@@ -486,7 +486,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             fc.oneof(
                 fc.constant(() => {}),
                 fc.constant(Symbol("test")),
-                fc.constant(BigInt(123))
+                fc.constant(123n)
             ),
         ])("should handle non-JSON-serializable values gracefully", (input) => {
             const result = safeStringify(input);

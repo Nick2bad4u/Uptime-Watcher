@@ -15,7 +15,7 @@ describe("stringConversion Direct Function Coverage", () => {
         expect(safeStringify("hello")).toBe("hello");
         expect(safeStringify(42)).toBe("42");
         expect(safeStringify(true)).toBe("true");
-        expect(safeStringify(BigInt(123))).toBe("123");
+        expect(safeStringify(123n)).toBe("123");
         expect(safeStringify({ a: 1 })).toContain("1");
         expect(safeStringify(() => {})).toBe("[Function]");
         expect(safeStringify(Symbol("test"))).toContain("test");

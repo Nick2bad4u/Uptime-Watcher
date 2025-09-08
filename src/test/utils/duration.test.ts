@@ -421,7 +421,11 @@ describe("Duration Utilities", () => {
 
             describe("calculateMaxDuration property tests", () => {
                 test.prop([
-                    fc.float({ min: Math.fround(0.1), max: Math.fround(300) }),
+                    fc.float({
+                        min: Math.fround(0.1),
+                        max: Math.fround(300),
+                        noNaN: true,
+                    }),
                     fc.integer({ min: 0, max: 10 }),
                 ])(
                     "should always return a valid duration string format",

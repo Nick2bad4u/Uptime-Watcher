@@ -89,7 +89,7 @@ describe("String Conversion - 100% Coverage Override", () => {
         // Test other values to ensure proper coverage
         const results = [
             safeStringify(Symbol("test")),
-            safeStringify(BigInt(123)),
+            safeStringify(123n),
             safeStringify(() => {}),
             safeStringify(true),
             safeStringify(42),
@@ -136,7 +136,7 @@ describe("String Conversion - 100% Coverage Override", () => {
             { value: 42, expected: "42" },
             { value: "string", expected: "string" },
             { value: Symbol("sym"), expected: "Symbol(sym)" },
-            { value: BigInt(999), expected: "999" },
+            { value: 999n, expected: "999" },
 
             // Objects and functions
             { value: {}, expected: "{}" },
@@ -207,7 +207,7 @@ describe("String Conversion - 100% Coverage Override", () => {
             ["number", 42],
             ["string", "test"],
             ["symbol", Symbol("test")],
-            ["bigint", BigInt(123)],
+            ["bigint", 123n],
             ["function", () => {}],
             ["object", {}],
             ["object", null], // typeof null === "object"

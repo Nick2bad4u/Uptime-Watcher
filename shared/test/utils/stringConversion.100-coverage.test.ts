@@ -76,7 +76,7 @@ describe("String Conversion - 100% Coverage Tests", () => {
             expect(safeStringify(123)).toBe("123");
             expect(safeStringify(true)).toBe("true");
             expect(safeStringify(Symbol("test"))).toBe("Symbol(test)");
-            expect(safeStringify(BigInt(123))).toBe("123");
+            expect(safeStringify(123n)).toBe("123");
             expect(safeStringify(() => {})).toBe("[Function]");
             expect(safeStringify({})).toBe("{}");
         });

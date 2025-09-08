@@ -98,7 +98,7 @@ describe("String Conversion - Final Coverage", () => {
             expect(safeStringify("string")).toBe("string");
             expect(safeStringify(42)).toBe("42");
             expect(safeStringify(true)).toBe("true");
-            expect(safeStringify(BigInt(123))).toBe("123");
+            expect(safeStringify(123n)).toBe("123");
             expect(safeStringify(() => {})).toBe("[Function]");
             expect(safeStringify({})).toBe("{}");
             expect(safeStringify(Symbol("test"))).toContain("Symbol");

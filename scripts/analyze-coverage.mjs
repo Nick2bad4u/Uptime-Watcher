@@ -41,9 +41,9 @@ const coveragePath = path.join(
     "coverage",
     "coverage-final.json"
 );
-// eslint-disable-next-line unicorn/prefer-json-parse-buffer
+ 
 const coverageData = JSON.parse(
-    fs.readFileSync(coveragePath, { encoding: "utf8" })
+    fs.readFileSync(coveragePath)
 );
 
 // --------- Configurable defaults (tweak these at top of file) ---------

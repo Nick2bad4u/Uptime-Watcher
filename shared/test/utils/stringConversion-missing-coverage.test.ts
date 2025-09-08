@@ -96,7 +96,7 @@ describe("StringConversion - Missing Coverage", () => {
                 { value: [], expected: "[]" },
                 { value: Symbol("test"), expected: "Symbol(test)" },
                 { value: function value() {}, expected: "[Function]" },
-                { value: BigInt(123), expected: "123" },
+                { value: 123n, expected: "123" },
             ];
 
             for (const { value, expected } of testCases) {

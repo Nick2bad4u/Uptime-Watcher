@@ -277,7 +277,7 @@ describe("StringConversion - Fast-Check Fuzzing Tests", () => {
                 Object.create(null), // unusual object
                 new WeakMap(), // non-JSON-serializable object
                 Symbol("test"), // symbol case
-                BigInt(123), // bigint case
+                123n, // bigint case
             ];
 
             for (const testCase of testCases) {

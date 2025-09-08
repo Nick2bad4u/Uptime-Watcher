@@ -1,0 +1,19 @@
+alice:
+    image_url: https://example.com/alice.png
+    name: Alice Example
+    page: true
+    socials:
+        github: alice
+    title: Contributor
+    url: https://example.com/alice
+
+nick:
+    image_url: https://github.com/Nick2bad4u.png
+    name: Nick2bad4u
+    page:
+        permalink: /blog/author/nick
+    socials:
+        github: Nick2bad4u
+        x: Nick2bad4u
+    title: Project Maintainer
+    url: https://github.com/Nick2bad4u

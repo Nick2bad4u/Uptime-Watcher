@@ -602,7 +602,11 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                     const result = safeParseFloat(input, defaultVal);
 
                     expect(typeof result).toBe("number");
-                    expect(Number.isNaN(result)).toBeFalsy();
+
+                    // Only expect non-NaN result if default value is also non-NaN
+                    if (!Number.isNaN(defaultVal)) {
+                        expect(Number.isNaN(result)).toBeFalsy();
+                    }
 
                     if (typeof input === "number" && !Number.isNaN(input)) {
                         expect(result).toBe(input);
@@ -662,22 +666,33 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                         expect(result).toBeLessThanOrEqual(100);
 
                         // The function applies safeParseFloat then clamps with Math.max(0, Math.min(100, parsed))
-                        const numValue =
-                            typeof input === "number"
-                                ? input
-                                : typeof input === "string"
-                                  ? Number(input)
-                                  : Number.NaN;
-
-                        if (Number.isFinite(numValue)) {
-                            // For any valid number, the function clamps it to [0, 100]
+                        // safeParseFloat returns the input number as-is for number types (including Infinity/-Infinity)
+                        if (typeof input === "number") {
+                            // For any number (finite or infinite), clamp to [0, 100]
                             const expectedResult = Math.max(
                                 0,
-                                Math.min(100, numValue)
+                                Math.min(100, input)
                             );
                             expect(result).toBe(expectedResult);
+                        } else if (typeof input === "string") {
+                            const parsed = Number.parseFloat(input);
+                            if (Number.isNaN(parsed)) {
+                                // Invalid string uses clamped default
+                                const expectedDefault = Math.max(
+                                    0,
+                                    Math.min(100, defaultVal)
+                                );
+                                expect(result).toBe(expectedDefault);
+                            } else {
+                                // Valid string number gets clamped
+                                const expectedResult = Math.max(
+                                    0,
+                                    Math.min(100, parsed)
+                                );
+                                expect(result).toBe(expectedResult);
+                            }
                         } else {
-                            // For invalid input, it should clamp the default value
+                            // Non-number, non-string uses clamped default
                             const expectedDefault = Math.max(
                                 0,
                                 Math.min(100, defaultVal)

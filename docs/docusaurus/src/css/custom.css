@@ -1740,3 +1740,240 @@ html {
         transform: translateY(0);
     }
 }
+
+/* ================================================== */
+/* 🔧 NAVBAR Z-INDEX AND RESPONSIVE FIXES           */
+/* ================================================== */
+
+/* Fix navbar z-index to ensure it doesn't overlap content inappropriately */
+.navbar--fixed-top {
+    z-index: var(--ifm-z-index-fixed) !important;
+}
+
+/* Comprehensive navbar sidebar fixes */
+.navbar-sidebar {
+    position: fixed !important;
+    z-index: calc(var(--ifm-z-index-fixed) + 10) !important;
+    /* Fix overflow that might clip interactive elements */
+    overflow-x: visible !important;
+    overflow-y: auto !important;
+    /* Ensure pointer events work */
+    pointer-events: auto !important;
+    /* Proper positioning and dimensions */
+    top: 0 !important;
+    bottom: 0 !important;
+    width: var(--ifm-navbar-sidebar-width) !important;
+    /* Use top/bottom instead of explicit height for better control */
+    height: 100vh !important;
+    max-height: 100vh !important;
+    /* Ensure content fits properly */
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Fix transform-based positioning that creates stacking contexts */
+.navbar-sidebar {
+    /* Override default transform positioning with left positioning */
+    left: calc(-1 * var(--ifm-navbar-sidebar-width)) !important;
+    transform: none !important;
+    transition:
+        left var(--ifm-transition-fast) ease-in-out,
+        opacity var(--ifm-transition-fast) ease-in-out !important;
+}
+
+.navbar-sidebar--show .navbar-sidebar {
+    left: 0 !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Fix navbar backdrop z-index */
+.navbar-sidebar__backdrop {
+    position: fixed !important;
+    z-index: calc(var(--ifm-z-index-fixed) + 5) !important;
+    pointer-events: auto !important;
+}
+
+/* Responsive navbar fixes for narrow screens */
+@media (width <= 996px) {
+    /* Ensure html and body don't clip the navbar */
+    html,
+    body {
+        overflow-x: visible !important;
+    }
+
+    /* Hide non-essential navbar items on mobile to prevent cramming */
+    .navbar__items--right .navbar__item:not(.persistent) {
+        display: none !important;
+    }
+
+    /* Keep only essential items visible - search and theme toggle */
+    .navbar__items--right .navbar__item.persistent,
+    .navbar__items--right .colorModeToggle_DEke,
+    .navbar__items--right .navbarSearchContainer_Bca1,
+    .navbar__items--right [class*="searchBox"] {
+        display: flex !important;
+    }
+
+    /* When navbar sidebar is shown, ensure proper layering */
+    .navbar-sidebar--show .navbar {
+        position: fixed !important;
+        z-index: calc(var(--ifm-z-index-fixed) + 15) !important;
+    }
+
+    /* Ensure all sidebar content is interactive */
+    .navbar-sidebar--show .navbar-sidebar {
+        pointer-events: auto !important;
+        overflow: visible !important;
+    }
+
+    /* Fix sidebar content sizing to prevent it being too tall */
+    .navbar-sidebar__items {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        max-height: calc(100vh - var(--ifm-navbar-height)) !important;
+    }
+
+    /* Ensure the sidebar brand area doesn't take too much space */
+    .navbar-sidebar__brand {
+        flex-shrink: 0 !important;
+        max-height: var(--ifm-navbar-height) !important;
+    }
+
+    /* Ensure the sidebar menu items are clickable */
+    .navbar-sidebar--show .navbar-sidebar__items {
+        position: relative !important;
+        z-index: calc(var(--ifm-z-index-fixed) + 12) !important;
+        pointer-events: auto !important;
+        overflow: visible !important;
+    }
+
+    /* Fix the sidebar menu panel z-index */
+    .navbar-sidebar--show .theme-layout-navbar-sidebar-panel {
+        position: relative !important;
+        z-index: calc(var(--ifm-z-index-fixed) + 11) !important;
+        pointer-events: auto !important;
+    }
+
+    /* Ensure the menu list itself has proper positioning and interaction */
+    .navbar-sidebar--show .menu__list {
+        position: relative !important;
+        z-index: calc(var(--ifm-z-index-fixed) + 13) !important;
+        pointer-events: auto !important;
+        overflow: visible !important;
+    }
+
+    /* Make sure menu links are clickable */
+    .navbar-sidebar--show .menu__link {
+        position: relative !important;
+        z-index: calc(var(--ifm-z-index-fixed) + 14) !important;
+        pointer-events: auto !important;
+    }
+
+    /* Ensure navbar brand and other elements are interactive */
+    .navbar-sidebar--show .navbar-sidebar__brand,
+    .navbar-sidebar--show .navbar-sidebar__brand * {
+        pointer-events: auto !important;
+        z-index: calc(var(--ifm-z-index-fixed) + 14) !important;
+    }
+
+    /* Ensure main content doesn't overlap with navbar when sidebar is closed */
+    .main-wrapper {
+        padding-top: var(--ifm-navbar-height);
+    }
+
+    /* Fix for content being behind navbar on mobile */
+    .theme-doc-markdown,
+    .theme-doc-footer,
+    .theme-doc-toc-mobile {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Additional fix: ensure no parent containers clip the sidebar */
+    .navbar-sidebar__brand,
+    .navbar-sidebar__items {
+        overflow: visible !important;
+    }
+}
+
+/* Additional responsive fixes for very narrow screens */
+@media (width <= 768px) {
+    /* Ensure no overflow clipping anywhere in the document */
+    html,
+    body,
+    #__docusaurus {
+        overflow-x: visible !important;
+    }
+
+    /* Ensure the navbar sidebar container doesn't get clipped */
+    .navbar-sidebar,
+    .navbar-sidebar--show {
+        overflow: visible !important;
+        contain: none !important;
+    }
+
+    /* Fix any transform contexts that might interfere */
+    .navbar-sidebar,
+    .navbar-sidebar__items,
+    .navbar-sidebar__brand {
+        transform: none !important;
+        will-change: auto !important;
+    }
+
+    /* Force hide non-essential navbar items - prevent reappearing when search becomes icon */
+    .navbar__items--right .navbar__item:not(.persistent) {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* Only allow search and theme toggle - even when search is icon-only */
+    .navbar__items--right .navbar__item.persistent {
+        display: none !important; /* Force hide even persistent items */
+    }
+
+    .navbar__items--right .colorModeToggle_DEke,
+    .navbar__items--right .navbarSearchContainer_Bca1,
+    .navbar__items--right [class*="searchBox"],
+    .navbar__items--right [class*="DocSearch"] {
+        display: flex !important;
+        visibility: visible !important;
+    }
+
+    /* Ensure navbar brand doesn't take too much space */
+    .navbar__brand .navbar__title {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Critical fix: ensure sidebar width is correct and not clipped */
+    .navbar-sidebar {
+        width: min(83vw, 400px) !important;
+        max-width: 83vw !important;
+    }
+}
+
+/* Extra small screens - prevent any navbar cramming */
+@media (width <= 480px) {
+    /* Absolutely ensure GitHub and Download links never show */
+    .navbar__items--right
+        .navbar__item:not([class*="searchBox"]):not([class*="DocSearch"]):not(
+            [class*="colorModeToggle"]
+        ) {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* Make navbar title even smaller on tiny screens */
+    .navbar__brand .navbar__title {
+        max-width: 100px;
+    }
+
+    /* Ensure search doesn't get too cramped */
+    .navbar__items--right {
+        gap: 0.25rem;
+    }
+}

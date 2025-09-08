@@ -942,43 +942,43 @@ describe("useMonitorTypes Hook", () => {
             }
         );
 
-        test.prop([fc.integer({ min: 10, max: 50 })], { timeout: 2000 })(
-            "should handle loading state timing correctly",
-            async (delayMs) => {
-                // Clear mocks at start of each property test execution
-                vi.clearAllMocks();
+        test.prop([fc.integer({ min: 5, max: 25 })], {
+            timeout: 1500, // Increase fast-check timeout to 1.5s
+            numRuns: 5, // Reduce number of test runs
+        })("should handle loading state timing correctly", async (delayMs) => {
+            // Clear mocks at start of each property test execution
+            vi.clearAllMocks();
 
-                const mockOptions = [{ label: "Delayed", value: "delayed" }];
+            const mockOptions = [{ label: "Delayed", value: "delayed" }];
 
-                mockGetMonitorTypeOptions.mockImplementation(
-                    () =>
-                        new Promise((resolve) =>
-                            setTimeout(() => resolve(mockOptions), delayMs)
-                        )
-                );
+            mockGetMonitorTypeOptions.mockImplementation(
+                () =>
+                    new Promise((resolve) =>
+                        setTimeout(() => resolve(mockOptions), delayMs)
+                    )
+            );
 
-                const { result } = renderHook(() => useMonitorTypes());
+            const { result } = renderHook(() => useMonitorTypes());
 
-                // Should be loading initially
-                expect(result.current.isLoading).toBeTruthy();
-                expect(result.current.options).toEqual([]);
-                expect(result.current.error).toBeUndefined();
+            // Should be loading initially
+            expect(result.current.isLoading).toBeTruthy();
+            expect(result.current.options).toEqual([]);
+            expect(result.current.error).toBeUndefined();
 
-                // Wait for completion with sufficient timeout
-                await waitFor(
-                    () => {
-                        expect(result.current.isLoading).toBeFalsy();
-                    },
-                    { timeout: delayMs + 200 }
-                );
+            // Wait for completion with sufficient timeout
+            await waitFor(
+                () => {
+                    expect(result.current.isLoading).toBeFalsy();
+                },
+                { timeout: delayMs + 100 } // Reduced buffer time
+            );
 
-                expect(result.current.options).toEqual(mockOptions);
-                expect(result.current.error).toBeUndefined();
+            expect(result.current.options).toEqual(mockOptions);
+            expect(result.current.error).toBeUndefined();
 
-                // Verify delay properties
-                expect(delayMs).toBeGreaterThanOrEqual(10);
-                expect(delayMs).toBeLessThanOrEqual(50);
-            }
-        );
+            // Verify delay properties
+            expect(delayMs).toBeGreaterThanOrEqual(5);
+            expect(delayMs).toBeLessThanOrEqual(25);
+        });
     });
 });

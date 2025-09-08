@@ -65,10 +65,10 @@ describe("StringConversion - Complete Function Coverage", () => {
             expect(stringConversionModule.safeStringify(false)).toBe("false");
 
             // Test bigint case
-            expect(stringConversionModule.safeStringify(BigInt(123))).toBe(
+            expect(stringConversionModule.safeStringify(123n)).toBe(
                 "123"
             );
-            expect(stringConversionModule.safeStringify(BigInt(0))).toBe("0");
+            expect(stringConversionModule.safeStringify(0n)).toBe("0");
             expect(stringConversionModule.safeStringify(BigInt(-456))).toBe(
                 "-456"
             );
@@ -233,7 +233,7 @@ describe("StringConversion - Complete Function Coverage", () => {
                 123,
                 true,
                 false,
-                BigInt(456),
+                456n,
                 Symbol("test"),
                 {},
                 { key: "value" },
@@ -287,7 +287,7 @@ describe("StringConversion - Complete Function Coverage", () => {
             // - default
 
             // All these are already tested above, but let's be explicit for coverage
-            expect(typeof stringConversionModule.safeStringify(BigInt(1))).toBe(
+            expect(typeof stringConversionModule.safeStringify(1n)).toBe(
                 "string"
             );
             expect(typeof stringConversionModule.safeStringify(true)).toBe(

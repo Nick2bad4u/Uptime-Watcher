@@ -60,7 +60,12 @@ describe("Error Handling Utils Property-Based Tests", () => {
             // The implementation has safe string conversion with fallbacks
             // Don't test against String(value) directly as it can throw for problematic objects
             expect(typeof result.error.message).toBe("string");
-            expect(result.error.message.length).toBeGreaterThan(0);
+            // Empty strings are preserved as-is, so only check length for non-empty cases
+            if (typeof value === "string" && value === "") {
+                expect(result.error.message).toBe("");
+            } else {
+                expect(result.error.message.length).toBeGreaterThan(0);
+            }
         });
 
         fcTest.prop([fc.string()])(
@@ -145,7 +150,21 @@ describe("Error Handling Utils Property-Based Tests", () => {
             const result = ensureError(value);
 
             expect(result).toBeInstanceOf(Error);
-            expect(result.message).toBe(String(value));
+
+            // Handle special cases where the implementation enhances the message
+            if (
+                typeof value === "string" &&
+                value.trim().length === 0 &&
+                value.length > 0
+            ) {
+                // Whitespace-only strings are converted to descriptive messages
+                expect(result.message).toBe(
+                    `[whitespace-only ${typeof value}]`
+                );
+            } else {
+                // Other values should match String conversion
+                expect(result.message).toBe(String(value));
+            }
         });
 
         fcTest.prop([fc.string()])(

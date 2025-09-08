@@ -517,7 +517,7 @@ describe("middleware.ts - Additional Coverage", () => {
                 level: "debug",
                 includeData: true,
             });
-            const bigintData = BigInt(123);
+            const bigintData = 123n;
 
             await mw("bigint:event", bigintData, next);
 

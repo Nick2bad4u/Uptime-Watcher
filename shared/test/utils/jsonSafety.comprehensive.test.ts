@@ -440,7 +440,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const obj = { bigInt: BigInt(123) };
+            const obj = { bigInt: 123n };
             const result = safeJsonStringifyWithFallback(
                 obj,
                 "bigint_fallback"
@@ -705,7 +705,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const obj = { bigInt: BigInt(123) };
+            const obj = { bigInt: 123n };
             const result = safeJsonStringify(obj);
             expect(result.success).toBeFalsy();
             expect(result.error).toContain("JSON stringification failed");

@@ -1053,7 +1053,7 @@ describe("jsonSafety utilities", () => {
                         fc.constant(undefined),
                         fc.constant(Symbol("test")),
                         fc.constant(() => {}),
-                        fc.constant(BigInt(123))
+                        fc.constant(123n)
                     ),
                     (edgeCaseValue) => {
                         const result = safeJsonStringify(edgeCaseValue);

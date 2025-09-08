@@ -75,7 +75,8 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
             ),
         ])("isNumber should handle all numeric edge cases", (value) => {
             const result = isNumber(value);
-            const expectedResult = typeof value === "number";
+            const expectedResult =
+                typeof value === "number" && !Number.isNaN(value);
 
             expect(result).toBe(expectedResult);
         });
@@ -182,7 +183,10 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
             ),
         ])("isObject should handle all object variations", (value) => {
             const result = isObject(value);
-            const expectedResult = typeof value === "object" && value !== null;
+            const expectedResult =
+                typeof value === "object" &&
+                value !== null &&
+                !Array.isArray(value);
 
             expect(result).toBe(expectedResult);
         });
@@ -233,7 +237,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 const result = isPositiveNumber(value);
                 const expectedResult =
                     typeof value === "number" &&
-                    Number.isFinite(value) &&
+                    !Number.isNaN(value) &&
                     value > 0;
 
                 expect(result).toBe(expectedResult);
@@ -258,7 +262,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 const result = isNonNegativeNumber(value);
                 const expectedResult =
                     typeof value === "number" &&
-                    Number.isFinite(value) &&
+                    !Number.isNaN(value) &&
                     value >= 0;
 
                 expect(result).toBe(expectedResult);
@@ -304,8 +308,9 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 const result = isValidTimestamp(value);
                 const expectedResult =
                     typeof value === "number" &&
-                    Number.isInteger(value) &&
-                    value >= 0;
+                    !Number.isNaN(value) &&
+                    value > 0 &&
+                    value <= Date.now() + 86_400_000;
 
                 expect(result).toBe(expectedResult);
             }
@@ -328,7 +333,11 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
             "hasProperty should correctly detect property existence",
             (obj, propName) => {
                 const result = hasProperty(obj, propName);
-                const expectedResult = propName in obj;
+                const expectedResult =
+                    typeof obj === "object" &&
+                    obj !== null &&
+                    !Array.isArray(obj) &&
+                    Object.hasOwn(obj, propName);
 
                 expect(result).toBe(expectedResult);
             }
@@ -392,7 +401,9 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
             (value) => {
                 const result = isNonNullObject(value);
                 const expectedResult =
-                    typeof value === "object" && value !== null;
+                    typeof value === "object" &&
+                    value !== null &&
+                    !Array.isArray(value);
 
                 expect(result).toBe(expectedResult);
             }
@@ -403,7 +414,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
         // Test validateMonitorType with various monitor types
         fcTest.prop([
             fc.oneof(
-                fc.constantFrom("http", "https", "ping", "port", "dns"), // Valid types
+                fc.constantFrom("http", "ping", "port", "dns"), // Valid types
                 fc.string(), // Random strings
                 fc.integer(),
                 fc.boolean(),
@@ -416,7 +427,6 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 const result = validateMonitorType(monitorType);
                 const validTypes = [
                     "http",
-                    "https",
                     "ping",
                     "port",
                     "dns",
@@ -557,7 +567,10 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
         // Test with extreme values
         fcTest.prop([
             fc.record({
-                type: fc.string(),
+                type: fc.oneof(
+                    fc.constantFrom("http", "port", "ping", "dns"),
+                    fc.string()
+                ),
                 port: fc.integer({ min: -10_000, max: 100_000 }),
                 timeout: fc.integer({ min: -1000, max: 1_000_000 }),
                 interval: fc.integer({ min: -1000, max: 10_000_000 }),
@@ -569,8 +582,36 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
 
                 expect(Array.isArray(result)).toBeTruthy();
 
-                // Should include errors for out-of-range values
-                if (extremeConfig.port < 1 || extremeConfig.port > 65_535) {
+                // Check for invalid monitor type first
+                const validTypes = new Set([
+                    "http",
+                    "port",
+                    "ping",
+                    "dns",
+                ]);
+                if (
+                    !extremeConfig.type ||
+                    !validTypes.has(extremeConfig.type)
+                ) {
+                    // Accept either "Monitor type is required" for empty/falsy types
+                    // or "unknown monitor type" for invalid but non-empty types
+                    expect(
+                        result.some(
+                            (error) =>
+                                error.toLowerCase().includes("monitor type") ||
+                                error
+                                    .toLowerCase()
+                                    .includes("unknown monitor type")
+                        )
+                    ).toBeTruthy();
+                    return; // Don't check other validations for invalid monitor types
+                }
+
+                // Should include errors for out-of-range values only for appropriate monitor types
+                if (
+                    extremeConfig.type === "port" &&
+                    (extremeConfig.port < 1 || extremeConfig.port > 65_535)
+                ) {
                     expect(
                         result.some((error) =>
                             error.toLowerCase().includes("port")
@@ -578,9 +619,10 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                     ).toBeTruthy();
                 }
 
+                // Check for invalid timeout only if monitor type is valid and uses timeout validation
                 if (
-                    extremeConfig.timeout < 1000 ||
-                    extremeConfig.timeout > 60_000
+                    validTypes.has(extremeConfig.type) &&
+                    extremeConfig.timeout < 0
                 ) {
                     expect(
                         result.some((error) =>

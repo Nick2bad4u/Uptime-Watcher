@@ -67,7 +67,7 @@ describe("100% Coverage - Remaining Lines", () => {
                 [{}, "{}"],
                 [[], "[]"],
                 [() => {}, "[Function]"],
-                [BigInt(123), "123"],
+                [123n, "123"],
             ];
 
             for (const [input, expected] of testCases) {

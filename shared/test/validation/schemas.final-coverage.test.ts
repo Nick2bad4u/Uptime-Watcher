@@ -189,7 +189,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
 
             // Test with various invalid types to exercise all error paths
             const testCases = [
-                BigInt(123),
+                123n,
                 function testFunction() {},
                 new Date("invalid"),
                 /regex/,

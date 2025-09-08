@@ -929,7 +929,7 @@ describe("Header Component", () => {
             fc.record({
                 siteCount: fc.integer({ min: 1, max: 10 }),
                 monitorsPerSite: fc.integer({ min: 1, max: 5 }),
-                upProbability: fc.double({ min: 0, max: 1 }),
+                upProbability: fc.double({ min: 0, max: 1, noNaN: true }),
             }),
         ])(
             "should handle complex monitoring scenarios correctly",

@@ -162,9 +162,16 @@ describe("SafeConversions utilities fuzzing tests", () => {
             "should floor non-integer numbers",
             (num) => {
                 const result = safeParseInt(num);
-                expect(result).toBe(
-                    Number.isInteger(num) ? num : Math.floor(num)
-                );
+
+                if (Number.isFinite(num)) {
+                    // For finite values, it should either return the integer value or floor it
+                    expect(result).toBe(
+                        Number.isInteger(num) ? num : Math.floor(num)
+                    );
+                } else {
+                    // For infinite values, safeParseInt returns the default value (0)
+                    expect(result).toBe(0);
+                }
             }
         );
 
