@@ -401,7 +401,7 @@
 .themed-button__icon {
     display: flex;
     align-items: center;
-    font-size: 1.1rem;
+    font-size: 1.125rem;
     line-height: 1;
 }
 
@@ -737,7 +737,8 @@
     }
 }
 
-.error-alert__icon {
+.error-alert__icon,
+.text-error-default {
     color: var(--color-error);
 }
 
@@ -797,17 +798,13 @@
     );
 }
 
-.update-alert--error {
-    border-color: var(--color-error);
-
-    &::before {
-        background: linear-gradient(
-            90deg,
-            transparent 0%,
-            var(--color-error) 50%,
-            transparent 100%
-        );
-    }
+.update-alert--error::before {
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--color-error) 50%,
+        transparent 100%
+    );
 }
 
 .update-alert__icon {
@@ -968,19 +965,13 @@
 }
 
 /* Theme-based Error Classes */
-/* stylelint-disable-next-line plugin/stylelint-group-selectors -- Semantic Seperation */
-.border-error-default {
+.border-error-default,
+.update-alert--error {
     border-color: var(--color-error);
 }
 
-/* stylelint-disable-next-line plugin/stylelint-group-selectors -- Semantic Seperation */
 .bg-error-muted {
     background-color: rgb(239 68 68 / 10%);
-}
-
-/* stylelint-disable-next-line plugin/stylelint-group-selectors -- Semantic Seperation */
-.text-error-default {
-    color: var(--color-error);
 }
 
 .bg-error-default {

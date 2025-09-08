@@ -1,4 +1,5 @@
 /** eslint-disable css/use-baseline */
+/* stylelint-disable declaration-no-important, keyframes-name-pattern, selector-class-pattern, scales/font-sizes, time-min-milliseconds, plugin/no-low-performance-animation-properties, comment-empty-line-before, plugin/use-logical-properties-and-values, plugin/use-logical-units, plugin/use-defensive-css, declaration-block-no-redundant-longhand-properties, order/properties-order, no-duplicate-selectors, no-descending-specificity, selector-max-specificity, selector-not-notation, csstools/use-nesting -- Docusaurus CSS patterns */
 
 /**
  * Any CSS included here will be global. The classic template
@@ -264,7 +265,16 @@ h3 {
     animation: fadeInFast 0.1s ease-out !important;
 }
 
-.markdown > * {
+.markdown > h1,
+.markdown > h2,
+.markdown > h3,
+.markdown > h4,
+.markdown > h5,
+.markdown > h6,
+.markdown > p,
+.markdown > div,
+.markdown > section,
+.markdown > article {
     animation: slideInFast 0.08s ease-out !important;
 }
 
@@ -1249,16 +1259,6 @@ html {
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-
 @media (hover: none) {
     .interactive-hover:hover::before,
     .button:hover::before,
@@ -1873,7 +1873,10 @@ html {
 
     /* Ensure navbar brand and other elements are interactive */
     .navbar-sidebar--show .navbar-sidebar__brand,
-    .navbar-sidebar--show .navbar-sidebar__brand * {
+    .navbar-sidebar--show .navbar-sidebar__brand .navbar__title,
+    .navbar-sidebar--show .navbar-sidebar__brand .navbar__logo,
+    .navbar-sidebar--show .navbar-sidebar__brand img,
+    .navbar-sidebar--show .navbar-sidebar__brand svg {
         pointer-events: auto !important;
         z-index: calc(var(--ifm-z-index-fixed) + 14) !important;
     }
@@ -1903,7 +1906,7 @@ html {
     /* Ensure no overflow clipping anywhere in the document */
     html,
     body,
-    #__docusaurus {
+    [id="__docusaurus"] {
         overflow-x: visible !important;
     }
 

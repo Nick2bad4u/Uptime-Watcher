@@ -7,10 +7,20 @@ package.json
 package-lock.json
 .vscode/
 .vscode/settings.json
-**/*.js
-**/*.jsx
-**/*.ts
-**/*.tsx
+# Allow TSX/JSX files to be processed for CSS-in-JS and styled components
+# **/*.js
+# **/*.jsx
+# **/*.ts
+# **/*.tsx
+# Ignore specific directories and build files that don't contain CSS
+scripts/**/*.js
+scripts/**/*.jsx
+scripts/**/*.ts
+scripts/**/*.tsx
+benchmarks/**/*.js
+benchmarks/**/*.jsx
+benchmarks/**/*.ts
+benchmarks/**/*.tsx
 **/*.cjs
 **/*.mjs
 scripts/
@@ -30,5 +40,20 @@ license
 **/*.yaml
 **/*.desktop
 **/*.txt
+**/*.ico
+**/*.log
+**/*.pdf
+**/*.env
+**/*.key
+**/*.pem
+**/*.pub
+**/*.crt
+**/*.zip
+**/*.tar.gz
+**/stylelintcache
+**/*.jpg
+**/*.jpeg
+**/*.gif
+
 CNAME
-docs/**
+**/docs/docusaurus/static/eslint-inspector

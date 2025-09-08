@@ -65,9 +65,7 @@ describe("StringConversion - Complete Function Coverage", () => {
             expect(stringConversionModule.safeStringify(false)).toBe("false");
 
             // Test bigint case
-            expect(stringConversionModule.safeStringify(123n)).toBe(
-                "123"
-            );
+            expect(stringConversionModule.safeStringify(123n)).toBe("123");
             expect(stringConversionModule.safeStringify(0n)).toBe("0");
             expect(stringConversionModule.safeStringify(BigInt(-456))).toBe(
                 "-456"

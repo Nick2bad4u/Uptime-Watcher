@@ -25,12 +25,12 @@ import path from "node:path";
 import { createRequire } from "node:module";
 // Small ANSI color helpers (avoid extra deps)
 const colors = {
-    reset: (s) => `\u001B[0m${s}\u001B[0m`,
-    bold: (s) => `\u001B[1m${s}\u001B[22m`,
-    red: (s) => `\u001B[31m${s}\u001B[39m`,
-    green: (s) => `\u001B[32m${s}\u001B[39m`,
-    yellow: (s) => `\u001B[33m${s}\u001B[39m`,
-    cyan: (s) => `\u001B[36m${s}\u001B[39m`,
+    reset: (/** @type {any} */ s) => `\u001B[0m${s}\u001B[0m`,
+    bold: (/** @type {any} */ s) => `\u001B[1m${s}\u001B[22m`,
+    red: (/** @type {any} */ s) => `\u001B[31m${s}\u001B[39m`,
+    green: (/** @type {any} */ s) => `\u001B[32m${s}\u001B[39m`,
+    yellow: (/** @type {any} */ s) => `\u001B[33m${s}\u001B[39m`,
+    cyan: (/** @type {any} */ s) => `\u001B[36m${s}\u001B[39m`,
 };
 
 // Read the coverage file
@@ -43,7 +43,8 @@ const coveragePath = path.join(
 );
 
 const coverageData = JSON.parse(
-    fs.readFileSync(coveragePath)
+    // eslint-disable-next-line unicorn/prefer-json-parse-buffer
+    fs.readFileSync(coveragePath, "utf8")
 );
 
 // --------- Configurable defaults (tweak these at top of file) ---------
@@ -69,7 +70,7 @@ const limitOverride =
 // Respect --no-color by overriding color helpers to pass-through
 if (noColor) {
     Object.keys(colors).forEach((k) => {
-        colors[k] = (s) => s;
+        colors[k] = (/** @type {any} */ s) => s;
     });
 }
 
@@ -207,7 +208,9 @@ for (const [filePath, data] of Object.entries(coverageData)) {
 }
 
 // Sort by function coverage (lowest first) using immutable operation
-const sortedByFunctionCoverage = fileAnalysis.toSorted((a, b) => a.functions.percentage - b.functions.percentage);
+const sortedByFunctionCoverage = fileAnalysis.toSorted(
+    (a, b) => a.functions.percentage - b.functions.percentage
+);
 
 // Get limit from CLI argument or environment variable
 const fileDisplayLimit = limitOverride ?? DEFAULTS.fileDisplayLimit;
@@ -241,12 +244,17 @@ if (debugFile) {
 }
 
 // Helper: format a fixed-width table for coverage sections
+/**
+ * @param {any[]} displayed
+ */
 function computeColWidths(displayed) {
     // file column width + four numeric columns
     const minFileCol = 30;
     const fileCol = Math.max(
         minFileCol,
-        ...displayed.map((f) => f.file.length)
+        ...displayed.map(
+            (/** @type {{ file: string | any[] }} */ f) => f.file.length
+        )
     );
     // other columns get a reasonable width
     const numCol = DEFAULTS.numericColumnWidth ?? 20;
@@ -260,6 +268,10 @@ function computeColWidths(displayed) {
 }
 
 // Shorten long paths by keeping head and tail with ellipsis in the middle
+/**
+ * @param {any} s
+ * @param {number} max
+ */
 function ellipsize(s, max) {
     const str = String(s);
     if (!max || str.length <= max) return str;
@@ -298,7 +310,9 @@ function printCoverageSection(header, files) {
         });
 
         displayed.forEach((f) => {
-            const fmt = (cov) => {
+            const fmt = (
+                /** @type {{ percentage: number; covered: any; total: any }} */ cov
+            ) => {
                 if (!cov) return "-";
                 const pct = cov.percentage ?? 0;
                 const pctStr = `${pct.toFixed(2)}%`;
@@ -306,8 +320,8 @@ function printCoverageSection(header, files) {
                 return pct >= 90
                     ? colors.green(text)
                     : pct >= 75
-                        ? colors.yellow(text)
-                        : colors.red(text);
+                      ? colors.yellow(text)
+                      : colors.red(text);
             };
             table.push([
                 ellipsize(f.file, DEFAULTS.truncateFilePath),
@@ -341,7 +355,9 @@ function printCoverageSection(header, files) {
             ellipsize(f.file, DEFAULTS.truncateFilePath),
             fileCol
         );
-        const cell = (cov) => {
+        const cell = (
+            /** @type {{ percentage: number; covered: any; total: any }} */ cov
+        ) => {
             if (!cov) return padLeft("-", 14);
             const pct = cov.percentage ?? 0;
             const pctStr = `${pct.toFixed(2)}%`;
@@ -351,8 +367,8 @@ function printCoverageSection(header, files) {
                 pct >= 90
                     ? colors.green(padded)
                     : pct >= 75
-                        ? colors.yellow(padded)
-                        : colors.red(padded);
+                      ? colors.yellow(padded)
+                      : colors.red(padded);
             return colored;
         };
 
@@ -364,12 +380,20 @@ function printCoverageSection(header, files) {
 }
 
 // Small helpers for padding
+/**
+ * @param {string} s
+ * @param {number} width
+ */
 function padRight(s, width) {
     const str = String(s);
     if (str.length >= width) return str;
     return str + " ".repeat(width - str.length);
 }
 
+/**
+ * @param {string} s
+ * @param {number} width
+ */
 function padLeft(s, width) {
     const str = String(s);
     if (str.length >= width) return str;
@@ -406,7 +430,7 @@ if (outputFormat === "csv") {
     ].join(",");
     console.log(hdr);
     for (const f of fileAnalysis) {
-        const csvEscape = (v) => {
+        const csvEscape = (/** @type {string | null | undefined} */ v) => {
             if (v === null || v === undefined) return "";
             const s = String(v);
             if (s.includes(",") || s.includes('"') || s.includes("\n")) {
@@ -441,14 +465,18 @@ printCoverageSection(
 );
 
 // Sort by branch coverage using immutable operation
-const sortedByBranchCoverage = fileAnalysis.toSorted((a, b) => a.branches.percentage - b.branches.percentage);
+const sortedByBranchCoverage = fileAnalysis.toSorted(
+    (a, b) => a.branches.percentage - b.branches.percentage
+);
 const lowBranchCoverage = sortedByBranchCoverage.filter(
     (file) => file.branches.percentage < 90
 );
 printCoverageSection("FILES WITH LOWEST BRANCH COVERAGE", lowBranchCoverage);
 
 // Sort by statement coverage using immutable operation
-const sortedByStatementCoverage = fileAnalysis.toSorted((a, b) => a.statements.percentage - b.statements.percentage);
+const sortedByStatementCoverage = fileAnalysis.toSorted(
+    (a, b) => a.statements.percentage - b.statements.percentage
+);
 const lowStatementCoverage = sortedByStatementCoverage.filter(
     (file) => file.statements.percentage < 90
 );

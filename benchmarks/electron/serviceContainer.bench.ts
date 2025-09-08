@@ -303,7 +303,7 @@ describe("Service Container Benchmarks", () => {
             let memoryAllocated = 0;
             let error: string | undefined;
 
-            if (fromCache) {
+            if (fromCache && existingInstance) {
                 // Update existing instance access info
                 existingInstance.lastAccessedAt = Date.now();
                 existingInstance.accessCount++;

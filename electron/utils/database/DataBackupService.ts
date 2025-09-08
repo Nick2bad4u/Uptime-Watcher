@@ -14,6 +14,7 @@ import type { Logger } from "../interfaces";
 
 import { DB_FILE_NAME } from "../../constants";
 import { createDatabaseBackup } from "../../services/database/utils/databaseBackup";
+import { SiteLoadingError } from "./interfaces";
 
 /**
  * Configuration for data backup operations.
@@ -65,11 +66,10 @@ export class DataBackupService {
                 timestamp: Date.now(),
             });
 
-            throw new Error(
+            // eslint-disable-next-line ex/use-error-cause -- SiteLoadingError has specific constructor signature
+            throw new SiteLoadingError(
                 `Failed to download backup: ${error instanceof Error ? error.message : String(error)}`,
-                {
-                    cause: error,
-                }
+                error instanceof Error ? error : undefined
             );
         }
     }

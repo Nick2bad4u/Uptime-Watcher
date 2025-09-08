@@ -174,10 +174,10 @@ function aggregateResponseTimes(results: MonitorCheckResult[]): {
     const average =
         responseTimes.reduce((sum, time) => sum + time, 0) /
         responseTimes.length;
-    const min = responseTimes[0];
-    const max = responseTimes.at(-1);
+    const min = responseTimes[0]!;
+    const max = responseTimes.at(-1)!;
     const p95Index = Math.floor(responseTimes.length * 0.95);
-    const p95 = responseTimes[p95Index] || responseTimes.at(-1);
+    const p95 = responseTimes[p95Index] ?? responseTimes.at(-1)!;
 
     return { average, min, max, p95 };
 }

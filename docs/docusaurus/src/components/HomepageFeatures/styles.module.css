@@ -1,3 +1,5 @@
+/* stylelint-disable scales/font-sizes, scales/line-heights, keyframes-name-pattern -- Docusaurus CSS patterns */
+
 .features {
     display: flex;
     align-items: center;

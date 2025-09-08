@@ -26,6 +26,7 @@ import type { SiteRepository } from "../../services/database/SiteRepository";
 import type { Logger } from "../interfaces";
 
 import { withDatabaseOperation } from "../operationalHooks";
+import { SiteLoadingError } from "./interfaces";
 
 /**
  * Configuration for data import/export operations.
@@ -132,9 +133,11 @@ export class DataImportExportService {
                 }
             );
 
-            throw new Error(`Failed to export data: ${message}`, {
-                cause: error,
-            });
+            // eslint-disable-next-line ex/use-error-cause -- SiteLoadingError has specific constructor signature
+            throw new SiteLoadingError(
+                `Failed to export data: ${message}`,
+                error instanceof Error ? error : undefined
+            );
         }
     }
 
@@ -150,7 +153,7 @@ export class DataImportExportService {
             const parseResult = safeJsonParse(jsonData, isImportData);
 
             if (!parseResult.success || !parseResult.data) {
-                throw new Error(
+                throw new SiteLoadingError(
                     `${ERROR_CATALOG.database.IMPORT_DATA_INVALID}: ${parseResult.error ?? "Unknown parsing error"}`
                 );
             }
@@ -177,9 +180,11 @@ export class DataImportExportService {
                 }
             );
 
-            throw new Error(`Failed to parse import data: ${message}`, {
-                cause: error,
-            });
+            // eslint-disable-next-line ex/use-error-cause -- SiteLoadingError has specific constructor signature
+            throw new SiteLoadingError(
+                `Failed to parse import data: ${message}`,
+                error instanceof Error ? error : undefined
+            );
         }
     }
 
