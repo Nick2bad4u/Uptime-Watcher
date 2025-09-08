@@ -7,14 +7,103 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[f0a21c2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f0a21c217dd5c193310d8f765355bdec4c117d37)...
-[f0a21c2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f0a21c217dd5c193310d8f765355bdec4c117d37)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f0a21c217dd5c193310d8f765355bdec4c117d37...f0a21c217dd5c193310d8f765355bdec4c117d37))
+[[424e873](https://github.com/Nick2bad4u/Uptime-Watcher/commit/424e873b8ff4c8273c306977bc36a7ce655f50d6)...
+[424e873](https://github.com/Nick2bad4u/Uptime-Watcher/commit/424e873b8ff4c8273c306977bc36a7ce655f50d6)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/424e873b8ff4c8273c306977bc36a7ce655f50d6...424e873b8ff4c8273c306977bc36a7ce655f50d6))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 13.9.0 [`(424e873)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/424e873b8ff4c8273c306977bc36a7ce655f50d6)
+
+
+
+
+
+
+## [13.9.0] - 2025-09-08
+
+
+[[f368113](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f3681134738fe7a1d1084fde651fcaf9af74d546)...
+[15c77da](https://github.com/Nick2bad4u/Uptime-Watcher/commit/15c77da0789004c27266459c8a144ae2681057e1)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f3681134738fe7a1d1084fde651fcaf9af74d546...15c77da0789004c27266459c8a144ae2681057e1))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update dependency group (#66) [`(1c94463)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1c94463f0bc1f3997516fa2c62e23cea5c4264c0)
+
+
 - [dependency] Update version 13.8.0 [`(f0a21c2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f0a21c217dd5c193310d8f765355bdec4c117d37)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Replace .sort() with .toSorted() for immutability
+
+- Modernizes sorting logic across codebase by switching from mutating `.sort()` to immutable `.toSorted()` for arrays.
+ - Prevents accidental in-place mutations, leading to safer and more predictable code.
+ - Updates error handling to consistently use the `cause` option for better error context.
+ - Refactors fuzz and test utilities to handle JavaScript quirks (e.g. signed zero serialization) for more robust assertions.
+ - Reduces test run timeouts and improves DOM interaction speed in fuzzing scenarios for faster CI.
+ - Cleans up unused imports and improves code style consistency.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f48cb7f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f48cb7f9a75878d6970755ff17c9b796690c17bd)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Refactors and improves test mocks, typing, and property usage
+
+- Refactors property-based tests to enhance data generation versatility,
+   improving test coverage and maintainability for database repositories.
+ - Updates variable naming for clarity and consistency, replacing unused
+   parameters with underscores.
+ - Removes redundant mock methods and adapts to updated repository interfaces,
+   ensuring alignment with actual method signatures.
+ - Applies stricter typing in test mocks and assertions for increased type safety.
+ - Addresses edge cases in test logic, such as optional chaining and safer
+   property access, to reduce false positives and improve reliability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4f1924b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4f1924b7f3585e0a398450b84df11ec93cac1cf0)
+
+
+- 🧪 [test] Improve fuzzing reliability and coverage for input, error, and validation tests
+
+- Refactors property-based fuzzing tests to reduce timeouts, shrink run counts, and optimize DOM interactions for better reliability and speed
+- Adds comprehensive edge case coverage for AddSiteForm user input boundaries, including site name, URL, host, and port fields, with aggressive cleanup to prevent flaky behavior
+- Updates error handling, type guard, and JSON safety fuzzing to account for normalization differences and avoid false negative assertions on empty/invalid cases
+- Improves validation tests to mock dependencies, handle invalid monitor types, and reduce brittle test failures
+- Tweaks global and per-test fast-check timeouts for more robust CI performance
+- Clarifies and strengthens assertions to focus on practical user input and realistic boundary conditions
+
+Relates to stability and coverage improvements for property-based test suites
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f368113)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f3681134738fe7a1d1084fde651fcaf9af74d546)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v13.8.0 [skip ci] [`(4a13903)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4a1390358455625f2139a8f710d537905fd7b01b)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Enhance Stylelint config for modern workflows
+
+- Expands Stylelint configuration to support HTML, CSS-in-JS, styled JSX, CSS Modules, and SCSS, improving coverage for diverse frontend workflows
+- Integrates new plugins for custom properties, BEM patterns, SCSS, and scale enforcement to boost standards, maintainability, and error detection
+- Updates ignore patterns to better handle build artifacts and allow linting on relevant JS/TS files
+- Upgrades and adds dev dependencies for advanced Stylelint and PostCSS support
+- Refines scripts to use compact output, including docs and module files in lint targets
+- Improves error handling and type safety in scripts and tests for robustness
+- Refines CSS for error states, font sizes, and logical structure to align with new linting rules
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2a4d08f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a4d08f243e299087e73519c35a6cdd0dd1b433f)
 
 
 
