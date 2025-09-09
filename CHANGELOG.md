@@ -7,14 +7,67 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[0e67c43](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0e67c43da2d0f239f649f396330ebdbd919416e1)...
+[0e67c43](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0e67c43da2d0f239f649f396330ebdbd919416e1)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0e67c43da2d0f239f649f396330ebdbd919416e1...0e67c43da2d0f239f649f396330ebdbd919416e1))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 14.0.0 [`(0e67c43)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0e67c43da2d0f239f649f396330ebdbd919416e1)
+
+
+
+
+
+
+## [14.0.0] - 2025-09-09
+
+
 [[424e873](https://github.com/Nick2bad4u/Uptime-Watcher/commit/424e873b8ff4c8273c306977bc36a7ce655f50d6)...
-[424e873](https://github.com/Nick2bad4u/Uptime-Watcher/commit/424e873b8ff4c8273c306977bc36a7ce655f50d6)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/424e873b8ff4c8273c306977bc36a7ce655f50d6...424e873b8ff4c8273c306977bc36a7ce655f50d6))
+[a90a140](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a90a1402fda4f098cd4f8f72842e53995e4de3de)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/424e873b8ff4c8273c306977bc36a7ce655f50d6...a90a1402fda4f098cd4f8f72842e53995e4de3de))
+
+
+### ✨ Features
+
+- ✨ [feat] Add new ESLint plugins and fuzz test scripts
+
+- Integrates multiple ESLint plugins for security, timer cleanup, secret detection, paths, key sorting, and switch-case rules to enhance code quality and security coverage.
+- Updates dependencies to support these plugins and adds new ESLint formatters for improved reporting.
+- Relaxes static secret and a11y rules to reduce false positives and improve accessibility flexibility.
+- Adds comprehensive fuzz testing npm scripts for targeted, minimal, quiet, and verbose test runs, supporting frontend, shared, and Electron code.
+- Improves documentation styling rules for accessibility and maintainability of Docusaurus docs.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a90a140)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a90a1402fda4f098cd4f8f72842e53995e4de3de)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 13.9.0 [`(424e873)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/424e873b8ff4c8273c306977bc36a7ce655f50d6)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add comprehensive property-based fuzzing for validation, database, and IPC layers
+
+- Adds extensive Fast-Check fuzzing suites to cover validation, database, and IPC logic, targeting edge cases, concurrency, error handling, and performance under load.
+- Expands test coverage for transaction safety, referential integrity, batch operations, resource constraints, and security scenarios.
+- Refines validation and update logic to improve test reliability and reduce false negatives in property-based tests.
+- Updates CI workflow to support advanced Stylelint reporting and accessibility rule management.
+- Improves CSS for better accessibility, reduced-motion support, and consistent :focus styling.
+- Upgrades and extends linting scripts and dependencies for Stylelint with additional formatters and accessibility plugins.
+Relates to #231, #232, #233
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ec7b1d6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec7b1d602837701ce5b8cb1da887d5245de5b274)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v13.9.0 [skip ci] [`(413fcfa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/413fcfa0c22f879c5b396dafab1fd035f94409ec)
 
 
 
