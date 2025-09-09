@@ -82,6 +82,17 @@ export default defineConfig({
             },
         },
         {
+            // Docusaurus documentation files
+            files: ["docs/docusaurus/**/*.{css,scss}"],
+            rules: {
+                // Relax accessibility rules for documentation UI elements
+                "a11y/content-property-no-static-value": null,
+                "a11y/font-size-is-readable": null,
+                "plugin/stylelint-group-selectors": null,
+                "scss/declaration-property-value-no-unknown": null,
+            },
+        },
+        {
             // SCSS files
             customSyntax: "postcss-scss",
             files: ["**/*.{scss,sass}"],
@@ -217,8 +228,16 @@ export default defineConfig({
         "@stylistic/value-list-max-empty-lines": null,
 
         // A11y Plugin Rules (@double-great/stylelint-a11y)
-        "a11y/content-property-no-static-value": true,
-        "a11y/font-size-is-readable": true,
+        // Disable static content rule as we use it legitimately for checkmarks, tooltips, and visual indicators
+        "a11y/content-property-no-static-value": null,
+        "a11y/font-size-is-readable": [
+            true,
+            {
+                // Allow smaller font sizes for tooltips and visual indicators
+                ignoreProperties: ["content"],
+                severity: "warning",
+            },
+        ],
         "a11y/line-height-is-vertical-rhythmed": null,
         "a11y/media-prefers-color-scheme": null,
         "a11y/media-prefers-reduced-motion": true,

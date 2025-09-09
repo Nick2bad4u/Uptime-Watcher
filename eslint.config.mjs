@@ -28,6 +28,7 @@ import * as htmlParser from "@html-eslint/parser";
 import implicitDependencies from "@jcoreio/eslint-plugin-implicit-dependencies";
 import * as pluginDesignTokens from "@metamask/eslint-plugin-design-tokens";
 import pluginMicrosoftSdl from "@microsoft/eslint-plugin-sdl";
+import rushStackSecurity from "@rushstack/eslint-plugin-security";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tseslintParser from "@typescript-eslint/parser";
 import vitest from "@vitest/eslint-plugin";
@@ -40,6 +41,8 @@ import pluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
 import pluginBoundaries from "eslint-plugin-boundaries";
 import pluginCanonical from "eslint-plugin-canonical";
 import * as pluginCleanCode from "eslint-plugin-clean-code";
+// New plugins from user request
+import pluginCleanTimer from "eslint-plugin-clean-timer";
 import eslintPluginCommentLength from "eslint-plugin-comment-length";
 // eslint-disable-next-line import-x/no-unresolved -- Works fine
 import pluginCompat from "eslint-plugin-compat";
@@ -81,12 +84,14 @@ import * as pluginNFDAR from "eslint-plugin-no-function-declare-after-return";
 import pluginNoHardcoded from "eslint-plugin-no-hardcoded-strings";
 import pluginRegexLook from "eslint-plugin-no-lookahead-lookbehind-regexp";
 import pluginNoOnly from "eslint-plugin-no-only-tests";
+import noSecrets from "eslint-plugin-no-secrets";
 import pluginNoUnary from "eslint-plugin-no-unary-plus";
 import pluginNoUnwaited from "eslint-plugin-no-unawaited-dot-catch-throw";
 import nounsanitized from "eslint-plugin-no-unsanitized";
 import eslintPluginNoUseExtendNative from "eslint-plugin-no-use-extend-native";
 import observers from "eslint-plugin-observers";
 import packageJson from "eslint-plugin-package-json";
+import paths from "eslint-plugin-paths";
 import pluginPerfectionist from "eslint-plugin-perfectionist";
 import pluginPreferArrow from "eslint-plugin-prefer-arrow";
 import pluginPrettier from "eslint-plugin-prettier";
@@ -117,10 +122,12 @@ import pluginSecurity from "eslint-plugin-security";
 import pluginSonarjs from "eslint-plugin-sonarjs";
 import pluginSortClassMembers from "eslint-plugin-sort-class-members";
 import pluginSortDestructure from "eslint-plugin-sort-destructure-keys";
+import pluginSortKeysFix from "eslint-plugin-sort-keys-fix";
 import pluginSortReactDependency from "eslint-plugin-sort-react-dependency-arrays";
 import sqlTemplate from "eslint-plugin-sql-template";
 import pluginSSR from "eslint-plugin-ssr-friendly";
 import styledA11y from "eslint-plugin-styled-components-a11y";
+import pluginSwitchCase from "eslint-plugin-switch-case";
 import tailwind from "eslint-plugin-tailwindcss";
 import pluginTestingLibrary from "eslint-plugin-testing-library";
 import eslintPluginToml from "eslint-plugin-toml";
@@ -145,6 +152,7 @@ import yamlEslintParser from "yaml-eslint-parser";
 
 // Unused and Uninstalled Plugins:
 // import putout from "eslint-plugin-putout";
+// import pluginPii from "eslint-plugin-pii"; - broken
 // import * as nodeDependenciesPlugin from "eslint-plugin-node-dependencies"; Broken with isJson undefined error
 // eslint-config-prettier
 // eslint-find-rules
@@ -381,7 +389,6 @@ export default [
         },
         rules: {
             ...html.configs.recommended.rules,
-
             "html/id-naming-convention": "warn",
             "html/indent": "error",
             "html/lowercase": "warn",
@@ -578,7 +585,6 @@ export default [
         files: ["**/*.mdx"],
         name: "MDX - **/*.MDX",
         plugins: { mdx: mdx },
-
         rules: {
             ...mdx.flat.rules,
             ...mdx.flatCodeBlocks.rules,
@@ -683,12 +689,12 @@ export default [
             eslintPluginJsonc: eslintPluginJsonc,
             json: json,
             "json-schema-validator": eslintPluginJsonSchemaValidator,
+            "no-secrets": noSecrets,
         },
         // ═══════════════════════════════════════════════════════════════════════════════
         // Plugin Config for eslint-plugin-jsonc to enable Prettier formatting
         // ═══════════════════════════════════════════════════════════════════════════════
         ...eslintPluginJsonc.configs["flat/prettier"][0],
-
         language: "json/jsonc",
         languageOptions: {
             parser: jsoncEslintParser,
@@ -777,6 +783,12 @@ export default [
             "jsonc/space-unary-ops": "warn",
             "jsonc/valid-json-number": "warn",
             "jsonc/vue-custom-block/no-parsing-error": "warn",
+            "no-secrets/no-secrets": [
+                "error",
+                {
+                    tolerance: 5,
+                },
+            ],
         },
     },
 
@@ -790,11 +802,18 @@ export default [
         plugins: {
             json: json,
             "json-schema-validator": eslintPluginJsonSchemaValidator,
+            "no-secrets": noSecrets,
         },
         rules: {
             ...json.configs.recommended.rules,
             "json/sort-keys": ["warn"],
             "json/top-level-interop": "warn",
+            "no-secrets/no-secrets": [
+                "error",
+                {
+                    tolerance: 5,
+                },
+            ],
         },
     },
 
@@ -808,9 +827,16 @@ export default [
         plugins: {
             json: json,
             "json-schema-validator": eslintPluginJsonSchemaValidator,
+            "no-secrets": noSecrets,
         },
         rules: {
             ...json.configs.recommended.rules,
+            "no-secrets/no-secrets": [
+                "error",
+                {
+                    tolerance: 5,
+                },
+            ],
         },
     },
 
@@ -1048,11 +1074,14 @@ export default [
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
+            "@rushstack/security": rushStackSecurity,
             "@typescript-eslint": tseslint,
             "array-func": arrayFunc,
             boundaries: pluginBoundaries,
             canonical: pluginCanonical,
             "clean-code": pluginCleanCode,
+            // New plugins from user request
+            "clean-timer": pluginCleanTimer,
             "comment-length": eslintPluginCommentLength,
             compat: pluginCompat,
             css: css,
@@ -1086,6 +1115,7 @@ export default [
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
             "no-function-declare-after-return": pluginNFDAR,
             "no-lookahead-lookbehind-regexp": pluginRegexLook,
+            "no-secrets": noSecrets,
             "no-unary-plus": pluginNoUnary,
             "no-unawaited-dot-catch-throw": pluginNoUnwaited,
             "no-unsanitized": nounsanitized,
@@ -1107,10 +1137,12 @@ export default [
             sonarjs: pluginSonarjs,
             "sort-class-members": pluginSortClassMembers,
             "sort-destructure-keys": pluginSortDestructure,
+            "sort-keys-fix": pluginSortKeysFix,
             "sql-template": sqlTemplate,
             // @ts-expect-error -- TS Error from fixupPluginRules
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
+            "switch-case": pluginSwitchCase,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
             unicorn: pluginUnicorn,
@@ -1165,12 +1197,10 @@ export default [
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
-
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/no-untranslated-text": "off",
             "@docusaurus/prefer-docusaurus-heading": "warn",
             "@docusaurus/string-literal-i18n-messages": "off",
-
             "@eslint-react/avoid-shorthand-boolean": "off",
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
@@ -1271,9 +1301,7 @@ export default [
             "@microsoft/sdl/no-document-domain": "warn",
             "@microsoft/sdl/no-document-write": "warn",
             "@microsoft/sdl/no-electron-node-integration": "warn",
-
             "@microsoft/sdl/no-html-method": "warn",
-
             "@microsoft/sdl/no-inner-html": "warn",
             "@microsoft/sdl/no-insecure-random": "off",
             "@microsoft/sdl/no-insecure-url": "warn",
@@ -1281,12 +1309,13 @@ export default [
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
+            "@rushstack/security/no-unsafe-regexp": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
-
             "@typescript-eslint/array-type": [
                 "error",
                 { default: "array-simple" },
             ], // Prefer T[] for simple types, Array<T> for complex types
+
             "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
             "@typescript-eslint/ban-ts-comment": "warn",
             "@typescript-eslint/ban-tslint-comment": "warn",
@@ -1609,9 +1638,9 @@ export default [
             "canonical/filename-no-index": "off",
             "canonical/import-specifier-newline": "off",
             "canonical/no-barrel-import": "error",
+            "canonical/no-export-all": "error",
             // Core quality rules
 
-            "canonical/no-export-all": "error",
             "canonical/no-import-namespace-destructure": "warn",
             "canonical/no-re-export": "warn",
             "canonical/no-reassign-imports": "error",
@@ -1638,6 +1667,7 @@ export default [
             "clean-code/exception-handling": "off",
             // "write-good-comments/write-good-comments": "warn",
             "clean-code/feature-envy": "off",
+            "clean-timer/assign-timer-id": "warn",
             "comment-length/limit-multi-line-comments": [
                 "warn",
                 {
@@ -1851,7 +1881,6 @@ export default [
             "max-params": "off",
             "max-statements": "off",
             "module-interop/no-import-cjs": "off",
-
             "module-interop/no-require-esm": "off",
             // Node
             "n/callback-return": "warn",
@@ -1898,6 +1927,12 @@ export default [
                 "off",
             "no-magic-numbers": "off",
             "no-plusplus": "off",
+            "no-secrets/no-secrets": [
+                "error",
+                {
+                    tolerance: 5,
+                },
+            ],
             "no-ternary": "off",
             "no-unary-plus/no-unary-plus": "error",
             "no-unawaited-dot-catch-throw/enforce-no-unawaited-dot-catch-throw":
@@ -2102,11 +2137,14 @@ export default [
             "sort-destructure-keys/sort-destructure-keys": "off",
             "sort-imports": "off",
             "sort-keys": "off",
+            "sort-keys-fix/sort-keys-fix": "off",
             "sql-template/no-unsafe-query": "error",
             "ssr-friendly/no-dom-globals-in-constructor": "error",
             "ssr-friendly/no-dom-globals-in-module-scope": "error",
             "ssr-friendly/no-dom-globals-in-react-cc-render": "error",
             "ssr-friendly/no-dom-globals-in-react-fc": "error",
+            "switch-case/newline-between-switch-case": "off",
+            "switch-case/no-case-curly": "off",
             "total-functions/no-hidden-type-assertions": "off",
             "total-functions/no-nested-fp-ts-effects": "off",
             "total-functions/no-partial-division": "off",
@@ -2279,6 +2317,7 @@ export default [
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
+            "@rushstack/security": rushStackSecurity,
             "@typescript-eslint": tseslint,
             antfu: antfu,
             "array-func": arrayFunc,
@@ -2286,6 +2325,8 @@ export default [
             boundaries: pluginBoundaries,
             canonical: pluginCanonical,
             "clean-code": pluginCleanCode,
+            // New plugins from user request
+            "clean-timer": pluginCleanTimer,
             "comment-length": eslintPluginCommentLength,
             compat: pluginCompat,
             css: css,
@@ -2320,11 +2361,13 @@ export default [
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
             "no-function-declare-after-return": pluginNFDAR,
             "no-lookahead-lookbehind-regexp": pluginRegexLook,
+            "no-secrets": noSecrets,
             "no-unary-plus": pluginNoUnary,
             "no-unawaited-dot-catch-throw": pluginNoUnwaited,
             "no-unsanitized": nounsanitized,
             "no-use-extend-native": eslintPluginNoUseExtendNative,
             observers: observers,
+            paths: paths,
             perfectionist: pluginPerfectionist,
             "prefer-arrow": pluginPreferArrow,
             prettier: pluginPrettier,
@@ -2349,11 +2392,13 @@ export default [
             sonarjs: pluginSonarjs,
             "sort-class-members": pluginSortClassMembers,
             "sort-destructure-keys": pluginSortDestructure,
+            "sort-keys-fix": pluginSortKeysFix,
             "sort-react-dependency-arrays": pluginSortReactDependency,
             "sql-template": sqlTemplate,
             // @ts-expect-error -- TS Error from fixupPluginRules
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
+            "switch-case": pluginSwitchCase,
             tailwind: tailwind,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
@@ -2414,14 +2459,12 @@ export default [
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
             ...pluginBetterTailwindcss.configs.correctness.rules,
-
-            // Sonar quality helpers
-
             "@arthurgeron/react-usememo/require-memo": "off",
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "off",
-            "@eslint-react/avoid-shorthand-boolean": "off",
+            // Sonar quality helpers
 
+            "@eslint-react/avoid-shorthand-boolean": "off",
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
@@ -2520,9 +2563,7 @@ export default [
             "@microsoft/sdl/no-document-domain": "warn",
             "@microsoft/sdl/no-document-write": "warn",
             "@microsoft/sdl/no-electron-node-integration": "warn",
-
             "@microsoft/sdl/no-html-method": "warn",
-
             "@microsoft/sdl/no-inner-html": "warn",
             "@microsoft/sdl/no-insecure-random": "off",
             "@microsoft/sdl/no-insecure-url": "warn",
@@ -2530,13 +2571,14 @@ export default [
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
+            "@rushstack/security/no-unsafe-regexp": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
-
             "@typescript-eslint/array-type": [
                 "error",
                 { default: "array-simple" },
             ], // Prefer T[] for simple types, Array<T> for complex types
             "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
+
             "@typescript-eslint/ban-ts-comment": "warn",
             "@typescript-eslint/ban-tslint-comment": "warn",
             "@typescript-eslint/class-literal-property-style": "warn",
@@ -2546,7 +2588,6 @@ export default [
             "@typescript-eslint/consistent-return": "warn",
             // Function and type safety rules
             "@typescript-eslint/consistent-type-assertions": "error",
-
             "@typescript-eslint/consistent-type-definitions": "warn",
             "@typescript-eslint/consistent-type-exports": "warn",
             "@typescript-eslint/consistent-type-imports": "warn",
@@ -2697,15 +2738,12 @@ export default [
             "@typescript-eslint/only-throw-error": "warn",
             "@typescript-eslint/parameter-properties": "warn",
             "@typescript-eslint/prefer-as-const": "warn",
-
             "@typescript-eslint/prefer-destructuring": "warn",
             "@typescript-eslint/prefer-enum-initializers": "warn",
             "@typescript-eslint/prefer-find": "warn",
             "@typescript-eslint/prefer-for-of": "warn",
             "@typescript-eslint/prefer-function-type": "error",
-
             "@typescript-eslint/prefer-includes": "warn",
-
             "@typescript-eslint/prefer-literal-enum-member": "warn",
             "@typescript-eslint/prefer-namespace-keyword": "warn",
             "@typescript-eslint/prefer-nullish-coalescing": [
@@ -2766,13 +2804,11 @@ export default [
             "better-tailwindcss/enforce-consistent-class-order": "warn",
             "better-tailwindcss/enforce-consistent-important-position": "warn",
             "better-tailwindcss/enforce-consistent-line-wrapping": "off",
-
             "better-tailwindcss/enforce-consistent-variable-syntax": "warn",
             "better-tailwindcss/enforce-shorthand-classes": "off",
             "better-tailwindcss/no-deprecated-classes": "warn",
             "better-tailwindcss/no-duplicate-classes": "warn",
             "better-tailwindcss/no-restricted-classes": "warn",
-
             "better-tailwindcss/no-unnecessary-whitespace": "warn",
             "better-tailwindcss/no-unregistered-classes": [
                 "off",
@@ -2880,10 +2916,10 @@ export default [
             "canonical/prefer-use-mount": "warn",
             "canonical/sort-react-dependencies": "warn",
             "capitalized-comments": "off",
-
             "class-methods-use-this": "off",
             "clean-code/exception-handling": "off",
             "clean-code/feature-envy": "off",
+            "clean-timer/assign-timer-id": "warn",
             "comment-length/limit-multi-line-comments": [
                 "warn",
                 {
@@ -3000,7 +3036,6 @@ export default [
             "import-x/no-extraneous-dependencies": "warn",
             "import-x/no-import-module-exports": "warn",
             "import-x/no-internal-modules": "off",
-
             "import-x/no-mutable-exports": "warn",
             "import-x/no-named-as-default": "warn",
             "import-x/no-named-as-default-member": "off",
@@ -3090,7 +3125,6 @@ export default [
             "max-params": "off",
             "max-statements": "off",
             "module-interop/no-import-cjs": "off",
-
             "module-interop/no-require-esm": "off",
             // Node
             "n/callback-return": "warn",
@@ -3135,6 +3169,12 @@ export default [
             "no-inline-comments": "off",
             "no-magic-numbers": "off",
             "no-plusplus": "off",
+            "no-secrets/no-secrets": [
+                "error",
+                {
+                    tolerance: 5,
+                },
+            ],
             "no-ternary": "off",
             "no-unary-plus/no-unary-plus": "error",
             "no-unawaited-dot-catch-throw/enforce-no-unawaited-dot-catch-throw":
@@ -3169,6 +3209,12 @@ export default [
                     blankLine: "always",
                     next: "class",
                     prev: "*",
+                },
+            ],
+            "paths/alias": [
+                "warn",
+                {
+                    configFilePath: "./tsconfig.shared.json",
                 },
             ],
             "perfectionist/sort-classes": "off",
@@ -3562,12 +3608,15 @@ export default [
             "sort-destructure-keys/sort-destructure-keys": "off",
             "sort-imports": "off",
             "sort-keys": "off",
+            "sort-keys-fix/sort-keys-fix": "off",
             "sort-react-dependency-arrays/sort": "error",
             "sql-template/no-unsafe-query": "error",
             "ssr-friendly/no-dom-globals-in-constructor": "error",
             "ssr-friendly/no-dom-globals-in-module-scope": "error",
             "ssr-friendly/no-dom-globals-in-react-cc-render": "error",
             "ssr-friendly/no-dom-globals-in-react-fc": "error",
+            "switch-case/newline-between-switch-case": "off",
+            "switch-case/no-case-curly": "off",
             // // Tailwind CSS
             // "tailwind/classnames-order": "warn",
             // "tailwind/enforces-negative-arbitrary-values": "warn",
@@ -3770,12 +3819,15 @@ export default [
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
+            "@rushstack/security": rushStackSecurity,
             "@typescript-eslint": tseslint,
             antfu: antfu,
             "array-func": arrayFunc,
             boundaries: pluginBoundaries,
             canonical: pluginCanonical,
             "clean-code": pluginCleanCode,
+            // New plugins from user request
+            "clean-timer": pluginCleanTimer,
             "comment-length": eslintPluginCommentLength,
             compat: pluginCompat,
             css: css,
@@ -3809,11 +3861,13 @@ export default [
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
             "no-function-declare-after-return": pluginNFDAR,
             "no-lookahead-lookbehind-regexp": pluginRegexLook,
+            "no-secrets": noSecrets,
             "no-unary-plus": pluginNoUnary,
             "no-unawaited-dot-catch-throw": pluginNoUnwaited,
             "no-unsanitized": nounsanitized,
             "no-use-extend-native": eslintPluginNoUseExtendNative,
             observers: observers,
+            paths: paths,
             perfectionist: pluginPerfectionist,
             "prefer-arrow": pluginPreferArrow,
             prettier: pluginPrettier,
@@ -3830,10 +3884,12 @@ export default [
             sonarjs: pluginSonarjs,
             "sort-class-members": pluginSortClassMembers,
             "sort-destructure-keys": pluginSortDestructure,
+            "sort-keys-fix": pluginSortKeysFix,
             "sql-template": sqlTemplate,
             // @ts-expect-error -- TS Error from fixupPluginRules
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
+            "switch-case": pluginSwitchCase,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
             unicorn: pluginUnicorn,
@@ -3889,13 +3945,11 @@ export default [
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
-
             "@eslint-react/avoid-shorthand-boolean": "off",
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
             "@eslint-react/ensure-forward-ref-using-ref": "warn",
-
             "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks":
                 "warn",
             "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps":
@@ -3991,21 +4045,19 @@ export default [
             "@microsoft/sdl/no-document-write": "warn",
             "@microsoft/sdl/no-electron-node-integration": "warn",
             "@microsoft/sdl/no-html-method": "warn",
-
             "@microsoft/sdl/no-inner-html": "warn",
-
             "@microsoft/sdl/no-insecure-random": "off",
             "@microsoft/sdl/no-insecure-url": "warn",
             "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
+            "@rushstack/security/no-unsafe-regexp": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
             "@typescript-eslint/array-type": [
                 "error",
                 { default: "array-simple" },
             ], // Prefer T[] for simple types, Array<T> for complex types
-
             "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
             "@typescript-eslint/ban-ts-comment": "warn",
             "@typescript-eslint/ban-tslint-comment": "warn",
@@ -4019,7 +4071,6 @@ export default [
             "@typescript-eslint/consistent-type-definitions": "warn",
             "@typescript-eslint/consistent-type-exports": "warn",
             "@typescript-eslint/consistent-type-imports": "warn",
-
             "@typescript-eslint/default-param-last": "warn",
             "@typescript-eslint/dot-notation": "warn",
             "@typescript-eslint/explicit-function-return-type": [
@@ -4137,7 +4188,6 @@ export default [
             "@typescript-eslint/no-unnecessary-parameter-property-assignment":
                 "warn",
             "@typescript-eslint/no-unnecessary-qualifier": "warn",
-
             "@typescript-eslint/no-unnecessary-template-expression": "warn",
             "@typescript-eslint/no-unnecessary-type-arguments": "warn",
             // Enhanced type safety for backend services
@@ -4172,9 +4222,7 @@ export default [
             "@typescript-eslint/prefer-find": "warn",
             // "write-good-comments/write-good-comments": "warn",
             "@typescript-eslint/prefer-for-of": "warn",
-
             "@typescript-eslint/prefer-function-type": "error",
-
             "@typescript-eslint/prefer-includes": "warn",
             "@typescript-eslint/prefer-literal-enum-member": "warn",
             "@typescript-eslint/prefer-namespace-keyword": "warn",
@@ -4329,6 +4377,7 @@ export default [
             "class-methods-use-this": "off",
             "clean-code/exception-handling": "off",
             "clean-code/feature-envy": "off",
+            "clean-timer/assign-timer-id": "warn",
             "comment-length/limit-multi-line-comments": [
                 "warn",
                 {
@@ -4543,7 +4592,6 @@ export default [
             "max-params": "off",
             "max-statements": "off",
             "module-interop/no-import-cjs": "off",
-
             "module-interop/no-require-esm": "off",
             // Node
             "n/callback-return": "warn",
@@ -4552,8 +4600,8 @@ export default [
             "n/global-require": "warn",
             "n/handle-callback-err": "warn",
             "n/no-callback-literal": "warn",
-
             "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
+
             "n/no-missing-import": "off", // Allow missing imports for dynamic imports
             "n/no-mixed-requires": "warn",
             "n/no-new-require": "warn",
@@ -4589,6 +4637,12 @@ export default [
             "no-inline-comments": "off",
             "no-magic-numbers": "off",
             "no-plusplus": "off",
+            "no-secrets/no-secrets": [
+                "error",
+                {
+                    tolerance: 5,
+                },
+            ],
             "no-ternary": "off",
             "no-unary-plus/no-unary-plus": "error",
             "no-unawaited-dot-catch-throw/enforce-no-unawaited-dot-catch-throw":
@@ -4623,6 +4677,12 @@ export default [
                     blankLine: "always",
                     next: "class",
                     prev: "*",
+                },
+            ],
+            "paths/alias": [
+                "warn",
+                {
+                    configFilePath: "./tsconfig.electron.json",
                 },
             ],
             "perfectionist/sort-classes": "off",
@@ -4771,11 +4831,14 @@ export default [
             "sort-destructure-keys/sort-destructure-keys": "off",
             "sort-imports": "off",
             "sort-keys": "off",
+            "sort-keys-fix/sort-keys-fix": "off",
             "sql-template/no-unsafe-query": "error",
             "ssr-friendly/no-dom-globals-in-constructor": "error",
             "ssr-friendly/no-dom-globals-in-module-scope": "error",
             "ssr-friendly/no-dom-globals-in-react-cc-render": "error",
             "ssr-friendly/no-dom-globals-in-react-fc": "error",
+            "switch-case/newline-between-switch-case": "off",
+            "switch-case/no-case-curly": "off",
             "total-functions/no-hidden-type-assertions": "off",
             "total-functions/no-nested-fp-ts-effects": "off",
             "total-functions/no-partial-division": "off",
@@ -4964,12 +5027,15 @@ export default [
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
+            "@rushstack/security": rushStackSecurity,
             "@typescript-eslint": tseslint,
             antfu: antfu,
             "array-func": arrayFunc,
             boundaries: pluginBoundaries,
             canonical: pluginCanonical,
             "clean-code": pluginCleanCode,
+            // New plugins from user request
+            "clean-timer": pluginCleanTimer,
             "comment-length": eslintPluginCommentLength,
             compat: pluginCompat,
             css: css,
@@ -5004,11 +5070,13 @@ export default [
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
             "no-function-declare-after-return": pluginNFDAR,
             "no-lookahead-lookbehind-regexp": pluginRegexLook,
+            "no-secrets": noSecrets,
             "no-unary-plus": pluginNoUnary,
             "no-unawaited-dot-catch-throw": pluginNoUnwaited,
             "no-unsanitized": nounsanitized,
             "no-use-extend-native": eslintPluginNoUseExtendNative,
             observers: observers,
+            paths: paths,
             perfectionist: pluginPerfectionist,
             "prefer-arrow": pluginPreferArrow,
             prettier: pluginPrettier,
@@ -5033,11 +5101,13 @@ export default [
             sonarjs: pluginSonarjs,
             "sort-class-members": pluginSortClassMembers,
             "sort-destructure-keys": pluginSortDestructure,
+            "sort-keys-fix": pluginSortKeysFix,
             "sort-react-dependency-arrays": pluginSortReactDependency,
             "sql-template": sqlTemplate,
             // @ts-expect-error -- TS Error from fixupPluginRules
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
+            "switch-case": pluginSwitchCase,
             tailwind: tailwind,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
@@ -5097,12 +5167,10 @@ export default [
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
-
             "@arthurgeron/react-usememo/require-memo": "warn",
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
-
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
@@ -5201,9 +5269,7 @@ export default [
             "@microsoft/sdl/no-document-domain": "warn",
             "@microsoft/sdl/no-document-write": "warn",
             "@microsoft/sdl/no-electron-node-integration": "warn",
-
             "@microsoft/sdl/no-html-method": "warn",
-
             "@microsoft/sdl/no-inner-html": "warn",
             "@microsoft/sdl/no-insecure-random": "off",
             "@microsoft/sdl/no-insecure-url": "warn",
@@ -5211,13 +5277,14 @@ export default [
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
+            "@rushstack/security/no-unsafe-regexp": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
-
             "@typescript-eslint/array-type": [
                 "error",
                 { default: "array-simple" },
             ], // Prefer T[] for simple types, Array<T> for complex types
             "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
+
             "@typescript-eslint/ban-ts-comment": "warn",
             "@typescript-eslint/ban-tslint-comment": "warn",
             "@typescript-eslint/class-literal-property-style": "warn",
@@ -5227,7 +5294,6 @@ export default [
             "@typescript-eslint/consistent-return": "warn",
             // Function and type safety rules
             "@typescript-eslint/consistent-type-assertions": "error",
-
             "@typescript-eslint/consistent-type-definitions": "warn",
             "@typescript-eslint/consistent-type-exports": "warn",
             "@typescript-eslint/consistent-type-imports": "warn",
@@ -5378,15 +5444,12 @@ export default [
             "@typescript-eslint/only-throw-error": "warn",
             "@typescript-eslint/parameter-properties": "warn",
             "@typescript-eslint/prefer-as-const": "warn",
-
             "@typescript-eslint/prefer-destructuring": "warn",
             "@typescript-eslint/prefer-enum-initializers": "warn",
             "@typescript-eslint/prefer-find": "warn",
             "@typescript-eslint/prefer-for-of": "warn",
             "@typescript-eslint/prefer-function-type": "error",
-
             "@typescript-eslint/prefer-includes": "warn",
-
             "@typescript-eslint/prefer-literal-enum-member": "warn",
             "@typescript-eslint/prefer-namespace-keyword": "warn",
             "@typescript-eslint/prefer-nullish-coalescing": [
@@ -5515,13 +5578,11 @@ export default [
             "boundaries/no-ignored": "warn",
             camelcase: "off",
             "canonical/destructuring-property-newline": "off",
-
             "canonical/export-specifier-newline": "off",
             "canonical/filename-match-exported": "warn",
             "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
             "canonical/filename-no-index": "error",
             "canonical/import-specifier-newline": "off",
-
             "canonical/no-barrel-import": "error",
             "canonical/no-export-all": "error",
             "canonical/no-import-namespace-destructure": "warn",
@@ -5547,9 +5608,9 @@ export default [
             "canonical/sort-react-dependencies": "warn",
             "capitalized-comments": "off",
             "class-methods-use-this": "off",
-
             "clean-code/exception-handling": "off",
             "clean-code/feature-envy": "off",
+            "clean-timer/assign-timer-id": "warn",
             "comment-length/limit-multi-line-comments": [
                 "warn",
                 {
@@ -5667,7 +5728,6 @@ export default [
             "import-x/no-import-module-exports": "warn",
             "import-x/no-internal-modules": "off",
             "import-x/no-mutable-exports": "warn",
-
             "import-x/no-named-as-default": "warn",
             "import-x/no-named-as-default-member": "off",
             "import-x/no-named-default": "warn",
@@ -5757,7 +5817,6 @@ export default [
             "max-params": "off",
             "max-statements": "off",
             "module-interop/no-import-cjs": "off",
-
             "module-interop/no-require-esm": "off",
             // Node
             "n/callback-return": "warn",
@@ -5802,6 +5861,12 @@ export default [
             "no-inline-comments": "off",
             "no-magic-numbers": "off",
             "no-plusplus": "off",
+            "no-secrets/no-secrets": [
+                "error",
+                {
+                    tolerance: 5,
+                },
+            ],
             "no-ternary": "off",
             "no-unary-plus/no-unary-plus": "error",
             "no-unawaited-dot-catch-throw/enforce-no-unawaited-dot-catch-throw":
@@ -5836,6 +5901,12 @@ export default [
                     blankLine: "always",
                     next: "class",
                     prev: "*",
+                },
+            ],
+            "paths/alias": [
+                "warn",
+                {
+                    configFilePath: "./tsconfig.json",
                 },
             ],
             "perfectionist/sort-classes": "off",
@@ -6229,12 +6300,15 @@ export default [
             "sort-destructure-keys/sort-destructure-keys": "off",
             "sort-imports": "off",
             "sort-keys": "off",
+            "sort-keys-fix/sort-keys-fix": "off",
             "sort-react-dependency-arrays/sort": "error",
             "sql-template/no-unsafe-query": "error",
             "ssr-friendly/no-dom-globals-in-constructor": "error",
             "ssr-friendly/no-dom-globals-in-module-scope": "error",
             "ssr-friendly/no-dom-globals-in-react-cc-render": "error",
             "ssr-friendly/no-dom-globals-in-react-fc": "error",
+            "switch-case/newline-between-switch-case": "off",
+            "switch-case/no-case-curly": "off",
             // // Tailwind CSS
             // "tailwind/classnames-order": "warn",
             // "tailwind/enforces-negative-arbitrary-values": "warn",
@@ -6450,7 +6524,6 @@ export default [
             ...pluginComments.configs.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
-
             // Relaxed function rules for tests (explicit for clarity)
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
 
@@ -6486,10 +6559,8 @@ export default [
                     skipComments: true,
                 },
             ],
-
             "max-params": "off",
             "max-statements": "off",
-
             "new-cap": "off", // Allow new-cap for class constructors
 
             "nitpick/no-redundant-vars": "off", // Allow redundant vars in tests
@@ -6523,7 +6594,6 @@ export default [
             "require-unicode-regexp": "off",
             "sort-imports": "off",
             "sort-keys": "off",
-
             "testing-library/await-async-queries": "error",
             "testing-library/no-await-sync-queries": "error",
             "testing-library/no-debugging-utils": "off",
@@ -6579,7 +6649,6 @@ export default [
             "vitest/valid-title": "warn",
             "vitest/warn-todo": "warn",
         },
-
         settings: {
             "import-x/resolver": {
                 node: true,
@@ -6668,7 +6737,6 @@ export default [
             ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
-
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
 
             "@typescript-eslint/no-explicit-any": "off",
@@ -6704,10 +6772,8 @@ export default [
                     skipComments: true,
                 },
             ],
-
             "max-params": "off",
             "max-statements": "off",
-
             "new-cap": "off", // Allow new-cap for class constructors
 
             "no-await-in-loop": "off", // Allow await in loops for sequential operations
@@ -6743,7 +6809,6 @@ export default [
             "require-unicode-regexp": "off",
             "sort-imports": "off",
             "sort-keys": "off",
-
             "testing-library/await-async-queries": "error",
             "testing-library/no-await-sync-queries": "error",
             "testing-library/no-debugging-utils": "off",
@@ -6888,7 +6953,6 @@ export default [
             ...pluginComments.configs.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
-
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
 
             "@typescript-eslint/no-explicit-any": "off",
@@ -6915,7 +6979,6 @@ export default [
                     skipComments: true,
                 },
             ],
-
             "max-params": "off",
             "max-statements": "off",
             "no-console": "off",
@@ -6926,7 +6989,6 @@ export default [
             "no-undef-init": "off",
             "no-undefined": "off",
             "no-void": "off",
-
             // Relaxed function rules for tests (explicit for clarity)
 
             "object-shorthand": "off",
@@ -6939,7 +7001,6 @@ export default [
             "require-unicode-regexp": "off",
             "sort-imports": "off",
             "sort-keys": "off",
-
             "testing-library/await-async-queries": "error",
             "testing-library/no-await-sync-queries": "error",
             "testing-library/no-debugging-utils": "off",
@@ -6993,7 +7054,6 @@ export default [
             "vitest/valid-title": "warn",
             "vitest/warn-todo": "warn",
         },
-
         settings: {
             "import-x/resolver": {
                 node: true,
@@ -7085,9 +7145,7 @@ export default [
             ...vitest.configs.recommended.rules,
             ...pluginComments.configs.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
-
             "@typescript-eslint/no-empty-function": "off",
-
             // Allow flexible patterns for benchmark mock implementations
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-floating-promises": "off", // Benchmarks may not await all promises
@@ -7124,7 +7182,6 @@ export default [
                     skipComments: true,
                 },
             ],
-
             "max-params": "off",
             "max-statements": "off",
             "new-cap": "off", // Allow new-cap for class constructors
@@ -7314,7 +7371,6 @@ export default [
             ...pluginComments.configs.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...arrayFunc.configs.all.rules,
-
             "@typescript-eslint/array-type": [
                 "error",
                 { default: "array-simple" },
@@ -7327,10 +7383,8 @@ export default [
                 },
             ],
             "@typescript-eslint/no-empty-object-type": "error",
-
             // Allow more flexibility for backend patterns
             "@typescript-eslint/no-explicit-any": "warn",
-
             // Advanced type-checked rules for backend async safety and runtime error prevention
             "@typescript-eslint/no-floating-promises": [
                 "error",
@@ -7488,7 +7542,6 @@ export default [
             "functional/no-conditional-statements": "off",
             "functional/no-expression-statements": "off",
             "functional/no-let": "off",
-
             "functional/no-loop-statements": "off",
             "functional/no-mixed-types": "off", // Mixed types are common in Electron services
             "functional/no-return-void": "off",
@@ -7497,7 +7550,6 @@ export default [
             "id-length": "off",
             "import-x/consistent-type-specifier-style": "off",
             "import-x/default": "warn",
-
             "import-x/dynamic-import-chunkname": "warn",
             "import-x/export": "warn",
             "import-x/exports-last": "off",
@@ -7571,13 +7623,11 @@ export default [
             "max-statements": "off",
             // Node
             "n/callback-return": "warn",
-
             "n/exports-style": "warn",
             "n/file-extension-in-import": "off", // Allow missing file extensions for imports
             "n/global-require": "warn",
             "n/handle-callback-err": "warn",
             "n/no-callback-literal": "warn",
-
             "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
             "n/no-missing-import": "off", // Allow missing imports for dynamic imports
             "n/no-mixed-requires": "warn",
@@ -7850,9 +7900,7 @@ export default [
             ...vitest.configs.recommended.rules,
             ...pluginComments.configs.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
-
             "@typescript-eslint/no-empty-function": "off",
-
             // Allow flexible patterns for benchmark mock implementations
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-floating-promises": "off", // Benchmarks may not await all promises
@@ -7889,7 +7937,6 @@ export default [
                     skipComments: true,
                 },
             ],
-
             "max-params": "off",
             "max-statements": "off",
             "new-cap": "off", // Allow new-cap for class constructors
@@ -8042,12 +8089,10 @@ export default [
             ...pluginSecurity.configs.recommended.rules,
             ...nodePlugin.configs["flat/recommended"].rules,
             ...eslintPluginMath.configs.recommended.rules,
-
             camelcase: "off",
             "capitalized-comments": "off",
             "class-methods-use-this": "off",
             "depend/ban-dependencies": "error",
-
             "dot-notation": "off",
             "func-style": "off",
             "id-length": "off",
@@ -8066,7 +8111,6 @@ export default [
             "max-params": "off",
             "max-statements": "off",
             "no-console": "off",
-
             "no-inline-comments": "off",
             "no-magic-numbers": "off",
             "no-plusplus": "off",
@@ -8138,7 +8182,6 @@ export default [
         },
         rules: {
             ...vitest.configs.all.rules,
-
             "testing-library/consistent-data-testid": [
                 "warn",
                 {
@@ -8214,7 +8257,6 @@ export default [
 
             // @typescript-eslint
             "@typescript-eslint/no-empty-interface": "off",
-
             "@typescript-eslint/no-loss-of-precision": "off",
             "@typescript-eslint/no-type-alias": "off",
             "@typescript-eslint/no-var-requires": "off",
@@ -8223,11 +8265,8 @@ export default [
             "@typescript-eslint/typedef": "off",
             // better-tailwindcss
             "better-tailwindcss/multiline": "off",
-
             "better-tailwindcss/sort-classes": "off",
-
             "callback-return": "off",
-
             // Deprecated rules - to be removed in future
 
             "functional/no-promise-reject": "off",
@@ -8258,18 +8297,14 @@ export default [
             "no-catch-shadow": "off",
             "no-hardcoded-strings/no-hardcoded-strings": "off", // Will use i18n in future
             "no-mixed-requires": "off",
-
             "no-native-reassign": "off",
-
             "no-negated-in-lhs": "off",
             "no-new-object": "off",
             "no-new-require": "off",
             "no-new-symbol": "off",
             "no-path-concat": "off",
-
             "no-process-env": "off",
             "no-process-exit": "off",
-
             "no-restricted-modules": "off",
             "no-return-await": "off",
             "no-sync": "off",
@@ -8278,15 +8313,11 @@ export default [
             // react
             "react/jsx-sort-default-props": "off",
             "spaced-comment": "off",
-
             "styled-components-a11y/accessible-emoji": "off",
-
             // styled-components-a11y (and jsx-a11y equivalents)
             "styled-components-a11y/lang": "off",
             "styled-components-a11y/no-onchange": "off",
-
             "unicorn/no-array-push-push": "off",
-
             // unicorn (deprecated / replaced rules)
             "unicorn/no-instanceof-array": "off",
             "unicorn/no-length-as-slice-end": "off",
