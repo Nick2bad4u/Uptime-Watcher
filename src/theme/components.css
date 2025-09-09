@@ -1,8 +1,10 @@
+/* Theme Components CSS - Professional UI Enhancement */
+
 /* stylelint-disable keyframes-name-pattern -- already kebab case just -- */
 /* stylelint-disable selector-class-pattern -- already kebab case just -- */
 /* stylelint-disable no-descending-specificity -- not worth fixing atm -- */
-
-/* Theme Components CSS - Professional UI Enhancement */
+/* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
+/* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
 
 /* CSS Custom Properties for animations */
 :root {

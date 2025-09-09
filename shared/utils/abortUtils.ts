@@ -380,16 +380,21 @@ export async function raceWithAbort<T>(
         throw new Error("Operation was aborted");
     }
 
-    return Promise.race([
-        operation,
-        new Promise<never>((_resolve, reject) => {
-            signal.addEventListener(
-                "abort",
-                () => {
-                    reject(new Error("Operation was aborted"));
-                },
-                { once: true }
-            );
-        }),
-    ]);
+    // Create abort promise before racing to ensure listener is set up
+    const abortPromise = new Promise<never>((_resolve, reject) => {
+        if (signal.aborted) {
+            reject(new Error("Operation was aborted"));
+            return;
+        }
+
+        signal.addEventListener(
+            "abort",
+            () => {
+                reject(new Error("Operation was aborted"));
+            },
+            { once: true }
+        );
+    });
+
+    return Promise.race([operation, abortPromise]);
 }

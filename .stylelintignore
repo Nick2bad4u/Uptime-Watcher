@@ -1,18 +1,4 @@
-node_modules/
-dist/
-dist-electron/
-release/
-build/
-package.json
-package-lock.json
-.vscode/
-.vscode/settings.json
-# Allow TSX/JSX files to be processed for CSS-in-JS and styled components
-# **/*.js
-# **/*.jsx
-# **/*.ts
-# **/*.tsx
-# Ignore specific directories and build files that don't contain CSS
+# Ignore Scripts and Benchmarks
 scripts/**/*.js
 scripts/**/*.jsx
 scripts/**/*.ts
@@ -21,10 +7,12 @@ benchmarks/**/*.js
 benchmarks/**/*.jsx
 benchmarks/**/*.ts
 benchmarks/**/*.tsx
-**/*.cjs
-**/*.mjs
 scripts/
 icons/
+
+# Ignore non-CSS file types
+**/*.cjs
+**/*.mjs
 **/*.png
 **/*.ps1
 **/*.disabled
@@ -35,7 +23,6 @@ icons/
 **/*.properties
 **/*.svg
 **/*.toml
-license
 **/*.xml
 **/*.yaml
 **/*.desktop
@@ -55,5 +42,55 @@ license
 **/*.jpeg
 **/*.gif
 
+# Ignore dependencies and node modules
+node_modules/
+
+# Ignore build and distribution directories
+dist/
+dist-electron/
+dist-shared/
+dist-benchmark/
+dist**/
+**/dist/** */
+release/
+build/
+
+# Package files
+package.json
+package-lock.json
+# VS Code settings
+.vscode/
+.vscode/settings.json
+
+# Allow TSX/JSX files to be processed for CSS-in-JS and styled components
+# **/*.js
+# **/*.jsx
+# **/*.ts
+# **/*.tsx
+
+# Ignore specific directories and build files that don't contain CSS
+scripts/**/*.js
+scripts/**/*.jsx
+scripts/**/*.ts
+scripts/**/*.tsx
+benchmarks/**/*.js
+benchmarks/**/*.jsx
+benchmarks/**/*.ts
+benchmarks/**/*.tsx
+scripts/
+icons/
+
+# License file
+license
+
+# Stylelint cache files
+**/stylelintcache
+**/.stylelintignore
+**/stylelint.config.mjs
+
+# CNAME file for Github Pages
 CNAME
+
+# Docusaurus static directory
 **/docs/docusaurus/static/eslint-inspector
+**/docs/docusaurus/docusaurus.config.ts

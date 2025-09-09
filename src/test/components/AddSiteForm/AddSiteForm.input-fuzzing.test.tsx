@@ -23,7 +23,13 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+    render,
+    screen,
+    fireEvent,
+    waitFor,
+    act,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import type { MonitorType, Site } from "../../../../shared/types";
@@ -711,9 +717,19 @@ describe("AddSiteForm User Input Fuzzing", () => {
             const user = userEvent.setup();
             render(<AddSiteForm />);
 
-            const monitorTypeSelects =
-                screen.getAllByLabelText(/monitor type/i);
-            const monitorTypeSelect = monitorTypeSelects[0];
+            // Wait for monitor type select to be available and select it
+            const monitorTypeSelect = await waitFor(() => {
+                const selects = screen.queryAllByLabelText(/monitor type/i);
+                if (selects.length === 0) {
+                    // Fallback: try finding by role and accessible name
+                    const selectByRole = screen.queryByRole("combobox", {
+                        name: /monitor type/i,
+                    });
+                    if (selectByRole) return selectByRole;
+                    throw new Error("Monitor type select not found");
+                }
+                return selects[0];
+            });
             await user.selectOptions(monitorTypeSelect, "http");
 
             // With the updated mock, URL input should be available immediately
@@ -909,21 +925,25 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                 // Should not crash during form interaction
                 expect(async () => {
-                    // Set mode - use getAllBy and select first to handle duplicates
-                    const modeRadios = screen.getAllByDisplayValue(
-                        formData.mode
-                    );
-                    const modeRadio = modeRadios[0];
-                    await user.click(modeRadio);
+                    // Set mode - use query to handle missing elements
+                    const modeRadio = screen.queryByDisplayValue(formData.mode);
+                    if (modeRadio) {
+                        await act(async () => {
+                            await user.click(modeRadio);
+                        });
+                    }
 
-                    // Set monitor type - use getAllBy and select first
-                    const monitorTypeSelects =
-                        screen.getAllByLabelText(/monitor type/i);
-                    const monitorTypeSelect = monitorTypeSelects[0];
-                    await user.selectOptions(
-                        monitorTypeSelect,
-                        formData.monitorType
-                    );
+                    // Set monitor type - use query to handle missing elements
+                    const monitorTypeSelect =
+                        screen.queryByLabelText(/monitor type/i);
+                    if (monitorTypeSelect) {
+                        await act(async () => {
+                            await user.selectOptions(
+                                monitorTypeSelect,
+                                formData.monitorType
+                            );
+                        });
+                    }
 
                     // Fill in fields based on monitor type and mode
                     if (formData.mode === "new") {

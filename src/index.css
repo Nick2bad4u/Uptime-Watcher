@@ -20,6 +20,7 @@
 @config "../tailwind.config.mjs";
 
 /* Theme configuration using CSS custom properties */
+
 @theme {
     /* Enhanced animations with modern timing functions */
     --animate-bounce-soft: bounce-soft 0.6s ease-out;
@@ -226,7 +227,8 @@ body {
     background: var(--color-border-secondary, #d1d5db);
     transition: background 0.2s ease;
 
-    &:hover {
+    &:hover,
+    &:focus {
         background: var(--color-text-tertiary, #9ca3af);
     }
 }
@@ -240,7 +242,8 @@ body {
     ::-webkit-scrollbar-thumb {
         background: var(--color-border-primary, #4b5563);
 
-        &:hover {
+        &:hover,
+        &:focus {
             background: var(--color-text-secondary, #d1d5db);
         }
     }

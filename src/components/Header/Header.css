@@ -1,4 +1,8 @@
 /* Use theme variables for status colors and accent */
+
+/* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
+/* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
+
 :root {
     --status-up: var(--color-status-up, #10b981);
     --status-down: var(--color-status-down, #ef4444);

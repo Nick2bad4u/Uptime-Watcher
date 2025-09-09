@@ -276,5 +276,11 @@ export function isValidPort(value: unknown): value is number {
  * @returns True if `value` is a valid timestamp; otherwise, false.
  */
 export function isValidTimestamp(value: unknown): value is number {
-    return isNumber(value) && value > 0 && value <= Date.now() + 86_400_000;
+    if (!isNumber(value) || value <= 0) {
+        return false;
+    }
+
+    // Allow timestamps up to 1 day (86400000ms) in the future
+    const maxFutureTimestamp = Date.now() + 86_400_000;
+    return value <= maxFutureTimestamp;
 }

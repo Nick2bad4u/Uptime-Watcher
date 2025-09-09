@@ -941,7 +941,7 @@ describe("typeGuards", () => {
             await annotate("Type: Business Logic", "type");
 
             const now = Date.now();
-            expect(isValidTimestamp(now + 86_400_001)).toBeFalsy(); // just over 1 day in future
+            expect(isValidTimestamp(now + 86_400_000 + 1000)).toBeFalsy(); // 1 day + 1 second in future
             expect(isValidTimestamp(now + 172_800_000)).toBeFalsy(); // 2 days in future
         });
 

@@ -379,9 +379,9 @@ const config: Config = {
                     type: "docSidebar",
                 },
                 {
-                    href: "https://github.com/Nick2bad4u/Uptime-Watcher/eslint-inspector/",
-                    label: "ESLint",
                     position: "left",
+                    type: "html",
+                    value: '<a href="https://nick2bad4u.github.io/Uptime-Watcher/eslint-inspector/" target="_blank" rel="noopener noreferrer">ESLint</a>',
                 },
                 {
                     className: "persistent",

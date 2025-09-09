@@ -39,6 +39,30 @@
         inset-inline: 0;
         opacity: 0.1;
         pointer-events: none;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            position: absolute;
+            animation: none;
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent 98%,
+                    #27e34f 99%,
+                    transparent 100%
+                ),
+                linear-gradient(
+                    180deg,
+                    transparent 98%,
+                    #27e34f 99%,
+                    transparent 100%
+                );
+            background-size: 20px 20px;
+            content: "";
+            inset-block: 0;
+            inset-inline: 0;
+            opacity: 0.1;
+            pointer-events: none;
+        }
     }
 
     /* Add floating particles effect */
@@ -78,6 +102,44 @@
         inline-size: 100%;
         opacity: 0.15;
         pointer-events: none;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            position: absolute;
+            animation: none;
+            background-image:
+                radial-gradient(
+                    2px 2px at 20px 30px,
+                    rgb(39 227 79 / 30%),
+                    transparent
+                ),
+                radial-gradient(
+                    2px 2px at 40px 70px,
+                    rgb(65 176 89 / 30%),
+                    transparent
+                ),
+                radial-gradient(
+                    1px 1px at 90px 40px,
+                    rgb(120 227 39 / 40%),
+                    transparent
+                ),
+                radial-gradient(
+                    1px 1px at 130px 80px,
+                    rgb(39 227 79 / 30%),
+                    transparent
+                ),
+                radial-gradient(
+                    2px 2px at 160px 30px,
+                    rgb(65 176 89 / 30%),
+                    transparent
+                );
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            block-size: 100%;
+            content: "";
+            inline-size: 100%;
+            opacity: 0.15;
+            pointer-events: none;
+        }
     }
 }
 
@@ -158,9 +220,26 @@
         inset-block-start: 0;
         inset-inline-start: -100%;
         transition: inset-inline-start 0.5s ease;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            position: absolute;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgb(255 255 255 / 30%),
+                transparent
+            );
+            block-size: 100%;
+            content: "";
+            inline-size: 100%;
+            inset-block-start: 0;
+            inset-inline-start: -100%;
+            transition: none;
+        }
     }
 
-    &:hover {
+    &:hover,
+    &:focus {
         background: #fff;
         box-shadow: 0 0 30px rgb(255 255 255 / 50%);
         color: #000;
@@ -168,6 +247,52 @@
 
         &::before {
             inset-inline-start: 100%;
+        }
+    }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        position: relative;
+        overflow: hidden;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 0;
+        background: #71b041;
+        box-shadow: 0 0 20px rgb(113 176 65 / 30%);
+        color: #000;
+        font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        transition: none;
+
+        /* Add shimmer effect */
+        &::before {
+            position: absolute;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgb(255 255 255 / 30%),
+                transparent
+            );
+            block-size: 100%;
+            content: "";
+            inline-size: 100%;
+            inset-block-start: 0;
+            inset-inline-start: -100%;
+            transition: inset-inline-start 0.5s ease;
+        }
+
+        &:hover,
+        &:focus {
+            background: #fff;
+            box-shadow: 0 0 30px rgb(255 255 255 / 50%);
+            color: #000;
+            transform: translateY(-3px) scale(1.05);
+
+            &::before {
+                inset-inline-start: 100%;
+            }
         }
     }
 }
@@ -203,9 +328,32 @@
     text-align: center;
     transition: all 0.2s ease;
 
-    &:hover {
+    &:hover,
+    &:focus {
         background: rgb(255 255 255 / 15%);
         transform: translateY(-1px);
+    }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        border: 1px solid rgb(255 255 255 / 20%);
+        border-radius: 4px;
+        background: rgb(255 255 255 / 10%);
+        block-size: auto;
+        font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+        font-size: 0.9rem;
+        min-inline-size: 120px;
+        text-align: center;
+        transition: none;
+
+        &:hover,
+        &:focus {
+            background: rgb(255 255 255 / 15%);
+            transform: translateY(-1px);
+        }
     }
 }
 
@@ -269,9 +417,31 @@
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.3s ease;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            position: absolute;
+            border-radius: inherit;
+            animation: none;
+            background: linear-gradient(
+                45deg,
+                rgb(39 227 79 / 10%) 0%,
+                rgb(65 176 89 / 10%) 25%,
+                rgb(120 227 39 / 10%) 50%,
+                rgb(39 227 79 / 10%) 75%,
+                rgb(65 176 89 / 10%) 100%
+            );
+            background-size: 200% 200%;
+            content: "";
+            inset-block: 0;
+            inset-inline: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: none;
+        }
     }
 
-    &:hover {
+    &:hover,
+    &:focus {
         box-shadow:
             0 20px 50px rgb(0 0 0 / 80%),
             0 0 0 1px rgb(39 227 79 / 30%);
@@ -280,6 +450,54 @@
 
         &::before {
             opacity: 1;
+        }
+    }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #1a1a1a;
+        box-shadow:
+            0 8px 32px rgb(0 0 0 / 60%),
+            0 0 0 1px rgb(255 255 255 / 10%);
+        inline-size: 100%;
+        max-inline-size: 500px;
+        transition: none;
+
+        /* Add holographic effect */
+        &::before {
+            position: absolute;
+            border-radius: inherit;
+            animation: holographicShift 4s ease-in-out infinite;
+            background: linear-gradient(
+                45deg,
+                rgb(39 227 79 / 10%) 0%,
+                rgb(65 176 89 / 10%) 25%,
+                rgb(120 227 39 / 10%) 50%,
+                rgb(39 227 79 / 10%) 75%,
+                rgb(65 176 89 / 10%) 100%
+            );
+            background-size: 200% 200%;
+            content: "";
+            inset-block: 0;
+            inset-inline: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        &:hover,
+        &:focus {
+            box-shadow:
+                0 20px 50px rgb(0 0 0 / 80%),
+                0 0 0 1px rgb(39 227 79 / 30%);
+            transform: translateY(-10px) perspective(1000px) rotateX(5deg)
+                rotateY(5deg);
+
+            &::before {
+                opacity: 1;
+            }
         }
     }
 }
@@ -355,8 +573,25 @@
     font-size: 0.8rem;
     transition: all 0.2s ease;
 
-    &:hover {
+    &:hover,
+    &:focus {
         background: #fff;
+    }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        padding: 0.5rem 1rem;
+        border: none;
+        background: #71b041;
+        color: #000;
+        cursor: pointer;
+        font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+        font-size: 0.8rem;
+        transition: none;
+
+        &:hover,
+        &:focus {
+            background: #fff;
+        }
     }
 }
 
@@ -402,6 +637,33 @@
             content: "";
             inset-block: -4px;
             inset-inline: -4px;
+
+            @media screen and (prefers-reduced-motion: reduce) {
+                position: absolute;
+                border: 2px solid rgb(39 227 79 / 30%);
+                border-radius: 50%;
+                animation: none;
+                content: "";
+                inset-block: -4px;
+                inset-inline: -4px;
+            }
+        }
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            animation: none;
+            background: #27e34f;
+            box-shadow: 0 0 4px rgb(39 227 79 / 50%);
+
+            /* Add expanding ring effect */
+            &::after {
+                position: absolute;
+                border: 2px solid rgb(39 227 79 / 30%);
+                border-radius: 50%;
+                animation: statusPulse 2s ease-in-out infinite reverse;
+                content: "";
+                inset-block: -4px;
+                inset-inline: -4px;
+            }
         }
     }
 
@@ -418,6 +680,32 @@
             content: "";
             inset-block: -4px;
             inset-inline: -4px;
+
+            @media screen and (prefers-reduced-motion: reduce) {
+                position: absolute;
+                border: 2px solid rgb(255 68 68 / 30%);
+                border-radius: 50%;
+                animation: none;
+                content: "";
+                inset-block: -4px;
+                inset-inline: -4px;
+            }
+        }
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            animation: none;
+            background: #f44;
+            box-shadow: 0 0 4px rgb(255 68 68 / 50%);
+
+            &::after {
+                position: absolute;
+                border: 2px solid rgb(255 68 68 / 30%);
+                border-radius: 50%;
+                animation: statusPulse 1s ease-in-out infinite reverse;
+                content: "";
+                inset-block: -4px;
+                inset-inline: -4px;
+            }
         }
     }
 }
@@ -529,6 +817,23 @@
         inset-block-end: -10px;
         inset-inline-start: 50%;
         transform: translateX(-50%);
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            position: absolute;
+            animation: none;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                #71b041,
+                transparent
+            );
+            block-size: 2px;
+            content: "";
+            inline-size: 100px;
+            inset-block-end: -10px;
+            inset-inline-start: 50%;
+            transform: translateX(-50%);
+        }
     }
 }
 
@@ -559,6 +864,22 @@
         inset-block-start: 0;
         inset-inline-start: -100%;
         transition: inset-inline-start 0.8s ease;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            position: absolute;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                #71b041,
+                transparent
+            );
+            block-size: 2px;
+            content: "";
+            inline-size: 100%;
+            inset-block-start: 0;
+            inset-inline-start: -100%;
+            transition: none;
+        }
     }
 
     /* Add depth with pseudo-shadow */
@@ -575,9 +896,25 @@
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.4s ease;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            position: absolute;
+            background: linear-gradient(
+                135deg,
+                rgb(113 176 65 / 5%),
+                transparent 50%
+            );
+            content: "";
+            inset-block: 0;
+            inset-inline: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: none;
+        }
     }
 
-    &:hover {
+    &:hover,
+    &:focus {
         border-color: #71b041;
         background: linear-gradient(135deg, #1a1a1a, #202020);
         box-shadow:
@@ -597,14 +934,100 @@
     /* Add staggered entrance animation */
     &:nth-child(1) {
         animation: slideInUp 0.6s ease-out 0.1s both;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            animation: none;
+        }
     }
 
     &:nth-child(2) {
         animation: slideInUp 0.6s ease-out 0.2s both;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            animation: none;
+        }
     }
 
     &:nth-child(3) {
         animation: slideInUp 0.6s ease-out 0.3s both;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            animation: none;
+        }
+    }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        position: relative;
+        overflow: hidden;
+        padding: 2rem;
+        border: 1px solid #333;
+        border-radius: 8px;
+        background: #1a1a1a;
+        transition: none;
+
+        /* Add subtle scanning effect */
+        &::before {
+            position: absolute;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                #71b041,
+                transparent
+            );
+            block-size: 2px;
+            content: "";
+            inline-size: 100%;
+            inset-block-start: 0;
+            inset-inline-start: -100%;
+            transition: inset-inline-start 0.8s ease;
+        }
+
+        /* Add depth with pseudo-shadow */
+        &::after {
+            position: absolute;
+            background: linear-gradient(
+                135deg,
+                rgb(113 176 65 / 5%),
+                transparent 50%
+            );
+            content: "";
+            inset-block: 0;
+            inset-inline: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        &:hover,
+        &:focus {
+            border-color: #71b041;
+            background: linear-gradient(135deg, #1a1a1a, #202020);
+            box-shadow:
+                0 8px 32px rgb(113 176 65 / 20%),
+                0 0 0 1px rgb(113 176 65 / 30%);
+            transform: translateY(-8px) scale(1.02);
+
+            &::before {
+                inset-inline-start: 100%;
+            }
+
+            &::after {
+                opacity: 1;
+            }
+        }
+
+        /* Add staggered entrance animation */
+        &:nth-child(1) {
+            animation: slideInUp 0.6s ease-out 0.1s both;
+        }
+
+        &:nth-child(2) {
+            animation: slideInUp 0.6s ease-out 0.2s both;
+        }
+
+        &:nth-child(3) {
+            animation: slideInUp 0.6s ease-out 0.3s both;
+        }
     }
 }
 
@@ -675,9 +1098,21 @@
         inset-inline-start: -3px;
         opacity: 0;
         transition: opacity 0.3s ease;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            position: absolute;
+            background: linear-gradient(180deg, #71b041, #27e34f, #41b059);
+            content: "";
+            inline-size: 3px;
+            inset-block: 0;
+            inset-inline-start: -3px;
+            opacity: 0;
+            transition: none;
+        }
     }
 
-    &:hover {
+    &:hover,
+    &:focus {
         padding: 1rem 1rem 1rem 1.5rem;
         border-radius: 8px;
         background: linear-gradient(90deg, rgb(113 176 65 / 10%), transparent);
@@ -687,6 +1122,11 @@
         &::before {
             animation: dataFlow 1s ease-in-out;
             opacity: 1;
+
+            @media screen and (prefers-reduced-motion: reduce) {
+                animation: none;
+                opacity: 1;
+            }
         }
     }
 
@@ -696,11 +1136,25 @@
         font-size: 1.1rem;
         margin-block-end: 0.5rem;
         transition: color 0.3s ease;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            display: block;
+            color: #fff;
+            font-size: 1.1rem;
+            margin-block-end: 0.5rem;
+            transition: none;
+        }
     }
 
-    &:hover strong {
+    &:hover strong,
+    &:focus strong {
         animation: neonFlicker 2s ease-in-out infinite;
         color: #27e34f;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            animation: none;
+            color: #27e34f;
+        }
     }
 
     & p {
@@ -708,10 +1162,86 @@
         color: #ccc;
         font-size: 0.95rem;
         transition: color 0.3s ease;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            margin: 0;
+            color: #ccc;
+            font-size: 0.95rem;
+            transition: none;
+        }
     }
 
-    &:hover p {
+    &:hover p,
+    &:focus p {
         color: #fff;
+    }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        position: relative;
+        border-inline-start: 3px solid #71b041;
+        padding-inline-start: 1.5rem;
+        transition: none;
+
+        /* Add hover glow effect */
+        &::before {
+            position: absolute;
+            background: linear-gradient(180deg, #71b041, #27e34f, #41b059);
+            content: "";
+            inline-size: 3px;
+            inset-block: 0;
+            inset-inline-start: -3px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        &:hover,
+        &:focus {
+            padding: 1rem 1rem 1rem 1.5rem;
+            border-radius: 8px;
+            background: linear-gradient(
+                90deg,
+                rgb(113 176 65 / 10%),
+                transparent
+            );
+            margin-inline-start: -1rem;
+            transform: translateX(10px);
+
+            &::before {
+                animation: dataFlow 1s ease-in-out;
+                opacity: 1;
+
+                @media screen and (prefers-reduced-motion: reduce) {
+                    animation: none;
+                    opacity: 1;
+                }
+            }
+        }
+
+        & strong {
+            display: block;
+            color: #fff;
+            font-size: 1.1rem;
+            margin-block-end: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        &:hover strong,
+        &:focus strong {
+            animation: neonFlicker 2s ease-in-out infinite;
+            color: #27e34f;
+        }
+
+        & p {
+            margin: 0;
+            color: #ccc;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        &:hover p,
+        &:focus p {
+            color: #fff;
+        }
     }
 }
 
@@ -745,15 +1275,69 @@
         inset-block: 0;
         inset-inline: 0;
         pointer-events: none;
+
+        @media screen and (prefers-reduced-motion: reduce) {
+            position: absolute;
+            animation: none;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgb(39 227 79 / 3%) 2px,
+                rgb(39 227 79 / 3%) 4px
+            );
+            content: "";
+            inset-block: 0;
+            inset-inline: 0;
+            pointer-events: none;
+        }
     }
 
-    &:hover {
+    &:hover,
+    &:focus {
         border-color: #71b041;
         box-shadow: 0 0 20px rgb(113 176 65 / 30%);
         transform: scale(1.02);
 
         &::before {
             animation-duration: 2s;
+        }
+    }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #333;
+        border-radius: 8px;
+        background: #1a1a1a;
+        transition: none;
+
+        /* Add matrix-style effect */
+        &::before {
+            position: absolute;
+            animation: codeScroll 10s linear infinite;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgb(39 227 79 / 3%) 2px,
+                rgb(39 227 79 / 3%) 4px
+            );
+            content: "";
+            inset-block: 0;
+            inset-inline: 0;
+            pointer-events: none;
+        }
+
+        &:hover,
+        &:focus {
+            border-color: #71b041;
+            box-shadow: 0 0 20px rgb(113 176 65 / 30%);
+            transform: scale(1.02);
+
+            &::before {
+                animation-duration: 2s;
+            }
         }
     }
 }
@@ -781,13 +1365,26 @@
     font-weight: 500;
     text-decoration: none;
     transition: all 0.2s ease;
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        padding: 0.25rem 0.5rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: inherit, system-ui, sans-serif;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: none;
+    }
 }
 
 .copyButton {
     background: #444;
     color: #ccc;
 
-    &:hover {
+    &:hover,
+    &:focus {
         background: #555;
         transform: translateY(-1px);
     }
@@ -802,7 +1399,8 @@
     color: #fff;
 }
 
-.viewButton:hover {
+.viewButton:hover,
+.viewButton:focus {
     background: #0052a3;
     color: #fff;
     text-decoration: none;
@@ -1136,7 +1734,9 @@
     }
 
     .primaryButton:hover,
-    .secondaryButton:hover {
+    .secondaryButton:hover,
+    .primaryButton:focus,
+    .secondaryButton:focus {
         animation: none;
     }
 }
@@ -1266,7 +1866,9 @@
 }
 
 [data-theme="light"] .primaryButton:hover,
-[data-theme="light"] .addButton:hover {
+[data-theme="light"] .addButton:hover,
+[data-theme="light"] .primaryButton:focus,
+[data-theme="light"] .addButton:focus {
     background: #049;
 }
 
@@ -1275,7 +1877,8 @@
     background: transparent;
     color: #06c;
 
-    &:hover {
+    &:hover,
+    &:focus {
         background: #06c;
         color: #fff;
     }
@@ -1348,13 +1951,24 @@
     font-size: 0.9rem;
     font-weight: 500;
     transition: all 0.2s ease;
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: none;
+    }
 }
 
 .modalButtonCancel {
     background: #444;
     color: #fff;
 
-    &:hover {
+    &:hover,
+    &:focus {
         background: #555;
     }
 }
@@ -1374,7 +1988,8 @@
     border: 1px solid #dee2e6;
     background: #fff;
 
-    &:hover {
+    &:hover,
+    &:focus {
         border-color: #06c;
         box-shadow: 0 4px 20px rgb(0 102 204 / 10%);
     }
@@ -1413,7 +2028,8 @@
     background: #e9ecef;
     color: #495057;
 
-    &:hover {
+    &:hover,
+    &:focus {
         background: #dee2e6;
     }
 }
@@ -1451,7 +2067,8 @@
     background: linear-gradient(180deg, #06c, #28a745, #17a2b8);
 }
 
-[data-theme="light"] .techFeature:hover {
+[data-theme="light"] .techFeature:hover,
+[data-theme="light"] .techFeature:focus {
     background: linear-gradient(90deg, rgb(6 102 204 / 10%), transparent);
 
     & strong {
@@ -1506,6 +2123,28 @@
     &::placeholder {
         color: #888;
     }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        padding: 0.75rem;
+        border: 1px solid #444;
+        border-radius: 6px;
+        background: #1a1a1a;
+        color: #fff;
+        font-size: 1rem;
+        inline-size: 100%;
+        margin-block-end: 1.5rem;
+        transition: none;
+
+        &:focus {
+            border-color: #06c;
+            box-shadow: 0 0 0 2px rgb(0 102 204 / 20%);
+            outline: none;
+        }
+
+        &::placeholder {
+            color: #888;
+        }
+    }
 }
 
 .modalButtons {
@@ -1515,10 +2154,8 @@
 }
 
 /* Light theme modal styles */
-[data-theme="light"] .modal {
-    & h3 {
-        color: #212529;
-    }
+[data-theme="light"] .modal h3 {
+    color: #212529;
 }
 
 /* Scroll Reveal Animation Classes */
@@ -1531,6 +2168,17 @@
         opacity: 1;
         transform: translateY(0);
     }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: none;
+
+        &.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 }
 
 .scrollRevealLeft {
@@ -1542,6 +2190,17 @@
         opacity: 1;
         transform: translateX(0);
     }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        opacity: 0;
+        transform: translateX(-30px);
+        transition: none;
+
+        &.revealed {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
 }
 
 .scrollRevealRight {
@@ -1552,6 +2211,17 @@
     &.revealed {
         opacity: 1;
         transform: translateX(0);
+    }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        opacity: 0;
+        transform: translateX(30px);
+        transition: none;
+
+        &.revealed {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 }
 
