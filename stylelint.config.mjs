@@ -13,7 +13,9 @@
  * - CSS Modules
  * - SCSS/Sass files
  */
+
 /** @type {import("stylelint").Config} */
+
 // eslint-disable-next-line n/no-unpublished-import, import-x/no-named-as-default -- dev tools
 import defineConfig from "stylelint-define-config";
 

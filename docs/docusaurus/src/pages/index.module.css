@@ -2160,7 +2160,7 @@
 
 /* Scroll Reveal Animation Classes */
 .scrollReveal {
-    opacity: 0;
+    opacity: 1;
     transform: translateY(30px);
     transition: all 0.6s ease-out;
 
@@ -2182,7 +2182,7 @@
 }
 
 .scrollRevealLeft {
-    opacity: 0;
+    opacity: 1;
     transform: translateX(-30px);
     transition: all 0.6s ease-out;
 
@@ -2204,7 +2204,7 @@
 }
 
 .scrollRevealRight {
-    opacity: 0;
+    opacity: 1;
     transform: translateX(30px);
     transition: all 0.6s ease-out;
 
