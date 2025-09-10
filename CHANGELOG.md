@@ -7,14 +7,77 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[0e67c43](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0e67c43da2d0f239f649f396330ebdbd919416e1)...
-[0e67c43](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0e67c43da2d0f239f649f396330ebdbd919416e1)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0e67c43da2d0f239f649f396330ebdbd919416e1...0e67c43da2d0f239f649f396330ebdbd919416e1))
+[[417620b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/417620bbd73fd8bc3a1c6ff05b564c444b760b31)...
+[417620b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/417620bbd73fd8bc3a1c6ff05b564c444b760b31)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/417620bbd73fd8bc3a1c6ff05b564c444b760b31...417620bbd73fd8bc3a1c6ff05b564c444b760b31))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 14.1.0 [`(417620b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/417620bbd73fd8bc3a1c6ff05b564c444b760b31)
+
+
+
+
+
+
+## [14.1.0] - 2025-09-10
+
+
+[[e1bb06f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e1bb06f88f79cab9113cc9b876cc7655adf1c220)...
+[e8f173f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e8f173f92ed63e2c330353855e2d3f3d501f33d4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e1bb06f88f79cab9113cc9b876cc7655adf1c220...e8f173f92ed63e2c330353855e2d3f3d501f33d4))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 14.0.0 [`(0e67c43)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0e67c43da2d0f239f649f396330ebdbd919416e1)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Add rich project docs, accessibility, and mascot assets
+
+- Introduces a comprehensive documentation page with project overview, badges, screenshots, architecture, and contribution guidelines for improved onboarding and transparency
+- Adds accessibility-focused CSS for reduced motion, refines button and print styles, and improves sidebar layout for better usability
+- Includes high-res mascot images for branding and visual identity
+- Updates Docusaurus config for sidebar and favicon, tweaks menu links for clarity
+- Improves code and settings timer management to prevent memory leaks and ensure proper cleanup
+- Enhances clipboard and theme logic for better user feedback and accessibility
+- Adds property-based tests for utility functions to boost test coverage and reliability
+- Applies stricter error handling and prototype pollution protection to utility modules
+- Refines ignore files and CI/test configs to better support docs and robust testing workflows
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0340ad9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0340ad93c739dde461294c3827416f121f8f7cc2)
+
+
+
+### 🧹 Chores
+
+- Update dependencies and improve error handling [`(e8f173f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e8f173f92ed63e2c330353855e2d3f3d501f33d4)
+
+
+- Update changelogs for v14.0.0 [skip ci] [`(ec911c9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec911c96d6069e26e780380487a0b5780061c411)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Normalize output path separators in build scripts
+
+- Updates build scripts to use forward slashes and quoted paths for output directories, ensuring cross-platform compatibility and preventing issues on non-Windows systems. [skip-ci]
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1775202)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1775202b2fb161fec2240b280f75c301a2e2724b)
+
+
+- 🔧 [build] Update dev dependencies and fix scroll reveal styles
+
+- Upgrades multiple dev dependencies to latest versions for improved linting, formatting, and build reliability.
+- Sets scroll reveal animation classes to visible by default to address potential visibility or animation issues.
+- Updates stylelint configuration formatting for clarity and consistency.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e1bb06f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e1bb06f88f79cab9113cc9b876cc7655adf1c220)
 
 
 
