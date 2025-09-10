@@ -23,9 +23,8 @@
         "@docusaurus/theme-live-codeblock": "3.8.1",
         "@docusaurus/theme-mermaid": "3.8.1",
         "@docusaurus/theme-search-algolia": "3.8.1",
-        "@docusaurus/types": "3.8.1",
         "@easyops-cn/docusaurus-search-local": "^0.52.1",
-        "@mdx-js/react": "^3.1.0",
+        "@mdx-js/react": "^3.1.1",
         "clsx": "^2.1.1",
         "docusaurus-plugin-copy-page-button": "^0.3.4",
         "docusaurus-plugin-image-zoom": "^3.0.1",
@@ -33,13 +32,14 @@
         "prism-react-renderer": "^2.4.1",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
-        "react-github-btn": "^1.4.0"
+        "react-github-btn": "^1.4.0",
+        "@docusaurus/types": "^3.8.1"
     },
     "description": "Documentation site for Uptime Watcher using Docusaurus",
     "devDependencies": {
-        "@docusaurus/module-type-aliases": "3.8.1",
-        "@docusaurus/tsconfig": "3.8.1",
-        "typedoc": "^0.28.10",
+        "@docusaurus/module-type-aliases": "^3.8.1",
+        "@docusaurus/tsconfig": "^3.8.1",
+        "typedoc": "^0.28.12",
         "typedoc-docusaurus-theme": "^1.4.2",
         "typedoc-plugin-markdown": "^4.8.1",
         "typescript": "~5.9.2"

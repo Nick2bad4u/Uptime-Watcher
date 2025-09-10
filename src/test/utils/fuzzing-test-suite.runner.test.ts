@@ -272,7 +272,10 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                         let score = 0;
 
                         // Coverage weight: 40%
-                        score += (metrics.coverage / 100) * 40;
+                        const coverage = Number.isNaN(metrics.coverage)
+                            ? 0
+                            : metrics.coverage;
+                        score += (coverage / 100) * 40;
 
                         // Performance weight: 30%
                         const avgTime = Number.isNaN(

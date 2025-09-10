@@ -169,37 +169,53 @@ const loggerInstance: LoggerInterface = {
     },
     // Debug level - for development debugging
     debug: (message: string, ...args: unknown[]): void => {
-        if (args.length > 0) {
-            log.debug(`[UPTIME-WATCHER] ${message}`, ...args);
-        } else {
-            log.debug(`[UPTIME-WATCHER] ${message}`);
+        try {
+            if (args.length > 0) {
+                log.debug(`[UPTIME-WATCHER] ${message}`, ...args);
+            } else {
+                log.debug(`[UPTIME-WATCHER] ${message}`);
+            }
+        } catch {
+            // Silently ignore logging errors to prevent application crashes
         }
     },
     // Error level - errors that should be investigated
     error: (message: string, error?: Error, ...args: unknown[]): void => {
-        if (error instanceof Error) {
-            const errorData = {
-                message: error.message,
-                name: error.name,
-                stack: error.stack,
-            };
-            if (args.length > 0) {
-                log.error(`[UPTIME-WATCHER] ${message}`, errorData, ...args);
+        try {
+            if (error instanceof Error) {
+                const errorData = {
+                    message: error.message,
+                    name: error.name,
+                    stack: error.stack,
+                };
+                if (args.length > 0) {
+                    log.error(
+                        `[UPTIME-WATCHER] ${message}`,
+                        errorData,
+                        ...args
+                    );
+                } else {
+                    log.error(`[UPTIME-WATCHER] ${message}`, errorData);
+                }
+            } else if (args.length > 0) {
+                log.error(`[UPTIME-WATCHER] ${message}`, ...args);
             } else {
-                log.error(`[UPTIME-WATCHER] ${message}`, errorData);
+                log.error(`[UPTIME-WATCHER] ${message}`);
             }
-        } else if (args.length > 0) {
-            log.error(`[UPTIME-WATCHER] ${message}`, ...args);
-        } else {
-            log.error(`[UPTIME-WATCHER] ${message}`);
+        } catch {
+            // Silently ignore logging errors to prevent application crashes
         }
     },
     // Info level - general application flow
     info: (message: string, ...args: unknown[]): void => {
-        if (args.length > 0) {
-            log.info(`[UPTIME-WATCHER] ${message}`, ...args);
-        } else {
-            log.info(`[UPTIME-WATCHER] ${message}`);
+        try {
+            if (args.length > 0) {
+                log.info(`[UPTIME-WATCHER] ${message}`, ...args);
+            } else {
+                log.info(`[UPTIME-WATCHER] ${message}`);
+            }
+        } catch {
+            // Silently ignore logging errors to prevent application crashes
         }
     },
     /**
@@ -302,10 +318,14 @@ const loggerInstance: LoggerInterface = {
     },
     // Warn level - something unexpected but not an error
     warn: (message: string, ...args: unknown[]): void => {
-        if (args.length > 0) {
-            log.warn(`[UPTIME-WATCHER] ${message}`, ...args);
-        } else {
-            log.warn(`[UPTIME-WATCHER] ${message}`);
+        try {
+            if (args.length > 0) {
+                log.warn(`[UPTIME-WATCHER] ${message}`, ...args);
+            } else {
+                log.warn(`[UPTIME-WATCHER] ${message}`);
+            }
+        } catch {
+            // Silently ignore logging errors to prevent application crashes
         }
     },
 };

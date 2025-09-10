@@ -822,7 +822,7 @@
     "fast-check": "^4.3.0",
     "fs-extra": "^11.3.1",
     "git-cliff": "^2.10.0",
-    "globals": "^16.3.0",
+    "globals": "^16.4.0",
     "globals-vitest": "^3.2.4",
     "husky": "^9.1.7",
     "jiti": "^2.5.1",
