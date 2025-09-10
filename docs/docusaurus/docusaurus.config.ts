@@ -90,20 +90,20 @@ const config: Config = {
                 }, */
             },
         ],
-        [
-            "@grnet/docusaurus-terminology",
-            {
-                // Directory containing all documentation files to process
-                docsDir: "./docs",
-                // Path to the glossary file that will be auto-generated
-                glossaryFilepath: "./docs/glossary.md",
-                // Directory containing term definition files
-                termsDir: "./docs/terms",
-                // Optional: Custom component paths (uncomment if needed)
-                // glossaryComponentPath: "relative/path/to/your/glossary-component",
-                // termPreviewComponentPath: "relative/path/to/your/term-preview-component",
-            },
-        ],
+        // [
+        //     "@grnet/docusaurus-terminology",
+        //     {
+        //         // Directory containing all documentation files to process
+        //         docsDir: "./docs",
+        //         // Path to the glossary file that will be auto-generated
+        //         glossaryFilepath: "./docs/glossary.md",
+        //         // Directory containing term definition files
+        //         termsDir: "./docs/terms",
+        //         // Optional: Custom component paths (uncomment if needed)
+        //         // glossaryComponentPath: "relative/path/to/your/glossary-component",
+        //         // termPreviewComponentPath: "relative/path/to/your/term-preview-component",
+        //     },
+        // ],
         [
             "@easyops-cn/docusaurus-search-local",
             {

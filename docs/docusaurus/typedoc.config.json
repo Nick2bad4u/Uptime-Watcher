@@ -314,7 +314,8 @@
         "../../docs/Architecture/**/*.md",
         "../../docs/Guides/**/*.md",
         "../../docs/TSDoc/**/*.md",
-        "../../docs/Packages/**/*.md"
+        "../../docs/Packages/**/*.md",
+        "../../README.md"
     ],
     "readme": "../../README.md",
     "replaceText": {

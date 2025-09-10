@@ -98,13 +98,31 @@ const incrementCountByStatus = (
  * @returns Monitor counts object with status breakdown for the site
  */
 const countMonitorsInSite = (
-    site: Site
+    site: unknown
 ): ReturnType<typeof initializeMonitorCounts> => {
     const counts = initializeMonitorCounts();
-    const monitors = (site.monitors as Monitor[] | null | undefined) ?? [];
+
+    // Defensive programming: handle null/undefined sites
+    if (!site || typeof site !== "object") {
+        return counts;
+    }
+
+    // Type guard: ensure site has monitors property
+    const siteObj = site as { monitors?: Monitor[] | null | undefined };
+    const monitors = Array.isArray(siteObj.monitors) ? siteObj.monitors : [];
 
     for (const monitor of monitors) {
-        incrementCountByStatus(counts, monitor.status);
+        // Defensive programming: handle null/undefined monitors
+        const monitorObj = monitor as null | undefined | { status?: string };
+        if (
+            !monitorObj ||
+            typeof monitorObj !== "object" ||
+            !monitorObj.status
+        ) {
+            // Skip invalid monitors
+        } else {
+            incrementCountByStatus(counts, monitorObj.status);
+        }
     }
 
     return counts;
@@ -118,11 +136,17 @@ const countMonitorsInSite = (
  * @returns Total monitor counts object with combined status breakdown
  */
 const aggregateMonitorCounts = (
-    sites: Site[]
+    sites: null | readonly Site[] | undefined
 ): ReturnType<typeof initializeMonitorCounts> => {
     const totalCounts = initializeMonitorCounts();
 
+    // Defensive programming: handle null/undefined sites array
+    if (!sites || !Array.isArray(sites)) {
+        return totalCounts;
+    }
+
     for (const site of sites) {
+        // Defensive programming: countMonitorsInSite handles type validation internally
         const siteCounts = countMonitorsInSite(site);
         totalCounts.down += siteCounts.down;
         totalCounts.paused += siteCounts.paused;

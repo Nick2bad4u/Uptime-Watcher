@@ -576,3 +576,5 @@ eslint-inspector-local-test/
 docs/docusaurus/docs/typedoc-sidebar.cjs
 docs/docusaurus/docs/.nojekyll
 docs/docusaurus/docs/coverage.svg
+docs/docusaurus/docs/index.md
+docs/docusaurus/docs/modules.md

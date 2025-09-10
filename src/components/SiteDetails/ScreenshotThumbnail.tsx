@@ -8,7 +8,7 @@
 
 import type { JSX, MouseEvent } from "react";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { useUIStore } from "../../stores/ui/useUiStore";
@@ -44,10 +44,16 @@ export const ScreenshotThumbnail = ({
     url,
 }: ScreenshotThumbnailProperties): JSX.Element => {
     const [hovered, setHovered] = useState(false);
+    const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
     const linkReference = useRef<HTMLAnchorElement>(null);
-    const timeoutRef = useRef<NodeJS.Timeout | undefined>();
+    const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
     const { themeName } = useTheme();
     const { openExternal } = useUIStore();
+
+    // Set portal container after component mounts to avoid SSR issues
+    useEffect(() => {
+        setPortalContainer(document.body);
+    }, []);
 
     // Calculate safe values using useMemo to avoid infinite loops
     const safeUrl = useMemo(
@@ -71,6 +77,46 @@ export const ScreenshotThumbnail = ({
     const ariaLabel = useMemo(
         () => (safeUrl ? `Open ${safeUrl} in browser` : "Open in browser"),
         [safeUrl]
+    );
+
+    // Memoized style objects to prevent unnecessary re-renders
+    const portalOverlayStyle = useMemo(
+        () => ({
+            left: "50%",
+            maxHeight: "80vh",
+            maxWidth: "80vw",
+            pointerEvents: "none" as const,
+            position: "fixed" as const,
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 9999,
+        }),
+        []
+    );
+
+    const portalImageStyle = useMemo(
+        () => ({
+            borderRadius: "8px",
+            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)",
+            display: "block",
+            maxHeight: "100%",
+            maxWidth: "100%",
+        }),
+        []
+    );
+
+    const placeholderStyle = useMemo(
+        () => ({
+            alignItems: "center" as const,
+            backgroundColor: "var(--color-neutral-200)",
+            color: "var(--color-neutral-600)",
+            display: "flex" as const,
+            fontSize: "12px",
+            height: "60px",
+            justifyContent: "center" as const,
+            width: "100px",
+        }),
+        []
     );
 
     const handleClick = useCallback(
@@ -120,36 +166,21 @@ export const ScreenshotThumbnail = ({
 
     // Simple portal - let CSS handle positioning to avoid complex state management
     const portalJSX =
-        hovered && screenshotUrl
+        hovered && screenshotUrl && portalContainer
             ? createPortal(
                   <div
                       className={`site-details-thumbnail-portal-overlay theme-${themeName}`}
-                      style={{
-                          left: "50%",
-                          maxHeight: "80vh",
-                          maxWidth: "80vw",
-                          pointerEvents: "none",
-                          position: "fixed",
-                          top: "50%",
-                          transform: "translate(-50%, -50%)",
-                          zIndex: 9999,
-                      }}
+                      style={portalOverlayStyle}
                   >
                       <img
                           alt={`Large screenshot of ${safeSiteName}`}
                           className="site-details-thumbnail-img-portal"
                           loading="lazy"
                           src={screenshotUrl}
-                          style={{
-                              borderRadius: "8px",
-                              boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)",
-                              display: "block",
-                              maxHeight: "100%",
-                              maxWidth: "100%",
-                          }}
+                          style={portalImageStyle}
                       />
                   </div>,
-                  document.body
+                  portalContainer
               )
             : null;
 
@@ -177,16 +208,7 @@ export const ScreenshotThumbnail = ({
                 ) : (
                     <div
                         className="site-details-thumbnail-placeholder"
-                        style={{
-                            alignItems: "center",
-                            backgroundColor: "#f0f0f0",
-                            color: "#666",
-                            display: "flex",
-                            fontSize: "12px",
-                            height: "60px",
-                            justifyContent: "center",
-                            width: "100px",
-                        }}
+                        style={placeholderStyle}
                     >
                         No Preview
                     </div>
