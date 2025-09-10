@@ -250,6 +250,8 @@ export class DnsMonitor implements IMonitorService {
                 // If we have retries left, wait and try again
                 if (attemptNumber < retryAttempts) {
                     await new Promise<void>((resolve) => {
+                        // Timer will complete when Promise resolves, cleanup not needed
+                        // eslint-disable-next-line clean-timer/assign-timer-id -- Timer completes with Promise resolution
                         setTimeout(
                             () => {
                                 resolve();
@@ -299,6 +301,8 @@ export class DnsMonitor implements IMonitorService {
     ): Promise<{ details?: string; error?: string; success: boolean }> {
         // Create timeout promise
         const timeoutPromise = new Promise<never>((_resolve, reject) => {
+            // Timer used in Promise.race, cleanup not practical
+            // eslint-disable-next-line clean-timer/assign-timer-id -- Timer used in race condition
             setTimeout(() => {
                 reject(new Error(`DNS resolution timeout after ${timeout}ms`));
             }, timeout);

@@ -4,6 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+import { test, fc } from "@fast-check/vitest";
 import type { Monitor, Site } from "../../types.js";
 import {
     getMonitorValidationErrors,
@@ -109,6 +110,52 @@ describe("Shared Validation - Backend Coverage", () => {
             expect(validateMonitorType(123)).toBeFalsy();
             expect(validateMonitorType(null)).toBeFalsy();
             expect(validateMonitorType(undefined)).toBeFalsy();
+        });
+
+        // Property-based testing for monitor type validation
+        test.prop({
+            validTypes: fc.constantFrom("http", "port", "ping", "dns"),
+        })("should accept all valid monitor types", (props) => {
+            expect(validateMonitorType(props.validTypes)).toBeTruthy();
+        });
+
+        test.prop({
+            invalidInput: fc.oneof(
+                fc.integer(),
+                fc.float(),
+                fc.boolean(),
+                fc.array(fc.string()),
+                fc.object(),
+                fc.string().filter(
+                    (s) =>
+                        ![
+                            "http",
+                            "port",
+                            "ping",
+                            "dns",
+                        ].includes(s)
+                )
+            ),
+        })("should reject all invalid monitor types", (props) => {
+            expect(validateMonitorType(props.invalidInput)).toBeFalsy();
+        });
+
+        test.prop({
+            stringInput: fc.string({ minLength: 1, maxLength: 20 }),
+        })("should handle arbitrary strings correctly", (props) => {
+            const result = validateMonitorType(props.stringInput);
+            const validTypes = [
+                "http",
+                "port",
+                "ping",
+                "dns",
+            ];
+
+            if (validTypes.includes(props.stringInput)) {
+                expect(result).toBeTruthy();
+            } else {
+                expect(result).toBeFalsy();
+            }
         });
     });
 

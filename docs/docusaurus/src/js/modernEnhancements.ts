@@ -199,6 +199,8 @@ function applyThemeToggleAnimation(): CleanupFunction {
     );
 
     if (isHTMLElement(themeToggle)) {
+        let animationTimer: null | ReturnType<typeof setTimeout> = null;
+
         function handleClick(): void {
             // Add a spinning animation
             if (isHTMLElement(themeToggle)) {
@@ -206,10 +208,16 @@ function applyThemeToggleAnimation(): CleanupFunction {
                 themeToggle.style.transition =
                     "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)";
 
-                setTimeout(() => {
+                // Clear any existing animation timer
+                if (animationTimer) {
+                    clearTimeout(animationTimer);
+                }
+
+                animationTimer = setTimeout(() => {
                     if (isHTMLElement(themeToggle)) {
                         themeToggle.style.transform = "scale(1) rotate(0deg)";
                     }
+                    animationTimer = null;
                 }, 150);
             }
         }
@@ -217,6 +225,10 @@ function applyThemeToggleAnimation(): CleanupFunction {
         themeToggle.addEventListener("click", handleClick);
 
         return function cleanup(): void {
+            if (animationTimer) {
+                clearTimeout(animationTimer);
+                animationTimer = null;
+            }
             themeToggle.removeEventListener("click", handleClick);
         };
     }
@@ -475,13 +487,24 @@ function initializeEnhancements(): CleanupFunction {
 
     // Re-initialize on route changes (for SPA behavior)
     let lastPathname = typeof location === "undefined" ? "" : location.pathname;
+    let routeChangeTimer: null | ReturnType<typeof setTimeout> = null;
+
     const observer = new MutationObserver(() => {
         if (
             typeof location !== "undefined" &&
             location.pathname !== lastPathname
         ) {
             lastPathname = location.pathname;
-            setTimeout(setupEnhancements, 100); // Small delay for DOM updates
+
+            // Clear any existing route change timer
+            if (routeChangeTimer) {
+                clearTimeout(routeChangeTimer);
+            }
+
+            routeChangeTimer = setTimeout(() => {
+                setupEnhancements();
+                routeChangeTimer = null;
+            }, 100); // Small delay for DOM updates
         }
     });
     observer.observe(document.body, { childList: true, subtree: true });
@@ -489,6 +512,10 @@ function initializeEnhancements(): CleanupFunction {
     function handleBeforeUnload(): void {
         if (cleanupRef.current) {
             cleanupRef.current();
+        }
+        if (routeChangeTimer) {
+            clearTimeout(routeChangeTimer);
+            routeChangeTimer = null;
         }
         observer.disconnect();
     }

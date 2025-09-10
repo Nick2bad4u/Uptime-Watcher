@@ -82,6 +82,7 @@ export async function withRetry<T>(
             if (attempt < maxRetries - 1) {
                 // eslint-disable-next-line no-await-in-loop -- retry delay requires sequential awaits
                 await new Promise<void>((resolve) => {
+                    // eslint-disable-next-line clean-timer/assign-timer-id -- Timer completes with Promise resolution
                     setTimeout(() => {
                         resolve();
                     }, delayMs);

@@ -344,6 +344,17 @@ export function isAbortError(error: unknown): boolean {
             error.message.toLowerCase().includes("cancelled")
         );
     }
+
+    // Handle DOMException (e.g., from fetch AbortController)
+    if (error instanceof DOMException) {
+        return (
+            error.name === "AbortError" ||
+            error.name === "TimeoutError" ||
+            error.message.toLowerCase().includes("aborted") ||
+            error.message.toLowerCase().includes("cancelled")
+        );
+    }
+
     return false;
 }
 

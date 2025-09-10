@@ -365,17 +365,19 @@
     margin-block-start: 0.5rem;
 }
 
-/* GitHub button base styling */
-.github-button {
-    background-color: initial !important;
+/* GitHub button base styling - increased specificity to avoid !important */
+.starButtonContainer .github-button,
+.hero .github-button {
+    background-color: initial;
 }
 
-/* GitHub button styling fixes - more specific */
-.starButtonContainer .github-button {
-    overflow: hidden !important;
-    block-size: 32px !important;
-    line-height: 32px !important;
-    white-space: nowrap !important;
+/* GitHub button styling fixes - high specificity to avoid !important */
+.hero .starButtonContainer .github-button,
+.starButtonContainer .github-button.github-button {
+    overflow: hidden;
+    block-size: 32px;
+    line-height: 32px;
+    white-space: nowrap;
 }
 
 /* Hero Demo - App UI Mockup */
@@ -1360,7 +1362,10 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-family: inherit, system-ui, sans-serif;
+    font-family:
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 0.75rem;
     font-weight: 500;
     text-decoration: none;
@@ -1371,7 +1376,10 @@
         border: none;
         border-radius: 4px;
         cursor: pointer;
-        font-family: inherit, system-ui, sans-serif;
+        font-family:
+            system-ui,
+            -apple-system,
+            sans-serif;
         font-size: 0.75rem;
         font-weight: 500;
         text-decoration: none;
@@ -1743,12 +1751,18 @@
 
 /* Performance and accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
-    /* Universal selector is intentionally used here for accessibility compliance */
+    /*
+     * Universal selector and !important are intentionally used here for accessibility compliance
+     * to ensure motion reduction overrides all other animation styles regardless of specificity
+     */
     *,
     *::before,
     *::after {
+        /* stylelint-disable-next-line declaration-no-important -- Required for accessibility override */
         animation-duration: 0.01ms !important;
+        /* stylelint-disable-next-line declaration-no-important -- Required for accessibility override */
         animation-iteration-count: 1 !important;
+        /* stylelint-disable-next-line declaration-no-important -- Required for accessibility override */
         transition-duration: 0.01ms !important;
     }
 }
@@ -1785,18 +1799,21 @@
     }
 }
 
-/* Print styles */
+/* Print styles - !important needed to override all display/color rules for print media */
 @media print {
     .heroSection::before,
     .heroSection::after,
     .appWindow::before,
     .statusCard::before,
     .codeBlock::before {
+        /* stylelint-disable-next-line declaration-no-important -- Required for print media override */
         display: none !important;
     }
 
     .heroSection {
+        /* stylelint-disable-next-line declaration-no-important -- Required for print media override */
         background: #fff !important;
+        /* stylelint-disable-next-line declaration-no-important -- Required for print media override */
         color: #000 !important;
     }
 }
@@ -1920,7 +1937,8 @@
 [data-theme="light"] .sectionTitle,
 [data-theme="light"] .statusText,
 [data-theme="light"] .techInfo h2,
-[data-theme="light"] .codeContent {
+[data-theme="light"] .codeContent,
+[data-theme="light"] .modal h3 {
     color: #212529;
 }
 
@@ -2151,11 +2169,6 @@
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-}
-
-/* Light theme modal styles */
-[data-theme="light"] .modal h3 {
-    color: #212529;
 }
 
 /* Scroll Reveal Animation Classes */

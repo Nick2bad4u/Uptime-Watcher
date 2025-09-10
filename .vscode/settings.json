@@ -64,7 +64,9 @@
         "vue-ts",
         "tailwindcss"
     ],
-    "eslint.workingDirectories": ["."],
+    "eslint.workingDirectories": [
+        "."
+    ],
     "files.exclude": {
         "**/.husky/**": true,
         "**/.nyc_output/**": true,
@@ -80,9 +82,9 @@
         "**/dist-test-electron/**": true,
         "**/dist-test/**": true,
         "**/dist/**": true,
+        "**/docs/docusaurus/docs/index.md": false,
         "**/docs/docusaurus/.docusaurus/**": true,
         "**/docs/docusaurus/build/**": true,
-        "**/docs/docusaurus/docs/**": true,
         "**/docs/docusaurus/node_modules/**": true,
         "**/html/**": true,
         "**/node_modules/**": true,
@@ -91,6 +93,7 @@
         "**/reports/**": true
     },
     "files.watcherExclude": {
+        "**/docs/docusaurus/docs/index.md": false,
         "**/.cache/**": true,
         "**/.husky/**": true,
         "**/.nyc_output/**": true,
@@ -117,6 +120,7 @@
         "**/reports/**": true
     },
     "search.exclude": {
+        "**/docs/docusaurus/docs/index.md": false,
         "**/.cache/**": true,
         "**/.husky/**": true,
         "**/.nyc_output/**": true,

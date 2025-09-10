@@ -12,7 +12,7 @@ const config: Config = {
 
     deploymentBranch: "gh-pages",
 
-    favicon: "../../icons/favicon.ico",
+    favicon: "img/favicon.ico",
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
     future: {
         experimental_faster: {
@@ -202,7 +202,7 @@ const config: Config = {
                     routeBasePath: "docs",
                     showLastUpdateAuthor: true,
                     showLastUpdateTime: true,
-                    sidebarCollapsed: false,
+                    sidebarCollapsed: true,
                     sidebarCollapsible: true,
                     sidebarPath: "./sidebars.ts",
                 },
@@ -313,8 +313,8 @@ const config: Config = {
                             to: "/docs/documents/Architecture",
                         },
                         {
-                            label: "🧪 Advanced Internals",
-                            to: "/docs/category/-advanced-internals",
+                            href: "https://nick2bad4u.github.io/Uptime-Watcher/eslint-inspector/",
+                            label: "🧪 ESlint Config",
                         },
                         {
                             label: "📝 TSDoc Standards",
@@ -377,11 +377,6 @@ const config: Config = {
                     position: "left",
                     sidebarId: "unifiedSidebar",
                     type: "docSidebar",
-                },
-                {
-                    position: "left",
-                    type: "html",
-                    value: '<a href="https://nick2bad4u.github.io/Uptime-Watcher/eslint-inspector/" target="_blank" rel="noopener noreferrer">ESLint</a>',
                 },
                 {
                     className: "persistent",

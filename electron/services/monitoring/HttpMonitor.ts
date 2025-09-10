@@ -84,6 +84,8 @@ class SimpleRateLimiter {
         const key = this.getKey(url);
         const sleep = async (ms: number): Promise<void> =>
             new Promise((resolve) => {
+                // Timer will complete when Promise resolves, cleanup not needed
+                // eslint-disable-next-line clean-timer/assign-timer-id -- Timer completes with Promise resolution
                 setTimeout(resolve, ms);
             });
         for (;;) {

@@ -94,3 +94,6 @@ CNAME
 # Docusaurus static directory
 **/docs/docusaurus/static/eslint-inspector
 **/docs/docusaurus/docusaurus.config.ts
+**/docs/docusaurus/src/js/modernEnhancements.ts
+**/docs/docusaurus/src/pages/index.tsx
+**/docs/docusaurus/sidebars.ts

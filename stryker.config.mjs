@@ -40,10 +40,10 @@ const config = {
         reportType: "full", // Options: "full" | "mutationScore"
     },
 
-    disableBail: false, // Bail on first test failure for performance
+    disableBail: true, // Don't bail on test failures during initial run for better CI resilience
 
     disableTypeChecks: false, // Keep type checking enabled for accuracy
-    dryRunTimeoutMinutes: 15, // Longer dry run timeout for complex setup
+    dryRunTimeoutMinutes: 20, // Longer dry run timeout for complex setup and CI environments
     eventReporter: {
         baseDir: "coverage/events",
     },

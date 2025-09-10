@@ -7,6 +7,7 @@
  */
 
 import { describe, expect, it, vi, beforeAll, afterAll } from "vitest";
+import { test, fc } from "@fast-check/vitest";
 import {
     isObject,
     isNumber,
@@ -139,6 +140,40 @@ describe("typeGuards", () => {
             expect(isNumber(undefined)).toBeFalsy();
             expect(isNumber({})).toBeFalsy();
             expect(isNumber([])).toBeFalsy();
+        });
+
+        // Property-based testing for number validation
+        test.prop({
+            num: fc.float(),
+        })(
+            "should return true for any valid float (excluding NaN)",
+            (props) => {
+                // Skip NaN values since isNumber should reject them
+                if (Number.isNaN(props.num)) {
+                    expect(isNumber(props.num)).toBeFalsy();
+                } else {
+                    expect(isNumber(props.num)).toBeTruthy();
+                }
+            }
+        );
+
+        test.prop({
+            num: fc.integer(),
+        })("should return true for any integer", (props) => {
+            expect(isNumber(props.num)).toBeTruthy();
+        });
+
+        test.prop({
+            nonNumber: fc.oneof(
+                fc.string(),
+                fc.boolean(),
+                fc.array(fc.anything()),
+                fc.object(),
+                fc.constant(null),
+                fc.constant(undefined)
+            ),
+        })("should return false for any non-number value", (props) => {
+            expect(isNumber(props.nonNumber)).toBeFalsy();
         });
     });
 
@@ -889,6 +924,49 @@ describe("typeGuards", () => {
             expect(isValidPort(true)).toBeFalsy();
             expect(isValidPort(null)).toBeFalsy();
             expect(isValidPort(undefined)).toBeFalsy();
+        });
+
+        // Property-based testing for port validation
+        test.prop({
+            validPort: fc.integer({ min: 1, max: 65_535 }),
+        })(
+            "should return true for all valid port numbers (1-65535)",
+            (props) => {
+                expect(isValidPort(props.validPort)).toBeTruthy();
+            }
+        );
+
+        test.prop({
+            invalidPort: fc.oneof(
+                fc.integer({ max: 0 }), // <= 0
+                fc.integer({ min: 65_536 }) // > 65535
+            ),
+        })(
+            "should return false for port numbers outside valid range",
+            (props) => {
+                expect(isValidPort(props.invalidPort)).toBeFalsy();
+            }
+        );
+
+        test.prop({
+            nonIntegerNumber: fc
+                .float()
+                .filter((n) => !Number.isInteger(n) && !Number.isNaN(n)),
+        })("should return false for non-integer numbers", (props) => {
+            expect(isValidPort(props.nonIntegerNumber)).toBeFalsy();
+        });
+
+        test.prop({
+            nonNumber: fc.oneof(
+                fc.string(),
+                fc.boolean(),
+                fc.array(fc.anything()),
+                fc.object(),
+                fc.constant(null),
+                fc.constant(undefined)
+            ),
+        })("should return false for any non-number value", (props) => {
+            expect(isValidPort(props.nonNumber)).toBeFalsy();
         });
     });
 

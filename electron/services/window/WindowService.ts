@@ -171,6 +171,7 @@ export class WindowService {
             );
 
             // Delay opening DevTools to ensure renderer is ready
+            // eslint-disable-next-line clean-timer/assign-timer-id -- One-time dev tools initialization
             setTimeout(() => {
                 if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                     try {
@@ -280,7 +281,7 @@ export class WindowService {
                 logger.debug(
                     `[WindowService] Waiting ${Math.round(totalDelay)}ms before retry ${attempt + 2}/${MAX_RETRIES}`
                 );
-                // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- Sequential retry delay required
+                // eslint-disable-next-line no-await-in-loop, no-promise-executor-return, clean-timer/assign-timer-id -- Sequential retry delay required, timer completes with Promise
                 await new Promise((resolve) => setTimeout(resolve, totalDelay));
             }
         }

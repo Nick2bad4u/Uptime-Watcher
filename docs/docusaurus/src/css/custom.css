@@ -210,6 +210,22 @@
     }
 }
 
+@media screen and (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-menu .menu__link:hover,
+    .theme-doc-sidebar-menu .menu__link:focus {
+        background: rgb(0 0 0 / 4%);
+        transition: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-menu .menu__link:hover,
+    .theme-doc-sidebar-menu .menu__link:focus {
+        background: rgb(0 0 0 / 4%);
+        transition: none;
+    }
+}
+
 .theme-doc-sidebar-menu .menu__link:hover,
 .theme-doc-sidebar-menu .menu__link:focus {
     background: rgb(0 0 0 / 4%);
@@ -265,7 +281,7 @@
     background: var(--ifm-color-primary);
     color: #fff;
     content: attr(data-badge);
-    font-size: 10px;
+    font-size: 12px; /* Increased from 10px for better accessibility */
     font-weight: 600;
     letter-spacing: 0.5px;
     margin-inline-start: 8px;
@@ -310,6 +326,24 @@
 }
 
 /* Base typography - must come before specific selectors */
+@media screen and (prefers-reduced-motion: reduce) {
+    h1,
+    h2,
+    h3 {
+        position: relative;
+        animation: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    h1,
+    h2,
+    h3 {
+        position: relative;
+        animation: none;
+    }
+}
+
 @media screen and (prefers-reduced-motion: reduce) {
     h1,
     h2,
@@ -419,6 +453,20 @@ h3 {
     }
 }
 
+@media screen and (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-item-link,
+    .theme-doc-sidebar-item-category {
+        transition: none !important;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-item-link,
+    .theme-doc-sidebar-item-category {
+        transition: none !important;
+    }
+}
+
 .theme-doc-sidebar-item-link,
 .theme-doc-sidebar-item-category {
     transition: all 0.05s ease !important;
@@ -433,6 +481,36 @@ h3 {
 
 .theme-doc-markdown {
     animation: fadeInFast 0.1s ease-out !important;
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .markdown > h1,
+    .markdown > h2,
+    .markdown > h3,
+    .markdown > h4,
+    .markdown > h5,
+    .markdown > h6,
+    .markdown > p,
+    .markdown > div,
+    .markdown > section,
+    .markdown > article {
+        animation: none !important;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .markdown > h1,
+    .markdown > h2,
+    .markdown > h3,
+    .markdown > h4,
+    .markdown > h5,
+    .markdown > h6,
+    .markdown > p,
+    .markdown > div,
+    .markdown > section,
+    .markdown > article {
+        animation: none !important;
+    }
 }
 
 @media screen and (prefers-reduced-motion: reduce) {
@@ -631,6 +709,34 @@ h3 {
     }
 }
 
+@media screen and (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"],
+    .navbar__item button[title*="Switch"] {
+        position: relative;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 50% !important;
+        backdrop-filter: blur(10px);
+        background: var(--glass-backdrop) !important;
+        block-size: 40px !important;
+        inline-size: 40px !important;
+        transition: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"],
+    .navbar__item button[title*="Switch"] {
+        position: relative;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 50% !important;
+        backdrop-filter: blur(10px);
+        background: var(--glass-backdrop) !important;
+        block-size: 40px !important;
+        inline-size: 40px !important;
+        transition: none;
+    }
+}
+
 .navbar__item button[aria-label*="color mode"],
 .navbar__item button[title*="Switch"] {
     position: relative;
@@ -641,6 +747,26 @@ h3 {
     block-size: 40px !important;
     inline-size: 40px !important;
     transition: all 0.3s var(--animation-spring);
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"]:hover,
+    .navbar__item button[title*="Switch"]:hover,
+    .navbar__item button[aria-label*="color mode"]:focus,
+    .navbar__item button[title*="Switch"]:focus {
+        animation: none;
+        transform: scale(1.1);
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"]:hover,
+    .navbar__item button[title*="Switch"]:hover,
+    .navbar__item button[aria-label*="color mode"]:focus,
+    .navbar__item button[title*="Switch"]:focus {
+        animation: none;
+        transform: scale(1.1);
+    }
 }
 
 @media screen and (prefers-reduced-motion: reduce) {
@@ -1399,6 +1525,42 @@ h3 {
     }
 }
 
+@media screen and (prefers-reduced-motion: reduce) {
+    .button,
+    .button--primary,
+    .button--secondary {
+        position: relative;
+        overflow: hidden;
+        border: none !important;
+        border-radius: var(--border-radius-modern) !important;
+        background: linear-gradient(
+            135deg,
+            var(--ifm-color-primary) 0%,
+            var(--ifm-color-primary-dark) 100%
+        ) !important;
+        box-shadow: 0 4px 15px rgb(var(--ifm-color-primary-rgb), 0.3);
+        transition: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .button,
+    .button--primary,
+    .button--secondary {
+        position: relative;
+        overflow: hidden;
+        border: none !important;
+        border-radius: var(--border-radius-modern) !important;
+        background: linear-gradient(
+            135deg,
+            var(--ifm-color-primary) 0%,
+            var(--ifm-color-primary-dark) 100%
+        ) !important;
+        box-shadow: 0 4px 15px rgb(var(--ifm-color-primary-rgb), 0.3);
+        transition: none;
+    }
+}
+
 .button,
 .button--primary,
 .button--secondary {
@@ -1590,6 +1752,22 @@ h3 {
         }
     }
 
+    @media screen and (prefers-reduced-motion: reduce) {
+        .scroll-fade,
+        .scroll-slide {
+            animation: none;
+            opacity: 0;
+        }
+    }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        .scroll-fade,
+        .scroll-slide {
+            animation: none;
+            opacity: 0;
+        }
+    }
+
     .scroll-fade,
     .scroll-slide {
         animation: slideInUp 0.35s var(--animation-smooth) forwards;
@@ -1715,6 +1893,24 @@ h3 {
 /* 🎨 Enhanced Content Cards                          */
 
 /* -------------------------------------------------- */
+@media screen and (prefers-reduced-motion: reduce) {
+    .markdown > div,
+    .theme-doc-markdown > div,
+    article,
+    .animate-slide-up {
+        animation: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .markdown > div,
+    .theme-doc-markdown > div,
+    article,
+    .animate-slide-up {
+        animation: none;
+    }
+}
+
 @media screen and (prefers-reduced-motion: reduce) {
     .markdown > div,
     .theme-doc-markdown > div,
@@ -2082,11 +2278,18 @@ article,
 }
 
 @media (prefers-reduced-motion: reduce) {
+    /*
+     * Universal selector and !important are intentionally used for accessibility compliance
+     * to ensure motion reduction overrides all animations regardless of CSS specificity
+     */
     *,
     *::before,
     *::after {
+        /* stylelint-disable-next-line declaration-no-important -- Required for accessibility override */
         animation-duration: 0.01ms !important;
+        /* stylelint-disable-next-line declaration-no-important -- Required for accessibility override */
         animation-iteration-count: 1 !important;
+        /* stylelint-disable-next-line declaration-no-important -- Required for accessibility override */
         transition-duration: 0.01ms !important;
     }
 }
@@ -3136,6 +3339,28 @@ html {
     }
 }
 
+@media screen and (prefers-reduced-motion: reduce) {
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:hover .dropdown__menu,
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:focus .dropdown__menu {
+        transition: none !important;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:hover .dropdown__menu,
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:focus .dropdown__menu {
+        transition: none !important;
+    }
+}
+
 .dropdown .dropdown__menu,
 .dropdown--show .dropdown__menu,
 .dropdown--hoverable:hover .dropdown__menu,
@@ -3159,6 +3384,24 @@ html {
 }
 
 /* Speed up modal and overlay transitions */
+@media screen and (prefers-reduced-motion: reduce) {
+    .modal,
+    .backdrop,
+    .DocSearch-Modal,
+    .DocSearch-Container {
+        transition: none !important;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .modal,
+    .backdrop,
+    .DocSearch-Modal,
+    .DocSearch-Container {
+        transition: none !important;
+    }
+}
+
 @media screen and (prefers-reduced-motion: reduce) {
     .modal,
     .backdrop,
@@ -3369,6 +3612,7 @@ html {
         z-index: calc(var(--ifm-z-index-fixed) + 12) !important;
         pointer-events: auto !important;
         overflow: visible !important;
+        display: inline-grid !important;
     }
 
     /* Fix the sidebar menu panel z-index */
@@ -3420,6 +3664,7 @@ html {
     .navbar-sidebar__brand,
     .navbar-sidebar__items {
         overflow: visible !important;
+        display: inline-grid !important;
     }
 }
 

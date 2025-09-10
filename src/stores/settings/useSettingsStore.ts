@@ -55,12 +55,22 @@ const defaultSettings: AppSettings = {
     theme: "system",
 };
 
+// Store timer reference for cleanup capability
+// eslint-disable-next-line eslint-plugin-toplevel/no-toplevel-let -- Mutable state required for timer management
+let settingsSyncTimer: null | ReturnType<typeof setTimeout> = null;
+
 const syncSettingsAfterRehydration = (
     state: SettingsStore | undefined
 ): void => {
     if (state) {
+        // Clear any existing timer
+        if (settingsSyncTimer) {
+            clearTimeout(settingsSyncTimer);
+            settingsSyncTimer = null;
+        }
+
         // Use setTimeout to avoid blocking the rehydration process
-        setTimeout(() => {
+        settingsSyncTimer = setTimeout(() => {
             // Use an IIFE to handle the async operation properly
             void (async (): Promise<void> => {
                 try {
@@ -77,6 +87,7 @@ const syncSettingsAfterRehydration = (
                         error
                     );
                 }
+                settingsSyncTimer = null;
             })();
         }, 100); // Small delay to ensure everything is initialized
     }

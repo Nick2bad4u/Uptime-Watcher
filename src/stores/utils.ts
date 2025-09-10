@@ -224,7 +224,7 @@ export async function waitForElectronAPI(
 
         // Wait with exponential backoff
         const delay = Math.min(baseDelay * 1.5 ** attempt, 2000);
-        // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- Sequential retry delay required
+        // eslint-disable-next-line no-await-in-loop, no-promise-executor-return, clean-timer/assign-timer-id -- Sequential retry delay required, timer completes with Promise
         await new Promise((resolve) => setTimeout(resolve, delay));
     }
 

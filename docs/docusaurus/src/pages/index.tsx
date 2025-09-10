@@ -20,8 +20,12 @@ import GitHubStatsComponent from "@site/src/components/GitHubStats";
 /**
  * Copies code to clipboard with fallback support.
  */
-const handleCopyCode = async (): Promise<void> => {
-    const code = `{
+const handleCopyCode = (() => {
+    // Module-scoped variable to track the feedback timer for proper cleanup
+    let feedbackTimer: null | ReturnType<typeof setTimeout> = null;
+
+    return async (): Promise<void> => {
+        const code = `{
   "name": "uptime-watcher",
   "version": "12.5.0",
   "description": "Desktop uptime monitoring",
@@ -40,43 +44,51 @@ const handleCopyCode = async (): Promise<void> => {
   "license": "Unlicense"
 }`;
 
-    // Try modern clipboard API first (browser environment only)
-    if (
-        typeof window !== "undefined" &&
-        "navigator" in window &&
-        // eslint-disable-next-line n/no-unsupported-features/node-builtins, @typescript-eslint/no-unnecessary-condition -- Browser API access requires runtime checks
-        window.navigator.clipboard
-    ) {
-        try {
-            // eslint-disable-next-line n/no-unsupported-features/node-builtins -- Browser clipboard API is required for copy functionality
-            await window.navigator.clipboard.writeText(code);
-            // Simple feedback
-            const button = document.activeElement;
-            if (button && button instanceof HTMLButtonElement) {
-                const originalText = button.textContent;
-                button.textContent = "Copied!";
-                setTimeout(() => {
-                    button.textContent = originalText;
-                }, 1000);
-            }
-            return;
-        } catch {
-            // Fall through to legacy method
-        }
-    }
+        // Try modern clipboard API first (browser environment only)
+        if (
+            typeof window !== "undefined" &&
+            "navigator" in window &&
+            // eslint-disable-next-line n/no-unsupported-features/node-builtins, @typescript-eslint/no-unnecessary-condition -- Browser API access requires runtime checks
+            window.navigator.clipboard
+        ) {
+            try {
+                // eslint-disable-next-line n/no-unsupported-features/node-builtins -- Browser clipboard API is required for copy functionality
+                await window.navigator.clipboard.writeText(code);
+                // Simple feedback
+                const button = document.activeElement;
+                if (button && button instanceof HTMLButtonElement) {
+                    const originalText = button.textContent;
+                    button.textContent = "Copied!";
 
-    // Fallback for older browsers or when navigator is not available
-    const textArea = document.createElement("textarea");
-    textArea.value = code;
-    document.body.append(textArea);
-    textArea.select();
-    try {
-        document.execCommand("copy");
-    } catch {
-        console.warn("Copy to clipboard not supported");
-    }
-    textArea.remove();
-};
+                    // Clear any existing feedback timer
+                    if (feedbackTimer) {
+                        clearTimeout(feedbackTimer);
+                    }
+
+                    feedbackTimer = setTimeout(() => {
+                        button.textContent = originalText;
+                        feedbackTimer = null;
+                    }, 1000);
+                }
+                return;
+            } catch {
+                // Fall through to legacy method
+            }
+        }
+
+        // Fallback for older browsers or when navigator is not available
+        const textArea = document.createElement("textarea");
+        textArea.value = code;
+        document.body.append(textArea);
+        textArea.select();
+        try {
+            document.execCommand("copy");
+        } catch {
+            console.warn("Copy to clipboard not supported");
+        }
+        textArea.remove();
+    };
+})();
 
 /**
  * Wrapper for handleCopyCode to handle the async function in onClick.

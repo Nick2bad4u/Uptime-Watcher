@@ -385,6 +385,15 @@ export function formatErrorMessage(
 ): string {
     let result = template;
     for (const [key, value] of Object.entries(params)) {
+        // Skip dangerous keys for security (prevent prototype pollution)
+        if (
+            key === "__proto__" ||
+            key === "constructor" ||
+            key === "prototype"
+        ) {
+            // eslint-disable-next-line no-continue -- Security skip for dangerous prototype keys
+            continue;
+        }
         const placeholder = `{${key}}`;
         const stringValue = String(value);
         // Use replacement function to avoid special replacement pattern interpretation
