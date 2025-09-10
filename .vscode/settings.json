@@ -64,9 +64,7 @@
         "vue-ts",
         "tailwindcss"
     ],
-    "eslint.workingDirectories": [
-        "."
-    ],
+    "eslint.workingDirectories": ["."],
     "files.exclude": {
         "**/.husky/**": true,
         "**/.nyc_output/**": true,

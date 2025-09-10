@@ -55,9 +55,7 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
         clearAllErrors: (): void => {
             logStoreAction("ErrorStore", "clearAllErrors");
             set({
-                isLoading: false,
                 lastError: undefined,
-                operationLoading: {},
                 storeErrors: {},
             });
         },

@@ -926,9 +926,9 @@ describe(ScreenshotThumbnail, () => {
 
             render(<ScreenshotThumbnail {...propsWithEmptyUrl} />);
 
-            // Link should still be accessible with empty href (not converted to hash since it doesn't start with http)
+            // Link should use fallback "#" href when URL is empty for proper anchor behavior
             const link = screen.getByLabelText("Open in browser");
-            expect(link).toHaveAttribute("href", "");
+            expect(link).toHaveAttribute("href", "#");
         });
     });
 
@@ -1522,8 +1522,8 @@ describe(ScreenshotThumbnail, () => {
 
             fireEvent.mouseLeave(image);
 
-            // This should have cleared timeouts (multiple clearTimeout calls are expected)
-            expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
+            // This should have cleared timeouts (only the second mouseLeave clears an existing timeout)
+            expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();

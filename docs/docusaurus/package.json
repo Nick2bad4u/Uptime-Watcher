@@ -23,7 +23,11 @@
         "@docusaurus/theme-live-codeblock": "3.8.1",
         "@docusaurus/theme-mermaid": "3.8.1",
         "@docusaurus/theme-search-algolia": "3.8.1",
+        "@docusaurus/types": "^3.8.1",
         "@easyops-cn/docusaurus-search-local": "^0.52.1",
+        "@grnet/docusaurus-glossary-view": "^2.0.0-rc.2",
+        "@grnet/docusaurus-term-preview": "^2.0.0-rc.2",
+        "@grnet/docusaurus-terminology": "^2.0.0-rc.2",
         "@mdx-js/react": "^3.1.1",
         "clsx": "^2.1.1",
         "docusaurus-plugin-copy-page-button": "^0.3.4",
@@ -32,8 +36,7 @@
         "prism-react-renderer": "^2.4.1",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
-        "react-github-btn": "^1.4.0",
-        "@docusaurus/types": "^3.8.1"
+        "react-github-btn": "^1.4.0"
     },
     "description": "Documentation site for Uptime Watcher using Docusaurus",
     "devDependencies": {

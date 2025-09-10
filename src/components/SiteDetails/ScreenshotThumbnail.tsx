@@ -78,7 +78,11 @@ export const ScreenshotThumbnail = ({
             event.preventDefault();
             openExternal(safeUrl, { siteName: safeSiteName });
         },
-        [openExternal, safeSiteName, safeUrl]
+        [
+            openExternal,
+            safeSiteName,
+            safeUrl,
+        ]
     );
 
     const handleMouseEnter = useCallback(() => {
@@ -115,38 +119,39 @@ export const ScreenshotThumbnail = ({
     }, []);
 
     // Simple portal - let CSS handle positioning to avoid complex state management
-    const portalJSX = hovered && screenshotUrl
-        ? createPortal(
-              <div
-                  className={`site-details-thumbnail-portal-overlay theme-${themeName}`}
-                  style={{
-                      position: "fixed",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      zIndex: 9999,
-                      pointerEvents: "none",
-                      maxWidth: "80vw",
-                      maxHeight: "80vh",
-                  }}
-              >
-                  <img
-                      alt={`Large screenshot of ${safeSiteName}`}
-                      className="site-details-thumbnail-img-portal"
-                      loading="lazy"
-                      src={screenshotUrl}
+    const portalJSX =
+        hovered && screenshotUrl
+            ? createPortal(
+                  <div
+                      className={`site-details-thumbnail-portal-overlay theme-${themeName}`}
                       style={{
-                          display: "block",
-                          maxWidth: "100%",
-                          maxHeight: "100%",
-                          borderRadius: "8px",
-                          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)",
+                          left: "50%",
+                          maxHeight: "80vh",
+                          maxWidth: "80vw",
+                          pointerEvents: "none",
+                          position: "fixed",
+                          top: "50%",
+                          transform: "translate(-50%, -50%)",
+                          zIndex: 9999,
                       }}
-                  />
-              </div>,
-              document.body
-          )
-        : null;
+                  >
+                      <img
+                          alt={`Large screenshot of ${safeSiteName}`}
+                          className="site-details-thumbnail-img-portal"
+                          loading="lazy"
+                          src={screenshotUrl}
+                          style={{
+                              borderRadius: "8px",
+                              boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)",
+                              display: "block",
+                              maxHeight: "100%",
+                              maxWidth: "100%",
+                          }}
+                      />
+                  </div>,
+                  document.body
+              )
+            : null;
 
     return (
         <>
@@ -173,14 +178,14 @@ export const ScreenshotThumbnail = ({
                     <div
                         className="site-details-thumbnail-placeholder"
                         style={{
-                            width: "100px",
-                            height: "60px",
-                            backgroundColor: "#f0f0f0",
-                            display: "flex",
                             alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "12px",
+                            backgroundColor: "#f0f0f0",
                             color: "#666",
+                            display: "flex",
+                            fontSize: "12px",
+                            height: "60px",
+                            justifyContent: "center",
+                            width: "100px",
                         }}
                     >
                         No Preview
