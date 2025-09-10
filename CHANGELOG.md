@@ -7,14 +7,52 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[7153cc9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7153cc97251eeddc30ba58ad1a22d559ab728cfb)...
-[7153cc9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7153cc97251eeddc30ba58ad1a22d559ab728cfb)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7153cc97251eeddc30ba58ad1a22d559ab728cfb...7153cc97251eeddc30ba58ad1a22d559ab728cfb))
+[[aeef930](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aeef9307c66aa5bdc7c0a97a05261f5944cbebba)...
+[aeef930](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aeef9307c66aa5bdc7c0a97a05261f5944cbebba)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/aeef9307c66aa5bdc7c0a97a05261f5944cbebba...aeef9307c66aa5bdc7c0a97a05261f5944cbebba))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 14.3.0 [`(aeef930)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aeef9307c66aa5bdc7c0a97a05261f5944cbebba)
+
+
+
+
+
+
+## [14.3.0] - 2025-09-10
+
+
+[[7153cc9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7153cc97251eeddc30ba58ad1a22d559ab728cfb)...
+[35e00aa](https://github.com/Nick2bad4u/Uptime-Watcher/commit/35e00aa85b8036e2a2e474c1832e7ed2cd97839d)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7153cc97251eeddc30ba58ad1a22d559ab728cfb...35e00aa85b8036e2a2e474c1832e7ed2cd97839d))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update dependency group (#67) [`(4481cdb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4481cdbab2f9a7416cdaa930f5a0f6356138da4f)
+
+
 - [dependency] Update version 14.2.0 [`(7153cc9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7153cc97251eeddc30ba58ad1a22d559ab728cfb)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update documentation strategy and test summary
+
+- Adds a comprehensive summary detailing recent test suite fixes, strategic documentation improvements, and future priorities to support continued project quality.
+- Removes glossary to streamline documentation and updates ignore settings for generated doc files.
+- Emphasizes systematic test methodology and a phased plugin rollout plan to enhance long-term maintainability and documentation accuracy.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(35e00aa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/35e00aa85b8036e2a2e474c1832e7ed2cd97839d)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v14.2.0 [skip ci] [`(6df3db7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6df3db702f74f2ac3ec349c6d0ee97f3880729d2)
 
 
 
