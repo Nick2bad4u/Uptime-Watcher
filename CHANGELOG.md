@@ -7,14 +7,51 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[417620b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/417620bbd73fd8bc3a1c6ff05b564c444b760b31)...
-[417620b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/417620bbd73fd8bc3a1c6ff05b564c444b760b31)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/417620bbd73fd8bc3a1c6ff05b564c444b760b31...417620bbd73fd8bc3a1c6ff05b564c444b760b31))
+[[7153cc9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7153cc97251eeddc30ba58ad1a22d559ab728cfb)...
+[7153cc9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7153cc97251eeddc30ba58ad1a22d559ab728cfb)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7153cc97251eeddc30ba58ad1a22d559ab728cfb...7153cc97251eeddc30ba58ad1a22d559ab728cfb))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 14.2.0 [`(7153cc9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7153cc97251eeddc30ba58ad1a22d559ab728cfb)
+
+
+
+
+
+
+## [14.2.0] - 2025-09-10
+
+
+[[db764c7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/db764c7b7acc2ffa655620b79dc961a05f07fa71)...
+[db6adcd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/db6adcd848000642e45ea2a4c7fd5ce893ebdafa)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/db764c7b7acc2ffa655620b79dc961a05f07fa71...db6adcd848000642e45ea2a4c7fd5ce893ebdafa))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 14.1.0 [`(417620b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/417620bbd73fd8bc3a1c6ff05b564c444b760b31)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add fast-check property-based fuzzing tests
+
+Introduces extensive property-based and fuzzing tests for core components, stores, utilities, and services using fast-check, improving reliability and coverage for edge cases and input validation.
+
+Validates error and sites store state management, UI and settings forms, chart configuration, logger output, and component behavior under varied and extreme conditions. Enhances test suite with focused accessibility, performance, and security scenarios.
+
+Includes related small fixes for test expectations and minor refactors to support robust fuzzing.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(db764c7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/db764c7b7acc2ffa655620b79dc961a05f07fa71)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v14.1.0 [skip ci] [`(3a3e975)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a3e975718ff8df2ac494c8cfd61304d7a79d451)
 
 
 
