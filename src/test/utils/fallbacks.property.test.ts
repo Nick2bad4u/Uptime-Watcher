@@ -13,10 +13,12 @@
  *   fc.assert(fc.property( fc.string({ unit: 'binary', minLength: 1, maxLength:
  *   200 }), fc.integer({ min: 10, max: 50 }), (unicodeStr, maxLength) => {
  *   const result = truncateForLogging(unicodeStr, maxLength);
- *   expect(result.length).toBeLessThanOrEqual(maxLength); if (unicodeStr.length
- *   > maxLength) { expect(result.length).toBe(maxLength); } else {
- *   expect(result).toBe(unicodeStr); } } )); });ay utilities
- *   (getMonitorDisplayIdentifier, getMonitorTypeDisplayLabel)
+ *   expect(result.length).toBeLessThanOrEqual(maxLength); if
+ *   (unicodeStr.length
+ *
+ * > MaxLength) { expect(result.length).toBe(maxLength); } else {
+ *   > expect(result).toBe(unicodeStr); } } )); });ay utilities
+ *   > (getMonitorDisplayIdentifier, getMonitorTypeDisplayLabel)
  * - String processing utilities (truncateForLogging)
  * - Edge cases and robustness (null inputs, malformed objects)
  * - Performance and determinism testing

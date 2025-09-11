@@ -341,10 +341,7 @@ describe("Theme Merging Property-Based Tests", () => {
                 expect(result.colors).toEqual(baseTheme.colors);
             } else if (
                 overrideTheme.colors.background &&
-                Object.hasOwn(
-                    overrideTheme.colors.background,
-                    "modal"
-                )
+                Object.hasOwn(overrideTheme.colors.background, "modal")
             ) {
                 // If colors exists, check nested properties
                 expect(result.colors.background.modal).toBe(
@@ -359,10 +356,7 @@ describe("Theme Merging Property-Based Tests", () => {
             // Complex nested objects should merge properly
             if (
                 overrideTheme.colors?.primary &&
-                Object.hasOwn(
-                    overrideTheme.colors.primary,
-                    "50"
-                )
+                Object.hasOwn(overrideTheme.colors.primary, "50")
             ) {
                 expect(result.colors.primary["50"]).toBe(
                     overrideTheme.colors.primary["50"]
@@ -411,10 +405,7 @@ describe("Theme Merging Property-Based Tests", () => {
 
             if (
                 overrideTheme.typography?.fontWeight &&
-                Object.hasOwn(
-                    overrideTheme.typography.fontWeight,
-                    "bold"
-                )
+                Object.hasOwn(overrideTheme.typography.fontWeight, "bold")
             ) {
                 // When override explicitly has bold property, use that value (even if undefined)
                 expect(result.typography.fontWeight.bold).toBe(
@@ -430,10 +421,7 @@ describe("Theme Merging Property-Based Tests", () => {
                 expect(result.typography).toEqual(baseTheme.typography);
             } else if (
                 overrideTheme.typography.fontWeight &&
-                Object.hasOwn(
-                    overrideTheme.typography.fontWeight,
-                    "normal"
-                )
+                Object.hasOwn(overrideTheme.typography.fontWeight, "normal")
             ) {
                 // If typography exists, check nested properties
                 expect(result.typography.fontWeight.normal).toBe(

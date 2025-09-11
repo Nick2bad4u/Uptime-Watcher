@@ -1,11 +1,14 @@
 /**
- * Property-based fuzzing tests for SiteCard component rendering and interaction.
+ * Property-based fuzzing tests for SiteCard component rendering and
+ * interaction.
  *
- * Uses fast-check to generate comprehensive test cases that exercise the SiteCard
- * component with various site configurations, edge cases, and malformed data.
- * This approach helps discover bugs that traditional example-based tests might miss.
+ * Uses fast-check to generate comprehensive test cases that exercise the
+ * SiteCard component with various site configurations, edge cases, and
+ * malformed data. This approach helps discover bugs that traditional
+ * example-based tests might miss.
  *
  * Coverage areas:
+ *
  * - SiteCard rendering with arbitrary site data
  * - Theme integration and styling variations
  * - Sub-component interaction and prop passing
@@ -16,6 +19,7 @@
  * - Accessibility attributes maintenance
  *
  * @file Comprehensive property-based fuzzing tests for SiteCard component
+ *
  * @author AI Assistant
  */
 
@@ -24,7 +28,12 @@ import { test as fcTest, fc } from "@fast-check/vitest";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import type { ReactNode } from "react";
-import type { Site, Monitor, MonitorStatus, MonitorType } from "../../../../../shared/types";
+import type {
+    Site,
+    Monitor,
+    MonitorStatus,
+    MonitorType,
+} from "../../../../../shared/types";
 
 import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
 
@@ -41,7 +50,13 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHeader", () => ({
 }));
 
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardStatus", () => ({
-    SiteCardStatus: ({ status, selectedMonitorId }: { status: MonitorStatus; selectedMonitorId: string }) => (
+    SiteCardStatus: ({
+        status,
+        selectedMonitorId,
+    }: {
+        status: MonitorStatus;
+        selectedMonitorId: string;
+    }) => (
         <div data-testid={`site-card-status-${selectedMonitorId}`}>
             Status: {status}
         </div>
@@ -53,7 +68,7 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
         status,
         uptime,
         responseTime,
-        checkCount
+        checkCount,
     }: {
         status: string;
         uptime: number;
@@ -61,10 +76,12 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
         checkCount: number;
     }) => {
         // Get unique site identifier from mock data
-        const siteId = mockSiteData?.identifier || 'default';
+        const siteId = mockSiteData?.identifier || "default";
         return (
             <div data-testid={`site-card-metrics-${siteId}-${status}`}>
-                Metrics: {uptime}% | {responseTime ? `${responseTime}ms` : 'N/A'} | {checkCount} checks
+                Metrics: {uptime}% |{" "}
+                {responseTime ? `${responseTime}ms` : "N/A"} | {checkCount}{" "}
+                checks
             </div>
         );
     },
@@ -73,12 +90,12 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
     SiteCardHistory: ({
         filteredHistory,
-        monitor
+        monitor,
     }: {
         filteredHistory: any[];
         monitor: Monitor | undefined;
     }) => (
-        <div data-testid={`site-card-history-${monitor?.id || 'no-monitor'}`}>
+        <div data-testid={`site-card-history-${monitor?.id || "no-monitor"}`}>
             History: {filteredHistory.length} entries
         </div>
     ),
@@ -87,7 +104,7 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardFooter", () => ({
     SiteCardFooter: () => {
         // Get unique site identifier from mock data
-        const siteId = mockSiteData?.identifier || 'default';
+        const siteId = mockSiteData?.identifier || "default";
         return (
             <div data-testid={`site-card-footer-${siteId}`}>
                 Click to view details
@@ -125,7 +142,7 @@ vi.mock("../../../../theme/components/ThemedBox", () => ({
         children,
         className,
         onClick,
-        "aria-label": ariaLabel
+        "aria-label": ariaLabel,
     }: {
         children: ReactNode;
         className?: string;
@@ -133,11 +150,14 @@ vi.mock("../../../../theme/components/ThemedBox", () => ({
         "aria-label"?: string;
     }) => {
         // Get unique site identifier from mock data
-        const siteId = mockSiteData?.identifier || 'default';
+        const siteId = mockSiteData?.identifier || "default";
         // Extract site name from aria-label to create unique test ID
-        const siteNameMatch = ariaLabel?.match(/View details for (?<siteName>.+)/);
-        const siteName = siteNameMatch?.groups?.['siteName'] || 'unknown';
-        const testId = `themed-box-${siteId}-${siteName.replaceAll(/[^\dA-Za-z]/g, '_')}`;
+        // Handle the case where aria-label is "View details for " (empty name)
+        const siteNameMatch = ariaLabel?.match(
+            /View details for (?<siteName>.*)/
+        );
+        const siteName = siteNameMatch?.groups?.["siteName"] ?? "unknown";
+        const testId = `themed-box-${siteId}-${siteName.replaceAll(/[^\dA-Za-z]/g, "_")}`;
 
         return (
             <div
@@ -153,46 +173,134 @@ vi.mock("../../../../theme/components/ThemedBox", () => ({
 }));
 
 /**
- * Arbitrary for generating CSS-safe identifiers
- * Avoids characters that would break CSS selectors: [](){}#$%'",;:*&^!|~`
+ * Arbitrary for generating CSS-safe identifiers Avoids characters that would
+ * break CSS selectors: [](){}#$%'",;:*&^!|~`
  */
-const cssSafeIdentifierArbitrary = (options: { minLength?: number; maxLength?: number } = {}) =>
-    fc.array(
-        fc.constantFrom(
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_', '.'
-        ),
-        { minLength: options.minLength || 1, maxLength: options.maxLength || 50 }
-    ).map(arr => arr.join('')).map(s => s.trim().replace(/^[.-]/, 'a')).filter(s => s.length > 0 && /^[A-Za-z]/.test(s));
+const cssSafeIdentifierArbitrary = (
+    options: { minLength?: number; maxLength?: number } = {}
+) =>
+    fc
+        .array(
+            fc.constantFrom(
+                "a",
+                "b",
+                "c",
+                "d",
+                "e",
+                "f",
+                "g",
+                "h",
+                "i",
+                "j",
+                "k",
+                "l",
+                "m",
+                "n",
+                "o",
+                "p",
+                "q",
+                "r",
+                "s",
+                "t",
+                "u",
+                "v",
+                "w",
+                "x",
+                "y",
+                "z",
+                "A",
+                "B",
+                "C",
+                "D",
+                "E",
+                "F",
+                "G",
+                "H",
+                "I",
+                "J",
+                "K",
+                "L",
+                "M",
+                "N",
+                "O",
+                "P",
+                "Q",
+                "R",
+                "S",
+                "T",
+                "U",
+                "V",
+                "W",
+                "X",
+                "Y",
+                "Z",
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "-",
+                "_",
+                "."
+            ),
+            {
+                minLength: options.minLength || 1,
+                maxLength: options.maxLength || 50,
+            }
+        )
+        .map((arr) => arr.join(""))
+        .map((s) => s.trim().replace(/^[.-]/, "a"))
+        .filter((s) => s.length > 0 && /^[A-Za-z]/.test(s));
 
 /**
  * Arbitrary for generating valid Monitor objects with history
  */
 const validMonitorArbitrary = fc.record({
     id: cssSafeIdentifierArbitrary({ minLength: 5, maxLength: 15 }),
-    type: fc.constantFrom("http", "ping", "port", "dns") as fc.Arbitrary<MonitorType>,
+    type: fc.constantFrom(
+        "http",
+        "ping",
+        "port",
+        "dns"
+    ) as fc.Arbitrary<MonitorType>,
     monitoring: fc.boolean(),
-    status: fc.constantFrom("up", "down", "pending", "paused") as fc.Arbitrary<MonitorStatus>,
+    status: fc.constantFrom(
+        "up",
+        "down",
+        "pending",
+        "paused"
+    ) as fc.Arbitrary<MonitorStatus>,
     responseTime: fc.integer({ min: 0, max: 10_000 }),
     checkInterval: fc.integer({ min: 1000, max: 300_000 }),
     timeout: fc.integer({ min: 1000, max: 60_000 }),
     retryAttempts: fc.integer({ min: 0, max: 10 }),
-    history: fc.uniqueArray(fc.record({
-        timestamp: fc.integer({ min: 0, max: Date.now() }),
-        status: fc.constantFrom("up", "down"),
-        responseTime: fc.integer({ min: 0, max: 10_000 }),
-        details: fc.option(fc.string(), { nil: undefined }),
-    }), { selector: (item) => item.timestamp, maxLength: 100 }),
+    history: fc.uniqueArray(
+        fc.record({
+            timestamp: fc.integer({ min: 0, max: Date.now() }),
+            status: fc.constantFrom("up", "down"),
+            responseTime: fc.integer({ min: 0, max: 10_000 }),
+            details: fc.option(fc.string(), { nil: undefined }),
+        }),
+        { selector: (item) => item.timestamp, maxLength: 100 }
+    ),
     host: fc.option(fc.string(), { nil: undefined }),
     port: fc.option(fc.integer({ min: 1, max: 65_535 }), { nil: undefined }),
     url: fc.option(fc.webUrl(), { nil: undefined }),
     lastChecked: fc.option(fc.date(), { nil: undefined }),
     expectedValue: fc.option(fc.string(), { nil: undefined }),
     recordType: fc.option(fc.string(), { nil: undefined }),
-    activeOperations: fc.option(fc.uniqueArray(cssSafeIdentifierArbitrary({ minLength: 3, maxLength: 10 }), { selector: (str) => str, maxLength: 5 }), { nil: undefined }),
+    activeOperations: fc.option(
+        fc.uniqueArray(
+            cssSafeIdentifierArbitrary({ minLength: 3, maxLength: 10 }),
+            { selector: (str) => str, maxLength: 5 }
+        ),
+        { nil: undefined }
+    ),
 });
 
 /**
@@ -204,9 +312,18 @@ const validSiteArbitrary = fc.record({
     url: fc.webUrl(),
     monitoring: fc.boolean(),
     created: fc.integer({ min: 0, max: Date.now() }),
-    lastCheck: fc.option(fc.integer({ min: 0, max: Date.now() }), { nil: undefined }),
-    activeOperations: fc.uniqueArray(cssSafeIdentifierArbitrary({ minLength: 3, maxLength: 10 }), { selector: (op) => op, maxLength: 10 }),
-    monitors: fc.uniqueArray(validMonitorArbitrary, { selector: (monitor) => monitor.id, minLength: 1, maxLength: 5 }),
+    lastCheck: fc.option(fc.integer({ min: 0, max: Date.now() }), {
+        nil: undefined,
+    }),
+    activeOperations: fc.uniqueArray(
+        cssSafeIdentifierArbitrary({ minLength: 3, maxLength: 10 }),
+        { selector: (op) => op, maxLength: 10 }
+    ),
+    monitors: fc.uniqueArray(validMonitorArbitrary, {
+        selector: (monitor) => monitor.id,
+        minLength: 1,
+        maxLength: 5,
+    }),
 });
 
 /**
@@ -232,171 +349,303 @@ const edgeCaseSiteArbitrary = fc.record({
         fc.constant(Date.now()),
         fc.integer({ min: -1000, max: Date.now() + 1000 })
     ),
-    lastCheck: fc.option(fc.integer({ min: 0, max: Date.now() }), { nil: undefined }),
-    activeOperations: fc.uniqueArray(cssSafeIdentifierArbitrary({ minLength: 1, maxLength: 5 }), { selector: (op) => op, maxLength: 3 }),
-    monitors: fc.uniqueArray(validMonitorArbitrary, { selector: (monitor) => monitor.id, minLength: 0, maxLength: 2 }),
+    lastCheck: fc.option(fc.integer({ min: 0, max: Date.now() }), {
+        nil: undefined,
+    }),
+    activeOperations: fc.uniqueArray(
+        cssSafeIdentifierArbitrary({ minLength: 1, maxLength: 5 }),
+        { selector: (op) => op, maxLength: 3 }
+    ),
+    monitors: fc.uniqueArray(validMonitorArbitrary, {
+        selector: (monitor) => monitor.id,
+        minLength: 0,
+        maxLength: 2,
+    }),
 });
 
 /**
- * Helper function to render SiteCard component with mocks
+ * Helper function to render SiteCard component with mocks in a unique container
  */
 const renderSiteCard = (site: any) => {
     mockSiteData = site;
-    return render(<SiteCard site={site} />);
+    // Create a unique container for each test to avoid conflicts
+    const uniqueId = `sitecard-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+    const container = document.createElement("div");
+    container.id = uniqueId;
+    document.body.append(container);
+
+    const view = render(<SiteCard site={site} />, { container });
+
+    return {
+        ...view,
+        unmount: () => {
+            view.unmount();
+            // Clean up the unique container
+            container.remove();
+        },
+    };
 };
 
 /**
  * Verify basic SiteCard structure is rendered correctly
  */
 const verifySiteCardStructure = (site: any) => {
-    const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, '_')}`;
+    // Use consistent testId pattern matching the mocked ThemedBox implementation
+    const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
     const themedBox = screen.getByTestId(testId);
     expect(themedBox).toBeInTheDocument();
-    expect(themedBox).toHaveAttribute("aria-label", `View details for ${site.name}`);
+    expect(themedBox).toHaveAttribute(
+        "aria-label",
+        `View details for ${site.name}`
+    );
 
     // Verify sub-components are rendered
-    expect(screen.getByTestId(`site-card-header-${site.identifier}`)).toBeInTheDocument();
+    expect(
+        screen.getByTestId(`site-card-header-${site.identifier}`)
+    ).toBeInTheDocument();
     if (site.monitors.length > 0) {
-        expect(screen.getByTestId(`site-card-status-${site.monitors[0]!.id}`)).toBeInTheDocument();
-        expect(screen.getByTestId(`site-card-history-${site.monitors[0]!.id}`)).toBeInTheDocument();
+        expect(
+            screen.getByTestId(`site-card-status-${site.monitors[0]!.id}`)
+        ).toBeInTheDocument();
+        expect(
+            screen.getByTestId(`site-card-history-${site.monitors[0]!.id}`)
+        ).toBeInTheDocument();
+    } else {
+        // Handle sites with no monitors
+        expect(
+            screen.getByTestId(`site-card-status-default`)
+        ).toBeInTheDocument();
+        expect(
+            screen.getByTestId(`site-card-history-no-monitor`)
+        ).toBeInTheDocument();
     }
-    expect(screen.getByTestId(`site-card-metrics-${site.identifier}-up`)).toBeInTheDocument();
-    expect(screen.getByTestId(`site-card-footer-${site.identifier}`)).toBeInTheDocument();
+    expect(
+        screen.getByTestId(`site-card-metrics-${site.identifier}-up`)
+    ).toBeInTheDocument();
+    expect(
+        screen.getByTestId(`site-card-footer-${site.identifier}`)
+    ).toBeInTheDocument();
 };
 
 describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockSiteData = null;
+        // Clean up any leftover containers from previous tests
+        for (const container of document.querySelectorAll(
+            '[id^="sitecard-test-"]'
+        )) {
+            container.remove();
+        }
     });
 
     afterEach(() => {
         mockSiteData = null;
+        // Clean up any leftover containers after each test
+        for (const container of document.querySelectorAll(
+            '[id^="sitecard-test-"]'
+        )) {
+            container.remove();
+        }
     });
 
     describe("Basic Rendering with Arbitrary Data", () => {
         fcTest.prop([validSiteArbitrary], {
             numRuns: 50,
             timeout: 5000,
-        })(
-            "should render SiteCard with valid site data",
-            (site) => {
-                renderSiteCard(site);
+        })("should render SiteCard with valid site data", (site) => {
+            const { unmount } = renderSiteCard(site);
+
+            try {
                 verifySiteCardStructure(site);
 
-                // Verify site data is passed correctly
-                expect(screen.getByText(`Header: ${site.name}`)).toBeInTheDocument();
-                expect(screen.getByText("Status: up")).toBeInTheDocument();
-                expect(screen.getByText(/Metrics: 99\.5% \| 150ms \| 100 checks/)).toBeInTheDocument();
-                expect(screen.getByText("History: 0 entries")).toBeInTheDocument();
-                expect(screen.getByText("Click to view details")).toBeInTheDocument();
+                // Verify site data is passed correctly using unique selectors
+                expect(
+                    screen.getByTestId(`site-card-header-${site.identifier}`)
+                ).toBeInTheDocument();
+
+                // Normalize whitespace for comparison - HTML normalizes consecutive spaces
+                // Split and join to normalize whitespace instead of using regex replace
+                const normalizeWhitespace = (text: string) =>
+                    text.split(/\s+/).join(" ").trim();
+                const expectedHeaderText = normalizeWhitespace(
+                    `Header: ${site.name}`
+                );
+                const headerElement = screen.getByTestId(
+                    `site-card-header-${site.identifier}`
+                );
+                const actualHeaderText = normalizeWhitespace(
+                    headerElement.textContent || ""
+                );
+                expect(actualHeaderText).toBe(expectedHeaderText);
+
+                // Use more specific selectors to avoid conflicts between multiple cards
+                if (site.monitors.length > 0) {
+                    expect(
+                        screen.getByTestId(
+                            `site-card-status-${site.monitors[0]!.id}`
+                        )
+                    ).toHaveTextContent("Status: up");
+                    expect(
+                        screen.getByTestId(
+                            `site-card-history-${site.monitors[0]!.id}`
+                        )
+                    ).toHaveTextContent("History: 0 entries");
+                } else {
+                    expect(
+                        screen.getByTestId(`site-card-status-default`)
+                    ).toHaveTextContent("Status: up");
+                    expect(
+                        screen.getByTestId(`site-card-history-no-monitor`)
+                    ).toHaveTextContent("History: 0 entries");
+                }
+
+                expect(
+                    screen.getByTestId(
+                        `site-card-metrics-${site.identifier}-up`
+                    )
+                ).toHaveTextContent(/Metrics: 99\.5% \| 150ms \| 100 checks/);
+                expect(
+                    screen.getByTestId(`site-card-footer-${site.identifier}`)
+                ).toHaveTextContent("Click to view details");
+            } finally {
+                unmount();
             }
-        );
+        });
     });
 
     describe("Theme Integration and Styling", () => {
         fcTest.prop([validSiteArbitrary], {
             numRuns: 20,
             timeout: 3000,
-        })(
-            "should apply correct CSS classes and theme styling",
-            (site) => {
-                renderSiteCard(site);
+        })("should apply correct CSS classes and theme styling", (site) => {
+            const { unmount } = renderSiteCard(site);
 
-                const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, '_')}`;
+            try {
+                const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
                 const themedBox = screen.getByTestId(testId);
-                expect(themedBox).toHaveClass("group", "site-card", "flex", "w-full", "cursor-pointer", "flex-col", "gap-2", "text-left");
-                expect(themedBox).toHaveAttribute("aria-label", `View details for ${site.name}`);
+                expect(themedBox).toHaveClass(
+                    "group",
+                    "site-card",
+                    "flex",
+                    "w-full",
+                    "cursor-pointer",
+                    "flex-col",
+                    "gap-2",
+                    "text-left"
+                );
+                expect(themedBox).toHaveAttribute(
+                    "aria-label",
+                    `View details for ${site.name}`
+                );
+            } finally {
+                unmount();
             }
-        );
+        });
     });
 
     describe("Edge Cases and Boundary Conditions", () => {
         fcTest.prop([edgeCaseSiteArbitrary], {
             numRuns: 30,
             timeout: 5000,
-        })(
-            "should handle edge case site configurations",
-            (site) => {
-                renderSiteCard(site);
+        })("should handle edge case site configurations", (site) => {
+            const { unmount } = renderSiteCard(site);
 
-                // Should render without crashing
-                const testId = `themed-box-${site.name.replaceAll(/[^\dA-Za-z]/g, '_')}`;
+            try {
+                // Should render without crashing - use consistent testId pattern
+                const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
                 const themedBox = screen.getByTestId(testId);
                 expect(themedBox).toBeInTheDocument();
 
                 // Should still render header
-                expect(screen.getByTestId(`site-card-header-${site.identifier}`)).toBeInTheDocument();
+                expect(
+                    screen.getByTestId(`site-card-header-${site.identifier}`)
+                ).toBeInTheDocument();
+            } finally {
+                unmount();
             }
-        );
+        });
     });
 
     describe("Performance with Large Datasets", () => {
-        fcTest.prop([validSiteArbitrary.map(site => ({
-            ...site,
-            monitors: fc.sample(
-                fc.uniqueArray(validMonitorArbitrary, {
-                    selector: (monitor) => monitor.id,
-                    minLength: 3,
-                    maxLength: 10
-                }),
-                1
-            )[0],
-        }))], {
-            numRuns: 10,
-            timeout: 10_000,
-        })(
-            "should handle sites with many monitors efficiently",
-            (site) => {
-                const startTime = performance.now();
-                renderSiteCard(site);
-                const endTime = performance.now();
+        fcTest.prop(
+            [
+                validSiteArbitrary.map((site) => ({
+                    ...site,
+                    monitors: fc.sample(
+                        fc.uniqueArray(validMonitorArbitrary, {
+                            selector: (monitor) => monitor.id,
+                            minLength: 3,
+                            maxLength: 10,
+                        }),
+                        1
+                    )[0],
+                })),
+            ],
+            {
+                numRuns: 10,
+                timeout: 10_000,
+            }
+        )("should handle sites with many monitors efficiently", (site) => {
+            const startTime = performance.now();
+            const { unmount } = renderSiteCard(site);
+            const endTime = performance.now();
 
+            try {
                 // Performance assertion - should render within reasonable time
                 expect(endTime - startTime).toBeLessThan(100);
 
                 verifySiteCardStructure(site);
+            } finally {
+                unmount();
             }
-        );
+        });
     });
 
     describe("Component Resilience", () => {
         fcTest.prop([validSiteArbitrary], {
             numRuns: 20,
             timeout: 3000,
-        })(
-            "should handle sites with no monitors gracefully",
-            (site) => {
-                const siteWithNoMonitors = {
-                    ...site,
-                    monitors: [],
-                };
+        })("should handle sites with no monitors gracefully", (site) => {
+            const siteWithNoMonitors = {
+                ...site,
+                monitors: [],
+            };
 
-                renderSiteCard(siteWithNoMonitors);
+            const { unmount } = renderSiteCard(siteWithNoMonitors);
 
-                // Should render basic structure
-                const testId = `themed-box-${siteWithNoMonitors.name.replaceAll(/[^\dA-Za-z]/g, '_')}`;
+            try {
+                // Should render basic structure - use consistent testId pattern
+                const testId = `themed-box-${siteWithNoMonitors.identifier}-${siteWithNoMonitors.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
                 const themedBox = screen.getByTestId(testId);
                 expect(themedBox).toBeInTheDocument();
-                expect(screen.getByTestId(`site-card-header-${site.identifier}`)).toBeInTheDocument();
+                expect(
+                    screen.getByTestId(
+                        `site-card-header-${siteWithNoMonitors.identifier}`
+                    )
+                ).toBeInTheDocument();
+            } finally {
+                unmount();
             }
-        );
+        });
 
         fcTest.prop([validSiteArbitrary], {
             numRuns: 20,
             timeout: 3000,
-        })(
-            "should handle extremely long site names",
-            (site) => {
-                const siteWithLongName = {
-                    ...site,
-                    name: "A".repeat(200),
-                };
+        })("should handle extremely long site names", (site) => {
+            const siteWithLongName = {
+                ...site,
+                name: "A".repeat(200),
+            };
 
-                renderSiteCard(siteWithLongName);
+            const { unmount } = renderSiteCard(siteWithLongName);
+
+            try {
                 verifySiteCardStructure(siteWithLongName);
+            } finally {
+                unmount();
             }
-        );
+        });
     });
 
     describe("Accessibility and User Experience", () => {
@@ -406,11 +655,19 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
         })(
             "should provide proper ARIA labels and accessibility attributes",
             (site) => {
-                renderSiteCard(site);
+                const { unmount } = renderSiteCard(site);
 
-                const testId = `themed-box-${site.name.replaceAll(/[^\dA-Za-z]/g, '_')}`;
-                const themedBox = screen.getByTestId(testId);
-                expect(themedBox).toHaveAttribute("aria-label", `View details for ${site.name}`);
+                try {
+                    // Use consistent testId pattern
+                    const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
+                    const themedBox = screen.getByTestId(testId);
+                    expect(themedBox).toHaveAttribute(
+                        "aria-label",
+                        `View details for ${site.name}`
+                    );
+                } finally {
+                    unmount();
+                }
             }
         );
     });
@@ -419,18 +676,18 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
         fcTest.prop([validSiteArbitrary], {
             numRuns: 10,
             timeout: 5000,
-        })(
-            "should properly cleanup on unmount",
-            (site) => {
-                const { unmount } = renderSiteCard(site);
-                verifySiteCardStructure(site);
+        })("should properly cleanup on unmount", (site) => {
+            const { unmount } = renderSiteCard(site);
 
-                // Unmount and verify cleanup
-                unmount();
+            // Verify structure before unmounting
+            verifySiteCardStructure(site);
+            const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
 
-                // Verify cleanup was successful
-                expect(screen.queryByTestId("themed-box")).not.toBeInTheDocument();
-            }
-        );
+            // Unmount and verify cleanup
+            unmount();
+
+            // Verify cleanup was successful - the specific testId should not exist
+            expect(screen.queryByTestId(testId)).not.toBeInTheDocument();
+        });
     });
 });

@@ -18,11 +18,31 @@ describe(useErrorStore, () => {
         // Reset store state before each test
         const store = useErrorStore.getState();
         act(() => {
+            // Ensure complete state reset
             store.clearAllErrors();
             store.setLoading(false);
+
             // Clear all operation loading states by setting them to false
-            for (const operation of Object.keys(store.operationLoading)) {
+            const currentOperations = Object.keys(store.operationLoading);
+            for (const operation of currentOperations) {
                 store.setOperationLoading(operation, false);
+            }
+
+            // Double-check that the state is clean
+            const finalState = useErrorStore.getState();
+            if (
+                finalState.lastError !== undefined ||
+                finalState.isLoading !== false ||
+                Object.keys(finalState.storeErrors).length > 0 ||
+                Object.values(finalState.operationLoading).includes(true)
+            ) {
+                // Force a complete reset if the standard clear didn't work
+                useErrorStore.setState({
+                    isLoading: false,
+                    lastError: undefined,
+                    operationLoading: {},
+                    storeErrors: {},
+                });
             }
         });
         vi.clearAllMocks();
@@ -597,15 +617,42 @@ describe(useErrorStore, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Data Loading", "type");
 
-            const { result: result1 } = renderHook(() => useErrorStore());
-            const { result: result2 } = renderHook(() => useErrorStore());
+            // Ensure clean state for this test
+            act(() => {
+                useErrorStore.getState().clearAllErrors();
+            });
+
+            const { result: result1, rerender: rerender1 } = renderHook(() =>
+                useErrorStore()
+            );
+            const { result: result2, rerender: rerender2 } = renderHook(() =>
+                useErrorStore()
+            );
+
+            // Verify initial state is clean
+            expect(
+                result1.current.getOperationLoading("shared-operation")
+            ).toBeFalsy();
+            expect(
+                result2.current.getOperationLoading("shared-operation")
+            ).toBeFalsy();
 
             act(() => {
                 result1.current.setOperationLoading("shared-operation", true);
             });
 
+            // Force re-renders to ensure both hooks see the updated state
+            rerender1();
+            rerender2();
+
+            // Now both hooks should see the shared state
             expect(
                 result2.current.getOperationLoading("shared-operation")
+            ).toBeTruthy();
+
+            // Also verify that the first hook still sees the state
+            expect(
+                result1.current.getOperationLoading("shared-operation")
             ).toBeTruthy();
         });
 

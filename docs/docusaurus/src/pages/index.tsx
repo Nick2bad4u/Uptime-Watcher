@@ -195,6 +195,7 @@ const UIDemo = (): JSX.Element => {
  * call-to-action buttons, GitHub stats, and a demo UI window. This component is
  * used as the hero section at the top of the landing page.
  */
+
 const HomepageHeader = (): JSX.Element => (
         <header className={styles["heroSection"]}>
             <div className="container">

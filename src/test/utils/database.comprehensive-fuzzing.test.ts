@@ -2717,7 +2717,16 @@ describe("Comprehensive Database Operations Fuzzing", () => {
 
                 // Property: Processing time should be reasonable
                 expect(result.processingTimeMs).toBeGreaterThan(0);
-                expect(result.throughputRecordsPerSecond).toBeGreaterThan(0);
+
+                // Property: Throughput should be appropriate for successful operations
+                if (result.successfulRecords > 0) {
+                    expect(result.throughputRecordsPerSecond).toBeGreaterThan(
+                        0
+                    );
+                } else {
+                    // When no records are successful (e.g., ROLLBACK_ALL), throughput should be 0
+                    expect(result.throughputRecordsPerSecond).toBe(0);
+                }
 
                 // Property: Memory usage should not exceed limits
                 expect(result.memoryUsageMB).toBeLessThanOrEqual(

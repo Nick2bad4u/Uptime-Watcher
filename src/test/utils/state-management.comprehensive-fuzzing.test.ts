@@ -22,6 +22,77 @@
 import { describe, expect, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
 
+// --- Type declarations to help TS infer fast-check outputs ---
+interface MonitorState {
+    id: number;
+    name: string;
+    url: string;
+    type: "http" | "ping" | "dns" | "port";
+    status: "up" | "down" | "pending" | "paused";
+    interval: number;
+    timeout: number;
+    retries: number;
+    enabled: boolean;
+    lastChecked: Date | null;
+    responseTime: number | null;
+    uptime: number;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+interface SiteState {
+    id: number;
+    name: string;
+    url: string;
+    monitors: number[];
+    status: "up" | "down" | "mixed" | "unknown";
+    overallUptime: number;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+interface SettingsState {
+    theme: "light" | "dark" | "auto";
+    language: "en" | "es" | "fr" | "de";
+    notifications: {
+        enabled: boolean;
+        desktop: boolean;
+        email: boolean;
+        sound: boolean;
+    };
+    monitoring: {
+        defaultInterval: number;
+        defaultTimeout: number;
+        maxRetries: number;
+        enableAnalytics: boolean;
+    };
+    ui: {
+        sidebarCollapsed: boolean;
+        showTooltips: boolean;
+        animationsEnabled: boolean;
+        compactMode: boolean;
+    };
+}
+
+type StateAction =
+    | {
+          type:
+              | "ADD_MONITOR"
+              | "UPDATE_MONITOR"
+              | "DELETE_MONITOR"
+              | "TOGGLE_MONITOR";
+          payload: Partial<MonitorState> | MonitorState;
+      }
+    | {
+          type: "ADD_SITE" | "UPDATE_SITE" | "DELETE_SITE";
+          payload: Partial<SiteState> | SiteState;
+      }
+    | {
+          type: "UPDATE_SETTINGS" | "RESET_SETTINGS";
+          payload: Partial<SettingsState> | object;
+      }
+    | { type: "UPDATE_STATUS" | "BULK_STATUS_UPDATE"; payload: any };
+
 // =============================================================================
 // Custom Fast-Check Arbitraries for State Management
 // =============================================================================
@@ -29,7 +100,7 @@ import { test as fcTest, fc } from "@fast-check/vitest";
 /**
  * Generates monitor state objects for testing
  */
-const monitorStateData = fc.record({
+const monitorStateData = fc.record<MonitorState>({
     id: fc.integer({ min: 1, max: 10_000 }),
     name: fc.string({ minLength: 1, maxLength: 255 }),
     url: fc.webUrl(),
@@ -52,7 +123,7 @@ const monitorStateData = fc.record({
 /**
  * Generates site state objects for testing
  */
-const siteStateData = fc.record({
+const siteStateData = fc.record<SiteState>({
     id: fc.integer({ min: 1, max: 1000 }),
     name: fc.string({ minLength: 1, maxLength: 255 }),
     url: fc.webUrl(),
@@ -69,7 +140,7 @@ const siteStateData = fc.record({
 /**
  * Generates application settings state for testing
  */
-const settingsStateData = fc.record({
+const settingsStateData = fc.record<SettingsState>({
     theme: fc.constantFrom("light", "dark", "auto"),
     language: fc.constantFrom("en", "es", "fr", "de"),
     notifications: fc.record({
@@ -95,7 +166,7 @@ const settingsStateData = fc.record({
 /**
  * Generates state action objects for testing
  */
-const stateActions = fc.oneof(
+const stateActions: fc.Arbitrary<StateAction> = fc.oneof(
     // Monitor actions
     fc.record({
         type: fc.constantFrom(
@@ -126,7 +197,7 @@ const stateActions = fc.oneof(
             )
         ),
     })
-);
+) as unknown as fc.Arbitrary<StateAction>;
 
 // =============================================================================
 // State Management Fuzzing Tests
@@ -175,13 +246,13 @@ describe("Comprehensive State Management Fuzzing", () => {
     describe("State Mutation Safety", () => {
         fcTest.prop([monitorStateData])(
             "Monitor state updates should be immutable",
-            (monitorData) => {
+            (monitorData: MonitorState) => {
                 // Mock store with immutable update logic
-                const monitors = new Map<number, typeof monitorData>();
+                const monitors = new Map<number, MonitorState>();
                 const mockStore = {
                     monitors,
 
-                    addMonitor: (monitor: typeof monitorData) => {
+                    addMonitor: (monitor: MonitorState): MonitorState => {
                         // Validate monitor data
                         if (!monitor.id || monitor.id <= 0) {
                             throw new Error("Invalid monitor ID");
@@ -204,7 +275,7 @@ describe("Comprehensive State Management Fuzzing", () => {
 
                     updateMonitor: (
                         id: number,
-                        updates: Partial<typeof monitorData>
+                        updates: Partial<MonitorState>
                     ) => {
                         const existing = monitors.get(id);
                         if (!existing) {
@@ -223,7 +294,7 @@ describe("Comprehensive State Management Fuzzing", () => {
                         return updated;
                     },
 
-                    getMonitor: (id: number) => {
+                    getMonitor: (id: number): MonitorState | null => {
                         const monitor = monitors.get(id);
                         // Return deep copy to prevent mutation
                         return monitor ? { ...monitor } : null;
@@ -281,13 +352,34 @@ describe("Comprehensive State Management Fuzzing", () => {
             ),
         ])(
             "Bulk state updates should maintain consistency",
-            (initialMonitors, updates) => {
+            (
+                initialMonitors: MonitorState[],
+                updates: {
+                    id: number;
+                    updates: {
+                        name?: string | undefined;
+                        status?:
+                            | "up"
+                            | "down"
+                            | "pending"
+                            | "paused"
+                            | undefined;
+                        enabled?: boolean | undefined;
+                    };
+                }[]
+            ) => {
                 const bulkMonitors = new Map<number, any>();
                 const mockBulkStore = {
                     monitors: bulkMonitors,
 
-                    bulkAdd: (monitors: typeof initialMonitors) => {
-                        const results: any[] = [];
+                    bulkAdd: (
+                        monitors: MonitorState[]
+                    ): {
+                        results: MonitorState[];
+                        errors: string[];
+                        total: number;
+                    } => {
+                        const results: MonitorState[] = [];
                         const errors: string[] = [];
 
                         for (const monitor of monitors) {
@@ -317,8 +409,26 @@ describe("Comprehensive State Management Fuzzing", () => {
                         return { results, errors, total: monitors.length };
                     },
 
-                    bulkUpdate: (updateRequests: typeof updates) => {
-                        const results: any[] = [];
+                    bulkUpdate: (
+                        updateRequests: {
+                            id: number;
+                            updates: {
+                                name?: string | undefined;
+                                status?:
+                                    | "up"
+                                    | "down"
+                                    | "pending"
+                                    | "paused"
+                                    | undefined;
+                                enabled?: boolean | undefined;
+                            };
+                        }[]
+                    ): {
+                        results: MonitorState[];
+                        errors: string[];
+                        total: number;
+                    } => {
+                        const results: MonitorState[] = [];
                         const errors: string[] = [];
 
                         for (const update of updateRequests) {
@@ -406,7 +516,7 @@ describe("Comprehensive State Management Fuzzing", () => {
     describe("Action Validation and Dispatch", () => {
         fcTest.prop([stateActions])(
             "State actions should be validated before dispatch",
-            (action) => {
+            (action: StateAction) => {
                 const mockActionDispatcher = {
                     validators: {
                         ADD_MONITOR: (payload: any) => {
@@ -492,7 +602,12 @@ describe("Comprehensive State Management Fuzzing", () => {
                         },
                     },
 
-                    dispatch(actionToDispatch: typeof action) {
+                    dispatch(actionToDispatch: StateAction): {
+                        success: boolean;
+                        error: string | null;
+                        payload: any;
+                        type?: string;
+                    } {
                         const validator =
                             this.validators[
                                 actionToDispatch.type as keyof typeof this.validators
@@ -561,12 +676,15 @@ describe("Comprehensive State Management Fuzzing", () => {
 
         fcTest.prop([fc.array(stateActions, { minLength: 1, maxLength: 20 })])(
             "Action queue should process actions in order",
-            (actionQueue) => {
+            (actionQueue: StateAction[]) => {
                 const mockActionQueue = {
                     queue: [] as any[],
                     processed: [] as any[],
 
-                    enqueue(actionsToQueue: typeof actionQueue) {
+                    enqueue(actionsToQueue: StateAction[]): {
+                        queued: number;
+                        totalInQueue: number;
+                    } {
                         this.queue.push(...actionsToQueue);
                         return {
                             queued: actionsToQueue.length,
@@ -574,7 +692,11 @@ describe("Comprehensive State Management Fuzzing", () => {
                         };
                     },
 
-                    processQueue() {
+                    processQueue(): {
+                        processed: number;
+                        results: any[];
+                        queueEmpty: boolean;
+                    } {
                         const results: any[] = [];
 
                         while (this.queue.length > 0) {

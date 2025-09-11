@@ -247,14 +247,14 @@ describe("ChartConfigService - Property-Based Fuzzing Tests", () => {
 
                 // Verify scales configuration
                 if (config.scales) {
-                    expect(config.scales['x']).toBeDefined();
-                    expect(config.scales['y']).toBeDefined();
+                    expect(config.scales["x"]).toBeDefined();
+                    expect(config.scales["y"]).toBeDefined();
                     if (
-                        config.scales['y'] &&
-                        typeof config.scales['y'] === "object"
+                        config.scales["y"] &&
+                        typeof config.scales["y"] === "object"
                     ) {
                         expect(
-                            (config.scales['y'] as any).beginAtZero
+                            (config.scales["y"] as any).beginAtZero
                         ).toBeTruthy();
                     }
                 }

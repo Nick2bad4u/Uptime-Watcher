@@ -145,6 +145,7 @@ export class ConfigurationManager {
      *
      * @internal
      */
+
     private readonly siteValidator: SiteValidator;
 
     /**

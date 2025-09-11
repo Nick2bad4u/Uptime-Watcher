@@ -54,6 +54,7 @@ import type {
  *
  * @public
  */
+
 export interface UptimeChartOptions {
     /** Animation configuration */
     animation?: {

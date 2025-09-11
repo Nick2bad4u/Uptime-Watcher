@@ -1,8 +1,6 @@
 /**
  * Advanced fuzzing tests for type guards and validation utilities.
  *
- * @ts-expect-error Complex fuzzing tests with intentional type mismatches - exact type safety deferred for validation testing
- *
  * @remarks
  * This test suite focuses on achieving 100% branch coverage for type guard
  * functions and validation utilities through intensive property-based testing.
@@ -17,6 +15,8 @@
  * - Performance characteristics under stress
  *
  * @file Advanced fuzzing tests for type guards and validation utilities
+ *
+ * @ts-expect-error Complex fuzzing tests with intentional type mismatches - exact type safety deferred for validation testing
  */
 
 import { describe, expect } from "vitest";

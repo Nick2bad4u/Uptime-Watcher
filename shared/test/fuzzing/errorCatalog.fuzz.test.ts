@@ -219,7 +219,16 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
             const params = { [key]: value };
             const result = formatErrorMessage(template, params);
 
-            expect(result).toBe(`Error: ${String(value)}`);
+            // Security feature: dangerous prototype keys are skipped
+            if (
+                key === "__proto__" ||
+                key === "constructor" ||
+                key === "prototype"
+            ) {
+                expect(result).toBe(`Error: {${key}}`); // Placeholder remains unchanged
+            } else {
+                expect(result).toBe(`Error: ${String(value)}`);
+            }
         });
 
         it("should handle empty template", () => {

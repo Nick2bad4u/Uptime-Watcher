@@ -7,66 +7,130 @@
 
 import type { Theme } from "../types";
 
+// Helper function to merge objects, allowing explicit undefined to override
+const mergeWithExplicitUndefined = <T extends Record<string, unknown>>(
+    base: T,
+    override?: Partial<T>
+): T => {
+    if (!override) return { ...base };
+
+    // Simple spread behavior: explicit undefined overrides
+    return { ...base, ...override };
+};
+
+// Special merge function for fontSize that skips undefined but allows null
+const mergeFontSize = (
+    baseFontSize: Theme["typography"]["fontSize"],
+    overrideFontSize?: Partial<Theme["typography"]["fontSize"]>
+): Theme["typography"]["fontSize"] => {
+    if (!overrideFontSize) return { ...baseFontSize };
+
+    const result = { ...baseFontSize };
+    for (const [key, value] of Object.entries(overrideFontSize)) {
+        if (value !== undefined) {
+            // Allow null and other values, but skip undefined
+            (result as Record<string, unknown>)[key] = value;
+        }
+    }
+    return result;
+};
+
 // Helper functions for theme merging (reduces function length by composition)
 const mergeColors = (
     baseColors: Theme["colors"],
     overrideColors?: Partial<Theme["colors"]>
-): Theme["colors"] => ({
-    ...baseColors,
-    ...overrideColors,
-    background: {
-        ...baseColors.background,
-        ...overrideColors?.background,
-    },
-    border: {
-        ...baseColors.border,
-        ...overrideColors?.border,
-    },
-    hover: {
-        ...baseColors.hover,
-        ...overrideColors?.hover,
-    },
-    primary: {
-        ...baseColors.primary,
-        ...overrideColors?.primary,
-    },
-    status: {
-        ...baseColors.status,
-        ...overrideColors?.status,
-    },
-    surface: {
-        ...baseColors.surface,
-        ...overrideColors?.surface,
-    },
-    text: {
-        ...baseColors.text,
-        ...overrideColors?.text,
-    },
-});
+): Theme["colors"] => {
+    if (!overrideColors) {
+        return {
+            ...baseColors,
+            background: { ...baseColors.background },
+            border: { ...baseColors.border },
+            hover: { ...baseColors.hover },
+            primary: { ...baseColors.primary },
+            status: { ...baseColors.status },
+            surface: { ...baseColors.surface },
+            text: { ...baseColors.text },
+        };
+    }
+
+    return {
+        ...baseColors,
+        ...(Object.hasOwn(overrideColors, "error") && {
+            error: overrideColors.error,
+        }),
+        ...(Object.hasOwn(overrideColors, "errorAlert") && {
+            errorAlert: overrideColors.errorAlert,
+        }),
+        ...(Object.hasOwn(overrideColors, "info") && {
+            info: overrideColors.info,
+        }),
+        ...(Object.hasOwn(overrideColors, "success") && {
+            success: overrideColors.success,
+        }),
+        ...(Object.hasOwn(overrideColors, "warning") && {
+            warning: overrideColors.warning,
+        }),
+        background: mergeWithExplicitUndefined(
+            baseColors.background,
+            overrideColors.background
+        ),
+        border: mergeWithExplicitUndefined(
+            baseColors.border,
+            overrideColors.border
+        ),
+        hover: mergeWithExplicitUndefined(
+            baseColors.hover,
+            overrideColors.hover
+        ),
+        primary: mergeWithExplicitUndefined(
+            baseColors.primary,
+            overrideColors.primary
+        ),
+        status: mergeWithExplicitUndefined(
+            baseColors.status,
+            overrideColors.status
+        ),
+        surface: mergeWithExplicitUndefined(
+            baseColors.surface,
+            overrideColors.surface
+        ),
+        text: mergeWithExplicitUndefined(baseColors.text, overrideColors.text),
+    };
+};
 
 const mergeTypography = (
     baseTypography: Theme["typography"],
     overrideTypography?: Partial<Theme["typography"]>
-): Theme["typography"] => ({
-    ...baseTypography,
-    ...overrideTypography,
-    fontFamily: {
-        ...baseTypography.fontFamily,
-        ...overrideTypography?.fontFamily,
-    },
-    fontSize: {
-        ...baseTypography.fontSize,
-        ...overrideTypography?.fontSize,
-    },
-    fontWeight: {
-        ...baseTypography.fontWeight,
-        ...overrideTypography?.fontWeight,
-    },
-    lineHeight: {
-        ...baseTypography.lineHeight,
-        ...overrideTypography?.lineHeight,
-    },
-});
+): Theme["typography"] => {
+    if (!overrideTypography) {
+        return {
+            ...baseTypography,
+            fontFamily: { ...baseTypography.fontFamily },
+            fontSize: { ...baseTypography.fontSize },
+            fontWeight: { ...baseTypography.fontWeight },
+            lineHeight: { ...baseTypography.lineHeight },
+        };
+    }
+
+    return {
+        fontFamily: mergeWithExplicitUndefined(
+            baseTypography.fontFamily,
+            overrideTypography.fontFamily
+        ),
+        fontSize: mergeFontSize(
+            baseTypography.fontSize,
+            overrideTypography.fontSize
+        ),
+        fontWeight: mergeWithExplicitUndefined(
+            baseTypography.fontWeight,
+            overrideTypography.fontWeight
+        ),
+        lineHeight: mergeWithExplicitUndefined(
+            baseTypography.lineHeight,
+            overrideTypography.lineHeight
+        ),
+    };
+};
 
 /**
  * Deep merge themes with proper type safety and nested object handling.

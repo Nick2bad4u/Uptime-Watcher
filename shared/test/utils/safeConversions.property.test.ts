@@ -152,7 +152,7 @@ describe("SafeConversions - Property-Based Tests", () => {
         test.prop({
             value: fc
                 .float({ min: Math.fround(-1000), max: Math.fround(1000) })
-                .filter((n) => !Number.isInteger(n)),
+                .filter((n) => !Number.isInteger(n) && Number.isFinite(n)),
         })("should floor floating point numbers", (props) => {
             const result = safeParseInt(props.value);
             expect(result).toBe(Math.floor(props.value));
@@ -183,7 +183,9 @@ describe("SafeConversions - Property-Based Tests", () => {
 
     describe(safeParsePercentage, () => {
         test.prop({
-            value: fc.float({ min: Math.fround(0), max: Math.fround(100) }),
+            value: fc
+                .float({ min: Math.fround(0), max: Math.fround(100) })
+                .filter((n) => Number.isFinite(n)),
         })("should return the same value for valid percentages", (props) => {
             const result = safeParsePercentage(props.value);
             expect(result).toBeCloseTo(props.value, 5);
@@ -192,7 +194,9 @@ describe("SafeConversions - Property-Based Tests", () => {
         });
 
         test.prop({
-            value: fc.float({ min: Math.fround(101), max: Math.fround(1000) }),
+            value: fc
+                .float({ min: Math.fround(101), max: Math.fround(1000) })
+                .filter((n) => Number.isFinite(n)),
         })("should clamp values > 100 to 100", (props) => {
             const result = safeParsePercentage(props.value);
             expect(result).toBe(100);
@@ -298,10 +302,12 @@ describe("SafeConversions - Property-Based Tests", () => {
 
     describe(safeParseTimeout, () => {
         test.prop({
-            value: fc.float({
-                min: Math.fround(0.1),
-                max: Math.fround(100_000),
-            }),
+            value: fc
+                .float({
+                    min: Math.fround(0.1),
+                    max: Math.fround(100_000),
+                })
+                .filter((n) => Number.isFinite(n)),
         })("should return positive timeouts unchanged", (props) => {
             const result = safeParseTimeout(props.value);
             expect(result).toBe(props.value);
@@ -309,11 +315,15 @@ describe("SafeConversions - Property-Based Tests", () => {
         });
 
         test.prop({
-            value: fc.float({ min: Math.fround(-1000), max: Math.fround(0) }),
-            defaultValue: fc.float({
-                min: Math.fround(1),
-                max: Math.fround(100_000),
-            }),
+            value: fc
+                .float({ min: Math.fround(-1000), max: Math.fround(0) })
+                .filter((n) => Number.isFinite(n)),
+            defaultValue: fc
+                .float({
+                    min: Math.fround(1),
+                    max: Math.fround(100_000),
+                })
+                .filter((n) => Number.isFinite(n)),
         })("should return default for non-positive timeouts", (props) => {
             const result = safeParseTimeout(props.value, props.defaultValue);
             expect(result).toBe(props.defaultValue);

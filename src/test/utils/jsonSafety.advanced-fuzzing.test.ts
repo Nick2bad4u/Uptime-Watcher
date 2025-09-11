@@ -61,6 +61,7 @@ function normalizeForJsonComparison(value: any): any {
     }
 
     // For objects, remove undefined properties and handle special values
+    // Create a normal object to mimic JSON.parse behavior (which creates objects with Object.prototype)
     const normalized: any = {};
     for (const [key, val] of Object.entries(value)) {
         if (val !== undefined) {
@@ -71,6 +72,14 @@ function normalizeForJsonComparison(value: any): any {
             }
         }
     }
+
+    // Handle objects with __proto__: null - they become regular objects through JSON round-trip
+    // Also handles objects with special prototype pollution keys
+    if (Object.getPrototypeOf(value) === null) {
+        // Return a regular object with Object.prototype to match JSON round-trip behavior
+        return { ...normalized };
+    }
+
     return normalized;
 }
 
@@ -179,7 +188,8 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
             ),
         ])("should parse valid JSON primitives correctly", (primitive) => {
             const jsonString = JSON.stringify(primitive);
-            const validator = (_data: unknown): _data is typeof primitive => true;
+            const validator = (_data: unknown): _data is typeof primitive =>
+                true;
 
             const result = safeJsonParse(jsonString, validator);
 

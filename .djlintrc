@@ -14,5 +14,7 @@
     "blank_line_before_tag": "true",
     "format_css": true,
     "format_js": true,
-    "use_gitignore": true
+    "use_gitignore": true,
+    "close_void_tags": true,
+    "ignore_case": true
 }

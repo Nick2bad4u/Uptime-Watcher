@@ -7,67 +7,68 @@
  * persistence operations. The Settings component manages critical application
  * configuration and data operations.
  *
- * T        )(
-            "should hand        )(
-            "should handle extreme settings configurations gracefully",
-            async (extremeSettings) => {
-// Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
-                vi.clearAllMocks();
-
-                mockSettingsState = extremeSettings as AppSettings;
-
-                expect(() => {
-                    render(<Settings onClose={mockOnClose} />);
-                }).not.toThrow();
-
-                // Component should still render with defensive programming
-                expect(screen.getAllByText("⚙️ Settings")[0]).toBeInTheDocument();
-
-            }
-        );valid settings configurations",
-            async (settings) => {
-// Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
-                vi.clearAllMocks();
-
-                mockSettingsState = settings;
-
-                expect(() => {
-                    render(<Settings onClose={mockOnClose} />);
-                }).not.toThrow();
-
-                // Verify settings modal renders
-                expect(screen.getAllByText("⚙️ Settings")[0]).toBeInTheDocument();
-
-            }
-        );omponent handles:
+ * T )( "should hand )( "should handle extreme settings configurations
+ * gracefully", async (extremeSettings) => { // Manual DOM cleanup for
+ * property-based testing iterations document.body.innerHTML = '<div
+ * id="vitest-test-root"></div>'; vi.clearAllMocks();
+ *
+ * ```
+ *             mockSettingsState = extremeSettings as AppSettings;
+ *
+ *             expect(() => {
+ *                 render(<Settings onClose={mockOnClose} />);
+ *             }).not.toThrow();
+ *
+ *             // Component should still render with defensive programming
+ *             expect(screen.getAllByText("⚙️ Settings")[0]).toBeInTheDocument();
+ *
+ *         }
+ *     );valid settings configurations",
+ *         async (settings) => {
+ * ```
+ *
+ * // Manual DOM cleanup for property-based testing iterations
+ * document.body.innerHTML = '<div id="vitest-test-root"></div>';
+ * vi.clearAllMocks();
+ *
+ * ```
+ *             mockSettingsState = settings;
+ *
+ *             expect(() => {
+ *                 render(<Settings onClose={mockOnClose} />);
+ *             }).not.toThrow();
+ *
+ *             // Verify settings modal renders
+ *             expect(screen.getAllByText("⚙️ Settings")[0]).toBeInTheDocument();
+ *
+ *         }
+ *     );omponent handles:
+ * ```
  *
  * - Theme selection and system preferences
  * - History limit configuration with validation
  * - Notification and sound preferences
  * - Auto-start and tray behavior settings
- * - Data import/export operations
-        )(
-            "should handle settings reset with confirmation",
-            async (confirmReset) => {
-// Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
-                vi.clearAllMocks();
-
-                (window.confirm as any).mockReturnValue(confirmReset);
-
-                render(<Settings onClose={mockOnClose} />);
-
-                const resetButton = screen.getAllByText("Reset to Defaults")[0];
-                fireEvent.click(resetButton);
-
-                expect(window.confirm).toHaveBeenCalledWith(
-                    "Are you sure you want to reset all settings to defaults?"
-                );
-
-                if (confirmReset) {
-                    expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
+ * - Data import/export operations )( "should handle settings reset with
+ *   confirmation", async (confirmReset) => { // Manual DOM cleanup for
+ *   property-based testing iterations document.body.innerHTML = '<div
+ *   id="vitest-test-root"></div>'; vi.clearAllMocks();
+ *
+ *   ```
+ *             (window.confirm as any).mockReturnValue(confirmReset);
+ *
+ *           render(<Settings onClose={mockOnClose} />);
+ *
+ *           const resetButton = screen.getAllByText("Reset to Defaults")[0];
+ *           fireEvent.click(resetButton);
+ *
+ *           expect(window.confirm).toHaveBeenCalledWith(
+ *               "Are you sure you want to reset all settings to defaults?"
+ *           );
+ *
+ *           if (confirmReset) {
+ *               expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
+ * ```
  * - Error handling and recovery
  *
  * Focus areas:
@@ -82,12 +83,7 @@
 
 import { describe, expect, vi, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
-import {
-    render,
-    screen,
-    fireEvent,
-
-} from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 import "@testing-library/jest-dom";
 import type { AppSettings } from "../../../stores/types";
@@ -197,11 +193,7 @@ vi.mock("../../../theme/useTheme", () => ({
             isDark: mockSettingsState.theme === "dark",
             colors: {},
         },
-        availableThemes: [
-            "light",
-            "dark",
-            "system",
-        ],
+        availableThemes: ["light", "dark", "system"],
         setTheme: mockSetTheme,
     })),
 }));
@@ -334,7 +326,7 @@ const invalidHistoryLimitArbitrary = fc.oneof(
     fc.integer({ min: -100, max: -2 }), // Invalid negative numbers (bounded)
     fc.integer({ min: 0, max: 24 }), // Too small
     fc.integer({ min: 10_001, max: 50_000 }), // Too large (bounded)
-    fc.integer().map(n => n + 0.5), // Simulate decimal numbers as integers + 0.5
+    fc.integer().map((n) => n + 0.5), // Simulate decimal numbers as integers + 0.5
     fc.constant(0), // Zero edge case
     fc.constant(-1) // Special case for unlimited
 );
@@ -427,7 +419,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 }).not.toThrow();
 
                 // Verify settings modal renders
-                expect(screen.getAllByText("⚙️ Settings")[0]).toBeInTheDocument();
+                expect(
+                    screen.getAllByText("⚙️ Settings")[0]
+                ).toBeInTheDocument();
             }
         );
 
@@ -448,7 +442,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 }).not.toThrow();
 
                 // Component should still render with defensive programming
-                expect(screen.getAllByText("⚙️ Settings")[0]).toBeInTheDocument();
+                expect(
+                    screen.getAllByText("⚙️ Settings")[0]
+                ).toBeInTheDocument();
             }
         );
     });
@@ -458,9 +454,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             numRuns: 50,
             timeout: 5000,
         })("should handle theme selection correctly", async (themeName) => {
-// Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
-                vi.clearAllMocks();
+            // Manual DOM cleanup for property-based testing iterations
+            document.body.innerHTML = '<div id="vitest-test-root"></div>';
+            vi.clearAllMocks();
 
             render(<Settings onClose={mockOnClose} />);
 
@@ -472,7 +468,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             fireEvent.change(themeSelect, { target: { value: themeName } });
 
             expect(mockSetTheme).toHaveBeenCalledWith(themeName);
-
         });
 
         fcTest.prop([fc.integer({ min: 1, max: 10 })], {
@@ -481,7 +476,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
         })(
             "should handle rapid theme changes without issues",
             async (changeCount) => {
-// Manual DOM cleanup for property-based testing iterations
+                // Manual DOM cleanup for property-based testing iterations
                 document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
@@ -490,11 +485,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 const themeSelect = screen.getAllByLabelText(
                     "Select application theme"
                 )[0]!;
-                const themes: ThemeName[] = [
-                    "light",
-                    "dark",
-                    "system",
-                ];
+                const themes: ThemeName[] = ["light", "dark", "system"];
 
                 for (let i = 0; i < changeCount; i++) {
                     const theme = themes[i % themes.length];
@@ -504,7 +495,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 }
 
                 expect(mockSetTheme).toHaveBeenCalledTimes(changeCount);
-
             }
         );
     });
@@ -516,7 +506,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
         })(
             "should handle valid history limit changes",
             async (historyLimit) => {
-// Manual DOM cleanup for property-based testing iterations
+                // Manual DOM cleanup for property-based testing iterations
                 document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
@@ -533,7 +523,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 expect(mockUpdateHistoryLimitValue).toHaveBeenCalledWith(
                     historyLimit
                 );
-
             }
         );
 
@@ -543,7 +532,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
         })(
             "should handle invalid history limit values gracefully",
             async (invalidLimit) => {
-// Manual DOM cleanup for property-based testing iterations
+                // Manual DOM cleanup for property-based testing iterations
                 document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
@@ -559,7 +548,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                         target: { value: invalidLimit.toString() },
                     });
                 }).not.toThrow();
-
             }
         );
     });
@@ -594,8 +582,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 fireEvent.click(notificationsCheckbox);
 
                 // Test sound alerts checkbox
-                const soundAlertsCheckbox =
-                    screen.getByLabelText("Enable sound alerts");
+                const soundAlertsCheckbox = screen.getByLabelText(
+                    "Enable sound alerts"
+                );
                 fireEvent.click(soundAlertsCheckbox);
 
                 // Test auto start checkbox
@@ -612,7 +601,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
                 // Verify update calls were made
                 expect(mockUpdateSettings).toHaveBeenCalled();
-
             }
         );
 
@@ -620,9 +608,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             numRuns: 30,
             timeout: 15_000,
         })("should handle rapid checkbox toggling", async (toggleCount) => {
-// Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
-                vi.clearAllMocks();
+            // Manual DOM cleanup for property-based testing iterations
+            document.body.innerHTML = '<div id="vitest-test-root"></div>';
+            vi.clearAllMocks();
 
             render(<Settings onClose={mockOnClose} />);
 
@@ -635,7 +623,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             }
 
             expect(mockUpdateSettings).toHaveBeenCalledTimes(toggleCount);
-
         });
     });
 
@@ -644,9 +631,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             numRuns: 50,
             timeout: 5000,
         })("should handle sync operations", async (shouldFail) => {
-// Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
-                vi.clearAllMocks();
+            // Manual DOM cleanup for property-based testing iterations
+            document.body.innerHTML = '<div id="vitest-test-root"></div>';
+            vi.clearAllMocks();
 
             if (shouldFail) {
                 mockFullSyncFromBackend.mockRejectedValueOnce(
@@ -668,10 +655,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
             // For error checking, we need to give React a chance to update state
             if (shouldFail) {
-                await new Promise(resolve => setTimeout(resolve, 10));
+                await new Promise((resolve) => setTimeout(resolve, 10));
                 expect(mockSetError).toHaveBeenCalled();
             }
-
         });
 
         // eslint-disable-next-line no-warning-comments -- Temporarily disabling problematic test
@@ -716,7 +702,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
         })(
             "should handle settings reset with confirmation",
             async (confirmReset) => {
-// Manual DOM cleanup for property-based testing iterations
+                // Manual DOM cleanup for property-based testing iterations
                 document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
@@ -724,7 +710,8 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
                 render(<Settings onClose={mockOnClose} />);
 
-                const resetButton = screen.getAllByText("Reset to Defaults")[0]!;
+                const resetButton =
+                    screen.getAllByText("Reset to Defaults")[0]!;
 
                 fireEvent.click(resetButton);
 
@@ -743,7 +730,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 } else {
                     expect(mockResetSettings).not.toHaveBeenCalled();
                 }
-
             }
         );
     });
@@ -755,7 +741,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
         })(
             "should handle error scenarios gracefully",
             async (errorScenario) => {
-// Manual DOM cleanup for property-based testing iterations
+                // Manual DOM cleanup for property-based testing iterations
                 document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
@@ -775,7 +761,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                         expect(errorAlert).toBeInTheDocument();
                     }
                 }
-
             }
         );
     });
@@ -785,9 +770,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             numRuns: 30,
             timeout: 10_000,
         })("should handle close button interactions", async (clickCount) => {
-// Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
-                vi.clearAllMocks();
+            // Manual DOM cleanup for property-based testing iterations
+            document.body.innerHTML = '<div id="vitest-test-root"></div>';
+            vi.clearAllMocks();
 
             render(<Settings onClose={mockOnClose} />);
 
@@ -798,7 +783,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             }
 
             expect(mockOnClose).toHaveBeenCalledTimes(clickCount);
-
         });
     });
 
@@ -809,7 +793,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
         })(
             "should maintain accessibility attributes under all conditions",
             async (settings) => {
-// Manual DOM cleanup for property-based testing iterations
+                // Manual DOM cleanup for property-based testing iterations
                 document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
@@ -852,7 +836,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 ]) {
                     expect(element).not.toHaveAttribute("tabindex", "-1");
                 }
-
             }
         );
     });
@@ -877,7 +860,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
         )(
             "should handle rapid setting changes efficiently",
             async (scenario) => {
-// Manual DOM cleanup for property-based testing iterations
+                // Manual DOM cleanup for property-based testing iterations
                 document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
@@ -891,11 +874,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                         const themeSelect = screen.getAllByLabelText(
                             "Select application theme"
                         )[0]!;
-                        const themes = [
-                            "light",
-                            "dark",
-                            "system",
-                        ];
+                        const themes = ["light", "dark", "system"];
                         for (let i = 0; i < scenario.rapidChanges; i++) {
                             const theme = themes[i % themes.length];
                             fireEvent.change(themeSelect, {
@@ -908,13 +887,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                         const historySelect = screen.getAllByLabelText(
                             "Maximum number of history records to keep per site"
                         )[0]!;
-                        const limits = [
-                            25,
-                            50,
-                            100,
-                            500,
-                            1000,
-                        ];
+                        const limits = [25, 50, 100, 500, 1000];
                         for (let i = 0; i < scenario.rapidChanges; i++) {
                             const limit = limits[i % limits.length]!;
                             fireEvent.change(historySelect, {
@@ -933,7 +906,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                         break;
                     }
                     case "soundAlerts": {
-                        const checkbox = screen.getByLabelText("Enable sound alerts");
+                        const checkbox = screen.getByLabelText(
+                            "Enable sound alerts"
+                        );
                         for (let i = 0; i < scenario.rapidChanges; i++) {
                             fireEvent.click(checkbox);
                         }
@@ -946,7 +921,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
                 // Should handle rapid changes efficiently
                 expect(operationTime).toBeLessThan(10_000); // 10 seconds max
-
             }
         );
     });

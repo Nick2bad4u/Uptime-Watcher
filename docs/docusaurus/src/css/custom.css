@@ -124,7 +124,7 @@
 }
 
 /* Faster sidebar animations - base selectors first */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .theme-doc-sidebar-menu .menu__link {
         transition: none;
     }
@@ -162,7 +162,7 @@
 }
 
 /* Subtle hover elevation */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .theme-doc-sidebar-menu .menu__link:hover,
     .theme-doc-sidebar-menu .menu__link:focus {
         background: rgb(0 0 0 / 4%);
@@ -170,7 +170,7 @@
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .theme-doc-sidebar-menu .menu__link:hover,
     .theme-doc-sidebar-menu .menu__link:focus {
         background: rgb(0 0 0 / 4%);
@@ -178,7 +178,7 @@
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .theme-doc-sidebar-menu .menu__link:hover,
     .theme-doc-sidebar-menu .menu__link:focus {
         background: rgb(0 0 0 / 4%);
@@ -186,7 +186,7 @@
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .theme-doc-sidebar-menu .menu__link:hover,
     .theme-doc-sidebar-menu .menu__link:focus {
         background: rgb(0 0 0 / 4%);
@@ -194,7 +194,47 @@
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-menu .menu__link:hover,
+    .theme-doc-sidebar-menu .menu__link:focus {
+        background: rgb(0 0 0 / 4%);
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-menu .menu__link:hover,
+    .theme-doc-sidebar-menu .menu__link:focus {
+        background: rgb(0 0 0 / 4%);
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-menu .menu__link:hover,
+    .theme-doc-sidebar-menu .menu__link:focus {
+        background: rgb(0 0 0 / 4%);
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-menu .menu__link:hover,
+    .theme-doc-sidebar-menu .menu__link:focus {
+        background: rgb(0 0 0 / 4%);
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-menu .menu__link:hover,
+    .theme-doc-sidebar-menu .menu__link:focus {
+        background: rgb(0 0 0 / 4%);
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
     .theme-doc-sidebar-menu .menu__link:hover,
     .theme-doc-sidebar-menu .menu__link:focus {
         background: rgb(0 0 0 / 4%);
@@ -230,6 +270,13 @@
 .theme-doc-sidebar-menu .menu__link:focus {
     background: rgb(0 0 0 / 4%);
     transition: all 0.1s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-menu .menu__link:hover,
+    .theme-doc-sidebar-menu .menu__link:focus {
+        transition: none;
+    }
 }
 
 /* Dark theme hover - higher specificity */
@@ -281,7 +328,7 @@
     background: var(--ifm-color-primary);
     color: #fff;
     content: attr(data-badge);
-    font-size: 12px; /* Increased from 10px for better accessibility */
+    font-size: 16px; /* Accessible font size - minimum 16px for readability */
     font-weight: 600;
     letter-spacing: 0.5px;
     margin-inline-start: 8px;
@@ -305,7 +352,7 @@
     background: #d627e3;
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .menu__list-item-collapsible .menu__caret {
         transition: none;
     }
@@ -315,7 +362,7 @@
     transition: transform 0.08s ease;
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .menu__list {
         transition: none;
     }
@@ -326,7 +373,7 @@
 }
 
 /* Base typography - must come before specific selectors */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     h1,
     h2,
     h3 {
@@ -335,7 +382,7 @@
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     h1,
     h2,
     h3 {
@@ -344,7 +391,7 @@
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     h1,
     h2,
     h3 {
@@ -353,7 +400,7 @@
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     h1,
     h2,
     h3 {
@@ -362,7 +409,43 @@
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
+    h1,
+    h2,
+    h3 {
+        position: relative;
+        animation: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    h1,
+    h2,
+    h3 {
+        position: relative;
+        animation: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    h1,
+    h2,
+    h3 {
+        position: relative;
+        animation: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    h1,
+    h2,
+    h3 {
+        position: relative;
+        animation: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
     h1,
     h2,
     h3 {
@@ -405,41 +488,84 @@ h3 {
     animation: slideInUp 0.8s var(--animation-smooth);
 }
 
+@media (prefers-reduced-motion: reduce) {
+    h1,
+    h2,
+    h3 {
+        animation: none;
+    }
+}
+
 /* Generated index pages heading spacing tweak */
 .theme-doc-markdown h1:first-of-type {
     margin-block-start: 0.5rem;
 }
 
 /* Speed up document sidebar navigation */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .theme-doc-sidebar-item-link,
     .theme-doc-sidebar-item-category {
         transition: none !important;
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .theme-doc-sidebar-item-link,
     .theme-doc-sidebar-item-category {
         transition: none !important;
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .theme-doc-sidebar-item-link,
     .theme-doc-sidebar-item-category {
         transition: none !important;
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .theme-doc-sidebar-item-link,
     .theme-doc-sidebar-item-category {
         transition: none !important;
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-item-link,
+    .theme-doc-sidebar-item-category {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-item-link,
+    .theme-doc-sidebar-item-category {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-item-link,
+    .theme-doc-sidebar-item-category {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-item-link,
+    .theme-doc-sidebar-item-category {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-item-link,
+    .theme-doc-sidebar-item-category {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
     .theme-doc-sidebar-item-link,
     .theme-doc-sidebar-item-category {
         transition: none !important;
@@ -472,8 +598,15 @@ h3 {
     transition: all 0.05s ease !important;
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-item-link,
+    .theme-doc-sidebar-item-category {
+        transition: none !important;
+    }
+}
+
 /* Speed up page content transitions */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .theme-doc-markdown {
         animation: none !important;
     }
@@ -483,7 +616,7 @@ h3 {
     animation: fadeInFast 0.1s ease-out !important;
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .markdown > h1,
     .markdown > h2,
     .markdown > h3,
@@ -498,7 +631,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .markdown > h1,
     .markdown > h2,
     .markdown > h3,
@@ -513,7 +646,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .markdown > h1,
     .markdown > h2,
     .markdown > h3,
@@ -528,7 +661,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .markdown > h1,
     .markdown > h2,
     .markdown > h3,
@@ -543,7 +676,82 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
+    .markdown > h1,
+    .markdown > h2,
+    .markdown > h3,
+    .markdown > h4,
+    .markdown > h5,
+    .markdown > h6,
+    .markdown > p,
+    .markdown > div,
+    .markdown > section,
+    .markdown > article {
+        animation: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .markdown > h1,
+    .markdown > h2,
+    .markdown > h3,
+    .markdown > h4,
+    .markdown > h5,
+    .markdown > h6,
+    .markdown > p,
+    .markdown > div,
+    .markdown > section,
+    .markdown > article {
+        animation: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .markdown > h1,
+    .markdown > h2,
+    .markdown > h3,
+    .markdown > h4,
+    .markdown > h5,
+    .markdown > h6,
+    .markdown > p,
+    .markdown > div,
+    .markdown > section,
+    .markdown > article {
+        animation: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .markdown > h1,
+    .markdown > h2,
+    .markdown > h3,
+    .markdown > h4,
+    .markdown > h5,
+    .markdown > h6,
+    .markdown > p,
+    .markdown > div,
+    .markdown > section,
+    .markdown > article {
+        animation: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .markdown > h1,
+    .markdown > h2,
+    .markdown > h3,
+    .markdown > h4,
+    .markdown > h5,
+    .markdown > h6,
+    .markdown > p,
+    .markdown > div,
+    .markdown > section,
+    .markdown > article {
+        animation: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
     .markdown > h1,
     .markdown > h2,
     .markdown > h3,
@@ -625,7 +833,7 @@ h3 {
 /* Fix theme toggle icon to show correctly - override default Docusaurus behavior */
 
 /* Target the color mode toggle button more specifically */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .navbar__item button[aria-label*="color mode"],
     .navbar__item button[title*="Switch"] {
         position: relative;
@@ -639,7 +847,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .navbar__item button[aria-label*="color mode"],
     .navbar__item button[title*="Switch"] {
         position: relative;
@@ -653,7 +861,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .navbar__item button[aria-label*="color mode"],
     .navbar__item button[title*="Switch"] {
         position: relative;
@@ -667,7 +875,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .navbar__item button[aria-label*="color mode"],
     .navbar__item button[title*="Switch"] {
         position: relative;
@@ -681,7 +889,77 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"],
+    .navbar__item button[title*="Switch"] {
+        position: relative;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 50% !important;
+        backdrop-filter: blur(10px);
+        background: var(--glass-backdrop) !important;
+        block-size: 40px !important;
+        inline-size: 40px !important;
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"],
+    .navbar__item button[title*="Switch"] {
+        position: relative;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 50% !important;
+        backdrop-filter: blur(10px);
+        background: var(--glass-backdrop) !important;
+        block-size: 40px !important;
+        inline-size: 40px !important;
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"],
+    .navbar__item button[title*="Switch"] {
+        position: relative;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 50% !important;
+        backdrop-filter: blur(10px);
+        background: var(--glass-backdrop) !important;
+        block-size: 40px !important;
+        inline-size: 40px !important;
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"],
+    .navbar__item button[title*="Switch"] {
+        position: relative;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 50% !important;
+        backdrop-filter: blur(10px);
+        background: var(--glass-backdrop) !important;
+        block-size: 40px !important;
+        inline-size: 40px !important;
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"],
+    .navbar__item button[title*="Switch"] {
+        position: relative;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 50% !important;
+        backdrop-filter: blur(10px);
+        background: var(--glass-backdrop) !important;
+        block-size: 40px !important;
+        inline-size: 40px !important;
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
     .navbar__item button[aria-label*="color mode"],
     .navbar__item button[title*="Switch"] {
         position: relative;
@@ -749,7 +1027,14 @@ h3 {
     transition: all 0.3s var(--animation-spring);
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"],
+    .navbar__item button[title*="Switch"] {
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
     .navbar__item button[aria-label*="color mode"]:hover,
     .navbar__item button[title*="Switch"]:hover,
     .navbar__item button[aria-label*="color mode"]:focus,
@@ -759,7 +1044,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .navbar__item button[aria-label*="color mode"]:hover,
     .navbar__item button[title*="Switch"]:hover,
     .navbar__item button[aria-label*="color mode"]:focus,
@@ -769,7 +1054,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .navbar__item button[aria-label*="color mode"]:hover,
     .navbar__item button[title*="Switch"]:hover,
     .navbar__item button[aria-label*="color mode"]:focus,
@@ -779,7 +1064,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .navbar__item button[aria-label*="color mode"]:hover,
     .navbar__item button[title*="Switch"]:hover,
     .navbar__item button[aria-label*="color mode"]:focus,
@@ -789,7 +1074,57 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"]:hover,
+    .navbar__item button[title*="Switch"]:hover,
+    .navbar__item button[aria-label*="color mode"]:focus,
+    .navbar__item button[title*="Switch"]:focus {
+        animation: none;
+        transform: scale(1.1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"]:hover,
+    .navbar__item button[title*="Switch"]:hover,
+    .navbar__item button[aria-label*="color mode"]:focus,
+    .navbar__item button[title*="Switch"]:focus {
+        animation: none;
+        transform: scale(1.1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"]:hover,
+    .navbar__item button[title*="Switch"]:hover,
+    .navbar__item button[aria-label*="color mode"]:focus,
+    .navbar__item button[title*="Switch"]:focus {
+        animation: none;
+        transform: scale(1.1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"]:hover,
+    .navbar__item button[title*="Switch"]:hover,
+    .navbar__item button[aria-label*="color mode"]:focus,
+    .navbar__item button[title*="Switch"]:focus {
+        animation: none;
+        transform: scale(1.1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"]:hover,
+    .navbar__item button[title*="Switch"]:hover,
+    .navbar__item button[aria-label*="color mode"]:focus,
+    .navbar__item button[title*="Switch"]:focus {
+        animation: none;
+        transform: scale(1.1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
     .navbar__item button[aria-label*="color mode"]:hover,
     .navbar__item button[title*="Switch"]:hover,
     .navbar__item button[aria-label*="color mode"]:focus,
@@ -835,6 +1170,15 @@ h3 {
 .navbar__item button[title*="Switch"]:focus {
     animation: pulseGlow 2s infinite;
     transform: scale(1.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"]:hover,
+    .navbar__item button[title*="Switch"]:hover,
+    .navbar__item button[aria-label*="color mode"]:focus,
+    .navbar__item button[title*="Switch"]:focus {
+        animation: none;
+    }
 }
 
 /* Hide the default SVG icons */
@@ -903,7 +1247,7 @@ h3 {
     margin-block-end: 0.75rem;
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .footer__link-item {
         position: relative;
         display: inline-flex;
@@ -913,7 +1257,7 @@ h3 {
         text-decoration: none;
         transition: none;
 
-        @media screen and (prefers-reduced-motion: reduce) {
+        @media (prefers-reduced-motion: reduce) {
             &::before {
                 position: absolute;
                 background: var(--gradient-accent);
@@ -960,7 +1304,7 @@ h3 {
     text-decoration: none;
     transition: all 0.3s var(--animation-smooth);
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         &::before {
             position: absolute;
             background: var(--gradient-accent);
@@ -1130,7 +1474,7 @@ h3 {
     box-shadow: var(--shadow-glow);
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .glass-card {
         position: relative;
         overflow: hidden;
@@ -1142,7 +1486,7 @@ h3 {
         box-shadow: var(--shadow-glow);
         transition: none;
 
-        @media screen and (prefers-reduced-motion: reduce) {
+        @media (prefers-reduced-motion: reduce) {
             &::before {
                 position: absolute;
                 background: linear-gradient(
@@ -1199,7 +1543,7 @@ h3 {
     box-shadow: var(--shadow-glow);
     transition: all 0.3s var(--animation-smooth);
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         &::before {
             position: absolute;
             background: linear-gradient(
@@ -1249,7 +1593,7 @@ h3 {
 /* 🎨 Enhanced Navbar with Modern Effects             */
 
 /* -------------------------------------------------- */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .navbar {
         backdrop-filter: blur(20px);
         background: rgb(255 255 255 / 85%) !important;
@@ -1275,7 +1619,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .navbar__brand {
         transition: none;
 
@@ -1295,14 +1639,14 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .navbar__item .navbar__link {
         position: relative;
         padding: 0.5rem 1rem !important;
         border-radius: 8px;
         transition: none;
 
-        @media screen and (prefers-reduced-motion: reduce) {
+        @media (prefers-reduced-motion: reduce) {
             &::before {
                 position: absolute;
                 background: var(--gradient-primary);
@@ -1346,7 +1690,7 @@ h3 {
     border-radius: 8px;
     transition: all 0.3s var(--animation-smooth);
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         &::before {
             position: absolute;
             background: var(--gradient-primary);
@@ -1384,7 +1728,7 @@ h3 {
 }
 
 /* Enhanced search bar */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .navbar__search input {
         border: 1px solid var(--glass-border) !important;
         border-radius: var(--border-radius-pill) !important;
@@ -1417,7 +1761,7 @@ h3 {
 /* 🎯 Advanced Button Effects                         */
 
 /* -------------------------------------------------- */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .button,
     .button--primary,
     .button--secondary {
@@ -1435,7 +1779,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .button,
     .button--primary,
     .button--secondary {
@@ -1453,7 +1797,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .button,
     .button--primary,
     .button--secondary {
@@ -1471,7 +1815,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .button,
     .button--primary,
     .button--secondary {
@@ -1489,7 +1833,97 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
+    .button,
+    .button--primary,
+    .button--secondary {
+        position: relative;
+        overflow: hidden;
+        border: none !important;
+        border-radius: var(--border-radius-modern) !important;
+        background: linear-gradient(
+            135deg,
+            var(--ifm-color-primary) 0%,
+            var(--ifm-color-primary-dark) 100%
+        ) !important;
+        box-shadow: 0 4px 15px rgb(var(--ifm-color-primary-rgb), 0.3);
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .button,
+    .button--primary,
+    .button--secondary {
+        position: relative;
+        overflow: hidden;
+        border: none !important;
+        border-radius: var(--border-radius-modern) !important;
+        background: linear-gradient(
+            135deg,
+            var(--ifm-color-primary) 0%,
+            var(--ifm-color-primary-dark) 100%
+        ) !important;
+        box-shadow: 0 4px 15px rgb(var(--ifm-color-primary-rgb), 0.3);
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .button,
+    .button--primary,
+    .button--secondary {
+        position: relative;
+        overflow: hidden;
+        border: none !important;
+        border-radius: var(--border-radius-modern) !important;
+        background: linear-gradient(
+            135deg,
+            var(--ifm-color-primary) 0%,
+            var(--ifm-color-primary-dark) 100%
+        ) !important;
+        box-shadow: 0 4px 15px rgb(var(--ifm-color-primary-rgb), 0.3);
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .button,
+    .button--primary,
+    .button--secondary {
+        position: relative;
+        overflow: hidden;
+        border: none !important;
+        border-radius: var(--border-radius-modern) !important;
+        background: linear-gradient(
+            135deg,
+            var(--ifm-color-primary) 0%,
+            var(--ifm-color-primary-dark) 100%
+        ) !important;
+        box-shadow: 0 4px 15px rgb(var(--ifm-color-primary-rgb), 0.3);
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .button,
+    .button--primary,
+    .button--secondary {
+        position: relative;
+        overflow: hidden;
+        border: none !important;
+        border-radius: var(--border-radius-modern) !important;
+        background: linear-gradient(
+            135deg,
+            var(--ifm-color-primary) 0%,
+            var(--ifm-color-primary-dark) 100%
+        ) !important;
+        box-shadow: 0 4px 15px rgb(var(--ifm-color-primary-rgb), 0.3);
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
     .button,
     .button--primary,
     .button--secondary {
@@ -1577,6 +2011,14 @@ h3 {
     transition: all 0.3s var(--animation-smooth);
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .button,
+    .button--primary,
+    .button--secondary {
+        transition: none;
+    }
+}
+
 [class*="collapseSidebarButton"] {
     overflow: visible;
 }
@@ -1586,7 +2028,7 @@ h3 {
     stroke: var(--ifm-color-primary-darkest);
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .button::before {
         position: absolute;
         background: linear-gradient(
@@ -1635,7 +2077,7 @@ h3 {
 }
 
 /* Magnetic button effect */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .button-magnetic {
         transition: none;
     }
@@ -1651,7 +2093,7 @@ h3 {
 
 /* -------------------------------------------------- */
 @supports (animation-timeline: scroll()) {
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         .scroll-fade {
             animation: none;
             animation-range: entry 0% cover 30%;
@@ -1665,7 +2107,13 @@ h3 {
         animation-timeline: view();
     }
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
+        .scroll-fade {
+            animation: none;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
         .scroll-slide {
             animation: none;
             animation-range: entry 0% cover 40%;
@@ -1677,6 +2125,12 @@ h3 {
         animation: slide-up linear;
         animation-range: entry 0% cover 40%;
         animation-timeline: view();
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .scroll-slide {
+            animation: none;
+        }
     }
 }
 
@@ -1704,7 +2158,7 @@ h3 {
 
 /* Fallback for browsers without scroll-driven animations */
 @supports not (animation-timeline: scroll()) {
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         .scroll-fade,
         .scroll-slide {
             animation: none;
@@ -1712,7 +2166,7 @@ h3 {
         }
     }
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         .scroll-fade,
         .scroll-slide {
             animation: none;
@@ -1720,7 +2174,7 @@ h3 {
         }
     }
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         .scroll-fade,
         .scroll-slide {
             animation: none;
@@ -1728,7 +2182,7 @@ h3 {
         }
     }
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         .scroll-fade,
         .scroll-slide {
             animation: none;
@@ -1736,7 +2190,47 @@ h3 {
         }
     }
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
+        .scroll-fade,
+        .scroll-slide {
+            animation: none;
+            opacity: 0;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .scroll-fade,
+        .scroll-slide {
+            animation: none;
+            opacity: 0;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .scroll-fade,
+        .scroll-slide {
+            animation: none;
+            opacity: 0;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .scroll-fade,
+        .scroll-slide {
+            animation: none;
+            opacity: 0;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .scroll-fade,
+        .scroll-slide {
+            animation: none;
+            opacity: 0;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
         .scroll-fade,
         .scroll-slide {
             animation: none;
@@ -1797,7 +2291,7 @@ h3 {
     transform-style: preserve-3d;
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .card-3d-inner {
         position: relative;
         block-size: 100%;
@@ -1825,7 +2319,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .tilt-hover {
         transition: none;
 
@@ -1866,7 +2360,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .code-block-container {
         position: relative;
         transition: none;
@@ -1893,7 +2387,7 @@ h3 {
 /* 🎨 Enhanced Content Cards                          */
 
 /* -------------------------------------------------- */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .markdown > div,
     .theme-doc-markdown > div,
     article,
@@ -1902,7 +2396,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .markdown > div,
     .theme-doc-markdown > div,
     article,
@@ -1911,7 +2405,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .markdown > div,
     .theme-doc-markdown > div,
     article,
@@ -1920,7 +2414,7 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .markdown > div,
     .theme-doc-markdown > div,
     article,
@@ -1929,7 +2423,52 @@ h3 {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
+    .markdown > div,
+    .theme-doc-markdown > div,
+    article,
+    .animate-slide-up {
+        animation: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .markdown > div,
+    .theme-doc-markdown > div,
+    article,
+    .animate-slide-up {
+        animation: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .markdown > div,
+    .theme-doc-markdown > div,
+    article,
+    .animate-slide-up {
+        animation: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .markdown > div,
+    .theme-doc-markdown > div,
+    article,
+    .animate-slide-up {
+        animation: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .markdown > div,
+    .theme-doc-markdown > div,
+    article,
+    .animate-slide-up {
+        animation: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
     .markdown > div,
     .theme-doc-markdown > div,
     article,
@@ -1973,7 +2512,7 @@ article,
 }
 
 /* Enhanced cards for content sections */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .content-card {
         position: relative;
         overflow: hidden;
@@ -2022,13 +2561,13 @@ article,
 /* 🌈 Interactive Hover States                        */
 
 /* -------------------------------------------------- */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .interactive-hover {
         position: relative;
         cursor: pointer;
         transition: none;
 
-        @media screen and (prefers-reduced-motion: reduce) {
+        @media (prefers-reduced-motion: reduce) {
             &::before {
                 position: absolute;
                 z-index: -1;
@@ -2071,7 +2610,7 @@ article,
     cursor: pointer;
     transition: all 0.3s var(--animation-smooth);
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         &::before {
             position: absolute;
             z-index: -1;
@@ -2113,7 +2652,7 @@ article,
 /* 🔮 Advanced Loading States                         */
 
 /* -------------------------------------------------- */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .loading-shimmer {
         animation: none;
         background: linear-gradient(
@@ -2170,7 +2709,7 @@ article,
 /* 🎨 Enhanced Typography with Modern Effects         */
 
 /* -------------------------------------------------- */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .gradient-text {
         animation: none;
         background: var(--gradient-primary);
@@ -2222,7 +2761,7 @@ article,
 /* 🌊 Scroll Indicators                               */
 
 /* -------------------------------------------------- */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .scroll-indicator {
         position: fixed;
         z-index: 1000;
@@ -2285,11 +2824,8 @@ article,
     *,
     *::before,
     *::after {
-        /* stylelint-disable-next-line declaration-no-important -- Required for accessibility override */
         animation-duration: 0.01ms !important;
-        /* stylelint-disable-next-line declaration-no-important -- Required for accessibility override */
         animation-iteration-count: 1 !important;
-        /* stylelint-disable-next-line declaration-no-important -- Required for accessibility override */
         transition-duration: 0.01ms !important;
     }
 }
@@ -2358,7 +2894,7 @@ html {
 }
 
 /* Advanced loading skeleton with shimmer */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .skeleton {
         border-radius: 8px;
         animation: none;
@@ -2390,7 +2926,7 @@ html {
     background-attachment: fixed;
     background-size: cover;
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         &::before {
             position: absolute;
             animation: none;
@@ -2420,7 +2956,7 @@ html {
 }
 
 /* Advanced card hover with depth */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .interactive-card {
         transform-style: preserve-3d;
         transition: none;
@@ -2456,7 +2992,7 @@ html {
     position: relative;
     overflow: hidden;
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         &::before {
             position: absolute;
             background: linear-gradient(
@@ -2502,7 +3038,7 @@ html {
 .stacked-cards {
     position: relative;
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         &::after {
             position: absolute;
             border-radius: 50%;
@@ -2540,7 +3076,7 @@ html {
 }
 
 /* Gradient text animations */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .gradient-text-animated {
         animation: none;
         background: linear-gradient(
@@ -2583,7 +3119,7 @@ html {
 
 /* Enhanced tooltips with smooth transitions */
 [data-tooltip] {
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         &::before {
             position: absolute;
             z-index: 1000;
@@ -2629,7 +3165,7 @@ html {
 }
 
 /* Enhanced section dividers */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .section-divider {
         border-radius: 1px;
         margin: 3rem 0;
@@ -2692,7 +3228,7 @@ html {
 /* 🎨 UTILITY CLASSES FOR EASY APPLICATION           */
 
 /* ================================================== */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .animate-breathe {
         animation: none;
     }
@@ -2702,7 +3238,7 @@ html {
     animation: breathe 4s ease-in-out infinite;
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .animate-float {
         animation: none;
     }
@@ -2712,7 +3248,7 @@ html {
     animation: float 6s ease-in-out infinite;
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .animate-pulse-glow {
         animation: none;
     }
@@ -2816,7 +3352,7 @@ html {
     background: var(--ifm-background-color);
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     ::-webkit-scrollbar-thumb {
         border-radius: 4px;
         background: linear-gradient(
@@ -2879,7 +3415,7 @@ html {
 }
 
 /* Advanced neon glow effect for special elements */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .neon-glow {
         animation: none;
         filter: drop-shadow(0 0 5px var(--ifm-color-primary))
@@ -2902,7 +3438,7 @@ html {
 }
 
 /* Advanced liquid blob effect for buttons */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .liquid-blob::before {
         position: absolute;
         z-index: -1;
@@ -2954,7 +3490,7 @@ html {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .text-reveal {
         animation: none;
     }
@@ -2970,7 +3506,7 @@ html {
     box-shadow: 0 0 0 3px rgb(var(--ifm-color-primary-rgb), 0.3);
     outline: none;
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         &::after {
             position: absolute;
             border-radius: 50%;
@@ -3007,7 +3543,7 @@ html {
 }
 
 /* Advanced gradient text with animation */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .gradient-text-flow {
         animation: none;
         background: linear-gradient(
@@ -3078,7 +3614,7 @@ html {
     position: relative;
     cursor: help;
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         &::before {
             position: absolute;
             z-index: 1000;
@@ -3118,7 +3654,7 @@ html {
         white-space: nowrap;
     }
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         &::after {
             position: absolute;
             border: 6px solid transparent;
@@ -3169,7 +3705,7 @@ html {
     );
     block-size: 1px;
 
-    @media screen and (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         &::before {
             position: absolute;
             animation: none;
@@ -3273,7 +3809,7 @@ html {
 }
 
 /* Speed up dropdowns and other UI animations */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .dropdown .dropdown__menu,
     .dropdown--show .dropdown__menu,
     .dropdown--hoverable:hover .dropdown__menu,
@@ -3284,7 +3820,7 @@ html {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .dropdown .dropdown__menu,
     .dropdown--show .dropdown__menu,
     .dropdown--hoverable:hover .dropdown__menu,
@@ -3295,7 +3831,7 @@ html {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .dropdown .dropdown__menu,
     .dropdown--show .dropdown__menu,
     .dropdown--hoverable:hover .dropdown__menu,
@@ -3306,7 +3842,7 @@ html {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .dropdown .dropdown__menu,
     .dropdown--show .dropdown__menu,
     .dropdown--hoverable:hover .dropdown__menu,
@@ -3317,7 +3853,62 @@ html {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:hover .dropdown__menu,
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:focus .dropdown__menu {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:hover .dropdown__menu,
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:focus .dropdown__menu {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:hover .dropdown__menu,
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:focus .dropdown__menu {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:hover .dropdown__menu,
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:focus .dropdown__menu {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:hover .dropdown__menu,
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:focus .dropdown__menu {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
     .dropdown .dropdown__menu,
     .dropdown--show .dropdown__menu,
     .dropdown--hoverable:hover .dropdown__menu,
@@ -3373,7 +3964,7 @@ html {
 }
 
 /* Speed up tab transitions */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .tabs__item {
         transition: none !important;
     }
@@ -3384,7 +3975,7 @@ html {
 }
 
 /* Speed up modal and overlay transitions */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .modal,
     .backdrop,
     .DocSearch-Modal,
@@ -3393,7 +3984,7 @@ html {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .modal,
     .backdrop,
     .DocSearch-Modal,
@@ -3402,7 +3993,7 @@ html {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .modal,
     .backdrop,
     .DocSearch-Modal,
@@ -3411,7 +4002,7 @@ html {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .modal,
     .backdrop,
     .DocSearch-Modal,
@@ -3420,7 +4011,52 @@ html {
     }
 }
 
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
+    .modal,
+    .backdrop,
+    .DocSearch-Modal,
+    .DocSearch-Container {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal,
+    .backdrop,
+    .DocSearch-Modal,
+    .DocSearch-Container {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal,
+    .backdrop,
+    .DocSearch-Modal,
+    .DocSearch-Container {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal,
+    .backdrop,
+    .DocSearch-Modal,
+    .DocSearch-Container {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal,
+    .backdrop,
+    .DocSearch-Modal,
+    .DocSearch-Container {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
     .modal,
     .backdrop,
     .DocSearch-Modal,
@@ -3464,7 +4100,7 @@ html {
 }
 
 /* Speed up navbar dropdown */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .navbar__item.dropdown .navbar__link::after {
         transition: none !important;
     }
@@ -3528,7 +4164,7 @@ html {
 }
 
 /* Fix transform-based positioning that creates stacking contexts */
-@media screen and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     .navbar-sidebar {
         /* Override default transform positioning with left positioning */
         left: calc(-1 * var(--ifm-navbar-sidebar-width)) !important;
@@ -3747,3 +4383,5 @@ html {
         gap: 0.25rem;
     }
 }
+
+/* Accessibility: Individual reduced motion media queries for each selector group */

@@ -1,8 +1,6 @@
 /**
  * Property-based fuzzing tests for AddSiteForm user input boundaries.
  *
- * @ts-expect-error Complex fuzzing tests with dynamic DOM queries - exact type safety deferred for test coverage
- *
  * @remarks
  * These tests focus on the actual user input attack surface - the add site form
  * where users can input site names, URLs, host names, ports, and other
@@ -21,6 +19,8 @@
  * - Port validation (range checking, type coercion issues)
  * - Record type validation for DNS monitors
  * - Form submission with malicious or edge case combinations
+ *
+ * @ts-expect-error Complex fuzzing tests with dynamic DOM queries - exact type safety deferred for test coverage
  */
 
 import { describe, expect, vi, beforeEach, afterEach } from "vitest";

@@ -190,10 +190,11 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                     // Channel validation
                     if (
                         typeof msg.channel !== "string" ||
-                        msg.channel.trim().length === 0
+                        msg.channel.trim().length === 0 ||
+                        msg.channel.includes(" ")
                     ) {
                         errors.push(
-                            "Invalid channel: must be non-empty string"
+                            "Invalid channel: must be non-empty string without spaces"
                         );
                     }
 

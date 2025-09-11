@@ -1,5 +1,5 @@
 /** eslint-disable css/use-baseline */
-/* stylelint-disable declaration-no-important, keyframes-name-pattern, scales/font-sizes, scales/line-heights, time-min-milliseconds, plugin/no-low-performance-animation-properties, declaration-property-value-no-unknown -- Docusaurus CSS patterns */
+/* stylelint-disable declaration-no-important, keyframes-name-pattern, scales/font-sizes, scales/line-heights, time-min-milliseconds, plugin/no-low-performance-animation-properties -- Docusaurus CSS patterns */
 
 /**
  * CSS files with the .module.css suffix will be treated as CSS modules
@@ -1758,11 +1758,8 @@
     *,
     *::before,
     *::after {
-        /* stylelint-disable-next-line declaration-no-important -- Required for accessibility override */
         animation-duration: 0.01ms !important;
-        /* stylelint-disable-next-line declaration-no-important -- Required for accessibility override */
         animation-iteration-count: 1 !important;
-        /* stylelint-disable-next-line declaration-no-important -- Required for accessibility override */
         transition-duration: 0.01ms !important;
     }
 }
@@ -1806,14 +1803,11 @@
     .appWindow::before,
     .statusCard::before,
     .codeBlock::before {
-        /* stylelint-disable-next-line declaration-no-important -- Required for print media override */
         display: none !important;
     }
 
     .heroSection {
-        /* stylelint-disable-next-line declaration-no-important -- Required for print media override */
         background: #fff !important;
-        /* stylelint-disable-next-line declaration-no-important -- Required for print media override */
         color: #000 !important;
     }
 }
@@ -1933,15 +1927,6 @@
     background: rgb(0 102 204 / 5%);
 }
 
-[data-theme="light"] .siteUrl,
-[data-theme="light"] .sectionTitle,
-[data-theme="light"] .statusText,
-[data-theme="light"] .techInfo h2,
-[data-theme="light"] .codeContent,
-[data-theme="light"] .modal h3 {
-    color: #212529;
-}
-
 /* Base modal styles (must come before themed versions for CSS specificity) */
 .modal {
     padding: 2rem;
@@ -1958,6 +1943,15 @@
         font-size: 1.25rem;
         font-weight: 600;
     }
+}
+
+[data-theme="light"] .siteUrl,
+[data-theme="light"] .sectionTitle,
+[data-theme="light"] .statusText,
+[data-theme="light"] .techInfo h2,
+[data-theme="light"] .codeContent,
+[data-theme="light"] .modal h3 {
+    color: #212529;
 }
 
 .modalButtonCancel,

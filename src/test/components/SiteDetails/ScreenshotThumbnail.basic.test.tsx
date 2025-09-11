@@ -2,12 +2,14 @@
  * Basic unit tests for ScreenshotThumbnail component
  *
  * @remarks
- * These tests focus on core functionality without property-based fuzzing
- * to avoid infinite render loops and ensure reliable test execution.
+ * These tests focus on core functionality without property-based fuzzing to
+ * avoid infinite render loops and ensure reliable test execution.
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
+import { useEffect } from "react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import "@testing-library/jest-dom";
 
 import { ScreenshotThumbnail } from "../../../components/SiteDetails/ScreenshotThumbnail";
 
@@ -35,12 +37,17 @@ vi.mock("../../../theme/useTheme", () => ({
 }));
 
 vi.mock("../../../hooks/useMount", () => ({
-    useMount: vi.fn((init, cleanup) => {
-        if (init) init();
-        return () => {
-            if (cleanup) cleanup();
-        };
-    }),
+    useMount: (
+        init: (() => void) | undefined,
+        cleanup?: (() => void) | undefined
+    ) => {
+        useEffect(() => {
+            if (init) init();
+            return () => {
+                if (cleanup) cleanup();
+            };
+        }, []); // Empty dependency array ensures it only runs once on mount
+    },
 }));
 
 // Mock constants
@@ -274,25 +281,21 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
     describe("Edge Cases", () => {
         it("should handle empty site name", () => {
             render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName=""
-                />
+                <ScreenshotThumbnail url="https://example.com" siteName="" />
             );
 
             // Look for the text pattern including the space after colon
             expect(screen.getByText(/Preview:\s*$/)).toBeInTheDocument();
             // The alt text includes trailing space for empty siteName
-            expect(screen.getByAltText(/Screenshot of\s*$/)).toBeInTheDocument();
+            expect(
+                screen.getByAltText(/Screenshot of\s*$/)
+            ).toBeInTheDocument();
         });
 
         it("should handle special characters in URL", () => {
             const specialUrl = "https://example.com/path?param=value&other=123";
             render(
-                <ScreenshotThumbnail
-                    url={specialUrl}
-                    siteName="Special Site"
-                />
+                <ScreenshotThumbnail url={specialUrl} siteName="Special Site" />
             );
 
             const link = screen.getByRole("link");
@@ -304,7 +307,8 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
         });
 
         it("should handle long site names", () => {
-            const longName = "This is a very long site name that might cause issues with layout";
+            const longName =
+                "This is a very long site name that might cause issues with layout";
             render(
                 <ScreenshotThumbnail
                     url="https://example.com"
@@ -312,8 +316,12 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
                 />
             );
 
-            expect(screen.getByText(`Preview: ${longName}`)).toBeInTheDocument();
-            expect(screen.getByAltText(`Screenshot of ${longName}`)).toBeInTheDocument();
+            expect(
+                screen.getByText(`Preview: ${longName}`)
+            ).toBeInTheDocument();
+            expect(
+                screen.getByAltText(`Screenshot of ${longName}`)
+            ).toBeInTheDocument();
         });
     });
 });

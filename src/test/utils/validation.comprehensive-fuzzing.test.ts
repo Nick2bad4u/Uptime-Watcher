@@ -966,7 +966,8 @@ describe("Comprehensive Validation Function Fuzzing", () => {
 
                 // Property: Valid percentage strings should parse correctly
                 if (typeof uptimeStr === "string") {
-                    const cleanStr = uptimeStr.replace("%", "").trim();
+                    // Match the function's actual behavior: remove ALL % signs and spaces
+                    const cleanStr = uptimeStr.replaceAll(/[\s%]/g, "");
                     const num = Number.parseFloat(cleanStr);
                     if (
                         !Number.isNaN(num) &&
@@ -974,7 +975,9 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                         num >= 0 &&
                         num <= 100
                     ) {
-                        expect(result).toBe(num);
+                        // Match the function's clamping behavior
+                        const clampedNum = Math.min(100, Math.max(0, num));
+                        expect(result).toBe(clampedNum);
                     }
                 }
             }

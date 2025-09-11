@@ -1,6 +1,4 @@
 /**
- * @ts-expect-error Complex fuzzing tests with Site object type compatibility - exact type safety deferred for test coverage
- *
  * @remarks
  * Tests all UI store operations with property-based testing using fast-check to
  * discover edge cases in modal management, site selection, tab navigation, and
@@ -22,6 +20,8 @@
  *   management
  *
  * @author AI Assistant
+ *
+ * @ts-expect-error Complex fuzzing tests with Site object type compatibility - exact type safety deferred for test coverage
  */
 
 import { beforeEach, describe, expect, vi } from "vitest";
@@ -101,15 +101,27 @@ const arbitraries = {
                         fc.oneof(
                             // StatusHistory without details
                             fc.record({
-                                timestamp: fc.integer({ min: 0, max: Date.now() }),
+                                timestamp: fc.integer({
+                                    min: 0,
+                                    max: Date.now(),
+                                }),
                                 status: fc.constantFrom("up", "down"),
-                                responseTime: fc.integer({ min: 0, max: 10_000 }),
+                                responseTime: fc.integer({
+                                    min: 0,
+                                    max: 10_000,
+                                }),
                             }),
                             // StatusHistory with details
                             fc.record({
-                                timestamp: fc.integer({ min: 0, max: Date.now() }),
+                                timestamp: fc.integer({
+                                    min: 0,
+                                    max: Date.now(),
+                                }),
                                 status: fc.constantFrom("up", "down"),
-                                responseTime: fc.integer({ min: 0, max: 10_000 }),
+                                responseTime: fc.integer({
+                                    min: 0,
+                                    max: 10_000,
+                                }),
                                 details: fc.string(),
                             })
                         ),
@@ -132,15 +144,27 @@ const arbitraries = {
                         fc.oneof(
                             // StatusHistory without details
                             fc.record({
-                                timestamp: fc.integer({ min: 0, max: Date.now() }),
+                                timestamp: fc.integer({
+                                    min: 0,
+                                    max: Date.now(),
+                                }),
                                 status: fc.constantFrom("up", "down"),
-                                responseTime: fc.integer({ min: 0, max: 10_000 }),
+                                responseTime: fc.integer({
+                                    min: 0,
+                                    max: 10_000,
+                                }),
                             }),
                             // StatusHistory with details
                             fc.record({
-                                timestamp: fc.integer({ min: 0, max: Date.now() }),
+                                timestamp: fc.integer({
+                                    min: 0,
+                                    max: Date.now(),
+                                }),
                                 status: fc.constantFrom("up", "down"),
-                                responseTime: fc.integer({ min: 0, max: 10_000 }),
+                                responseTime: fc.integer({
+                                    min: 0,
+                                    max: 10_000,
+                                }),
                                 details: fc.string(),
                             })
                         ),
@@ -152,7 +176,13 @@ const arbitraries = {
                     host: fc.domain(),
                     lastChecked: fc.date(),
                     port: fc.integer({ min: 1, max: 65_535 }),
-                    recordType: fc.constantFrom("A", "AAAA", "CNAME", "MX", "TXT"),
+                    recordType: fc.constantFrom(
+                        "A",
+                        "AAAA",
+                        "CNAME",
+                        "MX",
+                        "TXT"
+                    ),
                     url: fc.webUrl(),
                 })
             ),
@@ -380,8 +410,8 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             fc.array(arbitraries.site, { minLength: 2, maxLength: 5 }),
         ])("should handle rapid site selection changes", (sites) => {
             // Act - rapidly change selections
-            for (const site of sites) useUIStore.getState().setSelectedSite(site)
-            ;
+            for (const site of sites)
+                useUIStore.getState().setSelectedSite(site);
 
             // Assert - last selection should win
             const lastSite = sites.at(-1);
@@ -407,8 +437,8 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             fc.array(arbitraries.tabId, { minLength: 1, maxLength: 20 }),
         ])("should handle rapid tab navigation", (tabIds) => {
             // Act - rapidly switch tabs
-            for (const tabId of tabIds) useUIStore.getState().setActiveSiteDetailsTab(tabId)
-            ;
+            for (const tabId of tabIds)
+                useUIStore.getState().setActiveSiteDetailsTab(tabId);
 
             // Assert - last tab should be active
             const lastTabId = tabIds.at(-1);
@@ -450,8 +480,8 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             }),
         ])("should handle rapid time range changes", (timeRanges) => {
             // Act - rapidly change time ranges
-            for (const timeRange of timeRanges) useUIStore.getState().setSiteDetailsChartTimeRange(timeRange)
-            ;
+            for (const timeRange of timeRanges)
+                useUIStore.getState().setSiteDetailsChartTimeRange(timeRange);
 
             // Assert - last time range should be selected
             const lastTimeRange = timeRanges.at(-1);
