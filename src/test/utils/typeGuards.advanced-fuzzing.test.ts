@@ -1,6 +1,8 @@
 /**
  * Advanced fuzzing tests for type guards and validation utilities.
  *
+ * @ts-expect-error Complex fuzzing tests with intentional type mismatches - exact type safety deferred for validation testing
+ *
  * @remarks
  * This test suite focuses on achieving 100% branch coverage for type guard
  * functions and validation utilities through intensive property-based testing.
@@ -481,7 +483,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
         ])(
             "validateSite should handle various site object structures",
             (siteObject) => {
-                const result = validateSite(siteObject);
+                const result = validateSite(siteObject as any);
 
                 // Result should always be a boolean
                 expect(typeof result).toBe("boolean");
@@ -512,7 +514,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                 fc.constant(undefined)
             ),
         ])("validateSite should reject invalid site objects", (invalidSite) => {
-            const result = validateSite(invalidSite);
+            const result = validateSite(invalidSite as any);
 
             // Should handle any input gracefully
             expect(typeof result).toBe("boolean");
@@ -552,7 +554,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
         ])(
             "getMonitorValidationErrors should return appropriate error arrays",
             (monitorConfig) => {
-                const result = getMonitorValidationErrors(monitorConfig);
+                const result = getMonitorValidationErrors(monitorConfig as any);
 
                 // Should always return an array
                 expect(Array.isArray(result)).toBeTruthy();
@@ -579,7 +581,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
         ])(
             "getMonitorValidationErrors should handle extreme numeric values",
             (extremeConfig) => {
-                const result = getMonitorValidationErrors(extremeConfig);
+                const result = getMonitorValidationErrors(extremeConfig as any);
 
                 expect(Array.isArray(result)).toBeTruthy();
 

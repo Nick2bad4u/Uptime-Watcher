@@ -19,7 +19,7 @@
  * @author AI Assistant
  */
 
-import { beforeEach, describe, expect, it, vi, afterEach } from "vitest";
+import { beforeEach, describe, expect, vi, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -136,7 +136,7 @@ vi.mock("../../../../theme/components/ThemedBox", () => ({
         const siteId = mockSiteData?.identifier || 'default';
         // Extract site name from aria-label to create unique test ID
         const siteNameMatch = ariaLabel?.match(/View details for (?<siteName>.+)/);
-        const siteName = siteNameMatch?.groups?.siteName || 'unknown';
+        const siteName = siteNameMatch?.groups?.['siteName'] || 'unknown';
         const testId = `themed-box-${siteId}-${siteName.replaceAll(/[^\dA-Za-z]/g, '_')}`;
 
         return (
@@ -240,7 +240,7 @@ const edgeCaseSiteArbitrary = fc.record({
 /**
  * Helper function to render SiteCard component with mocks
  */
-const renderSiteCard = (site: Site) => {
+const renderSiteCard = (site: any) => {
     mockSiteData = site;
     return render(<SiteCard site={site} />);
 };
@@ -248,7 +248,7 @@ const renderSiteCard = (site: Site) => {
 /**
  * Verify basic SiteCard structure is rendered correctly
  */
-const verifySiteCardStructure = (site: Site) => {
+const verifySiteCardStructure = (site: any) => {
     const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, '_')}`;
     const themedBox = screen.getByTestId(testId);
     expect(themedBox).toBeInTheDocument();
@@ -257,8 +257,8 @@ const verifySiteCardStructure = (site: Site) => {
     // Verify sub-components are rendered
     expect(screen.getByTestId(`site-card-header-${site.identifier}`)).toBeInTheDocument();
     if (site.monitors.length > 0) {
-        expect(screen.getByTestId(`site-card-status-${site.monitors[0].id}`)).toBeInTheDocument();
-        expect(screen.getByTestId(`site-card-history-${site.monitors[0].id}`)).toBeInTheDocument();
+        expect(screen.getByTestId(`site-card-status-${site.monitors[0]!.id}`)).toBeInTheDocument();
+        expect(screen.getByTestId(`site-card-history-${site.monitors[0]!.id}`)).toBeInTheDocument();
     }
     expect(screen.getByTestId(`site-card-metrics-${site.identifier}-up`)).toBeInTheDocument();
     expect(screen.getByTestId(`site-card-footer-${site.identifier}`)).toBeInTheDocument();

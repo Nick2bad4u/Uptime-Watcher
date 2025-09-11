@@ -917,7 +917,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                 const result = measureValidation(
                     getMonitorValidationErrors,
                     "getMonitorValidationErrors",
-                    monitorData
+                    monitorData as any
                 );
 
                 expect(() => result).not.toThrow();

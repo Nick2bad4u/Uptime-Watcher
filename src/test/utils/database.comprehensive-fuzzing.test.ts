@@ -195,14 +195,14 @@ const migrationScenarios = fc.record({
 /**
  * Generates performance constraint scenarios
  */
-const performanceConstraints = fc.record({
-    maxMemoryMB: fc.integer({ min: 100, max: 2048 }),
-    maxQueryTime: fc.integer({ min: 100, max: 10_000 }),
-    maxResultSetSize: fc.integer({ min: 100, max: 100_000 }),
-    memoryPressure: fc.boolean(),
-    cpuThrottling: fc.boolean(),
-    diskIOLimit: fc.integer({ min: 10, max: 1000 }),
-});
+// const performanceConstraints = fc.record({
+//     maxMemoryMB: fc.integer({ min: 100, max: 2048 }),
+//     maxQueryTime: fc.integer({ min: 100, max: 10_000 }),
+//     maxResultSetSize: fc.integer({ min: 100, max: 100_000 }),
+//     memoryPressure: fc.boolean(),
+//     cpuThrottling: fc.boolean(),
+//     diskIOLimit: fc.integer({ min: 10, max: 1000 }),
+// });
 
 /**
  * Generates security context data
@@ -382,33 +382,33 @@ const batchOperationScenarios = fc.record({
 /**
  * Generates comprehensive constraint validation scenarios
  */
-const constraintValidationScenarios = fc.record({
-    constraintType: fc.constantFrom(
-        "NOT_NULL",
-        "CHECK",
-        "UNIQUE",
-        "PRIMARY_KEY",
-        "FOREIGN_KEY",
-        "COMPOSITE_UNIQUE",
-        "EXCLUSION"
-    ),
-    targetTable: tableNames,
-    columnNames: fc.array(fc.string(), { minLength: 1, maxLength: 3 }),
-    constraintExpression: fc.oneof(fc.string(), fc.constant(null)),
-    violationData: fc.array(fc.object(), { minLength: 1, maxLength: 100 }),
-    enforceOnInsert: fc.boolean(),
-    enforceOnUpdate: fc.boolean(),
-    deferrable: fc.boolean(),
-    initiallyDeferred: fc.boolean(),
-    cascadeAction: fc.constantFrom(
-        "CASCADE",
-        "RESTRICT",
-        "SET_NULL",
-        "SET_DEFAULT",
-        "NO_ACTION"
-    ),
-    validationLevel: fc.constantFrom("IMMEDIATE", "DEFERRED", "DISABLED"),
-});
+// const constraintValidationScenarios = fc.record({
+//     constraintType: fc.constantFrom(
+//         "NOT_NULL",
+//         "CHECK",
+//         "UNIQUE",
+//         "PRIMARY_KEY",
+//         "FOREIGN_KEY",
+//         "COMPOSITE_UNIQUE",
+//         "EXCLUSION"
+//     ),
+//     targetTable: tableNames,
+//     columnNames: fc.array(fc.string(), { minLength: 1, maxLength: 3 }),
+//     constraintExpression: fc.oneof(fc.string(), fc.constant(null)),
+//     violationData: fc.array(fc.object(), { minLength: 1, maxLength: 100 }),
+//     enforceOnInsert: fc.boolean(),
+//     enforceOnUpdate: fc.boolean(),
+//     deferrable: fc.boolean(),
+//     initiallyDeferred: fc.boolean(),
+//     cascadeAction: fc.constantFrom(
+//         "CASCADE",
+//         "RESTRICT",
+//         "SET_NULL",
+//         "SET_DEFAULT",
+//         "NO_ACTION"
+//     ),
+//     validationLevel: fc.constantFrom("IMMEDIATE", "DEFERRED", "DISABLED"),
+// });
 
 /**
  * Generates cross-operation interaction scenarios for comprehensive testing
@@ -1168,7 +1168,7 @@ describe("Comprehensive Database Operations Fuzzing", () => {
             async (timeoutScenarios) => {
                 const simulateConnectionTimeouts = (timeouts: number[]) => {
                     const results = timeouts.map((timeout) => {
-                        const startTime = performance.now();
+                        // const startTime = performance.now();
 
                         // Simulate connection attempt
                         const connectionSuccess = timeout > 1000; // Arbitrary threshold
@@ -1326,7 +1326,7 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                         const victimIndex = Math.floor(
                             Math.random() * transactions.length
                         );
-                        transactions[victimIndex].deadlocked = true;
+                        transactions[victimIndex]!.deadlocked = true;
                     }
 
                     // Complete remaining transactions

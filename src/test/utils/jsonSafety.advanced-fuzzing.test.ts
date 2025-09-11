@@ -117,7 +117,7 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
         ])(
             "should handle malformed JSON strings gracefully",
             (malformedJson) => {
-                const validator = (data: unknown): data is any => true;
+                const validator = (_data: unknown): _data is any => true;
                 const result = safeJsonParse(malformedJson, validator);
 
                 expect(result.success).toBeFalsy();
@@ -179,7 +179,7 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
             ),
         ])("should parse valid JSON primitives correctly", (primitive) => {
             const jsonString = JSON.stringify(primitive);
-            const validator = (data: unknown): data is typeof primitive => true;
+            const validator = (_data: unknown): _data is typeof primitive => true;
 
             const result = safeJsonParse(jsonString, validator);
 
@@ -238,7 +238,7 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
             "should respect validator rejection",
             (data) => {
                 const jsonString = JSON.stringify(data);
-                const rejectingValidator = (data: unknown): data is any =>
+                const rejectingValidator = (_data: unknown): _data is any =>
                     false;
 
                 const result = safeJsonParse(jsonString, rejectingValidator);
@@ -260,7 +260,7 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
             ),
         ])("should reject non-array JSON", (nonArrayData) => {
             const jsonString = JSON.stringify(nonArrayData);
-            const validator = (item: unknown): item is any => true;
+            const validator = (_item: unknown): _item is any => true;
 
             const result = safeJsonParseArray(jsonString, validator);
 
@@ -282,7 +282,7 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
             ),
         ])("should handle mixed array types", (mixedArray) => {
             const jsonString = JSON.stringify(mixedArray);
-            const validator = (item: unknown): item is any => true;
+            const validator = (_item: unknown): _item is any => true;
 
             const result = safeJsonParseArray(jsonString, validator);
 
@@ -353,8 +353,8 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
             "should return fallback for malformed JSON",
             (malformedJson, fallbackValue) => {
                 const validator = (
-                    data: unknown
-                ): data is typeof fallbackValue => true;
+                    _data: unknown
+                ): _data is typeof fallbackValue => true;
 
                 const result = safeJsonParseWithFallback(
                     malformedJson,
@@ -605,8 +605,8 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
 
                 if (stringifyResult.success && stringifyResult.data) {
                     const validator = (
-                        data: unknown
-                    ): data is typeof originalData => true;
+                        _data: unknown
+                    ): _data is typeof originalData => true;
                     const parseResult = safeJsonParse(
                         stringifyResult.data,
                         validator

@@ -8,9 +8,10 @@
 
 import type { JSX, MouseEvent } from "react";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { useMount } from "../../hooks/useMount";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { useTheme } from "../../theme/useTheme";
 
@@ -44,16 +45,20 @@ export const ScreenshotThumbnail = ({
     url,
 }: ScreenshotThumbnailProperties): JSX.Element => {
     const [hovered, setHovered] = useState(false);
-    const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+    const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(
+        null
+    );
     const linkReference = useRef<HTMLAnchorElement>(null);
     const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
     const { themeName } = useTheme();
     const { openExternal } = useUIStore();
 
     // Set portal container after component mounts to avoid SSR issues
-    useEffect(() => {
-        setPortalContainer(document.body);
-    }, []);
+    useMount(
+        useCallback(function initializePortalContainer() {
+            setPortalContainer(document.body);
+        }, [])
+    );
 
     // Calculate safe values using useMemo to avoid infinite loops
     const safeUrl = useMemo(
@@ -185,6 +190,7 @@ export const ScreenshotThumbnail = ({
             : null;
 
     return (
+        // eslint-disable-next-line @eslint-react/avoid-shorthand-fragment -- Shorthand fragment preferred by react/jsx-fragments rule
         <>
             <a
                 aria-label={ariaLabel}

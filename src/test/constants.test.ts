@@ -864,7 +864,7 @@ describe("Application Constants", () => {
     describe("Property-based tests for constants validation", () => {
         test.prop([fc.array(fc.integer(), { minLength: 1 })])(
             "should maintain CHECK_INTERVALS ordering properties",
-            (randomNumbers) => {
+            (_randomNumbers) => {
                 // The constant CHECK_INTERVALS should always be sorted
                 expect(CHECK_INTERVALS).toBeDefined();
                 expect(Array.isArray(CHECK_INTERVALS)).toBeTruthy();
@@ -957,7 +957,7 @@ describe("Application Constants", () => {
 
         test.prop([fc.integer({ min: 1, max: 100 })])(
             "should have consistent history limit options",
-            (multiplier) => {
+            (_multiplier) => {
                 expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBeTruthy();
                 expect(HISTORY_LIMIT_OPTIONS.length).toBeGreaterThan(0);
 
@@ -985,7 +985,7 @@ describe("Application Constants", () => {
 
         test.prop([fc.constantFrom("SUCCESS", "ERROR", "WARNING", "INFO")])(
             "should have valid ARIA_LABEL structure",
-            (level) => {
+            (_level) => {
                 expect(ARIA_LABEL).toBeDefined();
                 expect(typeof ARIA_LABEL).toBe("string");
                 expect(ARIA_LABEL.length).toBeGreaterThan(0);
@@ -998,11 +998,11 @@ describe("Application Constants", () => {
 
         test.prop([fc.constantFrom("retry", "attempts", "delay")])(
             "should maintain retry constraint consistency",
-            (constraintType) => {
+            (_constraintType) => {
                 expect(RETRY_CONSTRAINTS).toBeDefined();
 
                 // All retry values should be numbers
-                for (const [key, value] of Object.entries(RETRY_CONSTRAINTS)) {
+                for (const [_key, value] of Object.entries(RETRY_CONSTRAINTS)) {
                     expect(typeof value).toBe("number");
                     expect(value).toBeGreaterThanOrEqual(0); // MIN can be 0
                 }
@@ -1021,11 +1021,11 @@ describe("Application Constants", () => {
 
         test.prop([fc.integer({ min: 1, max: 1000 })])(
             "should have consistent UI delay values",
-            (testValue) => {
+            (_testValue) => {
                 expect(UI_DELAYS).toBeDefined();
 
                 // All UI delays should be numbers and non-negative
-                for (const [key, value] of Object.entries(UI_DELAYS)) {
+                for (const [_key, value] of Object.entries(UI_DELAYS)) {
                     expect(typeof value).toBe("number");
                     expect(value).toBeGreaterThanOrEqual(0); // STATE_UPDATE_DEFER can be 0
                     expect(value).toBeLessThan(10_000); // Should be reasonable for UI
@@ -1040,7 +1040,7 @@ describe("Application Constants", () => {
 
         test.prop([fc.constantFrom("hours", "days", "weeks")])(
             "should have valid chart time periods structure",
-            (periodType) => {
+            (_periodType) => {
                 expect(CHART_TIME_PERIODS).toBeDefined();
                 expect(CHART_TIME_RANGES).toBeDefined();
 

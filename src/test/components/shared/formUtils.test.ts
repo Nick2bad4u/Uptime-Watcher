@@ -221,7 +221,8 @@ describe("Form Utilities", () => {
 
                     handler(mockEvent);
 
-                    const [[calledValue]] = setValue.mock.calls;
+                    const calls = setValue.mock.calls || [];
+                    const [calledValue] = calls[0] || [];
                     expect(typeof calledValue).toBe("boolean");
                     expect(calledValue).toBe(checkedState);
                 }

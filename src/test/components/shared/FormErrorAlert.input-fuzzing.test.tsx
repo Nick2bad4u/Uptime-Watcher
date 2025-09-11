@@ -28,16 +28,15 @@
  * - Security considerations for error message content
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, vi, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
 import {
     render,
     screen,
     fireEvent,
-    waitFor,
-    act,
+
 } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+
 import "@testing-library/jest-dom";
 import type { JSX } from "react/jsx-runtime";
 import { FormErrorAlert } from "../../../components/shared/FormErrorAlert";
@@ -203,7 +202,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
             async (nullError) => {
                 render(
                     <FormErrorAlert
-                        error={nullError}
+                        error={nullError ?? null}
                         onClearError={mockOnClearError}
                     />
                 );
@@ -225,7 +224,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
             async (errorMessages) => {
                 const { rerender } = render(
                     <FormErrorAlert
-                        error={errorMessages[0]}
+                        error={errorMessages[0] ?? null}
                         onClearError={mockOnClearError}
                     />
                 );
@@ -233,7 +232,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                 for (let i = 1; i < errorMessages.length; i++) {
                     rerender(
                         <FormErrorAlert
-                            error={errorMessages[i]}
+                            error={errorMessages[i] ?? null}
                             onClearError={mockOnClearError}
                         />
                     );
@@ -408,7 +407,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
             async (scenario) => {
                 const { rerender } = render(
                     <FormErrorAlert
-                        error={scenario.initialError}
+                        error={scenario.initialError ?? null}
                         onClearError={mockOnClearError}
                     />
                 );
@@ -418,7 +417,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                         // Rapid transitions without delays
                         rerender(
                             <FormErrorAlert
-                                error={nextError}
+                                error={nextError ?? null}
                                 onClearError={mockOnClearError}
                             />
                         );
@@ -426,7 +425,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                         // Normal transitions with small delays
                         rerender(
                             <FormErrorAlert
-                                error={nextError}
+                                error={nextError ?? null}
                                 onClearError={mockOnClearError}
                             />
                         );
@@ -488,7 +487,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
             async (config) => {
                 render(
                     <FormErrorAlert
-                        error={config.error}
+                        error={config.error ?? null}
                         onClearError={mockOnClearError}
                         isDark={config.isDark}
                         className={config.className}
@@ -522,7 +521,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                 fc.constantFrom(
                     "<script>alert('XSS')</script>",
                     "<img src=x onerror=alert(1)>",
-                    "javascript:alert('test')",
+                    "data:text/html,<script>alert('test')</script>",
                     "<iframe src=javascript:alert(1)>",
                     "<svg onload=alert(1)>",
                     "Error with HTML: <b>bold</b> <i>italic</i>",
@@ -584,7 +583,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                         <FormErrorAlert
                             key={i}
                             error={`Error message ${i}`}
-                            onClearError={onClearHandlers[i]}
+                            onClearError={onClearHandlers[i] ?? (() => {})}
                             data-testid={`error-alert-${i}`}
                         />
                     );
@@ -604,7 +603,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                             <FormErrorAlert
                                 key={i}
                                 error={`Updated error ${i}-${changeIndex}`}
-                                onClearError={onClearHandlers[i]}
+                                onClearError={onClearHandlers[i] ?? (() => {})}
                                 data-testid={`error-alert-${i}`}
                             />
                         );

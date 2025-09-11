@@ -56,7 +56,7 @@ vi.mock("react-dom", async (importOriginal) => {
     const actual = await importOriginal<typeof import("react-dom")>();
     return {
         ...actual,
-        createPortal: vi.fn((children, container) => children),
+        createPortal: vi.fn((children, _container) => children),
     };
 });
 

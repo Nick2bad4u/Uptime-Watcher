@@ -450,7 +450,6 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             "should handle different types of submission failures",
             async (error) => {
                 const mockEvent = { preventDefault: vi.fn() } as any;
-                const properties = createMockProperties();
 
                 // Mock different error scenarios
                 const mockError = new Error(
@@ -553,7 +552,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
         ])(
             "should handle multiple concurrent form submissions",
             async (submissionData) => {
-                const submissions = submissionData.map((data, index) => {
+                const submissions = submissionData.map((_data, index) => {
                     const mockEvent = { preventDefault: vi.fn() } as any;
                     const properties = createMockProperties({
                         name: `Site ${index}`,

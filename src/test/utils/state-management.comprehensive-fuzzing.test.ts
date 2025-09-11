@@ -17,7 +17,6 @@
  * @packageDocumentation
  */
 
-/* eslint-disable no-invalid-this */
 /* eslint-disable prefer-named-capture-group */
 
 import { describe, expect, beforeEach, afterEach } from "vitest";
@@ -663,7 +662,7 @@ describe("Comprehensive State Management Fuzzing", () => {
                             // Simulate state serialization with validation
                             const serialized = JSON.stringify(
                                 state,
-                                (key, value) => {
+                                (_key, value) => {
                                     if (value instanceof Date) {
                                         return {
                                             __type: "Date",
@@ -967,9 +966,9 @@ describe("Comprehensive State Management Fuzzing", () => {
                 }
 
                 // Property: All strategies should be attempted if earlier ones fail
-                const failedStrategies = recoveryResult.attempts.filter(
-                    (a) => !a.success
-                );
+                // const failedStrategies = recoveryResult.attempts.filter(
+                //     (a) => !a.success
+                // );
                 const successfulStrategies = recoveryResult.attempts.filter(
                     (a) => a.success
                 );
@@ -1003,7 +1002,7 @@ describe("Comprehensive State Management Fuzzing", () => {
                             const batch = actions.slice(i, i + batchSize);
 
                             for (const [index, action] of batch.entries()) {
-                                this.actionCount++;
+                                mockHighPerfStore.actionCount++;
                                 results.push({
                                     actionIndex: i + index,
                                     type: action.type,
@@ -1055,5 +1054,4 @@ describe("Comprehensive State Management Fuzzing", () => {
     });
 });
 
-/* eslint-enable no-invalid-this */
 /* eslint-enable prefer-named-capture-group */

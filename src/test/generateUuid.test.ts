@@ -102,9 +102,9 @@ describe("UUID Generation", () => {
             expect(timestampMatch).toBeTruthy();
 
             if (timestampMatch && timestampMatch.groups) {
-                const fullDigits = timestampMatch.groups["full"];
+                const fullDigits = timestampMatch.groups?.["full"];
                 // Remove the last 3 digits (microseconds) to get the timestamp
-                const timestampStr = fullDigits.slice(0, -3);
+                const timestampStr = fullDigits?.slice(0, -3) ?? "";
                 const timestamp = Number.parseInt(timestampStr, 10);
                 expect(timestamp).toBeGreaterThanOrEqual(beforeTime);
                 expect(timestamp).toBeLessThanOrEqual(afterTime);
@@ -641,7 +641,7 @@ describe("UUID Generation", () => {
                 if (timestampMatch?.groups) {
                     const fullDigits = timestampMatch.groups["full"];
                     // Remove the last 3 digits (microseconds) to get the timestamp
-                    const timestampStr = fullDigits.slice(0, -3);
+                    const timestampStr = fullDigits?.slice(0, -3) ?? "";
                     const extractedTimestamp = Number.parseInt(
                         timestampStr,
                         10

@@ -626,10 +626,10 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 i++
             ) {
                 if (i < infoMessages.length) {
-                    logger.info(infoMessages[i]);
+                    logger.info(infoMessages[i]!);
                 }
                 if (i < errors.length) {
-                    logger.error("Error occurred", errors[i]);
+                    logger.error("Error occurred", errors[i]!);
                 }
             }
 

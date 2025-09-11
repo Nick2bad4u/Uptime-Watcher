@@ -518,7 +518,7 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
     describe("Integration Testing", () => {
         fcTest.prop([fc.constantFrom("complete-suite")])(
             "Complete fuzzing test suite should achieve target coverage",
-            (suiteType) => {
+            (_suiteType) => {
                 const fullSuiteRunner = {
                     runCompleteSuite: () => {
                         const modules = [

@@ -63,7 +63,7 @@ describe("ErrorHandling Advanced Fuzzing Tests", () => {
         // Test circular reference handling
         fcTest.prop([fc.string(), fc.integer({ min: 1, max: 5 })])(
             "should handle circular object references without throwing",
-            (propName, depth) => {
+            (_propName, depth) => {
                 // Create circular reference
                 const circularObj: Record<string, any> = {};
                 let current = circularObj;
@@ -73,7 +73,7 @@ describe("ErrorHandling Advanced Fuzzing Tests", () => {
                     current[`level${i}`] = {};
                     current = current[`level${i}`];
                 }
-                current.circular = circularObj; // Create the circle
+                current["circular"] = circularObj; // Create the circle
 
                 const result = convertError(circularObj);
 

@@ -698,7 +698,6 @@ describe("AddSiteForm Comprehensive Tests", () => {
         ])(
             "should handle realistic site configurations",
             async (config) => {
-                const user = userEvent.setup();
                 render(<AddSiteForm />);
 
                 // Verify realistic input characteristics
@@ -744,7 +743,6 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 const siteName = `${scenario.company} ${scenario.service} (${scenario.environment})`;
                 const url = `https://${scenario.service.toLowerCase()}.${scenario.company.toLowerCase()}.com`;
 
-                const user = userEvent.setup();
                 render(<AddSiteForm />);
 
                 // Verify corporate scenario characteristics

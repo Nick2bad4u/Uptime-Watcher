@@ -1,6 +1,8 @@
 /**
  * Property-based fuzzing tests for AddSiteForm user input boundaries.
  *
+ * @ts-expect-error Complex fuzzing tests with dynamic DOM queries - exact type safety deferred for test coverage
+ *
  * @remarks
  * These tests focus on the actual user input attack surface - the add site form
  * where users can input site names, URLs, host names, ports, and other
@@ -21,7 +23,7 @@
  * - Form submission with malicious or edge case combinations
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, vi, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
 import {
     render,
@@ -485,12 +487,12 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                 // Switch to "new" mode to show site name field
                 const newRadios = screen.getAllByDisplayValue("new");
-                const newRadio = newRadios[0];
+                const newRadio = newRadios[0]!;
                 await user.click(newRadio);
 
                 // Find and interact with site name input
                 const siteNameInputs = screen.getAllByLabelText(/site name/i);
-                const siteNameInput = siteNameInputs[0];
+                const siteNameInput = siteNameInputs[0]!;
                 expect(siteNameInput).toBeInTheDocument();
 
                 // Test input handling
@@ -544,11 +546,11 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                 // Switch to "new" mode
                 const newRadios = screen.getAllByDisplayValue("new");
-                const newRadio = newRadios[0];
+                const newRadio = newRadios[0]!;
                 await user.click(newRadio);
 
                 const siteNameInputs = screen.getAllByLabelText(/site name/i);
-                const siteNameInput = siteNameInputs[0];
+                const siteNameInput = siteNameInputs[0]!;
 
                 // Clear and set value using fireEvent for more control
                 fireEvent.change(siteNameInput, {
@@ -603,11 +605,11 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 render(<AddSiteForm />);
 
                 const newRadios = screen.getAllByDisplayValue("new");
-                const newRadio = newRadios[0];
+                const newRadio = newRadios[0]!;
                 await user.click(newRadio);
 
                 const siteNameInputs = screen.getAllByLabelText(/site name/i);
-                const siteNameInput = siteNameInputs[0];
+                const siteNameInput = siteNameInputs[0]!;
 
                 // Should not throw or crash when handling malicious input
                 expect(() => {
@@ -682,7 +684,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
             // URL input should be available immediately with HTTP monitor type
             const urlInputs = screen.getAllByLabelText(/url/i);
-            const urlInput = urlInputs[0]; // Take the first one if multiple exist
+            const urlInput = urlInputs[0]!; // Take the first one if multiple exist
             expect(urlInput).toBeInTheDocument();
 
             // Use direct DOM manipulation instead of userEvent for speed
@@ -730,11 +732,11 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 }
                 return selects[0];
             });
-            await user.selectOptions(monitorTypeSelect, "http");
+            await user.selectOptions(monitorTypeSelect!, "http");
 
             // With the updated mock, URL input should be available immediately
             const urlInputs = screen.getAllByLabelText(/url/i);
-            const urlInput = urlInputs[0]; // Take the first one if multiple exist
+            const urlInput = urlInputs[0]!; // Take the first one if multiple exist
             expect(urlInput).toBeInTheDocument();
 
             // Should not crash when entering dangerous URLs
@@ -780,7 +782,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                 // Verify host input is available
                 const hostInputs = screen.getAllByLabelText(/host/i);
-                const hostInput = hostInputs[0]; // Take the first one if multiple exist
+                const hostInput = hostInputs[0]!; // Take the first one if multiple exist
                 expect(hostInput).toBeInTheDocument();
 
                 // Use direct DOM manipulation instead of userEvent for speed
@@ -818,7 +820,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                 // Verify host input is available
                 const hostInputs = screen.getAllByLabelText(/host/i);
-                const hostInput = hostInputs[0]; // Take the first one if multiple exist
+                const hostInput = hostInputs[0]!; // Take the first one if multiple exist
                 expect(hostInput).toBeInTheDocument();
 
                 // Should not crash
@@ -843,7 +845,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
             // Port input should be available immediately
             const portInputs = screen.getAllByLabelText(/port/i);
-            const portInput = portInputs[0]; // Take the first one if multiple exist
+            const portInput = portInputs[0]!; // Take the first one if multiple exist
             expect(portInput).toBeInTheDocument();
 
             // Use direct DOM manipulation instead of userEvent for speed
@@ -882,7 +884,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                 // Port input should be available immediately
                 const portInputs = screen.getAllByLabelText(/port/i);
-                const portInput = portInputs[0]; // Take the first one if multiple exist
+                const portInput = portInputs[0]!; // Take the first one if multiple exist
                 expect(portInput).toBeInTheDocument();
 
                 // Should not crash on invalid input

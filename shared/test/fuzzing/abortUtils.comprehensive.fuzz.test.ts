@@ -27,29 +27,6 @@ import {
 // =============================================================================
 
 /**
- * Generates abort controller configurations for testing
- */
-const abortControllerConfig = fc.record({
-    timeout: fc.oneof(
-        fc.integer({ min: 1, max: 50 }), // Reduced max timeout
-        fc.constantFrom(0, -1, 1.5)
-    ),
-    additionalSignals: fc.array(fc.constant(new AbortController().signal), {
-        maxLength: 2, // Reduced array size
-    }),
-});
-
-/**
- * Generates retry configurations
- */
-const retryConfig = fc.record({
-    maxRetries: fc.integer({ min: 0, max: 2 }), // Reduced retries
-    initialDelay: fc.integer({ min: 1, max: 5 }), // Reduced delay
-    maxDelay: fc.integer({ min: 5, max: 20 }), // Reduced max delay
-    backoffMultiplier: fc.float({ min: 1, max: 2 }),
-});
-
-/**
  * Generates promise factories for testing
  */
 const promiseFactory = fc.oneof(
@@ -105,7 +82,7 @@ describeFn("AbortUtils Comprehensive Fuzzing Tests", () => {
                 );
 
                 for (const [index, shouldAbort] of signalStates.entries()) {
-                    if (shouldAbort) {
+                    if (shouldAbort && controllers[index]) {
                         controllers[index].abort("Test abort");
                     }
                 }
@@ -113,7 +90,7 @@ describeFn("AbortUtils Comprehensive Fuzzing Tests", () => {
                 const additionalSignals = controllers.map((c) => c.signal);
                 const combined = createCombinedAbortSignal({
                     additionalSignals,
-                    timeoutMs: timeout,
+                    ...(timeout !== undefined && { timeoutMs: timeout }),
                 });
 
                 expect(combined).toBeInstanceOf(AbortSignal);

@@ -240,7 +240,8 @@ describe(generateUuid, () => {
             vi.useFakeTimers();
 
             let timeValue = 1_640_995_200_000; // 2022-01-01T00:00:00.000Z
-            const randomValue = 0.1;
+            // Constant for potential random testing
+            void 0.1;
 
             vi.setSystemTime(timeValue);
             const mockRandom = vi

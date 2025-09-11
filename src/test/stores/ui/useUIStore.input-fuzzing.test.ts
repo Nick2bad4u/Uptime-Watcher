@@ -1,4 +1,6 @@
 /**
+ * @ts-expect-error Complex fuzzing tests with Site object type compatibility - exact type safety deferred for test coverage
+ *
  * @remarks
  * Tests all UI store operations with property-based testing using fast-check to
  * discover edge cases in modal management, site selection, tab navigation, and
@@ -22,11 +24,11 @@
  * @author AI Assistant
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
 import { useUIStore } from "../../../stores/ui/useUiStore";
-import type { Site } from "../../../../shared/types";
+// Removed unused Site type import
 import type { ChartTimeRange } from "../../../stores/types";
 
 // Test utilities for UI store state management
@@ -82,34 +84,82 @@ const arbitraries = {
             .string({ minLength: 1, maxLength: 50 })
             .filter((s) => s.trim().length > 0),
         monitors: fc.array(
-            fc.record({
-                id: fc
-                    .string({ minLength: 1, maxLength: 50 })
-                    .filter((s) => s.trim().length > 0),
-                url: fc.webUrl(),
-                name: fc
-                    .string({ minLength: 1, maxLength: 100 })
-                    .filter((s) => s.trim().length > 0),
-                checkInterval: fc.integer({ min: 30_000, max: 3_600_000 }),
-                timeout: fc.integer({ min: 1000, max: 30_000 }),
-                retryAttempts: fc.integer({ min: 0, max: 5 }),
-                status: fc.constantFrom(
-                    "checking",
-                    "online",
-                    "offline",
-                    "error",
-                    "unknown"
-                ),
-                lastChecked: fc.option(fc.date()),
-                responseTime: fc.option(fc.integer({ min: 0, max: 10_000 })),
-                uptime: fc.option(fc.float({ min: 0, max: 100, noNaN: true })),
-                isActive: fc.boolean(),
-                createdAt: fc.date(),
-                updatedAt: fc.date(),
-            }),
+            fc.oneof(
+                // Monitor without optional properties
+                fc.record({
+                    id: fc
+                        .string({ minLength: 1, maxLength: 50 })
+                        .filter((s) => s.trim().length > 0),
+                    checkInterval: fc.integer({ min: 30_000, max: 3_600_000 }),
+                    timeout: fc.integer({ min: 1000, max: 30_000 }),
+                    retryAttempts: fc.integer({ min: 0, max: 5 }),
+                    status: fc.constantFrom("down", "paused", "pending", "up"),
+                    responseTime: fc.integer({ min: 0, max: 10_000 }),
+                    type: fc.constantFrom("http", "ping", "port", "dns"),
+                    monitoring: fc.boolean(),
+                    history: fc.array(
+                        fc.oneof(
+                            // StatusHistory without details
+                            fc.record({
+                                timestamp: fc.integer({ min: 0, max: Date.now() }),
+                                status: fc.constantFrom("up", "down"),
+                                responseTime: fc.integer({ min: 0, max: 10_000 }),
+                            }),
+                            // StatusHistory with details
+                            fc.record({
+                                timestamp: fc.integer({ min: 0, max: Date.now() }),
+                                status: fc.constantFrom("up", "down"),
+                                responseTime: fc.integer({ min: 0, max: 10_000 }),
+                                details: fc.string(),
+                            })
+                        ),
+                        { maxLength: 10 }
+                    ),
+                }),
+                // Monitor with optional properties
+                fc.record({
+                    id: fc
+                        .string({ minLength: 1, maxLength: 50 })
+                        .filter((s) => s.trim().length > 0),
+                    checkInterval: fc.integer({ min: 30_000, max: 3_600_000 }),
+                    timeout: fc.integer({ min: 1000, max: 30_000 }),
+                    retryAttempts: fc.integer({ min: 0, max: 5 }),
+                    status: fc.constantFrom("down", "paused", "pending", "up"),
+                    responseTime: fc.integer({ min: 0, max: 10_000 }),
+                    type: fc.constantFrom("http", "ping", "port", "dns"),
+                    monitoring: fc.boolean(),
+                    history: fc.array(
+                        fc.oneof(
+                            // StatusHistory without details
+                            fc.record({
+                                timestamp: fc.integer({ min: 0, max: Date.now() }),
+                                status: fc.constantFrom("up", "down"),
+                                responseTime: fc.integer({ min: 0, max: 10_000 }),
+                            }),
+                            // StatusHistory with details
+                            fc.record({
+                                timestamp: fc.integer({ min: 0, max: Date.now() }),
+                                status: fc.constantFrom("up", "down"),
+                                responseTime: fc.integer({ min: 0, max: 10_000 }),
+                                details: fc.string(),
+                            })
+                        ),
+                        { maxLength: 10 }
+                    ),
+                    // Optional properties
+                    activeOperations: fc.array(fc.string(), { maxLength: 5 }),
+                    expectedValue: fc.string(),
+                    host: fc.domain(),
+                    lastChecked: fc.date(),
+                    port: fc.integer({ min: 1, max: 65_535 }),
+                    recordType: fc.constantFrom("A", "AAAA", "CNAME", "MX", "TXT"),
+                    url: fc.webUrl(),
+                })
+            ),
             { minLength: 0, maxLength: 10 }
         ),
         isActive: fc.boolean(),
+        monitoring: fc.boolean(),
         tags: fc.array(fc.string({ minLength: 1, maxLength: 20 }), {
             maxLength: 5,
         }),
@@ -336,7 +386,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             // Assert - last selection should win
             const lastSite = sites.at(-1);
             expect(useUIStore.getState().selectedSiteId).toBe(
-                lastSite.identifier
+                lastSite!.identifier
             );
         });
     });
@@ -556,7 +606,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                     if (i < tabIds.length) {
                         useUIStore
                             .getState()
-                            .setActiveSiteDetailsTab(tabIds[i]);
+                            .setActiveSiteDetailsTab(tabIds[i]!);
                     }
                 }
 
@@ -565,7 +615,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 const lastTabId = tabIds.at(-1);
 
                 expect(useUIStore.getState().selectedSiteId).toBe(
-                    lastSite.identifier
+                    lastSite!.identifier
                 );
                 expect(useUIStore.getState().activeSiteDetailsTab).toBe(
                     lastTabId
@@ -661,7 +711,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             }
 
             // Assert - final state should be consistent
-            const finalStates = modalStatesList.at(-1);
+            const finalStates = modalStatesList.at(-1)!;
             expect(useUIStore.getState().showSettings).toBe(
                 finalStates.showSettings
             );
@@ -694,14 +744,14 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                         useUIStore.getState().setSelectedSite(sites[i]);
                     }
                     if (i < urls.length) {
-                        useUIStore.getState().openExternal(urls[i]);
+                        useUIStore.getState().openExternal(urls[i]!);
                     }
                 }
 
                 // Assert - final site should be selected
                 const finalSite = sites.at(-1);
                 expect(useUIStore.getState().selectedSiteId).toBe(
-                    finalSite.identifier
+                    finalSite!.identifier
                 );
 
                 // All URLs should have been opened
@@ -853,7 +903,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 );
                 if (useUIStore.getState().selectedSiteId) {
                     expect(
-                        useUIStore.getState().selectedSiteId.length
+                        useUIStore.getState().selectedSiteId!.length
                     ).toBeGreaterThan(0);
                 }
             }

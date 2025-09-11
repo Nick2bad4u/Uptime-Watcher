@@ -1506,17 +1506,17 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 }
 
                 // Verify final state matches expected values
-                if (expectedValues.name !== undefined) {
-                    expect(result.current.name).toBe(expectedValues.name);
+                if (expectedValues['name'] !== undefined) {
+                    expect(result.current.name).toBe(expectedValues['name']);
                 }
-                if (expectedValues.url !== undefined) {
-                    expect(result.current.url).toBe(expectedValues.url);
+                if (expectedValues['url'] !== undefined) {
+                    expect(result.current.url).toBe(expectedValues['url']);
                 }
-                if (expectedValues.host !== undefined) {
-                    expect(result.current.host).toBe(expectedValues.host);
+                if (expectedValues['host'] !== undefined) {
+                    expect(result.current.host).toBe(expectedValues['host']);
                 }
-                if (expectedValues.port !== undefined) {
-                    expect(result.current.port).toBe(expectedValues.port);
+                if (expectedValues['port'] !== undefined) {
+                    expect(result.current.port).toBe(expectedValues['port']);
                 }
 
                 expect(Array.isArray(fieldUpdates)).toBeTruthy();

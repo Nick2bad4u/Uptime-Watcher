@@ -27,16 +27,15 @@
  * - Error handling with invalid props
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, vi, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
 import {
     render,
     screen,
     fireEvent,
-    waitFor,
-    act,
+
 } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+
 import "@testing-library/jest-dom";
 import type { JSX } from "react/jsx-runtime";
 import { SaveButton } from "../../../components/shared/SaveButton";
@@ -270,7 +269,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                 // Normal clicks with small delays
                 for (let i = 0; i < scenario.clickCount; i++) {
                      fireEvent.click(button);
-                    
+
                     await new Promise((resolve) => setTimeout(resolve, 10));
                 }
             }
@@ -298,7 +297,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                 // Reset and test loading state
                 mockOnClick.mockClear();
 
-                const { rerender } = render(
+                const { rerender: _rerender } = render(
                     <SaveButton onClick={mockOnClick} isLoading={true} />
                 );
                 const loadingButton = screen.getByTestId("themed-button");
@@ -448,7 +447,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                     buttons.push(
                         <SaveButton
                             key={i}
-                            onClick={onClickHandlers[i]}
+                            onClick={onClickHandlers[i] ?? (() => {})}
                             data-testid={`save-button-${i}`}
                         />
                     );
@@ -537,6 +536,8 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
 
                 // Get initial icon reference
                 const initialIcon = screen.getByTestId("button-icon");
+                // Icon state tracking for future test expansion
+                void initialIcon;
 
                 for (let i = 0; i < rerenderCount; i++) {
                     // Re-render with different props that shouldn't affect icon memoization
@@ -557,4 +558,3 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
         );
     });
 });
-

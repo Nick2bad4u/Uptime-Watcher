@@ -255,7 +255,7 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
                     return;
                 }
 
-                const monitorToRemove = site.monitors[0];
+                const monitorToRemove = site.monitors[0]!;
 
                 // Test the pure utility function
                 const updatedSite = {
@@ -333,7 +333,7 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
 
                 // Assert - all monitor statuses should be valid
                 const state = useSitesStore.getState();
-                const addedSite = state.sites[0];
+                const addedSite = state.sites[0]!;
                 for (const monitor of addedSite.monitors) {
                     expect([
                         "up",

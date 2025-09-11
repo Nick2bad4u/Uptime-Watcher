@@ -8061,6 +8061,7 @@ export default [
             promise: pluginPromise,
             react: pluginReact,
             "react-hooks": reactHooks,
+            "react-perf": reactPerfPlugin,
             redos: pluginRedos,
             regexp: pluginRegexp,
             security: pluginSecurity,
@@ -8207,6 +8208,9 @@ export default [
     {
         files: ["src/theme/**/*.{ts,tsx,cts,mts}"],
         name: "Theme Components Override - src/theme/**/*.{TS,TSX,CTS,MTS}",
+        plugins: {
+            "react-perf": reactPerfPlugin,
+        },
         rules: {
             // Theme components legitimately need inline styles for dynamic theming
             "react-perf/jsx-no-new-object-as-prop": "warn",

@@ -20,15 +20,18 @@
  * @author AI Assistant
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 
 // Test utilities for error store state management
 const createTestErrorStore = () => {
-    // Get the store instance and call clearAllErrors to reset state
-    useErrorStore.getState().clearAllErrors();
+    // Get the current store state
+    const store = useErrorStore.getState();
+
+    // Clear all error states - clearAllErrors now properly clears everything
+    store.clearAllErrors();
 
     // Verify the state is actually cleared
     const clearedState = useErrorStore.getState();
@@ -549,7 +552,7 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 // Operation loadings should be cleared
                 for (const config of operationLoadings) {
                     expect(store.getOperationLoading(config.operation)).toBeFalsy(
-                        
+
                     );
                 }
             }
@@ -557,7 +560,7 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
 
         fcTest.prop([arbitraries.multipleStoreErrors])(
             "should handle clearing empty error state",
-            (storeErrors) => {
+            (_storeErrors) => {
                 store = createTestErrorStore();
                 // Ensure clean state
                 store.clearAllErrors();
@@ -623,14 +626,14 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                     i++
                 ) {
                     if (i < storeConfigs.length) {
-                        const config = storeConfigs[i];
+                        const config = storeConfigs[i]!;
                         store.setStoreError(
                             config.store,
                             config.error ?? undefined
                         );
                     }
                     if (i < operationConfigs.length) {
-                        const config = operationConfigs[i];
+                        const config = operationConfigs[i]!;
                         store.setOperationLoading(
                             config.operation,
                             config.loading
@@ -707,7 +710,7 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                     if (i < loadingStates.length) {
                         store.setOperationLoading(
                             operationName,
-                            loadingStates[i]
+                            loadingStates[i]!
                         );
                     }
                 }

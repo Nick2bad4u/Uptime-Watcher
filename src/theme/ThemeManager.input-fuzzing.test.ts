@@ -340,6 +340,7 @@ describe("ThemeManager Property-Based Tests", () => {
         (baseTheme, overrides) => {
             const customTheme = themeManager.createCustomTheme(
                 baseTheme,
+                // @ts-expect-error - Fuzzing test with intentionally partial theme data for edge case testing
                 overrides
             );
 
@@ -361,7 +362,7 @@ describe("ThemeManager Property-Based Tests", () => {
             }
 
             // Non-overridden properties should be preserved
-            if (!overrides.typography) {
+            if (!(overrides as any).typography) {
                 expect(customTheme.typography).toEqual(baseTheme.typography);
             }
         }
@@ -507,10 +508,10 @@ describe("ThemeManager Property-Based Tests", () => {
                 .filter((line) => line.trim().length > 0);
 
             // First line should be :root {
-            expect(lines[0].trim()).toBe(":root {");
+            expect(lines[0]!.trim()).toBe(":root {");
 
             // Last line should be }
-            expect(lines.at(-1).trim()).toBe("}");
+            expect(lines.at(-1)!.trim()).toBe("}");
 
             // Middle lines should be CSS variables
             const variableLines = lines.slice(1, -1);

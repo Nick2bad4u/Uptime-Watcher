@@ -511,7 +511,7 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                         } else if (request.updates.name.length > 255) {
                             errors.push("Name too long");
                         } else {
-                            updates.name = request.updates.name.trim();
+                            updates["name"] = request.updates.name.trim();
                         }
                     }
 
@@ -523,7 +523,7 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                         ) {
                             errors.push("Invalid interval update");
                         } else {
-                            updates.interval = request.updates.interval;
+                            updates["interval"] = request.updates.interval;
                         }
                     }
 
@@ -535,13 +535,13 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                         ) {
                             errors.push("Invalid timeout update");
                         } else {
-                            updates.timeout = request.updates.timeout;
+                            updates["timeout"] = request.updates.timeout;
                         }
                     }
 
                     if (request.updates.enabled !== undefined) {
                         if (typeof request.updates.enabled === "boolean") {
-                            updates.enabled = request.updates.enabled;
+                            updates["enabled"] = request.updates.enabled;
                         } else {
                             errors.push("Invalid enabled update");
                         }
@@ -549,9 +549,9 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
 
                     // Cross-field validation
                     if (
-                        updates.timeout &&
-                        updates.interval &&
-                        updates.timeout >= updates.interval
+                        updates["timeout"] &&
+                        updates["interval"] &&
+                        updates["timeout"] >= updates["interval"]
                     ) {
                         errors.push("Timeout must be less than interval");
                     }

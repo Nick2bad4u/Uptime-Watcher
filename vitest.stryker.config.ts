@@ -4,13 +4,15 @@
  * (utilities).
  */
 
+import type { UserConfig } from "vite";
+
 import path from "node:path";
 import { normalizePath } from "vite";
 import { defineConfig } from "vitest/config";
 
 const dirname = import.meta.dirname;
 
-export default defineConfig({
+const config: UserConfig = defineConfig({
     cacheDir: "./.cache/.vitest-stryker",
     esbuild: {
         keepNames: true,
@@ -177,3 +179,5 @@ export default defineConfig({
         },
     },
 });
+
+export default config;
