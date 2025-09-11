@@ -7,14 +7,71 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[987d81d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/987d81dbb517df1fd00800f0d8f8aba60fb20255)...
+[987d81d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/987d81dbb517df1fd00800f0d8f8aba60fb20255)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/987d81dbb517df1fd00800f0d8f8aba60fb20255...987d81dbb517df1fd00800f0d8f8aba60fb20255))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 14.4.0 [`(987d81d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/987d81dbb517df1fd00800f0d8f8aba60fb20255)
+
+
+
+
+
+
+## [14.4.0] - 2025-09-11
+
+
 [[aeef930](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aeef9307c66aa5bdc7c0a97a05261f5944cbebba)...
-[aeef930](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aeef9307c66aa5bdc7c0a97a05261f5944cbebba)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/aeef9307c66aa5bdc7c0a97a05261f5944cbebba...aeef9307c66aa5bdc7c0a97a05261f5944cbebba))
+[17fd1f5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/17fd1f58a8ef7b22d4bcb2b55885bdecd2de1a53)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/aeef9307c66aa5bdc7c0a97a05261f5944cbebba...17fd1f58a8ef7b22d4bcb2b55885bdecd2de1a53))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 14.3.0 [`(aeef930)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aeef9307c66aa5bdc7c0a97a05261f5944cbebba)
+
+
+
+### 🛠️ Other Changes
+
+- Refactor tests and utility functions for improved clarity and functionality
+
+- Updated test cases in `useAddSiteForm.comprehensive.test.ts` to use consistent bracket notation for object properties.
+- Modified `chartConfig.input-fuzzing.test.ts` to enhance readability by standardizing property access.
+- Improved assertions in `useErrorStore.input-fuzzing.test.ts` to clarify expected behavior of error clearing functions.
+- Enhanced `useUIStore.input-fuzzing.test.ts` with consistent loop structures for rapid state changes.
+- Refined `database.comprehensive-fuzzing.test.ts` to ensure throughput assertions align with operation success.
+- Adjusted `themeMerging.ts` to introduce helper functions for merging objects, allowing explicit undefined values to override.
+- Updated `validation.comprehensive-fuzzing.test.ts` to match function behavior for percentage string parsing.
+- Enhanced type safety in state management tests by defining interfaces for state actions and states.
+- Improved error handling and validation in IPC communication tests to ensure robust message channel checks.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(17fd1f5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/17fd1f58a8ef7b22d4bcb2b55885bdecd2de1a53)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Refactors property-based tests for stricter type safety and coverage
+
+- Updates numerous test files to use non-null assertions and more precise type guards, reducing TypeScript errors and improving maintainability.
+- Removes unused imports and redundant variable assignments to streamline test logic.
+- Refactors arbitraries in property-based tests for edge cases and compatibility with actual data structures.
+- Comments out or disables problematic tests and scenarios for future investigation, especially those causing issues with mocks or performance constraints.
+- Introduces more consistent prop naming, usage of array destructuring, and explicit nullability checks to prevent runtime errors.
+- Refactors build config to explicitly type the configuration object, improving IDE compatibility.
+- Relates to increased test robustness and improved compatibility with evolving codebase.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2020ece)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2020ece6488e296f2613689f894d0962285d041d)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v14.3.0 [skip ci] [`(458c8c4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/458c8c4c33a443ae2613380a3af3dea9fb21fd24)
 
 
 
