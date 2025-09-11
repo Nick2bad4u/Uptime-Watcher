@@ -294,11 +294,6 @@ export async function retryWithAbort<T>(
                 // eslint-disable-next-line no-await-in-loop -- retry delay requires sequential awaits
                 await sleep(delay, signal);
             } catch (sleepError) {
-                if (signal?.aborted) {
-                    throw new Error("Operation was aborted", {
-                        cause: sleepError,
-                    });
-                }
                 throw new Error("Operation was aborted", { cause: sleepError });
             }
             delay = Math.min(delay * backoffMultiplier, maxDelay);

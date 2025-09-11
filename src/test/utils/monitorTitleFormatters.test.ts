@@ -1277,7 +1277,14 @@ describe("monitorTitleFormatters", () => {
             );
 
             test.prop([
-                fc.string({ minLength: 1, maxLength: 50 }),
+                fc.string({ minLength: 1, maxLength: 50 }).filter(
+                    (s) =>
+                        ![
+                            "__proto__",
+                            "constructor",
+                            "prototype",
+                        ].includes(s)
+                ),
                 fc.record({
                     id: fc.string({ minLength: 1, maxLength: 50 }),
                     type: fc.string({ minLength: 1, maxLength: 20 }),

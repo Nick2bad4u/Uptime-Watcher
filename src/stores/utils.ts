@@ -107,6 +107,11 @@ export const createPersistConfig = <T>(
  * argument combination, allowing different argument sets to be debounced
  * independently.
  *
+ * **Warning**: This function creates timeouts that may not be cleaned up
+ * automatically. If used in components, ensure proper cleanup on unmount to
+ * prevent memory leaks. Consider using a proper cleanup mechanism in your
+ * component lifecycle.
+ *
  * @example
  *
  * ```typescript

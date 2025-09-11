@@ -60,6 +60,18 @@ export const ScreenshotThumbnail = ({
         }, [])
     );
 
+    // Cleanup timeout on component unmount to prevent memory leaks
+    useMount(
+        useCallback(function setupComponent(): void {
+            // No setup needed, just using for cleanup
+        }, []),
+        useCallback(function cleanupTimeout(): void {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        }, [])
+    );
+
     // Calculate safe values using useMemo to avoid infinite loops
     const safeUrl = useMemo(
         () => (typeof url === "string" ? url.trim() : ""),

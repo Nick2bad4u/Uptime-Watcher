@@ -7,6 +7,40 @@
             ],
             "name": "Dev: Vite + Electron Main",
             "stopAll": true
+        },
+        {
+            "configurations": [
+                "Debug Electron Main Process",
+                "Electron: Renderer"
+            ],
+            "name": "Electron: All",
+            "stopAll": true
+        },
+        {
+            "configurations": [
+                "Run Vite Dev Server",
+                "Debug Electron Main Process",
+                "Electron: Renderer"
+            ],
+            "name": "Full Debug: Vite + Main + Renderer",
+            "stopAll": true
+        },
+        {
+            "configurations": [
+                "Run Vite Dev Server",
+                "Debug Electron Main (Fixed AppData)"
+            ],
+            "name": "Dev: Vite + Electron Main (Fixed)",
+            "stopAll": true
+        },
+        {
+            "configurations": [
+                "Run Vite Dev Server",
+                "Debug Electron Main (Fixed AppData)",
+                "Electron: Renderer"
+            ],
+            "name": "Electron: All (Fixed Database)",
+            "stopAll": true
         }
     ],
     "configurations": [
@@ -26,15 +60,42 @@
             "args": ["${workspaceFolder}/dist-electron/main.js"],
             "console": "integratedTerminal",
             "env": {
+                "ELECTRON_IS_DEV": "true",
                 "NODE_ENV": "development"
             },
             "name": "Debug Electron Main Process",
             "outFiles": ["${workspaceFolder}/dist-electron/**/*.js"],
             "preLaunchTask": "Build Electron Main (Dev)",
             "request": "launch",
+            "runtimeArgs": ["--remote-debugging-port=9223"],
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
             "skipFiles": ["<node_internals>/**"],
-            "type": "node"
+            "type": "node",
+            "windows": {
+                "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+            }
+        },
+        {
+            "args": ["${workspaceFolder}/dist-electron/main.js"],
+            "console": "integratedTerminal",
+            "env": {
+                "ELECTRON_IS_DEV": "true",
+                "NODE_ENV": "development"
+            },
+            "name": "Debug Electron Main (Fixed AppData)",
+            "outFiles": ["${workspaceFolder}/dist-electron/**/*.js"],
+            "preLaunchTask": "Build Electron Main (Dev)",
+            "request": "launch",
+            "runtimeArgs": [
+                "--remote-debugging-port=9223",
+                "--user-data-dir=${env:APPDATA}/uptime-watcher"
+            ],
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            "skipFiles": ["<node_internals>/**"],
+            "type": "node",
+            "windows": {
+                "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+            }
         },
         {
             "console": "integratedTerminal",
@@ -59,6 +120,7 @@
             "preLaunchTask": "Build (Vite + Electron)",
             "program": "${workspaceFolder}/dist-electron/main.js",
             "request": "launch",
+            "runtimeArgs": ["--remote-debugging-port=9223"],
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
             "type": "node",
             "windows": {
@@ -90,6 +152,14 @@
             "type": "chrome",
             "url": "http://localhost:5173",
             "webRoot": "${workspaceFolder}/src"
+        },
+        {
+            "name": "Electron: Renderer",
+            "port": 9223,
+            "request": "attach",
+            "timeout": 30000,
+            "type": "chrome",
+            "webRoot": "${workspaceFolder}"
         },
         {
             "args": ["--ui"],

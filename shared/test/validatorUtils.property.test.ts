@@ -14,7 +14,15 @@
  * - Property-based testing for string validation functions
  * - URL and domain validation with comprehensive edge cases
  * - Host and port validation with boundary testing
- * - Integer and numeric validation with format testing
+ * - I        fc.property([
+ *             fc.oneof(
+ *                 fc.string().filter((s) => Number.isNaN(Number(s)) && s !== "" && !validator.isFloat(s)),
+ *                 fc.anything().filter((x) => typeof x !== "string")
+ *             ),
+ *         ])("should return false for non-numeric strings", (nonNumString) => {
+ *             const result = isValidNumeric(nonNumString);
+ *             expect(result).toBeFalsy();
+ *         });d numeric validation with format testing
  * - Array validation functions with type safety
  * - Performance testing with large inputs
  */

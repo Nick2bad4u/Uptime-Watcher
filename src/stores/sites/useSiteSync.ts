@@ -198,13 +198,31 @@ const statusUpdateManager: { instance?: StatusUpdateManager } = {};
 export const createSiteSyncActions = (
     deps: SiteSyncDependencies
 ): SiteSyncActions => {
+    // Synchronization state to prevent concurrent syncs
+    let pendingSyncPromise: null | Promise<void> = null;
+
     const actions: SiteSyncActions = {
-        fullSyncFromBackend: async () => {
-            await actions.syncSitesFromBackend();
-            logStoreAction("SitesStore", "fullSyncFromBackend", {
-                message: "Full backend synchronization completed",
-                success: true,
-            });
+        fullSyncFromBackend: async (): Promise<void> => {
+            // If sync is already in progress, return the existing promise
+            if (pendingSyncPromise) {
+                return pendingSyncPromise;
+            }
+
+            // Start a new sync and store the promise
+            pendingSyncPromise = (async (): Promise<void> => {
+                try {
+                    await actions.syncSitesFromBackend();
+                    logStoreAction("SitesStore", "fullSyncFromBackend", {
+                        message: "Full backend synchronization completed",
+                        success: true,
+                    });
+                } finally {
+                    // Clear the pending promise when done (success or failure)
+                    pendingSyncPromise = null;
+                }
+            })();
+
+            return pendingSyncPromise;
         },
         getSyncStatus: async () => {
             try {

@@ -276,7 +276,7 @@ describe("TypeGuards Fuzzing Tests", () => {
             }
         );
 
-        test.prop([fc.date()])(
+        test.prop([fc.date().filter((d) => !Number.isNaN(d.getTime()))])(
             "should return true for valid Date instances",
             (date) => {
                 expect(isDate(date)).toBeTruthy();

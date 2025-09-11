@@ -666,14 +666,24 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                         expect(result).toBeLessThanOrEqual(100);
 
                         // The function applies safeParseFloat then clamps with Math.max(0, Math.min(100, parsed))
-                        // safeParseFloat returns the input number as-is for number types (including Infinity/-Infinity)
-                        if (typeof input === "number") {
-                            // For any number (finite or infinite), clamp to [0, 100]
+                        // safeParseFloat returns the input number as-is for number types (excluding NaN)
+                        if (typeof input === "number" && !Number.isNaN(input)) {
+                            // For any valid number (finite or infinite), clamp to [0, 100]
                             const expectedResult = Math.max(
                                 0,
                                 Math.min(100, input)
                             );
                             expect(result).toBe(expectedResult);
+                        } else if (
+                            typeof input === "number" &&
+                            Number.isNaN(input)
+                        ) {
+                            // NaN uses clamped default value
+                            const expectedDefault = Math.max(
+                                0,
+                                Math.min(100, defaultVal)
+                            );
+                            expect(result).toBe(expectedDefault);
                         } else if (typeof input === "string") {
                             const parsed = Number.parseFloat(input);
                             if (Number.isNaN(parsed)) {

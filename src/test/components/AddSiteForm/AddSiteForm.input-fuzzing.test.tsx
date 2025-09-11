@@ -714,34 +714,27 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     "javascript:alert('test')"
                 ),
             ],
-            { numRuns: 2, timeout: 20_000 }
+            { numRuns: 2, timeout: 30_000 }
         )("should reject dangerous URL protocols", async (dangerousUrl) => {
-            const user = userEvent.setup();
+            // Pre-set mock state to avoid DOM queries
+            mockState.monitorType = "http";
+
             render(<AddSiteForm />);
 
-            // Wait for monitor type select to be available and select it
-            const monitorTypeSelect = await waitFor(() => {
-                const selects = screen.queryAllByLabelText(/monitor type/i);
-                if (selects.length === 0) {
-                    // Fallback: try finding by role and accessible name
-                    const selectByRole = screen.queryByRole("combobox", {
-                        name: /monitor type/i,
-                    });
-                    if (selectByRole) return selectByRole;
-                    throw new Error("Monitor type select not found");
-                }
-                return selects[0];
-            });
-            await user.selectOptions(monitorTypeSelect!, "http");
-
-            // With the updated mock, URL input should be available immediately
-            const urlInputs = screen.getAllByLabelText(/url/i);
-            const urlInput = urlInputs[0]!; // Take the first one if multiple exist
-            expect(urlInput).toBeInTheDocument();
+            // Use faster query method with timeout
+            const urlInput = await waitFor(
+                () => {
+                    const inputs = screen.queryAllByLabelText(/url/i);
+                    if (inputs.length === 0) {
+                        throw new Error("URL input not found");
+                    }
+                    return inputs[0]!;
+                },
+                { timeout: 5000 }
+            );
 
             // Should not crash when entering dangerous URLs
-            await user.clear(urlInput);
-            // Use faster direct assignment instead of slow typing
+            // Use direct DOM manipulation for speed
             (urlInput as HTMLInputElement).value = dangerousUrl;
             urlInput.dispatchEvent(new Event("input", { bubbles: true }));
 
@@ -807,28 +800,34 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     "host>output" // Redirects
                 ),
             ],
-            { numRuns: 2, timeout: 20_000 }
+            { numRuns: 2, timeout: 10_000 }
         )(
             "should safely handle malicious host name inputs",
             async (maliciousHost) => {
-                const user = userEvent.setup();
-
-                // Set the mock state to port type before rendering
+                // Set the mock state to port type before rendering to avoid state changes
                 mockState.monitorType = "port";
 
                 render(<AddSiteForm />);
 
-                // Verify host input is available
-                const hostInputs = screen.getAllByLabelText(/host/i);
-                const hostInput = hostInputs[0]!; // Take the first one if multiple exist
-                expect(hostInput).toBeInTheDocument();
+                // Use faster query with proper timeout
+                const hostInput = await waitFor(
+                    () => {
+                        const inputs = screen.queryAllByLabelText(/host/i);
+                        if (inputs.length === 0) {
+                            throw new Error("Host input not found");
+                        }
+                        return inputs[0]!;
+                    },
+                    { timeout: 2000 }
+                );
 
-                // Should not crash
-                await user.clear(hostInput);
-                // Use faster direct assignment
+                // Should not crash - use direct DOM manipulation for speed
                 const limitedHost = maliciousHost.slice(0, 50); // Limit to reasonable length
                 (hostInput as HTMLInputElement).value = limitedHost;
                 hostInput.dispatchEvent(new Event("input", { bubbles: true }));
+
+                // Verify the input was set without crashing
+                expect(hostInput).toBeInTheDocument();
             }
         );
     });

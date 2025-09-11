@@ -55,10 +55,9 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
         clearAllErrors: (): void => {
             logStoreAction("ErrorStore", "clearAllErrors");
             set({
-                isLoading: false,
                 lastError: undefined,
-                operationLoading: {},
                 storeErrors: {},
+                // Note: isLoading and operationLoading are NOT cleared as they track loading states, not errors
             });
         },
         clearError: (): void => {

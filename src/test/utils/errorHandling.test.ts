@@ -802,7 +802,15 @@ describe("Error Handling Utilities", () => {
                 (input) => {
                     const result = ensureError(input);
                     expect(result).toBeInstanceOf(Error);
-                    expect(result.message).toBe(input);
+
+                    // Function converts whitespace-only strings to a descriptive message
+                    if (input.trim().length === 0 && input.length > 0) {
+                        expect(result.message).toBe(
+                            `[whitespace-only ${typeof input}]`
+                        );
+                    } else {
+                        expect(result.message).toBe(input);
+                    }
                 }
             );
 

@@ -360,10 +360,33 @@ describe("TypeHelpers utilities fuzzing tests", () => {
                 const arrayResult = isArray(value);
                 const recordResult = isRecord(value);
 
-                // Arrays and records are mutually exclusive
+                // Arrays and records are mutually exclusive - ensure both guards work correctly
                 if (arrayResult) {
                     expect(recordResult).toBeFalsy();
+                    expect(Array.isArray(value)).toBeTruthy();
+                } else if (recordResult) {
+                    expect(arrayResult).toBeFalsy();
+                    expect(
+                        value !== null &&
+                            typeof value === "object" &&
+                            !Array.isArray(value)
+                    ).toBeTruthy();
+                } else {
+                    // Neither array nor record - verify consistency
+                    expect(Array.isArray(value)).toBeFalsy();
+                    const isObjectButNotRecord =
+                        value !== null &&
+                        typeof value === "object" &&
+                        !Array.isArray(value);
+                    if (isObjectButNotRecord) {
+                        // This is an edge case where value is object-like but doesn't pass isRecord test
+                        expect(recordResult).toBeFalsy();
+                    }
                 }
+
+                // Ensure type guards don't throw errors
+                expect(() => isArray(value)).not.toThrow();
+                expect(() => isRecord(value)).not.toThrow();
             }
         );
 

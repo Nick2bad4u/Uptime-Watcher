@@ -1,7 +1,8 @@
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
 param(
     [int]$keepLast,
-    [switch]$deleteTags
+    [switch]$deleteTags,
+    [switch]$Force
 )
 
 # Requires: gh CLI authenticated and in the correct repo directory
@@ -14,16 +15,33 @@ if ($keepLast) {
 }
 
 # Get all releases
-$json = gh release list --limit 1000 --json tagName,publishedAt
+try {
+    $json = gh release list --limit 1000 --json tagName,publishedAt 2>$null
+} catch {
+    Write-Error "Failed to run 'gh release list'. Make sure the GitHub CLI is installed and authenticated. $_"
+    exit 1
+}
+
+if (-not $json -or $json.Trim() -eq '') {
+    Write-Output "No releases returned from gh."
+    exit 0
+}
+
 Write-Verbose "RAW JSON OUTPUT:"
 Write-Verbose $json
-$releases = $json | ConvertFrom-Json
+
+try {
+    $releases = $json | ConvertFrom-Json
+} catch {
+    Write-Error "Failed to parse JSON from gh release list: $_"
+    exit 1
+}
 Write-Verbose "RELEASE COUNT: $($releases.Count)"
 
 # Remove empty array case
 if (-not $releases -or $releases.Count -eq 0) {
     Write-Output "No releases found after JSON parse."
-    exit
+    exit 0
 }
 
 # Filter out releases with invalid or missing publishedAt
@@ -59,35 +77,60 @@ Write-Verbose "DEBUG: Total releases: $($releases.Count)"
 Write-Verbose "DEBUG: Keep tags: $($keepTags -join ', ')"
 Write-Verbose ("DEBUG: To delete: " + ((($toDelete | ForEach-Object { $_.tagName }) -join ', ')))
 
-if ($toDelete.Count -eq 0) {
+if (-not $toDelete -or $toDelete.Count -eq 0) {
     Write-Output "No releases to delete."
-    exit
+    exit 0
 }
 
 Write-Output "The following releases will be deleted:"
 $toDelete | ForEach-Object { Write-Output $_.tagName }
 
-$confirmation = Read-Host "Do you want to proceed with deleting these releases? (y/n)"
-if ($confirmation -eq 'y') {
+if ($Force -or $PSCmdlet.ShouldProcess("Releases to delete", "Delete $($toDelete.Count) releases")) {
+    if (-not $Force) {
+        $confirmation = Read-Host "Do you want to proceed with deleting these releases? (y/n)"
+        if ($confirmation -ne 'y') {
+            Write-Output "Aborted. No releases were deleted."
+            exit 0
+        }
+    }
+
     Write-Verbose "DEBUG: Git tags before deletion:"
     git tag | ForEach-Object { Write-Verbose $_ }
     foreach ($release in $toDelete) {
-        Write-Output "Deleting $($release.tagName)..."
-        gh release delete $release.tagName --yes
+        $tag = $release.tagName
+        Write-Output "Deleting $tag..."
+        try {
+            gh release delete $tag --yes 2>$null
+        } catch {
+            Write-Warning "Failed to delete release $tag: $_"
+            continue
+        }
         if ($deleteTags) {
-            Write-Output "Deleting tag $($release.tagName)..."
-            git tag -d $release.tagName 2>$null
-            git push origin :refs/tags/$($release.tagName)
+            if ($PSCmdlet.ShouldProcess("Tag $tag", "Delete git tag $tag")) {
+                Write-Output "Deleting tag $tag..."
+                git tag -d $tag 2>$null
+                git push origin :refs/tags/$tag 2>$null
+            }
         }
     }
+
     Write-Verbose "DEBUG: Git tags after release/tag deletion:"
     git tag | ForEach-Object { Write-Verbose $_ }
     # Also check for tags that exist but have no release (orphans)
     if ($deleteTags) {
         # Re-fetch releases after deletion to get the current state
-        $jsonAfter = gh release list --limit 1000 --json tagName,publishedAt
-        $releasesAfter = $jsonAfter | ConvertFrom-Json
-        $releaseTagsAfter = $releasesAfter | ForEach-Object { $_.tagName.Trim().ToLower() }
+        try {
+            $jsonAfter = gh release list --limit 1000 --json tagName,publishedAt 2>$null
+            $releasesAfter = $jsonAfter | ConvertFrom-Json
+        } catch {
+            Write-Warning "Failed to re-fetch releases after deletion: $_"
+            $releasesAfter = @()
+        }
+
+        $releaseTagsAfter = @()
+        if ($releasesAfter) {
+            $releaseTagsAfter = $releasesAfter | ForEach-Object { ($_.tagName -as [string]).Trim().ToLower() }
+        }
         $releaseTagsNoV = $releaseTagsAfter | ForEach-Object { $_.TrimStart('v') }
         $allTags = git tag | Where-Object { $_ -ne '' } | ForEach-Object { $_.Trim().ToLower() }
         Write-Verbose "DEBUG: All tags: $($allTags -join ', ')"
@@ -104,8 +147,10 @@ if ($confirmation -eq 'y') {
             Write-Output "Deleting orphan tags with no release:"
             $orphanTags | ForEach-Object { Write-Output $_ }
             foreach ($tag in $orphanTags) {
-                git tag -d $tag 2>$null
-                git push origin :refs/tags/$tag
+                if ($PSCmdlet.ShouldProcess("Orphan tag $tag", "Delete git tag $tag")) {
+                    git tag -d $tag 2>$null
+                    git push origin :refs/tags/$tag 2>$null
+                }
             }
         } else {
             Write-Output "No orphan tags found."

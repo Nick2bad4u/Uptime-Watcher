@@ -26,12 +26,27 @@ const mergeFontSize = (
     if (!overrideFontSize) return { ...baseFontSize };
 
     const result = { ...baseFontSize };
-    for (const [key, value] of Object.entries(overrideFontSize)) {
+
+    // Handle each fontSize property individually to avoid type issues with Object.entries
+    const fontSizeKeys = [
+        "2xl",
+        "3xl",
+        "4xl",
+        "base",
+        "lg",
+        "sm",
+        "xl",
+        "xs",
+    ] as const;
+
+    for (const key of fontSizeKeys) {
+        const value = overrideFontSize[key];
+        // Skip undefined values but allow null and other values
         if (value !== undefined) {
-            // Allow null and other values, but skip undefined
-            (result as Record<string, unknown>)[key] = value;
+            result[key] = value;
         }
     }
+
     return result;
 };
 

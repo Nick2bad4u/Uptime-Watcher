@@ -118,7 +118,17 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
                 const params = { [key]: value };
                 const result = formatErrorMessage(template, params);
 
-                expect(result).toBe(`${prefix} ${String(value)}`);
+                // Check for dangerous keys that should not be replaced for security
+                if (
+                    key === "__proto__" ||
+                    key === "constructor" ||
+                    key === "prototype"
+                ) {
+                    // Dangerous keys should remain as placeholders for security
+                    expect(result).toBe(`${prefix} {${key}}`);
+                } else {
+                    expect(result).toBe(`${prefix} ${String(value)}`);
+                }
             }
         );
 

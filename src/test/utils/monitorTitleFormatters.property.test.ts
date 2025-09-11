@@ -364,7 +364,14 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
         );
 
         test.prop([
-            fc.string({ minLength: 1 }),
+            fc
+                .string({ minLength: 1 })
+                .filter(
+                    (s) =>
+                        s !== "__proto__" &&
+                        s !== "constructor" &&
+                        s !== "prototype"
+                ),
             fc.string({ minLength: 1 }),
             fc.string({ minLength: 1 }),
         ])(

@@ -299,11 +299,10 @@ export class DnsMonitor implements IMonitorService {
         expectedValue: string | undefined,
         timeout: number
     ): Promise<{ details?: string; error?: string; success: boolean }> {
-        // Create timeout promise
+        // Create timeout promise with cleanup capability
+        let timeoutId: NodeJS.Timeout | undefined = undefined;
         const timeoutPromise = new Promise<never>((_resolve, reject) => {
-            // Timer used in Promise.race, cleanup not practical
-            // eslint-disable-next-line clean-timer/assign-timer-id -- Timer used in race condition
-            setTimeout(() => {
+            timeoutId = setTimeout(() => {
                 reject(new Error(`DNS resolution timeout after ${timeout}ms`));
             }, timeout);
         });
@@ -323,9 +322,15 @@ export class DnsMonitor implements IMonitorService {
             // Race between DNS resolution and timeout
             const result = await Promise.race([resolvePromise, timeoutPromise]);
 
+            // Clear timeout since operation completed successfully
+            clearTimeout(timeoutId);
+
             // Format result based on record type and check expected value
             return this.formatDnsResult(result, recordType, expectedValue);
         } catch (error) {
+            // Clear timeout in case of error
+            clearTimeout(timeoutId);
+
             return {
                 details: `DNS resolution failed for ${recordType} record`,
                 error: error instanceof Error ? error.message : String(error),

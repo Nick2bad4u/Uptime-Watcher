@@ -1040,7 +1040,13 @@ describe("jsonSafety utilities", () => {
 
                     if (result.success && result.data) {
                         const parsed = JSON.parse(result.data);
-                        expect(parsed).toBe(number);
+                        // JSON.stringify(-0) becomes "0", which parses to +0
+                        // This is expected JSON behavior
+                        if (Object.is(number, -0)) {
+                            expect(parsed).toBe(0);
+                        } else {
+                            expect(parsed).toBe(number);
+                        }
                     }
                 })
             );
