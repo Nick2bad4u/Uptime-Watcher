@@ -1,6 +1,6 @@
 ---
 description: Audit code for security vulnerabilities and suggest improvements to protect against threats.
-tools: ['Best Tools']
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'sequentialthinking', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
 ---
 
 # Security mode instructions

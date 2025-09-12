@@ -1,6 +1,6 @@
 ---
 description: AI-powered debugging mode for diagnosing, analyzing, and resolving errors or unexpected behaviors in code.
-tools: ['Best Tools']
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'sequentialthinking', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
 ---
 
 # Debugging mode instructions

@@ -1,6 +1,6 @@
 ---
 description: Analyze code for performance bottlenecks and suggest optimizations for speed, memory, and efficiency.
-tools: ['Best Tools']
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'sequentialthinking', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
 ---
 
 # Performance mode instructions

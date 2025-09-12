@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['Best Tools']
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'sequentialthinking', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
 description: "Review new pull requests (PRs) against the Uptime Watcher repository in a low-confidence safe mode, ensuring correctness and adherence to project standards."
 ---
 # PR Review Assistant — Low-Confidence Safe Mode
@@ -70,7 +70,7 @@ Do / Don't quick list
 - Don't: make large speculative refactors in a review comment; apply code changes automatically unless trivial fix and CI green.
 
 Closing
-- Add a short re-check instruction: "After addressing the points above, please push a fixup commit and the reviewer will re-run the checks. If you need help implementating any fix, mention which area and I can propose a patch." 
+- Add a short re-check instruction: "After addressing the points above, please push a fixup commit and the reviewer will re-run the checks. If you need help implementating any fix, mention which area and I can propose a patch."
 
 ---
 

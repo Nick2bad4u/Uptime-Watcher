@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['Best Tools']
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'sequentialthinking', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
 description: "Review TSDoc comments to ensure they are accurate, complete, and compliant with project standards."
 ---
 
@@ -14,16 +14,16 @@ Use proper linking where available, and ensure that all TSDoc comments are clear
 
 ## Requirements
 
-- **Accuracy First:**  
+- **Accuracy First:**
   Every TSDoc comment must accurately describe the code it documents. Do not rely on assumptions—verify functionality and behavior directly from the codebase before updating or adding documentation.
 
-- **TSDoc Tag Compliance:**  
+- **TSDoc Tag Compliance:**
   Use **only** the standard TSDoc base tags as detailed in [/docs/TSDoc/TSDoc-Base-Tags.md](../../docs/TSDoc/TSDoc-Base-Tags.md).
-  **Do not use any tags that are not explicitly listed in the TSDoc base tags section below.**  
+  **Do not use any tags that are not explicitly listed in the TSDoc base tags section below.**
   Ensure that tags are used correctly and consistently.
   Make sure that the TSDoc comments are high quality.
 
-- **Key Tag Emphasis:**  
+- **Key Tag Emphasis:**
   Pay special attention to the following tags. Add them wherever appropriate:
   - `@remarks` — Supplementary notes or important clarifications about the API.
   - `@param` — Document all function and method parameters, specifying their purpose and expected types. (DONT USE `@property`)
@@ -31,11 +31,11 @@ Use proper linking where available, and ensure that all TSDoc comments are clear
   - `@throws` — List any errors or exceptions that can be thrown, with conditions for each.
   - `@example` — Provide usage examples, especially for complex or non-obvious APIs. (Do not use `@example` for simple getters/setters. Do not overuse `@example` unless it adds significant value.)
 
-- **Additional Tags:**  
+- **Additional Tags:**
   Where relevant, incorporate these tags for completeness and clarity:
   - `@typeParam`, `@deprecated`, `@see`, `@defaultValue`, `@decorator`, `@privateRemarks`, and modifier tags such as `@public`, `@internal`, `@readonly`, etc.
 
-- **Maintainability and Readability:**  
+- **Maintainability and Readability:**
   Ensure that documentation is clear, concise, and aids both current and future maintainers in understanding the intent and usage of the code.
 
 ## Goal
@@ -87,46 +87,46 @@ Elevate the clarity, accuracy, and completeness of TSDoc comments for enhanced m
 
 #### REQUIRED Order for Block Tags (!IMPORTANT!)
 
-- _Summary_ (first line, no tag)  
+- _Summary_ (first line, no tag)
   (Always begins the comment, not a tag.)
 
-- `@remarks`  
+- `@remarks`
   Additional information or context.
 
-- `@deprecated`  
+- `@deprecated`
   If the API is deprecated, state it early.
 
-- `@example`  
+- `@example`
   Show usage before listing technical details.
 
-- `@typeParam`  
+- `@typeParam`
   Document generic parameters before regular parameters.
 
-- `@param`  
+- `@param`
   List all function or method parameters, one per tag.
 
-- `@returns`  
+- `@returns`
   Describe what the function returns.
 
-- `@throws`  
+- `@throws`
   List possible exceptions/errors.
 
-- `@defaultValue`  
+- `@defaultValue`
   For properties/parameters with defaults.
 
-- `@see`  
+- `@see`
   Cross-references.
 
-- `@decorator`  
+- `@decorator`
   If applicable.
 
-- `@privateRemarks`  
+- `@privateRemarks`
   Internal documentation (usually at the end).
 
-- Modifier tags (such as `@public`, `@protected`, `@internal`, `@beta`, etc.)  
+- Modifier tags (such as `@public`, `@protected`, `@internal`, `@beta`, etc.)
   These are typically placed at the very beginning of the comment block (after the summary and before block tags), or even outside the comment block, depending on your project's conventions.
 
-- Inline tags  
+- Inline tags
   Used within the summary or other tag descriptions as needed (e.g., `{@link ...}`).
 
 Refer to the full documentation in `/docs/TSDoc/TSDoc-Base-Tags.md` for detailed usage.

@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['Best Tools']
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'sequentialthinking', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
 description: "Refactor code to align with Electron, React 19, TypeScript, Vite, Zustand, Vitest, Tailwind, and modern linting/testing best practices"
 ---
 
