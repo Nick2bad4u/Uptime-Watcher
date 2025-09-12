@@ -1,8 +1,7 @@
-# Generate 100% Test Coverage
-
-**Mode:** agent
-**Tools:** Best Tools
-**Description:** Generate 100% Test Coverage
+---
+mode: "agent"
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'sequentialthinking', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
+description: "Generate 100% Fast-Check Fuzzing Test Coverage"
 
 ---
 
