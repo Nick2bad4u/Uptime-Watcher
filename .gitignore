@@ -578,3 +578,10 @@ docs/docusaurus/docs/.nojekyll
 docs/docusaurus/docs/coverage.svg
 docs/docusaurus/docs/index.md
 docs/docusaurus/docs/modules.md
+playwright-report/
+test-results/
+
+# Playwright
+/playwright-report/
+/blob-report/
+/playwright/.cache/

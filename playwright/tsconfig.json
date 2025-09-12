@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../src/*"],
+      "@/electron/*": ["../electron/*"],
+      "@/playwright/*": ["./*"],
+      "@/shared/*": ["../shared/*"]
+    },
+    "types": ["@playwright/test", "node"]
+  },
+  "exclude": [
+    "coverage",
+    "node_modules",
+    "test-results"
+  ],
+  "extends": "../tsconfig.json",
+  "include": [
+    "**/*.js",
+    "**/*.ts",
+    "../electron/**/*.ts",
+    "../shared/**/*.ts"
+  ]
+}

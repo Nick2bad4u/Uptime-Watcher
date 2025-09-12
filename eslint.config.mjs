@@ -91,6 +91,7 @@ import observers from "eslint-plugin-observers";
 import packageJson from "eslint-plugin-package-json";
 import paths from "eslint-plugin-paths";
 import pluginPerfectionist from "eslint-plugin-perfectionist";
+import playwright from "eslint-plugin-playwright";
 import pluginPreferArrow from "eslint-plugin-prefer-arrow";
 import pluginPrettier from "eslint-plugin-prettier";
 import pluginPromise from "eslint-plugin-promise";
@@ -8193,6 +8194,84 @@ export default [
                 ],
             },
             react: { version: "19" },
+        },
+    },
+
+    // Playwright End-to-End Test Configuration
+    {
+        files: [
+            "playwright/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "**/*.playwright.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "**/playwright/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+        ],
+        name: "Playwright E2E Tests - playwright/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
+        ...playwright.configs["flat/recommended"],
+        plugins: {
+            ...playwright.configs["flat/recommended"].plugins,
+            "@typescript-eslint": tseslint,
+            playwright: playwright,
+        },
+        rules: {
+            ...playwright.configs["flat/recommended"].rules,
+            // TypeScript and testing-specific overrides for Playwright
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                {
+                    args: "after-used",
+                    argsIgnorePattern: "^_",
+                    ignoreRestSiblings: true,
+                    varsIgnorePattern: "^_",
+                },
+            ],
+            "import-x/no-unresolved": "off", // Playwright has special imports
+            "no-console": "off", // Allow console in tests
+            "no-magic-numbers": "off", // Test data may have magic numbers
+            // Enhanced Playwright-specific rules
+            "playwright/expect-expect": "error",
+            "playwright/max-nested-describe": [
+                "error",
+                { max: 3 },
+            ],
+            "playwright/missing-playwright-await": "error",
+            "playwright/no-conditional-in-test": "error",
+            "playwright/no-element-handle": "warn",
+            "playwright/no-eval": "error",
+            "playwright/no-focused-test": "error",
+            "playwright/no-force-option": "warn",
+            "playwright/no-nested-step": "error",
+            "playwright/no-networkidle": "warn",
+            "playwright/no-page-pause": "warn",
+            "playwright/no-skipped-test": "warn",
+            "playwright/no-useless-await": "error",
+            "playwright/no-useless-not": "error",
+            "playwright/no-wait-for-selector": "warn",
+
+            "playwright/no-wait-for-timeout": "warn",
+            "playwright/prefer-web-first-assertions": "error",
+            "playwright/valid-expect": "error",
+            "playwright/valid-title": "error",
+            "prefer-arrow-callback": "off", // Test functions don't need arrow syntax
+            "unicorn/consistent-function-scoping": "off", // Test helpers
+            "unicorn/no-await-expression-member": "off", // Common in Playwright
+        },
+        settings: {
+            "import-x/resolver": {
+                node: true,
+                typescript: {
+                    alwaysTryTypes: true,
+                    project: [
+                        "./tsconfig.json",
+                        "./playwright.config.ts",
+                    ],
+                },
+            },
+            playwright: {
+                additionalAssertFunctionNames: [
+                    "expectToBeVisible",
+                    "expectToHaveText",
+                    "expectToHaveCount",
+                ],
+            },
         },
     },
 

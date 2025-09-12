@@ -15,7 +15,6 @@ import {
     raceWithAbort,
     isAbortError,
     type CombineSignalsOptions,
-    type RetryWithAbortOptions,
 } from "../../../../shared/utils/abortUtils.js";
 
 describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
@@ -37,10 +36,13 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                         fc.integer({ min: 1, max: 10_000 }), // timeout in ms
                         fc.option(fc.string(), { nil: undefined }), // optional reason
                         (timeoutMs, reason) => {
-                            const signal = createCombinedAbortSignal({
+                            const options: CombineSignalsOptions = {
                                 timeoutMs,
-                                reason,
-                            });
+                            };
+                            if (reason !== undefined) {
+                                options.reason = reason;
+                            }
+                            const signal = createCombinedAbortSignal(options);
 
                             expect(signal).toBeInstanceOf(AbortSignal);
                             expect(signal.aborted).toBeFalsy();
