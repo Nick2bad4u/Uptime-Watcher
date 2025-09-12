@@ -1,4 +1,4 @@
-/* eslint-disable eslint-comments/disable-enable-pair -- needed for standalone config*/
+/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- needed for standalone config*/
 
 /**
  * Vitest configuration for Electron backend tests. Standalone config file that

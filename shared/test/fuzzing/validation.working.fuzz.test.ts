@@ -1,4 +1,4 @@
-/* eslint-disable-next-line eslint-comments/disable-enable-pair -- Disable specific rule */
+/* eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Disable specific rule */
 /* eslint-disable no-script-url -- Fuzzing tests */
 
 /**

@@ -1,4 +1,4 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair -- Theme files need hex color usage throughout entire file
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Theme files need hex color usage throughout entire file
 /* eslint-disable @metamask/design-tokens/color-no-hex -- Theme definitions require direct hex color values */
 /**
  * Theme definitions for the application.

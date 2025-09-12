@@ -1,4 +1,5 @@
-/* eslint-disable perfectionist/sort-objects */
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- messy
+/* eslint-disable perfectionist/sort-objects -- messy */
 
 /**
  * PostCSS configuration for the Uptime Watcher application.

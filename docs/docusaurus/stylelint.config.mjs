@@ -1,4 +1,4 @@
-/* eslint-disable eslint-comments/disable-enable-pair -- Docusaurus Requirement */
+/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- Docusaurus Requirement */
 /* eslint-disable import-x/no-anonymous-default-export -- Docusaurus Requirement */
 /* eslint-disable tsdoc/syntax -- Docusaurus Requirement */
 /**

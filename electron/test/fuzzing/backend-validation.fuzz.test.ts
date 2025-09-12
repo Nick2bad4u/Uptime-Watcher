@@ -17,7 +17,7 @@
  *
  * @packageDocumentation
  */
-
+/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- Testing Requirement */
 /* eslint-disable no-script-url, prefer-template, unicorn/prefer-string-replace-all, prefer-named-capture-group, arrow-body-style, unicorn/numeric-separators-style, unicorn/better-regex -- Testing malicious patterns and security vulnerabilities */
 
 import { describe, expect, it } from "vitest";

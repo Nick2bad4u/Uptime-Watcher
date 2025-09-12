@@ -1,4 +1,4 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair -- file operations require disable-enable pattern for controlled violations
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- file operations require disable-enable pattern for controlled violations
 /* eslint-disable n/no-unsupported-features/node-builtins -- using node above 24.0.0 so URL.revokeObjectURL is supported */
 /**
  * File backup utility for handling file download operations. Provides utilities

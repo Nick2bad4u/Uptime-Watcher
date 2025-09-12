@@ -1,4 +1,4 @@
-/* eslint-disable eslint-comments/disable-enable-pair -- This page contains multiple unrelated eslint rules that cannot be properly paired */
+/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- This page contains multiple unrelated eslint rules that cannot be properly paired */
 /* eslint-disable tailwind/no-custom-classname -- Using Docusaurus CSS classes, not Tailwind */
 
 /* eslint-disable @typescript-eslint/dot-notation -- Required for strict TypeScript configuration and dynamic property access */

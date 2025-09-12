@@ -10,12 +10,12 @@
  * - Modern ES2024+ features
  * - Enhanced security and performance rules
  */
-
-/* eslint-disable import-x/no-named-as-default-member -- Eslint doesn't use default*/
-/* eslint-disable n/no-unpublished-import -- Rule wants packages not in dev, doesn't apply */
+/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- Eslint doesn't use default */
+/* eslint-disable n/no-unpublished-import, import-x/no-named-as-default-member -- Rule wants packages not in dev, doesn't apply, eslint doesnt use default import */
 
 import pluginUseMemo2 from "@arthurgeron/eslint-plugin-react-usememo";
 import pluginDocusaurus from "@docusaurus/eslint-plugin";
+import pluginComments from "@eslint-community/eslint-plugin-eslint-comments/configs";
 import eslintReact from "@eslint-react/eslint-plugin";
 import { fixupPluginRules } from "@eslint/compat";
 import css from "@eslint/css";
@@ -49,8 +49,6 @@ import pluginCompat from "eslint-plugin-compat";
 import * as pluginCssModules from "eslint-plugin-css-modules";
 import depend from "eslint-plugin-depend";
 import pluginDeprecation from "eslint-plugin-deprecation";
-// eslint-disable-next-line depend/ban-dependencies -- Recommended one sucks
-import pluginComments from "eslint-plugin-eslint-comments";
 import etc from "eslint-plugin-etc";
 import { plugin as ex } from "eslint-plugin-exception-handling";
 import progress from "eslint-plugin-file-progress";
@@ -197,6 +195,7 @@ export default [
     noBarrelFiles.flat,
     // @ts-expect-error: nitpick.configs.recommended may not have correct types, but runtime usage is verified and safe
     nitpick.configs.recommended,
+    pluginComments.recommended,
     // ═══════════════════════════════════════════════════════════════════════════════
     // Global Ignore Patterns
     // Add patterns here to ignore files and directories globally
@@ -1088,10 +1087,10 @@ export default [
             depend: depend,
             // @ts-expect-error -- TS Error from fixupPluginRules
             deprecation: fixupPluginRules(pluginDeprecation),
-            "eslint-comments": pluginComments,
+
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -1168,6 +1167,7 @@ export default [
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
             ...importX.flatConfigs.electron.rules,
+            // @ts-expect-error
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -1180,12 +1180,16 @@ export default [
             ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
-            ...pluginComments.configs.recommended.rules,
+            ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-typescript"].rules,
+            // @ts-expect-error
             ...arrayFunc.configs.all.rules,
+            // @ts-expect-error
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            // @ts-expect-error
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
+            // @ts-expect-error
             ...pluginMicrosoftSdl.configs.required.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
@@ -1196,11 +1200,16 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
+            // @ts-expect-error
             ...etc.configs.recommended.rules,
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/no-untranslated-text": "off",
             "@docusaurus/prefer-docusaurus-heading": "warn",
             "@docusaurus/string-literal-i18n-messages": "off",
+            "@eslint-community/eslint-comments/no-restricted-disable": "warn",
+            "@eslint-community/eslint-comments/no-unused-disable": "warn",
+            "@eslint-community/eslint-comments/no-use": "off",
+            "@eslint-community/eslint-comments/require-description": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
@@ -1307,6 +1316,7 @@ export default [
             "@microsoft/sdl/no-insecure-url": "warn",
             "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
+
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@rushstack/security/no-unsafe-regexp": "warn",
@@ -1315,7 +1325,6 @@ export default [
                 "error",
                 { default: "array-simple" },
             ], // Prefer T[] for simple types, Array<T> for complex types
-
             "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
             "@typescript-eslint/ban-ts-comment": "warn",
             "@typescript-eslint/ban-tslint-comment": "warn",
@@ -1634,13 +1643,13 @@ export default [
             "canonical/destructuring-property-newline": "off",
             "canonical/export-specifier-newline": "off",
             "canonical/filename-match-exported": "off",
+            // Core quality rules
+
             "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
             "canonical/filename-no-index": "off",
             "canonical/import-specifier-newline": "off",
             "canonical/no-barrel-import": "error",
             "canonical/no-export-all": "error",
-            // Core quality rules
-
             "canonical/no-import-namespace-destructure": "warn",
             "canonical/no-re-export": "warn",
             "canonical/no-reassign-imports": "error",
@@ -1706,10 +1715,6 @@ export default [
                 "error",
                 "always",
             ],
-            "eslint-comments/no-restricted-disable": "warn",
-            "eslint-comments/no-unused-disable": "warn",
-            "eslint-comments/no-use": "off",
-            "eslint-comments/require-description": "warn",
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
             "eslint-plugin-toplevel/no-toplevel-let": "error",
             "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
@@ -2333,10 +2338,10 @@ export default [
             depend: depend,
             // @ts-expect-error -- TS Error from fixupPluginRules
             deprecation: fixupPluginRules(pluginDeprecation),
-            "eslint-comments": pluginComments,
+
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -2425,6 +2430,7 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
+            // @ts-expect-error
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -2438,12 +2444,16 @@ export default [
             ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
-            ...pluginComments.configs.recommended.rules,
+            ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-typescript"].rules,
+            // @ts-expect-error
             ...arrayFunc.configs.all.rules,
+            // @ts-expect-error
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            // @ts-expect-error
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
+            // @ts-expect-error
             ...pluginMicrosoftSdl.configs.required.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
@@ -2457,6 +2467,7 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
+            // @ts-expect-error
             ...etc.configs.recommended.rules,
             ...pluginBetterTailwindcss.configs.correctness.rules,
             "@arthurgeron/react-usememo/require-memo": "off",
@@ -2464,6 +2475,10 @@ export default [
             "@arthurgeron/react-usememo/require-usememo-children": "off",
             // Sonar quality helpers
 
+            "@eslint-community/eslint-comments/no-restricted-disable": "warn",
+            "@eslint-community/eslint-comments/no-unused-disable": "warn",
+            "@eslint-community/eslint-comments/no-use": "off",
+            "@eslint-community/eslint-comments/require-description": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
@@ -2571,6 +2586,7 @@ export default [
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
+
             "@rushstack/security/no-unsafe-regexp": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
             "@typescript-eslint/array-type": [
@@ -2578,7 +2594,6 @@ export default [
                 { default: "array-simple" },
             ], // Prefer T[] for simple types, Array<T> for complex types
             "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
-
             "@typescript-eslint/ban-ts-comment": "warn",
             "@typescript-eslint/ban-tslint-comment": "warn",
             "@typescript-eslint/class-literal-property-style": "warn",
@@ -2959,10 +2974,6 @@ export default [
                 "error",
                 "always",
             ],
-            "eslint-comments/no-restricted-disable": "warn",
-            "eslint-comments/no-unused-disable": "warn",
-            "eslint-comments/no-use": "off",
-            "eslint-comments/require-description": "warn",
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
             "eslint-plugin-toplevel/no-toplevel-let": "error",
             "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
@@ -3834,10 +3845,10 @@ export default [
             depend: depend,
             // @ts-expect-error -- TS Error from fixupPluginRules
             deprecation: fixupPluginRules(pluginDeprecation),
-            "eslint-comments": pluginComments,
+
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -3915,6 +3926,7 @@ export default [
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
             ...importX.flatConfigs.electron.rules,
+            // @ts-expect-error
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -3928,12 +3940,16 @@ export default [
             ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
-            ...pluginComments.configs.recommended.rules,
+            ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-typescript"].rules,
+            // @ts-expect-error
             ...arrayFunc.configs.all.rules,
+            // @ts-expect-error
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            // @ts-expect-error
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
+            // @ts-expect-error
             ...pluginMicrosoftSdl.configs.required.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
@@ -3944,7 +3960,12 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
+            // @ts-expect-error
             ...etc.configs.recommended.rules,
+            "@eslint-community/eslint-comments/no-restricted-disable": "warn",
+            "@eslint-community/eslint-comments/no-unused-disable": "warn",
+            "@eslint-community/eslint-comments/no-use": "off",
+            "@eslint-community/eslint-comments/require-description": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
@@ -4417,10 +4438,6 @@ export default [
                 "error",
                 "always",
             ],
-            "eslint-comments/no-restricted-disable": "warn",
-            "eslint-comments/no-unused-disable": "warn",
-            "eslint-comments/no-use": "off",
-            "eslint-comments/require-description": "warn",
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
             "eslint-plugin-toplevel/no-toplevel-let": "error",
             "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
@@ -5042,10 +5059,10 @@ export default [
             depend: depend,
             // @ts-expect-error -- TS Error from fixupPluginRules
             deprecation: fixupPluginRules(pluginDeprecation),
-            "eslint-comments": pluginComments,
+
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -5134,6 +5151,7 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
+            // @ts-expect-error
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -5147,12 +5165,16 @@ export default [
             ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
-            ...pluginComments.configs.recommended.rules,
+            ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-typescript"].rules,
+            // @ts-expect-error
             ...arrayFunc.configs.all.rules,
+            // @ts-expect-error
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            // @ts-expect-error
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
+            // @ts-expect-error
             ...pluginMicrosoftSdl.configs.required.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
@@ -5166,10 +5188,15 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
+            // @ts-expect-error
             ...etc.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "warn",
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "warn",
+            "@eslint-community/eslint-comments/no-restricted-disable": "warn",
+            "@eslint-community/eslint-comments/no-unused-disable": "warn",
+            "@eslint-community/eslint-comments/no-use": "off",
+            "@eslint-community/eslint-comments/require-description": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
@@ -5277,6 +5304,7 @@ export default [
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
+
             "@rushstack/security/no-unsafe-regexp": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
             "@typescript-eslint/array-type": [
@@ -5284,7 +5312,6 @@ export default [
                 { default: "array-simple" },
             ], // Prefer T[] for simple types, Array<T> for complex types
             "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
-
             "@typescript-eslint/ban-ts-comment": "warn",
             "@typescript-eslint/ban-tslint-comment": "warn",
             "@typescript-eslint/class-literal-property-style": "warn",
@@ -5650,10 +5677,6 @@ export default [
                 "error",
                 "always",
             ],
-            "eslint-comments/no-restricted-disable": "warn",
-            "eslint-comments/no-unused-disable": "warn",
-            "eslint-comments/no-use": "off",
-            "eslint-comments/require-description": "warn",
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
             "eslint-plugin-toplevel/no-toplevel-let": "error",
             "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
@@ -6500,7 +6523,7 @@ export default [
         name: "Tests (Frontend) - src/**/*.{spec,test}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
-            "eslint-comments": pluginComments,
+
             "import-x": importX,
             "loadable-imports": pluginLoadableImports,
             n: nodePlugin,
@@ -6521,7 +6544,7 @@ export default [
             ...tseslint.configs.stylisticTypeChecked,
             ...tseslint.configs.stylistic.rules,
             ...vitest.configs.recommended.rules,
-            ...pluginComments.configs.recommended.rules,
+            ...pluginComments.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
             // Relaxed function rules for tests (explicit for clarity)
@@ -6929,7 +6952,7 @@ export default [
         name: "Tests (Shared) - shared/**/*.{spec,test}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
-            "eslint-comments": pluginComments,
+
             "import-x": importX,
             "loadable-imports": pluginLoadableImports,
             n: nodePlugin,
@@ -6950,7 +6973,7 @@ export default [
             ...tseslint.configs.stylisticTypeChecked,
             ...tseslint.configs.stylistic.rules,
             ...vitest.configs.recommended.rules,
-            ...pluginComments.configs.recommended.rules,
+            ...pluginComments.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
@@ -7123,7 +7146,7 @@ export default [
         name: "Benchmarks - benchmarks/**/*.{bench}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
-            "eslint-comments": pluginComments,
+
             "import-x": importX,
             n: nodePlugin,
             react: pluginReact,
@@ -7143,7 +7166,7 @@ export default [
             ...tseslint.configs.stylisticTypeChecked,
             ...tseslint.configs.stylistic.rules,
             ...vitest.configs.recommended.rules,
-            ...pluginComments.configs.recommended.rules,
+            ...pluginComments.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
             "@typescript-eslint/no-empty-function": "off",
             // Allow flexible patterns for benchmark mock implementations
@@ -7318,7 +7341,7 @@ export default [
             compat: pluginCompat,
             css: css,
             depend: depend,
-            "eslint-comments": pluginComments,
+
             ex: ex,
             functional: pluginFunctional,
             "import-x": importX,
@@ -7358,6 +7381,7 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
+            // @ts-expect-error
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...jsxA11y.flatConfigs.strict.rules,
@@ -7368,8 +7392,9 @@ export default [
             ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
-            ...pluginComments.configs.recommended.rules,
+            ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
+            // @ts-expect-error
             ...arrayFunc.configs.all.rules,
             "@typescript-eslint/array-type": [
                 "error",
@@ -7884,7 +7909,7 @@ export default [
         name: "Scripts - scripts/**/*.{TS,TSX,CTS,MTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
-            "eslint-comments": pluginComments,
+
             "import-x": importX,
             n: nodePlugin,
             react: pluginReact,
@@ -7898,7 +7923,7 @@ export default [
 
             ...js.configs.all.rules,
             ...vitest.configs.recommended.rules,
-            ...pluginComments.configs.recommended.rules,
+            ...pluginComments.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
             "@typescript-eslint/no-empty-function": "off",
             // Allow flexible patterns for benchmark mock implementations
@@ -8079,6 +8104,7 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
+            // @ts-expect-error
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
