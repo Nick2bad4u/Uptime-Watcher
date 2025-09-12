@@ -7,14 +7,107 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[f535e62](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f535e6266861c3df3863a7d989acf738c3012c53)...
-[f535e62](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f535e6266861c3df3863a7d989acf738c3012c53)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f535e6266861c3df3863a7d989acf738c3012c53...f535e6266861c3df3863a7d989acf738c3012c53))
+[[b8c11b0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b8c11b0b3b1043a6f39956b76363d1400df69759)...
+[b8c11b0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b8c11b0b3b1043a6f39956b76363d1400df69759)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b8c11b0b3b1043a6f39956b76363d1400df69759...b8c11b0b3b1043a6f39956b76363d1400df69759))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 14.6.0 [`(b8c11b0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b8c11b0b3b1043a6f39956b76363d1400df69759)
+
+
+
+
+
+
+## [14.6.0] - 2025-09-12
+
+
+[[f535e62](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f535e6266861c3df3863a7d989acf738c3012c53)...
+[1edf6f7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1edf6f7f47668b5c8cbc0f4b532ef6ed76305940)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f535e6266861c3df3863a7d989acf738c3012c53...1edf6f7f47668b5c8cbc0f4b532ef6ed76305940))
+
+
+### ✨ Features
+
+- ✨ [feat] Add comprehensive Playwright E2E, accessibility, and compatibility test suites
+
+- Introduces extensive automated Playwright test coverage for critical user workflows, accessibility compliance (including WCAG and keyboard navigation), edge cases, cross-browser/platform compatibility, and UI resilience.
+ - Adds a helper script and documentation to streamline Playwright codegen and integration for Electron and web contexts.
+ - Refines test configuration with granular TypeScript isolation, enhanced ESLint Playwright rules, and improved test metadata/tagging.
+ - Updates core app markup and test selectors to support robust, reliable automated UI testing and accessibility assertions.
+ - Integrates Playwright test type checks into CI and scripts for higher code quality.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3f9a450)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f9a450b2410337cad88528bebf9cff994709664)
+
+
+- ✨ [feat] Integrate Playwright E2E tests with CI and linting
+
+- Adds Playwright setup for Electron app testing, including config, global setup/teardown, and initial E2E/UI/spec test suites.
+- Configures GitHub Actions workflow for Playwright test automation and reporting.
+- Enhances ESLint config with Playwright plugin and targeted lint rules for E2E tests.
+- Updates .gitignore for Playwright artifacts and test output directories.
+- Extends package scripts for Playwright test execution and reporting.
+- Provides TypeScript support for Playwright tests and test isolation.
+- Supplies a utility script for annotating Playwright tests with tags and metadata.
+- Improves reliability of combined abort signal tests in shared utilities.
+
+Relates to improved cross-platform E2E automation, better test organization, and CI/CD readiness.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e81e961)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e81e96113d6668942f17504a460524c6c9ac3199)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update dependency group (#68) [`(260ea81)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/260ea813fb0ed188d2ca710970e10631dc98b034)
+
+
 - [dependency] Update version 14.5.0 [`(f535e62)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f535e6266861c3df3863a7d989acf738c3012c53)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update prompt formatting and tool lists for coverage tasks
+
+- Switches prompt files to YAML frontmatter for improved structure and consistency.
+- Expands tool lists for agent mode to enable broader functionality.
+- Refines prompt descriptions to clarify focus on 100% test coverage.
+- Enhances maintainability and alignment with documentation standards.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(71783f6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/71783f61a1153f2705dfc2326331d9bca8e8a68d)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Refactors Playwright tests for improved locator usage and accessibility
+
+- Updates test files to consistently use role-based and descriptive locators for better reliability and accessibility checks.
+- Adds and documents ESLint disable comments for intentional raw locator usage where necessary.
+- Refactors UI tests to replace conditional expects with direct assertions, simplifying logic and improving test clarity.
+- Enhances Electron codegen helper script to support full Playwright Inspector recording, modern Electron launch patterns, and new command-line options for improved development experience.
+- Improves test robustness and maintainability by aligning locator strategies with Playwright best practices.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1edf6f7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1edf6f7f47668b5c8cbc0f4b532ef6ed76305940)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Standardize tool lists in prompts and chatmodes
+
+- Updates all chatmode and prompt files to use a comprehensive, unified set of supported tools instead of the previous placeholder.
+- Adds a dedicated Playwright test coverage prompt to enhance E2E testing guidance and workflow.
+- Improves documentation formatting and consistency for easier maintenance and extension.
+- Ensures agent instructions are accurate, modern, and actionable for AI-driven workflows.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c12b73d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c12b73dfc58c246dee493e04b6b95ccb132cd422)
+
+
+- Update changelogs for v14.5.0 [skip ci] [`(b67fce7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b67fce709768a4bece4e4bf1b463090979cc45fa)
 
 
 
