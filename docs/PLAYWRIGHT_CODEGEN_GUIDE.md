@@ -275,9 +275,11 @@ npx playwright codegen http://localhost:5173
 ### **Common Issues:**
 
 1. **Electron app not launching in codegen:**
+
    - Use development server instead: `npm run dev` + `npx playwright codegen http://localhost:5173`
 
 2. **Generated selectors not working:**
+
    - Check the actual DOM structure in your app
    - Use the selectors that work in your existing tests
 
