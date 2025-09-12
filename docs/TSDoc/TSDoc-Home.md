@@ -65,7 +65,6 @@ extensions. This can lead to frustrating incompatibilities.
 Consider a hypothetical input:
 
 ````typescript
-
 /**
  * @example Prints "true" for `{@link}` but "false" for `@internal`:
  *
