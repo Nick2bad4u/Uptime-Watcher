@@ -304,12 +304,14 @@ test.describe(
                 });
 
                 // Verify semantic elements exist
+                /* eslint-disable-next-line playwright/no-raw-locators */
                 const semanticElements = window.locator(
                     "main, .header-title-accent, .main-container"
                 );
                 await expect(semanticElements.first()).toBeVisible();
 
                 // Verify focusable elements exist
+                /* eslint-disable-next-line playwright/no-raw-locators */
                 const focusableElements = window.locator(
                     "button, input, select, a"
                 );

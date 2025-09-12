@@ -71,6 +71,7 @@ test.describe(
                 await window.waitForTimeout(2000);
 
                 // Look for site monitoring buttons in the UI with multiple selectors
+                /* eslint-disable-next-line playwright/no-raw-locators */
                 const monitoringButtons = window.locator(
                     'button:has-text("Monitor"), button:has-text("Start"), button[aria-label*="Monitor"], [aria-label*="Monitoring"]'
                 );
@@ -154,8 +155,8 @@ test.describe(
 
                 // Look for monitoring control buttons
                 const monitoringButtons = window
-                    .locator('[aria-label*="Start"]')
-                    .or(window.locator('button:has-text("Start")'));
+                    .getByRole("button", { name: /Start/i })
+                    .or(window.getByText("Start"));
 
                 // Take screenshot before interaction
                 await window.screenshot({
@@ -224,9 +225,9 @@ test.describe(
                 await window.waitForTimeout(2000);
 
                 // Check for buttons with proper ARIA labels
-                const monitoringButtons = window.locator(
-                    'button[aria-label*="Monitoring"]'
-                );
+                const monitoringButtons = window.getByRole("button", {
+                    name: /Monitoring/i,
+                });
 
                 if ((await monitoringButtons.count()) > 0) {
                     const firstButton = monitoringButtons.first();
@@ -358,6 +359,7 @@ test.describe(
                 await window.waitForTimeout(3000);
 
                 // Look for status indicators (colored dots, badges, etc.)
+                /* eslint-disable-next-line playwright/no-raw-locators */
                 const statusIndicators = window.locator(
                     '[class*="status"], [class*="badge"], .themed-status-up, .themed-status-down, .themed-status-paused'
                 );
@@ -438,7 +440,10 @@ test.describe(
                 });
 
                 // Look for disabled buttons or loading indicators
-                const disabledButtons = window.locator("button:disabled");
+                const disabledButtons = window.getByRole("button", {
+                    disabled: true,
+                });
+                /* eslint-disable-next-line playwright/no-raw-locators */
                 const loadingButtons = window.locator(
                     'button[aria-disabled="true"], button[class*="loading"], button[class*="disabled"]'
                 );

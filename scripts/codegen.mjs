@@ -4,23 +4,26 @@
  * Playwright Codegen Helper Script for Uptime-Watcher
  *
  * This script simplifies the process of generating Playwright tests for the
- * Uptime-Watcher Electron application.
+ * Uptime-Watcher Electron application using full codegen recording
+ * capabilities.
  *
  * Usage: node scripts/codegen.mjs [options]
  *
- * Options: --dev Use development server (default) --electron Use built Electron
- * app --viewport Set viewport size (e.g., 1280x720) --output Output file path
+ * Options: --dev Use development server with browser codegen (default)
+ * --electron Use Electron app with full recording capabilities --viewport Set
+ * viewport size (e.g., 1280x720) --output Output file path --inspector Open
+ * Playwright Inspector with full codegen features for Electron
  */
 
 import { spawn } from "node:child_process";
-import path from "node:path";
-import fs from "node:fs";
+import { _electron as electron } from "playwright";
 
 // Parse command line arguments
 const args = process.argv.slice(2);
 const options = {
     dev: args.includes("--dev") || !args.includes("--electron"),
     electron: args.includes("--electron"),
+    inspector: args.includes("--inspector"),
     viewport:
         args.find((arg) => arg.startsWith("--viewport="))?.split("=")[1] ||
         "1280,720",
@@ -35,33 +38,31 @@ function showHelp() {
 Usage: node scripts/codegen.mjs [options]
 
 Options:
-  --dev               Use development server (default)
-  --electron          Use built Electron app
+  --dev               Use development server with browser codegen (default)
+  --electron          Use Electron app with full recording capabilities
+  --inspector         Open Playwright Inspector with complete codegen features
   --viewport=WxH      Set viewport size (default: 1280,720)
   --output=file.ts    Output file path
   --help, -h          Show this help
 
 Examples:
-  node scripts/codegen.mjs                           # Use dev server
-  node scripts/codegen.mjs --electron                # Use Electron app
+  node scripts/codegen.mjs                           # Use dev server (browser)
+  node scripts/codegen.mjs --electron                # Use Electron recording
+  node scripts/codegen.mjs --electron --inspector    # Electron with full Inspector
   node scripts/codegen.mjs --viewport=1920x1080      # Custom viewport
   node scripts/codegen.mjs --output=my-test.ts       # Save to file
 
-Generated tests will need to be adapted to the Electron test pattern.
+For Electron mode with --inspector:
+- Opens the full Playwright Inspector with recording capabilities
+- Provides "Pick Locator", "Record", "Copy", and assertion features
+- Generates actual test code just like web browser codegen
+- Works with real Electron app for accurate testing
+- Use the Inspector's Record button to start/stop recording
+- Copy generated code directly from the Inspector window
+
 See docs/PLAYWRIGHT_CODEGEN_GUIDE.md for details.
 `);
     process.exit(0);
-}
-
-function checkElectronBuild() {
-    const electronMainPath = path.resolve("dist-electron/main.js");
-    if (!fs.existsSync(electronMainPath)) {
-        console.error(
-            '❌ Electron build not found. Run "npm run build" first.'
-        );
-        process.exit(1);
-    }
-    return electronMainPath;
 }
 
 async function startDevServer() {
@@ -92,11 +93,85 @@ async function startDevServer() {
     });
 }
 
+/**
+ * Launch Electron app with Playwright Inspector for full codegen recording
+ * Following the official Electron + Playwright documentation pattern
+ */
+async function startElectronWithInspector() {
+    console.log("🎭 Starting Electron app with Playwright Inspector...");
+    console.log(
+        "⏳ This may take a moment - waiting for Electron window to appear..."
+    );
+
+    // Use the official Electron + Playwright pattern from the docs
+    // Pass the project root directory '.' instead of absolute paths
+    const electronApp = await electron.launch({
+        args: ["."], // Launch from project root, not absolute path to main.js
+        timeout: 30_000, // Standard timeout, not excessive
+    });
+
+    // Get the first window with proper error handling
+    console.log("🔍 Waiting for Electron window to be ready...");
+    const window = await electronApp.firstWindow();
+
+    console.log("✅ Electron app launched successfully!");
+    console.log(`📱 Window title: ${await window.title()}`);
+
+    console.log(
+        "\n🎯 Opening Playwright Inspector with full codegen capabilities..."
+    );
+    console.log("⏳ Please wait for the Inspector window to appear...");
+
+    // This is the key! Using page.pause() opens the full Playwright Inspector
+    // with recording, "Pick Locator", and test generation capabilities
+    await window.pause();
+
+    console.log(
+        "\n🎉 Playwright Inspector is now active with full codegen features!"
+    );
+    console.log("📝 You can now:");
+    console.log(
+        "   - Click the 'Record' button to start recording interactions"
+    );
+    console.log("   - Use 'Pick Locator' button to select and test elements");
+    console.log("   - Copy generated test code from the Inspector");
+    console.log(
+        "   - Add assertions by clicking the assertion toolbar buttons"
+    );
+    console.log("   - Clear and restart recording as needed");
+    console.log("   - Save generated code to files for your test suite");
+
+    console.log(
+        "\n⏸️  Electron app is running with full Inspector capabilities..."
+    );
+    console.log(
+        "💡 The Inspector window provides the same features as web codegen!"
+    );
+    console.log("🛑 Close the Inspector window or press Resume to continue");
+
+    console.log("👋 Inspector session completed");
+}
+
+/**
+ * Build codegen command for standard web browser testing
+ *
+ * @param {string} target - Target URL
+ * @param {{ viewport?: string; output?: string }} options - Configuration
+ *   options
+ *
+ * @returns {string[]} Command array
+ */
 function buildCodegenCommand(target, options) {
-    const cmd = ["npx", "playwright", "codegen"];
+    const cmd = [
+        "npx",
+        "playwright",
+        "codegen",
+    ];
 
     // Add viewport
-    cmd.push("--viewport-size", options.viewport);
+    if (options.viewport) {
+        cmd.push("--viewport-size", options.viewport);
+    }
 
     // Add output file if specified
     if (options.output) {
@@ -109,6 +184,13 @@ function buildCodegenCommand(target, options) {
     return cmd;
 }
 
+/**
+ * Run the codegen command
+ *
+ * @param {string[]} cmd - Command array to execute
+ *
+ * @returns {import("child_process").ChildProcess} The spawned process
+ */
 function runCodegen(cmd) {
     console.log(`🎬 Running: ${cmd.join(" ")}`);
 
@@ -145,24 +227,51 @@ async function main() {
     console.log("🎭 Uptime-Watcher Playwright Codegen Helper\n");
 
     try {
-        let target;
-
         if (options.electron) {
             console.log("📱 Using Electron app mode...");
-            target = checkElectronBuild();
-            console.log(
-                "⚠️  Note: Direct Electron codegen may not work perfectly."
-            );
-            console.log(
-                "   Consider using --dev mode instead for better results."
-            );
+
+            if (options.inspector) {
+                // Use the new approach with page.pause() for full codegen capabilities
+                // Following official Electron + Playwright documentation
+                await startElectronWithInspector();
+            } else {
+                console.log(
+                    "💡 Tip: Use --inspector flag for full codegen recording experience!"
+                );
+                console.log(
+                    "🚀 Starting basic Electron app for manual testing..."
+                );
+
+                // Launch Electron app for manual interaction using official pattern
+                const electronApp = await electron.launch({
+                    args: ["."], // Use project root instead of absolute path
+                    timeout: 30_000, // Standard timeout
+                });
+
+                console.log("🔍 Waiting for Electron window...");
+                const window = await electronApp.firstWindow();
+                console.log("✅ Electron app launched!");
+                console.log(`📱 Window title: ${await window.title()}`);
+                console.log("💡 You can now manually test your app");
+                console.log(
+                    "📝 Use browser DevTools to inspect elements and copy selectors"
+                );
+                console.log("🛑 Press Ctrl+C to stop");
+
+                // Keep running until manually stopped
+                await electronApp.evaluate(
+                    ({ app }) =>
+                        new Promise((resolve) => {
+                            app.on("window-all-closed", () => resolve(true));
+                        })
+                );
+            }
         } else {
             console.log("🌐 Using development server mode...");
-            target = await startDevServer();
+            const target = await startDevServer();
+            const cmd = buildCodegenCommand(target, options);
+            runCodegen(cmd);
         }
-
-        const cmd = buildCodegenCommand(target, options);
-        runCodegen(cmd);
     } catch (error) {
         console.error(
             "❌ Error:",

@@ -29,7 +29,12 @@ import path from "node:path";
 test.describe(
     "comprehensive user workflows",
     {
-        tag: ["@e2e", "@comprehensive", "@user-workflows", "@critical"],
+        tag: [
+            "@e2e",
+            "@comprehensive",
+            "@user-workflows",
+            "@critical",
+        ],
         annotation: {
             type: "category",
             description: "Complete end-to-end user workflow validation",
@@ -98,7 +103,11 @@ test.describe(
         test(
             "complete first-time user workflow: setup to monitoring",
             {
-                tag: ["@slow", "@critical", "@first-time-user"],
+                tag: [
+                    "@slow",
+                    "@critical",
+                    "@first-time-user",
+                ],
                 annotation: [
                     {
                         type: "workflow",
@@ -186,6 +195,7 @@ test.describe(
                     });
 
                     // Step 7: Check that status indicators are present
+                    /* eslint-disable-next-line playwright/no-raw-locators */
                     const statusIndicators = window.locator(
                         '[class*="status"], [class*="indicator"]'
                     );
@@ -220,7 +230,11 @@ test.describe(
         test(
             "bulk site management workflow",
             {
-                tag: ["@slow", "@bulk-operations", "@advanced"],
+                tag: [
+                    "@slow",
+                    "@bulk-operations",
+                    "@advanced",
+                ],
                 annotation: [
                     {
                         type: "workflow",
@@ -299,7 +313,11 @@ test.describe(
         test(
             "monitoring lifecycle complete workflow",
             {
-                tag: ["@slow", "@monitoring", "@lifecycle"],
+                tag: [
+                    "@slow",
+                    "@monitoring",
+                    "@lifecycle",
+                ],
                 annotation: [
                     {
                         type: "workflow",
@@ -362,6 +380,7 @@ test.describe(
                         await window.waitForTimeout(5000);
 
                         // Look for status indicators or changes
+                        /* eslint-disable-next-line playwright/no-raw-locators */
                         const statusElements = window.locator(
                             '[class*="status"], [class*="up"], [class*="down"]'
                         );
@@ -412,7 +431,11 @@ test.describe(
         test(
             "app restart data persistence workflow",
             {
-                tag: ["@slow", "@persistence", "@data-integrity"],
+                tag: [
+                    "@slow",
+                    "@persistence",
+                    "@data-integrity",
+                ],
                 annotation: [
                     {
                         type: "workflow",
@@ -499,7 +522,11 @@ test.describe(
         test(
             "error handling and recovery workflow",
             {
-                tag: ["@slow", "@error-handling", "@resilience"],
+                tag: [
+                    "@slow",
+                    "@error-handling",
+                    "@resilience",
+                ],
                 annotation: [
                     {
                         type: "workflow",
