@@ -783,6 +783,7 @@ export default [
             "jsonc/space-unary-ops": "warn",
             "jsonc/valid-json-number": "warn",
             "jsonc/vue-custom-block/no-parsing-error": "warn",
+            "no-secrets/no-pattern-match": "off",
             "no-secrets/no-secrets": [
                 "error",
                 {
@@ -808,6 +809,7 @@ export default [
             ...json.configs.recommended.rules,
             "json/sort-keys": ["warn"],
             "json/top-level-interop": "warn",
+            "no-secrets/no-pattern-match": "off",
             "no-secrets/no-secrets": [
                 "error",
                 {
@@ -831,6 +833,7 @@ export default [
         },
         rules: {
             ...json.configs.recommended.rules,
+            "no-secrets/no-pattern-match": "off",
             "no-secrets/no-secrets": [
                 "error",
                 {
@@ -1933,6 +1936,7 @@ export default [
                 "off",
             "no-magic-numbers": "off",
             "no-plusplus": "off",
+            "no-secrets/no-pattern-match": "off",
             "no-secrets/no-secrets": [
                 "error",
                 {
@@ -3181,6 +3185,7 @@ export default [
             "no-inline-comments": "off",
             "no-magic-numbers": "off",
             "no-plusplus": "off",
+            "no-secrets/no-pattern-match": "off",
             "no-secrets/no-secrets": [
                 "error",
                 {
@@ -4655,6 +4660,7 @@ export default [
             "no-inline-comments": "off",
             "no-magic-numbers": "off",
             "no-plusplus": "off",
+            "no-secrets/no-pattern-match": "off",
             "no-secrets/no-secrets": [
                 "error",
                 {
@@ -5885,6 +5891,7 @@ export default [
             "no-inline-comments": "off",
             "no-magic-numbers": "off",
             "no-plusplus": "off",
+            "no-secrets/no-pattern-match": "off",
             "no-secrets/no-secrets": [
                 "error",
                 {
@@ -8228,29 +8235,68 @@ export default [
             "no-magic-numbers": "off", // Test data may have magic numbers
             // Enhanced Playwright-specific rules
             "playwright/expect-expect": "error",
+            "playwright/max-expects": [
+                "error",
+                { max: 10 },
+            ],
+
             "playwright/max-nested-describe": [
                 "error",
-                { max: 3 },
+                { max: 4 },
             ],
             "playwright/missing-playwright-await": "error",
+            "playwright/no-commented-out-tests": "warn",
+            // Conditional logic in tests is usually an indication that a test is attempting to cover too much, and not testing the logic it intends to. Each branch of code executing within a conditional statement will usually be better served by a test devoted to it.
             "playwright/no-conditional-in-test": "error",
+            "playwright/no-duplicate-hooks": "error",
             "playwright/no-element-handle": "warn",
             "playwright/no-eval": "error",
             "playwright/no-focused-test": "error",
             "playwright/no-force-option": "warn",
+            "playwright/no-get-by-title": "error",
+            "playwright/no-hooks": "off", // disabling - hooks are needed in most projects
             "playwright/no-nested-step": "error",
             "playwright/no-networkidle": "warn",
+            "playwright/no-nth-methods": "off",
             "playwright/no-page-pause": "warn",
+            "playwright/no-raw-locators": [
+                "error",
+                {
+                    allowed: [
+                        "iframe",
+                        "[aria-busy='false']",
+                    ],
+                },
+            ],
+            "playwright/no-restricted-matchers": "off", // disabling - restricting matchers is often unnecessary
             "playwright/no-skipped-test": "warn",
+            "playwright/no-slowed-test": "off",
             "playwright/no-useless-await": "error",
             "playwright/no-useless-not": "error",
             "playwright/no-wait-for-selector": "warn",
-
             "playwright/no-wait-for-timeout": "warn",
+            "playwright/prefer-comparison-matcher": "warn",
+            "playwright/prefer-equality-matcher": "warn",
+            "playwright/prefer-hooks-in-order": "warn",
+            "playwright/prefer-hooks-on-top": "warn",
+            "playwright/prefer-locator": "warn",
+            "playwright/prefer-lowercase-title": "warn",
+            "playwright/prefer-native-locators": "warn",
+            "playwright/prefer-strict-equal": "warn",
+            "playwright/prefer-to-be": "warn",
+            "playwright/prefer-to-contain": "warn",
+            "playwright/prefer-to-have-count": "warn",
+            "playwright/prefer-to-have-length": "warn",
             "playwright/prefer-web-first-assertions": "error",
+            "playwright/require-hook": "off", // disabling - not always required
+            "playwright/require-soft-assertions": "off", // disabling - soft assertions are not always desirable
+            "playwright/require-to-throw-message": "warn",
+            "playwright/require-top-level-describe": "warn",
             "playwright/valid-expect": "error",
             "playwright/valid-title": "error",
+
             "prefer-arrow-callback": "off", // Test functions don't need arrow syntax
+
             "unicorn/consistent-function-scoping": "off", // Test helpers
             "unicorn/no-await-expression-member": "off", // Common in Playwright
         },

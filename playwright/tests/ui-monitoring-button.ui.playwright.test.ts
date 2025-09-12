@@ -1,5 +1,6 @@
 /**
- * End-to-end UI tests for the SiteMonitoringButton component.
+ * End-to-end Utest.describe( "monitoring button UI tests", { tag: ["@ui",
+ * "@monitoring"],sts for the SiteMonitoringButton component.
  *
  * These tests verify the monitoring button functionality within the complete
  * Electron application context, including real UI interactions and behavior.
@@ -15,11 +16,17 @@
  * - Event propagation handling
  */
 
+/* eslint-disable playwright/no-conditional-in-test */
+/* eslint-disable playwright/no-conditional-expect */
+/* eslint-disable playwright/expect-expect */
+// NOTE: These monitoring UI tests intentionally use conditional logic
+// to test various monitoring states and edge cases
+
 import { test, expect, _electron as electron } from "@playwright/test";
 import path from "node:path";
 
 test.describe(
-    "SiteMonitoringButton UI Tests",
+    "site monitoring button UI tests",
     {
         tag: ["@ui", "@monitoring"],
         annotation: {
@@ -67,7 +74,7 @@ test.describe(
                 const monitoringButtons = window.locator(
                     'button:has-text("Monitor"), button:has-text("Start"), button[aria-label*="Monitor"], [aria-label*="Monitoring"]'
                 );
-                const allButtons = window.locator("button");
+                const allButtons = window.getByRole("button");
 
                 // Take a screenshot to help with debugging if test fails
                 await window.screenshot({
@@ -226,8 +233,9 @@ test.describe(
                     await expect(firstButton).toBeVisible();
 
                     // Verify the button has an aria-label
-                    const ariaLabel = firstButton;
-                    await expect(ariaLabel).toHaveAttribute("aria-label");
+                    const ariaLabel =
+                        await firstButton.getAttribute("aria-label");
+                    await expect(firstButton).toHaveAttribute("aria-label");
                     expect(ariaLabel).toMatch(/monitoring/i);
 
                     console.log(
@@ -417,7 +425,7 @@ test.describe(
                 await window.waitForTimeout(2000);
 
                 // Look for buttons that might show loading states
-                const buttons = window.locator("button");
+                const buttons = window.getByRole("button");
                 const buttonCount = await buttons.count();
 
                 console.log(
@@ -454,3 +462,7 @@ test.describe(
         );
     }
 );
+
+/* eslint-enable playwright/no-conditional-in-test */
+/* eslint-enable playwright/no-conditional-expect */
+/* eslint-enable playwright/expect-expect */

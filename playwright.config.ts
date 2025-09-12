@@ -81,11 +81,21 @@ const config: PlaywrightTestConfig = defineConfig({
                 viewport: { height: 1080, width: 1920 }, // Larger viewport for UI tests
             },
         },
+        {
+            name: "comprehensive-e2e",
+            testMatch: "**/e2e-*.e2e.playwright.test.ts",
+            use: {
+                ...devices["Desktop Chrome"],
+                // Comprehensive E2E testing configuration
+                viewport: { height: 1080, width: 1920 },
+                headless: false, // Run in headed mode for better debugging
+            },
+        },
     ],
 
     // Reporter configuration with multiple formats
     reporter: [
-        ["list"],
+        ["list", { FORCE_COLOR: true, printSteps: true }],
         [
             "html",
             {
@@ -131,28 +141,53 @@ const config: PlaywrightTestConfig = defineConfig({
     timeout: 30 * 1000, // 30 seconds per test
 
     // TypeScript configuration
+    /**
+     * @remarks
+     * Playwright tests use a dedicated tsconfig (`./playwright/tsconfig.json`)
+     * to isolate test-specific TypeScript settings from the main application.
+     * This prevents conflicts with app build settings and ensures Playwright
+     * tests compile and run with their own strictness and module resolution.
+     */
     tsconfig: "./playwright/tsconfig.json",
 
     // Global test configuration
     use: {
+        acceptDownloads: true,
         // Action timeouts
         actionTimeout: 10 * 1000, // 10 seconds for actions
+
         // Disable web security for Electron testing
         bypassCSP: true,
 
+        /**
+         * @remarks
+         * Electron's automated testing is most reliable with Chromium-based
+         * browsers. browsers. The "chrome" channel ensures compatibility with
+         * Electron's underlying Chromium engine, providing consistent results
+         * and access to Electron-specific APIs during testing. See: See:
+         * https://www.electronjs.org/docs/latest/tutorial/automated-testing#using-playwright
+         */
+        channel: "chrome",
+        colorScheme: "dark",
         // Browser configuration
         headless: Boolean(process.env.CI), // Headless in CI, headed locally
+
+        ignoreHTTPSErrors: true,
+
+        javaScriptEnabled: true,
+
+        locale: "en-US",
+
         navigationTimeout: 30 * 1000, // 30 seconds for navigation
+
         // Recording configuration - capture failures
         screenshot: "only-on-failure",
 
         // Custom test ID attribute for better selector reliability
         testIdAttribute: "data-testid",
-
+        timezoneId: "America/Detroit",
         trace: "on-first-retry",
-
         video: "retain-on-failure",
-
         // Viewport configuration for consistent testing
         viewport: { height: 720, width: 1280 },
     },

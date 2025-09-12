@@ -1,24 +1,44 @@
 {
+  "$schema": "https://www.schemastore.org/tsconfig.json",
   "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2020"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "noEmit": true,
     "paths": {
       "@/*": ["../src/*"],
       "@/electron/*": ["../electron/*"],
       "@/playwright/*": ["./*"],
       "@/shared/*": ["../shared/*"]
     },
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2020",
     "types": ["@playwright/test", "node"]
   },
   "exclude": [
     "coverage",
     "node_modules",
-    "test-results"
+    "test-results",
+    "../dist*/**",
+    "../coverage/**",
+    "../node_modules/**"
   ],
-  "extends": "../tsconfig.json",
   "include": [
     "**/*.js",
     "**/*.ts",
-    "../electron/**/*.ts",
-    "../shared/**/*.ts"
+    "fixtures/**/*.js",
+    "fixtures/**/*.ts"
   ]
 }

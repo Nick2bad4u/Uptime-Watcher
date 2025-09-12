@@ -9,7 +9,7 @@ import { test, expect, _electron as electron } from "@playwright/test";
 import path from "node:path";
 
 test.describe(
-    "Electron Main Process",
+    "electron main process",
     {
         tag: ["@main", "@core"],
         annotation: {

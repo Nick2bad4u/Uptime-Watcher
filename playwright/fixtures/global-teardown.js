@@ -21,7 +21,7 @@ export default async function globalTeardown() {
                 stdio: "ignore",
             });
         }
-    } catch (error) {
+    } catch {
         // Ignore errors - processes might not be running
     }
 

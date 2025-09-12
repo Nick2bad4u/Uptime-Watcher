@@ -295,7 +295,10 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     return (
         <ErrorBoundary>
             <ThemeProvider>
-                <div className={`app-container ${isDark ? "dark" : ""}`}>
+                <div
+                    className={`app-container ${isDark ? "dark" : ""}`}
+                    data-testid="app-container"
+                >
                     {/* Global Loading Overlay */}
                     {showLoadingOverlay ? (
                         <output

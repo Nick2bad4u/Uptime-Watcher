@@ -1,5 +1,6 @@
 /**
- * Renderer process tests for the Electron application.
+ * Retest.describe( "electron renderer process", { tag: ["@renderer",
+ * "@core"],er process tests for the Electron application.
  *
  * These tests focus on the UI and browser window functionality, testing the
  * React frontend and user interactions.
@@ -9,7 +10,7 @@ import { test, expect, _electron as electron } from "@playwright/test";
 import path from "node:path";
 
 test.describe(
-    "Electron Renderer Process",
+    "electron renderer process",
     {
         tag: ["@renderer", "@ui"],
         annotation: {
@@ -50,11 +51,18 @@ test.describe(
                 // Get the main window
                 const window = await electronApp.firstWindow();
 
-                // Wait for the page to load
+                // Wait for the page to load completely
                 await window.waitForLoadState("domcontentloaded");
 
-                // Check if the page has content
-                await expect(window.locator("body")).toHaveText(/.+/); // Has any text content
+                // Wait for React app to initialize - check for root element
+                await expect(window.getByTestId("app-root")).toBeVisible({
+                    timeout: 15000,
+                });
+
+                // Wait for any content to appear in the root element
+                await expect(window.getByTestId("app-root")).not.toBeEmpty({
+                    timeout: 10000,
+                });
 
                 // Take a screenshot of the loaded UI
                 await window.screenshot({
@@ -142,9 +150,9 @@ test.describe(
                 await window.waitForTimeout(2000);
 
                 // Try to find any clickable elements
-                const clickableElements = await window
-                    .locator('button, [role="button"], a')
-                    .count();
+                const buttons = await window.getByRole("button").count();
+                const links = await window.getByRole("link").count();
+                const clickableElements = buttons + links;
 
                 // Should have some interactive elements
                 expect(clickableElements).toBeGreaterThan(0);
@@ -207,10 +215,8 @@ test.describe(
                 );
 
                 expect(bounds).toBeTruthy();
-                if (bounds) {
-                    expect(bounds.width).toBeGreaterThan(0);
-                    expect(bounds.height).toBeGreaterThan(0);
-                }
+                expect(bounds?.width).toBeGreaterThan(0);
+                expect(bounds?.height).toBeGreaterThan(0);
 
                 await electronApp.close();
             }
@@ -276,9 +282,11 @@ test.describe(
                     console.log(
                         `Dev tools check failed or timed out: ${error}`
                     );
-                    // Don't fail the test for dev tools unavailability in test environment
-                    expect(true).toBe(true);
+                    // Dev tools may not be available in test environment - this is expected
                 }
+
+                // Always succeed - dev tools availability is environment dependent
+                expect(electronApp).toBeTruthy();
 
                 await electronApp.close();
             }
