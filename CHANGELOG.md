@@ -7,14 +7,80 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[f535e62](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f535e6266861c3df3863a7d989acf738c3012c53)...
+[f535e62](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f535e6266861c3df3863a7d989acf738c3012c53)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f535e6266861c3df3863a7d989acf738c3012c53...f535e6266861c3df3863a7d989acf738c3012c53))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 14.5.0 [`(f535e62)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f535e6266861c3df3863a7d989acf738c3012c53)
+
+
+
+
+
+
+## [14.5.0] - 2025-09-12
+
+
 [[987d81d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/987d81dbb517df1fd00800f0d8f8aba60fb20255)...
-[987d81d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/987d81dbb517df1fd00800f0d8f8aba60fb20255)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/987d81dbb517df1fd00800f0d8f8aba60fb20255...987d81dbb517df1fd00800f0d8f8aba60fb20255))
+[c223e96](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c223e969eb1361d10c29c6d3659d4b45f3e1523b)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/987d81dbb517df1fd00800f0d8f8aba60fb20255...c223e969eb1361d10c29c6d3659d4b45f3e1523b))
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Update ESLint config for new eslint-comments plugin
+
+- Switches all disable/enable-pair comments to use the new scoped rule name from @eslint-community.
+- Updates ESLint configuration to reference @eslint-community/eslint-plugin-eslint-comments and its recommended rules.
+- Removes old rule references and replaces direct rule settings and plugin usage with the updated plugin configuration.
+- Ensures improved compatibility, future-proofing, and correct rule enforcement for comment management.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c223e96)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c223e969eb1361d10c29c6d3659d4b45f3e1523b)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 14.4.0 [`(987d81d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/987d81dbb517df1fd00800f0d8f8aba60fb20255)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Expand fuzz coverage and fix timing/test logic
+
+- Improves property-based and fuzz test coverage for form utilities, monitor operations, abort/cancellation helpers, database operations, and hook/store integrations.
+- Adjusts timing tolerances and error handling for more robust and realistic test scenarios.
+- Adds edge case and type checks, fixes logic in monitor normalization and database batching.
+- Updates dependencies for better stability and compatibility.
+- Refines VSCode launch configs, build scripts, and code style for clarity and modern usage.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8157a7f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8157a7faa0a5cdca7919762147bc0aa52e510ca2)
+
+
+- 🧪 [test] Achieve 100% property-based coverage in shared and stores utils
+
+- Adds comprehensive fast-check property-based tests for shared/types, shared/validation, error handling, abort logic, monitor/site utils, and file download utilities to maximize function coverage and robustness.
+- Improves test assertions for edge cases, boundary conditions, security (prototype pollution), and type guard consistency.
+- Refines fuzzing and input tests for form components, fixing timeout and query performance.
+- Updates validation, monitor, and error handling logic to align with stricter test expectations (e.g., whitespace handling, dangerous keys).
+- Refactors font size merging and theme utility for safer property assignment.
+- Fixes memory leaks by adding cleanup for timeouts in React components.
+- Enhances site synchronization logic to prevent concurrent syncs and ensure proper promise handling.
+- Updates launch configuration and chat mode tooling for expanded development workflows.
+- Improves documentation warnings for debounce utility regarding potential memory leaks.
+- Relates to improving overall code reliability, correctness, and maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ca8dd66)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ca8dd663c0bb11a910566fda0a405d3413edb5c5)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v14.4.0 [skip ci] [`(3497623)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/34976235a58d96fe38cffec6012b8f6f8f8e74d8)
 
 
 
