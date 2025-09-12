@@ -725,11 +725,17 @@ describe(useErrorStore, () => {
                 result.current.clearAllErrors();
             });
 
+            // Debug: Verify the operation loading is preserved
+            const operationLoading =
+                result.current.getOperationLoading("fetchSites");
+            console.log(
+                "Operation loading after clearAllErrors:",
+                operationLoading
+            );
+
             expect(result.current.lastError).toBeUndefined();
             expect(result.current.storeErrors).toEqual({});
-            expect(
-                result.current.getOperationLoading("fetchSites")
-            ).toBeTruthy();
+            expect(operationLoading).toBeTruthy();
         });
 
         it("should handle complex state transitions", async ({

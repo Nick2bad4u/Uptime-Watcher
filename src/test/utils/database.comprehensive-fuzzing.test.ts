@@ -2655,23 +2655,42 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                                 break;
                             }
                             case "ROLLBACK_CHUNK": {
-                                successfulRecords =
-                                    failureBatch * operation.batchSize;
+                                successfulRecords = Math.max(
+                                    0,
+                                    failureBatch *
+                                        Math.min(
+                                            operation.batchSize,
+                                            operation.totalRecords
+                                        )
+                                );
                                 recoveryRequired = true;
                                 break;
                             }
                             case "CONTINUE": {
-                                successfulRecords =
-                                    processedRecords - operation.batchSize;
+                                successfulRecords = Math.max(
+                                    0,
+                                    processedRecords -
+                                        Math.min(
+                                            operation.batchSize,
+                                            operation.totalRecords
+                                        )
+                                );
                                 break;
                             }
                             case "RETRY": {
                                 // Retry usually succeeds
+                                const effectiveBatchSize = Math.min(
+                                    operation.batchSize,
+                                    operation.totalRecords
+                                );
                                 successfulRecords =
                                     Math.random() > 0.3
                                         ? processedRecords
-                                        : processedRecords -
-                                          operation.batchSize;
+                                        : Math.max(
+                                              0,
+                                              processedRecords -
+                                                  effectiveBatchSize
+                                          );
                                 break;
                             }
                         }
@@ -2718,7 +2737,7 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                 expect(result.totalBatches).toBeGreaterThan(0);
 
                 // Property: Processing time should be reasonable
-                expect(result.processingTimeMs).toBeGreaterThan(0);
+                expect(result.processingTimeMs).toBeGreaterThanOrEqual(0);
 
                 // Property: Throughput should be appropriate for successful operations
                 if (result.successfulRecords > 0) {

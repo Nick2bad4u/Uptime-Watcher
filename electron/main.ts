@@ -10,6 +10,7 @@
  */
 
 import { app, BrowserWindow } from "electron";
+import debug from "electron-debug";
 import {
     installExtension,
     REACT_DEVELOPER_TOOLS,
@@ -20,6 +21,13 @@ import log from "electron-log/main";
 import { isDev } from "./electronUtils";
 import { ApplicationService } from "./services/application/ApplicationService";
 import { logger } from "./utils/logger";
+
+// Initialize electron-debug for enhanced debugging capabilities
+debug({
+    devToolsMode: "right", // Dock DevTools to the right by default
+    isEnabled: isDev(), // Only enable in development mode
+    showDevTools: isDev(), // Auto-open DevTools in development
+});
 
 // Configure electron-log for main process
 /**

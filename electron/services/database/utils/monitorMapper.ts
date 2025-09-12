@@ -59,14 +59,15 @@ function copyDynamicFields(
     ]);
 
     // Copy monitor-type specific fields
-    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Dynamic monitor field assignment requires type assertions for extensible monitor type system */
+
     for (const [key, value] of Object.entries(dynamicMonitor)) {
         if (!excludedFields.has(key)) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment -- Dynamic field assignment required for monitor type system. Key is validated from dynamicMonitor which comes from typed database mapping.
-            (monitor as any)[key] = value;
+            // Dynamic field assignment for monitor type system
+            // Key is validated from dynamicMonitor which comes from typed database mapping
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Required for dynamic monitor field assignment system
+            (monitor as unknown as Record<string, unknown>)[key] = value;
         }
     }
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable type assertion rules after dynamic monitor mapping */
 }
 
 /**

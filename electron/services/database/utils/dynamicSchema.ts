@@ -716,9 +716,9 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
         monitoring: (row.enabled ?? 0) === 1, // Map enabled -> monitoring for frontend consistency
         responseTime: row.response_time ?? -1,
         retryAttempts: row.retry_attempts ?? 3,
-        status: (row.status as MonitorStatus | undefined) ?? "down",
+        status: (row.status ?? "down") as MonitorStatus,
         timeout: row.timeout ?? 5000,
-        type: (row.type as MonitorType | undefined) ?? "http",
+        type: (row.type ?? "http") as MonitorType,
         // Add conditional fields based on monitor type
         ...(row.host && { host: row.host }),
         ...(row.port && { port: row.port }),

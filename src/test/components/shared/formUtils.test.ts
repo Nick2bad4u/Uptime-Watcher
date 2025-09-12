@@ -10,6 +10,8 @@ import { test, fc } from "@fast-check/vitest";
 import type React from "react";
 import {
     createInputChangeHandler,
+    createStringInputHandler,
+    createTypedInputHandler,
     createSelectChangeHandler,
     createCheckboxChangeHandler,
     validationPatterns,
@@ -1269,5 +1271,221 @@ describe("Form Utilities", () => {
             handler(invalidEvent2);
             expect(setValue).not.toHaveBeenCalled();
         });
+    });
+
+    describe("createStringInputHandler - Missing Function Coverage", () => {
+        test.prop([fc.string()])(
+            "should handle any string input without validation",
+            (inputValue) => {
+                const setValue = vi.fn();
+                const handler = createStringInputHandler(setValue);
+
+                const mockEvent = {
+                    target: { value: inputValue },
+                } as React.ChangeEvent<HTMLInputElement>;
+
+                handler(mockEvent);
+                expect(setValue).toHaveBeenCalledWith(inputValue);
+            }
+        );
+
+        test.prop([fc.string()])(
+            "should respect validation function - valid inputs",
+            (inputValue) => {
+                fc.pre(inputValue.trim().length > 0); // Only test non-empty strings
+                const setValue = vi.fn();
+                const validator = (value: string) => value.trim().length > 0;
+                const handler = createStringInputHandler(setValue, validator);
+
+                const mockEvent = {
+                    target: { value: inputValue },
+                } as React.ChangeEvent<HTMLInputElement>;
+
+                handler(mockEvent);
+                expect(setValue).toHaveBeenCalledWith(inputValue);
+            }
+        );
+
+        test.prop([fc.constantFrom("", "   ", "\t", "\n", "  \t  \n  ")])(
+            "should reject invalid inputs with validation",
+            (emptyInput) => {
+                const setValue = vi.fn();
+                const validator = (value: string) => value.trim().length > 0;
+                const handler = createStringInputHandler(setValue, validator);
+
+                const mockEvent = {
+                    target: { value: emptyInput },
+                } as React.ChangeEvent<HTMLInputElement>;
+
+                handler(mockEvent);
+                expect(setValue).not.toHaveBeenCalled();
+            }
+        );
+
+        it("should handle validation function that throws", () => {
+            const setValue = vi.fn();
+            const validator = () => {
+                throw new Error("Validation error");
+            };
+            const handler = createStringInputHandler(setValue, validator);
+
+            const mockEvent = {
+                target: { value: "test" },
+            } as React.ChangeEvent<HTMLInputElement>;
+
+            expect(() => handler(mockEvent)).toThrow("Validation error");
+            expect(setValue).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("createTypedInputHandler - Missing Function Coverage", () => {
+        test.prop([fc.integer({ min: -1000, max: 1000 })])(
+            "should convert string to number without validation",
+            (numValue) => {
+                const setValue = vi.fn();
+                const converter = (value: string) => Number.parseInt(value, 10);
+                const handler = createTypedInputHandler(setValue, converter);
+
+                const mockEvent = {
+                    target: { value: numValue.toString() },
+                } as React.ChangeEvent<HTMLInputElement>;
+
+                handler(mockEvent);
+                expect(setValue).toHaveBeenCalledWith(numValue);
+            }
+        );
+
+        test.prop([fc.integer({ min: 1, max: 1000 })])(
+            "should convert and validate positive numbers",
+            (positiveNum) => {
+                const setValue = vi.fn();
+                const converter = (value: string) => Number.parseInt(value, 10);
+                const validator = (num: number) => num > 0;
+                const handler = createTypedInputHandler(
+                    setValue,
+                    converter,
+                    validator
+                );
+
+                const mockEvent = {
+                    target: { value: positiveNum.toString() },
+                } as React.ChangeEvent<HTMLInputElement>;
+
+                handler(mockEvent);
+                expect(setValue).toHaveBeenCalledWith(positiveNum);
+            }
+        );
+
+        test.prop([fc.integer({ min: -1000, max: 0 })])(
+            "should reject negative numbers with positive validator",
+            (negativeNum) => {
+                const setValue = vi.fn();
+                const converter = (value: string) => Number.parseInt(value, 10);
+                const validator = (num: number) => num > 0;
+                const handler = createTypedInputHandler(
+                    setValue,
+                    converter,
+                    validator
+                );
+
+                const mockEvent = {
+                    target: { value: negativeNum.toString() },
+                } as React.ChangeEvent<HTMLInputElement>;
+
+                handler(mockEvent);
+                expect(setValue).not.toHaveBeenCalled();
+            }
+        );
+
+        test.prop([
+            fc.string().filter((s) => Number.isNaN(Number.parseInt(s, 10))),
+        ])("should handle invalid number strings", (invalidString) => {
+            const setValue = vi.fn();
+            const converter = (value: string) => Number.parseInt(value, 10);
+            const validator = (num: number) => !Number.isNaN(num);
+            const handler = createTypedInputHandler(
+                setValue,
+                converter,
+                validator
+            );
+
+            const mockEvent = {
+                target: { value: invalidString },
+            } as React.ChangeEvent<HTMLInputElement>;
+
+            handler(mockEvent);
+            expect(setValue).not.toHaveBeenCalled();
+        });
+
+        it("should handle converter that throws", () => {
+            const setValue = vi.fn();
+            const converter = () => {
+                throw new Error("Conversion error");
+            };
+            const handler = createTypedInputHandler(setValue, converter);
+
+            const mockEvent = {
+                target: { value: "test" },
+            } as React.ChangeEvent<HTMLInputElement>;
+
+            expect(() => handler(mockEvent)).toThrow("Conversion error");
+            expect(setValue).not.toHaveBeenCalled();
+        });
+
+        it("should handle validator that throws", () => {
+            const setValue = vi.fn();
+            const converter = (value: string) => Number.parseInt(value, 10);
+            const validator = () => {
+                throw new Error("Validation error");
+            };
+            const handler = createTypedInputHandler(
+                setValue,
+                converter,
+                validator
+            );
+
+            const mockEvent = {
+                target: { value: "123" },
+            } as React.ChangeEvent<HTMLInputElement>;
+
+            expect(() => handler(mockEvent)).toThrow("Validation error");
+            expect(setValue).not.toHaveBeenCalled();
+        });
+
+        // Test with different types
+        test.prop([fc.string()])(
+            "should work with boolean conversion",
+            (stringValue) => {
+                const setValue = vi.fn();
+                const converter = (value: string) =>
+                    value.toLowerCase() === "true";
+                const handler = createTypedInputHandler(setValue, converter);
+
+                const mockEvent = {
+                    target: { value: stringValue },
+                } as React.ChangeEvent<HTMLInputElement>;
+
+                handler(mockEvent);
+                expect(setValue).toHaveBeenCalledWith(
+                    stringValue.toLowerCase() === "true"
+                );
+            }
+        );
+
+        test.prop([fc.float({ min: 0, max: 100 })])(
+            "should work with float conversion",
+            (floatValue) => {
+                const setValue = vi.fn();
+                const converter = (value: string) => Number.parseFloat(value);
+                const handler = createTypedInputHandler(setValue, converter);
+
+                const mockEvent = {
+                    target: { value: floatValue.toString() },
+                } as React.ChangeEvent<HTMLInputElement>;
+
+                handler(mockEvent);
+                expect(setValue).toHaveBeenCalledWith(floatValue);
+            }
+        );
     });
 });

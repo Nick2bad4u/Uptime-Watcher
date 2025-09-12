@@ -26,6 +26,7 @@ import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { UnknownRecord } from "type-fest";
 
 import { CacheKeys } from "@shared/utils/cacheKeys";
+import { validateMonitorType } from "@shared/utils/validation";
 
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
@@ -377,9 +378,8 @@ export async function getTypesWithFeature(
                         ? config.uiConfig?.supportsResponseTime
                         : config.uiConfig?.supportsAdvancedAnalytics;
 
-                if (supports) {
-                    /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- config.type is guaranteed to be MonitorType from getAvailableMonitorTypes */
-                    supportedTypes.push(config.type as MonitorType);
+                if (supports && validateMonitorType(config.type)) {
+                    supportedTypes.push(config.type);
                 }
             }
 

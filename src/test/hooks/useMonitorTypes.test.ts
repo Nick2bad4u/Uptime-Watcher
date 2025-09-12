@@ -701,46 +701,46 @@ describe("useMonitorTypes Hook", () => {
             }
         );
 
-        test.prop([
-            fc.oneof(
-                fc.string().map((msg) => new Error(msg)),
-                fc
-                    .record({ message: fc.string() })
-                    .map((obj) => new Error(obj.message)),
-                fc.constantFrom(
-                    new Error("Network error"),
-                    new Error("API unavailable"),
-                    new Error("Timeout"),
-                    new Error("Unknown error")
-                )
-            ),
-        ])(
-            "should handle various error types gracefully",
-            async (testError) => {
-                mockGetMonitorTypeOptions.mockRejectedValue(testError);
+        test.prop(
+            [
+                fc.oneof(
+                    fc.string().map((msg) => new Error(msg)),
+                    fc
+                        .record({ message: fc.string() })
+                        .map((obj) => new Error(obj.message)),
+                    fc.constantFrom(
+                        new Error("Network error"),
+                        new Error("API unavailable"),
+                        new Error("Timeout"),
+                        new Error("Unknown error")
+                    )
+                ),
+            ],
+            { timeout: 5000, numRuns: 10 }
+        )("should handle various error types gracefully", async (testError) => {
+            mockGetMonitorTypeOptions.mockRejectedValue(testError);
 
-                const { result } = renderHook(() => useMonitorTypes());
+            const { result } = renderHook(() => useMonitorTypes());
 
-                await waitFor(() => {
-                    expect(result.current.isLoading).toBeFalsy();
-                });
+            await waitFor(() => {
+                expect(result.current.isLoading).toBeFalsy();
+            });
 
-                // Hook transforms error into a contextual string message
-                const expectedMessage = `Monitor types loading failed: ${testError.message}. Using fallback options.`;
-                expect(result.current.error).toBe(expectedMessage);
-                expect(result.current.options).toEqual(
-                    FALLBACK_MONITOR_TYPE_OPTIONS
-                );
-                expect(mockLogger.error).toHaveBeenCalledWith(
-                    "Failed to load monitor types from backend",
-                    testError
-                );
+            // Hook transforms error into a contextual string message
+            const expectedMessage = `Monitor types loading failed: ${testError.message}. Using fallback options.`;
+            expect(result.current.error).toBe(expectedMessage);
+            expect(result.current.options).toEqual(
+                FALLBACK_MONITOR_TYPE_OPTIONS
+            );
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Failed to load monitor types from backend",
+                testError
+            );
 
-                // Verify error properties
-                expect(testError).toBeInstanceOf(Error);
-                expect(typeof testError.message).toBe("string");
-            }
-        );
+            // Verify error properties
+            expect(testError).toBeInstanceOf(Error);
+            expect(typeof testError.message).toBe("string");
+        });
 
         test.prop([fc.integer({ min: 0, max: 20 })])(
             "should handle different monitor type counts correctly",

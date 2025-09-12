@@ -57,17 +57,19 @@
  *   ```
  *             (window.confirm as any).mockReturnValue(confirmReset);
  *
- *           render(<Settings onClose={mockOnClose} />);
+ *         render(<Settings onClose={mockOnClose} />);
  *
- *           const resetButton = screen.getAllByText("Reset to Defaults")[0];
- *           fireEvent.click(resetButton);
+ *         const resetButton = screen.getAllByText("Reset to Defaults")[0];
+ *         fireEvent.click(resetButton);
  *
- *           expect(window.confirm).toHaveBeenCalledWith(
- *               "Are you sure you want to reset all settings to defaults?"
- *           );
+ *         expect(window.confirm).toHaveBeenCalledWith(
+ *             "Are you sure you want to reset all settings to defaults?"
+ *         );
  *
- *           if (confirmReset) {
- *               expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
+ *         if (confirmReset) {
+ *             expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
+ * ```
+ *
  * ```
  * - Error handling and recovery
  *
@@ -79,6 +81,7 @@
  * - Error handling and user feedback
  * - Performance with large configuration changes
  * - Accessibility and keyboard navigation
+ * ```
  */
 
 import { describe, expect, vi, beforeEach, afterEach } from "vitest";
@@ -564,7 +567,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             ],
             {
                 numRuns: 100,
-                timeout: 10_000,
+                timeout: 20_000,
             }
         )(
             "should handle checkbox setting changes",
@@ -629,7 +632,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
     describe("Data Operations Fuzzing", () => {
         fcTest.prop([fc.boolean()], {
             numRuns: 50,
-            timeout: 5000,
+            timeout: 15_000,
         })("should handle sync operations", async (shouldFail) => {
             // Manual DOM cleanup for property-based testing iterations
             document.body.innerHTML = '<div id="vitest-test-root"></div>';

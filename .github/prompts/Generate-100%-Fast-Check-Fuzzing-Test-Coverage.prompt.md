@@ -85,7 +85,7 @@ Regular testing methods:
 ## Test Creation Rules
 
 ### General Guidelines
-
+>>> FOCUS ON ADDING TO EXISTING TESTS, NOT CREATING NEW TEST FILES UNLESS ABSOLUTELY NECESSARY. <<<
 1. **Aim for clarity and simplicity** in your tests. They should be easy to read and understand.
 2. **Test one thing at a time**. If a test is failing, you should be able to pinpoint the exact cause.
 3. **Use descriptive names** for your tests. This will make it easier to understand what is being tested and why.

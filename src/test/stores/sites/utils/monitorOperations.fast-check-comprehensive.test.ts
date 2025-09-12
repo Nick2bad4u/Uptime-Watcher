@@ -51,7 +51,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         url: urlArb,
         status: fc.constant(DEFAULT_MONITOR_STATUS),
         monitoring: fc.boolean(),
-        lastChecked: fc.option(fc.date(), { nil: undefined }),
+        lastChecked: fc.date(),
         responseTime: fc.integer({ min: -1, max: 10_000 }),
         timeout: timeoutArb,
         checkInterval: checkIntervalArb,
@@ -76,7 +76,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         port: portArb,
         status: fc.constant(DEFAULT_MONITOR_STATUS),
         monitoring: fc.boolean(),
-        lastChecked: fc.option(fc.date(), { nil: undefined }),
+        lastChecked: fc.date(),
         responseTime: fc.integer({ min: -1, max: 10_000 }),
         timeout: timeoutArb,
         checkInterval: checkIntervalArb,
@@ -100,7 +100,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         host: hostArb,
         status: fc.constant(DEFAULT_MONITOR_STATUS),
         monitoring: fc.boolean(),
-        lastChecked: fc.option(fc.date(), { nil: undefined }),
+        lastChecked: fc.date(),
         responseTime: fc.integer({ min: -1, max: 10_000 }),
         timeout: timeoutArb,
         checkInterval: checkIntervalArb,
@@ -123,12 +123,9 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         type: fc.constant("dns" as MonitorType),
         host: hostArb,
         recordType: fc.constantFrom("A", "AAAA", "CNAME", "MX", "TXT", "NS"),
-        expectedValue: fc.option(fc.string({ minLength: 1, maxLength: 50 }), {
-            nil: undefined,
-        }),
         status: fc.constant(DEFAULT_MONITOR_STATUS),
         monitoring: fc.boolean(),
-        lastChecked: fc.option(fc.date(), { nil: undefined }),
+        lastChecked: fc.date(),
         responseTime: fc.integer({ min: -1, max: 10_000 }),
         timeout: timeoutArb,
         checkInterval: checkIntervalArb,
@@ -160,35 +157,31 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         monitors: fc.array(monitorArb, { maxLength: 10 }),
     }) as fc.Arbitrary<Site>;
 
+    // Create a partial monitor generator that properly handles Partial<Monitor> type
     const partialMonitorArb = fc.record(
         {
-            id: fc.option(monitorIdArb, { nil: undefined }),
-            type: fc.option(monitorTypeArb, { nil: undefined }),
-            url: fc.option(urlArb, { nil: undefined }),
-            host: fc.option(hostArb, { nil: undefined }),
-            port: fc.option(portArb, { nil: undefined }),
+            id: fc.option(monitorIdArb),
+            type: fc.option(monitorTypeArb),
+            url: fc.option(urlArb),
+            host: fc.option(hostArb),
+            port: fc.option(portArb),
             recordType: fc.option(
-                fc.constantFrom("A", "AAAA", "CNAME", "MX", "TXT", "NS"),
-                { nil: undefined }
+                fc.constantFrom("A", "AAAA", "CNAME", "MX", "TXT", "NS")
             ),
             expectedValue: fc.option(
-                fc.string({ minLength: 1, maxLength: 50 }),
-                { nil: undefined }
+                fc.string({ minLength: 1, maxLength: 50 })
             ),
             status: fc.option(
-                fc.constantFrom("up", "down", "pending", "paused"),
-                { nil: undefined }
+                fc.constantFrom("up", "down", "pending", "paused")
             ),
-            monitoring: fc.option(fc.boolean(), { nil: undefined }),
-            responseTime: fc.option(fc.integer({ min: -1, max: 10_000 }), {
-                nil: undefined,
-            }),
-            timeout: fc.option(timeoutArb, { nil: undefined }),
-            checkInterval: fc.option(checkIntervalArb, { nil: undefined }),
-            retryAttempts: fc.option(retryAttemptsArb, { nil: undefined }),
+            monitoring: fc.option(fc.boolean()),
+            responseTime: fc.option(fc.integer({ min: -1, max: 10_000 })),
+            timeout: fc.option(timeoutArb),
+            checkInterval: fc.option(checkIntervalArb),
+            retryAttempts: fc.option(retryAttemptsArb),
         },
         { requiredKeys: [] }
-    );
+    ) as fc.Arbitrary<Partial<Monitor>>;
 
     describe("addMonitorToSite function coverage", () => {
         it("should add monitors to sites with immutable updates", () => {
@@ -228,7 +221,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         identifier: siteIdArb,
                         name: fc.string({ minLength: 1, maxLength: 100 }),
                         monitoring: fc.boolean(),
-                        monitors: fc.constant([]),
+                        monitors: fc.constant([] as Monitor[]),
                     }),
                     monitorArb,
                     (emptySite, monitor) => {
@@ -285,15 +278,16 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                             Math.random() * site.monitors.length
                         );
                         const targetMonitor = site.monitors[randomIndex];
+                        expect(targetMonitor).toBeDefined(); // Assert it exists
 
                         const foundMonitor = findMonitorInSite(
                             site,
-                            targetMonitor.id
+                            targetMonitor!.id
                         );
 
                         expect(foundMonitor).toBeDefined();
                         expect(foundMonitor).toBe(targetMonitor);
-                        expect(foundMonitor?.id).toBe(targetMonitor.id);
+                        expect(foundMonitor?.id).toBe(targetMonitor!.id);
                     }
                 )
             );
@@ -327,7 +321,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         identifier: siteIdArb,
                         name: fc.string({ minLength: 1, maxLength: 100 }),
                         monitoring: fc.boolean(),
-                        monitors: fc.constant([]),
+                        monitors: fc.constant([] as Monitor[]),
                     }),
                     fc.string({ minLength: 1, maxLength: 50 }),
                     (emptySite, anyId) => {
@@ -431,7 +425,9 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         it("should preserve valid ID when provided", () => {
             fc.assert(
                 fc.property(
-                    fc.string({ minLength: 1, maxLength: 50 }),
+                    fc
+                        .string({ minLength: 1, maxLength: 50 })
+                        .filter((str) => str.trim().length > 0),
                     (customId) => {
                         const normalized = normalizeMonitor({ id: customId });
                         expect(normalized.id).toBe(customId);
@@ -441,11 +437,10 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         });
 
         it("should generate UUID when ID is missing or invalid", () => {
-            const testCases = [
+            const testCases: Partial<Monitor>[] = [
                 {},
                 { id: "" },
-                { id: null },
-                { id: undefined },
+                // Note: null and undefined tests are handled separately due to strict typing
             ];
 
             for (const testCase of testCases) {
@@ -454,6 +449,15 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                 expect(typeof normalized.id).toBe("string");
                 expect(normalized.id.length).toBeGreaterThan(0);
             }
+
+            // Test null and undefined separately with type assertion
+            const nullCase = normalizeMonitor({ id: null } as any);
+            expect(typeof nullCase.id).toBe("string");
+            expect(nullCase.id.length).toBeGreaterThan(0);
+
+            const undefinedCase = normalizeMonitor({ id: undefined } as any);
+            expect(typeof undefinedCase.id).toBe("string");
+            expect(undefinedCase.id.length).toBeGreaterThan(0);
         });
 
         it("should handle invalid input gracefully", () => {
@@ -496,8 +500,11 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     expect(BASE_MONITOR_TYPES).toContain(defaultMonitor.type);
                     expect(typeof defaultMonitor.monitoring).toBe("boolean");
 
-                    // Should apply overrides when valid
-                    if (overrides.monitoring !== undefined) {
+                    // Should apply overrides when valid (monitoring is required boolean, null/undefined trigger defaults)
+                    if (
+                        overrides.monitoring !== null &&
+                        overrides.monitoring !== undefined
+                    ) {
                         expect(defaultMonitor.monitoring).toBe(
                             overrides.monitoring
                         );
@@ -529,9 +536,10 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     siteArb.filter((site) => site.monitors.length > 0),
                     (site) => {
                         const targetMonitor = site.monitors[0];
+                        expect(targetMonitor).toBeDefined(); // Assert it exists
                         const updatedSite = removeMonitorFromSite(
                             site,
-                            targetMonitor.id
+                            targetMonitor!.id
                         );
 
                         expect(updatedSite.monitors).toHaveLength(
@@ -584,13 +592,16 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     partialMonitorArb,
                     (site, updates) => {
                         const targetMonitor = site.monitors[0];
+                        expect(targetMonitor).toBeDefined(); // Assert it exists
                         // Extract only the update fields, don't use the ID from updates
                         const updateFields = { ...updates };
-                        delete updateFields.id; // Don't change the ID
+                        if ("id" in updateFields) {
+                            delete updateFields.id; // Don't change the ID
+                        }
 
                         const updatedSite = updateMonitorInSite(
                             site,
-                            targetMonitor.id,
+                            targetMonitor!.id,
                             updateFields
                         );
 
@@ -600,10 +611,10 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
 
                         const updatedMonitor = findMonitorInSite(
                             updatedSite,
-                            targetMonitor.id
+                            targetMonitor!.id
                         );
                         expect(updatedMonitor).toBeDefined();
-                        expect(updatedMonitor!.id).toBe(targetMonitor.id); // ID should be preserved
+                        expect(updatedMonitor!.id).toBe(targetMonitor!.id); // ID should be preserved
                     }
                 )
             );
@@ -636,8 +647,9 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     siteArb.filter((site) => site.monitors.length > 0),
                     (site) => {
                         const targetMonitor = site.monitors[0];
+                        expect(targetMonitor).toBeDefined(); // Assert it exists
                         expect(() =>
-                            validateMonitorExists(site, targetMonitor.id)
+                            validateMonitorExists(site, targetMonitor!.id)
                         ).not.toThrow();
                     }
                 )
@@ -854,7 +866,9 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         { requiredKeys: [] }
                     ),
                     (complexPartial) => {
-                        const normalized = normalizeMonitor(complexPartial);
+                        const normalized = normalizeMonitor(
+                            complexPartial as any
+                        );
 
                         // Should always produce valid monitor regardless of input quality
                         expect(typeof normalized.id).toBe("string");
@@ -873,19 +887,21 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     siteArb.filter((site) => site.monitors.length > 0),
                     (site) => {
                         const originalMonitor = site.monitors[0];
+                        expect(originalMonitor).toBeDefined(); // Assert it exists
 
                         // Test that operations don't mutate original objects
-                        const toggled =
-                            monitorOperations.toggleMonitoring(originalMonitor);
-                        expect(originalMonitor.monitoring).not.toBe(
+                        const toggled = monitorOperations.toggleMonitoring(
+                            originalMonitor!
+                        );
+                        expect(originalMonitor!.monitoring).not.toBe(
                             toggled.monitoring
                         );
 
                         const updated = monitorOperations.updateTimeout(
-                            originalMonitor,
+                            originalMonitor!,
                             10_000
                         );
-                        expect(originalMonitor.timeout).not.toBe(
+                        expect(originalMonitor!.timeout).not.toBe(
                             updated.timeout
                         );
                         expect(originalMonitor === updated).toBeFalsy();

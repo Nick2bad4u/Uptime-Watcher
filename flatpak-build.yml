@@ -10,7 +10,7 @@ runtime-version: "24.08"
 sdk: org.freedesktop.Sdk//24.08
 
 # Electron BaseApp for optimized Electron applications
-base: org.electronjs.Electron2.BaseApp3333333333333333333333333333
+base: org.electronjs.Electron2.BaseApp
 base-version: "24.08"
 
 # Node.js SDK extension for build-time dependencies

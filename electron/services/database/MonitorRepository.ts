@@ -439,7 +439,7 @@ export class MonitorRepository {
                 db,
                 MONITOR_QUERIES.SELECT_BY_SITE,
                 [siteIdentifier]
-            ) as MonitorRow[];
+            );
 
             return Promise.resolve(rowsToMonitors(monitorRows));
         }, `find-monitors-by-site-${siteIdentifier}`);

@@ -124,7 +124,13 @@ describe("SafeConversions utilities fuzzing tests", () => {
     describe(safeParseFloat, () => {
         test.prop([fc.float()])("should return floats unchanged", (num) => {
             const result = safeParseFloat(num);
-            expect(result).toBe(num);
+
+            // For NaN, safeParseFloat returns the default value (0)
+            if (Number.isNaN(num)) {
+                expect(result).toBe(0);
+            } else {
+                expect(result).toBe(num);
+            }
         });
 
         test.prop([fc.string()])("should parse valid float strings", (str) => {

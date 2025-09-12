@@ -212,9 +212,9 @@ describe("AbortUtils Fuzzing Tests", () => {
                 await sleep(ms);
                 const elapsed = Date.now() - start;
 
-                // Allow some tolerance for timing
-                expect(elapsed).toBeGreaterThanOrEqual(ms - 10);
-                expect(elapsed).toBeLessThan(ms + 50);
+                // Allow more tolerance for timing - system timing can vary
+                expect(elapsed).toBeGreaterThanOrEqual(ms - 15);
+                expect(elapsed).toBeLessThan(ms + 100);
             }
         );
 

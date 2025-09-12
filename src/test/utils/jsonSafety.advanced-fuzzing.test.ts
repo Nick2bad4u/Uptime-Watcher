@@ -68,7 +68,17 @@ function normalizeForJsonComparison(value: any): any {
             const normalizedVal = normalizeForJsonComparison(val);
             // Only include properties that would survive JSON serialization
             if (normalizedVal !== undefined) {
-                normalized[key] = normalizedVal;
+                // Handle the special case of "__proto__" key which doesn't behave normally with assignment
+                if (key === "__proto__") {
+                    Object.defineProperty(normalized, "__proto__", {
+                        value: normalizedVal,
+                        writable: true,
+                        enumerable: true,
+                        configurable: true,
+                    });
+                } else {
+                    normalized[key] = normalizedVal;
+                }
             }
         }
     }

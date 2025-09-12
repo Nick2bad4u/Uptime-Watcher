@@ -5,7 +5,7 @@
 
 import { describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
+import type { Site } from "../../../../shared/types";
 
 // Mock the electron API
 const mockElectronAPI = {
@@ -222,6 +222,40 @@ describe("useSitesStore - Complete Function Coverage", () => {
 
             expect(sharedFunctions.getSites()).toEqual(mockStore.sites);
             expect(typeof sharedFunctions.setSites).toBe("function");
+        });
+
+        it("should test actual store instantiation and basic functionality", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: useSitesStore actual store usage",
+                "component"
+            );
+            await annotate("Category: Store", "category");
+            await annotate("Type: Integration", "type");
+
+            // Import renderHook for proper React hook testing
+            const { renderHook } = await import("@testing-library/react");
+            const { useSitesStore } = await import(
+                "../../../stores/sites/useSitesStore"
+            );
+
+            // Verify the store is created and has expected methods
+            expect(useSitesStore).toBeDefined();
+            expect(typeof useSitesStore).toBe("function");
+
+            // Get the store state using renderHook - this exercises the store function
+            const { result } = renderHook(() => useSitesStore());
+
+            // Verify initial state and core functions exist
+            expect(result.current.sites).toBeDefined();
+            expect(Array.isArray(result.current.sites)).toBeTruthy();
+            expect(typeof result.current.setSites).toBe("function");
+            expect(typeof result.current.addSite).toBe("function");
+            expect(typeof result.current.removeSite).toBe("function");
+            expect(typeof result.current.syncSitesFromBackend).toBe("function");
         });
     });
 
