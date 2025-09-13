@@ -15,6 +15,7 @@ docs/docusaurus/docs/
 docs/docusaurus/build/
 docs/docusaurus/.docusaurus/
 docs/packages/
+docs/TSDoc/
 
 # Ignore Change Logs
 **/CHANGELOG.md

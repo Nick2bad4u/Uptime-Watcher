@@ -124,10 +124,13 @@ description: "Generate 100% Test Coverage"
 ### Important AI Note
 
 - **Time constraint setting:** `unlimited`
-- **Compute Resource setting:** `unlimited`
-- **Compute Constraint setting:** `unlimited`
-- **Thinking Mode setting:** `Super Think,` `Deep Think`
-- **Thinking Constraint Time setting:** `unlimited`
+- **Compute Resource setting:** `unlimited` and `high` and `maximum`
+- **Compute Constraint setting:** `unlimited` and `high` and `maximum`
+- **Request constraint setting:** `unlimited` and `high` and `maximum`
+- **Thinking Mode setting:** `Super Think` and `Deep Think` and `Think Harder` and `Think Twice`
+- **Thinking Constraint Time setting:** `unlimited` and `high` and `maximum`
+- **Thinking Constraint Compute setting:** `unlimited` and `high` and `maximum`
+- **Thinking Constraint Requests setting:** `unlimited` and `high` and `maximum`
 
 ---
 

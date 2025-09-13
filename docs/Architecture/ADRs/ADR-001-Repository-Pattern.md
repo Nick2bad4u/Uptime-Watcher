@@ -34,7 +34,6 @@ We will use the **Repository Pattern** for all database access with the followin
 ### 3. Consistent Structure
 
 ````typescript
-
 import { Database } from "node-sqlite3-wasm";
 import { logger } from "@shared/utils/logger";
 import { withDatabaseOperation } from "@electron/utils/operationalHooks";
@@ -170,11 +169,7 @@ export class ExampleRepository {
 
   try {
    for (const record of records) {
-    stmt.run([
-     record.id,
-     record.name,
-     record.createdAt,
-    ]);
+    stmt.run([record.id, record.name, record.createdAt]);
    }
    logger.debug(
     `[ExampleRepository] Bulk inserted ${records.length} records (internal)`

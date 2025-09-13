@@ -475,7 +475,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 createTestErrorStore(); // Clean the store state
 
                 // Clear any existing operation loading for this specific operation
-                useErrorStore.getState().setOperationLoading(operationName, false);
+                useErrorStore
+                    .getState()
+                    .setOperationLoading(operationName, false);
 
                 // Ensure operation is not set (false should cause it to be removed or return false)
                 expect(
@@ -483,7 +485,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 ).toBeFalsy();
 
                 // Act & Assert - should return false for non-existent operations
-                const loading = useErrorStore.getState().getOperationLoading(operationName);
+                const loading = useErrorStore
+                    .getState()
+                    .getOperationLoading(operationName);
                 expect(loading).toBeFalsy();
             }
         );

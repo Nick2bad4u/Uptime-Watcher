@@ -7,7 +7,6 @@ This document standardizes inline code examples and TSDoc patterns across the Up
 ### Enhanced Basic Format
 
 ````typescript
-
 /**
  * Brief one-line description of the function/class/interface.
  *
@@ -56,7 +55,6 @@ This document standardizes inline code examples and TSDoc patterns across the Up
 #### Repository Class
 
 ````typescript
-
 /**
  * Repository for managing [ENTITY] data persistence.
  *
@@ -108,7 +106,6 @@ This document standardizes inline code examples and TSDoc patterns across the Up
 #### Repository Methods
 
 ````typescript
-
 /**
  * Creates a new [ENTITY] in the database.
  *
@@ -163,7 +160,6 @@ This document standardizes inline code examples and TSDoc patterns across the Up
 #### Event Bus
 
 ````typescript
-
 /**
  * Enhanced event bus with type safety and middleware support.
  *
@@ -223,7 +219,6 @@ This document standardizes inline code examples and TSDoc patterns across the Up
 #### Event Emission
 
 ````typescript
-
 /**
  * Emits a typed event with automatic metadata injection.
  *
@@ -285,7 +280,6 @@ This document standardizes inline code examples and TSDoc patterns across the Up
 #### Store Interface
 
 ````typescript
-
 /**
  * [DOMAIN] store for managing [DESCRIPTION] state and interactions.
  *
@@ -356,7 +350,6 @@ This document standardizes inline code examples and TSDoc patterns across the Up
 #### withErrorHandling Function
 
 ````typescript
-
 /**
  * Shared error handling utility for async operations with context-aware
  * behavior.
@@ -439,7 +432,6 @@ This document standardizes inline code examples and TSDoc patterns across the Up
 #### Handler Registration
 
 ````typescript
-
 /**
  * Registers standardized IPC handler with validation and error handling.
  *
@@ -518,7 +510,6 @@ This document standardizes inline code examples and TSDoc patterns across the Up
 #### Simple Examples
 
 ````typescript
-
 /**
  * @example
  *
@@ -533,7 +524,6 @@ This document standardizes inline code examples and TSDoc patterns across the Up
 #### Complex Examples
 
 ````typescript
-
 /**
  * @example
  *
@@ -559,7 +549,6 @@ This document standardizes inline code examples and TSDoc patterns across the Up
 #### Usage Pattern Examples
 
 ````typescript
-
 /**
  * @example
  *
@@ -587,7 +576,6 @@ This document standardizes inline code examples and TSDoc patterns across the Up
 Show the most common, straightforward usage:
 
 ````typescript
-
 /**
  * @example
  *
@@ -606,7 +594,6 @@ Show the most common, straightforward usage:
 Demonstrate proper error handling patterns:
 
 ````typescript
-
 /**
  * @example
  *
@@ -629,7 +616,6 @@ Demonstrate proper error handling patterns:
 Show complex scenarios and integration patterns:
 
 ````typescript
-
 /**
  * @example
  *

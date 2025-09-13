@@ -17,8 +17,9 @@
  *   (unicodeStr.length
  *
  * > MaxLength) { expect(result.length).toBe(maxLength); } else {
- *   > expect(result).toBe(unicodeStr); } } )); });ay utilities
- *   > (getMonitorDisplayIdentifier, getMonitorTypeDisplayLabel)
+ * > expect(result).toBe(unicodeStr); } } )); });ay utilities
+ * > (getMonitorDisplayIdentifier, getMonitorTypeDisplayLabel)
+ *
  * - String processing utilities (truncateForLogging)
  * - Edge cases and robustness (null inputs, malformed objects)
  * - Performance and determinism testing

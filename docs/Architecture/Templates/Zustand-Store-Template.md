@@ -7,7 +7,6 @@ Use this template when creating new Zustand stores for frontend state management
 For stores with straightforward state that don't require modular composition:
 
 ````typescript
-
 /**
  * [DESCRIPTION] store for managing [DOMAIN] state and interactions.
  *

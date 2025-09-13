@@ -32,6 +32,9 @@
     "css.lint.importStatement": "ignore",
     "css.lint.unknownAtRules": "ignore",
     "css.validate": false,
+    "editor.gotoLocation.alternativeImplementationCommand": "editor.action.goToReferences",
+    "editor.gotoLocation.alternativeReferenceCommand": "editor.action.peekDefinition",
+    "editor.suggest.showStatusBar": true,
     "eslint.ignoreUntitled": true,
     "eslint.validate": [
         "javascript",
@@ -64,7 +67,9 @@
         "vue-ts",
         "tailwindcss"
     ],
-    "eslint.workingDirectories": ["."],
+    "eslint.workingDirectories": [
+        "."
+    ],
     "files.exclude": {
         "**/.husky/**": true,
         "**/.nyc_output/**": true,
@@ -167,9 +172,5 @@
         "css",
         "postcss",
         "scss"
-    ],
-    "editor.gotoLocation.alternativeImplementationCommand": "editor.action.goToReferences",
-    "editor.gotoLocation.alternativeReferenceCommand": "editor.action.peekDefinition",
-    "editor.suggest.showStatusBar": true
-
+    ]
 }

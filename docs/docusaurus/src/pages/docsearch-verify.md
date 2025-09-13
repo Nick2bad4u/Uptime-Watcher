@@ -18,7 +18,7 @@ You can verify your site with Algolia by adding a meta tag to your HTML.
 ```
 
 ```html
-<meta name="algolia-site-verification"  content="380B91BE48387F93" />
+<meta name="algolia-site-verification" content="380B91BE48387F93" />
 ```
 
 <meta name="algolia-site-verification"  content="380B91BE48387F93" />

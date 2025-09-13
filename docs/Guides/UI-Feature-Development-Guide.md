@@ -160,7 +160,6 @@ Always follow this order to minimize breaking changes:
 ### Component Structure
 
 ````tsx
-
 // Import standardized prop types for consistency
 import type {
  CoreComponentProperties,
@@ -675,11 +674,7 @@ export const ReusableButton = React.memo(function ReusableButton({
    if (isDisabled || isLoading) return;
    onClick?.(event);
   },
-  [
-   onClick,
-   isDisabled,
-   isLoading,
-  ]
+  [onClick, isDisabled, isLoading]
  );
 
  return (

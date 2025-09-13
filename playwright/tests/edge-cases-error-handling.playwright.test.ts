@@ -11,18 +11,18 @@
  *   ```
  *             const firstButton = buttons.first();
  *
- *         // Rapid clicking test
- *         for (let i = 0; i < 10; i++) {
- *             await firstButton.click();
- *             await window.waitForTimeout(10); // Very short delay
- *         }
+ *       // Rapid clicking test
+ *       for (let i = 0; i < 10; i++) {
+ *           await firstButton.click();
+ *           await window.waitForTimeout(10); // Very short delay
+ *       }
  *
- *         // Test that the application is still responsive
- *         const isResponsive = await window.evaluate(() => {
- *             return document.readyState === "complete";
- *         });
+ *       // Test that the application is still responsive
+ *       const isResponsive = await window.evaluate(() => {
+ *           return document.readyState === "complete";
+ *       });
  *
- *         expect(isResponsive).toBe(true); handling validation
+ *       expect(isResponsive).toBe(true); handling validation
  * ```
  */
 
@@ -107,7 +107,7 @@ test.describe(
             },
             async () => {
                 await ensureCleanState(window);
-                
+
                 // Test invalid URLs
                 const invalidUrls = [
                     "not-a-url",
@@ -236,7 +236,7 @@ test.describe(
             },
             async () => {
                 await ensureCleanState(window);
-                
+
                 // Find clickable elements
                 const buttons = window.getByRole("button");
                 const buttonCount = await buttons.count();
@@ -352,7 +352,7 @@ test.describe(
             },
             async () => {
                 const originalSize = await window.viewportSize();
-                
+
                 // Ensure we have a valid original size
                 expect(originalSize).toBeTruthy();
                 expect(originalSize?.width).toBeGreaterThan(0);

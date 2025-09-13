@@ -7,6 +7,7 @@
 
 import { test, expect, _electron as electron } from "@playwright/test";
 import path from "node:path";
+import { launchElectronApp } from "../fixtures/electron-helpers";
 
 test.describe(
     "electron main process",
@@ -35,13 +36,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
+                const electronApp = await launchElectronApp(electron);
 
                 // Test app module
                 const appPath = await electronApp.evaluate(async ({ app }) => {
@@ -84,13 +79,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
+                const electronApp = await launchElectronApp(electron);
 
                 // Get the main window (not directly used but needed for proper window management)
                 await electronApp.firstWindow();
@@ -133,13 +122,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
+                const electronApp = await launchElectronApp(electron);
 
                 // Test app ready state
                 const readyState = await electronApp.evaluate(
@@ -178,10 +161,16 @@ test.describe(
             },
             async () => {
                 const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
+                    args: [
+                        path.join(__dirname, "../../dist-electron/main.js"),
+                        // Disable sandbox in CI environment to avoid SUID sandbox issues
+                        ...(process.env["CI"] ? ["--no-sandbox", "--disable-setuid-sandbox"] : []),
+                    ],
                     env: {
                         ...process.env,
                         NODE_ENV: "test",
+                        // Disable Electron sandbox in CI
+                        ...(process.env["CI"] && { ELECTRON_DISABLE_SANDBOX: "1" }),
                     },
                 });
 
