@@ -13,9 +13,9 @@
  * - Screen reader compatibility basics
  */
 
-import { test, expect, _electron as electron } from "@playwright/test";
-import path from "node:path";
+import { test, expect } from "@playwright/test";
 import { ensureCleanState } from "../utils/modal-cleanup";
+import { launchElectronApp } from "../fixtures/electron-helpers";
 
 test.describe(
     "basic accessibility testing",
@@ -35,13 +35,7 @@ test.describe(
          * Helper to launch app and ensure it's accessible from the start.
          */
         async function launchAccessibleApp() {
-            const electronApp = await electron.launch({
-                args: [path.join(__dirname, "../../dist-electron/main.js")],
-                env: {
-                    ...process.env,
-                    NODE_ENV: "test",
-                },
-            });
+            const electronApp = await launchElectronApp();
 
             const window = await electronApp.firstWindow();
             await window.waitForLoadState("domcontentloaded");

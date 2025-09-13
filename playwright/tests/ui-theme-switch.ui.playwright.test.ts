@@ -7,19 +7,13 @@
  * @file Playwright test for theme switching functionality
  */
 
-import { test, expect, _electron as electron } from "@playwright/test";
-import path from "node:path";
+import { test, expect } from "@playwright/test";
 import { ensureCleanState } from "../utils/modal-cleanup";
+import { launchElectronApp } from "../fixtures/electron-helpers";
 
 test.describe("theme switch UI", () => {
     test("should toggle between light and dark themes", async () => {
-        const electronApp = await electron.launch({
-            args: [path.join(__dirname, "../../dist-electron/main.js")],
-            env: {
-                ...process.env,
-                NODE_ENV: "test",
-            },
-        });
+        const electronApp = await launchElectronApp();
 
         const page = await electronApp.firstWindow();
         await page.waitForLoadState("domcontentloaded");

@@ -5,8 +5,8 @@
  * properly, and basic functionality works as expected.
  */
 
-import { test, expect, _electron as electron } from "@playwright/test";
-import path from "node:path";
+import { test, expect } from "@playwright/test";
+import { launchElectronApp } from "../fixtures/electron-helpers";
 
 test.describe(
     "electron app - basic functionality",
@@ -36,13 +36,7 @@ test.describe(
             },
             async () => {
                 // Launch the Electron app
-                const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
+                const electronApp = await launchElectronApp();
 
                 // Verify the app launched
                 expect(electronApp).toBeTruthy();

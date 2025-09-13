@@ -23,9 +23,9 @@
 // NOTE: These form UI tests intentionally use conditional logic
 // to test various form states and validation scenarios
 
-import { test, expect, _electron as electron } from "@playwright/test";
-import path from "node:path";
+import { test, expect } from "@playwright/test";
 import { ensureCleanState } from "../utils/modal-cleanup";
+import { launchElectronApp } from "../fixtures/electron-helpers";
 
 test.describe(
     "addSiteForm UI tests",
@@ -58,13 +58,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
+                const electronApp = await launchElectronApp();
 
                 const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");
@@ -160,13 +154,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
+                const electronApp = await launchElectronApp();
 
                 const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");
@@ -245,13 +233,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
+                const electronApp = await launchElectronApp();
 
                 const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");
@@ -328,13 +310,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
+                const electronApp = await launchElectronApp();
 
                 const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");
@@ -428,13 +404,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
+                const electronApp = await launchElectronApp();
 
                 const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");
@@ -532,13 +502,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
+                const electronApp = await launchElectronApp();
 
                 const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");

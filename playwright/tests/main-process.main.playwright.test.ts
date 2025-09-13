@@ -160,19 +160,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: [
-                        path.join(__dirname, "../../dist-electron/main.js"),
-                        // Disable sandbox in CI environment to avoid SUID sandbox issues
-                        ...(process.env["CI"] ? ["--no-sandbox", "--disable-setuid-sandbox"] : []),
-                    ],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                        // Disable Electron sandbox in CI
-                        ...(process.env["CI"] && { ELECTRON_DISABLE_SANDBOX: "1" }),
-                    },
-                });
+                const electronApp = await launchElectronApp(electron);
 
                 // Get system information
                 const systemInfo = await electronApp.evaluate(
