@@ -24,12 +24,12 @@ import { useCallback, useMemo } from "react";
 
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
-import { StatusIndicator } from "../../theme/components/StatusIndicator";
 import { ThemedBox } from "../../theme/components/ThemedBox";
-import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
-import "./Header.css";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
+import { HeaderControls } from "./HeaderControls";
+import "./Header.css";
+import { StatusSummary } from "./StatusSummary";
 
 /**
  * Initializes a monitor counts object with all status counts set to zero.
@@ -202,257 +202,51 @@ export const Header = (): JSX.Element => {
     }, [setShowSettings]);
 
     return (
-        <ThemedBox
-            border
-            className="border-b shadow-xs"
-            padding="md"
-            surface="elevated"
-        >
-            <div className="header-container">
-                <div className="flex flex-wrap items-center justify-between gap-4 py-4">
-                    {/* Left: App Title & Status Summary */}
-                    <div className="flex min-w-0 shrink flex-wrap items-center gap-6">
-                        {/* App Title with subtle background and border */}
-                        <span className="header-title-box flex min-w-45 items-center gap-2 px-4 py-1">
-                            <span className="text-2xl select-none">📊</span>
-                            <ThemedText
-                                className="header-title-accent truncate"
-                                size="2xl"
-                                weight="bold"
-                            >
-                                Uptime Watcher
-                            </ThemedText>
-                        </span>
-
-                        {/* Status Summary - Enhanced */}
-                        <ThemedBox
-                            className="header-status-summary-box flex min-w-85 items-center space-x-3 transition-all duration-300"
-                            padding="sm"
-                            rounded="lg"
-                            shadow="sm"
-                            variant="secondary"
-                        >
-                            {/* Overall Health Badge */}
-                            {totalMonitors > 0 && (
-                                <div
-                                    className="group health-badge flex items-center space-x-2 rounded-md px-3 py-1 transition-all duration-200"
-                                    data-health-color={getAvailabilityColor(
-                                        uptimePercentage
-                                    )}
+        <header role="banner">
+            <ThemedBox
+                border
+                className="border-b shadow-xs"
+                padding="md"
+                surface="elevated"
+            >
+                <div className="header-container">
+                    <div className="flex flex-wrap items-center justify-between gap-4 py-4">
+                        {/* Left: App Title & Status Summary */}
+                        <div className="flex min-w-0 shrink flex-wrap items-center gap-6">
+                            {/* App Title with subtle background and border */}
+                            <span className="header-title-box flex min-w-45 items-center gap-2 px-4 py-1">
+                                <span className="text-2xl select-none">📊</span>
+                                <ThemedText
+                                    className="header-title-accent truncate"
+                                    size="2xl"
+                                    weight="bold"
                                 >
-                                    <div
-                                        className="health-dot h-3 w-3 animate-pulse rounded-full"
-                                        data-health-color={getAvailabilityColor(
-                                            uptimePercentage
-                                        )}
-                                    />
-                                    <div className="flex flex-col">
-                                        <ThemedText
-                                            className="health-text"
-                                            data-health-color={getAvailabilityColor(
-                                                uptimePercentage
-                                            )}
-                                            size="sm"
-                                            weight="bold"
-                                        >
-                                            {uptimePercentage}%
-                                        </ThemedText>
-                                        <ThemedText
-                                            className="leading-none"
-                                            size="xs"
-                                            variant="secondary"
-                                        >
-                                            Health
-                                        </ThemedText>
-                                    </div>
-                                </div>
-                            )}
+                                    Uptime Watcher
+                                </ThemedText>
+                            </span>
 
-                            {totalMonitors > 0 && (
-                                <div className="h-8 w-px bg-current opacity-20" />
-                            )}
+                            {/* Status Summary - Enhanced */}
+                            <StatusSummary
+                                downMonitors={downMonitors}
+                                getAvailabilityColor={getAvailabilityColor}
+                                pausedMonitors={pausedMonitors}
+                                pendingMonitors={pendingMonitors}
+                                totalMonitors={totalMonitors}
+                                upMonitors={upMonitors}
+                                uptimePercentage={uptimePercentage}
+                            />
+                        </div>
 
-                            {/* Up Status */}
-                            <div className="group status-up-badge flex items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
-                                <StatusIndicator size="sm" status="up" />
-                                <div className="flex flex-col">
-                                    <ThemedText
-                                        size="sm"
-                                        variant="primary"
-                                        weight="semibold"
-                                    >
-                                        {upMonitors}
-                                    </ThemedText>
-                                    <ThemedText
-                                        className="leading-none"
-                                        size="xs"
-                                        variant="secondary"
-                                    >
-                                        Up
-                                    </ThemedText>
-                                </div>
-                            </div>
-
-                            {/* Divider */}
-                            <div className="h-8 w-px bg-current opacity-20" />
-
-                            {/* Down Status */}
-                            <div className="group status-down-badge flex items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
-                                <StatusIndicator size="sm" status="down" />
-                                <div className="flex flex-col">
-                                    <ThemedText
-                                        size="sm"
-                                        variant="primary"
-                                        weight="semibold"
-                                    >
-                                        {downMonitors}
-                                    </ThemedText>
-                                    <ThemedText
-                                        className="leading-none"
-                                        size="xs"
-                                        variant="secondary"
-                                    >
-                                        Down
-                                    </ThemedText>
-                                </div>
-                            </div>
-
-                            {/* Divider */}
-                            <div className="h-8 w-px bg-current opacity-20" />
-
-                            {/* Pending Status */}
-                            <div className="group status-pending-badge flex items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
-                                <StatusIndicator size="sm" status="pending" />
-                                <div className="flex flex-col">
-                                    <ThemedText
-                                        size="sm"
-                                        variant="primary"
-                                        weight="semibold"
-                                    >
-                                        {pendingMonitors}
-                                    </ThemedText>
-                                    <ThemedText
-                                        className="leading-none"
-                                        size="xs"
-                                        variant="secondary"
-                                    >
-                                        Pending
-                                    </ThemedText>
-                                </div>
-                            </div>
-
-                            {/* Divider */}
-                            <div className="h-8 w-px bg-current opacity-20" />
-
-                            {/* Paused Status */}
-                            <div className="group status-paused-badge flex items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
-                                <StatusIndicator size="sm" status="paused" />
-                                <div className="flex flex-col">
-                                    <ThemedText
-                                        size="sm"
-                                        variant="primary"
-                                        weight="semibold"
-                                    >
-                                        {pausedMonitors}
-                                    </ThemedText>
-                                    <ThemedText
-                                        className="leading-none"
-                                        size="xs"
-                                        variant="secondary"
-                                    >
-                                        Paused
-                                    </ThemedText>
-                                </div>
-                            </div>
-
-                            {/* Total Sites Badge */}
-                            {/* eslint-disable @eslint-react/avoid-shorthand-fragment -- Badge wrapper needs fragment for multiple sibling elements */}
-                            {totalMonitors > 0 && (
-                                <>
-                                    <div className="h-8 w-px bg-current opacity-20" />
-                                    <div className="total-sites-badge bg-overlay-default/10 flex items-center space-x-2 rounded-md px-2 py-1">
-                                        <div className="h-2 w-2 rounded-full bg-current opacity-50" />
-                                        <div className="flex flex-col">
-                                            <ThemedText
-                                                size="sm"
-                                                variant="primary"
-                                                weight="semibold"
-                                            >
-                                                {totalMonitors}
-                                            </ThemedText>
-                                            <ThemedText
-                                                className="leading-none"
-                                                size="xs"
-                                                variant="secondary"
-                                            >
-                                                Total
-                                            </ThemedText>
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                            {/* eslint-enable @eslint-react/avoid-shorthand-fragment -- Re-enable rule from above */}
-                        </ThemedBox>
-                    </div>
-
-                    {/* Right: Controls */}
-                    <div className="flex flex-wrap items-center gap-3">
-                        {/* Add Site Button */}
-                        <ThemedBox
-                            className="header-controls-box flex items-center"
-                            padding="xs"
-                            rounded="md"
-                            variant="tertiary"
-                        >
-                            <ThemedButton
-                                aria-label="Add new site"
-                                className="themed-button--icon p-2"
-                                onClick={handleShowAddSiteModal}
-                                size="sm"
-                                variant="secondary"
-                            >
-                                ➕
-                            </ThemedButton>
-                        </ThemedBox>
-
-                        {/* Theme Toggle */}
-                        <ThemedBox
-                            className="header-controls-box flex items-center"
-                            padding="xs"
-                            rounded="md"
-                            variant="tertiary"
-                        >
-                            <ThemedButton
-                                aria-label="Toggle theme"
-                                className="themed-button--icon p-2"
-                                onClick={toggleTheme}
-                                size="sm"
-                                variant="secondary"
-                            >
-                                {isDark ? "☀️" : "🌙"}
-                            </ThemedButton>
-                        </ThemedBox>
-
-                        {/* Settings Button */}
-                        <ThemedBox
-                            className="header-controls-box flex items-center"
-                            padding="xs"
-                            rounded="md"
-                            variant="tertiary"
-                        >
-                            <ThemedButton
-                                aria-label="Settings"
-                                className="themed-button--icon p-2"
-                                onClick={handleShowSettings}
-                                size="sm"
-                                variant="secondary"
-                            >
-                                ⚙️
-                            </ThemedButton>
-                        </ThemedBox>
+                        {/* Right: Controls */}
+                        <HeaderControls
+                            isDark={isDark}
+                            onShowAddSiteModal={handleShowAddSiteModal}
+                            onShowSettings={handleShowSettings}
+                            onToggleTheme={toggleTheme}
+                        />
                     </div>
                 </div>
-            </div>
-        </ThemedBox>
+            </ThemedBox>
+        </header>
     );
 };

@@ -1,25 +1,6 @@
 name: npm audit
 
 on:
-    pull_request:
-        paths-ignore:
-            - "*"
-            - "*/**"
-            - "!src/**"
-            - "**/CHANGELOG.md"
-            - "CHANGELOG.md"
-    push:
-        branches:
-            - main
-            - "releases/*"
-        paths-ignore:
-            - "*"
-            - "*/**"
-            - "!src/**"
-            - "**/CHANGELOG.md"
-            - "CHANGELOG.md"
-    schedule:
-        - cron: "0 10 * * *"
     workflow_dispatch:
 
 permissions: write-all

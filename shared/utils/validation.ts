@@ -84,6 +84,7 @@ function validateBasicMonitorFields(
     if (
         monitor.checkInterval !== undefined &&
         (typeof monitor.checkInterval !== "number" ||
+            !Number.isFinite(monitor.checkInterval) ||
             monitor.checkInterval < 1000)
     ) {
         errors.push("Check interval must be at least 1000ms");
@@ -91,7 +92,9 @@ function validateBasicMonitorFields(
 
     if (
         monitor.timeout !== undefined &&
-        (typeof monitor.timeout !== "number" || monitor.timeout <= 0)
+        (typeof monitor.timeout !== "number" ||
+            !Number.isFinite(monitor.timeout) ||
+            monitor.timeout <= 0)
     ) {
         errors.push("Timeout must be a positive number");
     }
@@ -99,6 +102,7 @@ function validateBasicMonitorFields(
     if (
         monitor.retryAttempts !== undefined &&
         (typeof monitor.retryAttempts !== "number" ||
+            !Number.isFinite(monitor.retryAttempts) ||
             monitor.retryAttempts < 0 ||
             monitor.retryAttempts > 10)
     ) {
@@ -170,6 +174,7 @@ function validatePortMonitorFields(
     }
     if (
         typeof monitor.port !== "number" ||
+        !Number.isFinite(monitor.port) ||
         monitor.port < 1 ||
         monitor.port > 65_535
     ) {

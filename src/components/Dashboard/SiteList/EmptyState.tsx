@@ -53,11 +53,16 @@ import { ThemedText } from "../../../theme/components/ThemedText";
  * @public
  */
 export const EmptyState = (): JSX.Element => (
-    <ThemedBox className="text-center" padding="xl" surface="base">
+    <ThemedBox
+        className="text-center"
+        data-testid="empty-state"
+        padding="xl"
+        surface="base"
+    >
         {/* empty-state-icon class provides styling from src/theme/components.css */}
         <div className="empty-state-icon">🌐</div>
         <ThemedText className="mb-2" size="lg" weight="medium">
-            No sites to monitor
+            No sites are being monitored
         </ThemedText>
         <ThemedText variant="secondary">
             Add your first website to start monitoring its uptime.

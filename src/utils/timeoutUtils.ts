@@ -161,6 +161,9 @@ export function isValidTimeoutMs(timeoutMs: number): boolean {
  * @returns True if the timeout is valid, false otherwise
  */
 export function isValidTimeoutSeconds(timeoutSeconds: number): boolean {
+    if (Number.isNaN(timeoutSeconds)) {
+        return false;
+    }
     return (
         timeoutSeconds >= TIMEOUT_CONSTRAINTS.MIN &&
         timeoutSeconds <= TIMEOUT_CONSTRAINTS.MAX

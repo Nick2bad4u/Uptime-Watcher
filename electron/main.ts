@@ -123,17 +123,141 @@ log.transports.console.format = LOG_CONSOLE_FORMAT;
 
 // Hot reload for preload scripts (development only)
 if (isDev()) {
+    // Enhanced hot reload protection configuration
+    const HOT_RELOAD_THROTTLE_MS = 1000; // Minimum time between individual reloads
+    const MAX_RELOADS_PER_WINDOW = 5; // Maximum reloads in sliding window
+    const RATE_LIMIT_WINDOW_MS = 10_000; // 10 seconds sliding window
+    const CIRCUIT_BREAKER_TIMEOUT_MS = 30_000; // 30 seconds timeout in circuit breaker mode
+    const PROGRESSIVE_BACKOFF_MULTIPLIER = 2; // Multiplier for progressive backoff
+
+    // Hot reload state management
+    let lastHotReloadTime = 0;
+    let reloadHistory: number[] = []; // Track recent reload timestamps
+    let isReloadInProgress = false;
+    let circuitBreakerMode = false;
+    let circuitBreakerUntil = 0;
+    let circuitBreakerCount = 0;
+    let reloadProgressTimer: NodeJS.Timeout | null = null;
+
     /**
-     * Handles hot reload messages from vite-plugin-electron.
+     * Cleans old entries from reload history based on sliding window.
+     */
+    const cleanReloadHistory = (): void => {
+        const now = Date.now();
+        reloadHistory = reloadHistory.filter(
+            (timestamp) => now - timestamp < RATE_LIMIT_WINDOW_MS
+        );
+    };
+
+    /**
+     * Checks if rate limit is exceeded within the sliding window.
+     *
+     * @returns True if rate limit is exceeded
+     */
+    const isRateLimitExceeded = (): boolean => {
+        cleanReloadHistory();
+        return reloadHistory.length >= MAX_RELOADS_PER_WINDOW;
+    };
+
+    /**
+     * Activates circuit breaker mode with progressive backoff.
+     */
+    const activateCircuitBreaker = (): void => {
+        circuitBreakerCount++;
+        const backoffTime =
+            CIRCUIT_BREAKER_TIMEOUT_MS *
+            PROGRESSIVE_BACKOFF_MULTIPLIER **
+                Math.min(circuitBreakerCount - 1, 3);
+
+        circuitBreakerMode = true;
+        circuitBreakerUntil = Date.now() + backoffTime;
+
+        logger.warn(
+            `[Main] Hot reload circuit breaker activated (attempt ${circuitBreakerCount}). ` +
+                `Disabled for ${backoffTime / 1000} seconds due to excessive reload frequency.`
+        );
+    };
+
+    /**
+     * Checks and resets circuit breaker if timeout has passed.
+     */
+    const checkCircuitBreakerReset = (): void => {
+        if (circuitBreakerMode && Date.now() > circuitBreakerUntil) {
+            circuitBreakerMode = false;
+            logger.info(
+                "[Main] Hot reload circuit breaker reset - normal operation resumed"
+            );
+        }
+    };
+
+    /**
+     * Handles hot reload messages from vite-plugin-electron with comprehensive
+     * protection against infinite loops.
      *
      * @param msg - Message from the plugin
      */
     const handleHotReload = (msg: unknown): void => {
-        if (msg === "electron-vite&type=hot-reload") {
+        if (msg !== "electron-vite&type=hot-reload") {
+            return;
+        }
+
+        const now = Date.now();
+
+        // Check if circuit breaker is active
+        checkCircuitBreakerReset();
+        if (circuitBreakerMode) {
+            logger.debug("[Main] Hot reload blocked - circuit breaker active");
+            return;
+        }
+
+        // Check if reload is already in progress
+        if (isReloadInProgress) {
+            logger.debug(
+                "[Main] Hot reload blocked - reload already in progress"
+            );
+            return;
+        }
+
+        // Basic throttling - minimum time between reloads
+        if (now - lastHotReloadTime < HOT_RELOAD_THROTTLE_MS) {
+            logger.debug(
+                "[Main] Hot reload throttled - too frequent (basic throttle)"
+            );
+            return;
+        }
+
+        // Rate limiting - check sliding window
+        if (isRateLimitExceeded()) {
+            logger.warn(
+                `[Main] Hot reload rate limit exceeded (${MAX_RELOADS_PER_WINDOW} ` +
+                    `reloads in ${RATE_LIMIT_WINDOW_MS / 1000}s window)`
+            );
+            activateCircuitBreaker();
+            return;
+        }
+
+        // Proceed with hot reload
+        lastHotReloadTime = now;
+        reloadHistory.push(now);
+        isReloadInProgress = true;
+
+        logger.info(
+            `[Main] Performing hot reload (${reloadHistory.length}/${MAX_RELOADS_PER_WINDOW} in window)`
+        );
+
+        try {
             for (const win of BrowserWindow.getAllWindows()) {
                 // Hot reload preload scripts
                 win.webContents.reload();
             }
+        } catch (error) {
+            logger.error("[Main] Error during hot reload", error);
+        } finally {
+            // Reset reload progress flag after a short delay
+            reloadProgressTimer = setTimeout(() => {
+                isReloadInProgress = false;
+                reloadProgressTimer = null;
+            }, 500); // 500ms timeout for reload operation
         }
     };
     /**
@@ -142,6 +266,12 @@ if (isDev()) {
     const handleCleanup = (): void => {
         process.off("message", handleHotReload);
         app.off("before-quit", handleCleanup); // <-- Remove the before-quit listener
+
+        // Clean up any pending timer
+        if (reloadProgressTimer) {
+            clearTimeout(reloadProgressTimer);
+            reloadProgressTimer = null;
+        }
     };
     process.on("message", handleHotReload);
     app.on("before-quit", handleCleanup);
@@ -169,17 +299,23 @@ class Main {
      * Named event handler for safe cleanup on process exit.
      */
     private readonly handleProcessExit = (): void => {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- applicationService may be undefined during shutdown
-        if (!this.cleanedUp && this.applicationService?.cleanup) {
+        if (!this.cleanedUp) {
             this.cleanedUp = true;
-            void (async (): Promise<void> => {
-                try {
-                    await this.applicationService.cleanup();
-                } catch (error) {
-                    logger.error("[Main] Cleanup failed", error);
-                    throw error;
-                }
-            })();
+            // Handle cleanup asynchronously without blocking process exit
+            // Use setImmediate to avoid blocking the event loop
+            setImmediate((): void => {
+                void (async (): Promise<void> => {
+                    try {
+                        await this.performCleanup();
+                    } catch (error: unknown) {
+                        logger.error(
+                            "[Main] Unexpected error during process exit cleanup",
+                            error
+                        );
+                        // Log the error but don't prevent process exit
+                    }
+                })();
+            });
         }
     };
 
@@ -187,19 +323,39 @@ class Main {
      * Named event handler for safe cleanup on app quit.
      */
     private readonly handleAppQuit = (): void => {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- applicationService may be undefined during shutdown
-        if (!this.cleanedUp && this.applicationService?.cleanup) {
+        if (!this.cleanedUp) {
             this.cleanedUp = true;
-            void (async (): Promise<void> => {
-                try {
-                    await this.applicationService.cleanup();
-                } catch (error) {
-                    logger.error("[Main] Cleanup failed", error);
-                    throw error;
-                }
-            })();
+            // Handle cleanup asynchronously during app quit
+            setImmediate((): void => {
+                void (async (): Promise<void> => {
+                    try {
+                        await this.performCleanup();
+                    } catch (error: unknown) {
+                        logger.error(
+                            "[Main] Unexpected error during app quit cleanup",
+                            error
+                        );
+                        // Don't throw - app is already quitting, just exit with error code
+                        app.exit(1);
+                    }
+                })();
+            });
         }
     };
+
+    /**
+     * Performs cleanup of application service.
+     *
+     * @returns Promise that resolves when cleanup is complete
+     */
+    private async performCleanup(): Promise<void> {
+        try {
+            await this.applicationService.cleanup();
+        } catch (error) {
+            logger.error("[Main] Cleanup failed", error);
+            // Don't re-throw as this is called during shutdown
+        }
+    }
 
     /**
      * Constructs the main application and sets up shutdown handlers.

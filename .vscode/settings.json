@@ -167,6 +167,9 @@
         "css",
         "postcss",
         "scss"
-    ]
+    ],
+    "editor.gotoLocation.alternativeImplementationCommand": "editor.action.goToReferences",
+    "editor.gotoLocation.alternativeReferenceCommand": "editor.action.peekDefinition",
+    "editor.suggest.showStatusBar": true
 
 }

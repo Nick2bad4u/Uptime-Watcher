@@ -25,6 +25,7 @@
 
 import { test, expect, _electron as electron } from "@playwright/test";
 import path from "node:path";
+import { ensureCleanState } from "../utils/modal-cleanup";
 
 test.describe(
     "addSiteForm UI tests",
@@ -67,6 +68,9 @@ test.describe(
 
                 const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");
+
+                // Clean up modal state to prevent interference
+                await ensureCleanState(window);
 
                 // Wait for the React app to fully load
                 await expect(window.getByTestId("app-root")).toBeVisible({
@@ -445,7 +449,7 @@ test.describe(
                 const inputsWithLabels = window.locator(
                     "input[aria-label], input[aria-labelledby]"
                 );
-                 
+
                 const inputsWithPlaceholders =
                     /* eslint-disable-next-line playwright/no-raw-locators */
                     window.locator("input[placeholder]");

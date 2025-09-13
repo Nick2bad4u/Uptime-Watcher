@@ -23,6 +23,29 @@ import type { IpcRendererEvent } from "electron";
 import { contextBridge, ipcRenderer } from "electron";
 
 /**
+ * Runtime validation helpers for IPC responses
+ */
+function validateBackupResponse(value: unknown): {
+    buffer: ArrayBuffer;
+    fileName: string;
+} {
+    if (
+        typeof value === "object" &&
+        value !== null &&
+        "buffer" in value &&
+        "fileName" in value &&
+        value.buffer instanceof ArrayBuffer &&
+        typeof value.fileName === "string"
+    ) {
+        return {
+            buffer: value.buffer,
+            fileName: value.fileName,
+        };
+    }
+    throw new Error("Invalid backup response format");
+}
+
+/**
  * Site management API methods for CRUD operations.
  */
 const siteAPI = {
@@ -46,6 +69,19 @@ const siteAPI = {
      */
     checkSiteNow: (identifier: string, monitorId: string): Promise<void> =>
         ipcRenderer.invoke("check-site-now", identifier, monitorId),
+
+    /**
+     * Remove all sites from the database (primarily for testing).
+     *
+     * @remarks
+     * This operation is destructive and irreversible. It will delete all sites
+     * and their associated monitors from the database. Primarily intended for
+     * testing purposes to ensure clean test state.
+     *
+     * @returns Promise resolving to the number of sites deleted
+     */
+    deleteAllSites: (): Promise<number> =>
+        ipcRenderer.invoke("delete-all-sites"),
 
     /**
      * Retrieve all configured sites from the database.
@@ -171,17 +207,20 @@ const dataAPI = {
     downloadSQLiteBackup: async (): Promise<{
         buffer: ArrayBuffer;
         fileName: string;
-    }> =>
-        // This assertion is safe because:
-        // 1. The IPC handler is defined in our codebase with a known return
-        // type 2. This is an internal API call with a well-defined contract 3.
-        // The main process handler guarantees this specific return type
-        // structure
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- IPC handler contract guarantees this return type structure
-        ipcRenderer.invoke("download-sqlite-backup") as Promise<{
-            buffer: ArrayBuffer;
-            fileName: string;
-        }>,
+    }> => {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- IPC response type is validated at runtime
+            const response = await ipcRenderer.invoke("download-sqlite-backup");
+            return validateBackupResponse(response);
+        } catch (error) {
+            throw new Error(
+                `Failed to download SQLite backup: ${
+                    error instanceof Error ? error.message : "Unknown error"
+                }`,
+                { cause: error }
+            );
+        }
+    },
     /**
      * Export all application data as JSON string.
      *

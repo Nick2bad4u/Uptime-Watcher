@@ -8,7 +8,7 @@
 
 import type { JSX, MouseEvent } from "react";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { useMount } from "../../hooks/useMount";
@@ -202,8 +202,7 @@ export const ScreenshotThumbnail = ({
             : null;
 
     return (
-        // eslint-disable-next-line @eslint-react/avoid-shorthand-fragment -- Shorthand fragment preferred by react/jsx-fragments rule
-        <>
+        <Fragment>
             <a
                 aria-label={ariaLabel}
                 className="site-details-thumbnail-link"
@@ -236,6 +235,6 @@ export const ScreenshotThumbnail = ({
                 </span>
             </a>
             {portalJSX}
-        </>
+        </Fragment>
     );
 };

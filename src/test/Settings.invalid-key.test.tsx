@@ -296,13 +296,9 @@ describe("Settings Component - Invalid Key Coverage", () => {
         // This test will trigger the lines 87-89 by directly testing the handleSettingChange method
         render(<Settings onClose={vi.fn()} />);
 
-        // We need to access the component instance to call handleSettingChange with invalid key
-        // Since the method is private, we'll need to trigger it through reflection or by
-        // modifying the component to expose it for testing
-
         // Get the Settings component from the render result
         const settingsComponent = screen
-            .getByRole("button", { name: "Close settings" })
+            .getByRole("button", { name: "Close settings", hidden: true })
             .closest(".modal-container");
         expect(settingsComponent).toBeTruthy();
 

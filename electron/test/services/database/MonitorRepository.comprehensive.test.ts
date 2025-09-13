@@ -323,11 +323,22 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Data Deletion", "type");
 
+            // Mock queryForIds call to return some monitor IDs
+            mockDatabase.all.mockReturnValue([
+                { id: 1 },
+                { id: 2 },
+                { id: 3 },
+            ]);
             mockDatabase.run.mockReturnValue({ changes: 5 });
 
             await repository.deleteAll();
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+            // Verify that SELECT_ALL_IDS was called to get monitor IDs
+            expect(mockDatabase.all).toHaveBeenCalledWith(
+                "SELECT id FROM monitors",
+                undefined
+            );
         });
         it("should handle delete all errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

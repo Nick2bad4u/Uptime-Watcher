@@ -37,7 +37,7 @@ const config: PlaywrightTestConfig = defineConfig({
         timeout: 5000, // 5 seconds for assertions
     },
 
-    forbidOnly: Boolean(process.env.CI), // Prevent test.only in CI
+    forbidOnly: Boolean(process.env["CI"]), // Prevent test.only in CI
     // Test execution configuration
     fullyParallel: false, // Disable for Electron stability
 
@@ -133,7 +133,7 @@ const config: PlaywrightTestConfig = defineConfig({
         ],
     ],
 
-    retries: process.env.CI ? 2 : 0, // Retry on CI only
+    retries: process.env["CI"] ? 2 : 0, // Retry on CI only
 
     // Test directory configuration
     testDir: "./playwright/tests",
@@ -185,7 +185,7 @@ const config: PlaywrightTestConfig = defineConfig({
         channel: "chrome",
         colorScheme: "dark",
         // Browser configuration
-        headless: Boolean(process.env.CI), // Headless in CI, headed locally
+        headless: Boolean(process.env["CI"]), // Headless in CI, headed locally
 
         ignoreHTTPSErrors: true,
 
@@ -207,7 +207,7 @@ const config: PlaywrightTestConfig = defineConfig({
         viewport: { height: 720, width: 1280 },
     },
 
-    workers: process.env.CI ? 1 : 2, // Limit workers for Electron
+    workers: process.env["CI"] ? 1 : 2, // Limit workers for Electron
 });
 
 export default config;

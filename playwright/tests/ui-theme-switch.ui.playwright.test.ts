@@ -7,20 +7,39 @@
  * @file Playwright test for theme switching functionality
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect, _electron as electron } from "@playwright/test";
+import path from "node:path";
+import { ensureCleanState } from "../utils/modal-cleanup";
 
 test.describe("theme switch UI", () => {
-    test("should toggle between light and dark themes", async ({ page }) => {
-        // Test initial state (light theme)
-        await expect(page.getByLabel("Toggle theme")).toContainText("☀️");
+    test("should toggle between light and dark themes", async () => {
+        const electronApp = await electron.launch({
+            args: [path.join(__dirname, "../../dist-electron/main.js")],
+            env: {
+                ...process.env,
+                NODE_ENV: "test",
+            },
+        });
 
-        // Toggle to dark theme
-        await page.getByRole("button", { name: "Toggle theme" }).click();
+        const page = await electronApp.firstWindow();
+        await page.waitForLoadState("domcontentloaded");
+        await ensureCleanState(page);
+
+        // Wait for the React app to fully load
+        await expect(page.getByTestId("app-root")).toBeVisible({
+            timeout: 15000,
+        });
+
+        // Test initial state (light theme shows moon icon)
         await expect(page.getByLabel("Toggle theme")).toContainText("🌙");
 
-        // Toggle back to light theme
+        // Toggle to dark theme (shows sun icon)
         await page.getByRole("button", { name: "Toggle theme" }).click();
         await expect(page.getByLabel("Toggle theme")).toContainText("☀️");
+
+        // Toggle back to light theme (shows moon icon)
+        await page.getByRole("button", { name: "Toggle theme" }).click();
+        await expect(page.getByLabel("Toggle theme")).toContainText("🌙");
 
         // Verify app container and main content is visible
         const appContainer = page.getByTestId("app-container");
@@ -28,10 +47,14 @@ test.describe("theme switch UI", () => {
 
         // Verify main UI elements using aria snapshot
         await expect(appContainer).toMatchAriaSnapshot(`
-        - text: /📊 Uptime Watcher 0% Health 0 Up 0 Down 0 Pending \\d+ Paused \\d+ Total/
-        - button "Add new site"
-        - button "Toggle theme"
-        - button "Settings"
+        - banner:
+          - text: 📊 Uptime Watcher 0 Up 0 Down 0 Pending 0 Paused
+          - button "Add new site": ➕
+          - button "Toggle theme": 🌙
+          - button "Settings": ⚙️
+        - main: Monitored Sites (0) 🌐 No sites are being monitoredAdd your first website to start monitoring its uptime.
         `);
+
+        await electronApp.close();
     });
 });

@@ -1254,7 +1254,7 @@ export default [
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
             "@eslint-react/prefer-shorthand-boolean": "off",
-            "@eslint-react/prefer-shorthand-fragment": "warn",
+            "@eslint-react/prefer-shorthand-fragment": "off",
             "@eslint-react/use-jsx-vars": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
@@ -2524,7 +2524,7 @@ export default [
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
             "@eslint-react/prefer-shorthand-boolean": "off",
-            "@eslint-react/prefer-shorthand-fragment": "warn",
+            "@eslint-react/prefer-shorthand-fragment": "off",
             "@eslint-react/use-jsx-vars": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
@@ -3488,7 +3488,7 @@ export default [
             "react/jsx-first-prop-new-line": "off",
             "react/jsx-fragments": [
                 "warn",
-                "syntax",
+                "element",
             ],
             "react/jsx-handler-names": "warn", // Enforce consistent handler names
             "react/jsx-indent": "off",
@@ -4012,7 +4012,7 @@ export default [
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
             "@eslint-react/prefer-shorthand-boolean": "off",
-            "@eslint-react/prefer-shorthand-fragment": "warn",
+            "@eslint-react/prefer-shorthand-fragment": "off",
             "@eslint-react/use-jsx-vars": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
@@ -5244,7 +5244,7 @@ export default [
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
             "@eslint-react/prefer-shorthand-boolean": "off",
-            "@eslint-react/prefer-shorthand-fragment": "warn",
+            "@eslint-react/prefer-shorthand-fragment": "off",
             "@eslint-react/use-jsx-vars": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
@@ -6194,7 +6194,7 @@ export default [
             "react/jsx-first-prop-new-line": "off",
             "react/jsx-fragments": [
                 "warn",
-                "syntax",
+                "element",
             ],
             "react/jsx-handler-names": "warn", // Enforce consistent handler names
             "react/jsx-indent": "off",
@@ -8425,6 +8425,14 @@ export default [
         name: "JSON Files - Disables",
         rules: {
             "json/sort-keys": "off",
+        },
+    },
+
+    {
+        files: ["**/.vscode/**"],
+        name: "Vscode Files - Disables",
+        rules: {
+            "jsonc/array-bracket-newline": "off",
         },
     },
 

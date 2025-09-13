@@ -22,6 +22,7 @@ export type BoxElement =
     | "article"
     | "aside"
     | "button"
+    | "dialog"
     | "div"
     | "footer"
     | "header"

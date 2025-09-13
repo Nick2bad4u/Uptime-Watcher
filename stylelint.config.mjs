@@ -90,6 +90,11 @@ export default defineConfig({
                 // Relax accessibility rules for documentation UI elements
                 "a11y/content-property-no-static-value": null,
                 "a11y/font-size-is-readable": null,
+                // The docs theme defines fast transitions/animations but provides
+                // explicit reduced-motion fallbacks already. The a11y rule can
+                // flag false positives due to the complex selector duplication.
+                // Disable it for docs to avoid noisy warnings.
+                "a11y/media-prefers-reduced-motion": null,
                 "plugin/stylelint-group-selectors": null,
                 "scss/declaration-property-value-no-unknown": null,
             },

@@ -4,7 +4,7 @@
  * cases.
  */
 
-import { describe, expect, it, vi, beforeAll, afterAll } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
     hasProperties,

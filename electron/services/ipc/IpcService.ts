@@ -888,6 +888,21 @@ export class IpcService {
             this.registeredIpcHandlers
         );
 
+        // Delete all sites handler (no parameters)
+        registerStandardizedIpcHandler(
+            "delete-all-sites",
+            async () => {
+                logger.info("delete-all-sites IPC handler called");
+                const result = await this.uptimeOrchestrator.deleteAllSites();
+                logger.info(
+                    `delete-all-sites completed, deleted ${result} sites`
+                );
+                return result;
+            },
+            SiteHandlerValidators.deleteAllSites,
+            this.registeredIpcHandlers
+        );
+
         // Remove site handler with validation
         registerStandardizedIpcHandler(
             "remove-site",

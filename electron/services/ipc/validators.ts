@@ -54,6 +54,7 @@ interface MonitorTypeHandlerValidatorsInterface {
  */
 interface SiteHandlerValidatorsInterface {
     addSite: IpcParameterValidator;
+    deleteAllSites: IpcParameterValidator;
     getSites: IpcParameterValidator;
     removeMonitor: IpcParameterValidator;
     removeSite: IpcParameterValidator;
@@ -323,6 +324,14 @@ export const SiteHandlerValidators: SiteHandlerValidatorsInterface = {
      * Expects a single parameter: a site object.
      */
     addSite: createSingleObjectValidator("site"),
+
+    /**
+     * Validates parameters for the "delete-all-sites" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters.
+     */
+    deleteAllSites: createNoParamsValidator(),
 
     /**
      * Validates parameters for the "get-sites" IPC handler.

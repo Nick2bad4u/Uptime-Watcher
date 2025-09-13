@@ -15,6 +15,7 @@
 
 import { test, expect, _electron as electron } from "@playwright/test";
 import path from "node:path";
+import { ensureCleanState } from "../utils/modal-cleanup";
 
 test.describe(
     "basic accessibility testing",
@@ -44,6 +45,9 @@ test.describe(
 
             const window = await electronApp.firstWindow();
             await window.waitForLoadState("domcontentloaded");
+
+            // Clean up modal state to prevent accessibility interference
+            await ensureCleanState(window);
 
             await expect(window.getByTestId("app-root")).toBeVisible({
                 timeout: 15000,

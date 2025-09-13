@@ -448,6 +448,85 @@ export class SiteManager {
     }
 
     /**
+     * Removes all sites from the database and cache.
+     *
+     * @remarks
+     * This method is primarily intended for testing purposes to ensure clean
+     * test state. It performs atomic deletion of all sites and their associated
+     * monitors using a database transaction. The operation clears both the
+     * database and the in-memory cache.
+     *
+     * All monitoring for all sites will be stopped before deletion occurs.
+     * Event notifications are emitted for each site removal to maintain
+     * consistency with the event system.
+     *
+     * @example
+     *
+     * ```typescript
+     * const deletedCount = await siteManager.deleteAllSites();
+     * console.log(`Deleted ${deletedCount} sites`);
+     * ```
+     *
+     * @returns Promise resolving to the number of sites deleted.
+     *
+     * @throws If database operation fails.
+     */
+    public async deleteAllSites(): Promise<number> {
+        try {
+            // Get all sites before deletion for event emission
+            const sitesToDelete = this.sitesCache.getAll();
+            const deleteCount = sitesToDelete.length;
+
+            if (deleteCount === 0) {
+                logger.debug("[SiteManager] No sites to delete");
+                return 0;
+            }
+
+            logger.info(`[SiteManager] Deleting all ${deleteCount} sites`);
+
+            // Use transaction to delete all sites atomically
+            await this.repositories.databaseService.executeTransaction((db) => {
+                // Delete all monitors first (foreign key constraint)
+                this.repositories.monitorRepository.deleteAllInternal(db);
+                // Delete all sites
+                this.repositories.siteRepository.deleteAllInternal(db);
+                return Promise.resolve();
+            });
+
+            // Clear the cache
+            this.sitesCache.clear();
+
+            // Emit events for each deleted site for consistency
+            for (const site of sitesToDelete) {
+                /* eslint-disable no-await-in-loop -- Sequential event emission required for consistency */
+                await this.eventEmitter.emitTyped("site:removed", {
+                    cascade: true,
+                    siteId: site.identifier,
+                    siteName: site.name,
+                    timestamp: Date.now(),
+                });
+                /* eslint-enable no-await-in-loop -- Re-enable after controlled sequential event processing */
+            }
+
+            // Emit bulk sync event for state consistency
+            await this.eventEmitter.emitTyped("sites:state-synchronized", {
+                action: "bulk-sync" as const,
+                siteIdentifier: "all",
+                source: "database" as const,
+                timestamp: Date.now(),
+            });
+
+            logger.info(
+                `[SiteManager] Successfully deleted all ${deleteCount} sites`
+            );
+            return deleteCount;
+        } catch (error) {
+            logger.error("[SiteManager] Failed to delete all sites", error);
+            throw error;
+        }
+    }
+
+    /**
      * Updates a site in the database and cache.
      *
      * @example

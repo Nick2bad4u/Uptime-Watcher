@@ -136,8 +136,9 @@ export class DatabaseService {
 
         // Check if we're already in a transaction (nested transaction scenario)
         if (db.inTransaction) {
-            logger.debug(
-                "[DatabaseService] Already in transaction, executing operation without new transaction"
+            logger.warn(
+                "[DatabaseService] Nested transaction detected - executing operation within existing transaction. " +
+                    "This may indicate a design issue where transaction boundaries are not properly managed."
             );
             // If we're already in a transaction, just execute the operation
             // without starting a new transaction (SQLite doesn't support nested transactions)

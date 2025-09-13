@@ -59,6 +59,7 @@ import type {
 
 import {
     type CSSProperties,
+    Fragment,
     isValidElement,
     type JSX,
     memo,
@@ -181,17 +182,15 @@ const ThemedButtonComponent = ({
                 return iconElement;
             }
             return iconPosition === "left" ? (
-                // eslint-disable-next-line @eslint-react/avoid-shorthand-fragment -- Conflicting ESLint rules: @eslint-react/prefer-shorthand-fragment vs @eslint-react/avoid-shorthand-fragment
-                <>
+                <Fragment>
                     {iconElement}
                     <span>{children}</span>
-                </>
+                </Fragment>
             ) : (
-                // eslint-disable-next-line @eslint-react/avoid-shorthand-fragment -- Conflicting ESLint rules: @eslint-react/prefer-shorthand-fragment vs @eslint-react/avoid-shorthand-fragment
-                <>
+                <Fragment>
                     <span>{children}</span>
                     {iconElement}
-                </>
+                </Fragment>
             );
         }
         return children;

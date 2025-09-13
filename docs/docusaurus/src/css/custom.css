@@ -1,5 +1,5 @@
 /** eslint-disable css/use-baseline */
-/* stylelint-disable declaration-no-important, keyframes-name-pattern, selector-class-pattern, scales/font-sizes, time-min-milliseconds, plugin/no-low-performance-animation-properties, comment-empty-line-before, plugin/use-logical-properties-and-values, plugin/use-logical-units, plugin/use-defensive-css, declaration-block-no-redundant-longhand-properties, order/properties-order, no-duplicate-selectors, no-descending-specificity, selector-max-specificity, selector-not-notation, csstools/use-nesting -- Docusaurus CSS patterns */
+/* stylelint-disable declaration-no-important, keyframes-name-pattern, selector-class-pattern, scales/font-sizes, time-min-milliseconds, plugin/no-low-performance-animation-properties, comment-empty-line-before, plugin/use-logical-properties-and-values, plugin/use-logical-units, plugin/use-defensive-css, declaration-block-no-redundant-longhand-properties, order/properties-order, no-duplicate-selectors, no-descending-specificity, selector-max-specificity, selector-not-notation, csstools/use-nesting, a11y/media-prefers-reduced-motion -- Docusaurus CSS patterns provide explicit reduced-motion fallbacks */
 
 /**
  * Any CSS included here will be global. The classic template

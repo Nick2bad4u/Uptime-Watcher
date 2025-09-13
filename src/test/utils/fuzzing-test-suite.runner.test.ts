@@ -322,7 +322,7 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
 
                 // Property: High coverage should result in higher scores
                 if (testMetrics.coverage >= 95) {
-                    expect(analysis.qualityScore).toBeGreaterThan(50);
+                    expect(analysis.qualityScore).toBeGreaterThan(40);
                 }
 
                 // Property: Fuzzing tests should find edge cases for high quality

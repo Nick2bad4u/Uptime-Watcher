@@ -56,6 +56,19 @@ test.describe(
             const window = await electronApp.firstWindow();
             await window.waitForLoadState("domcontentloaded");
 
+            // Clean up database state before each test to ensure isolation
+            await window.evaluate(async () => {
+                try {
+                    // @ts-ignore - electronAPI is available in the renderer context
+                    await window.electronAPI.sites.deleteAllSites();
+                } catch (error) {
+                    console.warn("Failed to cleanup sites before test:", error);
+                }
+            });
+
+            // Allow time for database cleanup to complete
+            await window.waitForTimeout(500);
+
             // Wait for React app to fully initialize
             await expect(window.getByTestId("app-root")).toBeVisible({
                 timeout: 15000,
@@ -72,8 +85,10 @@ test.describe(
          */
         // @ts-ignore - Parameters are typed externally
         async function addSiteViaUI(window, siteName, siteUrl) {
-            // Click the Add Site button to open the form
-            const addSiteButton = window.getByRole("button").first();
+            // Click the Add Site button to open the form - use specific selector
+            const addSiteButton = window.getByRole("button", {
+                name: "Add new site",
+            });
             await expect(addSiteButton).toBeVisible({ timeout: 5000 });
             await addSiteButton.click();
 
@@ -89,9 +104,9 @@ test.describe(
             await expect(urlField).toBeVisible();
             await urlField.fill(siteUrl);
 
-            // Submit the form
+            // Submit the form - be specific about which button
             const submitButton = window.getByRole("button", {
-                name: /add|create|submit/i,
+                name: "Add new site",
             });
             await expect(submitButton).toBeVisible();
             await submitButton.click();

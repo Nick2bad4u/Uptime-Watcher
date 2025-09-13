@@ -99,7 +99,7 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
 
         render(<EmptyState />);
 
-        const heading = screen.getByText("No sites to monitor");
+        const heading = screen.getByText("No sites are being monitored");
         expect(heading).toBeInTheDocument();
         expect(heading).toHaveClass("themed-text--primary");
         expect(heading).toHaveClass("themed-text--size-lg");
@@ -196,7 +196,9 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         render(<EmptyState />);
 
         // Verify exact text content
-        expect(screen.getByText("No sites to monitor")).toBeInTheDocument();
+        expect(
+            screen.getByText("No sites are being monitored")
+        ).toBeInTheDocument();
         expect(
             screen.getByText(
                 "Add your first website to start monitoring its uptime."
@@ -219,7 +221,7 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         render(<EmptyState />);
 
         // Main heading should have specific CSS classes
-        const heading = screen.getByText("No sites to monitor");
+        const heading = screen.getByText("No sites are being monitored");
         expect(heading).toHaveClass("mb-2");
         expect(heading).toHaveClass("themed-text--size-lg");
         expect(heading).toHaveClass("themed-text--weight-medium");
@@ -245,7 +247,9 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         render(<EmptyState />);
 
         // Component should be findable by text content
-        expect(screen.getByText("No sites to monitor")).toBeInTheDocument();
+        expect(
+            screen.getByText("No sites are being monitored")
+        ).toBeInTheDocument();
         expect(
             screen.getByText(
                 "Add your first website to start monitoring its uptime."

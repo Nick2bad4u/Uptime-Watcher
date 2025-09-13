@@ -174,7 +174,7 @@ describe(IpcService, () => {
             ipcService.setupHandlers();
 
             // Verify that ipcMain.handle was called multiple times for different handlers
-            expect(mockIpcMain.handle).toHaveBeenCalledTimes(22);
+            expect(mockIpcMain.handle).toHaveBeenCalledTimes(23);
             expect(mockIpcMain.on).toHaveBeenCalled();
         });
         it("should setup site handlers", async ({ task, annotate }) => {
@@ -270,7 +270,7 @@ describe(IpcService, () => {
 
             ipcService.cleanup();
 
-            expect(mockIpcMain.removeHandler).toHaveBeenCalledTimes(23);
+            expect(mockIpcMain.removeHandler).toHaveBeenCalledTimes(24);
             expect(mockIpcMain.removeAllListeners).toHaveBeenCalledWith(
                 "quit-and-install"
             );

@@ -430,6 +430,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     <main className="main-container">
                         {/* Full-width site list */}
                         <ThemedBox
+                            data-testid="dashboard-container"
                             padding="md"
                             rounded="lg"
                             shadow="sm"

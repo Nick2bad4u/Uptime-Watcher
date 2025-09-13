@@ -430,7 +430,11 @@ describe("main.ts - Electron Main Process", () => {
             });
 
             expect(mockInstallExtension).toHaveBeenCalledWith(
-                [REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS],
+                [
+                    REDUX_DEVTOOLS,
+                    REACT_DEVELOPER_TOOLS,
+                    "jambeljnbnfbkcpnoiaedcabbgmnnlcd",
+                ],
                 {
                     loadExtensionOptions: { allowFileAccess: true },
                 }

@@ -31,8 +31,22 @@ on:
                 description: "Branch to run mutation testing against"
                 required: true
                 default: "main"
+            stryker-concurrency:
+                description: "Stryker concurrency (number of workers)"
+                required: false
+                default: "4"
+            artifact-retention-days:
+                description: "Number of days to retain mutation testing artifacts (default: 30)"
+                required: false
+                default: "30"
+            timeout-minutes:
+                description: "Timeout for mutation testing job (default: 120 minutes)"
+                required: false
+                default: "120"
 
 # Limit concurrency to avoid running multiple mutation tests simultaneously
+# The concurrency group uses `${{ github.ref }}` so that only one mutation test runs per branch or PR at a time.
+# This prevents overlapping runs for the same branch or PR, ensuring results are not corrupted by concurrent executions.
 concurrency:
     group: stryker-${{ github.ref }}
     cancel-in-progress: true
@@ -45,8 +59,8 @@ permissions:
 jobs:
     mutation-testing:
         name: Run Stryker Mutation Testing
-        runs-on: ubuntu-latest
-        timeout-minutes: 60 # Mutation testing can take a while
+        runs-on: windows-latest
+        timeout-minutes: ${{ github.event.inputs.timeout-minutes != '' && github.event.inputs.timeout-minutes || 120 }} # Configurable timeout for large projects
 
         steps:
             - name: Harden the runner
@@ -57,7 +71,7 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
-                  ref: ${{ github.event.inputs.branch || github.ref }}
+                  ref: ${{ github.event.inputs.branch != '' && github.event.inputs.branch || github.ref }}
                   # Fetch full history for better incremental mode performance
                   fetch-depth: 0
 
@@ -79,25 +93,58 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
-            - name: Create reports directory
-              run: mkdir -p reports/mutation
+            # NEW STEP: Run full test suite to ensure baseline stability before mutation testing
+            # This prevents Stryker from running on a failing test suite, which would produce unreliable results
+            - name: Run test suite
+              id: run-tests
+              shell: pwsh
+              run: |
+                  Write-Host "🧪 Running test suite to validate baseline..."
+                  npm test
+              continue-on-error: false # Fail the job if tests fail, as Stryker requires a passing suite
 
+            # MODIFIED: Conditionally run Stryker only if tests passed
+            # Uses the output from the test step to skip if tests failed
             - name: Run Stryker mutation testing
+              if: steps.run-tests.outcome == 'success' # Only run if tests passed
               env:
                   # 🔑 Dashboard API Key - Set this as a repository secret
                   STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
                   # 📊 GitHub Actions automatically provides these for dashboard reporting
                   # GITHUB_REPOSITORY and GITHUB_SHA are automatically available
                   CI: true
+              shell: pwsh
               run: |
-                  echo "🧬 Starting Stryker mutation testing..."
-                  echo "📊 Project: github.com/${{ github.repository }}"
-                  echo "🏷️ Version: ${{ github.ref_name }}-${{ github.sha }}"
-                  echo "📁 Reports will be saved to: reports/mutation/"
+                  Write-Host "🧬 Starting Stryker mutation testing..."
+                  Write-Host "📊 Project: github.com/${{ github.repository }}"
+                  Write-Host "🏷️ Version: ${{ github.ref_name }}-${{ github.sha }}"
+                  Write-Host "📁 Reports will be saved to: reports/mutation/"
 
                   # Run Stryker with dashboard reporting enabled
-                  npx stryker run --concurrency 4
-              continue-on-error: true # Don't fail the build if mutation score is below threshold
+                  # Use workflow input or default to 4
+                  $CONCURRENCY = "${{ github.event.inputs.stryker-concurrency }}"
+                  if ([string]::IsNullOrEmpty($CONCURRENCY)) {
+                    $CONCURRENCY = "4"
+                  }
+                  Write-Host "Using Stryker concurrency: $CONCURRENCY"
+                  npx stryker run --configFile stryker.config.mjs --concurrency "$CONCURRENCY"
+              continue-on-error: true
+
+            - name: Verify Stryker report files
+              shell: pwsh
+              run: |
+                  $expectedFiles = @(
+                    "coverage/stryker.json",
+                    "coverage/stryker.html",
+                    "coverage/events",
+                    "reports/stryker-incremental.json"
+                  )
+                  $missing = $expectedFiles | Where-Object { -not (Test-Path $_) }
+                  if ($missing.Count -gt 0) {
+                    Write-Host "⚠️ Warning: The following Stryker report files are missing:`n$($missing -join "`n")"
+                  } else {
+                    Write-Host "✅ All expected Stryker report files are present."
+                  }
 
             - name: Upload mutation testing reports
               if: always() # Upload reports even if Stryker fails
@@ -105,59 +152,90 @@ jobs:
               with:
                   name: stryker-reports-${{ github.sha }}
                   path: |
-                      reports/mutation/
-                      reports/stryker-incremental.json
                       coverage/stryker.json
                       coverage/stryker.html
                       coverage/events
-                  retention-days: 30
+                      reports/stryker-incremental.json
+                  retention-days: ${{ github.event.inputs.artifact-retention-days != '' && github.event.inputs.artifact-retention-days || 30 }}
 
+            # Adds a comment to the pull request summarizing mutation testing results.
+            # Reads the Stryker mutation report, calculates the mutation score, and posts a status comment.
+            # If the report is missing, notifies the PR with a warning and instructions.
             - name: Comment mutation score on PR
-              if: github.event_name == 'pull_request' && always()
+              if: always() && github.event_name == 'pull_request'
               uses: actions/github-script@v8
               with:
                   script: |
                       const fs = require('fs');
-                      const path = 'coverage/stryker.json';
+                      const path = require('path');
+                      const reportPath = path.join('coverage', 'stryker.json');
 
-                      if (fs.existsSync(path)) {
-                        const report = JSON.parse(fs.readFileSync(path, 'utf8'));
-                        const score = Math.round(report.thresholds?.high || 0);
+                      let comment;
+                      if (fs.existsSync(reportPath)) {
+                        const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+                        const score = Math.round(report.mutationScore || 0);
 
-                        const comment = `## 🧬 Mutation Testing Results
+                        let scoreStatus;
+                        if (score >= 85) {
+                          scoreStatus = '🟢 Excellent mutation coverage!';
+                        } else if (score >= 70) {
+                          scoreStatus = '🟡 Good mutation coverage';
+                        } else {
+                          scoreStatus = '🔴 Mutation coverage needs improvement';
+                        }
+
+                        // Sanitize branch name for dashboard URL
+                        const rawBranch = process.env.GITHUB_REF_NAME || '${{ github.ref_name }}';
+                        const safeBranch = rawBranch.replace(/[^a-zA-Z0-9._-]/g, '-');
+                        const dashboardUrl = `https://dashboard.stryker-mutator.io/reports/github.com/${{ github.repository }}/${safeBranch}-${{ github.sha }}`;
+
+                        comment = `## 🧬 Mutation Testing Results
 
                         **Mutation Score:** ${score}%
 
-                        📊 [View detailed report](https://dashboard.stryker-mutator.io/reports/github.com/${{ github.repository }}/${{ github.ref_name }}-${{ github.sha }})
+                        📊 [View detailed report](${dashboardUrl})
 
-                        ${score >= 85 ? '🟢 Excellent mutation coverage!' :
-                          score >= 70 ? '🟡 Good mutation coverage' :
-                          '🔴 Mutation coverage needs improvement'}
+                        ${scoreStatus}
                         `;
+                      } else {
+                        comment = `## 🧬 Mutation Testing Results
 
-                        github.rest.issues.createComment({
-                          issue_number: context.issue.number,
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          body: comment
-                        });
+                        ⚠️ Mutation report not found. Mutation testing results are unavailable for this PR.
+
+                        Please check the workflow logs for details or re-run the mutation testing workflow if needed.
+                        `;
                       }
 
+                      github.rest.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: comment
+                      });
+
+            # MODIFIED: Update final check to handle cases where Stryker was skipped due to test failures or produced invalid output
             - name: Check mutation score threshold
               if: always()
+              shell: pwsh
               run: |
-                  if [ -f "reports/mutation/mutation.json" ]; then
-                    SCORE=$(cat reports/mutation/mutation.json | jq -r '.thresholds.high // 0')
-                    echo "🧬 Mutation score: ${SCORE}%"
-
-                    if [ "$SCORE" -lt 60 ]; then
-                      echo "❌ Mutation score ${SCORE}% is below the minimum threshold of 60%"
-                      echo "🔍 Check the detailed report for areas that need better test coverage"
+                  $mutationReport = "coverage/stryker.json"
+                  if (Test-Path $mutationReport) {
+                    $score = (Get-Content $mutationReport | ConvertFrom-Json).mutationScore
+                    if ($null -eq $score) { $score = 0 }
+                    Write-Host "🧬 Mutation score: $score%"
+                    if ($score -lt 60) {
+                      Write-Host "❌ Mutation score $score% is below the minimum threshold of 60%"
+                      $reportUrl = "https://dashboard.stryker-mutator.io/reports/github.com/${{ github.repository }}/${{ github.ref_name }}-${{ github.sha }}"
+                      Write-Host "🔍 Check the detailed report for areas that need better test coverage: $reportUrl"
                       exit 1
-                    else
-                      echo "✅ Mutation score ${SCORE}% meets the quality threshold"
-                    fi
-                  else
-                    echo "⚠️ No mutation report found - Stryker may have failed to complete"
+                    } else {
+                      Write-Host "✅ Mutation score $score% meets the quality threshold"
+                    }
+                  } elseif ("${{ steps.run-tests.outcome }}" -ne "success") {
+                    Write-Host "⚠️ Test suite failed - Stryker was skipped to avoid unreliable mutation results"
+                    Write-Host "🔧 Fix the failing tests before running mutation testing"
                     exit 1
-                  fi
+                  } else {
+                    Write-Host "⚠️ No mutation report found - Stryker may have failed to complete"
+                    exit 1
+                  }

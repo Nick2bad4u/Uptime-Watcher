@@ -62,10 +62,12 @@
             ],
             "runtimeExecutable": "npm",
             "skipFiles": ["<node_internals>/**"],
-            "type": "node"
+            "type": "node",
+            "windows": {
+                "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+            }
         },
         {
-            "args": ["${workspaceFolder}/dist-electron/main.js"],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
@@ -77,7 +79,10 @@
             "outputCapture": "std",
             "preLaunchTask": "Build Electron Main (Dev)",
             "request": "launch",
-            "runtimeArgs": ["--remote-debugging-port=9223"],
+            "runtimeArgs": [
+                "${workspaceFolder}/dist-electron/main.js",
+                "--remote-debugging-port=9223"
+            ],
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
             "skipFiles": ["<node_internals>/**"],
             "type": "node",
@@ -86,7 +91,6 @@
             }
         },
         {
-            "args": ["${workspaceFolder}/dist-electron/main.js"],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
@@ -99,8 +103,9 @@
             "preLaunchTask": "Build Electron Main (Dev)",
             "request": "launch",
             "runtimeArgs": [
+                "${workspaceFolder}/dist-electron/main.js",
                 "--remote-debugging-port=9223",
-                "--user-data-dir=${env:APPDATA}/uptime-watcher"
+                "--user-data-dir=\"${env:APPDATA}\\\\uptime-watcher\""
             ],
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
             "skipFiles": ["<node_internals>/**"],
@@ -145,7 +150,7 @@
             "autoAttachChildProcesses": true,
             "console": "integratedTerminal",
             "name": "🔍 Debug Current Test File",
-            "program": "${workspaceRoot}/node_modules/vitest/vitest.mjs",
+            "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**",

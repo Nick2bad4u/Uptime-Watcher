@@ -609,8 +609,19 @@ export class MonitorRepository {
      * @returns Void
      */
     public deleteAllInternal(db: Database): void {
+        // Get all monitor IDs first
+        const monitorRows = queryForIds(db, MONITOR_QUERIES.SELECT_ALL_IDS);
+
+        // Delete history for all monitors first (foreign key constraint)
+        for (const row of monitorRows) {
+            db.run(MONITOR_QUERIES.DELETE_HISTORY_BY_MONITOR, [row.id]);
+        }
+
+        // Then delete all monitors
         db.run(MONITOR_QUERIES.DELETE_ALL);
-        logger.debug("[MonitorRepository] Cleared all monitors (internal)");
+        logger.debug(
+            "[MonitorRepository] Cleared all monitors and history (internal)"
+        );
     }
 
     /**

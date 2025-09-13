@@ -34,6 +34,7 @@ import {
     type Page,
 } from "@playwright/test";
 import path from "node:path";
+import { ensureCleanState } from "../utils/modal-cleanup";
 
 test.describe(
     "edge Cases & Error Handling - Comprehensive Tests",
@@ -58,6 +59,7 @@ test.describe(
             });
             window = await electronApp.firstWindow();
             await window.waitForLoadState("domcontentloaded");
+            await ensureCleanState(window);
         });
 
         test.afterEach(async () => {
@@ -104,6 +106,8 @@ test.describe(
                 },
             },
             async () => {
+                await ensureCleanState(window);
+                
                 // Test invalid URLs
                 const invalidUrls = [
                     "not-a-url",
@@ -231,6 +235,8 @@ test.describe(
                 },
             },
             async () => {
+                await ensureCleanState(window);
+                
                 // Find clickable elements
                 const buttons = window.getByRole("button");
                 const buttonCount = await buttons.count();
@@ -346,6 +352,11 @@ test.describe(
             },
             async () => {
                 const originalSize = await window.viewportSize();
+                
+                // Ensure we have a valid original size
+                expect(originalSize).toBeTruthy();
+                expect(originalSize?.width).toBeGreaterThan(0);
+                expect(originalSize?.height).toBeGreaterThan(0);
 
                 // Test extreme sizes
                 const extremeSizes = [

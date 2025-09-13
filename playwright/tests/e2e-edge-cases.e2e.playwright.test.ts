@@ -124,7 +124,7 @@ test.describe(
 
                         // Try to submit and verify error handling
                         const submitButton = window.getByRole("button", {
-                            name: "Add Site",
+                            name: "Add new site",
                         });
                         await submitButton.click();
                         await window.waitForTimeout(1000);
@@ -261,7 +261,7 @@ test.describe(
 
                         // Submit form
                         const submitButton = window.getByRole("button", {
-                            name: "Add Site",
+                            name: "Add new site",
                         });
                         await submitButton.click();
                         await window.waitForTimeout(1000);

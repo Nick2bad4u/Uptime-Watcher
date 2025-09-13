@@ -585,3 +585,4 @@ test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+docs/docusaurus/stylelintcache

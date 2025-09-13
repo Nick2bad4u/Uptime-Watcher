@@ -943,6 +943,28 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
+     * Removes all sites from the database.
+     *
+     * @remarks
+     * This method is primarily intended for testing purposes to ensure clean
+     * test state. It delegates to SiteManager for the actual deletion operation
+     * which performs atomic deletion of all sites and their associated monitors
+     * using a database transaction. The operation clears both the database and
+     * the in-memory cache.
+     *
+     * All monitoring for all sites will be stopped before deletion occurs.
+     * Event notifications are emitted for each site removal to maintain
+     * consistency with the event system.
+     *
+     * @returns Promise resolving to the number of sites deleted.
+     *
+     * @throws If database operation fails.
+     */
+    public async deleteAllSites(): Promise<number> {
+        return this.siteManager.deleteAllSites();
+    }
+
+    /**
      * Resets all application settings to their default values.
      *
      * @remarks

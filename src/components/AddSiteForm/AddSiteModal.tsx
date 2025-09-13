@@ -85,6 +85,7 @@ export const AddSiteModal: NamedExoticComponent<object> = memo(
                 onClick={handleBackdropClick}
             >
                 <ThemedBox
+                    as="dialog"
                     className="m-4 max-h-screen w-full max-w-2xl overflow-y-auto"
                     padding="lg"
                     rounded="lg"
