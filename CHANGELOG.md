@@ -7,14 +7,104 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[8a80089](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a8008980dc36f536a7d0373b0cd94dcf04232c0)...
+[8a80089](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a8008980dc36f536a7d0373b0cd94dcf04232c0)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/8a8008980dc36f536a7d0373b0cd94dcf04232c0...8a8008980dc36f536a7d0373b0cd94dcf04232c0))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 14.7.0 [`(8a80089)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a8008980dc36f536a7d0373b0cd94dcf04232c0)
+
+
+
+
+
+
+## [14.7.0] - 2025-09-13
+
+
 [[b8c11b0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b8c11b0b3b1043a6f39956b76363d1400df69759)...
-[b8c11b0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b8c11b0b3b1043a6f39956b76363d1400df69759)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b8c11b0b3b1043a6f39956b76363d1400df69759...b8c11b0b3b1043a6f39956b76363d1400df69759))
+[d56689f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d56689f9c56a55ae6faea3d33ae6517cba93557b)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b8c11b0b3b1043a6f39956b76363d1400df69759...d56689f9c56a55ae6faea3d33ae6517cba93557b))
+
+
+### ✨ Features
+
+- ✨ [feat] Add bulk site deletion and refactor header status UI
+
+- Implements a bulk deletion API for all monitored sites, with IPC handler, validation, and database transaction support; enables clean test state and improves test isolation for E2E and accessibility suites
+- Refactors header status section into modular components for health, counters, dividers, and controls, greatly improving maintainability and accessibility
+- Updates empty state messages and test selectors for better clarity in UI and test assertions
+- Adds comprehensive modal cleanup utility for Playwright tests to prevent UI state leakage between runs
+- Improves validation logic for monitor configuration fields, enforcing finite and safe values
+- Refines main process hot reload logic with circuit breaker and progressive backoff to avoid infinite reload loops during development
+- Updates and clarifies CI workflow triggers, timeout handling, and artifact reporting for mutation testing
+- Tweaks Playwright and ESLint configs for robustness and disables noisy or conflicting rules in documentation and VSCode workspace files
+
+Relates to enhanced E2E test reliability and maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ab7c92f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab7c92f4af70bc07e7b742752fcbe312dd52cd7f)
+
+
+- ✨ [feat] Add comprehensive Playwright E2E, UI, and error handling tests
+
+- Introduces full-featured Playwright test suites covering accessibility, UI component integrity, user workflows, edge cases, error resilience, and Electron main process validation.
+- Implements custom codegen template and transform scripts to enforce lint-compliant test outputs, semantic locators, and standardized structure.
+- Enhances developer experience with Playwright codegen/transform commands, detailed best practices, and usage documentation.
+- Refines ESLint Playwright config for improved linting, TypeScript support, and testing-library rules.
+- Updates Electron tests for improved dependency mocking and module isolation.
+- Integrates Istanbul code coverage for Vite.
+- Fixes minor logic in shared type guards and form error alert fuzzing tests for stability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d76bffe)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d76bffeb0bac88b3fb23716885942cda5c761b9f)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 14.6.0 [`(b8c11b0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b8c11b0b3b1043a6f39956b76363d1400df69759)
+
+
+
+### 🛠️ Other Changes
+
+- Delete docs/docusaurus/stylelintcache
+
+Non supposed to be uploaded [`(211367e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/211367e863d95bb2e31b281825b2e065e7c060c6)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Centralize Electron test app launch logic
+
+- Replaces repeated Electron app launch code in Playwright tests with a shared utility for improved maintainability and consistency.
+- Handles CI-specific environment and sandbox settings automatically, reducing duplication and risk of misconfiguration.
+- Prepares test codebase for easier scaling and future updates to Electron launch parameters.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d56689f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d56689f9c56a55ae6faea3d33ae6517cba93557b)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Streamline code samples, improve clarity, update formatting
+
+- Removes redundant blank lines for cleaner code blocks in documentation and templates.
+- Refactors lists, arrays, and configuration examples for compactness and readability.
+- Updates summary docs to better structure test and documentation status.
+- Fixes minor markdown and HTML formatting issues for consistency.
+- Improves code sample formatting and indentation in tests and guides.
+- No logic changes; focuses on editorial and presentational improvements.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7829915)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/782991527da93951a8b06cf5ca2649cf6b239caf)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v14.6.0 [skip ci] [`(c9c370a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c9c370a1d3171ca4c7fcb811933da5d00d1d7b5e)
 
 
 
