@@ -285,7 +285,11 @@ if (process.versions.electron) {
         if (isDev()) {
             try {
                 const extensions = await installExtension(
-                    [REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS],
+                    [
+                        REDUX_DEVTOOLS,
+                        REACT_DEVELOPER_TOOLS,
+                        "jambeljnbnfbkcpnoiaedcabbgmnnlcd",
+                    ],
                     {
                         loadExtensionOptions: { allowFileAccess: true },
                     }

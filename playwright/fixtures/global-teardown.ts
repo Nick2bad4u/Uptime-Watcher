@@ -4,6 +4,8 @@
  * This file runs once after all tests and cleans up the environment.
  */
 
+import { execSync } from "node:child_process";
+
 async function globalTeardown(): Promise<void> {
     console.log("🧹 Cleaning up after Playwright tests...");
 
@@ -12,19 +14,16 @@ async function globalTeardown(): Promise<void> {
     try {
         if (process.platform === "win32") {
             // Windows
-            require("node:child_process").execSync(
-                "taskkill /F /IM electron.exe /T",
-                {
-                    stdio: "ignore",
-                }
-            );
+            execSync("taskkill /F /IM electron.exe /T", {
+                stdio: "ignore",
+            });
         } else {
             // macOS/Linux
-            require("node:child_process").execSync("pkill -f electron", {
+            execSync("pkill -f electron", {
                 stdio: "ignore",
             });
         }
-    } catch (error) {
+    } catch {
         // Ignore errors - processes might not be running
     }
 

@@ -42,8 +42,8 @@ const config: PlaywrightTestConfig = defineConfig({
     fullyParallel: false, // Disable for Electron stability
 
     // Global setup and teardown with TypeScript
-    globalSetup: require.resolve("./playwright/fixtures/global-setup.js"),
-    globalTeardown: require.resolve("./playwright/fixtures/global-teardown.js"),
+    globalSetup: require.resolve("./playwright/fixtures/global-setup.ts"),
+    globalTeardown: require.resolve("./playwright/fixtures/global-teardown.ts"),
     // Output and artifacts configuration
     outputDir: "test-results/",
     // Multiple projects for different test types
@@ -86,9 +86,24 @@ const config: PlaywrightTestConfig = defineConfig({
             testMatch: "**/e2e-*.e2e.playwright.test.ts",
             use: {
                 ...devices["Desktop Chrome"],
+                headless: false, // Run in headed mode for better debugging
                 // Comprehensive E2E testing configuration
                 viewport: { height: 1080, width: 1920 },
+            },
+        },
+        {
+            name: "comprehensive-tests",
+            testMatch: [
+                "**/electron-main-process.playwright.test.ts",
+                "**/component-ui-comprehensive.playwright.test.ts",
+                "**/accessibility-performance.playwright.test.ts",
+                "**/edge-cases-error-handling.playwright.test.ts",
+            ],
+            use: {
+                ...devices["Desktop Chrome"],
                 headless: false, // Run in headed mode for better debugging
+                // Comprehensive testing configuration
+                viewport: { height: 1080, width: 1920 },
             },
         },
     ],

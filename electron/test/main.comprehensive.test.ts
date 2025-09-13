@@ -6,6 +6,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { App } from "electron";
 
+// ========================================
+// MOCK ALL DEPENDENCIES BEFORE MAIN.TS IMPORT
+// ========================================
+
 // Mock electron-log before importing
 const mockLog = {
     initialize: vi.fn(),
@@ -75,9 +79,23 @@ const mockApp: Partial<App> = {
 
 const mockBrowserWindow = vi.fn();
 
-vi.mock("electron", () => ({
-    app: mockApp,
-    BrowserWindow: mockBrowserWindow,
+// Mock electron with both named exports and default export
+vi.mock("electron", () => {
+    const mockElectron = {
+        app: mockApp,
+        BrowserWindow: mockBrowserWindow,
+    };
+
+    // Support both named imports and default import
+    return {
+        ...mockElectron,
+        default: mockElectron,
+    };
+});
+
+// Mock electron-debug
+vi.mock("electron-debug", () => ({
+    default: vi.fn(),
 }));
 
 describe("main.ts - Electron Main Process", () => {
@@ -89,8 +107,13 @@ describe("main.ts - Electron Main Process", () => {
         originalArgv = process.argv;
         originalVersions = process.versions;
 
+        // Reset mock log levels to defaults
+        mockLog.transports.file.level = "info";
+        mockLog.transports.console.level = "debug";
+
         // Reset mocks to default states
         mockIsDev.mockReturnValue(true);
+        (mockApp as any).isPackaged = false;
         mockInstallExtension.mockResolvedValue([
             { name: "React Developer Tools" },
             { name: "Redux DevTools" },
@@ -134,7 +157,8 @@ describe("main.ts - Electron Main Process", () => {
                 "--debug",
             ];
 
-            // Import main.ts to trigger initialization
+            // Reset the module cache and import main.ts with new argv
+            vi.resetModules();
             await import("../main");
 
             expect(mockLog.initialize).toHaveBeenCalledWith({ preload: true });
@@ -156,6 +180,7 @@ describe("main.ts - Electron Main Process", () => {
                 "--log-production",
             ];
 
+            vi.resetModules();
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("warn");
@@ -176,6 +201,7 @@ describe("main.ts - Electron Main Process", () => {
                 "--log-info",
             ];
 
+            vi.resetModules();
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("info");
@@ -193,6 +219,7 @@ describe("main.ts - Electron Main Process", () => {
             process.argv = ["node", "main.js"];
             (mockApp as any).isPackaged = false;
 
+            vi.resetModules();
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("info");
@@ -210,6 +237,7 @@ describe("main.ts - Electron Main Process", () => {
             process.argv = ["node", "main.js"];
             (mockApp as any).isPackaged = true;
 
+            vi.resetModules();
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("warn");
@@ -230,6 +258,7 @@ describe("main.ts - Electron Main Process", () => {
                 "--log-prod",
             ];
 
+            vi.resetModules();
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("warn");
@@ -250,6 +279,7 @@ describe("main.ts - Electron Main Process", () => {
                 "--log-debug",
             ];
 
+            vi.resetModules();
             await import("../main");
 
             expect(mockLog.transports.file.level).toBe("debug");
@@ -270,6 +300,7 @@ describe("main.ts - Electron Main Process", () => {
                 "../services/application/ApplicationService"
             );
 
+            vi.resetModules();
             await import("../main");
 
             expect(ApplicationService).toHaveBeenCalledTimes(1);
@@ -288,6 +319,7 @@ describe("main.ts - Electron Main Process", () => {
 
             const processOnSpy = vi.spyOn(process, "on");
 
+            vi.resetModules();
             await import("../main");
 
             expect(processOnSpy).toHaveBeenCalledWith(
@@ -341,6 +373,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
+            vi.resetModules();
             mockApplicationService.cleanup.mockRejectedValue(
                 new Error("Cleanup failed")
             );
@@ -378,6 +411,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            vi.resetModules();
             mockIsDev.mockReturnValue(true);
 
             await import("../main");
@@ -414,6 +448,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            vi.resetModules();
             mockIsDev.mockReturnValue(false);
 
             await import("../main");
@@ -434,6 +469,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
+            vi.resetModules();
             mockIsDev.mockReturnValue(true);
             mockInstallExtension.mockRejectedValue(
                 new Error("Extension installation failed")
@@ -462,6 +498,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            vi.resetModules();
             mockIsDev.mockReturnValue(true);
             const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
 
@@ -484,6 +521,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Initialization", "type");
 
+            vi.resetModules();
             // Test with Electron environment
             Object.defineProperty(process, "versions", {
                 value: { ...originalVersions, electron: "25.0.0" },
@@ -506,6 +544,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Initialization", "type");
 
+            vi.resetModules();
             // Test without Electron environment
             Object.defineProperty(process, "versions", {
                 value: { ...originalVersions },
@@ -532,6 +571,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            vi.resetModules();
             (mockApplicationService as any).cleanup = undefined;
             const processOnSpy = vi.spyOn(process, "on");
 
@@ -555,6 +595,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            vi.resetModules();
             const { ApplicationService } = await import(
                 "../services/application/ApplicationService"
             );
@@ -584,6 +625,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            vi.resetModules();
             await import("../main");
 
             expect(mockLog.transports.file.fileName).toBe(
@@ -603,6 +645,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            vi.resetModules();
             await import("../main");
 
             expect(mockLog.transports.console.format).toBe(

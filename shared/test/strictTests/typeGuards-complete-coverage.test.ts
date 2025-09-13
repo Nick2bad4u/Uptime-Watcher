@@ -25,7 +25,19 @@ import {
     isValidTimestamp,
 } from "@shared/utils/typeGuards";
 
+// Fixed timestamp for consistent testing
+const FIXED_NOW = 1_672_531_200_000; // Jan 1, 2023
+
 describe("TypeGuards - Complete Function Coverage", () => {
+    beforeEach(() => {
+        // Mock Date.now() using spy to avoid breaking constructor
+        vi.spyOn(Date, "now").mockReturnValue(FIXED_NOW);
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
     describe(isObject, () => {
         it("should return true for plain objects", async ({
             task,
@@ -1059,17 +1071,9 @@ describe("TypeGuards - Complete Function Coverage", () => {
     });
 
     describe(isValidTimestamp, () => {
-        const now = Date.now();
+        // Use the same fixed timestamp that's mocked globally
+        const now = FIXED_NOW; // Jan 1, 2023
         const oneDayInMs = 86_400_000;
-
-        beforeAll(() => {
-            // Mock Date.now to ensure consistent test results
-            vi.spyOn(Date, "now").mockReturnValue(now);
-        });
-
-        afterAll(() => {
-            vi.restoreAllMocks();
-        });
 
         it("should return true for valid timestamps", async ({
             task,

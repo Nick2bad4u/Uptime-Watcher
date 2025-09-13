@@ -47,6 +47,7 @@ vi.mock("../utils/logger", () => ({
 }));
 
 vi.mock("electron-log/main", () => ({ default: mockLog }));
+vi.mock("electron-debug", () => ({ default: vi.fn() }));
 vi.mock("electron-devtools-installer", () => ({
     installExtension: mockInstallExtension,
     REACT_DEVELOPER_TOOLS: "react-devtools",
@@ -55,13 +56,21 @@ vi.mock("electron-devtools-installer", () => ({
 vi.mock("../electronUtils", () => ({ isDev: mockIsDev }));
 
 // Mock electron module
-vi.mock("electron", () => ({
-    app: mockApp,
-    BrowserWindow: vi.fn(),
-    Menu: { setApplicationMenu: vi.fn() },
-    shell: { openExternal: vi.fn() },
-    nativeTheme: { themeSource: "system" },
-}));
+vi.mock("electron", () => {
+    const mockElectron = {
+        app: mockApp,
+        BrowserWindow: vi.fn(),
+        Menu: { setApplicationMenu: vi.fn() },
+        shell: { openExternal: vi.fn() },
+        nativeTheme: { themeSource: "system" },
+    };
+
+    // Support both named imports and default import
+    return {
+        default: mockElectron,
+        ...mockElectron,
+    };
+});
 
 // Mock the application service to prevent actual initialization
 vi.mock("../services/application/ApplicationService", () => ({
@@ -109,6 +118,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            vi.resetModules();
             process.argv = [
                 "node",
                 "main.js",
@@ -133,6 +143,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            vi.resetModules();
             process.argv = [
                 "node",
                 "main.js",
@@ -160,6 +171,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            vi.resetModules();
             process.argv = [
                 "node",
                 "main.js",
@@ -184,6 +196,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            vi.resetModules();
             process.argv = [
                 "node",
                 "main.js",
@@ -211,6 +224,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            vi.resetModules();
             process.argv = [
                 "node",
                 "main.js",
@@ -241,6 +255,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Data Loading", "type");
 
+            vi.resetModules();
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
@@ -263,6 +278,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
+            vi.resetModules();
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
@@ -290,6 +306,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            vi.resetModules();
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
@@ -311,6 +328,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Initialization", "type");
 
+            vi.resetModules();
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
@@ -330,6 +348,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Event Processing", "type");
 
+            vi.resetModules();
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",

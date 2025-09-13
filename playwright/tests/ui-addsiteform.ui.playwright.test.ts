@@ -445,7 +445,7 @@ test.describe(
                 const inputsWithLabels = window.locator(
                     "input[aria-label], input[aria-labelledby]"
                 );
-                /* eslint-disable-next-line playwright/no-raw-locators */
+                 
                 const inputsWithPlaceholders =
                     /* eslint-disable-next-line playwright/no-raw-locators */
                     window.locator("input[placeholder]");

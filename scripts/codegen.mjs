@@ -17,6 +17,12 @@
 
 import { spawn } from "node:child_process";
 import { _electron as electron } from "playwright";
+import { existsSync } from "node:fs";
+import path from "node:path";
+
+// Will be loaded dynamically in main()
+/** @type {function(string): string|undefined} */
+let applyLintCompliantTransforms;
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -220,6 +226,31 @@ function runCodegen(cmd) {
 }
 
 async function main() {
+    // Load custom transformations
+    try {
+        // Get current directory safely for ESM
+        const currentDir = new URL(".", import.meta.url).pathname;
+        const templatePath = path.join(
+            currentDir,
+            "..",
+            "playwright",
+            "codegen-template.mjs"
+        );
+        if (existsSync(templatePath)) {
+            const transformModule = await import(templatePath);
+            applyLintCompliantTransforms =
+                transformModule.applyLintCompliantTransforms;
+            console.log("✅ Loaded lint-compliant transform functions");
+        }
+    } catch (error) {
+        console.warn(
+            "⚠️ Could not load transform functions:",
+            error instanceof Error ? error.message : String(error)
+        );
+        /** @param {string} code */
+        applyLintCompliantTransforms = (code) => code; // Fallback function
+    }
+
     if (options.help) {
         showHelp();
     }
@@ -271,6 +302,18 @@ async function main() {
             const target = await startDevServer();
             const cmd = buildCodegenCommand(target, options);
             runCodegen(cmd);
+            console.log(
+                "\n💡 Post-processing tip: If you save generated tests with --output,"
+            );
+            console.log(
+                "   you can manually apply transforms using applyLintCompliantTransforms()"
+            );
+            console.log(
+                "   from the loaded template to make them lint-compliant."
+            );
+            console.log(
+                `   Transform function loaded: ${typeof applyLintCompliantTransforms === "function" ? "✅" : "❌"}`
+            );
         }
     } catch (error) {
         console.error(

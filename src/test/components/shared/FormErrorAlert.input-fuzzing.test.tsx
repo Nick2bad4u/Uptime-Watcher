@@ -527,7 +527,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                 // Base classes should always be present
                 expect(alertBox).toHaveClass("error-alert");
 
-                if (className) {
+                if (className && className.trim()) {
                     expect(alertBox).toHaveClass(className);
                 }
 

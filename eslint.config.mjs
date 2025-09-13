@@ -8213,13 +8213,42 @@ export default [
         ],
         name: "Playwright E2E Tests - playwright/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         ...playwright.configs["flat/recommended"],
+        languageOptions: {
+            globals: {
+                ...globals.node,
+                ...vitest.environments.env.globals,
+                __dirname: "readonly",
+                __filename: "readonly",
+                Buffer: "readonly",
+                global: "readonly",
+                module: "readonly",
+                process: "readonly",
+                require: "readonly",
+            },
+            parser: tseslintParser,
+            parserOptions: {
+                ecmaFeatures: {
+                    jsx: true,
+                },
+                ecmaVersion: "latest",
+                jsDocParsingMode: "all",
+                project: "playwright/tsconfig.json",
+                sourceType: "module",
+                tsconfigRootDir: path.resolve(import.meta.dirname),
+                warnOnUnsupportedTypeScriptVersion: true,
+            },
+        },
         plugins: {
             ...playwright.configs["flat/recommended"].plugins,
             "@typescript-eslint": tseslint,
             playwright: playwright,
+            "testing-library": pluginTestingLibrary,
+            vitest: vitest,
         },
         rules: {
             ...playwright.configs["flat/recommended"].rules,
+            ...pluginTestingLibrary.configs["flat/dom"].rules,
+
             // TypeScript and testing-specific overrides for Playwright
             "@typescript-eslint/no-unused-vars": [
                 "error",
@@ -8239,11 +8268,11 @@ export default [
                 "error",
                 { max: 10 },
             ],
-
             "playwright/max-nested-describe": [
                 "error",
                 { max: 4 },
             ],
+
             "playwright/missing-playwright-await": "error",
             "playwright/no-commented-out-tests": "warn",
             // Conditional logic in tests is usually an indication that a test is attempting to cover too much, and not testing the logic it intends to. Each branch of code executing within a conditional statement will usually be better served by a test devoted to it.
@@ -8294,8 +8323,9 @@ export default [
             "playwright/require-top-level-describe": "warn",
             "playwright/valid-expect": "error",
             "playwright/valid-title": "error",
-
             "prefer-arrow-callback": "off", // Test functions don't need arrow syntax
+
+            "testing-library/prefer-screen-queries": "off", // Allow destructuring from render result
 
             "unicorn/consistent-function-scoping": "off", // Test helpers
             "unicorn/no-await-expression-member": "off", // Common in Playwright

@@ -9,7 +9,7 @@ import type { FullConfig } from "@playwright/test";
 import { execSync } from "node:child_process";
 import path from "node:path";
 
-async function globalSetup(config: FullConfig): Promise<void> {
+async function globalSetup(_config: FullConfig): Promise<void> {
     console.log("🔧 Setting up Playwright Electron tests...");
 
     // Ensure the Electron app is built
@@ -17,23 +17,23 @@ async function globalSetup(config: FullConfig): Promise<void> {
         console.log("📦 Building Electron app...");
         execSync("npm run build:electron-main", {
             stdio: "inherit",
-            cwd: path.resolve(import.meta.dirname, "../.."),
+            cwd: path.resolve(__dirname, "../.."),
         });
         console.log("✅ Electron app built successfully");
     } catch (error) {
-        console.error("❌ Failed to build Electron app:", error);
+        console.error(
+            "❌ Failed to build Electron app:",
+            (error as Error).message
+        );
         throw error;
     }
 
     // Verify that the main process file exists
-    const mainPath = path.resolve(
-        import.meta.dirname,
-        "../../dist-electron/main.js"
-    );
+    const mainPath = path.resolve(__dirname, "../../dist-electron/main.js");
     try {
         await import("node:fs/promises").then((fs) => fs.access(mainPath));
         console.log("✅ Main process file found at:", mainPath);
-    } catch (error) {
+    } catch {
         console.error("❌ Main process file not found at:", mainPath);
         throw new Error(
             `Main process file not found. Expected at: ${mainPath}`
