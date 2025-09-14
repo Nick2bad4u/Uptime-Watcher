@@ -48,11 +48,10 @@ const handleCopyCode = (() => {
         if (
             typeof window !== "undefined" &&
             "navigator" in window &&
-            // eslint-disable-next-line n/no-unsupported-features/node-builtins, @typescript-eslint/no-unnecessary-condition -- Browser API access requires runtime checks
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Browser API access requires runtime checks
             window.navigator.clipboard
         ) {
             try {
-                // eslint-disable-next-line n/no-unsupported-features/node-builtins -- Browser clipboard API is required for copy functionality
                 await window.navigator.clipboard.writeText(code);
                 // Simple feedback
                 const button = document.activeElement;

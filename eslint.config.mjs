@@ -1907,8 +1907,45 @@ export default [
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
+            "n/no-unpublished-import": [
+                "warn",
+                {
+                    allowModules: [
+                        "electron",
+                        "node",
+                        "electron-devtools-installer",
+                        "index.css",
+                        "styles.css",
+                        "main.css",
+                        "header.css",
+                        "footer.css",
+                        "SiteDetails.css",
+                    ],
+                },
+            ],
             "n/no-top-level-await": "warn",
-            "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
+            "n/no-unsupported-features/es-builtins": [
+                "warn",
+                {
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
+            "n/no-unsupported-features/es-syntax": [
+                "warn",
+                {
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
+            "n/no-unsupported-features/node-builtins": [
+                "warn",
+                {
+                    allowExperimental: true,
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
             "n/prefer-global/buffer": "warn",
             "n/prefer-global/console": "warn",
             "n/prefer-global/process": "warn",
@@ -3158,8 +3195,45 @@ export default [
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
+            "n/no-unpublished-import": [
+                "warn",
+                {
+                    allowModules: [
+                        "electron",
+                        "node",
+                        "electron-devtools-installer",
+                        "index.css",
+                        "styles.css",
+                        "main.css",
+                        "header.css",
+                        "footer.css",
+                        "SiteDetails.css",
+                    ],
+                },
+            ],
             "n/no-top-level-await": "warn",
-            "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
+            "n/no-unsupported-features/es-builtins": [
+                "warn",
+                {
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
+            "n/no-unsupported-features/es-syntax": [
+                "warn",
+                {
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
+            "n/no-unsupported-features/node-builtins": [
+                "warn",
+                {
+                    allowExperimental: true,
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
             "n/prefer-global/buffer": "warn",
             "n/prefer-global/console": "warn",
             "n/prefer-global/process": "warn",
@@ -4633,8 +4707,45 @@ export default [
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
+            "n/no-unpublished-import": [
+                "warn",
+                {
+                    allowModules: [
+                        "electron",
+                        "node",
+                        "electron-devtools-installer",
+                        "index.css",
+                        "styles.css",
+                        "main.css",
+                        "header.css",
+                        "footer.css",
+                        "SiteDetails.css",
+                    ],
+                },
+            ],
             "n/no-top-level-await": "warn",
-            "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
+            "n/no-unsupported-features/es-builtins": [
+                "warn",
+                {
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
+            "n/no-unsupported-features/es-syntax": [
+                "warn",
+                {
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
+            "n/no-unsupported-features/node-builtins": [
+                "warn",
+                {
+                    allowExperimental: true,
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
             "n/prefer-global/buffer": "warn",
             "n/prefer-global/console": "warn",
             "n/prefer-global/process": "warn",
@@ -5864,8 +5975,45 @@ export default [
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
+            "n/no-unpublished-import": [
+                "warn",
+                {
+                    allowModules: [
+                        "electron",
+                        "node",
+                        "electron-devtools-installer",
+                        "index.css",
+                        "styles.css",
+                        "main.css",
+                        "header.css",
+                        "footer.css",
+                        "SiteDetails.css",
+                    ],
+                },
+            ],
             "n/no-top-level-await": "warn",
-            "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
+            "n/no-unsupported-features/es-builtins": [
+                "warn",
+                {
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
+            "n/no-unsupported-features/es-syntax": [
+                "warn",
+                {
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
+            "n/no-unsupported-features/node-builtins": [
+                "warn",
+                {
+                    allowExperimental: true,
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
             "n/prefer-global/buffer": "warn",
             "n/prefer-global/console": "warn",
             "n/prefer-global/process": "warn",
@@ -7670,9 +7818,44 @@ export default [
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
-            "n/no-top-level-await": "warn",
-            "n/no-unpublished-import": "off",
-            "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
+            "n/no-unpublished-import": [
+                "warn",
+                {
+                    allowModules: [
+                        "electron",
+                        "node",
+                        "electron-devtools-installer",
+                        "index.css",
+                        "styles.css",
+                        "main.css",
+                        "header.css",
+                        "footer.css",
+                        "SiteDetails.css",
+                    ],
+                },
+            ],
+            "n/no-unsupported-features/es-builtins": [
+                "warn",
+                {
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
+            "n/no-unsupported-features/es-syntax": [
+                "warn",
+                {
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
+            "n/no-unsupported-features/node-builtins": [
+                "warn",
+                {
+                    allowExperimental: true,
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
             "n/prefer-global/buffer": "warn",
             "n/prefer-global/console": "warn",
             "n/prefer-global/process": "warn",

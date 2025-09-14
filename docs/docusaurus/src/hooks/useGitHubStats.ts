@@ -54,7 +54,6 @@ export function useGitHubStats(): UseGitHubStatsReturn {
     useEffect(function fetchGitHubStatsEffect(): void {
         const fetchStats = async (): Promise<void> => {
             try {
-                // eslint-disable-next-line n/no-unsupported-features/node-builtins -- We use ES2024
                 const response = await fetch(
                     "https://api.github.com/repos/Nick2bad4u/Uptime-Watcher"
                 );
@@ -95,7 +94,7 @@ export function usePackageVersion(): UsePackageVersionReturn {
         const fetchVersion = async (): Promise<void> => {
             try {
                 // Try to fetch package.json from the repository
-                // eslint-disable-next-line n/no-unsupported-features/node-builtins -- We use ES2024
+
                 const response = await fetch(
                     "https://raw.githubusercontent.com/Nick2bad4u/Uptime-Watcher/main/package.json"
                 );
