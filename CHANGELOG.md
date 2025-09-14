@@ -7,14 +7,51 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[d156328](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d1563289da78595bd4f4cbdf771bf45e8d5972a7)...
+[d156328](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d1563289da78595bd4f4cbdf771bf45e8d5972a7)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d1563289da78595bd4f4cbdf771bf45e8d5972a7...d1563289da78595bd4f4cbdf771bf45e8d5972a7))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 14.8.0 [`(d156328)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d1563289da78595bd4f4cbdf771bf45e8d5972a7)
+
+
+
+
+
+
+## [14.8.0] - 2025-09-14
+
+
 [[8a80089](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a8008980dc36f536a7d0373b0cd94dcf04232c0)...
-[8a80089](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a8008980dc36f536a7d0373b0cd94dcf04232c0)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/8a8008980dc36f536a7d0373b0cd94dcf04232c0...8a8008980dc36f536a7d0373b0cd94dcf04232c0))
+[7b94508](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b94508b00f9c6869f0b75c2cb4b01e5ad9357d4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/8a8008980dc36f536a7d0373b0cd94dcf04232c0...7b94508b00f9c6869f0b75c2cb4b01e5ad9357d4))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 14.7.0 [`(8a80089)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a8008980dc36f536a7d0373b0cd94dcf04232c0)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Improve store, service, and component coverage
+
+- Adds critical coverage test suites for store functions, service error handling, and edge cases in hooks and components
+- Targets previously uncovered logic, invalid states, and boundary conditions to raise overall coverage
+- Updates workflows for stricter concurrency control and output auditing
+- Refines Playwright and Stryker testing logic for reliability and reporting
+- Adjusts coverage and build config for more accurate reporting and exclusion of interface-only files
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7b94508)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b94508b00f9c6869f0b75c2cb4b01e5ad9357d4)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v14.7.0 [skip ci] [`(03dae1b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/03dae1b23741dd3fc32f69e2255f3b029baa1a7d)
 
 
 
