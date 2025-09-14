@@ -3196,7 +3196,7 @@ export default [
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
             "n/no-unpublished-import": [
-                "warn",
+                "off",
                 {
                     allowModules: [
                         "electron",
@@ -7497,7 +7497,6 @@ export default [
             compat: pluginCompat,
             css: css,
             depend: depend,
-
             ex: ex,
             functional: pluginFunctional,
             "import-x": importX,
@@ -7819,10 +7818,10 @@ export default [
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
             "n/no-unpublished-import": [
-                "warn",
+                "off",
                 {
                     allowModules: [
-                        "electron",
+                        "electron",d
                         "node",
                         "electron-devtools-installer",
                         "index.css",
