@@ -177,6 +177,7 @@ const ThemedInputComponent = ({
             aria-describedby={ariaDescribedBy}
             aria-label={ariaLabel}
             className={`themed-input ${className}`}
+            data-testid={id ? `input-${id}` : undefined}
             disabled={disabled}
             id={id}
             max={max}

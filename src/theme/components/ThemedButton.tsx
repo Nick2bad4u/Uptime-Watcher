@@ -200,6 +200,11 @@ const ThemedButtonComponent = ({
         <button
             aria-label={ariaLabel}
             className={classNames}
+            data-testid={
+                ariaLabel
+                    ? `button-${ariaLabel.toLowerCase().replace(/\s+/g, "-")}`
+                    : undefined
+            }
             disabled={disabled || loading}
             onClick={handleClick}
             style={style}

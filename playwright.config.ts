@@ -98,6 +98,11 @@ const config: PlaywrightTestConfig = defineConfig({
                 "**/component-ui-comprehensive.playwright.test.ts",
                 "**/accessibility-performance.playwright.test.ts",
                 "**/edge-cases-error-handling.playwright.test.ts",
+                "**/comprehensive-navigation-structure.playwright.test.ts",
+                "**/advanced-accessibility-wcag.playwright.test.ts",
+                "**/performance-memory-benchmarks.playwright.test.ts",
+                "**/cross-browser-compatibility.playwright.test.ts",
+                "**/comprehensive-integration.playwright.test.ts",
             ],
             use: {
                 ...devices["Desktop Chrome"],

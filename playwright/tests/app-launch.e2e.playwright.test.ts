@@ -74,13 +74,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
+                const electronApp = await launchElectronApp();
 
                 // Wait for the first window to be created
                 const window = await electronApp.firstWindow();
@@ -120,13 +114,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
+                const electronApp = await launchElectronApp();
 
                 // Get app name and version
                 const appName = await electronApp.evaluate(async ({ app }) => {
@@ -165,13 +153,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
+                const electronApp = await launchElectronApp();
 
                 // Check if app is ready
                 const isReady = await electronApp.evaluate(async ({ app }) => {

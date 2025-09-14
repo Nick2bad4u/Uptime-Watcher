@@ -345,6 +345,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         return (
             <ThemedBox
                 className="mx-auto max-w-md"
+                data-testid="add-site-form-container"
                 padding="lg"
                 rounded="lg"
                 surface="base"
@@ -352,6 +353,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 <form
                     aria-label="Add Site Form"
                     className="space-y-4"
+                    data-testid="add-site-form"
                     onSubmit={handleFormSubmit}
                 >
                     {/* Add mode toggle */}

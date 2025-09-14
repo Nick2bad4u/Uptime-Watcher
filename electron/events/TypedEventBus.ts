@@ -257,7 +257,23 @@ export class TypedEventBus<
                 timestamp: Date.now(),
             });
 
-            this.emit(eventName, enhancedData);
+            // Use resilient listener notification (catches and logs listener errors)
+            const listeners = this.listeners(eventName);
+            for (const listener of listeners) {
+                try {
+                    if (typeof listener === "function") {
+                        listener(enhancedData);
+                    }
+                } catch (listenerError) {
+                    // Log listener errors but don't let them fail the emission
+                    // Use base logger directly for error objects since
+                    // template logger doesn't support error objects
+                    baseLogger.error(
+                        `[TypedEventBus:${this.busId}] Listener error for '${eventName}' [${correlationId}]`,
+                        listenerError
+                    );
+                }
+            }
 
             logger.debug(LOG_TEMPLATES.debug.EVENT_BUS_EMISSION_SUCCESS, {
                 busId: this.busId,
