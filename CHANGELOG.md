@@ -7,14 +7,51 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[d5cbc45](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d5cbc4514de9feeef687d766cad0895d30c5708e)...
+[d5cbc45](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d5cbc4514de9feeef687d766cad0895d30c5708e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d5cbc4514de9feeef687d766cad0895d30c5708e...d5cbc4514de9feeef687d766cad0895d30c5708e))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 14.9.0 [`(d5cbc45)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d5cbc4514de9feeef687d766cad0895d30c5708e)
+
+
+
+
+
+
+## [14.9.0] - 2025-09-14
+
+
 [[d156328](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d1563289da78595bd4f4cbdf771bf45e8d5972a7)...
-[d156328](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d1563289da78595bd4f4cbdf771bf45e8d5972a7)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d1563289da78595bd4f4cbdf771bf45e8d5972a7...d1563289da78595bd4f4cbdf771bf45e8d5972a7))
+[321d872](https://github.com/Nick2bad4u/Uptime-Watcher/commit/321d872e8cf34bb7ee60c22bf1858e7a69a99fd7)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d1563289da78595bd4f4cbdf771bf45e8d5972a7...321d872e8cf34bb7ee60c22bf1858e7a69a99fd7))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 14.8.0 [`(d156328)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d1563289da78595bd4f4cbdf771bf45e8d5972a7)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v14.8.0 [skip ci] [`(a15e1d2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a15e1d238f62221782227fa5e08d9d19e15f70a1)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies and Node requirements for ES2024+
+
+- Upgrades major and minor dependencies for better compatibility with Node.js 24+ and latest ecosystem standards, including axios, joi, jsdom, type-fest, tough-cookie, eslint-plugin-n, and related packages.
+- Adjusts .gitignore to support React Native and new cache files, improving cross-platform development workflows.
+- Refines ESLint configuration to enforce support for ES2024 features and Node.js 24+, increasing code quality and future-proofing.
+- Updates build scripts to use TypeScript project references and removes redundant cleaning steps for faster and safer builds.
+- Cleans up unnecessary ESLint disable comments where modern Node.js resolves compatibility issues.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(321d872)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/321d872e8cf34bb7ee60c22bf1858e7a69a99fd7)
 
 
 
