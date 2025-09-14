@@ -1,11 +1,11 @@
 name: Playwright Tests
+
 on:
     push:
         branches: [main, master]
     pull_request:
         branches: [main, master]
 
-# Permissions required for test execution and artifact upload
 permissions:
     contents: read
 
@@ -15,36 +15,87 @@ concurrency:
 
 jobs:
     test:
+        name: Playwright E2E Tests (Windows)
+        runs-on: windows-latest
         timeout-minutes: 60
-        runs-on: ubuntu-latest
+
         steps:
+            # Harden the runner (audit all outbound calls)
             - name: Harden the runner (Audit all outbound calls)
               uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
               with:
                   egress-policy: audit
 
-            - uses: actions/checkout@v5
-            - uses: actions/setup-node@v5
+            - name: Checkout repository
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
-                  node-version: lts/*
+                  fetch-depth: 0
+
+            - name: Setup Node.js
+              uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+              with:
+                  node-version: "20"
+                  cache: "npm"
+
+            - name: Cache NPM
+              uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+              with:
+                  path: ~/.npm
+                  key: npm-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      npm-
+                      npm-${{ hashFiles('**/package.json') }}
+
+            # Install dependencies (robust error handling for package-lock.json and npm presence)
+            # This PowerShell script checks for npm, then installs dependencies using 'npm ci' if package-lock.json exists, otherwise 'npm install' if only package.json is present. Errors if neither file is found.
             - name: Install dependencies
-              run: npm ci
+              run: |
+                  if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
+                    Write-Error "npm is not installed or not found in PATH."
+                    exit 1
+                  }
+                  if (Test-Path "package-lock.json") {
+                    npm ci
+                  } elseif (Test-Path "package.json") {
+                    npm install
+                  } else {
+                    Write-Error "Neither package-lock.json nor package.json found. Cannot install dependencies."
+                    exit 1
+                  }
+              shell: pwsh
+
+            # Build TypeScript
             - name: Build TypeScript
               run: npm run build
-            - name: Install Playwright Browsers
-              run: npx playwright install --with-deps
+              shell: pwsh
+
+            # Install Playwright Chromium browser only (Windows compatible)
+            - name: Install Playwright Chromium Browser
+              run: npx playwright install chromium
+              shell: pwsh
+
+            # Run Playwright tests (Windows, Electron sandbox fix)
             - name: Run Playwright tests
               run: npx playwright test
+              shell: pwsh
+              # Electron sandbox must be disabled for Playwright tests on Windows due to Electron's sandboxing incompatibility with Windows runners.
+              # PLAYWRIGHT_CHROMIUM_ARGS disables Chromium sandboxing for compatibility with Windows runners and Electron.
+              # This ensures Playwright tests run reliably in CI environments where sandboxing is not supported.
+              # For traceability, see 'playwright.config.ts', section: 'use: { ...chromium launchOptions... }', where PLAYWRIGHT_CHROMIUM_ARGS is read and applied.
               env:
-                  # Fix for Electron sandbox issues in GitHub Actions CI environment
-                  # The Chrome sandbox cannot be properly configured in CI containers
-                  # These environment variables disable sandbox requirements
-                  ELECTRON_DISABLE_SANDBOX: 1
-                  # Additional Chromium args for Playwright browser tests
+                  ELECTRON_DISABLE_SANDBOX: "1"
                   PLAYWRIGHT_CHROMIUM_ARGS: "--no-sandbox --disable-setuid-sandbox"
-            - uses: actions/upload-artifact@v4
+                  # TSDoc: PLAYWRIGHT_CHROMIUM_ARGS is set for Chromium sandbox compatibility on Windows/Electron CI runners.
+                  # Ensure your Playwright config (playwright.config.ts) reads this variable and passes its value to the Chromium launch args.
+                  # See playwright.config.ts, section 'use: { ...chromium launchOptions... }', for implementation details.
+
+            # Upload Playwright HTML report as artifact
+            # TSDoc: Artifact retention policy is set to 7 days to minimize storage costs.
+            # For organization-wide consistency, document and update artifact retention policy in your repository’s CI/CD guidelines.
+            - name: Upload Playwright report
               if: ${{ !cancelled() }}
+              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
               with:
                   name: playwright-report
                   path: playwright-report/
-                  retention-days: 30
+                  retention-days: 7 # Reduced retention to minimize storage costs; see CI/CD guidelines for org policy

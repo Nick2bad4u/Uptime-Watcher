@@ -39,9 +39,13 @@ const config: PlaywrightTestConfig = defineConfig({
 
     forbidOnly: Boolean(process.env["CI"]), // Prevent test.only in CI
     // Test execution configuration
-    fullyParallel: false, // Disable for Electron stability
-
-    // Global setup and teardown with TypeScript
+    /**
+     * Global setup and teardown scripts for Playwright. These scripts run
+     * before all tests (setup) and after all tests (teardown). Used for
+     * initializing and cleaning up test environments, such as starting/stopping
+     * Electron, seeding databases, etc. See:
+     * https://playwright.dev/docs/test-global-setup-teardown
+     */
     globalSetup: require.resolve("./playwright/fixtures/global-setup.ts"),
     globalTeardown: require.resolve("./playwright/fixtures/global-teardown.ts"),
     // Output and artifacts configuration
@@ -51,6 +55,7 @@ const config: PlaywrightTestConfig = defineConfig({
         {
             name: "electron-main",
             testMatch: "**/main-process.*.playwright.test.ts",
+            fullyParallel: false, // Electron stability
             use: {
                 ...devices["Desktop Chrome"],
                 // Main process specific configuration
@@ -59,6 +64,7 @@ const config: PlaywrightTestConfig = defineConfig({
         {
             name: "electron-renderer",
             testMatch: "**/renderer-process.*.playwright.test.ts",
+            fullyParallel: false, // Electron stability
             use: {
                 ...devices["Desktop Chrome"],
                 // Renderer process specific configuration
@@ -67,6 +73,7 @@ const config: PlaywrightTestConfig = defineConfig({
         {
             name: "electron-e2e",
             testMatch: "**/app-launch.*.playwright.test.ts",
+            fullyParallel: false, // Electron stability
             use: {
                 ...devices["Desktop Chrome"],
                 // E2E specific configuration
@@ -75,6 +82,7 @@ const config: PlaywrightTestConfig = defineConfig({
         {
             name: "ui-tests",
             testMatch: "**/ui-*.playwright.test.ts",
+            fullyParallel: true, // Safe to run UI tests in parallel
             use: {
                 ...devices["Desktop Chrome"],
                 // UI testing specific configuration
@@ -84,9 +92,9 @@ const config: PlaywrightTestConfig = defineConfig({
         {
             name: "comprehensive-e2e",
             testMatch: "**/e2e-*.e2e.playwright.test.ts",
+            fullyParallel: false, // Electron stability
             use: {
                 ...devices["Desktop Chrome"],
-                headless: false, // Run in headed mode for better debugging
                 // Comprehensive E2E testing configuration
                 viewport: { height: 1080, width: 1920 },
             },
@@ -104,9 +112,9 @@ const config: PlaywrightTestConfig = defineConfig({
                 "**/cross-browser-compatibility.playwright.test.ts",
                 "**/comprehensive-integration.playwright.test.ts",
             ],
+            fullyParallel: true, // Enable parallelism for non-Electron comprehensive tests
             use: {
                 ...devices["Desktop Chrome"],
-                headless: false, // Run in headed mode for better debugging
                 // Comprehensive testing configuration
                 viewport: { height: 1080, width: 1920 },
             },
@@ -172,7 +180,12 @@ const config: PlaywrightTestConfig = defineConfig({
 
     // Global test configuration
     use: {
+        /**
+         * Allow file downloads in tests. Electron apps may trigger downloads
+         * for logs, exports, etc.
+         */
         acceptDownloads: true,
+
         // Action timeouts
         actionTimeout: 10 * 1000, // 10 seconds for actions
 
@@ -182,10 +195,15 @@ const config: PlaywrightTestConfig = defineConfig({
         /**
          * @remarks
          * Electron's automated testing is most reliable with Chromium-based
-         * browsers. browsers. The "chrome" channel ensures compatibility with
-         * Electron's underlying Chromium engine, providing consistent results
-         * and access to Electron-specific APIs during testing. See: See:
-         * https://www.electronjs.org/docs/latest/tutorial/automated-testing#using-playwright
+         * browsers. The "chrome" channel ensures compatibility with Electron's
+         * underlying Chromium engine, providing consistent results and access
+         * to Electron-specific APIs during testing.
+         *
+         * @note
+         * The 'headless' mode is set globally based on the CI environment.
+         * Individual projects do NOT override this setting for consistency.
+         * If you need to run headed locally, set CI=false in your environment.
+         * See: https://www.electronjs.org/docs/latest/tutorial/automated-testing#using-playwright
          */
         channel: "chrome",
         colorScheme: "dark",
@@ -194,8 +212,16 @@ const config: PlaywrightTestConfig = defineConfig({
 
         ignoreHTTPSErrors: true,
 
+        /**
+         * Ensure JavaScript is enabled for all Electron renderer tests.
+         * Electron apps rely on JS for UI and logic.
+         */
         javaScriptEnabled: true,
 
+        /**
+         * Set locale for consistent UI rendering and i18n tests. Electron apps
+         * may display locale-dependent content.
+         */
         locale: "en-US",
 
         navigationTimeout: 30 * 1000, // 30 seconds for navigation
