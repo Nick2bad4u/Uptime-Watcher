@@ -1,5 +1,10 @@
 name: Codacy Coverage Reporter
 
+# Prevent multiple coverage runs from conflicting
+concurrency:
+    group: codacy-coverage-${{ github.ref }}
+    cancel-in-progress: true
+
 on:
     push:
         branches:

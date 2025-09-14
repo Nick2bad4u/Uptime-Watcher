@@ -654,15 +654,23 @@ describe("Electron Preload Script", () => {
                 "purpose"
             );
 
+            // Mock the IPC response with valid backup response format
+            const mockBackupResponse = {
+                buffer: new ArrayBuffer(1024),
+                fileName: "backup_test.db",
+            };
+            mockIpcRenderer.invoke.mockResolvedValueOnce(mockBackupResponse);
+
             await import("../preload");
 
             const exposedAPI = getExposedAPI();
 
-            await exposedAPI.data.downloadSQLiteBackup();
+            const result = await exposedAPI.data.downloadSQLiteBackup();
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 "download-sqlite-backup"
             );
+            expect(result).toEqual(mockBackupResponse);
         });
     });
 

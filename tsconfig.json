@@ -132,6 +132,8 @@
         "src/App.tsx",
         "src/index.css",
         "src/types/global.d.ts",
+        "src/test/strictTests/**/*.ts",
+        "src/test/strictTests/**/*.tsx",
         "vite.config.ts",
         "vite/client",
         "vitest.config.ts",

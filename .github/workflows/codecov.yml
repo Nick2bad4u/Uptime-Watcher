@@ -1,11 +1,20 @@
 name: Run tests and upload coverage
 
+# Prevent multiple test runs from conflicting
+concurrency:
+    group: codecov-${{ github.ref }}
+    cancel-in-progress: true
+
 on:
     push:
         branches: [main]
     pull_request:
         branches: [main]
     workflow_dispatch:
+
+# Permissions required for test execution and coverage upload
+permissions:
+    contents: read
 
 jobs:
     test:

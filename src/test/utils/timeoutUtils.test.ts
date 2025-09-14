@@ -839,6 +839,7 @@ describe("Timeout Utilities", () => {
                 fc.float({
                     min: TIMEOUT_CONSTRAINTS.MIN,
                     max: Math.fround(TIMEOUT_CONSTRAINTS.MAX),
+                    noNaN: true,
                 }),
             ])(
                 "should handle fractional seconds within range",

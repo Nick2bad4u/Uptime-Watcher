@@ -100,13 +100,48 @@ jobs:
               shell: pwsh
               run: |
                   Write-Host "🧪 Running test suite to validate baseline..."
-                  npm test
-              continue-on-error: false # Fail the job if tests fail, as Stryker requires a passing suite
+                  try {
+                      npm test
+                      Write-Host "✅ All tests passed!"
+                      echo "tests_status=passed" >> $env:GITHUB_OUTPUT
+                  }
+                  catch {
+                      Write-Host "❌ Some tests failed!"
+                      Write-Host "Failed test output:"
+                      Write-Host $_.Exception.Message
+                      echo "tests_status=failed" >> $env:GITHUB_OUTPUT
+                      echo "test_error<<EOF" >> $env:GITHUB_OUTPUT
+                      echo $_.Exception.Message >> $env:GITHUB_OUTPUT
+                      echo "EOF" >> $env:GITHUB_OUTPUT
+                  }
+              continue-on-error: true # Continue to report failure details
+
+            - name: Report test failures
+              if: steps.run-tests.outputs.tests_status == 'failed'
+              shell: pwsh
+              run: |
+                  Write-Host "⚠️  Tests failed. Mutation testing cannot run on a failing test suite."
+                  Write-Host "Test failure details:"
+                  Write-Host "${{ steps.run-tests.outputs.test_error }}"
+                  Write-Host ""
+                  Write-Host "Please fix the failing tests before running mutation testing."
+
+                  # Create a summary for the workflow
+                  echo "## 🚨 Test Suite Failed" >> $env:GITHUB_STEP_SUMMARY
+                  echo "" >> $env:GITHUB_STEP_SUMMARY
+                  echo "Mutation testing was skipped because the test suite is failing." >> $env:GITHUB_STEP_SUMMARY
+                  echo "" >> $env:GITHUB_STEP_SUMMARY
+                  echo "### Test Errors:" >> $env:GITHUB_STEP_SUMMARY
+                  echo '```' >> $env:GITHUB_STEP_SUMMARY
+                  echo "${{ steps.run-tests.outputs.test_error }}" >> $env:GITHUB_STEP_SUMMARY
+                  echo '```' >> $env:GITHUB_STEP_SUMMARY
+                  echo "" >> $env:GITHUB_STEP_SUMMARY
+                  echo "Fix these test failures and re-run the workflow." >> $env:GITHUB_STEP_SUMMARY
 
             # MODIFIED: Conditionally run Stryker only if tests passed
             # Uses the output from the test step to skip if tests failed
             - name: Run Stryker mutation testing
-              if: steps.run-tests.outcome == 'success' # Only run if tests passed
+              if: steps.run-tests.outputs.tests_status == 'passed' # Only run if tests passed
               env:
                   # 🔑 Dashboard API Key - Set this as a repository secret
                   STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}

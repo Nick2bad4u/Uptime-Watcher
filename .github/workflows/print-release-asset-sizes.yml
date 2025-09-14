@@ -6,6 +6,11 @@ on:
         workflows: ["Build and Release Electron App"]
         types:
             - completed
+
+# Permissions required for accessing release assets
+permissions:
+    contents: read
+
 concurrency:
     group: assetsizes-${{ github.ref }}
     cancel-in-progress: false
@@ -13,6 +18,7 @@ concurrency:
 jobs:
     print-release-asset-sizes:
         runs-on: ubuntu-latest
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
         steps:
             - name: Harden the runner (Audit all outbound calls)
@@ -22,6 +28,21 @@ jobs:
 
             - name: Checkout repository
               uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+            - name: Wait for release to be available
+              run: |
+                  echo "Waiting 360 (6 minutes) seconds for release to be properly created..."
+                  sleep 360
+
+            - name: Check if releases exist
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  if ! gh release list --limit 1 > /dev/null 2>&1; then
+                    echo "No releases found, skipping asset size calculation"
+                    exit 0
+                  fi
+
             - name: Calculate and print release asset sizes
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

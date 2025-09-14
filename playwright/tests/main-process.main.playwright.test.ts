@@ -5,8 +5,7 @@
  * communication, and Electron APIs.
  */
 
-import { test, expect, _electron as electron } from "@playwright/test";
-import path from "node:path";
+import { test, expect } from "@playwright/test";
 import { launchElectronApp } from "../fixtures/electron-helpers";
 
 test.describe(
@@ -36,7 +35,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await launchElectronApp(electron);
+                const electronApp = await launchElectronApp();
 
                 // Test app module
                 const appPath = await electronApp.evaluate(async ({ app }) => {
@@ -79,7 +78,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await launchElectronApp(electron);
+                const electronApp = await launchElectronApp();
 
                 // Get the main window (not directly used but needed for proper window management)
                 await electronApp.firstWindow();
@@ -122,7 +121,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await launchElectronApp(electron);
+                const electronApp = await launchElectronApp();
 
                 // Test app ready state
                 const readyState = await electronApp.evaluate(
@@ -160,7 +159,7 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await launchElectronApp(electron);
+                const electronApp = await launchElectronApp();
 
                 // Get system information
                 const systemInfo = await electronApp.evaluate(

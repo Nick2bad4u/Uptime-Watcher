@@ -1,0 +1,311 @@
+/**
+ * Critical Priority Tests - Store Function Coverage
+ *
+ * This test file targets the useSitesStore.ts file which has 0% function
+ * coverage despite having 100% other metrics. We need to test the actual store
+ * creation and function composition.
+ */
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Site } from "@shared/types";
+import { useSitesStore } from "@app/stores/sites/useSitesStore";
+
+// Mock the electron API
+const mockElectronAPI = {
+    addSite: vi.fn(),
+    getSites: vi.fn(),
+    updateSite: vi.fn(),
+    deleteSite: vi.fn(),
+    addMonitorToSite: vi.fn(),
+    removeMonitorFromSite: vi.fn(),
+    updateMonitorTimeout: vi.fn(),
+    updateMonitorRetryAttempts: vi.fn(),
+    updateSiteCheckInterval: vi.fn(),
+    downloadSQLiteBackup: vi.fn(),
+    checkSiteNow: vi.fn(),
+    startSiteMonitoring: vi.fn(),
+    stopSiteMonitoring: vi.fn(),
+    startSiteMonitorMonitoring: vi.fn(),
+    stopSiteMonitorMonitoring: vi.fn(),
+    fullSyncFromBackend: vi.fn(),
+    syncSitesFromBackend: vi.fn(),
+    getSyncStatus: vi.fn(),
+    subscribeToSyncEvents: vi.fn(),
+    subscribeToStatusUpdates: vi.fn(),
+    unsubscribeFromStatusUpdates: vi.fn(),
+};
+
+// Mock the global electronAPI
+Object.defineProperty(global, "window", {
+    value: {
+        electronAPI: mockElectronAPI,
+    },
+    writable: true,
+});
+
+describe("useSitesStore Function Coverage Tests", () => {
+    beforeEach(() => {
+        // Reset all mocks
+        vi.clearAllMocks();
+
+        // Reset store state
+        const store = useSitesStore.getState();
+        store.setSites([]);
+        store.setSelectedSite(undefined);
+    });
+
+    describe("Store Creation and Composition", () => {
+        it("should create store with all required functions", () => {
+            const store = useSitesStore.getState();
+
+            // Verify all state functions exist
+            expect(typeof store.addSite).toBe("function");
+            expect(typeof store.removeSite).toBe("function");
+            expect(typeof store.modifySite).toBe("function");
+            expect(typeof store.setSites).toBe("function");
+            expect(typeof store.setSelectedSite).toBe("function");
+            expect(typeof store.getSelectedSite).toBe("function");
+            expect(typeof store.setSelectedMonitorId).toBe("function");
+            expect(typeof store.getSelectedMonitorId).toBe("function");
+
+            // Verify all operation functions exist
+            expect(typeof store.createSite).toBe("function");
+            expect(typeof store.deleteSite).toBe("function");
+            expect(typeof store.addMonitorToSite).toBe("function");
+            expect(typeof store.removeMonitorFromSite).toBe("function");
+            expect(typeof store.updateMonitorTimeout).toBe("function");
+            expect(typeof store.updateMonitorRetryAttempts).toBe("function");
+            expect(typeof store.updateSiteCheckInterval).toBe("function");
+            expect(typeof store.downloadSQLiteBackup).toBe("function");
+
+            // Verify all monitoring functions exist
+            expect(typeof store.checkSiteNow).toBe("function");
+            expect(typeof store.startSiteMonitoring).toBe("function");
+            expect(typeof store.stopSiteMonitoring).toBe("function");
+            expect(typeof store.startSiteMonitorMonitoring).toBe("function");
+            expect(typeof store.stopSiteMonitorMonitoring).toBe("function");
+
+            // Verify all sync functions exist
+            expect(typeof store.fullSyncFromBackend).toBe("function");
+            expect(typeof store.syncSitesFromBackend).toBe("function");
+            expect(typeof store.getSyncStatus).toBe("function");
+            expect(typeof store.subscribeToSyncEvents).toBe("function");
+
+            // Verify subscription functions exist
+            expect(typeof store.subscribeToStatusUpdates).toBe("function");
+            expect(typeof store.unsubscribeFromStatusUpdates).toBe("function");
+        });
+
+        it("should have initial state properties", () => {
+            const store = useSitesStore.getState();
+
+            expect(Array.isArray(store.sites)).toBeTruthy();
+            expect(store.sites).toHaveLength(0);
+            expect(store.selectedSiteId).toBeUndefined();
+            expect(typeof store.selectedMonitorIds).toBe("object");
+        });
+
+        it("should create shared functions correctly", () => {
+            const store = useSitesStore.getState();
+
+            // Test that getSites function works
+            const testSite: Site = {
+                identifier: "test-site",
+                name: "Test Site",
+                monitors: [],
+                monitoring: false,
+            };
+
+            store.addSite(testSite);
+            const sites = store.sites;
+            expect(sites).toHaveLength(1);
+            expect(sites[0]).toEqual(testSite);
+        });
+    });
+
+    describe("Function Integration Tests", () => {
+        it("should properly integrate state and operations", async () => {
+            const store = useSitesStore.getState();
+
+            // Mock successful site creation
+            mockElectronAPI.addSite.mockResolvedValueOnce(undefined);
+            mockElectronAPI.getSites.mockResolvedValueOnce([]);
+
+            // Test createSite function
+            await store.createSite({
+                identifier: "test-site",
+                name: "Test Site",
+                monitors: [],
+            });
+
+            expect(mockElectronAPI.addSite).toHaveBeenCalledWith({
+                identifier: "test-site",
+                name: "Test Site",
+                monitors: [],
+            });
+        });
+
+        it("should properly integrate monitoring functions", async () => {
+            const store = useSitesStore.getState();
+
+            // Mock monitoring operations
+            mockElectronAPI.startSiteMonitoring.mockResolvedValueOnce(
+                undefined
+            );
+            mockElectronAPI.stopSiteMonitoring.mockResolvedValueOnce(undefined);
+            mockElectronAPI.checkSiteNow.mockResolvedValueOnce(undefined);
+
+            // Test monitoring functions
+            await store.startSiteMonitoring("test-site");
+            expect(mockElectronAPI.startSiteMonitoring).toHaveBeenCalledWith(
+                "test-site"
+            );
+
+            await store.stopSiteMonitoring("test-site");
+            expect(mockElectronAPI.stopSiteMonitoring).toHaveBeenCalledWith(
+                "test-site"
+            );
+
+            await store.checkSiteNow("test-site", "monitor-id");
+            expect(mockElectronAPI.checkSiteNow).toHaveBeenCalledWith(
+                "test-site",
+                "monitor-id"
+            );
+        });
+
+        it("should properly integrate sync functions", async () => {
+            const store = useSitesStore.getState();
+
+            // Mock sync operations
+            const mockSyncStatus = {
+                success: true,
+                synchronized: true,
+                siteCount: 0,
+                lastSync: Date.now(),
+            };
+
+            mockElectronAPI.getSyncStatus.mockResolvedValueOnce(mockSyncStatus);
+            mockElectronAPI.syncSitesFromBackend.mockResolvedValueOnce([]);
+            mockElectronAPI.fullSyncFromBackend.mockResolvedValueOnce([]);
+
+            // Test sync functions
+            const syncStatus = await store.getSyncStatus();
+            expect(syncStatus).toEqual(mockSyncStatus);
+            expect(mockElectronAPI.getSyncStatus).toHaveBeenCalled();
+
+            await store.syncSitesFromBackend();
+            expect(mockElectronAPI.syncSitesFromBackend).toHaveBeenCalled();
+
+            await store.fullSyncFromBackend();
+            expect(mockElectronAPI.fullSyncFromBackend).toHaveBeenCalled();
+        });
+    });
+
+    describe("Store State Management", () => {
+        it("should manage selected site state correctly", () => {
+            const store = useSitesStore.getState();
+
+            const testSite: Site = {
+                identifier: "test-site",
+                name: "Test Site",
+                monitors: [],
+                monitoring: false,
+            };
+
+            // Test setting selected site
+            store.setSelectedSite(testSite);
+            expect(store.getSelectedSite()).toEqual(testSite);
+
+            // Test clearing selected site
+            store.setSelectedSite(undefined);
+            expect(store.getSelectedSite()).toBeUndefined();
+        });
+
+        it("should manage monitor selection state correctly", () => {
+            const store = useSitesStore.getState();
+
+            // Test setting monitor ID
+            store.setSelectedMonitorId("site-1", "monitor-1");
+            expect(store.getSelectedMonitorId("site-1")).toBe("monitor-1");
+
+            // Test getting undefined for unknown site
+            expect(store.getSelectedMonitorId("unknown-site")).toBeUndefined();
+        });
+
+        it("should manage sites array correctly", () => {
+            const store = useSitesStore.getState();
+
+            const site1: Site = {
+                identifier: "site-1",
+                name: "Site 1",
+                monitors: [],
+                monitoring: false,
+            };
+
+            const site2: Site = {
+                identifier: "site-2",
+                name: "Site 2",
+                monitors: [],
+                monitoring: false,
+            };
+
+            // Test adding sites
+            store.addSite(site1);
+            expect(store.sites).toHaveLength(1);
+
+            store.addSite(site2);
+            expect(store.sites).toHaveLength(2);
+
+            // Test setting all sites
+            store.setSites([site1]);
+            expect(store.sites).toHaveLength(1);
+            expect(store.sites[0]).toEqual(site1);
+
+            // Test removing site
+            store.removeSite("site-1");
+            expect(store.sites).toHaveLength(0);
+        });
+    });
+
+    describe("Error Handling in Store Functions", () => {
+        it("should handle errors in async operations gracefully", async () => {
+            const store = useSitesStore.getState();
+
+            // Mock error for create site
+            mockElectronAPI.addSite.mockRejectedValueOnce(
+                new Error("Network error")
+            );
+
+            await expect(
+                store.createSite({
+                    identifier: "test-site",
+                    name: "Test Site",
+                })
+            ).rejects.toThrow("Network error");
+        });
+
+        it("should handle errors in monitoring operations gracefully", async () => {
+            const store = useSitesStore.getState();
+
+            // Mock error for monitoring
+            mockElectronAPI.startSiteMonitoring.mockRejectedValueOnce(
+                new Error("Monitoring error")
+            );
+
+            await expect(
+                store.startSiteMonitoring("test-site")
+            ).rejects.toThrow("Monitoring error");
+        });
+
+        it("should handle errors in sync operations gracefully", async () => {
+            const store = useSitesStore.getState();
+
+            // Mock error for sync
+            mockElectronAPI.getSyncStatus.mockRejectedValueOnce(
+                new Error("Sync error")
+            );
+
+            await expect(store.getSyncStatus()).rejects.toThrow("Sync error");
+        });
+    });
+});

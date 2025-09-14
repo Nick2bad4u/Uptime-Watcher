@@ -1076,54 +1076,5 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 }
             }
         );
-
-        test.skip.prop([fc.integer({ min: 1, max: 3 })])(
-            "should handle realistic user interaction sequences",
-            async (interactionCount) => {
-                const user = userEvent.setup();
-                render(<AddSiteForm />);
-
-                // Simulate only safe user interactions that won't cause form submission hangs
-                for (let i = 0; i < interactionCount; i++) {
-                    const actions = [
-                        async () =>
-                            await act(async () => {
-                                await user.tab();
-                            }),
-                        // Removed potentially problematic {Enter} and {Escape} that could trigger form actions
-                    ];
-
-                    const actionIndex = i % actions.length;
-                    const randomAction = actions[actionIndex];
-                    if (randomAction) {
-                        try {
-                            await randomAction();
-                            // Add small delay to prevent rapid successive actions
-                            await new Promise((resolve) =>
-                                setTimeout(resolve, 10)
-                            );
-                        } catch (error) {
-                            // Skip failed actions to prevent test hanging
-                            console.warn(
-                                `Action ${actionIndex} failed:`,
-                                error
-                            );
-                        }
-                    }
-                }
-
-                // Verify interaction characteristics
-                expect(interactionCount).toBeGreaterThanOrEqual(1);
-                expect(interactionCount).toBeLessThanOrEqual(3);
-
-                // Form should still be functional after interactions
-                const forms = screen.getAllByRole("form", {
-                    name: /add site form/i,
-                });
-                const form = forms[0];
-                expect(form).toBeInTheDocument();
-            },
-            10_000 // 10 second timeout
-        );
     });
 });

@@ -1,5 +1,10 @@
 name: SonarCloud Analysis
 
+# Prevent multiple SonarCloud analyses from running simultaneously
+concurrency:
+    group: sonarcloud-${{ github.ref }}
+    cancel-in-progress: true
+
 on:
     push:
         branches:
@@ -7,6 +12,10 @@ on:
             - master
     pull_request:
         types: [opened, synchronize, reopened]
+
+# Permissions required for SonarCloud analysis
+permissions:
+    contents: read
 
 jobs:
     sonarcloud:

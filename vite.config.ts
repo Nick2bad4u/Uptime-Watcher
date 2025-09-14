@@ -641,6 +641,7 @@ export default defineConfig(({ mode }) => {
                     "**/node_modules/**",
                     "src/**/types.ts", // Exclude type definition files only in src directory
                     "**/types.tsx", // Exclude type definition files with JSX
+                    "src/**/baseTypes.ts", // Exclude interface-only files that contain only TypeScript interfaces
                     "src/test/**",
                     "shared/test",
                     "coverage/**",
@@ -663,7 +664,7 @@ export default defineConfig(({ mode }) => {
                     ...coverageConfigDefaults.exclude,
                 ],
                 excludeAfterRemap: true, // Exclude files after remapping for accuracy
-                experimentalAstAwareRemapping: true, // Enable AST-aware remapping for accurate coverage
+                experimentalAstAwareRemapping: false, // Temporarily disabled due to ast-v8-to-istanbul column parsing error
                 ignoreEmptyLines: true, // Ignore empty lines, comments, and TypeScript interfaces
                 // V8 Provider Configuration (Recommended since Vitest v3.2.0)
                 provider: "v8" as const, // Switch to V8 for better TypeScript support

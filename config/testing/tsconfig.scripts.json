@@ -9,6 +9,7 @@
         "alwaysStrict": true,
         "baseUrl": "../../",
         "checkJs": true,
+        "composite": true,
         "declaration": true,
         "declarationMap": true,
         "disableSizeLimit": true,
