@@ -27,7 +27,7 @@ const arbitraryTheme = fc.constantFrom("light", "dark", "system");
 const arbitraryAppSettings = fc.record({
     theme: arbitraryTheme,
     autoStart: fc.boolean(),
-    historyLimit: fc.integer({ min: 100, max: 10000 }),
+    historyLimit: fc.integer({ min: 100, max: 10_000 }),
     minimizeToTray: fc.boolean(),
     notifications: fc.boolean(),
     soundAlerts: fc.boolean(),
@@ -36,7 +36,7 @@ const arbitraryAppSettings = fc.record({
 const arbitraryPartialSettings = fc.record({
     theme: fc.option(arbitraryTheme),
     autoStart: fc.option(fc.boolean()),
-    historyLimit: fc.option(fc.integer({ min: 100, max: 10000 })),
+    historyLimit: fc.option(fc.integer({ min: 100, max: 10_000 })),
     minimizeToTray: fc.option(fc.boolean()),
     notifications: fc.option(fc.boolean()),
     soundAlerts: fc.option(fc.boolean()),
@@ -110,7 +110,7 @@ describe("Stores - 100% Fast-Check Fuzzing Coverage", () => {
             ).resolves.toBeDefined();
         });
 
-        fcTest.prop([fc.integer({ min: 100, max: 10000 })])(
+        fcTest.prop([fc.integer({ min: 100, max: 10_000 })])(
             "should update history limit",
             async (historyLimit) => {
                 const { result } = renderHook(() => useSettingsStore());
@@ -182,7 +182,7 @@ describe("Stores - 100% Fast-Check Fuzzing Coverage", () => {
             expect(
                 result.current.lastError === undefined ||
                     typeof result.current.lastError === "string"
-            ).toBe(true);
+            ).toBeTruthy();
         });
     });
 
@@ -267,7 +267,7 @@ describe("Stores - 100% Fast-Check Fuzzing Coverage", () => {
         test("should have monitor types store available", () => {
             const { result } = renderHook(() => useMonitorTypesStore());
             expect(result.current).toBeDefined();
-            expect(Array.isArray(result.current.monitorTypes)).toBe(true);
+            expect(Array.isArray(result.current.monitorTypes)).toBeTruthy();
         });
 
         fcTest.prop([fc.string()])(

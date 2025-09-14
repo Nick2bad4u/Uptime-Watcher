@@ -202,7 +202,7 @@ const ThemedButtonComponent = ({
             className={classNames}
             data-testid={
                 ariaLabel
-                    ? `button-${ariaLabel.toLowerCase().replace(/\s+/g, "-")}`
+                    ? `button-${ariaLabel.toLowerCase().replaceAll(/\s+/g, "-")}`
                     : undefined
             }
             disabled={disabled || loading}

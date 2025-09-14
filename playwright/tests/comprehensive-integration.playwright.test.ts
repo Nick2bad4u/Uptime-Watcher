@@ -15,8 +15,8 @@ import {
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 
-test.describe("Comprehensive Integration Tests", () => {
-    test.describe("Complete User Workflows", () => {
+test.describe("comprehensive Integration Tests", () => {
+    test.describe("complete User Workflows", () => {
         test("should complete full site monitoring workflow @integration @workflow @monitoring", async () => {
             const electronApp = await launchElectronApp();
             const page = await electronApp.firstWindow();
@@ -84,10 +84,10 @@ test.describe("Comprehensive Integration Tests", () => {
             });
 
             // Verify modal is visible
-            const modalVisible = await page
+            const modalVisible = page
                 .locator(UI_SELECTORS.MODAL_OVERLAY)
-                .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
-            expect(modalVisible).toBe(true);
+                ;
+            await expect(modalVisible).toBeVisible(, );
 
             // Close modal with Escape key
             await page.keyboard.press("Escape");
@@ -161,10 +161,10 @@ test.describe("Comprehensive Integration Tests", () => {
             await page.waitForTimeout(WAIT_TIMEOUTS.SHORT);
 
             // Modal should still be visible (validation should prevent submission)
-            const modalVisible = await page
+            const modalVisible = page
                 .locator(UI_SELECTORS.MODAL_OVERLAY)
-                .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
-            expect(modalVisible).toBe(true);
+                ;
+            await expect(modalVisible).toBeVisible(, );
 
             // Fill required fields
             await page.fill(
@@ -190,7 +190,7 @@ test.describe("Comprehensive Integration Tests", () => {
         });
     });
 
-    test.describe("Error Handling and Recovery", () => {
+    test.describe("error Handling and Recovery", () => {
         test("should handle rapid user interactions @integration @stress @rapid-interactions", async () => {
             const electronApp = await launchElectronApp();
             const page = await electronApp.firstWindow();
@@ -283,7 +283,7 @@ test.describe("Comprehensive Integration Tests", () => {
         });
     });
 
-    test.describe("Application Lifecycle", () => {
+    test.describe("application Lifecycle", () => {
         test("should handle application startup gracefully @integration @lifecycle @startup", async () => {
             console.log("Step 1: Testing application startup");
 
@@ -315,10 +315,10 @@ test.describe("Comprehensive Integration Tests", () => {
             });
 
             // Verify modal opened
-            const modalVisible = await page
+            const modalVisible = page
                 .locator(UI_SELECTORS.MODAL_OVERLAY)
-                .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
-            expect(modalVisible).toBe(true);
+                ;
+            await expect(modalVisible).toBeVisible(, );
 
             // Close modal
             await page.keyboard.press("Escape");
@@ -374,10 +374,10 @@ test.describe("Comprehensive Integration Tests", () => {
             });
 
             // Verify modal still works after heavy interactions
-            const modalVisible = await page
+            const modalVisible = page
                 .locator(UI_SELECTORS.MODAL_OVERLAY)
-                .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
-            expect(modalVisible).toBe(true);
+                ;
+            await expect(modalVisible).toBeVisible(, );
 
             // Close final modal
             await page.keyboard.press("Escape");

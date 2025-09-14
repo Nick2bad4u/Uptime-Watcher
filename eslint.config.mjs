@@ -1907,6 +1907,7 @@ export default [
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
+            "n/no-top-level-await": "warn",
             "n/no-unpublished-import": [
                 "warn",
                 {
@@ -1923,7 +1924,6 @@ export default [
                     ],
                 },
             ],
-            "n/no-top-level-await": "warn",
             "n/no-unsupported-features/es-builtins": [
                 "warn",
                 {
@@ -3195,6 +3195,7 @@ export default [
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
+            "n/no-top-level-await": "warn",
             "n/no-unpublished-import": [
                 "off",
                 {
@@ -3211,7 +3212,6 @@ export default [
                     ],
                 },
             ],
-            "n/no-top-level-await": "warn",
             "n/no-unsupported-features/es-builtins": [
                 "warn",
                 {
@@ -4707,6 +4707,7 @@ export default [
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
+            "n/no-top-level-await": "warn",
             "n/no-unpublished-import": [
                 "warn",
                 {
@@ -4723,7 +4724,6 @@ export default [
                     ],
                 },
             ],
-            "n/no-top-level-await": "warn",
             "n/no-unsupported-features/es-builtins": [
                 "warn",
                 {
@@ -5975,6 +5975,7 @@ export default [
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
+            "n/no-top-level-await": "warn",
             "n/no-unpublished-import": [
                 "warn",
                 {
@@ -5991,7 +5992,6 @@ export default [
                     ],
                 },
             ],
-            "n/no-top-level-await": "warn",
             "n/no-unsupported-features/es-builtins": [
                 "warn",
                 {
@@ -7821,7 +7821,7 @@ export default [
                 "off",
                 {
                     allowModules: [
-                        "electron",d
+                        "electron",
                         "node",
                         "electron-devtools-installer",
                         "index.css",

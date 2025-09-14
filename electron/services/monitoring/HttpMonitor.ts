@@ -80,6 +80,8 @@ class SimpleRateLimiter {
 
     private readonly minIntervalMs: number;
 
+    private readonly maxWaitMs: number;
+
     public async schedule<T>(url: string, fn: () => Promise<T>): Promise<T> {
         const key = this.getKey(url);
         const sleep = async (ms: number): Promise<void> =>
@@ -88,8 +90,19 @@ class SimpleRateLimiter {
                 // eslint-disable-next-line clean-timer/assign-timer-id -- Timer completes with Promise resolution
                 setTimeout(resolve, ms);
             });
+
+        const startTime = Date.now();
         for (;;) {
             const now = Date.now();
+
+            // Prevent infinite waiting - max wait time safety check
+            if (now - startTime > this.maxWaitMs) {
+                logger.warn(
+                    `[SimpleRateLimiter] Max wait time exceeded for ${url}, proceeding anyway`
+                );
+                break;
+            }
+
             const last = this.lastInvocation.get(key) ?? 0;
             const since = now - last;
             const needDelay = since < this.minIntervalMs;
@@ -109,9 +122,14 @@ class SimpleRateLimiter {
         }
     }
 
-    public constructor(maxConcurrent: number, minIntervalMs: number) {
+    public constructor(
+        maxConcurrent: number,
+        minIntervalMs: number,
+        maxWaitMs = 30_000
+    ) {
         this.maxConcurrent = maxConcurrent;
         this.minIntervalMs = minIntervalMs;
+        this.maxWaitMs = maxWaitMs;
     }
 
     private getKey(url: string): string {

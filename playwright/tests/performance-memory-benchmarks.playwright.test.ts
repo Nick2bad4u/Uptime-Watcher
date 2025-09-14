@@ -10,7 +10,7 @@ import { launchElectronApp } from "../fixtures/electron-helpers";
 import { waitForAppInitialization } from "../utils/ui-helpers";
 
 test.describe(
-    "Performance and Memory Management",
+    "performance and Memory Management",
     {
         tag: [
             "@performance",

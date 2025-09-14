@@ -777,50 +777,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         try {
             logger.info("[UptimeOrchestrator] Starting shutdown...");
 
-            // Remove specific event listeners using the named handler
-            // references
-            this.off(
-                "internal:database:update-sites-cache-requested",
-                this.handleUpdateSitesCacheRequestedEvent
-            );
-            this.off(
-                "internal:database:get-sites-from-cache-requested",
-                this.handleGetSitesFromCacheRequestedEvent
-            );
-            this.off(
-                "internal:database:initialized",
-                this.handleDatabaseInitializedEvent
-            );
-
-            this.off("internal:site:added", this.handleSiteAddedEvent);
-            this.off("internal:site:removed", this.handleSiteRemovedEvent);
-            this.off("internal:site:updated", this.handleSiteUpdatedEvent);
-
-            this.off(
-                "internal:monitor:started",
-                this.handleMonitorStartedEvent
-            );
-            this.off(
-                "internal:monitor:stopped",
-                this.handleMonitorStoppedEvent
-            );
-
-            this.off(
-                "internal:site:start-monitoring-requested",
-                this.handleStartMonitoringRequestedEvent
-            );
-            this.off(
-                "internal:site:stop-monitoring-requested",
-                this.handleStopMonitoringRequestedEvent
-            );
-            this.off(
-                "internal:site:is-monitoring-active-requested",
-                this.handleIsMonitoringActiveRequestedEvent
-            );
-            this.off(
-                "internal:site:restart-monitoring-requested",
-                this.handleRestartMonitoringRequestedEvent
-            );
+            // Remove specific event listeners using the named handler references
+            this.removeEventHandlers();
 
             // Clear all middleware
             this.clearMiddleware();
@@ -1168,20 +1126,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Handles the database initialized event asynchronously.
-     *
-     * @returns Promise that resolves when the event handling is complete
-     */
-    private async handleDatabaseInitialized(): Promise<void> {
-        await this.emitTyped("database:transaction-completed", {
-            duration: 0,
-            operation: "initialize",
-            success: true,
-            timestamp: Date.now(),
-        });
-    }
-
-    /**
      * Handles the get sites from cache request asynchronously.
      *
      * @returns Promise that resolves when the response is sent
@@ -1196,6 +1140,20 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 timestamp: Date.now(),
             }
         );
+    }
+
+    /**
+     * Handles the database initialized event asynchronously.
+     *
+     * @returns Promise that resolves when the event handling is complete
+     */
+    private async handleDatabaseInitialized(): Promise<void> {
+        await this.emitTyped("database:transaction-completed", {
+            duration: 0,
+            operation: "initialize",
+            success: true,
+            timestamp: Date.now(),
+        });
     }
 
     /**
@@ -1270,6 +1228,58 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 `[UptimeOrchestrator] Successfully set up monitoring for all ${successful} loaded sites`
             );
         }
+    }
+
+    /**
+     * Removes all event handlers to prevent memory leaks during shutdown.
+     *
+     * @remarks
+     * Systematically removes all event listeners that were registered during
+     * initialization to ensure proper cleanup and prevent memory leaks.
+     *
+     * @private
+     */
+    private removeEventHandlers(): void {
+        // Remove database event handlers
+        this.off(
+            "internal:database:update-sites-cache-requested",
+            this.handleUpdateSitesCacheRequestedEvent
+        );
+        this.off(
+            "internal:database:get-sites-from-cache-requested",
+            this.handleGetSitesFromCacheRequestedEvent
+        );
+        this.off(
+            "internal:database:initialized",
+            this.handleDatabaseInitializedEvent
+        );
+
+        // Remove site event handlers
+        this.off("internal:site:added", this.handleSiteAddedEvent);
+        this.off("internal:site:removed", this.handleSiteRemovedEvent);
+        this.off("internal:site:updated", this.handleSiteUpdatedEvent);
+
+        // Remove monitoring event handlers
+        this.off("internal:monitor:started", this.handleMonitorStartedEvent);
+        this.off("internal:monitor:stopped", this.handleMonitorStoppedEvent);
+
+        // Remove site management event handlers
+        this.off(
+            "internal:site:start-monitoring-requested",
+            this.handleStartMonitoringRequestedEvent
+        );
+        this.off(
+            "internal:site:stop-monitoring-requested",
+            this.handleStopMonitoringRequestedEvent
+        );
+        this.off(
+            "internal:site:is-monitoring-active-requested",
+            this.handleIsMonitoringActiveRequestedEvent
+        );
+        this.off(
+            "internal:site:restart-monitoring-requested",
+            this.handleRestartMonitoringRequestedEvent
+        );
     }
 
     /**

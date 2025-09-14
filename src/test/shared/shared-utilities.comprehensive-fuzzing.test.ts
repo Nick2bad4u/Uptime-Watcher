@@ -36,7 +36,7 @@ import {
 
 // Custom arbitraries for domain-specific testing
 const arbitraryUrl = fc.webUrl();
-const arbitraryPort = fc.integer({ min: 1, max: 65535 });
+const arbitraryPort = fc.integer({ min: 1, max: 65_535 });
 const arbitraryHttpMethod = fc.constantFrom(
     "GET",
     "POST",
@@ -47,7 +47,7 @@ const arbitraryHttpMethod = fc.constantFrom(
     "OPTIONS"
 );
 const arbitraryStatusCode = fc.integer({ min: 100, max: 599 });
-const arbitraryResponseTime = fc.float({ min: 0, max: 10000, noNaN: true });
+const arbitraryResponseTime = fc.float({ min: 0, max: 10_000, noNaN: true });
 const arbitraryTimestamp = fc.date().map((d) => d.getTime());
 
 // Complex object arbitraries
@@ -55,8 +55,8 @@ const arbitraryMonitorData = fc.record({
     id: fc.string(),
     url: arbitraryUrl,
     method: arbitraryHttpMethod,
-    interval: fc.integer({ min: 1000, max: 3600000 }),
-    timeout: fc.integer({ min: 1000, max: 30000 }),
+    interval: fc.integer({ min: 1000, max: 3_600_000 }),
+    timeout: fc.integer({ min: 1000, max: 30_000 }),
     enabled: fc.boolean(),
 });
 
@@ -98,7 +98,7 @@ describe("Shared Utilities - 100% Fast-Check Fuzzing Coverage", () => {
             (port) => {
                 const result = validation.isValidPort(port);
                 expect(typeof result).toBe("boolean");
-                expect(result).toBe(port >= 1 && port <= 65535);
+                expect(result).toBe(port >= 1 && port <= 65_535);
             }
         );
     });
@@ -119,27 +119,27 @@ describe("Shared Utilities - 100% Fast-Check Fuzzing Coverage", () => {
         fcTest.prop([fc.string()])(
             "should correctly identify strings",
             (str) => {
-                expect(typeGuards.isString(str)).toBe(true);
-                expect(typeGuards.isNumber(str)).toBe(false);
-                expect(typeGuards.isBoolean(str)).toBe(false);
+                expect(typeGuards.isString(str)).toBeTruthy();
+                expect(typeGuards.isNumber(str)).toBeFalsy();
+                expect(typeGuards.isBoolean(str)).toBeFalsy();
             }
         );
 
         fcTest.prop([fc.float()])(
             "should correctly identify numbers",
             (num) => {
-                expect(typeGuards.isNumber(num)).toBe(true);
-                expect(typeGuards.isString(num)).toBe(false);
-                expect(typeGuards.isBoolean(num)).toBe(false);
+                expect(typeGuards.isNumber(num)).toBeTruthy();
+                expect(typeGuards.isString(num)).toBeFalsy();
+                expect(typeGuards.isBoolean(num)).toBeFalsy();
             }
         );
 
         fcTest.prop([fc.boolean()])(
             "should correctly identify booleans",
             (bool) => {
-                expect(typeGuards.isBoolean(bool)).toBe(true);
-                expect(typeGuards.isString(bool)).toBe(false);
-                expect(typeGuards.isNumber(bool)).toBe(false);
+                expect(typeGuards.isBoolean(bool)).toBeTruthy();
+                expect(typeGuards.isString(bool)).toBeFalsy();
+                expect(typeGuards.isNumber(bool)).toBeFalsy();
             }
         );
     });
@@ -195,7 +195,7 @@ describe("Shared Utilities - 100% Fast-Check Fuzzing Coverage", () => {
                 const result = safeConversions.safeToNumber(input);
                 if (result !== null) {
                     expect(typeof result).toBe("number");
-                    expect(isNaN(result)).toBe(false);
+                    expect(isNaN(result)).toBeFalsy();
                 }
             }
         );
@@ -206,7 +206,7 @@ describe("Shared Utilities - 100% Fast-Check Fuzzing Coverage", () => {
                 const result = safeConversions.safeToInteger(input);
                 if (result !== null) {
                     expect(typeof result).toBe("number");
-                    expect(Number.isInteger(result)).toBe(true);
+                    expect(Number.isInteger(result)).toBeTruthy();
                 }
             }
         );
@@ -259,9 +259,9 @@ describe("Shared Utilities - 100% Fast-Check Fuzzing Coverage", () => {
         fcTest.prop([fc.record({ a: fc.string(), b: fc.integer() })])(
             "should correctly identify valid objects",
             (obj) => {
-                expect(objectSafety.isValidObject(obj)).toBe(true);
-                expect(objectSafety.hasProperty(obj, "a")).toBe(true);
-                expect(objectSafety.hasProperty(obj, "b")).toBe(true);
+                expect(objectSafety.isValidObject(obj)).toBeTruthy();
+                expect(objectSafety.hasProperty(obj, "a")).toBeTruthy();
+                expect(objectSafety.hasProperty(obj, "b")).toBeTruthy();
             }
         );
     });
@@ -393,7 +393,7 @@ describe("Shared Utilities - 100% Fast-Check Fuzzing Coverage", () => {
     });
 
     describe("Abort utilities", () => {
-        fcTest.prop([fc.integer({ min: 0, max: 10000 })])(
+        fcTest.prop([fc.integer({ min: 0, max: 10_000 })])(
             "should create timeout controllers",
             (timeout) => {
                 const controller = abortUtils.createTimeoutController(timeout);
@@ -481,7 +481,7 @@ describe("Shared Utilities - 100% Fast-Check Fuzzing Coverage", () => {
             fc.record({
                 url: arbitraryUrl,
                 method: arbitraryHttpMethod,
-                timeout: fc.integer({ min: 1000, max: 30000 }),
+                timeout: fc.integer({ min: 1000, max: 30_000 }),
                 data: fc.anything(),
             }),
         ])("should handle complex workflow scenarios", (requestData) => {
@@ -495,8 +495,8 @@ describe("Shared Utilities - 100% Fast-Check Fuzzing Coverage", () => {
                 const deserialized = jsonSafety.safeParse(serialized);
 
                 expect(deserialized).not.toBeNull();
-                expect(objectSafety.hasProperty(deserialized, "url")).toBe(
-                    true
+                expect(objectSafety.hasProperty(deserialized, "url")).toBeTruthy(
+                    
                 );
             }
         });
@@ -520,10 +520,10 @@ describe("Shared Utilities - 100% Fast-Check Fuzzing Coverage", () => {
                 });
 
                 expect(processedData).toHaveLength(dataArray.length);
-                processedData.forEach((item) => {
+                for (const item of processedData) {
                     expect(typeof item.string).toBe("string");
                     expect(typeof item.boolean).toBe("boolean");
-                });
+                }
             }
         );
     });

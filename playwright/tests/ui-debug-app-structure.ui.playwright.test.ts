@@ -5,7 +5,7 @@
 import { test, expect } from "@playwright/test";
 import { launchElectronApp } from "../fixtures/electron-helpers";
 
-test.describe("Debug - App Structure Verification", () => {
+test.describe("debug - App Structure Verification", () => {
     test("should verify app structure and data-testid attributes", async () => {
         const electronApp = await launchElectronApp();
         const page = await electronApp.firstWindow();
@@ -45,7 +45,7 @@ test.describe("Debug - App Structure Verification", () => {
             console.log("Current HTML length:", htmlContent.length);
 
             // Look for app-container
-            const appContainer = page.locator('[data-testid="app-container"]');
+            const appContainer = page.getByTestId("app-container");
             const appContainerVisible = await appContainer.isVisible();
             console.log("app-container visible:", appContainerVisible);
 
@@ -54,7 +54,7 @@ test.describe("Debug - App Structure Verification", () => {
             }
 
             // Look for dashboard-container
-            const dashboardContainer = page.locator('[data-testid="dashboard-container"]');
+            const dashboardContainer = page.getByTestId("dashboard-container");
             const dashboardContainerVisible = await dashboardContainer.isVisible();
             console.log("dashboard-container visible:", dashboardContainerVisible);
 

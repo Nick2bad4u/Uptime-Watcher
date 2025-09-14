@@ -18,7 +18,7 @@ import {
 } from "../utils/ui-helpers";
 
 test.describe(
-    "Add Site Modal - Basic Tests",
+    "add Site Modal - Basic Tests",
     {
         tag: [
             "@modal",
@@ -120,7 +120,7 @@ test.describe(
                     );
                     if (await closeButton.isVisible()) {
                         await closeButton.click();
-                        await expect(modalOverlay).not.toBeVisible();
+                        await expect(modalOverlay).toBeHidden();
                         console.log("✅ Modal closed successfully");
                     } else {
                         console.log(
@@ -140,7 +140,7 @@ test.describe(
                     // Verify modal is closed
                     await expect(
                         page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                    ).not.toBeVisible();
+                    ).toBeHidden();
                 } finally {
                     await electronApp.close();
                 }
@@ -187,7 +187,7 @@ test.describe(
                     await page.keyboard.press("Escape");
                     await expect(
                         page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                    ).not.toBeVisible();
+                    ).toBeHidden();
                 } finally {
                     await electronApp.close();
                 }

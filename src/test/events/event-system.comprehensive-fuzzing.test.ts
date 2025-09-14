@@ -44,7 +44,7 @@ const arbitraryLogLevel = fc.constantFrom(
 
 const arbitraryCorrelationId = fc.string({ minLength: 8, maxLength: 36 });
 
-const arbitraryTimestamp = fc.integer({ min: 1, max: Date.now() + 86400000 }); // Current time plus 1 day
+const arbitraryTimestamp = fc.integer({ min: 1, max: Date.now() + 86_400_000 }); // Current time plus 1 day
 
 const arbitraryEventPayload = fc.oneof(
     fc.record({

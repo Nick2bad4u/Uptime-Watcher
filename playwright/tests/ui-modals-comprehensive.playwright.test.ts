@@ -24,7 +24,7 @@ import {
 } from "../utils/ui-helpers";
 
 test.describe(
-    "Comprehensive Modal Tests",
+    "comprehensive Modal Tests",
     {
         tag: [
             "@modal",
@@ -33,7 +33,7 @@ test.describe(
         ],
     },
     () => {
-        test.describe("Add Site Modal", () => {
+        test.describe("add Site Modal", () => {
             test(
                 "should open and close Add Site modal",
                 {
@@ -60,7 +60,7 @@ test.describe(
                         await page.keyboard.press("Escape");
                         await expect(
                             page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                        ).not.toBeVisible();
+                        ).toBeHidden();
                     } finally {
                         await electronApp.close();
                     }
@@ -84,7 +84,7 @@ test.describe(
                         await page.keyboard.press("Escape");
                         await expect(
                             page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                        ).not.toBeVisible();
+                        ).toBeHidden();
                     } finally {
                         await electronApp.close();
                     }
@@ -110,7 +110,7 @@ test.describe(
                             .click({ position: { x: 50, y: 50 } });
                         await expect(
                             page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                        ).not.toBeVisible();
+                        ).toBeHidden();
                     } finally {
                         await electronApp.close();
                     }
@@ -255,7 +255,7 @@ test.describe(
             );
         });
 
-        test.describe("Modal Accessibility", () => {
+        test.describe("modal Accessibility", () => {
             test(
                 "should trap focus within modal",
                 {
@@ -356,7 +356,7 @@ test.describe(
             );
         });
 
-        test.describe("Settings Modal", () => {
+        test.describe("settings Modal", () => {
             test(
                 "should open Settings modal",
                 {
@@ -389,7 +389,7 @@ test.describe(
             );
         });
 
-        test.describe("Theme Toggle", () => {
+        test.describe("theme Toggle", () => {
             test(
                 "should toggle theme via button",
                 {
@@ -435,7 +435,7 @@ test.describe(
             );
         });
 
-        test.describe("Modal Error Handling", () => {
+        test.describe("modal Error Handling", () => {
             test(
                 "should handle network errors gracefully",
                 {

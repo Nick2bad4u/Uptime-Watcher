@@ -10,8 +10,7 @@ New claims to review, these are LOW confidence claims that need to be reviewed t
 
 1. Ensure these are real claims and not false positives
 2. Check that the claim makes sense with our project standards, context, and codebase architecture
-3. Document each claim in a NEW document in the `/docs/Reviews/` folder with name: `LC.AI.R-Filename.md` and detail the findings about the claim
-4. If they are valid claims, plan to implement the proper fixes according to project standards in the document.
+3. If they are valid claims, plan to implement the proper fixes according to project standards in the document.
 
 ## Instructions
 

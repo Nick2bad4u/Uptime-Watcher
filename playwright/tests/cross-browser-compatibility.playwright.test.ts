@@ -10,8 +10,8 @@ import { test, expect } from "@playwright/test";
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import { waitForAppInitialization } from "../utils/ui-helpers";
 
-test.describe("Cross-Browser Compatibility", () => {
-    test.describe("Core Browser Features", () => {
+test.describe("cross-Browser Compatibility", () => {
+    test.describe("core Browser Features", () => {
         test("should support modern JavaScript features @compatibility @javascript @features", async () => {
             const electronApp = await launchElectronApp();
             const page = await electronApp.firstWindow();
@@ -167,7 +167,7 @@ test.describe("Cross-Browser Compatibility", () => {
         });
     });
 
-    test.describe("Storage and Data Persistence", () => {
+    test.describe("storage and Data Persistence", () => {
         test("should support modern storage APIs @compatibility @storage @persistence", async () => {
             const electronApp = await launchElectronApp();
             const page = await electronApp.firstWindow();
@@ -255,7 +255,7 @@ test.describe("Cross-Browser Compatibility", () => {
         });
     });
 
-    test.describe("Network and Communication", () => {
+    test.describe("network and Communication", () => {
         test("should support fetch API @compatibility @network @fetch", async () => {
             const electronApp = await launchElectronApp();
             const page = await electronApp.firstWindow();
@@ -309,7 +309,7 @@ test.describe("Cross-Browser Compatibility", () => {
         });
     });
 
-    test.describe("Security and Compatibility", () => {
+    test.describe("security and Compatibility", () => {
         test("should support security features @compatibility @security @crypto", async () => {
             const electronApp = await launchElectronApp();
             const page = await electronApp.firstWindow();

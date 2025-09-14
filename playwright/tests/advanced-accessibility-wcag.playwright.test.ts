@@ -11,7 +11,7 @@ import { launchElectronApp } from "../fixtures/electron-helpers";
 import { waitForAppInitialization } from "../utils/ui-helpers";
 
 test.describe(
-    "Advanced Accessibility - WCAG Compliance",
+    "advanced Accessibility - WCAG Compliance",
     {
         tag: [
             "@accessibility",

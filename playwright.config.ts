@@ -53,36 +53,36 @@ const config: PlaywrightTestConfig = defineConfig({
     // Multiple projects for different test types
     projects: [
         {
+            fullyParallel: false, // Electron stability
             name: "electron-main",
             testMatch: "**/main-process.*.playwright.test.ts",
-            fullyParallel: false, // Electron stability
             use: {
                 ...devices["Desktop Chrome"],
                 // Main process specific configuration
             },
         },
         {
+            fullyParallel: false, // Electron stability
             name: "electron-renderer",
             testMatch: "**/renderer-process.*.playwright.test.ts",
-            fullyParallel: false, // Electron stability
             use: {
                 ...devices["Desktop Chrome"],
                 // Renderer process specific configuration
             },
         },
         {
+            fullyParallel: false, // Electron stability
             name: "electron-e2e",
             testMatch: "**/app-launch.*.playwright.test.ts",
-            fullyParallel: false, // Electron stability
             use: {
                 ...devices["Desktop Chrome"],
                 // E2E specific configuration
             },
         },
         {
+            fullyParallel: true, // Safe to run UI tests in parallel
             name: "ui-tests",
             testMatch: "**/ui-*.playwright.test.ts",
-            fullyParallel: true, // Safe to run UI tests in parallel
             use: {
                 ...devices["Desktop Chrome"],
                 // UI testing specific configuration
@@ -90,9 +90,9 @@ const config: PlaywrightTestConfig = defineConfig({
             },
         },
         {
+            fullyParallel: false, // Electron stability
             name: "comprehensive-e2e",
             testMatch: "**/e2e-*.e2e.playwright.test.ts",
-            fullyParallel: false, // Electron stability
             use: {
                 ...devices["Desktop Chrome"],
                 // Comprehensive E2E testing configuration
@@ -100,6 +100,7 @@ const config: PlaywrightTestConfig = defineConfig({
             },
         },
         {
+            fullyParallel: true, // Enable parallelism for non-Electron comprehensive tests
             name: "comprehensive-tests",
             testMatch: [
                 "**/electron-main-process.playwright.test.ts",
@@ -112,7 +113,6 @@ const config: PlaywrightTestConfig = defineConfig({
                 "**/cross-browser-compatibility.playwright.test.ts",
                 "**/comprehensive-integration.playwright.test.ts",
             ],
-            fullyParallel: true, // Enable parallelism for non-Electron comprehensive tests
             use: {
                 ...devices["Desktop Chrome"],
                 // Comprehensive testing configuration

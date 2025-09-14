@@ -253,6 +253,11 @@ if (isDev()) {
         } catch (error) {
             logger.error("[Main] Error during hot reload", error);
         } finally {
+            // Always reset reload progress flag, even on error
+            if (reloadProgressTimer) {
+                clearTimeout(reloadProgressTimer);
+                reloadProgressTimer = null;
+            }
             // Reset reload progress flag after a short delay
             reloadProgressTimer = setTimeout(() => {
                 isReloadInProgress = false;

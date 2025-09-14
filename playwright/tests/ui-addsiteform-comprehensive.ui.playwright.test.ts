@@ -32,7 +32,7 @@ import {
 } from "../utils/ui-helpers";
 
 test.describe(
-    "Add Site Form - Comprehensive Tests",
+    "add Site Form - Comprehensive Tests",
     {
         tag: [
             "@ui",
@@ -75,7 +75,7 @@ test.describe(
                     // Verify modal is not initially visible
                     await expect(
                         page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                    ).not.toBeVisible();
+                    ).toBeHidden();
 
                     // Open the Add Site modal
                     await openAddSiteModal(page);
@@ -90,7 +90,7 @@ test.describe(
 
                     // Verify form is present
                     await expect(
-                        page.locator('[data-testid="add-site-form"]')
+                        page.getByTestId("add-site-form")
                     ).toBeVisible();
 
                     // Close modal using close button
@@ -99,7 +99,7 @@ test.describe(
                     // Verify modal is closed
                     await expect(
                         page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                    ).not.toBeVisible();
+                    ).toBeHidden();
                 } finally {
                     await electronApp.close();
                 }
@@ -138,7 +138,7 @@ test.describe(
                     // Verify modal is closed
                     await expect(
                         page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                    ).not.toBeVisible();
+                    ).toBeHidden();
                 } finally {
                     await electronApp.close();
                 }
@@ -168,15 +168,15 @@ test.describe(
 
                     // Verify form container
                     await expect(
-                        page.locator('[data-testid="add-site-form-container"]')
+                        page.getByTestId("add-site-form-container")
                     ).toBeVisible();
                     await expect(
-                        page.locator('[data-testid="add-site-form"]')
+                        page.getByTestId("add-site-form")
                     ).toBeVisible();
 
                     // Verify form fields are present (site name should be visible by default for new site mode)
                     await expect(
-                        page.locator('[data-testid="input-siteName"]')
+                        page.getByTestId("input-siteName")
                     ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                     // Look for URL input field (it might be part of dynamic monitor fields)
@@ -193,7 +193,7 @@ test.describe(
                     await expect(submitButton).toContainText(/Add Site|Create/);
 
                     // Verify form has proper ARIA labeling
-                    const form = page.locator('[data-testid="add-site-form"]');
+                    const form = page.getByTestId("add-site-form");
                     await expect(form).toHaveAttribute(
                         "aria-label",
                         "Add Site Form"
@@ -226,9 +226,7 @@ test.describe(
                     await openAddSiteModal(page);
 
                     // Fill site name
-                    const siteNameInput = page.locator(
-                        '[data-testid="input-siteName"]'
-                    );
+                    const siteNameInput = page.getByTestId("input-siteName");
                     await expect(siteNameInput).toBeVisible();
                     await siteNameInput.fill("Test Website");
                     await expect(siteNameInput).toHaveValue("Test Website");
@@ -335,7 +333,7 @@ test.describe(
 
                     // Site name field should be visible in new mode
                     await expect(
-                        page.locator('[data-testid="input-siteName"]')
+                        page.getByTestId("input-siteName")
                     ).toBeVisible();
 
                     // Switch to existing mode
@@ -347,8 +345,8 @@ test.describe(
 
                     // Site name field should not be visible in existing mode
                     await expect(
-                        page.locator('[data-testid="input-siteName"]')
-                    ).not.toBeVisible();
+                        page.getByTestId("input-siteName")
+                    ).toBeHidden();
 
                     // Should show site selector instead
                     const siteSelect = page.locator(
@@ -389,13 +387,11 @@ test.describe(
                     // Should show validation errors or prevent submission
                     // The form should still be visible (not closed)
                     await expect(
-                        page.locator('[data-testid="add-site-form"]')
+                        page.getByTestId("add-site-form")
                     ).toBeVisible();
 
                     // Fill only site name (missing URL should cause validation error)
-                    const siteNameInput = page.locator(
-                        '[data-testid="input-siteName"]'
-                    );
+                    const siteNameInput = page.getByTestId("input-siteName");
                     await siteNameInput.fill("Test Site");
 
                     // Try to submit again
@@ -403,7 +399,7 @@ test.describe(
 
                     // Form should still be visible due to validation error
                     await expect(
-                        page.locator('[data-testid="add-site-form"]')
+                        page.getByTestId("add-site-form")
                     ).toBeVisible();
                 } finally {
                     await electronApp.close();
@@ -434,18 +430,16 @@ test.describe(
                     await openAddSiteModal(page);
 
                     // Verify ARIA attributes
-                    const form = page.locator('[data-testid="add-site-form"]');
+                    const form = page.getByTestId("add-site-form");
                     await expect(form).toHaveAttribute("aria-label");
 
                     // Verify form fields have proper labels
-                    const siteNameInput = page.locator(
-                        '[data-testid="input-siteName"]'
-                    );
+                    const siteNameInput = page.getByTestId("input-siteName");
                     await expect(siteNameInput).toHaveAttribute("aria-label");
 
                     // Test keyboard navigation
                     await page.keyboard.press("Tab");
-                    const focusedElement = await page.locator(":focus").first();
+                    const focusedElement = page.locator(":focus").first();
                     await expect(focusedElement).toBeVisible();
 
                     // Test that form elements are reachable via keyboard

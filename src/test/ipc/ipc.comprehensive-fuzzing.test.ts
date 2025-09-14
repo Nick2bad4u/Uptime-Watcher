@@ -182,9 +182,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             "should handle handler validation",
             async (channel, input) => {
                 const handler = vi.fn(() => Promise.resolve("success"));
-                const validator = vi.fn((data: unknown): data is any => {
-                    return typeof data === "object" && data !== null;
-                });
+                const validator = vi.fn((data: unknown): data is any => typeof data === "object" && data !== null);
 
                 registerStandardizedIpcHandler(channel, handler, validator);
 
@@ -356,14 +354,12 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 const handler = vi.fn(() => Promise.resolve("success"));
                 const strictValidator = (
                     data: unknown
-                ): data is { required: string } => {
-                    return (
+                ): data is { required: string } => (
                         typeof data === "object" &&
                         data !== null &&
                         "required" in data &&
                         typeof (data as any).required === "string"
                     );
-                };
 
                 registerStandardizedIpcHandler(
                     channel,
@@ -597,8 +593,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 );
                 const siteValidator = (
                     data: unknown
-                ): data is typeof siteData => {
-                    return (
+                ): data is typeof siteData => (
                         typeof data === "object" &&
                         data !== null &&
                         "name" in data &&
@@ -606,7 +601,6 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                         typeof (data as any).name === "string" &&
                         typeof (data as any).url === "string"
                     );
-                };
 
                 registerStandardizedIpcHandler(channel, handler, siteValidator);
 
@@ -634,8 +628,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 const handler = vi.fn(() => Promise.resolve("updated"));
                 const monitoringValidator = (
                     data: unknown
-                ): data is typeof monitoringData => {
-                    return (
+                ): data is typeof monitoringData => (
                         typeof data === "object" &&
                         data !== null &&
                         "siteId" in data &&
@@ -643,7 +636,6 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                         typeof (data as any).siteId === "string" &&
                         typeof (data as any).status === "string"
                     );
-                };
 
                 registerStandardizedIpcHandler(
                     channel,
@@ -675,9 +667,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 const handler = vi.fn(() => Promise.resolve());
                 const settingsValidator = (
                     data: unknown
-                ): data is typeof settingsData => {
-                    return typeof data === "object" && data !== null;
-                };
+                ): data is typeof settingsData => typeof data === "object" && data !== null;
 
                 registerStandardizedIpcHandler(
                     channel,

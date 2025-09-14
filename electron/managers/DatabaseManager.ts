@@ -293,7 +293,6 @@ export class DatabaseManager {
                         data
                     );
                     await this.commandExecutor.execute(command);
-                    return true;
                 },
                 { logger: monitorLogger, operationName: "import data" }
             );

@@ -50,8 +50,8 @@ const arbitraryMonitorFormData = fc.record({
     name: fc.string(),
     url: fc.webUrl(),
     method: fc.constantFrom("GET", "POST", "PUT", "DELETE"),
-    interval: fc.integer({ min: 5000, max: 3600000 }),
-    timeout: fc.integer({ min: 1000, max: 30000 }),
+    interval: fc.integer({ min: 5000, max: 3_600_000 }),
+    timeout: fc.integer({ min: 1000, max: 30_000 }),
 });
 
 const arbitraryMonitor = fc.record({
@@ -100,7 +100,7 @@ describe("Source Utilities - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([fc.integer({ min: 0, max: 10000 })])(
+        fcTest.prop([fc.integer({ min: 0, max: 10_000 })])(
             "should format duration correctly",
             (timeout) => {
                 const result = duration.calculateMaxDuration(timeout, 0);
@@ -151,13 +151,13 @@ describe("Source Utilities - 100% Fast-Check Fuzzing Coverage", () => {
     });
 
     describe("Timeout utilities", () => {
-        fcTest.prop([fc.integer({ min: 0, max: 100000 })])(
+        fcTest.prop([fc.integer({ min: 0, max: 100_000 })])(
             "should clamp timeout milliseconds",
             (timeoutMs) => {
                 const result = timeoutUtils.clampTimeoutMs(timeoutMs);
                 expect(typeof result).toBe("number");
                 expect(result).toBeGreaterThanOrEqual(1000);
-                expect(result).toBeLessThanOrEqual(30000);
+                expect(result).toBeLessThanOrEqual(30_000);
             }
         );
 
@@ -171,7 +171,7 @@ describe("Source Utilities - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([fc.integer({ min: 1000, max: 30000 })])(
+        fcTest.prop([fc.integer({ min: 1000, max: 30_000 })])(
             "should convert ms to seconds",
             (timeoutMs) => {
                 const result = timeoutUtils.timeoutMsToSeconds(timeoutMs);
@@ -206,7 +206,7 @@ describe("Source Utilities - 100% Fast-Check Fuzzing Coverage", () => {
             (timeoutMs) => {
                 const result = timeoutUtils.isValidTimeoutMs(timeoutMs);
                 expect(typeof result).toBe("boolean");
-                expect(result).toBe(timeoutMs >= 1000 && timeoutMs <= 30000);
+                expect(result).toBe(timeoutMs >= 1000 && timeoutMs <= 30_000);
             }
         );
 
@@ -224,7 +224,7 @@ describe("Source Utilities - 100% Fast-Check Fuzzing Coverage", () => {
     });
 
     describe("Time utilities", () => {
-        fcTest.prop([fc.integer({ min: 0, max: 86400000 })])(
+        fcTest.prop([fc.integer({ min: 0, max: 86_400_000 })])(
             "should format duration",
             (ms) => {
                 const result = time.formatDuration(ms);
@@ -242,7 +242,7 @@ describe("Source Utilities - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([fc.integer({ min: 1000, max: 3600000 })])(
+        fcTest.prop([fc.integer({ min: 1000, max: 3_600_000 })])(
             "should format interval duration",
             (ms) => {
                 const result = time.formatIntervalDuration(ms);
@@ -260,7 +260,7 @@ describe("Source Utilities - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([fc.float({ min: 0, max: 10000, noNaN: true })])(
+        fcTest.prop([fc.float({ min: 0, max: 10_000, noNaN: true })])(
             "should format response duration",
             (ms) => {
                 const result = time.formatResponseDuration(ms);
@@ -269,7 +269,7 @@ describe("Source Utilities - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([fc.option(fc.float({ min: 0, max: 10000, noNaN: true }))])(
+        fcTest.prop([fc.option(fc.float({ min: 0, max: 10_000, noNaN: true }))])(
             "should format response time",
             (responseTime) => {
                 const result = time.formatResponseTime(
@@ -279,7 +279,7 @@ describe("Source Utilities - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([fc.integer({ min: 1000, max: 3600000 })])(
+        fcTest.prop([fc.integer({ min: 1000, max: 3_600_000 })])(
             "should get interval label",
             (interval) => {
                 const result = time.getIntervalLabel(interval);
@@ -408,7 +408,7 @@ describe("Source Utilities - 100% Fast-Check Fuzzing Coverage", () => {
             "should provide fallback value",
             (value, fallbackValue) => {
                 const result = fallbacks.withFallback(value, fallbackValue);
-                expect(result === value || result === fallbackValue).toBe(true);
+                expect(result === value || result === fallbackValue).toBeTruthy();
                 if (value === null || value === undefined) {
                     expect(result).toBe(fallbackValue);
                 } else {
@@ -509,7 +509,7 @@ describe("Source Utilities - 100% Fast-Check Fuzzing Coverage", () => {
 
     describe("Integration fuzzing tests", () => {
         fcTest.prop([
-            fc.integer({ min: 1000, max: 30000 }),
+            fc.integer({ min: 1000, max: 30_000 }),
             fc.integer({ min: 0, max: 5 }),
         ])(
             "should handle timeout and duration calculations",
@@ -524,7 +524,7 @@ describe("Source Utilities - 100% Fast-Check Fuzzing Coverage", () => {
 
                 if (isValidTimeout) {
                     expect(timeoutSeconds).toBeGreaterThan(0);
-                    expect(maxDuration).toMatch(/^\d+[smh]$/);
+                    expect(maxDuration).toMatch(/^\d+[hms]$/);
                 }
             }
         );
@@ -550,7 +550,7 @@ describe("Source Utilities - 100% Fast-Check Fuzzing Coverage", () => {
         );
 
         fcTest.prop([
-            fc.float({ min: 0, max: 10000, noNaN: true }),
+            fc.float({ min: 0, max: 10_000, noNaN: true }),
             fc.integer({ min: 0, max: Date.now() }),
         ])(
             "should handle time formatting workflow",

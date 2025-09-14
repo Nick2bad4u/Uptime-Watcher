@@ -30,7 +30,7 @@ import {
 } from "../utils/ui-helpers";
 
 test.describe(
-    "Main Application - Comprehensive Tests",
+    "main Application - Comprehensive Tests",
     {
         tag: [
             "@app",
@@ -220,7 +220,7 @@ test.describe(
                     // Verify no modal is initially open
                     await expect(
                         page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                    ).not.toBeVisible();
+                    ).toBeHidden();
 
                     // Open settings modal
                     await openSettingsModal(page);
@@ -254,7 +254,7 @@ test.describe(
                     // Verify modal is closed
                     await expect(
                         page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                    ).not.toBeVisible();
+                    ).toBeHidden();
                 } finally {
                     await electronApp.close();
                 }
@@ -369,7 +369,7 @@ test.describe(
                     await page.keyboard.press("Escape");
                     await expect(
                         page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                    ).not.toBeVisible();
+                    ).toBeHidden();
                 } finally {
                     await electronApp.close();
                 }
@@ -533,10 +533,10 @@ test.describe(
                     await page.waitForTimeout(WAIT_TIMEOUTS.SHORT);
 
                     // Verify state is maintained
-                    const finalMonitorCount = await page
+                    const finalMonitorCount = page
                         .getByText(/Monitored Sites \(\d+\)/)
-                        .textContent();
-                    expect(finalMonitorCount).toBe(initialMonitorCount);
+                        ;
+                    await expect(finalMonitorCount).toHaveText(initialMonitorCount);
 
                     // App should still be fully functional
                     await expect(

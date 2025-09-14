@@ -11,7 +11,7 @@ import { launchElectronApp } from "../fixtures/electron-helpers";
 import { waitForAppInitialization, UI_SELECTORS } from "../utils/ui-helpers";
 
 test.describe(
-    "Comprehensive Navigation and Structure Tests",
+    "comprehensive Navigation and Structure Tests",
     {
         tag: [
             "@navigation",

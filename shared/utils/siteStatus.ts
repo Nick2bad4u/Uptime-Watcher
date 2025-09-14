@@ -91,14 +91,30 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
         return "unknown";
     }
 
-    // Get unique statuses
-    const statuses = Array.from(new Set(monitors.map((m) => m.status)));
+    // Get unique statuses and validate they exist
+    const statuses = Array.from(
+        new Set(monitors.map((m) => m.status).filter(Boolean))
+    );
+
+    // Handle case where no valid statuses found
+    if (statuses.length === 0) {
+        return "unknown";
+    }
 
     // Single status - all monitors have the same status
     if (statuses.length === 1) {
-        // Type assertion is safe as we know all monitors have the same status
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- safe assertion for single uniform status
-        return statuses[0] as SiteStatus;
+        const status = statuses[0];
+        // Validate the status is a valid SiteStatus before returning
+        if (
+            status === "up" ||
+            status === "down" ||
+            status === "pending" ||
+            status === "paused"
+        ) {
+            return status;
+        }
+        // Fallback for invalid status values
+        return "unknown";
     }
 
     // Multiple statuses - mixed state
