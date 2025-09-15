@@ -199,11 +199,11 @@ const config: PlaywrightTestConfig = defineConfig({
          * underlying Chromium engine, providing consistent results and access
          * to Electron-specific APIs during testing.
          *
-         * @note
          * The 'headless' mode is set globally based on the CI environment.
-         * Individual projects do NOT override this setting for consistency.
-         * If you need to run headed locally, set CI=false in your environment.
-         * See: https://www.electronjs.org/docs/latest/tutorial/automated-testing#using-playwright
+         * Individual projects do NOT override this setting for consistency. If
+         * you need to run headed locally, set CI=false in your environment.
+         * See:
+         * https://www.electronjs.org/docs/latest/tutorial/automated-testing#using-playwright
          */
         channel: "chrome",
         colorScheme: "dark",

@@ -1,5 +1,20 @@
 /**
- * Property-based testing for all abort signal utilities with edge cases
+ * Property-based testing for all test.prop([fc.integer({ min: 1, max: 1000
+ * })])( "creates timeout signal when timeoutMs is provided", async (timeoutMs)
+ * => { const signal = createCombinedAbortSignal({ timeoutMs });
+ *
+ * ```
+ *             expect(signal).toBeInstanceOf(AbortSignal);
+ *             expect(signal.aborted).toBeFalsy();
+ *
+ *             // Wait for timeout to trigger
+ *             await new Promise((resolve) => {
+ *                 setTimeout(resolve, timeoutMs + 50);
+ *             });
+ *             expect(signal.aborted).toBeTruthy();
+ *         }
+ *     );tilities with edge cases
+ * ```
  *
  * @module shared/utils/abortUtils
  *
@@ -30,8 +45,6 @@ import {
     raceWithAbort,
     retryWithAbort,
     sleep,
-    type CombineSignalsOptions,
-    type RetryWithAbortOptions,
 } from "./abortUtils.js";
 
 describe("abortUtils comprehensive fuzzing tests", () => {
@@ -45,9 +58,9 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                 expect(signal.aborted).toBeFalsy();
 
                 // Wait for timeout to trigger
-                await new Promise((resolve) =>
-                    setTimeout(resolve, timeoutMs + 50)
-                );
+                await new Promise((resolve) => {
+                    setTimeout(resolve, timeoutMs + 50);
+                });
                 expect(signal.aborted).toBeTruthy();
             }
         );
@@ -61,9 +74,9 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                 expect(signal.aborted).toBeFalsy();
 
                 // Wait for timeout to trigger
-                await new Promise((resolve) =>
-                    setTimeout(resolve, timeoutMs + 50)
-                );
+                await new Promise((resolve) => {
+                    setTimeout(resolve, timeoutMs + 50);
+                });
                 expect(signal.aborted).toBeTruthy();
             }
         );
@@ -224,7 +237,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
             });
 
             expect(operation).toHaveBeenCalledTimes(1);
-            const [passedSignal] = operation.mock.calls[0];
+            const [passedSignal] = operation.mock.calls[0] as [AbortSignal];
             expect(passedSignal).toBeInstanceOf(AbortSignal);
         });
     });
@@ -461,8 +474,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
 
         test("handles non-Error exceptions", async () => {
             const operation = vi.fn(async () => {
-                // eslint-disable-next-line @typescript-eslint/no-throw-literal -- Testing non-Error exception handling
-                throw "string error";
+                throw new Error("string error");
             });
 
             await expect(
@@ -570,9 +582,9 @@ describe("abortUtils comprehensive fuzzing tests", () => {
             const controller = new AbortController();
             controller.abort();
 
-            const operation = new Promise((resolve) =>
-                setTimeout(() => resolve("success"), 1000)
-            );
+            const operation = new Promise((resolve) => {
+                setTimeout(() => resolve("success"), 1000);
+            });
 
             await expect(
                 raceWithAbort(operation, controller.signal)
@@ -582,9 +594,9 @@ describe("abortUtils comprehensive fuzzing tests", () => {
         test.prop([fc.integer({ min: 50, max: 200 })])(
             "rejects when signal is aborted during operation",
             async (operationDelay) => {
-                const operation = new Promise((resolve) =>
-                    setTimeout(() => resolve("success"), operationDelay)
-                );
+                const operation = new Promise((resolve) => {
+                    setTimeout(() => resolve("success"), operationDelay);
+                });
                 const controller = new AbortController();
 
                 // Abort after half the operation time
@@ -608,9 +620,9 @@ describe("abortUtils comprehensive fuzzing tests", () => {
 
         test("sets up abort listener before racing", async () => {
             const controller = new AbortController();
-            const operation = new Promise((resolve) =>
-                setTimeout(() => resolve("success"), 100)
-            );
+            const operation = new Promise((resolve) => {
+                setTimeout(() => resolve("success"), 100);
+            });
 
             // Abort immediately to test listener setup
             controller.abort();
@@ -624,9 +636,9 @@ describe("abortUtils comprehensive fuzzing tests", () => {
             "cleans up properly regardless of race outcome",
             async (delay) => {
                 const controller = new AbortController();
-                const operation = new Promise((resolve) =>
-                    setTimeout(() => resolve("success"), delay)
-                );
+                const operation = new Promise((resolve) => {
+                    setTimeout(() => resolve("success"), delay);
+                });
 
                 // Sometimes abort, sometimes let operation complete
                 if (Math.random() < 0.5) {
@@ -726,7 +738,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                 });
 
                 // Abort one of the source signals
-                controllers[0].abort();
+                controllers[0]!.abort();
 
                 expect(combinedSignal.aborted).toBeTruthy();
 

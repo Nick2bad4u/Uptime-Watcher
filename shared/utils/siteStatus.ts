@@ -103,7 +103,7 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
 
     // Single status - all monitors have the same status
     if (statuses.length === 1) {
-        const status = statuses[0];
+        const [status] = statuses;
         // Validate the status is a valid SiteStatus before returning
         if (
             status === "up" ||

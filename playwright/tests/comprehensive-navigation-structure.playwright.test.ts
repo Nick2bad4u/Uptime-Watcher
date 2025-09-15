@@ -68,11 +68,11 @@ test.describe(
             );
 
             // Verify main content areas exist
-            const statusSummary = page.locator(".header-status-summary-box");
+            const statusSummary = page.getByTestId("header-status-summary");
             await expect(statusSummary).toBeVisible();
 
             // Check for monitoring status indicators
-            const statusIndicators = page.locator(".themed-status-indicator");
+            const statusIndicators = page.getByTestId("status-indicator");
             const indicatorCount = await statusIndicators.count();
             expect(indicatorCount).toBeGreaterThan(0);
 
@@ -153,7 +153,7 @@ test.describe(
 
             // Verify we're in settings (different from Add Site)
             const settingsContent = page
-                .locator("dialog")
+                .getByRole("dialog")
                 .getByText("Settings");
             await expect(settingsContent).toBeVisible();
 
@@ -205,7 +205,12 @@ test.describe(
             await expect(modalOverlay).not.toBeVisible({ timeout: 5000 });
 
             // Focus should return to the button that opened the modal
-            await page.waitForTimeout(100); // Brief wait for focus to settle
+            await page.waitForFunction(
+                () =>
+                    document.activeElement?.getAttribute("data-testid") ===
+                    "button-add-new-site",
+                { timeout: 2000 }
+            );
             focusedElement = await page.evaluate(() =>
                 document.activeElement?.getAttribute("data-testid")
             );
@@ -229,7 +234,13 @@ test.describe(
             await page.getByTestId("button-toggle-theme").click();
 
             // Wait for theme change
-            await page.waitForTimeout(300);
+            await page.waitForFunction(
+                () => {
+                    const currentClass = document.body.className;
+                    return currentClass !== initialBodyClass;
+                },
+                { timeout: 2000 }
+            );
 
             // Verify theme changed
             const newBodyClass = await page.evaluate(
@@ -244,7 +255,16 @@ test.describe(
 
             // Click again to toggle back
             await themeButton.click();
-            await page.waitForTimeout(300);
+            await page.waitForFunction(
+                () => {
+                    const body = document.body;
+                    return (
+                        body.classList.contains("dark") ||
+                        body.classList.contains("light")
+                    );
+                },
+                { timeout: 300 }
+            );
 
             // Should return to original theme
             const finalBodyClass = await page.evaluate(
@@ -261,16 +281,14 @@ test.describe(
 
             await waitForAppInitialization(page);
 
-            // Check for main landmark
-            const mainLandmark = page.locator("main, [role='main']");
-            const mainExists = (await mainLandmark.count()) > 0;
-
-            if (mainExists) {
-                await expect(mainLandmark.first()).toBeVisible();
-            }
+            // Check for main landmark - use testid if available, otherwise check for main element
+            const mainLandmark = page
+                .getByRole("main")
+                .or(page.getByTestId("main-content"));
+            await expect(mainLandmark.first()).toBeVisible();
 
             // Check button roles and labels
-            const buttons = page.locator("button");
+            const buttons = page.getByRole("button");
             const buttonCount = await buttons.count();
             expect(buttonCount).toBeGreaterThan(0);
 
@@ -303,7 +321,7 @@ test.describe(
 
             for (const viewport of viewports) {
                 await page.setViewportSize(viewport);
-                await page.waitForTimeout(200); // Wait for layout
+                await page.waitForLoadState("domcontentloaded"); // Wait for layout
 
                 // Core elements should remain visible and functional
                 await expect(page.getByTestId("app-container")).toBeVisible();
@@ -316,9 +334,9 @@ test.describe(
                 await expect(page.getByTestId("button-settings")).toBeVisible();
 
                 // Status summary should adapt to viewport
-                const statusSummary = page.locator(
-                    ".header-status-summary-box"
-                );
+                const statusSummary = page
+                    .getByTestId("header-status-summary")
+                    .or(page.getByText(/status/i));
                 await expect(statusSummary).toBeVisible();
             }
 
@@ -335,18 +353,21 @@ test.describe(
             for (let i = 0; i < 5; i++) {
                 // Open Add Site modal
                 await page.getByTestId("button-add-new-site").click();
-                await expect(
-                    page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                ).toBeVisible({ timeout: 2000 });
+                await expect(page.getByRole("dialog")).toBeVisible({
+                    timeout: 2000,
+                });
 
                 // Close with Escape
                 await page.keyboard.press("Escape");
-                await expect(
-                    page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                ).not.toBeVisible({ timeout: 2000 });
+                await expect(page.getByRole("dialog")).not.toBeVisible({
+                    timeout: 2000,
+                });
 
                 // Brief pause between iterations
-                await page.waitForTimeout(100);
+                await page.waitForFunction(
+                    () => document.readyState === "complete",
+                    { timeout: 100 }
+                );
             }
 
             // Verify app is still functional after rapid navigation

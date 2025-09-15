@@ -64,10 +64,11 @@ test.describe(
             // DOM content should load quickly
             expect(performanceMetrics.domContentLoaded).toBeLessThan(1000);
 
-            // First paint should occur within reasonable time
-            if (performanceMetrics.firstPaint > 0) {
-                expect(performanceMetrics.firstPaint).toBeLessThan(2000);
-            }
+            // First paint should occur within reasonable time when available
+            expect(
+                performanceMetrics.firstPaint === 0 ||
+                    performanceMetrics.firstPaint < 2000
+            ).toBe(true);
 
             await electronApp.close();
         });
@@ -94,7 +95,7 @@ test.describe(
             for (let i = 0; i < 10; i++) {
                 // Trigger theme toggle to test memory cleanup
                 await page.getByTestId("button-toggle-theme").click();
-                await page.waitForTimeout(100);
+                await page.waitForLoadState("domcontentloaded");
             }
 
             // Get memory after operations
@@ -108,16 +109,14 @@ test.describe(
             });
 
             // Memory should not grow excessively (allow for reasonable growth)
-            if (
-                initialMemory.usedJSHeapSize > 0 &&
-                afterMemory.usedJSHeapSize > 0
-            ) {
-                const memoryGrowth =
-                    (afterMemory.usedJSHeapSize -
-                        initialMemory.usedJSHeapSize) /
-                    initialMemory.usedJSHeapSize;
-                expect(memoryGrowth).toBeLessThan(2.0); // Should not double memory usage
-            }
+            // Ensure both memory values are positive
+            expect(initialMemory.usedJSHeapSize).toBeGreaterThan(0);
+            expect(afterMemory.usedJSHeapSize).toBeGreaterThan(0);
+
+            const memoryGrowth =
+                (afterMemory.usedJSHeapSize - initialMemory.usedJSHeapSize) /
+                initialMemory.usedJSHeapSize;
+            expect(memoryGrowth).toBeLessThan(2.0); // Should not double memory usage
 
             await electronApp.close();
         });
@@ -138,7 +137,7 @@ test.describe(
                         document.body,
                         NodeFilter.SHOW_ELEMENT
                     );
-                    let currentDepth = 0;
+                    let _currentDepth = 0;
 
                     while (walker.nextNode()) {
                         const node = walker.currentNode as Element;
@@ -189,7 +188,9 @@ test.describe(
                 rapidInteractions.push(time);
 
                 // Brief pause to prevent overwhelming
-                await page.waitForTimeout(50);
+                await page.waitForFunction(
+                    () => document.readyState === "complete"
+                );
             }
 
             // Calculate average response time
@@ -346,7 +347,7 @@ test.describe(
             for (let i = 0; i < 5; i++) {
                 const start = performance.now();
                 await page.getByTestId("button-toggle-theme").click();
-                await page.waitForTimeout(100); // Wait for transition
+                await page.waitForLoadState("domcontentloaded"); // Wait for transition
                 const end = performance.now();
 
                 themeSwitchTimes.push(end - start);
@@ -371,7 +372,7 @@ test.describe(
             await waitForAppInitialization(page);
 
             // Get initial resource state
-            const initialResources = await page.evaluate(() => {
+            const _initialResources = await page.evaluate(() => {
                 return {
                     timers: (globalThis as any).timerCount || 0,
                     intervals: (globalThis as any).intervalCount || 0,
@@ -381,7 +382,7 @@ test.describe(
 
             // Perform operations that might create resources
             await page.getByTestId("button-toggle-theme").click();
-            await page.waitForTimeout(100);
+            await page.waitForLoadState("domcontentloaded");
 
             // Application should clean up properly when closed
             await electronApp.close();

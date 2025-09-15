@@ -12,7 +12,7 @@ import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { logger } from "../../services/logger";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import type { Monitor, Site } from "../../../shared/types";
-import type { ChangeEvent } from "react";
+// import type { ChangeEvent } from "react";
 
 // Mock modules
 vi.mock("../../stores/sites/useSitesStore");
@@ -260,7 +260,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
             ...mockMonitor,
             id: "special-monitor",
             type: "dns",
-            url: undefined,
+            url: "special-host", // Changed from undefined to match type requirement
             host: "special-host",
             port: 8080,
         };

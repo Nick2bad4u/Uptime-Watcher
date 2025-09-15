@@ -133,7 +133,7 @@ describe("objectSafety comprehensive fuzzing tests", () => {
             const obj = { test: 42 };
 
             let callCount = 0;
-            let receivedValue: unknown;
+            let receivedValue: unknown = undefined;
             const validator = (value: unknown): value is number => {
                 callCount++;
                 receivedValue = value;
@@ -151,7 +151,7 @@ describe("objectSafety comprehensive fuzzing tests", () => {
             const obj = { test: "string-value" };
 
             let callCount = 0;
-            let receivedValue: unknown;
+            let receivedValue: unknown = undefined;
             const numberValidator = (value: unknown): value is number => {
                 callCount++;
                 receivedValue = value;

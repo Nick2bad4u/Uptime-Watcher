@@ -20,7 +20,7 @@ test.describe("cross-Browser Compatibility", () => {
 
             // Test modern JavaScript features
             const jsFeatures = await page.evaluate(() => {
-                const tests = {
+                return {
                     asyncAwait: typeof (async () => {})().then === "function",
                     arrow: (() => true)(),
                     destructuring: (() => {
@@ -43,22 +43,24 @@ test.describe("cross-Browser Compatibility", () => {
                     weakMap: typeof WeakMap !== "undefined",
                     proxy: typeof Proxy !== "undefined",
                 };
-
-                return tests;
             });
 
             // All modern JS features should be supported
+            // Check core language features
             expect(jsFeatures.asyncAwait).toBe(true);
             expect(jsFeatures.arrow).toBe(true);
             expect(jsFeatures.destructuring).toBe(true);
             expect(jsFeatures.templateLiterals).toBe(true);
             expect(jsFeatures.spread).toBe(true);
+
+            // Check built-in objects
             expect(jsFeatures.map).toBe(true);
             expect(jsFeatures.set).toBe(true);
             expect(jsFeatures.promise).toBe(true);
             expect(jsFeatures.symbol).toBe(true);
-            expect(jsFeatures.weakMap).toBe(true);
-            expect(jsFeatures.proxy).toBe(true);
+
+            // Check advanced features
+            expect(jsFeatures.weakMap && jsFeatures.proxy).toBe(true);
 
             await electronApp.close();
         });
@@ -75,7 +77,9 @@ test.describe("cross-Browser Compatibility", () => {
                 document.body.appendChild(testElement);
 
                 const style = testElement.style;
-                const tests = {
+
+                document.body.removeChild(testElement);
+                return {
                     flexbox: "flex" in style,
                     grid: "grid" in style,
                     customProperties: CSS.supports("color", "var(--test)"),
@@ -90,9 +94,6 @@ test.describe("cross-Browser Compatibility", () => {
                         "linear-gradient(to right, red, blue)"
                     ),
                 };
-
-                document.body.removeChild(testElement);
-                return tests;
             });
 
             // Modern CSS features should be supported
@@ -150,18 +151,23 @@ test.describe("cross-Browser Compatibility", () => {
             });
 
             // DOM APIs should be available
+            // Core DOM selection and manipulation
             expect(domFeatures.querySelector).toBe(true);
             expect(domFeatures.querySelectorAll).toBe(true);
-            expect(domFeatures.addEventListener).toBe(true);
-            expect(domFeatures.removeEventListener).toBe(true);
             expect(domFeatures.createElement).toBe(true);
             expect(domFeatures.getElementById).toBe(true);
             expect(domFeatures.getElementsByClassName).toBe(true);
-            expect(domFeatures.classList).toBe(true);
-            expect(domFeatures.dataset).toBe(true);
+
+            // Event handling
+            expect(domFeatures.addEventListener).toBe(true);
+            expect(domFeatures.removeEventListener).toBe(true);
+
+            // Modern DOM features
+            expect(domFeatures.classList && domFeatures.dataset).toBe(true);
             expect(domFeatures.customElements).toBe(true);
-            expect(domFeatures.intersectionObserver).toBe(true);
-            expect(domFeatures.mutationObserver).toBe(true);
+            expect(
+                domFeatures.intersectionObserver && domFeatures.mutationObserver
+            ).toBe(true);
 
             await electronApp.close();
         });

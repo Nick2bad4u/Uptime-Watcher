@@ -35,8 +35,8 @@ npm run playwright:transform my-new-test.spec.ts
 
 This automatically converts:
 
-- ❌ `page.locator("button")` → ✅ `page.getByRole("button")`
-- ❌ `page.locator("[data-testid=submit]")` → ✅ `page.getByTestId("submit")`
+- ❌ `page.getByRole("button")` → ✅ `page.getByRole("button")`
+- ❌ `page.getByRole("[data-testid=submit]")` → ✅ `page.getByTestId("submit")`
 - ❌ `test("Click button")` → ✅ `test("should click button")`
 - ❌ Raw test structure → ✅ Proper `describe` blocks
 
@@ -48,9 +48,9 @@ Your `codegen-template.mjs` automatically transforms generated code for:
 
 ```typescript
 // Before (raw CSS selectors)
-page.locator("button");
-page.locator("input[type=text]");
-page.locator("[data-testid=login-form]");
+page.getByRole("button");
+page.getByRole("input[type=text]");
+page.getByRole("[data-testid=login-form]");
 
 // After (semantic locators)
 page.getByRole("button");

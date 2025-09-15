@@ -8,7 +8,13 @@
  * @packageDocumentation
  */
 
-import { describe, expect, test, vi, beforeEach } from "vitest";
+import {
+    describe,
+    expect,
+    test,
+    vi,
+    beforeEach,
+} from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
 
 // Mock electron modules
@@ -180,12 +186,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 );
 
                 const handlerSet = new Set<string>();
-                registerStandardizedIpcHandler(
-                    channel,
-                    handler,
-                    validator,
-                    handlerSet
-                );
+                registerStandardizedIpcHandler(channel, handler, validator, handlerSet);
 
                 // Get the registered handler function
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
@@ -544,7 +545,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     throw new Error("Async error");
                 });
 
-                registerStandardizedIpcHandler(channel, asyncErrorHandler, null, registeredHandlers);
+                registerStandardizedIpcHandler(channel, asyncErrorHandler);
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
@@ -567,7 +568,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 return Promise.resolve(circular);
             });
 
-            registerStandardizedIpcHandler(channel, handler, null, registeredHandlers);
+            registerStandardizedIpcHandler(channel, handler);
 
             const registeredHandler = mockIpcMain.handle.mock.calls.find(
                 (call) => call[0] === channel

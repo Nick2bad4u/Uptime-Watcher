@@ -95,9 +95,9 @@ page.getByLabel("Username");
 page.getByPlaceholder("Enter email");
 
 // ❌ Avoid - raw CSS
-page.locator("button");
-page.locator("#submit");
-page.locator(".my-class");
+page.getByRole("button");
+page.getByRole("#submit");
+page.getByRole(".my-class");
 ```
 
 ### 3. Use testId for complex elements
@@ -107,7 +107,7 @@ page.locator(".my-class");
 page.getByTestId("complex-component");
 
 // ❌ Avoid - complex CSS selectors
-page.locator("div.container > ul.list > li:nth-child(3)");
+page.getByRole("div.container > ul.list > li:nth-child(3)");
 ```
 
 ### 4. Write descriptive test titles

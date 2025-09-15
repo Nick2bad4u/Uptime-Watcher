@@ -19,7 +19,6 @@ import {
     fillAddSiteForm,
     submitAddSiteForm,
     UI_SELECTORS,
-    FORM_SELECTORS,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 
@@ -105,12 +104,9 @@ test.describe(
                         await openAddSiteModal(page);
 
                         // Click backdrop (outside modal content)
-                        await page
-                            .locator(UI_SELECTORS.MODAL_OVERLAY)
-                            .click({ position: { x: 50, y: 50 } });
-                        await expect(
-                            page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                        ).toBeHidden();
+                        const modal = page.getByRole("dialog");
+                        await modal.click({ position: { x: 50, y: 50 } });
+                        await expect(modal).toBeHidden();
                     } finally {
                         await electronApp.close();
                     }
@@ -131,20 +127,19 @@ test.describe(
                         await openAddSiteModal(page);
 
                         // Try to submit empty form
-                        const submitButton = page.locator(
-                            FORM_SELECTORS.SUBMIT_BUTTON
-                        );
-                        if (await submitButton.isVisible()) {
-                            await submitButton.click();
+                        const submitButton = page.getByRole("button", {
+                            name: /submit|add|save/i,
+                        });
+                        await expect(submitButton).toBeVisible();
+                        await submitButton.click();
 
-                            // Check for validation messages
-                            const validationMessages = page.locator(
-                                '[role="alert"], .error-message, .field-error'
-                            );
-                            await expect(
-                                validationMessages.first()
-                            ).toBeVisible({ timeout: WAIT_TIMEOUTS.SHORT });
-                        }
+                        // Check for validation messages
+                        const validationMessages = page
+                            .getByRole("alert")
+                            .or(page.getByText(/error|invalid|required/i));
+                        await expect(validationMessages.first()).toBeVisible({
+                            timeout: 2000,
+                        });
                     } finally {
                         await electronApp.close();
                     }
@@ -206,20 +201,19 @@ test.describe(
                             monitorType: "http",
                         });
 
-                        const submitButton = page.locator(
-                            FORM_SELECTORS.SUBMIT_BUTTON
-                        );
-                        if (await submitButton.isVisible()) {
-                            await submitButton.click();
+                        const submitButton = page.getByRole("button", {
+                            name: /submit|add|save/i,
+                        });
+                        await expect(submitButton).toBeVisible();
+                        await submitButton.click();
 
-                            // Should show URL validation error
-                            const urlError = page.locator(
-                                'text*="valid URL", text*="invalid", text*="format"'
-                            );
-                            await expect(urlError.first()).toBeVisible({
-                                timeout: WAIT_TIMEOUTS.SHORT,
-                            });
-                        }
+                        // Should show URL validation error
+                        const urlError = page.getByText(
+                            /valid URL|invalid|format/i
+                        );
+                        await expect(urlError.first()).toBeVisible({
+                            timeout: 2000,
+                        });
                     } finally {
                         await electronApp.close();
                     }
@@ -240,14 +234,11 @@ test.describe(
                         await openAddSiteModal(page);
 
                         // First form input should be focused
-                        const firstInput = page.locator(
-                            FORM_SELECTORS.SITE_NAME_INPUT
-                        );
-                        if (await firstInput.isVisible()) {
-                            await expect(firstInput).toBeFocused({
-                                timeout: WAIT_TIMEOUTS.SHORT,
-                            });
-                        }
+                        const firstInput = page
+                            .getByLabel(/name/i)
+                            .or(page.getByRole("textbox").first());
+                        await expect(firstInput).toBeVisible();
+                        await expect(firstInput).toBeFocused({ timeout: 2000 });
                     } finally {
                         await electronApp.close();
                     }
@@ -274,43 +265,31 @@ test.describe(
                         await openAddSiteModal(page);
 
                         // Tab through all focusable elements
-                        const focusableElements = page.locator(
-                            'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
-                        );
+                        const focusableElements = page
+                            .getByRole("button")
+                            .or(page.getByRole("textbox"))
+                            .or(page.getByRole("combobox"));
                         const focusableCount = await focusableElements.count();
 
-                        if (focusableCount > 0) {
-                            // Tab through elements and ensure focus stays within modal
-                            for (let i = 0; i < focusableCount + 2; i++) {
-                                await page.keyboard.press("Tab");
+                        // Assert we have focusable elements to test with
+                        expect(focusableCount).toBeGreaterThan(0);
 
-                                // Verify focused element is within modal
-                                const focusedElement = page.locator(":focus");
-                                const modalContainer = page.locator(
-                                    UI_SELECTORS.MODAL_OVERLAY
+                        // Tab through elements and ensure focus stays within modal
+                        for (let i = 0; i < focusableCount + 2; i++) {
+                            await page.keyboard.press("Tab");
+
+                            // Verify focused element is within modal
+                            const isInModal = await page.evaluate(() => {
+                                const focused = document.activeElement;
+                                const modal =
+                                    document.querySelector(".modal-overlay") ||
+                                    document.querySelector('[role="dialog"]');
+                                return (
+                                    focused && modal && modal.contains(focused)
                                 );
+                            });
 
-                                if (await focusedElement.isVisible()) {
-                                    // Check if focused element is within modal using evaluate
-                                    const isInModal = await page.evaluate(
-                                        () => {
-                                            const focused =
-                                                document.activeElement;
-                                            const modal =
-                                                document.querySelector(
-                                                    ".modal-overlay"
-                                                );
-                                            return (
-                                                focused &&
-                                                modal &&
-                                                modal.contains(focused)
-                                            );
-                                        }
-                                    );
-
-                                    expect(isInModal).toBeTruthy();
-                                }
-                            }
+                            expect(isInModal).toBeTruthy();
                         }
                     } finally {
                         await electronApp.close();
@@ -331,24 +310,19 @@ test.describe(
                         await waitForAppInitialization(page);
                         await openAddSiteModal(page);
 
-                        const modal = page.locator(UI_SELECTORS.MODAL_OVERLAY);
+                        const modal = page.getByRole("dialog");
 
                         // Check for modal-specific ARIA attributes
-                        const modalDialog = modal.locator(
-                            'dialog, [role="dialog"]'
-                        );
-                        if ((await modalDialog.count()) > 0) {
-                            // Verify ARIA attributes exist
-                            const ariaLabel =
-                                await modalDialog.getAttribute("aria-label");
-                            const ariaLabelledBy =
-                                await modalDialog.getAttribute(
-                                    "aria-labelledby"
-                                );
+                        await expect(modal).toBeVisible();
 
-                            // Modal should have accessible name
-                            expect(ariaLabel || ariaLabelledBy).toBeTruthy();
-                        }
+                        // Verify ARIA attributes exist
+                        const ariaLabel =
+                            await modal.getAttribute("aria-label");
+                        const ariaLabelledBy =
+                            await modal.getAttribute("aria-labelledby");
+
+                        // Modal should have accessible name
+                        expect(ariaLabel || ariaLabelledBy).toBeTruthy();
                     } finally {
                         await electronApp.close();
                     }
@@ -369,19 +343,15 @@ test.describe(
                     try {
                         await waitForAppInitialization(page);
 
-                        const settingsButton = page.locator(
-                            UI_SELECTORS.SETTINGS_BUTTON
-                        );
-                        if (await settingsButton.isVisible()) {
-                            await settingsButton.click();
+                        const settingsButton = page.getByRole("button", {
+                            name: /settings/i,
+                        });
+                        await expect(settingsButton).toBeVisible();
+                        await settingsButton.click();
 
-                            // Settings modal should appear
-                            await expect(
-                                page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                            ).toBeVisible({
-                                timeout: WAIT_TIMEOUTS.MEDIUM,
-                            });
-                        }
+                        // Settings modal should appear
+                        const modal = page.getByRole("dialog");
+                        await expect(modal).toBeVisible({ timeout: 5000 });
                     } finally {
                         await electronApp.close();
                     }
@@ -402,32 +372,37 @@ test.describe(
                     try {
                         await waitForAppInitialization(page);
 
-                        const themeToggle = page.locator(
-                            UI_SELECTORS.THEME_TOGGLE
+                        const themeToggle = page.getByRole("button", {
+                            name: /theme|dark|light/i,
+                        });
+                        await expect(themeToggle).toBeVisible();
+
+                        // Get initial theme state
+                        const initialClass = await page.evaluate(
+                            () => document.body.className
                         );
-                        if (await themeToggle.isVisible()) {
-                            // Get initial theme state
-                            const initialClass =
-                                (await page
-                                    .locator("body")
-                                    .getAttribute("class")) || "";
-                            const initialIsDark = initialClass.includes("dark");
+                        const initialIsDark = initialClass.includes("dark");
 
-                            // Toggle theme
-                            await themeToggle.click();
+                        // Toggle theme
+                        await themeToggle.click();
 
-                            // Wait for theme change
-                            await page.waitForTimeout(500);
+                        // Wait for theme change
+                        await page.waitForFunction(() => {
+                            const body = document.body;
+                            return (
+                                body.classList.contains("dark") ||
+                                body.classList.contains("light") ||
+                                body.dataset.theme !== undefined
+                            );
+                        });
 
-                            // Check theme changed
-                            const newClass =
-                                (await page
-                                    .locator("body")
-                                    .getAttribute("class")) || "";
-                            const newIsDark = newClass.includes("dark");
+                        // Check theme changed
+                        const newClass = await page.evaluate(
+                            () => document.body.className
+                        );
+                        const newIsDark = newClass.includes("dark");
 
-                            expect(newIsDark).not.toBe(initialIsDark);
-                        }
+                        expect(newIsDark).not.toBe(initialIsDark);
                     } finally {
                         await electronApp.close();
                     }
@@ -463,11 +438,11 @@ test.describe(
                         await submitAddSiteForm(page);
 
                         // Should show error message
-                        const errorMessage = page.locator(
-                            '[role="alert"], .error-message, .notification-error'
-                        );
+                        const errorMessage = page
+                            .getByRole("alert")
+                            .or(page.getByText(/error|invalid|failed/i));
                         await expect(errorMessage.first()).toBeVisible({
-                            timeout: WAIT_TIMEOUTS.MEDIUM,
+                            timeout: 5000,
                         });
                     } finally {
                         await electronApp.close();
@@ -488,22 +463,24 @@ test.describe(
                         await waitForAppInitialization(page);
 
                         // Try to open multiple modals rapidly
+                        const addButton = page.getByRole("button", {
+                            name: /add.?site/i,
+                        });
                         for (let i = 0; i < 3; i++) {
-                            await page
-                                .locator(UI_SELECTORS.ADD_SITE_BUTTON)
-                                .click();
-                            await page.waitForTimeout(100);
+                            await addButton.click();
+                            await page.waitForFunction(() => true, {
+                                timeout: 100,
+                            });
                         }
 
                         // Should still have only one modal
-                        const modalCount = await page
-                            .locator(UI_SELECTORS.MODAL_OVERLAY)
-                            .count();
+                        const modals = page.getByRole("dialog");
+                        const modalCount = await modals.count();
                         expect(modalCount).toBeLessThanOrEqual(1);
 
-                        if (modalCount > 0) {
-                            await closeModal(page);
-                        }
+                        // Close any open modal
+                        await expect(modals.first()).toBeVisible();
+                        await closeModal(page);
                     } finally {
                         await electronApp.close();
                     }

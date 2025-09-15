@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
 
 // Custom arbitraries for database testing
@@ -336,7 +336,7 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
                 expect(typeof settingsMap).toBe("object");
                 expect(settingsMap).not.toBeNull();
 
-                for (const [key, value] of Object.entries(settingsMap)) {
+                for (const [key, _value] of Object.entries(settingsMap)) {
                     expect(typeof key).toBe("string");
                     // Value type validation happens at the application layer
                 }

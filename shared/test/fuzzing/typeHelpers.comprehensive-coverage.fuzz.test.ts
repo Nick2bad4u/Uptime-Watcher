@@ -139,7 +139,9 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
                 ])
             ).toBeTruthy();
             expect(isArray({})).toBeFalsy();
-            expect(isArray(arguments)).toBeFalsy();
+            // Test with arguments-like object instead of 'arguments' keyword
+            const argumentsLike = { 0: "a", 1: "b", length: 2 };
+            expect(isArray(argumentsLike)).toBeFalsy();
             expect(isArray("[]")).toBeFalsy();
         });
     });
@@ -178,7 +180,7 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
             expect(isRecord({})).toBeTruthy();
             expect(isRecord(Object.create(null))).toBeTruthy();
             expect(isRecord(new Date())).toBeTruthy();
-            expect(isRecord(new RegExp(""))).toBeTruthy();
+            expect(isRecord(/(?:)/)).toBeTruthy();
             expect(isRecord(null)).toBeFalsy();
             expect(isRecord([])).toBeFalsy();
             expect(isRecord(() => {})).toBeFalsy();
@@ -211,9 +213,10 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
         test.prop([fc.object(), fc.string()])(
             "should return undefined when property doesn't exist",
             (obj, key) => {
-                // Ensure the key doesn't exist
+                // Ensure the key doesn't exist by creating a fresh object without it
                 const testObj = { ...obj };
-                delete testObj[key];
+                // Use Reflect.deleteProperty for safe dynamic deletion
+                Reflect.deleteProperty(testObj, key);
 
                 if (!(key in testObj)) {
                     const result = safePropertyAccess(testObj, key);

@@ -42,7 +42,8 @@ const arbitraryEventPayload = fc.oneof(
 );
 
 const arbitraryCorrelationId = fc.string({ minLength: 8, maxLength: 36 });
-const arbitraryTimestamp = fc.date().map((d) => d.getTime());
+// Unused arbitraries for future expansion
+// const arbitraryTimestamp = fc.date().map((d) => d.getTime());
 
 describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
     let eventBus: TypedEventBus<UptimeEvents>;
@@ -231,7 +232,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             async (eventType, payload) => {
                 const middleware = vi
                     .fn()
-                    .mockImplementation(async (event, data, next) => {
+                    .mockImplementation(async (_event, _data, next) => {
                         await next();
                     });
                 const listener = vi.fn();
@@ -289,10 +290,14 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
         test("should support middleware removal", () => {
             const middleware1 = vi
                 .fn()
-                .mockImplementation(async (event, data, next) => await next());
+                .mockImplementation(
+                    async (_event, _data, next) => await next()
+                );
             const middleware2 = vi
                 .fn()
-                .mockImplementation(async (event, data, next) => await next());
+                .mockImplementation(
+                    async (_event, _data, next) => await next()
+                );
 
             eventBus.registerMiddleware(middleware1);
             eventBus.registerMiddleware(middleware2);
@@ -423,16 +428,16 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
             // Add up to limit
             limitedBus.registerMiddleware(
-                vi.fn().mockImplementation(async (e, d, n) => await n())
+                vi.fn().mockImplementation(async (_e, _d, n) => await n())
             );
             limitedBus.registerMiddleware(
-                vi.fn().mockImplementation(async (e, d, n) => await n())
+                vi.fn().mockImplementation(async (_e, _d, n) => await n())
             );
 
             // Adding beyond limit should throw
             expect(() => {
                 limitedBus.registerMiddleware(
-                    vi.fn().mockImplementation(async (e, d, n) => await n())
+                    vi.fn().mockImplementation(async (_e, _d, n) => await n())
                 );
             }).toThrow("Maximum middleware limit");
         });

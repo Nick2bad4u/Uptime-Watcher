@@ -27,12 +27,13 @@ const arbitraryEventType = fc.constantFrom(
     "system:health:check"
 );
 
-const arbitraryMonitorStatus = fc.constantFrom(
-    "up",
-    "down",
-    "pending",
-    "paused"
-);
+// Unused arbitraries for future expansion
+// const arbitraryMonitorStatus = fc.constantFrom(
+//     "up",
+//     "down",
+//     "pending",
+//     "paused"
+// );
 
 const arbitraryLogLevel = fc.constantFrom(
     "debug",
@@ -364,7 +365,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             async (eventType, payload) => {
                 const middleware = vi
                     .fn()
-                    .mockImplementation(async (event, data, next) => {
+                    .mockImplementation(async (_event, _data, next) => {
                         await next();
                     });
                 const listener = vi.fn();
@@ -505,16 +506,16 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             arbitraryEventMetadata,
         ])(
             "should handle complete event lifecycle",
-            (eventType, payload, metadata) => {
+            (eventType, payload, _metadata) => {
                 const listener = vi.fn();
                 eventBus.on(String(eventType), listener);
 
-                // Create complete event
-                const completeEvent = {
-                    type: eventType,
-                    payload,
-                    metadata,
-                };
+                // Create complete event (unused)
+                // const _completeEvent = {
+                //     type: eventType,
+                //     payload,
+                //     metadata,
+                // };
 
                 // Emit with metadata
                 eventBus.emit(String(eventType), payload);

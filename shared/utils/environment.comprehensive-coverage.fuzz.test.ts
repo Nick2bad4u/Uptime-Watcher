@@ -37,9 +37,9 @@ import {
 } from "./environment.js";
 
 describe("environment comprehensive fuzzing tests", () => {
-    let originalProcess: typeof globalThis.process;
-    let originalWindow: typeof globalThis.window;
-    let originalDocument: typeof globalThis.document;
+    let originalProcess: typeof globalThis.process = globalThis.process;
+    let originalWindow: typeof globalThis.window = globalThis.window;
+    let originalDocument: typeof globalThis.document = globalThis.document;
 
     beforeEach(() => {
         // Store original globals

@@ -33,6 +33,7 @@ test.describe(
             await waitForAppInitialization(page);
 
             // Test primary text elements for contrast compliance
+            // eslint-disable-next-line playwright/no-raw-locators
             const textElements = await page
                 .locator("*")
                 .evaluateAll((elements) => {
@@ -70,10 +71,12 @@ test.describe(
                 expect(element.color).toBeTruthy();
                 expect(element.fontSize).toBeGreaterThan(0);
 
-                // For WCAG AA, minimum font size should be 12px for body text
-                if (element.tagName === "P" || element.tagName === "SPAN") {
-                    expect(element.fontSize).toBeGreaterThanOrEqual(12);
-                }
+                // For WCAG AA, minimum font size should be 12px for body text elements
+                expect(
+                    element.tagName === "P" || element.tagName === "SPAN"
+                        ? element.fontSize >= 12
+                        : true
+                ).toBe(true);
             }
 
             await electronApp.close();
@@ -86,6 +89,7 @@ test.describe(
             await waitForAppInitialization(page);
 
             // Test landmark structure
+            // eslint-disable-next-line playwright/no-raw-locators
             const landmarks = await page
                 .locator("[role], main, nav, header, footer, aside, section")
                 .evaluateAll((elements) => {
@@ -103,7 +107,7 @@ test.describe(
 
             // Test button accessibility
             const buttons = await page
-                .locator("button")
+                .getByRole("button")
                 .evaluateAll((buttons) => {
                     return buttons.map((btn) => {
                         const button = btn as HTMLButtonElement;
@@ -126,6 +130,7 @@ test.describe(
             }
 
             // Test input accessibility
+            // eslint-disable-next-line playwright/no-raw-locators
             const inputs = await page.locator("input").evaluateAll((inputs) => {
                 return inputs.map((input) => {
                     const inputEl = input as HTMLInputElement;
@@ -169,7 +174,7 @@ test.describe(
                 return elements.map((el) => ({
                     tagName: el.tagName,
                     type: el.getAttribute("type"),
-                    tabIndex: el.tabIndex,
+                    tabIndex: (el as HTMLElement).tabIndex,
                     ariaLabel: el.getAttribute("aria-label"),
                     id: el.getAttribute("id"),
                     testId: el.getAttribute("data-testid"),
@@ -191,7 +196,7 @@ test.describe(
 
             // Test Enter/Space activation
             await page.keyboard.press("Tab");
-            const currentElement = await page.evaluate(() => {
+            const _currentElement = await page.evaluate(() => {
                 const activeEl = document.activeElement;
                 return {
                     tagName: activeEl?.tagName,
@@ -199,13 +204,9 @@ test.describe(
                 };
             });
 
-            if (currentElement.tagName === "BUTTON") {
-                // Test Space activation
-                await page.keyboard.press("Space");
-
-                // Test Enter activation
-                await page.keyboard.press("Enter");
-            }
+            // Test activation keys on focused element
+            await page.keyboard.press("Space");
+            await page.keyboard.press("Enter");
 
             await electronApp.close();
         });
@@ -217,7 +218,7 @@ test.describe(
             await waitForAppInitialization(page);
 
             // Test focus indicators
-            const buttons = page.locator("button");
+            const buttons = page.getByRole("button");
             const buttonCount = await buttons.count();
 
             for (let i = 0; i < Math.min(buttonCount, 3); i++) {
@@ -236,14 +237,13 @@ test.describe(
                     };
                 });
 
-                // Should have some form of focus indicator
-                const hasFocusIndicator =
+                // Expect that the element has at least one focus indicator
+                expect(
                     focusStyle.outline !== "none" ||
-                    focusStyle.outlineWidth !== "0px" ||
-                    focusStyle.boxShadow !== "none" ||
-                    parseFloat(focusStyle.borderWidth) > 1;
-
-                expect(hasFocusIndicator).toBe(true);
+                        focusStyle.outlineWidth !== "0px" ||
+                        focusStyle.boxShadow !== "none" ||
+                        parseFloat(focusStyle.borderWidth) > 1
+                ).toBe(true);
             }
 
             await electronApp.close();
@@ -268,7 +268,17 @@ test.describe(
 
             // Toggle theme
             await themeButton.click();
-            await page.waitForTimeout(300);
+            // Wait for theme change to take effect
+            await page.waitForFunction(
+                () => {
+                    const body = document.body;
+                    return (
+                        body.className.includes("dark") ||
+                        body.className.includes("light")
+                    );
+                },
+                { timeout: 5000 }
+            );
 
             // Check accessibility properties after theme change
             const afterToggleProps = await themeButton.evaluate((btn) => ({
@@ -291,7 +301,8 @@ test.describe(
             await waitForAppInitialization(page);
 
             // Check for live regions
-            const liveRegions = await page
+            // eslint-disable-next-line playwright/no-raw-locators
+            const _liveRegions = await page
                 .locator("[aria-live], [role='status'], [role='alert']")
                 .evaluateAll((regions) => {
                     return regions.map((region) => ({
@@ -303,26 +314,25 @@ test.describe(
                 });
 
             // Status indicators should have appropriate announcements
+            // eslint-disable-next-line playwright/no-raw-locators
             const statusElements = page.locator(
                 ".status-up-badge, .status-down-badge, .themed-status-indicator"
             );
             const statusCount = await statusElements.count();
 
-            if (statusCount > 0) {
-                // Check if status elements have proper accessibility attributes
-                for (let i = 0; i < Math.min(statusCount, 3); i++) {
-                    const statusEl = statusElements.nth(i);
-                    const statusProps = await statusEl.evaluate((el) => ({
-                        ariaLabel: el.getAttribute("aria-label"),
-                        role: el.getAttribute("role"),
-                        textContent: el.textContent?.trim(),
-                    }));
+            // Check if status elements have proper accessibility attributes (first 3 max)
+            for (let i = 0; i < Math.min(statusCount, 3); i++) {
+                const statusEl = statusElements.nth(i);
+                const statusProps = await statusEl.evaluate((el) => ({
+                    ariaLabel: el.getAttribute("aria-label"),
+                    role: el.getAttribute("role"),
+                    textContent: el.textContent?.trim(),
+                }));
 
-                    // Status should have some accessible content
-                    expect(
-                        statusProps.ariaLabel || statusProps.textContent
-                    ).toBeTruthy();
-                }
+                // Status should have some accessible content
+                expect(
+                    statusProps.ariaLabel || statusProps.textContent
+                ).toBeTruthy();
             }
 
             await electronApp.close();
@@ -353,7 +363,7 @@ test.describe(
             });
 
             // Test CSS custom properties for theming
-            const themeProperties = await page.evaluate(() => {
+            const _themeProperties = await page.evaluate(() => {
                 const computedStyle = window.getComputedStyle(
                     document.documentElement
                 );
@@ -380,31 +390,40 @@ test.describe(
 
             // Test that error messages would be properly associated
             // (This tests the accessibility infrastructure)
-            const forms = await page.locator("form").count();
-            const inputs = await page.locator("input").count();
+            // eslint-disable-next-line playwright/no-raw-locators
+            const _forms = await page.locator("form").count();
+            // eslint-disable-next-line playwright/no-raw-locators
+            const _inputs = await page.locator("input").count();
 
-            if (inputs > 0) {
-                // Check input accessibility attributes
-                const inputAccessibility = await page
-                    .locator("input")
-                    .first()
-                    .evaluate((input) => ({
-                        ariaDescribedBy: input.getAttribute("aria-describedby"),
-                        ariaInvalid: input.getAttribute("aria-invalid"),
-                        required: input.required,
-                        type: input.type,
-                    }));
+            // Check input accessibility attributes for all inputs
+            // eslint-disable-next-line playwright/no-raw-locators
+            const inputsLocator = page.locator("input");
+            const inputCount = await inputsLocator.count();
 
-                // Required inputs should be properly marked
-                if (inputAccessibility.required) {
-                    expect(
-                        inputAccessibility.ariaDescribedBy ||
-                            inputAccessibility.ariaInvalid !== null
-                    ).toBeTruthy();
-                }
+            for (let i = 0; i < Math.min(inputCount, 3); i++) {
+                const inputAccessibility = await inputsLocator
+                    .nth(i)
+                    .evaluate((input) => {
+                        const inputEl = input as HTMLInputElement;
+                        return {
+                            ariaDescribedBy:
+                                inputEl.getAttribute("aria-describedby"),
+                            ariaInvalid: inputEl.getAttribute("aria-invalid"),
+                            required: inputEl.required,
+                            type: inputEl.type,
+                        };
+                    });
+
+                // All inputs should have proper accessibility structure
+                expect(
+                    inputAccessibility.ariaDescribedBy ||
+                        inputAccessibility.ariaInvalid !== null ||
+                        !inputAccessibility.required
+                ).toBeTruthy();
             }
 
             // Test alert accessibility
+            // eslint-disable-next-line playwright/no-raw-locators
             const alerts = await page
                 .locator("[role='alert'], .alert, .error")
                 .evaluateAll((alerts) => {
@@ -417,11 +436,12 @@ test.describe(
 
             // Any alerts should have proper accessibility attributes
             for (const alert of alerts) {
-                if (alert.textContent) {
-                    expect(
-                        alert.role === "alert" || alert.ariaLive
-                    ).toBeTruthy();
-                }
+                // All alerts should have either role="alert" or aria-live attribute
+                expect(
+                    alert.role === "alert" ||
+                        alert.ariaLive ||
+                        !alert.textContent
+                ).toBeTruthy();
             }
 
             await electronApp.close();
@@ -434,7 +454,7 @@ test.describe(
             await waitForAppInitialization(page);
 
             // Test semantic HTML elements
-            const semanticElements = await page.evaluate(() => {
+            const _semanticElements = await page.evaluate(() => {
                 const semantic = [
                     "main",
                     "nav",
@@ -444,7 +464,7 @@ test.describe(
                     "article",
                     "aside",
                 ];
-                const found = [];
+                const found: Array<{ tag: string; count: number }> = [];
 
                 semantic.forEach((tag) => {
                     const elements = document.getElementsByTagName(tag);
@@ -457,6 +477,7 @@ test.describe(
             });
 
             // Test heading hierarchy
+            // eslint-disable-next-line playwright/no-raw-locators
             const headings = await page
                 .locator("h1, h2, h3, h4, h5, h6")
                 .evaluateAll((headings) => {
@@ -467,26 +488,24 @@ test.describe(
                     }));
                 });
 
-            // Verify heading hierarchy is logical (if headings exist)
-            if (headings.length > 0) {
-                // First heading should typically be h1 or h2
-                expect(headings[0].level).toBeLessThanOrEqual(2);
+            // Verify heading hierarchy is logical
+            // First heading should typically be h1 or h2 (or no headings exist)
+            expect(headings.length === 0 || headings[0].level <= 2).toBe(true);
 
-                // Check for proper nesting
-                for (let i = 1; i < headings.length; i++) {
-                    const currentLevel = headings[i].level;
-                    const previousLevel = headings[i - 1].level;
+            // Check for proper nesting - no level should jump by more than 1
+            for (let i = 1; i < headings.length; i++) {
+                const currentLevel = headings[i].level;
+                const previousLevel = headings[i - 1].level;
 
-                    // Level shouldn't jump by more than 1
-                    if (currentLevel > previousLevel) {
-                        expect(
-                            currentLevel - previousLevel
-                        ).toBeLessThanOrEqual(1);
-                    }
-                }
+                // Level shouldn't jump by more than 1 when increasing
+                expect(
+                    currentLevel <= previousLevel ||
+                        currentLevel - previousLevel <= 1
+                ).toBe(true);
             }
 
             // Test list structure
+            // eslint-disable-next-line playwright/no-raw-locators
             const lists = await page
                 .locator("ul, ol, dl")
                 .evaluateAll((lists) => {
@@ -499,9 +518,12 @@ test.describe(
 
             // Lists should have list items
             for (const list of lists) {
-                if (list.type === "UL" || list.type === "OL") {
-                    expect(list.hasItems).toBe(true);
-                }
+                // UL and OL lists should have items, DL lists are definition lists
+                expect(
+                    list.type === "UL" || list.type === "OL"
+                        ? list.hasItems
+                        : true
+                ).toBe(true);
             }
 
             await electronApp.close();

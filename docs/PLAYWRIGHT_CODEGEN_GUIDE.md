@@ -102,14 +102,14 @@ test.describe("My Generated Tests", () => {
   await window.waitForLoadState("domcontentloaded");
 
   // Wait for React app to initialize
-  await expect(window.locator("#root")).toBeVisible({ timeout: 15000 });
-  await expect(window.locator("#root")).not.toBeEmpty({ timeout: 10000 });
+  await expect(window.getByRole("#root")).toBeVisible({ timeout: 15000 });
+  await expect(window.getByRole("#root")).not.toBeEmpty({ timeout: 10000 });
 
   // === YOUR GENERATED INTERACTIONS GO HERE ===
   // Example:
   // await window.click("button");
   // await window.fill("input", "value");
-  // await expect(window.locator("text=Something")).toBeVisible();
+  // await expect(window.getByRole("text=Something")).toBeVisible();
 
   // Close the app
   await electronApp.close();
@@ -331,7 +331,7 @@ test.describe(
 
    const window = await electronApp.firstWindow();
    await window.waitForLoadState("domcontentloaded");
-   await expect(window.locator("#root")).toBeVisible({ timeout: 15000 });
+   await expect(window.getByRole("#root")).toBeVisible({ timeout: 15000 });
 
    // Generated interactions (adapted from codegen)
    await window.click('button[aria-label="Add new site"]');
@@ -340,7 +340,7 @@ test.describe(
    await window.click('button[type="submit"]');
 
    // Verify result
-   await expect(window.locator('text="Example Site"')).toBeVisible();
+   await expect(window.getByRole('text="Example Site"')).toBeVisible();
 
    await electronApp.close();
   });

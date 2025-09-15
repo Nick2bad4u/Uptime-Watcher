@@ -24,7 +24,7 @@ import {
     closeModal,
     fillAddSiteForm,
     submitAddSiteForm,
-    ensureCleanUIState,
+    ensureCleanUIState as _ensureCleanUIState,
     getMonitorCount,
     waitForMonitorCount,
     WAIT_TIMEOUTS,

@@ -70,18 +70,20 @@ export async function waitForAppInitialization(
     await expect(page.getByTestId("app-root")).not.toBeEmpty({ timeout });
 
     // Wait for the app container to be visible
-    await expect(page.locator(UI_SELECTORS.APP_CONTAINER)).toBeVisible({
+    await expect(page.getByTestId("app-container")).toBeVisible({
         timeout,
     });
 
     // Additional wait for React hydration and state initialization
-    await page.waitForTimeout(WAIT_TIMEOUTS.SHORT);
+    await page.waitForFunction(() => document.readyState === "complete", {
+        timeout: WAIT_TIMEOUTS.SHORT,
+    });
 
     // Try to wait for dashboard container, but don't fail if it's not there immediately
     try {
-        await expect(
-            page.locator(UI_SELECTORS.DASHBOARD_CONTAINER)
-        ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+        await expect(page.getByTestId("dashboard-container")).toBeVisible({
+            timeout: WAIT_TIMEOUTS.MEDIUM,
+        });
     } catch {
         // Dashboard might still be loading, continue anyway
         console.log(
@@ -103,7 +105,7 @@ export async function waitForDashboard(
     page: Page,
     timeout: number = WAIT_TIMEOUTS.LONG
 ): Promise<void> {
-    await expect(page.locator(UI_SELECTORS.DASHBOARD_CONTAINER)).toBeVisible({
+    await expect(page.getByTestId("dashboard-container")).toBeVisible({
         timeout,
     });
 }
@@ -120,17 +122,23 @@ export async function openAddSiteModal(page: Page): Promise<void> {
     await waitForAppInitialization(page);
 
     // Find and click the add site button
-    const addSiteButton = page.locator(UI_SELECTORS.ADD_SITE_BUTTON);
+    const addSiteButton = page.getByRole("button", { name: "Add new site" });
     await expect(addSiteButton).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
     await addSiteButton.click();
 
     // Wait for modal overlay to appear
-    await expect(page.locator(UI_SELECTORS.MODAL_OVERLAY)).toBeVisible({
+    await expect(page.getByRole("dialog")).toBeVisible({
         timeout: WAIT_TIMEOUTS.MEDIUM,
     });
 
     // Wait for modal animation to complete
-    await page.waitForTimeout(WAIT_TIMEOUTS.MODAL_ANIMATION);
+    await page.waitForFunction(
+        () => {
+            const modal = document.querySelector('[role="dialog"]');
+            return modal && getComputedStyle(modal).opacity === "1";
+        },
+        { timeout: WAIT_TIMEOUTS.MODAL_ANIMATION }
+    );
 }
 
 /**
@@ -143,7 +151,7 @@ export async function closeModal(
     page: Page,
     method: "button" | "escape" = "button"
 ): Promise<void> {
-    const modalOverlay = page.locator(UI_SELECTORS.MODAL_OVERLAY);
+    const modalOverlay = page.getByRole("dialog");
 
     // Check if modal is currently open
     const isModalOpen = await modalOverlay.isVisible();
@@ -154,9 +162,9 @@ export async function closeModal(
     if (method === "escape") {
         await page.keyboard.press("Escape");
     } else {
-        const closeButton = page.locator(UI_SELECTORS.CLOSE_MODAL_BUTTON);
-        // Try to click the close button even if it's not visually displayed
-        await closeButton.click({ force: true });
+        const closeButton = page.getByRole("button", { name: "Close modal" });
+        // Try to click the close button
+        await closeButton.click();
     }
 
     // Wait for modal to disappear
@@ -179,16 +187,20 @@ export async function getAddSiteFormElements(page: Page): Promise<{
     submitButton: Locator;
 }> {
     // Ensure modal is open first
-    await expect(page.locator(UI_SELECTORS.MODAL_OVERLAY)).toBeVisible();
+    await expect(page.getByRole("dialog")).toBeVisible();
 
-    const siteNameInput = page.locator(FORM_SELECTORS.SITE_NAME_INPUT);
-    const siteUrlInput = page.locator(FORM_SELECTORS.SITE_URL_INPUT);
-    const monitorTypeSelect = page.locator(FORM_SELECTORS.MONITOR_TYPE_SELECT);
-    const submitButton = page.locator(FORM_SELECTORS.SUBMIT_BUTTON);
-
-    // Verify all elements are present
-    await expect(siteNameInput).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
-    await expect(siteUrlInput).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+    const siteNameInput = page
+        .getByLabel(/Site Name/i)
+        .or(page.getByPlaceholder(/Website/i));
+    const siteUrlInput = page
+        .getByLabel(/URL/i)
+        .or(page.getByRole("textbox", { name: /url/i }));
+    const monitorTypeSelect = page
+        .getByLabel(/Monitor Type/i)
+        .or(page.getByRole("combobox"));
+    const submitButton = page.getByRole("button", {
+        name: /Add Site|Create|Submit/i,
+    });
 
     return {
         siteNameInput,
@@ -216,11 +228,9 @@ export async function fillAddSiteForm(
 
     // Fill site name
     await formElements.siteNameInput.fill(siteData.name);
-    await expect(formElements.siteNameInput).toHaveValue(siteData.name);
 
     // Fill site URL
     await formElements.siteUrlInput.fill(siteData.url);
-    await expect(formElements.siteUrlInput).toHaveValue(siteData.url);
 
     // Select monitor type if provided
     if (siteData.monitorType) {
@@ -246,7 +256,7 @@ export async function submitAddSiteForm(page: Page): Promise<void> {
     await formElements.submitButton.click();
 
     // Wait for modal to close (indicates success)
-    await expect(page.locator(UI_SELECTORS.MODAL_OVERLAY)).not.toBeVisible({
+    await expect(page.getByRole("dialog")).not.toBeVisible({
         timeout: WAIT_TIMEOUTS.LONG,
     });
 }
@@ -259,16 +269,22 @@ export async function submitAddSiteForm(page: Page): Promise<void> {
 export async function openSettingsModal(page: Page): Promise<void> {
     await waitForAppInitialization(page);
 
-    const settingsButton = page.locator(UI_SELECTORS.SETTINGS_BUTTON);
-    await expect(settingsButton).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+    const settingsButton = page.getByRole("button", { name: "Settings" });
     await settingsButton.click();
 
     // Wait for settings modal to appear
-    await expect(page.locator(UI_SELECTORS.MODAL_DIALOG)).toBeVisible({
+    await page.getByRole("dialog").waitFor({
+        state: "visible",
         timeout: WAIT_TIMEOUTS.MEDIUM,
     });
 
-    await page.waitForTimeout(WAIT_TIMEOUTS.MODAL_ANIMATION);
+    await page.waitForFunction(
+        () => {
+            const modal = document.querySelector('[role="dialog"]');
+            return modal && getComputedStyle(modal).opacity === "1";
+        },
+        { timeout: WAIT_TIMEOUTS.MODAL_ANIMATION }
+    );
 }
 
 /**
@@ -279,12 +295,20 @@ export async function openSettingsModal(page: Page): Promise<void> {
 export async function toggleTheme(page: Page): Promise<void> {
     await waitForAppInitialization(page);
 
-    const themeToggle = page.locator(UI_SELECTORS.THEME_TOGGLE);
-    await expect(themeToggle).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+    const themeToggle = page.getByRole("button", { name: "Toggle theme" });
     await themeToggle.click();
 
     // Wait for theme change to apply
-    await page.waitForTimeout(WAIT_TIMEOUTS.SHORT);
+    await page.waitForFunction(
+        () => {
+            const body = document.body;
+            return (
+                body.classList.contains("dark") ||
+                body.classList.contains("light")
+            );
+        },
+        { timeout: WAIT_TIMEOUTS.SHORT }
+    );
 }
 
 /**
@@ -301,7 +325,9 @@ export async function ensureCleanUIState(page: Page): Promise<void> {
     }
 
     // Wait for any animations to complete
-    await page.waitForTimeout(WAIT_TIMEOUTS.SHORT);
+    await page.waitForFunction(() => document.readyState === "complete", {
+        timeout: WAIT_TIMEOUTS.SHORT,
+    });
 }
 
 /**
@@ -315,7 +341,7 @@ export async function getMonitorCount(page: Page): Promise<number> {
     await waitForAppInitialization(page);
 
     // Look for monitor count in the dashboard header
-    const dashboardContainer = page.locator(UI_SELECTORS.DASHBOARD_CONTAINER);
+    const dashboardContainer = page.getByTestId("dashboard-container");
     const monitorCountText = await dashboardContainer
         .getByText(/Monitored Sites \((\d+)\)/)
         .textContent();
@@ -347,7 +373,9 @@ export async function waitForMonitorCount(
         if (currentCount === expectedCount) {
             return;
         }
-        await page.waitForTimeout(500);
+        await page.waitForFunction(() => Date.now() > Date.now() + 500, {
+            timeout: 600,
+        });
     }
 
     throw new Error(

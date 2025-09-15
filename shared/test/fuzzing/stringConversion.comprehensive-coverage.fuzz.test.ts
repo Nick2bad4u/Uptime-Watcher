@@ -94,7 +94,7 @@ describe("StringConversion Complete Coverage Fuzzing Tests", () => {
             expect(typeof result).toBe("string");
             expect(result.startsWith("Symbol")).toBeTruthy();
 
-            const anonSymbol = Symbol();
+            const anonSymbol = Symbol("anonymous");
             const anonResult = safeStringify(anonSymbol);
             expect(anonResult).toBe(anonSymbol.toString());
             expect(anonResult.startsWith("Symbol")).toBeTruthy();
@@ -226,7 +226,15 @@ describe("StringConversion Complete Coverage Fuzzing Tests", () => {
         });
 
         it("should handle mixed arrays", () => {
-            const mixed = [1, "hello", true, null, undefined, { a: 1 }, [1, 2]];
+            const mixed = [
+                1,
+                "hello",
+                true,
+                null,
+                undefined,
+                { a: 1 },
+                [1, 2],
+            ];
             const result = safeStringify(mixed);
             expect(typeof result).toBe("string");
 
@@ -271,7 +279,11 @@ describe("StringConversion Complete Coverage Fuzzing Tests", () => {
 
         it("should handle Map and Set", () => {
             const map = new Map([["key", "value"]]);
-            const set = new Set([1, 2, 3]);
+            const set = new Set([
+                1,
+                2,
+                3,
+            ]);
 
             const mapResult = safeStringify(map);
             const setResult = safeStringify(set);

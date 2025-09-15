@@ -262,7 +262,9 @@ export class TypedEventBus<
             for (const listener of listeners) {
                 try {
                     if (typeof listener === "function") {
-                        listener(enhancedData);
+                        // Call listener with proper error handling
+                        // The listener is from EventEmitter, so we safely invoke it
+                        listener.call(this, enhancedData);
                     }
                 } catch (listenerError) {
                     // Log listener errors but don't let them fail the emission
