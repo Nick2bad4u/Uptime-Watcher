@@ -55,6 +55,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
             "should use default value for non-convertible values",
             (value, defaultValue) => {
                 fc.pre(
+                    // Non-convertible: not a number, not a numeric string
                     typeof value !== "number" &&
                         (typeof value !== "string" ||
                             Number.isNaN(Number(value)))

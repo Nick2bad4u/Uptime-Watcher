@@ -8,7 +8,7 @@
 
 import { test, expect } from "@playwright/test";
 import { launchElectronApp } from "../fixtures/electron-helpers";
-import { waitForAppInitialization, UI_SELECTORS } from "../utils/ui-helpers";
+import { waitForAppInitialization } from "../utils/ui-helpers";
 
 test.describe(
     "comprehensive Navigation and Structure Tests",
@@ -134,7 +134,7 @@ test.describe(
             await page.getByTestId("button-add-new-site").click();
 
             // Wait for modal to appear
-            const modalOverlay = page.locator(UI_SELECTORS.MODAL_OVERLAY);
+            const modalOverlay = page.getByRole("dialog");
             await expect(modalOverlay).toBeVisible({ timeout: 5000 });
 
             // Verify Add Site modal content
@@ -180,7 +180,7 @@ test.describe(
             // Open modal and verify focus moves into modal
             await page.getByTestId("button-add-new-site").click();
 
-            const modalOverlay = page.locator(UI_SELECTORS.MODAL_OVERLAY);
+            const modalOverlay = page.getByRole("dialog");
             await expect(modalOverlay).toBeVisible({ timeout: 5000 });
 
             // Focus should be trapped within modal

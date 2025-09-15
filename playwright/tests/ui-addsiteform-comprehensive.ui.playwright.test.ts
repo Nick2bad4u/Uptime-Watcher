@@ -15,7 +15,6 @@
  * The tests use improved UI helpers for reliable element selection and proper
  * modal workflow handling.
  */
-
 import { test, expect } from "@playwright/test";
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import {
@@ -28,7 +27,6 @@ import {
     getMonitorCount,
     waitForMonitorCount,
     WAIT_TIMEOUTS,
-    UI_SELECTORS,
 } from "../utils/ui-helpers";
 
 test.describe(
@@ -73,20 +71,13 @@ test.describe(
                     await waitForAppInitialization(page);
 
                     // Verify modal is not initially visible
-                    await expect(
-                        page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                    ).toBeHidden();
+                    await expect(page.getByRole("dialog")).toBeHidden();
 
                     // Open the Add Site modal
                     await openAddSiteModal(page);
 
                     // Verify modal is now visible
-                    await expect(
-                        page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                    ).toBeVisible();
-                    await expect(
-                        page.locator(UI_SELECTORS.MODAL_DIALOG)
-                    ).toBeVisible();
+                    await expect(page.getByRole("dialog")).toBeVisible();
 
                     // Verify form is present
                     await expect(
@@ -97,9 +88,7 @@ test.describe(
                     await closeModal(page, "button");
 
                     // Verify modal is closed
-                    await expect(
-                        page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                    ).toBeHidden();
+                    await expect(page.getByRole("dialog")).toBeHidden();
                 } finally {
                     await electronApp.close();
                 }
@@ -128,17 +117,12 @@ test.describe(
 
                     // Open the modal
                     await openAddSiteModal(page);
-                    await expect(
-                        page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                    ).toBeVisible();
+                    await expect(page.getByRole("dialog")).toBeVisible();
 
                     // Close modal using Escape key
                     await closeModal(page, "escape");
-
                     // Verify modal is closed
-                    await expect(
-                        page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                    ).toBeHidden();
+                    await expect(page.getByRole("dialog")).toBeHidden();
                 } finally {
                     await electronApp.close();
                 }
@@ -180,17 +164,20 @@ test.describe(
                     ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                     // Look for URL input field (it might be part of dynamic monitor fields)
-                    const urlInputs = page.locator(
-                        'input[type="url"], input[placeholder*="http"], input[id*="url"]'
-                    );
-                    await expect(urlInputs.first()).toBeVisible({
+                    const urlInputDisplay = page
+                        .getByLabel(/url/i)
+                        .or(page.getByPlaceholder(/http/i))
+                        .or(page.getByRole("textbox", { name: /url/i }))
+                        .first();
+                    await expect(urlInputDisplay).toBeVisible({
                         timeout: WAIT_TIMEOUTS.MEDIUM,
                     });
 
                     // Verify submit button
-                    const submitButton = page.locator('button[type="submit"]');
-                    await expect(submitButton).toBeVisible();
-                    await expect(submitButton).toContainText(/Add Site|Create/);
+                    const submitButtonDisplay = page.getByRole("button", {
+                        name: /Add Site|Create|Submit/i,
+                    });
+                    await expect(submitButtonDisplay).toBeVisible();
 
                     // Verify form has proper ARIA labeling
                     const form = page.getByTestId("add-site-form");
@@ -232,10 +219,11 @@ test.describe(
                     await expect(siteNameInput).toHaveValue("Test Website");
 
                     // Fill URL field (find the appropriate URL input)
-                    const urlInputs = page.locator(
-                        'input[type="url"], input[placeholder*="http"], input[id*="url"]'
-                    );
-                    const urlInput = urlInputs.first();
+                    const urlInput = page
+                        .getByLabel(/url/i)
+                        .or(page.getByPlaceholder(/http/i))
+                        .or(page.getByRole("textbox", { name: /url/i }))
+                        .first();
                     await expect(urlInput).toBeVisible({
                         timeout: WAIT_TIMEOUTS.MEDIUM,
                     });
@@ -243,7 +231,9 @@ test.describe(
                     await expect(urlInput).toHaveValue("https://example.com");
 
                     // Verify the form accepts the input
-                    const submitButton = page.locator('button[type="submit"]');
+                    const submitButton = page.getByRole("button", {
+                        name: /Add Site|Create|Submit/i,
+                    });
                     await expect(submitButton).toBeVisible();
                     await expect(submitButton).toBeEnabled();
                 } finally {
@@ -326,9 +316,7 @@ test.describe(
                     await openAddSiteModal(page);
 
                     // By default, should be in "new" mode
-                    const newModeRadio = page.locator(
-                        'input[value="new"][type="radio"]'
-                    );
+                    const newModeRadio = page.getByLabel(/new/i);
                     await expect(newModeRadio).toBeChecked();
 
                     // Site name field should be visible in new mode
@@ -337,9 +325,7 @@ test.describe(
                     ).toBeVisible();
 
                     // Switch to existing mode
-                    const existingModeRadio = page.locator(
-                        'input[value="existing"][type="radio"]'
-                    );
+                    const existingModeRadio = page.getByLabel(/existing/i);
                     await existingModeRadio.click();
                     await expect(existingModeRadio).toBeChecked();
 
@@ -349,10 +335,10 @@ test.describe(
                     ).toBeHidden();
 
                     // Should show site selector instead
-                    const siteSelect = page.locator(
-                        'select[id="selectedSite"]'
-                    );
-                    await expect(siteSelect).toBeVisible();
+                    const siteSelect = page
+                        .getByLabel(/site/i)
+                        .or(page.getByRole("combobox"));
+                    await expect(siteSelect.first()).toBeVisible();
                 } finally {
                     await electronApp.close();
                 }
@@ -381,7 +367,9 @@ test.describe(
                     await openAddSiteModal(page);
 
                     // Try to submit form without required fields
-                    const submitButton = page.locator('button[type="submit"]');
+                    const submitButton = page.getByRole("button", {
+                        name: /Add Site|Create|Submit/i,
+                    });
                     await submitButton.click();
 
                     // Should show validation errors or prevent submission
@@ -439,8 +427,18 @@ test.describe(
 
                     // Test keyboard navigation
                     await page.keyboard.press("Tab");
-                    const focusedElement = page.locator(":focus").first();
-                    await expect(focusedElement).toBeVisible();
+                    await page.waitForFunction(
+                        () =>
+                            !!document.activeElement &&
+                            document.activeElement !== document.body,
+                        { timeout: WAIT_TIMEOUTS.MEDIUM }
+                    );
+                    const hasFocus = await page.evaluate(
+                        () =>
+                            !!document.activeElement &&
+                            document.activeElement !== document.body
+                    );
+                    expect(hasFocus).toBeTruthy();
 
                     // Test that form elements are reachable via keyboard
                     await page.keyboard.press("Tab");

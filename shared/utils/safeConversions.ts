@@ -7,7 +7,7 @@
  * conversion functions with proper error handling and fallback values.
  */
 
-import { isNumber, isString } from "./typeGuards";
+import { isBoolean, isNumber, isString } from "./typeGuards";
 
 /**
  * Safely converts any value to a number with fallback.
@@ -33,16 +33,27 @@ import { isNumber, isString } from "./typeGuards";
  * @returns Valid number or the default value
  */
 export function safeNumberConversion(value: unknown, defaultValue = 0): number {
+    const fallback = Number.isNaN(defaultValue) ? 0 : defaultValue;
+    // Numbers: preserve value (including ±Infinity), only exclude NaN
     if (isNumber(value)) {
         return value;
     }
 
-    if (isString(value)) {
-        const parsed = Number(value);
-        return Number.isNaN(parsed) ? defaultValue : parsed;
+    // Do not coerce booleans; treat them as invalid for numeric conversion
+    if (isBoolean(value)) {
+        return fallback;
     }
 
-    return defaultValue;
+    // Strings: reject empty string; preserve valid numeric results (including ±Infinity)
+    if (isString(value)) {
+        if (value.trim() === "") {
+            return fallback;
+        }
+        const parsed = Number(value);
+        return Number.isNaN(parsed) ? fallback : parsed;
+    }
+
+    return fallback;
 }
 
 /**
@@ -53,6 +64,7 @@ export function safeParseCheckInterval(
     defaultValue = 300_000
 ): number {
     const parsed = safeNumberConversion(value, defaultValue);
+    // Enforce a minimum of 1000ms; accept any value >= 1000
     return parsed >= 1000 ? parsed : defaultValue;
 }
 
@@ -79,13 +91,16 @@ export function safeParseCheckInterval(
  * @returns Valid floating-point number or the default value
  */
 export function safeParseFloat(value: unknown, defaultValue = 0): number {
+    // Numbers: preserve as-is, including ±Infinity; NaN is filtered by isNumber
     if (isNumber(value)) {
         return value;
     }
 
     if (isString(value)) {
+        // parseFloat accepts e.g. "123.45abc" -> 123.45
+        // Reject non-finite results like Infinity/-Infinity from strings
         const parsed = Number.parseFloat(value);
-        return Number.isNaN(parsed) ? defaultValue : parsed;
+        return Number.isFinite(parsed) ? parsed : defaultValue;
     }
 
     return defaultValue;
@@ -121,6 +136,7 @@ export function safeParseInt(value: unknown, defaultValue = 0): number {
             return value;
         }
         if (Number.isFinite(value)) {
+            // For numeric inputs, align with floor semantics used in property tests
             return Math.floor(value);
         }
         return defaultValue;
@@ -157,6 +173,14 @@ export function safeParseInt(value: unknown, defaultValue = 0): number {
  * @returns Valid percentage clamped between 0 and 100, or the default value
  */
 export function safeParsePercentage(value: unknown, defaultValue = 0): number {
+    if (isNumber(value)) {
+        if (Number.isNaN(value)) {
+            return Math.max(0, Math.min(100, defaultValue));
+        }
+        if (value === Infinity) return 100;
+        if (value === -Infinity) return 0;
+        return Math.max(0, Math.min(100, value));
+    }
     const parsed = safeParseFloat(value, defaultValue);
     return Math.max(0, Math.min(100, parsed));
 }

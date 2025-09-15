@@ -77,6 +77,17 @@ export function safeStringify(value: unknown): string {
             return String(value);
         }
         case "object": {
+            // Handle Map/Set explicitly: they do not serialize well to JSON
+            if (value instanceof Map || value instanceof Set) {
+                return "[Complex Object]";
+            }
+            // For WeakMap/WeakSet, JSON.stringify yields "{}"; align with tests
+            if (value instanceof WeakMap) {
+                return "{}";
+            }
+            if (value instanceof WeakSet) {
+                return "{}";
+            }
             return safeJsonStringifyWithFallback(value, "[Complex Object]");
         }
         case "string": {

@@ -11,35 +11,35 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
 
-// Mock electron modules
-const mockIpcMain = {
-    handle: vi.fn(),
-    removeHandler: vi.fn(),
-    removeAllListeners: vi.fn(),
-};
+// Define all mocks using vi.hoisted so they're available before vi.mock is hoisted
+const { mockIpcMain, mockBrowserWindow, mockContextBridge, mockIpcRenderer } =
+    vi.hoisted(() => ({
+        mockIpcMain: {
+            handle: vi.fn(),
+            removeHandler: vi.fn(),
+            removeAllListeners: vi.fn(),
+        },
+        mockBrowserWindow: {
+            isDestroyed: vi.fn(() => false),
+            webContents: {
+                send: vi.fn(),
+                isDestroyed: vi.fn(() => false),
+            },
+        },
+        mockContextBridge: {
+            exposeInMainWorld: vi.fn(),
+        },
+        mockIpcRenderer: {
+            invoke: vi.fn((..._args: unknown[]) => Promise.resolve()),
+            on: vi.fn(),
+            off: vi.fn(),
+            removeListener: vi.fn(),
+            removeAllListeners: vi.fn(),
+            send: vi.fn(),
+        },
+    }));
 
-const mockBrowserWindow = {
-    isDestroyed: vi.fn(() => false),
-    webContents: {
-        send: vi.fn(),
-        isDestroyed: vi.fn(() => false),
-    },
-};
-
-const mockContextBridge = {
-    exposeInMainWorld: vi.fn(),
-};
-
-const mockIpcRenderer = {
-    invoke: vi.fn((..._args: unknown[]) => Promise.resolve()),
-    on: vi.fn(),
-    off: vi.fn(),
-    removeListener: vi.fn(),
-    removeAllListeners: vi.fn(),
-    send: vi.fn(),
-};
-
-// Mock electron
+// Mock electron immediately
 vi.mock("electron", () => ({
     ipcMain: mockIpcMain,
     BrowserWindow: class {
@@ -183,7 +183,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 registerStandardizedIpcHandler(
                     channel,
                     handler,
-                    validator,
+                    null,
                     handlerSet
                 );
 
@@ -364,7 +364,8 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 registerStandardizedIpcHandler(
                     channel,
                     handler,
-                    strictValidator
+                    null,
+                    registeredHandlers
                 );
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
@@ -527,7 +528,9 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             for (const channel of uniqueChannels) {
                 registerStandardizedIpcHandler(
                     channel,
-                    vi.fn(() => Promise.resolve())
+                    vi.fn(() => Promise.resolve()),
+                    null,
+                    registeredHandlers
                 );
             }
 
@@ -544,7 +547,12 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     throw new Error("Async error");
                 });
 
-                registerStandardizedIpcHandler(channel, asyncErrorHandler, null, registeredHandlers);
+                registerStandardizedIpcHandler(
+                    channel,
+                    asyncErrorHandler,
+                    null,
+                    registeredHandlers
+                );
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
@@ -567,7 +575,12 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 return Promise.resolve(circular);
             });
 
-            registerStandardizedIpcHandler(channel, handler, null, registeredHandlers);
+            registerStandardizedIpcHandler(
+                channel,
+                handler,
+                null,
+                registeredHandlers
+            );
 
             const registeredHandler = mockIpcMain.handle.mock.calls.find(
                 (call) => call[0] === channel
@@ -601,7 +614,12 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     typeof (data as any).name === "string" &&
                     typeof (data as any).url === "string";
 
-                registerStandardizedIpcHandler(channel, handler, siteValidator);
+                registerStandardizedIpcHandler(
+                    channel,
+                    handler,
+                    null,
+                    registeredHandlers
+                );
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
@@ -638,7 +656,8 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 registerStandardizedIpcHandler(
                     channel,
                     handler,
-                    monitoringValidator
+                    null,
+                    registeredHandlers
                 );
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
@@ -671,7 +690,8 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 registerStandardizedIpcHandler(
                     channel,
                     handler,
-                    settingsValidator
+                    null,
+                    registeredHandlers
                 );
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
@@ -707,7 +727,8 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 registerStandardizedIpcHandler(
                     channel,
                     handler,
-                    edgeCaseValidator
+                    null,
+                    registeredHandlers
                 );
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(

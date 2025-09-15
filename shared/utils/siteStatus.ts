@@ -209,7 +209,11 @@ export function getSiteStatusDescription(site: SiteForStatus): string {
             return `All ${monitorCount} monitors are pending`;
         }
         case "unknown": {
-            return "No monitors configured";
+            // Distinguish between no monitors and unknown due to invalid statuses
+            if (monitorCount === 0) {
+                return "No monitors configured";
+            }
+            return "Unknown status";
         }
         case "up": {
             return `All ${monitorCount} monitors are up and running`;

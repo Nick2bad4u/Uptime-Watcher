@@ -117,7 +117,8 @@ describe("useSitesStore Function Coverage Tests", () => {
             };
 
             store.addSite(testSite);
-            const sites = store.sites;
+            // Read fresh state after mutation to avoid stale snapshot
+            const sites = useSitesStore.getState().sites;
             expect(sites).toHaveLength(1);
             expect(sites[0]).toEqual(testSite);
         });

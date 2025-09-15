@@ -1,0 +1,14 @@
+{
+    "browser": {
+        "browserName": "chromium",
+        "isolated": true
+    },
+    "capabilities": [
+        "tabs",
+        "install",
+        "pdf",
+        "vision"
+    ],
+    "imageResponses": "allow",
+    "outputDir": ""
+}

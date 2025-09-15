@@ -18,7 +18,6 @@ import {
     closeModal,
     fillAddSiteForm,
     submitAddSiteForm,
-    UI_SELECTORS,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 
@@ -51,15 +50,11 @@ test.describe(
 
                         // Open modal
                         await openAddSiteModal(page);
-                        await expect(
-                            page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                        ).toBeVisible();
+                        await expect(page.getByRole("dialog")).toBeVisible();
 
                         // Close modal with Escape key (more reliable)
                         await page.keyboard.press("Escape");
-                        await expect(
-                            page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                        ).toBeHidden();
+                        await expect(page.getByRole("dialog")).toBeHidden();
                     } finally {
                         await electronApp.close();
                     }
@@ -81,9 +76,7 @@ test.describe(
 
                         // Close with Escape key
                         await page.keyboard.press("Escape");
-                        await expect(
-                            page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                        ).toBeHidden();
+                        await expect(page.getByRole("dialog")).toBeHidden();
                     } finally {
                         await electronApp.close();
                     }
@@ -170,9 +163,7 @@ test.describe(
                         await submitAddSiteForm(page);
 
                         // Modal should close on successful submission
-                        await expect(
-                            page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                        ).not.toBeVisible({
+                        await expect(page.getByRole("dialog")).not.toBeVisible({
                             timeout: WAIT_TIMEOUTS.MEDIUM,
                         });
                     } finally {

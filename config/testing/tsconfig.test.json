@@ -20,9 +20,7 @@
     },
     "exclude": [
         "../../electron/**/*.test.ts",
-        "../../electron/**/*.test.tsx",
-        "../../src/test/**/*.comprehensive-fuzzing.test.ts",
-        "../../src/test/**/*.comprehensive-coverage.fuzz.test.ts"
+        "../../electron/**/*.test.tsx"
     ],
     "extends": "../../tsconfig.json",
     "include": [
