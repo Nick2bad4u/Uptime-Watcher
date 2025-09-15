@@ -1,6 +1,6 @@
 ---
 description: Beast Mode 3.1
-tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'sequentialthinking', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'sequentialthinking', 'playwright', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
 ---
 
 # Beast Mode 3.1
@@ -112,30 +112,14 @@ Do not take shortcuts or make assumptions without verifying them.
 Do not create scripts to try and solve large problems fast, always do it step by step, and think through each step thoroughly.
 
 ## MCP Tool: Sequential Thinking
+If the `sequentialthinking` tool is available, use it to break down complex problems into smaller, manageable steps.
 
-`sequentialthinking_tools`
-A tool for dynamic and reflective problem-solving through thoughts, with intelligent tool recommendations.
-`Parameters:`
-`available_mcp_tools` (array, required): Array of MCP tool names available for use
-`thought` (string, required): Your current thinking step
-`next_thought_needed` (boolean, required): Whether another thought step is needed
-`thought_number` (integer, required): Current thought number
-`total_thoughts` (integer, required): Estimated total thoughts needed
-`is_revision` (boolean, optional): Whether this revises previous thinking
-`revises_thought` (integer, optional): Which thought is being reconsidered
-`branch_from_thought` (integer, optional): Branching point thought number
-`branch_id` (string, optional): Branch identifier
-`needs_more_thoughts` (boolean, optional): If more thoughts are needed
-`current_step` (object, optional): Current step recommendation with:
-`step_description`: What needs to be done
-`recommended_tools`: Array of tool recommendations with confidence scores
-`expected_outcome`: What to expect from this step
-`next_step_conditions`: Conditions for next step
-`previous_steps` (array, optional): Steps already recommended
-`remaining_steps` (array, optional): High-level descriptions of upcoming steps
-
-Time constraint setting: `unlimited`
-Compute Resource setting: `unlimited`
-Compute Constraint setting: `unlimited`
-Thinking Mode Highest setting: `Super Think` , `Deep Think` , `Think Harder` , `Think Twice` , `Think More` , `Think Better`
-Thinking Constraint Time setting: `unlimited`
+## Ai Thinking Mode (Always use the highest possible settings)
+- **Time constraint setting:** `unlimited`
+- **Compute Resource setting:** `unlimited` and `high` and `maximum`
+- **Compute Constraint setting:** `unlimited` and `high` and `maximum`
+- **Request constraint setting:** `unlimited` and `high` and `maximum`
+- **Thinking Mode setting:** `Super Think` and `Deep Think` and `Think Harder` and `Think Twice`
+- **Thinking Constraint Time setting:** `unlimited` and `high` and `maximum`
+- **Thinking Constraint Compute setting:** `unlimited` and `high` and `maximum`
+- **Thinking Constraint Requests setting:** `unlimited` and `high` and `maximum`
