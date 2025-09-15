@@ -236,7 +236,7 @@ export function safeParsePort(value: unknown, defaultValue = 80): number {
  */
 export function safeParsePositiveInt(value: unknown, defaultValue = 1): number {
     const result = safeParseInt(value, defaultValue);
-    return result > 0 ? result : defaultValue;
+    return result > 0 && Number.isFinite(result) ? result : defaultValue;
 }
 
 /**
@@ -297,7 +297,7 @@ export function safeParseTimeout(
     defaultValue = 10_000
 ): number {
     const parsed = safeNumberConversion(value, defaultValue);
-    return parsed > 0 ? parsed : defaultValue;
+    return parsed > 0 && Number.isFinite(parsed) ? parsed : defaultValue;
 }
 
 /**
@@ -332,6 +332,10 @@ export function safeParseTimestamp(
     const fallback = defaultValue ?? Date.now();
     const parsed = safeNumberConversion(value, fallback);
 
-    // Basic timestamp validation (must be positive and reasonable)
-    return parsed > 0 && parsed <= Date.now() + 86_400_000 ? parsed : fallback;
+    // Basic timestamp validation (must be positive, finite, and reasonable)
+    return parsed > 0 &&
+        Number.isFinite(parsed) &&
+        parsed <= Date.now() + 86_400_000
+        ? parsed
+        : fallback;
 }

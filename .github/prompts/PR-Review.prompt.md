@@ -1,5 +1,5 @@
 ---
-mode: "agent"
+mode: "BeastMode"
 tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'sequentialthinking', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
 description: "Review new pull requests (PRs) against the Uptime Watcher repository in a low-confidence safe mode, ensuring correctness and adherence to project standards."
 ---

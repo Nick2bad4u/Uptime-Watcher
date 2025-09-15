@@ -49,7 +49,9 @@ const arbitraryStatusUpdate = fc.record({
     responseTime: fc.option(arbitraryInteger),
     statusCode: fc.option(fc.integer({ min: 100, max: 599 })),
     errorMessage: fc.option(arbitraryString),
-    timestamp: fc.date().map((d) => d.getTime()),
+    timestamp: fc
+        .date({ min: new Date(1), max: new Date(Date.now() + 86_400_000) })
+        .map((d) => d.getTime()),
 });
 
 const arbitrarySettings = fc.record({
@@ -265,17 +267,17 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([fc.date(), fc.date()])(
-            "should handle date range queries",
-            (date1, date2) => {
-                const startTime = Math.min(date1.getTime(), date2.getTime());
-                const endTime = Math.max(date1.getTime(), date2.getTime());
+        fcTest.prop([
+            fc.date().filter((date) => !Number.isNaN(date.getTime())),
+            fc.date().filter((date) => !Number.isNaN(date.getTime())),
+        ])("should handle date range queries", (date1, date2) => {
+            const startTime = Math.min(date1.getTime(), date2.getTime());
+            const endTime = Math.max(date1.getTime(), date2.getTime());
 
-                expect(typeof startTime).toBe("number");
-                expect(typeof endTime).toBe("number");
-                expect(endTime).toBeGreaterThanOrEqual(startTime);
-            }
-        );
+            expect(typeof startTime).toBe("number");
+            expect(typeof endTime).toBe("number");
+            expect(endTime).toBeGreaterThanOrEqual(startTime);
+        });
 
         fcTest.prop([fc.integer({ min: 1, max: 365 })])(
             "should handle retention period validation",
@@ -458,21 +460,25 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([fc.date()])(
-            "should handle backup timestamp validation",
-            (timestamp) => {
-                const time = timestamp.getTime();
-                expect(typeof time).toBe("number");
-                expect(Number.isFinite(time)).toBeTruthy();
-                expect(time).toBeGreaterThan(0);
+        fcTest.prop([
+            fc
+                .date({
+                    min: new Date(1),
+                    max: new Date(Date.now() + 86_400_000),
+                })
+                .filter((date) => !Number.isNaN(date.getTime())), // Filter out invalid dates
+        ])("should handle backup timestamp validation", (timestamp) => {
+            const time = timestamp.getTime();
+            expect(typeof time).toBe("number");
+            expect(Number.isFinite(time)).toBeTruthy();
+            expect(time).toBeGreaterThan(0);
 
-                // Test timestamp within reasonable bounds
-                const now = Date.now();
-                const isReasonable =
-                    time <= now && time > now - 365 * 24 * 60 * 60 * 1000;
-                expect(typeof isReasonable).toBe("boolean");
-            }
-        );
+            // Test timestamp within reasonable bounds
+            const now = Date.now();
+            const isReasonable =
+                time <= now && time > now - 365 * 24 * 60 * 60 * 1000;
+            expect(typeof isReasonable).toBe("boolean");
+        });
 
         fcTest.prop([fc.array(arbitrarySiteRow, { maxLength: 100 })])(
             "should handle data export validation",

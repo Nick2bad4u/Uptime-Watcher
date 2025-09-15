@@ -1,5 +1,5 @@
 ---
-mode: "agent"
+mode: "BeastMode"
 tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'sequentialthinking', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
 description: "Review TSDoc comments to ensure they are accurate, complete, and compliant with project standards."
 ---

@@ -190,10 +190,10 @@ describe(TypedEventBus, () => {
             });
             eventBus.on("test-event", errorListener);
 
-            // emitTyped should also propagate errors
-            await expect(async () => {
-                await eventBus.emitTyped("test-event", { data: "test" });
-            }).rejects.toThrow("Async listener error");
+            // emitTyped should not throw when listeners error - it logs them internally
+            await expect(
+                eventBus.emitTyped("test-event", { data: "test" })
+            ).resolves.toBeUndefined();
 
             expect(errorListener).toHaveBeenCalled();
         });

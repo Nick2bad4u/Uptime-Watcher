@@ -272,7 +272,7 @@ describe("safeConversions comprehensive fuzzing tests", () => {
     });
 
     describe(safeParsePercentage, () => {
-        test.prop([fc.anything(), fc.float({ min: 0, max: 100 })])(
+        test.prop([fc.anything(), fc.float({ min: 0, max: 100, noNaN: true })])(
             "returns percentage between 0-100 or default",
             (input, defaultValue) => {
                 const result = safeParsePercentage(input, defaultValue);
@@ -627,7 +627,9 @@ describe("safeConversions comprehensive fuzzing tests", () => {
                 expect(safeParsePositiveInt(specialValue, 1)).toBe(1);
                 expect(safeParseRetryAttempts(specialValue, 3)).toBe(3);
                 expect(safeParseTimeout(specialValue, 10_000)).toBe(
-                    Number.isNaN(specialValue) || specialValue < 0
+                    Number.isNaN(specialValue) ||
+                        specialValue < 0 ||
+                        !Number.isFinite(specialValue)
                         ? 10_000
                         : specialValue
                 );

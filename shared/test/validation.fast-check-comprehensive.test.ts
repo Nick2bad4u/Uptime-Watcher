@@ -366,7 +366,18 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                     fc.integer({ min: -1000, max: 0 }),
                     fc.integer({ min: 65_536, max: 100_000 }),
                     fc.float(),
-                    fc.string(),
+                    fc.string().filter((s) => {
+                        // Only use strings that are NOT valid port numbers
+                        const num = Number.parseInt(s, 10);
+                        return (
+                            Number.isNaN(num) ||
+                            num < 1 ||
+                            num > 65_535 ||
+                            s === "0" ||
+                            s.trim() !== s ||
+                            s.includes(".")
+                        );
+                    }),
                     fc.constantFrom(null, undefined, Number.NaN)
                 ),
             ])("should return false for invalid ports", (invalidPort) => {

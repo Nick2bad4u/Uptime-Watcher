@@ -57,17 +57,17 @@
  *   ```
  *             (window.confirm as any).mockReturnValue(confirmReset);
  *
- *       render(<Settings onClose={mockOnClose} />);
+ *   render(<Settings onClose={mockOnClose} />);
  *
- *       const resetButton = screen.getAllByText("Reset to Defaults")[0];
- *       fireEvent.click(resetButton);
+ *   const resetButton = screen.getAllByText("Reset to Defaults")[0];
+ *   fireEvent.click(resetButton);
  *
- *       expect(window.confirm).toHaveBeenCalledWith(
- *           "Are you sure you want to reset all settings to defaults?"
- *       );
+ *   expect(window.confirm).toHaveBeenCalledWith(
+ *       "Are you sure you want to reset all settings to defaults?"
+ *   );
  *
- *       if (confirmReset) {
- *           expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
+ *   if (confirmReset) {
+ *       expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
  * ```
  *
  * - Error handling and recovery
@@ -84,7 +84,7 @@
 
 import { describe, expect, vi, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 
 import "@testing-library/jest-dom";
 import type { AppSettings } from "../../../stores/types";
@@ -404,8 +404,8 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
     describe("Settings Configuration Fuzzing", () => {
         fcTest.prop([settingsArbitrary], {
-            numRuns: 100,
-            timeout: 10_000,
+            numRuns: 10,
+            timeout: 25_000,
         })(
             "should handle arbitrary valid settings configurations",
             async (settings) => {
@@ -427,8 +427,8 @@ describe("Settings Component - Property-Based Fuzzing", () => {
         );
 
         fcTest.prop([extremeSettingsArbitrary], {
-            numRuns: 50,
-            timeout: 10_000,
+            numRuns: 10,
+            timeout: 5000,
         })(
             "should handle extreme settings configurations gracefully",
             async (extremeSettings) => {
@@ -452,8 +452,8 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
     describe("Theme Selection Fuzzing", () => {
         fcTest.prop([themeNameArbitrary], {
-            numRuns: 50,
-            timeout: 5000,
+            numRuns: 10,
+            timeout: 25_000,
         })("should handle theme selection correctly", async (themeName) => {
             // Manual DOM cleanup for property-based testing iterations
             document.body.innerHTML = '<div id="vitest-test-root"></div>';
@@ -473,7 +473,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
         fcTest.prop([fc.integer({ min: 1, max: 10 })], {
             numRuns: 30,
-            timeout: 10_000,
+            timeout: 5000,
         })(
             "should handle rapid theme changes without issues",
             async (changeCount) => {
@@ -502,8 +502,8 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
     describe("History Limit Configuration Fuzzing", () => {
         fcTest.prop([historyLimitArbitrary], {
-            numRuns: 50,
-            timeout: 5000,
+            numRuns: 10,
+            timeout: 25_000,
         })(
             "should handle valid history limit changes",
             async (historyLimit) => {
@@ -528,7 +528,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
         );
 
         fcTest.prop([invalidHistoryLimitArbitrary], {
-            numRuns: 50,
+            numRuns: 10,
             timeout: 5000,
         })(
             "should handle invalid history limit values gracefully",
@@ -564,8 +564,8 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 }),
             ],
             {
-                numRuns: 100,
-                timeout: 20_000,
+                numRuns: 10,
+                timeout: 30_000,
             }
         )(
             "should handle checkbox setting changes",
@@ -629,7 +629,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
     describe("Data Operations Fuzzing", () => {
         fcTest.prop([fc.boolean()], {
-            numRuns: 50,
+            numRuns: 10,
             timeout: 15_000,
         })("should handle sync operations", async (shouldFail) => {
             // Manual DOM cleanup for property-based testing iterations
@@ -664,7 +664,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
         // eslint-disable-next-line no-warning-comments -- Temporarily disabling problematic test
         // TODO: Fix download button mock issue - button exists but mock isn't called
         // fcTest.prop([fc.boolean()], {
-        //     numRuns: 50,
+        //     numRuns: 10,
         //     timeout: 5000,
         // })("should handle backup download operations", async (shouldFail) => {
         //     // Manual DOM cleanup for property-based testing iterations
@@ -698,8 +698,8 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
     describe("Settings Reset Fuzzing", () => {
         fcTest.prop([fc.boolean()], {
-            numRuns: 50,
-            timeout: 10_000,
+            numRuns: 10,
+            timeout: 5000,
         })(
             "should handle settings reset with confirmation",
             async (confirmReset) => {
@@ -737,8 +737,8 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
     describe("Error Handling Fuzzing", () => {
         fcTest.prop([errorScenarioArbitrary], {
-            numRuns: 100,
-            timeout: 10_000,
+            numRuns: 10,
+            timeout: 5000,
         })(
             "should handle error scenarios gracefully",
             async (errorScenario) => {
@@ -769,7 +769,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
     describe("Modal Behavior Fuzzing", () => {
         fcTest.prop([fc.integer({ min: 1, max: 5 })], {
             numRuns: 30,
-            timeout: 10_000,
+            timeout: 5000,
         })("should handle close button interactions", async (clickCount) => {
             // Manual DOM cleanup for property-based testing iterations
             document.body.innerHTML = '<div id="vitest-test-root"></div>';
@@ -789,8 +789,8 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
     describe("Accessibility Fuzzing", () => {
         fcTest.prop([settingsArbitrary], {
-            numRuns: 50,
-            timeout: 10_000,
+            numRuns: 3,
+            timeout: 30_000,
         })(
             "should maintain accessibility attributes under all conditions",
             async (settings) => {

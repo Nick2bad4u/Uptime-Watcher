@@ -44,7 +44,7 @@
 import type { MonitorType } from "@shared/types";
 import type { Simplify } from "type-fest";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { useMonitorFields } from "../../hooks/useMonitorFields";
@@ -279,33 +279,44 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
     // Use monitor fields hook for dynamic validation
     const { getFields } = useMonitorFields();
 
-    // Track previous values to detect changes and auto-reset fields
-    const [prevMonitorType, setPrevMonitorType] = useState(monitorType);
-    const [prevAddMode, setPrevAddMode] = useState(addMode);
-
     // Compute effective field values based on monitor type during render
     const currentFields = getFields(monitorType);
-    const currentFieldNames = new Set(currentFields.map((field) => field.name));
 
-    // Reset fields when monitor type changes
-    if (monitorType !== prevMonitorType) {
-        setPrevMonitorType(monitorType);
-        setFormError(undefined);
-        resetFieldsForMonitorType(currentFieldNames, {
+    // Reset fields when monitor type changes - using useEffect to avoid render-time setState
+    useEffect(
+        function resetFieldsOnMonitorTypeChange() {
+            const currentFieldNames = new Set(
+                currentFields.map((field) => field.name)
+            );
+            resetFieldsForMonitorType(currentFieldNames, {
+                setExpectedValue,
+                setHost,
+                setPort,
+                setRecordType,
+                setUrl,
+            });
+        },
+        [
+            currentFields,
             setExpectedValue,
             setHost,
             setPort,
             setRecordType,
             setUrl,
-        });
-    }
+        ]
+    );
 
-    // Reset name and siteId when switching modes
-    if (addMode !== prevAddMode) {
-        setPrevAddMode(addMode);
-        setFormError(undefined);
-        resetFieldsForModeChange(addMode, { setName, setSiteId });
-    }
+    // Reset name and siteId when switching modes - using useEffect to avoid render-time setState
+    useEffect(
+        function resetFieldsOnAddModeChange() {
+            resetFieldsForModeChange(addMode, { setName, setSiteId });
+        },
+        [
+            addMode,
+            setName,
+            setSiteId,
+        ]
+    );
 
     // Simple validation function without logging - only used for submit button
     // state

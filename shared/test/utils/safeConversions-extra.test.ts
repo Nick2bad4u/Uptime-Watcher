@@ -845,7 +845,7 @@ describe(safeParseTimeout, () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(safeParseTimeout(Infinity)).toBe(Infinity);
+        expect(safeParseTimeout(Infinity)).toBe(10_000); // Infinity is not finite, so use default
         expect(safeParseTimeout(-Infinity)).toBe(10_000); // negative, so use default
         expect(safeParseTimeout(Number.NaN)).toBe(10_000); // NaN should use default
     });

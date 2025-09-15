@@ -360,13 +360,19 @@ describe("SafeConversions utilities fuzzing tests", () => {
     });
 
     describe(safeParseTimeout, () => {
-        test.prop([fc.float({ min: Math.fround(0.1), noNaN: true })])(
-            "should return positive timeouts unchanged",
-            (timeout) => {
-                const result = safeParseTimeout(timeout);
-                expect(result).toBe(timeout);
-            }
-        );
+        test.prop([
+            fc
+                .float({ min: Math.fround(0.1), noNaN: true })
+                .filter((n) => Number.isFinite(n)),
+        ])("should return positive timeouts unchanged", (timeout) => {
+            const result = safeParseTimeout(timeout);
+            expect(result).toBe(timeout);
+        });
+
+        test("should return default value for infinity", () => {
+            expect(safeParseTimeout(Number.POSITIVE_INFINITY)).toBe(10_000);
+            expect(safeParseTimeout(Number.NEGATIVE_INFINITY)).toBe(10_000);
+        });
 
         test.prop([fc.float({ max: Math.fround(0) })])(
             "should return default for non-positive timeouts",

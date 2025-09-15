@@ -67,7 +67,7 @@ jobs:
     mutation-testing:
         name: Run Stryker Mutation Testing
         runs-on: windows-latest
-        timeout-minutes: ${{ github.event.inputs.timeout-minutes || 120 }} # Configurable timeout for large projects
+        timeout-minutes: ${{ fromJSON(github.event.inputs.timeout-minutes || '120') }} # Configurable timeout for large projects
 
         steps:
             - name: Harden the runner
@@ -198,7 +198,7 @@ jobs:
                       coverage/stryker.html
                       coverage/events
                       reports/stryker-incremental.json
-                  retention-days: ${{ github.event.inputs.artifact-retention-days || 30 }}
+                  retention-days: ${{ fromJSON(github.event.inputs.artifact-retention-days || '30') }}
 
             # Adds a comment to the pull request summarizing mutation testing results.
             # Reads the Stryker mutation report, calculates the mutation score, and posts a status comment.

@@ -520,17 +520,27 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                     expect(typeof result).toBe("number");
                     expect(Number.isNaN(result)).toBeFalsy();
 
+                    // The function sanitizes NaN defaultVal to 0
+                    const expectedDefault = Number.isNaN(defaultVal)
+                        ? 0
+                        : defaultVal;
+
                     if (typeof input === "number" && !Number.isNaN(input)) {
                         expect(result).toBe(input);
                     } else if (typeof input === "string") {
-                        const parsed = Number(input);
-                        if (Number.isNaN(parsed)) {
-                            expect(result).toBe(defaultVal);
+                        // Empty or whitespace-only strings are treated as invalid
+                        if (input.trim() === "") {
+                            expect(result).toBe(expectedDefault);
                         } else {
-                            expect(result).toBe(parsed);
+                            const parsed = Number(input);
+                            if (Number.isNaN(parsed)) {
+                                expect(result).toBe(expectedDefault);
+                            } else {
+                                expect(result).toBe(parsed);
+                            }
                         }
                     } else {
-                        expect(result).toBe(defaultVal);
+                        expect(result).toBe(expectedDefault);
                     }
                 })
             );
@@ -939,10 +949,71 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                     const defaultFloat = 1.5;
                     const defaultInt = 42;
 
-                    // All functions should return valid numbers
+                    // Test all functions
                     const results = [
-                        safeNumberConversion(input, defaultFloat),
-                        safeParseFloat(input, defaultFloat),
+                        {
+                            name: "safeNumberConversion",
+                            result: safeNumberConversion(input, defaultFloat),
+                        },
+                        {
+                            name: "safeParseFloat",
+                            result: safeParseFloat(input, defaultFloat),
+                        },
+                        {
+                            name: "safeParseInt",
+                            result: safeParseInt(input, defaultInt),
+                        },
+                        {
+                            name: "safeParseCheckInterval",
+                            result: safeParseCheckInterval(input, 60_000),
+                        },
+                        {
+                            name: "safeParsePercentage",
+                            result: safeParsePercentage(input, 50),
+                        },
+                        {
+                            name: "safeParsePort",
+                            result: safeParsePort(input, 8080),
+                        },
+                        {
+                            name: "safeParsePositiveInt",
+                            result: safeParsePositiveInt(input, 1),
+                        },
+                        {
+                            name: "safeParseRetryAttempts",
+                            result: safeParseRetryAttempts(input, 3),
+                        },
+                        {
+                            name: "safeParseTimeout",
+                            result: safeParseTimeout(input, 5000),
+                        },
+                        {
+                            name: "safeParseTimestamp",
+                            result: safeParseTimestamp(input, Date.now()),
+                        },
+                    ];
+
+                    // All results should be numbers and not NaN
+                    for (const { name, result } of results) {
+                        expect(typeof result).toBe("number");
+                        expect(Number.isNaN(result)).toBeFalsy();
+                    }
+
+                    // Special handling for functions that can preserve infinity from numeric inputs
+                    const numConvResult = safeNumberConversion(
+                        input,
+                        defaultFloat
+                    );
+                    const floatResult = safeParseFloat(input, defaultFloat);
+
+                    if (typeof input === "number" && !Number.isFinite(input)) {
+                        // These functions preserve infinity when input is an infinite number
+                        expect(Number.isFinite(numConvResult)).toBeFalsy();
+                        expect(Number.isFinite(floatResult)).toBeFalsy();
+                    }
+
+                    // Functions that should always return finite numbers
+                    const finiteResults = [
                         safeParseInt(input, defaultInt),
                         safeParseCheckInterval(input, 60_000),
                         safeParsePercentage(input, 50),
@@ -953,9 +1024,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                         safeParseTimestamp(input, Date.now()),
                     ];
 
-                    for (const result of results) {
-                        expect(typeof result).toBe("number");
-                        expect(Number.isNaN(result)).toBeFalsy();
+                    for (const result of finiteResults) {
                         expect(Number.isFinite(result)).toBeTruthy();
                     }
 

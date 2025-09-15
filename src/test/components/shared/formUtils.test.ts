@@ -187,8 +187,8 @@ describe("Form Utilities", () => {
 
                     const convertedValue = Number.parseInt(nonNumericValue, 10);
                     expect(setValue).toHaveBeenCalledWith(convertedValue);
-                    // Should be NaN for non-numeric strings
-                    if (!/^\d+/.test(nonNumericValue)) {
+                    // Should be NaN for non-numeric strings (strings that don't start with digits)
+                    if (!/^\d/.test(nonNumericValue)) {
                         expect(Number.isNaN(convertedValue)).toBeTruthy();
                     }
                 }

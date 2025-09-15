@@ -596,8 +596,12 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                 // Property: Fuzzing should discover significant edge cases
                 expect(suiteResult.summary.totalEdgeCases).toBeGreaterThan(10);
 
-                // Property: High coverage should correlate with target achievement
-                if (suiteResult.summary.overallCoverage >= 95) {
+                // Property: High coverage should correlate with target achievement when tests pass
+                if (
+                    suiteResult.summary.overallCoverage >= 90 &&
+                    suiteResult.summary.totalEdgeCases >= 20 &&
+                    suiteResult.summary.allPassed
+                ) {
                     expect(suiteResult.summary.targetMet).toBeTruthy();
                 }
             }

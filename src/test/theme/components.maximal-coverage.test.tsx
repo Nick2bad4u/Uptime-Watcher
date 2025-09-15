@@ -481,7 +481,7 @@ describe("Theme Components - Complete Coverage", () => {
             );
 
             const button = screen.getByRole("button", {
-                name: "🚀 Icon Button",
+                name: "🚀Icon Button",
             });
             expect(button).toBeInTheDocument();
             expect(screen.getByText("🚀")).toBeInTheDocument();
@@ -509,7 +509,7 @@ describe("Theme Components - Complete Coverage", () => {
             );
 
             const button = screen.getByRole("button", {
-                name: "Icon Right 🚀",
+                name: "Icon Right🚀",
             });
             expect(button).toBeInTheDocument();
         });
@@ -536,7 +536,7 @@ describe("Theme Components - Complete Coverage", () => {
             );
 
             const button = screen.getByRole("button", {
-                name: "🚀 Colored Icon",
+                name: "🚀Colored Icon",
             });
             expect(button).toBeInTheDocument();
         });
