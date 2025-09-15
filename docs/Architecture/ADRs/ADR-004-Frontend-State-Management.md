@@ -18,9 +18,37 @@ The frontend needed a state management solution that would:
 
 We will use **Zustand** as our primary state management library with specific architectural patterns:
 
-### 1. Modular Store Composition
+### 1. Store Architecture Patterns
 
-Large stores are composed of smaller, focused modules to improve maintainability:
+We use two patterns based on store complexity:
+
+#### A. Direct Create Pattern (Simple Stores)
+
+For stores with single responsibility and straightforward state management:
+
+```typescript
+// Simple store example
+export const useErrorStore = create<ErrorStore>()((set, get) => ({
+ // Initial state
+ isLoading: false,
+ lastError: undefined,
+ storeErrors: {},
+
+ // Actions
+ setError: (error: string | undefined) => {
+  logStoreAction("ErrorStore", "setError", { error });
+  set({ lastError: error });
+ },
+ setLoading: (loading: boolean) => {
+  logStoreAction("ErrorStore", "setLoading", { loading });
+  set({ isLoading: loading });
+ },
+}));
+```
+
+#### B. Modular Composition Pattern (Complex Stores)
+
+For stores with multiple domains, extensive operations, or complex state management:
 
 ```typescript
 // Main store composes multiple modules
@@ -44,6 +72,27 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
  };
 });
 ```
+
+### Store Pattern Decision Criteria
+
+**Use Direct Create Pattern when:**
+
+- Single responsibility/domain (e.g., error handling, settings, UI state)
+- Simple state structure (typically <200 lines)
+- Limited cross-cutting concerns
+- Straightforward action implementations
+
+**Use Modular Composition Pattern when:**
+
+- Multiple interconnected domains (e.g., sites + monitors + history)
+- Complex business logic requiring separation of concerns
+- Extensive operations requiring dependency injection
+- Large stores that would benefit from module separation (typically >300 lines)
+
+**Examples by Pattern:**
+
+- **Direct Pattern**: `useErrorStore`, `useUpdatesStore`, `useSettingsStore`, `useUIStore`
+- **Modular Pattern**: `useSitesStore` (manages sites, monitors, sync, operations)
 
 ### 2. Typed Store Interfaces
 
@@ -306,11 +355,24 @@ Always wrap async operations with error handling utilities.
 
 All frontend state follows these patterns:
 
-- Type-safe store interfaces
-- Consistent action logging
-- Modular composition for complex stores
-- Selective persistence for user preferences
-- Integration with error handling system
+- **Type-safe store interfaces** for all stores
+- **Consistent action logging** with `logStoreAction`
+- **Pattern selection based on complexity**:
+  - Direct create() pattern for simple stores
+  - Modular composition for complex stores
+- **Selective persistence** for user preferences
+- **Integration with error handling system**
+
+## Store Pattern Examples
+
+### Current Implementation Compliance:
+
+- ✅ `useSitesStore` - Complex store using modular composition
+- ✅ `useErrorStore` - Simple store using direct create() pattern
+- ✅ `useUpdatesStore` - Simple store using direct create() pattern
+- ✅ `useSettingsStore` - Simple store using direct create() pattern
+- ✅ `useUIStore` - Simple store using direct create() pattern
+- ✅ `useMonitorTypesStore` - Focused store using direct create() pattern
 
 ## Related ADRs
 

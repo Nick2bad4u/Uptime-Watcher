@@ -59,7 +59,7 @@ import { TextField } from "./TextField";
  *
  * @public
  */
-export interface DynamicFieldProps {
+interface DynamicFieldProperties {
     /**
      * Whether the field is disabled.
      */
@@ -113,13 +113,13 @@ export interface DynamicFieldProps {
  *
  * @public
  */
-export const DynamicField: NamedExoticComponent<DynamicFieldProps> = memo(
+export const DynamicField: NamedExoticComponent<DynamicFieldProperties> = memo(
     function DynamicField({
         disabled = false,
         field,
         onChange,
         value,
-    }: DynamicFieldProps): JSX.Element {
+    }: DynamicFieldProperties): JSX.Element {
         const handleChange = useCallback(
             (newValue: number | string) => {
                 onChange(newValue);

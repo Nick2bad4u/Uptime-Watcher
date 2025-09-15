@@ -8,7 +8,7 @@ description: "Conduct a thorough review of the codebase for consistency"
 
 ## Objective
 
-Perform a comprehensive analysis of the entire codebase to identify and resolve any inconsistencies in logic, data flow, and architectural patterns before implementing new features.
+Perform a comprehensive analysis of the **entire codebase** (scan **ALL** files, not just a subset) to identify and resolve any inconsistencies in logic, data flow, and architectural patterns before implementing new features. Start with small utility files and work your way back to the larger files like main.ts and app.tsx
 
 ## Analysis Requirements
 
@@ -85,3 +85,9 @@ Create a consistency improvement roadmap with:
 - Focus on implementation files only
 - Don't worry about minor formatting issues when making changes. (Can always fix with (eslint . --fix))
 - Highlight any inconsistencies that might affect upcoming feature work
+
+- **Time constraint setting:** `unlimited`
+- **Compute Resource setting:** `unlimited`
+- **Compute Constraint setting:** `unlimited`
+- **Thinking Mode setting:** `Super Think` `Deep Think` `Think step by step` `think harder`
+- **Thinking Constraint Time setting:** `unlimited`

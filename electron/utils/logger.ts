@@ -22,50 +22,7 @@
 
 import log from "electron-log/main";
 
-/**
- * Interface for logger instance methods.
- *
- * @remarks
- * Defines the contract for logger objects with consistent method signatures
- * across all logging instances. All methods are synchronous and handle
- * formatting internally.
- *
- * @public
- */
-interface Logger {
-    /**
-     * Log debug information for development and troubleshooting.
-     *
-     * @param message - The debug message to log
-     * @param args - Additional arguments for context and structured data
-     */
-    debug: (message: string, ...args: unknown[]) => void;
-
-    /**
-     * Log error messages with optional error objects.
-     *
-     * @param message - The error message to log
-     * @param error - Optional error object or additional context
-     * @param args - Additional arguments for context and structured data
-     */
-    error: (message: string, error?: unknown, ...args: unknown[]) => void;
-
-    /**
-     * Log general informational messages.
-     *
-     * @param message - The information message to log
-     * @param args - Additional arguments for context and structured data
-     */
-    info: (message: string, ...args: unknown[]) => void;
-
-    /**
-     * Log warning messages for potential issues.
-     *
-     * @param message - The warning message to log
-     * @param args - Additional arguments for context and structured data
-     */
-    warn: (message: string, ...args: unknown[]) => void;
-}
+import type { Logger } from "./interfaces";
 
 /**
  * Creates a logger with a specific prefix for categorization.

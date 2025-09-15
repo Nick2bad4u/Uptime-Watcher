@@ -408,10 +408,40 @@ const ActionButton: React.FC<ActionButtonProperties> = ({
 
 ### Modular Zustand Store Architecture
 
-The application uses a **modular composition pattern** for Zustand stores to separate concerns and improve testability:
+The application uses **two store patterns** based on complexity requirements:
+
+#### Pattern 1: Direct Create (Simple Stores)
+
+For simple stores with single responsibility:
 
 ```typescript
-// ✅ Good: Modular store composition
+// ✅ Good: Direct create pattern for simple stores
+import { create } from "zustand";
+
+export const useErrorStore = create<ErrorStore>()((set, get) => ({
+ // Initial state
+ isLoading: false,
+ lastError: undefined,
+ storeErrors: {},
+
+ // Actions
+ setError: (error: string | undefined) => {
+  logStoreAction("ErrorStore", "setError", { error });
+  set({ lastError: error });
+ },
+ setLoading: (loading: boolean) => {
+  logStoreAction("ErrorStore", "setLoading", { loading });
+  set({ isLoading: loading });
+ },
+}));
+```
+
+#### Pattern 2: Modular Composition (Complex Stores)
+
+For complex stores with multiple domains and extensive operations:
+
+```typescript
+// ✅ Good: Modular composition for complex stores
 import { create } from "zustand";
 
 export const useSitesStore = create<SitesStore>()((set, get) => {
@@ -447,6 +477,27 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
  };
 });
 ```
+
+#### Choosing the Right Pattern
+
+**Use Direct Create Pattern when:**
+
+- Single responsibility/domain (error handling, settings, UI state)
+- Simple state structure (typically <200 lines)
+- Limited cross-cutting concerns
+- Straightforward action implementations
+
+**Use Modular Composition Pattern when:**
+
+- Multiple interconnected domains (sites + monitors + history)
+- Complex business logic requiring separation of concerns
+- Extensive operations requiring dependency injection
+- Large stores benefiting from module separation (typically >300 lines)
+
+**Current Store Examples:**
+
+- **Direct Pattern**: `useErrorStore`, `useUpdatesStore`, `useSettingsStore`, `useUIStore`, `useMonitorTypesStore`
+- **Modular Pattern**: `useSitesStore` (manages sites, monitors, sync, operations)
 
 ### Store Module Structure
 

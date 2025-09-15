@@ -244,4 +244,5 @@ I REPEAT: You cannot stop until you eliminate all of these test warnings:
 "ERROR: Coverage for statements does not meet global threshold (95%)"
 "ERROR: Coverage for branches does not meet global threshold (95%)"
 
-I REPEAT: You cannot stop until you eliminate all of these test warnings above for both Front AND Backend tests.
+No failing tests, no TypeScript errors, no lint errors, and 95% coverage (100% if above 95%) for all files.
+If you have failing tests, fix them first, you cannot stop until all tests pass with no errors or warnings.

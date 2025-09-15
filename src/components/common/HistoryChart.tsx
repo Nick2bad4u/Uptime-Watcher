@@ -19,7 +19,7 @@ import { ThemedText } from "../../theme/components/ThemedText";
  *
  * @public
  */
-export interface HistoryChartProps extends CoreComponentProperties {
+export interface HistoryChartProperties extends CoreComponentProperties {
     /** Array of historical status records to display */
     readonly history: StatusHistory[];
     /** Maximum number of items to display (default: 120) */
@@ -44,13 +44,13 @@ export interface HistoryChartProps extends CoreComponentProperties {
  * @returns JSX element containing the history chart, or null if no data
  *   (following React conventions for conditional rendering)
  */
-export const HistoryChart: NamedExoticComponent<HistoryChartProps> = memo(
+export const HistoryChart: NamedExoticComponent<HistoryChartProperties> = memo(
     function HistoryChart({
         className = "",
         history,
         maxItems = 120,
         title,
-    }: HistoryChartProps) {
+    }: HistoryChartProperties) {
         // Return null for empty history (React convention for "render nothing")
         if (history.length === 0) {
             // React components, returning null from a render function
