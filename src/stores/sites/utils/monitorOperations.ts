@@ -17,12 +17,15 @@ import {
     type Site,
 } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     isNonEmptyString,
     isValidPort,
     isValidUrl,
     safeInteger,
 } from "@shared/validation/validatorUtils";
+
+import { logger } from "../../../services/logger";
 
 // Import validateMonitor directly from "@shared/types" if needed
 
@@ -460,7 +463,11 @@ export function updateMonitorInSite(
             return normalizeMonitor(merged);
         } catch (error) {
             // If updates are invalid, keep the baseline (already normalized) instead of possibly malformed original
-            console.error(`Failed to update monitor ${monitorId}:`, error);
+            logger.error(
+                `Failed to update monitor ${monitorId}:`,
+
+                ensureError(error)
+            );
             return baseline;
         }
     });

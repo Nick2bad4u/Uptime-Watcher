@@ -38,7 +38,7 @@ const resetUIStore = () => {
     useUIStore.getState().setShowSiteDetails(false);
     useUIStore.getState().setShowAddSiteModal(false);
     useUIStore.getState().setShowAdvancedMetrics(false);
-    useUIStore.getState().setSelectedSite(undefined);
+    useUIStore.getState().selectSite(undefined);
     useUIStore.getState().setActiveSiteDetailsTab("site-overview");
     useUIStore.getState().setSiteDetailsChartTimeRange("24h");
 };
@@ -368,7 +368,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             "should handle site selection",
             (site) => {
                 // Act
-                useUIStore.getState().setSelectedSite(site);
+                useUIStore.getState().selectSite(site);
 
                 // Assert
                 expect(useUIStore.getState().selectedSiteId).toBe(
@@ -382,7 +382,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
         ])("should handle selection across multiple sites", (sites) => {
             // Act & Assert - select each site in turn
             for (const site of sites) {
-                useUIStore.getState().setSelectedSite(site);
+                useUIStore.getState().selectSite(site);
                 expect(useUIStore.getState().selectedSiteId).toBe(
                     site.identifier
                 );
@@ -393,13 +393,13 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             "should handle clearing site selection",
             (site) => {
                 // Arrange
-                useUIStore.getState().setSelectedSite(site);
+                useUIStore.getState().selectSite(site);
                 expect(useUIStore.getState().selectedSiteId).toBe(
                     site.identifier
                 );
 
                 // Act
-                useUIStore.getState().setSelectedSite(undefined);
+                useUIStore.getState().selectSite(undefined);
 
                 // Assert
                 expect(useUIStore.getState().selectedSiteId).toBeUndefined();
@@ -411,7 +411,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
         ])("should handle rapid site selection changes", (sites) => {
             // Act - rapidly change selections
             for (const site of sites)
-                useUIStore.getState().setSelectedSite(site);
+                useUIStore.getState().selectSite(site);
 
             // Assert - last selection should win
             const lastSite = sites.at(-1);
@@ -573,7 +573,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             "should handle complex state combinations",
             (site, modalStates, uiState) => {
                 // Act - set complex state combination
-                useUIStore.getState().setSelectedSite(site);
+                useUIStore.getState().selectSite(site);
                 useUIStore.getState().setShowSettings(modalStates.showSettings);
                 useUIStore
                     .getState()
@@ -631,7 +631,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                     i++
                 ) {
                     if (i < sites.length) {
-                        useUIStore.getState().setSelectedSite(sites[i]);
+                        useUIStore.getState().selectSite(sites[i]);
                     }
                     if (i < tabIds.length) {
                         useUIStore
@@ -771,7 +771,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 // Act - interleave site selection and URL operations
                 for (let i = 0; i < Math.max(sites.length, urls.length); i++) {
                     if (i < sites.length) {
-                        useUIStore.getState().setSelectedSite(sites[i]);
+                        useUIStore.getState().selectSite(sites[i]);
                     }
                     if (i < urls.length) {
                         useUIStore.getState().openExternal(urls[i]!);
@@ -797,7 +797,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
 
             // Act & Assert - setting undefined site should not crash
             expect(() =>
-                useUIStore.getState().setSelectedSite(undefined)
+                useUIStore.getState().selectSite(undefined)
             ).not.toThrow();
             expect(useUIStore.getState().selectedSiteId).toBeUndefined();
         });
@@ -922,7 +922,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             "should maintain site selection consistency",
             (site) => {
                 // Act
-                useUIStore.getState().setSelectedSite(site);
+                useUIStore.getState().selectSite(site);
 
                 // Assert invariants
                 expect(useUIStore.getState().selectedSiteId).toBe(

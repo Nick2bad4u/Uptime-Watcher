@@ -80,14 +80,14 @@ describe("Settings Component", () => {
         },
         updateSetting: vi.fn(),
         updateSettings: vi.fn(),
-        updateHistoryLimitValue: vi.fn().mockResolvedValue(undefined),
+        persistHistoryLimit: vi.fn().mockResolvedValue(undefined),
         resetSettings: vi.fn(),
         syncSettings: vi.fn(),
     };
 
     const mockSitesStore = {
         downloadSQLiteBackup: vi.fn(),
-        fullSyncFromBackend: vi.fn().mockResolvedValue(undefined),
+        fullResyncSites: vi.fn().mockResolvedValue(undefined),
     };
 
     const mockTheme = {
@@ -268,7 +268,7 @@ describe("Settings Component", () => {
         );
         fireEvent.change(input, { target: { value: "500" } });
 
-        expect(mockSettingsStore.updateHistoryLimitValue).toHaveBeenCalledWith(
+        expect(mockSettingsStore.persistHistoryLimit).toHaveBeenCalledWith(
             500
         );
     });
@@ -341,7 +341,7 @@ describe("Settings Component", () => {
         const syncButton = screen.getByText("🔄 Sync Data");
         fireEvent.click(syncButton);
 
-        expect(mockSitesStore.fullSyncFromBackend).toHaveBeenCalled();
+        expect(mockSitesStore.fullResyncSites).toHaveBeenCalled();
     });
 
     it("should handle SQLite backup download", ({ task, annotate }) => {

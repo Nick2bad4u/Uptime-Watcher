@@ -9,6 +9,9 @@
 
 import type { Site } from "@shared/types";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
+import { logger } from "../../../services/logger";
 import { safeExtractIpcData } from "../../../types/ipc";
 import { waitForElectronAPI } from "../../utils";
 
@@ -131,7 +134,11 @@ export const SiteService = {
         try {
             await waitForElectronAPI();
         } catch (error) {
-            console.error("Failed to initialize SiteService:", error);
+            logger.error(
+                "Failed to initialize SiteService:",
+
+                ensureError(error)
+            );
             throw error;
         }
     },

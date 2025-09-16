@@ -10,13 +10,13 @@ import type { Monitor, MonitorType, Site } from "@shared/types";
 
 import { isDevelopment } from "@shared/utils/environment";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import { ensureError } from "@shared/utils/errorHandling";
 
 import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
 
 import { logger } from "../../services/logger";
 import { safeExtractIpcData } from "../../types/ipc";
-import { ensureError } from "../../utils/errorHandling";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
 import { normalizeMonitor } from "./utils/monitorOperations";
 import {

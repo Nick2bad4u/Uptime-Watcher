@@ -22,8 +22,8 @@
  * updateSettings({ theme: "dark", notifications: true });
  *
  * // History limit with backend sync
- * const { updateHistoryLimitValue } = useSettingsStore();
- * await updateHistoryLimitValue(500);
+ * const { persistHistoryLimit } = useSettingsStore();
+ * await persistHistoryLimit(500);
  *
  * // Settings initialization
  * const { initializeSettings } = useSettingsStore();
@@ -41,6 +41,7 @@ import type { AppSettings } from "../types";
 import type { SettingsStore } from "./types";
 
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
+import { logger } from "../../services/logger";
 import { safeExtractIpcData } from "../../types/ipc";
 import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction } from "../utils";
@@ -82,9 +83,11 @@ const syncSettingsAfterRehydration = (
                     );
                     state.updateSettings({ historyLimit });
                 } catch (error) {
-                    console.warn(
+                    logger.warn(
                         "Failed to sync settings after rehydration:",
-                        error
+                        error instanceof Error
+                            ? error
+                            : new Error(String(error))
                     );
                 }
                 settingsSyncTimer = null;
@@ -218,6 +221,69 @@ export const useSettingsStore: UseBoundStore<
 
                 return result;
             },
+            persistHistoryLimit: async (limit: number): Promise<void> => {
+                logStoreAction("SettingsStore", "persistHistoryLimit", {
+                    limit,
+                });
+
+                const currentSettings = get().settings;
+
+                await withErrorHandling(
+                    async () => {
+                        // Update local state immediately for responsive UI
+                        get().updateSettings({ historyLimit: limit });
+
+                        // Call backend to update and prune history
+                        await window.electronAPI.settings.updateHistoryLimit(
+                            limit
+                        );
+
+                        // Verify the value from backend to ensure sync
+                        const response =
+                            await window.electronAPI.settings.getHistoryLimit();
+                        const backendLimit = safeExtractIpcData<number>(
+                            response,
+                            limit
+                        );
+
+                        // Ensure we have a valid number from backend
+                        const validBackendLimit =
+                            typeof backendLimit === "number" && backendLimit > 0
+                                ? backendLimit
+                                : limit;
+
+                        // Update with backend value to ensure consistency
+                        get().updateSettings({
+                            historyLimit: validBackendLimit,
+                        });
+                    },
+                    {
+                        clearError: (): void => {
+                            useErrorStore
+                                .getState()
+                                .clearStoreError("settings");
+                        },
+                        setError: (error: string | undefined): void => {
+                            // Revert to previous state on error instead of
+                            // using default
+                            useErrorStore
+                                .getState()
+                                .setStoreError("settings", error);
+                            get().updateSettings({
+                                historyLimit: currentSettings.historyLimit,
+                            });
+                        },
+                        setLoading: (loading): void => {
+                            useErrorStore
+                                .getState()
+                                .setOperationLoading(
+                                    "updateHistoryLimit",
+                                    loading
+                                );
+                        },
+                    }
+                );
+            },
             resetSettings: async (): Promise<{
                 message: string;
                 success: boolean;
@@ -291,69 +357,6 @@ export const useSettingsStore: UseBoundStore<
                     },
                     createStoreErrorHandler("settings", "syncFromBackend")
                 ),
-            updateHistoryLimitValue: async (limit: number): Promise<void> => {
-                logStoreAction("SettingsStore", "updateHistoryLimitValue", {
-                    limit,
-                });
-
-                const currentSettings = get().settings;
-
-                await withErrorHandling(
-                    async () => {
-                        // Update local state immediately for responsive UI
-                        get().updateSettings({ historyLimit: limit });
-
-                        // Call backend to update and prune history
-                        await window.electronAPI.settings.updateHistoryLimit(
-                            limit
-                        );
-
-                        // Verify the value from backend to ensure sync
-                        const response =
-                            await window.electronAPI.settings.getHistoryLimit();
-                        const backendLimit = safeExtractIpcData<number>(
-                            response,
-                            limit
-                        );
-
-                        // Ensure we have a valid number from backend
-                        const validBackendLimit =
-                            typeof backendLimit === "number" && backendLimit > 0
-                                ? backendLimit
-                                : limit;
-
-                        // Update with backend value to ensure consistency
-                        get().updateSettings({
-                            historyLimit: validBackendLimit,
-                        });
-                    },
-                    {
-                        clearError: (): void => {
-                            useErrorStore
-                                .getState()
-                                .clearStoreError("settings");
-                        },
-                        setError: (error: string | undefined): void => {
-                            // Revert to previous state on error instead of
-                            // using default
-                            useErrorStore
-                                .getState()
-                                .setStoreError("settings", error);
-                            get().updateSettings({
-                                historyLimit: currentSettings.historyLimit,
-                            });
-                        },
-                        setLoading: (loading): void => {
-                            useErrorStore
-                                .getState()
-                                .setOperationLoading(
-                                    "updateHistoryLimit",
-                                    loading
-                                );
-                        },
-                    }
-                );
-            },
             updateSettings: (newSettings: Partial<AppSettings>): void => {
                 logStoreAction("SettingsStore", "updateSettings", {
                     newSettings,

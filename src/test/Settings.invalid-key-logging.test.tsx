@@ -42,7 +42,7 @@ vi.mock("../stores/settings/useSettingsStore", () => ({
 // Mock other dependencies
 vi.mock("../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn(() => ({
-        updateHistoryLimitValue: vi.fn(),
+        persistHistoryLimit: vi.fn(),
     })),
 }));
 

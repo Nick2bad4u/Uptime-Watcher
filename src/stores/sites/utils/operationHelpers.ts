@@ -10,6 +10,7 @@ import { withErrorHandling } from "@shared/utils/errorHandling";
 
 import type { SiteOperationsDependencies } from "../types";
 
+import { logger } from "../../../services/logger";
 import { logStoreAction } from "../../utils";
 import { createStoreErrorHandler } from "../../utils/storeErrorHandling";
 import { updateMonitorInSite } from "./monitorOperations";
@@ -63,7 +64,7 @@ export const updateMonitorAndSave = async (
             error instanceof Error &&
             error.message.includes(ERROR_CATALOG.sites.NOT_FOUND as string)
         ) {
-            console.error(`Failed to find site with ID ${siteId}:`, error);
+            logger.error(`Failed to find site with ID ${siteId}:`, error);
             throw new Error(`Site not found: ${siteId}`, { cause: error });
         }
         // Re-throw other errors
@@ -97,7 +98,7 @@ export const withSiteOperation = async (
         async () => {
             await operation();
             if (syncAfter) {
-                await deps.syncSitesFromBackend();
+                await deps.syncSites();
             }
         },
         createStoreErrorHandler("sites-operations", operationName)
@@ -133,7 +134,7 @@ export const withSiteOperationReturning = async <T>(
 
             /* eslint-disable nitpick/no-redundant-vars -- Variable needed for sync operation sequencing */
             const result = await operation();
-            await deps.syncSitesFromBackend();
+            await deps.syncSites();
             return result;
             /* eslint-enable nitpick/no-redundant-vars -- Re-enable after sync operation sequencing */
         },

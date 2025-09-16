@@ -25,6 +25,17 @@ export interface UpdateInfo {
 export interface UpdatesStore {
     /** Apply downloaded update and restart */
     applyUpdate: () => void;
+    /**
+     * Applies a new update status to the store with proper state management.
+     *
+     * @remarks
+     * Updates the current update status with clear semantics for status
+     * transitions. This method provides better naming clarity for update state
+     * management operations.
+     *
+     * @param status - New update status to apply
+     */
+    applyUpdateStatus: (status: UpdateStatus) => void;
     /** Clear update error */
     clearUpdateError: () => void;
     /** Set update error */
@@ -35,8 +46,6 @@ export interface UpdatesStore {
     /** Set update progress */
     setUpdateProgress: (progress: number) => void;
     // Actions
-    /** Set update status */
-    setUpdateStatus: (status: UpdateStatus) => void;
     /** Update error message if any */
     updateError: string | undefined;
     /** Update information */

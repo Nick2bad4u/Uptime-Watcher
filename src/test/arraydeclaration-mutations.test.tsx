@@ -137,18 +137,18 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
         });
     });
 
-    describe("Settings.tsx Line 166: [settings.historyLimit, updateHistoryLimitValue] dependencies", () => {
+    describe("Settings.tsx Line 166: [settings.historyLimit, persistHistoryLimit] dependencies", () => {
         it("should respond to historyLimit changes (detect [] mutation)", () => {
             const effectCallback = vi.fn();
             let historyLimit = 100;
-            let updateHistoryLimitValue = vi.fn();
+            let persistHistoryLimit = vi.fn();
 
             function TestComponent() {
                 const settings = { historyLimit };
 
                 React.useEffect(effectCallback, [
                     settings.historyLimit,
-                    updateHistoryLimitValue,
+                    persistHistoryLimit,
                 ]);
                 return (
                     <div data-testid="history-component">History Settings</div>
@@ -164,7 +164,7 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
             expect(effectCallback).toHaveBeenCalledTimes(2);
 
             // Change update function
-            updateHistoryLimitValue = vi.fn();
+            persistHistoryLimit = vi.fn();
             rerender(<TestComponent />);
             expect(effectCallback).toHaveBeenCalledTimes(3);
 

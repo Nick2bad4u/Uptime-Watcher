@@ -147,24 +147,24 @@ describe("useSiteActions Hook Coverage Tests", () => {
             );
 
             const uiStore = {
-                setSelectedSite: vi.fn(),
+                selectSite: vi.fn(),
                 setShowSiteDetails: vi.fn(),
             };
 
-            expect(typeof uiStore.setSelectedSite).toBe("function");
+            expect(typeof uiStore.selectSite).toBe("function");
             expect(typeof uiStore.setShowSiteDetails).toBe("function");
 
-            uiStore.setSelectedSite("site-1");
+            uiStore.selectSite("site-1");
             uiStore.setShowSiteDetails(true);
 
-            expect(uiStore.setSelectedSite).toHaveBeenCalledWith("site-1");
+            expect(uiStore.selectSite).toHaveBeenCalledWith("site-1");
             expect(uiStore.setShowSiteDetails).toHaveBeenCalledWith(true);
         });
     });
 
     describe("Action Handlers", () => {
         it("should handle card click navigation", () => {
-            const mockSetSelectedSite = vi.fn();
+            const mockselectSite = vi.fn();
             const mockSetShowSiteDetails = vi.fn();
             const mockLogger = {
                 user: {
@@ -178,14 +178,14 @@ describe("useSiteActions Hook Coverage Tests", () => {
             };
 
             // Simulate handleCardClick logic
-            mockSetSelectedSite(site.identifier);
+            mockselectSite(site.identifier);
             mockSetShowSiteDetails(true);
             mockLogger.user.action("Opened site details", {
                 siteId: site.identifier,
                 siteName: site.name,
             });
 
-            expect(mockSetSelectedSite).toHaveBeenCalledWith(site.identifier);
+            expect(mockselectSite).toHaveBeenCalledWith(site.identifier);
             expect(mockSetShowSiteDetails).toHaveBeenCalledWith(true);
             expect(mockLogger.user.action).toHaveBeenCalledWith(
                 "Opened site details",
@@ -541,7 +541,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 "startSiteMonitorMonitoring",
                 "stopSiteMonitorMonitoring",
                 "checkSiteNow",
-                "setSelectedSite",
+                "selectSite",
                 "setShowSiteDetails",
             ];
 
@@ -636,7 +636,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                     stopSiteMonitoring: vi.fn(),
                 },
                 uiStore: {
-                    setSelectedSite: vi.fn(),
+                    selectSite: vi.fn(),
                     setShowSiteDetails: vi.fn(),
                 },
             };
@@ -645,7 +645,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
             expect(storeIntegration.sitesStore).toHaveProperty(
                 "startSiteMonitoring"
             );
-            expect(storeIntegration.uiStore).toHaveProperty("setSelectedSite");
+            expect(storeIntegration.uiStore).toHaveProperty("selectSite");
             expect(storeIntegration.uiStore).toHaveProperty(
                 "setShowSiteDetails"
             );

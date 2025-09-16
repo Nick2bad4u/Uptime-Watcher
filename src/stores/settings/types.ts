@@ -57,6 +57,20 @@ export interface SettingsStore {
     }>;
 
     /**
+     * Persists history limit setting with backend synchronization.
+     *
+     * @remarks
+     * Updates the history limit preference with proper validation and backend
+     * synchronization. This method provides clearer persistence semantics
+     * compared to a generic update operation.
+     *
+     * @param limit - New history limit value in number of records
+     *
+     * @returns Promise that resolves when update is complete
+     */
+    persistHistoryLimit: (limit: number) => Promise<void>;
+
+    /**
      * Resets all settings to default values with backend synchronization.
      *
      * @remarks
@@ -107,25 +121,6 @@ export interface SettingsStore {
         /** Whether the synchronization completed successfully */
         success: boolean;
     }>;
-
-    /**
-     * Updates history retention limit with backend synchronization.
-     *
-     * @remarks
-     * Updates the history limit setting with special handling:
-     *
-     * - Validates the new limit value
-     * - Synchronizes with backend immediately
-     * - Updates local state and persistent storage
-     *
-     * This setting is critical for data management and requires immediate
-     * backend synchronization.
-     *
-     * @param limit - New history limit value in number of records
-     *
-     * @returns Promise that resolves when update is complete
-     */
-    updateHistoryLimitValue: (limit: number) => Promise<void>;
 
     /**
      * Updates multiple application settings with persistence.

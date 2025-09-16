@@ -96,7 +96,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         addMode: "new",
         setAddMode: vi.fn(),
         selectedSite: null,
-        setSelectedSite: vi.fn(),
+        selectSite: vi.fn(),
     })),
 }));
 

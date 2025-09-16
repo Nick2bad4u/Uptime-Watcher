@@ -13,11 +13,11 @@ import { useSitesStore } from "../../stores/sites/useSitesStore";
 import type { SitesStore } from "../../stores/sites/types";
 
 // Mock the useSitesStore
-const mockFullSyncFromBackend = vi.fn();
+const mockfullResyncSites = vi.fn();
 
 // Create a minimal mock store with only the required properties
 const createMockStore = (): Partial<SitesStore> => ({
-    fullSyncFromBackend: mockFullSyncFromBackend,
+    fullResyncSites: mockfullResyncSites,
     sites: [],
     selectedMonitorIds: {},
     selectedSiteId: undefined,
@@ -36,7 +36,7 @@ const createMockStore = (): Partial<SitesStore> => ({
     removeMonitorFromSite: vi.fn(),
     removeSite: vi.fn(),
     setSelectedMonitorId: vi.fn(),
-    setSelectedSite: vi.fn(),
+    selectSite: vi.fn(),
     setSites: vi.fn(),
     startSiteMonitoring: vi.fn(),
     startSiteMonitorMonitoring: vi.fn(),
@@ -44,7 +44,7 @@ const createMockStore = (): Partial<SitesStore> => ({
     stopSiteMonitorMonitoring: vi.fn(),
     subscribeToStatusUpdates: vi.fn(),
     subscribeToSyncEvents: vi.fn(),
-    syncSitesFromBackend: vi.fn(),
+    syncSites: vi.fn(),
     unsubscribeFromStatusUpdates: vi.fn(),
     updateMonitorRetryAttempts: vi.fn(),
     updateMonitorTimeout: vi.fn(),
@@ -97,7 +97,7 @@ describe("useBackendFocusSync Hook", () => {
             renderHook(() => useBackendFocusSync());
 
             expect(mockAddEventListener).not.toHaveBeenCalled();
-            expect(mockFullSyncFromBackend).not.toHaveBeenCalled();
+            expect(mockfullResyncSites).not.toHaveBeenCalled();
         });
 
         it("should not add event listener when explicitly disabled", async ({
@@ -112,7 +112,7 @@ describe("useBackendFocusSync Hook", () => {
             renderHook(() => useBackendFocusSync(false));
 
             expect(mockAddEventListener).not.toHaveBeenCalled();
-            expect(mockFullSyncFromBackend).not.toHaveBeenCalled();
+            expect(mockfullResyncSites).not.toHaveBeenCalled();
         });
 
         it("should return undefined cleanup function when disabled", async ({
@@ -151,7 +151,7 @@ describe("useBackendFocusSync Hook", () => {
             expect(mockAddEventListener).toHaveBeenCalledTimes(1);
         });
 
-        it("should call fullSyncFromBackend when focus event is triggered", async ({
+        it("should call fullResyncSites when focus event is triggered", async ({
             task,
             annotate,
         }) => {
@@ -174,7 +174,7 @@ describe("useBackendFocusSync Hook", () => {
                 focusHandler();
             }
 
-            expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(1);
+            expect(mockfullResyncSites).toHaveBeenCalledTimes(1);
         });
 
         it("should handle multiple focus events", async ({
@@ -197,7 +197,7 @@ describe("useBackendFocusSync Hook", () => {
                 focusHandler();
             }
 
-            expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(3);
+            expect(mockfullResyncSites).toHaveBeenCalledTimes(3);
         });
 
         it("should remove event listener on unmount", async ({
@@ -324,7 +324,7 @@ describe("useBackendFocusSync Hook", () => {
     });
 
     describe("Store selector behavior", () => {
-        it("should use store selector to get fullSyncFromBackend function", async ({
+        it("should use store selector to get fullResyncSites function", async ({
             task,
             annotate,
         }) => {
@@ -341,7 +341,7 @@ describe("useBackendFocusSync Hook", () => {
             );
         });
 
-        it("should re-run effect when fullSyncFromBackend function changes", async ({
+        it("should re-run effect when fullResyncSites function changes", async ({
             task,
             annotate,
         }) => {
@@ -357,7 +357,7 @@ describe("useBackendFocusSync Hook", () => {
             vi.mocked(useSitesStore).mockImplementation((selector) => {
                 const store = {
                     ...mockStore,
-                    fullSyncFromBackend: mockFullSyncFromBackend,
+                    fullResyncSites: mockfullResyncSites,
                 };
                 if (typeof selector === "function") {
                     return selector(store);
@@ -374,7 +374,7 @@ describe("useBackendFocusSync Hook", () => {
             vi.mocked(useSitesStore).mockImplementation((selector) => {
                 const store = {
                     ...mockStore,
-                    fullSyncFromBackend: newMockFullSync,
+                    fullResyncSites: newMockFullSync,
                 };
                 if (typeof selector === "function") {
                     return selector(store);
@@ -397,12 +397,12 @@ describe("useBackendFocusSync Hook", () => {
             secondHandler();
 
             expect(newMockFullSync).toHaveBeenCalledTimes(1);
-            expect(mockFullSyncFromBackend).not.toHaveBeenCalled();
+            expect(mockfullResyncSites).not.toHaveBeenCalled();
         });
     });
 
     describe("Error handling and edge cases", () => {
-        it("should handle fullSyncFromBackend throwing an error", async ({
+        it("should handle fullResyncSites throwing an error", async ({
             task,
             annotate,
         }) => {
@@ -411,7 +411,7 @@ describe("useBackendFocusSync Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Error Handling", "type");
 
-            mockFullSyncFromBackend.mockImplementation(() => {
+            mockfullResyncSites.mockImplementation(() => {
                 throw new Error("Sync failed");
             });
 
@@ -427,7 +427,7 @@ describe("useBackendFocusSync Hook", () => {
             }).not.toThrow();
         });
 
-        it("should handle fullSyncFromBackend returning a rejected promise", async ({
+        it("should handle fullResyncSites returning a rejected promise", async ({
             task,
             annotate,
         }) => {
@@ -436,7 +436,7 @@ describe("useBackendFocusSync Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Business Logic", "type");
 
-            mockFullSyncFromBackend.mockRejectedValue(
+            mockfullResyncSites.mockRejectedValue(
                 new Error("Async sync failed")
             );
 
@@ -513,7 +513,7 @@ describe("useBackendFocusSync Hook", () => {
             vi.mocked(useSitesStore).mockImplementation((selector) => {
                 const store = {
                     ...mockStore,
-                    fullSyncFromBackend: mockFullSyncFromBackend,
+                    fullResyncSites: mockfullResyncSites,
                 };
                 if (typeof selector === "function") {
                     return selector(store);
@@ -543,7 +543,7 @@ describe("useBackendFocusSync Hook", () => {
                 focusHandler();
             }
 
-            expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(1);
+            expect(mockfullResyncSites).toHaveBeenCalledTimes(1);
         });
 
         it("should properly clean up when component unmounts while enabled", async ({
@@ -596,7 +596,7 @@ describe("useBackendFocusSync Hook", () => {
                 handler2();
             }
 
-            expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(2);
+            expect(mockfullResyncSites).toHaveBeenCalledTimes(2);
 
             // Clean up first instance
             unmount1();
@@ -607,7 +607,7 @@ describe("useBackendFocusSync Hook", () => {
 
             // Second instance should still work
             handler2();
-            expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(3);
+            expect(mockfullResyncSites).toHaveBeenCalledTimes(3);
 
             // Clean up second instance
             unmount2();

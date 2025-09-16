@@ -286,7 +286,7 @@ describe("useSitesState", () => {
         });
     });
 
-    describe("setSelectedSite", () => {
+    describe("selectSite", () => {
         it("should set selected site", async ({ annotate }) => {
             await annotate("Component: useSitesState", "component");
             await annotate(
@@ -311,7 +311,7 @@ describe("useSitesState", () => {
                 "purpose"
             );
 
-            stateActions.setSelectedSite(mockSite);
+            stateActions.selectSite(mockSite);
 
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
 
@@ -343,7 +343,7 @@ describe("useSitesState", () => {
                 "purpose"
             );
 
-            stateActions.setSelectedSite(undefined);
+            stateActions.selectSite(undefined);
 
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
 

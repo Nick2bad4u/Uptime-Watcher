@@ -121,11 +121,32 @@ export interface MonitorTypesActions {
      * Loads all available monitor type configurations from backend.
      *
      * @remarks
-     * Fetches monitor type definitions from the backend registry and caches
-     * them in the store. This includes field configurations, validation
-     * schemas, and UI metadata for each monitor type.
+     * **Initial Load Operation**: Fetches monitor type definitions from the
+     * backend registry and caches them in the store on first use. This is
+     * intended for application initialization or when monitor types haven't
+     * been loaded yet.
      *
-     * Uses `safeExtractIpcData` for robust IPC response handling.
+     * Key characteristics:
+     *
+     * - Designed for initial application startup
+     * - Populates empty cache with fresh data
+     * - Includes field configurations, validation schemas, and UI metadata
+     * - Uses `safeExtractIpcData` for robust IPC response handling
+     * - Should be called once during app initialization
+     *
+     * For updating existing cached data, use {@link refreshMonitorTypes}
+     * instead, which provides cache invalidation and forced refresh semantics.
+     *
+     * @example
+     *
+     * ```typescript
+     * // Application initialization
+     * const { loadMonitorTypes, isLoaded } = useMonitorTypesStore();
+     *
+     * if (!isLoaded) {
+     *     await loadMonitorTypes(); // Initial load
+     * }
+     * ```
      *
      * @returns Promise that resolves when loading is complete
      */
@@ -135,9 +156,31 @@ export interface MonitorTypesActions {
      * Clears monitor types cache and reloads from backend.
      *
      * @remarks
-     * Forces a fresh load of monitor type configurations from the backend,
-     * bypassing any cached data. Useful for development or when types may have
-     * changed.
+     * **Background Refresh Operation**: Forces a fresh load of monitor type
+     * configurations from the backend, bypassing and replacing any cached data.
+     * This is intended for runtime updates when monitor types may have changed
+     * or when explicit cache invalidation is needed.
+     *
+     * Key characteristics:
+     *
+     * - Designed for runtime cache invalidation
+     * - Replaces existing cached data with fresh backend data
+     * - Useful during development when types are being modified
+     * - Appropriate for user-triggered refresh actions
+     * - Can be called multiple times without side effects
+     *
+     * For initial application loading, use {@link loadMonitorTypes} instead,
+     * which provides first-time loading semantics optimized for startup.
+     *
+     * @example
+     *
+     * ```typescript
+     * // User-triggered refresh or development hot-reload
+     * const { refreshMonitorTypes } = useMonitorTypesStore();
+     *
+     * // Force cache refresh
+     * await refreshMonitorTypes();
+     * ```
      *
      * @returns Promise that resolves when refresh is complete
      */

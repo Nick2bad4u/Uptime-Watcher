@@ -994,7 +994,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                     ];
 
                     // All results should be numbers and not NaN
-                    for (const { name, result } of results) {
+                    for (const { result } of results) {
                         expect(typeof result).toBe("number");
                         expect(Number.isNaN(result)).toBeFalsy();
                     }

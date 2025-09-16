@@ -15,6 +15,7 @@
  */
 
 import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     type FormEvent,
     memo,
@@ -270,7 +271,11 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                         url,
                     });
                 } catch (error) {
-                    console.error("Form submission failed:", error);
+                    logger.error(
+                        "Form submission failed:",
+
+                        ensureError(error)
+                    );
                     // Form error handling is already managed by handleSubmit
                 }
             },

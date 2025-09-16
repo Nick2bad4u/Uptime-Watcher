@@ -17,7 +17,7 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
 
 vi.mock("../../../stores/ui/useUiStore", () => ({
     useUIStore: vi.fn(() => ({
-        setSelectedSite: vi.fn(),
+        selectSite: vi.fn(),
         setShowSiteDetails: vi.fn(),
     })),
 }));

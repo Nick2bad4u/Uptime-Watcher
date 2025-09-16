@@ -84,7 +84,7 @@
 
 import { describe, expect, vi, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 import "@testing-library/jest-dom";
 import type { AppSettings } from "../../../stores/types";
@@ -124,7 +124,7 @@ const mockUpdateSettings = vi.fn((newSettings: Partial<AppSettings>) => {
     };
 });
 
-const mockUpdateHistoryLimitValue = vi.fn(async (limit: number) => {
+const mockpersistHistoryLimit = vi.fn(async (limit: number) => {
     mockSettingsState.historyLimit = limit;
 });
 
@@ -147,7 +147,7 @@ const mockClearError = vi.fn(() => {
     mockErrorState.error = null;
 });
 
-const mockFullSyncFromBackend = vi.fn(async () => {
+const mockfullResyncSites = vi.fn(async () => {
     // Simulate sync operation
 });
 
@@ -163,7 +163,7 @@ vi.mock("../../../stores/settings/useSettingsStore", () => ({
         settings: mockSettingsState,
         setTheme: mockSetTheme,
         updateSettings: mockUpdateSettings,
-        updateHistoryLimitValue: mockUpdateHistoryLimitValue,
+        persistHistoryLimit: mockpersistHistoryLimit,
         resetSettings: mockResetSettings,
         isLoading: mockErrorState.isLoading,
     })),
@@ -182,7 +182,7 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn(() => ({
         sites: mockSitesState.sites,
         isLoading: mockSitesState.isLoading,
-        fullSyncFromBackend: mockFullSyncFromBackend,
+        fullResyncSites: mockfullResyncSites,
         downloadSQLiteBackup: mockDownloadSQLiteBackup,
     })),
 }));
@@ -521,7 +521,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                     target: { value: historyLimit.toString() },
                 });
 
-                expect(mockUpdateHistoryLimitValue).toHaveBeenCalledWith(
+                expect(mockpersistHistoryLimit).toHaveBeenCalledWith(
                     historyLimit
                 );
             }
@@ -637,11 +637,11 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             vi.clearAllMocks();
 
             if (shouldFail) {
-                mockFullSyncFromBackend.mockRejectedValueOnce(
+                mockfullResyncSites.mockRejectedValueOnce(
                     new Error("Sync failed")
                 );
             } else {
-                mockFullSyncFromBackend.mockResolvedValueOnce(undefined);
+                mockfullResyncSites.mockResolvedValueOnce(undefined);
             }
 
             render(<Settings onClose={mockOnClose} />);
@@ -652,7 +652,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             fireEvent.click(syncButton);
 
             // Check the mock was called immediately (sync operation is async but call is immediate)
-            expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(1);
+            expect(mockfullResyncSites).toHaveBeenCalledTimes(1);
 
             // For error checking, we need to give React a chance to update state
             if (shouldFail) {

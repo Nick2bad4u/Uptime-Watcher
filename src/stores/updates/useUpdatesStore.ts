@@ -107,6 +107,10 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
                     success: true,
                 });
             },
+            applyUpdateStatus: (status: UpdateStatus): void => {
+                logStoreAction("UpdatesStore", "applyUpdateStatus", { status });
+                set({ updateStatus: status });
+            },
             clearUpdateError: (): void => {
                 set({ updateError: undefined });
                 logStoreAction("UpdatesStore", "clearUpdateError", {
@@ -128,10 +132,6 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
                     progress,
                 });
                 set({ updateProgress: progress });
-            },
-            setUpdateStatus: (status: UpdateStatus): void => {
-                logStoreAction("UpdatesStore", "setUpdateStatus", { status });
-                set({ updateStatus: status });
             },
             updateError: undefined,
             updateInfo: undefined,

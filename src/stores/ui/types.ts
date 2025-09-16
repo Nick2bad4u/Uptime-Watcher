@@ -39,18 +39,18 @@ export interface UIStore {
     selectedSiteId: string | undefined;
 
     /**
+     * Selects a site for focused operations and UI display.
+     *
+     * @param site - The site to select, or `undefined` to clear selection.
+     */
+    selectSite: (site: Site | undefined) => void;
+
+    /**
      * Sets the active tab in the site details modal.
      *
      * @param tab - The tab identifier to activate.
      */
     setActiveSiteDetailsTab: (tab: string) => void;
-
-    /**
-     * Sets the selected site.
-     *
-     * @param site - The site to select, or `undefined` to clear selection.
-     */
-    setSelectedSite: (site: Site | undefined) => void;
 
     /**
      * Sets the visibility of the add site modal.

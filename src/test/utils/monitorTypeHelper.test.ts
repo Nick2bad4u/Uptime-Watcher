@@ -7,7 +7,7 @@ import { test } from "@fast-check/vitest";
 import * as fc from "fast-check";
 
 import { AppCaches } from "../../utils/cache";
-import * as errorHandling from "../../utils/errorHandling";
+import * as errorHandling from "@shared/utils/errorHandling";
 import * as ipcTypes from "../../types/ipc";
 import {
     clearMonitorTypeCache,

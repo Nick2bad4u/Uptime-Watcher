@@ -37,8 +37,8 @@ import { useSitesStore } from "../stores/sites/useSitesStore";
 export function useBackendFocusSync(enabled = false): void {
     // Use selector to avoid unnecessary re-renders when other store state
     // changes
-    const fullSyncFromBackend = useSitesStore(
-        useCallback((state) => state.fullSyncFromBackend, [])
+    const fullResyncSites = useSitesStore(
+        useCallback((state) => state.fullResyncSites, [])
     );
 
     useEffect(
@@ -47,9 +47,9 @@ export function useBackendFocusSync(enabled = false): void {
                 // Use full sync on focus to ensure complete data consistency
                 // since the user may have been away for a while
                 // Note: Error handling is managed internally by
-                // fullSyncFromBackend through the store's withErrorHandling
+                // fullResyncSites through the store's withErrorHandling
                 // wrapper, so void is safe here
-                void fullSyncFromBackend();
+                void fullResyncSites();
             };
 
             if (enabled) {
@@ -62,6 +62,6 @@ export function useBackendFocusSync(enabled = false): void {
                 }
             };
         },
-        [enabled, fullSyncFromBackend]
+        [enabled, fullResyncSites]
     );
 }

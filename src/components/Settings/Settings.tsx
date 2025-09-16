@@ -37,6 +37,7 @@
 import type { ChangeEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { useCallback, useMemo, useState } from "react";
 
@@ -56,7 +57,6 @@ import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
 import { ThemedSelect } from "../../theme/components/ThemedSelect";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
-import { ensureError } from "../../utils/errorHandling";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { SettingItem } from "../shared/SettingItem";
 
@@ -114,9 +114,9 @@ export const Settings = ({
     onClose,
 }: Readonly<SettingsProperties>): JSX.Element => {
     const { clearError, isLoading, lastError, setError } = useErrorStore();
-    const { resetSettings, settings, updateHistoryLimitValue, updateSettings } =
+    const { persistHistoryLimit, resetSettings, settings, updateSettings } =
         useSettingsStore();
-    const { downloadSQLiteBackup, fullSyncFromBackend } = useSitesStore();
+    const { downloadSQLiteBackup, fullResyncSites } = useSitesStore();
 
     const { availableThemes, setTheme } = useTheme();
 
@@ -151,7 +151,7 @@ export const Settings = ({
                     50_000
                 );
 
-                await updateHistoryLimitValue(limit);
+                await persistHistoryLimit(limit);
 
                 // Log the change after successful update
                 logger.user.settingsChange("historyLimit", oldLimit, limit);
@@ -163,7 +163,7 @@ export const Settings = ({
                 // Error is already handled by the store action
             }
         },
-        [settings.historyLimit, updateHistoryLimitValue]
+        [persistHistoryLimit, settings.historyLimit]
     );
 
     const handleReset = useCallback(() => {
@@ -239,7 +239,7 @@ export const Settings = ({
     const handleSyncNow = useCallback(async () => {
         setSyncSuccess(false);
         try {
-            await fullSyncFromBackend();
+            await fullResyncSites();
             setSyncSuccess(true);
             logger.user.action("Synced data from SQLite backend");
         } catch (error: unknown) {
@@ -255,7 +255,7 @@ export const Settings = ({
                 }`
             );
         }
-    }, [fullSyncFromBackend, setError]);
+    }, [fullResyncSites, setError]);
 
     const handleDownloadSQLite = useCallback(async () => {
         clearError();

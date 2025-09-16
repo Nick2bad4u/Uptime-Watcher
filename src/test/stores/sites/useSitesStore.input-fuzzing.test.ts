@@ -40,7 +40,7 @@ beforeEach(() => {
 const createTestSitesStore = () => {
     // Clear all state in the store
     useSitesStore.getState().setSites([]);
-    useSitesStore.getState().setSelectedSite(undefined);
+    useSitesStore.getState().selectSite(undefined);
 
     // Verify the state is actually cleared
     const clearedState = useSitesStore.getState();
@@ -193,7 +193,7 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
                 useSitesStore.getState().addSite(site);
 
                 // Act
-                useSitesStore.getState().setSelectedSite(site);
+                useSitesStore.getState().selectSite(site);
 
                 // Assert
                 const state = useSitesStore.getState();
@@ -210,10 +210,10 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
                 // Arrange - add and select site
                 createTestSitesStore();
                 useSitesStore.getState().addSite(site);
-                useSitesStore.getState().setSelectedSite(site);
+                useSitesStore.getState().selectSite(site);
 
                 // Act
-                useSitesStore.getState().setSelectedSite(undefined);
+                useSitesStore.getState().selectSite(undefined);
 
                 // Assert
                 const state = useSitesStore.getState();
@@ -306,7 +306,7 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
                 // Arrange - add site and select it
                 createTestSitesStore();
                 useSitesStore.getState().addSite(site);
-                useSitesStore.getState().setSelectedSite(site);
+                useSitesStore.getState().selectSite(site);
 
                 // Act - remove the selected site
                 useSitesStore.getState().removeSite(site.identifier);
@@ -360,7 +360,7 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
                         .removeSite("non-existent-identifier")
                 ).not.toThrow();
                 expect(() =>
-                    useSitesStore.getState().setSelectedSite(site)
+                    useSitesStore.getState().selectSite(site)
                 ).not.toThrow();
 
                 const state = useSitesStore.getState();

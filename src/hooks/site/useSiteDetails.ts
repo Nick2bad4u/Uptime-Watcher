@@ -18,6 +18,7 @@
 
 import type { Monitor, Site } from "@shared/types";
 
+import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { type ChangeEvent, useCallback, useEffect, useState } from "react";
 
@@ -28,7 +29,6 @@ import { logger } from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
-import { withUtilityErrorHandling } from "../../utils/errorHandling";
 import { getDefaultMonitorId } from "../../utils/monitorUiHelpers";
 import { validateMonitorFieldClientSide } from "../../utils/monitorValidation";
 import {

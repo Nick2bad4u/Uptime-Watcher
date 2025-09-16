@@ -7,6 +7,7 @@ import type { Monitor, MonitorType } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 import type { Simplify, UnknownRecord } from "type-fest";
 
+import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 // Import shared validation functions for client-side validation
 import {
     validateMonitorData as sharedValidateMonitorData,
@@ -22,7 +23,6 @@ import type {
 } from "../types/monitorFormData";
 
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
-import { withUtilityErrorHandling } from "./errorHandling";
 
 // ValidationResult type available via direct import from
 // @shared/types/validation

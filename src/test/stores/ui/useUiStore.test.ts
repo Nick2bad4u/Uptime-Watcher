@@ -53,7 +53,7 @@ describe(useUIStore, () => {
         const store = useUIStore.getState();
         act(() => {
             store.setActiveSiteDetailsTab("site-overview");
-            store.setSelectedSite(undefined);
+            store.selectSite(undefined);
             store.setShowAdvancedMetrics(false);
             store.setShowSettings(false);
             store.setShowSiteDetails(false);
@@ -98,7 +98,7 @@ describe(useUIStore, () => {
             expect(typeof result.current.setActiveSiteDetailsTab).toBe(
                 "function"
             );
-            expect(typeof result.current.setSelectedSite).toBe("function");
+            expect(typeof result.current.selectSite).toBe("function");
             expect(typeof result.current.setShowAdvancedMetrics).toBe(
                 "function"
             );
@@ -198,7 +198,7 @@ describe(useUIStore, () => {
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
-                result.current.setSelectedSite(mockSite);
+                result.current.selectSite(mockSite);
             });
 
             expect(result.current.selectedSiteId).toBe(mockSite.identifier);
@@ -217,13 +217,13 @@ describe(useUIStore, () => {
 
             // First set a site
             act(() => {
-                result.current.setSelectedSite(mockSite);
+                result.current.selectSite(mockSite);
             });
             expect(result.current.selectedSiteId).toBe(mockSite.identifier);
 
             // Then clear it
             act(() => {
-                result.current.setSelectedSite(undefined);
+                result.current.selectSite(undefined);
             });
             expect(result.current.selectedSiteId).toBeUndefined();
         });
@@ -245,7 +245,7 @@ describe(useUIStore, () => {
             };
 
             act(() => {
-                result.current.setSelectedSite(differentSite);
+                result.current.selectSite(differentSite);
             });
 
             expect(result.current.selectedSiteId).toBe("different-site-456");
@@ -268,7 +268,7 @@ describe(useUIStore, () => {
             };
 
             act(() => {
-                result.current.setSelectedSite(emptySite);
+                result.current.selectSite(emptySite);
             });
 
             expect(result.current.selectedSiteId).toBe("");
@@ -289,12 +289,12 @@ describe(useUIStore, () => {
             const site2: Site = { ...mockSite, identifier: "site-2" };
 
             act(() => {
-                result.current.setSelectedSite(site1);
+                result.current.selectSite(site1);
             });
             expect(result.current.selectedSiteId).toBe("site-1");
 
             act(() => {
-                result.current.setSelectedSite(site2);
+                result.current.selectSite(site2);
             });
             expect(result.current.selectedSiteId).toBe("site-2");
         });
@@ -693,7 +693,7 @@ describe(useUIStore, () => {
 
             // User selects a site
             act(() => {
-                result.current.setSelectedSite(mockSite);
+                result.current.selectSite(mockSite);
             });
             expect(result.current.selectedSiteId).toBe(mockSite.identifier);
 
@@ -747,14 +747,14 @@ describe(useUIStore, () => {
 
             for (const site of sites) {
                 act(() => {
-                    result.current.setSelectedSite(site);
+                    result.current.selectSite(site);
                 });
                 expect(result.current.selectedSiteId).toBe(site.identifier);
             }
 
             // Clear selection
             act(() => {
-                result.current.setSelectedSite(undefined);
+                result.current.selectSite(undefined);
             });
             expect(result.current.selectedSiteId).toBeUndefined();
         });
@@ -772,7 +772,7 @@ describe(useUIStore, () => {
 
             // Simulate rapid UI interactions
             act(() => {
-                result.current.setSelectedSite(mockSite);
+                result.current.selectSite(mockSite);
                 result.current.setShowSiteDetails(true);
                 result.current.setActiveSiteDetailsTab("history");
                 result.current.setSiteDetailsChartTimeRange("30d");
@@ -867,15 +867,15 @@ describe(useUIStore, () => {
 
             // Set a site first
             act(() => {
-                result.current.setSelectedSite(mockSite);
+                result.current.selectSite(mockSite);
             });
             expect(result.current.selectedSiteId).toBe(mockSite.identifier);
 
             // Clear with undefined multiple times
             act(() => {
-                result.current.setSelectedSite(undefined);
-                result.current.setSelectedSite(undefined);
-                result.current.setSelectedSite(undefined);
+                result.current.selectSite(undefined);
+                result.current.selectSite(undefined);
+                result.current.selectSite(undefined);
             });
             expect(result.current.selectedSiteId).toBeUndefined();
         });

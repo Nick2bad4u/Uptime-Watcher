@@ -52,7 +52,7 @@ const mockUpdateSettings = vi.fn();
 const mockUseStore = {
     clearError: vi.fn(),
     downloadSQLiteBackup: vi.fn().mockResolvedValue(undefined),
-    fullSyncFromBackend: vi.fn().mockResolvedValue(undefined),
+    fullResyncSites: vi.fn().mockResolvedValue(undefined),
     isLoading: false,
     lastError: null as string | null,
     resetSettings: vi.fn(),
@@ -65,7 +65,7 @@ const mockUseStore = {
         soundAlerts: false,
         theme: "dark" as ThemeName,
     },
-    updateHistoryLimitValue: vi.fn().mockResolvedValue(undefined),
+    persistHistoryLimit: vi.fn().mockResolvedValue(undefined),
     updateSettings: mockUpdateSettings,
 };
 

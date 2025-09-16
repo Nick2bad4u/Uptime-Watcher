@@ -42,7 +42,7 @@ describe("StatusUpdateHandler", () => {
     let manager: StatusUpdateManager;
     let mockSetSites: any;
     let mockGetSites: any;
-    let mockFullSyncFromBackend: any;
+    let mockfullResyncSites: any;
     let mockOnUpdate: any;
 
     const createMockSite = (id: string, monitorId: string): Site => ({
@@ -79,14 +79,14 @@ describe("StatusUpdateHandler", () => {
         // Setup function mocks
         mockSetSites = vi.fn();
         mockGetSites = vi.fn(() => [createMockSite("site1", "monitor1")]);
-        mockFullSyncFromBackend = vi.fn().mockResolvedValue(undefined);
+        mockfullResyncSites = vi.fn().mockResolvedValue(undefined);
         mockOnUpdate = vi.fn();
 
         // Setup options
         mockOptions = {
             setSites: mockSetSites,
             getSites: mockGetSites,
-            fullSyncFromBackend: mockFullSyncFromBackend,
+            fullResyncSites: mockfullResyncSites,
             onUpdate: mockOnUpdate,
         };
 
@@ -147,7 +147,7 @@ describe("StatusUpdateHandler", () => {
             const optionsWithoutCallback = {
                 setSites: mockSetSites,
                 getSites: mockGetSites,
-                fullSyncFromBackend: mockFullSyncFromBackend,
+                fullResyncSites: mockfullResyncSites,
             };
             const testManager = new StatusUpdateManager(optionsWithoutCallback);
             expect(testManager).toBeDefined();
@@ -364,7 +364,7 @@ describe("StatusUpdateHandler", () => {
 
             // Trigger the callback and wait for async execution
             await startedCallback(startEvent);
-            expect(mockFullSyncFromBackend).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should handle monitoring stopped events", async ({
@@ -382,7 +382,7 @@ describe("StatusUpdateHandler", () => {
 
             // Trigger the callback and wait for async execution
             await stoppedCallback(stopEvent);
-            expect(mockFullSyncFromBackend).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
     });
 
@@ -452,7 +452,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockFullSyncFromBackend).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should fall back to full sync when monitor not found", async ({
@@ -475,7 +475,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockFullSyncFromBackend).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should handle invalid data format and fall back to full sync", async ({
@@ -496,7 +496,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(invalidData);
-            expect(mockFullSyncFromBackend).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should handle when updated site is not found after update", async ({
@@ -550,7 +550,7 @@ describe("StatusUpdateHandler", () => {
             const optionsWithoutCallback = {
                 setSites: mockSetSites,
                 getSites: mockGetSites,
-                fullSyncFromBackend: mockFullSyncFromBackend,
+                fullResyncSites: mockfullResyncSites,
             };
             const managerWithoutCallback = new StatusUpdateManager(
                 optionsWithoutCallback
@@ -622,7 +622,7 @@ describe("StatusUpdateHandler", () => {
                     await fn();
                 } catch {
                     // Simulate fallback to full sync on error
-                    await mockFullSyncFromBackend();
+                    await mockfullResyncSites();
                 }
             });
 
@@ -637,7 +637,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockFullSyncFromBackend).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should handle errors in onUpdate callback gracefully", async ({
@@ -674,7 +674,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            mockFullSyncFromBackend.mockRejectedValue(new Error("Sync error"));
+            mockfullResyncSites.mockRejectedValue(new Error("Sync error"));
 
             manager.subscribe();
 
@@ -912,7 +912,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockFullSyncFromBackend).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should handle sites with no monitors", async ({
@@ -940,7 +940,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockFullSyncFromBackend).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should handle null/undefined status updates", async ({
@@ -958,7 +958,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(undefined);
 
             // Account for the initial full sync in subscribe() plus the 2 fallback syncs
-            expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(3);
+            expect(mockfullResyncSites).toHaveBeenCalledTimes(3);
         });
 
         it("should handle multiple rapid status updates", async ({
@@ -1032,7 +1032,7 @@ describe("StatusUpdateHandler", () => {
             }
 
             // Should trigger full sync for each invalid data type
-            expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(
+            expect(mockfullResyncSites).toHaveBeenCalledTimes(
                 1 + invalidDataTypes.length // 1 for initial sync + one for each invalid data
             );
         });
@@ -1111,7 +1111,7 @@ describe("StatusUpdateHandler", () => {
             await monitoringStartedCallback();
 
             // Should have triggered full sync
-            expect(mockFullSyncFromBackend).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should trigger full sync when monitoring stops", async ({
@@ -1128,7 +1128,7 @@ describe("StatusUpdateHandler", () => {
             await monitoringStoppedCallback();
 
             // Should have triggered full sync
-            expect(mockFullSyncFromBackend).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should handle invalid event data and log warning in development mode", async ({
@@ -1159,7 +1159,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(invalidEvent);
 
             // Should have triggered full sync as fallback
-            expect(mockFullSyncFromBackend).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalled();
 
             // Should have logged warning in development mode
             expect(logger.logger.warn).toHaveBeenCalledWith(
@@ -1191,7 +1191,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(invalidEvent);
 
             // Should still trigger full sync but without warning
-            expect(mockFullSyncFromBackend).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalled();
             expect(logger.logger.warn).not.toHaveBeenCalled();
         });
 
@@ -1350,7 +1350,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(event);
 
             // Should trigger full sync but not log debug messages
-            expect(mockFullSyncFromBackend).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalled();
             expect(logger.logger.debug).not.toHaveBeenCalled();
         });
 

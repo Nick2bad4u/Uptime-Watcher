@@ -117,13 +117,13 @@ describe("Settings Component Coverage Tests", () => {
                     soundAlerts: false,
                     theme: "system" as const,
                 },
-                updateHistoryLimitValue: vi.fn(),
+                persistHistoryLimit: vi.fn(),
                 updateSettings: vi.fn(),
             };
 
             expect(typeof settingsStore.resetSettings).toBe("function");
             expect(typeof settingsStore.settings).toBe("object");
-            expect(typeof settingsStore.updateHistoryLimitValue).toBe(
+            expect(typeof settingsStore.persistHistoryLimit).toBe(
                 "function"
             );
             expect(typeof settingsStore.updateSettings).toBe("function");
@@ -144,17 +144,17 @@ describe("Settings Component Coverage Tests", () => {
 
             const sitesStore = {
                 downloadSQLiteBackup: vi.fn(),
-                fullSyncFromBackend: vi.fn(),
+                fullResyncSites: vi.fn(),
             };
 
             expect(typeof sitesStore.downloadSQLiteBackup).toBe("function");
-            expect(typeof sitesStore.fullSyncFromBackend).toBe("function");
+            expect(typeof sitesStore.fullResyncSites).toBe("function");
 
             sitesStore.downloadSQLiteBackup();
-            sitesStore.fullSyncFromBackend();
+            sitesStore.fullResyncSites();
 
             expect(sitesStore.downloadSQLiteBackup).toHaveBeenCalled();
-            expect(sitesStore.fullSyncFromBackend).toHaveBeenCalled();
+            expect(sitesStore.fullResyncSites).toHaveBeenCalled();
         });
 
         it("should integrate with useTheme", async ({ task, annotate }) => {
@@ -517,10 +517,10 @@ describe("Settings Component Coverage Tests", () => {
             await annotate("Category: Component", "category");
             await annotate("Type: Business Logic", "type");
 
-            const fullSyncFromBackend = vi.fn().mockResolvedValue(undefined);
+            const fullResyncSites = vi.fn().mockResolvedValue(undefined);
 
             const handleSync = async () => {
-                await fullSyncFromBackend();
+                await fullResyncSites();
             };
 
             expect(typeof handleSync).toBe("function");

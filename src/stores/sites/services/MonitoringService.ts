@@ -29,6 +29,9 @@
  * @public
  */
 
+import { ensureError } from "@shared/utils/errorHandling";
+
+import { logger } from "../../../services/logger";
 import { waitForElectronAPI } from "../../utils";
 
 /**
@@ -55,7 +58,11 @@ export const MonitoringService = {
         try {
             await waitForElectronAPI();
         } catch (error) {
-            console.error("Failed to initialize MonitoringService:", error);
+            logger.error(
+                "Failed to initialize MonitoringService:",
+
+                ensureError(error)
+            );
             throw error;
         }
     },

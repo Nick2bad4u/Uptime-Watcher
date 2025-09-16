@@ -308,7 +308,7 @@ describe(useSettingsStore, () => {
         });
     });
 
-    describe("updateHistoryLimitValue", () => {
+    describe("persistHistoryLimit", () => {
         it("should update history limit successfully", async ({
             task,
             annotate,
@@ -327,7 +327,7 @@ describe(useSettingsStore, () => {
             });
 
             await act(async () => {
-                await result.current.updateHistoryLimitValue(2000);
+                await result.current.persistHistoryLimit(2000);
             });
 
             expect(
@@ -337,7 +337,7 @@ describe(useSettingsStore, () => {
             expect(result.current.settings.historyLimit).toBe(2000);
             expect(mockLogStoreAction).toHaveBeenCalledWith(
                 "SettingsStore",
-                "updateHistoryLimitValue",
+                "persistHistoryLimit",
                 {
                     limit: 2000,
                 }
@@ -363,7 +363,7 @@ describe(useSettingsStore, () => {
 
             // Test update with small value
             await act(async () => {
-                await result.current.updateHistoryLimitValue(50);
+                await result.current.persistHistoryLimit(50);
             });
 
             expect(result.current.settings.historyLimit).toBe(50); // No clamping in frontend
@@ -375,7 +375,7 @@ describe(useSettingsStore, () => {
             });
 
             await act(async () => {
-                await result.current.updateHistoryLimitValue(100_000);
+                await result.current.persistHistoryLimit(100_000);
             });
 
             expect(result.current.settings.historyLimit).toBe(100_000); // No clamping in frontend
@@ -427,7 +427,7 @@ describe(useSettingsStore, () => {
             // Attempt update that will fail
             await act(async () => {
                 await expect(
-                    result.current.updateHistoryLimitValue(600)
+                    result.current.persistHistoryLimit(600)
                 ).rejects.toThrow("Update failed");
             });
 
@@ -440,7 +440,7 @@ describe(useSettingsStore, () => {
             );
         });
 
-        it("should handle all error cases in updateHistoryLimitValue", async ({
+        it("should handle all error cases in persistHistoryLimit", async ({
             task,
             annotate,
         }) => {
@@ -463,7 +463,7 @@ describe(useSettingsStore, () => {
 
             await act(async () => {
                 try {
-                    await result.current.updateHistoryLimitValue(600);
+                    await result.current.persistHistoryLimit(600);
                 } catch {
                     // Expected to throw
                 }
@@ -514,9 +514,9 @@ describe(useSettingsStore, () => {
             const { result } = renderHook(() => useSettingsStore());
 
             const promises = [
-                result.current.updateHistoryLimitValue(500),
-                result.current.updateHistoryLimitValue(600),
-                result.current.updateHistoryLimitValue(700),
+                result.current.persistHistoryLimit(500),
+                result.current.persistHistoryLimit(600),
+                result.current.persistHistoryLimit(700),
             ];
 
             await act(async () => {
@@ -584,7 +584,7 @@ describe(useSettingsStore, () => {
             const { result } = renderHook(() => useSettingsStore());
 
             await act(async () => {
-                await result.current.updateHistoryLimitValue(500);
+                await result.current.persistHistoryLimit(500);
             });
 
             expect(loadingStatesDuringCall).toEqual([true, false]);
@@ -604,7 +604,7 @@ describe(useSettingsStore, () => {
             const { result } = renderHook(() => useSettingsStore());
 
             await act(async () => {
-                await result.current.updateHistoryLimitValue(500);
+                await result.current.persistHistoryLimit(500);
             });
 
             expect(mockErrorStore.clearStoreError).toHaveBeenCalledWith(
@@ -630,7 +630,7 @@ describe(useSettingsStore, () => {
 
             await act(async () => {
                 await expect(
-                    result.current.updateHistoryLimitValue(500)
+                    result.current.persistHistoryLimit(500)
                 ).rejects.toThrow();
             });
 
@@ -694,13 +694,13 @@ describe(useSettingsStore, () => {
             });
 
             await act(async () => {
-                await result.current.updateHistoryLimitValue(500);
+                await result.current.persistHistoryLimit(500);
             });
 
-            // Check that both updateHistoryLimitValue and updateSettings are logged
+            // Check that both persistHistoryLimit and updateSettings are logged
             expect(mockLogStoreAction).toHaveBeenCalledWith(
                 "SettingsStore",
-                "updateHistoryLimitValue",
+                "persistHistoryLimit",
                 {
                     limit: 500,
                 }

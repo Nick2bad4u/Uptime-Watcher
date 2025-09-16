@@ -89,8 +89,8 @@ describe("useSiteSync - Final 100% Coverage", () => {
         syncActions = createSiteSyncActions(mockDeps);
     });
 
-    describe("Lines 194-195: fullSyncFromBackend", () => {
-        it("should call syncSitesFromBackend and log success message", async ({
+    describe("Lines 194-195: fullResyncSites", () => {
+        it("should call syncSites and log success message", async ({
             task,
             annotate,
         }) => {
@@ -102,7 +102,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Mock syncSitesFromBackend to succeed
+            // Mock syncSites to succeed
             vi.mocked(SiteService.getSites).mockResolvedValue(mockSites);
 
             // Mock withErrorHandling to execute normally
@@ -110,12 +110,12 @@ describe("useSiteSync - Final 100% Coverage", () => {
                 async (operation) => await operation()
             );
 
-            await syncActions.fullSyncFromBackend();
+            await syncActions.fullResyncSites();
 
-            // Verify lines 194-195: syncSitesFromBackend was called and logStoreAction was called
+            // Verify lines 194-195: syncSites was called and logStoreAction was called
             expect(logStoreAction).toHaveBeenCalledWith(
                 "SitesStore",
-                "fullSyncFromBackend",
+                "fullResyncSites",
                 {
                     message: "Full backend synchronization completed",
                     success: true,

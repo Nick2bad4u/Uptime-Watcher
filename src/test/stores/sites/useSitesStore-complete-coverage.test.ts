@@ -68,7 +68,7 @@ describe("useSitesStore - Complete Function Coverage", () => {
 
                 // Mock sync actions creation
                 const syncActions = {
-                    syncSitesFromBackend: vi.fn(),
+                    syncSites: vi.fn(),
                 };
 
                 // Mock monitoring actions creation
@@ -97,7 +97,7 @@ describe("useSitesStore - Complete Function Coverage", () => {
 
             expect(store.sites).toEqual([]);
             expect(typeof store.setSites).toBe("function");
-            expect(typeof store.syncSitesFromBackend).toBe("function");
+            expect(typeof store.syncSites).toBe("function");
             expect(typeof store.checkSiteNow).toBe("function");
             expect(typeof store.createSite).toBe("function");
         });
@@ -255,7 +255,7 @@ describe("useSitesStore - Complete Function Coverage", () => {
             expect(typeof result.current.setSites).toBe("function");
             expect(typeof result.current.addSite).toBe("function");
             expect(typeof result.current.removeSite).toBe("function");
-            expect(typeof result.current.syncSitesFromBackend).toBe("function");
+            expect(typeof result.current.syncSites).toBe("function");
         });
     });
 

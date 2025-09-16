@@ -11,7 +11,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Import utilities to test
 import { generateUuid } from "../utils/data/generateUuid";
-import { ensureError, withUtilityErrorHandling } from "../utils/errorHandling";
+import {
+    ensureError,
+    withUtilityErrorHandling,
+} from "@shared/utils/errorHandling";
 import { isNullOrUndefined, withAsyncErrorHandling } from "../utils/fallbacks";
 
 // Mock logger

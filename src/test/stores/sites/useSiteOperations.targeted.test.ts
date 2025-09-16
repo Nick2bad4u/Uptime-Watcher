@@ -156,7 +156,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             removeSite: vi.fn(),
             addSite: vi.fn(),
             setSites: vi.fn(),
-            syncSitesFromBackend: vi.fn(),
+            syncSites: vi.fn(),
         };
 
         actions = createSiteOperationsActions(mockSiteDeps);

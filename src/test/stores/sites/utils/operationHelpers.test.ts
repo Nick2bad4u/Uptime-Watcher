@@ -106,7 +106,7 @@ describe("OperationHelpers", () => {
             setSites: vi.fn(),
             addSite: vi.fn(),
             removeSite: vi.fn(),
-            syncSitesFromBackend: vi.fn().mockResolvedValue(undefined),
+            syncSites: vi.fn().mockResolvedValue(undefined),
         };
 
         // Default mock implementations
@@ -277,7 +277,7 @@ describe("OperationHelpers", () => {
             await wrappedOperation();
 
             expect(mockOperation).toHaveBeenCalledTimes(2); // Once in main call, once in test
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalledTimes(2); // Once in main call, once in test
+            expect(mockDeps.syncSites).toHaveBeenCalledTimes(2); // Once in main call, once in test
         });
 
         it("should execute operation without sync when syncAfter is false", async ({
@@ -315,7 +315,7 @@ describe("OperationHelpers", () => {
             await wrappedOperation();
 
             expect(mockOperation).toHaveBeenCalledTimes(2); // Once in main call, once in test
-            expect(mockDeps.syncSitesFromBackend).not.toHaveBeenCalled();
+            expect(mockDeps.syncSites).not.toHaveBeenCalled();
         });
 
         it("should handle operation errors through withErrorHandling", async ({
@@ -359,7 +359,7 @@ describe("OperationHelpers", () => {
 
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             const syncError = new Error("Sync failed");
-            mockDeps.syncSitesFromBackend = vi
+            mockDeps.syncSites = vi
                 .fn()
                 .mockRejectedValue(syncError);
             const params = { siteId: "site1" };
@@ -379,7 +379,7 @@ describe("OperationHelpers", () => {
             ).rejects.toThrow("Sync failed");
 
             expect(mockOperation).toHaveBeenCalledTimes(1);
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalledTimes(1);
+            expect(mockDeps.syncSites).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -428,7 +428,7 @@ describe("OperationHelpers", () => {
 
             expect(wrappedResult).toEqual(expectedResult);
             expect(mockOperation).toHaveBeenCalledTimes(2); // Once in main call, once in test
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalledTimes(2); // Once in main call, once in test
+            expect(mockDeps.syncSites).toHaveBeenCalledTimes(2); // Once in main call, once in test
         });
 
         it("should execute operation without sync when syncAfter is false and return result", async ({
@@ -472,7 +472,7 @@ describe("OperationHelpers", () => {
 
             expect(wrappedResult).toEqual(expectedResult);
             expect(mockOperation).toHaveBeenCalledTimes(2); // Once in main call, once in test
-            expect(mockDeps.syncSitesFromBackend).not.toHaveBeenCalled();
+            expect(mockDeps.syncSites).not.toHaveBeenCalled();
         });
 
         it("should handle operation errors through withErrorHandling", async ({
@@ -520,7 +520,7 @@ describe("OperationHelpers", () => {
             const expectedResult = { data: "test result" };
             const mockOperation = vi.fn().mockResolvedValue(expectedResult);
             const syncError = new Error("Sync failed");
-            mockDeps.syncSitesFromBackend = vi
+            mockDeps.syncSites = vi
                 .fn()
                 .mockRejectedValue(syncError);
             const params = { siteId: "site1" };
@@ -540,7 +540,7 @@ describe("OperationHelpers", () => {
             ).rejects.toThrow("Sync failed");
 
             expect(mockOperation).toHaveBeenCalledTimes(1);
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalledTimes(1);
+            expect(mockDeps.syncSites).toHaveBeenCalledTimes(1);
         });
 
         it("should return different types of results", async ({

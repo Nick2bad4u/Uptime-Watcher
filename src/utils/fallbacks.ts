@@ -45,8 +45,12 @@
 import type { Monitor } from "@shared/types";
 import type { ReadonlyDeep } from "type-fest";
 
+import {
+    ensureError,
+    withUtilityErrorHandling,
+} from "@shared/utils/errorHandling";
+
 import { logger } from "../services/logger";
-import { ensureError, withUtilityErrorHandling } from "./errorHandling";
 
 /**
  * Enhanced null/undefined check utility.

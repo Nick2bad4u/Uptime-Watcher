@@ -56,10 +56,10 @@
  * @public
  */
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { useEffect, useRef } from "react";
 
 import { logger } from "../services/logger";
-import { ensureError } from "../utils/errorHandling";
 
 /**
  * React hook for mount and unmount lifecycle management with StrictMode

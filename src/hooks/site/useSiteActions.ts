@@ -9,12 +9,12 @@
  */
 import type { Monitor, Site } from "@shared/types";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { useCallback } from "react";
 
 import { logger } from "../../services/logger";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
-import { ensureError } from "../../utils/errorHandling";
 
 /**
  * Result interface for the useSiteActions hook.
@@ -97,7 +97,7 @@ export function useSiteActions(
         stopSiteMonitoring,
         stopSiteMonitorMonitoring,
     } = useSitesStore();
-    const { setSelectedSite, setShowSiteDetails } = useUIStore();
+    const { selectSite, setShowSiteDetails } = useUIStore();
 
     // Start monitoring the site with proper logging
     const handleStartMonitoring = useCallback(() => {
@@ -257,15 +257,15 @@ export function useSiteActions(
             siteName: site.name,
         });
 
-        setSelectedSite(site);
+        selectSite(site);
         if (monitor) {
             setSelectedMonitorId(site.identifier, monitor.id);
         }
         setShowSiteDetails(true);
     }, [
         monitor,
+        selectSite,
         setSelectedMonitorId,
-        setSelectedSite,
         setShowSiteDetails,
         site,
     ]);

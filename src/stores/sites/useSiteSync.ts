@@ -17,11 +17,10 @@
 
 import type { Site, StatusUpdate } from "@shared/types";
 
-import { withErrorHandling } from "@shared/utils/errorHandling";
+import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
 import { logger } from "../../services/logger";
 import { safeExtractIpcData } from "../../types/ipc";
-import { ensureError } from "../../utils/errorHandling";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 import { SiteService } from "./services/SiteService";
@@ -39,16 +38,17 @@ import { StatusUpdateManager } from "./utils/statusUpdateHandler";
  */
 export interface SiteSyncActions {
     /**
-     * Performs a complete synchronization from the backend.
+     * Performs complete resynchronization from the backend with full state
+     * replacement.
      *
      * @remarks
-     * Triggers a full sync operation that updates all local site data with the
-     * latest information from the backend. This is typically used during
-     * application startup or when recovering from errors.
+     * Triggers a comprehensive sync operation that replaces all local site data
+     * with authoritative information from the backend. This method provides
+     * complete data consistency and is used for recovery scenarios.
      *
      * @returns Promise that resolves when synchronization is complete
      */
-    fullSyncFromBackend: () => Promise<void>;
+    fullResyncSites: () => Promise<void>;
 
     /**
      * Retrieves current synchronization status from the backend.
@@ -118,7 +118,7 @@ export interface SiteSyncActions {
     subscribeToSyncEvents: () => () => void;
 
     /**
-     * Synchronizes all sites from the backend.
+     * Synchronizes sites data with backend while preserving local state.
      *
      * @remarks
      * Fetches the latest site data from the backend and updates the local store
@@ -129,7 +129,7 @@ export interface SiteSyncActions {
      *
      * @returns Promise that resolves when sync is complete
      */
-    syncSitesFromBackend: () => Promise<void>;
+    syncSites: () => Promise<void>;
 
     /**
      * Removes subscription to status updates.
@@ -202,7 +202,7 @@ export const createSiteSyncActions = (
     let pendingSyncPromise: null | Promise<void> = null;
 
     const actions: SiteSyncActions = {
-        fullSyncFromBackend: async (): Promise<void> => {
+        fullResyncSites: async (): Promise<void> => {
             // If sync is already in progress, return the existing promise
             if (pendingSyncPromise) {
                 return pendingSyncPromise;
@@ -211,9 +211,9 @@ export const createSiteSyncActions = (
             // Start a new sync and store the promise
             pendingSyncPromise = (async (): Promise<void> => {
                 try {
-                    await actions.syncSitesFromBackend();
-                    logStoreAction("SitesStore", "fullSyncFromBackend", {
-                        message: "Full backend synchronization completed",
+                    await actions.syncSites();
+                    logStoreAction("SitesStore", "fullResyncSites", {
+                        message: "Full backend resynchronization completed",
                         success: true,
                     });
                 } finally {
@@ -262,7 +262,7 @@ export const createSiteSyncActions = (
         ) => {
             // Initialize status update manager if not already done
             statusUpdateManager.instance ??= new StatusUpdateManager({
-                fullSyncFromBackend: actions.fullSyncFromBackend,
+                fullResyncSites: actions.fullResyncSites,
                 getSites: deps.getSites,
                 onUpdate: callback,
                 setSites: deps.setSites,
@@ -310,7 +310,7 @@ export const createSiteSyncActions = (
                         // For single site updates, trigger a full sync
                         void (async (): Promise<void> => {
                             try {
-                                await actions.syncSitesFromBackend();
+                                await actions.syncSites();
                             } catch (error: unknown) {
                                 logStoreAction("SitesStore", "error", {
                                     error,
@@ -327,19 +327,19 @@ export const createSiteSyncActions = (
                     }
                 }
             }),
-        syncSitesFromBackend: async () => {
+        syncSites: async (): Promise<void> => {
             await withErrorHandling(
                 async () => {
                     const backendSites = await SiteService.getSites();
                     deps.setSites(backendSites);
 
-                    logStoreAction("SitesStore", "syncSitesFromBackend", {
+                    logStoreAction("SitesStore", "syncSites", {
                         message: "Sites synchronized from backend",
                         sitesCount: deps.getSites().length,
                         success: true,
                     });
                 },
-                createStoreErrorHandler("sites-sync", "syncSitesFromBackend")
+                createStoreErrorHandler("sites-sync", "syncSites")
             );
         },
         unsubscribeFromStatusUpdates: () => {

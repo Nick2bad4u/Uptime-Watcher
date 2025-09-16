@@ -73,8 +73,8 @@ export interface BaseSiteMonitoring {
  * sync-related modules.
  */
 export interface BaseSiteSync {
-    /** Full sync from backend */
-    fullSyncFromBackend: () => Promise<void>;
+    /** Full resync from backend */
+    fullResyncSites: () => Promise<void>;
     /** Get sync status */
     getSyncStatus: () => Promise<{
         /** Timestamp of last successful sync operation */
@@ -89,7 +89,7 @@ export interface BaseSiteSync {
     /** Subscribe to sync events */
     subscribeToSyncEvents: () => () => void;
     /** Sync sites from backend */
-    syncSitesFromBackend: () => Promise<void>;
+    syncSites: () => Promise<void>;
 }
 
 /**
@@ -105,10 +105,10 @@ export interface BaseSiteState {
     getSelectedSite: () => Site | undefined;
     /** Remove a site from the store */
     removeSite: (identifier: string) => void;
+    /** Select site */
+    selectSite: (site: Site | undefined) => void;
     /** Set selected monitor ID for a site */
     setSelectedMonitorId: (siteId: string, monitorId: string) => void;
-    /** Set selected site */
-    setSelectedSite: (site: Site | undefined) => void;
     /** Set all sites */
     setSites: (sites: Site[]) => void;
     /** Update a site */

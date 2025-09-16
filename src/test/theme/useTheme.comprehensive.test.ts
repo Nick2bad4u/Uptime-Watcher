@@ -223,7 +223,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             initializeSettings: vi.fn(),
             resetSettings: vi.fn(),
             syncFromBackend: vi.fn(),
-            updateHistoryLimitValue: vi.fn(),
+            persistHistoryLimit: vi.fn(),
             error: null,
             isLoading: false,
         });

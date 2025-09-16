@@ -75,13 +75,13 @@ describe("Settings - Branch Coverage Tests", () => {
             soundAlerts: false,
             theme: "light",
         },
-        updateHistoryLimitValue: vi.fn(),
+        persistHistoryLimit: vi.fn(),
         updateSettings: vi.fn(),
     };
 
     const mockSitesStore = {
         downloadSQLiteBackup: vi.fn(),
-        fullSyncFromBackend: vi.fn(),
+        fullResyncSites: vi.fn(),
     };
 
     const mockTheme = {
@@ -247,7 +247,7 @@ describe("Settings - Branch Coverage Tests", () => {
 
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
-                fullSyncFromBackend: vi.fn().mockResolvedValue(undefined),
+                fullResyncSites: vi.fn().mockResolvedValue(undefined),
             });
 
             render(<Settings onClose={mockOnClose} />);
@@ -425,7 +425,7 @@ describe("Settings - Branch Coverage Tests", () => {
             const syncError = new Error("Sync failed");
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
-                fullSyncFromBackend: vi.fn().mockRejectedValue(syncError),
+                fullResyncSites: vi.fn().mockRejectedValue(syncError),
             });
 
             render(<Settings onClose={mockOnClose} />);
@@ -494,7 +494,7 @@ describe("Settings - Branch Coverage Tests", () => {
 
             vi.mocked(useSettingsStore).mockReturnValue({
                 ...mockSettingsStore,
-                updateHistoryLimitValue: mockUpdateHistoryLimit,
+                persistHistoryLimit: mockUpdateHistoryLimit,
             });
 
             render(<Settings onClose={mockOnClose} />);
@@ -634,7 +634,7 @@ describe("Settings - Branch Coverage Tests", () => {
             const errorWithMessage = { message: "Detailed error message" };
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
-                fullSyncFromBackend: vi
+                fullResyncSites: vi
                     .fn()
                     .mockRejectedValue(errorWithMessage),
             });
@@ -702,7 +702,7 @@ describe("Settings - Branch Coverage Tests", () => {
             const primitiveError = "Simple string error";
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
-                fullSyncFromBackend: vi.fn().mockRejectedValue(primitiveError),
+                fullResyncSites: vi.fn().mockRejectedValue(primitiveError),
             });
 
             render(<Settings onClose={mockOnClose} />);
@@ -780,7 +780,7 @@ describe("Settings - Branch Coverage Tests", () => {
             fireEvent.change(historySelect, { target: { value: "200" } });
 
             expect(
-                mockSettingsStore.updateHistoryLimitValue
+                mockSettingsStore.persistHistoryLimit
             ).toHaveBeenCalledWith(200);
         });
 
@@ -827,7 +827,7 @@ describe("Settings - Branch Coverage Tests", () => {
 
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
-                fullSyncFromBackend: mockFullSync,
+                fullResyncSites: mockFullSync,
             });
 
             render(<Settings onClose={mockOnClose} />);

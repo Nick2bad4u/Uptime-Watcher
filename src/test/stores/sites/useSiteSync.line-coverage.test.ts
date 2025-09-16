@@ -215,7 +215,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
     });
 
     describe("Lines 298-307: Delete/update event handling", () => {
-        it("should handle delete event and call syncSitesFromBackend (line 300)", async ({
+        it("should handle delete event and call syncSites (line 300)", async ({
             task,
             annotate,
         }) => {
@@ -232,9 +232,9 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 }
             );
 
-            // Spy on syncSitesFromBackend
+            // Spy on syncSites
             const syncSpy = vi
-                .spyOn(syncActions, "syncSitesFromBackend")
+                .spyOn(syncActions, "syncSites")
                 .mockResolvedValue(undefined);
 
             syncActions.subscribeToSyncEvents();
@@ -252,11 +252,11 @@ describe("useSiteSync - Line Coverage Completion", () => {
             // Wait for async operation
             await new Promise((resolve) => setTimeout(resolve, 0));
 
-            // Verify line 300: syncSitesFromBackend was called
+            // Verify line 300: syncSites was called
             expect(syncSpy).toHaveBeenCalled();
         });
 
-        it("should handle update event and call syncSitesFromBackend (line 300)", async ({
+        it("should handle update event and call syncSites (line 300)", async ({
             task,
             annotate,
         }) => {
@@ -274,7 +274,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
             );
 
             const syncSpy = vi
-                .spyOn(syncActions, "syncSitesFromBackend")
+                .spyOn(syncActions, "syncSites")
                 .mockResolvedValue(undefined);
 
             syncActions.subscribeToSyncEvents();
@@ -291,11 +291,11 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             await new Promise((resolve) => setTimeout(resolve, 0));
 
-            // Verify line 300: syncSitesFromBackend was called
+            // Verify line 300: syncSites was called
             expect(syncSpy).toHaveBeenCalled();
         });
 
-        it("should log error when syncSitesFromBackend fails (lines 301-304)", async ({
+        it("should log error when syncSites fails (lines 301-304)", async ({
             task,
             annotate,
         }) => {
@@ -314,7 +314,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             const testError = new Error("Sync failed");
             const syncSpy = vi
-                .spyOn(syncActions, "syncSitesFromBackend")
+                .spyOn(syncActions, "syncSites")
                 .mockRejectedValue(testError);
 
             syncActions.subscribeToSyncEvents();
@@ -339,7 +339,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
         });
     });
 
-    describe("Lines 335-341: syncSitesFromBackend error handlers", () => {
+    describe("Lines 335-341: syncSites error handlers", () => {
         it("should call clearError, setError, and setLoading handlers", async ({
             task,
             annotate,
@@ -379,7 +379,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             vi.mocked(SiteService.getSites).mockResolvedValue(mockSites);
 
-            await syncActions.syncSitesFromBackend();
+            await syncActions.syncSites();
 
             // Verify the specific error handlers were called (lines 335-341)
             expect(mockErrorStore.clearStoreError).toHaveBeenCalledWith(
@@ -390,11 +390,11 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 expect.any(Error)
             );
             expect(mockErrorStore.setOperationLoading).toHaveBeenCalledWith(
-                "syncSitesFromBackend",
+                "syncSites",
                 true
             );
             expect(mockErrorStore.setOperationLoading).toHaveBeenCalledWith(
-                "syncSitesFromBackend",
+                "syncSites",
                 false
             );
         });

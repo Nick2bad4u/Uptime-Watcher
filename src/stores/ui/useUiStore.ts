@@ -118,13 +118,13 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 }
             },
             selectedSiteId: undefined,
+            selectSite: (site: Site | undefined): void => {
+                logStoreAction("UIStore", "selectSite", { site });
+                set({ selectedSiteId: site ? site.identifier : undefined });
+            },
             setActiveSiteDetailsTab: (tab: string): void => {
                 logStoreAction("UIStore", "setActiveSiteDetailsTab", { tab });
                 set({ activeSiteDetailsTab: tab });
-            },
-            setSelectedSite: (site: Site | undefined): void => {
-                logStoreAction("UIStore", "setSelectedSite", { site });
-                set({ selectedSiteId: site ? site.identifier : undefined });
             },
             setShowAddSiteModal: (show: boolean): void => {
                 logStoreAction("UIStore", "setShowAddSiteModal", { show });

@@ -767,14 +767,6 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
                 const channel = "test:edge-cases";
                 const handler = vi.fn(() => Promise.resolve("success"));
-                const edgeCaseValidator = (data: unknown): data is any => {
-                    // Test various edge cases
-                    if (data === null || data === undefined) return false;
-                    if (typeof data === "function") return false;
-                    if (data instanceof Error) return false;
-                    if (Array.isArray(data) && data.length === 0) return false;
-                    return true;
-                };
 
                 registerStandardizedIpcHandler(
                     channel,

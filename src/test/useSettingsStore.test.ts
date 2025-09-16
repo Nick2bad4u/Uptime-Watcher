@@ -289,7 +289,7 @@ describe(useSettingsStore, () => {
         });
     });
 
-    describe("updateHistoryLimitValue", () => {
+    describe("persistHistoryLimit", () => {
         it("should update history limit with backend sync", async ({
             task,
             annotate,
@@ -307,7 +307,7 @@ describe(useSettingsStore, () => {
                 data: 300,
             });
 
-            await useSettingsStore.getState().updateHistoryLimitValue(300);
+            await useSettingsStore.getState().persistHistoryLimit(300);
 
             expect(
                 mockElectronAPI.settings.updateHistoryLimit
@@ -332,7 +332,7 @@ describe(useSettingsStore, () => {
             );
 
             await expect(
-                useSettingsStore.getState().updateHistoryLimitValue(300)
+                useSettingsStore.getState().persistHistoryLimit(300)
             ).rejects.toThrow("Backend error");
         });
     });

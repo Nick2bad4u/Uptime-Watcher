@@ -6,10 +6,10 @@
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 import { CacheKeys } from "@shared/utils/cacheKeys";
+import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
-import { withUtilityErrorHandling } from "./errorHandling";
 
 /**
  * Frontend representation of monitor type configuration.

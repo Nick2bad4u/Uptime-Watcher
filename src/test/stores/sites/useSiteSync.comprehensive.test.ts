@@ -93,7 +93,7 @@ describe("useSiteSync", () => {
         syncActions = createSiteSyncActions(mockDeps);
     });
 
-    describe("fullSyncFromBackend", () => {
+    describe("fullResyncSites", () => {
         it("should perform full sync successfully", async ({
             task,
             annotate,
@@ -105,7 +105,7 @@ describe("useSiteSync", () => {
 
             vi.mocked(SiteService.getSites).mockResolvedValue(mockSites);
 
-            await syncActions.fullSyncFromBackend();
+            await syncActions.fullResyncSites();
 
             expect(SiteService.getSites).toHaveBeenCalled();
             expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
@@ -373,7 +373,7 @@ describe("useSiteSync", () => {
             ).toHaveBeenCalled();
         });
 
-        it("should handle update events with syncSitesFromBackend error", async ({
+        it("should handle update events with syncSites error", async ({
             task,
             annotate,
         }) => {
@@ -413,7 +413,7 @@ describe("useSiteSync", () => {
         });
     });
 
-    describe("syncSitesFromBackend", () => {
+    describe("syncSites", () => {
         beforeEach(() => {
             // Reset mocks specifically for this describe block
             vi.clearAllMocks();
@@ -437,7 +437,7 @@ describe("useSiteSync", () => {
 
             vi.mocked(SiteService.getSites).mockResolvedValue(mockSites as any);
 
-            await syncActions.syncSitesFromBackend();
+            await syncActions.syncSites();
 
             // Verify sync was called and completed
             expect(SiteService.getSites).toHaveBeenCalled();
@@ -455,7 +455,7 @@ describe("useSiteSync", () => {
 
             // Test that the function handles errors gracefully
             try {
-                await syncActions.syncSitesFromBackend();
+                await syncActions.syncSites();
                 // The function should handle errors internally and not throw
             } catch (error_: unknown) {
                 // If it does throw, that's also acceptable behavior
@@ -498,8 +498,8 @@ describe("useSiteSync", () => {
             const instance2 = createSiteSyncActions(mockDeps);
 
             expect(instance1).not.toBe(instance2);
-            expect(typeof instance1.syncSitesFromBackend).toBe("function");
-            expect(typeof instance2.syncSitesFromBackend).toBe("function");
+            expect(typeof instance1.syncSites).toBe("function");
+            expect(typeof instance2.syncSites).toBe("function");
         });
 
         it("should return all required action methods", async ({
@@ -513,18 +513,18 @@ describe("useSiteSync", () => {
 
             const actions = createSiteSyncActions(mockDeps);
 
-            expect(actions).toHaveProperty("fullSyncFromBackend");
+            expect(actions).toHaveProperty("fullResyncSites");
             expect(actions).toHaveProperty("getSyncStatus");
             expect(actions).toHaveProperty("subscribeToStatusUpdates");
             expect(actions).toHaveProperty("subscribeToSyncEvents");
-            expect(actions).toHaveProperty("syncSitesFromBackend");
+            expect(actions).toHaveProperty("syncSites");
             expect(actions).toHaveProperty("unsubscribeFromStatusUpdates");
 
-            expect(typeof actions.fullSyncFromBackend).toBe("function");
+            expect(typeof actions.fullResyncSites).toBe("function");
             expect(typeof actions.getSyncStatus).toBe("function");
             expect(typeof actions.subscribeToStatusUpdates).toBe("function");
             expect(typeof actions.subscribeToSyncEvents).toBe("function");
-            expect(typeof actions.syncSitesFromBackend).toBe("function");
+            expect(typeof actions.syncSites).toBe("function");
             expect(typeof actions.unsubscribeFromStatusUpdates).toBe(
                 "function"
             );

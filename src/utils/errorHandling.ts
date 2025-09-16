@@ -1,95 +1,44 @@
 /**
- * Utility-specific error handling wrapper for frontend utilities.
+ * Frontend utility error handling helpers.
  *
  * @remarks
- * Provides consistent error handling for utility functions that don't need
- * store management. Focused on pure utility error handling patterns.
+ * This module provides utility error handling functions for frontend use cases.
  */
-
-import type { Simplify } from "type-fest";
-
-import { logger } from "../services/logger";
 
 /**
- * Type-safe error conversion result with enhanced type information.
- */
-type ErrorConversionResult = Simplify<{
-    /** The resulting Error instance */
-    error: Error;
-    /** The original input type information */
-    originalType: string;
-    /** Whether the input was already an Error instance */
-    wasError: boolean;
-}>;
-
-/**
- * Enhanced error conversion that provides detailed type information.
+ * Convert unknown error to Error instance.
  *
- * @param error - Unknown error value from catch blocks
+ * @param error - Unknown error value
  *
- * @returns Detailed error conversion result
+ * @returns Error instance
  */
-export function convertError(error: unknown): ErrorConversionResult {
+export function convertError(error: unknown): Error {
     if (error instanceof Error) {
-        return {
-            error,
-            originalType: "Error",
-            wasError: true,
-        };
+        return error;
     }
-
-    // Safely convert to string with fallback for problematic objects
-    // eslint-disable-next-line @typescript-eslint/init-declarations -- initialized in try-catch below
-    let errorMessage: string;
-    try {
-        errorMessage = String(error);
-    } catch {
-        // Fallback for objects that can't be converted to string
-        try {
-            errorMessage = JSON.stringify(error);
-        } catch {
-            errorMessage = "[object cannot be converted to string]";
-        }
-    }
-
-    // Provide fallback for whitespace-only strings (but preserve truly empty strings)
-    if (errorMessage.trim().length === 0 && errorMessage.length > 0) {
-        errorMessage = `[whitespace-only ${typeof error}]`;
-    }
-
-    return {
-        error: new Error(errorMessage),
-        originalType: typeof error,
-        wasError: false,
-    };
+    return new Error(String(error));
 }
 
 /**
- * Ensures an error object is properly typed and formatted. Converts unknown
- * error types to proper Error instances.
+ * Ensure unknown value is an Error instance.
  *
- * @param error - Unknown error value from catch blocks
+ * @param error - Unknown error value
  *
- * @returns Properly typed Error instance
+ * @returns Error instance
  */
 export function ensureError(error: unknown): Error {
-    return convertError(error).error;
+    return convertError(error);
 }
 
 /**
- * Simple error handling wrapper for utility functions. Provides consistent
- * error logging and error response formatting.
+ * Utility error handling wrapper for frontend operations.
  *
- * @param operation - The async operation to execute
+ * @param operation - Async operation to execute
  * @param operationName - Name of the operation for logging
- * @param fallbackValue - Value to return if operation fails (required if
- *   shouldThrow is false)
- * @param shouldThrow - Whether to throw on error or return fallback value
+ * @param fallbackValue - Optional fallback value on error
+ * @param shouldThrow - Whether to throw on error
  *
- * @returns Promise resolving to operation result or fallback value
- *
- * @throws When shouldThrow is true or when shouldThrow is false but no
- *   fallbackValue is provided
+ * @returns Promise resolving to operation result or fallback
  */
 export async function withUtilityErrorHandling<T>(
     operation: () => Promise<T>,
@@ -101,7 +50,9 @@ export async function withUtilityErrorHandling<T>(
         return await operation();
     } catch (error) {
         const wrappedError = ensureError(error);
-        logger.error(`${operationName} failed`, wrappedError);
+
+        // Use console logging for utilities to avoid logger dependencies
+        console.error(`${operationName} failed`, wrappedError);
 
         if (shouldThrow) {
             throw wrappedError;

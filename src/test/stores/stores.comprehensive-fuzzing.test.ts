@@ -93,7 +93,7 @@ describe("Stores Comprehensive Fuzzing", () => {
 
         test("should handle update status and progress", () => {
             const { result } = renderHook(() => useUpdatesStore());
-            expect(typeof result.current.setUpdateStatus).toBe("function");
+            expect(typeof result.current.applyUpdateStatus).toBe("function");
             expect(typeof result.current.setUpdateProgress).toBe("function");
             expect(typeof result.current.updateStatus).toBe("string");
             expect(typeof result.current.updateProgress).toBe("number");

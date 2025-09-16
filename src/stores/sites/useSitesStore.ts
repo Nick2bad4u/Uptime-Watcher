@@ -86,7 +86,7 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
             getSites,
             removeSite: stateActions.removeSite,
             setSites: stateActions.setSites,
-            syncSitesFromBackend: syncActions.syncSitesFromBackend,
+            syncSites: syncActions.syncSites,
         });
 
         return {

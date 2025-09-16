@@ -132,7 +132,7 @@ describe("App Component - Comprehensive Coverage", () => {
     const defaultUpdatesStore = {
         applyUpdate: vi.fn(),
         setUpdateError: vi.fn(),
-        setUpdateStatus: vi.fn(),
+        applyUpdateStatus: vi.fn(),
         updateError: null,
         updateStatus: "idle" as const,
     };
@@ -634,13 +634,13 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Data Update", "type");
 
-            const setUpdateStatus = vi.fn();
+            const applyUpdateStatus = vi.fn();
             const setUpdateError = vi.fn();
             mockUseUpdatesStore.mockReturnValue({
                 ...defaultUpdatesStore,
                 updateStatus: "error",
                 updateError: "Test error",
-                setUpdateStatus,
+                applyUpdateStatus,
                 setUpdateError,
             });
 
@@ -649,7 +649,7 @@ describe("App Component - Comprehensive Coverage", () => {
             const dismissButton = screen.getByText("Dismiss");
             await userEvent.click(dismissButton);
 
-            expect(setUpdateStatus).toHaveBeenCalledWith("idle");
+            expect(applyUpdateStatus).toHaveBeenCalledWith("idle");
             expect(setUpdateError).toHaveBeenCalledWith(undefined);
         });
     });

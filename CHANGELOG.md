@@ -6,6 +6,25 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### ✨ New Features
+
+#### Store Method Naming Convention Standardization
+
+- **[stores]** Add standardized naming convention aliases for consistent verb taxonomy across all store methods
+  - **Settings Store**: `persistHistoryLimit()` - alias for `updateHistoryLimitValue()` with clearer persistence semantics
+  - **Sites Sync Store**:
+    - `syncSites()` - alias for `syncSitesFromBackend()` with standardized naming
+    - `fullResyncSites()` - alias for `fullSyncFromBackend()` with explicit full synchronization semantics
+  - **Sites State Store**: `selectSite()` - alias for `setSelectedSite()` with clearer action semantics
+  - **Updates Store**: `applyUpdateStatus()` - alias for `setUpdateStatus()` with explicit application behavior
+  - **Monitor Types Store**: Enhanced JSDoc documentation to clarify semantic differences between `loadMonitorTypes()` (initial load) and `refreshMonitorTypes()` (background refresh)
+
+- **[documentation]** All aliases include comprehensive JSDoc with `@remarks` sections explaining preferred usage, backward compatibility, and deprecation plans
+- **[testing]** Comprehensive unit tests ensure aliases properly delegate to original implementations with correct parameter passing and return value handling
+- **[types]** Complete TypeScript interface definitions for all new alias methods with proper parameter and return types
+
+**Migration Guide**: Original method names remain fully functional for backward compatibility. New aliases provide more consistent and descriptive naming following established patterns: `sync`/`load`/`refresh`/`update`/`set`/`persist`/`apply`/`select`. Gradual migration to new names is recommended, with original methods planned for deprecation in future releases.
+
 
 [[b51e1dc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b51e1dcc39ee25e727a33d34732dae7e7be86619)...
 [b51e1dc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b51e1dcc39ee25e727a33d34732dae7e7be86619)]

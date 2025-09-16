@@ -18,7 +18,7 @@ describe("useSitesStore Function Coverage Tests", () => {
         // Reset store to initial state before each test
         const store = useSitesStore.getState();
         store.setSites([]);
-        store.setSelectedSite(undefined);
+        store.selectSite(undefined);
     });
 
     describe("Store Creation and Composition", () => {
@@ -37,7 +37,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             expect(typeof store.addSite).toBe("function");
             expect(typeof store.removeSite).toBe("function");
             expect(typeof store.setSites).toBe("function");
-            expect(typeof store.setSelectedSite).toBe("function");
+            expect(typeof store.selectSite).toBe("function");
             expect(typeof store.getSelectedSite).toBe("function");
             expect(typeof store.setSelectedMonitorId).toBe("function");
             expect(typeof store.getSelectedMonitorId).toBe("function");
@@ -52,8 +52,8 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             // Verify sync functions
             expect(typeof store.getSyncStatus).toBe("function");
-            expect(typeof store.syncSitesFromBackend).toBe("function");
-            expect(typeof store.fullSyncFromBackend).toBe("function");
+            expect(typeof store.syncSites).toBe("function");
+            expect(typeof store.fullResyncSites).toBe("function");
 
             // Verify monitoring functions
             expect(typeof store.startSiteMonitoring).toBe("function");
@@ -95,8 +95,8 @@ describe("useSitesStore Function Coverage Tests", () => {
             expect(useSitesStore.getState().sites).toHaveLength(1);
             expect(useSitesStore.getState().sites[0]).toEqual(testSite);
 
-            // Test setSelectedSite
-            store.setSelectedSite(testSite);
+            // Test selectSite
+            store.selectSite(testSite);
             expect(useSitesStore.getState().selectedSiteId).toBe(
                 testSite.identifier
             );
@@ -261,12 +261,12 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             const store = useSitesStore.getState();
 
-            // Test syncSitesFromBackend
-            await store.syncSitesFromBackend();
+            // Test syncSites
+            await store.syncSites();
             expect(mockElectronAPI.sites.getSites).toHaveBeenCalled();
 
-            // Test fullSyncFromBackend
-            await store.fullSyncFromBackend();
+            // Test fullResyncSites
+            await store.fullResyncSites();
             // Should call getSites again for full sync
             expect(mockElectronAPI.sites.getSites).toHaveBeenCalledTimes(2);
         });

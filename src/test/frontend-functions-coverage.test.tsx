@@ -159,9 +159,9 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             // Test available functions
             act(() => {
                 if (
-                    typeof result.current.updateHistoryLimitValue === "function"
+                    typeof result.current.persistHistoryLimit === "function"
                 ) {
-                    result.current.updateHistoryLimitValue(1000);
+                    result.current.persistHistoryLimit(1000);
                 }
             });
 

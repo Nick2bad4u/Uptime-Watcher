@@ -93,7 +93,7 @@ vi.mock("../components/Settings/Settings", () => ({
 const mockUpdatesStoreState = {
     updateStatus: "idle" as any,
     updateError: undefined as string | undefined,
-    setUpdateStatus: vi.fn(),
+    applyUpdateStatus: vi.fn(),
     setUpdateError: vi.fn(),
     applyUpdate: vi.fn(),
     checkForUpdates: vi.fn(),
@@ -321,7 +321,7 @@ describe("App Additional Coverage Tests", () => {
         Object.assign(mockUpdatesStoreState, {
             updateStatus: "idle" as const,
             updateError: undefined,
-            setUpdateStatus: vi.fn(),
+            applyUpdateStatus: vi.fn(),
             setUpdateError: vi.fn(),
             applyUpdate: vi.fn(),
             checkForUpdates: vi.fn(),
@@ -782,10 +782,10 @@ describe("App Additional Coverage Tests", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Data Loading", "type");
 
-        const setUpdateStatusMock = vi.fn();
+        const applyUpdateStatusMock = vi.fn();
         const setUpdateErrorMock = vi.fn();
 
-        mockUpdatesStoreState.setUpdateStatus = setUpdateStatusMock;
+        mockUpdatesStoreState.applyUpdateStatus = applyUpdateStatusMock;
         mockUpdatesStoreState.setUpdateError = setUpdateErrorMock;
         mockUpdatesStoreState.updateStatus = "error";
         mockUpdatesStoreState.updateError = "Test error";
@@ -796,7 +796,7 @@ describe("App Additional Coverage Tests", () => {
         const dismissButton = screen.getByText("Dismiss");
         await userEvent.click(dismissButton);
 
-        expect(setUpdateStatusMock).toHaveBeenCalledWith("idle");
+        expect(applyUpdateStatusMock).toHaveBeenCalledWith("idle");
         expect(setUpdateErrorMock).toHaveBeenCalledWith(undefined);
     });
 
@@ -1258,7 +1258,7 @@ describe("App Additional Coverage Tests", () => {
 
         // The button should still be responsive to clicks
         await userEvent.click(dismissButton);
-        expect(mockUpdatesStoreState.setUpdateStatus).toHaveBeenCalledWith(
+        expect(mockUpdatesStoreState.applyUpdateStatus).toHaveBeenCalledWith(
             "idle"
         );
     });

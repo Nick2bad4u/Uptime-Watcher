@@ -44,10 +44,10 @@ export interface SitesStateActions {
     getSelectedSite: () => Site | undefined;
     /** Remove a site from the store */
     removeSite: (identifier: string) => void;
+    /** Select a site for focused operations and UI display */
+    selectSite: (site: Site | undefined) => void;
     /** Set selected monitor ID for a site */
     setSelectedMonitorId: (siteId: string, monitorId: string) => void;
-    /** Set selected site */
-    setSelectedSite: (site: Site | undefined) => void;
     /** Set sites data */
     setSites: (sites: Site[]) => void;
 }
@@ -116,6 +116,10 @@ export const createSitesStateActions = (
             };
         });
     },
+    selectSite: (site: Site | undefined): void => {
+        logStoreAction("SitesStore", "selectSite", { site });
+        set(() => ({ selectedSiteId: site ? site.identifier : undefined }));
+    },
     setSelectedMonitorId: (siteId: string, monitorId: string): void => {
         logStoreAction("SitesStore", "setSelectedMonitorId", {
             monitorId,
@@ -127,10 +131,6 @@ export const createSitesStateActions = (
                 [siteId]: monitorId,
             },
         }));
-    },
-    setSelectedSite: (site: Site | undefined): void => {
-        logStoreAction("SitesStore", "setSelectedSite", { site });
-        set(() => ({ selectedSiteId: site ? site.identifier : undefined }));
     },
     setSites: (sites: Site[]): void => {
         logStoreAction("SitesStore", "setSites", { count: sites.length });

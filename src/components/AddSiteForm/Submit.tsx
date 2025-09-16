@@ -13,6 +13,8 @@ import type { Monitor, MonitorType } from "@shared/types";
 import type { FormEvent } from "react";
 import type { Simplify, UnknownRecord } from "type-fest";
 
+import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
+
 import type { Logger } from "../../services/logger";
 import type {
     AddSiteFormActions,
@@ -20,7 +22,6 @@ import type {
 } from "../SiteDetails/useAddSiteForm";
 
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
-import { withUtilityErrorHandling } from "../../utils/errorHandling";
 import { truncateForLogging } from "../../utils/fallbacks";
 import {
     validateMonitorFieldClientSide,

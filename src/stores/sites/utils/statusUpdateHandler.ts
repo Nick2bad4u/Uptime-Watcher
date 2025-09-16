@@ -14,12 +14,12 @@ import type { Monitor, MonitorStatus, Site, StatusUpdate } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
 import { isDevelopment } from "@shared/utils/environment";
-
-import { logger } from "../../../services/logger";
 import {
     ensureError,
     withUtilityErrorHandling,
-} from "../../../utils/errorHandling";
+} from "@shared/utils/errorHandling";
+
+import { logger } from "../../../services/logger";
 
 /**
  * Monitor status changed event data structure.
@@ -55,7 +55,7 @@ export interface StatusUpdateHandlerOptions {
      * Called when incremental updates fail or when a complete refresh is
      * needed.
      */
-    fullSyncFromBackend: () => Promise<void>;
+    fullResyncSites: () => Promise<void>;
 
     /**
      * Function to get current sites array.
@@ -97,7 +97,7 @@ export interface StatusUpdateHandlerOptions {
  *
  * ```typescript
  * const manager = new StatusUpdateManager({
- *     fullSyncFromBackend: () => syncSites(),
+ *     fullResyncSites: () => syncSites(),
  *     getSites: () => store.getSites(),
  *     setSites: (sites) => store.setSites(sites),
  * });
@@ -130,7 +130,7 @@ export class StatusUpdateManager {
      *
      * @internal
      */
-    private readonly fullSyncFromBackend: () => Promise<void>;
+    private readonly fullResyncSites: () => Promise<void>;
 
     /**
      * Function to get current sites from store.
@@ -206,7 +206,7 @@ export class StatusUpdateManager {
                         `Site ${event.siteId} not found in store, triggering full sync`
                     );
                 }
-                await this.fullSyncFromBackend();
+                await this.fullResyncSites();
                 return;
             }
 
@@ -218,7 +218,7 @@ export class StatusUpdateManager {
                         `Monitor ${event.monitorId} not found in site ${event.siteId}, triggering full sync`
                     );
                 }
-                await this.fullSyncFromBackend();
+                await this.fullResyncSites();
                 return;
             }
 
@@ -257,7 +257,7 @@ export class StatusUpdateManager {
                 "Failed to apply incremental status update, falling back to full sync",
                 ensureError(error)
             );
-            await this.fullSyncFromBackend();
+            await this.fullResyncSites();
         }
     }
 
@@ -272,7 +272,7 @@ export class StatusUpdateManager {
      * @param options - Configuration options for the status update manager
      */
     public constructor(options: StatusUpdateHandlerOptions) {
-        this.fullSyncFromBackend = options.fullSyncFromBackend;
+        this.fullResyncSites = options.fullResyncSites;
         this.getSites = options.getSites;
         this.setSites = options.setSites;
         this.onUpdate = options.onUpdate ?? undefined;
@@ -313,7 +313,7 @@ export class StatusUpdateManager {
         // Initial full sync
         void withUtilityErrorHandling(
             async () => {
-                await this.fullSyncFromBackend();
+                await this.fullResyncSites();
             },
             "Initial full sync on status update handler subscribe",
             undefined,
@@ -338,7 +338,7 @@ export class StatusUpdateManager {
                                         data
                                     );
                                 }
-                                await this.fullSyncFromBackend();
+                                await this.fullResyncSites();
                             }
                         },
                         "Monitor status update processing",
@@ -355,7 +355,7 @@ export class StatusUpdateManager {
             window.electronAPI.events.onMonitoringStarted(() => {
                 void withUtilityErrorHandling(
                     async () => {
-                        await this.fullSyncFromBackend();
+                        await this.fullResyncSites();
                     },
                     "Full sync on monitoring started",
                     undefined,
@@ -369,7 +369,7 @@ export class StatusUpdateManager {
             window.electronAPI.events.onMonitoringStopped(() => {
                 void withUtilityErrorHandling(
                     async () => {
-                        await this.fullSyncFromBackend();
+                        await this.fullResyncSites();
                     },
                     "Full sync on monitoring stopped",
                     undefined,

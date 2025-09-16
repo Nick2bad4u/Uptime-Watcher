@@ -217,7 +217,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
         });
     });
 
-    describe("Ternary operator branches in updateHistoryLimitValue", () => {
+    describe("Ternary operator branches in persistHistoryLimit", () => {
         it("should use backend limit when it's a valid positive number", async ({
             task,
             annotate,
@@ -240,7 +240,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             });
 
             await act(async () => {
-                await result.current.updateHistoryLimitValue(3000);
+                await result.current.persistHistoryLimit(3000);
             });
 
             // Should use the backend limit (5000) instead of the provided limit (3000)
@@ -269,7 +269,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             });
 
             await act(async () => {
-                await result.current.updateHistoryLimitValue(3000);
+                await result.current.persistHistoryLimit(3000);
             });
 
             // Should use the provided limit (3000) since backend returned invalid number
@@ -298,7 +298,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             });
 
             await act(async () => {
-                await result.current.updateHistoryLimitValue(2500);
+                await result.current.persistHistoryLimit(2500);
             });
 
             // Should use the provided limit (2500) since backend returned 0
@@ -327,7 +327,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             });
 
             await act(async () => {
-                await result.current.updateHistoryLimitValue(1500);
+                await result.current.persistHistoryLimit(1500);
             });
 
             // Should use the provided limit (1500) since backend returned non-number
@@ -358,7 +358,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             });
 
             await act(async () => {
-                await result.current.updateHistoryLimitValue(4000);
+                await result.current.persistHistoryLimit(4000);
             });
 
             // Should use provided limit since typeof check fails
@@ -387,7 +387,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             });
 
             await act(async () => {
-                await result.current.updateHistoryLimitValue(3500);
+                await result.current.persistHistoryLimit(3500);
             });
 
             // Should use provided limit since value check fails

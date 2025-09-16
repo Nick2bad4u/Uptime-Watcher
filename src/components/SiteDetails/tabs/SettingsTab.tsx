@@ -7,6 +7,7 @@
 import type { Monitor, Site } from "@shared/types";
 import type { ChangeEvent, JSX } from "react";
 
+import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FiSave, FiTrash2 } from "react-icons/fi";
 import {
@@ -31,7 +32,6 @@ import { ThemedSelect } from "../../../theme/components/ThemedSelect";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
 import { calculateMaxDuration } from "../../../utils/duration";
-import { withUtilityErrorHandling } from "../../../utils/errorHandling";
 import {
     getMonitorDisplayIdentifier,
     getMonitorTypeDisplayLabel,

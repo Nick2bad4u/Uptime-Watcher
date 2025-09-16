@@ -1,6 +1,6 @@
 /**
  * @file Tests to reach 100% coverage for useUiStore.ts lines 130-131 Targeting
- *   the setSelectedSite function when site is undefined
+ *   the selectSite function when site is undefined
  */
 
 import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
@@ -23,8 +23,8 @@ describe("useUIStore - 100% Coverage Tests", () => {
         useUIStore.persist.clearStorage();
     });
 
-    describe("Targeting Lines 130-131 (setSelectedSite with undefined)", () => {
-        test("should handle setSelectedSite with undefined site", async ({
+    describe("Targeting Lines 130-131 (selectSite with undefined)", () => {
+        test("should handle selectSite with undefined site", async ({
             task,
             annotate,
         }) => {
@@ -54,20 +54,20 @@ describe("useUIStore - 100% Coverage Tests", () => {
             };
 
             await act(async () => {
-                result.current.setSelectedSite(mockSite);
+                result.current.selectSite(mockSite);
             });
 
             expect(result.current.selectedSiteId).toBe("test-site-1");
 
             // Now set it to undefined - this targets line 130-131
             await act(async () => {
-                result.current.setSelectedSite(undefined);
+                result.current.selectSite(undefined);
             });
 
             expect(result.current.selectedSiteId).toBeUndefined();
         });
 
-        test("should handle setSelectedSite with valid site", async ({
+        test("should handle selectSite with valid site", async ({
             task,
             annotate,
         }) => {
@@ -97,7 +97,7 @@ describe("useUIStore - 100% Coverage Tests", () => {
 
             // This should set the identifier
             await act(async () => {
-                result.current.setSelectedSite(mockSite);
+                result.current.selectSite(mockSite);
             });
 
             expect(result.current.selectedSiteId).toBe("test-site-2");

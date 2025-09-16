@@ -15,7 +15,10 @@ import { ReactNode } from "react";
 // Import components and utilities to test
 import { AddSiteForm } from "../components/AddSiteForm/AddSiteForm";
 import { generateUuid } from "../utils/data/generateUuid";
-import { ensureError, withUtilityErrorHandling } from "../utils/errorHandling";
+import {
+    ensureError,
+    withUtilityErrorHandling,
+} from "@shared/utils/errorHandling";
 import { isNullOrUndefined, withAsyncErrorHandling } from "../utils/fallbacks";
 import { logger } from "../services/logger";
 import { useErrorStore } from "../stores/error/useErrorStore";

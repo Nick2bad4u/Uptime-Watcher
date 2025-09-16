@@ -95,7 +95,7 @@ describe("App Development Logging Coverage", () => {
         vi.mocked(useUpdatesStore).mockReturnValue({
             applyUpdate: vi.fn(),
             setUpdateError: vi.fn(),
-            setUpdateStatus: vi.fn(),
+            applyUpdateStatus: vi.fn(),
             updateError: null,
             updateStatus: "idle",
         });

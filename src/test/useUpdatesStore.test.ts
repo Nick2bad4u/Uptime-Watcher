@@ -83,7 +83,7 @@ describe(useUpdatesStore, () => {
             const { result } = renderHook(() => useUpdatesStore());
 
             act(() => {
-                result.current.setUpdateStatus("checking");
+                result.current.applyUpdateStatus("checking");
             });
 
             expect(result.current.updateStatus).toBe("checking");
@@ -111,7 +111,7 @@ describe(useUpdatesStore, () => {
 
             for (const status of statuses) {
                 act(() => {
-                    result.current.setUpdateStatus(status);
+                    result.current.applyUpdateStatus(status);
                 });
 
                 expect(result.current.updateStatus).toBe(status);
@@ -316,14 +316,14 @@ describe(useUpdatesStore, () => {
 
             // Start checking for updates
             act(() => {
-                result.current.setUpdateStatus("checking");
+                result.current.applyUpdateStatus("checking");
             });
 
             expect(result.current.updateStatus).toBe("checking");
 
             // Update available
             act(() => {
-                result.current.setUpdateStatus("available");
+                result.current.applyUpdateStatus("available");
                 result.current.setUpdateInfo({
                     releaseDate: "2023-01-01",
                     releaseName: "v1.0.0",
@@ -337,7 +337,7 @@ describe(useUpdatesStore, () => {
 
             // Start downloading
             act(() => {
-                result.current.setUpdateStatus("downloading");
+                result.current.applyUpdateStatus("downloading");
                 result.current.setUpdateProgress(0);
             });
 
@@ -353,7 +353,7 @@ describe(useUpdatesStore, () => {
 
             // Download complete
             act(() => {
-                result.current.setUpdateStatus("downloaded");
+                result.current.applyUpdateStatus("downloaded");
                 result.current.setUpdateProgress(100);
             });
 
@@ -374,12 +374,12 @@ describe(useUpdatesStore, () => {
 
             // Start checking for updates
             act(() => {
-                result.current.setUpdateStatus("checking");
+                result.current.applyUpdateStatus("checking");
             });
 
             // Error occurred
             act(() => {
-                result.current.setUpdateStatus("error");
+                result.current.applyUpdateStatus("error");
                 result.current.setUpdateError("Network error");
             });
 
@@ -388,7 +388,7 @@ describe(useUpdatesStore, () => {
 
             // Reset to idle
             act(() => {
-                result.current.setUpdateStatus("idle");
+                result.current.applyUpdateStatus("idle");
                 result.current.setUpdateError(undefined);
             });
 
@@ -415,7 +415,7 @@ describe(useUpdatesStore, () => {
             };
 
             act(() => {
-                result.current.setUpdateStatus("downloading");
+                result.current.applyUpdateStatus("downloading");
                 result.current.setUpdateProgress(75);
                 result.current.setUpdateInfo(updateInfo);
                 result.current.setUpdateError("Connection timeout");
@@ -428,7 +428,7 @@ describe(useUpdatesStore, () => {
 
             // Change only status
             act(() => {
-                result.current.setUpdateStatus("error");
+                result.current.applyUpdateStatus("error");
             });
 
             expect(result.current.updateStatus).toBe("error");
@@ -470,7 +470,7 @@ describe(useUpdatesStore, () => {
 
             // Set state to downloaded
             act(() => {
-                result.current.setUpdateStatus("downloaded");
+                result.current.applyUpdateStatus("downloaded");
                 result.current.setUpdateProgress(100);
             });
 
@@ -505,7 +505,7 @@ describe(useUpdatesStore, () => {
 
             // Test all actions that should log
             act(() => {
-                result.current.setUpdateStatus("checking");
+                result.current.applyUpdateStatus("checking");
                 result.current.setUpdateProgress(50);
                 result.current.setUpdateError("Test error");
                 result.current.setUpdateInfo(updateInfo);
@@ -515,7 +515,7 @@ describe(useUpdatesStore, () => {
 
             expect(logStoreAction).toHaveBeenCalledWith(
                 "UpdatesStore",
-                "setUpdateStatus",
+                "applyUpdateStatus",
                 { status: "checking" }
             );
             expect(logStoreAction).toHaveBeenCalledWith(

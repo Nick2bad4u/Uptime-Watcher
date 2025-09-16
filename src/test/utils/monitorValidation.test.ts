@@ -43,7 +43,7 @@ import {
 import type { ValidationResult } from "../../../shared/types/validation";
 
 // Import mocked functions
-import { withUtilityErrorHandling } from "../../utils/errorHandling";
+import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import {
     validateMonitorData as sharedValidateMonitorData,
     validateMonitorField as sharedValidateMonitorField,

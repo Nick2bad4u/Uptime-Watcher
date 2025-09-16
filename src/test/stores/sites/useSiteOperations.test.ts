@@ -102,7 +102,7 @@ describe(createSiteOperationsActions, () => {
             getSites: vi.fn(() => [mockSite]),
             removeSite: vi.fn(),
             setSites: vi.fn(),
-            syncSitesFromBackend: vi.fn(),
+            syncSites: vi.fn(),
         };
 
         actions = createSiteOperationsActions(mockDeps);
@@ -131,7 +131,7 @@ describe(createSiteOperationsActions, () => {
                     ]), // Original + new
                 }
             );
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
+            expect(mockDeps.syncSites).toHaveBeenCalled();
         });
 
         it("should throw error when site is not found", async ({
@@ -367,7 +367,7 @@ describe(createSiteOperationsActions, () => {
                 "test-site",
                 updates
             );
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
+            expect(mockDeps.syncSites).toHaveBeenCalled();
         });
 
         it("should handle modify errors", async ({ task, annotate }) => {
@@ -417,7 +417,7 @@ describe(createSiteOperationsActions, () => {
                 "test-site",
                 "monitor-1"
             );
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
+            expect(mockDeps.syncSites).toHaveBeenCalled();
         });
     });
 
@@ -440,7 +440,7 @@ describe(createSiteOperationsActions, () => {
             );
 
             expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
+            expect(mockDeps.syncSites).toHaveBeenCalled();
         });
 
         it("should update monitor timeout", async ({ task, annotate }) => {
@@ -458,7 +458,7 @@ describe(createSiteOperationsActions, () => {
             );
 
             expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
+            expect(mockDeps.syncSites).toHaveBeenCalled();
         });
 
         it("should update site check interval", async ({ task, annotate }) => {
@@ -476,7 +476,7 @@ describe(createSiteOperationsActions, () => {
             );
 
             expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
-            expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
+            expect(mockDeps.syncSites).toHaveBeenCalled();
         });
     });
 

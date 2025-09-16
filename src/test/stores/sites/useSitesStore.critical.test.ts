@@ -32,8 +32,8 @@ const mockElectronAPI = {
         stopMonitoringForSiteMonitor: vi.fn(),
     },
     stateSync: {
-        fullSyncFromBackend: vi.fn(),
-        syncSitesFromBackend: vi.fn(),
+        fullResyncSites: vi.fn(),
+        syncSites: vi.fn(),
         getSyncStatus: vi.fn(),
         subscribeToSyncEvents: vi.fn(),
     },
@@ -59,7 +59,7 @@ describe("useSitesStore Function Coverage Tests", () => {
         // Reset store state
         const store = useSitesStore.getState();
         store.setSites([]);
-        store.setSelectedSite(undefined);
+        store.selectSite(undefined);
     });
 
     describe("Store Creation and Composition", () => {
@@ -71,7 +71,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             expect(typeof store.removeSite).toBe("function");
             expect(typeof store.modifySite).toBe("function");
             expect(typeof store.setSites).toBe("function");
-            expect(typeof store.setSelectedSite).toBe("function");
+            expect(typeof store.selectSite).toBe("function");
             expect(typeof store.getSelectedSite).toBe("function");
             expect(typeof store.setSelectedMonitorId).toBe("function");
             expect(typeof store.getSelectedMonitorId).toBe("function");
@@ -94,8 +94,8 @@ describe("useSitesStore Function Coverage Tests", () => {
             expect(typeof store.stopSiteMonitorMonitoring).toBe("function");
 
             // Verify all sync functions exist
-            expect(typeof store.fullSyncFromBackend).toBe("function");
-            expect(typeof store.syncSitesFromBackend).toBe("function");
+            expect(typeof store.fullResyncSites).toBe("function");
+            expect(typeof store.syncSites).toBe("function");
             expect(typeof store.getSyncStatus).toBe("function");
             expect(typeof store.subscribeToSyncEvents).toBe("function");
 
@@ -223,18 +223,18 @@ describe("useSitesStore Function Coverage Tests", () => {
                 success: true,
                 data: mockSyncStatus,
             });
-            // Mock getSites for syncSitesFromBackend
+            // Mock getSites for syncSites
             mockElectronAPI.sites.getSites.mockResolvedValueOnce({
                 success: true,
                 data: [],
             });
-            mockElectronAPI.stateSync.syncSitesFromBackend.mockResolvedValueOnce(
+            mockElectronAPI.stateSync.syncSites.mockResolvedValueOnce(
                 {
                     success: true,
                     data: [],
                 }
             );
-            mockElectronAPI.stateSync.fullSyncFromBackend.mockResolvedValueOnce(
+            mockElectronAPI.stateSync.fullResyncSites.mockResolvedValueOnce(
                 {
                     success: true,
                     data: [],
@@ -246,11 +246,11 @@ describe("useSitesStore Function Coverage Tests", () => {
             expect(syncStatus).toEqual(mockSyncStatus);
             expect(mockElectronAPI.stateSync.getSyncStatus).toHaveBeenCalled();
 
-            await store.syncSitesFromBackend();
+            await store.syncSites();
             expect(mockElectronAPI.sites.getSites).toHaveBeenCalled();
 
-            await store.fullSyncFromBackend();
-            // fullSyncFromBackend calls syncSitesFromBackend which calls SiteService.getSites()
+            await store.fullResyncSites();
+            // fullResyncSites calls syncSites which calls SiteService.getSites()
             expect(mockElectronAPI.sites.getSites).toHaveBeenCalled();
         });
     });
@@ -270,11 +270,11 @@ describe("useSitesStore Function Coverage Tests", () => {
             store.setSites([testSite]);
 
             // Test setting selected site
-            store.setSelectedSite(testSite);
+            store.selectSite(testSite);
             expect(store.getSelectedSite()).toEqual(testSite);
 
             // Test clearing selected site
-            store.setSelectedSite(undefined);
+            store.selectSite(undefined);
             expect(store.getSelectedSite()).toBeUndefined();
         });
 

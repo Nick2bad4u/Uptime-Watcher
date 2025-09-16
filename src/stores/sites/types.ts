@@ -35,8 +35,17 @@ export interface SitesActions {
     deleteSite: (identifier: string) => Promise<void>;
     /** Download SQLite backup */
     downloadSQLiteBackup: () => Promise<void>;
-    /** Full sync from backend */
-    fullSyncFromBackend: () => Promise<void>;
+    /**
+     * Performs complete resynchronization of all sites data from backend.
+     *
+     * @remarks
+     * Executes a full data refresh from the backend, clearing local state and
+     * rebuilding it with the latest server data. This method ensures complete
+     * data consistency between client and server.
+     *
+     * @returns Promise that resolves when full resync is complete
+     */
+    fullResyncSites: () => Promise<void>;
     /** Get selected monitor ID for a site */
     getSelectedMonitorId: (siteId: string) => string | undefined;
     /** Get the currently selected site */
@@ -67,10 +76,19 @@ export interface SitesActions {
     removeMonitorFromSite: (siteId: string, monitorId: string) => Promise<void>;
     /** Remove a site from the store */
     removeSite: (identifier: string) => void;
+    /**
+     * Selects a site for focused operations and UI display.
+     *
+     * @remarks
+     * Updates the currently selected site with proper state management. This
+     * method provides clear site selection semantics for better code
+     * readability.
+     *
+     * @param site - Site to select, or undefined to clear selection
+     */
+    selectSite: (site: Site | undefined) => void;
     /** Set selected monitor ID for a site */
     setSelectedMonitorId: (siteId: string, monitorId: string) => void;
-    /** Set selected site */
-    setSelectedSite: (site: Site | undefined) => void;
     /** Set sites data */
     setSites: (sites: Site[]) => void;
     /** Start monitoring for all monitors of a site */
@@ -93,8 +111,17 @@ export interface SitesActions {
     ) => void;
     /** Subscribe to sync events */
     subscribeToSyncEvents: () => () => void;
-    /** Sync sites from backend */
-    syncSitesFromBackend: () => Promise<void>;
+    /**
+     * Synchronizes sites data with backend while preserving local state.
+     *
+     * @remarks
+     * Updates local sites data by fetching changes from the backend without
+     * clearing existing state. This method preserves local modifications and
+     * merges backend updates efficiently.
+     *
+     * @returns Promise that resolves when sync is complete
+     */
+    syncSites: () => Promise<void>;
     /** Unsubscribe from status updates */
     unsubscribeFromStatusUpdates: () => void;
     /** Update monitor retry attempts */
@@ -161,5 +188,5 @@ export interface SiteOperationsDependencies {
     /** Replace all sites in the store */
     setSites: (sites: Site[]) => void;
     /** Synchronize sites from backend storage */
-    syncSitesFromBackend: () => Promise<void>;
+    syncSites: () => Promise<void>;
 }

@@ -112,8 +112,8 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // Updates store
     const {
         applyUpdate,
+        applyUpdateStatus,
         setUpdateError,
-        setUpdateStatus,
         updateError,
         updateStatus,
     } = useUpdatesStore();
@@ -262,13 +262,13 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         if (updateStatus === "downloaded") {
             applyUpdate();
         } else {
-            setUpdateStatus("idle");
+            applyUpdateStatus("idle");
             setUpdateError(undefined);
         }
     }, [
         applyUpdate,
+        applyUpdateStatus,
         setUpdateError,
-        setUpdateStatus,
         updateStatus,
     ]);
 

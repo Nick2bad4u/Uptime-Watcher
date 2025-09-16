@@ -6,7 +6,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { logger } from "../../services/logger";
-import { ensureError } from "../../utils/errorHandling";
+import { ensureError } from "@shared/utils/errorHandling";
 import { clearMonitorTypeCache } from "../../utils/monitorTypeHelper";
 import { setupCacheSync } from "../../utils/cacheSync";
 

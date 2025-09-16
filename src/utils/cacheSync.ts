@@ -3,8 +3,9 @@
  * caches with backend cache invalidation events.
  */
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import { logger } from "../services/logger";
-import { ensureError } from "./errorHandling";
 import { clearMonitorTypeCache } from "./monitorTypeHelper";
 
 /**

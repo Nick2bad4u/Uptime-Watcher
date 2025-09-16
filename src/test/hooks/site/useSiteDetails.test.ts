@@ -123,7 +123,7 @@ import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { useSiteAnalytics } from "../../../hooks/site/useSiteAnalytics";
-import { withUtilityErrorHandling } from "../../../utils/errorHandling";
+import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 
 describe("useSiteDetails Hook - Basic Coverage", () => {
     const mockSite: Site = {
