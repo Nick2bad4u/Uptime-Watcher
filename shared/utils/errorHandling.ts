@@ -343,13 +343,13 @@ export function ensureError(error: unknown): Error {
  *
  * @param operation - The async operation to execute
  * @param operationName - Name of the operation for logging
- * @param fallbackValue - Value to return if operation fails (required if
- *   shouldThrow is false)
+ * @param fallbackValue - Value to return if operation fails when shouldThrow is
+ *   false
  * @param shouldThrow - Whether to throw on error or return fallback value
  *
  * @returns Promise resolving to operation result or fallback value
  *
- * @throws When shouldThrow is true or when shouldThrow is false but no
+ * @throws When shouldThrow is true, or when shouldThrow is false but no
  *   fallbackValue is provided
  */
 export async function withUtilityErrorHandling<T>(
@@ -372,7 +372,8 @@ export async function withUtilityErrorHandling<T>(
 
         if (fallbackValue === undefined) {
             throw new Error(
-                `${operationName} failed and no fallback value provided`,
+                `${operationName} failed and no fallback value provided. ` +
+                    `When shouldThrow is false, you must provide a fallbackValue parameter.`,
                 { cause: error }
             );
         }

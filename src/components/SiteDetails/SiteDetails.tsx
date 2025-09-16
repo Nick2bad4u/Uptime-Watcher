@@ -378,8 +378,9 @@ export const SiteDetails = ({
                 onClick={onClose}
                 type="button"
             />
-            <dialog
+            <ThemedBox
                 aria-label="Site details"
+                as="dialog"
                 className="relative mx-auto flex max-h-[90vh] w-full max-w-[1400px] flex-col sm:max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-4rem)] lg:max-w-[1400px]"
                 open
             >
@@ -443,7 +444,7 @@ export const SiteDetails = ({
                         {settingsTab}
                     </ThemedBox>
                 </ThemedBox>
-            </dialog>
+            </ThemedBox>
         </div>
     );
 };

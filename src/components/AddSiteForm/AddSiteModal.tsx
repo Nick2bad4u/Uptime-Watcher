@@ -3,7 +3,7 @@
  *
  * @remarks
  * - Provides a modal wrapper for the AddSiteForm component
- * - Manages its own visibility state via the UI store
+ * - Parent-controlled visibility via onClose prop
  * - Handles form success by closing the modal
  * - Uses consistent theming and modal patterns
  *
@@ -15,15 +15,23 @@ import {
     type MouseEvent,
     type NamedExoticComponent,
     useCallback,
-    useEffect,
 } from "react";
 
-import { useUIStore } from "../../stores/ui/useUiStore";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
 import { AddSiteForm } from "./AddSiteForm";
+
+/**
+ * Props for the AddSiteModal component
+ *
+ * @public
+ */
+export interface AddSiteModalProperties {
+    /** Callback function to close the modal */
+    readonly onClose: () => void;
+}
 
 /**
  * Modal wrapper for the AddSiteForm component.
@@ -32,49 +40,22 @@ import { AddSiteForm } from "./AddSiteForm";
  * Provides a modal dialog containing the AddSiteForm with proper theming and
  * close functionality. Automatically closes when form submission succeeds.
  *
+ * @param props - Component configuration properties
+ *
  * @returns JSX element containing the modal dialog with AddSiteForm
  */
-export const AddSiteModal: NamedExoticComponent<object> = memo(
-    function AddSiteModal() {
+export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
+    function AddSiteModal({ onClose }: AddSiteModalProperties) {
         const { isDark } = useTheme();
-        const { setShowAddSiteModal, showAddSiteModal } = useUIStore();
-
-        const handleClose = useCallback(() => {
-            setShowAddSiteModal(false);
-        }, [setShowAddSiteModal]);
 
         const handleBackdropClick = useCallback(
             (event: MouseEvent) => {
                 if (event.target === event.currentTarget) {
-                    handleClose();
+                    onClose();
                 }
             },
-            [handleClose]
+            [onClose]
         );
-
-        // Handle escape key for modal
-        useEffect(
-            function handleEscapeKey() {
-                const handleKeyDown = (event: KeyboardEvent): void => {
-                    if (event.key === "Escape" && showAddSiteModal) {
-                        handleClose();
-                    }
-                };
-
-                if (showAddSiteModal) {
-                    document.addEventListener("keydown", handleKeyDown);
-                }
-
-                return (): void => {
-                    document.removeEventListener("keydown", handleKeyDown);
-                };
-            },
-            [handleClose, showAddSiteModal]
-        );
-
-        if (!showAddSiteModal) {
-            return null;
-        }
 
         return (
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- Modal backdrop requires click handler for UX; keyboard support provided by modal focus management
@@ -87,6 +68,7 @@ export const AddSiteModal: NamedExoticComponent<object> = memo(
                 <ThemedBox
                     as="dialog"
                     className="m-4 max-h-screen w-full max-w-2xl overflow-y-auto"
+                    open
                     padding="lg"
                     rounded="lg"
                     shadow="lg"
@@ -99,7 +81,7 @@ export const AddSiteModal: NamedExoticComponent<object> = memo(
                         </ThemedText>
                         <ThemedButton
                             aria-label="Close modal"
-                            onClick={handleClose}
+                            onClick={onClose}
                             size="sm"
                             title="Close"
                             variant="secondary"
@@ -110,7 +92,7 @@ export const AddSiteModal: NamedExoticComponent<object> = memo(
 
                     {/* Modal Content */}
                     <div className="-m-4">
-                        <AddSiteForm onSuccess={handleClose} />
+                        <AddSiteForm onSuccess={onClose} />
                     </div>
                 </ThemedBox>
             </div>

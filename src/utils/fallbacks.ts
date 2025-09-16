@@ -47,7 +47,6 @@ import type { ReadonlyDeep } from "type-fest";
 
 import {
     ensureError,
-    withUtilityErrorHandling,
 } from "@shared/utils/errorHandling";
 
 import { logger } from "../services/logger";
@@ -79,12 +78,9 @@ export function withAsyncErrorHandling(
     operationName: string
 ): () => void {
     return () => {
-        void withUtilityErrorHandling(
-            operation,
-            operationName,
-            undefined,
-            false
-        );
+        void operation().catch((error) => {
+            logger.error(`${operationName} failed`, ensureError(error));
+        });
     };
 }
 

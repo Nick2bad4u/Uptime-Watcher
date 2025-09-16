@@ -11,8 +11,7 @@
  * Covers:
  *
  * - Settings store: persistHistoryLimit -> persistHistoryLimit
- * - Sites sync store: syncSites -> syncSites, fullResyncSites ->
- *   fullResyncSites
+ * - Sites sync store: syncSites -> syncSites, fullResyncSites -> fullResyncSites
  * - Sites state store: selectSite -> selectSite
  * - Updates store: applyUpdateStatus -> applyUpdateStatus
  */
@@ -246,10 +245,7 @@ describe("Store Alias Methods", () => {
             const sitesStore = useSitesStore.getState();
 
             // Mock original methods to prevent actual API calls
-            vi.spyOn(
-                settingsStore,
-                "persistHistoryLimit"
-            ).mockResolvedValue();
+            vi.spyOn(settingsStore, "persistHistoryLimit").mockResolvedValue();
             vi.spyOn(sitesStore, "syncSites").mockResolvedValue();
             vi.spyOn(sitesStore, "fullResyncSites").mockResolvedValue();
 

@@ -294,7 +294,10 @@ export const Settings = ({
     return (
         <div className="modal-overlay">
             <ThemedBox
+                as="dialog"
                 className="modal-container"
+                data-testid="settings-modal"
+                open
                 padding="md"
                 rounded="lg"
                 shadow="xl"

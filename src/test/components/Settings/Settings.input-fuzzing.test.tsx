@@ -70,6 +70,8 @@
  *       expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
  * ```
  *
+ * ```
+ *
  * - Error handling and recovery
  *
  * Focus areas:
@@ -80,6 +82,7 @@
  * - Error handling and user feedback
  * - Performance with large configuration changes
  * - Accessibility and keyboard navigation
+ * ```
  */
 
 import { describe, expect, vi, beforeEach, afterEach } from "vitest";
@@ -194,7 +197,11 @@ vi.mock("../../../theme/useTheme", () => ({
             isDark: mockSettingsState.theme === "dark",
             colors: {},
         },
-        availableThemes: ["light", "dark", "system"],
+        availableThemes: [
+            "light",
+            "dark",
+            "system",
+        ],
         setTheme: mockSetTheme,
     })),
 }));
@@ -486,7 +493,11 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 const themeSelect = screen.getAllByLabelText(
                     "Select application theme"
                 )[0]!;
-                const themes: ThemeName[] = ["light", "dark", "system"];
+                const themes: ThemeName[] = [
+                    "light",
+                    "dark",
+                    "system",
+                ];
 
                 for (let i = 0; i < changeCount; i++) {
                     const theme = themes[i % themes.length];
@@ -875,7 +886,11 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                         const themeSelect = screen.getAllByLabelText(
                             "Select application theme"
                         )[0]!;
-                        const themes = ["light", "dark", "system"];
+                        const themes = [
+                            "light",
+                            "dark",
+                            "system",
+                        ];
                         for (let i = 0; i < scenario.rapidChanges; i++) {
                             const theme = themes[i % themes.length];
                             fireEvent.change(themeSelect, {
@@ -888,7 +903,13 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                         const historySelect = screen.getAllByLabelText(
                             "Maximum number of history records to keep per site"
                         )[0]!;
-                        const limits = [25, 50, 100, 500, 1000];
+                        const limits = [
+                            25,
+                            50,
+                            100,
+                            500,
+                            1000,
+                        ];
                         for (let i = 0; i < scenario.rapidChanges; i++) {
                             const limit = limits[i % limits.length]!;
                             fireEvent.change(historySelect, {

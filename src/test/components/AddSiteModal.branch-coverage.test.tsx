@@ -85,9 +85,11 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
     const mockSetShowAddSiteModal = vi.fn();
     const mockUseUIStore = vi.mocked(useUIStore);
     const mockUseTheme = vi.mocked(useTheme);
+    let mockOnClose: any;
 
     beforeEach(() => {
         vi.clearAllMocks();
+        mockOnClose = vi.fn();
         mockUseTheme.mockReturnValue({
             isDark: false,
             currentTheme: {
@@ -216,7 +218,7 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
     });
 
     describe("Modal Visibility Branches", () => {
-        it("should render nothing when showAddSiteModal is false", ({
+        it("should render modal when component is mounted", ({
             task,
             annotate,
         }) => {
@@ -231,7 +233,7 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate("Type: Business Logic", "type");
 
             mockUseUIStore.mockReturnValue({
-                showAddSiteModal: false,
+                showAddSiteModal: true,
                 setShowAddSiteModal: mockSetShowAddSiteModal,
                 selectedSiteId: null,
                 setSelectedSiteId: vi.fn(),
@@ -244,8 +246,11 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
                 clearError: vi.fn(),
             });
 
-            const { container } = render(<AddSiteModal />);
-            expect(container.firstChild).toBeNull();
+            const mockOnClose = vi.fn();
+            const { container } = render(<AddSiteModal onClose={mockOnClose} />);
+            expect(container.firstChild).not.toBeNull();
+            expect(screen.getByTestId("modal-outer-box")).toBeInTheDocument();
+            expect(screen.getByText("Add New Site")).toBeInTheDocument();
         });
 
         it("should render modal when showAddSiteModal is true", ({
@@ -276,7 +281,7 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
                 clearError: vi.fn(),
             });
 
-            render(<AddSiteModal />);
+            render(<AddSiteModal onClose={mockOnClose} />);
             expect(screen.getByTestId("modal-outer-box")).toBeInTheDocument();
             expect(screen.getByText("Add New Site")).toBeInTheDocument();
         });
@@ -325,7 +330,7 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
                 clearError: vi.fn(),
             });
 
-            render(<AddSiteModal />);
+            render(<AddSiteModal onClose={mockOnClose} />);
             const backdrop = document.querySelector(".fixed.inset-0");
             expect(backdrop).toHaveClass("dark");
         });
@@ -372,7 +377,7 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
                 clearError: vi.fn(),
             });
 
-            render(<AddSiteModal />);
+            render(<AddSiteModal onClose={mockOnClose} />);
             // Check that the backdrop div exists and verify dark class is absent
             const backdrop = document.querySelector(".fixed.inset-0");
             expect(backdrop).not.toHaveClass("dark");
@@ -410,14 +415,14 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<AddSiteModal />);
+            render(<AddSiteModal onClose={mockOnClose} />);
 
             const closeButton = screen.getByRole("button", {
                 name: /close modal/i,
             });
             await userEvent.click(closeButton);
 
-            expect(mockSetShowAddSiteModal).toHaveBeenCalledWith(false);
+            expect(mockOnClose).toHaveBeenCalledTimes(1);
         });
 
         it("should call setShowAddSiteModal(false) when backdrop is clicked", async ({
@@ -434,13 +439,13 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<AddSiteModal />);
+            render(<AddSiteModal onClose={mockOnClose} />);
 
             // Get the backdrop by testing the event directly
             const backdrop = document.querySelector(".fixed.inset-0")!;
             fireEvent.click(backdrop);
 
-            expect(mockSetShowAddSiteModal).toHaveBeenCalledWith(false);
+            expect(mockOnClose).toHaveBeenCalledTimes(1);
         });
 
         it("should not close modal when clicking inside the modal content", async ({
@@ -457,12 +462,12 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<AddSiteModal />);
+            render(<AddSiteModal onClose={mockOnClose} />);
 
             const modalContent = screen.getByTestId("modal-outer-box");
             fireEvent.click(modalContent);
 
-            expect(mockSetShowAddSiteModal).not.toHaveBeenCalled();
+            expect(mockOnClose).not.toHaveBeenCalled();
         });
 
         it("should close modal when form success callback is called", async ({
@@ -479,167 +484,12 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<AddSiteModal />);
+            render(<AddSiteModal onClose={mockOnClose} />);
 
             const successButton = screen.getByTestId("mock-success-button");
             await userEvent.click(successButton);
 
-            expect(mockSetShowAddSiteModal).toHaveBeenCalledWith(false);
-        });
-    });
-
-    describe("Keyboard Event Branches", () => {
-        beforeEach(() => {
-            mockUseUIStore.mockReturnValue({
-                showAddSiteModal: true,
-                setShowAddSiteModal: mockSetShowAddSiteModal,
-                selectedSiteId: null,
-                setSelectedSiteId: vi.fn(),
-                selectedChartPeriod: "1d",
-                setSelectedChartPeriod: vi.fn(),
-                isLoading: false,
-                setIsLoading: vi.fn(),
-                error: null,
-                setError: vi.fn(),
-                clearError: vi.fn(),
-            });
-        });
-
-        it("should close modal when Escape key is pressed and modal is visible", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteModal />);
-
-            fireEvent.keyDown(document, { key: "Escape" });
-
-            await waitFor(() => {
-                expect(mockSetShowAddSiteModal).toHaveBeenCalledWith(false);
-            });
-        });
-
-        it("should not close modal when other keys are pressed", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            render(<AddSiteModal />);
-
-            fireEvent.keyDown(document, { key: "Enter" });
-            fireEvent.keyDown(document, { key: "Space" });
-            fireEvent.keyDown(document, { key: "Tab" });
-
-            expect(mockSetShowAddSiteModal).not.toHaveBeenCalled();
-        });
-
-        it("should not respond to Escape when modal is not visible", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            // First render with modal hidden
-            mockUseUIStore.mockReturnValue({
-                showAddSiteModal: false,
-                setShowAddSiteModal: mockSetShowAddSiteModal,
-                selectedSiteId: null,
-                setSelectedSiteId: vi.fn(),
-                selectedChartPeriod: "1d",
-                setSelectedChartPeriod: vi.fn(),
-                isLoading: false,
-                setIsLoading: vi.fn(),
-                error: null,
-                setError: vi.fn(),
-                clearError: vi.fn(),
-            });
-
-            render(<AddSiteModal />);
-
-            fireEvent.keyDown(document, { key: "Escape" });
-
-            expect(mockSetShowAddSiteModal).not.toHaveBeenCalled();
-        });
-    });
-
-    describe("Event Cleanup Branches", () => {
-        it("should add and remove event listeners based on modal visibility", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Data Deletion", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Data Deletion", "type");
-
-            const addEventListenerSpy = vi.spyOn(document, "addEventListener");
-            const removeEventListenerSpy = vi.spyOn(
-                document,
-                "removeEventListener"
-            );
-
-            // Start with modal visible
-            mockUseUIStore.mockReturnValue({
-                showAddSiteModal: true,
-                setShowAddSiteModal: mockSetShowAddSiteModal,
-                selectedSiteId: null,
-                setSelectedSiteId: vi.fn(),
-                selectedChartPeriod: "1d",
-                setSelectedChartPeriod: vi.fn(),
-                isLoading: false,
-                setIsLoading: vi.fn(),
-                error: null,
-                setError: vi.fn(),
-                clearError: vi.fn(),
-            });
-
-            const { unmount } = render(<AddSiteModal />);
-
-            expect(addEventListenerSpy).toHaveBeenCalledWith(
-                "keydown",
-                expect.any(Function)
-            );
-
-            unmount();
-
-            expect(removeEventListenerSpy).toHaveBeenCalledWith(
-                "keydown",
-                expect.any(Function)
-            );
-
-            addEventListenerSpy.mockRestore();
-            removeEventListenerSpy.mockRestore();
+            expect(mockOnClose).toHaveBeenCalledTimes(1);
         });
     });
 });

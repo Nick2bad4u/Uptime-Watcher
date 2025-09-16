@@ -606,7 +606,7 @@ export default defineConfig(({ mode }) => {
             // Directory for storing Vitest test attachments (screenshots, logs, etc.) in a hidden cache folder.
             // This helps keep test artifacts organized and out of the main source tree.
             attachmentsDir: "./.cache/.vitest-attachments",
-            bail: 100, // Stop after 100 failures to avoid excessive output
+            bail: 200, // Stop after 200 failures to avoid excessive output
             benchmark: {
                 exclude: [
                     "**/dist*/**",

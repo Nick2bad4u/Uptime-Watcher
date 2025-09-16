@@ -75,9 +75,11 @@ vi.mock("../components/SiteList", () => ({
     default: () => <div data-testid="site-list">Site List Component</div>,
 }));
 
-vi.mock("../components/AddSiteModal", () => ({
-    default: () => (
-        <div data-testid="add-site-modal">Add Site Modal Component</div>
+vi.mock("../components/AddSiteForm/AddSiteModal", () => ({
+    AddSiteModal: ({ onClose }: { onClose: () => void }) => (
+        <div data-testid="add-site-modal" onClick={onClose}>
+            Add Site Modal Component
+        </div>
     ),
 }));
 

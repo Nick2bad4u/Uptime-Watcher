@@ -52,7 +52,11 @@ vi.mock("../components/Dashboard/SiteList/SiteList", () => ({
 }));
 
 vi.mock("../components/AddSiteForm/AddSiteModal", () => ({
-    AddSiteModal: () => <div data-testid="add-site-modal">Add Site Modal</div>,
+    AddSiteModal: ({ onClose }: { onClose: () => void }) => (
+        <div data-testid="add-site-modal" onClick={onClose}>
+            Add Site Modal
+        </div>
+    ),
 }));
 
 vi.mock("../components/common/ErrorAlert/ErrorAlert", () => ({

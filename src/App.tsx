@@ -103,8 +103,10 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
 
     // UI store
     const {
+        setShowAddSiteModal,
         setShowSettings,
         setShowSiteDetails,
+        showAddSiteModal,
         showSettings,
         showSiteDetails,
     } = useUIStore();
@@ -280,11 +282,52 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     }, [setShowSettings]);
 
     /**
+     * Handles closing the add site modal.
+     */
+    const handleCloseAddSiteModal = useCallback(() => {
+        setShowAddSiteModal(false);
+    }, [setShowAddSiteModal]);
+
+    /**
      * Handles closing the site details modal.
      */
     const handleCloseSiteDetails = useCallback(() => {
         setShowSiteDetails(false);
     }, [setShowSiteDetails]);
+
+    /**
+     * Handle escape key for closing modals
+     */
+    useEffect(
+        function handleEscapeKey() {
+            const handleKeyDown = (event: KeyboardEvent): void => {
+                if (event.key === "Escape") {
+                    // Close modals in priority order (most recently opened first)
+                    if (showSiteDetails) {
+                        handleCloseSiteDetails();
+                    } else if (showAddSiteModal) {
+                        handleCloseAddSiteModal();
+                    } else if (showSettings) {
+                        handleCloseSettings();
+                    }
+                }
+            };
+
+            document.addEventListener("keydown", handleKeyDown);
+
+            return (): void => {
+                document.removeEventListener("keydown", handleKeyDown);
+            };
+        },
+        [
+            handleCloseAddSiteModal,
+            handleCloseSettings,
+            handleCloseSiteDetails,
+            showAddSiteModal,
+            showSettings,
+            showSiteDetails,
+        ]
+    );
 
     // Extract SiteDetails JSX to avoid complex conditional rendering
     const siteDetailsJSX =
@@ -454,7 +497,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     </main>
 
                     {/* Add Site Modal */}
-                    <AddSiteModal />
+                    {showAddSiteModal ? (
+                        <AddSiteModal onClose={handleCloseAddSiteModal} />
+                    ) : null}
 
                     {/* Settings Modal */}
                     {showSettings ? (

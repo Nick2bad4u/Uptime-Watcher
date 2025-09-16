@@ -699,6 +699,12 @@
     inset: 0;
 }
 
+/* Ensure dialog elements within modal overlays are positioned correctly */
+.modal-overlay dialog {
+    position: relative;
+    margin: auto;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;

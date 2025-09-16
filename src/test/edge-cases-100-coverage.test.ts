@@ -3,8 +3,25 @@
  * functions.
  *
  * @remarks
- * This test suite focuses on edge cases and error paths that might be missed in
- * regular unit tests to achieve complete code coverage.
+ * This test suite focuses on edge cases and error paths that might be mi        it("should handle async operation failure with fallback", async () => {
+            const operation = vi
+                .fn()
+                .mockRejectedValue(new Error("test error"));
+            const { logger } = await import("../services/logger");
+
+            const result = await withUtilityErrorHandling(
+                operation,
+                "test-operation",
+                "fallback",
+                false
+            );
+
+            expect(result).toBe("fallback");
+            expect(console.error).toHaveBeenCalledWith(
+                "test-operation failed",
+                expect.any(Error)
+            );
+        }); unit tests to achieve complete code coverage.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -164,6 +181,10 @@ describe("100% Coverage Edge Cases", () => {
     });
 
     describe("Async Error Handling Edge Cases", () => {
+        beforeEach(() => {
+            vi.spyOn(console, "error").mockImplementation(() => {});
+        });
+
         it("should handle async operation success", async () => {
             const operation = vi.fn().mockResolvedValue("success");
             const result = await withUtilityErrorHandling(
@@ -190,7 +211,7 @@ describe("100% Coverage Edge Cases", () => {
             );
 
             expect(result).toBe("fallback");
-            expect(logger.error).toHaveBeenCalledWith(
+            expect(console.error).toHaveBeenCalledWith(
                 "test-operation failed",
                 expect.any(Error)
             );
@@ -233,7 +254,7 @@ describe("100% Coverage Edge Cases", () => {
             );
 
             expect(result).toBe("fallback");
-            expect(logger.error).toHaveBeenCalledWith(
+            expect(console.error).toHaveBeenCalledWith(
                 "test-operation failed",
                 expect.any(Error)
             );

@@ -284,6 +284,16 @@ describe("100% Coverage Edge Cases", () => {
     });
 
     describe("Async Error Handling Edge Cases", () => {
+        let consoleErrorSpy: any;
+        
+        beforeEach(() => {
+            consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        });
+        
+        afterEach(() => {
+            consoleErrorSpy.mockRestore();
+        });
+        
         it("should handle async operation success", async () => {
             const operation = vi.fn().mockResolvedValue("success");
             const result = await withUtilityErrorHandling(
@@ -307,7 +317,7 @@ describe("100% Coverage Edge Cases", () => {
                 false
             );
             expect(result).toBe("fallback");
-            expect(logger.error).toHaveBeenCalledWith(
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
                 "test-operation failed",
                 expect.any(Error)
             );

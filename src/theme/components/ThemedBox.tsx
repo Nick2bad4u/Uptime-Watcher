@@ -82,6 +82,15 @@ export interface ThemedBoxProperties
     readonly onMouseLeave?: () => void;
 
     /**
+     * Whether the dialog is open (for dialog elements only).
+     *
+     * @remarks
+     * This prop is only relevant when `as="dialog"` and controls the dialog's
+     * visibility using the native HTML dialog `open` attribute.
+     */
+    readonly open?: boolean;
+
+    /**
      * Padding size variant.
      *
      * @defaultValue "md"
@@ -196,6 +205,7 @@ const ThemedBoxComponent = ({
     onClick,
     onMouseEnter,
     onMouseLeave,
+    open,
     padding = "md",
     role,
     rounded = "md",
@@ -236,6 +246,7 @@ const ThemedBoxComponent = ({
         onMouseEnter,
         onMouseLeave,
         style,
+        ...(open !== undefined && { open }),
     };
 
     // Interactive props for clickable elements
