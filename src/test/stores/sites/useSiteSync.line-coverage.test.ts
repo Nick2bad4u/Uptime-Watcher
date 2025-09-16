@@ -22,7 +22,14 @@ vi.mock("../../../stores/utils", () => ({
 }));
 
 vi.mock("../../../../shared/utils/errorHandling", () => ({
+    ensureError: vi.fn((error) =>
+        error instanceof Error ? error : new Error(String(error))
+    ),
     withErrorHandling: vi.fn(),
+    withUtilityErrorHandling: vi.fn(),
+    convertError: vi.fn((error) =>
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 vi.mock("../../../stores/sites/services/SiteService", () => ({

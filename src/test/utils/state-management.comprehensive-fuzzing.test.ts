@@ -930,11 +930,29 @@ describe("Comprehensive State Management Fuzzing", () => {
                             stateSnapshot.sites.length
                         );
 
-                        // Property: Date objects should be restored
-                        if (stateSnapshot.monitors.length > 0) {
-                            expect(
-                                deserialResult.state.monitors[0].createdAt
-                            ).toBeInstanceOf(Date);
+                        // Property: Date objects should be restored (if they were valid originally)
+                        if (
+                            stateSnapshot.monitors.length > 0 &&
+                            stateSnapshot.monitors[0]
+                        ) {
+                            const originalDate =
+                                stateSnapshot.monitors[0].createdAt;
+                            const deserializedDate =
+                                deserialResult.state.monitors[0]?.createdAt;
+
+                            // If the original date was valid, expect the deserialized date to be valid
+                            if (
+                                !Number.isNaN(originalDate.getTime()) &&
+                                deserializedDate
+                            ) {
+                                expect(deserializedDate).toBeInstanceOf(Date);
+                                expect(
+                                    Number.isNaN(deserializedDate.getTime())
+                                ).toBeFalsy();
+                            } else {
+                                // If the original date was invalid (NaN), it becomes null during serialization
+                                expect(deserializedDate).toBeNull();
+                            }
                         }
                     }
                 }

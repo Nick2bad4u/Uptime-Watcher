@@ -12,7 +12,7 @@
  * - Theme state branches
  */
 
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useUIStore } from "../../stores/ui/useUiStore";
@@ -247,7 +247,9 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             });
 
             const mockOnClose = vi.fn();
-            const { container } = render(<AddSiteModal onClose={mockOnClose} />);
+            const { container } = render(
+                <AddSiteModal onClose={mockOnClose} />
+            );
             expect(container.firstChild).not.toBeNull();
             expect(screen.getByTestId("modal-outer-box")).toBeInTheDocument();
             expect(screen.getByText("Add New Site")).toBeInTheDocument();

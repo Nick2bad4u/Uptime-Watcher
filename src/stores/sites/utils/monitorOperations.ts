@@ -449,6 +449,8 @@ export function updateMonitorInSite(
     const updatedMonitors = site.monitors.map((monitor) => {
         if (monitor.id !== monitorId) return monitor;
 
+        // Preserve the original monitor ID throughout the update process
+        const originalId = monitor.id;
         // Always work with a normalized baseline to avoid undefined fields lingering
         const baseline = normalizeMonitor(monitor);
         try {
@@ -458,16 +460,19 @@ export function updateMonitorInSite(
             const merged: Partial<Monitor> = {
                 ...baseline,
                 ...restUpdates,
-                id: baseline.id,
+                id: originalId, // Use original ID, not the potentially changed baseline ID
             };
-            return normalizeMonitor(merged);
+            const normalized = normalizeMonitor(merged);
+            // Ensure the ID is definitely preserved after normalization
+            normalized.id = originalId;
+            return normalized;
         } catch (error) {
-            // If updates are invalid, keep the baseline (already normalized) instead of possibly malformed original
+            // If updates are invalid, keep the baseline (already normalized) but preserve original ID
             logger.error(
                 `Failed to update monitor ${monitorId}:`,
-
                 ensureError(error)
             );
+            baseline.id = originalId; // Ensure original ID is preserved even in error case
             return baseline;
         }
     });

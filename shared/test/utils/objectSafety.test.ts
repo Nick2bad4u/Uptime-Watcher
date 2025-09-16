@@ -477,7 +477,15 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                         // Each entry should correspond to a key and value
                         for (const [key, value] of entries) {
                             expect(keys).toContain(key);
-                            expect(values).toContain(value);
+
+                            // Special handling for NaN since NaN !== NaN
+                            if (Number.isNaN(value)) {
+                                expect(
+                                    values.some((v) => Number.isNaN(v))
+                                ).toBeTruthy();
+                            } else {
+                                expect(values).toContain(value);
+                            }
                         }
                     }
                 )

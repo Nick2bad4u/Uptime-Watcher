@@ -8,6 +8,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteService } from "../../stores/sites/services/SiteService";
+import { logger } from "../../services/logger";
 import * as storeUtils from "../../stores/utils";
 
 // Mock the waitForElectronAPI utility
@@ -20,6 +21,16 @@ vi.mock("../../types/ipc", () => ({
     safeExtractIpcData: vi.fn(
         (response, fallback) => response?.data || fallback
     ),
+}));
+
+// Mock the logger
+vi.mock("../../services/logger", () => ({
+    logger: {
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        debug: vi.fn(),
+    },
 }));
 
 describe("SiteService Critical Coverage Tests", () => {
@@ -243,9 +254,6 @@ describe("SiteService Critical Coverage Tests", () => {
     describe("Initialize method coverage", () => {
         it("should properly initialize and handle errors", async () => {
             // Arrange
-            const consoleErrorSpy = vi
-                .spyOn(console, "error")
-                .mockImplementation(() => {});
             const initError = new Error("API unavailable");
 
             vi.mocked(storeUtils.waitForElectronAPI).mockRejectedValue(
@@ -256,12 +264,10 @@ describe("SiteService Critical Coverage Tests", () => {
             await expect(SiteService.initialize()).rejects.toThrow(
                 "API unavailable"
             );
-            expect(consoleErrorSpy).toHaveBeenCalledWith(
+            expect(logger.error).toHaveBeenCalledWith(
                 "Failed to initialize SiteService:",
-                initError
+                expect.any(Error)
             );
-
-            consoleErrorSpy.mockRestore();
         });
 
         it("should successfully initialize when API is available", async () => {

@@ -340,6 +340,9 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                         "port",
                         "dns",
                         "ping",
+                        "__proto__",
+                        "constructor",
+                        "prototype",
                     ].includes(s)
             ),
             fc.string({ minLength: 1, maxLength: 100 }),

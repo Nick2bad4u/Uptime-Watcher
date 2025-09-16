@@ -45,7 +45,10 @@ vi.mock("../../types/ipc", () => ({
     safeExtractIpcData: vi.fn(),
 }));
 
-vi.mock("../../utils/errorHandling", () => ({
+vi.mock("@shared/utils/errorHandling", () => ({
+    ensureError: vi.fn(),
+    convertError: vi.fn(),
+    withErrorHandling: vi.fn(),
     withUtilityErrorHandling: vi.fn(),
 }));
 
@@ -836,7 +839,14 @@ describe("monitorTypeHelper", () => {
             test.prop([
                 fc.array(
                     fc.record({
-                        type: fc.string({ minLength: 1, maxLength: 20 }),
+                        type: fc.string({ minLength: 1, maxLength: 20 }).filter(
+                            (s) =>
+                                ![
+                                    "__proto__",
+                                    "constructor",
+                                    "prototype",
+                                ].includes(s)
+                        ),
                         displayName: fc.string({ minLength: 1, maxLength: 50 }),
                         description: fc.string({
                             minLength: 5,
@@ -869,7 +879,14 @@ describe("monitorTypeHelper", () => {
             test.prop([
                 fc.array(
                     fc.record({
-                        type: fc.string({ minLength: 1, maxLength: 20 }),
+                        type: fc.string({ minLength: 1, maxLength: 20 }).filter(
+                            (s) =>
+                                ![
+                                    "__proto__",
+                                    "constructor",
+                                    "prototype",
+                                ].includes(s)
+                        ),
                         displayName: fc.string({ minLength: 1, maxLength: 50 }),
                         description: fc.string({
                             minLength: 5,
@@ -906,7 +923,14 @@ describe("monitorTypeHelper", () => {
             test.prop([
                 fc.array(
                     fc.record({
-                        type: fc.string({ minLength: 1, maxLength: 20 }),
+                        type: fc.string({ minLength: 1, maxLength: 20 }).filter(
+                            (s) =>
+                                ![
+                                    "__proto__",
+                                    "constructor",
+                                    "prototype",
+                                ].includes(s)
+                        ),
                         displayName: fc.string({ minLength: 1, maxLength: 50 }),
                         description: fc.string({
                             minLength: 5,

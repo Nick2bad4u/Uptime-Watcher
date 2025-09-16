@@ -1,6 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
+import "@testing-library/jest-dom";
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
 // Mock logger service with inline functions
@@ -430,7 +431,7 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         fireEvent.click(submitButton);
 
         await waitFor(() => {
-            expect(consoleErrorSpy).toHaveBeenCalledWith(
+            expect(logger.error).toHaveBeenCalledWith(
                 "Form submission failed:",
                 expect.any(Error)
             );

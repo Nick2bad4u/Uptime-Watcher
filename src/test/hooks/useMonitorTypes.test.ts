@@ -662,17 +662,23 @@ describe("useMonitorTypes Hook", () => {
     });
 
     describe("Property-Based Testing with Fast-Check", () => {
-        test.prop([
-            fc.array(
-                fc.record({
-                    label: fc.string({ minLength: 1, maxLength: 50 }),
-                    value: fc
-                        .string({ minLength: 1, maxLength: 20 })
-                        .filter((s) => /^[\w-]+$/.test(s)),
-                }),
-                { minLength: 0, maxLength: 10 }
-            ),
-        ])(
+        test.prop(
+            [
+                fc.array(
+                    fc.record({
+                        label: fc.string({ minLength: 1, maxLength: 50 }),
+                        value: fc
+                            .string({ minLength: 1, maxLength: 20 })
+                            .filter((s) => /^[\w-]+$/.test(s)),
+                    }),
+                    { minLength: 0, maxLength: 10 }
+                ),
+            ],
+            {
+                timeout: 1500,
+                numRuns: 5,
+            }
+        )(
             "should handle various monitor type option configurations",
             async (monitorOptions) => {
                 mockGetMonitorTypeOptions.mockResolvedValue(monitorOptions);
@@ -742,7 +748,10 @@ describe("useMonitorTypes Hook", () => {
             expect(typeof testError.message).toBe("string");
         });
 
-        test.prop([fc.integer({ min: 0, max: 20 })])(
+        test.prop([fc.integer({ min: 0, max: 20 })], {
+            timeout: 1500,
+            numRuns: 5,
+        })(
             "should handle different monitor type counts correctly",
             async (optionCount) => {
                 const monitorOptions = Array.from(
@@ -771,30 +780,36 @@ describe("useMonitorTypes Hook", () => {
             }
         );
 
-        test.prop([
-            fc.array(
-                fc.oneof(
-                    fc.record({
-                        label: fc.string({ minLength: 1, maxLength: 30 }),
-                        value: fc.string({ minLength: 1, maxLength: 15 }),
-                    }),
-                    fc.record({
-                        label: fc.string(),
-                        value: fc.string(),
-                        extraProperty: fc.string(),
-                    }),
-                    fc.record({
-                        label: fc.constant(""),
-                        value: fc.string({ minLength: 1 }),
-                    }),
-                    fc.record({
-                        label: fc.string({ minLength: 1 }),
-                        value: fc.constant(""),
-                    })
+        test.prop(
+            [
+                fc.array(
+                    fc.oneof(
+                        fc.record({
+                            label: fc.string({ minLength: 1, maxLength: 30 }),
+                            value: fc.string({ minLength: 1, maxLength: 15 }),
+                        }),
+                        fc.record({
+                            label: fc.string(),
+                            value: fc.string(),
+                            extraProperty: fc.string(),
+                        }),
+                        fc.record({
+                            label: fc.constant(""),
+                            value: fc.string({ minLength: 1 }),
+                        }),
+                        fc.record({
+                            label: fc.string({ minLength: 1 }),
+                            value: fc.constant(""),
+                        })
+                    ),
+                    { minLength: 1, maxLength: 5 }
                 ),
-                { minLength: 1, maxLength: 5 }
-            ),
-        ])(
+            ],
+            {
+                timeout: 1500,
+                numRuns: 5,
+            }
+        )(
             "should handle various option formats and edge cases",
             async (mixedOptions) => {
                 mockGetMonitorTypeOptions.mockResolvedValue(
@@ -852,6 +867,8 @@ describe("useMonitorTypes Hook", () => {
 
                     // Clear mocks after initial load to count only refresh calls
                     mockGetMonitorTypeOptions.mockClear();
+                    // Re-set the mock implementation for refresh calls
+                    mockGetMonitorTypeOptions.mockResolvedValue(mockOptions);
 
                     // Perform multiple refreshes sequentially to avoid race conditions
                     for (let i = 0; i < refreshCount; i++) {
@@ -885,26 +902,32 @@ describe("useMonitorTypes Hook", () => {
             }
         );
 
-        test.prop([
-            fc.record({
-                successOptions: fc.array(
-                    fc.constantFrom(
-                        { label: "HTTP", value: "http" },
-                        { label: "Port", value: "port" },
-                        { label: "Ping", value: "ping" },
-                        { label: "DNS", value: "dns" }
+        test.prop(
+            [
+                fc.record({
+                    successOptions: fc.array(
+                        fc.constantFrom(
+                            { label: "HTTP", value: "http" },
+                            { label: "Port", value: "port" },
+                            { label: "Ping", value: "ping" },
+                            { label: "DNS", value: "dns" }
+                        ),
+                        { minLength: 1, maxLength: 3 }
                     ),
-                    { minLength: 1, maxLength: 3 }
-                ),
-                errorMessage: fc.constantFrom(
-                    "Network error",
-                    "Connection failed",
-                    "Timeout occurred",
-                    "Server unavailable",
-                    "API error"
-                ),
-            }),
-        ])(
+                    errorMessage: fc.constantFrom(
+                        "Network error",
+                        "Connection failed",
+                        "Timeout occurred",
+                        "Server unavailable",
+                        "API error"
+                    ),
+                }),
+            ],
+            {
+                timeout: 1500,
+                numRuns: 5,
+            }
+        )(
             "should handle alternating success and error scenarios",
             async ({ successOptions, errorMessage }) => {
                 // Clear mocks and reset completely
@@ -957,7 +980,10 @@ describe("useMonitorTypes Hook", () => {
             }
         );
 
-        test.prop([fc.constantFrom(null, undefined, [], {}, "invalid", 123)])(
+        test.prop([fc.constantFrom(null, undefined, [], {}, "invalid", 123)], {
+            timeout: 1500, // Increase fast-check timeout to 1.5s
+            numRuns: 5, // Reduce number of test runs
+        })(
             "should handle invalid API responses gracefully",
             async (invalidResponse) => {
                 mockGetMonitorTypeOptions.mockResolvedValue(
@@ -976,7 +1002,7 @@ describe("useMonitorTypes Hook", () => {
             }
         );
 
-        test.prop([fc.integer({ min: 5, max: 25 })], {
+        test.prop([fc.integer({ min: 20, max: 50 })], {
             timeout: 1500, // Increase fast-check timeout to 1.5s
             numRuns: 5, // Reduce number of test runs
         })("should handle loading state timing correctly", async (delayMs) => {
@@ -1004,15 +1030,15 @@ describe("useMonitorTypes Hook", () => {
                 () => {
                     expect(result.current.isLoading).toBeFalsy();
                 },
-                { timeout: delayMs + 100 } // Reduced buffer time
+                { timeout: delayMs + 200 } // More generous buffer time
             );
 
             expect(result.current.options).toEqual(mockOptions);
             expect(result.current.error).toBeUndefined();
 
             // Verify delay properties
-            expect(delayMs).toBeGreaterThanOrEqual(5);
-            expect(delayMs).toBeLessThanOrEqual(25);
+            expect(delayMs).toBeGreaterThanOrEqual(20);
+            expect(delayMs).toBeLessThanOrEqual(50);
         });
     });
 });

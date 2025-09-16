@@ -63,6 +63,11 @@ export interface ThemedBoxProperties
     readonly border?: boolean;
 
     /**
+     * Test identifier for automated testing (data-testid attribute).
+     */
+    readonly "data-testid"?: string;
+
+    /**
      * Click handler for interactive usage.
      *
      * @remarks
@@ -202,6 +207,7 @@ const ThemedBoxComponent = ({
     border = false,
     children,
     className = "",
+    "data-testid": dataTestId,
     onClick,
     onMouseEnter,
     onMouseLeave,
@@ -243,6 +249,7 @@ const ThemedBoxComponent = ({
     // Base props for all element types
     const baseProps = {
         className: classNames,
+        "data-testid": dataTestId,
         onMouseEnter,
         onMouseLeave,
         style,

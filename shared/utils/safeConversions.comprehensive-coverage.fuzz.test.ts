@@ -61,8 +61,16 @@ describe("safeConversions comprehensive fuzzing tests", () => {
             (stringInput, defaultValue) => {
                 const result = safeNumberConversion(stringInput, defaultValue);
 
-                if (stringInput === "" || Number.isNaN(Number(stringInput))) {
-                    expect(result).toBe(defaultValue);
+                // The function sanitizes NaN default values to 0
+                const sanitizedDefault = Number.isNaN(defaultValue)
+                    ? 0
+                    : defaultValue;
+
+                if (
+                    stringInput.trim() === "" ||
+                    Number.isNaN(Number(stringInput))
+                ) {
+                    expect(result).toBe(sanitizedDefault);
                 } else {
                     const expected = Number(stringInput);
                     // For string inputs, preserve valid numeric results including infinities
@@ -71,7 +79,10 @@ describe("safeConversions comprehensive fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.boolean(), fc.float({ min: -1000, max: 1000 })])(
+        test.prop([
+            fc.boolean(),
+            fc.float({ min: -1000, max: 1000, noNaN: true }),
+        ])(
             "treats booleans as non-numeric and returns default",
             (boolInput, defaultValue) => {
                 const result = safeNumberConversion(boolInput, defaultValue);
@@ -166,7 +177,19 @@ describe("safeConversions comprehensive fuzzing tests", () => {
                 const result = safeParseFloat(input, defaultValue);
                 expect(typeof result).toBe("number");
                 expect(Number.isNaN(result)).toBeFalsy();
-                expect(Number.isFinite(result)).toBeTruthy();
+
+                // safeParseFloat preserves infinity from numeric inputs but rejects it from strings
+                if (
+                    typeof input === "number" &&
+                    !Number.isFinite(input) &&
+                    !Number.isNaN(input)
+                ) {
+                    // Numeric infinity should be preserved
+                    expect(result).toBe(input);
+                } else {
+                    // All other cases should return finite numbers
+                    expect(Number.isFinite(result)).toBeTruthy();
+                }
             }
         );
 
@@ -454,15 +477,15 @@ describe("safeConversions comprehensive fuzzing tests", () => {
     });
 
     describe(safeParseTimeout, () => {
-        test.prop([fc.anything(), fc.float({ min: 1, max: 300_000 })])(
-            "returns positive timeout or default",
-            (input, defaultValue) => {
-                const result = safeParseTimeout(input, defaultValue);
-                expect(typeof result).toBe("number");
-                expect(result).toBeGreaterThan(0);
-                expect(Number.isFinite(result)).toBeTruthy();
-            }
-        );
+        test.prop([
+            fc.anything(),
+            fc.float({ min: 1, max: 300_000, noNaN: true }),
+        ])("returns positive timeout or default", (input, defaultValue) => {
+            const result = safeParseTimeout(input, defaultValue);
+            expect(typeof result).toBe("number");
+            expect(result).toBeGreaterThan(0);
+            expect(Number.isFinite(result)).toBeTruthy();
+        });
 
         test.prop([fc.float({ min: 1, max: 300_000, noNaN: true })])(
             "preserves positive timeout values",

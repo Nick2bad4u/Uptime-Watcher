@@ -3,25 +3,26 @@
  * functions.
  *
  * @remarks
- * This test suite focuses on edge cases and error paths that might be mi        it("should handle async operation failure with fallback", async () => {
-            const operation = vi
-                .fn()
-                .mockRejectedValue(new Error("test error"));
-            const { logger } = await import("../services/logger");
-
-            const result = await withUtilityErrorHandling(
-                operation,
-                "test-operation",
-                "fallback",
-                false
-            );
-
-            expect(result).toBe("fallback");
-            expect(console.error).toHaveBeenCalledWith(
-                "test-operation failed",
-                expect.any(Error)
-            );
-        }); unit tests to achieve complete code coverage.
+ * This test suite focuses on edge cases and error paths that might be mi
+ * it("should handle async operation failure with fallback", async () => { const
+ * operation = vi .fn() .mockRejectedValue(new Error("test error")); const {
+ * logger } = await import("../services/logger");
+ *
+ * ```
+ *         const result = await withUtilityErrorHandling(
+ *             operation,
+ *             "test-operation",
+ *             "fallback",
+ *             false
+ *         );
+ *
+ *         expect(result).toBe("fallback");
+ *         expect(console.error).toHaveBeenCalledWith(
+ *             "test-operation failed",
+ *             expect.any(Error)
+ *         );
+ *     }); unit tests to achieve complete code coverage.
+ * ```
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -169,11 +170,7 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle array errors", () => {
-            const error = [
-                1,
-                2,
-                3,
-            ];
+            const error = [1, 2, 3];
             const result = ensureError(error);
             expect(result).toBeInstanceOf(Error);
             expect(result.message).toBe("1,2,3");
@@ -201,7 +198,6 @@ describe("100% Coverage Edge Cases", () => {
             const operation = vi
                 .fn()
                 .mockRejectedValue(new Error("Async error"));
-            const { logger } = await import("../services/logger");
 
             const result = await withUtilityErrorHandling(
                 operation,
@@ -244,7 +240,6 @@ describe("100% Coverage Edge Cases", () => {
 
         it("should handle non-Error rejection", async () => {
             const operation = vi.fn().mockRejectedValue("string error");
-            const { logger } = await import("../services/logger");
 
             const result = await withUtilityErrorHandling(
                 operation,
@@ -349,14 +344,7 @@ describe("100% Coverage Edge Cases", () => {
 
     describe("Type Guard Edge Cases", () => {
         it("should handle various falsy values", () => {
-            const falsyValues = [
-                null,
-                undefined,
-                false,
-                0,
-                "",
-                Number.NaN,
-            ];
+            const falsyValues = [null, undefined, false, 0, "", Number.NaN];
 
             for (const value of falsyValues) {
                 if (value === null || value === undefined) {
@@ -368,14 +356,7 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle various truthy values", () => {
-            const truthyValues = [
-                true,
-                1,
-                "test",
-                [],
-                {},
-                Symbol("test"),
-            ];
+            const truthyValues = [true, 1, "test", [], {}, Symbol("test")];
 
             for (const value of truthyValues) {
                 expect(isNullOrUndefined(value)).toBeFalsy();
@@ -391,11 +372,7 @@ describe("100% Coverage Edge Cases", () => {
                         error: "deeply nested error",
                     },
                 },
-                array: [
-                    1,
-                    2,
-                    3,
-                ],
+                array: [1, 2, 3],
                 toString: () => "Custom toString",
             };
 

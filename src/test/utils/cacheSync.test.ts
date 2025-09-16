@@ -12,7 +12,12 @@ import { setupCacheSync } from "../../utils/cacheSync";
 
 // Mock dependencies
 vi.mock("../../services/logger");
-vi.mock("../../utils/errorHandling");
+vi.mock("@shared/utils/errorHandling", () => ({
+    ensureError: vi.fn(),
+    convertError: vi.fn(),
+    withErrorHandling: vi.fn(),
+    withUtilityErrorHandling: vi.fn(),
+}));
 vi.mock("../../utils/monitorTypeHelper", () => ({
     clearMonitorTypeCache: vi.fn(), // <-- ensure this is a real mock function that records arguments
 }));

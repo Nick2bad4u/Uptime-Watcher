@@ -335,6 +335,95 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             <SiteDetails onClose={handleCloseSiteDetails} site={selectedSite} />
         ) : null;
 
+    // Helper function to render update notification to reduce complexity
+    const renderUpdateNotification = (): JSX.Element | null => {
+        if (
+            !(
+                updateStatus === "available" ||
+                updateStatus === "downloading" ||
+                updateStatus === "downloaded" ||
+                updateStatus === "error"
+            )
+        ) {
+            return null;
+        }
+
+        if (updateStatus === "error") {
+            return (
+                <div
+                    aria-live="assertive"
+                    className="fixed top-12 right-0 left-0 z-50"
+                    role="alert"
+                >
+                    <ThemedBox
+                        className={`update-alert update-alert--${updateStatus}`}
+                        padding="md"
+                        surface="elevated"
+                    >
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                                <div className="update-alert__icon">⚠️</div>
+                                <ThemedText size="sm" variant="error">
+                                    {updateError ??
+                                        UI_MESSAGES.UPDATE_ERROR_FALLBACK}
+                                </ThemedText>
+                            </div>
+                            <ThemedButton
+                                className="update-alert__action ml-4"
+                                onClick={handleUpdateAction}
+                                size="sm"
+                                variant="secondary"
+                            >
+                                {UI_MESSAGES.UPDATE_DISMISS_BUTTON}
+                            </ThemedButton>
+                        </div>
+                    </ThemedBox>
+                </div>
+            );
+        }
+
+        return (
+            <output
+                aria-live="polite"
+                className="fixed top-12 right-0 left-0 z-50"
+            >
+                <ThemedBox
+                    className={`update-alert update-alert--${updateStatus}`}
+                    padding="md"
+                    surface="elevated"
+                >
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                            <div className="update-alert__icon">
+                                {updateStatus === "available" && "⬇️"}
+                                {updateStatus === "downloading" && "⏬"}
+                                {updateStatus === "downloaded" && "✅"}
+                            </div>
+                            <ThemedText size="sm" variant="primary">
+                                {updateStatus === "available" &&
+                                    UI_MESSAGES.UPDATE_AVAILABLE}
+                                {updateStatus === "downloading" &&
+                                    UI_MESSAGES.UPDATE_DOWNLOADING}
+                                {updateStatus === "downloaded" &&
+                                    UI_MESSAGES.UPDATE_DOWNLOADED}
+                            </ThemedText>
+                        </div>
+                        {updateStatus === "downloaded" && (
+                            <ThemedButton
+                                className="update-alert__action ml-4"
+                                onClick={handleUpdateAction}
+                                size="sm"
+                                variant="secondary"
+                            >
+                                {UI_MESSAGES.UPDATE_RESTART_BUTTON}
+                            </ThemedButton>
+                        )}
+                    </div>
+                </ThemedBox>
+            </output>
+        );
+    };
+
     return (
         <ErrorBoundary>
             <ThemeProvider>
@@ -377,96 +466,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     ) : null}
 
                     {/* Update Notification */}
-                    {/* eslint-disable-next-line @eslint-react/no-complex-conditional-rendering, @eslint-react/no-complicated-conditional-rendering -- update notification requires complex state-based rendering logic */}
-                    {(updateStatus === "available" ||
-                        updateStatus === "downloading" ||
-                        updateStatus === "downloaded" ||
-                        updateStatus === "error") &&
-                        (updateStatus === "error" ? (
-                            <div
-                                aria-live="assertive"
-                                className="fixed top-12 right-0 left-0 z-50"
-                                role="alert"
-                            >
-                                <ThemedBox
-                                    className={`update-alert update-alert--${updateStatus}`}
-                                    padding="md"
-                                    surface="elevated"
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-2">
-                                            <div className="update-alert__icon">
-                                                ⚠️
-                                            </div>
-                                            <ThemedText
-                                                size="sm"
-                                                variant="error"
-                                            >
-                                                {updateError ??
-                                                    UI_MESSAGES.UPDATE_ERROR_FALLBACK}
-                                            </ThemedText>
-                                        </div>
-                                        <ThemedButton
-                                            className="update-alert__action ml-4"
-                                            onClick={handleUpdateAction}
-                                            size="sm"
-                                            variant="secondary"
-                                        >
-                                            {UI_MESSAGES.UPDATE_DISMISS_BUTTON}
-                                        </ThemedButton>
-                                    </div>
-                                </ThemedBox>
-                            </div>
-                        ) : (
-                            <output
-                                aria-live="polite"
-                                className="fixed top-12 right-0 left-0 z-50"
-                            >
-                                <ThemedBox
-                                    className={`update-alert update-alert--${updateStatus}`}
-                                    padding="md"
-                                    surface="elevated"
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-2">
-                                            <div className="update-alert__icon">
-                                                {updateStatus === "available" &&
-                                                    "⬇️"}
-                                                {updateStatus ===
-                                                    "downloading" && "⏬"}
-                                                {updateStatus ===
-                                                    "downloaded" && "✅"}
-                                            </div>
-                                            <ThemedText
-                                                size="sm"
-                                                variant="primary"
-                                            >
-                                                {updateStatus === "available" &&
-                                                    UI_MESSAGES.UPDATE_AVAILABLE}
-                                                {updateStatus ===
-                                                    "downloading" &&
-                                                    UI_MESSAGES.UPDATE_DOWNLOADING}
-                                                {updateStatus ===
-                                                    "downloaded" &&
-                                                    UI_MESSAGES.UPDATE_DOWNLOADED}
-                                            </ThemedText>
-                                        </div>
-                                        {updateStatus === "downloaded" && (
-                                            <ThemedButton
-                                                className="update-alert__action ml-4"
-                                                onClick={handleUpdateAction}
-                                                size="sm"
-                                                variant="secondary"
-                                            >
-                                                {
-                                                    UI_MESSAGES.UPDATE_RESTART_BUTTON
-                                                }
-                                            </ThemedButton>
-                                        )}
-                                    </div>
-                                </ThemedBox>
-                            </output>
-                        ))}
+                    {renderUpdateNotification()}
 
                     <Header />
 

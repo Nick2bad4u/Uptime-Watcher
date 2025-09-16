@@ -69,10 +69,33 @@ describe("StatusUpdateHandler", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        // Mock withUtilityErrorHandling to just call the function
-        mockWithUtilityErrorHandling.mockImplementation(async (fn) => {
-            await fn();
-        });
+        // Mock withUtilityErrorHandling to just call the function and handle parameters properly
+        mockWithUtilityErrorHandling.mockImplementation(
+            async (
+                fn,
+                operationName,
+                fallbackValue = undefined,
+                shouldThrow = false
+            ) => {
+                try {
+                    return await fn();
+                } catch (error) {
+                    if (shouldThrow) {
+                        throw error;
+                    }
+
+                    if (fallbackValue === undefined) {
+                        throw new Error(
+                            `${operationName} failed and no fallback value provided. ` +
+                                `When shouldThrow is false, you must provide a fallbackValue parameter.`,
+                            { cause: error }
+                        );
+                    }
+
+                    return fallbackValue;
+                }
+            }
+        );
 
         mockIsDevelopment.mockReturnValue(true);
 
@@ -617,14 +640,30 @@ describe("StatusUpdateHandler", () => {
             });
 
             // Mock error handling to trigger fallback
-            mockWithUtilityErrorHandling.mockImplementation(async (fn) => {
-                try {
-                    await fn();
-                } catch {
-                    // Simulate fallback to full sync on error
-                    await mockfullResyncSites();
+            mockWithUtilityErrorHandling.mockImplementation(
+                async (
+                    fn,
+                    _operationName,
+                    fallbackValue = undefined,
+                    shouldThrow = false
+                ) => {
+                    try {
+                        return await fn();
+                    } catch (error) {
+                        if (shouldThrow) {
+                            throw error;
+                        }
+
+                        if (fallbackValue === undefined) {
+                            // Simulate fallback to full sync on error for this specific test
+                            await mockfullResyncSites();
+                            return void 0;
+                        }
+
+                        return fallbackValue;
+                    }
                 }
-            });
+            );
 
             manager.subscribe();
 

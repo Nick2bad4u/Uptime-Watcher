@@ -45,9 +45,7 @@
 import type { Monitor } from "@shared/types";
 import type { ReadonlyDeep } from "type-fest";
 
-import {
-    ensureError,
-} from "@shared/utils/errorHandling";
+import { ensureError } from "@shared/utils/errorHandling";
 
 import { logger } from "../services/logger";
 
@@ -78,9 +76,13 @@ export function withAsyncErrorHandling(
     operationName: string
 ): () => void {
     return () => {
-        void operation().catch((error) => {
-            logger.error(`${operationName} failed`, ensureError(error));
-        });
+        void (async (): Promise<void> => {
+            try {
+                await operation();
+            } catch (error: unknown) {
+                logger.error(`${operationName} failed`, ensureError(error));
+            }
+        })();
     };
 }
 

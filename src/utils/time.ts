@@ -164,8 +164,8 @@ export function formatRelativeTimestamp(timestamp: number): string {
  */
 export function formatResponseDuration(milliseconds: number): string {
     // Handle extremely small values (effectively zero) by rounding to 0
-    // Only round to 0 for values smaller than 1e-10 to avoid scientific notation
-    if (milliseconds < 1e-10 && milliseconds > 0) {
+    // Only round to 0 for values smaller than or equal to 1e-10 to avoid scientific notation
+    if (milliseconds <= 1e-10 && milliseconds > 0) {
         return "0ms";
     }
     if (milliseconds < 1000) {

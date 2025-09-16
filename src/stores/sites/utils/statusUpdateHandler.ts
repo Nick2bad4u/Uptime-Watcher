@@ -14,10 +14,7 @@ import type { Monitor, MonitorStatus, Site, StatusUpdate } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
 import { isDevelopment } from "@shared/utils/environment";
-import {
-    ensureError,
-    withUtilityErrorHandling,
-} from "@shared/utils/errorHandling";
+import { ensureError } from "@shared/utils/errorHandling";
 
 import { logger } from "../../../services/logger";
 
@@ -311,22 +308,25 @@ export class StatusUpdateManager {
         this.unsubscribe();
 
         // Initial full sync
-        void withUtilityErrorHandling(
-            async () => {
+        void (async (): Promise<void> => {
+            try {
                 await this.fullResyncSites();
-            },
-            "Initial full sync on status update handler subscribe",
-            undefined,
-            false
-        );
+            } catch (error) {
+                // Log error but don't throw - subscription should continue
+                console.error(
+                    "Initial full sync on status update handler subscribe failed",
+                    ensureError(error)
+                );
+            }
+        })();
 
         // Listen to monitor status changed events for efficient incremental
         // updates
         const statusUpdateCleanup =
             window.electronAPI.events.onMonitorStatusChanged(
                 (data: unknown) => {
-                    void withUtilityErrorHandling(
-                        async () => {
+                    void (async (): Promise<void> => {
+                        try {
                             if (this.isMonitorStatusChangedEvent(data)) {
                                 await this.handleIncrementalStatusUpdate(data);
                             } else {
@@ -340,11 +340,14 @@ export class StatusUpdateManager {
                                 }
                                 await this.fullResyncSites();
                             }
-                        },
-                        "Monitor status update processing",
-                        undefined,
-                        false
-                    );
+                        } catch (error) {
+                            // Log error but don't throw - event handling should continue
+                            console.error(
+                                "Monitor status update processing failed",
+                                ensureError(error)
+                            );
+                        }
+                    })();
                 }
             );
 
@@ -353,28 +356,34 @@ export class StatusUpdateManager {
         // Subscribe to monitoring lifecycle events for full sync triggers
         const monitoringStartedCleanup =
             window.electronAPI.events.onMonitoringStarted(() => {
-                void withUtilityErrorHandling(
-                    async () => {
+                void (async (): Promise<void> => {
+                    try {
                         await this.fullResyncSites();
-                    },
-                    "Full sync on monitoring started",
-                    undefined,
-                    false
-                );
+                    } catch (error) {
+                        // Log error but don't throw - event handling should continue
+                        console.error(
+                            "Full sync on monitoring started failed",
+                            ensureError(error)
+                        );
+                    }
+                })();
             });
 
         this.cleanupFunctions.push(monitoringStartedCleanup);
 
         const monitoringStoppedCleanup =
             window.electronAPI.events.onMonitoringStopped(() => {
-                void withUtilityErrorHandling(
-                    async () => {
+                void (async (): Promise<void> => {
+                    try {
                         await this.fullResyncSites();
-                    },
-                    "Full sync on monitoring stopped",
-                    undefined,
-                    false
-                );
+                    } catch (error) {
+                        // Log error but don't throw - event handling should continue
+                        console.error(
+                            "Full sync on monitoring stopped failed",
+                            ensureError(error)
+                        );
+                    }
+                })();
             });
 
         this.cleanupFunctions.push(monitoringStoppedCleanup);

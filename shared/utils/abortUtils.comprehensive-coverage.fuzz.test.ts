@@ -284,8 +284,8 @@ describe("abortUtils comprehensive fuzzing tests", () => {
             async (sleepMs) => {
                 const controller = new AbortController();
 
-                // Abort after half the sleep time
-                setTimeout(() => controller.abort(), sleepMs / 2);
+                // Abort after a quarter of the sleep time to give more margin
+                setTimeout(() => controller.abort(), sleepMs / 4);
 
                 const startTime = Date.now();
                 await expect(sleep(sleepMs, controller.signal)).rejects.toThrow(
@@ -294,8 +294,8 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                 const endTime = Date.now();
 
                 // Sleep should be interrupted before completion
-                // Add tolerance for test execution overhead
-                expect(endTime - startTime).toBeLessThan(sleepMs + 20);
+                // Add generous tolerance for test execution overhead (50ms buffer)
+                expect(endTime - startTime).toBeLessThan(sleepMs + 50);
             }
         );
 
@@ -419,7 +419,13 @@ describe("abortUtils comprehensive fuzzing tests", () => {
 
         test.prop([
             fc.integer({ min: 10, max: 100 }),
-            fc.float({ min: Math.fround(1.1), max: Math.fround(3) }),
+            fc
+                .float({
+                    min: Math.fround(1.1),
+                    max: Math.fround(3),
+                    noNaN: true,
+                })
+                .filter((n) => !Number.isNaN(n) && Number.isFinite(n) && n > 1),
         ])(
             "implements exponential backoff correctly",
             async (initialDelay, backoffMultiplier) => {

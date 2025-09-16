@@ -18,12 +18,8 @@ interface Site {
 }
 
 // Mock error handling utilities
-vi.mock("../../../utils/errorHandling", () => ({
-    withUtilityErrorHandling: vi.fn(
-        (fn, _context) =>
-            async (...args: any[]) =>
-                fn(...args)
-    ),
+vi.mock("@shared/utils/errorHandling", () => ({
+    withUtilityErrorHandling: vi.fn(),
 }));
 
 // Mock validation utilities
@@ -125,6 +121,8 @@ import { useUIStore } from "../../../stores/ui/useUiStore";
 import { useSiteAnalytics } from "../../../hooks/site/useSiteAnalytics";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 
+const mockWithUtilityErrorHandling = vi.mocked(withUtilityErrorHandling);
+
 describe("useSiteDetails Hook - Basic Coverage", () => {
     const mockSite: Site = {
         identifier: "site-1",
@@ -145,6 +143,21 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+
+        // Setup default mock for withUtilityErrorHandling
+        mockWithUtilityErrorHandling.mockImplementation(
+            async (
+                fn: () => Promise<any>,
+                _operationName: string,
+                fallback?: any
+            ) => {
+                try {
+                    return await fn();
+                } catch {
+                    return fallback;
+                }
+            }
+        );
 
         // Mock sites store to return the current site
         (useSitesStore as any).mockReturnValue({
@@ -549,10 +562,18 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
         });
 
         // Reset withUtilityErrorHandling mock
-        (withUtilityErrorHandling as any).mockImplementation(
-            (fn: any, _context: any) =>
-                async (...args: any[]) =>
-                    fn(...args)
+        mockWithUtilityErrorHandling.mockImplementation(
+            async (
+                fn: () => Promise<any>,
+                _operationName: string,
+                fallback?: any
+            ) => {
+                try {
+                    return await fn();
+                } catch {
+                    return fallback;
+                }
+            }
         );
     });
 

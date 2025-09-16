@@ -1,6 +1,6 @@
 ---
 description: Beast Mode 3.1
-tools: ['createFile', 'createDirectory', 'editFiles', 'search', 'new', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'vite', 'search_uptime_watcher_code', 'append_insight', 'list_insights', 'list_tables', 'read_query', 'memory', 'sequentialthinking', 'context7', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
+tools: ['createFile', 'createDirectory', 'editFiles', 'search', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'vite', 'context7', 'search_uptime_watcher_code', 'append_insight', 'list_insights', 'list_tables', 'read_query', 'memory', 'sequentialthinking', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
 ---
 
 # Beast Mode 3.1

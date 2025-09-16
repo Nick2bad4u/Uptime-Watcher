@@ -847,8 +847,12 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                                   ? Number(input)
                                   : Number.NaN;
 
-                        if (!Number.isNaN(numValue) && numValue > 0) {
-                            // Changed from >=1000 to >0
+                        if (
+                            !Number.isNaN(numValue) &&
+                            numValue > 0 &&
+                            Number.isFinite(numValue)
+                        ) {
+                            // Must be positive AND finite
                             expect(result).toBe(numValue);
                         } else {
                             expect(result).toBe(defaultVal);

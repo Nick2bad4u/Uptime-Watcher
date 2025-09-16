@@ -145,6 +145,7 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
             <ThemedBox
                 aria-label={`View details for ${latestSite.name}`}
                 className="group site-card flex w-full cursor-pointer flex-col gap-2 text-left"
+                data-testid="site-card"
                 onClick={handleCardClick}
                 padding="md"
                 rounded="md"

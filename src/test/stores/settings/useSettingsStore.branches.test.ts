@@ -6,11 +6,22 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+import { logger } from "../../../services/logger";
 
 // Mock extractIpcData
 vi.mock("../../../types/ipc", () => ({
     extractIpcData: vi.fn(),
     safeExtractIpcData: vi.fn(),
+}));
+
+// Mock logger
+vi.mock("../../../services/logger", () => ({
+    logger: {
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        debug: vi.fn(),
+    },
 }));
 
 // Mock error store
@@ -183,11 +194,6 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            // Mock console.warn to avoid noise in test output
-            const consoleSpy = vi
-                .spyOn(console, "warn")
-                .mockImplementation(() => {});
-
             // Make the API call reject to trigger catch block
             mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(
                 new Error("Network failure")
@@ -208,12 +214,10 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             });
 
             expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
-            expect(consoleSpy).toHaveBeenCalledWith(
+            expect(logger.warn).toHaveBeenCalledWith(
                 "Failed to sync settings after rehydration:",
                 expect.any(Error)
             );
-
-            consoleSpy.mockRestore();
         });
     });
 
