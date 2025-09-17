@@ -12,7 +12,7 @@ test.describe("debug modal issue", () => {
 
             // Take initial screenshot for debugging
             await page.screenshot({
-                path: "debug-initial.png",
+                path: "playwright/test-results/screenshots/debug-initial.png",
                 fullPage: true,
             });
 
@@ -66,7 +66,7 @@ test.describe("debug modal issue", () => {
 
             // Take screenshot after clicking
             await page.screenshot({
-                path: "debug-after-click.png",
+                path: "playwright/test-results/screenshots/debug-after-click.png",
                 fullPage: true,
             });
 

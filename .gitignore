@@ -827,6 +827,7 @@ test-results/
 
 # Playwright
 /playwright-report/
+/playwright/test-results/
 /blob-report/
 /playwright/.cache/
 docs/docusaurus/stylelintcache

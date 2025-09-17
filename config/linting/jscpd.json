@@ -58,7 +58,7 @@
     "minLines": 10,
     "minTokens": 50,
     "mode": "mild",
-    "output": "./report/jscpd/",
+    "output": "./reports/jscpd/",
     "reporters": [
         "html",
         "markdown",

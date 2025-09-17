@@ -87,6 +87,21 @@ export class WindowService {
      */
     private readonly handleReadyToShow = (): void => {
         logger.info("[WindowService] Main window ready to show");
+
+        // Check for headless mode (for testing environments)
+        const isHeadless =
+            process.env["HEADLESS"] === "true" ||
+            process.env["CI"] === "true" ||
+            process.argv.includes("--headless") ||
+            process.argv.includes("--test-headless");
+
+        if (isHeadless) {
+            logger.info(
+                "[WindowService] Running in headless mode - window will not be shown"
+            );
+            return;
+        }
+
         this.mainWindow?.show();
     };
 

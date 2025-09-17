@@ -10,12 +10,20 @@ import { _electron as electron } from "@playwright/test";
 /**
  * Launch Electron with CI-compatible configuration.
  *
- * Automatically handles sandbox disabling in CI environments where the Chrome
- * sandbox cannot be properly configured. Also adds test mode arguments for
- * faster startup during UI testing.
+ * Automatically handles:
+ *
+ * - Sandbox disabling in CI environments where Chrome sandbox cannot be
+ *   configured
+ * - Headless mode for Electron testing (prevents windows from showing)
+ * - Test mode arguments for faster startup during UI testing
+ *
+ * **Headless Mode Implementation:** Sets HEADLESS=true environment variable
+ * which is checked by the Electron app's WindowService to skip showing windows
+ * during testing. This simulates headless behavior since Electron doesn't
+ * support true headless mode like browsers.
  *
  * @param customArgs - Additional arguments to pass to Electron
- * @param customEnv - Additional environment variables
+ * @param customEnv - Additional environment variables (can override HEADLESS)
  *
  * @returns Promise resolving to Electron app instance
  */
@@ -37,6 +45,8 @@ export async function launchElectronApp(
             ...process.env,
             // Don't override NODE_ENV - let it inherit from environment
             // This allows proper development vs production detection
+            // Enable headless mode for Electron during testing
+            HEADLESS: "true",
             // Disable Electron sandbox in CI
             ...(process.env["CI"] && { ELECTRON_DISABLE_SANDBOX: "1" }),
             ...customEnv,

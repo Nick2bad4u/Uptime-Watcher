@@ -352,4 +352,4 @@ This gives you a complete setup for using Playwright codegen with your Uptime-Wa
 
 ## 📚 **Related Documentation**
 
-- [Complete Playwright Testing Guide](./Testing/PLAYWRIGHT_TESTING_GUIDE.md) - Comprehensive testing setup, troubleshooting, and best practices
+- [Complete Playwright Testing Guide](./PLAYWRIGHT_TESTING_GUIDE.md) - Comprehensive testing setup, troubleshooting, and best practices

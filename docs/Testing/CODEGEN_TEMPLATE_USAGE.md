@@ -105,7 +105,34 @@ npm run playwright:transform input-test.spec.ts output-test.spec.ts
 3. **Add custom assertions** as needed
 4. **Run tests** with `npm run playwright`
 
-## **🚨 Troubleshooting**
+## **� Screenshot Best Practices**
+
+### **Use Screenshot Helpers**
+
+```typescript
+import { takeScreenshot, debugScreenshot } from "../helpers/screenshot";
+
+// Automatic path and naming
+await takeScreenshot(page, "login-form");
+await debugScreenshot(window, "after-modal-open");
+```
+
+### **Manual Screenshots (if needed)**
+
+Always use proper paths for screenshots:
+
+````typescript
+Always use proper paths for screenshots:
+
+```typescript
+// ✅ Good - saves to playwright test-results directory
+await page.screenshot({ path: "playwright/test-results/screenshots/my-screenshot.png" });
+
+// ❌ Bad - saves to project root
+await page.screenshot({ path: "my-screenshot.png" });
+````
+
+## **�🚨 Troubleshooting**
 
 ### **If transforms aren't applied automatically:**
 

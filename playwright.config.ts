@@ -48,8 +48,8 @@ const config: PlaywrightTestConfig = defineConfig({
      */
     globalSetup: require.resolve("./playwright/fixtures/global-setup.ts"),
     globalTeardown: require.resolve("./playwright/fixtures/global-teardown.ts"),
-    // Output and artifacts configuration
-    outputDir: "test-results/",
+    // Output and artifacts configuration - organized within playwright directory
+    outputDir: "playwright/test-results/",
     // Multiple projects for different test types
     projects: [
         {
@@ -128,20 +128,20 @@ const config: PlaywrightTestConfig = defineConfig({
             "html",
             {
                 open: "never", // Don't auto-open in CI
-                outputFolder: "playwright-report",
+                outputFolder: "playwright/test-results/html-report",
             },
         ],
         [
             "json",
             {
-                outputFile: "playwright-report/results.json",
+                outputFile: "playwright/test-results/results.json",
             },
         ],
         // Add JUnit reporter for CI integration
         [
             "junit",
             {
-                outputFile: "playwright-report/results.xml",
+                outputFile: "playwright/test-results/results.xml",
             },
         ],
     ],
@@ -199,16 +199,24 @@ const config: PlaywrightTestConfig = defineConfig({
          * underlying Chromium engine, providing consistent results and access
          * to Electron-specific APIs during testing.
          *
-         * The 'headless' mode is set globally based on the CI environment.
-         * Individual projects do NOT override this setting for consistency. If
-         * you need to run headed locally, set CI=false in your environment.
-         * See:
-         * https://www.electronjs.org/docs/latest/tutorial/automated-testing#using-playwright
+         * IMPORTANT: Electron doesn't support true "headless" mode like
+         * browsers. Instead, the headless behavior is controlled at the
+         * Electron app level by preventing windows from showing during tests.
+         * This setting affects browser tests but NOT Electron tests.
+         *
+         * For Electron headless testing:
+         *
+         * - Set HEADLESS=true environment variable
+         * - Your Electron app should check this and skip window.show()
+         * - On Linux CI: use xvfb-run or xvfb-maybe for virtual display
+         *
+         * See: https://github.com/microsoft/playwright/issues/13288
+         * https://www.electronjs.org/docs/latest/tutorial/testing-on-headless-ci
          */
         channel: "chrome",
         colorScheme: "dark",
-        // Browser configuration
-        headless: Boolean(process.env["CI"]), // Headless in CI, headed locally
+        // Browser configuration - NOTE: This doesn't affect Electron apps
+        headless: Boolean(process.env["CI"]), // For browser tests only
 
         ignoreHTTPSErrors: true,
 

@@ -27,7 +27,10 @@ test.describe("theme and settings", () => {
             await expect(themeButton).toBeVisible({ timeout: 10000 });
 
             // Take screenshot before theme change
-            await page.screenshot({ path: "theme-before.png", fullPage: true });
+            await page.screenshot({
+                path: "playwright/test-results/screenshots/theme-before.png",
+                fullPage: true,
+            });
 
             // Click theme toggle
             await themeButton.click();
@@ -36,7 +39,10 @@ test.describe("theme and settings", () => {
             await page.waitForLoadState("domcontentloaded");
 
             // Take screenshot after theme change
-            await page.screenshot({ path: "theme-after.png", fullPage: true });
+            await page.screenshot({
+                path: "playwright/test-results/screenshots/theme-after.png",
+                fullPage: true,
+            });
 
             // Verify theme button is still visible (it should persist)
             await expect(themeButton).toBeVisible();

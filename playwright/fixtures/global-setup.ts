@@ -12,12 +12,18 @@ import path from "node:path";
 async function globalSetup(_config: FullConfig): Promise<void> {
     console.log("🔧 Setting up Playwright Electron tests...");
 
+    // Set HEADLESS environment variable for Electron tests
+    // This tells the Electron app to skip showing windows during tests
+    process.env["HEADLESS"] = "true";
+    console.log("🔇 Set HEADLESS=true for Electron headless testing");
+
     // Ensure the Electron app is built
     try {
         console.log("📦 Building Electron app...");
         execSync("npm run build:electron-main", {
             stdio: "inherit",
             cwd: path.resolve(__dirname, "../.."),
+            env: { ...process.env, HEADLESS: "true" },
         });
         console.log("✅ Electron app built successfully");
     } catch (error) {

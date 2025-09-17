@@ -301,7 +301,7 @@ Usually caused by:
 ## 📚 Additional Resources
 
 - [Playwright Electron Documentation](https://playwright.dev/docs/api/class-electronapplication)
-- [Project Codegen Guide](../PLAYWRIGHT_CODEGEN_GUIDE.md)
+- [Project Codegen Guide](./PLAYWRIGHT_CODEGEN_GUIDE.md)
 - [Electron Testing Best Practices](https://www.electronjs.org/docs/latest/tutorial/automated-testing)
 
 ## 🚨 Emergency Fixes

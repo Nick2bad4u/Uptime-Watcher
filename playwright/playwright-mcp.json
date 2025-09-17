@@ -10,5 +10,5 @@
         "vision"
     ],
     "imageResponses": "allow",
-    "outputDir": ""
+    "outputDir": "./playwright-mcp/"
 }
