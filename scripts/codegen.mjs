@@ -77,7 +77,7 @@ async function startDevServer() {
     return new Promise((resolve, reject) => {
         const devServer = spawn("npm", ["run", "dev"], {
             stdio: "pipe",
-            shell: true,
+            shell: process.platform === "win32",
         });
 
         devServer.stdout?.on("data", (data) => {
@@ -202,7 +202,7 @@ function runCodegen(cmd) {
 
     const codegen = spawn(cmd[0], cmd.slice(1), {
         stdio: "inherit",
-        shell: true,
+        shell: process.platform === "win32",
     });
 
     codegen.on("close", (code) => {

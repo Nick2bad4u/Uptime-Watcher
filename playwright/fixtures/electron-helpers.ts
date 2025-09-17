@@ -11,7 +11,8 @@ import { _electron as electron } from "@playwright/test";
  * Launch Electron with CI-compatible configuration.
  *
  * Automatically handles sandbox disabling in CI environments where the Chrome
- * sandbox cannot be properly configured.
+ * sandbox cannot be properly configured. Also adds test mode arguments for
+ * faster startup during UI testing.
  *
  * @param customArgs - Additional arguments to pass to Electron
  * @param customEnv - Additional environment variables
@@ -25,6 +26,7 @@ export async function launchElectronApp(
     return await electron.launch({
         args: [
             ".", // Launch from project root like codegen script
+            "--test-mode", // Enable lightweight mode for faster UI testing
             // Disable sandbox in CI environment to avoid SUID sandbox issues
             ...(process.env["CI"]
                 ? ["--no-sandbox", "--disable-setuid-sandbox"]

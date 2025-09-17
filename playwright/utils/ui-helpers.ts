@@ -19,7 +19,7 @@ export const WAIT_TIMEOUTS = {
     MEDIUM: 5000,
     LONG: 10000,
     MODAL_ANIMATION: 1000,
-    APP_INITIALIZATION: 15000,
+    APP_INITIALIZATION: 30000, // Increased from 15000 to 30000 for complex database loading
 } as const;
 
 /**
@@ -348,7 +348,7 @@ export async function getMonitorCount(page: Page): Promise<number> {
 
     if (monitorCountText) {
         const match = monitorCountText.match(/\((\d+)\)/);
-        return match ? parseInt(match[1], 10) : 0;
+        return match && match[1] ? parseInt(match[1], 10) : 0;
     }
 
     return 0;

@@ -61,10 +61,5 @@
         "../../tailwind.config.mjs",
         "vitest.config.ts",
         "vitest.shared.config.ts"
-    ],
-    "references": [
-        {
-            "path": "../../tsconfig.shared.json"
-        }
     ]
 }

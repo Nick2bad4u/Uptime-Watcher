@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test } from "@playwright/test";
 import { launchElectronApp } from "../fixtures/electron-helpers";
 
 test("debug modal issue", async () => {
@@ -19,6 +19,8 @@ test("debug modal issue", async () => {
 
         for (let i = 0; i < buttons.length; i++) {
             const button = buttons[i];
+            if (!button) continue;
+
             const text = await button.textContent().catch(() => "N/A");
             const ariaLabel = await button
                 .getAttribute("aria-label")

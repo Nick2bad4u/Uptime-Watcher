@@ -3,11 +3,11 @@
     "compilerOptions": {
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
-        "isolatedDeclarations": false,
         "baseUrl": ".",
         "checkJs": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
+        "isolatedDeclarations": false,
         "isolatedModules": true,
         "lib": [
             "DOM.Iterable",
@@ -42,6 +42,7 @@
                 "../shared/*"
             ]
         },
+        "pretty": true,
         "resolveJsonModule": true,
         "skipLibCheck": false,
         "strict": true,
@@ -57,7 +58,8 @@
         "test-results",
         "../dist*/**",
         "../coverage/**",
-        "../node_modules/**"
+        "../node_modules/**",
+        "codegen-template.mjs"
     ],
     "extends": "../tsconfig.json",
     "include": [

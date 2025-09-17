@@ -90,7 +90,7 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
             expect(MonitorRepository).toBeDefined();
             expect(HistoryRepository).toBeDefined();
             expect(SettingsRepository).toBeDefined();
-        }, 30000);
+        }, 30_000);
 
         test("should import data services", async () => {
             const { DataBackupService } = await import(

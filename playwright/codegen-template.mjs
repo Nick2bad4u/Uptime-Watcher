@@ -59,7 +59,7 @@ test.describe("{{testName}}", () => {
  * @example // Converts: locator("button") => getByRole("button") // Converts:
  * locator("[data-testid='submit']") => getByTestId("submit")
  */
-const locatorTransforms = {
+const locatorTransforms = /** @type {Record<string, string>} */ ({
     // Basic element transformations (alphabetized)
     'locator("a")': 'getByRole("link")',
     'locator("article")': 'getByRole("article")',
@@ -127,7 +127,7 @@ const locatorTransforms = {
     // TODO: Replace with semantic locator where possible.
     'locator("body")': 'locator("body")',
     'locator("html")': 'locator("html")',
-};
+});
 
 /**
  * Maps raw Playwright test titles to improved, lint-compliant versions.
@@ -141,7 +141,7 @@ const locatorTransforms = {
  * Converts: test("Verify user creation") => test("should verify user
  * creation")
  */
-const titleTransforms = {
+const titleTransforms = /** @type {Record<string, string>} */ ({
     // Ensures test titles start with "should check" for checking actions
     'test("Check': 'test("should check',
 
@@ -174,7 +174,7 @@ const titleTransforms = {
 
     // Already uses preferred "should" phrasing, no change needed
     'test("should': 'test("should',
-};
+});
 
 /**
  * Post-processing function to apply all transformations.
@@ -237,17 +237,20 @@ function applyLintCompliantTransforms(codegenOutput) {
         // Remove all top-level test cases from transformed
         let codeWithoutTests = transformed;
         for (let i = testCases.length - 1; i >= 0; i--) {
-            codeWithoutTests =
-                codeWithoutTests.slice(0, testCases[i].start) +
-                codeWithoutTests.slice(testCases[i].end);
+            const testCase = testCases[i];
+            if (testCase) {
+                codeWithoutTests =
+                    codeWithoutTests.slice(0, testCase.start) +
+                    codeWithoutTests.slice(testCase.end);
+            }
         }
 
         // Determine describe block name
         const firstTestTitleMatch =
-            testCases.length > 0
+            testCases.length > 0 && testCases[0]
                 ? testCases[0].code.match(/test\("([^"]+)"/)
                 : null;
-        const describeName = firstTestTitleMatch
+        const describeName = firstTestTitleMatch && firstTestTitleMatch[1]
             ? firstTestTitleMatch[1]
                 .replace(/^should\s+/, "")
                 .replace(/\s+/g, " ")
