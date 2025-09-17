@@ -121,6 +121,18 @@ log.transports.file.maxSize = LOG_FILE_MAX_SIZE;
 log.transports.file.format = LOG_FILE_FORMAT;
 log.transports.console.format = LOG_CONSOLE_FORMAT;
 
+// Configure remote debugging for MCP electron server support
+if (isDev() || process.argv.includes("--enable-mcp-debugging")) {
+    try {
+        app.commandLine.appendSwitch("remote-debugging-port", "9222");
+        logger.info(
+            "[Main] Remote debugging enabled on port 9222 (Electron MCP)"
+        );
+    } catch (error) {
+        logger.warn("[Main] Failed to set remote debugging port", error);
+    }
+}
+
 // Hot reload for preload scripts (development only)
 if (isDev()) {
     // Enhanced hot reload protection configuration

@@ -11,6 +11,8 @@
 import { describe, expect, it } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 
+import { standardTestAnnotationAsync } from "../../../shared/test/testUtils";
+
 import {
     DEFAULT_REQUEST_TIMEOUT_SECONDS,
     TIMEOUT_CONSTRAINTS,
@@ -32,10 +34,13 @@ describe("Timeout Utilities", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: timeoutUtils", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            await standardTestAnnotationAsync(
+                task,
+                annotate,
+                "timeoutUtils",
+                "Utility",
+                "Business Logic"
+            );
 
             const validTimeout = 30_000; // 30 seconds
             expect(clampTimeoutMs(validTimeout)).toBe(validTimeout);

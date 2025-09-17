@@ -11,6 +11,7 @@ import type { Monitor, MonitorType, Site } from "@shared/types";
 import { isDevelopment } from "@shared/utils/environment";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getErrorMessage } from "@shared/utils/errorUtils";
 
 import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
@@ -100,7 +101,7 @@ export const createSiteOperationsActions = (
                                 : new Error(String(error))
                         );
                         throw new Error(
-                            `Monitor normalization failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+                            `Monitor normalization failed: ${getErrorMessage(error)}`,
                             { cause: error }
                         );
                     }

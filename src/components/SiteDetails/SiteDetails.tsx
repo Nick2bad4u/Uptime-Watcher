@@ -41,7 +41,8 @@
 import type { Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
+import { useCallback, useMemo, useState } from "react";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ChartConfigService } from "../../services/chartConfig";
@@ -105,21 +106,18 @@ export const SiteDetails = ({
     const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
 
     // Add global escape key handler
-    useEffect(
-        function handleGlobalEscapeKey() {
-            const handleGlobalKeyDown = (event: KeyboardEvent): void => {
-                if (event.key === "Escape") {
-                    onClose();
-                }
-            };
-
-            document.addEventListener("keydown", handleGlobalKeyDown);
-            return (): void => {
-                document.removeEventListener("keydown", handleGlobalKeyDown);
-            };
-        },
+    const modalConfigs = useMemo(
+        () => [
+            {
+                isOpen: true, // SiteDetails is always considered "open" when rendered
+                onClose,
+                priority: 1,
+            },
+        ],
         [onClose]
     );
+
+    useEscapeKeyModalHandler(modalConfigs);
 
     // Use our custom hook to get all the data and functionality we need
     const {

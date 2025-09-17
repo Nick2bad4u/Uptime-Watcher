@@ -163,10 +163,7 @@ const ThemedInputComponent = ({
             width: "100%",
         }),
         [
-            currentTheme.borderRadius.md,
-            currentTheme.spacing.md,
-            currentTheme.spacing.sm,
-            currentTheme.typography.fontSize.sm,
+            currentTheme,
             getBackgroundClass,
             getBorderClass,
             getTextClass,

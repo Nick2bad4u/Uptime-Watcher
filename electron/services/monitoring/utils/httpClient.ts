@@ -167,12 +167,14 @@ const DEFAULT_MAX_BODY_LENGTH =
     Number.parseInt(getEnv("UW_HTTP_MAX_BODY_LENGTH", `${8 * 1024}`), 10) ||
     8 * 1024; // 8KB request body cap
 export function createHttpClient(config: MonitorConfig): AxiosInstance {
-    const forceStrictStatus =
-        getEnv("UW_HTTP_STRICT_STATUS", "true").toLowerCase() === "true";
     const headers: Record<string, string> = {};
     if (config.userAgent !== undefined) {
         headers["User-Agent"] = config.userAgent;
     }
+
+    // Add Accept header to handle content negotiation properly
+    // Accept all content types to avoid 406 Not Acceptable responses
+    headers["Accept"] = "*/*";
 
     const createConfig: UnknownRecord = {
         headers,
@@ -186,18 +188,14 @@ export function createHttpClient(config: MonitorConfig): AxiosInstance {
         // sufficient for monitoring
         responseType: "text",
         /**
-         * Status validation strategy.
+         * Status validation strategy for monitoring.
          *
-         * - Strict mode (default): Only status codes 200-399 are treated as
-         *   success.
-         * - Lenient mode (opt-out): All responses treated as success and
-         *   interpreted by upstream logic.
-         *
-         * Controlled via UW_HTTP_STRICT_STATUS environment variable.
+         * For monitoring purposes, ALL HTTP responses (including 4xx and 5xx)
+         * should be treated as successful Axios responses so we can analyze the
+         * status code in our monitoring logic. This prevents 4xx/5xx responses
+         * from being thrown as Axios errors.
          */
-        validateStatus: forceStrictStatus
-            ? (status: number): boolean => status >= 200 && status < 400
-            : (): true => true,
+        validateStatus: (): true => true,
     };
 
     if (config.timeout !== undefined) {

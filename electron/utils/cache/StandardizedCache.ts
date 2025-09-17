@@ -215,26 +215,10 @@ export class StandardizedCache<T> {
      * Get cache entries iterator.
      */
     public entries(): IterableIterator<[string, T]> {
-        const entries: Array<[string, T]> = [];
-        const expiredKeys: string[] = [];
-        const now = Date.now();
+        const entries = this.cleanupAndExtract(
+            (key, entry) => [key, entry.data] as [string, T]
+        );
 
-        for (const [key, entry] of this.cache.entries()) {
-            // Skip expired entries
-            if (entry.expiresAt && entry.expiresAt < now) {
-                this.cache.delete(key);
-                expiredKeys.push(key);
-            } else {
-                entries.push([key, entry.data]);
-            }
-        }
-
-        // Notify callbacks for expired items
-        for (const key of expiredKeys) {
-            this.notifyInvalidation(key);
-        }
-
-        this.updateSize();
         // Workaround for ESLint plugin bug: avoid direct [Symbol.iterator]()
         // call
         const iteratorFn = entries[Symbol.iterator];
@@ -274,27 +258,7 @@ export class StandardizedCache<T> {
      * Get all cached values.
      */
     public getAll(): T[] {
-        const values: T[] = [];
-        const expiredKeys: string[] = [];
-        const now = Date.now();
-
-        for (const [key, entry] of this.cache.entries()) {
-            // Skip expired entries
-            if (entry.expiresAt && entry.expiresAt < now) {
-                this.cache.delete(key);
-                expiredKeys.push(key);
-            } else {
-                values.push(entry.data);
-            }
-        }
-
-        // Notify callbacks for expired items
-        for (const key of expiredKeys) {
-            this.notifyInvalidation(key);
-        }
-
-        this.updateSize();
-        return values;
+        return this.cleanupAndExtract((_key, entry) => entry.data);
     }
 
     /**
@@ -357,27 +321,7 @@ export class StandardizedCache<T> {
      * Get all cache keys. Filters out expired keys automatically.
      */
     public keys(): string[] {
-        const validKeys: string[] = [];
-        const expiredKeys: string[] = [];
-        const now = Date.now();
-
-        for (const [key, entry] of this.cache.entries()) {
-            // Skip expired entries
-            if (entry.expiresAt && entry.expiresAt < now) {
-                this.cache.delete(key);
-                expiredKeys.push(key);
-            } else {
-                validKeys.push(key);
-            }
-        }
-
-        // Notify callbacks for expired items
-        for (const key of expiredKeys) {
-            this.notifyInvalidation(key);
-        }
-
-        this.updateSize();
-        return validKeys;
+        return this.cleanupAndExtract((key) => key);
     }
 
     /**
@@ -451,6 +395,39 @@ export class StandardizedCache<T> {
                 ...data,
             });
         }
+    }
+
+    /**
+     * Clean up expired entries and return valid entries.
+     *
+     * @param extractFn - Function to extract the desired value from valid
+     *   entries
+     *
+     * @returns Array of extracted values from valid entries
+     */
+    private cleanupAndExtract<R>(
+        extractFn: (key: string, entry: CacheEntry<T>) => R
+    ): R[] {
+        const results: R[] = [];
+        const expiredKeys: string[] = [];
+        const now = Date.now();
+
+        for (const [key, entry] of this.cache.entries()) {
+            if (entry.expiresAt && entry.expiresAt < now) {
+                this.cache.delete(key);
+                expiredKeys.push(key);
+            } else {
+                results.push(extractFn(key, entry));
+            }
+        }
+
+        // Notify callbacks for expired items
+        for (const key of expiredKeys) {
+            this.notifyInvalidation(key);
+        }
+
+        this.updateSize();
+        return results;
     }
 
     /**

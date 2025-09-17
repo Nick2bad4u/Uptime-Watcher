@@ -291,7 +291,7 @@ export async function handleSQLiteBackupDownload(
             );
             // Re-throw with more context
             throw new Error(
-                `Download trigger failed: ${clickError instanceof Error ? clickError.message : "Unknown error"}`,
+                `Download trigger failed: ${clickError instanceof Error ? clickError.message : String(clickError)}`,
                 { cause: clickError }
             );
         }

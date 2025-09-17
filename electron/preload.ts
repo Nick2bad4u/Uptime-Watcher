@@ -20,6 +20,7 @@ import type {
 } from "@shared/types/events";
 import type { IpcRendererEvent } from "electron";
 
+import { getErrorMessage } from "@shared/utils/errorUtils";
 import { contextBridge, ipcRenderer } from "electron";
 
 /**
@@ -214,9 +215,7 @@ const dataAPI = {
             return validateBackupResponse(response);
         } catch (error) {
             throw new Error(
-                `Failed to download SQLite backup: ${
-                    error instanceof Error ? error.message : "Unknown error"
-                }`,
+                `Failed to download SQLite backup: ${getErrorMessage(error)}`,
                 { cause: error }
             );
         }

@@ -584,7 +584,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                 siteRepositoryService.getSitesFromDatabase()
             ).rejects.toThrow(SiteLoadingError);
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to fetch sites from database: String error",
+                "Failed to fetch sites from database: Unknown error",
                 "String error"
             );
         });
@@ -704,13 +704,13 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             ).rejects.toThrow(errorString);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to load sites into cache: String error",
+                "Failed to load sites into cache: Unknown error",
                 errorString
             );
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:error",
                 {
-                    details: "Failed to load sites into cache: String error",
+                    details: "Failed to load sites into cache: Unknown error",
                     error: new Error("String error"),
                     operation: "load-sites-into-cache",
                     timestamp: expect.any(Number),

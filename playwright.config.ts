@@ -238,7 +238,7 @@ const config: PlaywrightTestConfig = defineConfig({
         viewport: { height: 720, width: 1280 },
     },
 
-    workers: process.env["CI"] ? 1 : 2, // Limit workers for Electron
+    workers: process.env["CI"] ? 1 : 20, // Limit workers for Electron
 });
 
 export default config;

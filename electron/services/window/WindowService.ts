@@ -40,6 +40,7 @@
 import type { Event } from "electron";
 
 import { getNodeEnv } from "@shared/utils/environment";
+import { getErrorMessage } from "@shared/utils/errorUtils";
 import { BrowserWindow } from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
 import * as path from "node:path";
@@ -260,7 +261,7 @@ export class WindowService {
                     !(error instanceof Error && error.name === "AbortError")
                 ) {
                     logger.debug(
-                        `[WindowService] Vite server not ready (attempt ${attempt + 1}/${MAX_RETRIES}): ${error instanceof Error ? error.message : "Unknown error"}`
+                        `[WindowService] Vite server not ready (attempt ${attempt + 1}/${MAX_RETRIES}): ${getErrorMessage(error)}`
                     );
                 }
             }

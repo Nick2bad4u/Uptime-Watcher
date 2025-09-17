@@ -6,7 +6,6 @@
  */
 
 import { _electron as electron } from "@playwright/test";
-import path from "path";
 
 /**
  * Launch Electron with CI-compatible configuration.
@@ -25,7 +24,7 @@ export async function launchElectronApp(
 ) {
     return await electron.launch({
         args: [
-            path.join(__dirname, "../../dist-electron/main.js"),
+            ".", // Launch from project root like codegen script
             // Disable sandbox in CI environment to avoid SUID sandbox issues
             ...(process.env["CI"]
                 ? ["--no-sandbox", "--disable-setuid-sandbox"]
@@ -34,10 +33,12 @@ export async function launchElectronApp(
         ],
         env: {
             ...process.env,
-            NODE_ENV: "test",
+            // Don't override NODE_ENV - let it inherit from environment
+            // This allows proper development vs production detection
             // Disable Electron sandbox in CI
             ...(process.env["CI"] && { ELECTRON_DISABLE_SANDBOX: "1" }),
             ...customEnv,
         },
+        timeout: 30000, // Add timeout like codegen script
     });
 }

@@ -1091,7 +1091,6 @@ export default [
             depend: depend,
             // @ts-expect-error -- TS Error from fixupPluginRules
             deprecation: fixupPluginRules(pluginDeprecation),
-
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
             // @ts-expect-error -- TS Error from fixupPluginRules
@@ -2380,7 +2379,6 @@ export default [
             depend: depend,
             // @ts-expect-error -- TS Error from fixupPluginRules
             deprecation: fixupPluginRules(pluginDeprecation),
-
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
             // @ts-expect-error -- TS Error from fixupPluginRules
@@ -6666,6 +6664,7 @@ export default [
             parser: tseslintParser,
             parserOptions: {
                 ecmaFeatures: {
+                    impliedStrict: true,
                     jsx: true,
                 },
                 ecmaVersion: "latest",
@@ -6882,6 +6881,7 @@ export default [
             parser: tseslintParser,
             parserOptions: {
                 ecmaFeatures: {
+                    impliedStrict: true,
                     jsx: true,
                 },
                 ecmaVersion: "latest",
@@ -7095,6 +7095,7 @@ export default [
             parser: tseslintParser,
             parserOptions: {
                 ecmaFeatures: {
+                    impliedStrict: true,
                     jsx: true,
                 },
                 ecmaVersion: "latest",
@@ -7289,6 +7290,7 @@ export default [
             parser: tseslintParser,
             parserOptions: {
                 ecmaFeatures: {
+                    impliedStrict: true,
                     jsx: true,
                 },
                 ecmaVersion: "latest",
@@ -7478,11 +7480,21 @@ export default [
             parser: tseslintParser,
             parserOptions: {
                 ecmaFeatures: {
+                    impliedStrict: true,
                     jsx: true,
                 },
                 ecmaVersion: "latest",
                 jsDocParsingMode: "all",
                 project: "config/testing/tsconfig.configs.json",
+                projectService: {
+                    allowDefaultProject: [
+                        "*.js",
+                        "playwright.config.ts",
+                        "vitest.shared.config.ts",
+                        "vitest.stryker.config.ts",
+                    ],
+                    defaultProject: "config/testing/tsconfig.configs.json",
+                },
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
@@ -8410,6 +8422,7 @@ export default [
             parser: tseslintParser,
             parserOptions: {
                 ecmaFeatures: {
+                    impliedStrict: true,
                     jsx: true,
                 },
                 ecmaVersion: "latest",

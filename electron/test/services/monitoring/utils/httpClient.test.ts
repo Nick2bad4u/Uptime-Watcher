@@ -65,6 +65,7 @@ describe("HTTP Client Utils", () => {
             expect(result).toBe(mockAxiosInstance);
             expect(mockAxiosCreate).toHaveBeenCalledWith({
                 headers: {
+                    Accept: "*/*",
                     "User-Agent": "test-agent",
                 },
                 httpAgent: expect.any(Object),
@@ -93,7 +94,7 @@ describe("HTTP Client Utils", () => {
             // Assert
             expect(result).toBe(mockAxiosInstance);
             expect(mockAxiosCreate).toHaveBeenCalledWith({
-                headers: {},
+                headers: { Accept: "*/*" },
                 httpAgent: expect.any(Object),
                 httpsAgent: expect.any(Object),
                 maxBodyLength: 8 * 1024,
@@ -103,7 +104,7 @@ describe("HTTP Client Utils", () => {
                 validateStatus: expect.any(Function),
             });
         });
-        it("should configure validateStatus to be strict by default (2xx-3xx)", async ({
+        it("should configure validateStatus to accept all statuses (lenient)", async ({
             task,
             annotate,
         }) => {
@@ -124,10 +125,10 @@ describe("HTTP Client Utils", () => {
             expect(axiosConfig?.validateStatus).toBeDefined();
             expect(axiosConfig?.validateStatus!(200)).toBeTruthy();
             expect(axiosConfig?.validateStatus!(302)).toBeTruthy();
-            expect(axiosConfig?.validateStatus!(404)).toBeFalsy();
-            expect(axiosConfig?.validateStatus!(500)).toBeFalsy();
+            expect(axiosConfig?.validateStatus!(404)).toBeTruthy();
+            expect(axiosConfig?.validateStatus!(500)).toBeTruthy();
         });
-        it("should allow lenient mode when UW_HTTP_STRICT_STATUS=false", async ({
+        it("should remain lenient regardless of UW_HTTP_STRICT_STATUS env", async ({
             task,
             annotate,
         }) => {

@@ -14,6 +14,7 @@
 
 import type { AxiosError } from "axios";
 
+import { getErrorMessage } from "@shared/utils/errorUtils";
 import axios from "axios";
 
 import type { MonitorCheckResult } from "../types";
@@ -170,8 +171,7 @@ export function handleCheckError(
     // Non-Axios errors (shouldn't happen, but defensive programming)
     // "Unknown error" fallback handles cases where thrown value isn't an Error
     // instance
-    const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = getErrorMessage(error);
 
     const logData = correlationId ? { correlationId, error } : { error };
     logger.error(`[HttpMonitor] Unexpected error checking ${url}`, logData);

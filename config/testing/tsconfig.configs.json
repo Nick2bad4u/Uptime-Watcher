@@ -46,9 +46,12 @@
         "vitest.config.ts",
         "vitest.electron.config.ts",
         "../../vitest.electron.config.ts",
-        "vitest.shared.config.ts",
+        "**/vitest.shared.config.ts",
+        "**/vitest.stryker.config.ts",
         "../../vitest.shared.config.ts",
-        "docs/docusaurus/stylelint.config.mjs"
+        "../../vitest.stryker.config.ts",
+        "docs/docusaurus/stylelint.config.mjs",
+        "**/playwright.config.ts"
     ],
     "references": [
         {

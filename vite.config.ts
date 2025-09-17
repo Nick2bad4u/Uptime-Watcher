@@ -21,7 +21,6 @@ import { analyzer } from "vite-bundle-analyzer";
 import { patchCssModules } from "vite-css-modules";
 import devtoolsJson from "vite-plugin-devtools-json";
 import electron from "vite-plugin-electron";
-import { ViteMcp } from "vite-plugin-mcp";
 import packageVersion from "vite-plugin-package-version";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import { coverageConfigDefaults, defaultExclude } from "vitest/config";
@@ -295,7 +294,7 @@ export default defineConfig(({ mode }) => {
              * development. It is included to accelerate the Vite build process
              * and improve developer experience.
              */
-            ViteMcp(),
+            // ViteMcp(),
             // Only include react-scan in development mode to avoid sourcemap warnings in production
             ...(isDev
                 ? [

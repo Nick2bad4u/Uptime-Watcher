@@ -10,11 +10,13 @@
 import type { JSX } from "react/jsx-runtime";
 
 import { isDevelopment, isProduction } from "@shared/utils/environment";
+import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
 import {
     memo,
     type NamedExoticComponent,
     useCallback,
     useEffect,
+    useMemo,
     useRef,
     useState,
 } from "react";
@@ -298,27 +300,24 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     /**
      * Handle escape key for closing modals
      */
-    useEffect(
-        function handleEscapeKey() {
-            const handleKeyDown = (event: KeyboardEvent): void => {
-                if (event.key === "Escape") {
-                    // Close modals in priority order (most recently opened first)
-                    if (showSiteDetails) {
-                        handleCloseSiteDetails();
-                    } else if (showAddSiteModal) {
-                        handleCloseAddSiteModal();
-                    } else if (showSettings) {
-                        handleCloseSettings();
-                    }
-                }
-            };
-
-            document.addEventListener("keydown", handleKeyDown);
-
-            return (): void => {
-                document.removeEventListener("keydown", handleKeyDown);
-            };
-        },
+    const modalConfigs = useMemo(
+        () => [
+            {
+                isOpen: showSiteDetails,
+                onClose: handleCloseSiteDetails,
+                priority: 3, // Highest priority
+            },
+            {
+                isOpen: showAddSiteModal,
+                onClose: handleCloseAddSiteModal,
+                priority: 2,
+            },
+            {
+                isOpen: showSettings,
+                onClose: handleCloseSettings,
+                priority: 1,
+            },
+        ],
         [
             handleCloseAddSiteModal,
             handleCloseSettings,
@@ -328,6 +327,8 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             showSiteDetails,
         ]
     );
+
+    useEscapeKeyModalHandler(modalConfigs);
 
     // Extract SiteDetails JSX to avoid complex conditional rendering
     const siteDetailsJSX =

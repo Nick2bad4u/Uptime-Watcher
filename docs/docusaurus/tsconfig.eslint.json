@@ -5,11 +5,13 @@
         "allowSyntheticDefaultImports": true,
         "baseUrl": ".",
         "checkJs": false,
+        "composite": true,
         "declaration": false,
         "declarationMap": false,
         "emitDeclarationOnly": false,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
+        "incremental": true,
         "jsx": "react-jsx",
         "lib": [
             "DOM",

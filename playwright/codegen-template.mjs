@@ -13,6 +13,15 @@
  */
 
 // Template for generated test files
+/**
+ * Template string for generating Playwright test files with lint-compliant structure.
+ *
+ * @param {string} testName - The name of the test suite.
+ * @param {string} testTitle - The title of the individual test.
+ * @param {string} testBody - The body of the test containing Playwright actions and assertions.
+ * @usage
+ * Replace {{testName}}, {{testTitle}}, and {{testBody}} with appropriate values when generating a test file.
+ */
 const testTemplate = `/**
  * Generated UI test for {{testName}}
  *
@@ -20,6 +29,13 @@ const testTemplate = `/**
  * @file Generated Playwright test
  */
 
+/**
+ * Imports Playwright's test runner and assertion utilities for use in generated test files.
+ *
+ * @remarks
+ * This import provides the core testing API `(`test`, `expect`)` required for Playwright test execution.
+ * All generated tests rely on these functions for structure and assertions.
+ */
 import { test, expect } from "@playwright/test";
 
 test.describe("{{testName}}", () => {
@@ -44,72 +60,73 @@ test.describe("{{testName}}", () => {
  * locator("[data-testid='submit']") => getByTestId("submit")
  */
 const locatorTransforms = {
-    // Basic element transformations
-    'locator("button")': 'getByRole("button")',
-    'locator("input[type=text]")': 'getByRole("textbox")',
-    'locator("input[type=email]")': 'getByRole("textbox", { name: /email/i })',
-    'locator("input[type=password]")':
-        'getByRole("textbox", { name: /password/i })',
-    'locator("input[type=url]")': 'getByRole("textbox", { name: /url/i })',
-    'locator("input[type=search]")': 'getByRole("searchbox")',
-    'locator("textarea")': 'getByRole("textbox")',
-    'locator("select")': 'getByRole("combobox")',
+    // Basic element transformations (alphabetized)
     'locator("a")': 'getByRole("link")',
+    'locator("article")': 'getByRole("article")',
+    'locator("aside")': 'getByRole("complementary")',
+    'locator("button")': 'getByRole("button")',
+    'locator("dialog")': 'getByRole("dialog")',
+    'locator("footer")': 'getByRole("contentinfo")',
     'locator("h1")': 'getByRole("heading", { level: 1 })',
     'locator("h2")': 'getByRole("heading", { level: 2 })',
     'locator("h3")': 'getByRole("heading", { level: 3 })',
     'locator("h4")': 'getByRole("heading", { level: 4 })',
     'locator("h5")': 'getByRole("heading", { level: 5 })',
     'locator("h6")': 'getByRole("heading", { level: 6 })',
-    'locator("nav")': 'getByRole("navigation")',
-    'locator("main")': 'getByRole("main")',
-    'locator("dialog")': 'getByRole("dialog")',
-    'locator("article")': 'getByRole("article")',
-    'locator("section")': 'getByRole("region")',
-    'locator("aside")': 'getByRole("complementary")',
     'locator("header")': 'getByRole("banner")',
-    'locator("footer")': 'getByRole("contentinfo")',
+    'locator("input[type=email]")': 'getByRole("textbox", { name: /email/i })',
+    'locator("input[type=password]")': 'getByRole("textbox", { name: /password/i })',
+    'locator("input[type=search]")': 'getByRole("searchbox")',
+    'locator("input[type=text]")': 'getByRole("textbox")',
+    'locator("input[type=url]")': 'getByRole("textbox", { name: /url/i })',
+    'locator("main")': 'getByRole("main")',
+    'locator("nav")': 'getByRole("navigation")',
+    'locator("section")': 'getByRole("region")',
+    'locator("select")': 'getByRole("combobox")',
+    'locator("textarea")': 'getByRole("textbox")',
 
-    // Role-based transformations
-    'locator("[role=button]")': 'getByRole("button")',
-    'locator("[role=textbox]")': 'getByRole("textbox")',
-    'locator("[role=link]")': 'getByRole("link")',
-    'locator("[role=dialog]")': 'getByRole("dialog")',
-    'locator("[role=menu]")': 'getByRole("menu")',
-    'locator("[role=menuitem]")': 'getByRole("menuitem")',
-    'locator("[role=tab]")': 'getByRole("tab")',
-    'locator("[role=tabpanel]")': 'getByRole("tabpanel")',
-    'locator("[role=tablist]")': 'getByRole("tablist")',
-    'locator("[role=listbox]")': 'getByRole("listbox")',
-    'locator("[role=option]")': 'getByRole("option")',
-    'locator("[role=checkbox]")': 'getByRole("checkbox")',
-    'locator("[role=radio]")': 'getByRole("radio")',
-    'locator("[role=slider]")': 'getByRole("slider")',
-    'locator("[role=spinbutton]")': 'getByRole("spinbutton")',
-    'locator("[role=progressbar]")': 'getByRole("progressbar")',
-    'locator("[role=status]")': 'getByRole("status")',
+    // Role-based transformations (alphabetized)
     'locator("[role=alert]")': 'getByRole("alert")',
     'locator("[role=banner]")': 'getByRole("banner")',
-    'locator("[role=main]")': 'getByRole("main")',
-    'locator("[role=navigation]")': 'getByRole("navigation")',
-    'locator("[role=contentinfo]")': 'getByRole("contentinfo")',
+    'locator("[role=button]")': 'getByRole("button")',
+    'locator("[role=checkbox]")': 'getByRole("checkbox")',
     'locator("[role=complementary]")': 'getByRole("complementary")',
+    'locator("[role=contentinfo]")': 'getByRole("contentinfo")',
+    'locator("[role=dialog]")': 'getByRole("dialog")',
+    'locator("[role=link]")': 'getByRole("link")',
+    'locator("[role=listbox]")': 'getByRole("listbox")',
+    'locator("[role=main]")': 'getByRole("main")',
+    'locator("[role=menu]")': 'getByRole("menu")',
+    'locator("[role=menuitem]")': 'getByRole("menuitem")',
+    'locator("[role=navigation]")': 'getByRole("navigation")',
+    'locator("[role=option]")': 'getByRole("option")',
+    'locator("[role=progressbar]")': 'getByRole("progressbar")',
+    'locator("[role=radio]")': 'getByRole("radio")',
     'locator("[role=search]")': 'getByRole("search")',
+    'locator("[role=slider]")': 'getByRole("slider")',
+    'locator("[role=spinbutton]")': 'getByRole("spinbutton")',
+    'locator("[role=tab]")': 'getByRole("tab")',
+    'locator("[role=tablist]")': 'getByRole("tablist")',
+    'locator("[role=tabpanel]")': 'getByRole("tabpanel")',
+    'locator("[role=status]")': 'getByRole("status")',
+    'locator("[role=textbox]")': 'getByRole("textbox")',
 
-    // Test ID transformations
+    // Test ID transformations (alphabetized)
     "locator(\"[data-testid='": 'getByTestId("',
     'locator("[data-testid="': 'getByTestId("',
 
-    // Common class-based selectors to semantic alternatives
+    // Common class-based selectors to semantic alternatives (alphabetized)
     'locator(".btn")': 'getByRole("button")',
     'locator(".button")': 'getByRole("button")',
-    'locator(".link")': 'getByRole("link")',
-    'locator(".input")': 'getByRole("textbox")',
     'locator(".form-control")': 'getByRole("textbox")',
+    'locator(".input")': 'getByRole("textbox")',
+    'locator(".link")': 'getByRole("link")',
 
     // Body/html replacements (often problematic)
-    'locator("body")': 'locator("body")', // Keep as is but add comment
-    'locator("html")': 'locator("html")', // Keep as is but add comment
+    // Retained for legacy compatibility; prefer semantic locators (e.g., getByRole, getByTestId) for maintainability.
+    // TODO: Replace with semantic locator where possible.
+    'locator("body")': 'locator("body")',
+    'locator("html")': 'locator("html")',
 };
 
 /**
@@ -125,25 +142,45 @@ const locatorTransforms = {
  * creation")
  */
 const titleTransforms = {
-    'test("should': 'test("should', // Already good
-    'test("Test': 'test("should test',
-    'test("Verify': 'test("should verify',
+    // Ensures test titles start with "should check" for checking actions
     'test("Check': 'test("should check',
+
+    // Ensures test titles start with "should click" for click actions
     'test("Click': 'test("should click',
-    'test("Navigate': 'test("should navigate',
-    'test("Enter': 'test("should enter',
-    'test("Select': 'test("should select',
-    'test("Submit': 'test("should submit',
-    'test("Upload': 'test("should upload',
+
+    // Ensures test titles start with "should download" for download actions
     'test("Download': 'test("should download',
+
+    // Ensures test titles start with "should enter" for input actions
+    'test("Enter': 'test("should enter',
+
+    // Ensures test titles start with "should navigate" for navigation actions
+    'test("Navigate': 'test("should navigate',
+
+    // Ensures test titles start with "should select" for selection actions
+    'test("Select': 'test("should select',
+
+    // Ensures test titles start with "should submit" for submission actions
+    'test("Submit': 'test("should submit',
+
+    // Ensures test titles start with "should test" for clarity
+    'test("Test': 'test("should test',
+
+    // Ensures test titles start with "should upload" for upload actions
+    'test("Upload': 'test("should upload',
+
+    // Ensures test titles start with "should verify" for verification actions
+    'test("Verify': 'test("should verify',
+
+    // Already uses preferred "should" phrasing, no change needed
+    'test("should': 'test("should',
 };
 
 /**
- * Post-processing function to apply all transformations
+ * Post-processing function to apply all transformations.
  *
- * @param codegenOutput - The generated test code to transform
- *
- * @returns The transformed, lint-compliant test code
+ * @param {string} codegenOutput - The generated test code to transform.
+ * @returns {string} The transformed, lint-compliant test code.
  */
 function applyLintCompliantTransforms(codegenOutput) {
     let transformed = codegenOutput;
@@ -212,8 +249,8 @@ function applyLintCompliantTransforms(codegenOutput) {
                 : null;
         const describeName = firstTestTitleMatch
             ? firstTestTitleMatch[1]
-                  .replace(/^should\s+/, "")
-                  .replace(/\s+/g, " ")
+                .replace(/^should\s+/, "")
+                .replace(/\s+/g, " ")
             : "Generated Test";
 
         // Insert describe block after last import
@@ -259,9 +296,20 @@ function applyLintCompliantTransforms(codegenOutput) {
     return transformed;
 }
 
+/**
+ * @module playwright/codegen-template
+ *
+ * @remarks
+ * Exports the custom Playwright codegen template and transformation utilities.
+ *
+ * @exports applyLintCompliantTransforms - Applies all locator and title transformations, wraps tests in describe blocks, and post-processes generated code for lint compliance.
+ * @exports locatorTransforms - Maps raw locator strings to semantic alternatives for improved readability and maintainability.
+ * @exports testTemplate - The template string for generating Playwright test files with lint-compliant structure.
+ * @exports titleTransforms - Maps raw test titles to standardized, lint-compliant forms.
+ */
 export {
-    testTemplate,
-    locatorTransforms,
-    titleTransforms,
     applyLintCompliantTransforms,
+    locatorTransforms,
+    testTemplate,
+    titleTransforms,
 };

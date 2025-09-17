@@ -218,6 +218,24 @@ npm run dist
 
 </div>
 
+### Monitoring recommendations
+
+For practical guidance on configuring HTTP monitors and writing resilient integration tests (redirects, content negotiation, transient 5xx, timeouts), see:
+
+- HTTP Monitoring: Practical Recommendations → <a href="./docs/Testing/HTTP-Monitoring-Recommendations.md">docs/Testing/HTTP-Monitoring-Recommendations.md</a>
+
+### Fuzzing and property-based tests
+
+For running and tuning our fast-check based fuzzing suites, see:
+
+- Fast-Check Fuzzing Coverage Guide → <a href="./docs/Testing/FAST-CHECK-FUZZING-COVERAGE.md">docs/Testing/FAST-CHECK-FUZZING-COVERAGE.md</a>
+
+### End-to-end testing with Playwright
+
+For comprehensive testing with Playwright, including setup, configuration, and troubleshooting common issues:
+
+- Playwright Testing Guide → <a href="./docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md">docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md</a>
+
 ## **Architectural Principles**
 
 The application follows a **service-oriented architecture** with clear separation of concerns:

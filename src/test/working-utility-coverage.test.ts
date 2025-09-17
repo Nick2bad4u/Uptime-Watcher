@@ -4,6 +4,8 @@
 
 import { describe, expect, it } from "vitest";
 
+import { standardTestAnnotation } from "../../shared/test/testUtils";
+
 // Import utility functions from shared modules with low function coverage
 import {
     getEnvironment,
@@ -52,15 +54,13 @@ describe("Working Utility Coverage Tests", () => {
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: working-utility-coverage", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: working-utility-coverage", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+            standardTestAnnotation(
+                task,
+                annotate,
+                "working-utility-coverage",
+                "Core",
+                "Business Logic"
+            );
 
             // Test getEnvironment
             const env = getEnvironment();
@@ -81,15 +81,13 @@ describe("Working Utility Coverage Tests", () => {
 
     describe("Type Guard Utilities", () => {
         it("should test all type guard functions", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: working-utility-coverage", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: working-utility-coverage", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+            standardTestAnnotation(
+                task,
+                annotate,
+                "working-utility-coverage",
+                "Core",
+                "Business Logic"
+            );
 
             const testObj = { test: "value" } as const;
             const testArray = [
@@ -188,15 +186,13 @@ describe("Working Utility Coverage Tests", () => {
 
     describe("Validation Utilities", () => {
         it("should test validation functions", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: working-utility-coverage", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Validation", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: working-utility-coverage", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Validation", "type");
+            standardTestAnnotation(
+                task,
+                annotate,
+                "working-utility-coverage",
+                "Core",
+                "Validation"
+            );
 
             // Test validateMonitorType
             expect(validateMonitorType("http")).toBeTruthy();

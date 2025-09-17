@@ -349,3 +349,7 @@ test.describe(
 ```
 
 This gives you a complete setup for using Playwright codegen with your Uptime-Watcher Electron application! 🎭✨
+
+## 📚 **Related Documentation**
+
+- [Complete Playwright Testing Guide](./Testing/PLAYWRIGHT_TESTING_GUIDE.md) - Comprehensive testing setup, troubleshooting, and best practices

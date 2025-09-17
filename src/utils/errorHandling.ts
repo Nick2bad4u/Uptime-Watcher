@@ -1,5 +1,5 @@
 /**
- * Frontend utility error handling helpers.
+ * Frontend utility error handling module.
  *
  * @remarks
  * This module provides utility error handling functions for frontend use cases.

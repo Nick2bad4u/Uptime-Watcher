@@ -35,6 +35,8 @@
 
 import type { Site } from "@shared/types";
 
+import { getErrorMessage } from "@shared/utils/errorUtils";
+
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { HistoryRepository } from "../../services/database/HistoryRepository";
@@ -85,7 +87,7 @@ export class SiteLoadingOrchestrator {
             };
         } catch (error) {
             return {
-                message: `Failed to load sites: ${error instanceof Error ? error.message : "Unknown error"}`,
+                message: `Failed to load sites: ${getErrorMessage(error)}`,
                 sitesLoaded: 0,
                 success: false,
             };
@@ -193,7 +195,7 @@ export class SiteRepositoryService {
 
             return await Promise.all(sitePromises);
         } catch (error) {
-            const message = `Failed to fetch sites from database: ${error instanceof Error ? error.message : String(error)}`;
+            const message = `Failed to fetch sites from database: ${getErrorMessage(error)}`;
             this.logger.error(message, error);
             // eslint-disable-next-line ex/use-error-cause -- SiteLoadingError has specific constructor signature
             throw new SiteLoadingError(
@@ -219,7 +221,7 @@ export class SiteRepositoryService {
 
             this.logger.info(`Loaded ${sites.length} sites into cache`);
         } catch (error) {
-            const message = `Failed to load sites into cache: ${error instanceof Error ? error.message : String(error)}`;
+            const message = `Failed to load sites into cache: ${getErrorMessage(error)}`;
             this.logger.error(message, error);
 
             // Emit typed error event
