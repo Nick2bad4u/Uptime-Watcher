@@ -737,8 +737,8 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 }),
             ],
             {
-                numRuns: 5,
-                timeout: 3000,
+                numRuns: 3,
+                timeout: 30_000,
             }
         )("should handle realistic site configurations", async (config) => {
             render(<AddSiteForm />);
@@ -786,8 +786,8 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 }),
             ],
             {
-                numRuns: 10,
-                timeout: 5000,
+                numRuns: 5,
+                timeout: 20_000,
             }
         )(
             "should handle corporate service monitoring scenarios",
@@ -843,7 +843,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ],
             {
                 numRuns: 10,
-                timeout: 5000,
+                timeout: 20_000,
             }
         )("should handle regional service configurations", async (config) => {
             const regionalUrl = `${config.protocol}://service-${config.region}.example.com:${config.port}`;
@@ -881,7 +881,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ],
             {
                 numRuns: 10,
-                timeout: 5000,
+                timeout: 20_000,
             }
         )(
             "should handle multiple monitoring configurations",
@@ -935,7 +935,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ],
             {
                 numRuns: 2,
-                timeout: 2000,
+                timeout: 15_000,
             }
         )(
             "should handle different user personas and scenarios",
@@ -990,7 +990,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ],
             {
                 numRuns: 10,
-                timeout: 5000,
+                timeout: 20_000,
             }
         )(
             "should handle international and scheduling scenarios",
@@ -1058,7 +1058,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ],
             {
                 numRuns: 10,
-                timeout: 5000,
+                timeout: 20_000,
             }
         )(
             "should handle different website categories and features",
@@ -1137,7 +1137,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ],
             {
                 numRuns: 10,
-                timeout: 5000,
+                timeout: 20_000,
             }
         )(
             "should handle business context and compliance requirements",

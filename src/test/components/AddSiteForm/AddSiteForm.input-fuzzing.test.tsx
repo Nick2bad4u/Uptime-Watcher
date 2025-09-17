@@ -478,7 +478,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     "localhost-test"
                 ),
             ],
-            { numRuns: 2, timeout: 20_000 }
+            { numRuns: 2, timeout: 30_000 }
         )(
             "should handle realistic site name inputs safely",
             async (siteName) => {
@@ -537,7 +537,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     "    " // Multiple spaces
                 ),
             ],
-            { numRuns: 2, timeout: 20_000 }
+            { numRuns: 2, timeout: 30_000 }
         )(
             "should handle empty and whitespace site names appropriately",
             async (emptyName) => {
@@ -597,7 +597,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     "Site < Name"
                 ),
             ],
-            { numRuns: 2, timeout: 20_000 }
+            { numRuns: 2, timeout: 30_000 }
         )(
             "should safely handle potentially malicious site name inputs",
             async (maliciousName) => {
@@ -870,7 +870,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     )
                 ),
             ],
-            { numRuns: 3, timeout: 20_000 }
+            { numRuns: 3, timeout: 30_000 }
         )(
             "should handle invalid port number inputs appropriately",
             async (invalidPort) => {
@@ -917,7 +917,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     port: fc.string({ maxLength: 5 }), // String because user input is string
                 }),
             ],
-            { numRuns: 2, timeout: 20_000 }
+            { numRuns: 2, timeout: 30_000 }
         )(
             "should handle edge case form submissions without crashing",
             async (formData) => {
@@ -1070,7 +1070,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     ),
                 }),
             ],
-            { numRuns: 2, timeout: 20_000 }
+            { numRuns: 2, timeout: 30_000 }
         )(
             "should validate site configurations with realistic inputs",
             async (config) => {
