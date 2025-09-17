@@ -96,7 +96,7 @@ describe(performSinglePortCheck, () => {
             const timeout = 5000;
             mockPerformanceNow
                 .mockReturnValueOnce(100)
-                .mockReturnValueOnce(250); // start=100, end=250, diff=150
+                .mockReturnValueOnce(250); // Start=100, end=250, diff=150
 
             // Act
             const result = await performSinglePortCheck(host, port, timeout);

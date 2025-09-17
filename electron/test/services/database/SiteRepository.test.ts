@@ -420,7 +420,7 @@ describe(SiteRepository, () => {
 
                         await repository.upsert(siteData);
 
-                        // upsert returns void, so we just verify it was called correctly
+                        // Upsert returns void, so we just verify it was called correctly
                         expect(
                             mockDatabaseService.getDatabase
                         ).toHaveBeenCalled();
@@ -431,7 +431,7 @@ describe(SiteRepository, () => {
                             expect.arrayContaining([
                                 siteData.identifier,
                                 siteData.name,
-                                siteData.monitoring ? 1 : 0, // monitoring is converted to number
+                                siteData.monitoring ? 1 : 0, // Monitoring is converted to number
                             ])
                         );
                     }
@@ -444,7 +444,7 @@ describe(SiteRepository, () => {
                 fc.asyncProperty(
                     fc
                         .string({ minLength: 1, maxLength: 100 })
-                        .filter((s) => s.trim().length > 0), // identifier as string
+                        .filter((s) => s.trim().length > 0), // Identifier as string
                     fc.record({
                         identifier: fc
                             .string({ minLength: 1, maxLength: 100 })
@@ -465,7 +465,7 @@ describe(SiteRepository, () => {
 
                         await repository.upsert(updateData);
 
-                        // upsert returns void, so we just verify it was called correctly
+                        // Upsert returns void, so we just verify it was called correctly
                         expect(
                             mockDatabaseService.getDatabase
                         ).toHaveBeenCalled();
@@ -490,7 +490,7 @@ describe(SiteRepository, () => {
                     fc.array(
                         fc
                             .string({ minLength: 1, maxLength: 100 })
-                            .filter((s) => s.trim().length > 0), // identifiers as strings
+                            .filter((s) => s.trim().length > 0), // Identifiers as strings
                         { minLength: 1, maxLength: 10 }
                     ),
                     async (siteIdentifiers) => {
@@ -529,7 +529,7 @@ describe(SiteRepository, () => {
                     ),
                     fc
                         .string({ minLength: 1, maxLength: 100 })
-                        .filter((s) => s.trim().length > 0), // searchIdentifier as string
+                        .filter((s) => s.trim().length > 0), // SearchIdentifier as string
                     async (mockSite, searchIdentifier) => {
                         mockDatabase.get.mockReturnValue(mockSite);
 

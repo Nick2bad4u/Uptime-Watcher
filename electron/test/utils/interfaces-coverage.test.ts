@@ -237,9 +237,9 @@ describe("Interfaces Coverage Tests", () => {
             };
 
             // Test with edge case arguments
-            mockLogger.debug(""); // empty string
+            mockLogger.debug(""); // Empty string
             mockLogger.info(null as any); // null
-            mockLogger.warn(undefined as any); // undefined
+            mockLogger.warn(undefined as any); // Undefined
             mockLogger.error("error", null as any); // null error
 
             expect(mockLogger.debug).toHaveBeenCalledWith("");

@@ -60,7 +60,7 @@ interface NotificationQueue {
 interface RateLimitRule {
     category: string;
     maxNotifications: number;
-    timeWindow: number; // milliseconds
+    timeWindow: number; // Milliseconds
     currentCount: number;
     windowStart: number;
     violationCount: number;

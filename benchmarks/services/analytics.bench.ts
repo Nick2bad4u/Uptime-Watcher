@@ -50,8 +50,8 @@ interface AnalyticsQuery {
     };
     aggregation: {
         type: "sum" | "avg" | "min" | "max" | "count" | "percentile";
-        interval?: number; // in milliseconds
-        percentile?: number; // for percentile aggregation
+        interval?: number; // In milliseconds
+        percentile?: number; // For percentile aggregation
     };
     filters?: Record<string, any>;
     groupBy?: string[];
@@ -91,7 +91,7 @@ interface AlertRule {
     condition: {
         operator: ">" | "<" | ">=" | "<=" | "==" | "!=";
         threshold: number;
-        duration: number; // in milliseconds
+        duration: number; // In milliseconds
     };
     isActive: boolean;
     lastTriggered?: Date;
@@ -109,8 +109,8 @@ interface Alert {
 
 class MockMetricsStorage {
     private timeSeries = new Map<string, TimeSeries>();
-    private indexByTime = new Map<number, string[]>(); // timestamp -> metric names
-    private indexByTags = new Map<string, Set<string>>(); // tag -> metric names
+    private indexByTime = new Map<number, string[]>(); // Timestamp -> metric names
+    private indexByTags = new Map<string, Set<string>>(); // Tag -> metric names
 
     async store(
         name: string,

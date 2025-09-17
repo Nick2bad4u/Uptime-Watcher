@@ -389,7 +389,7 @@ export function parseCacheKey(key: StandardizedCacheKey): {
         };
     }
 
-    // parts.length === 3
+    // Parts.length === 3
     const [
         prefix,
         operation,

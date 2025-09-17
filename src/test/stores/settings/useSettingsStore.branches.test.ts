@@ -353,7 +353,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
                 success: true,
-                data: "not-a-number" as any, // typeof will be "string", not "number"
+                data: "not-a-number" as any, // Typeof will be "string", not "number"
             });
 
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
@@ -382,7 +382,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
                 success: true,
-                data: -500, // typeof is "number" but value is not > 0
+                data: -500, // Typeof is "number" but value is not > 0
             });
 
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({

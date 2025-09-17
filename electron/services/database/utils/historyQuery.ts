@@ -78,7 +78,7 @@ export function findHistoryByMonitorId(
                 monitorId,
             }),
             error
-        ); /* v8 ignore next */
+        ); /* V8 ignore next */
         throw error;
     }
 }

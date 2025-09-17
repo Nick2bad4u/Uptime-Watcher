@@ -323,7 +323,7 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
                 mockConfig.timeoutManager.scheduleTimeout
             ).toHaveBeenCalledWith(
                 "test-operation-id",
-                45_000 + 5000 // timeout * 1000 + buffer
+                45_000 + 5000 // Timeout * 1000 + buffer
             );
         });
     });

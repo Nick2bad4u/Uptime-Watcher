@@ -215,7 +215,7 @@ describe(SaveButton, () => {
 
             const button = screen.getByTestId("themed-button");
             expect(button).toBeDisabled();
-            expect(button).toHaveAttribute("data-variant", "primary"); // isLoading doesn't change variant
+            expect(button).toHaveAttribute("data-variant", "primary"); // IsLoading doesn't change variant
         });
 
         it("should be disabled when both disabled and isLoading are true", ({

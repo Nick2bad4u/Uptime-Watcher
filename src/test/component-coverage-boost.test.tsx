@@ -1133,7 +1133,7 @@ describe("Component Coverage Boost", () => {
                 metric,
             ];
             const visible = monitorUILogic.getVisibleComponents(components);
-            expect(visible).toHaveLength(3); // deleteButton is not visible
+            expect(visible).toHaveLength(3); // DeleteButton is not visible
         });
 
         it("should handle StatusBadge edge cases", ({ task, annotate }) => {
@@ -1441,7 +1441,7 @@ describe("Component Coverage Boost", () => {
                         const end = new Date(incident.endTime).getTime();
                         totalDowntime += end - start;
                     }
-                    return totalDowntime / incidents.length / 1000 / 60; // minutes
+                    return totalDowntime / incidents.length / 1000 / 60; // Minutes
                 },
             };
 

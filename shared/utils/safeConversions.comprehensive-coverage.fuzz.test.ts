@@ -178,7 +178,7 @@ describe("safeConversions comprehensive fuzzing tests", () => {
                 expect(typeof result).toBe("number");
                 expect(Number.isNaN(result)).toBeFalsy();
 
-                // safeParseFloat preserves infinity from numeric inputs but rejects it from strings
+                // SafeParseFloat preserves infinity from numeric inputs but rejects it from strings
                 if (
                     typeof input === "number" &&
                     !Number.isFinite(input) &&
@@ -681,10 +681,10 @@ describe("safeConversions comprehensive fuzzing tests", () => {
                 expect(
                     Number.isNaN(safeNumberConversion(input, 0))
                 ).toBeFalsy();
-                // safeNumberConversion may legitimately return ±Infinity for such inputs
+                // SafeNumberConversion may legitimately return ±Infinity for such inputs
 
                 expect(Number.isNaN(safeParseFloat(input, 0))).toBeFalsy();
-                // safeParseFloat may return ±Infinity for numeric Infinity inputs
+                // SafeParseFloat may return ±Infinity for numeric Infinity inputs
 
                 expect(Number.isNaN(safeParseInt(input, 0))).toBeFalsy();
                 expect(Number.isFinite(safeParseInt(input, 0))).toBeTruthy();

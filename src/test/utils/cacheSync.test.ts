@@ -91,7 +91,7 @@ describe("cacheSync", () => {
 
         // Clean up any existing window.electronAPI
         if (globalThis.window !== undefined) {
-            // delete window.electronAPI;
+            // Delete window.electronAPI;
             (globalThis as any).electronAPI = undefined;
         }
     });

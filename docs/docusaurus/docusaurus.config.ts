@@ -62,7 +62,7 @@ const config: Config = {
         [
             "docusaurus-plugin-copy-page-button",
             {
-                /*  customStyles: {
+                /*  CustomStyles: {
                     button: {
                         className: "my-custom-button",
                         style: {
@@ -175,7 +175,7 @@ const config: Config = {
             "classic",
             {
                 blog: {
-                    authorsMapPath: "authors.yml", // file located at blog/authors.yml
+                    authorsMapPath: "authors.yml", // File located at blog/authors.yml
                     blogDescription: "Updates and posts about Uptime Watcher",
                     blogSidebarCount: 5,
                     blogSidebarTitle: "Recent posts",
@@ -193,10 +193,10 @@ const config: Config = {
                         description: "Uptime Watcher updates and changelogs",
                         limit: 20,
                         title: "Uptime Watcher Blog",
-                        type: ["rss", "atom"], // enable rss + atom
+                        type: ["rss", "atom"], // Enable rss + atom
                     },
                     include: ["**/*.{md,mdx}"],
-                    path: "blog", // relative to site dir
+                    path: "blog", // Relative to site dir
                     postsPerPage: 10,
                     routeBasePath: "blog", // URL: /Uptime-Watcher/blog/
                     showReadingTime: true,
@@ -239,26 +239,26 @@ const config: Config = {
                 },
                 svgr: {
                     svgrConfig: {
-                        dimensions: false, // remove width/height so CSS controls size
-                        expandProps: "start", // spread props at the start: <svg {...props}>
-                        icon: true, // treat SVGs as icons (scales via viewBox)
-                        memo: true, // wrap component with React.memo
-                        native: false, // produce web React components (not React Native)
-                        prettier: true, // run Prettier on output
+                        dimensions: false, // Remove width/height so CSS controls size
+                        expandProps: "start", // Spread props at the start: <svg {...props}>
+                        icon: true, // Treat SVGs as icons (scales via viewBox)
+                        memo: true, // Wrap component with React.memo
+                        native: false, // Produce web React components (not React Native)
+                        prettier: true, // Run Prettier on output
                         prettierConfig: "../../.prettierrc",
                         replaceAttrValues: {
                             "#000": "currentColor",
                             "#000000": "currentColor",
-                        }, // inherit color
-                        svgo: true, // enable SVGO optimizations
+                        }, // Inherit color
+                        svgo: true, // Enable SVGO optimizations
                         svgoConfig: {
                             plugins: [
-                                { active: false, name: "removeViewBox" }, // keep viewBox for scalability
+                                { active: false, name: "removeViewBox" }, // Keep viewBox for scalability
                             ],
                         },
-                        svgProps: { focusable: "false", role: "img" }, // default SVG props
-                        titleProp: true, // allow passing a title prop for accessibility
-                        typescript: true, // generate TypeScript-friendly output (.tsx)
+                        svgProps: { focusable: "false", role: "img" }, // Default SVG props
+                        titleProp: true, // Allow passing a title prop for accessibility
+                        typescript: true, // Generate TypeScript-friendly output (.tsx)
                     },
                 },
                 theme: {
@@ -444,7 +444,7 @@ const config: Config = {
                 light: "rgb(255, 255, 255)",
             },
             config: {
-                // options you can specify via https://github.com/francoischalifour/medium-zoom#usage
+                // Options you can specify via https://github.com/francoischalifour/medium-zoom#usage
             },
             selector: ".markdown > img",
         },

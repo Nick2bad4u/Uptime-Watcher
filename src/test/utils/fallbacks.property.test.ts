@@ -329,7 +329,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                 // Use a smaller set to reduce unhandled promises
                 const operations = [
                     async () => {
-                        /* successful operation */
+                        /* Successful operation */
                     },
                     async () => {
                         throw new Error("failure");
@@ -851,7 +851,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                 expect(() =>
                     getMonitorTypeDisplayLabel(input as any)
                 ).not.toThrow();
-                // truncateForLogging returns the original value for falsy inputs (including null)
+                // TruncateForLogging returns the original value for falsy inputs (including null)
                 expect(truncateForLogging(input as any)).toBe(input);
             }
         });

@@ -110,7 +110,7 @@ describe(useSettingsStore, () => {
             expect(state.settings.notifications).toBeFalsy();
             expect(state.settings.soundAlerts).toBeTruthy();
             expect(state.settings.theme).toBe("dark");
-            expect(state.settings.autoStart).toBeFalsy(); // unchanged
+            expect(state.settings.autoStart).toBeFalsy(); // Unchanged
         });
 
         it("should reset settings to defaults", async ({ task, annotate }) => {

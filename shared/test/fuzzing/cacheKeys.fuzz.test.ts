@@ -61,13 +61,13 @@ describe("cacheKeys fuzzing tests", () => {
             fc.assert(
                 fc.property(
                     fc.oneof(
-                        fc.constant(""), // empty string
+                        fc.constant(""), // Empty string
                         fc.constant("single-part"), // no colons
-                        fc.constant(":missing-first"), // missing first part
-                        fc.constant("missing-last:"), // missing last part
-                        fc.constant("config::empty-middle"), // empty middle part
-                        fc.constant("config:too:many:colons:here"), // too many parts
-                        fc.constant("invalid:identifier"), // invalid prefix
+                        fc.constant(":missing-first"), // Missing first part
+                        fc.constant("missing-last:"), // Missing last part
+                        fc.constant("config::empty-middle"), // Empty middle part
+                        fc.constant("config:too:many:colons:here"), // Too many parts
+                        fc.constant("invalid:identifier"), // Invalid prefix
                         fc.string().filter(
                             (s) =>
                                 s.split(":").length > 3 ||
@@ -78,7 +78,7 @@ describe("cacheKeys fuzzing tests", () => {
                                     "site",
                                     "validation",
                                 ].includes(s.split(":")[0] || "")
-                        ) // invalid patterns
+                        ) // Invalid patterns
                     ),
                     (invalidKey) => {
                         expect(isStandardizedCacheKey(invalidKey)).toBeFalsy();
@@ -171,12 +171,12 @@ describe("cacheKeys fuzzing tests", () => {
             fc.assert(
                 fc.property(
                     fc.oneof(
-                        fc.constant(""), // empty string
+                        fc.constant(""), // Empty string
                         fc.constant("single-part"), // no colons
-                        fc.constant(":missing-first"), // missing first part
-                        fc.constant("missing-last:"), // missing last part
-                        fc.constant("::empty-middle"), // empty middle part
-                        fc.constant("too:many:colons:here") // too many parts
+                        fc.constant(":missing-first"), // Missing first part
+                        fc.constant("missing-last:"), // Missing last part
+                        fc.constant("::empty-middle"), // Empty middle part
+                        fc.constant("too:many:colons:here") // Too many parts
                     ),
                     (invalidKey) => {
                         expect(() => parseCacheKey(invalidKey)).toThrow();

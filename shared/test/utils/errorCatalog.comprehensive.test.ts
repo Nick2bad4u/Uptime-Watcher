@@ -36,7 +36,7 @@ describe("errorCatalog utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const template = "Monitor {monitorId} on site {siteId} failed";
-            const variables = { monitorId: "mon-123" }; // missing siteId
+            const variables = { monitorId: "mon-123" }; // Missing siteId
 
             const result = formatErrorMessage(template, variables);
 

@@ -181,8 +181,8 @@ export function createHttpClient(config: MonitorConfig): AxiosInstance {
         // Connection pooling for better performance
         httpAgent: new http.Agent({ keepAlive: true }),
         httpsAgent: new https.Agent({ keepAlive: true }),
-        maxBodyLength: DEFAULT_MAX_BODY_LENGTH, // bounded request size
-        maxContentLength: DEFAULT_MAX_CONTENT_LENGTH, // bounded response size
+        maxBodyLength: DEFAULT_MAX_BODY_LENGTH, // Bounded request size
+        maxContentLength: DEFAULT_MAX_CONTENT_LENGTH, // Bounded response size
         maxRedirects: DEFAULT_MAX_REDIRECTS,
         // Text response minimizes parsing overhead; status codes are
         // sufficient for monitoring

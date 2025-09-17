@@ -1470,7 +1470,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     status: "pending",
                     responseTime: -1,
                     history: [],
-                    // lastChecked is intentionally missing (optional field)
+                    // LastChecked is intentionally missing (optional field)
                 };
 
                 const result = validateMonitorData("http", incompleteData);

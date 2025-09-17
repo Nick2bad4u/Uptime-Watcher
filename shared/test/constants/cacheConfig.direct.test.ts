@@ -54,19 +54,19 @@ describe("cacheConfig - Direct Function Coverage", () => {
         expect(CACHE_NAMES.monitors("")).toBe("monitors-");
         expect(CACHE_NAMES.monitors("test")).toBe("monitors-test");
 
-        // settings function branches
+        // Settings function branches
         expect(CACHE_NAMES.settings()).toBe("settings");
         expect(CACHE_NAMES.settings(undefined)).toBe("settings");
         expect(CACHE_NAMES.settings("")).toBe("settings-");
         expect(CACHE_NAMES.settings("test")).toBe("settings-test");
 
-        // sites function branches
+        // Sites function branches
         expect(CACHE_NAMES.sites()).toBe("sites");
         expect(CACHE_NAMES.sites(undefined)).toBe("sites");
         expect(CACHE_NAMES.sites("")).toBe("sites-");
         expect(CACHE_NAMES.sites("test")).toBe("sites-test");
 
-        // temporary function (no conditional logic but ensure coverage)
+        // Temporary function (no conditional logic but ensure coverage)
         expect(CACHE_NAMES.temporary("")).toBe("temporary-");
         expect(CACHE_NAMES.temporary("test")).toBe("temporary-test");
         expect(CACHE_NAMES.temporary("import")).toBe("temporary-import");

@@ -49,7 +49,7 @@ describe("safeConversions - Complete Function Coverage", () => {
 
             expect(safeParseCheckInterval(60_000)).toBe(60_000);
             expect(safeParseCheckInterval("60000")).toBe(60_000);
-            expect(safeParseCheckInterval(60)).toBe(300_000); // below minimum
+            expect(safeParseCheckInterval(60)).toBe(300_000); // Below minimum
             expect(safeParseCheckInterval("invalid")).toBe(300_000);
             expect(safeParseCheckInterval(null)).toBe(300_000);
         });
@@ -101,8 +101,8 @@ describe("safeConversions - Complete Function Coverage", () => {
 
             expect(safeParsePercentage(50)).toBe(50);
             expect(safeParsePercentage("75")).toBe(75);
-            expect(safeParsePercentage(150)).toBe(100); // clamped to max
-            expect(safeParsePercentage(-10)).toBe(0); // clamped to min
+            expect(safeParsePercentage(150)).toBe(100); // Clamped to max
+            expect(safeParsePercentage(-10)).toBe(0); // Clamped to min
             expect(safeParsePercentage("invalid", 25)).toBe(25);
             expect(safeParsePercentage(null)).toBe(0);
         });
@@ -117,8 +117,8 @@ describe("safeConversions - Complete Function Coverage", () => {
 
             expect(safeParsePort(443)).toBe(443);
             expect(safeParsePort("8080")).toBe(8080);
-            expect(safeParsePort(0)).toBe(80); // invalid port
-            expect(safeParsePort(65_536)).toBe(80); // invalid port
+            expect(safeParsePort(0)).toBe(80); // Invalid port
+            expect(safeParsePort(65_536)).toBe(80); // Invalid port
             expect(safeParsePort("invalid", 3000)).toBe(3000);
             expect(safeParsePort(null)).toBe(80);
         });
@@ -136,8 +136,8 @@ describe("safeConversions - Complete Function Coverage", () => {
 
             expect(safeParsePositiveInt(5)).toBe(5);
             expect(safeParsePositiveInt("10")).toBe(10);
-            expect(safeParsePositiveInt(0)).toBe(1); // forced to positive
-            expect(safeParsePositiveInt(-5)).toBe(1); // forced to positive
+            expect(safeParsePositiveInt(0)).toBe(1); // Forced to positive
+            expect(safeParsePositiveInt(-5)).toBe(1); // Forced to positive
             expect(safeParsePositiveInt("invalid", 3)).toBe(3);
             expect(safeParsePositiveInt(null)).toBe(1);
         });
@@ -155,8 +155,8 @@ describe("safeConversions - Complete Function Coverage", () => {
 
             expect(safeParseRetryAttempts(3)).toBe(3);
             expect(safeParseRetryAttempts("5")).toBe(5);
-            expect(safeParseRetryAttempts(0)).toBe(0); // valid minimum
-            expect(safeParseRetryAttempts(20)).toBe(3); // above maximum
+            expect(safeParseRetryAttempts(0)).toBe(0); // Valid minimum
+            expect(safeParseRetryAttempts(20)).toBe(3); // Above maximum
             expect(safeParseRetryAttempts("invalid")).toBe(3);
             expect(safeParseRetryAttempts(null)).toBe(3);
         });
@@ -174,8 +174,8 @@ describe("safeConversions - Complete Function Coverage", () => {
 
             expect(safeParseTimeout(5000)).toBe(5000);
             expect(safeParseTimeout("10000")).toBe(10_000);
-            expect(safeParseTimeout(500)).toBe(500); // positive values pass through
-            expect(safeParseTimeout(0)).toBe(10_000); // zero is invalid
+            expect(safeParseTimeout(500)).toBe(500); // Positive values pass through
+            expect(safeParseTimeout(0)).toBe(10_000); // Zero is invalid
             expect(safeParseTimeout(-1000)).toBe(10_000); // negative is invalid
             expect(safeParseTimeout("invalid")).toBe(10_000);
             expect(safeParseTimeout(null)).toBe(10_000);

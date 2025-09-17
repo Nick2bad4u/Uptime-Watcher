@@ -337,7 +337,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             ).toHaveBeenCalledWith(
                 mockSite,
                 "monitor-1",
-                true // isManualCheck flag
+                true // IsManualCheck flag
             );
             expect(
                 mockDependencies.eventEmitter.emitTyped

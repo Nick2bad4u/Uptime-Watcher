@@ -12,8 +12,8 @@ Object.defineProperty(globalThis, "matchMedia", {
         matches: false,
         media: query,
         onchange: null,
-        addListener: vi.fn(), // deprecated
-        removeListener: vi.fn(), // deprecated
+        addListener: vi.fn(), // Deprecated
+        removeListener: vi.fn(), // Deprecated
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
         dispatchEvent: vi.fn(),
@@ -209,7 +209,7 @@ describe(ThemeManager, () => {
             (globalThis as any).matchMedia = undefined;
 
             const preference = themeManager.getSystemThemePreference();
-            expect(preference).toBe("light"); // default fallback
+            expect(preference).toBe("light"); // Default fallback
 
             // Restore matchMedia
             globalThis.matchMedia = originalMatchMedia;

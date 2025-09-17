@@ -768,7 +768,7 @@ describe("Branch Coverage Optimization Tests", () => {
             const monitor = {
                 id: "test-1",
                 type: "http" as const,
-                // url is missing
+                // Url is missing
                 checkInterval: 60_000,
                 timeout: 5000,
                 retryAttempts: 3,

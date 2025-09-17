@@ -348,7 +348,7 @@ describe("useSite Hook", () => {
 
             const { result } = renderHook(() => useSite(multiMonitorSite));
 
-            // useSite delegates monitor management to useSiteMonitor
+            // UseSite delegates monitor management to useSiteMonitor
             expect(result.current).toBeDefined();
         });
 

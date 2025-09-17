@@ -679,7 +679,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                 const stringInput = String(input);
                 if (isValidInteger(stringInput)) {
                     const parsed = Number.parseInt(stringInput, 10);
-                    // safeInteger function parses valid integer strings, even if beyond safe bounds
+                    // SafeInteger function parses valid integer strings, even if beyond safe bounds
                     expect(result).toBe(parsed);
                 } else {
                     // Property: Invalid inputs should return fallback

@@ -597,7 +597,7 @@ describe("Value Converters Utility", () => {
                 undefined,
                 updateFields,
                 updateValues
-            ); // skipped
+            ); // Skipped
             addBooleanField(
                 "notificationsEnabled",
                 false,
@@ -629,7 +629,7 @@ describe("Value Converters Utility", () => {
 
             const rawData = {
                 timestamp: new Date("2023-12-25T10:30:00.000Z"),
-                timeout: "5000", // string number
+                timeout: "5000", // String number
                 retries: 3,
                 description: undefined,
                 isEnabled: true,

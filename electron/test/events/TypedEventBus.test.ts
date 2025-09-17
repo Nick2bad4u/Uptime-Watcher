@@ -190,7 +190,7 @@ describe(TypedEventBus, () => {
             });
             eventBus.on("test-event", errorListener);
 
-            // emitTyped should not throw when listeners error - it logs them internally
+            // EmitTyped should not throw when listeners error - it logs them internally
             await expect(
                 eventBus.emitTyped("test-event", { data: "test" })
             ).resolves.toBeUndefined();

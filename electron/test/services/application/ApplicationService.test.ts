@@ -13,7 +13,7 @@ const {
     mockApp,
     mockServiceContainer,
     mockUptimeOrchestrator,
-    // mockIpcService, // Currently unused
+    // MockIpcService, // Currently unused
     // mockAutoUpdaterService, // Currently unused
     // mockWindowService, // Currently unused
     mockLogger,

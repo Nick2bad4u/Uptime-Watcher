@@ -238,7 +238,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 downloadError
             );
 
-            // logger.error should be called and error should be rethrown
+            // Logger.error should be called and error should be rethrown
             (logger.error as any).mockClear?.();
 
             await expect(actions.downloadSQLiteBackup()).rejects.toThrow(

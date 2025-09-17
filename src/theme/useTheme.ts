@@ -180,7 +180,7 @@ export function useTheme(): UseThemeReturn {
                 cleanup();
             };
         },
-        // systemTheme is not needed as dependency since this effect only sets up listeners
+        // SystemTheme is not needed as dependency since this effect only sets up listeners
         [updateSystemTheme]
     );
 

@@ -852,9 +852,9 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
                 stopMonitoringForSite(config, "site1"), // This returns false without callback
             ]);
 
-            expect(result1).toBeTruthy(); // startAllMonitoring should succeed
-            expect(result2).toBeFalsy(); // startMonitoringForSite without callback returns false
-            expect(result3).toBeFalsy(); // stopMonitoringForSite without callback returns false
+            expect(result1).toBeTruthy(); // StartAllMonitoring should succeed
+            expect(result2).toBeFalsy(); // StartMonitoringForSite without callback returns false
+            expect(result3).toBeFalsy(); // StopMonitoringForSite without callback returns false
         });
     });
 });

@@ -560,7 +560,7 @@ describe(ServiceContainer, () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ServiceContainer", "component");
 
-            // const statusBefore = container.getInitializationStatus(); // Currently unused
+            // Const statusBefore = container.getInitializationStatus(); // Currently unused
 
             // Initialize a service
             container.getDatabaseService();

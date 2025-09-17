@@ -96,7 +96,7 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
             const isNumber = (value: unknown): value is number =>
                 typeof value === "number";
 
-            expect(safeObjectAccess(obj, "timeout", 1000, isNumber)).toBe(1000); // string fails number validator
+            expect(safeObjectAccess(obj, "timeout", 1000, isNumber)).toBe(1000); // String fails number validator
             expect(safeObjectAccess(obj, "count", 1000, isNumber)).toBe(42); // number passes validator
         });
 

@@ -186,7 +186,7 @@ async function emitStartEvent(
             ...context,
         });
     } catch (eventError) {
-        /* v8 ignore next 2 */ logger.debug(
+        /* V8 ignore next 2 */ logger.debug(
             `[OperationalHooks] Failed to emit start event for ${operationName}`,
             eventError
         );
@@ -212,7 +212,7 @@ async function handleFailure<T>(
         try {
             await onFailure(error, attempt);
         } catch (callbackError) {
-            /* v8 ignore next 2 */ logger.debug(
+            /* V8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] Failure callback failed for ${operationName}`,
                 callbackError
             );
@@ -230,14 +230,14 @@ async function handleFailure<T>(
                 ...context,
             });
         } catch (eventError) {
-            /* v8 ignore next 2 */ logger.debug(
+            /* V8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] Failed to emit failure event for ${operationName}`,
                 eventError
             );
         }
     }
 
-    /* v8 ignore next 2 */ logger.error(
+    /* V8 ignore next 2 */ logger.error(
         `[OperationalHooks] ${operationName} failed permanently after ${attempt} attempts`,
         {
             duration,
@@ -272,7 +272,7 @@ async function handleRetry<T>(
         try {
             await onRetry(attempt, error);
         } catch (callbackError) {
-            /* v8 ignore next 2 */ logger.debug(
+            /* V8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] Retry callback failed for ${operationName}`,
                 callbackError
             );
@@ -282,7 +282,7 @@ async function handleRetry<T>(
     const delay = calculateDelay(attempt, initialDelay, backoff);
 
     if (delay > 0) {
-        /* v8 ignore next 2 */ logger.debug(
+        /* V8 ignore next 2 */ logger.debug(
             `[OperationalHooks] Retrying ${operationName} in ${delay}ms`,
             {
                 attempt: attempt + 1,
@@ -319,7 +319,7 @@ async function handleSuccess<T>(
         try {
             await onSuccess(result);
         } catch (callbackError) {
-            /* v8 ignore next 2 */ logger.debug(
+            /* V8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] Success callback failed for ${operationName}`,
                 callbackError
             );
@@ -338,14 +338,14 @@ async function handleSuccess<T>(
                 ...context,
             });
         } catch (eventError) {
-            /* v8 ignore next 2 */ logger.debug(
+            /* V8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] Failed to emit success event for ${operationName}`,
                 eventError
             );
         }
     }
 
-    /* v8 ignore next 2 */ logger.debug(
+    /* V8 ignore next 2 */ logger.debug(
         `[OperationalHooks] ${operationName} succeeded after ${attempt} attempt(s)`,
         {
             duration,
@@ -387,7 +387,7 @@ export async function withOperationalHooks<T>(
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-            /* v8 ignore next 2 */ logger.debug(
+            /* V8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] ${operationName} attempt ${attempt}/${maxRetries}`,
                 {
                     context,
@@ -410,7 +410,7 @@ export async function withOperationalHooks<T>(
             lastError =
                 error instanceof Error ? error : new Error(String(error));
 
-            /* v8 ignore next 2 */ logger.debug(
+            /* V8 ignore next 2 */ logger.debug(
                 `[OperationalHooks] ${operationName} failed on attempt ${attempt}/${maxRetries}`,
                 {
                     error: lastError,

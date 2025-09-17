@@ -360,7 +360,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
             "hasProperty should handle non-object inputs gracefully",
             (value, propName) => {
                 const result = hasProperty(value, propName);
-                // hasProperty only returns true for objects that actually have the property
+                // HasProperty only returns true for objects that actually have the property
                 // It should return false for non-objects (including null/undefined)
                 const expectedResult = false;
 

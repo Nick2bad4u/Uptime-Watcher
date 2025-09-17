@@ -251,7 +251,7 @@ describe("StringConversion Complete Coverage Fuzzing Tests", () => {
                 expect(parsed[1]).toBe("hello");
                 expect(parsed[2]).toBeTruthy();
                 expect(parsed[3]).toBe(null);
-                expect(parsed[4]).toBe(null); // undefined becomes null in JSON
+                expect(parsed[4]).toBe(null); // Undefined becomes null in JSON
             } catch {
                 expect(result).toBe("[Complex Object]");
             }

@@ -44,8 +44,8 @@ interface DownloadProgress {
     currentTime: number;
     totalBytes: number;
     downloadedBytes: number;
-    speed: number; // bytes per second
-    remainingTime: number; // milliseconds
+    speed: number; // Bytes per second
+    remainingTime: number; // Milliseconds
     progress: number; // 0-1
     paused: boolean;
     error?: string;
@@ -534,7 +534,7 @@ describe("Updater Service Benchmarks", () => {
                     2000,
                     3000,
                     1000,
-                ], // milliseconds
+                ], // Milliseconds
                 successRate: 0.95,
                 backupEnabled: true,
                 rollbackSupported: true,

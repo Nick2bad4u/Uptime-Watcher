@@ -141,7 +141,7 @@ describe("Database Schema", () => {
                     // Assert that database operations scale correctly
                     expect(testDatabase.run).toHaveBeenCalledTimes(
                         callCount * 6
-                    ); // sites + monitors + history + settings + stats + logs tables
+                    ); // Sites + monitors + history + settings + stats + logs tables
 
                     // Verify each call included the required table creations
                     for (let i = 0; i < callCount; i++) {

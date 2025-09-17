@@ -574,7 +574,7 @@ describe(ConfigurationManager, () => {
                 type: "port",
                 host: "example.com",
                 port: 80,
-                // url is omitted since it's not needed for port monitors
+                // Url is omitted since it's not needed for port monitors
             });
             const expectedResult: ValidationResult = {
                 success: true,

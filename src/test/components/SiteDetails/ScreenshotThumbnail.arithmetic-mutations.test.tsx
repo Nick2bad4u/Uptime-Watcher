@@ -264,7 +264,7 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
             { timeout: 2000 }
         );
 
-        // overlayW should be 900 (capped), so overlayW / 2 = 450
+        // OverlayW should be 900 (capped), so overlayW / 2 = 450
         // This affects the centering calculation
         const portal = document.querySelector(
             ".site-details-thumbnail-portal-overlay"

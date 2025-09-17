@@ -116,7 +116,7 @@ describe("monitorTitleFormatters", () => {
                 const monitor = createMockMonitor({
                     type: "http",
                 });
-                // url is undefined by default
+                // Url is undefined by default
 
                 const result = formatTitleSuffix(monitor);
 
@@ -256,7 +256,7 @@ describe("monitorTitleFormatters", () => {
                     type: "port",
                     port: 5432,
                 });
-                // host is already undefined in the base case
+                // Host is already undefined in the base case
 
                 const result = formatTitleSuffix(monitor);
 
@@ -303,7 +303,7 @@ describe("monitorTitleFormatters", () => {
                     type: "port",
                     host: "database.example.com",
                 });
-                // port is already undefined in the base case
+                // Port is already undefined in the base case
 
                 const result = formatTitleSuffix(monitor);
 

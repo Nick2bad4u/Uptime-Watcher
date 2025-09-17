@@ -202,7 +202,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
                     templateWithPlaceholders += ` {${key}}`;
                 }
 
-                // formatErrorMessage should not throw even if params are missing
+                // FormatErrorMessage should not throw even if params are missing
                 expect(() =>
                     formatErrorMessage(templateWithPlaceholders, params)
                 ).not.toThrow();

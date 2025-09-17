@@ -82,7 +82,7 @@ describe("ArithmeticOperator Mutations - Frontend Components", () => {
                 const viewportW = 1200;
                 const maxImgW = Math.min(viewportW * 0.9, 900);
 
-                // viewportW * 0.9 = 1200 * 0.9 = 1080
+                // ViewportW * 0.9 = 1200 * 0.9 = 1080
                 // Math.min(1080, 900) = 900
                 expect(maxImgW).toBe(900);
 
@@ -103,7 +103,7 @@ describe("ArithmeticOperator Mutations - Frontend Components", () => {
                 const viewportH = 600;
                 const maxImgH = Math.min(viewportH * 0.9, 700);
 
-                // viewportH * 0.9 = 600 * 0.9 = 540
+                // ViewportH * 0.9 = 600 * 0.9 = 540
                 expect(maxImgH).toBe(540);
 
                 // With mutation: 600 / 0.9 = 666.67 ≠ 540

@@ -456,8 +456,8 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isStandardizedCacheKey("monitor::")).toBeFalsy(); // empty operation in 3-part
-            expect(isStandardizedCacheKey("site::identifier")).toBeFalsy(); // empty operation
+            expect(isStandardizedCacheKey("monitor::")).toBeFalsy(); // Empty operation in 3-part
+            expect(isStandardizedCacheKey("site::identifier")).toBeFalsy(); // Empty operation
         });
     });
 

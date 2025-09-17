@@ -315,7 +315,7 @@ export class DatabaseManager {
                 );
             }
 
-            // withErrorHandling already logged the error, so we just return
+            // WithErrorHandling already logged the error, so we just return
             // false
             return false;
         }

@@ -39,7 +39,7 @@ describe("shared/types.ts main functions", () => {
                 history: [],
                 host: "example.com",
                 monitoring: true,
-                // activeOperations is undefined
+                // ActiveOperations is undefined
             };
 
             // First check the actual validation
@@ -367,7 +367,7 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             const invalidMonitor: any = {
-                id: 123, // should be string
+                id: 123, // Should be string
                 type: "http",
                 status: "up",
                 checkInterval: 60,
@@ -497,7 +497,7 @@ describe("shared/types.ts function coverage", () => {
                 checkInterval: 60,
                 timeout: 30,
                 retryAttempts: 3,
-                responseTime: "150", // should be number
+                responseTime: "150", // Should be number
                 history: [],
                 url: "https://example.com",
                 monitoring: true,
@@ -519,7 +519,7 @@ describe("shared/types.ts function coverage", () => {
                 id: "monitor1",
                 type: "http",
                 status: "up",
-                checkInterval: "60", // should be number
+                checkInterval: "60", // Should be number
                 timeout: 30,
                 retryAttempts: 3,
                 responseTime: 150,
@@ -545,7 +545,7 @@ describe("shared/types.ts function coverage", () => {
                 type: "http",
                 status: "up",
                 checkInterval: 60,
-                timeout: "30", // should be number
+                timeout: "30", // Should be number
                 retryAttempts: 3,
                 responseTime: 150,
                 history: [],
@@ -571,7 +571,7 @@ describe("shared/types.ts function coverage", () => {
                 status: "up",
                 checkInterval: 60,
                 timeout: 30,
-                retryAttempts: "3", // should be number
+                retryAttempts: "3", // Should be number
                 responseTime: 150,
                 history: [],
                 url: "https://example.com",
@@ -598,7 +598,7 @@ describe("shared/types.ts function coverage", () => {
                 timeout: 30,
                 retryAttempts: 3,
                 responseTime: 150,
-                history: "not-an-array", // should be array
+                history: "not-an-array", // Should be array
                 url: "https://example.com",
                 monitoring: true,
             };
@@ -626,7 +626,7 @@ describe("shared/types.ts function coverage", () => {
                 history: [],
                 url: "https://example.com",
                 monitoring: true,
-                activeOperations: [""], // contains empty string
+                activeOperations: [""], // Contains empty string
             };
 
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
@@ -656,7 +656,7 @@ describe("shared/types.ts function coverage", () => {
                     "check",
                     "",
                     "retry",
-                ], // contains empty string
+                ], // Contains empty string
             };
 
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
@@ -682,7 +682,7 @@ describe("shared/types.ts function coverage", () => {
                 history: [],
                 url: "https://example.com",
                 monitoring: true,
-                activeOperations: "not-an-array", // should be array
+                activeOperations: "not-an-array", // Should be array
             };
 
             expect(validateMonitor(invalidMonitor)).toBeFalsy();

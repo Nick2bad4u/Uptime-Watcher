@@ -384,7 +384,7 @@ async function runCSpell(config, logger) {
             maxBuffer: 1024 * 1024 * 10, // 10MB buffer
         });
     } catch (error) {
-        // cspell returns a non-zero exit code when spelling issues are found,
+        // Cspell returns a non-zero exit code when spelling issues are found,
         // but the output (err.stdout) still contains the list of unknown words we want to process.
         if (
             error &&

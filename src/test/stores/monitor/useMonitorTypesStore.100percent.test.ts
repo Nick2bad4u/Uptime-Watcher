@@ -699,7 +699,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 data: null,
                 errors: [],
                 warnings: [], // null should become empty array
-                metadata: {}, // undefined should become empty object
+                metadata: {}, // Undefined should become empty object
             });
         });
 

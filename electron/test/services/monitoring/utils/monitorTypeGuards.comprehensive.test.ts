@@ -551,8 +551,8 @@ describe("Monitor Type Guards", () => {
             const testCases = [
                 { host: "sub.example.com", isValidFQDN: true, expected: true },
                 { host: "example.co.uk", isValidFQDN: true, expected: true },
-                { host: "test", isValidFQDN: false, expected: true }, // matches regex
-                { host: "test.", isValidFQDN: false, expected: true }, // matches regex
+                { host: "test", isValidFQDN: false, expected: true }, // Matches regex
+                { host: "test.", isValidFQDN: false, expected: true }, // Matches regex
             ];
 
             for (const testCase of testCases) {
@@ -1425,11 +1425,11 @@ describe("Monitor Type Guards", () => {
             await annotate("Type: Monitoring", "type");
 
             const mixedMonitor = createTestMonitor({
-                host: "valid.com", // valid
-                port: -1, // invalid
-                timeout: 5000, // valid
-                retryAttempts: -1, // invalid
-                url: "invalid-url", // invalid
+                host: "valid.com", // Valid
+                port: -1, // Invalid
+                timeout: 5000, // Valid
+                retryAttempts: -1, // Invalid
+                url: "invalid-url", // Invalid
             });
 
             vi.mocked(isNonEmptyString).mockReturnValue(true);

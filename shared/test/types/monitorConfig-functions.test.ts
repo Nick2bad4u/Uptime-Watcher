@@ -112,7 +112,7 @@ describe("shared/types/monitorConfig function coverage", () => {
 
             const incompleteConfig = {
                 url: "https://example.com",
-                // missing other required properties
+                // Missing other required properties
             };
 
             expect(isHttpMonitorConfig(incompleteConfig as any)).toBeFalsy();
@@ -128,7 +128,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const invalidConfig = {
-                url: 123, // should be string
+                url: 123, // Should be string
                 method: "GET",
                 timeout: 30,
                 followRedirects: false,
@@ -242,7 +242,7 @@ describe("shared/types/monitorConfig function coverage", () => {
 
             const incompleteConfig = {
                 host: "example.com",
-                // missing other required properties
+                // Missing other required properties
             };
 
             expect(isPingMonitorConfig(incompleteConfig as any)).toBeFalsy();
@@ -258,7 +258,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const invalidConfig = {
-                host: 123, // should be string
+                host: 123, // Should be string
                 timeout: 5000,
                 retries: 3,
                 interval: 1000,
@@ -369,7 +369,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             const incompleteConfig = {
                 host: "example.com",
                 port: 80,
-                // missing other required properties
+                // Missing other required properties
             };
 
             expect(isPortMonitorConfig(incompleteConfig as any)).toBeFalsy();
@@ -386,7 +386,7 @@ describe("shared/types/monitorConfig function coverage", () => {
 
             const invalidConfig = {
                 host: "example.com",
-                port: "80", // should be number
+                port: "80", // Should be number
                 timeout: 5000,
                 expectedResponseTime: 1000,
                 protocol: "tcp",
@@ -410,7 +410,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 retryAttempts: 3,
                 timeout: 30_000,
                 host: "example.com",
-                port: 65_535, // max port
+                port: 65_535, // Max port
                 connectionTimeout: 5000,
             };
 
@@ -538,7 +538,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 enabled: true,
                 retryAttempts: 100,
                 timeout: 1,
-                host: "a".repeat(253), // max domain length
+                host: "a".repeat(253), // Max domain length
                 maxPacketLoss: 100,
                 packetCount: 1,
                 packetSize: 1,

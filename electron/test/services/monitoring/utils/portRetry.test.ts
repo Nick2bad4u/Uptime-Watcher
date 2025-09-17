@@ -117,7 +117,7 @@ describe(performPortCheckWithRetry, () => {
                 expect.any(Function),
                 expect.objectContaining({
                     initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
-                    maxRetries: 3, // maxRetries + 1 = totalAttempts
+                    maxRetries: 3, // MaxRetries + 1 = totalAttempts
                     operationName: "Port check for example.com:80",
                 })
             );

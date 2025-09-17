@@ -46,7 +46,7 @@ describe("BaseFormField - Additional Coverage", () => {
                 id="test-field"
                 label="Test Label"
                 required={false}
-                // error is undefined (not passed)
+                // Error is undefined (not passed)
                 // helpText is undefined (not passed)
             >
                 {childrenSpy}
@@ -90,7 +90,7 @@ describe("BaseFormField - Additional Coverage", () => {
                 label="Test Label"
                 required={true}
                 error="This is an error"
-                // helpText is undefined (not passed)
+                // HelpText is undefined (not passed)
             >
                 {childrenSpy}
             </BaseFormField>
@@ -132,7 +132,7 @@ describe("BaseFormField - Additional Coverage", () => {
                 id="test-field"
                 label="Test Label"
                 required={false}
-                // error is undefined (not passed)
+                // Error is undefined (not passed)
                 helpText="This is help text"
             >
                 {childrenSpy}
@@ -262,7 +262,7 @@ describe("BaseFormField - Additional Coverage", () => {
                 id="test-field"
                 label="Test Label"
                 required={false}
-                // error is undefined
+                // Error is undefined
                 helpText=""
             >
                 {childrenSpy}

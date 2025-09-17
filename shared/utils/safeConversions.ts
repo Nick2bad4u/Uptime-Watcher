@@ -97,7 +97,7 @@ export function safeParseFloat(value: unknown, defaultValue = 0): number {
     }
 
     if (isString(value)) {
-        // parseFloat accepts e.g. "123.45abc" -> 123.45
+        // ParseFloat accepts e.g. "123.45abc" -> 123.45
         // Reject non-finite results like Infinity/-Infinity from strings
         const parsed = Number.parseFloat(value);
         return Number.isFinite(parsed) ? parsed : defaultValue;

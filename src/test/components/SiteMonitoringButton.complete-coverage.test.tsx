@@ -1013,7 +1013,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const secondButton = screen.getByTestId("themed-button");
             const secondOnClick = (secondButton as any).onclick;
 
-            // useCallback should maintain reference stability
+            // UseCallback should maintain reference stability
             expect(firstOnClick).toBe(secondOnClick);
         });
     });
@@ -1294,7 +1294,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(button).toHaveAttribute("data-variant", "success");
             expect(button).not.toBeDisabled();
             expect(screen.getByText("▶️")).toBeInTheDocument();
-            expect(screen.queryByText("Start All")).not.toBeInTheDocument(); // compact mode
+            expect(screen.queryByText("Start All")).not.toBeInTheDocument(); // Compact mode
         });
 
         it("should maintain consistency across theme changes", ({

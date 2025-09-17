@@ -304,7 +304,7 @@ export const SettingsTab = ({
         selectedMonitor.retryAttempts,
     ]);
 
-    // useCallback handlers for jsx-no-bind compliance
+    // UseCallback handlers for jsx-no-bind compliance
     const handleNameChange = useCallback(
         (e: ChangeEvent<HTMLInputElement>) => {
             setLocalName(e.target.value);

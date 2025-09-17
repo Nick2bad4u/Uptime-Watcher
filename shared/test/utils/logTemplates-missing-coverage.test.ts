@@ -173,7 +173,7 @@ describe("LogTemplates - Missing Coverage", () => {
                 undefined
             );
 
-            // variables is defined -> should use interpolateLogTemplate
+            // Variables is defined -> should use interpolateLogTemplate
             templateLogger.debug("Test {placeholder}", {
                 placeholder: "value",
             });

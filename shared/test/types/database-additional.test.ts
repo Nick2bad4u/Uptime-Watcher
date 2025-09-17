@@ -134,7 +134,7 @@ describe("shared/types/database additional function coverage", () => {
                 "not-a-number",
                 "",
                 "abc123",
-                "2023-13-45", // invalid date
+                "2023-13-45", // Invalid date
                 "invalid",
             ];
 
@@ -524,18 +524,18 @@ describe("shared/types/database additional function coverage", () => {
                     timestamp: Date.now(),
                     responseTime: 150,
                     details: "All good",
-                }, // valid
+                }, // Valid
                 {
                     monitorId: "monitor1",
-                    status: "invalid-status", // invalid status
+                    status: "invalid-status", // Invalid status
                     timestamp: Date.now(),
-                }, // invalid
-                null, // invalid
+                }, // Invalid
+                null, // Invalid
                 {
                     monitorId: "monitor1",
                     status: "up",
-                    timestamp: "invalid-timestamp", // invalid timestamp
-                }, // invalid
+                    timestamp: "invalid-timestamp", // Invalid timestamp
+                }, // Invalid
             ];
 
             const results = mixedData.map((item) => isValidHistoryRow(item));

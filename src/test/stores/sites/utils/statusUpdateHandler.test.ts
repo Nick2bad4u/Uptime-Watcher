@@ -553,7 +553,7 @@ describe("StatusUpdateHandler", () => {
 
             await statusChangedCallback(monitorStatusEvent);
 
-            // onUpdate should not be called since updated site wasn't found in the result
+            // OnUpdate should not be called since updated site wasn't found in the result
             expect(mockOnUpdate).not.toHaveBeenCalled();
 
             // Restore original method
@@ -1059,11 +1059,11 @@ describe("StatusUpdateHandler", () => {
                 [],
                 true,
                 false,
-                { monitorId: 123 }, // wrong type
-                { monitorId: "test" }, // missing other fields
-                { monitorId: "test", newStatus: null }, // wrong type
-                { monitorId: "test", newStatus: "up", previousStatus: 123 }, // wrong type
-                { monitorId: "test", newStatus: "up", previousStatus: "down" }, // missing siteId
+                { monitorId: 123 }, // Wrong type
+                { monitorId: "test" }, // Missing other fields
+                { monitorId: "test", newStatus: null }, // Wrong type
+                { monitorId: "test", newStatus: "up", previousStatus: 123 }, // Wrong type
+                { monitorId: "test", newStatus: "up", previousStatus: "down" }, // Missing siteId
             ];
 
             for (const invalidData of invalidDataTypes) {
@@ -1298,7 +1298,7 @@ describe("StatusUpdateHandler", () => {
 
             await statusChangedCallback(event);
 
-            // onUpdate should not have been called since no updated site was found
+            // OnUpdate should not have been called since no updated site was found
             expect(mockOnUpdate).not.toHaveBeenCalled();
         });
 

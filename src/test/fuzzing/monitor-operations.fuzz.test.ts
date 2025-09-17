@@ -89,7 +89,7 @@ const arbitraryHost = (): fc.Arbitrary<string> =>
             "ending-dot.com.",
             "spaces in hostname",
             `toolong${"a".repeat(300)}.com`,
-            "localhost:3000", // port in hostname
+            "localhost:3000", // Port in hostname
             "user@hostname",
             "hostname with spaces",
             "hostname.with..double.dots"

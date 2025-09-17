@@ -742,7 +742,7 @@ describe("Database Performance Monitoring", () => {
                 recordsDeleted += oldRecords;
 
                 // Simulate deletion overhead
-                const deletionOverhead = oldRecords * 0.001; // ms per record
+                const deletionOverhead = oldRecords * 0.001; // Ms per record
             }
 
             const cleanupTime = Date.now() - scanStartTime;

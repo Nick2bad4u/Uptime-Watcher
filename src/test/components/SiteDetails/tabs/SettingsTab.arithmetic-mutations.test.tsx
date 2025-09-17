@@ -354,7 +354,7 @@ describe("SettingsTab arithmetic mutations", () => {
                 // Test with 1 retry attempt
                 const result = calculateMaxDuration(5, 1);
 
-                // totalAttempts = 1 + 1 = 2
+                // TotalAttempts = 1 + 1 = 2
                 // timeoutTime = 5 * 2 = 10s
                 // backoffTime = 0.5s (one retry)
                 // total = 10 + 0.5 = 10.5s -> Math.ceil = 11s
@@ -428,7 +428,7 @@ describe("SettingsTab arithmetic mutations", () => {
             it("should handle zero retries (no backoff)", () => {
                 const result = calculateMaxDuration(15, 0);
 
-                // totalAttempts = 0 + 1 = 1
+                // TotalAttempts = 0 + 1 = 1
                 // timeoutTime = 15 * 1 = 15s
                 // backoffTime = 0s (no retries)
                 // total = 15 + 0 = 15s

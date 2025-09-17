@@ -70,7 +70,7 @@ const config: UserConfig = defineConfig({
             "electron/test/DnsMonitor.debug.test.ts",
             "electron/test/services/window/WindowService.test.ts",
 
-            // electronAPI global redefinition conflicts
+            // ElectronAPI global redefinition conflicts
             "shared/test/strictTests/useSitesStore-complete-coverage.test.ts",
 
             // Logger spy/mock setup issues in Stryker environment

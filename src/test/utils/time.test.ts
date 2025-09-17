@@ -769,9 +769,9 @@ describe("Time Utilities", () => {
 
                     // Property: Should match expected format patterns
                     const patterns = [
-                        /^\d+s$/, // seconds only
-                        /^\d+m \d+s$/, // minutes and seconds
-                        /^\d+h \d+m$/, // hours and minutes
+                        /^\d+s$/, // Seconds only
+                        /^\d+m \d+s$/, // Minutes and seconds
+                        /^\d+h \d+m$/, // Hours and minutes
                     ];
                     expect(
                         patterns.some((pattern) => pattern.test(result))

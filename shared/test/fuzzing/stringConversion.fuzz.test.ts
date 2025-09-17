@@ -274,10 +274,10 @@ describe("StringConversion - Fast-Check Fuzzing Tests", () => {
             // we test our function's robustness
             const testCases = [
                 undefined, // explicit undefined for line 86-87
-                Object.create(null), // unusual object
+                Object.create(null), // Unusual object
                 new WeakMap(), // non-JSON-serializable object
-                Symbol("test"), // symbol case
-                123n, // bigint case
+                Symbol("test"), // Symbol case
+                123n, // Bigint case
             ];
 
             for (const testCase of testCases) {

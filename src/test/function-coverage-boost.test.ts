@@ -22,7 +22,7 @@ describe("Function Coverage Boost Tests", () => {
 
             // Test all valid monitor types
             expect(validateMonitorType("http")).toBeTruthy();
-            expect(validateMonitorType("https")).toBeFalsy(); // invalid type
+            expect(validateMonitorType("https")).toBeFalsy(); // Invalid type
             expect(validateMonitorType("port")).toBeTruthy();
             expect(validateMonitorType("ping")).toBeTruthy();
             expect(validateMonitorType("dns")).toBeTruthy();
@@ -139,9 +139,9 @@ describe("Function Coverage Boost Tests", () => {
                 id: "",
                 type: "invalid-type",
                 status: "invalid-status",
-                checkInterval: 500, // too low
+                checkInterval: 500, // Too low
                 timeout: -1, // negative
-                retryAttempts: 15, // too high
+                retryAttempts: 15, // Too high
             } as any;
 
             const errors = getMonitorValidationErrors(invalidMonitor);
@@ -175,7 +175,7 @@ describe("Function Coverage Boost Tests", () => {
                 id: "test",
                 type: "port",
                 status: "up",
-                port: 99_999, // too high
+                port: 99_999, // Too high
             } as any;
             const portErrors = getMonitorValidationErrors(portMonitorInvalid);
             expect(portErrors).toContain("Host is required for port monitors");

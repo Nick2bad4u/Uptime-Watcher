@@ -91,7 +91,7 @@ describe("electronUtils.ts - Branch Coverage", () => {
             const { isDevelopment } = await import(
                 "../../shared/utils/environment.js"
             );
-            (isDevelopment as any).mockReturnValue(false); // undefined NODE_ENV means not development
+            (isDevelopment as any).mockReturnValue(false); // Undefined NODE_ENV means not development
 
             mockApp.isPackaged = false;
 

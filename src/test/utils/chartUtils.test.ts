@@ -47,7 +47,7 @@ describe("Chart Utilities", () => {
             const config = {
                 scales: {
                     x: { title: { text: "X Axis" } },
-                    // y is optional
+                    // Y is optional
                 },
             };
             expect(hasScales(config)).toBeTruthy();
@@ -248,7 +248,7 @@ describe("Chart Utilities", () => {
             const config = {
                 scales: {
                     x: { type: "linear" },
-                    // y is missing
+                    // Y is missing
                 },
             };
             expect(getScaleConfig(config, "y")).toBeUndefined();
@@ -408,7 +408,7 @@ describe("Chart Utilities", () => {
             const config = {
                 scales: {
                     x: { type: "linear" },
-                    // y is missing
+                    // Y is missing
                 },
             };
             expect(getScaleProperty(config, "y", "type")).toBeUndefined();
@@ -593,7 +593,7 @@ describe("Chart Utilities", () => {
             const config = {
                 scales: {
                     x: { title: { text: "X Axis" } },
-                    // y is missing
+                    // Y is missing
                 },
             };
             expect(

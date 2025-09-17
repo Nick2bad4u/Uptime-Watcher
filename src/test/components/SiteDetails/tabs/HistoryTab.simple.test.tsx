@@ -174,7 +174,7 @@ describe(HistoryTab, () => {
 
             // Should respect history limit
             const indicators = screen.getAllByTestId("status-indicator");
-            expect(indicators.length).toBeLessThanOrEqual(25); // default limit
+            expect(indicators.length).toBeLessThanOrEqual(25); // Default limit
         });
 
         it("should call formatting functions", ({ task, annotate }) => {
@@ -243,8 +243,8 @@ describe(HistoryTab, () => {
             const monitorWithIncompleteHistory = {
                 ...createMockMonitor(),
                 history: [
-                    { timestamp: Date.now(), status: "up" }, // missing responseTime
-                    { timestamp: Date.now() - 60_000 }, // missing status and responseTime
+                    { timestamp: Date.now(), status: "up" }, // Missing responseTime
+                    { timestamp: Date.now() - 60_000 }, // Missing status and responseTime
                 ],
             } as any;
 

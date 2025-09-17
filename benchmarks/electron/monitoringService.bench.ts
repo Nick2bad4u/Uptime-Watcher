@@ -475,7 +475,7 @@ describe("Monitoring Service Benchmarks", () => {
                 enabledCount: results.length,
                 totalTime,
                 averageTime: totalTime / bulkSize,
-                throughput: bulkSize / (totalTime / 1000), // monitors per second
+                throughput: bulkSize / (totalTime / 1000), // Monitors per second
                 successRate:
                     results.filter((r) => r.success).length / results.length,
             };

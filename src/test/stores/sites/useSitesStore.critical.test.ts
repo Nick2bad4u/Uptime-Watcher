@@ -250,7 +250,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             expect(mockElectronAPI.sites.getSites).toHaveBeenCalled();
 
             await store.fullResyncSites();
-            // fullResyncSites calls syncSites which calls SiteService.getSites()
+            // FullResyncSites calls syncSites which calls SiteService.getSites()
             expect(mockElectronAPI.sites.getSites).toHaveBeenCalled();
         });
     });

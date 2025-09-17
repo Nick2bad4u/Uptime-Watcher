@@ -86,7 +86,7 @@ describe("shared/types/themeConfig function coverage", () => {
             const incompletePalette = {
                 background: "#ffffff",
                 text: "#000000",
-                // missing other required properties
+                // Missing other required properties
             };
 
             expect(isColorPalette(incompletePalette)).toBeFalsy();
@@ -102,7 +102,7 @@ describe("shared/types/themeConfig function coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const invalidPalette = {
-                background: 123, // should be string
+                background: 123, // Should be string
                 border: "#cccccc",
                 text: "#000000",
                 primary: "#0066cc",
@@ -126,7 +126,7 @@ describe("shared/types/themeConfig function coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const edgeCasePalette: ColorPalette = {
-                primary: "#ff0000", // valid color
+                primary: "#ff0000", // Valid color
                 secondary: "#666666",
                 error: "#cc0000",
                 warning: "#ffaa00",
@@ -337,7 +337,7 @@ describe("shared/types/themeConfig function coverage", () => {
                         muted: "#999999",
                     },
                 },
-                // missing fonts, spacing, borderRadius
+                // Missing fonts, spacing, borderRadius
             };
 
             expect(isThemeConfig(incompleteConfig)).toBeFalsy();
@@ -354,7 +354,7 @@ describe("shared/types/themeConfig function coverage", () => {
 
             const invalidConfig = {
                 colors: {
-                    light: "invalid", // should be ColorPalette object
+                    light: "invalid", // Should be ColorPalette object
                     dark: {
                         background: "#1a1a1a",
                         border: "#444444",
@@ -410,7 +410,7 @@ describe("shared/types/themeConfig function coverage", () => {
                         error: "#cc0000",
                         muted: "#999999",
                     },
-                    // missing dark theme
+                    // Missing dark theme
                 },
                 fonts: {
                     primary: "Arial, sans-serif",

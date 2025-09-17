@@ -126,7 +126,7 @@ describe("Shared Types - Complete Function Coverage", () => {
             // Test monitor with invalid field types
             expect(
                 typesModule.validateMonitor({
-                    id: 123 as any, // should be string
+                    id: 123 as any, // Should be string
                     type: "http",
                     status: "up",
                     monitoring: true,
@@ -141,7 +141,7 @@ describe("Shared Types - Complete Function Coverage", () => {
             expect(
                 typesModule.validateMonitor({
                     id: "test",
-                    type: "invalid-type" as any, // should be valid monitor type
+                    type: "invalid-type" as any, // Should be valid monitor type
                     status: "up",
                     monitoring: true,
                     responseTime: 150,
@@ -156,7 +156,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                 typesModule.validateMonitor({
                     id: "test",
                     type: "http",
-                    status: "invalid-status" as any, // should be valid monitor status
+                    status: "invalid-status" as any, // Should be valid monitor status
                     monitoring: true,
                     responseTime: 150,
                     checkInterval: 30_000,
@@ -171,7 +171,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     id: "test",
                     type: "http",
                     status: "up",
-                    monitoring: "yes" as any, // should be boolean
+                    monitoring: "yes" as any, // Should be boolean
                     responseTime: 150,
                     checkInterval: 30_000,
                     timeout: 5000,
@@ -186,7 +186,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     type: "http",
                     status: "up",
                     monitoring: true,
-                    responseTime: "150" as any, // should be number
+                    responseTime: "150" as any, // Should be number
                     checkInterval: 30_000,
                     timeout: 5000,
                     retryAttempts: 3,
@@ -204,7 +204,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     checkInterval: 30_000,
                     timeout: 5000,
                     retryAttempts: 3,
-                    history: "not-array" as any, // should be array
+                    history: "not-array" as any, // Should be array
                 })
             ).toBeFalsy();
 
@@ -220,7 +220,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     timeout: 5000,
                     retryAttempts: 3,
                     history: [],
-                    activeOperations: "not-array" as any, // should be array or undefined
+                    activeOperations: "not-array" as any, // Should be array or undefined
                 })
             ).toBeFalsy();
 
@@ -235,7 +235,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     timeout: 5000,
                     retryAttempts: 3,
                     history: [],
-                    activeOperations: [123 as any, "valid"], // all elements should be strings
+                    activeOperations: [123 as any, "valid"], // All elements should be strings
                 })
             ).toBeFalsy();
 
@@ -250,7 +250,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     timeout: 5000,
                     retryAttempts: 3,
                     history: [],
-                    activeOperations: ["", "valid"], // empty strings should be invalid
+                    activeOperations: ["", "valid"], // Empty strings should be invalid
                 })
             ).toBeFalsy();
 
@@ -265,7 +265,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     timeout: 5000,
                     retryAttempts: 3,
                     history: [],
-                    activeOperations: ["   ", "valid"], // whitespace-only strings should be invalid
+                    activeOperations: ["   ", "valid"], // Whitespace-only strings should be invalid
                 })
             ).toBeFalsy();
         });

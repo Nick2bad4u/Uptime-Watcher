@@ -148,7 +148,7 @@ export const UiDefaults: ReadonlyDeep<{
     errorLabel: "Error",
     // Timeouts defaults
     /** Delay in milliseconds before showing loading spinner */
-    loadingDelay: 100, // ms before showing loading spinner
+    loadingDelay: 100, // Ms before showing loading spinner
     /** Default loading state text */
     loadingLabel: "Loading...",
     /** Default text when data is not available */
@@ -360,9 +360,9 @@ export function getMonitorTypeDisplayLabel(monitorType: string): string {
                 // Convert from camelCase/snake_case to Title Case
                 const titleCase = monitorType
                     // eslint-disable-next-line regexp/require-unicode-sets-regexp -- Environment compatibility
-                    .replaceAll(/[_-]/g, " ") // Replace underscores and hyphens with spaces
+                    .replaceAll(/[_-]/gu, " ") // Replace underscores and hyphens with spaces
                     // eslint-disable-next-line regexp/require-unicode-sets-regexp, no-lookahead-lookbehind-regexp/no-lookahead-lookbehind-regexp -- Environment compatibility
-                    .replaceAll(/(?<=[a-z])(?=[A-Z])/g, " ") // Add space before capitals
+                    .replaceAll(/(?<=[a-z])(?=[A-Z])/gu, " ") // Add space before capitals
                     .split(" ")
                     .map(
                         (word) =>

@@ -200,7 +200,7 @@ export function getMonitorWithResult(
     ) {
         try {
             instance.updateConfig(config);
-            // configurationApplied remains true
+            // ConfigurationApplied remains true
         } catch (error) {
             configurationApplied = false;
             configurationError =

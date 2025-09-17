@@ -432,7 +432,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             mockThemeManager.onSystemThemeChange.mockImplementation(
                 (callback: (isDark: boolean) => void) => {
                     systemThemeChangeCallback = callback;
-                    return () => {}; // cleanup function
+                    return () => {}; // Cleanup function
                 }
             );
 

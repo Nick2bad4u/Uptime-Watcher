@@ -45,7 +45,7 @@ describe("Correlation Utility", () => {
 
             const id = generateCorrelationId();
 
-            // randomBytes(8) => 8 bytes => 16 hex characters
+            // RandomBytes(8) => 8 bytes => 16 hex characters
             expect(id).toHaveLength(16);
         });
         it("should generate unique IDs", async ({ task, annotate }) => {

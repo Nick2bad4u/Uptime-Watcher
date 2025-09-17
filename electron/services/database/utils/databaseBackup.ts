@@ -115,7 +115,7 @@ export async function createDatabaseBackup(
         let fs: typeof fsPromises | undefined = undefined;
         try {
             fs = await import(
-                /* webpackChunkName: "node-fs-promises" */ "node:fs/promises"
+                /* WebpackChunkName: "node-fs-promises" */ "node:fs/promises"
             );
         } catch (importError) {
             const errorMessage =

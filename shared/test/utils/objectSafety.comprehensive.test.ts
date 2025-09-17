@@ -90,13 +90,13 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(safeObjectAccess(testObj, "string", 42)).toBe(42); // string vs number
+            expect(safeObjectAccess(testObj, "string", 42)).toBe(42); // String vs number
             expect(safeObjectAccess(testObj, "number", "default")).toBe(
                 "default"
             ); // number vs string
             expect(safeObjectAccess(testObj, "boolean", "default")).toBe(
                 "default"
-            ); // boolean vs string
+            ); // Boolean vs string
         });
 
         it("should work with validator function", async ({
@@ -261,7 +261,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             );
             expect(consoleSpy).toHaveBeenCalledWith(
                 "Safe object iteration: Expected object, got object"
-            ); // array
+            ); // Array
 
             consoleSpy.mockRestore();
         });

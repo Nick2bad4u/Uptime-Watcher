@@ -135,7 +135,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isObject(function testFunction() {})).toBeFalsy(); // functions are not objects in this context
+            expect(isObject(function testFunction() {})).toBeFalsy(); // Functions are not objects in this context
         });
     });
 

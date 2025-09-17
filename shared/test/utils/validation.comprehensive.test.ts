@@ -708,7 +708,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
                     type: "http",
                     url: "https://example.com",
                     status: "pending",
-                    // checkInterval, timeout, and retryAttempts are intentionally omitted
+                    // CheckInterval, timeout, and retryAttempts are intentionally omitted
                 };
 
                 const errors = getMonitorValidationErrors(monitor);

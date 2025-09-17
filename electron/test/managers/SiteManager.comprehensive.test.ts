@@ -1032,7 +1032,7 @@ describe("SiteManager - Comprehensive", () => {
 
             const config = siteManager["createMonitoringConfig"]();
 
-            // setHistoryLimit returns void, not a promise - it handles errors internally
+            // SetHistoryLimit returns void, not a promise - it handles errors internally
             expect(() => config.setHistoryLimit(100)).not.toThrow();
 
             expect(

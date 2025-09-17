@@ -26,7 +26,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(10, 0);
-                // timeout: 10 seconds * 1 attempt = 10 seconds
+                // Timeout: 10 seconds * 1 attempt = 10 seconds
                 // backoff: 0 (no retries)
                 // total: 10 seconds
                 expect(result).toBe("10s");
@@ -42,7 +42,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(5, 1);
-                // timeout: 5 seconds * 2 attempts = 10 seconds
+                // Timeout: 5 seconds * 2 attempts = 10 seconds
                 // backoff: 0.5 seconds (first retry)
                 // total: Math.ceil(10.5) = 11 seconds
                 expect(result).toBe("11s");
@@ -58,7 +58,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(2, 3);
-                // timeout: 2 seconds * 4 attempts = 8 seconds
+                // Timeout: 2 seconds * 4 attempts = 8 seconds
                 // backoff: 0.5 + 1.0 + 2.0 = 3.5 seconds
                 // total: Math.ceil(11.5) = 12 seconds
                 expect(result).toBe("12s");
@@ -76,7 +76,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1, 2);
-                // timeout: 1 second * 3 attempts = 3 seconds
+                // Timeout: 1 second * 3 attempts = 3 seconds
                 // backoff: 0.5 + 1.0 = 1.5 seconds
                 // total: Math.ceil(4.5) = 5 seconds
                 expect(result).toBe("5s");
@@ -92,7 +92,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1, 5);
-                // timeout: 1 second * 6 attempts = 6 seconds
+                // Timeout: 1 second * 6 attempts = 6 seconds
                 // backoff: 0.5 + 1.0 + 2.0 + 4.0 + 5.0 = 12.5 seconds (4th retry capped at 5s)
                 // total: Math.ceil(18.5) = 19 seconds
                 expect(result).toBe("19s");
@@ -108,7 +108,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1, 10);
-                // timeout: 1 second * 11 attempts = 11 seconds
+                // Timeout: 1 second * 11 attempts = 11 seconds
                 // backoff: 0.5 + 1.0 + 2.0 + 4.0 + 5.0 + 5.0 + 5.0 + 5.0 + 5.0 + 5.0 = 37.5 seconds
                 // total: Math.ceil(48.5) = 49 seconds
                 expect(result).toBe("49s");
@@ -257,7 +257,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(0, 2);
-                // timeout: 0 * 3 = 0 seconds
+                // Timeout: 0 * 3 = 0 seconds
                 // backoff: 0.5 + 1.0 = 1.5 seconds
                 // total: Math.ceil(1.5) = 2 seconds
                 expect(result).toBe("2s");
@@ -273,7 +273,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1.5, 1);
-                // timeout: 1.5 * 2 = 3 seconds
+                // Timeout: 1.5 * 2 = 3 seconds
                 // backoff: 0.5 seconds
                 // total: Math.ceil(3.5) = 4 seconds
                 expect(result).toBe("4s");
@@ -303,7 +303,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(10, 20);
-                // timeout: 10 * 21 = 210 seconds
+                // Timeout: 10 * 21 = 210 seconds
                 // backoff: significant amount with capping at 5s per retry
                 // This should result in minutes
                 expect(result).toMatch(/^\d+m$/);

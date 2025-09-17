@@ -54,7 +54,7 @@ describe("ErrorAlert - Complete Coverage", () => {
 
             expect(screen.getByRole("alert")).toBeInTheDocument();
             expect(screen.getByText("Test error message")).toBeInTheDocument();
-            expect(screen.getByTestId("alert-circle-icon")).toBeInTheDocument(); // default error variant
+            expect(screen.getByTestId("alert-circle-icon")).toBeInTheDocument(); // Default error variant
         });
 
         it("should render with custom className", ({ task, annotate }) => {
@@ -804,7 +804,7 @@ describe("ErrorAlert - Complete Coverage", () => {
             const secondButton = screen.getByLabelText("Dismiss error");
             const secondOnClick = (secondButton as any).onclick;
 
-            // useCallback should maintain reference stability
+            // UseCallback should maintain reference stability
             expect(firstOnClick).toBe(secondOnClick);
         });
     });

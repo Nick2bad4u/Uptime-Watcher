@@ -184,7 +184,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
 
             const obj = { a: 1, b: undefined };
             expect(hasProperty(obj, "a")).toBeTruthy();
-            expect(hasProperty(obj, "b")).toBeTruthy(); // undefined values still count as having the property
+            expect(hasProperty(obj, "b")).toBeTruthy(); // Undefined values still count as having the property
         });
 
         it("should return false when object doesn't have property", async ({
@@ -289,7 +289,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
                     isString
                 )
             ).toBeFalsy();
-            expect(isArray([], isString)).toBeTruthy(); // empty array is valid
+            expect(isArray([], isString)).toBeTruthy(); // Empty array is valid
         });
     });
 
@@ -994,7 +994,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
                 validObject
             );
 
-            const invalidObject = { name: "Bob" }; // missing age
+            const invalidObject = { name: "Bob" }; // Missing age
             expect(() =>
                 validateAndConvert(invalidObject, validator)
             ).toThrow();

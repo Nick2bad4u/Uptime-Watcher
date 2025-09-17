@@ -838,7 +838,7 @@ describe("monitorOperations", () => {
             expect(result.monitors[0]).toEqual({
                 ...mockSite.monitors[0],
                 activeOperations: [], // normalizeMonitor adds this field
-                url: "https://example.com", // default for http type
+                url: "https://example.com", // Default for http type
             });
         });
     });

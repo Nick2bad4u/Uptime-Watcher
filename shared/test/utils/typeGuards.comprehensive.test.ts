@@ -168,9 +168,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
             const child = Object.create(parent);
             child.own = "childValue";
 
-            // hasProperties uses Object.hasOwn, so inherited properties should not count
+            // HasProperties uses Object.hasOwn, so inherited properties should not count
             expect(hasProperties(child, ["own"])).toBeTruthy();
-            expect(hasProperties(child, ["inherited"])).toBeFalsy(); // inherited, not own
+            expect(hasProperties(child, ["inherited"])).toBeFalsy(); // Inherited, not own
         });
 
         it("should handle edge cases", async ({ task, annotate }) => {
@@ -201,7 +201,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             const obj = { a: 1, b: undefined, c: null };
             expect(hasProperty(obj, "a")).toBeTruthy();
-            expect(hasProperty(obj, "b")).toBeTruthy(); // undefined is still a property
+            expect(hasProperty(obj, "b")).toBeTruthy(); // Undefined is still a property
             expect(hasProperty(obj, "c")).toBeTruthy(); // null is still a property
         });
 
@@ -216,7 +216,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             const obj = { a: 1 };
             expect(hasProperty(obj, "b")).toBeFalsy();
-            expect(hasProperty(obj, "toString")).toBeFalsy(); // inherited property
+            expect(hasProperty(obj, "toString")).toBeFalsy(); // Inherited property
         });
 
         it("should return false for non-objects", async ({

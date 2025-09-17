@@ -169,6 +169,6 @@ describe("useTheme Basic Coverage", () => {
         result.current.getStatusColor("invalid" as any); // Test invalid input
 
         expect(typeof statusColor1).toBe("string");
-        // statusColor2 might be undefined, which is ok
+        // StatusColor2 might be undefined, which is ok
     });
 });

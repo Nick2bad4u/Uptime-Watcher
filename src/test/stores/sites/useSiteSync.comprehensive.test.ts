@@ -338,7 +338,7 @@ describe("useSiteSync", () => {
 
             eventHandler(bulkSyncEvent);
 
-            // setSites should not be called when sites is undefined
+            // SetSites should not be called when sites is undefined
             expect(mockDeps.setSites).not.toHaveBeenCalled();
         });
 

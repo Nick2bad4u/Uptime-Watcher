@@ -424,7 +424,7 @@ describe("Database Query Performance Benchmarks", () => {
                                   0
                               )) *
                           1000
-                        : 0, // rows per second
+                        : 0, // Rows per second
             };
         });
     });

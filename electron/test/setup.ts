@@ -29,17 +29,17 @@ fc.configureGlobal({
 
     // Reporting / debugging helpers
     verbose: 2, // 0 = quiet, 1 = medium, 2 = most verbose
-    includeErrorInReport: true, // include the original error text (helps many runners)
+    includeErrorInReport: true, // Include the original error text (helps many runners)
 
     // Failure and time limits
-    endOnFailure: true, // stop on first property failure
-    timeout: 1000, // per-case async timeout (ms)
-    interruptAfterTimeLimit: 5 * 60 * 1000, // overall cap for a run (ms)
-    markInterruptAsFailure: true, // treat interrupts as failures (good for CI)
-    skipAllAfterTimeLimit: 60 * 1000, // cap time spent on skipping/shrinking (ms)
+    endOnFailure: true, // Stop on first property failure
+    timeout: 1000, // Per-case async timeout (ms)
+    interruptAfterTimeLimit: 5 * 60 * 1000, // Overall cap for a run (ms)
+    markInterruptAsFailure: true, // Treat interrupts as failures (good for CI)
+    skipAllAfterTimeLimit: 60 * 1000, // Cap time spent on skipping/shrinking (ms)
 
     // Duplicate handling and skipping
-    maxSkipsPerRun: 100, // tolerance for preconditions / filters
+    maxSkipsPerRun: 100, // Tolerance for preconditions / filters
     // skipEqualValues: true, // skip duplicates while still achieving numRuns
 
     // Examples and sampling

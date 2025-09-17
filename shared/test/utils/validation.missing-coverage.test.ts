@@ -209,7 +209,7 @@ describe("Validation - Missing Coverage Tests", () => {
                 id: "dns-test",
                 type: "dns",
                 host: "example.com",
-                recordType: "a", // lowercase
+                recordType: "a", // Lowercase
                 status: "pending",
                 checkInterval: 60_000,
                 timeout: 5000,

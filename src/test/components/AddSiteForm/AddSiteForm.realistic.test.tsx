@@ -398,7 +398,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 await user.type(nameInput, "Test");
             });
 
-            // userEvent.type calls the setter for each character
+            // UserEvent.type calls the setter for each character
             expect(mockFormHook.setName).toHaveBeenCalledTimes(4);
             expect(mockFormHook.setName).toHaveBeenCalledWith("T");
             expect(mockFormHook.setName).toHaveBeenCalledWith("e");

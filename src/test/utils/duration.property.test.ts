@@ -356,12 +356,12 @@ describe("Duration Utils Property-Based Tests", () => {
             // Test second/minute boundary
             expect(calculateMaxDuration(59, 0)).toBe("59s");
             expect(calculateMaxDuration(60, 0)).toBe("1m");
-            expect(calculateMaxDuration(61, 0)).toBe("2m"); // ceil(61/60) = 2
+            expect(calculateMaxDuration(61, 0)).toBe("2m"); // Ceil(61/60) = 2
 
             // Test minute/hour boundary
-            expect(calculateMaxDuration(3599, 0)).toBe("60m"); // ceil(3599/60) = 60
+            expect(calculateMaxDuration(3599, 0)).toBe("60m"); // Ceil(3599/60) = 60
             expect(calculateMaxDuration(3600, 0)).toBe("1h");
-            expect(calculateMaxDuration(3661, 0)).toBe("2h"); // ceil(3661/3600) = 2
+            expect(calculateMaxDuration(3661, 0)).toBe("2h"); // Ceil(3661/3600) = 2
         });
 
         test.prop([fc.double({ min: 60, max: 3599, noNaN: true })])(

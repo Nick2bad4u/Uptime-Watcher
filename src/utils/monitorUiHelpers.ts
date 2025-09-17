@@ -26,10 +26,15 @@ import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { UnknownRecord } from "type-fest";
 
 import { CacheKeys } from "@shared/utils/cacheKeys";
+import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { validateMonitorType } from "@shared/utils/validation";
 
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
+import {
+    getAvailableMonitorTypes,
+    getMonitorTypeConfig,
+} from "./monitorTypeHelper";
 
 /**
  * Help text configuration for monitor types
@@ -75,13 +80,6 @@ function isMonitorTypeConfig(value: unknown): value is MonitorTypeConfig {
     );
     /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe runtime type validation */
 }
-
-import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-
-import {
-    getAvailableMonitorTypes,
-    getMonitorTypeConfig,
-} from "./monitorTypeHelper";
 
 /**
  * Retrieves monitor type configuration with automatic caching.

@@ -22,7 +22,7 @@ import css from "@eslint/css";
 import js from "@eslint/js";
 import json from "@eslint/json";
 import markdown from "@eslint/markdown";
-// import html from "eslint-plugin-html";
+// Import html from "eslint-plugin-html";
 import html from "@html-eslint/eslint-plugin";
 import * as htmlParser from "@html-eslint/parser";
 import implicitDependencies from "@jcoreio/eslint-plugin-implicit-dependencies";
@@ -78,7 +78,7 @@ import noBarrelFiles from "eslint-plugin-no-barrel-files";
 import pluginNoConstructBind from "eslint-plugin-no-constructor-bind";
 import pluginNoExplicitTypeExports from "eslint-plugin-no-explicit-type-exports";
 import * as pluginNFDAR from "eslint-plugin-no-function-declare-after-return";
-// import * as tailwind4 from "tailwind-csstree";
+// Import * as tailwind4 from "tailwind-csstree";
 import pluginNoHardcoded from "eslint-plugin-no-hardcoded-strings";
 import pluginRegexLook from "eslint-plugin-no-lookahead-lookbehind-regexp";
 import pluginNoOnly from "eslint-plugin-no-only-tests";
@@ -138,7 +138,7 @@ import pluginUnicorn from "eslint-plugin-unicorn";
 import pluginUnusedImports from "eslint-plugin-unused-imports";
 import pluginUseMemo from "eslint-plugin-usememo-recommendations";
 import pluginValidateJSX from "eslint-plugin-validate-jsx-nesting";
-// * as cssPlugin from "eslint-plugin-css"
+// import * as cssPlugin from "eslint-plugin-css"
 import pluginWriteGood from "eslint-plugin-write-good-comments";
 import xss from "eslint-plugin-xss";
 import eslintPluginYml from "eslint-plugin-yml";
@@ -595,14 +595,14 @@ export default [
         },
         settings: {
             processor: mdx.createRemarkProcessor({
-                // optional, same as the `parserOptions.ignoreRemarkConfig`, you have to specify it twice unfortunately
+                // Optional, same as the `parserOptions.ignoreRemarkConfig`, you have to specify it twice unfortunately
                 ignoreRemarkConfig: true,
-                // optional, if you want to disable language mapper, set it to `false`
-                // if you want to override the default language mapper inside, you can provide your own
+                // Optional, if you want to disable language mapper, set it to `false`
+                // If you want to override the default language mapper inside, you can provide your own
                 languageMapper: {},
                 lintCodeBlocks: true,
-                // optional, same as the `parserOptions.remarkConfigPath`, you have to specify it twice unfortunately
-                // remarkConfigPath: "path/to/your/remarkrc",
+                // Optional, same as the `parserOptions.remarkConfigPath`, you have to specify it twice unfortunately
+                // RemarkConfigPath: "path/to/your/remarkrc",
             }),
         },
     },
@@ -975,7 +975,7 @@ export default [
         },
         settings: {
             "better-tailwindcss": {
-                // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
+                // Tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
                 entryPoint: "./src/index.css",
             },
             "boundaries/elements": [
@@ -1218,6 +1218,7 @@ export default [
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
+            "@eslint-react/dom/no-unknown-property": "warn",
             "@eslint-react/ensure-forward-ref-using-ref": "warn",
             "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks":
                 "warn",
@@ -1234,6 +1235,8 @@ export default [
             "@eslint-react/hooks-extra/no-useless-custom-hooks": "warn",
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
+            "@eslint-react/jsx-uses-react": "warn",
+            "@eslint-react/jsx-uses-vars": "warn",
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
             /* Naming convention subplugin */
@@ -1675,7 +1678,16 @@ export default [
             "canonical/prefer-react-lazy": "off",
             "canonical/prefer-use-mount": "warn",
             "canonical/sort-react-dependencies": "warn",
-            "capitalized-comments": "off",
+            "capitalized-comments": [
+                "error",
+                "always",
+                {
+                    ignoreConsecutiveComments: true,
+                    ignoreInlineComments: true,
+                    ignorePattern:
+                        "pragma|ignored|import|prettier|eslint|tslint|copyright|license|eslint-disable|@ts-.*|jsx-a11y.*|@eslint.*|global|jsx|jsdoc|prettier|istanbul|jcoreio|metamask|microsoft|no-unsafe-optional-chaining|no-unnecessary-type-assertion|no-non-null-asserted-optional-chain|no-non-null-asserted-nullish-coalescing|@typescript-eslint.*|@docusaurus.*|@react.*|boundaries.*|depend.*|deprecation.*|etc.*|ex.*|functional.*|import-x.*|import-zod.*|jsx-a11y.*|loadable-imports.*|math.*|n.*|neverthrow.*|no-constructor-bind.*|no-explicit-type-exports.*|no-function-declare-after-return.*|no-lookahead-lookbehind-regexp.*|no-secrets.*|no-unary-plus.*|no-unawaited-dot-catch-throw.*|no-unsanitized.*|no-use-extend-native.*|observers.*|prefer-arrow.*|perfectionist.*|prettier.*|promise.*|react.*|react-hooks.*|react-hooks-addons.*|redos.*|regexp.*|require-jsdoc.*|safe-jsx.*|security.*|sonarjs.*|sort-class-members.*|sort-destructure-keys.*|sort-keys-fix.*|sql-template.*|ssr-friendly.*|styled-components-a11y.*|switch-case.*|total-functions.*|tsdoc.*|unicorn.*|unused-imports.*|usememo-recommendations.*|validate-jsx-nesting.*|write-good-comments.*|xss.*",
+                },
+            ],
             "class-methods-use-this": "off",
             "clean-code/exception-handling": "off",
             // "write-good-comments/write-good-comments": "warn",
@@ -1977,8 +1989,10 @@ export default [
                     allowSeparateTypeImports: true,
                 },
             ],
+            "no-empty-character-class": "error",
             "no-explicit-type-exports/no-explicit-type-exports": "error",
             "no-inline-comments": "off",
+            "no-invalid-regexp": "error",
             "no-lookahead-lookbehind-regexp/no-lookahead-lookbehind-regexp":
                 "off",
             "no-magic-numbers": "off",
@@ -1996,8 +2010,10 @@ export default [
                 "error",
             "no-undef-init": "off",
             "no-undefined": "off",
+            "no-unexpected-multiline": "error",
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",
+            "no-useless-backreference": "error",
             "no-void": "off",
             "object-shorthand": "off",
             "observers/matching-unobserve-target": "error",
@@ -2149,7 +2165,7 @@ export default [
             "regexp/prefer-regexp-exec": "warn",
             "regexp/prefer-regexp-test": "warn",
             "regexp/prefer-result-array-groups": "warn",
-            "regexp/require-unicode-regexp": "off",
+            "regexp/require-unicode-regexp": "warn",
             "regexp/require-unicode-sets-regexp": "warn",
             "regexp/sort-alternatives": "warn",
             "regexp/sort-character-class-elements": "off",
@@ -2162,13 +2178,41 @@ export default [
             "security/detect-non-literal-regexp": "warn",
             "security/detect-non-literal-require": "error",
             "security/detect-object-injection": "off",
+            "sonarjs/arguments-usage": "warn",
+            "sonarjs/array-constructor": "warn",
+            "sonarjs/aws-iam-all-resources-accessible": "warn",
             "sonarjs/cognitive-complexity": [
                 "warn",
                 30,
             ],
+            "sonarjs/comment-regex": "warn",
+            "sonarjs/declarations-in-global-scope": "off",
+            "sonarjs/elseif-without-else": "warn",
+            "sonarjs/for-in": "warn",
             "sonarjs/function-return-type": "off", // Allow flexible return types in Docusaurus
+            "sonarjs/nested-control-flow": "warn",
+            "sonarjs/no-built-in-override": "warn",
+            "sonarjs/no-collapsible-if": "warn",
             "sonarjs/no-duplicate-string": "off",
+            "sonarjs/no-for-in-iterable": "warn",
+            "sonarjs/no-function-declaration-in-block": "warn",
+            "sonarjs/no-implicit-dependencies": "warn",
+            "sonarjs/no-inconsistent-returns": "warn",
+            "sonarjs/no-incorrect-string-concat": "warn",
+            "sonarjs/no-nested-incdec": "warn",
+            "sonarjs/no-nested-switch": "warn",
+            "sonarjs/no-reference-error": "warn",
+            "sonarjs/no-require-or-define": "warn",
+            "sonarjs/no-return-type-any": "warn",
+            "sonarjs/no-sonar-comments": "error",
+            "sonarjs/no-undefined-assignment": "warn",
             "sonarjs/no-unused-function-argument": "warn",
+            "sonarjs/non-number-in-arithmetic-expression": "warn",
+            "sonarjs/operation-returning-nan": "warn",
+            "sonarjs/prefer-immediate-return": "warn",
+            "sonarjs/shorthand-property-grouping": "warn",
+            "sonarjs/strings-comparison": "warn",
+            "sonarjs/too-many-break-or-continue-in-loop": "warn",
             "sort-class-members/sort-class-members": [
                 "warn",
                 {
@@ -2204,7 +2248,7 @@ export default [
             "switch-case/no-case-curly": "off",
             "total-functions/no-hidden-type-assertions": "off",
             "total-functions/no-nested-fp-ts-effects": "off",
-            "total-functions/no-partial-division": "off",
+            "total-functions/no-partial-division": "warn",
             "total-functions/no-partial-url-constructor": "off",
             "total-functions/no-unsafe-mutable-readonly-assignment": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
@@ -2525,7 +2569,6 @@ export default [
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "off",
             // Sonar quality helpers
-
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
             "@eslint-community/eslint-comments/no-use": "off",
@@ -2534,6 +2577,7 @@ export default [
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
+            "@eslint-react/dom/no-unknown-property": "warn",
             "@eslint-react/ensure-forward-ref-using-ref": "warn",
             "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks":
                 "warn",
@@ -2550,6 +2594,8 @@ export default [
             "@eslint-react/hooks-extra/no-useless-custom-hooks": "warn",
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
+            "@eslint-react/jsx-uses-react": "warn",
+            "@eslint-react/jsx-uses-vars": "warn",
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
             /* Naming convention subplugin */
@@ -2981,7 +3027,16 @@ export default [
             "canonical/prefer-react-lazy": "off",
             "canonical/prefer-use-mount": "warn",
             "canonical/sort-react-dependencies": "warn",
-            "capitalized-comments": "off",
+            "capitalized-comments": [
+                "error",
+                "always",
+                {
+                    ignoreConsecutiveComments: true,
+                    ignoreInlineComments: true,
+                    ignorePattern:
+                        "pragma|ignored|import|prettier|eslint|tslint|copyright|license|eslint-disable|@ts-.*|jsx-a11y.*|@eslint.*|global|jsx|jsdoc|prettier|istanbul|jcoreio|metamask|microsoft|no-unsafe-optional-chaining|no-unnecessary-type-assertion|no-non-null-asserted-optional-chain|no-non-null-asserted-nullish-coalescing|@typescript-eslint.*|@docusaurus.*|@react.*|boundaries.*|depend.*|deprecation.*|etc.*|ex.*|functional.*|import-x.*|import-zod.*|jsx-a11y.*|loadable-imports.*|math.*|n.*|neverthrow.*|no-constructor-bind.*|no-explicit-type-exports.*|no-function-declare-after-return.*|no-lookahead-lookbehind-regexp.*|no-secrets.*|no-unary-plus.*|no-unawaited-dot-catch-throw.*|no-unsanitized.*|no-use-extend-native.*|observers.*|prefer-arrow.*|perfectionist.*|prettier.*|promise.*|react.*|react-hooks.*|react-hooks-addons.*|redos.*|regexp.*|require-jsdoc.*|safe-jsx.*|security.*|sonarjs.*|sort-class-members.*|sort-destructure-keys.*|sort-keys-fix.*|sql-template.*|ssr-friendly.*|styled-components-a11y.*|switch-case.*|total-functions.*|tsdoc.*|unicorn.*|unused-imports.*|usememo-recommendations.*|validate-jsx-nesting.*|write-good-comments.*|xss.*",
+                },
+            ],
             "class-methods-use-this": "off",
             "clean-code/exception-handling": "off",
             "clean-code/feature-envy": "off",
@@ -3095,6 +3150,28 @@ export default [
             "granular-selectors/granular-selectors": "error",
             "id-length": "off",
             // CSS
+            "import-x/consistent-type-specifier-style": "off",
+            "import-x/default": "warn",
+            "import-x/dynamic-import-chunkname": "warn",
+            "import-x/export": "warn",
+            "import-x/exports-last": "off",
+            "import-x/extensions": "warn",
+            "import-x/first": "warn",
+            "import-x/group-exports": "off",
+            "import-x/max-dependencies": "off",
+            // Import/Export Rules (import-x/*)
+            "import-x/named": "warn",
+            "import-x/namespace": "warn",
+            "import-x/newline-after-import": "warn",
+            "import-x/no-absolute-path": "warn",
+            "import-x/no-amd": "warn",
+            "import-x/no-anonymous-default-export": "warn",
+            "import-x/no-commonjs": "warn",
+            "import-x/no-cycle": "warn",
+            "import-x/no-default-export": "off",
+            "import-x/no-deprecated": "warn",
+            "import-x/no-duplicates": "warn",
+            "import-x/no-dynamic-require": "warn",
             "import-x/no-extraneous-dependencies": "warn",
             "import-x/no-import-module-exports": "warn",
             "import-x/no-internal-modules": "off",
@@ -3274,8 +3351,10 @@ export default [
                     allowSeparateTypeImports: true,
                 },
             ],
+            "no-empty-character-class": "error",
             "no-explicit-type-exports/no-explicit-type-exports": "error",
             "no-inline-comments": "off",
+            "no-invalid-regexp": "error",
             "no-magic-numbers": "off",
             "no-plusplus": "off",
             "no-secrets/no-pattern-match": "off",
@@ -3291,8 +3370,10 @@ export default [
                 "error",
             "no-undef-init": "off",
             "no-undefined": "off",
+            "no-unexpected-multiline": "error",
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",
+            "no-useless-backreference": "error",
             "no-void": "off",
             "object-shorthand": "off",
             "observers/matching-unobserve-target": "error",
@@ -3674,7 +3755,7 @@ export default [
             "regexp/prefer-regexp-test": "warn",
             "regexp/prefer-result-array-groups": "warn",
             "regexp/prefer-star-quantifier": "warn",
-            "regexp/require-unicode-regexp": "off",
+            "regexp/require-unicode-regexp": "warn",
             "regexp/require-unicode-sets-regexp": "warn",
             "regexp/sort-alternatives": "warn",
             "regexp/sort-character-class-elements": "off",
@@ -3687,12 +3768,40 @@ export default [
             "security/detect-non-literal-regexp": "warn",
             "security/detect-non-literal-require": "error",
             "security/detect-object-injection": "off",
+            "sonarjs/arguments-usage": "warn",
+            "sonarjs/array-constructor": "warn",
+            "sonarjs/aws-iam-all-resources-accessible": "warn",
             "sonarjs/cognitive-complexity": [
                 "warn",
                 30,
             ],
+            "sonarjs/comment-regex": "warn",
+            "sonarjs/declarations-in-global-scope": "off",
+            "sonarjs/elseif-without-else": "warn",
+            "sonarjs/for-in": "warn",
+            "sonarjs/nested-control-flow": "warn",
+            "sonarjs/no-built-in-override": "warn",
+            "sonarjs/no-collapsible-if": "warn",
             "sonarjs/no-duplicate-string": "off",
+            "sonarjs/no-for-in-iterable": "warn",
+            "sonarjs/no-function-declaration-in-block": "warn",
+            "sonarjs/no-implicit-dependencies": "warn",
+            "sonarjs/no-inconsistent-returns": "warn",
+            "sonarjs/no-incorrect-string-concat": "warn",
+            "sonarjs/no-nested-incdec": "warn",
+            "sonarjs/no-nested-switch": "warn",
+            "sonarjs/no-reference-error": "warn",
+            "sonarjs/no-require-or-define": "warn",
+            "sonarjs/no-return-type-any": "warn",
+            "sonarjs/no-sonar-comments": "error",
+            "sonarjs/no-undefined-assignment": "warn",
             "sonarjs/no-unused-function-argument": "warn",
+            "sonarjs/non-number-in-arithmetic-expression": "warn",
+            "sonarjs/operation-returning-nan": "warn",
+            "sonarjs/prefer-immediate-return": "warn",
+            "sonarjs/shorthand-property-grouping": "warn",
+            "sonarjs/strings-comparison": "warn",
+            "sonarjs/too-many-break-or-continue-in-loop": "warn",
             "sort-class-members/sort-class-members": [
                 "warn",
                 {
@@ -3749,7 +3858,7 @@ export default [
             ],
             "total-functions/no-hidden-type-assertions": "off",
             "total-functions/no-nested-fp-ts-effects": "off",
-            "total-functions/no-partial-division": "off",
+            "total-functions/no-partial-division": "warn",
             "total-functions/no-partial-url-constructor": "off",
             "total-functions/no-unsafe-mutable-readonly-assignment": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
@@ -3811,7 +3920,7 @@ export default [
         },
         settings: {
             "better-tailwindcss": {
-                // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
+                // Tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
                 entryPoint: "./src/index.css",
             },
             "boundaries/elements": [
@@ -4069,6 +4178,7 @@ export default [
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
+            "@eslint-react/dom/no-unknown-property": "warn",
             "@eslint-react/ensure-forward-ref-using-ref": "warn",
             "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks":
                 "warn",
@@ -4085,6 +4195,8 @@ export default [
             "@eslint-react/hooks-extra/no-useless-custom-hooks": "warn",
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
+            "@eslint-react/jsx-uses-react": "warn",
+            "@eslint-react/jsx-uses-vars": "warn",
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
             /* Naming convention subplugin */
@@ -4493,7 +4605,16 @@ export default [
             "canonical/prefer-react-lazy": "off",
             "canonical/prefer-use-mount": "warn",
             "canonical/sort-react-dependencies": "warn",
-            "capitalized-comments": "off",
+            "capitalized-comments": [
+                "error",
+                "always",
+                {
+                    ignoreConsecutiveComments: true,
+                    ignoreInlineComments: true,
+                    ignorePattern:
+                        "pragma|ignored|import|prettier|eslint|tslint|copyright|license|eslint-disable|@ts-.*|jsx-a11y.*|@eslint.*|global|jsx|jsdoc|prettier|istanbul|jcoreio|metamask|microsoft|no-unsafe-optional-chaining|no-unnecessary-type-assertion|no-non-null-asserted-optional-chain|no-non-null-asserted-nullish-coalescing|@typescript-eslint.*|@docusaurus.*|@react.*|boundaries.*|depend.*|deprecation.*|etc.*|ex.*|functional.*|import-x.*|import-zod.*|jsx-a11y.*|loadable-imports.*|math.*|n.*|neverthrow.*|no-constructor-bind.*|no-explicit-type-exports.*|no-function-declare-after-return.*|no-lookahead-lookbehind-regexp.*|no-secrets.*|no-unary-plus.*|no-unawaited-dot-catch-throw.*|no-unsanitized.*|no-use-extend-native.*|observers.*|prefer-arrow.*|perfectionist.*|prettier.*|promise.*|react.*|react-hooks.*|react-hooks-addons.*|redos.*|regexp.*|require-jsdoc.*|safe-jsx.*|security.*|sonarjs.*|sort-class-members.*|sort-destructure-keys.*|sort-keys-fix.*|sql-template.*|ssr-friendly.*|styled-components-a11y.*|switch-case.*|total-functions.*|tsdoc.*|unicorn.*|unused-imports.*|usememo-recommendations.*|validate-jsx-nesting.*|write-good-comments.*|xss.*",
+                },
+            ],
             "class-methods-use-this": "off",
             "clean-code/exception-handling": "off",
             "clean-code/feature-envy": "off",
@@ -4717,11 +4838,11 @@ export default [
             "n/handle-callback-err": "warn",
             "n/no-callback-literal": "warn",
             "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
-
             "n/no-missing-import": "off", // Allow missing imports for dynamic imports
             "n/no-mixed-requires": "warn",
             "n/no-new-require": "warn",
             "n/no-path-concat": "warn",
+
             "n/no-process-env": [
                 "error",
                 {
@@ -4796,8 +4917,10 @@ export default [
                     allowSeparateTypeImports: true,
                 },
             ],
+            "no-empty-character-class": "error",
             "no-explicit-type-exports/no-explicit-type-exports": "error",
             "no-inline-comments": "off",
+            "no-invalid-regexp": "error",
             "no-magic-numbers": "off",
             "no-plusplus": "off",
             "no-secrets/no-pattern-match": "off",
@@ -4813,8 +4936,10 @@ export default [
                 "error",
             "no-undef-init": "off",
             "no-undefined": "off",
+            "no-unexpected-multiline": "error",
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",
+            "no-useless-backreference": "error",
             "no-void": "off",
             "object-shorthand": "off",
             "observers/matching-unobserve-target": "error",
@@ -4951,7 +5076,7 @@ export default [
             "regexp/prefer-regexp-exec": "warn",
             "regexp/prefer-regexp-test": "warn",
             "regexp/prefer-result-array-groups": "warn",
-            "regexp/require-unicode-regexp": "off",
+            "regexp/require-unicode-regexp": "warn",
             "regexp/require-unicode-sets-regexp": "warn",
             "regexp/sort-alternatives": "warn",
             "regexp/sort-character-class-elements": "off",
@@ -4964,12 +5089,40 @@ export default [
             "security/detect-non-literal-regexp": "warn",
             "security/detect-non-literal-require": "error",
             "security/detect-object-injection": "off",
+            "sonarjs/arguments-usage": "warn",
+            "sonarjs/array-constructor": "warn",
+            "sonarjs/aws-iam-all-resources-accessible": "warn",
             "sonarjs/cognitive-complexity": [
                 "warn",
                 30,
             ],
+            "sonarjs/comment-regex": "warn",
+            "sonarjs/declarations-in-global-scope": "off",
+            "sonarjs/elseif-without-else": "warn",
+            "sonarjs/for-in": "warn",
+            "sonarjs/nested-control-flow": "warn",
+            "sonarjs/no-built-in-override": "warn",
+            "sonarjs/no-collapsible-if": "warn",
             "sonarjs/no-duplicate-string": "off",
+            "sonarjs/no-for-in-iterable": "warn",
+            "sonarjs/no-function-declaration-in-block": "warn",
+            "sonarjs/no-implicit-dependencies": "warn",
+            "sonarjs/no-inconsistent-returns": "warn",
+            "sonarjs/no-incorrect-string-concat": "warn",
+            "sonarjs/no-nested-incdec": "warn",
+            "sonarjs/no-nested-switch": "warn",
+            "sonarjs/no-reference-error": "warn",
+            "sonarjs/no-require-or-define": "warn",
+            "sonarjs/no-return-type-any": "warn",
+            "sonarjs/no-sonar-comments": "error",
+            "sonarjs/no-undefined-assignment": "warn",
             "sonarjs/no-unused-function-argument": "warn",
+            "sonarjs/non-number-in-arithmetic-expression": "warn",
+            "sonarjs/operation-returning-nan": "warn",
+            "sonarjs/prefer-immediate-return": "warn",
+            "sonarjs/shorthand-property-grouping": "warn",
+            "sonarjs/strings-comparison": "warn",
+            "sonarjs/too-many-break-or-continue-in-loop": "warn",
             "sort-class-members/sort-class-members": [
                 "warn",
                 {
@@ -5005,7 +5158,7 @@ export default [
             "switch-case/no-case-curly": "off",
             "total-functions/no-hidden-type-assertions": "off",
             "total-functions/no-nested-fp-ts-effects": "off",
-            "total-functions/no-partial-division": "off",
+            "total-functions/no-partial-division": "warn",
             "total-functions/no-partial-url-constructor": "off",
             "total-functions/no-unsafe-mutable-readonly-assignment": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
@@ -5348,6 +5501,7 @@ export default [
             "@eslint-react/avoid-shorthand-fragment": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
+            "@eslint-react/dom/no-unknown-property": "warn",
             "@eslint-react/ensure-forward-ref-using-ref": "warn",
             "@eslint-react/hooks-extra/ensure-custom-hooks-using-other-hooks":
                 "warn",
@@ -5364,6 +5518,8 @@ export default [
             "@eslint-react/hooks-extra/no-useless-custom-hooks": "warn",
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
+            "@eslint-react/jsx-uses-react": "warn",
+            "@eslint-react/jsx-uses-vars": "warn",
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
             /* Naming convention subplugin */
@@ -5780,7 +5936,16 @@ export default [
             "canonical/prefer-react-lazy": "off",
             "canonical/prefer-use-mount": "warn",
             "canonical/sort-react-dependencies": "warn",
-            "capitalized-comments": "off",
+            "capitalized-comments": [
+                "error",
+                "always",
+                {
+                    ignoreConsecutiveComments: true,
+                    ignoreInlineComments: true,
+                    ignorePattern:
+                        "pragma|ignored|import|prettier|eslint|tslint|copyright|license|eslint-disable|@ts-.*|jsx-a11y.*|@eslint.*|global|jsx|jsdoc|prettier|istanbul|jcoreio|metamask|microsoft|no-unsafe-optional-chaining|no-unnecessary-type-assertion|no-non-null-asserted-optional-chain|no-non-null-asserted-nullish-coalescing|@typescript-eslint.*|@docusaurus.*|@react.*|boundaries.*|depend.*|deprecation.*|etc.*|ex.*|functional.*|import-x.*|import-zod.*|jsx-a11y.*|loadable-imports.*|math.*|n.*|neverthrow.*|no-constructor-bind.*|no-explicit-type-exports.*|no-function-declare-after-return.*|no-lookahead-lookbehind-regexp.*|no-secrets.*|no-unary-plus.*|no-unawaited-dot-catch-throw.*|no-unsanitized.*|no-use-extend-native.*|observers.*|prefer-arrow.*|perfectionist.*|prettier.*|promise.*|react.*|react-hooks.*|react-hooks-addons.*|redos.*|regexp.*|require-jsdoc.*|safe-jsx.*|security.*|sonarjs.*|sort-class-members.*|sort-destructure-keys.*|sort-keys-fix.*|sql-template.*|ssr-friendly.*|styled-components-a11y.*|switch-case.*|total-functions.*|tsdoc.*|unicorn.*|unused-imports.*|usememo-recommendations.*|validate-jsx-nesting.*|write-good-comments.*|xss.*",
+                },
+            ],
             "class-methods-use-this": "off",
             "clean-code/exception-handling": "off",
             "clean-code/feature-envy": "off",
@@ -5894,6 +6059,28 @@ export default [
             "granular-selectors/granular-selectors": "error",
             "id-length": "off",
             // CSS
+            "import-x/consistent-type-specifier-style": "off",
+            "import-x/default": "warn",
+            "import-x/dynamic-import-chunkname": "warn",
+            "import-x/export": "warn",
+            "import-x/exports-last": "off",
+            "import-x/extensions": "warn",
+            "import-x/first": "warn",
+            "import-x/group-exports": "off",
+            "import-x/max-dependencies": "off",
+            // Import/Export Rules (import-x/*)
+            "import-x/named": "warn",
+            "import-x/namespace": "warn",
+            "import-x/newline-after-import": "warn",
+            "import-x/no-absolute-path": "warn",
+            "import-x/no-amd": "warn",
+            "import-x/no-anonymous-default-export": "warn",
+            "import-x/no-commonjs": "warn",
+            "import-x/no-cycle": "warn",
+            "import-x/no-default-export": "off",
+            "import-x/no-deprecated": "warn",
+            "import-x/no-duplicates": "warn",
+            "import-x/no-dynamic-require": "warn",
             "import-x/no-extraneous-dependencies": "warn",
             "import-x/no-import-module-exports": "warn",
             "import-x/no-internal-modules": "off",
@@ -6074,8 +6261,10 @@ export default [
                     allowSeparateTypeImports: true,
                 },
             ],
+            "no-empty-character-class": "error",
             "no-explicit-type-exports/no-explicit-type-exports": "error",
             "no-inline-comments": "off",
+            "no-invalid-regexp": "error",
             "no-magic-numbers": "off",
             "no-plusplus": "off",
             "no-secrets/no-pattern-match": "off",
@@ -6091,8 +6280,10 @@ export default [
                 "error",
             "no-undef-init": "off",
             "no-undefined": "off",
+            "no-unexpected-multiline": "error",
             "no-unsanitized/method": "error",
             "no-unsanitized/property": "error",
+            "no-useless-backreference": "error",
             "no-void": "off",
             "object-shorthand": "off",
             "observers/matching-unobserve-target": "error",
@@ -6474,7 +6665,7 @@ export default [
             "regexp/prefer-regexp-test": "warn",
             "regexp/prefer-result-array-groups": "warn",
             "regexp/prefer-star-quantifier": "warn",
-            "regexp/require-unicode-regexp": "off",
+            "regexp/require-unicode-regexp": "warn",
             "regexp/require-unicode-sets-regexp": "warn",
             "regexp/sort-alternatives": "warn",
             "regexp/sort-character-class-elements": "off",
@@ -6487,12 +6678,40 @@ export default [
             "security/detect-non-literal-regexp": "warn",
             "security/detect-non-literal-require": "error",
             "security/detect-object-injection": "off",
+            "sonarjs/arguments-usage": "warn",
+            "sonarjs/array-constructor": "warn",
+            "sonarjs/aws-iam-all-resources-accessible": "warn",
             "sonarjs/cognitive-complexity": [
                 "warn",
                 30,
             ],
+            "sonarjs/comment-regex": "warn",
+            "sonarjs/declarations-in-global-scope": "off",
+            "sonarjs/elseif-without-else": "warn",
+            "sonarjs/for-in": "warn",
+            "sonarjs/nested-control-flow": "warn",
+            "sonarjs/no-built-in-override": "warn",
+            "sonarjs/no-collapsible-if": "warn",
             "sonarjs/no-duplicate-string": "off",
+            "sonarjs/no-for-in-iterable": "warn",
+            "sonarjs/no-function-declaration-in-block": "warn",
+            "sonarjs/no-implicit-dependencies": "warn",
+            "sonarjs/no-inconsistent-returns": "warn",
+            "sonarjs/no-incorrect-string-concat": "warn",
+            "sonarjs/no-nested-incdec": "warn",
+            "sonarjs/no-nested-switch": "warn",
+            "sonarjs/no-reference-error": "warn",
+            "sonarjs/no-require-or-define": "warn",
+            "sonarjs/no-return-type-any": "warn",
+            "sonarjs/no-sonar-comments": "error",
+            "sonarjs/no-undefined-assignment": "warn",
             "sonarjs/no-unused-function-argument": "warn",
+            "sonarjs/non-number-in-arithmetic-expression": "warn",
+            "sonarjs/operation-returning-nan": "warn",
+            "sonarjs/prefer-immediate-return": "warn",
+            "sonarjs/shorthand-property-grouping": "warn",
+            "sonarjs/strings-comparison": "warn",
+            "sonarjs/too-many-break-or-continue-in-loop": "warn",
             "sort-class-members/sort-class-members": [
                 "warn",
                 {
@@ -6549,7 +6768,7 @@ export default [
             ],
             "total-functions/no-hidden-type-assertions": "off",
             "total-functions/no-nested-fp-ts-effects": "off",
-            "total-functions/no-partial-division": "off",
+            "total-functions/no-partial-division": "warn",
             "total-functions/no-partial-url-constructor": "off",
             "total-functions/no-unsafe-mutable-readonly-assignment": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
@@ -6611,7 +6830,7 @@ export default [
         },
         settings: {
             "better-tailwindcss": {
-                // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
+                // Tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
                 entryPoint: "./src/index.css",
             },
             "boundaries/elements": [
@@ -6754,7 +6973,16 @@ export default [
             "@typescript-eslint/no-unused-vars": "off",
             "@typescript-eslint/no-use-before-define": "off", // Allow use before define in tests
             camelcase: "off",
-            "capitalized-comments": "off",
+            "capitalized-comments": [
+                "error",
+                "always",
+                {
+                    ignoreConsecutiveComments: true,
+                    ignoreInlineComments: true,
+                    ignorePattern:
+                        "pragma|ignored|import|prettier|eslint|tslint|copyright|license|eslint-disable|@ts-.*|jsx-a11y.*|@eslint.*|global|jsx|jsdoc|prettier|istanbul|jcoreio|metamask|microsoft|no-unsafe-optional-chaining|no-unnecessary-type-assertion|no-non-null-asserted-optional-chain|no-non-null-asserted-nullish-coalescing|@typescript-eslint.*|@docusaurus.*|@react.*|boundaries.*|depend.*|deprecation.*|etc.*|ex.*|functional.*|import-x.*|import-zod.*|jsx-a11y.*|loadable-imports.*|math.*|n.*|neverthrow.*|no-constructor-bind.*|no-explicit-type-exports.*|no-function-declare-after-return.*|no-lookahead-lookbehind-regexp.*|no-secrets.*|no-unary-plus.*|no-unawaited-dot-catch-throw.*|no-unsanitized.*|no-use-extend-native.*|observers.*|prefer-arrow.*|perfectionist.*|prettier.*|promise.*|react.*|react-hooks.*|react-hooks-addons.*|redos.*|regexp.*|require-jsdoc.*|safe-jsx.*|security.*|sonarjs.*|sort-class-members.*|sort-destructure-keys.*|sort-keys-fix.*|sql-template.*|ssr-friendly.*|styled-components-a11y.*|switch-case.*|total-functions.*|tsdoc.*|unicorn.*|unused-imports.*|usememo-recommendations.*|validate-jsx-nesting.*|write-good-comments.*|xss.*",
+                },
+            ],
             "class-methods-use-this": "off",
             complexity: "off",
             "default-case": "off",
@@ -6967,7 +7195,16 @@ export default [
             "@typescript-eslint/no-unused-vars": "off",
             "@typescript-eslint/no-use-before-define": "off", // Allow use before define in tests
             camelcase: "off",
-            "capitalized-comments": "off",
+            "capitalized-comments": [
+                "error",
+                "always",
+                {
+                    ignoreConsecutiveComments: true,
+                    ignoreInlineComments: true,
+                    ignorePattern:
+                        "pragma|ignored|import|prettier|eslint|tslint|copyright|license|eslint-disable|@ts-.*|jsx-a11y.*|@eslint.*|global|jsx|jsdoc|prettier|istanbul|jcoreio|metamask|microsoft|no-unsafe-optional-chaining|no-unnecessary-type-assertion|no-non-null-asserted-optional-chain|no-non-null-asserted-nullish-coalescing|@typescript-eslint.*|@docusaurus.*|@react.*|boundaries.*|depend.*|deprecation.*|etc.*|ex.*|functional.*|import-x.*|import-zod.*|jsx-a11y.*|loadable-imports.*|math.*|n.*|neverthrow.*|no-constructor-bind.*|no-explicit-type-exports.*|no-function-declare-after-return.*|no-lookahead-lookbehind-regexp.*|no-secrets.*|no-unary-plus.*|no-unawaited-dot-catch-throw.*|no-unsanitized.*|no-use-extend-native.*|observers.*|prefer-arrow.*|perfectionist.*|prettier.*|promise.*|react.*|react-hooks.*|react-hooks-addons.*|redos.*|regexp.*|require-jsdoc.*|safe-jsx.*|security.*|sonarjs.*|sort-class-members.*|sort-destructure-keys.*|sort-keys-fix.*|sql-template.*|ssr-friendly.*|styled-components-a11y.*|switch-case.*|total-functions.*|tsdoc.*|unicorn.*|unused-imports.*|usememo-recommendations.*|validate-jsx-nesting.*|write-good-comments.*|xss.*",
+                },
+            ],
             "class-methods-use-this": "off",
             complexity: "off",
             "default-case": "off",
@@ -7182,7 +7419,16 @@ export default [
             "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
             "@typescript-eslint/no-unused-vars": "off",
             camelcase: "off",
-            "capitalized-comments": "off",
+            "capitalized-comments": [
+                "error",
+                "always",
+                {
+                    ignoreConsecutiveComments: true,
+                    ignoreInlineComments: true,
+                    ignorePattern:
+                        "pragma|ignored|import|prettier|eslint|tslint|copyright|license|eslint-disable|@ts-.*|jsx-a11y.*|@eslint.*|global|jsx|jsdoc|prettier|istanbul|jcoreio|metamask|microsoft|no-unsafe-optional-chaining|no-unnecessary-type-assertion|no-non-null-asserted-optional-chain|no-non-null-asserted-nullish-coalescing|@typescript-eslint.*|@docusaurus.*|@react.*|boundaries.*|depend.*|deprecation.*|etc.*|ex.*|functional.*|import-x.*|import-zod.*|jsx-a11y.*|loadable-imports.*|math.*|n.*|neverthrow.*|no-constructor-bind.*|no-explicit-type-exports.*|no-function-declare-after-return.*|no-lookahead-lookbehind-regexp.*|no-secrets.*|no-unary-plus.*|no-unawaited-dot-catch-throw.*|no-unsanitized.*|no-use-extend-native.*|observers.*|prefer-arrow.*|perfectionist.*|prettier.*|promise.*|react.*|react-hooks.*|react-hooks-addons.*|redos.*|regexp.*|require-jsdoc.*|safe-jsx.*|security.*|sonarjs.*|sort-class-members.*|sort-destructure-keys.*|sort-keys-fix.*|sql-template.*|ssr-friendly.*|styled-components-a11y.*|switch-case.*|total-functions.*|tsdoc.*|unicorn.*|unused-imports.*|usememo-recommendations.*|validate-jsx-nesting.*|write-good-comments.*|xss.*",
+                },
+            ],
             "class-methods-use-this": "off",
             "dot-notation": "off",
             "func-style": "off",
@@ -7379,7 +7625,16 @@ export default [
             "@typescript-eslint/no-unused-vars": "off",
             "@typescript-eslint/require-await": "off", // Benchmarks may have async patterns
             camelcase: "off",
-            "capitalized-comments": "off",
+            "capitalized-comments": [
+                "error",
+                "always",
+                {
+                    ignoreConsecutiveComments: true,
+                    ignoreInlineComments: true,
+                    ignorePattern:
+                        "pragma|ignored|import|prettier|eslint|tslint|copyright|license|eslint-disable|@ts-.*|jsx-a11y.*|@eslint.*|global|jsx|jsdoc|prettier|istanbul|jcoreio|metamask|microsoft|no-unsafe-optional-chaining|no-unnecessary-type-assertion|no-non-null-asserted-optional-chain|no-non-null-asserted-nullish-coalescing|@typescript-eslint.*|@docusaurus.*|@react.*|boundaries.*|depend.*|deprecation.*|etc.*|ex.*|functional.*|import-x.*|import-zod.*|jsx-a11y.*|loadable-imports.*|math.*|n.*|neverthrow.*|no-constructor-bind.*|no-explicit-type-exports.*|no-function-declare-after-return.*|no-lookahead-lookbehind-regexp.*|no-secrets.*|no-unary-plus.*|no-unawaited-dot-catch-throw.*|no-unsanitized.*|no-use-extend-native.*|observers.*|prefer-arrow.*|perfectionist.*|prettier.*|promise.*|react.*|react-hooks.*|react-hooks-addons.*|redos.*|regexp.*|require-jsdoc.*|safe-jsx.*|security.*|sonarjs.*|sort-class-members.*|sort-destructure-keys.*|sort-keys-fix.*|sql-template.*|ssr-friendly.*|styled-components-a11y.*|switch-case.*|total-functions.*|tsdoc.*|unicorn.*|unused-imports.*|usememo-recommendations.*|validate-jsx-nesting.*|write-good-comments.*|xss.*",
+                },
+            ],
             "class-methods-use-this": "off",
             complexity: "off",
             "default-case": "off",
@@ -7756,7 +8011,16 @@ export default [
             "canonical/no-import-namespace-destructure": "warn",
             "canonical/no-restricted-imports": "off",
             "canonical/prefer-react-lazy": "off",
-            "capitalized-comments": "off",
+            "capitalized-comments": [
+                "error",
+                "always",
+                {
+                    ignoreConsecutiveComments: true,
+                    ignoreInlineComments: true,
+                    ignorePattern:
+                        "pragma|ignored|import|prettier|eslint|tslint|copyright|license|eslint-disable|@ts-.*|jsx-a11y.*|@eslint.*|global|jsx|jsdoc|prettier|istanbul|jcoreio|metamask|microsoft|no-unsafe-optional-chaining|no-unnecessary-type-assertion|no-non-null-asserted-optional-chain|no-non-null-asserted-nullish-coalescing|@typescript-eslint.*|@docusaurus.*|@react.*|boundaries.*|depend.*|deprecation.*|etc.*|ex.*|functional.*|import-x.*|import-zod.*|jsx-a11y.*|loadable-imports.*|math.*|n.*|neverthrow.*|no-constructor-bind.*|no-explicit-type-exports.*|no-function-declare-after-return.*|no-lookahead-lookbehind-regexp.*|no-secrets.*|no-unary-plus.*|no-unawaited-dot-catch-throw.*|no-unsanitized.*|no-use-extend-native.*|observers.*|prefer-arrow.*|perfectionist.*|prettier.*|promise.*|react.*|react-hooks.*|react-hooks-addons.*|redos.*|regexp.*|require-jsdoc.*|safe-jsx.*|security.*|sonarjs.*|sort-class-members.*|sort-destructure-keys.*|sort-keys-fix.*|sql-template.*|ssr-friendly.*|styled-components-a11y.*|switch-case.*|total-functions.*|tsdoc.*|unicorn.*|unused-imports.*|usememo-recommendations.*|validate-jsx-nesting.*|write-good-comments.*|xss.*",
+                },
+            ],
             "class-methods-use-this": "off",
             complexity: "off",
             "default-case": "off",
@@ -7990,7 +8254,7 @@ export default [
             "regexp/prefer-regexp-exec": "warn",
             "regexp/prefer-regexp-test": "warn",
             "regexp/prefer-result-array-groups": "warn",
-            "regexp/require-unicode-regexp": "off",
+            "regexp/require-unicode-regexp": "warn",
             "regexp/require-unicode-sets-regexp": "warn",
             "regexp/sort-alternatives": "warn",
             "regexp/sort-character-class-elements": "off",
@@ -8002,12 +8266,40 @@ export default [
             "security/detect-non-literal-regexp": "warn",
             "security/detect-non-literal-require": "error",
             "security/detect-object-injection": "off",
+            "sonarjs/arguments-usage": "warn",
+            "sonarjs/array-constructor": "warn",
+            "sonarjs/aws-iam-all-resources-accessible": "warn",
             "sonarjs/cognitive-complexity": [
                 "warn",
                 30,
             ],
+            "sonarjs/comment-regex": "warn",
+            "sonarjs/declarations-in-global-scope": "off",
+            "sonarjs/elseif-without-else": "warn",
+            "sonarjs/for-in": "warn",
+            "sonarjs/nested-control-flow": "warn",
+            "sonarjs/no-built-in-override": "warn",
+            "sonarjs/no-collapsible-if": "warn",
             "sonarjs/no-duplicate-string": "off",
+            "sonarjs/no-for-in-iterable": "warn",
+            "sonarjs/no-function-declaration-in-block": "warn",
+            "sonarjs/no-implicit-dependencies": "warn",
+            "sonarjs/no-inconsistent-returns": "warn",
+            "sonarjs/no-incorrect-string-concat": "warn",
+            "sonarjs/no-nested-incdec": "warn",
+            "sonarjs/no-nested-switch": "warn",
+            "sonarjs/no-reference-error": "warn",
+            "sonarjs/no-require-or-define": "warn",
+            "sonarjs/no-return-type-any": "warn",
+            "sonarjs/no-sonar-comments": "error",
+            "sonarjs/no-undefined-assignment": "warn",
             "sonarjs/no-unused-function-argument": "warn",
+            "sonarjs/non-number-in-arithmetic-expression": "warn",
+            "sonarjs/operation-returning-nan": "warn",
+            "sonarjs/prefer-immediate-return": "warn",
+            "sonarjs/shorthand-property-grouping": "warn",
+            "sonarjs/strings-comparison": "warn",
+            "sonarjs/too-many-break-or-continue-in-loop": "warn",
             "sort-imports": "off",
             "sort-keys": "off",
             // Documentation
@@ -8182,16 +8474,25 @@ export default [
             "@typescript-eslint/no-empty-function": "off",
             // Allow flexible patterns for benchmark mock implementations
             "@typescript-eslint/no-explicit-any": "off",
-            "@typescript-eslint/no-floating-promises": "off", // Benchmarks may not await all promises
+            "@typescript-eslint/no-floating-promises": "off", // Scripts may not await all promises
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "@typescript-eslint/no-misused-promises": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-restricted-types": "off",
             "@typescript-eslint/no-unsafe-function-type": "off",
             "@typescript-eslint/no-unused-vars": "off",
-            "@typescript-eslint/require-await": "off", // Benchmarks may have async patterns
+            "@typescript-eslint/require-await": "off", // Scripts may have async patterns
             camelcase: "off",
-            "capitalized-comments": "off",
+            "capitalized-comments": [
+                "error",
+                "always",
+                {
+                    ignoreConsecutiveComments: true,
+                    ignoreInlineComments: true,
+                    ignorePattern:
+                        "pragma|ignored|import|prettier|eslint|tslint|copyright|license|eslint-disable|@ts-.*|jsx-a11y.*|@eslint.*|global|jsx|jsdoc|prettier|istanbul|jcoreio|metamask|microsoft|no-unsafe-optional-chaining|no-unnecessary-type-assertion|no-non-null-asserted-optional-chain|no-non-null-asserted-nullish-coalescing|@typescript-eslint.*|@docusaurus.*|@react.*|boundaries.*|depend.*|deprecation.*|etc.*|ex.*|functional.*|import-x.*|import-zod.*|jsx-a11y.*|loadable-imports.*|math.*|n.*|neverthrow.*|no-constructor-bind.*|no-explicit-type-exports.*|no-function-declare-after-return.*|no-lookahead-lookbehind-regexp.*|no-secrets.*|no-unary-plus.*|no-unawaited-dot-catch-throw.*|no-unsanitized.*|no-use-extend-native.*|observers.*|prefer-arrow.*|perfectionist.*|prettier.*|promise.*|react.*|react-hooks.*|react-hooks-addons.*|redos.*|regexp.*|require-jsdoc.*|safe-jsx.*|security.*|sonarjs.*|sort-class-members.*|sort-destructure-keys.*|sort-keys-fix.*|sql-template.*|ssr-friendly.*|styled-components-a11y.*|switch-case.*|total-functions.*|tsdoc.*|unicorn.*|unused-imports.*|usememo-recommendations.*|validate-jsx-nesting.*|write-good-comments.*|xss.*",
+                },
+            ],
             "class-methods-use-this": "off",
             complexity: "off",
             "default-case": "off",
@@ -8371,7 +8672,16 @@ export default [
             ...nodePlugin.configs["flat/recommended"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             camelcase: "off",
-            "capitalized-comments": "off",
+            "capitalized-comments": [
+                "error",
+                "always",
+                {
+                    ignoreConsecutiveComments: true,
+                    ignoreInlineComments: true,
+                    ignorePattern:
+                        "pragma|ignored|import|prettier|eslint|tslint|copyright|license|eslint-disable|@ts-.*|jsx-a11y.*|@eslint.*|global|jsx|jsdoc|prettier|istanbul|jcoreio|metamask|microsoft|no-unsafe-optional-chaining|no-unnecessary-type-assertion|no-non-null-asserted-optional-chain|no-non-null-asserted-nullish-coalescing|@typescript-eslint.*|@docusaurus.*|@react.*|boundaries.*|depend.*|deprecation.*|etc.*|ex.*|functional.*|import-x.*|import-zod.*|jsx-a11y.*|loadable-imports.*|math.*|n.*|neverthrow.*|no-constructor-bind.*|no-explicit-type-exports.*|no-function-declare-after-return.*|no-lookahead-lookbehind-regexp.*|no-secrets.*|no-unary-plus.*|no-unawaited-dot-catch-throw.*|no-unsanitized.*|no-use-extend-native.*|observers.*|prefer-arrow.*|perfectionist.*|prettier.*|promise.*|react.*|react-hooks.*|react-hooks-addons.*|redos.*|regexp.*|require-jsdoc.*|safe-jsx.*|security.*|sonarjs.*|sort-class-members.*|sort-destructure-keys.*|sort-keys-fix.*|sql-template.*|ssr-friendly.*|styled-components-a11y.*|switch-case.*|total-functions.*|tsdoc.*|unicorn.*|unused-imports.*|usememo-recommendations.*|validate-jsx-nesting.*|write-good-comments.*|xss.*",
+                },
+            ],
             "class-methods-use-this": "off",
             "depend/ban-dependencies": "error",
             "dot-notation": "off",
@@ -8407,12 +8717,40 @@ export default [
             ],
             "require-await": "off",
             "require-unicode-regexp": "off",
+            "sonarjs/arguments-usage": "warn",
+            "sonarjs/array-constructor": "warn",
+            "sonarjs/aws-iam-all-resources-accessible": "warn",
             "sonarjs/cognitive-complexity": [
                 "warn",
                 30,
             ],
+            "sonarjs/comment-regex": "warn",
+            "sonarjs/declarations-in-global-scope": "off",
+            "sonarjs/elseif-without-else": "warn",
+            "sonarjs/for-in": "warn",
+            "sonarjs/nested-control-flow": "warn",
+            "sonarjs/no-built-in-override": "warn",
+            "sonarjs/no-collapsible-if": "warn",
             "sonarjs/no-duplicate-string": "off",
+            "sonarjs/no-for-in-iterable": "warn",
+            "sonarjs/no-function-declaration-in-block": "warn",
+            "sonarjs/no-implicit-dependencies": "warn",
+            "sonarjs/no-inconsistent-returns": "warn",
+            "sonarjs/no-incorrect-string-concat": "warn",
+            "sonarjs/no-nested-incdec": "warn",
+            "sonarjs/no-nested-switch": "warn",
+            "sonarjs/no-reference-error": "warn",
+            "sonarjs/no-require-or-define": "warn",
+            "sonarjs/no-return-type-any": "warn",
+            "sonarjs/no-sonar-comments": "error",
+            "sonarjs/no-undefined-assignment": "warn",
             "sonarjs/no-unused-function-argument": "warn",
+            "sonarjs/non-number-in-arithmetic-expression": "warn",
+            "sonarjs/operation-returning-nan": "warn",
+            "sonarjs/prefer-immediate-return": "warn",
+            "sonarjs/shorthand-property-grouping": "warn",
+            "sonarjs/strings-comparison": "warn",
+            "sonarjs/too-many-break-or-continue-in-loop": "warn",
             "sort-imports": "off",
             "sort-keys": "off",
             "unicorn/consistent-function-scoping": "off", // Configs often use different scoping
@@ -8530,7 +8868,7 @@ export default [
             "playwright/no-focused-test": "error",
             "playwright/no-force-option": "warn",
             "playwright/no-get-by-title": "error",
-            "playwright/no-hooks": "off", // disabling - hooks are needed in most projects
+            "playwright/no-hooks": "off", // Disabling - hooks are needed in most projects
             "playwright/no-nested-step": "error",
             "playwright/no-networkidle": "warn",
             "playwright/no-nth-methods": "off",
@@ -8544,7 +8882,7 @@ export default [
                     ],
                 },
             ],
-            "playwright/no-restricted-matchers": "off", // disabling - restricting matchers is often unnecessary
+            "playwright/no-restricted-matchers": "off", // Disabling - restricting matchers is often unnecessary
             "playwright/no-skipped-test": "warn",
             "playwright/no-slowed-test": "off",
             "playwright/no-useless-await": "error",
@@ -8564,8 +8902,8 @@ export default [
             "playwright/prefer-to-have-count": "warn",
             "playwright/prefer-to-have-length": "warn",
             "playwright/prefer-web-first-assertions": "error",
-            "playwright/require-hook": "off", // disabling - not always required
-            "playwright/require-soft-assertions": "off", // disabling - soft assertions are not always desirable
+            "playwright/require-hook": "off", // Disabling - not always required
+            "playwright/require-soft-assertions": "off", // Disabling - soft assertions are not always desirable
             "playwright/require-to-throw-message": "warn",
             "playwright/require-top-level-describe": "warn",
             "playwright/valid-expect": "error",
@@ -8616,7 +8954,7 @@ export default [
                 {
                     testIdAttribute: ["data-testid"],
                     testIdPattern:
-                        "^[a-z]+([A-Z][a-z]+)*(-[a-z]+([A-Z][a-z]+)*)*$", // kebab-case or camelCase
+                        "^[a-z]+([A-Z][a-z]+)*(-[a-z]+([A-Z][a-z]+)*)*$", // Kebab-case or camelCase
                 },
             ],
             "testing-library/no-test-id-queries": "warn",
@@ -8686,7 +9024,7 @@ export default [
     // Global Disables
     {
         files: ["**/**"],
-        name: "Global Disables",
+        name: "Globals",
         rules: {
             "@eslint-react/debug/class-component": "off", // Debugging not needed
             "@eslint-react/debug/function-component": "off", // Debugging not needed
@@ -8695,15 +9033,7 @@ export default [
             "@eslint-react/debug/jsx": "off", // Debugging not needed
             "@eslint-react/debug/react-hooks": "off", // Debugging not needed
 
-            // @typescript-eslint
-            "@typescript-eslint/no-empty-interface": "off",
-            "@typescript-eslint/no-loss-of-precision": "off",
-            "@typescript-eslint/no-type-alias": "off",
-            "@typescript-eslint/no-var-requires": "off",
-            "@typescript-eslint/prefer-ts-expect-error": "off",
-            "@typescript-eslint/sort-type-constituents": "off",
-            "@typescript-eslint/typedef": "off",
-            // better-tailwindcss
+            // Better-tailwindcss
             "better-tailwindcss/multiline": "off",
             "better-tailwindcss/sort-classes": "off",
             "callback-return": "off",
@@ -8713,7 +9043,7 @@ export default [
             "functional/no-this-expressions": "off",
             "functional/no-try-statements": "off",
             "functional/prefer-property-signatures": "off",
-            // functional
+            // Functional
             "functional/prefer-readonly-type": "off",
             "functional/prefer-tacit": "off",
             "functional/readonly-type": "off",
@@ -8721,14 +9051,14 @@ export default [
             "global-require": "off",
             "handle-callback-err": "off",
             "id-blacklist": "off",
-            // import-x
+            // Import-x
             "import-x/imports-first": "off",
             "jsx-a11y/accessible-emoji": "off",
             "jsx-a11y/no-onchange": "off",
             "line-comment-position": "off",
             "lines-around-directive": "off",
             "multiline-comment-style": "off",
-            // n (Node plugin)
+            // N (Node plugin)
             "n/no-hide-core-modules": "off",
             "n/shebang": "off",
             "newline-after-var": "off",
@@ -8750,15 +9080,24 @@ export default [
             "no-sync": "off",
             "prefer-arrow/prefer-arrow-functions": "off", // Too strict
             "prefer-reflect": "off",
-            // react
+            // React
             "react/jsx-sort-default-props": "off",
-            "spaced-comment": "off",
+            "spaced-comment": [
+                "error",
+                "always",
+                {
+                    exceptions: [
+                        "-",
+                        "+",
+                    ],
+                },
+            ],
             "styled-components-a11y/accessible-emoji": "off",
-            // styled-components-a11y (and jsx-a11y equivalents)
+            // Styled-components-a11y (and jsx-a11y equivalents)
             "styled-components-a11y/lang": "off",
             "styled-components-a11y/no-onchange": "off",
             "unicorn/no-array-push-push": "off",
-            // unicorn (deprecated / replaced rules)
+            // Unicorn (deprecated / replaced rules)
             "unicorn/no-instanceof-array": "off",
             "unicorn/no-length-as-slice-end": "off",
             "write-good-comments/write-good-comments": "off", // Too strict

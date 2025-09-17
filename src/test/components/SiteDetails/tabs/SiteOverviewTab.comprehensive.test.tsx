@@ -130,7 +130,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getAllByText("Test Site")).toHaveLength(2);
             expect(screen.getByText("test-site")).toBeInTheDocument();
             // Check specific monitor count context instead of just "2"
-            expect(screen.getByText("1/2")).toBeInTheDocument(); // active/total format
+            expect(screen.getByText("1/2")).toBeInTheDocument(); // Active/total format
         });
 
         it("should display metrics with correct formatting", ({
@@ -150,7 +150,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Check monitor count display
-            expect(screen.getByText("1/2")).toBeInTheDocument(); // active monitors
+            expect(screen.getByText("1/2")).toBeInTheDocument(); // Active monitors
             expect(screen.getByText("Active")).toBeInTheDocument();
 
             // Check uptime display
@@ -188,7 +188,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("HTTP Monitor")).toBeInTheDocument();
             expect(screen.getByText("PING Monitor")).toBeInTheDocument();
             expect(screen.getByText("https://example.com")).toBeInTheDocument();
-            expect(screen.getByText("example.com")).toBeInTheDocument(); // ping monitor display
+            expect(screen.getByText("example.com")).toBeInTheDocument(); // Ping monitor display
         });
 
         it("should show correct monitor status badges", ({

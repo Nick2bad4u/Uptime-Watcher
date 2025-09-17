@@ -157,7 +157,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
                 cacheKeysModule.parseCacheKey("prefix::identifier")
             ).toThrow();
 
-            // parseCacheKey now throws for keys with too many parts
+            // ParseCacheKey now throws for keys with too many parts
             expect(() =>
                 cacheKeysModule.parseCacheKey(
                     "prefix:operation:identifier:extra" as any

@@ -237,7 +237,7 @@ describe("Database Operations Fuzzing Tests", () => {
                         monitoring: fc.boolean(),
                         responseTime: fc.integer({ min: 0, max: 30_000 }),
                     }),
-                    fc.string({ minLength: 1, maxLength: 100 }), // siteIdentifier
+                    fc.string({ minLength: 1, maxLength: 100 }), // SiteIdentifier
                     async (monitorData: any, siteIdentifier: string) => {
                         mockDatabaseService.executeTransaction.mockImplementation(
                             async (callback: any) => await callback(mockDb)

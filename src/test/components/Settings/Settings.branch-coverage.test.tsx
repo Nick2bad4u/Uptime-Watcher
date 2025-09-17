@@ -311,7 +311,7 @@ describe("Settings - Branch Coverage Tests", () => {
             fireEvent.click(notificationsCheckbox);
 
             expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({
-                notifications: false, // inverted from initial true
+                notifications: false, // Inverted from initial true
             });
         });
 

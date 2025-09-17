@@ -103,10 +103,10 @@ describe("calculateMaxDuration utility function", () => {
         annotate("Type: Business Logic", "type");
 
         // Test multiple values to ensure both branches work
-        expect(calculateMaxDuration(10, 0)).toBe("10s"); // retryAttempts = 0, hits line 194
-        expect(calculateMaxDuration(10, 1)).toMatch(/\d+s/); // retryAttempts > 0
-        expect(calculateMaxDuration(10, 2)).toMatch(/\d+s/); // retryAttempts > 0
-        expect(calculateMaxDuration(10, 3)).toMatch(/\d+s/); // retryAttempts > 0
+        expect(calculateMaxDuration(10, 0)).toBe("10s"); // RetryAttempts = 0, hits line 194
+        expect(calculateMaxDuration(10, 1)).toMatch(/\d+s/); // RetryAttempts > 0
+        expect(calculateMaxDuration(10, 2)).toMatch(/\d+s/); // RetryAttempts > 0
+        expect(calculateMaxDuration(10, 3)).toMatch(/\d+s/); // RetryAttempts > 0
     });
 
     it("should verify backoff calculation edge cases", ({ task, annotate }) => {

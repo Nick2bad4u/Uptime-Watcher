@@ -210,7 +210,7 @@ describe("String Conversion - 100% Coverage Override", () => {
             ["bigint", 123n],
             ["function", () => {}],
             ["object", {}],
-            ["object", null], // typeof null === "object"
+            ["object", null], // Typeof null === "object"
             ["undefined", undefined],
         ];
 

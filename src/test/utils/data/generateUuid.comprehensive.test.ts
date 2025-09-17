@@ -148,7 +148,7 @@ describe(generateUuid, () => {
             await annotate("Type: Business Logic", "type");
 
             // Arrange
-            globalThis.crypto = {} as any; // crypto exists but randomUUID doesn't
+            globalThis.crypto = {} as any; // Crypto exists but randomUUID doesn't
             vi.useFakeTimers();
             vi.setSystemTime(new Date("2023-06-15T12:30:00.000Z"));
 
@@ -247,17 +247,17 @@ describe(generateUuid, () => {
             const mockRandom = vi
                 .spyOn(Math, "random")
                 // First generateUuid() call: 3 Math.random() calls
-                .mockReturnValueOnce(0.1) // randomPart1
-                .mockReturnValueOnce(0.2) // randomPart2
-                .mockReturnValueOnce(0.3) // microseconds
+                .mockReturnValueOnce(0.1) // RandomPart1
+                .mockReturnValueOnce(0.2) // RandomPart2
+                .mockReturnValueOnce(0.3) // Microseconds
                 // Second generateUuid() call: 3 Math.random() calls
-                .mockReturnValueOnce(0.777_777_777) // randomPart1
-                .mockReturnValueOnce(0.777_777_777) // randomPart2
-                .mockReturnValueOnce(0.777_777_777) // microseconds
+                .mockReturnValueOnce(0.777_777_777) // RandomPart1
+                .mockReturnValueOnce(0.777_777_777) // RandomPart2
+                .mockReturnValueOnce(0.777_777_777) // Microseconds
                 // Third generateUuid() call: 3 Math.random() calls
-                .mockReturnValueOnce(0.259_259_259) // randomPart1 - 'a' in base36
-                .mockReturnValueOnce(0.518_518_518) // randomPart2 - 's' in base36
-                .mockReturnValueOnce(0.555_555_555); // microseconds
+                .mockReturnValueOnce(0.259_259_259) // RandomPart1 - 'a' in base36
+                .mockReturnValueOnce(0.518_518_518) // RandomPart2 - 's' in base36
+                .mockReturnValueOnce(0.555_555_555); // Microseconds
 
             // Act
             const result1 = generateUuid();
@@ -308,7 +308,7 @@ describe(generateUuid, () => {
             // Assert
             expect(result).toMatch(/^site-[\da-z]{12}-\d{16}$/);
             expect(result.startsWith("site-")).toBeTruthy();
-            expect(result).toContain("-1672531200000"); // timestamp part
+            expect(result).toContain("-1672531200000"); // Timestamp part
         });
 
         it("should handle different Math.random values correctly", async ({

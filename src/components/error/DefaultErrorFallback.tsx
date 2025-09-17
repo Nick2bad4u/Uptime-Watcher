@@ -15,7 +15,7 @@ export const DefaultErrorFallback: FC<
         onRetry: () => void;
     }>
 > = ({ error, onRetry }) => {
-    // useCallback handler for jsx-no-bind compliance
+    // UseCallback handler for jsx-no-bind compliance
     const handleReload = useCallback(() => {
         window.location.reload();
     }, []);

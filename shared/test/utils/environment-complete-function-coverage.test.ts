@@ -94,7 +94,7 @@ describe("Environment - Complete Function Coverage", () => {
 
             // Test in default environment (undefined NODE_ENV)
             delete process.env["NODE_ENV"];
-            expect(environmentModule.isDevelopment()).toBeFalsy(); // undefined !== 'development'
+            expect(environmentModule.isDevelopment()).toBeFalsy(); // Undefined !== 'development'
 
             // Test with development environment
             process.env["NODE_ENV"] = "development";
@@ -219,7 +219,7 @@ describe("Environment - Complete Function Coverage", () => {
             // Test with undefined NODE_ENV
             delete process.env["NODE_ENV"];
             expect(environmentModule.getNodeEnv()).toBe("development");
-            expect(environmentModule.isDevelopment()).toBeFalsy(); // undefined !== 'development'
+            expect(environmentModule.isDevelopment()).toBeFalsy(); // Undefined !== 'development'
             expect(environmentModule.isProduction()).toBeFalsy();
             expect(environmentModule.isTest()).toBeFalsy();
             expect(environmentModule.getEnvironment()).toBe("unknown");

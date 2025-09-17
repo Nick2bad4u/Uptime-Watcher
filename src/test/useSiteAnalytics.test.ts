@@ -365,9 +365,9 @@ describe(useSiteAnalytics, () => {
             await annotate("Type: Business Logic", "type");
 
             // Construct a monitor with a clear contiguous down period
-            const t0 = now - 5000; // earliest
-            const t1 = now - 4000; // still down
-            const t2 = now - 3000; // recovery (up)
+            const t0 = now - 5000; // Earliest
+            const t1 = now - 4000; // Still down
+            const t2 = now - 3000; // Recovery (up)
             // History should be ordered oldest -> newest for expected calcs
             const monitor: Monitor = {
                 checkInterval: 60_000,
@@ -389,7 +389,7 @@ describe(useSiteAnalytics, () => {
             const { result } = renderHook(() =>
                 useSiteAnalytics(monitor, "24h")
             );
-            // duration should be t1 - t0 (1000ms)
+            // Duration should be t1 - t0 (1000ms)
             expect(result.current.downtimePeriods).toHaveLength(1);
             expect(result.current.downtimePeriods[0]?.duration).toBe(1000);
             // Mutated (end + start) would yield ~ t1 + t0 (a huge number, certainly > now)
@@ -409,10 +409,10 @@ describe(useSiteAnalytics, () => {
 
             // Two distinct downtime incidents separated by up record
             const tA1 = now - 10_000;
-            const tA2 = now - 9000; // first incident 1000ms
+            const tA2 = now - 9000; // First incident 1000ms
             const tUp = now - 8000;
             const tB1 = now - 7000;
-            const tB2 = now - 6500; // second incident 500ms
+            const tB2 = now - 6500; // Second incident 500ms
             const monitor: Monitor = {
                 checkInterval: 60_000,
                 history: [
@@ -434,7 +434,7 @@ describe(useSiteAnalytics, () => {
             const { result } = renderHook(() =>
                 useSiteAnalytics(monitor, "24h")
             );
-            // total downtime = 1000 + 500 = 1500; count=2 -> mttr=750
+            // Total downtime = 1000 + 500 = 1500; count=2 -> mttr=750
             expect(result.current.totalDowntime).toBe(1500);
             expect(result.current.incidentCount).toBe(2);
             expect(result.current.mttr).toBe(750);
@@ -470,7 +470,7 @@ describe(useSiteAnalytics, () => {
             const { result } = renderHook(() =>
                 useSiteAnalytics(monitor, "24h")
             );
-            // p99 should resolve to last element (20) not undefined
+            // P99 should resolve to last element (20) not undefined
             expect([10, 20]).toContain(result.current.p99);
             expect(result.current.p99).toBeGreaterThanOrEqual(10);
             expect(result.current.p99).toBeLessThanOrEqual(20);
@@ -964,9 +964,9 @@ describe(useChartData, () => {
         const dataset = result.current.lineChartData.datasets[0];
         expect(dataset).toBeDefined();
         expect(dataset?.pointBackgroundColor).toEqual([
-            "#10b981", // up - success color
-            "#ef4444", // down - error color
-            "#10b981", // up - success color
+            "#10b981", // Up - success color
+            "#ef4444", // Down - error color
+            "#10b981", // Up - success color
         ]);
         expect(dataset?.pointBorderColor).toEqual([
             "#10b981",

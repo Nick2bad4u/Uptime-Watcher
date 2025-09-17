@@ -110,7 +110,7 @@ describe("shared/types/formData function coverage", () => {
             const incompleteFormData = {
                 type: "http",
                 url: "https://example.com",
-                // missing other required properties
+                // Missing other required properties
             };
             expect(isHttpFormData(incompleteFormData as any)).toBeFalsy();
         });
@@ -125,7 +125,7 @@ describe("shared/types/formData function coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const wrongTypeFormData = {
-                type: "ping", // should be "http"
+                type: "ping", // Should be "http"
                 url: "https://example.com",
                 method: "GET",
                 timeout: 30,
@@ -150,7 +150,7 @@ describe("shared/types/formData function coverage", () => {
 
             const invalidFormData = {
                 type: "http",
-                url: 123, // should be string
+                url: 123, // Should be string
                 method: "GET",
                 timeout: 30,
                 checkInterval: 60,
@@ -252,7 +252,7 @@ describe("shared/types/formData function coverage", () => {
             const incompleteFormData = {
                 type: "ping",
                 host: "example.com",
-                // missing other required properties
+                // Missing other required properties
             };
             expect(isPingFormData(incompleteFormData as any)).toBeFalsy();
         });
@@ -267,7 +267,7 @@ describe("shared/types/formData function coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const wrongTypeFormData = {
-                type: "http", // should be "ping"
+                type: "http", // Should be "ping"
                 host: "example.com",
                 timeout: 5000,
                 checkInterval: 30,
@@ -368,7 +368,7 @@ describe("shared/types/formData function coverage", () => {
                 type: "port",
                 host: "example.com",
                 port: 443,
-                // missing other required properties
+                // Missing other required properties
             };
             expect(isPortFormData(incompleteFormData as any)).toBeFalsy();
         });
@@ -383,7 +383,7 @@ describe("shared/types/formData function coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const wrongTypeFormData = {
-                type: "http", // should be "port"
+                type: "http", // Should be "port"
                 host: "example.com",
                 port: 443,
                 timeout: 5000,
@@ -406,7 +406,7 @@ describe("shared/types/formData function coverage", () => {
             const invalidFormData = {
                 type: "port",
                 host: "example.com",
-                port: "443", // should be number
+                port: "443", // Should be number
                 timeout: 5000,
                 checkInterval: 30,
                 retryAttempts: 3,

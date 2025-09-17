@@ -300,7 +300,7 @@ describe("Final Function Coverage Push", () => {
             if (typeof fn === "function") {
                 try {
                     if (key === "safeObjectIteration") {
-                        // safeObjectIteration requires a callback function
+                        // SafeObjectIteration requires a callback function
                         fn({}, () => {}, "test context");
                         fn({ a: 1, b: 2 }, (_k: string, _v: any) => {}, "test");
                         fn(null, () => {}, "null test");

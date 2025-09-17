@@ -594,7 +594,7 @@ describe("Ultimate Function Coverage - Site Status Utilities", () => {
             active: 2,
             total: 2,
             percentage: 100,
-        }); // enabled defaults to true
+        }); // Enabled defaults to true
 
         // Test getSiteDisplayStatus
         expect(getSiteDisplayStatus("up")).toBe("Operational");

@@ -176,7 +176,7 @@ describe(useSettingsStore, () => {
 
             expect(result.current.settings.theme).toBe("dark");
             expect(result.current.settings.notifications).toBeFalsy();
-            expect(result.current.settings.historyLimit).toBe(500); // unchanged - using correct DEFAULT_HISTORY_LIMIT
+            expect(result.current.settings.historyLimit).toBe(500); // Unchanged - using correct DEFAULT_HISTORY_LIMIT
         });
 
         it("should update individual settings", async ({ task, annotate }) => {
@@ -192,7 +192,7 @@ describe(useSettingsStore, () => {
             });
 
             expect(result.current.settings.theme).toBe("light");
-            expect(result.current.settings.notifications).toBeTruthy(); // unchanged
+            expect(result.current.settings.notifications).toBeTruthy(); // Unchanged
         });
 
         it("should handle reset to defaults", async ({ task, annotate }) => {
@@ -803,8 +803,8 @@ describe(useSettingsStore, () => {
             });
 
             expect(result.current.settings.theme).toBe("light");
-            expect(result.current.settings.notifications).toBeTruthy(); // unchanged
-            expect(result.current.settings.historyLimit).toBe(500); // default value
+            expect(result.current.settings.notifications).toBeTruthy(); // Unchanged
+            expect(result.current.settings.historyLimit).toBe(500); // Default value
         });
     });
 

@@ -782,7 +782,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             const intervalInput = screen.getByRole("combobox", {
                 name: /check interval/i,
             });
-            await user.selectOptions(intervalInput, "300000"); // milliseconds
+            await user.selectOptions(intervalInput, "300000"); // Milliseconds
             expect(setCheckInterval).toHaveBeenCalled();
         });
 

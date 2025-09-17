@@ -72,7 +72,7 @@ describe("HTTP Client Utils", () => {
                 httpsAgent: expect.any(Object),
                 maxBodyLength: 8 * 1024, // 8KB default
                 maxContentLength: 1 * 1024 * 1024, // 1MB default
-                maxRedirects: 3, // tightened default
+                maxRedirects: 3, // Tightened default
                 responseType: "text",
                 timeout: 5000,
                 validateStatus: expect.any(Function),

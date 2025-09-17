@@ -774,7 +774,7 @@ describe(HistoryRepository, () => {
                                     mockDatabase,
                                     monitorId,
                                     entry,
-                                    undefined // details parameter is undefined when not provided
+                                    undefined // Details parameter is undefined when not provided
                                 );
                             }
                         }

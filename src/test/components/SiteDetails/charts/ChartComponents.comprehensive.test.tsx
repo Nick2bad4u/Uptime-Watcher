@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { ChartOptions } from "chart.js";
-import "@testing-library/jest-dom/vitest"; // add matcher/type augmentation for Vitest
+import "@testing-library/jest-dom/vitest"; // Add matcher/type augmentation for Vitest
 
 import { ResponseTimeChart } from "../../../../components/SiteDetails/charts/ResponseTimeChart";
 import { StatusChart } from "../../../../components/SiteDetails/charts/StatusChart";

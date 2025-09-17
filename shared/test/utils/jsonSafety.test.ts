@@ -71,7 +71,7 @@ describe("jsonSafety utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const validJsonInvalidType = '{"id":"123","name":"John"}'; // missing age
+            const validJsonInvalidType = '{"id":"123","name":"John"}'; // Missing age
             const result = safeJsonParse(validJsonInvalidType, isValidUser);
 
             expect(result.success).toBeFalsy();
@@ -212,7 +212,7 @@ describe("jsonSafety utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const invalidElementJson = '[{"id":"1","value":10},{"id":"2"}]'; // missing value
+            const invalidElementJson = '[{"id":"1","value":10},{"id":"2"}]'; // Missing value
             const result = safeJsonParseArray(invalidElementJson, isValidItem);
 
             expect(result.success).toBeFalsy();
@@ -340,7 +340,7 @@ describe("jsonSafety utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const invalidTypeJson = '{"timeout":"1000","retries":5}'; // timeout should be number
+            const invalidTypeJson = '{"timeout":"1000","retries":5}'; // Timeout should be number
             const result = safeJsonParseWithFallback(
                 invalidTypeJson,
                 isValidConfig,
@@ -971,9 +971,9 @@ describe("jsonSafety utilities", () => {
                     fc.oneof(
                         fc.constant("not json"),
                         fc.constant('{"unclosed": '),
-                        fc.constant('{key: "value"}'), // invalid JSON (unquoted key)
-                        fc.constant("[1, 2, 3,]"), // trailing comma
-                        fc.constant('{"test": undefined}') // undefined is not JSON
+                        fc.constant('{key: "value"}'), // Invalid JSON (unquoted key)
+                        fc.constant("[1, 2, 3,]"), // Trailing comma
+                        fc.constant('{"test": undefined}') // Undefined is not JSON
                     ),
                     (malformedJson) => {
                         const isAny = (_data: unknown): _data is unknown =>

@@ -967,12 +967,12 @@ describe(AnalyticsTab, () => {
             render(<AnalyticsTab {...props} />);
 
             expect(getAvailabilityDescription).toHaveBeenCalledWith(99.5);
-            // formatDuration is called with totalDowntime in downtime card
-            expect(formatDuration).toHaveBeenCalledWith(780_000); // totalDowntime
+            // FormatDuration is called with totalDowntime in downtime card
+            expect(formatDuration).toHaveBeenCalledWith(780_000); // TotalDowntime
             // formatDuration is called with MTTR in advanced metrics (when shown)
             expect(formatDuration).toHaveBeenCalledWith(300_000); // MTTR
             // formatResponseTime is called multiple times for different response time values
-            expect(formatResponseTime).toHaveBeenCalledWith(150); // avgResponseTime
+            expect(formatResponseTime).toHaveBeenCalledWith(150); // AvgResponseTime
         });
 
         it("should handle function errors gracefully", ({ task, annotate }) => {

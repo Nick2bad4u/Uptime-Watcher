@@ -341,27 +341,27 @@ describe("Final 90% Function Coverage Push", () => {
         annotate("Category: Shared", "category");
         annotate("Type: Export Operation", "type");
 
-        // cacheKeys
+        // CacheKeys
         testModuleFunctions("cacheKeys", cacheKeys, (func) => {
             func("test");
             func("test", "param2");
             func("test", "param2", "param3");
         });
 
-        // environment
+        // Environment
         testModuleFunctions("environment", environment, (func) => {
             func();
             func("test");
         });
 
-        // errorCatalog
+        // ErrorCatalog
         testModuleFunctions("errorCatalog", errorCatalog, (func) => {
             func();
             func("test");
             func(new Error("test"));
         });
 
-        // jsonSafety
+        // JsonSafety
         testModuleFunctions("jsonSafety", jsonSafety, (func) => {
             func("{}");
             func('{"test": "value"}');
@@ -371,10 +371,10 @@ describe("Final 90% Function Coverage Push", () => {
             func("test", "fallback");
         });
 
-        // objectSafety
+        // ObjectSafety
         testModuleFunctions("objectSafety", objectSafety, (func, funcName) => {
             if (funcName === "safeObjectIteration") {
-                // safeObjectIteration requires a callback function
+                // SafeObjectIteration requires a callback function
                 func({}, () => {}, "test context");
                 func({ test: "value" }, (_k: string, _v: any) => {}, "test");
                 func(null, () => {}, "null test");
@@ -389,7 +389,7 @@ describe("Final 90% Function Coverage Push", () => {
             }
         });
 
-        // safeConversions
+        // SafeConversions
         testModuleFunctions("safeConversions", safeConversions, (func) => {
             func("123");
             func(123);
@@ -398,7 +398,7 @@ describe("Final 90% Function Coverage Push", () => {
             func(true);
         });
 
-        // stringConversion
+        // StringConversion
         testModuleFunctions("stringConversion", stringConversion, (func) => {
             func("test");
             func(123);
@@ -411,7 +411,7 @@ describe("Final 90% Function Coverage Push", () => {
             func(() => {});
         });
 
-        // typeGuards - Call all functions
+        // TypeGuards - Call all functions
         testModuleFunctions("guardUtils", guardUtils, (func) => {
             func(null);
             func(undefined);
@@ -426,7 +426,7 @@ describe("Final 90% Function Coverage Push", () => {
             func(["prop1"], (x: any) => typeof x === "string");
         });
 
-        // typeHelpers
+        // TypeHelpers
         testModuleFunctions("helperUtils", helperUtils, (func) => {
             func({});
             func(null);
@@ -435,7 +435,7 @@ describe("Final 90% Function Coverage Push", () => {
             func("Custom error message");
         });
 
-        // validation utils
+        // Validation utils
         testModuleFunctions("validationUtils", validationUtils, (func) => {
             func("http");
             func("port");
@@ -461,7 +461,7 @@ describe("Final 90% Function Coverage Push", () => {
         annotate("Category: Shared", "category");
         annotate("Type: Validation", "type");
 
-        // schemas
+        // Schemas
         const schemasFunctions = Object.keys(schemas).filter(
             (key) => typeof (schemas as any)[key] === "function"
         );
@@ -478,7 +478,7 @@ describe("Final 90% Function Coverage Push", () => {
             }
         }
 
-        // validatorUtils
+        // ValidatorUtils
         const validatorUtilsFunctions = Object.keys(
             validatorUtilsModule
         ).filter(
@@ -513,7 +513,7 @@ describe("Final 90% Function Coverage Push", () => {
         annotate("Category: Shared", "category");
         annotate("Type: Business Logic", "type");
 
-        // errorHandling
+        // ErrorHandling
         const errorHandlingFunctions = Object.keys(errorHandling).filter(
             (key) => typeof (errorHandling as any)[key] === "function"
         );
@@ -551,7 +551,7 @@ describe("Final 90% Function Coverage Push", () => {
             }
         }
 
-        // logTemplates
+        // LogTemplates
         const logTemplatesFunctions = Object.keys(logTemplates).filter(
             (key) => typeof (logTemplates as any)[key] === "function"
         );
@@ -566,7 +566,7 @@ describe("Final 90% Function Coverage Push", () => {
             }
         }
 
-        // siteStatus
+        // SiteStatus
         const siteStatusFunctions = Object.keys(siteStatus).filter(
             (key) => typeof (siteStatus as any)[key] === "function"
         );

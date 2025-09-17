@@ -153,10 +153,10 @@ describe(safeParseCheckInterval, () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(safeParseCheckInterval(500)).toBe(300_000); // default
-        expect(safeParseCheckInterval(999)).toBe(300_000); // default
-        expect(safeParseCheckInterval("0")).toBe(300_000); // default
-        expect(safeParseCheckInterval("-1000")).toBe(300_000); // default
+        expect(safeParseCheckInterval(500)).toBe(300_000); // Default
+        expect(safeParseCheckInterval(999)).toBe(300_000); // Default
+        expect(safeParseCheckInterval("0")).toBe(300_000); // Default
+        expect(safeParseCheckInterval("-1000")).toBe(300_000); // Default
     });
 
     it("should use custom default value", async ({ task, annotate }) => {
@@ -553,9 +553,9 @@ describe(safeParsePort, () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(safeParsePort(1)).toBe(1); // minimum valid port
+        expect(safeParsePort(1)).toBe(1); // Minimum valid port
         expect(safeParsePort("1")).toBe(1);
-        expect(safeParsePort(65_535)).toBe(65_535); // maximum valid port
+        expect(safeParsePort(65_535)).toBe(65_535); // Maximum valid port
         expect(safeParsePort("65535")).toBe(65_535);
     });
 
@@ -570,7 +570,7 @@ describe(safeParsePort, () => {
 
         expect(safeParsePort(80.9)).toBe(80);
         expect(safeParsePort("443.7")).toBe(443);
-        expect(safeParsePort(0.9)).toBe(80); // floors to 0, which is invalid
+        expect(safeParsePort(0.9)).toBe(80); // Floors to 0, which is invalid
     });
 });
 
@@ -648,7 +648,7 @@ describe(safeParsePositiveInt, () => {
 
         expect(safeParsePositiveInt(5.9)).toBe(5);
         expect(safeParsePositiveInt("10.7")).toBe(10);
-        expect(safeParsePositiveInt(0.9)).toBe(1); // floors to 0, then uses default
+        expect(safeParsePositiveInt(0.9)).toBe(1); // Floors to 0, then uses default
     });
 
     it("should handle edge cases", async ({ task, annotate }) => {
@@ -657,7 +657,7 @@ describe(safeParsePositiveInt, () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(safeParsePositiveInt(1)).toBe(1); // minimum positive
+        expect(safeParsePositiveInt(1)).toBe(1); // Minimum positive
         expect(safeParsePositiveInt("1")).toBe(1);
         expect(safeParsePositiveInt(Number.MAX_SAFE_INTEGER)).toBe(
             Number.MAX_SAFE_INTEGER
@@ -740,9 +740,9 @@ describe(safeParseRetryAttempts, () => {
         await annotate("Category: Utility", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(safeParseRetryAttempts(0)).toBe(0); // minimum valid (no retries)
+        expect(safeParseRetryAttempts(0)).toBe(0); // Minimum valid (no retries)
         expect(safeParseRetryAttempts("0")).toBe(0);
-        expect(safeParseRetryAttempts(10)).toBe(10); // maximum valid
+        expect(safeParseRetryAttempts(10)).toBe(10); // Maximum valid
         expect(safeParseRetryAttempts("10")).toBe(10);
     });
 
@@ -758,7 +758,7 @@ describe(safeParseRetryAttempts, () => {
         expect(safeParseRetryAttempts(5.9)).toBe(5);
         expect(safeParseRetryAttempts("7.3")).toBe(7);
         expect(safeParseRetryAttempts(10.9)).toBe(10);
-        expect(safeParseRetryAttempts(-0.5)).toBe(3); // floors to -1, which is invalid
+        expect(safeParseRetryAttempts(-0.5)).toBe(3); // Floors to -1, which is invalid
     });
 });
 

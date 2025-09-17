@@ -1038,7 +1038,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             vi.advanceTimersByTime(1200);
             const cleaned = cache.cleanup();
 
-            expect(cleaned).toBe(2); // key1 and key2 should be cleaned
+            expect(cleaned).toBe(2); // Key1 and key2 should be cleaned
             expect(cache.has("key1")).toBeFalsy();
             expect(cache.has("key2")).toBeFalsy();
             expect(cache.has("key3")).toBeTruthy();

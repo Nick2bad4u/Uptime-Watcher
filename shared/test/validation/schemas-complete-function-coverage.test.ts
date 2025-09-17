@@ -185,7 +185,7 @@ describe("Schemas - Complete Function Coverage", () => {
                 retryAttempts: -5, // Invalid value
             });
 
-            // validateMonitorField with boundary conditions
+            // ValidateMonitorField with boundary conditions
             schemasModule.validateMonitorField("http", "checkInterval", 5000); // Minimum
             schemasModule.validateMonitorField(
                 "http",

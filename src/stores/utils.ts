@@ -224,7 +224,7 @@ export async function waitForElectronAPI(
                 return; // API is ready
             }
         } catch {
-            // window.electronAPI not available yet
+            // Window.electronAPI not available yet
         }
 
         // Wait with exponential backoff

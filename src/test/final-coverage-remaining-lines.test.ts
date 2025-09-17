@@ -45,7 +45,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             // Let's test with a symbol that's not handled explicitly
             const symbolValue = Symbol("test");
             const result = safeStringify(symbolValue);
-            expect(result).toContain("Symbol(test)"); // symbol.toString()
+            expect(result).toContain("Symbol(test)"); // Symbol.toString()
         });
 
         test("should reach default case with unknown primitive type", ({

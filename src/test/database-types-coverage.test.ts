@@ -1238,13 +1238,13 @@ describe("Shared Database Types - Complete Coverage", () => {
             // These tests ensure the internal RowValidationUtils functions are exercised
 
             // Test the isValidObject check through different validation functions
-            expect(isValidHistoryRow(null)).toBeFalsy(); // tests isValidObject(null)
-            expect(isValidHistoryRow([])).toBeFalsy(); // tests isValidObject(array)
-            expect(isValidHistoryRow("string")).toBeFalsy(); // tests isValidObject(string)
-            expect(isValidHistoryRow(123)).toBeFalsy(); // tests isValidObject(number)
+            expect(isValidHistoryRow(null)).toBeFalsy(); // Tests isValidObject(null)
+            expect(isValidHistoryRow([])).toBeFalsy(); // Tests isValidObject(array)
+            expect(isValidHistoryRow("string")).toBeFalsy(); // Tests isValidObject(string)
+            expect(isValidHistoryRow(123)).toBeFalsy(); // Tests isValidObject(number)
 
             // Valid object should pass isValidObject but may fail other validations
-            expect(isValidHistoryRow({})).toBeFalsy(); // tests isValidObject returns true but missing required fields
+            expect(isValidHistoryRow({})).toBeFalsy(); // Tests isValidObject returns true but missing required fields
         });
     });
 

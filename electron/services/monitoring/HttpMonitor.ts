@@ -376,7 +376,7 @@ export class HttpMonitor implements IMonitorService {
                 throw new Error("Operation was aborted");
             }
 
-            // maxRetries parameter is "additional retries after first attempt"
+            // MaxRetries parameter is "additional retries after first attempt"
             // withOperationalHooks expects "total attempts"
             // So if maxRetries=3, we want 4 total attempts (1 initial + 3
             // retries)

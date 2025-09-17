@@ -458,7 +458,7 @@ describe("IPC Types", () => {
 
             const validParam: ExpectedParam = { id: 1, name: "test" };
             const invalidParam1 = { id: "not a number", name: "test" };
-            const invalidParam2 = { id: 1 }; // missing name
+            const invalidParam2 = { id: 1 }; // Missing name
 
             expect(validator([validParam])).toBeNull();
             expect(validator([invalidParam1])).toEqual([

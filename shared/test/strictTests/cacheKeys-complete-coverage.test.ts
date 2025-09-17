@@ -457,9 +457,9 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isStandardizedCacheKey("config:")).toBeTruthy(); // valid prefix, empty identifier
-            expect(isStandardizedCacheKey("monitor::")).toBeFalsy(); // empty operation in 3-part
-            expect(isStandardizedCacheKey("site::identifier")).toBeFalsy(); // empty operation
+            expect(isStandardizedCacheKey("config:")).toBeTruthy(); // Valid prefix, empty identifier
+            expect(isStandardizedCacheKey("monitor::")).toBeFalsy(); // Empty operation in 3-part
+            expect(isStandardizedCacheKey("site::identifier")).toBeFalsy(); // Empty operation
         });
     });
 

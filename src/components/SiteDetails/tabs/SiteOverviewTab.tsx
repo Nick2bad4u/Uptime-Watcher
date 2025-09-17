@@ -207,7 +207,7 @@ export const SiteOverviewTab = ({
         [avgResponseTime, getResponseTimeColor]
     );
 
-    // useCallback handlers for jsx-no-bind compliance
+    // UseCallback handlers for jsx-no-bind compliance
     const handleStopSiteMonitoringClick = useCallback(() => {
         void handleStopSiteMonitoring();
     }, [handleStopSiteMonitoring]);

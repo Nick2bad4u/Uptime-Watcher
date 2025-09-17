@@ -246,11 +246,11 @@ const recoveryScenarios = fc.record({
         "TRANSACTION_ROLLBACK"
     ),
     recoveryMethod: fc.constantFrom("ROLLBACK", "RESTORE", "REPAIR", "REBUILD"),
-    backupAge: fc.integer({ min: 0, max: 72 }), // hours
+    backupAge: fc.integer({ min: 0, max: 72 }), // Hours
     dataLoss: fc.boolean(),
     automaticRecovery: fc.boolean(),
     backupAvailable: fc.boolean(),
-    recoveryPointObjective: fc.integer({ min: 300, max: 7200 }), // seconds (5 min to 2 hours)
+    recoveryPointObjective: fc.integer({ min: 300, max: 7200 }), // Seconds (5 min to 2 hours)
 });
 
 /**
@@ -309,9 +309,9 @@ const maintenanceOperations = fc.record({
     preserveData: fc.boolean(),
     compressionLevel: fc.integer({ min: 0, max: 9 }),
     scheduledMaintenance: fc.boolean(),
-    estimatedDuration: fc.integer({ min: 60, max: 7200 }), // seconds (1 min to 2 hours)
+    estimatedDuration: fc.integer({ min: 60, max: 7200 }), // Seconds (1 min to 2 hours)
     requiresDowntime: fc.boolean(),
-    maintenanceWindow: fc.integer({ min: 3600, max: 14_400 }), // seconds (1 to 4 hours)
+    maintenanceWindow: fc.integer({ min: 3600, max: 14_400 }), // Seconds (1 to 4 hours)
 });
 
 /**
@@ -349,7 +349,7 @@ const indexOperationScenarios = fc.record({
     fillFactor: fc.integer({ min: 10, max: 100 }),
     concurrent: fc.boolean(),
     expectedRows: fc.integer({ min: 1000, max: 1_000_000 }),
-    storageSize: fc.integer({ min: 1024, max: 100_000_000 }), // bytes
+    storageSize: fc.integer({ min: 1024, max: 100_000_000 }), // Bytes
 });
 
 /**
@@ -1170,7 +1170,7 @@ describe("Comprehensive Database Operations Fuzzing", () => {
             async (timeoutScenarios) => {
                 const simulateConnectionTimeouts = (timeouts: number[]) => {
                     const results = timeouts.map((timeout) => {
-                        // const startTime = performance.now();
+                        // Const startTime = performance.now();
 
                         // Simulate connection attempt
                         const connectionSuccess = timeout > 1000; // Arbitrary threshold
@@ -2371,7 +2371,7 @@ describe("Comprehensive Database Operations Fuzzing", () => {
             "Index operations should optimize query performance",
             async (indexOp) => {
                 const executeIndexOperation = (operation: typeof indexOp) => {
-                    const baselinePerformance = operation.expectedRows * 0.1; // ms per row
+                    const baselinePerformance = operation.expectedRows * 0.1; // Ms per row
                     const indexedPerformance = Math.max(
                         Math.log10(operation.expectedRows) * 10,
                         1
@@ -2553,7 +2553,7 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                     queryLoad: number;
                     concurrentQueries: number;
                 }) => {
-                    const baselineQueryTime = params.queryLoad * 0.5; // ms
+                    const baselineQueryTime = params.queryLoad * 0.5; // Ms
 
                     // Simulate performance impact during index operation
                     const impactMultiplier =
@@ -2697,9 +2697,9 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                     }
 
                     const processingTime =
-                        totalBatches * 50 + processedRecords * 0.1; // ms
+                        totalBatches * 50 + processedRecords * 0.1; // Ms
                     const throughput =
-                        successfulRecords / (processingTime / 1000); // records/sec
+                        successfulRecords / (processingTime / 1000); // Records/sec
                     const memoryUsage = Math.min(
                         operation.memoryLimit,
                         operation.batchSize * 0.001 // 1KB per record estimate
@@ -2892,9 +2892,9 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                     scenario: typeof crossOp
                 ) => {
                     const primaryExecutionTime =
-                        scenario.primaryOperationSize * 0.5; // ms
+                        scenario.primaryOperationSize * 0.5; // Ms
                     const secondaryExecutionTime =
-                        scenario.secondaryOperationSize * 0.3; // ms
+                        scenario.secondaryOperationSize * 0.3; // Ms
 
                     // Calculate overlap timing
                     const overlapDuration =
@@ -3147,7 +3147,7 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                         resourceConstraint.gracefulDegradation;
 
                     // Performance impact calculation
-                    const basePerformance = 1000; // ms baseline
+                    const basePerformance = 1000; // Ms baseline
                     const constrainedPerformance =
                         basePerformance * (1 + resourcePressure * 3);
                     const degradationPercent =

@@ -185,7 +185,7 @@ export default defineConfig(({ mode }) => {
                     if (context.server) {
                         // Development mode: Add 'unsafe-eval' for zod compatibility
                         return html.replace(
-                            /script-src 'self' blob:/,
+                            /script-src 'self' blob:/u,
                             "script-src 'self' blob: 'unsafe-eval'"
                         );
                     }

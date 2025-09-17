@@ -519,7 +519,7 @@ describe("typeGuards", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isDate("2023-01-01")).toBeFalsy();
-            expect(isDate(1_672_531_200_000)).toBeFalsy(); // timestamp
+            expect(isDate(1_672_531_200_000)).toBeFalsy(); // Timestamp
             expect(isDate({})).toBeFalsy();
             expect(isDate(null)).toBeFalsy();
             expect(isDate(undefined)).toBeFalsy();

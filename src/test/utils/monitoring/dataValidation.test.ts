@@ -231,7 +231,7 @@ describe("Monitoring Data Validation", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            // validator.js only accepts HTTP/HTTPS protocols by default
+            // Validator.js only accepts HTTP/HTTPS protocols by default
             expect(isValidUrl("https://example.com")).toBeTruthy();
             expect(isValidUrl("http://example.com")).toBeTruthy();
             expect(isValidUrl("https://localhost")).toBeTruthy();
@@ -249,7 +249,7 @@ describe("Monitoring Data Validation", () => {
 
             // Our validation rejects FTP protocol - only HTTP/HTTPS allowed
             expect(isValidUrl("ftp://example.com")).toBeFalsy();
-            // validator.js rejects these protocols by default
+            // Validator.js rejects these protocols by default
             expect(isValidUrl("file:///path/to/file")).toBeFalsy();
             expect(isValidUrl("mailto:test@example.com")).toBeFalsy();
             expect(isValidUrl("tel:+1234567890")).toBeFalsy();
@@ -265,8 +265,8 @@ describe("Monitoring Data Validation", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isValidUrl("not-a-url")).toBeFalsy();
-            expect(isValidUrl("example.com")).toBeFalsy(); // missing protocol
-            expect(isValidUrl("://example.com")).toBeFalsy(); // missing scheme
+            expect(isValidUrl("example.com")).toBeFalsy(); // Missing protocol
+            expect(isValidUrl("://example.com")).toBeFalsy(); // Missing scheme
             expect(isValidUrl("")).toBeFalsy();
         });
 
@@ -300,7 +300,7 @@ describe("Monitoring Data Validation", () => {
             expect(isValidUrl("https:///")).toBeFalsy();
             expect(isValidUrl("https://[")).toBeFalsy();
             expect(isValidUrl("https://]")).toBeFalsy();
-            // validator.js rejects URLs with double dots for security
+            // Validator.js rejects URLs with double dots for security
             expect(isValidUrl("https://example..com")).toBeFalsy();
         });
 
@@ -313,7 +313,7 @@ describe("Monitoring Data Validation", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            // validator.js rejects URLs with unencoded spaces for security
+            // Validator.js rejects URLs with unencoded spaces for security
             expect(
                 isValidUrl("https://example.com/path with spaces")
             ).toBeFalsy();
@@ -386,8 +386,8 @@ describe("Monitoring Data Validation", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(safeGetHostname("not-a-url")).toBe("");
-            expect(safeGetHostname("example.com")).toBe(""); // missing protocol
-            expect(safeGetHostname("://example.com")).toBe(""); // missing scheme
+            expect(safeGetHostname("example.com")).toBe(""); // Missing protocol
+            expect(safeGetHostname("://example.com")).toBe(""); // Missing scheme
             expect(safeGetHostname("")).toBe("");
         });
 

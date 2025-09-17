@@ -188,7 +188,7 @@ const config = {
     // Features: Type check each mutant, mark invalid mutants as CompileError
     // Automatically overrides: allowUnreachableCode: true, noUnusedLocals: false, noUnusedParameters: false
     typescriptChecker: {
-        prioritizePerformanceOverAccuracy: true, // true = faster but may miss some CompileErrors
+        prioritizePerformanceOverAccuracy: true, // True = faster but may miss some CompileErrors
     },
     // === VITEST INTEGRATION ===
     // 📘 From: https://stryker-mutator.io/docs/stryker-js/vitest-runner/

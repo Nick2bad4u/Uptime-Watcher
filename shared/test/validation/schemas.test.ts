@@ -1080,7 +1080,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 timeout: 5000,
                 type: "http",
                 url: "https://example.com",
-                // lastChecked is optional and undefined - should generate warning
+                // LastChecked is optional and undefined - should generate warning
             };
 
             const result = validateMonitorData("http", dataWithOptionalMissing);

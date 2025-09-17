@@ -123,7 +123,7 @@ class MockReactHooks {
         this.currentComponentId = componentId;
     }
 
-    // useState implementation
+    // UseState implementation
     useState<T>(initialValue: T): [T, (newValue: T) => void] {
         const startTime = performance.now();
         const context = this.getCurrentContext();
@@ -193,7 +193,7 @@ class MockReactHooks {
         }
     }
 
-    // useEffect implementation
+    // UseEffect implementation
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
     useEffect(effect: () => void | (() => void), dependencies?: any[]): void {
         const startTime = performance.now();
@@ -260,7 +260,7 @@ class MockReactHooks {
         context.totalHookExecutionTime += executionTime;
     }
 
-    // useMemo implementation
+    // UseMemo implementation
     useMemo<T>(computationFunction: () => T, dependencies: any[]): T {
         const startTime = performance.now();
         const context = this.getCurrentContext();
@@ -329,7 +329,7 @@ class MockReactHooks {
         return hook.value;
     }
 
-    // useCallback implementation
+    // UseCallback implementation
     useCallback<T extends (...args: any[]) => any>(
         callback: T,
         dependencies: any[]
@@ -389,7 +389,7 @@ class MockReactHooks {
         return hook.value as T;
     }
 
-    // useRef implementation
+    // UseRef implementation
     useRef<T>(initialValue: T): { current: T } {
         const startTime = performance.now();
         const context = this.getCurrentContext();
@@ -782,7 +782,7 @@ class DependencyComparator {
 }
 
 describe("React Hook Performance", () => {
-    // useState benchmarks
+    // UseState benchmarks
     bench("useState - simple state updates", () => {
         const hookSystem = new MockReactHooks();
         const components: string[] = [];
@@ -885,7 +885,7 @@ describe("React Hook Performance", () => {
         hookSystem.reset();
     });
 
-    // useEffect benchmarks
+    // UseEffect benchmarks
     bench("useEffect - dependency optimization", () => {
         const hookSystem = new MockReactHooks();
         const components: string[] = [];
@@ -998,7 +998,7 @@ describe("React Hook Performance", () => {
         hookSystem.reset();
     });
 
-    // useMemo benchmarks
+    // UseMemo benchmarks
     bench("useMemo - expensive computations", () => {
         const hookSystem = new MockReactHooks();
         const components: string[] = [];
@@ -1079,7 +1079,7 @@ describe("React Hook Performance", () => {
         hookSystem.reset();
     });
 
-    // useCallback benchmarks
+    // UseCallback benchmarks
     bench("useCallback - function memoization", () => {
         const hookSystem = new MockReactHooks();
         const components: string[] = [];

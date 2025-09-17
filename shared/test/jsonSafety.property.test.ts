@@ -300,7 +300,7 @@ describe("JSON Safety Property-Based Tests", () => {
 
         it("should validate types correctly", () => {
             const validUserJson = '{"id": "123", "name": "John", "age": 30}';
-            const invalidUserJson = '{"id": 123, "name": "John"}'; // id should be string
+            const invalidUserJson = '{"id": 123, "name": "John"}'; // Id should be string
 
             const userValidator = (
                 data: unknown

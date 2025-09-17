@@ -154,12 +154,12 @@ describe("useSiteStats Edge Cases", () => {
                     status: "down",
                     timestamp: 1_640_995_200_000,
                 },
-                { responseTime: 0, status: "up", timestamp: 1_640_991_600_000 }, // filtered out
+                { responseTime: 0, status: "up", timestamp: 1_640_991_600_000 }, // Filtered out
                 {
                     responseTime: -1,
                     status: "up",
                     timestamp: 1_640_988_000_000,
-                }, // filtered out
+                }, // Filtered out
             ];
 
             const { result } = renderHook(() => useSiteStats(history));

@@ -498,7 +498,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
                     // Should start with prefix (or empty) and end with extension (or default)
                     const parts = result.split("-");
-                    expect(parts.length).toBeGreaterThanOrEqual(4); // prefix, year, month, day+extension
+                    expect(parts.length).toBeGreaterThanOrEqual(4); // Prefix, year, month, day+extension
                 }
             );
         });

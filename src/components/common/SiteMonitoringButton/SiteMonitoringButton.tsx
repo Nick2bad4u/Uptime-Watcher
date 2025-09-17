@@ -115,7 +115,7 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
         onStartSiteMonitoring,
         onStopSiteMonitoring,
     }: SiteMonitoringButtonProperties) {
-        // useCallback handlers for jsx-no-bind compliance
+        // UseCallback handlers for jsx-no-bind compliance
         const handleStopClick = useCallback(
             (event?: MouseEvent<HTMLButtonElement>) => {
                 event?.stopPropagation();

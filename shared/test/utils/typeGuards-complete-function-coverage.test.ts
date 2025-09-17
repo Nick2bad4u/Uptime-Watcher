@@ -75,8 +75,8 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(guardsTestModule.hasProperty(null, "a")).toBeFalsy();
             expect(
                 guardsTestModule.hasProperty("string", "length")
-            ).toBeFalsy(); // isObject excludes strings
-            expect(guardsTestModule.hasProperty([], "length")).toBeFalsy(); // isObject excludes arrays
+            ).toBeFalsy(); // IsObject excludes strings
+            expect(guardsTestModule.hasProperty([], "length")).toBeFalsy(); // IsObject excludes arrays
 
             // Test isArray function
             expect(typeof guardsTestModule.isArray).toBe("function");

@@ -87,9 +87,9 @@ describe("100% Coverage - Remaining Lines", () => {
 
             // Try various edge cases that might hit the default branch
             const edgeCases = [
-                Object.create(null), // pure object
-                Object.create(String.prototype), // unusual prototype
-                new Proxy({}, {}), // proxy object
+                Object.create(null), // Pure object
+                Object.create(String.prototype), // Unusual prototype
+                new Proxy({}, {}), // Proxy object
             ];
 
             for (const edgeCase of edgeCases) {

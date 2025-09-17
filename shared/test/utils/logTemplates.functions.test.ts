@@ -232,7 +232,7 @@ describe("logTemplates function coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const template = "User {userId} performed {action}";
-            const data = { userId: "123" }; // missing action
+            const data = { userId: "123" }; // Missing action
 
             const result = interpolateLogTemplate(template, data);
 

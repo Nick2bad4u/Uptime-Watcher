@@ -109,7 +109,7 @@ describe("chartConfig utilities", () => {
                 plugins: null,
             };
 
-            // hasPlugins correctly includes null check to return false for null plugins
+            // HasPlugins correctly includes null check to return false for null plugins
             expect(hasPlugins(config)).toBeFalsy();
         });
 

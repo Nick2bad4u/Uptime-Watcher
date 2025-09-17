@@ -208,12 +208,12 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
-                monitoring: false, // startMonitor method doesn't check this flag
+                monitoring: false, // StartMonitor method doesn't check this flag
             });
 
             const result = scheduler.startMonitor("site1", monitor);
 
-            expect(result).toBeTruthy(); // startMonitor ignores monitoring flag
+            expect(result).toBeTruthy(); // StartMonitor ignores monitoring flag
             expect(scheduler.getActiveCount()).toBe(1);
         });
 

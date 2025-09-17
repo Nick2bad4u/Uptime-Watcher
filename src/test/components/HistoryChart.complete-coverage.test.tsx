@@ -198,8 +198,8 @@ describe("HistoryChart - Complete Coverage", () => {
 
             const history: StatusHistory[] = [
                 createStatusHistory("up", 3000, 150), // newest (index 0)
-                createStatusHistory("down", 2000, 0), // middle
-                createStatusHistory("up", 1000, 200), // oldest (index 2)
+                createStatusHistory("down", 2000, 0), // Middle
+                createStatusHistory("up", 1000, 200), // Oldest (index 2)
             ];
 
             renderWithTheme(
@@ -319,7 +319,7 @@ describe("HistoryChart - Complete Coverage", () => {
 
             const history: StatusHistory[] = [
                 createStatusHistory("up", 1_234_567_891, 250, "Success"), // newer first in input
-                createStatusHistory("down", 1_234_567_890, 0, "Timeout"), // older second in input
+                createStatusHistory("down", 1_234_567_890, 0, "Timeout"), // Older second in input
             ];
 
             renderWithTheme(
@@ -359,8 +359,8 @@ describe("HistoryChart - Complete Coverage", () => {
 
             const history: StatusHistory[] = [
                 createStatusHistory("up", 2000, 150), // newest first
-                createStatusHistory("up", 1000, 151), // middle
-                createStatusHistory("down", 500, 0), // oldest
+                createStatusHistory("up", 1000, 151), // Middle
+                createStatusHistory("down", 500, 0), // Oldest
             ];
 
             renderWithTheme(
@@ -372,9 +372,9 @@ describe("HistoryChart - Complete Coverage", () => {
 
             // After toReversed(): [down@500, up@1000, up@2000] (oldest first)
             // Verify all bars are rendered (React would skip duplicates with same key)
-            expect(bars[0]).toHaveAttribute("data-response-time", "0"); // down@500
-            expect(bars[1]).toHaveAttribute("data-response-time", "151"); // up@1000
-            expect(bars[2]).toHaveAttribute("data-response-time", "150"); // up@2000
+            expect(bars[0]).toHaveAttribute("data-response-time", "0"); // Down@500
+            expect(bars[1]).toHaveAttribute("data-response-time", "151"); // Up@1000
+            expect(bars[2]).toHaveAttribute("data-response-time", "150"); // Up@2000
         });
     });
 
@@ -819,7 +819,7 @@ describe("HistoryChart - Complete Coverage", () => {
             const bars = screen.getAllByTestId("mini-chart-bar");
             expect(bars).toHaveLength(3);
 
-            // slice(0, 3) takes first 3: [5000, 4000, 3000]
+            // Slice(0, 3) takes first 3: [5000, 4000, 3000]
             // toReversed() makes: [3000, 4000, 5000]
             expect(bars[0]).toHaveAttribute("data-timestamp", "3000");
             expect(bars[1]).toHaveAttribute("data-timestamp", "4000");

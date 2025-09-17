@@ -39,7 +39,7 @@ interface CorrelationChain {
 class MockEventCorrelator {
     private correlationChains = new Map<string, CorrelationChain>();
     private eventLookup = new Map<string, CorrelatedEvent>();
-    private correlationIndex = new Map<string, string[]>(); // eventType -> correlationIds
+    private correlationIndex = new Map<string, string[]>(); // EventType -> correlationIds
     private metrics = {
         chainsCreated: 0,
         chainsCompleted: 0,

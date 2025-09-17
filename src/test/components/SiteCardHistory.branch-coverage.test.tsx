@@ -578,7 +578,7 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
                 id: "mon1",
                 type: "port",
                 host: "incomplete.example.com",
-                // port is missing, should fallback to empty suffix
+                // Port is missing, should fallback to empty suffix
                 checkInterval: 60_000,
                 monitoring: true,
                 status: "up",

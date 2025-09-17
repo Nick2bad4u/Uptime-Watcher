@@ -327,8 +327,8 @@ describe("PortMonitor Coverage Tests", () => {
             expect(vi.mocked(performPortCheckWithRetry)).toHaveBeenCalledWith(
                 "example.com",
                 443,
-                10_000, // timeout as separate parameter
-                3 // retryAttempts as separate parameter
+                10_000, // Timeout as separate parameter
+                3 // RetryAttempts as separate parameter
             );
             expect(result).toEqual(successResult);
         });
@@ -491,8 +491,8 @@ describe("PortMonitor Coverage Tests", () => {
             expect(vi.mocked(performPortCheckWithRetry)).toHaveBeenCalledWith(
                 "example.com",
                 443,
-                8000, // timeout
-                5 // retryAttempts
+                8000, // Timeout
+                5 // RetryAttempts
             );
         });
 
@@ -542,8 +542,8 @@ describe("PortMonitor Coverage Tests", () => {
                 ).toHaveBeenCalledWith(
                     host,
                     443,
-                    10_000, // timeout
-                    3 // retryAttempts
+                    10_000, // Timeout
+                    3 // RetryAttempts
                 );
             }
         });
@@ -579,8 +579,8 @@ describe("PortMonitor Coverage Tests", () => {
                 ).toHaveBeenCalledWith(
                     "example.com",
                     port,
-                    10_000, // timeout
-                    3 // retryAttempts
+                    10_000, // Timeout
+                    3 // RetryAttempts
                 );
             }
         });

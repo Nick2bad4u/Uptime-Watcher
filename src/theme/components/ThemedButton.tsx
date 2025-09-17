@@ -150,7 +150,7 @@ const ThemedButtonComponent = ({
         .filter(Boolean)
         .join(" ");
 
-    // useCallback handler for jsx-no-bind compliance
+    // UseCallback handler for jsx-no-bind compliance
     const handleClick = useCallback(
         (e: MouseEvent<HTMLButtonElement>) => {
             onClick?.(e);

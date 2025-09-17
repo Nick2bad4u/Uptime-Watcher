@@ -33,6 +33,8 @@
  * @packageDocumentation
  */
 
+import { isValidUrl } from "@shared/validation/validatorUtils";
+
 import { logger } from "../../services/logger";
 
 /**
@@ -46,7 +48,7 @@ import { logger } from "../../services/logger";
 export const parseUptimeValue = (uptimeString: string): number => {
     // Remove any percent signs and whitespace
     // eslint-disable-next-line regexp/require-unicode-sets-regexp -- Simple character class [\s%] is more readable and compatible than unicode sets for basic whitespace/percent removal
-    const cleanedUptime = uptimeString.replaceAll(/[\s%]/g, "");
+    const cleanedUptime = uptimeString.replaceAll(/[\s%]/gu, "");
     const parsed = Number.parseFloat(cleanedUptime);
 
     // Validate the parsed value is a valid number and within expected range
@@ -58,8 +60,6 @@ export const parseUptimeValue = (uptimeString: string): number => {
     // Clamp to 0-100 range for safety
     return Math.min(100, Math.max(0, parsed));
 };
-
-import { isValidUrl } from "@shared/validation/validatorUtils";
 
 /**
  * Safely extracts hostname from a URL string.

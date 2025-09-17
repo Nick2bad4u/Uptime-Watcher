@@ -524,5 +524,5 @@ export default defineConfig({
         "unit-allowed-list": null,
         "unit-disallowed-list": null,
     },
-    // validate: true, -- Disabled: not real config option only CLI flag
+    // Validate: true, -- Disabled: not real config option only CLI flag
 });

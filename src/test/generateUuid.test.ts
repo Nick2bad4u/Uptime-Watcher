@@ -137,7 +137,7 @@ describe("UUID Generation", () => {
             // Mock crypto without randomUUID
             vi.stubGlobal("crypto", {
                 getRandomValues: vi.fn(),
-                // randomUUID is not defined
+                // RandomUUID is not defined
             });
         });
 

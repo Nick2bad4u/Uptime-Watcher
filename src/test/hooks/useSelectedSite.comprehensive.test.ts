@@ -92,7 +92,7 @@ describe(useSelectedSite, () => {
             await annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseUIStore.mockReturnValue(null); // selectedSiteId is null
+            mockUseUIStore.mockReturnValue(null); // SelectedSiteId is null
             mockUseSitesStore.mockReturnValue(mockSites);
 
             // Act
@@ -112,7 +112,7 @@ describe(useSelectedSite, () => {
             await annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseUIStore.mockReturnValue(undefined); // selectedSiteId is undefined
+            mockUseUIStore.mockReturnValue(undefined); // SelectedSiteId is undefined
             mockUseSitesStore.mockReturnValue(mockSites);
 
             // Act
@@ -132,7 +132,7 @@ describe(useSelectedSite, () => {
             await annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseUIStore.mockReturnValue(""); // selectedSiteId is empty string
+            mockUseUIStore.mockReturnValue(""); // SelectedSiteId is empty string
             mockUseSitesStore.mockReturnValue(mockSites);
 
             // Act

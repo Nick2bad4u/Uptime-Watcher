@@ -290,9 +290,9 @@ describe(OverviewTab, () => {
             render(<OverviewTab {...baseProps} />);
 
             // Check if response times are formatted correctly
-            expect(mockFormatResponseTime).toHaveBeenCalledWith(150); // avg
-            expect(mockFormatResponseTime).toHaveBeenCalledWith(100); // fastest
-            expect(mockFormatResponseTime).toHaveBeenCalledWith(200); // slowest
+            expect(mockFormatResponseTime).toHaveBeenCalledWith(150); // Avg
+            expect(mockFormatResponseTime).toHaveBeenCalledWith(100); // Fastest
+            expect(mockFormatResponseTime).toHaveBeenCalledWith(200); // Slowest
         });
 
         it("should display total checks count", ({ task, annotate }) => {

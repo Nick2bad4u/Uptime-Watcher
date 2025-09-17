@@ -325,7 +325,7 @@ describe("DynamicField - Comprehensive Coverage", () => {
                 label: "Undefined Options",
                 type: "select",
                 required: false,
-                // options is undefined
+                // Options is undefined
             };
 
             const mockOnChange = vi.fn();

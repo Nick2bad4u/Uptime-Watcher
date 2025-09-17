@@ -189,7 +189,7 @@ export const DynamicField: NamedExoticComponent<DynamicFieldProperties> = memo(
                 );
             }
             case "text":
-            // falls through
+            // Falls through
             case "url": {
                 return (
                     <TextField

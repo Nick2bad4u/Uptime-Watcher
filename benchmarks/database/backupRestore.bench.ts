@@ -757,7 +757,7 @@ describe("Database Backup and Restore Benchmarks", () => {
             {
                 type: "corruption" as const,
                 dataLossRange: [0.1, 0.3],
-                downtimeRange: [1, 6], // hours
+                downtimeRange: [1, 6], // Hours
                 recoveryMethods: [
                     "point-in-time-restore",
                     "backup-restore",

@@ -692,7 +692,7 @@ describe("DatabaseManager - Coverage Tests", () => {
             await databaseManager.setHistoryLimit(999);
             await databaseManager.refreshSites();
 
-            expect(eventEmitter.emitTyped).toHaveBeenCalledTimes(3); // history-limit-updated, update-sites-cache-requested, sites-refreshed
+            expect(eventEmitter.emitTyped).toHaveBeenCalledTimes(3); // History-limit-updated, update-sites-cache-requested, sites-refreshed
         });
     });
 });

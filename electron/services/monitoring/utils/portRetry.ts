@@ -90,7 +90,7 @@ export async function performPortCheckWithRetry(
         // Prepare base configuration for operational hooks
         const baseConfig = {
             initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
-            maxRetries: totalAttempts, // withOperationalHooks expects total attempts
+            maxRetries: totalAttempts, // WithOperationalHooks expects total attempts
             operationName: `Port check for ${host}:${port}`,
         };
 

@@ -78,7 +78,7 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
             [
                 fc.constantFrom(
                     "",
-                    "   ", // whitespace only
+                    "   ", // Whitespace only
                     "This is a normal error",
                     "HTTP 404 Not Found",
                     "Network error",

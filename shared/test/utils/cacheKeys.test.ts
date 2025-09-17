@@ -690,7 +690,7 @@ describe("cacheKeys", () => {
             expect(isStandardizedCacheKey("::")).toBeFalsy();
             expect(
                 isStandardizedCacheKey("config::empty-operation")
-            ).toBeFalsy(); // empty operation is invalid
+            ).toBeFalsy(); // Empty operation is invalid
         });
 
         it("should handle edge cases", async ({ task, annotate }) => {

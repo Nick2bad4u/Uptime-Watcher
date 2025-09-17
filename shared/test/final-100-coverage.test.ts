@@ -14,7 +14,7 @@ describe("Final 100% Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = safeStringify(undefined);
-            expect(result).toBe(""); // safeStringify returns empty string for undefined
+            expect(result).toBe(""); // SafeStringify returns empty string for undefined
         });
 
         it("should handle default case for unknown types (line 89)", async ({

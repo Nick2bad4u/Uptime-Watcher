@@ -22,10 +22,10 @@ import type { Site } from "../../../shared/types.js";
 describe(SiteManager, () => {
     let manager: SiteManager;
     let mockDependencies: any;
-    // let mockSitesCache: any; // Currently unused
+    // Let mockSitesCache: any; // Currently unused
 
     beforeEach(() => {
-        // const mockSitesCache = { // Currently unused
+        // Const mockSitesCache = { // Currently unused
         //     delete: vi.fn(),
         //     get: vi.fn(),
         //     set: vi.fn(),

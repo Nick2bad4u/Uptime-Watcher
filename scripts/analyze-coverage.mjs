@@ -54,7 +54,7 @@ const DEFAULTS = {
     fileDisplayLimit: Number(process.env.COVERAGE_FILE_LIMIT) || 15,
     minFileColumnWidth: 30,
     numericColumnWidth: 20,
-    truncateFilePath: 80, // max characters in File column; longer paths will be ellipsized
+    truncateFilePath: 80, // Max characters in File column; longer paths will be ellipsized
     defaultFormat: "table", // 'table' | 'csv' | 'json'
 };
 
@@ -108,7 +108,7 @@ for (const [filePath, data] of Object.entries(coverageData)) {
         // Build a map of line -> coveredCount based on statements covering those lines
         derivedLines = {};
         for (const [stmtId, loc] of Object.entries(statementMap)) {
-            // loc has start.line and end.line typically
+            // Loc has start.line and end.line typically
             const startLine =
                 loc && loc.start && loc.start.line ? loc.start.line : null;
             const endLine =
@@ -116,7 +116,7 @@ for (const [filePath, data] of Object.entries(coverageData)) {
             if (startLine === null || startLine === undefined) continue;
             const covered = Number(statements[stmtId]) > 0 ? 1 : 0;
             for (let ln = startLine; ln <= (endLine ?? startLine); ln++) {
-                // accumulate coverage counts per line
+                // Accumulate coverage counts per line
                 derivedLines[ln] = (derivedLines[ln] || 0) + covered;
             }
         }
@@ -248,7 +248,7 @@ if (debugFile) {
  * @param {any[]} displayed
  */
 function computeColWidths(displayed) {
-    // file column width + four numeric columns
+    // File column width + four numeric columns
     const minFileCol = 30;
     const fileCol = Math.max(
         minFileCol,
@@ -256,7 +256,7 @@ function computeColWidths(displayed) {
             (/** @type {{ file: string | any[] }} */ f) => f.file.length
         )
     );
-    // other columns get a reasonable width
+    // Other columns get a reasonable width
     const numCol = DEFAULTS.numericColumnWidth ?? 20;
     return [
         fileCol,
@@ -277,7 +277,7 @@ function ellipsize(s, max) {
     if (!max || str.length <= max) return str;
     if (max <= 4) return str.slice(-max);
     const head = Math.ceil(max * 0.4);
-    const tail = max - head - 3; // for '...'
+    const tail = max - head - 3; // For '...'
     return `${str.slice(0, head)}...${str.slice(-tail)}`;
 }
 

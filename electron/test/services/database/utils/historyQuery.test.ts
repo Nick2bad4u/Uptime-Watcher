@@ -1298,8 +1298,8 @@ describe("historyQuery utilities", () => {
                 []
             );
             (mockDb.get as unknown as ReturnType<typeof vi.fn>)
-                .mockReturnValueOnce({ count: 0 }) // for getHistoryCount
-                .mockReturnValueOnce(undefined); // for getLatestHistoryEntry
+                .mockReturnValueOnce({ count: 0 }) // For getHistoryCount
+                .mockReturnValueOnce(undefined); // For getLatestHistoryEntry
 
             const allHistory = findHistoryByMonitorId(mockDb, "empty-monitor");
             const count = getHistoryCount(mockDb, "empty-monitor");

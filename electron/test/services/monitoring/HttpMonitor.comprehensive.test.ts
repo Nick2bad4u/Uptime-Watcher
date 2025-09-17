@@ -744,7 +744,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             expect(mockWithHooks).toHaveBeenCalledWith(
                 expect.any(Function),
                 expect.objectContaining({
-                    maxRetries: 2, // retryAttempts + 1
+                    maxRetries: 2, // RetryAttempts + 1
                     operationName:
                         "HTTP check for https://api.example.com/health",
                 })

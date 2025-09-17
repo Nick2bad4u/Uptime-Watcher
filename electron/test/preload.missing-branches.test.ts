@@ -123,7 +123,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
     });
     describe("Event Listener Edge Cases", () => {
         it("should handle removeAllListeners errors", async () => {
-            // removeAllListeners should not throw
+            // RemoveAllListeners should not throw
             expect(() =>
                 exposedAPI.events.removeAllListeners("test-channel")
             ).not.toThrow();

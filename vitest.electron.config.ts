@@ -64,14 +64,14 @@ const vitestConfig = defineConfig({
             exclude: [
                 "**/*.config.*",
                 "**/*.d.ts",
-                "**/dist*/**", // covers dist/, dist-electron/, dist-shared/, etc.
+                "**/dist*/**", // Covers dist/, dist-electron/, dist-shared/, etc.
                 "**/node_modules/**",
                 "**/docs/**",
                 "**/coverage/**",
-                "**/index.{ts,tsx}", // root + nested index.ts / index.tsx
-                "**/types.{ts,tsx}", // single-file types
-                "**/types/**", // types directories
-                "shared/test/**", // covers file + dir form
+                "**/index.{ts,tsx}", // Root + nested index.ts / index.tsx
+                "**/types.{ts,tsx}", // Single-file types
+                "**/types/**", // Types directories
+                "shared/test/**", // Covers file + dir form
                 "src/**",
                 "release/**",
                 "scripts/**",
@@ -80,7 +80,7 @@ const vitestConfig = defineConfig({
                 "**/electron/utils/interfaces.ts",
                 "**/html/**",
                 "**/enhanced-testUtilities.ts/**",
-                "electron/test/utils/enhanced-testUtilities.ts", // specific file exclude due to usage in tests
+                "electron/test/utils/enhanced-testUtilities.ts", // Specific file exclude due to usage in tests
                 ...coverageConfigDefaults.exclude,
             ],
             excludeAfterRemap: true, // Exclude files after remapping for accuracy

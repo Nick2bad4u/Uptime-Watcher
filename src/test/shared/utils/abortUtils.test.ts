@@ -33,8 +33,8 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should create valid abort signal with timeout", () => {
                 fc.assert(
                     fc.property(
-                        fc.integer({ min: 1, max: 10_000 }), // timeout in ms
-                        fc.option(fc.string(), { nil: undefined }), // optional reason
+                        fc.integer({ min: 1, max: 10_000 }), // Timeout in ms
+                        fc.option(fc.string(), { nil: undefined }), // Optional reason
                         (timeoutMs, reason) => {
                             const options: CombineSignalsOptions = {
                                 timeoutMs,
@@ -62,7 +62,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should handle multiple additional signals", () => {
                 fc.assert(
                     fc.property(
-                        fc.array(fc.boolean(), { minLength: 1, maxLength: 5 }), // signal states
+                        fc.array(fc.boolean(), { minLength: 1, maxLength: 5 }), // Signal states
                         (shouldAbort) => {
                             const controllers = shouldAbort.map(
                                 () => new AbortController()
@@ -93,18 +93,18 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                         fc.record({
                             timeoutMs: fc.option(
                                 fc.oneof(
-                                    fc.integer({ min: -1000, max: 0 }), // invalid timeout
-                                    fc.integer({ min: 1, max: 1000 }) // valid timeout
+                                    fc.integer({ min: -1000, max: 0 }), // Invalid timeout
+                                    fc.integer({ min: 1, max: 1000 }) // Valid timeout
                                 )
                             ),
                             additionalSignals: fc.option(
                                 fc.array(
                                     fc.oneof(
                                         fc.constant(null), // null signal
-                                        fc.constant(undefined), // undefined signal
+                                        fc.constant(undefined), // Undefined signal
                                         fc.constant(
                                             new AbortController().signal
-                                        ) // valid signal
+                                        ) // Valid signal
                                     )
                                 )
                             ),
@@ -125,7 +125,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should return single signal when only one provided", () => {
                 fc.assert(
                     fc.property(
-                        fc.boolean(), // whether to abort the signal
+                        fc.boolean(), // Whether to abort the signal
                         (shouldAbort) => {
                             const controller = new AbortController();
                             if (shouldAbort) {
@@ -153,8 +153,8 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should execute operation successfully with valid signals", async () => {
                 await fc.assert(
                     fc.asyncProperty(
-                        fc.integer({ min: 1, max: 100 }), // operation result
-                        fc.integer({ min: 100, max: 1000 }), // timeout
+                        fc.integer({ min: 1, max: 100 }), // Operation result
+                        fc.integer({ min: 100, max: 1000 }), // Timeout
                         async (result, timeoutMs) => {
                             const cleanup = vi.fn();
                             const operation = vi.fn().mockResolvedValue(result);
@@ -185,7 +185,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should handle operation errors and still call cleanup", async () => {
                 await fc.assert(
                     fc.asyncProperty(
-                        fc.string(), // error message
+                        fc.string(), // Error message
                         async (errorMessage) => {
                             const cleanup = vi.fn();
                             const operation = vi
@@ -205,7 +205,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should handle abortion during operation", async () => {
                 await fc.assert(
                     fc.asyncProperty(
-                        fc.integer({ min: 10, max: 100 }), // abort delay
+                        fc.integer({ min: 10, max: 100 }), // Abort delay
                         async (abortDelay) => {
                             const cleanup = vi.fn();
                             const controller = new AbortController();
@@ -252,7 +252,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should resolve after specified time without signal", async () => {
                 await fc.assert(
                     fc.asyncProperty(
-                        fc.integer({ min: 1, max: 1000 }), // sleep duration
+                        fc.integer({ min: 1, max: 1000 }), // Sleep duration
                         async (ms) => {
                             const promise = sleep(ms);
 
@@ -271,8 +271,8 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should abort when signal is triggered", async () => {
                 await fc.assert(
                     fc.asyncProperty(
-                        fc.integer({ min: 100, max: 1000 }), // sleep duration
-                        fc.integer({ min: 1, max: 50 }), // abort time
+                        fc.integer({ min: 100, max: 1000 }), // Sleep duration
+                        fc.integer({ min: 1, max: 50 }), // Abort time
                         async (sleepMs, abortMs) => {
                             const controller = new AbortController();
                             const promise = sleep(sleepMs, controller.signal);
@@ -293,8 +293,8 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should handle already aborted signals", async () => {
                 await fc.assert(
                     fc.asyncProperty(
-                        fc.integer({ min: 1, max: 1000 }), // sleep duration
-                        fc.string(), // abort reason
+                        fc.integer({ min: 1, max: 1000 }), // Sleep duration
+                        fc.string(), // Abort reason
                         async (ms, reason) => {
                             const controller = new AbortController();
                             controller.abort(reason);
@@ -315,7 +315,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should succeed on first attempt when operation succeeds", async () => {
                 await fc.assert(
                     fc.asyncProperty(
-                        fc.string(), // success result
+                        fc.string(), // Success result
                         async (result) => {
                             const operation = vi.fn().mockResolvedValue(result);
 
@@ -361,9 +361,9 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should resolve when operation completes before abort", async () => {
                 await fc.assert(
                     fc.asyncProperty(
-                        fc.integer({ min: 1, max: 100 }), // operation delay
-                        fc.integer({ min: 200, max: 1000 }), // signal delay (longer than operation)
-                        fc.string(), // result
+                        fc.integer({ min: 1, max: 100 }), // Operation delay
+                        fc.integer({ min: 200, max: 1000 }), // Signal delay (longer than operation)
+                        fc.string(), // Result
                         async (operationDelay, signalDelay, result) => {
                             const controller = new AbortController();
                             const operation = new Promise((resolve) =>
@@ -393,8 +393,8 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should abort when signal triggers before operation", async () => {
                 await fc.assert(
                     fc.asyncProperty(
-                        fc.integer({ min: 1, max: 100 }), // abort delay
-                        fc.integer({ min: 200, max: 1000 }), // operation delay (longer than abort)
+                        fc.integer({ min: 1, max: 100 }), // Abort delay
+                        fc.integer({ min: 200, max: 1000 }), // Operation delay (longer than abort)
                         async (abortDelay, operationDelay) => {
                             const controller = new AbortController();
                             const operation = new Promise((resolve) =>
@@ -424,7 +424,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should handle already aborted signals", async () => {
                 await fc.assert(
                     fc.asyncProperty(
-                        fc.string(), // abort reason
+                        fc.string(), // Abort reason
                         async (reason) => {
                             const controller = new AbortController();
                             controller.abort(reason);
@@ -449,8 +449,8 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
             it("should correctly identify abort errors", () => {
                 fc.assert(
                     fc.property(
-                        fc.string(), // error name
-                        fc.string(), // error message
+                        fc.string(), // Error name
+                        fc.string(), // Error message
                         (name, message) => {
                             const error = new Error(message);
                             error.name = name;
@@ -523,7 +523,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
         it("should properly clean up event listeners and timers", () => {
             fc.assert(
                 fc.property(
-                    fc.integer({ min: 100, max: 1000 }), // timeout
+                    fc.integer({ min: 100, max: 1000 }), // Timeout
                     (timeoutMs) => {
                         const clearTimeoutSpy = vi.spyOn(
                             global,
