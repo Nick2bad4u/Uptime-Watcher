@@ -72,7 +72,6 @@ test.describe(
                     ...process.env,
                     NODE_ENV: "test",
                     SKIP_AUTO_UPDATES: "true",
-                    TEST_MODE: "true",
                 },
                 timeout: 30000,
             });

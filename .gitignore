@@ -762,8 +762,6 @@ release/
 # Node modules
 node_modules/
 node_modules_backup/
-# Husky
-.husky/
 # Electron build output directories
 dist/
 **/dist/

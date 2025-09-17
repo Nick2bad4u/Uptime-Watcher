@@ -122,10 +122,10 @@ log.transports.file.format = LOG_FILE_FORMAT;
 log.transports.console.format = LOG_CONSOLE_FORMAT;
 
 // Configure remote debugging for MCP electron server support
-// Only enable remote debugging if not running in Playwright test mode
+// Only enable remote debugging if not running in headless mode (tests)
 if (
     (isDev() || process.argv.includes("--enable-mcp-debugging")) &&
-    !process.env["TEST_MODE"]
+    !process.env["HEADLESS"]
 ) {
     try {
         app.commandLine.appendSwitch("remote-debugging-port", "9222");

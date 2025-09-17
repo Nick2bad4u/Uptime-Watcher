@@ -4,7 +4,7 @@
     Finds test files that are outside the main test directories.
 
 .DESCRIPTION
-    Searches the entire repository for test files (*.test.ts, *.test.js, *.spec.ts, *.spec.js) 
+    Searches the entire repository for test files (*.test.ts, *.test.js, *.spec.ts, *.spec.js)
     that are located outside the main 3 test folders:
     - src/test/
     - electron/test/
@@ -21,29 +21,29 @@
 
 .EXAMPLE
     .\Find-OrphanedTests.ps1
-    
+
     Finds all orphaned test files and displays them in a table format.
 
 .EXAMPLE
     .\Find-OrphanedTests.ps1 -OutputFormat List
-    
+
     Finds all orphaned test files and displays them as a list.
 
 .EXAMPLE
     .\Find-OrphanedTests.ps1 -ShowOnlyProjectTests
-    
+
     Shows only test files from your project (excludes node_modules completely).
 
 .EXAMPLE
     .\Find-OrphanedTests.ps1 -OutputFormat Detailed -SkipNodeModules
-    
+
     Shows detailed categorized output without node_modules clutter.
 
 .NOTES
     Author: GitHub Copilot
     Created: 2025-01-19
-    
-    This script helps identify test files that may be misplaced or organized 
+
+    This script helps identify test files that may be misplaced or organized
     outside the standard test directory structure.
 #>
 
@@ -51,17 +51,17 @@
 param(
     [Parameter(Mandatory = $false)]
     [string]$RootPath = ".",
-    
+
     [Parameter(Mandatory = $false)]
     [ValidateSet("Table", "List", "Json", "Detailed")]
     [string]$OutputFormat = "Detailed",
-    
+
     [Parameter(Mandatory = $false)]
     [string[]]$ExcludePaths = @(),
-    
+
     [Parameter(Mandatory = $false)]
     [switch]$SkipNodeModules,
-    
+
     [Parameter(Mandatory = $false)]
     [switch]$ShowOnlyProjectTests
 )
@@ -72,7 +72,7 @@ $ErrorActionPreference = "Stop"
 # Define the main test directories (relative to root)
 $MainTestDirs = @(
     "src/test",
-    "electron/test", 
+    "electron/test",
     "shared/test"
 )
 
@@ -93,7 +93,7 @@ $DefaultExcludePaths = @(
     "node_modules",
     ".git",
     "dist",
-    "dist-electron", 
+    "dist-electron",
     "dist-shared",
     "dist-shared-test",
     "coverage",
@@ -101,7 +101,6 @@ $DefaultExcludePaths = @(
     "release",
     "build",
     ".vscode",
-    ".husky",
     "docs/docusaurus/node_modules",
     "docs/*/node_modules"
 )
@@ -116,7 +115,7 @@ if ($SkipNodeModules -or $ShowOnlyProjectTests) {
 
 function Write-Header {
     param([string]$Title)
-    
+
     Write-Host ""
     Write-Host "=" * 60 -ForegroundColor Cyan
     Write-Host $Title -ForegroundColor Cyan
@@ -129,7 +128,7 @@ function Get-RelativePath {
         [string]$Path,
         [string]$BasePath
     )
-    
+
     try {
         $resolvedPath = Resolve-Path -Path $Path -Relative -RelativeBasePath $BasePath -ErrorAction SilentlyContinue
         return $resolvedPath -replace "^\.\\", ""
@@ -145,22 +144,22 @@ function Find-TestFiles {
         [string[]]$Patterns,
         [string[]]$ExcludeDirs
     )
-    
+
     $testFiles = @()
-    
+
     foreach ($pattern in $Patterns) {
         try {
             $files = Get-ChildItem -Path $SearchPath -Filter $pattern -Recurse -File -ErrorAction SilentlyContinue
-            
+
             foreach ($file in $files) {
                 $relativePath = Get-RelativePath -Path $file.FullName -BasePath $SearchPath
                 $shouldExclude = $false
-                
+
                 # Check if file is in an excluded directory
                 foreach ($excludeDir in $ExcludeDirs) {
                     $normalizedExcludeDir = $excludeDir -replace "\\", "/"
                     $normalizedRelativePath = $relativePath -replace "\\", "/"
-                    
+
                     # Handle wildcard patterns and direct path matches
                     if ($normalizedExcludeDir.Contains("*")) {
                         if ($normalizedRelativePath -like $normalizedExcludeDir) {
@@ -168,7 +167,7 @@ function Find-TestFiles {
                             break
                         }
                     }
-                    elseif ($normalizedRelativePath -like "$normalizedExcludeDir/*" -or 
+                    elseif ($normalizedRelativePath -like "$normalizedExcludeDir/*" -or
                             $normalizedRelativePath -eq $normalizedExcludeDir -or
                             $normalizedRelativePath.Contains("/node_modules/") -or
                             $normalizedRelativePath.Contains("\node_modules\")) {
@@ -176,7 +175,7 @@ function Find-TestFiles {
                         break
                     }
                 }
-                
+
                 if (-not $shouldExclude) {
                     $testFiles += [PSCustomObject]@{
                         Name = $file.Name
@@ -193,7 +192,7 @@ function Find-TestFiles {
             Write-Warning "Error searching for pattern '$pattern': $($_.Exception.Message)"
         }
     }
-    
+
     return $testFiles
 }
 
@@ -202,28 +201,28 @@ function Test-IsInMainTestDir {
         [string]$FilePath,
         [string[]]$MainDirs
     )
-    
+
     foreach ($mainDir in $MainDirs) {
         $normalizedMainDir = $mainDir -replace "\\", "/"
         $normalizedFilePath = $FilePath -replace "\\", "/"
-        
+
         if ($normalizedFilePath -like "$normalizedMainDir/*") {
             return $true
         }
     }
-    
+
     return $false
 }
 
 # Main execution
 try {
     Write-Header "Orphaned Test File Finder"
-    
+
     # Resolve and validate root path
     $ResolvedRootPath = Resolve-Path -Path $RootPath -ErrorAction Stop
     Write-Host "Searching in: $ResolvedRootPath" -ForegroundColor Green
     Write-Host ""
-    
+
     # Display main test directories
     Write-Host "Main test directories:" -ForegroundColor Yellow
     foreach ($dir in $MainTestDirs) {
@@ -233,29 +232,29 @@ try {
         Write-Host "  $status $dir" -ForegroundColor $(if ($exists) { "Green" } else { "Red" })
     }
     Write-Host ""
-    
+
     # Display excluded directories
     Write-Host "Excluded directories:" -ForegroundColor Yellow
     foreach ($excludeDir in $AllExcludePaths) {
         Write-Host "  - $excludeDir" -ForegroundColor Gray
     }
     Write-Host ""
-    
+
     # Find all test files
     Write-Host "Searching for test files..." -ForegroundColor Yellow
     $allTestFiles = Find-TestFiles -SearchPath $ResolvedRootPath -Patterns $TestFilePatterns -ExcludeDirs $AllExcludePaths
-    
+
     Write-Host "Found $($allTestFiles.Count) total test files" -ForegroundColor Green
-    
+
     # Filter orphaned test files (not in main test directories)
     $orphanedTests = @()
     $projectOrphanedTests = @()
     $nodeModulesTests = @()
-    
+
     foreach ($testFile in $allTestFiles) {
         if (-not (Test-IsInMainTestDir -FilePath $testFile.Path -MainDirs $MainTestDirs)) {
             $orphanedTests += $testFile
-            
+
             # Categorize the orphaned tests
             if ($testFile.Path -match "node_modules" -or $testFile.Path -match "docs[\\/]docusaurus[\\/]") {
                 $nodeModulesTests += $testFile
@@ -265,22 +264,22 @@ try {
             }
         }
     }
-    
+
     # Apply filter if ShowOnlyProjectTests is specified
     if ($ShowOnlyProjectTests) {
         $orphanedTests = $projectOrphanedTests
     }
-    
+
     # Display results
     Write-Header "Results"
-    
+
     if ($orphanedTests.Count -eq 0) {
         Write-Host "✓ No orphaned test files found! All tests are in the main test directories." -ForegroundColor Green
     }
     else {
         Write-Host "Found $($orphanedTests.Count) orphaned test file(s):" -ForegroundColor Red
         Write-Host ""
-        
+
         switch ($OutputFormat) {
             "Table" {
                 $orphanedTests | Format-Table -Property Name, Directory, Path -AutoSize
@@ -301,7 +300,7 @@ try {
                     $projectOrphanedTests | Format-Table -Property Name, Directory, Path -AutoSize
                     Write-Host ""
                 }
-                
+
                 if ($nodeModulesTests.Count -gt 0 -and -not $ShowOnlyProjectTests) {
                     Write-Host "📦 NODE_MODULES TEST FILES:" -ForegroundColor Cyan
                     Write-Host "  (Found $($nodeModulesTests.Count) test files in dependencies)" -ForegroundColor Gray
@@ -315,14 +314,14 @@ try {
                 }
             }
         }
-        
+
         Write-Host ""
         Write-Host "Recommendations:" -ForegroundColor Cyan
         Write-Host "• Consider moving these files to appropriate test directories" -ForegroundColor White
         Write-Host "• Or add them to exclusions if they're intentionally placed" -ForegroundColor White
         Write-Host "• Verify these files are being run by your test suite" -ForegroundColor White
     }
-    
+
     # Summary statistics
     Write-Host ""
     Write-Host "Summary:" -ForegroundColor Cyan
@@ -333,7 +332,7 @@ try {
         Write-Host "  Node modules: $($nodeModulesTests.Count)" -ForegroundColor Cyan
         Write-Host "  Total orphaned: $($orphanedTests.Count)" -ForegroundColor $(if ($orphanedTests.Count -eq 0) { "Green" } else { "Red" })
     }
-    
+
 }
 catch {
     Write-Error "Script execution failed: $($_.Exception.Message)"

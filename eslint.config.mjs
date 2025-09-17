@@ -1903,7 +1903,17 @@ export default [
             "n/no-mixed-requires": "warn",
             "n/no-new-require": "warn",
             "n/no-path-concat": "warn",
-            "n/no-process-env": "warn",
+            "n/no-process-env": [
+                "error",
+                {
+                    allowedVariables: [
+                        "NODE_ENV",
+                        "HEADLESS",
+                        "CI",
+                        "TEST_MODE",
+                    ],
+                },
+            ],
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
@@ -3190,7 +3200,17 @@ export default [
             "n/no-mixed-requires": "warn",
             "n/no-new-require": "warn",
             "n/no-path-concat": "warn",
-            "n/no-process-env": "warn",
+            "n/no-process-env": [
+                "error",
+                {
+                    allowedVariables: [
+                        "NODE_ENV",
+                        "HEADLESS",
+                        "CI",
+                        "TEST_MODE",
+                    ],
+                },
+            ],
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
@@ -4702,7 +4722,17 @@ export default [
             "n/no-mixed-requires": "warn",
             "n/no-new-require": "warn",
             "n/no-path-concat": "warn",
-            "n/no-process-env": "warn",
+            "n/no-process-env": [
+                "error",
+                {
+                    allowedVariables: [
+                        "NODE_ENV",
+                        "HEADLESS",
+                        "CI",
+                        "TEST_MODE",
+                    ],
+                },
+            ],
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
@@ -5970,7 +6000,17 @@ export default [
             "n/no-mixed-requires": "warn",
             "n/no-new-require": "warn",
             "n/no-path-concat": "warn",
-            "n/no-process-env": "warn",
+            "n/no-process-env": [
+                "error",
+                {
+                    allowedVariables: [
+                        "NODE_ENV",
+                        "HEADLESS",
+                        "CI",
+                        "TEST_MODE",
+                    ],
+                },
+            ],
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
@@ -7826,7 +7866,18 @@ export default [
             "n/no-mixed-requires": "warn",
             "n/no-new-require": "warn",
             "n/no-path-concat": "warn",
-            "n/no-process-env": "off", // Allow process.env usage in Electron
+            "n/no-process-env": [
+                "error",
+                {
+                    allowedVariables: [
+                        "NODE_ENV",
+                        "HEADLESS",
+                        "CI",
+                        "TEST_MODE",
+                        "PACKAGE_VERSION",
+                    ],
+                },
+            ],
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
             "n/no-sync": "warn",
