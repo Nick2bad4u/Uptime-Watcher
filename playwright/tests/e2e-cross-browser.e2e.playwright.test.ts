@@ -15,7 +15,6 @@
  */
 
 import { test, expect, _electron as electron } from "@playwright/test";
-import path from "node:path";
 
 test.describe(
     "cross-browser and platform compatibility",
@@ -37,7 +36,7 @@ test.describe(
          */
         async function launchAppForCompatibilityTesting() {
             const electronApp = await electron.launch({
-                args: [path.join(__dirname, "../../dist-electron/main.js")],
+                args: ["."],
                 env: {
                     ...process.env,
                     NODE_ENV: "test",

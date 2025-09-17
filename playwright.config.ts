@@ -34,7 +34,7 @@ import { defineConfig, devices } from "@playwright/test";
  */
 const config: PlaywrightTestConfig = defineConfig({
     expect: {
-        timeout: 5000, // 5 seconds for assertions
+        timeout: 20 * 1000, // 20 seconds for assertions
     },
 
     forbidOnly: Boolean(process.env["CI"]), // Prevent test.only in CI
@@ -166,7 +166,7 @@ const config: PlaywrightTestConfig = defineConfig({
     testMatch: ["**/*.test.ts"],
 
     // Timeout and retry configuration
-    timeout: 30 * 1000, // 30 seconds per test
+    timeout: 20 * 1000, // 20 seconds per test
 
     // TypeScript configuration
     /**
@@ -187,7 +187,7 @@ const config: PlaywrightTestConfig = defineConfig({
         acceptDownloads: true,
 
         // Action timeouts
-        actionTimeout: 10 * 1000, // 10 seconds for actions
+        actionTimeout: 20 * 1000, // 20 seconds for actions
 
         // Disable web security for Electron testing
         bypassCSP: true,

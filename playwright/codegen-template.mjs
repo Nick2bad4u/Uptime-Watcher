@@ -33,7 +33,7 @@ const testTemplate = `/**
  * Imports Playwright's test runner and assertion utilities for use in generated test files.
  *
  * @remarks
- * This import provides the core testing API `(`test`, `expect`)` required for Playwright test execution.
+ * This import provides the core testing API \`(test, expect)\` required for Playwright test execution.
  * All generated tests rely on these functions for structure and assertions.
  */
 import { test, expect } from "@playwright/test";

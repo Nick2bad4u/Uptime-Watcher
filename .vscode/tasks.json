@@ -51,7 +51,6 @@
             "type": "npm"
         },
         {
-            "command": "npx tsc -p tsconfig.json && npm run postbuild",
             "group": "build",
             "label": "Build Electron Main (Dev)",
             "presentation": {
@@ -60,32 +59,7 @@
                 "panel": "shared",
                 "reveal": "always"
             },
-            "type": "shell"
-        },
-        {
-            "group": "build",
-            "isBackground": true,
-            "label": "Start Vite Dev Server",
-            "presentation": {
-                "clear": false,
-                "echo": true,
-                "focus": false,
-                "panel": "shared",
-                "reveal": "always",
-                "showReuseMessage": true
-            },
-            "problemMatcher": {
-                "background": {
-                    "activeOnStart": true,
-                    "beginsPattern": ".*VITE v.*",
-                    "endsPattern": ".*ready in.*"
-                },
-                "owner": "vite",
-                "pattern": {
-                    "regexp": ".*"
-                }
-            },
-            "script": "dev",
+            "script": "build",
             "type": "npm"
         },
         {

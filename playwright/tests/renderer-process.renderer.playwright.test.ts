@@ -7,7 +7,6 @@
  */
 
 import { test, expect, _electron as electron } from "@playwright/test";
-import path from "node:path";
 
 test.describe(
     "electron renderer process",
@@ -41,7 +40,7 @@ test.describe(
             },
             async () => {
                 const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
+                    args: ["."],
                     env: {
                         ...process.env,
                         NODE_ENV: "test",
@@ -91,7 +90,7 @@ test.describe(
             },
             async () => {
                 const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
+                    args: ["."],
                     env: {
                         ...process.env,
                         NODE_ENV: "test",
@@ -136,7 +135,7 @@ test.describe(
             },
             async () => {
                 const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
+                    args: ["."],
                     env: {
                         ...process.env,
                         NODE_ENV: "test",
@@ -179,7 +178,7 @@ test.describe(
             },
             async () => {
                 const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
+                    args: ["."],
                     env: {
                         ...process.env,
                         NODE_ENV: "test",
@@ -240,7 +239,7 @@ test.describe(
             },
             async () => {
                 const electronApp = await electron.launch({
-                    args: [path.join(__dirname, "../../dist-electron/main.js")],
+                    args: ["."],
                     env: {
                         ...process.env,
                         NODE_ENV: "test",

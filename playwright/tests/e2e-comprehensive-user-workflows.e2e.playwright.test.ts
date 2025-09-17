@@ -24,7 +24,6 @@
 // to test various user scenarios and edge cases in real-world usage patterns
 
 import { test, expect, _electron as electron } from "@playwright/test";
-import path from "node:path";
 
 test.describe(
     "comprehensive user workflows",
@@ -46,7 +45,7 @@ test.describe(
          */
         async function launchAndWaitForApp() {
             const electronApp = await electron.launch({
-                args: [path.join(__dirname, "../../dist-electron/main.js")],
+                args: ["."],
                 env: {
                     ...process.env,
                     NODE_ENV: "test",

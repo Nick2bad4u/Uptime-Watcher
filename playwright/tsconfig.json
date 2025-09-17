@@ -47,6 +47,7 @@
         "skipLibCheck": false,
         "strict": true,
         "target": "ES2024",
+        "tsBuildInfoFile": "../dist-test/tsconfig.test..playwright.tsbuildinfo",
         "types": [
             "@playwright/test",
             "node"

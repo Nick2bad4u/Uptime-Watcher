@@ -14,7 +14,6 @@ import {
     type ElectronApplication,
     type Page,
 } from "@playwright/test";
-import path from "node:path";
 
 test.describe(
     "uI Components - Comprehensive Tests",
@@ -35,7 +34,7 @@ test.describe(
 
         test.beforeEach(async () => {
             electronApp = await electron.launch({
-                args: [path.join(__dirname, "../../dist-electron/main.js")],
+                args: ["."],
                 env: {
                     ...process.env,
                     NODE_ENV: "test",

@@ -105,7 +105,7 @@
             "runtimeArgs": [
                 "${workspaceFolder}/dist-electron/main.js",
                 "--remote-debugging-port=9223",
-                "--user-data-dir=\"${env:APPDATA}\\\\uptime-watcher\""
+                "--user-data-dir=${env:APPDATA}\\uptime-watcher"
             ],
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
             "skipFiles": ["<node_internals>/**"],

@@ -42,5 +42,10 @@ export async function launchElectronApp(
             ...customEnv,
         },
         timeout: 30000, // Add timeout like codegen script
+        // NOTE: The DEP0190 deprecation warning about shell injection comes from
+        // Playwright's internal Electron launcher implementation, not our code.
+        // This is a known issue with Playwright's Electron integration and
+        // cannot be directly fixed in user code. The warning does not affect
+        // functionality and can be safely ignored.
     });
 }

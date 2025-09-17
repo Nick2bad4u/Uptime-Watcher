@@ -6,7 +6,6 @@
  */
 
 import { test, expect, _electron as electron } from "@playwright/test";
-import path from "node:path";
 import { ensureCleanState } from "../utils/modal-cleanup";
 
 // Performance test configurations
@@ -97,7 +96,7 @@ test.describe(
 
         test.beforeEach(async () => {
             electronApp = await electron.launch({
-                args: [path.join(__dirname, "../../dist-electron/main.js")],
+                args: ["."],
                 env: {
                     ...process.env,
                     NODE_ENV: "test",
