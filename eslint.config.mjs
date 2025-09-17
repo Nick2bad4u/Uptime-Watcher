@@ -247,6 +247,7 @@ export default [
             "release/",
             "report/**",
             "reports/**",
+            "playwright/codegen-template.mjs",
             // "config/testing/vitest.electron.config.ts", // Ignore vitest electron config
             // "config/testing/vitest.shared.config.ts", // Ignore vitest shared config
             // "vite.config.ts", // Ignore vite config due to parsing issues

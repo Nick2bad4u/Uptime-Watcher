@@ -80,7 +80,7 @@ const config: PlaywrightTestConfig = defineConfig({
             },
         },
         {
-            fullyParallel: true, // Safe to run UI tests in parallel
+            fullyParallel: false, // Disable parallelism for Electron UI stability
             name: "ui-tests",
             testMatch: "**/ui-*.playwright.test.ts",
             use: {
@@ -238,7 +238,7 @@ const config: PlaywrightTestConfig = defineConfig({
         viewport: { height: 720, width: 1280 },
     },
 
-    workers: process.env["CI"] ? 1 : 20, // Limit workers for Electron
+    workers: 1, // Force single worker for Electron stability
 });
 
 export default config;

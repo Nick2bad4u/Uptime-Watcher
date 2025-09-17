@@ -1,6 +1,6 @@
 ---
 mode: "BeastMode"
-tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'sequentialthinking', 'playwright', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
+tools: ['createFile', 'createDirectory', 'editFiles', 'search', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'context7', 'append_insight', 'describe_table', 'list_insights', 'list_tables', 'read_query', 'sequentialthinking', 'electron-mcp-server', 'execute_command', 'get_diagnostics', 'get_references', 'get_symbol_lsp_info', 'open_files', 'rename_symbol', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
 description: "Generate 100% Playwright Test Coverage"
 
 ---
@@ -14,15 +14,17 @@ Focus on End-to-End Test Generation using Playwright:
 
 Fix any broken tests, and then write comprehensive E2E tests focusing on user flows, UI interactions, cross-browser scenarios, accessibility, and edge cases.
 
-You have access to the Playwright MCP server for this task: https://github.com/microsoft/playwright-mcp
-This allows you to use special tools to create Playwright tests. Use the Playwright MCP tools as much as possible to create robust E2E tests, these will allow you to "see" the application as a user would based on structured data.
+When creating new tests, go slow. Always test one user flow at a time. Ensure each test is clear, concise, and mimics real user behavior. Always ensure passing tests before moving onto a new file or user flow.
+
+DO NOT make a ton of tests and then test them afterwards. This will lead to confusion and errors. Always ensure tests pass before moving onto a new file or user flow.
+
+Slowly and methodically work through the application, ensuring all user paths and components are covered. Make sure tests are high quality and maintainable. Make sure tests are well thought-out and cover all edge cases. Make sure tests are durable and will not break easily. Make sure all tests pass lint and type checks.
 
 Workflow:
 1. Fix broken tests (`npm run test:e2e` or `npm run test:e2e:debug` (Debug Mode)).
 2. Fix TypeScript errors (`npm run type-check:test`).
 3. Fix lint errors (`npm run lint` or `npm run lint:fix`).
 4. Create new E2E tests using Playwright to cover all user interactions, UI components, and scenarios. Use Playwright's codegen for initial test scaffolding if needed (`npx playwright codegen`).
-5. Use the Playwright MCP tools to enhance test coverage and robustness. Using the tools will help you create more effective tests that cover more scenarios and edge cases.
 
 Playwright Test Generation:
 You should use Playwright's built-in tools as much as possible for E2E testing:
