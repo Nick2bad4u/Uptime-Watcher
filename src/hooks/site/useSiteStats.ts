@@ -86,6 +86,7 @@ export function useSiteStats(history: StatusHistory[]): SiteStats {
         const upCount = history.filter(
             (record) => record.status === "up"
         ).length;
+
         const uptime = Math.round((upCount / checkCount) * 100);
 
         // Calculate average response time (only for successful "up" checks)

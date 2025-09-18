@@ -427,7 +427,7 @@ export function interpolateLogTemplate(
     variables: TemplateVariables
 ): string {
     return template.replaceAll(
-        // eslint-disable-next-line regexp/strict, regexp/require-unicode-sets-regexp -- Conflicting rules: strict wants escaped braces, require-unicode-sets wants v flag
+        // eslint-disable-next-line regexp/strict, regexp/require-unicode-sets-regexp, regexp/require-unicode-regexp -- Conflicting rules: strict wants escaped braces, require-unicode-sets wants v flag, require-unicode wants u flag
         /{(?<variableName>[$_a-z][\w$]*)}/gi,
         (match, key) => {
             // Type assertion is safe here as we're accessing with a string key

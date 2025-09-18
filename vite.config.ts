@@ -686,7 +686,7 @@ export default defineConfig(({ mode }) => {
             },
             css: {
                 exclude: [],
-                include: [/.+/],
+                include: [/.+/u],
                 modules: {
                     classNameStrategy: "stable",
                 },

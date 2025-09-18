@@ -805,6 +805,11 @@ export class MonitorManager {
                         }
                     )
                 );
+            } else {
+                // Monitor has no valid ID or is in an unknown state
+                logger.warn(
+                    `[MonitorManager] Skipping monitor without valid ID or in unknown state`
+                );
             }
         });
 

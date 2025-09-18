@@ -4,11 +4,6 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { fc } from "@fast-check/vitest";
-import {
-    createDatabaseBackup,
-    type DatabaseBackupResult,
-} from "../../../../../electron/services/database/utils/databaseBackup";
-import { BACKUP_DB_FILE_NAME } from "../../../../../electron/constants";
 
 // Mock the logger with a factory function to avoid hoisting issues
 vi.mock("../../../../../electron/utils/logger", () => ({
@@ -18,13 +13,24 @@ vi.mock("../../../../../electron/utils/logger", () => ({
     },
 }));
 
-// Import the mocked logger
-import { logger } from "../../../../../electron/utils/logger";
+// Mock node:fs module
+vi.mock("node:fs", () => ({
+    promises: {
+        readFile: vi.fn(),
+    },
+}));
 
-// Mock node:fs/promises dynamically
-let mockFs: {
-    readFile: ReturnType<typeof vi.fn>;
-};
+// Import after mocking
+import {
+    createDatabaseBackup,
+    type DatabaseBackupResult,
+} from "../../../../../electron/services/database/utils/databaseBackup";
+import { BACKUP_DB_FILE_NAME } from "../../../../../electron/constants";
+import { logger } from "../../../../../electron/utils/logger";
+import { promises as fs } from "node:fs";
+
+// Get the mocked function
+const mockReadFile = vi.mocked(fs.readFile);
 
 describe("databaseBackup.ts - Comprehensive Coverage", () => {
     const testDbPath = "/test/path/database.sqlite";
@@ -32,19 +38,11 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-
-        // Create fresh mocks for each test
-        mockFs = {
-            readFile: vi.fn(),
-        };
-
-        // Mock the dynamic import of fs/promises
-        vi.doMock("node:fs/promises", () => mockFs);
     });
+
     afterEach(() => {
         vi.clearAllMocks();
         vi.resetAllMocks();
-        vi.doUnmock("node:fs/promises");
     });
     describe("createDatabaseBackup - Success scenarios", () => {
         it("should create database backup with default filename", async ({
@@ -56,7 +54,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
-            mockFs.readFile.mockResolvedValue(testBuffer);
+            mockReadFile.mockResolvedValue(testBuffer);
             const startTime = Date.now();
 
             const result = await createDatabaseBackup(testDbPath);
@@ -71,7 +69,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             });
             expect(result.metadata.createdAt).toBeGreaterThanOrEqual(startTime);
             expect(result.metadata.createdAt).toBeLessThanOrEqual(Date.now());
-            expect(mockFs.readFile).toHaveBeenCalledWith(testDbPath);
+            expect(mockReadFile).toHaveBeenCalledWith(testDbPath);
             expect(logger.info).toHaveBeenCalledWith(
                 "[DatabaseBackup] Database backup created successfully",
                 expect.objectContaining({
@@ -92,7 +90,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             await annotate("Type: Constructor", "type");
 
             const customFileName = "custom-backup.sqlite";
-            mockFs.readFile.mockResolvedValue(testBuffer);
+            mockReadFile.mockResolvedValue(testBuffer);
 
             const result = await createDatabaseBackup(
                 testDbPath,
@@ -118,7 +116,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const emptyBuffer = Buffer.alloc(0);
-            mockFs.readFile.mockResolvedValue(emptyBuffer);
+            mockReadFile.mockResolvedValue(emptyBuffer);
 
             const result = await createDatabaseBackup(testDbPath);
 
@@ -142,7 +140,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
             const largeBuffer = Buffer.alloc(1024 * 1024 * 10); // 10MB
             largeBuffer.fill(42); // Fill with test data
-            mockFs.readFile.mockResolvedValue(largeBuffer);
+            mockReadFile.mockResolvedValue(largeBuffer);
 
             const result = await createDatabaseBackup(testDbPath);
 
@@ -168,12 +166,12 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const specialPath = "/test/path with spaces/database-файл.sqlite";
-            mockFs.readFile.mockResolvedValue(testBuffer);
+            mockReadFile.mockResolvedValue(testBuffer);
 
             const result = await createDatabaseBackup(specialPath);
 
             expect(result.metadata.originalPath).toBe(specialPath);
-            expect(mockFs.readFile).toHaveBeenCalledWith(specialPath);
+            expect(mockReadFile).toHaveBeenCalledWith(specialPath);
         });
         it("should preserve buffer content integrity", async ({
             task,
@@ -191,7 +189,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 0xcd,
                 0xef,
             ]);
-            mockFs.readFile.mockResolvedValue(binaryData);
+            mockReadFile.mockResolvedValue(binaryData);
 
             const result = await createDatabaseBackup(testDbPath);
 
@@ -215,7 +213,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     "ENOENT: no such file or directory"
                 );
                 fileError.name = "ENOENT";
-                mockFs.readFile.mockRejectedValue(fileError);
+                mockReadFile.mockRejectedValue(fileError);
 
                 await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(
                     fileError
@@ -242,7 +240,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 const permissionError = new Error("EACCES: permission denied");
                 permissionError.name = "EACCES";
-                mockFs.readFile.mockRejectedValue(permissionError);
+                mockReadFile.mockRejectedValue(permissionError);
 
                 await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(
                     permissionError
@@ -267,7 +265,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Error Handling", "type");
 
-                mockFs.readFile.mockRejectedValue("String error");
+                mockReadFile.mockRejectedValue("String error");
 
                 await expect(createDatabaseBackup(testDbPath)).rejects.toBe(
                     "String error"
@@ -294,7 +292,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 const timeoutError = new Error("Operation timed out");
                 timeoutError.name = "TIMEOUT";
-                mockFs.readFile.mockRejectedValue(timeoutError);
+                mockReadFile.mockRejectedValue(timeoutError);
 
                 await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(
                     timeoutError
@@ -321,7 +319,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 const customFileName = "error-backup.sqlite";
                 const error = new Error("File system error");
-                mockFs.readFile.mockRejectedValue(error);
+                mockReadFile.mockRejectedValue(error);
 
                 await expect(
                     createDatabaseBackup(testDbPath, customFileName)
@@ -348,11 +346,11 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                mockFs.readFile.mockResolvedValue(testBuffer);
+                mockReadFile.mockResolvedValue(testBuffer);
 
                 const result = await createDatabaseBackup("");
 
-                expect(mockFs.readFile).toHaveBeenCalledWith("");
+                expect(mockReadFile).toHaveBeenCalledWith("");
                 expect(result.metadata.originalPath).toBe("");
             });
             it("should handle very long file paths", async ({
@@ -365,12 +363,12 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const longPath = `/very/long/path/${"x".repeat(1000)}/database.sqlite`;
-                mockFs.readFile.mockResolvedValue(testBuffer);
+                mockReadFile.mockResolvedValue(testBuffer);
 
                 const result = await createDatabaseBackup(longPath);
 
                 expect(result.metadata.originalPath).toBe(longPath);
-                expect(mockFs.readFile).toHaveBeenCalledWith(longPath);
+                expect(mockReadFile).toHaveBeenCalledWith(longPath);
             });
             it("should handle empty custom filename", async ({
                 task,
@@ -381,7 +379,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                mockFs.readFile.mockResolvedValue(testBuffer);
+                mockReadFile.mockResolvedValue(testBuffer);
 
                 const result = await createDatabaseBackup(testDbPath, "");
 
@@ -406,7 +404,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const longFileName = `very-long-filename-${"x".repeat(1000)}.sqlite`;
-                mockFs.readFile.mockResolvedValue(testBuffer);
+                mockReadFile.mockResolvedValue(testBuffer);
 
                 const result = await createDatabaseBackup(
                     testDbPath,
@@ -425,7 +423,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const unicodeFileName = "backup-файл-数据库-🗃️.sqlite";
-                mockFs.readFile.mockResolvedValue(testBuffer);
+                mockReadFile.mockResolvedValue(testBuffer);
 
                 const result = await createDatabaseBackup(
                     testDbPath,
@@ -443,7 +441,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                mockFs.readFile.mockResolvedValue(testBuffer);
+                mockReadFile.mockResolvedValue(testBuffer);
 
                 const before = Date.now();
                 const result = await createDatabaseBackup(testDbPath);
@@ -468,7 +466,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Backup Operation", "type");
 
-                mockFs.readFile.mockResolvedValue(testBuffer);
+                mockReadFile.mockResolvedValue(testBuffer);
 
                 const result = await createDatabaseBackup(testDbPath);
 
@@ -493,7 +491,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Validation", "type");
 
-                mockFs.readFile.mockResolvedValue(testBuffer);
+                mockReadFile.mockResolvedValue(testBuffer);
 
                 const result = await createDatabaseBackup(
                     testDbPath,
@@ -529,7 +527,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 ];
 
                 for (const testCase of testCases) {
-                    mockFs.readFile.mockResolvedValue(testCase);
+                    mockReadFile.mockResolvedValue(testCase);
 
                     const result = await createDatabaseBackup(testDbPath);
 
@@ -555,7 +553,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                                 `test data for ${filename}`
                             );
 
-                            mockFs.readFile.mockResolvedValue(mockData);
+                            mockReadFile.mockResolvedValue(mockData);
 
                             const result = await createDatabaseBackup(testPath);
 
@@ -572,9 +570,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                             expect(result.metadata.createdAt).toBeGreaterThan(
                                 0
                             );
-                            expect(mockFs.readFile).toHaveBeenCalledWith(
-                                testPath
-                            );
+                            expect(mockReadFile).toHaveBeenCalledWith(testPath);
                         }
                     )
                 );
@@ -588,7 +584,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                             const testPath = "/test/database.sqlite";
                             const mockData = Buffer.from(dataArray);
 
-                            mockFs.readFile.mockResolvedValue(mockData);
+                            mockReadFile.mockResolvedValue(mockData);
 
                             const result = await createDatabaseBackup(testPath);
 
@@ -628,7 +624,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                             const error = new Error(`Mock error: ${errorCode}`);
                             (error as any).code = errorCode;
 
-                            mockFs.readFile.mockRejectedValue(error);
+                            mockReadFile.mockRejectedValue(error);
 
                             await expect(
                                 createDatabaseBackup(testPath)
@@ -656,7 +652,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                             const mockData = Buffer.alloc(dataSize, "x");
                             const beforeTimestamp = Date.now();
 
-                            mockFs.readFile.mockResolvedValue(mockData);
+                            mockReadFile.mockResolvedValue(mockData);
 
                             const result = await createDatabaseBackup(dbPath);
                             const afterTimestamp = Date.now();
@@ -696,7 +692,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                         async (testBuffer) => {
                             const testPath = "/edge/case/database.sqlite";
 
-                            mockFs.readFile.mockResolvedValue(testBuffer);
+                            mockReadFile.mockResolvedValue(testBuffer);
 
                             const result = await createDatabaseBackup(testPath);
 
@@ -734,7 +730,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                         async (dbPath, dataArray) => {
                             const mockData = Buffer.from(dataArray);
 
-                            mockFs.readFile.mockResolvedValue(mockData);
+                            mockReadFile.mockResolvedValue(mockData);
 
                             const result = await createDatabaseBackup(dbPath);
 

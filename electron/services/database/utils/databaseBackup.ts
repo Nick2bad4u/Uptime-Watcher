@@ -1,16 +1,15 @@
+import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 /**
  * Utilities for creating SQLite database backups.
  *
  * @remarks
  * Provides functionality to create backup copies of the SQLite database for
- * export, download, or archival purposes. Uses Node.js file system APIs with
- * lazy importing to minimize startup overhead and improve performance.
+ * export, download, or archival purposes. Uses Node.js file system APIs for
+ * reliable and efficient database backup operations.
  *
  * @public
  */
-import type { promises as fsPromises } from "node:fs";
-
-import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { promises as fs } from "node:fs";
 
 import { BACKUP_DB_FILE_NAME } from "../../../constants";
 import { logger } from "../../../utils/logger";
@@ -111,22 +110,7 @@ export async function createDatabaseBackup(
     fileName: string = BACKUP_DB_FILE_NAME
 ): Promise<DatabaseBackupResult> {
     try {
-        // Enhanced dynamic import error handling
-        let fs: typeof fsPromises | undefined = undefined;
-        try {
-            fs = await import(
-                /* WebpackChunkName: "node-fs-promises" */ "node:fs/promises"
-            );
-        } catch (importError) {
-            const errorMessage =
-                importError instanceof Error
-                    ? importError.message
-                    : "Unknown import error";
-            throw new Error(`Failed to import fs/promises: ${errorMessage}`, {
-                cause: importError,
-            });
-        }
-
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- dbPath is a validated database path parameter
         const buffer = await fs.readFile(dbPath);
         const createdAt = Date.now();
 

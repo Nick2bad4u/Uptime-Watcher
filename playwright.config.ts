@@ -128,7 +128,7 @@ const config: PlaywrightTestConfig = defineConfig({
             "html",
             {
                 open: "never", // Don't auto-open in CI
-                outputFolder: "playwright/test-results/html-report",
+                outputFolder: "playwright/reports/html-report",
             },
         ],
         [

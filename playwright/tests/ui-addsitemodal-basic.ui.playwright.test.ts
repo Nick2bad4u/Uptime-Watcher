@@ -229,8 +229,12 @@ test.describe(
                         console.log("Available elements:");
                         for (let i = 0; i < allTestIds.length; i++) {
                             const testId =
-                                await allTestIds[i].getAttribute("data-testid");
-                            console.log(`  - data-testid="${testId}"`);
+                                await allTestIds[i]?.getAttribute(
+                                    "data-testid"
+                                );
+                            console.log(
+                                `  - data-testid="${testId ?? "null"}"`
+                            );
                         }
 
                         // Log the issue but don't skip the test

@@ -189,6 +189,7 @@ export const Header = (): JSX.Element => {
     } = monitorCounts;
 
     // Calculate overall uptime percentage across all monitors
+
     const uptimePercentage =
         totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
 

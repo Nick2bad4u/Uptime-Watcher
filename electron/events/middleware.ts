@@ -257,7 +257,8 @@ export function composeMiddleware(
 
         const processNext = async (): Promise<void> => {
             if (index < middlewares.length) {
-                const middleware = middlewares[index++];
+                const middleware = middlewares[index];
+                index++;
                 if (middleware) {
                     await middleware(event, data, processNext);
                 }
@@ -750,7 +751,9 @@ export function createValidationMiddleware<T extends UnknownRecord>(
                     );
                     throw new Error(`Validation failed for event '${event}'`);
                 }
-            } else if (!result.isValid) {
+            } else if (result.isValid) {
+                // Validation passed (result.isValid === true)
+            } else {
                 const errorMsg = result.error ?? "Validation failed";
                 baseLogger.error(
                     `[EventBus] Validation failed for event '${event}': ${errorMsg}`,

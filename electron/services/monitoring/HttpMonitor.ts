@@ -92,7 +92,8 @@ class SimpleRateLimiter {
             });
 
         const startTime = Date.now();
-        for (;;) {
+        let shouldContinue = true;
+        while (shouldContinue) {
             const now = Date.now();
 
             // Prevent infinite waiting - max wait time safety check
@@ -100,18 +101,19 @@ class SimpleRateLimiter {
                 logger.warn(
                     `[SimpleRateLimiter] Max wait time exceeded for ${url}, proceeding anyway`
                 );
-                break;
+                shouldContinue = false;
+            } else {
+                const last = this.lastInvocation.get(key) ?? 0;
+                const since = now - last;
+                const needDelay = since < this.minIntervalMs;
+                if (this.active < this.maxConcurrent && !needDelay) {
+                    shouldContinue = false;
+                } else {
+                    const waitFor = needDelay ? this.minIntervalMs - since : 25;
+                    // eslint-disable-next-line no-await-in-loop -- Rate limiting requires sequential delays in monitoring loop
+                    await sleep(waitFor);
+                }
             }
-
-            const last = this.lastInvocation.get(key) ?? 0;
-            const since = now - last;
-            const needDelay = since < this.minIntervalMs;
-            if (this.active < this.maxConcurrent && !needDelay) {
-                break;
-            }
-            const waitFor = needDelay ? this.minIntervalMs - since : 25;
-            // eslint-disable-next-line no-await-in-loop -- Rate limiting requires sequential delays in monitoring loop
-            await sleep(waitFor);
         }
         this.active += 1;
         this.lastInvocation.set(key, Date.now());
