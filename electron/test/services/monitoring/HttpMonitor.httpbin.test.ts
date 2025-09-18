@@ -19,8 +19,24 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
 
     // Some runs against httpbin.org can be impacted by upstream/CDN outages.
     // Treat common transient 5xx as acceptable skips to avoid flakiness.
+    const transientNetworkErrors = new Set<string>([
+        "ECONNRESET",
+        "ECONNABORTED",
+        "ETIMEDOUT",
+        "EAI_AGAIN",
+        "ENOTFOUND",
+        "ERR_NETWORK",
+        "TimeoutError",
+        // Cloudflare/edge proxies sometimes surface 522/524
+        "522",
+        "524",
+    ]);
+
     const isTransientOutage = (code?: string): boolean =>
-        code === "502" || code === "503" || code === "504";
+        code === "502" ||
+        code === "503" ||
+        code === "504" ||
+        (code !== undefined && transientNetworkErrors.has(code));
 
     const handleTransientOutage = (
         label: string,
@@ -39,6 +55,32 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
             return true;
         }
         return false;
+    };
+
+    /**
+     * Retry wrapper for transient errors to reduce flakiness in httpbin-backed
+     * integration tests. Retries only when the result indicates a transient
+     * outage or known network blip.
+     */
+    const checkWithTransientRetry = async (
+        monitor: Site["monitors"][0],
+        label: string,
+        attempts = 2,
+        backoffMs = 300
+    ): Promise<Awaited<ReturnType<typeof httpMonitor.check>>> => {
+        let last: Awaited<ReturnType<typeof httpMonitor.check>> | undefined;
+        for (let i = 0; i < Math.max(1, attempts); i++) {
+            last = await httpMonitor.check(monitor);
+            if (!isTransientOutage(last.details)) return last;
+            if (i < attempts - 1) {
+                await new Promise((r) => setTimeout(r, backoffMs * (i + 1)));
+                console.warn(
+                    `[httpbin transient] retrying ${label} due to ${last.details} (attempt ${i + 2}/${attempts})`
+                );
+            }
+        }
+        // If still transient after retries, return last result
+        return last as Awaited<ReturnType<typeof httpMonitor.check>>;
     };
 
     beforeEach(() => {
@@ -91,7 +133,11 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                     timeout: 10_000,
                 };
 
-                const result = await httpMonitor.check(monitor);
+                const result = await checkWithTransientRetry(
+                    monitor,
+                    description,
+                    2
+                );
 
                 if (handleTransientOutage(description, result)) return;
 
@@ -128,7 +174,7 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                 timeout: 10_000,
             };
 
-            const result = await httpMonitor.check(monitor);
+            const result = await checkWithTransientRetry(monitor, "/image", 2);
 
             // This should currently fail with 406 Not Acceptable
             // We'll document the expected vs actual behavior
@@ -164,7 +210,11 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                 timeout: 10_000,
             };
 
-            const result = await httpMonitor.check(monitor);
+            const result = await checkWithTransientRetry(
+                monitor,
+                "/image/png",
+                2
+            );
             console.log(`PNG endpoint result:`, result);
 
             // PNG endpoint might be more lenient
@@ -222,7 +272,11 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                     timeout: 10_000,
                 };
 
-                const result = await httpMonitor.check(monitor);
+                const result = await checkWithTransientRetry(
+                    monitor,
+                    `status/${code}`,
+                    2
+                );
                 console.log(`Status ${code} result:`, result);
 
                 // We consider 3xx as UP. Axios may follow redirects for some endpoints,
@@ -262,7 +316,11 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                 timeout: 10_000,
             };
 
-            const result = await httpMonitor.check(monitor);
+            const result = await checkWithTransientRetry(
+                monitor,
+                "redirect/1",
+                2
+            );
             console.log(`Redirect result:`, result);
 
             if (handleTransientOutage("redirect/1", result)) return;
@@ -294,7 +352,7 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                 timeout: 10_000,
             };
 
-            const result = await httpMonitor.check(monitor);
+            const result = await checkWithTransientRetry(monitor, "delay/2", 2);
             console.log(`Delay result:`, result);
 
             if (handleTransientOutage("delay/2", result)) return;
@@ -351,7 +409,11 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                     timeout: 10_000,
                 };
 
-                const result = await httpMonitor.check(monitor);
+                const result = await checkWithTransientRetry(
+                    monitor,
+                    `content${path}`,
+                    2
+                );
                 console.log(`${description} result:`, result);
 
                 if (handleTransientOutage(`content${path}`, result)) return;

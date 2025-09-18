@@ -1,3 +1,4 @@
+/* eslint-disable playwright/no-raw-locators */
 /**
  * Monitor Type-Specific E2E Tests for Uptime Watcher.
  *
@@ -662,3 +663,5 @@ test.describe(
         );
     }
 );
+
+/* eslint-enable playwright/no-raw-locators */

@@ -51,6 +51,7 @@ const arbitraryStatusUpdate = fc.record({
     errorMessage: fc.option(arbitraryString),
     timestamp: fc
         .date({ min: new Date(1), max: new Date(Date.now() + 86_400_000) })
+        .filter((d) => Number.isFinite(d.getTime()))
         .map((d) => d.getTime()),
 });
 

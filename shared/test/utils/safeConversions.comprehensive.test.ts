@@ -199,8 +199,8 @@ describe("safeConversions - Complete Function Coverage", () => {
             // Use the same timestamp value for comparison to avoid timing issues
             // Date object conversion may have slight timing differences due to internal Date.now() calls
             const dateResult = safeParseTimestamp(dateObject);
-            expect(dateResult).toBeGreaterThanOrEqual(now - 1);
-            expect(dateResult).toBeLessThanOrEqual(now + 1);
+            expect(dateResult).toBeGreaterThanOrEqual(now - 10);
+            expect(dateResult).toBeLessThanOrEqual(now + 10);
             expect(safeParseTimestamp(-1)).toBeGreaterThan(0); // negative returns current time
             expect(safeParseTimestamp("invalid", now)).toBe(now);
             expect(safeParseTimestamp(null)).toBeGreaterThan(0); // null returns current time

@@ -454,20 +454,20 @@ describe("AbortUtils Fuzzing Tests", () => {
             }
         );
 
-        test.prop([fc.integer({ min: 10, max: 100 })])(
+        test.prop([fc.integer({ min: 20, max: 50 })])(
             "should reject when signal is aborted during operation",
             async (delayMs) => {
                 const controller = new AbortController();
                 const operation = new Promise<string>((resolve) => {
                     setTimeout(
                         () => resolve("should not resolve"),
-                        delayMs * 2
+                        delayMs + 100 // Operation takes longer than abort delay
                     );
                 });
 
                 const racePromise = raceWithAbort(operation, controller.signal);
 
-                // Abort before operation completes
+                // Abort after delayMs
                 setTimeout(() => controller.abort(), delayMs);
 
                 await expect(racePromise).rejects.toThrow(

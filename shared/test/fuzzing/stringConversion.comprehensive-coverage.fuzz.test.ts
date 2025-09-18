@@ -63,10 +63,11 @@ describe("StringConversion Complete Coverage Fuzzing Tests", () => {
             expect(typeof result).toBe("string");
 
             if (!Number.isNaN(num)) {
-                // Use reciprocal to distinguish -0 from 0
                 const back = Number(result);
                 if (Object.is(num, -0)) {
-                    expect(1 / back).toBe(-Infinity);
+                    // SafeStringify(-0) normalizes to "0"; reciprocal should be +Infinity
+                    expect(back).toBe(0);
+                    expect(1 / back).toBe(Infinity);
                 } else {
                     expect(back).toBe(num);
                 }

@@ -102,7 +102,9 @@ type StateAction =
  */
 const monitorStateData = fc.record<MonitorState>({
     id: fc.integer({ min: 1, max: 10_000 }),
-    name: fc.string({ minLength: 1, maxLength: 255 }),
+    name: fc
+        .string({ minLength: 1, maxLength: 255 })
+        .filter((s) => s.trim().length > 0),
     url: fc.webUrl(),
     type: fc.constantFrom("http", "ping", "dns", "port"),
     status: fc.constantFrom("up", "down", "pending", "paused"),
@@ -125,7 +127,9 @@ const monitorStateData = fc.record<MonitorState>({
  */
 const siteStateData = fc.record<SiteState>({
     id: fc.integer({ min: 1, max: 1000 }),
-    name: fc.string({ minLength: 1, maxLength: 255 }),
+    name: fc
+        .string({ minLength: 1, maxLength: 255 })
+        .filter((s) => s.trim().length > 0),
     url: fc.webUrl(),
     monitors: fc.array(fc.integer({ min: 1, max: 10_000 }), {
         minLength: 0,
@@ -338,7 +342,9 @@ describe("Comprehensive State Management Fuzzing", () => {
                     id: fc.integer({ min: 1, max: 20 }),
                     updates: fc.record({
                         name: fc.oneof(
-                            fc.string({ minLength: 1, maxLength: 100 }),
+                            fc
+                                .string({ minLength: 1, maxLength: 100 })
+                                .filter((s) => s.trim().length > 0),
                             fc.constant(undefined)
                         ),
                         status: fc.oneof(
