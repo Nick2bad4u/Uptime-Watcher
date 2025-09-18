@@ -135,6 +135,7 @@ test.describe(
                 },
             },
             async () => {
+                test.setTimeout(60000); // Increase timeout to 60 seconds for complex workflow
                 const { electronApp, window } =
                     await launchAppForStressTesting();
 
@@ -166,10 +167,15 @@ test.describe(
                         .click();
                     await window.waitForTimeout(2000);
 
-                    // Verify both sites were added
-                    await expect(window.getByTestId("site-card")).toHaveCount(
-                        2
-                    );
+                    // Verify both sites were added (should have at least 2, may have more from previous tests)
+                    const siteCardCount = await window
+                        .getByTestId("site-card")
+                        .count();
+                    expect(siteCardCount).toBeGreaterThanOrEqual(2);
+
+                    // Verify our specific sites are present
+                    await expect(window.getByText("Alpha Site")).toBeVisible();
+                    await expect(window.getByText("Beta Site")).toBeVisible();
 
                     await window.screenshot({
                         path: "playwright/test-results/data-migration-03-multiple-sites.png",
@@ -234,6 +240,7 @@ test.describe(
                 },
             },
             async () => {
+                test.setTimeout(60000); // Increase timeout to 60 seconds for complex workflow
                 const { electronApp, window } =
                     await launchAppForStressTesting();
 

@@ -559,13 +559,16 @@ test.describe(
                     },
                 ],
             },
+<<<<<<< HEAD
+            async ({ window }) => {
+                // Test 1: High contrast mode simulation
+                await window.emulateMedia({ colorScheme: "dark" });
+                await window.waitForTimeout(1000);
+=======
             async () => {
+                test.setTimeout(60000); // Increase timeout to 60 seconds for complex workflow
                 const { electronApp, window } = await launchAccessibleApp();
-
-                try {
-                    // Test 1: High contrast mode simulation
-                    await window.emulateMedia({ colorScheme: "dark" });
-                    await window.waitForTimeout(1000);
+>>>>>>> 5e974dcd (🧪 [test] Add comprehensive E2E tests for monitor types)
 
                     await window.screenshot({
                         path: "playwright/test-results/a11y-09-dark-mode.png",

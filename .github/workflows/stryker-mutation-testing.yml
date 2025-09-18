@@ -34,7 +34,7 @@ on:
             stryker-concurrency:
                 description: "Stryker concurrency (number of workers)"
                 required: false
-                default: "4"
+                default: "1"
             artifact-retention-days:
                 description: "Number of days to retain mutation testing artifacts (default: 30)"
                 required: false

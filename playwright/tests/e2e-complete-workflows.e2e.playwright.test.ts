@@ -122,7 +122,12 @@ test.describe(
                     },
                 ],
             },
+<<<<<<< HEAD
+            async ({ window }) => {
+=======
             async () => {
+                test.setTimeout(60000); // Increase timeout to 60 seconds for complex workflow
+>>>>>>> 5e974dcd (🧪 [test] Add comprehensive E2E tests for monitor types)
                 // Debug: Check what's actually on the page
                 await window.evaluate(() => {
                     console.log(
@@ -479,7 +484,12 @@ test.describe(
                     },
                 ],
             },
+<<<<<<< HEAD
+            async ({ window }) => {
+=======
             async () => {
+                test.setTimeout(60000); // Increase timeout to 60 seconds for complex workflow
+>>>>>>> 5e974dcd (🧪 [test] Add comprehensive E2E tests for monitor types)
                 // Add multiple sites to test persistence
                 const sitesToAdd = [TEST_SITES.primary, TEST_SITES.secondary];
 

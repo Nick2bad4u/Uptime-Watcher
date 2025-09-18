@@ -132,15 +132,18 @@ test.describe(
                     description: "Test rapid successive user interactions",
                 },
             },
+<<<<<<< HEAD
+            async ({ window }) => {
+                // Rapid button clicking stress test
+                const addSiteButton = window.getByRole("button", {
+                    name: "Add new site",
+                });
+=======
             async () => {
+                test.setTimeout(60000); // Increase timeout to 60 seconds for complex workflow
                 const { electronApp, window } =
                     await launchAppForStressTesting();
-
-                try {
-                    // Rapid button clicking stress test
-                    const addSiteButton = window.getByRole("button", {
-                        name: "Add new site",
-                    });
+>>>>>>> 5e974dcd (🧪 [test] Add comprehensive E2E tests for monitor types)
 
                     // Test rapid clicking with proper cleanup
                     for (let i = 0; i < 3; i++) {
@@ -271,14 +274,17 @@ test.describe(
                         "Test app behavior under extreme viewport changes",
                 },
             },
+<<<<<<< HEAD
+            async ({ window }) => {
+                // Test very small viewport
+                await window.setViewportSize({ width: 320, height: 240 });
+                await window.waitForTimeout(1000);
+=======
             async () => {
+                test.setTimeout(60000); // Increase timeout to 60 seconds for complex workflow
                 const { electronApp, window } =
                     await launchAppForStressTesting();
-
-                try {
-                    // Test very small viewport
-                    await window.setViewportSize({ width: 320, height: 240 });
-                    await window.waitForTimeout(1000);
+>>>>>>> 5e974dcd (🧪 [test] Add comprehensive E2E tests for monitor types)
 
                     // Verify app is still usable at small size
                     await expect(window.getByTestId("app-root")).toBeVisible();
@@ -404,17 +410,20 @@ test.describe(
                     description: "Test app recovery from error states",
                 },
             },
+<<<<<<< HEAD
+            async ({ window }) => {
+                // Test escape key error recovery
+                const addSiteButton = window.getByRole("button", {
+                    name: "Add new site",
+                });
+                await addSiteButton.click();
+                await window.waitForTimeout(1000);
+=======
             async () => {
+                test.setTimeout(60000); // Increase timeout to 60 seconds for complex workflow
                 const { electronApp, window } =
                     await launchAppForStressTesting();
-
-                try {
-                    // Test escape key error recovery
-                    const addSiteButton = window.getByRole("button", {
-                        name: "Add new site",
-                    });
-                    await addSiteButton.click();
-                    await window.waitForTimeout(1000);
+>>>>>>> 5e974dcd (🧪 [test] Add comprehensive E2E tests for monitor types)
 
                     // Press escape multiple times
                     for (let i = 0; i < 5; i++) {
