@@ -6,34 +6,253 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### ✨ New Features
 
-#### Store Method Naming Convention Standardization
+[[c5480c7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c5480c780cf9fdcb09a3eab98306adf53568c18a)...
+[c5480c7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c5480c780cf9fdcb09a3eab98306adf53568c18a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c5480c780cf9fdcb09a3eab98306adf53568c18a...c5480c780cf9fdcb09a3eab98306adf53568c18a))
 
-- **[stores]** Add standardized naming convention aliases for consistent verb taxonomy across all store methods
-  - **Settings Store**: `persistHistoryLimit()` - alias for `updateHistoryLimitValue()` with clearer persistence semantics
-  - **Sites Sync Store**:
-    - `syncSites()` - alias for `syncSitesFromBackend()` with standardized naming
-    - `fullResyncSites()` - alias for `fullSyncFromBackend()` with explicit full synchronization semantics
-  - **Sites State Store**: `selectSite()` - alias for `setSelectedSite()` with clearer action semantics
-  - **Updates Store**: `applyUpdateStatus()` - alias for `setUpdateStatus()` with explicit application behavior
-  - **Monitor Types Store**: Enhanced JSDoc documentation to clarify semantic differences between `loadMonitorTypes()` (initial load) and `refreshMonitorTypes()` (background refresh)
 
-- **[documentation]** All aliases include comprehensive JSDoc with `@remarks` sections explaining preferred usage, backward compatibility, and deprecation plans
-- **[testing]** Comprehensive unit tests ensure aliases properly delegate to original implementations with correct parameter passing and return value handling
-- **[types]** Complete TypeScript interface definitions for all new alias methods with proper parameter and return types
+### 📦 Dependencies
 
-**Migration Guide**: Original method names remain fully functional for backward compatibility. New aliases provide more consistent and descriptive naming following established patterns: `sync`/`load`/`refresh`/`update`/`set`/`persist`/`apply`/`select`. Gradual migration to new names is recommended, with original methods planned for deprecation in future releases.
+- [dependency] Update version 15.1.0 [`(c5480c7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c5480c780cf9fdcb09a3eab98306adf53568c18a)
+
+
+
+
+
+
+## [15.1.0] - 2025-09-18
 
 
 [[b51e1dc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b51e1dcc39ee25e727a33d34732dae7e7be86619)...
-[b51e1dc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b51e1dcc39ee25e727a33d34732dae7e7be86619)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b51e1dcc39ee25e727a33d34732dae7e7be86619...b51e1dcc39ee25e727a33d34732dae7e7be86619))
+[9469a25](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9469a258d4f6407fa70aa016acbf4dcf3ebef648)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b51e1dcc39ee25e727a33d34732dae7e7be86619...9469a258d4f6407fa70aa016acbf4dcf3ebef648))
+
+
+### ✨ Features
+
+- ✨ [feat] Add Playwright screenshot helpers and comprehensive testing docs
+
+- Introduces reusable screenshot utilities for Playwright tests, providing automated, consistent screenshot naming, storage, and reporting for both browser and Electron contexts.
+- Adds detailed documentation covering Playwright codegen workflows, headless Electron testing strategies, recommended codegen practices, template usage, and test script verbosity options.
+- Improves developer experience and test maintainability by standardizing test creation, output, and debugging practices across the project.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8202a3c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8202a3ca0e15dcdb8941d7a9ceeddf8feff3fdde)
+
+
+- ✨ [feat] Unifies error handling, adds shared form/modal utils, improves Playwright/E2E infra
+
+- Refactors error handling to use a shared utility for consistent messaging across backend, frontend, and tests; replaces ad-hoc error stringification with getErrorMessage everywhere.
+- Introduces new shared utilities for form validation and modal management to reduce duplication, enabling standardized handlers and validation patterns across components.
+- Updates modal escape key handling to prioritize modals and centralize logic, integrating new hook into main app and details modal.
+- Expands Playwright/E2E infrastructure: adds detailed guides, codegen template improvements, debug/test files, and corrects Electron launch logic to resolve flaky or broken test suites; increases allowed workers for local Electron tests.
+- Improves HTTP monitoring: makes Axios validateStatus always lenient to ensure all HTTP responses are analyzed (fixes false negatives for 4xx/5xx), sets default Accept header to avoid negotiation issues; adds comprehensive integration tests against httpbin endpoints.
+- Cleans up cache logic by extracting expiration handling into a shared cleanup utility, reducing code repetition and improving maintainability.
+- Updates TypeScript configs for stricter checks, dev dependencies, and proper project references; adjusts scripts for better lint, knip, markdownlint, and build commands.
+- Enhances documentation with detailed testing guides and adds references to new resources for fuzzing and Playwright coverage.
+- Fixes miscellaneous minor bugs and improves code organization and annotation in tests for coverage and maintainability.
+
+Relates to reliability and maintainability efforts; resolves E2E test flakiness and error reporting inconsistencies.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ea291a5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ea291a5a9f1c3ee0982e04178c287de0de2dfaeb)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Simplifies backup logic, removes debug tests, updates configs
+
+- Refactors database backup to use direct Node.js fs API, improving reliability and startup performance.
+- Removes Playwright debug and inspection tests to clean up the test suite and streamline CI runs.
+- Updates Playwright, ESLint, and Vite configurations for better report management and compatibility with modern code patterns.
+- Adds more robust logging and error handling for monitor and validation workflows.
+- Minor style fixes for improved code clarity and consistency.
+
+Relates to improved CI maintainability and test reliability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(14e5aee)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/14e5aee9cf531cc00d6877c13b3aadaaa4cb6496)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 15.0.0 [`(b51e1dc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b51e1dcc39ee25e727a33d34732dae7e7be86619)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Move modal visibility control and escape handling to parent
+
+- Refactors modal components to delegate visibility and close logic to parent
+- Implements centralized escape key handling in main app for all modals, improving UX consistency and simplifying modal code
+- Updates modal wrappers to use native dialog semantics via themed components and enforces open state via prop
+- Cleans up obsolete internal state, event listeners, and associated tests in modal components
+- Adjusts error handling tests to use direct console error spying for async fallback scenarios
+- Minor: bumps test bail threshold and improves style consistency for dialogs
+
+Facilitates easier modal management and composability, reduces duplication, and improves accessibility.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7f3e44e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7f3e44ef1518d41b8d801296f807b1840cbe9d26)
+
+
+- 🚜 [refactor] Consolidate error handling to shared module
+
+- Centralizes all error handling utilities in the shared module for improved consistency and maintainability
+- Updates imports across the codebase to use the shared error handling functions
+- Removes duplicate and redundant frontend error handling utilities and tests
+- Simplifies frontend error handling to rely on shared patterns, ensuring uniform behavior between frontend and backend
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(30a5b00)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/30a5b00a53ccf7fcaaeff6c4da27e59c4dc71f1b)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update chatmode and prompt files to replace 'tools' list with 'BestTools' for improved consistency across documentation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e6381dd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6381dd08ac9555f71a5cf78ed5dfa707144157f)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improve test formatting and comment readability
+
+- Updates code style in test files for better readability and consistency,
+  including array and object formatting, comment wrapping, and spacing.
+- Removes extraneous backticks and tidies multiline statements.
+- Enhances documentation clarity in template and transformation utilities.
+
+No functional changes are introduced; changes are cosmetic for maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9469a25)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9469a258d4f6407fa70aa016acbf4dcf3ebef648)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Remove legacy and redundant Playwright test suites
+
+Removes a large number of Playwright and E2E test files including accessibility, integration, navigation, performance, error handling, UI, and theme switching coverage.
+
+ - Motivated by test suite consolidation, deprecation of legacy scenarios, or migration to a new testing strategy.
+ - Reduces maintenance overhead and potential for outdated or duplicate test logic.
+ - Improves build speed and focus for future QA and automation efforts.
+
+No production code is affected; only test infrastructure is changed.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d3cc747)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d3cc7470e62ef9dc26bf028162c225d4bea1c702)
+
+
+- 🧪 [test] Add comprehensive coverage for shared utilities
+
+- Introduces exhaustive unit tests for form validation, modal handler, and error handling utilities, ensuring 100% coverage and robust input edge case handling.
+- Refactors legacy Playwright modal test to a minimal stub for easier debugging and future rework.
+- Increases input fuzzing and realistic test timeouts for AddSiteForm, improving reliability for slow environments and complex scenarios.
+- Enhances maintainability by validating all error, modal, and form logic against realistic and adversarial inputs.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7ddec26)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ddec26943be4ff7ff5296caa5008cc21d9a5183)
+
+
+- 🧪 [test] Simplifies Playwright E2E launches and stabilizes tests
+
+- Removes redundant path imports and switches all Electron launches in Playwright tests to use the project root as the entrypoint, reducing platform quirks and setup complexity.
+- Refactors and streamlines test logic for better reliability: reduces test data volume, replaces brittle selectors, and simplifies assertions for faster CI runs.
+- Adds a new basic data migration test suite to cover core data management scenarios and error handling.
+- Updates timeouts and Playwright config for more stable and consistent test execution.
+- Documents known Playwright Electron launcher warnings and clarifies comments for maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(233bcfd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/233bcfdbf6a256628124752d0c0ccb31328cd326)
+
+
+- 🧪 [test] Add comprehensive E2E UI and site management tests
+
+- Expands Playwright E2E coverage for Electron app UI, site management, and theme/settings features
+- Adds new tests for modal interactions, form validation, monitor controls, and UI persistence
+- Refactors debug tests for clarity and stability; improves test structure and assertions
+- Updates configuration to disable parallelism and enforce single worker for Electron stability
+- Broadens available toolset for prompt/chatmodes to support advanced testing and automation scenarios
+- Excludes codegen template from linting to avoid parsing errors
+
+Improves reliability, test coverage, and maintainability of UI automation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d86b695)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d86b6957ae5ab84a877f7074cec3254ed8e2c1cb)
+
+
+- 🧪 [test] Remove comprehensive Playwright E2E and integration tests
+
+Removes extensive accessibility, integration, user flow, and compatibility
+test suites from Playwright, including advanced WCAG, bulk operations,
+data migration, navigation, and cross-browser scenarios.
+
+Cleans up test configuration and references, streamlines the test environment,
+and eliminates large test files to reduce build time and maintenance overhead.
+
+Minor enhancements to existing helpers and templates for type safety and
+robustness, ensuring remaining tests run efficiently.
+
+ - Motivated by the need to simplify and focus automated test coverage.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dfae2ed)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dfae2ed51c31fb809ea8f41c49274ac03af02b5f)
+
+
+- 🧪 [test] Improve coverage, fuzzing, and error handling mocks
+
+- Expands property-based and edge-case tests for monitor validation, site sync, monitor types, and conversion utilities.
+- Refactors test mocks to consistently use injected logger/error handlers, ensuring error reporting through logger instead of console.
+- Relaxes timeouts and run counts for fuzz/property tests to improve reliability and performance.
+- Adds or corrects test IDs and props for components to support robust Playwright/E2E scenarios.
+- Updates conditional rendering of update notifications for better clarity and maintainability.
+- Preserves original monitor IDs in update logic to ensure data integrity.
+- Cleans up redundant or misordered test code, streamlining branch, line, and function coverage.
+- Ensures exclusion of dangerous prototype keys in property-based fuzzing for monitor types.
+- Improves async error handling wrappers to use safer, promise-based approaches.
+Relates to coverage and reliability improvements; no issue reference.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0802001)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/08020019d0a152b6adfe4aef807669362e54abf6)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Enforce comment capitalization and extend lint coverage
+
+- Enforces capitalized comments with exceptions for various rule-related tags, improving code readability and consistency.
+- Upgrades linting rigor by enabling additional rules for regex, import/export, React JSX, SonarJS, and total-functions, enhancing code quality and maintainability.
+- Refines comment clarity, capitalization, and disables redundant or overly strict rules where appropriate.
+- Updates global disables section and several rule descriptions for better documentation and understanding.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c66adb8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c66adb8e0bc786172a93fe9d500e560454248490)
+
+
+- 🧹 [chore] Remove lint-staged and Husky pre-commit tooling
+
+- Cleans up legacy pre-commit linting and formatting setup to streamline development workflow.
+- Deletes configuration, scripts, and dependencies related to lint-staged and Husky.
+- Updates linting rules to allow usage of certain process.env variables, improving clarity and safety in environment checks.
+- Simplifies Playwright test environment config by removing redundant test mode variable.
+- Improves maintainability and reduces unnecessary dependencies.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(59406d5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/59406d599b40fe124e25c1615a97ed3f4ac03469)
+
+
+- Update changelogs for v15.0.0 [skip ci] [`(824ed2b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/824ed2b7e235017105e6057cd72051ba97883999)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies and increase event bus listener limit
+
+- Upgrades multiple dependencies to latest versions for improved stability, compatibility, and security, including Electron, node-sqlite3-wasm, TypeScript types, Vite plugin, and Putout.
+- Updates the wasm asset and its version to match the new node-sqlite3-wasm release.
+- Raises the event bus max listeners from 50 to 60 to better support larger development setups and prevent warning spam.
+- Adds npm scripts for running fuzz tests to streamline test execution.
+
+Enhances development experience and keeps the project up-to-date with upstream improvements.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(836bae2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/836bae29a538702b60681b9fc2d80ace80d34718)
 
 
 
