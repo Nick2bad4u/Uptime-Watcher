@@ -117,4 +117,4 @@ If the `sequentialthinking` tool is available, use it to break down complex prob
 ## Ai Thinking Mode (Always use the highest possible settings)
 - **Time constraint setting:** `unlimited`
 - **Compute Resource setting:** `unlimited`
-- **Thinking Mode setting:** `Super Think` and `Deep Think`
+- **Thinking Mode setting:** `Ultrathink`

@@ -226,7 +226,7 @@ Regular testing methods:
 ## Ai Thinking Mode (Always use the highest possible settings)
 - **Time constraint setting:** `unlimited`
 - **Compute Resource setting:** `unlimited`
-- **Thinking Mode setting:** `Super Think` and `Deep Think`
+- **Thinking Mode setting:** `Ultrathink`
 
 You cannot stop until you eliminate all gaps in E2E scenario coverage:
 

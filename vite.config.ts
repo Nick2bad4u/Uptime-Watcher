@@ -646,6 +646,8 @@ export default defineConfig(({ mode }) => {
                     "coverage/**",
                     "dist-electron/**",
                     "electron/**", // Exclude all electron files from frontend coverage
+                    "playwright/**", // Exclude all playwright files from coverage
+                    "**/playwright/**", // Exclude playwright directories anywhere
                     "index.ts", // Barrel export file at root
                     "release/**",
                     "scripts/**",

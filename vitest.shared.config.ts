@@ -84,6 +84,9 @@ const vitestConfig = defineConfig({
                 // Frontend & Electron (broad excludes; replace with selective entries if desired)
                 "src/**",
                 "electron/**",
+                // Playwright exclusions
+                "playwright/**", // Exclude all playwright files from coverage
+                "**/playwright/**", // Exclude playwright directories anywhere
                 // Shared tests and general test/spec patterns
                 "shared/test/**",
                 "shared/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
