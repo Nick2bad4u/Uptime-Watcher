@@ -634,9 +634,7 @@ describe("Settings - Branch Coverage Tests", () => {
             const errorWithMessage = { message: "Detailed error message" };
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
-                fullResyncSites: vi
-                    .fn()
-                    .mockRejectedValue(errorWithMessage),
+                fullResyncSites: vi.fn().mockRejectedValue(errorWithMessage),
             });
 
             render(<Settings onClose={mockOnClose} />);
@@ -779,9 +777,9 @@ describe("Settings - Branch Coverage Tests", () => {
             );
             fireEvent.change(historySelect, { target: { value: "200" } });
 
-            expect(
-                mockSettingsStore.persistHistoryLimit
-            ).toHaveBeenCalledWith(200);
+            expect(mockSettingsStore.persistHistoryLimit).toHaveBeenCalledWith(
+                200
+            );
         });
 
         it("should handle close button clicks", async ({ task, annotate }) => {

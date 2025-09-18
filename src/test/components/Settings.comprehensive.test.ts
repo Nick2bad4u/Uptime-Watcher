@@ -123,9 +123,7 @@ describe("Settings Component Coverage Tests", () => {
 
             expect(typeof settingsStore.resetSettings).toBe("function");
             expect(typeof settingsStore.settings).toBe("object");
-            expect(typeof settingsStore.persistHistoryLimit).toBe(
-                "function"
-            );
+            expect(typeof settingsStore.persistHistoryLimit).toBe("function");
             expect(typeof settingsStore.updateSettings).toBe("function");
 
             expect(settingsStore.settings.autoStart).toBeFalsy();

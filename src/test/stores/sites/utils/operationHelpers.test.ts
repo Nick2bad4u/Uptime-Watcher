@@ -359,9 +359,7 @@ describe("OperationHelpers", () => {
 
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             const syncError = new Error("Sync failed");
-            mockDeps.syncSites = vi
-                .fn()
-                .mockRejectedValue(syncError);
+            mockDeps.syncSites = vi.fn().mockRejectedValue(syncError);
             const params = { siteId: "site1" };
 
             // Mock withErrorHandling to execute and re-throw sync error
@@ -520,9 +518,7 @@ describe("OperationHelpers", () => {
             const expectedResult = { data: "test result" };
             const mockOperation = vi.fn().mockResolvedValue(expectedResult);
             const syncError = new Error("Sync failed");
-            mockDeps.syncSites = vi
-                .fn()
-                .mockRejectedValue(syncError);
+            mockDeps.syncSites = vi.fn().mockRejectedValue(syncError);
             const params = { siteId: "site1" };
 
             // Mock withErrorHandling to execute and re-throw sync error

@@ -24,7 +24,7 @@ const config = {
         skipFull: false, // Show all results
     },
 
-    concurrency: 10, // Reduce concurrency to avoid resource conflicts
+    concurrency: 1, // Reduce concurrency to avoid resource conflicts
 
     // ⚡ COVERAGE ANALYSIS - Note: Vitest runner ignores this and forces "perTest" (optimal)
     coverageAnalysis: "perTest",

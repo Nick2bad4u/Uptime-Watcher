@@ -228,18 +228,14 @@ describe("useSitesStore Function Coverage Tests", () => {
                 success: true,
                 data: [],
             });
-            mockElectronAPI.stateSync.syncSites.mockResolvedValueOnce(
-                {
-                    success: true,
-                    data: [],
-                }
-            );
-            mockElectronAPI.stateSync.fullResyncSites.mockResolvedValueOnce(
-                {
-                    success: true,
-                    data: [],
-                }
-            );
+            mockElectronAPI.stateSync.syncSites.mockResolvedValueOnce({
+                success: true,
+                data: [],
+            });
+            mockElectronAPI.stateSync.fullResyncSites.mockResolvedValueOnce({
+                success: true,
+                data: [],
+            });
 
             // Test sync functions
             const syncStatus = await store.getSyncStatus();

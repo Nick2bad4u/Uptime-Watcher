@@ -170,7 +170,11 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle array errors", () => {
-            const error = [1, 2, 3];
+            const error = [
+                1,
+                2,
+                3,
+            ];
             const result = ensureError(error);
             expect(result).toBeInstanceOf(Error);
             expect(result.message).toBe("1,2,3");
@@ -344,7 +348,14 @@ describe("100% Coverage Edge Cases", () => {
 
     describe("Type Guard Edge Cases", () => {
         it("should handle various falsy values", () => {
-            const falsyValues = [null, undefined, false, 0, "", Number.NaN];
+            const falsyValues = [
+                null,
+                undefined,
+                false,
+                0,
+                "",
+                Number.NaN,
+            ];
 
             for (const value of falsyValues) {
                 if (value === null || value === undefined) {
@@ -356,7 +367,14 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle various truthy values", () => {
-            const truthyValues = [true, 1, "test", [], {}, Symbol("test")];
+            const truthyValues = [
+                true,
+                1,
+                "test",
+                [],
+                {},
+                Symbol("test"),
+            ];
 
             for (const value of truthyValues) {
                 expect(isNullOrUndefined(value)).toBeFalsy();
@@ -372,7 +390,11 @@ describe("100% Coverage Edge Cases", () => {
                         error: "deeply nested error",
                     },
                 },
-                array: [1, 2, 3],
+                array: [
+                    1,
+                    2,
+                    3,
+                ],
                 toString: () => "Custom toString",
             };
 

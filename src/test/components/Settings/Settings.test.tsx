@@ -268,9 +268,7 @@ describe("Settings Component", () => {
         );
         fireEvent.change(input, { target: { value: "500" } });
 
-        expect(mockSettingsStore.persistHistoryLimit).toHaveBeenCalledWith(
-            500
-        );
+        expect(mockSettingsStore.persistHistoryLimit).toHaveBeenCalledWith(500);
     });
 
     it("should handle reset settings", ({ task, annotate }) => {

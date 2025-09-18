@@ -410,8 +410,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             fc.array(arbitraries.site, { minLength: 2, maxLength: 5 }),
         ])("should handle rapid site selection changes", (sites) => {
             // Act - rapidly change selections
-            for (const site of sites)
-                useUIStore.getState().selectSite(site);
+            for (const site of sites) useUIStore.getState().selectSite(site);
 
             // Assert - last selection should win
             const lastSite = sites.at(-1);

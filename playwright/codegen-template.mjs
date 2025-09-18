@@ -14,11 +14,14 @@
 
 // Template for generated test files
 /**
- * Template string for generating Playwright test files with lint-compliant structure.
+ * Template string for generating Playwright test files with lint-compliant
+ * structure.
  *
  * @param {string} testName - The name of the test suite.
  * @param {string} testTitle - The title of the individual test.
- * @param {string} testBody - The body of the test containing Playwright actions and assertions.
+ * @param {string} testBody - The body of the test containing Playwright actions
+ *   and assertions.
+ *
  * @usage
  * Replace {{testName}}, {{testTitle}}, and {{testBody}} with appropriate values when generating a test file.
  */
@@ -75,7 +78,8 @@ const locatorTransforms = /** @type {Record<string, string>} */ ({
     'locator("h6")': 'getByRole("heading", { level: 6 })',
     'locator("header")': 'getByRole("banner")',
     'locator("input[type=email]")': 'getByRole("textbox", { name: /email/i })',
-    'locator("input[type=password]")': 'getByRole("textbox", { name: /password/i })',
+    'locator("input[type=password]")':
+        'getByRole("textbox", { name: /password/i })',
     'locator("input[type=search]")': 'getByRole("searchbox")',
     'locator("input[type=text]")': 'getByRole("textbox")',
     'locator("input[type=url]")': 'getByRole("textbox", { name: /url/i })',
@@ -180,6 +184,7 @@ const titleTransforms = /** @type {Record<string, string>} */ ({
  * Post-processing function to apply all transformations.
  *
  * @param {string} codegenOutput - The generated test code to transform.
+ *
  * @returns {string} The transformed, lint-compliant test code.
  */
 function applyLintCompliantTransforms(codegenOutput) {
@@ -250,11 +255,12 @@ function applyLintCompliantTransforms(codegenOutput) {
             testCases.length > 0 && testCases[0]
                 ? testCases[0].code.match(/test\("([^"]+)"/)
                 : null;
-        const describeName = firstTestTitleMatch && firstTestTitleMatch[1]
-            ? firstTestTitleMatch[1]
-                .replace(/^should\s+/, "")
-                .replace(/\s+/g, " ")
-            : "Generated Test";
+        const describeName =
+            firstTestTitleMatch && firstTestTitleMatch[1]
+                ? firstTestTitleMatch[1]
+                      .replace(/^should\s+/, "")
+                      .replace(/\s+/g, " ")
+                : "Generated Test";
 
         // Insert describe block after last import
         let insertionIndex = lastImportMatch
@@ -300,10 +306,10 @@ function applyLintCompliantTransforms(codegenOutput) {
 }
 
 /**
- * @module playwright/codegen-template
- *
  * @remarks
  * Exports the custom Playwright codegen template and transformation utilities.
+ *
+ * @module playwright/codegen-template
  *
  * @exports applyLintCompliantTransforms - Applies all locator and title transformations, wraps tests in describe blocks, and post-processes generated code for lint compliance.
  * @exports locatorTransforms - Maps raw locator strings to semantic alternatives for improved readability and maintainability.

@@ -74,7 +74,11 @@ describe("Fallback Utils Property-Based Tests", () => {
             retryAttempts: fc.option(fc.integer({ min: 0, max: 10 })),
         },
         {
-            requiredKeys: ["id", "type", "status"],
+            requiredKeys: [
+                "id",
+                "type",
+                "status",
+            ],
         }
     ) as fc.Arbitrary<Monitor>;
 
@@ -141,7 +145,12 @@ describe("Fallback Utils Property-Based Tests", () => {
         });
 
         it("should handle edge case falsy values correctly", () => {
-            const falsyValues = [0, "", false, Number.NaN];
+            const falsyValues = [
+                0,
+                "",
+                false,
+                Number.NaN,
+            ];
             for (const value of falsyValues) {
                 expect(isNullOrUndefined(value)).toBeFalsy();
             }
@@ -647,9 +656,14 @@ describe("Fallback Utils Property-Based Tests", () => {
         it("should generate reasonable labels for unknown monitor types", () => {
             fc.assert(
                 fc.property(
-                    fc
-                        .string({ minLength: 1, maxLength: 20 })
-                        .filter((s) => !["http", "ping", "port"].includes(s)),
+                    fc.string({ minLength: 1, maxLength: 20 }).filter(
+                        (s) =>
+                            ![
+                                "http",
+                                "ping",
+                                "port",
+                            ].includes(s)
+                    ),
                     (unknownType) => {
                         const result = getMonitorTypeDisplayLabel(unknownType);
                         expect(typeof result).toBe("string");
@@ -676,7 +690,15 @@ describe("Fallback Utils Property-Based Tests", () => {
         });
 
         it("should handle invalid input gracefully", () => {
-            const invalidInputs = ["", null, undefined, 123, true, {}, []];
+            const invalidInputs = [
+                "",
+                null,
+                undefined,
+                123,
+                true,
+                {},
+                [],
+            ];
 
             for (const input of invalidInputs) {
                 const result = getMonitorTypeDisplayLabel(input as any);
