@@ -206,6 +206,12 @@ export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
             return;
         }
 
+        // Handle negative or invalid values by resolving immediately
+        if (!Number.isFinite(ms) || ms <= 0) {
+            resolve();
+            return;
+        }
+
         const timeoutId = setTimeout(() => {
             resolve();
         }, ms);

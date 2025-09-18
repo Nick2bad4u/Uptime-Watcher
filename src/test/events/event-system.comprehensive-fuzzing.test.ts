@@ -94,6 +94,8 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
     beforeEach(() => {
         eventBus = new TypedEventBus<UptimeEvents>("test-bus");
+        // Increase max listeners for fuzzing tests that create many listeners
+        eventBus.setMaxListeners(2000);
     });
 
     describe("TypedEventBus Core Functionality", () => {
