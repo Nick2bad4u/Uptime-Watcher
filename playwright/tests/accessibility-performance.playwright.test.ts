@@ -7,13 +7,7 @@
  * @file Playwright tests for accessibility and performance validation
  */
 
-import {
-    test,
-    expect,
-    _electron as electron,
-    type ElectronApplication,
-    type Page,
-} from "@playwright/test";
+import { test, expect } from "../fixtures/electron-test";
 import { ensureCleanState } from "../utils/modal-cleanup";
 
 test.describe(
@@ -30,26 +24,8 @@ test.describe(
         },
     },
     () => {
-        let electronApp: ElectronApplication;
-        let window: Page;
-
-        test.beforeEach(async () => {
-            electronApp = await electron.launch({
-                args: ["."],
-                env: {
-                    ...process.env,
-                    NODE_ENV: "test",
-                },
-            });
-            window = await electronApp.firstWindow();
-            await window.waitForLoadState("domcontentloaded");
+        test.beforeEach(async ({ window }) => {
             await ensureCleanState(window);
-        });
-
-        test.afterEach(async () => {
-            if (electronApp) {
-                await electronApp.close();
-            }
         });
 
         test(
@@ -61,7 +37,7 @@ test.describe(
                     description: "Tests semantic HTML structure",
                 },
             },
-            async () => {
+            async ({ window }) => {
                 // Wait for app to be fully loaded
                 await expect(window.getByTestId("app-root")).toBeVisible({
                     timeout: 15000,
@@ -99,7 +75,7 @@ test.describe(
                     description: "Tests ARIA attributes and roles",
                 },
             },
-            async () => {
+            async ({ window }) => {
                 // Check for interactive elements with proper ARIA
                 const buttons = window.getByRole("button");
                 const textboxes = window.getByRole("textbox");
@@ -146,7 +122,7 @@ test.describe(
                     description: "Tests keyboard navigation support",
                 },
             },
-            async () => {
+            async ({ window }) => {
                 // Test Tab key navigation
                 await window.keyboard.press("Tab");
 
@@ -198,7 +174,7 @@ test.describe(
                     description: "Tests focus indicator visibility",
                 },
             },
-            async () => {
+            async ({ window }) => {
                 // Find focusable elements using semantic locators
                 const buttons = window.getByRole("button");
 
@@ -224,7 +200,7 @@ test.describe(
                     description: "Tests color contrast compliance",
                 },
             },
-            async () => {
+            async ({ window }) => {
                 // Get text elements and check their contrast using semantic locators
                 const headings = window.getByRole("heading");
                 const buttons = window.getByRole("button");
@@ -278,7 +254,7 @@ test.describe(
                     description: "Tests application load performance",
                 },
             },
-            async () => {
+            async ({ window }) => {
                 const startTime = Date.now();
 
                 // Reload page to measure load time
@@ -308,7 +284,7 @@ test.describe(
                     description: "Tests DOM efficiency and structure",
                 },
             },
-            async () => {
+            async ({ window }) => {
                 // Check DOM node count
                 const nodeCount = await window.evaluate(() => {
                     return document.querySelectorAll("*").length;
@@ -348,7 +324,7 @@ test.describe(
                     description: "Tests memory usage efficiency",
                 },
             },
-            async () => {
+            async ({ window }) => {
                 // Test memory usage through multiple interactions
                 const initialMemory = await window.evaluate(() => {
                     return (performance as any).memory?.usedJSHeapSize || 0;
@@ -384,7 +360,7 @@ test.describe(
                     description: "Tests screen reader compatibility",
                 },
             },
-            async () => {
+            async ({ window }) => {
                 // Check for proper document title
                 const title = await window.title();
                 expect(title).toBeTruthy();
@@ -422,7 +398,7 @@ test.describe(
                     description: "Tests high contrast mode support",
                 },
             },
-            async () => {
+            async ({ window }) => {
                 // Test if the application respects OS high contrast preferences
                 const supportsHighContrast = await window.evaluate(() => {
                     // Check if CSS supports prefers-contrast media query

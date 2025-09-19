@@ -373,9 +373,7 @@ export async function waitForMonitorCount(
         if (currentCount === expectedCount) {
             return;
         }
-        await page.waitForFunction(() => Date.now() > Date.now() + 500, {
-            timeout: 600,
-        });
+        await page.waitForTimeout(500);
     }
 
     throw new Error(

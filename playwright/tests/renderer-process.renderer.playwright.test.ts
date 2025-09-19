@@ -6,7 +6,7 @@
  * React frontend and user interactions.
  */
 
-import { test, expect, _electron as electron } from "@playwright/test";
+import { test, expect } from "../fixtures/electron-test";
 
 test.describe(
     "electron renderer process",
@@ -38,21 +38,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
-
-                // Get the main window
-                const window = await electronApp.firstWindow();
-
-                // Wait for the page to load completely
-                await window.waitForLoadState("domcontentloaded");
-
+            async ({ window }) => {
                 // Wait for React app to initialize - check for root element
                 await expect(window.getByTestId("app-root")).toBeVisible({
                     timeout: 15000,
@@ -67,8 +53,6 @@ test.describe(
                 await window.screenshot({
                     path: "playwright/test-results/renderer-ui.png",
                 });
-
-                await electronApp.close();
             }
         );
 
@@ -88,18 +72,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
-
-                const window = await electronApp.firstWindow();
-                await window.waitForLoadState("domcontentloaded");
-
+            async ({ window }) => {
                 // Wait for React to hydrate (look for React-specific elements)
                 const hasReactRoot = await window.evaluate(() => {
                     // Check if React has mounted
@@ -108,8 +81,6 @@ test.describe(
                 });
 
                 expect(hasReactRoot).toBe(true);
-
-                await electronApp.close();
             }
         );
 
@@ -133,18 +104,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
-
-                const window = await electronApp.firstWindow();
-                await window.waitForLoadState("domcontentloaded");
-
+            async ({ window }) => {
                 // Wait a bit for the app to fully initialize
                 await window.waitForTimeout(2000);
 
@@ -155,8 +115,6 @@ test.describe(
 
                 // Should have some interactive elements
                 expect(clickableElements).toBeGreaterThan(0);
-
-                await electronApp.close();
             }
         );
 
@@ -176,18 +134,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
-
-                const window = await electronApp.firstWindow();
-                await window.waitForLoadState("domcontentloaded");
-
+            async ({ window }) => {
                 // Get initial viewport size - may be null initially
                 // Don't assert initial viewport since it may be null for Electron windows
 
@@ -216,8 +163,6 @@ test.describe(
                 expect(bounds).toBeTruthy();
                 expect(bounds?.width).toBeGreaterThan(0);
                 expect(bounds?.height).toBeGreaterThan(0);
-
-                await electronApp.close();
             }
         );
 
@@ -237,18 +182,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
-
-                const window = await electronApp.firstWindow();
-                await window.waitForLoadState("domcontentloaded");
-
+            async ({ window }) => {
                 // Check if dev tools can be accessed with timeout
                 try {
                     const canOpenDevTools = await Promise.race([
@@ -286,8 +220,6 @@ test.describe(
 
                 // Always succeed - dev tools availability is environment dependent
                 expect(electronApp).toBeTruthy();
-
-                await electronApp.close();
             }
         );
     }

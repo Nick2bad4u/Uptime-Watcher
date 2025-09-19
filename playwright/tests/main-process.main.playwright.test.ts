@@ -5,8 +5,7 @@
  * communication, and Electron APIs.
  */
 
-import { test, expect } from "@playwright/test";
-import { launchElectronApp } from "../fixtures/electron-helpers";
+import { test, expect } from "../fixtures/electron-test";
 
 test.describe(
     "electron main process",
@@ -34,9 +33,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await launchElectronApp();
-
+            async ({ electronApp }) => {
                 // Test app module
                 const appPath = await electronApp.evaluate(async ({ app }) => {
                     return app.getAppPath();
@@ -56,8 +53,6 @@ test.describe(
                 expect(processInfo.platform).toBeTruthy();
                 expect(processInfo.arch).toBeTruthy();
                 expect(processInfo.version).toMatch(/^v\d+\.\d+\.\d+/);
-
-                await electronApp.close();
             }
         );
 
@@ -77,9 +72,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await launchElectronApp();
-
+            async ({ electronApp }) => {
                 // Get the main window (not directly used but needed for proper window management)
                 await electronApp.firstWindow();
 
@@ -99,8 +92,6 @@ test.describe(
                 expect(bounds).toHaveProperty("height");
                 expect(bounds).toHaveProperty("x");
                 expect(bounds).toHaveProperty("y");
-
-                await electronApp.close();
             }
         );
 
@@ -120,9 +111,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await launchElectronApp();
-
+            async ({ electronApp }) => {
                 // Test app ready state
                 const readyState = await electronApp.evaluate(
                     async ({ app }) => {
@@ -137,8 +126,6 @@ test.describe(
                 expect(readyState.isReady).toBe(true);
                 expect(readyState.name).toBeTruthy();
                 expect(readyState.locale).toBeTruthy();
-
-                await electronApp.close();
             }
         );
 
@@ -158,9 +145,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await launchElectronApp();
-
+            async ({ electronApp }) => {
                 // Get system information
                 const systemInfo = await electronApp.evaluate(
                     async ({ app }) => {
@@ -180,8 +165,6 @@ test.describe(
                 expect(Array.isArray(systemInfo.preferredSystemLanguages)).toBe(
                     true
                 );
-
-                await electronApp.close();
             }
         );
     }

@@ -6,7 +6,7 @@
  * monitoring functionality.
  */
 
-import { test, expect, _electron as electron } from "@playwright/test";
+import { test, expect } from "../fixtures/electron-test";
 
 test.describe(
     "site management - core user flows",
@@ -42,18 +42,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
-
-                const window = await electronApp.firstWindow();
-                await window.waitForLoadState("domcontentloaded");
-
+            async ({ window }) => {
                 // Wait for React app to fully initialize
                 await expect(window.getByTestId("app-root")).toBeVisible({
                     timeout: 15000,
@@ -87,7 +76,6 @@ test.describe(
                     fullPage: true,
                 });
 
-                await electronApp.close();
             }
         );
 
@@ -107,18 +95,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
-
-                const window = await electronApp.firstWindow();
-                await window.waitForLoadState("domcontentloaded");
-
+            async ({ window }) => {
                 await expect(window.getByTestId("app-root")).toBeVisible({
                     timeout: 15000,
                 });
@@ -143,7 +120,6 @@ test.describe(
                     fullPage: true,
                 });
 
-                await electronApp.close();
             }
         );
 
@@ -163,18 +139,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
-
-                const window = await electronApp.firstWindow();
-                await window.waitForLoadState("domcontentloaded");
-
+            async ({ window }) => {
                 await expect(window.getByTestId("app-root")).toBeVisible({
                     timeout: 15000,
                 });
@@ -198,7 +163,6 @@ test.describe(
                     fullPage: true,
                 });
 
-                await electronApp.close();
             }
         );
 
@@ -218,18 +182,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
-
-                const window = await electronApp.firstWindow();
-                await window.waitForLoadState("domcontentloaded");
-
+            async ({ window }) => {
                 await expect(window.getByTestId("app-root")).toBeVisible({
                     timeout: 15000,
                 });
@@ -263,7 +216,6 @@ test.describe(
                     fullPage: true,
                 });
 
-                await electronApp.close();
             }
         );
 
@@ -283,18 +235,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
-
-                const window = await electronApp.firstWindow();
-                await window.waitForLoadState("domcontentloaded");
-
+            async ({ window }) => {
                 await expect(window.getByTestId("app-root")).toBeVisible({
                     timeout: 15000,
                 });
@@ -329,7 +270,6 @@ test.describe(
                     fullPage: true,
                 });
 
-                await electronApp.close();
             }
         );
 
@@ -349,18 +289,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
-
-                const window = await electronApp.firstWindow();
-                await window.waitForLoadState("domcontentloaded");
-
+            async ({ window }) => {
                 await expect(window.getByTestId("app-root")).toBeVisible({
                     timeout: 15000,
                 });
@@ -391,7 +320,6 @@ test.describe(
                     fullPage: true,
                 });
 
-                await electronApp.close();
             }
         );
 
@@ -411,18 +339,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
-                });
-
-                const window = await electronApp.firstWindow();
-                await window.waitForLoadState("domcontentloaded");
-
+            async ({ window }) => {
                 await expect(window.getByTestId("app-root")).toBeVisible({
                     timeout: 15000,
                 });
@@ -460,7 +377,6 @@ test.describe(
                     fullPage: true,
                 });
 
-                await electronApp.close();
             }
         );
     }
