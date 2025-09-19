@@ -97,8 +97,8 @@ const config: PlaywrightTestConfig = defineConfig({
             use: {
                 ...devices["Desktop Chrome"],
                 // Comprehensive E2E testing configuration
-                viewport: { height: 1080, width: 1920 },
                 actionTimeout: 30 * 1000, // 30 seconds for actions in comprehensive tests
+                viewport: { height: 1080, width: 1920 },
             },
         },
         {

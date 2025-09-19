@@ -230,7 +230,7 @@ const result = methodName(value);
 
 - `ErrorType`: When this error occurs
 
-````
+````text
 
 ### Tutorial Documents
 

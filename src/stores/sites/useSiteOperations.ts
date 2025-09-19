@@ -117,6 +117,7 @@ export const createSiteOperationsActions = (
 
                 const response =
                     await window.electronAPI.sites.addSite(completeSite);
+                // eslint-disable-next-line ex/no-unhandled -- Error handled by withSiteOperation's withErrorHandling wrapper
                 const newSite = extractIpcData<Site>(response);
                 deps.addSite(newSite);
             },
@@ -199,6 +200,7 @@ export const createSiteOperationsActions = (
             "initializeSites",
             async () => {
                 const response = await window.electronAPI.sites.getSites();
+                // eslint-disable-next-line ex/no-unhandled -- Error handled by withSiteOperationReturning's withErrorHandling wrapper
                 const sites = extractIpcData<Site[]>(response);
                 deps.setSites(sites);
                 return {

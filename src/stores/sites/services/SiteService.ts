@@ -48,6 +48,7 @@ export const SiteService = {
     async addSite(site: Site): Promise<Site> {
         await this.initialize();
         const response = await window.electronAPI.sites.addSite(site);
+        // eslint-disable-next-line ex/no-unhandled -- Error handled by caller's withErrorHandling wrapper
         return extractIpcData<Site>(response);
     },
 
@@ -94,6 +95,7 @@ export const SiteService = {
     }> {
         await this.initialize();
         const response = await window.electronAPI.data.downloadSQLiteBackup();
+        // eslint-disable-next-line ex/no-unhandled -- Error handled by caller's withErrorHandling wrapper
         return extractIpcData<{
             buffer: ArrayBuffer;
             fileName: string;
@@ -117,6 +119,7 @@ export const SiteService = {
     async getSites(): Promise<Site[]> {
         await this.initialize();
         const response = await window.electronAPI.sites.getSites();
+        // eslint-disable-next-line ex/no-unhandled -- Error handled by caller's withErrorHandling wrapper
         return extractIpcData<Site[]>(response);
     },
 

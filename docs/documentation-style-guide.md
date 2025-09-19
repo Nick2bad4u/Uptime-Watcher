@@ -262,7 +262,7 @@ Brief description of what the project does.
 
 ### API Documentation
 
-````markdown
+`````markdown
 # API Reference
 
 ## Overview
@@ -292,11 +292,13 @@ const result = methodName(value);
 // Usage example
 const result = methodName(value);
 ````
+`````
 
 **Throws:**
 
 - `ErrorType`: When this error occurs
-````
+
+````text
 
 ### Tutorial Documents
 
@@ -324,7 +326,7 @@ More instructions...
 ## Next steps
 
 What to do after completing the tutorial.
-```
+````
 
 ### Architecture Decision Records (ADRs)
 

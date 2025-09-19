@@ -12,7 +12,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { HttpMonitor } from "../../../services/monitoring/HttpMonitor";
-import type { Site } from "@shared/types";
+import type { Site } from "../../../../shared/types";
 
 describe("HTTP Monitor - httpbin.org Integration Tests", () => {
     let httpMonitor: HttpMonitor;

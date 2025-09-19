@@ -7,8 +7,8 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Site } from "@shared/types";
-import { useSitesStore } from "@app/stores/sites/useSitesStore";
+import type { Site } from "../../../../shared/types";
+import { useSitesStore } from "../../../stores/sites/useSitesStore";
 
 // Mock the electron API
 const mockElectronAPI = {
