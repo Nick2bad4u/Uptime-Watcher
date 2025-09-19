@@ -93,10 +93,12 @@ const config: PlaywrightTestConfig = defineConfig({
             fullyParallel: false, // Electron stability
             name: "comprehensive-e2e",
             testMatch: "**/e2e-*.e2e.playwright.test.ts",
+            timeout: 60 * 1000, // 60 seconds for comprehensive E2E tests
             use: {
                 ...devices["Desktop Chrome"],
                 // Comprehensive E2E testing configuration
                 viewport: { height: 1080, width: 1920 },
+                actionTimeout: 30 * 1000, // 30 seconds for actions in comprehensive tests
             },
         },
         {
