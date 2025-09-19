@@ -47,6 +47,11 @@ on:
                 description: "Minimum mutation score threshold to pass (default: 60)"
                 required: false
                 default: "60"
+            allow-test-failures:
+                description: "Allow mutation testing to run even if some tests fail (default: false)"
+                required: false
+                default: false
+                type: boolean
 
 # Limit concurrency to avoid running multiple mutation tests simultaneously
 # The concurrency group uses `${{ github.ref }}` so that only one mutation test runs per branch or PR at a time.
@@ -105,8 +110,12 @@ jobs:
             - name: Run test suite
               id: run-tests
               shell: pwsh
+              env:
+                  # 🚀 Allocate more memory for CI environment
+                  NODE_OPTIONS: --max_old_space_size=8192
               run: |
                   Write-Host "🧪 Running test suite to validate baseline..."
+                  Write-Host "💾 Node memory allocation set to 8GB for CI environment"
                   try {
                       npm test
                       Write-Host "✅ All tests passed!"
@@ -145,31 +154,43 @@ jobs:
                   echo "" >> $env:GITHUB_STEP_SUMMARY
                   echo "Fix these test failures and re-run the workflow." >> $env:GITHUB_STEP_SUMMARY
 
-            # MODIFIED: Conditionally run Stryker only if tests passed
+            # MODIFIED: Conditionally run Stryker only if tests passed OR if test failures are explicitly allowed
             # Uses the output from the test step to skip if tests failed
             - name: Run Stryker mutation testing
-              if: steps.run-tests.outputs.tests_status == 'passed' # Only run if tests passed
+              if: steps.run-tests.outputs.tests_status == 'passed' || github.event.inputs.allow-test-failures == 'true' # Run if tests passed OR failures allowed
               env:
                   # 🔑 Dashboard API Key - Set this as a repository secret
                   STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
                   # 📊 GitHub Actions automatically provides these for dashboard reporting
                   # GITHUB_REPOSITORY and GITHUB_SHA are automatically available
                   CI: true
+                  # 🚀 Allocate additional memory for Stryker mutation testing in CI
+                  NODE_OPTIONS: --max_old_space_size=8192
               shell: pwsh
               run: |
                   Write-Host "🧬 Starting Stryker mutation testing..."
                   Write-Host "📊 Project: github.com/${{ github.repository }}"
                   Write-Host "🏷️ Version: ${{ github.ref_name }}-${{ github.sha }}"
                   Write-Host "📁 Reports will be saved to: reports/mutation/"
+                  Write-Host "💾 Node memory allocation set to 8GB for CI environment"
+
+                  # Check if running with test failures allowed
+                  if ("${{ github.event.inputs.allow-test-failures }}" -eq "true" -and "${{ steps.run-tests.outputs.tests_status }}" -eq "failed") {
+                    Write-Host "⚠️  NOTICE: Running mutation testing despite test failures (explicitly allowed)"
+                    Write-Host "🔧 Results may be unreliable due to failing baseline tests"
+                  }
 
                   # Run Stryker with dashboard reporting enabled
-                  # Use workflow input or default to 4
+                  # Use workflow input with conservative default of 1 for CI stability
                   $CONCURRENCY = "${{ github.event.inputs.stryker-concurrency }}"
                   if ([string]::IsNullOrEmpty($CONCURRENCY)) {
-                    $CONCURRENCY = "4"
+                    $CONCURRENCY = "1"
                   }
-                  Write-Host "Using Stryker concurrency: $CONCURRENCY"
-                  npx stryker run --concurrency "$CONCURRENCY"
+                  Write-Host "🔧 Using Stryker concurrency: $CONCURRENCY (optimized for CI)"
+
+                  # Add additional performance optimizations for CI
+                  Write-Host "⚡ Applying CI performance optimizations..."
+                  npx stryker run --concurrency "$CONCURRENCY" --logLevel warn --fileLogLevel error
               continue-on-error: true
 
             - name: Verify Stryker report files

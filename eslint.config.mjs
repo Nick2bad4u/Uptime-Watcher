@@ -35,6 +35,7 @@ import vitest from "@vitest/eslint-plugin";
 import gitignore from "eslint-config-flat-gitignore";
 import eslintConfigPrettier from "eslint-config-prettier";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import * as eslintMdx from 'eslint-mdx';
 import antfu from "eslint-plugin-antfu";
 import arrayFunc from "eslint-plugin-array-func";
 import pluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
@@ -584,10 +585,49 @@ export default [
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.mdx"],
+        languageOptions: {
+            ecmaVersion: 'latest',
+            globals: {
+                React: false,
+            },
+            parser: eslintMdx,
+            sourceType: 'module',
+        },
         name: "MDX - **/*.MDX",
         plugins: { mdx: mdx },
         rules: {
             ...mdx.flat.rules,
+            ...mdx.flatCodeBlocks.rules,
+            // Core Plugin ESLint Rules (Basic JavaScript)
+            "no-var": "error",
+            "prefer-const": "error",
+        },
+        settings: {
+            processor: mdx.createRemarkProcessor({
+                // Optional, same as the `parserOptions.ignoreRemarkConfig`, you have to specify it twice unfortunately
+                ignoreRemarkConfig: true,
+                // Optional, if you want to disable language mapper, set it to `false`
+                // If you want to override the default language mapper inside, you can provide your own
+                languageMapper: {},
+                lintCodeBlocks: true,
+                // Optional, same as the `parserOptions.remarkConfigPath`, you have to specify it twice unfortunately
+                // RemarkConfigPath: "path/to/your/remarkrc",
+            }),
+        },
+    },
+    {
+        files: ["**/*.mdx"],
+        languageOptions: {
+            ecmaVersion: 'latest',
+            globals: {
+                React: false,
+            },
+            parser: eslintMdx,
+            sourceType: 'module',
+        },
+        name: "MDX - **/*.MDX (Code Blocks)",
+        plugins: { mdx: mdx },
+        rules: {
             ...mdx.flatCodeBlocks.rules,
             // Core Plugin ESLint Rules (Basic JavaScript)
             "no-var": "error",

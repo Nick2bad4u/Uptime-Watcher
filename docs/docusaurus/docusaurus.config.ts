@@ -371,6 +371,12 @@ const config: Config = {
             playgroundPosition: "bottom",
         },
 
+        mermaid: {
+            options: {
+                configFile: "../../mermaid.config.json",
+            },
+            theme: { dark: "dark", light: "neutral" },
+        },
         metadata: [
             {
                 content:
@@ -437,12 +443,6 @@ const config: Config = {
             darkTheme: prismThemes.dracula,
             defaultLanguage: "typescript",
             theme: prismThemes.github,
-        },
-        mermaid: {
-            theme: { dark: "dark", light: "neutral" },
-            options: {
-                configFile: "../../mermaid.config.json",
-            },
         },
         zoom: {
             background: {

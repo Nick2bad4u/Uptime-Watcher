@@ -1,0 +1,264 @@
+import Layout from '@theme/Layout';
+import Mermaid from '@theme/Mermaid';
+
+export default function MonitoringWorkflows() {
+  return (
+    <Layout
+      title="Monitoring Workflows"
+      description="Detailed monitoring workflows and processes for Uptime Watcher"
+    >
+      <div className="container margin-vert--lg">
+        <div className="row">
+          <div className="col">
+
+# Monitoring Workflows
+
+This page showcases the various monitoring workflows and processes used in Uptime Watcher.
+
+## Site Monitoring Lifecycle
+
+This flowchart shows the complete lifecycle of monitoring a site from creation to deletion:
+
+<Mermaid value={`flowchart TD
+    Start([User Wants to Monitor Site]) --> Input[Enter Site Details]
+    Input --> Validate{Validate Input}
+    Validate -->|Invalid| Error[Show Error Message]
+    Error --> Input
+    Validate -->|Valid| Create[Create Site Record]
+    Create --> Configure[Configure Monitor Settings]
+    Configure --> Schedule[Schedule Monitoring]
+
+    Schedule --> Monitor{Monitor Site}
+    Monitor -->|Success| LogSuccess[Log Success Result]
+    Monitor -->|Failure| LogFailure[Log Failure Result]
+    Monitor -->|Timeout| LogTimeout[Log Timeout Result]
+
+    LogSuccess --> Store[Store in Database]
+    LogFailure --> Store
+    LogTimeout --> Store
+
+    Store --> Notify{Send Notifications?}
+    Notify -->|Yes| SendNotification[Send Alert/Email]
+    Notify -->|No| Wait[Wait for Next Interval]
+    SendNotification --> Wait
+
+    Wait --> Check{Site Still Active?}
+    Check -->|Yes| Monitor
+    Check -->|No| Cleanup[Cleanup Resources]
+    Cleanup --> End([Monitoring Stopped])
+
+    %% Styling
+    classDef startEnd fill:#e1f5fe,stroke:#0277bd,color:#000000
+    classDef process fill:#e8f5e8,stroke:#2e7d32,color:#000000
+    classDef decision fill:#fff3e0,stroke:#ef6c00,color:#000000
+    classDef error fill:#ffebee,stroke:#c62828,color:#000000
+    classDef data fill:#f3e5f5,stroke:#7b1fa2,color:#000000
+
+    class Start,End startEnd
+    class Input,Create,Configure,Schedule,LogSuccess,LogFailure,LogTimeout,SendNotification,Wait,Cleanup process
+    class Validate,Monitor,Notify,Check decision
+    class Error error
+    class Store data`} />
+
+## Monitor Type Decision Tree
+
+This diagram helps users choose the appropriate monitor type for their needs:
+
+<Mermaid value={`flowchart TD
+    Start([What do you want to monitor?]) --> Type{Type of Resource}
+
+    Type -->|Website/API| Web[Web Resource]
+    Type -->|Server/Service| Server[Server Resource]
+    Type -->|Domain/DNS| DNS[DNS Resource]
+
+    Web --> WebType{What aspect?}
+    WebType -->|Availability| HTTP[HTTP Monitor]
+    WebType -->|Response Content| HTTPContent[HTTP with Content Check]
+    WebType -->|API Endpoints| API[API Monitor]
+
+    Server --> ServerType{What service?}
+    ServerType -->|Network Connectivity| Ping[Ping Monitor]
+    ServerType -->|Specific Port| Port[Port Monitor]
+    ServerType -->|Multiple Services| Multi[Multiple Monitors]
+
+    DNS --> DNSType{What to check?}
+    DNSType -->|Domain Resolution| DNSBasic[Basic DNS Monitor]
+    DNSType -->|Specific Records| DNSRecord[DNS Record Monitor]
+    DNSType -->|DNS Server| DNSServer[DNS Server Monitor]
+
+    HTTP --> HTTPConfig[Configure:<br/>• URL<br/>• Method<br/>• Expected Status<br/>• Headers]
+    HTTPContent --> ContentConfig[Configure:<br/>• URL<br/>• Expected Content<br/>• Regex Patterns<br/>• Response Validation]
+    API --> APIConfig[Configure:<br/>• Endpoint<br/>• Authentication<br/>• Payload<br/>• Response Schema]
+
+    Ping --> PingConfig[Configure:<br/>• Host/IP<br/>• Packet Count<br/>• Timeout<br/>• Interval]
+    Port --> PortConfig[Configure:<br/>• Host/IP<br/>• Port Number<br/>• Protocol (TCP/UDP)<br/>• Timeout]
+    Multi --> MultiConfig[Configure:<br/>• Multiple Monitor Types<br/>• Dependency Rules<br/>• Grouping Logic]
+
+    DNSBasic --> DNSBasicConfig[Configure:<br/>• Domain Name<br/>• Expected IP<br/>• DNS Server<br/>• Timeout]
+    DNSRecord --> DNSRecordConfig[Configure:<br/>• Domain<br/>• Record Type<br/>• Expected Value<br/>• DNS Server]
+    DNSServer --> DNSServerConfig[Configure:<br/>• DNS Server IP<br/>• Test Queries<br/>• Response Time<br/>• Uptime Threshold]
+
+    %% Styling
+    classDef startNode fill:#e1f5fe,stroke:#0277bd,color:#000000
+    classDef decision fill:#fff3e0,stroke:#ef6c00,color:#000000
+    classDef monitorType fill:#e8f5e8,stroke:#2e7d32,color:#000000
+    classDef config fill:#f3e5f5,stroke:#7b1fa2,color:#000000
+
+    class Start startNode
+    class Type,WebType,ServerType,DNSType decision
+    class Web,Server,DNS,HTTP,HTTPContent,API,Ping,Port,Multi,DNSBasic,DNSRecord,DNSServer monitorType
+    class HTTPConfig,ContentConfig,APIConfig,PingConfig,PortConfig,MultiConfig,DNSBasicConfig,DNSRecordConfig,DNSServerConfig config`} />
+
+## Error Handling and Recovery Flow
+
+This diagram shows how the system handles errors and implements recovery strategies:
+
+<Mermaid value={`stateDiagram-v2
+    [*] --> Monitoring : Start Monitor
+
+    Monitoring --> Success : Check Passed
+    Monitoring --> Warning : Partial Failure
+    Monitoring --> Critical : Total Failure
+    Monitoring --> Timeout : Request Timeout
+
+    Success --> Monitoring : Continue Monitoring
+    Success --> AlertResolved : Send Resolution Alert
+    AlertResolved --> Monitoring
+
+    Warning --> RetryLogic : Implement Retry
+    RetryLogic --> Success : Retry Successful
+    RetryLogic --> Critical : Retry Failed
+    RetryLogic --> Warning : Partial Recovery
+
+    Critical --> ErrorAnalysis : Analyze Error
+    ErrorAnalysis --> NetworkIssue : Network Problem
+    ErrorAnalysis --> ServiceDown : Service Unavailable
+    ErrorAnalysis --> ConfigError : Configuration Issue
+
+    NetworkIssue --> RetryWithBackoff : Exponential Backoff
+    ServiceDown --> AlertCritical : Send Critical Alert
+    ConfigError --> AlertConfig : Send Config Alert
+
+    RetryWithBackoff --> Success : Network Recovered
+    RetryWithBackoff --> Critical : Network Still Down
+
+    AlertCritical --> Monitoring : Continue Monitoring
+    AlertConfig --> ManualIntervention : Requires Admin
+
+    Timeout --> TimeoutRetry : Retry with Longer Timeout
+    TimeoutRetry --> Success : Timeout Resolved
+    TimeoutRetry --> Critical : Still Timing Out
+
+    ManualIntervention --> Monitoring : Issue Resolved
+    ManualIntervention --> [*] : Monitor Disabled
+
+    Critical --> [*] : Max Retries Exceeded
+    Success --> [*] : Monitor Stopped`} />
+
+## Data Flow and Caching Strategy
+
+This diagram illustrates how data flows through the system and caching strategies:
+
+<Mermaid value={`graph TB
+    subgraph "Frontend Layer"
+        UI[User Interface]
+        Cache[Browser Cache]
+        Store[Zustand Store]
+    end
+
+    subgraph "IPC Layer"
+        Bridge[Context Bridge]
+        Queue[Request Queue]
+    end
+
+    subgraph "Backend Layer"
+        Router[Request Router]
+        Validator[Input Validator]
+
+        subgraph "Service Layer"
+            SiteService[Site Service]
+            MonitorService[Monitor Service]
+            CacheService[Cache Service]
+        end
+
+        subgraph "Data Layer"
+            Repository[Repository Layer]
+            L1Cache[L1 Cache<br/>Memory]
+            L2Cache[L2 Cache<br/>Redis-like]
+        end
+
+        Database[(SQLite Database)]
+    end
+
+    subgraph "External"
+        Network[Network Targets]
+    end
+
+    %% Data Flow
+    UI --> Store
+    Store --> Cache
+    Store --> Bridge
+    Bridge --> Queue
+    Queue --> Router
+    Router --> Validator
+
+    Validator --> SiteService
+    Validator --> MonitorService
+
+    SiteService --> CacheService
+    MonitorService --> CacheService
+
+    CacheService --> L1Cache
+    L1Cache --> L2Cache
+    L2Cache --> Repository
+    Repository --> Database
+
+    %% Monitoring Flow
+    MonitorService --> Network
+    Network --> MonitorService
+
+    %% Cache Hit Paths
+    CacheService -.->|Cache Hit| L1Cache
+    L1Cache -.->|Cache Miss| L2Cache
+    L2Cache -.->|Cache Miss| Repository
+
+    %% Response Flow
+    Repository -.-> L2Cache
+    L2Cache -.-> L1Cache
+    L1Cache -.-> CacheService
+    CacheService -.-> MonitorService
+    MonitorService -.-> Router
+    Router -.-> Queue
+    Queue -.-> Bridge
+    Bridge -.-> Store
+    Store -.-> UI
+
+    %% Cache Invalidation
+    MonitorService -.->|Invalidate| CacheService
+    SiteService -.->|Invalidate| CacheService
+
+    %% Styling
+    classDef frontend fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef ipc fill:#ea580c,stroke:#c2410c,color:#ffffff
+    classDef backend fill:#059669,stroke:#047857,color:#ffffff
+    classDef cache fill:#7c3aed,stroke:#5b21b6,color:#ffffff
+    classDef database fill:#dc2626,stroke:#b91c1c,color:#ffffff
+    classDef external fill:#f59e0b,stroke:#d97706,color:#ffffff
+
+    class UI,Cache,Store frontend
+    class Bridge,Queue ipc
+    class Router,Validator,SiteService,MonitorService backend
+    class CacheService,L1Cache,L2Cache cache
+    class Repository,Database database
+    class Network external`} />
+
+---
+
+These workflow diagrams provide detailed insights into how Uptime Watcher processes monitoring tasks, handles errors, and manages data flow throughout the system.
+
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+}

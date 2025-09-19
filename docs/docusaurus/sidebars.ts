@@ -105,6 +105,46 @@ const sidebars: SidebarsConfig = {
             type: "category",
         },
         {
+            className: "sb-cat-charts",
+            collapsed: false,
+            customProps: { badge: "visual" },
+            items: [
+                {
+                    href: "/Uptime-Watcher/system-architecture",
+                    label: "🏗️ System Architecture",
+                    type: "link",
+                },
+                {
+                    href: "/Uptime-Watcher/monitoring-workflows",
+                    label: "🔄 Monitoring Workflows",
+                    type: "link",
+                },
+                {
+                    href: "/Uptime-Watcher/data-models",
+                    label: "🗄️ Data Models",
+                    type: "link",
+                },
+                {
+                    href: "/Uptime-Watcher/deployment-infrastructure",
+                    label: "🚀 Deployment & Infrastructure",
+                    type: "link",
+                },
+                {
+                    href: "/Uptime-Watcher/performance-metrics",
+                    label: "📊 Performance Metrics",
+                    type: "link",
+                },
+            ],
+            label: "📈 Interactive Charts",
+            link: {
+                description:
+                    "Interactive Mermaid diagrams showcasing system architecture, workflows, and data models.",
+                title: "Interactive Charts & Diagrams",
+                type: "generated-index",
+            },
+            type: "category",
+        },
+        {
             className: "sb-cat-tsdoc",
             collapsed: true,
             customProps: { badge: "docs" },

@@ -1,0 +1,415 @@
+import Layout from '@theme/Layout';
+import Mermaid from '@theme/Mermaid';
+
+export default function DataModels() {
+    return (
+        <Layout
+            title="Data Models & Database Schema"
+            description="Database schema and data models for Uptime Watcher"
+        >
+            <div className="container margin-vert--lg">
+                <div className="row">
+                    <div className="col">
+
+                        # Data Models & Database Schema
+
+                        This page visualizes the database schema and data relationships in Uptime Watcher.
+
+                        ## Entity Relationship Diagram
+
+                        This diagram shows the relationships between different entities in the database:
+
+                        <Mermaid value={`erDiagram
+    SITES ||--o{ MONITORS : has
+    SITES ||--o{ HISTORY : generates
+    MONITORS ||--o{ HISTORY : creates
+    MONITORS ||--o{ MONITOR_CONFIGS : configures
+    USERS ||--o{ SITES : owns
+    USERS ||--|| SETTINGS : has
+    SITES ||--o{ NOTIFICATIONS : triggers
+    MONITOR_CONFIGS ||--o{ MONITOR_TEMPLATES : uses
+
+    SITES {
+        string id PK
+        string name
+        string url
+        string description
+        boolean active
+        timestamp created_at
+        timestamp updated_at
+        string user_id FK
+        json metadata
+    }
+
+    MONITORS {
+        string id PK
+        string site_id FK
+        string type
+        json configuration
+        boolean enabled
+        int interval_minutes
+        int timeout_seconds
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    HISTORY {
+        string id PK
+        string site_id FK
+        string monitor_id FK
+        string status
+        int response_time_ms
+        string details
+        json metadata
+        timestamp timestamp
+        timestamp created_at
+    }
+
+    MONITOR_CONFIGS {
+        string id PK
+        string monitor_id FK
+        string config_key
+        string config_value
+        string data_type
+        boolean encrypted
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    USERS {
+        string id PK
+        string username
+        string email
+        string password_hash
+        json preferences
+        timestamp created_at
+        timestamp last_login
+    }
+
+    SETTINGS {
+        string id PK
+        string user_id FK
+        string theme
+        json notification_preferences
+        json dashboard_layout
+        json global_settings
+        timestamp updated_at
+    }
+
+    NOTIFICATIONS {
+        string id PK
+        string site_id FK
+        string type
+        string title
+        string message
+        string status
+        json recipients
+        timestamp sent_at
+        timestamp created_at
+    }
+
+    MONITOR_TEMPLATES {
+        string id PK
+        string name
+        string monitor_type
+        json default_config
+        string description
+        boolean public
+        timestamp created_at
+    }`} />
+
+                        ## Monitor Configuration Schema
+
+                        This diagram shows the structure of monitor configurations for different monitor types:
+
+                        <Mermaid value={`classDiagram
+    class MonitorConfig {
+        <<interface>>
+        +id: string
+        +name: string
+        +type: MonitorType
+        +interval: number
+        +timeout: number
+        +enabled: boolean
+        +validate(): boolean
+    }
+
+    class HttpMonitorConfig {
+        +url: string
+        +method: HttpMethod
+        +headers: Map~string, string~
+        +body?: string
+        +expectedStatus: number[]
+        +followRedirects: boolean
+        +validateSSL: boolean
+        +userAgent?: string
+        +basicAuth?: BasicAuth
+    }
+
+    class DnsMonitorConfig {
+        +hostname: string
+        +recordType: DnsRecordType
+        +expectedValue?: string
+        +dnsServer?: string
+        +validateDNSSEC: boolean
+    }
+
+    class PingMonitorConfig {
+        +hostname: string
+        +packetCount: number
+        +packetSize: number
+        +ipVersion: 4 | 6
+    }
+
+    class PortMonitorConfig {
+        +hostname: string
+        +port: number
+        +protocol: 'tcp' | 'udp'
+        +banner?: string
+        +expectBanner?: boolean
+    }
+
+    class BasicAuth {
+        +username: string
+        +password: string
+    }
+
+    class MonitorResult {
+        +status: 'up' | 'down' | 'warning'
+        +responseTime: number
+        +timestamp: Date
+        +details: string
+        +metadata: Map~string, any~
+        +error?: Error
+    }
+
+    MonitorConfig <|-- HttpMonitorConfig
+    MonitorConfig <|-- DnsMonitorConfig
+    MonitorConfig <|-- PingMonitorConfig
+    MonitorConfig <|-- PortMonitorConfig
+
+    HttpMonitorConfig *-- BasicAuth : contains
+    MonitorConfig ..> MonitorResult : produces
+
+    class AlertConfig {
+        +enabled: boolean
+        +channels: AlertChannel[]
+        +conditions: AlertCondition[]
+        +cooldownMinutes: number
+        +escalation: EscalationRule[]
+    }
+
+    class AlertChannel {
+        <<enumeration>>
+        EMAIL
+        WEBHOOK
+        SLACK
+        DISCORD
+        SMS
+    }
+
+    class AlertCondition {
+        +metric: string
+        +operator: ComparisonOperator
+        +threshold: number
+        +duration: number
+    }
+
+    MonitorConfig *-- AlertConfig : has
+    AlertConfig *-- AlertChannel : uses
+    AlertConfig *-- AlertCondition : defines`} />
+
+                        ## State Management Data Flow
+
+                        This diagram shows how data flows through the application's state management system:
+
+                        <Mermaid value={`graph TB
+    subgraph "Frontend State"
+        UI[UI Components]
+
+        subgraph "Stores"
+            SiteStore[Site Store]
+            MonitorStore[Monitor Store]
+            HistoryStore[History Store]
+            SettingsStore[Settings Store]
+            UIStore[UI Store]
+        end
+
+        subgraph "Derived State"
+            SiteStats[Site Statistics]
+            MonitorStatus[Monitor Status]
+            AlertSummary[Alert Summary]
+        end
+    end
+
+    subgraph "IPC Layer"
+        IPCBridge[IPC Bridge]
+        EventBus[Event Bus]
+    end
+
+    subgraph "Backend State"
+        ServiceState[Service State]
+        CacheLayer[Cache Layer]
+
+        subgraph "Repositories"
+            SiteRepo[Site Repository]
+            MonitorRepo[Monitor Repository]
+            HistoryRepo[History Repository]
+            SettingsRepo[Settings Repository]
+        end
+
+        Database[(Database)]
+    end
+
+    %% UI to Store connections
+    UI --> SiteStore
+    UI --> MonitorStore
+    UI --> HistoryStore
+    UI --> SettingsStore
+    UI --> UIStore
+
+    %% Store to derived state
+    SiteStore --> SiteStats
+    MonitorStore --> MonitorStatus
+    SiteStore --> AlertSummary
+    MonitorStore --> AlertSummary
+
+    %% Store to IPC
+    SiteStore --> IPCBridge
+    MonitorStore --> IPCBridge
+    HistoryStore --> IPCBridge
+    SettingsStore --> IPCBridge
+
+    %% IPC to Backend
+    IPCBridge --> EventBus
+    EventBus --> ServiceState
+    ServiceState --> CacheLayer
+
+    %% Cache to Repositories
+    CacheLayer --> SiteRepo
+    CacheLayer --> MonitorRepo
+    CacheLayer --> HistoryRepo
+    CacheLayer --> SettingsRepo
+
+    %% Repositories to Database
+    SiteRepo --> Database
+    MonitorRepo --> Database
+    HistoryRepo --> Database
+    SettingsRepo --> Database
+
+    %% Reverse data flow (events)
+    Database -.-> HistoryRepo
+    HistoryRepo -.-> CacheLayer
+    CacheLayer -.-> ServiceState
+    ServiceState -.-> EventBus
+    EventBus -.-> IPCBridge
+    IPCBridge -.-> HistoryStore
+    HistoryStore -.-> UI
+
+    %% Real-time updates
+    ServiceState -.-> EventBus
+    EventBus -.-> IPCBridge
+    IPCBridge -.-> MonitorStore
+    MonitorStore -.-> MonitorStatus
+    MonitorStatus -.-> UI
+
+    %% Styling
+    classDef frontend fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef state fill:#10b981,stroke:#059669,color:#ffffff
+    classDef derived fill:#f59e0b,stroke:#d97706,color:#ffffff
+    classDef ipc fill:#ef4444,stroke:#dc2626,color:#ffffff
+    classDef backend fill:#8b5cf6,stroke:#7c3aed,color:#ffffff
+    classDef data fill:#6b7280,stroke:#4b5563,color:#ffffff
+
+    class UI frontend
+    class SiteStore,MonitorStore,HistoryStore,SettingsStore,UIStore state
+    class SiteStats,MonitorStatus,AlertSummary derived
+    class IPCBridge,EventBus ipc
+    class ServiceState,CacheLayer backend
+    class SiteRepo,MonitorRepo,HistoryRepo,SettingsRepo,Database data`} />
+
+                        ## Data Transformation Pipeline
+
+                        This flowchart shows how raw monitoring data is processed and transformed:
+
+                        <Mermaid value={`flowchart LR
+    subgraph "Data Collection"
+        Monitor[Monitor Execution]
+        RawResult[Raw Monitor Result]
+        Timestamp[Add Timestamp]
+    end
+
+    subgraph "Data Validation"
+        Validate[Validate Result]
+        Sanitize[Sanitize Data]
+        Enrich[Enrich Metadata]
+    end
+
+    subgraph "Data Processing"
+        Transform[Transform Format]
+        Aggregate[Calculate Aggregates]
+        Index[Create Indexes]
+    end
+
+    subgraph "Data Storage"
+        Cache[Update Cache]
+        Database[Store in DB]
+        Backup[Backup Data]
+    end
+
+    subgraph "Data Distribution"
+        Notify[Send Notifications]
+        Update[Update UI]
+        Export[Export Metrics]
+    end
+
+    Monitor --> RawResult
+    RawResult --> Timestamp
+    Timestamp --> Validate
+
+    Validate --> Sanitize
+    Sanitize --> Enrich
+
+    Enrich --> Transform
+    Transform --> Aggregate
+    Aggregate --> Index
+
+    Index --> Cache
+    Cache --> Database
+    Database --> Backup
+
+    Database --> Notify
+    Cache --> Update
+    Database --> Export
+
+    %% Error handling
+    Validate -->|Invalid| ErrorLog[Log Error]
+    ErrorLog --> Retry[Retry Logic]
+    Retry -->|Success| Sanitize
+    Retry -->|Failed| Discard[Discard Result]
+
+    %% Styling
+    classDef collection fill:#e1f5fe,stroke:#0277bd,color:#000000
+    classDef validation fill:#e8f5e8,stroke:#2e7d32,color:#000000
+    classDef processing fill:#fff3e0,stroke:#ef6c00,color:#000000
+    classDef storage fill:#f3e5f5,stroke:#7b1fa2,color:#000000
+    classDef distribution fill:#ffebee,stroke:#c62828,color:#000000
+    classDef error fill:#fce4ec,stroke:#ad1457,color:#000000
+
+    class Monitor,RawResult,Timestamp collection
+    class Validate,Sanitize,Enrich validation
+    class Transform,Aggregate,Index processing
+    class Cache,Database,Backup storage
+    class Notify,Update,Export distribution
+    class ErrorLog,Retry,Discard error`} />
+
+                        ---
+
+                        These data model diagrams provide a comprehensive view of how information is structured, stored, and flows through the Uptime Watcher system.
+
+                    </div>
+                </div>
+            </div>
+        </Layout>
+    );
+}

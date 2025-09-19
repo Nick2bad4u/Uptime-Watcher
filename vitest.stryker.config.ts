@@ -146,7 +146,7 @@ const config: UserConfig = defineConfig({
         poolOptions: {
             threads: {
                 isolate: true, // Isolate tests for better reliability
-                maxThreads: 4, // Conservative limit for Stryker compatibility
+                maxThreads: 2, // Reduced from 4 for better CI stability and memory usage
                 minThreads: 1, // Ensure at least one thread
                 singleThread: false, // Enable multi-threading but limited
                 useAtomics: true,

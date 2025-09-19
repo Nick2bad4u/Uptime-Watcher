@@ -1,0 +1,280 @@
+import Layout from '@theme/Layout';
+import Mermaid from '@theme/Mermaid';
+
+export default function SystemArchitecture() {
+  return (
+    <Layout
+      title="System Architecture Overview"
+      description="Comprehensive system architecture and component relationships for Uptime Watcher"
+    >
+      <div className="container margin-vert--lg">
+        <div className="row">
+          <div className="col">
+
+# System Architecture Overview
+
+This page provides a comprehensive view of the Uptime Watcher system architecture using interactive Mermaid diagrams.
+
+## High-Level System Architecture
+
+The following diagram shows the overall system architecture and how the main components interact:
+
+<Mermaid value={`graph TB
+    %% Main Application Layer
+    UI[Frontend UI<br/>React + TypeScript]
+    Store[State Management<br/>Zustand Stores]
+
+    %% IPC Communication
+    IPC[IPC Bridge<br/>Secure Context Bridge]
+
+    %% Electron Main Process
+    Main[Electron Main Process]
+    Services[Service Container<br/>Dependency Injection]
+
+    %% Core Services
+    Monitor[Monitor Manager<br/>HTTP/DNS/Ping/Port]
+    Site[Site Manager<br/>CRUD Operations]
+    Config[Configuration Manager<br/>Settings & Preferences]
+    DB[Database Manager<br/>SQLite Operations]
+
+    %% Database & Storage
+    SQLite[(SQLite Database<br/>Sites, History, Settings)]
+
+    %% External Systems
+    Network[Network Resources<br/>Monitored Sites]
+
+    %% UI Components
+    UI --> Store
+    Store --> IPC
+    IPC --> Main
+
+    %% Main Process Services
+    Main --> Services
+    Services --> Monitor
+    Services --> Site
+    Services --> Config
+    Services --> DB
+
+    %% Database Operations
+    DB --> SQLite
+
+    %% External Monitoring
+    Monitor --> Network
+
+    %% Data Flow
+    SQLite -.-> Site
+    Site -.-> Store
+    Monitor -.-> Store
+
+    %% Styling
+    classDef frontend fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef backend fill:#059669,stroke:#047857,color:#ffffff
+    classDef database fill:#dc2626,stroke:#b91c1c,color:#ffffff
+    classDef external fill:#7c3aed,stroke:#5b21b6,color:#ffffff
+    classDef ipc fill:#ea580c,stroke:#c2410c,color:#ffffff
+
+    class UI,Store frontend
+    class Main,Services,Monitor,Site,Config,DB backend
+    class SQLite database
+    class Network external
+    class IPC ipc`} />
+
+## Component Interaction Flow
+
+This diagram illustrates how different components interact during a typical monitoring cycle:
+
+<Mermaid value={`sequenceDiagram
+    participant UI as Frontend UI
+    participant Store as Zustand Store
+    participant IPC as IPC Bridge
+    participant MM as Monitor Manager
+    participant SM as Site Manager
+    participant DB as Database
+    participant Net as Network
+
+    Note over UI, Net: Site Monitoring Cycle
+
+    UI->>Store: User adds new site
+    Store->>IPC: Create site request
+    IPC->>SM: Validate & create site
+    SM->>DB: Store site configuration
+    DB-->>SM: Confirm storage
+    SM-->>Store: Site created successfully
+    Store-->>UI: Update site list
+
+    Note over MM, Net: Monitoring Process
+
+    MM->>DB: Get active sites
+    DB-->>MM: Return site list
+    MM->>Net: Monitor site health
+    Net-->>MM: Return health status
+    MM->>DB: Store monitoring result
+    MM->>Store: Broadcast status update
+    Store-->>UI: Update site status
+
+    Note over UI, DB: Data Persistence
+
+    UI->>Store: View site history
+    Store->>IPC: Request history data
+    IPC->>SM: Get site history
+    SM->>DB: Query historical data
+    DB-->>SM: Return history records
+    SM-->>Store: History data
+    Store-->>UI: Display charts`} />
+
+## Monitor Type Hierarchy
+
+This diagram shows the different types of monitors and their relationships:
+
+<Mermaid value={`classDiagram
+    class BaseMonitor {
+        <<abstract>>
+        +id: string
+        +name: string
+        +url: string
+        +interval: number
+        +timeout: number
+        +monitor(): Promise~MonitorResult~
+        +validate(): boolean
+    }
+
+    class HttpMonitor {
+        +method: HttpMethod
+        +headers: Record~string, string~
+        +expectedStatus: number[]
+        +followRedirects: boolean
+        +monitor(): Promise~MonitorResult~
+    }
+
+    class DnsMonitor {
+        +recordType: DnsRecordType
+        +expectedValue: string
+        +dnsServer: string
+        +monitor(): Promise~MonitorResult~
+    }
+
+    class PingMonitor {
+        +packetCount: number
+        +packetSize: number
+        +monitor(): Promise~MonitorResult~
+    }
+
+    class PortMonitor {
+        +port: number
+        +protocol: 'tcp' | 'udp'
+        +monitor(): Promise~MonitorResult~
+    }
+
+    class MonitorResult {
+        +status: 'up' | 'down'
+        +responseTime: number
+        +timestamp: Date
+        +details: string
+        +error?: Error
+    }
+
+    BaseMonitor <|-- HttpMonitor
+    BaseMonitor <|-- DnsMonitor
+    BaseMonitor <|-- PingMonitor
+    BaseMonitor <|-- PortMonitor
+
+    HttpMonitor ..> MonitorResult : returns
+    DnsMonitor ..> MonitorResult : returns
+    PingMonitor ..> MonitorResult : returns
+    PortMonitor ..> MonitorResult : returns
+
+    class MonitorFactory {
+        +createMonitor(type, config): BaseMonitor
+        +getAvailableTypes(): string[]
+    }
+
+    MonitorFactory ..> BaseMonitor : creates`} />
+
+## State Management Architecture
+
+This diagram shows how state is managed across the application:
+
+<Mermaid value={`graph TB
+    subgraph "Frontend State Management"
+        UI[React Components]
+
+        subgraph "Zustand Stores"
+            SiteStore[Sites Store<br/>Site data & operations]
+            MonitorStore[Monitor Store<br/>Monitor types & configs]
+            SettingsStore[Settings Store<br/>User preferences]
+            UIStore[UI Store<br/>Interface state]
+            ErrorStore[Error Store<br/>Error handling]
+        end
+
+        subgraph "Store Services"
+            SiteService[Site Service<br/>Site operations]
+            MonitorService[Monitor Service<br/>Monitor operations]
+        end
+    end
+
+    subgraph "IPC Communication"
+        ContextBridge[Context Bridge<br/>Secure IPC]
+    end
+
+    subgraph "Backend Services"
+        ServiceContainer[Service Container]
+        SiteManager[Site Manager]
+        MonitorManager[Monitor Manager]
+        ConfigManager[Configuration Manager]
+    end
+
+    subgraph "Data Layer"
+        Repositories[Repository Pattern<br/>Data Access]
+        Database[(SQLite Database)]
+    end
+
+    %% Component relationships
+    UI --> SiteStore
+    UI --> MonitorStore
+    UI --> SettingsStore
+    UI --> UIStore
+    UI --> ErrorStore
+
+    SiteStore --> SiteService
+    MonitorStore --> MonitorService
+
+    SiteService --> ContextBridge
+    MonitorService --> ContextBridge
+    SettingsStore --> ContextBridge
+
+    ContextBridge --> ServiceContainer
+    ServiceContainer --> SiteManager
+    ServiceContainer --> MonitorManager
+    ServiceContainer --> ConfigManager
+
+    SiteManager --> Repositories
+    MonitorManager --> Repositories
+    ConfigManager --> Repositories
+
+    Repositories --> Database
+
+    %% Styling
+    classDef uiLayer fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef storeLayer fill:#10b981,stroke:#059669,color:#ffffff
+    classDef serviceLayer fill:#f59e0b,stroke:#d97706,color:#ffffff
+    classDef ipcLayer fill:#ef4444,stroke:#dc2626,color:#ffffff
+    classDef backendLayer fill:#8b5cf6,stroke:#7c3aed,color:#ffffff
+    classDef dataLayer fill:#6b7280,stroke:#4b5563,color:#ffffff
+
+    class UI uiLayer
+    class SiteStore,MonitorStore,SettingsStore,UIStore,ErrorStore storeLayer
+    class SiteService,MonitorService serviceLayer
+    class ContextBridge ipcLayer
+    class ServiceContainer,SiteManager,MonitorManager,ConfigManager backendLayer
+    class Repositories,Database dataLayer`} />
+
+---
+
+These diagrams provide a comprehensive overview of the Uptime Watcher architecture. Each component is designed to be modular, testable, and maintainable while providing robust monitoring capabilities.
+
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+}
