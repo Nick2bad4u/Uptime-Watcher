@@ -424,6 +424,7 @@
     "test:docs:quiet": "vitest run scripts/tests/unit/platform-presets.test.mjs scripts/tests/unit/language-support.test.mjs scripts/tests/integration/cli-integration.test.mjs --config scripts/tests/vitest.config.mjs --reporter=default --silent",
     "test:docs:verbose": "vitest run scripts/tests/unit/platform-presets.test.mjs scripts/tests/unit/language-support.test.mjs scripts/tests/integration/cli-integration.test.mjs --config scripts/tests/vitest.config.mjs --reporter=verbose",
     "test:e2e": "npm run playwright",
+    "test:playwright": "npm run playwright",
     "test:e2e:debug": "npm run playwright:debug",
     "test:e2e:headed": "npm run playwright:headed",
     "test:e2e:ui": "npm run playwright:ui",

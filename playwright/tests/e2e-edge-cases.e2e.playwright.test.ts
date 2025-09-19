@@ -133,17 +133,23 @@ test.describe(
                 },
             },
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bbb14573 (🧪 [test] Refactors Playwright tests to use shared Electron fixtures)
             async ({ window }) => {
                 // Rapid button clicking stress test
                 const addSiteButton = window.getByRole("button", {
                     name: "Add new site",
                 });
+<<<<<<< HEAD
 =======
             async () => {
                 test.setTimeout(60000); // Increase timeout to 60 seconds for complex workflow
                 const { electronApp, window } =
                     await launchAppForStressTesting();
 >>>>>>> 5e974dcd (🧪 [test] Add comprehensive E2E tests for monitor types)
+=======
+>>>>>>> bbb14573 (🧪 [test] Refactors Playwright tests to use shared Electron fixtures)
 
                     // Test rapid clicking with proper cleanup
                     for (let i = 0; i < 3; i++) {
@@ -275,16 +281,22 @@ test.describe(
                 },
             },
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bbb14573 (🧪 [test] Refactors Playwright tests to use shared Electron fixtures)
             async ({ window }) => {
                 // Test very small viewport
                 await window.setViewportSize({ width: 320, height: 240 });
                 await window.waitForTimeout(1000);
+<<<<<<< HEAD
 =======
             async () => {
                 test.setTimeout(60000); // Increase timeout to 60 seconds for complex workflow
                 const { electronApp, window } =
                     await launchAppForStressTesting();
 >>>>>>> 5e974dcd (🧪 [test] Add comprehensive E2E tests for monitor types)
+=======
+>>>>>>> bbb14573 (🧪 [test] Refactors Playwright tests to use shared Electron fixtures)
 
                     // Verify app is still usable at small size
                     await expect(window.getByTestId("app-root")).toBeVisible();
@@ -411,6 +423,9 @@ test.describe(
                 },
             },
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bbb14573 (🧪 [test] Refactors Playwright tests to use shared Electron fixtures)
             async ({ window }) => {
                 // Test escape key error recovery
                 const addSiteButton = window.getByRole("button", {
@@ -418,12 +433,15 @@ test.describe(
                 });
                 await addSiteButton.click();
                 await window.waitForTimeout(1000);
+<<<<<<< HEAD
 =======
             async () => {
                 test.setTimeout(60000); // Increase timeout to 60 seconds for complex workflow
                 const { electronApp, window } =
                     await launchAppForStressTesting();
 >>>>>>> 5e974dcd (🧪 [test] Add comprehensive E2E tests for monitor types)
+=======
+>>>>>>> bbb14573 (🧪 [test] Refactors Playwright tests to use shared Electron fixtures)
 
                     // Press escape multiple times
                     for (let i = 0; i < 5; i++) {

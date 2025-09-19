@@ -224,15 +224,21 @@ test.describe(
                 },
             },
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bbb14573 (🧪 [test] Refactors Playwright tests to use shared Electron fixtures)
             async ({ window }) => {
                 // Test dark mode
                 await window.emulateMedia({ colorScheme: "dark" });
                 await window.waitForTimeout(1000);
+<<<<<<< HEAD
 =======
             async () => {
                 test.setTimeout(60000); // Increase timeout to 60 seconds for complex workflow
                 const { electronApp, window } = await launchAccessibleApp();
 >>>>>>> 5e974dcd (🧪 [test] Add comprehensive E2E tests for monitor types)
+=======
+>>>>>>> bbb14573 (🧪 [test] Refactors Playwright tests to use shared Electron fixtures)
 
                     await window.screenshot({
                         path: "playwright/test-results/a11y-basic-06-dark-mode.png",
@@ -278,15 +284,21 @@ test.describe(
                 },
             },
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bbb14573 (🧪 [test] Refactors Playwright tests to use shared Electron fixtures)
             async ({ window }) => {
                 // Navigate and interact using only keyboard
                 await window.keyboard.press("Tab");
                 await window.waitForTimeout(200);
+<<<<<<< HEAD
 =======
             async () => {
                 test.setTimeout(60000); // Increase timeout to 60 seconds for complex workflow
                 const { electronApp, window } = await launchAccessibleApp();
 >>>>>>> 5e974dcd (🧪 [test] Add comprehensive E2E tests for monitor types)
+=======
+>>>>>>> bbb14573 (🧪 [test] Refactors Playwright tests to use shared Electron fixtures)
 
                     await window.screenshot({
                         path: "playwright/test-results/a11y-workflow-01-start.png",
