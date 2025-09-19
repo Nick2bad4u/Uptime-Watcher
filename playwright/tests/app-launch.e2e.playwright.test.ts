@@ -5,7 +5,8 @@
  * properly, and basic functionality works as expected.
  */
 
-import { test, expect } from "../fixtures/electron-test";
+import { test, expect } from "@playwright/test";
+import { launchElectronApp } from "../fixtures/electron-helpers";
 
 test.describe(
     "electron app - basic functionality",
@@ -33,7 +34,10 @@ test.describe(
                     },
                 ],
             },
-            async ({ electronApp }) => {
+            async () => {
+                // Launch the Electron app
+                const electronApp = await launchElectronApp();
+
                 // Verify the app launched
                 expect(electronApp).toBeTruthy();
 
@@ -47,6 +51,9 @@ test.describe(
 
                 // Should not be packaged in development/test mode
                 expect(isPackaged).toBe(false);
+
+                // Close the app
+                await electronApp.close();
             }
         );
 
@@ -66,7 +73,12 @@ test.describe(
                     },
                 ],
             },
-            async ({ window }) => {
+            async () => {
+                const electronApp = await launchElectronApp();
+
+                // Wait for the first window to be created
+                const window = await electronApp.firstWindow();
+
                 // Verify window exists
                 expect(window).toBeTruthy();
 
@@ -78,6 +90,9 @@ test.describe(
                 await window.screenshot({
                     path: "playwright/test-results/main-window.png",
                 });
+
+                // Close the app
+                await electronApp.close();
             }
         );
 
@@ -98,7 +113,9 @@ test.describe(
                     },
                 ],
             },
-            async ({ electronApp }) => {
+            async () => {
+                const electronApp = await launchElectronApp();
+
                 // Get app name and version
                 const appName = await electronApp.evaluate(async ({ app }) => {
                     return app.getName();
@@ -114,6 +131,8 @@ test.describe(
                 // In development mode, app name defaults to "Electron" unless explicitly set
                 expect(appName).toMatch(/^(uptime-watcher|Electron)$/); // Allow both dev and production names
                 expect(appVersion).toMatch(/^\d+\.\d+\.\d+/); // Semver pattern
+
+                await electronApp.close();
             }
         );
 
@@ -133,13 +152,17 @@ test.describe(
                     },
                 ],
             },
-            async ({ electronApp }) => {
+            async () => {
+                const electronApp = await launchElectronApp();
+
                 // Check if app is ready
                 const isReady = await electronApp.evaluate(async ({ app }) => {
                     return app.isReady();
                 });
 
                 expect(isReady).toBe(true);
+
+                await electronApp.close();
             }
         );
     }

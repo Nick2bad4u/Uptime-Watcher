@@ -7,7 +7,13 @@
  * @file Playwright tests for comprehensive UI component testing
  */
 
-import { test, expect } from "../fixtures/electron-test";
+import {
+    test,
+    expect,
+    _electron as electron,
+    type ElectronApplication,
+    type Page,
+} from "@playwright/test";
 
 test.describe(
     "uI Components - Comprehensive Tests",
@@ -23,6 +29,27 @@ test.describe(
         },
     },
     () => {
+        let electronApp: ElectronApplication;
+        let window: Page;
+
+        test.beforeEach(async () => {
+            electronApp = await electron.launch({
+                args: ["."],
+                env: {
+                    ...process.env,
+                    NODE_ENV: "test",
+                },
+            });
+            window = await electronApp.firstWindow();
+            await window.waitForLoadState("domcontentloaded");
+        });
+
+        test.afterEach(async () => {
+            if (electronApp) {
+                await electronApp.close();
+            }
+        });
+
         test(
             "should render main application layout",
             {
@@ -32,7 +59,7 @@ test.describe(
                     description: "Tests main application layout rendering",
                 },
             },
-            async ({ window }) => {
+            async () => {
                 // Wait for app to be fully loaded
                 await window.waitForSelector("[data-testid='app-container']", {
                     timeout: 10000,
@@ -61,7 +88,7 @@ test.describe(
                     description: "Tests Add Site form functionality",
                 },
             },
-            async ({ window }) => {
+            async () => {
                 // Look for Add Site button or form using semantic locators
                 const addSiteButton = window.getByRole("button", {
                     name: /add.*site/i,
@@ -93,7 +120,7 @@ test.describe(
                     description: "Tests monitoring dashboard display",
                 },
             },
-            async ({ window }) => {
+            async () => {
                 // Wait for dashboard to load
                 await window.waitForTimeout(2000);
 
@@ -119,7 +146,7 @@ test.describe(
                     description: "Tests theme switching functionality",
                 },
             },
-            async ({ window }) => {
+            async () => {
                 // Look for theme toggle using semantic locators
                 const themeToggle = window.getByRole("button", {
                     name: /theme/i,
@@ -157,7 +184,7 @@ test.describe(
                     description: "Tests settings panel functionality",
                 },
             },
-            async ({ window }) => {
+            async () => {
                 // Look for settings button using semantic locators
                 const settingsButton = window.getByRole("button", {
                     name: /settings/i,
@@ -181,7 +208,7 @@ test.describe(
                     description: "Tests keyboard navigation",
                 },
             },
-            async ({ window }) => {
+            async () => {
                 // Test Tab navigation
                 await window.keyboard.press("Tab");
 
@@ -210,7 +237,7 @@ test.describe(
                     description: "Tests contextual menu functionality",
                 },
             },
-            async ({ window }) => {
+            async () => {
                 // Test right-click context menu on main content area
                 const mainContent = window.getByRole("main");
                 await mainContent.click({ button: "right" });
@@ -235,7 +262,7 @@ test.describe(
                     description: "Tests responsive design behavior",
                 },
             },
-            async ({ window }) => {
+            async () => {
                 // Test different viewport sizes
                 const viewports = [
                     { width: 1920, height: 1080 }, // Desktop
@@ -274,7 +301,7 @@ test.describe(
                     description: "Tests loading state displays",
                 },
             },
-            async ({ window }) => {
+            async () => {
                 // Refresh to catch loading states
                 await window.reload();
 
@@ -302,7 +329,7 @@ test.describe(
                     description: "Tests error state handling",
                 },
             },
-            async ({ window }) => {
+            async () => {
                 // Test JavaScript error handling
                 const errorHandled = await window.evaluate(() => {
                     // Add error listener
