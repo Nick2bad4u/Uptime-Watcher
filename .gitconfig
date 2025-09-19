@@ -1,0 +1,197 @@
+# .gitconfig for Uptime Watcher
+# Repository-specific Git configuration
+# See: https://git-scm.com/docs/git-config
+
+# === CORE SETTINGS ===
+[core]
+# Don't auto-convert line endings (handled by .gitattributes)
+autocrlf=false
+safecrlf=true
+
+# Windows-friendly settings
+filemode=false
+ignorecase=true
+
+# Use VS Code as default editor
+editor="code --wait"
+
+# Performance optimizations
+preloadindex=true
+fscache=true
+
+# === DIFF & MERGE ===
+[diff]
+# Better diff algorithm for code
+algorithm=histogram
+
+# Detect file renames and moves
+renames=true
+
+# Highlight moved code blocks
+colorMoved=default
+
+# Use VS Code for diffs
+tool=vscode
+
+[difftool "vscode"]
+cmd=code --wait --diff $LOCAL $REMOTE
+
+[merge]
+# Show base, local, and remote in conflicts
+conflictstyle=diff3
+
+# Use VS Code for merge conflicts
+tool=vscode
+
+[mergetool "vscode"]
+cmd=code --wait $MERGED
+
+# === BRANCH & WORKFLOW ===
+[pull]
+# Always rebase instead of merge for cleaner history
+rebase=true
+
+[push]
+# Only push current branch by default
+default=simple
+
+# Auto-create remote branch when pushing new branches
+autoSetupRemote=true
+
+# Push tags along with commits
+followTags=true
+
+[branch]
+# Auto-setup tracking for new branches
+autosetupmerge=always
+autosetuprebase=always
+
+# === LOGGING & DISPLAY ===
+[log]
+# Show relative dates (e.g., "2 hours ago")
+date=relative
+
+# Show branch/tag decorations
+decorate=short
+
+[blame]
+# Use relative dates in blame
+date=relative
+
+# === COLORS ===
+[color]
+ui=auto
+
+[color "branch"]
+current=yellow reverse
+local=yellow
+remote=green
+
+[color "diff"]
+meta=yellow bold
+frag=magenta bold
+old=red bold
+new=green bold
+
+[color "status"]
+added=green
+changed=yellow
+untracked=cyan
+
+# === ALIASES FOR ELECTRON DEVELOPMENT ===
+[alias]
+# Basic shortcuts
+st=status
+co=checkout
+br=branch
+ci=commit
+
+# Advanced shortcuts
+lg=log --oneline --graph --decorate --all
+unstage=reset HEAD --
+last=log -1 HEAD
+
+# Electron/Node.js specific
+build="!npm run build"
+dev="!npm run dev"
+test="!npm run test"
+lint="!npm run lint"
+clean="!npm run clean"
+
+# Quality checks
+type-check="!npm run type-check:all"
+format="!npm run format"
+
+# Combined workflows
+qa="!npm run lint && npm run type-check:all && npm run test"
+rebuild="!npm run clean && npm run build"
+
+# Release helpers
+changelog="!git cliff --output CHANGELOG.md"
+
+# Utility
+tree=log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+contributors=shortlog --summary --numbered
+
+# === PERFORMANCE ===
+[gc]
+# Auto garbage collect after 256 loose objects
+auto=256
+
+[pack]
+# Use all available CPU cores for packing
+threads=0
+
+# === COMMIT SETTINGS ===
+[commit]
+# Enable commit signing if GPG is configured
+# gpgsign = true
+
+# Use commit message template if it exists
+# template = ~/.gitmessage
+
+# === SECURITY ===
+[http]
+# Always verify SSL certificates
+sslVerify=true
+
+# === ELECTRON-SPECIFIC DIFF SETTINGS ===
+[diff "package-lock"]
+# Better diffs for package-lock.json
+textconv="jq --sort-keys ."
+
+[diff "json"]
+# Better diffs for JSON files
+textconv="jq --sort-keys ."
+
+# === GITHUB INTEGRATION ===
+[github]
+user=Nick2bad4u
+
+# === CREDENTIAL MANAGEMENT ===
+[credential]
+# Use Windows Credential Manager
+helper=manager
+
+# === SUBMODULE SETTINGS ===
+[submodule]
+# Fetch submodules in parallel
+fetchJobs=4
+
+# === REBASE SETTINGS ===
+[rebase]
+# Automatically stash/unstash when rebasing
+autoStash=true
+
+# Use abbreviated commit hashes in interactive rebase
+abbreviateCommands=true
+
+# === NOTES ===
+# To use this config for this repository only:
+# 1. This file is already in the repo root
+# 2. Git will automatically use these settings for this repository
+# 3. These settings override global ~/.gitconfig for this project
+#
+# To apply some settings globally:
+# git config --global core.editor "code --wait"
+# git config --global pull.rebase true

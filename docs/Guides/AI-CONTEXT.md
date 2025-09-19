@@ -1264,7 +1264,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
 
 - `docs/Architecture/ADRs/` - Key architectural decisions
 - `docs/Architecture/Patterns/Development-Patterns-Guide.md` - Coding patterns
-- `docs/Architecture/TSDoc-Standards.md` - Documentation standards
+- `docs/Architecture/tsdoc-standards.md` - Documentation standards
 
 ### For Implementation
 

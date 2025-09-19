@@ -65,7 +65,7 @@
         "clsx": "^2.1.1",
         "docusaurus-plugin-copy-page-button": "^0.3.4",
         "docusaurus-plugin-image-zoom": "^3.0.1",
-        "docusaurus-plugin-llms": "^0.2.0",
+        "docusaurus-plugin-llms": "^0.2.2",
         "prism-react-renderer": "^2.4.1",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",

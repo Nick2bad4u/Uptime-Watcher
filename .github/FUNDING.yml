@@ -1,0 +1,17 @@
+# GitHub Sponsors funding configuration for Uptime Watcher
+# This file enables the "Sponsor" button on the repository
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository
+
+# GitHub Sponsors
+github: [Nick2bad4u]
+# Other funding platforms (uncomment and fill as needed)
+# patreon: your-patreon-username
+# open_collective: your-open-collective-username
+# ko_fi: your-ko-fi-username
+# tidelift: npm/package-name
+# community_bridge: project-name
+# liberapay: your-liberapay-username
+# issuehunt: your-issuehunt-username
+# otechie: your-otechie-username
+# lfx_crowdfunding: project-name
+# custom: ['https://paypal.me/your-paypal-username', 'https://your-website.com/donate']

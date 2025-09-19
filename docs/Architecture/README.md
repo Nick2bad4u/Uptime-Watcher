@@ -19,7 +19,7 @@ docs/Architecture/
 │   ├── Repository-Template.md
 │   ├── Zustand-Store-Template.md
 │   └── IPC-Handler-Template.md
-└── TSDoc-Standards.md           # Documentation standards
+└── tsdoc-standards.md           # Documentation standards
 ```
 
 ## 🏗️ Architecture Decision Records (ADRs)
@@ -117,7 +117,7 @@ Complete IPC communication implementation:
 
 ## 📚 Documentation Standards
 
-### [TSDoc Standards](./TSDoc-Standards.md)
+### [TSDoc Standards](./tsdoc-standards.md)
 
 Standardized documentation patterns for inline code examples:
 

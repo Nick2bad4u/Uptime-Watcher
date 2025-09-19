@@ -7,44 +7,44 @@ This directory contains comprehensive TypeScript documentation standards, tag re
 ```text
 docs/TSDoc/
 ├── README.md                              # This file
-├── TSDoc-Home.md                          # TSDoc home and overview
-├── TSDoc-Intro-Approach.md                # Introduction to TSDoc approach
-├── TSDoc-Intro-UsingTsdoc.md              # Getting started with TSDoc
-├── TSDoc-Spec-Overview.md                 # TSDoc specification overview
-├── TSDoc-Spec-StandardizationGroups.md    # Standardization groups and governance
-├── TSDoc-Spec-TagKinds.md                 # Tag classification and usage
-├── TSDoc-Base-Tags.md                     # Base tag reference
-├── TSDoc-Package-EslintPluginTsdoc.md     # ESLint plugin integration
-├── TSDoc-Package-Tsdoc.md                 # Core TSDoc package
-├── TSDoc-Package-TsdocConfig.md           # Configuration options
-├── TSDoc-Download-Log.md                  # Documentation download log
+├── tsdoc-home.md                          # TSDoc home and overview
+├── tsdoc-intro-approach.md                # Introduction to TSDoc approach
+├── tsdoc-intro-using-tsdoc.md             # Getting started with TSDoc
+├── tsdoc-spec-overview.md                 # TSDoc specification overview
+├── tsdoc-spec-standardization-groups.md   # Standardization groups and governance
+├── tsdoc-spec-tag-kinds.md                # Tag classification and usage
+├── tsdoc-base-tags.md                     # Base tag reference
+├── tsdoc-package-eslint-plugin-tsdoc.md   # ESLint plugin integration
+├── tsdoc-package-tsdoc.md                 # Core TSDoc package
+├── tsdoc-package-tsdoc-config.md          # Configuration options
+├── tsdoc-download-log.md                  # Documentation download log
 ├── TSDoc-Hashes.json                      # Content verification hashes
 └── Tag documentation files               # Individual tag references
-    ├── TSDoc-Tag-Alpha.md
-    ├── TSDoc-Tag-Beta.md
-    ├── TSDoc-Tag-Decorator.md
-    ├── TSDoc-Tag-defaultValue.md
-    ├── TSDoc-Tag-Deprecated.md
-    ├── TSDoc-Tag-Eventproperty.md
-    ├── TSDoc-Tag-Example.md
-    ├── TSDoc-Tag-Experimental.md
-    ├── TSDoc-Tag-Inheritdoc.md
-    ├── TSDoc-Tag-Internal.md
-    ├── TSDoc-Tag-Label.md
-    ├── TSDoc-Tag-Link.md
-    ├── TSDoc-Tag-Override.md
-    ├── TSDoc-Tag-Packagedocumentation.md
-    ├── TSDoc-Tag-Param.md
-    ├── TSDoc-Tag-Privateremarks.md
-    ├── TSDoc-Tag-Public.md
-    ├── TSDoc-Tag-Readonly.md
-    ├── TSDoc-Tag-Remarks.md
-    ├── TSDoc-Tag-Returns.md
-    ├── TSDoc-Tag-Sealed.md
-    ├── TSDoc-Tag-See.md
-    ├── TSDoc-Tag-Throws.md
-    ├── TSDoc-Tag-Typeparam.md
-    └── TSDoc-Tag-Virtual.md
+    ├── tsdoc-tag-alpha.md
+    ├── tsdoc-tag-beta.md
+    ├── tsdoc-tag-decorator.md
+    ├── tsdoc-tag-default-value.md
+    ├── tsdoc-tag-deprecated.md
+    ├── tsdoc-tag-event-property.md
+    ├── tsdoc-tag-example.md
+    ├── tsdoc-tag-experimental.md
+    ├── tsdoc-tag-inheritdoc.md
+    ├── tsdoc-tag-internal.md
+    ├── tsdoc-tag-label.md
+    ├── tsdoc-tag-link.md
+    ├── tsdoc-tag-override.md
+    ├── tsdoc-tag-package-documentation.md
+    ├── tsdoc-tag-param.md
+    ├── tsdoc-tag-private-remarks.md
+    ├── tsdoc-tag-public.md
+    ├── tsdoc-tag-readonly.md
+    ├── tsdoc-tag-remarks.md
+    ├── tsdoc-tag-returns.md
+    ├── tsdoc-tag-sealed.md
+    ├── tsdoc-tag-see.md
+    ├── tsdoc-tag-throws.md
+    ├── tsdoc-tag-type-param.md
+    └── tsdoc-tag-virtual.md
 ```
 
 ## 📚 TSDoc overview
@@ -60,9 +60,9 @@ TSDoc is a markup language for documenting TypeScript code with structured comme
 
 For developers new to TSDoc:
 
-1. **[TSDoc home](./TSDoc-Home.md)** - Overview and introduction
-2. **[Using TSDoc](./TSDoc-Intro-UsingTsdoc.md)** - Practical usage guide
-3. **[Base tags reference](./TSDoc-Base-Tags.md)** - Essential tags for documentation
+1. **[TSDoc home](./tsdoc-home.md)** - Overview and introduction
+2. **[Using TSDoc](./tsdoc-intro-using-tsdoc.md)** - Practical usage guide
+3. **[Base tags reference](./tsdoc-base-tags.md)** - Essential tags for documentation
 
 ## 📖 Documentation standards
 
@@ -70,25 +70,25 @@ For developers new to TSDoc:
 
 | Document | Description | Purpose |
 |----------|-------------|---------|
-| [TSDoc home](./TSDoc-Home.md) | Overview of TSDoc system | Understanding TSDoc fundamentals |
-| [TSDoc approach](./TSDoc-Intro-Approach.md) | Documentation philosophy and approach | Establishing documentation standards |
-| [Using TSDoc](./TSDoc-Intro-UsingTsdoc.md) | Practical implementation guide | Day-to-day documentation practices |
+| [TSDoc home](./tsdoc-home.md) | Overview of TSDoc system | Understanding TSDoc fundamentals |
+| [TSDoc approach](./tsdoc-intro-approach.md) | Documentation philosophy and approach | Establishing documentation standards |
+| [Using TSDoc](./tsdoc-intro-using-tsdoc.md) | Practical implementation guide | Day-to-day documentation practices |
 
 ### Specification and standards
 
 | Document | Description | Purpose |
 |----------|-------------|---------|
-| [Specification overview](./TSDoc-Spec-Overview.md) | TSDoc specification details | Understanding formal standards |
-| [Standardization groups](./TSDoc-Spec-StandardizationGroups.md) | Governance and standardization | Standards compliance |
-| [Tag kinds](./TSDoc-Spec-TagKinds.md) | Tag classification system | Proper tag usage |
+| [Specification overview](./tsdoc-spec-overview.md) | TSDoc specification details | Understanding formal standards |
+| [Standardization groups](./tsdoc-spec-standardization-groups.md) | Governance and standardization | Standards compliance |
+| [Tag kinds](./tsdoc-spec-tag-kinds.md) | Tag classification system | Proper tag usage |
 
 ### Package integration
 
 | Document | Description | Purpose |
 |----------|-------------|---------|
-| [Core TSDoc package](./TSDoc-Package-Tsdoc.md) | Main TSDoc package documentation | Core functionality |
-| [ESLint plugin](./TSDoc-Package-EslintPluginTsdoc.md) | ESLint integration for TSDoc | Automated linting |
-| [Configuration](./TSDoc-Package-TsdocConfig.md) | TSDoc configuration options | Project setup |
+| [Core TSDoc package](./tsdoc-package-tsdoc.md) | Main TSDoc package documentation | Core functionality |
+| [ESLint plugin](./tsdoc-package-eslint-plugin-tsdoc.md) | ESLint integration for TSDoc | Automated linting |
+| [Configuration](./tsdoc-package-tsdoc-config.md) | TSDoc configuration options | Project setup |
 
 ## 🏷️ Tag reference
 
@@ -96,31 +96,31 @@ For developers new to TSDoc:
 
 | Tag | Purpose | Usage |
 |-----|---------|-------|
-| [`@param`](./TSDoc-Tag-Param.md) | Document function parameters | Required for all parameters |
-| [`@returns`](./TSDoc-Tag-Returns.md) | Document return values | Required for functions with return values |
-| [`@example`](./TSDoc-Tag-Example.md) | Provide usage examples | Recommended for public APIs |
-| [`@remarks`](./TSDoc-Tag-Remarks.md) | Additional implementation details | Detailed explanations |
-| [`@throws`](./TSDoc-Tag-Throws.md) | Document thrown exceptions | Error conditions |
+| [`@param`](./tsdoc-tag-param.md) | Document function parameters | Required for all parameters |
+| [`@returns`](./tsdoc-tag-returns.md) | Document return values | Required for functions with return values |
+| [`@example`](./tsdoc-tag-example.md) | Provide usage examples | Recommended for public APIs |
+| [`@remarks`](./tsdoc-tag-remarks.md) | Additional implementation details | Detailed explanations |
+| [`@throws`](./tsdoc-tag-throws.md) | Document thrown exceptions | Error conditions |
 
 ### Lifecycle and visibility tags
 
 | Tag | Purpose | Usage |
 |-----|---------|-------|
-| [`@public`](./TSDoc-Tag-Public.md) | Mark as public API | Public interfaces |
-| [`@internal`](./TSDoc-Tag-Internal.md) | Mark as internal implementation | Internal code |
-| [`@alpha`](./TSDoc-Tag-Alpha.md) | Mark as alpha/experimental | Early development |
-| [`@beta`](./TSDoc-Tag-Beta.md) | Mark as beta/preview | Pre-release features |
-| [`@deprecated`](./TSDoc-Tag-Deprecated.md) | Mark as deprecated | Legacy code |
+| [`@public`](./tsdoc-tag-public.md) | Mark as public API | Public interfaces |
+| [`@internal`](./tsdoc-tag-internal.md) | Mark as internal implementation | Internal code |
+| [`@alpha`](./tsdoc-tag-alpha.md) | Mark as alpha/experimental | Early development |
+| [`@beta`](./tsdoc-tag-beta.md) | Mark as beta/preview | Pre-release features |
+| [`@deprecated`](./tsdoc-tag-deprecated.md) | Mark as deprecated | Legacy code |
 
 ### Advanced tags
 
 | Tag | Purpose | Usage |
 |-----|---------|-------|
-| [`@inheritdoc`](./TSDoc-Tag-Inheritdoc.md) | Inherit documentation from parent | Interface implementations |
-| [`@override`](./TSDoc-Tag-Override.md) | Mark method overrides | Class inheritance |
-| [`@virtual`](./TSDoc-Tag-Virtual.md) | Mark as overridable | Base class methods |
-| [`@sealed`](./TSDoc-Tag-Sealed.md) | Mark as non-overridable | Final implementations |
-| [`@readonly`](./TSDoc-Tag-Readonly.md) | Mark as read-only | Immutable properties |
+| [`@inheritdoc`](./tsdoc-tag-inheritdoc.md) | Inherit documentation from parent | Interface implementations |
+| [`@override`](./tsdoc-tag-override.md) | Mark method overrides | Class inheritance |
+| [`@virtual`](./tsdoc-tag-virtual.md) | Mark as overridable | Base class methods |
+| [`@sealed`](./tsdoc-tag-sealed.md) | Mark as non-overridable | Final implementations |
+| [`@readonly`](./tsdoc-tag-readonly.md) | Mark as read-only | Immutable properties |
 
 ## 🔧 Configuration
 
@@ -162,13 +162,13 @@ TSDoc configuration in the Uptime Watcher project:
 - **[Architecture documentation](../Architecture/README.md)** - System design and patterns
 - **[Guides documentation](../Guides/README.md)** - Development guides and tutorials
 - **[Testing documentation](../Testing/README.md)** - Testing guides and best practices
-- **[Documentation style guide](../DOCUMENTATION_STYLE_GUIDE.md)** - Markdown documentation standards
+- **[Documentation style guide](../documentation-style-guide.md)** - Markdown documentation standards
 
 ## 📝 Contributing
 
 When working with TSDoc documentation:
 
-1. Follow the established [documentation style guide](../DOCUMENTATION_STYLE_GUIDE.md)
+1. Follow the established [documentation style guide](../documentation-style-guide.md)
 2. Use appropriate TSDoc tags for all public APIs
 3. Provide comprehensive examples for complex functionality
 4. Ensure all links and references are valid
@@ -179,7 +179,7 @@ When working with TSDoc documentation:
 
 The TSDoc documentation in this directory is sourced from the official TSDoc project and maintained for reference. When updating:
 
-1. Check the [download log](./TSDoc-Download-Log.md) for version information
+1. Check the [download log](./tsdoc-download-log.md) for version information
 2. Verify content hashes in [TSDoc-Hashes.json](./TSDoc-Hashes.json)
 3. Update any project-specific customizations
 4. Test documentation generation tools after updates

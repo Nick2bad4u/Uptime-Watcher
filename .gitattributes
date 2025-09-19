@@ -1,0 +1,174 @@
+# .gitattributes file for Uptime Watcher
+# This file defines attributes for files and directories in the repository
+# See: https://git-scm.com/docs/gitattributes
+
+# === TEXT FILES ===
+# Automatically normalize line endings for text files
+* text=auto eol=lf
+
+# === SOURCE CODE ===
+# TypeScript and JavaScript files
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+
+# JSON files
+*.json text eol=lf
+*.jsonc text eol=lf
+
+# Configuration files
+*.config.* text eol=lf
+.*rc text eol=lf
+*.toml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+
+# === STYLES ===
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+*.less text eol=lf
+
+# === MARKUP AND DOCUMENTATION ===
+*.html text eol=lf
+*.htm text eol=lf
+*.xml text eol=lf
+*.md text eol=lf
+*.mdx text eol=lf
+*.txt text eol=lf
+
+# === SHELL SCRIPTS ===
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+*.fish text eol=lf
+
+# PowerShell scripts (Windows line endings)
+*.ps1 text eol=crlf
+*.psm1 text eol=crlf
+*.psd1 text eol=crlf
+
+# Batch files (Windows line endings)
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# === BINARY FILES ===
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text eol=lf
+*.webp binary
+*.avif binary
+
+# Fonts
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
+
+# Audio/Video
+*.mp3 binary
+*.mp4 binary
+*.avi binary
+*.mov binary
+*.wav binary
+*.flac binary
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+*.bz2 binary
+*.xz binary
+*.7z binary
+*.rar binary
+
+# Executables
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.app binary
+*.deb binary
+*.rpm binary
+*.dmg binary
+*.pkg binary
+*.msi binary
+
+# Development files
+*.wasm binary
+*.node binary
+
+# === SPECIAL HANDLING ===
+# Package lock files should not be normalized
+package-lock.json text eol=lf
+yarn.lock text eol=lf
+pnpm-lock.yaml text eol=lf
+
+# Environment files
+.env* text eol=lf
+
+# Git files
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.gitmodules text eol=lf
+
+# === LANGUAGE DETECTION ===
+# Help GitHub properly detect languages
+*.ts linguist-language=TypeScript
+*.tsx linguist-language=TypeScript
+*.mjs linguist-language=JavaScript
+*.cjs linguist-language=JavaScript
+
+# Exclude generated files from language statistics
+/dist/ linguist-generated=true
+/dist-*/ linguist-generated=true
+/coverage/ linguist-generated=true
+/node_modules/ linguist-generated=true
+package-lock.json linguist-generated=true
+*.min.js linguist-generated=true
+*.min.css linguist-generated=true
+
+# Mark documentation
+*.md linguist-documentation=true
+/docs/ linguist-documentation=true
+
+# Mark configuration files
+*.config.* linguist-language=JSON
+.*rc linguist-language=JSON
+*.toml linguist-language=TOML
+*.yml linguist-language=YAML
+*.yaml linguist-language=YAML
+
+# === DIFF SETTINGS ===
+# Use appropriate diff drivers for specific file types
+*.md diff=markdown
+*.json diff=json
+*.css diff=css
+*.html diff=html
+
+# === MERGE SETTINGS ===
+# Files that should not be merged automatically
+package-lock.json merge=ours
+yarn.lock merge=ours
+pnpm-lock.yaml merge=ours
+CHANGELOG.md merge=union
+
+# === EXPORT IGNORE ===
+# Files to exclude from archive exports
+.gitattributes export-ignore
+.gitignore export-ignore
+.github/ export-ignore
+.vscode/ export-ignore
+.cache/ export-ignore
+coverage/ export-ignore
+node_modules/ export-ignore
+*.log export-ignore
+.env* export-ignore

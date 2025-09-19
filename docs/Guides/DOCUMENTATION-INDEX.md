@@ -52,7 +52,7 @@ System design, patterns, and architectural decisions:
 | Document                                                                                | Purpose                  | Use When                      |
 | --------------------------------------------------------------------------------------- | ------------------------ | ----------------------------- |
 | [Development-Patterns-Guide.md](../Architecture/Patterns/Development-Patterns-Guide.md) | Coding patterns overview | Understanding system patterns |
-| [TSDoc-Standards.md](../Architecture/TSDoc-Standards.md)                                | Documentation standards  | Writing code documentation    |
+| [tsdoc-standards.md](../Architecture/tsdoc-standards.md)                                | Documentation standards  | Writing code documentation    |
 
 #### Templates
 
@@ -183,7 +183,7 @@ Relevant historical context and lessons learned:
 
 ### 📝 Contributing to Documentation
 
-1. **Follow TSDoc Standards**: Use [TSDoc-Standards.md](../Architecture/TSDoc-Standards.md)
+1. **Follow TSDoc Standards**: Use [tsdoc-standards.md](../Architecture/tsdoc-standards.md)
 2. **Update Index**: Add new documents to this index
 3. **Cross-Reference**: Link related documents
 4. **Keep Current**: Update outdated information

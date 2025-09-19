@@ -1,0 +1,135 @@
+# CODEOWNERS file for Uptime Watcher
+# This file defines who owns which parts of the codebase
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global fallback - all code not covered by specific rules
+* @Nick2bad4u
+
+# === DOCUMENTATION ===
+# All documentation files
+*.md @Nick2bad4u
+/docs/ @Nick2bad4u
+README.md @Nick2bad4u
+CONTRIBUTING.md @Nick2bad4u
+CHANGELOG.md @Nick2bad4u
+SECURITY.md @Nick2bad4u
+
+# === CONFIGURATION FILES ===
+# Root configuration files
+package.json @Nick2bad4u
+package-lock.json @Nick2bad4u
+tsconfig*.json @Nick2bad4u
+*.config.* @Nick2bad4u
+.*rc @Nick2bad4u
+.*ignore @Nick2bad4u
+
+# Linting and code quality
+eslint.config.mjs @Nick2bad4u
+.prettierrc @Nick2bad4u
+stylelint.config.mjs @Nick2bad4u
+.cspell.json @Nick2bad4u
+
+# Build and development tools
+vite.config.ts @Nick2bad4u
+vitest*.config.ts @Nick2bad4u
+playwright.config.ts @Nick2bad4u
+stryker.config.mjs @Nick2bad4u
+
+# === FRONTEND (React/UI) ===
+# React components and frontend code
+/src/components/ @Nick2bad4u
+/src/pages/ @Nick2bad4u
+/src/hooks/ @Nick2bad4u
+/src/stores/ @Nick2bad4u
+/src/styles/ @Nick2bad4u
+/src/assets/ @Nick2bad4u
+/src/types/ui/ @Nick2bad4u
+
+# Styling and design
+*.css @Nick2bad4u
+*.scss @Nick2bad4u
+tailwind.config.mjs @Nick2bad4u
+postcss.config.mjs @Nick2bad4u
+
+# === BACKEND (Electron Main Process) ===
+# Electron main process
+/electron/ @Nick2bad4u
+/src/electron/ @Nick2bad4u
+
+# Database and data layer
+/src/database/ @Nick2bad4u
+/src/repositories/ @Nick2bad4u
+/src/models/ @Nick2bad4u
+
+# Services and business logic
+/src/services/ @Nick2bad4u
+/src/utils/ @Nick2bad4u
+/src/lib/ @Nick2bad4u
+
+# === SHARED CODE ===
+# Shared modules between main and renderer
+/shared/ @Nick2bad4u
+/src/shared/ @Nick2bad4u
+/src/types/shared/ @Nick2bad4u
+
+# === TESTING ===
+# Test files and testing configuration
+**/*.test.* @Nick2bad4u
+**/*.spec.* @Nick2bad4u
+**/tests/ @Nick2bad4u
+/playwright/ @Nick2bad4u
+/benchmarks/ @Nick2bad4u
+
+# Testing documentation
+/docs/Testing/ @Nick2bad4u
+
+# === BUILD AND DEPLOYMENT ===
+# Build output directories (generally shouldn't need review)
+/dist/ @Nick2bad4u
+/dist-*/ @Nick2bad4u
+/coverage/ @Nick2bad4u
+
+# Scripts and automation
+/scripts/ @Nick2bad4u
+*.sh @Nick2bad4u
+*.ps1 @Nick2bad4u
+
+# === GITHUB WORKFLOWS ===
+# GitHub Actions and automation
+/.github/workflows/ @Nick2bad4u
+/.github/dependabot.yml @Nick2bad4u
+/.github/codeql/ @Nick2bad4u
+
+# Issue and PR templates
+/.github/ISSUE_TEMPLATE/ @Nick2bad4u
+/.github/PULL_REQUEST_TEMPLATE/ @Nick2bad4u
+
+# === INFRASTRUCTURE ===
+# Desktop application packaging
+*.desktop @Nick2bad4u
+*.metainfo.xml @Nick2bad4u
+flatpak-build.yml @Nick2bad4u
+
+# Security and secrets
+.gitleaks.toml @Nick2bad4u
+.devskim.json @Nick2bad4u
+.secretlintignore @Nick2bad4u
+
+# === SPECIAL FILES ===
+# License and legal
+LICENSE @Nick2bad4u
+
+# Environment and secrets
+.env* @Nick2bad4u
+
+# Git configuration
+.gitignore @Nick2bad4u
+.gitattributes @Nick2bad4u
+
+# Editor configuration
+.vscode/ @Nick2bad4u
+.editorconfig @Nick2bad4u
+
+# Node.js version management
+.nvmrc @Nick2bad4u
+.node-version @Nick2bad4u

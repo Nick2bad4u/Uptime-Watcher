@@ -52,10 +52,10 @@ For new developers getting started with testing:
 
 ### Advanced testing techniques
 
-| Guide                                                           | Description                                   | Use case                           |
-| --------------------------------------------------------------- | --------------------------------------------- | ---------------------------------- |
-| [Fast-check fuzzing coverage](./FAST-CHECK-FUZZING-COVERAGE.md) | Property-based testing and fuzzing strategies | Finding edge cases and bugs        |
-| [Test verbosity guide](./TEST_VERBOSITY_GUIDE.md)               | Configuring test output and debugging         | Test debugging and CI optimization |
+| Guide                                                        | Description                                   | Use case                           |
+| ------------------------------------------------------------ | --------------------------------------------- | ---------------------------------- |
+| [Fast-check fuzzing coverage](./FAST-CHECK-FUZZING-GUIDE.md) | Property-based testing and fuzzing strategies | Finding edge cases and bugs        |
+| [Test verbosity guide](./test-verbosity-guide.md)            | Configuring test output and debugging         | Test debugging and CI optimization |
 
 ## 🏃‍♂️ Running tests
 
@@ -136,7 +136,7 @@ Test configuration files are located in the project root:
 
 When adding new tests or testing documentation:
 
-1. Follow the [documentation style guide](../DOCUMENTATION_STYLE_GUIDE.md)
+1. Follow the [documentation style guide](../documentation-style-guide.md)
 2. Update this README to include new testing guides
 3. Ensure tests follow established patterns and conventions
 4. Add appropriate coverage for new features
