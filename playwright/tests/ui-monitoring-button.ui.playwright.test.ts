@@ -22,7 +22,8 @@
 // NOTE: These monitoring UI tests intentionally use conditional logic
 // to test various monitoring states and edge cases
 
-import { test, expect } from "../fixtures/electron-test";
+import { test, expect } from "@playwright/test";
+import { launchElectronApp } from "../fixtures/electron-helpers";
 
 test.describe(
     "site monitoring button UI tests",
@@ -54,7 +55,10 @@ test.describe(
                     },
                 ],
             },
-            async ({ window }) => {
+            async () => {
+                const electronApp = await launchElectronApp();
+
+                const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");
 
                 // Wait for the React app to fully load
@@ -104,6 +108,8 @@ test.describe(
                     });
                     console.log("Monitoring button verified successfully");
                 }
+
+                await electronApp.close();
             }
         );
 
@@ -126,7 +132,10 @@ test.describe(
                     },
                 ],
             },
-            async ({ window }) => {
+            async () => {
+                const electronApp = await launchElectronApp();
+
+                const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");
 
                 // Wait for the React app to fully load
@@ -164,6 +173,8 @@ test.describe(
                         "No monitoring buttons found - this may be expected in test environment"
                     );
                 }
+
+                await electronApp.close();
             }
         );
 
@@ -186,7 +197,10 @@ test.describe(
                     },
                 ],
             },
-            async ({ window }) => {
+            async () => {
+                const electronApp = await launchElectronApp();
+
+                const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");
 
                 // Wait for the React app to fully load
@@ -211,6 +225,8 @@ test.describe(
                         `Found monitoring button with aria-label: ${ariaLabel}`
                     );
                 }
+
+                await electronApp.close();
             }
         );
 
@@ -233,7 +249,10 @@ test.describe(
                     },
                 ],
             },
-            async ({ window }) => {
+            async () => {
+                const electronApp = await launchElectronApp();
+
+                const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");
 
                 // Wait for the React app to fully load
@@ -276,6 +295,8 @@ test.describe(
                         break;
                     }
                 }
+
+                await electronApp.close();
             }
         );
 
@@ -298,7 +319,10 @@ test.describe(
                     },
                 ],
             },
-            async ({ window }) => {
+            async () => {
+                const electronApp = await launchElectronApp();
+
+                const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");
 
                 // Wait for the React app to fully load
@@ -333,6 +357,8 @@ test.describe(
                         );
                     }
                 }
+
+                await electronApp.close();
             }
         );
 
@@ -355,7 +381,10 @@ test.describe(
                     },
                 ],
             },
-            async ({ window }) => {
+            async () => {
+                const electronApp = await launchElectronApp();
+
+                const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");
 
                 // Wait for the React app to fully load
@@ -396,6 +425,8 @@ test.describe(
                         "Buttons properly showing disabled/loading states"
                     );
                 }
+
+                await electronApp.close();
             }
         );
     }

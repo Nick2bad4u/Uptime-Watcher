@@ -6,7 +6,8 @@
  * dashboard to be loaded first.
  */
 
-import { test, expect } from "../fixtures/electron-test";
+import { test, expect } from "@playwright/test";
+import { launchElectronApp } from "../fixtures/electron-helpers";
 import {
     waitForAppInitialization,
     waitForDashboard,
@@ -28,95 +29,113 @@ test.describe(
             {
                 tag: ["@fast", "@smoke"],
             },
-            async ({ window: page }) => {
-                // Wait for basic app initialization
-                await waitForAppInitialization(page);
+            async () => {
+                const electronApp = await launchElectronApp();
+                const page = await electronApp.firstWindow();
 
-                // Verify add site button is visible
-                await expect(
-                    page.getByRole("button", { name: "Add new site" })
-                ).toBeVisible();
+                try {
+                    // Wait for basic app initialization
+                    await waitForAppInitialization(page);
 
-                // Debug: Check the state of elements before and after click
-                console.log("=== BEFORE BUTTON CLICK ===");
-                const buttonVisible = await page
-                    .getByRole("button", { name: "Add new site" })
-                    .isVisible();
-                console.log("Add Site button visible:", buttonVisible);
+                    // Verify add site button is visible
+                    await expect(
+                        page.getByRole("button", { name: "Add new site" })
+                    ).toBeVisible();
 
-                const modalOverlayBefore = await page
-                    .getByRole("dialog")
-                    .count();
-                console.log("Modal overlay count before:", modalOverlayBefore);
+                    // Debug: Check the state of elements before and after click
+                    console.log("=== BEFORE BUTTON CLICK ===");
+                    const buttonVisible = await page
+                        .getByRole("button", { name: "Add new site" })
+                        .isVisible();
+                    console.log("Add Site button visible:", buttonVisible);
 
-                const modalDialogBefore = await page
-                    .getByRole("dialog")
-                    .count();
-                console.log("Modal dialog count before:", modalDialogBefore);
+                    const modalOverlayBefore = await page
+                        .getByRole("dialog")
+                        .count();
+                    console.log(
+                        "Modal overlay count before:",
+                        modalOverlayBefore
+                    );
 
-                // Click add site button
-                await page
-                    .getByRole("button", { name: "Add new site" })
-                    .click();
+                    const modalDialogBefore = await page
+                        .getByRole("dialog")
+                        .count();
+                    console.log(
+                        "Modal dialog count before:",
+                        modalDialogBefore
+                    );
 
-                // Wait a moment for the state to update
-                await page.waitForFunction(
-                    () => document.readyState === "complete",
-                    { timeout: 1000 }
-                );
+                    // Click add site button
+                    await page
+                        .getByRole("button", { name: "Add new site" })
+                        .click();
 
-                console.log("=== AFTER BUTTON CLICK ===");
-                const modalOverlayAfter = await page
-                    .getByRole("dialog")
-                    .count();
-                console.log("Modal overlay count after:", modalOverlayAfter);
+                    // Wait a moment for the state to update
+                    await page.waitForFunction(
+                        () => document.readyState === "complete",
+                        { timeout: 1000 }
+                    );
 
-                const modalDialogAfter = await page.getByRole("dialog").count();
-                console.log("Modal dialog count after:", modalDialogAfter);
+                    console.log("=== AFTER BUTTON CLICK ===");
+                    const modalOverlayAfter = await page
+                        .getByRole("dialog")
+                        .count();
+                    console.log(
+                        "Modal overlay count after:",
+                        modalOverlayAfter
+                    );
 
-                // Check dialog visibility and log details
-                const modalDialog = page.getByRole("dialog");
-                const isDialogVisible = await modalDialog.isVisible();
-                console.log("Modal dialog visible:", isDialogVisible);
+                    const modalDialogAfter = await page
+                        .getByRole("dialog")
+                        .count();
+                    console.log("Modal dialog count after:", modalDialogAfter);
 
-                const dialogHTML = await modalDialog
-                    .innerHTML()
-                    .catch(() => "No dialog found");
-                console.log(
-                    "Modal dialog HTML:",
-                    typeof dialogHTML === "string"
-                        ? dialogHTML.substring(0, 200) + "..."
-                        : dialogHTML
-                );
+                    // Check dialog visibility and log details
+                    const modalDialog = page.getByRole("dialog");
+                    const isDialogVisible = await modalDialog.isVisible();
+                    console.log("Modal dialog visible:", isDialogVisible);
 
-                // The modal overlay is visible, which means the modal opened successfully
-                const modalOverlay = page.getByRole("dialog");
-                await expect(modalOverlay).toBeVisible();
+                    const dialogHTML = await modalDialog
+                        .innerHTML()
+                        .catch(() => "No dialog found");
+                    console.log(
+                        "Modal dialog HTML:",
+                        typeof dialogHTML === "string"
+                            ? dialogHTML.substring(0, 200) + "..."
+                            : dialogHTML
+                    );
 
-                // Test passes if we can see the modal overlay
-                console.log(
-                    "✅ Modal opened successfully - overlay is visible"
-                );
+                    // The modal overlay is visible, which means the modal opened successfully
+                    const modalOverlay = page.getByRole("dialog");
+                    await expect(modalOverlay).toBeVisible();
 
-                // Verify we can close it
-                const closeButton = page.getByRole("button", {
-                    name: "Close modal",
-                });
-                await closeButton.click();
-                await expect(modalOverlay).toBeHidden();
-                console.log("✅ Modal closed successfully");
+                    // Test passes if we can see the modal overlay
+                    console.log(
+                        "✅ Modal opened successfully - overlay is visible"
+                    );
 
-                // Take screenshot of modal
-                await page.screenshot({
-                    path: "playwright/test-results/add-site-modal-open.png",
-                    fullPage: true,
-                });
+                    // Verify we can close it
+                    const closeButton = page.getByRole("button", {
+                        name: "Close modal",
+                    });
+                    await closeButton.click();
+                    await expect(modalOverlay).toBeHidden();
+                    console.log("✅ Modal closed successfully");
 
-                // Close modal with Escape
-                await page.keyboard.press("Escape");
+                    // Take screenshot of modal
+                    await page.screenshot({
+                        path: "playwright/test-results/add-site-modal-open.png",
+                        fullPage: true,
+                    });
 
-                // Verify modal is closed
-                await expect(page.getByRole("dialog")).toBeHidden();
+                    // Close modal with Escape
+                    await page.keyboard.press("Escape");
+
+                    // Verify modal is closed
+                    await expect(page.getByRole("dialog")).toBeHidden();
+                } finally {
+                    await electronApp.close();
+                }
             }
         );
 
@@ -125,39 +144,48 @@ test.describe(
             {
                 tag: ["@fast", "@controls"],
             },
-            async ({ window: page }) => {
-                // Wait for basic app initialization
-                await waitForAppInitialization(page);
+            async () => {
+                const electronApp = await launchElectronApp();
+                const page = await electronApp.firstWindow();
 
-                // Verify all header controls are present
-                await expect(
-                    page.getByRole("button", { name: "Add new site" })
-                ).toBeVisible();
-                await expect(
-                    page.getByRole("button", { name: "Toggle theme" })
-                ).toBeVisible();
-                await expect(
-                    page.getByRole("button", { name: "Settings" })
-                ).toBeVisible();
+                try {
+                    // Wait for basic app initialization
+                    await waitForAppInitialization(page);
 
-                // Test theme toggle
-                await page
-                    .getByRole("button", { name: "Toggle theme" })
-                    .click();
-                await page.waitForFunction(
-                    () => document.readyState === "complete",
-                    { timeout: WAIT_TIMEOUTS.SHORT }
-                );
+                    // Verify all header controls are present
+                    await expect(
+                        page.getByRole("button", { name: "Add new site" })
+                    ).toBeVisible();
+                    await expect(
+                        page.getByRole("button", { name: "Toggle theme" })
+                    ).toBeVisible();
+                    await expect(
+                        page.getByRole("button", { name: "Settings" })
+                    ).toBeVisible();
 
-                // Test settings button
-                await page.getByRole("button", { name: "Settings" }).click();
-                await expect(page.getByRole("dialog")).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                    // Test theme toggle
+                    await page
+                        .getByRole("button", { name: "Toggle theme" })
+                        .click();
+                    await page.waitForFunction(
+                        () => document.readyState === "complete",
+                        { timeout: WAIT_TIMEOUTS.SHORT }
+                    );
 
-                // Close settings modal
-                await page.keyboard.press("Escape");
-                await expect(page.getByRole("dialog")).toBeHidden();
+                    // Test settings button
+                    await page
+                        .getByRole("button", { name: "Settings" })
+                        .click();
+                    await expect(page.getByRole("dialog")).toBeVisible({
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
+
+                    // Close settings modal
+                    await page.keyboard.press("Escape");
+                    await expect(page.getByRole("dialog")).toBeHidden();
+                } finally {
+                    await electronApp.close();
+                }
             }
         );
 
@@ -166,43 +194,54 @@ test.describe(
             {
                 tag: ["@medium", "@dashboard"],
             },
-            async ({ window: page }) => {
-                // Wait for basic app initialization
-                await waitForAppInitialization(page);
+            async () => {
+                const electronApp = await launchElectronApp();
+                const page = await electronApp.firstWindow();
 
-                // Try to wait for dashboard with longer timeout
                 try {
-                    await waitForDashboard(page, WAIT_TIMEOUTS.LONG);
-                    console.log("✓ Dashboard loaded successfully");
+                    // Wait for basic app initialization
+                    await waitForAppInitialization(page);
 
-                    // If dashboard loads, verify it has content
-                    await expect(
-                        page.getByText(/Monitored Sites \(\d+\)/)
-                    ).toBeVisible();
-                } catch (error) {
-                    const errorMessage = String(error);
-                    console.log(
-                        "Dashboard did not load within timeout:",
-                        errorMessage
-                    );
+                    // Try to wait for dashboard with longer timeout
+                    try {
+                        await waitForDashboard(page, WAIT_TIMEOUTS.LONG);
+                        console.log("✓ Dashboard loaded successfully");
 
-                    // Take screenshot to see current state
-                    await page.screenshot({
-                        path: "playwright/test-results/dashboard-timeout.png",
-                        fullPage: true,
-                    });
+                        // If dashboard loads, verify it has content
+                        await expect(
+                            page.getByText(/Monitored Sites \(\d+\)/)
+                        ).toBeVisible();
+                    } catch (error) {
+                        const errorMessage = String(error);
+                        console.log(
+                            "Dashboard did not load within timeout:",
+                            errorMessage
+                        );
 
-                    // Log what elements are present
-                    const allTestIds = await page.getByTestId("").all();
-                    console.log("Available elements:");
-                    for (let i = 0; i < allTestIds.length; i++) {
-                        const testId =
-                            await allTestIds[i]?.getAttribute("data-testid");
-                        console.log(`  - data-testid="${testId ?? "null"}"`);
+                        // Take screenshot to see current state
+                        await page.screenshot({
+                            path: "playwright/test-results/dashboard-timeout.png",
+                            fullPage: true,
+                        });
+
+                        // Log what elements are present
+                        const allTestIds = await page.getByTestId("").all();
+                        console.log("Available elements:");
+                        for (let i = 0; i < allTestIds.length; i++) {
+                            const testId =
+                                await allTestIds[i]?.getAttribute(
+                                    "data-testid"
+                                );
+                            console.log(
+                                `  - data-testid="${testId ?? "null"}"`
+                            );
+                        }
+
+                        // Log the issue but don't skip the test
+                        console.log("Continuing with available elements...");
                     }
-
-                    // Log the issue but don't skip the test
-                    console.log("Continuing with available elements...");
+                } finally {
+                    await electronApp.close();
                 }
             }
         );

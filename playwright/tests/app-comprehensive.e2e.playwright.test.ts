@@ -21,11 +21,14 @@
 /* eslint-disable playwright/prefer-web-first-assertions */
 /* eslint-disable playwright/no-networkidle */
 
-import { test, expect } from "../fixtures/electron-test";
+import { test, expect } from "@playwright/test";
+import { launchElectronApp } from "../fixtures/electron-helpers";
 import {
+    waitForAppInitialization,
     openSettingsModal,
     closeModal,
     toggleTheme,
+    ensureCleanUIState as _ensureCleanUIState,
     WAIT_TIMEOUTS,
     UI_SELECTORS,
 } from "../utils/ui-helpers";
@@ -45,6 +48,10 @@ test.describe(
         },
     },
     () => {
+        test.beforeEach(async () => {
+            // Each test starts with a clean state
+        });
+
         test(
             "should launch and initialize application",
             {
@@ -58,23 +65,33 @@ test.describe(
                     description: "Basic application startup and initialization",
                 },
             },
-            async ({ window: page }) => {
-                // Verify main application container
-                await expect(
-                    page.locator(UI_SELECTORS.APP_CONTAINER)
-                ).toBeVisible();
-                await expect(
-                    page.locator(UI_SELECTORS.DASHBOARD_CONTAINER)
-                ).toBeVisible();
+            async () => {
+                const electronApp = await launchElectronApp();
+                const page = await electronApp.firstWindow();
 
-                // Verify page title
-                await expect(page).toHaveTitle(/Uptime Watcher/);
+                try {
+                    // Wait for app to initialize
+                    await waitForAppInitialization(page);
 
-                // Take screenshot for documentation
-                await page.screenshot({
-                    path: "playwright/test-results/app-initialized.png",
-                    fullPage: true,
-                });
+                    // Verify main application container
+                    await expect(
+                        page.locator(UI_SELECTORS.APP_CONTAINER)
+                    ).toBeVisible();
+                    await expect(
+                        page.locator(UI_SELECTORS.DASHBOARD_CONTAINER)
+                    ).toBeVisible();
+
+                    // Verify page title
+                    await expect(page).toHaveTitle(/Uptime Watcher/);
+
+                    // Take screenshot for documentation
+                    await page.screenshot({
+                        path: "playwright/test-results/app-initialized.png",
+                        fullPage: true,
+                    });
+                } finally {
+                    await electronApp.close();
+                }
             }
         );
 
@@ -92,35 +109,46 @@ test.describe(
                         "Header component display and controls presence",
                 },
             },
-            async ({ window: page }) => {
-                // Verify header is present
-                const header = page.getByRole("banner");
-                await expect(header).toBeVisible();
+            async () => {
+                const electronApp = await launchElectronApp();
+                const page = await electronApp.firstWindow();
 
-                // Verify application title
-                await expect(page.getByText("Uptime Watcher")).toBeVisible();
+                try {
+                    await waitForAppInitialization(page);
 
-                // Verify header controls are present
-                await expect(
-                    page.locator(UI_SELECTORS.ADD_SITE_BUTTON)
-                ).toBeVisible();
-                await expect(
-                    page.locator(UI_SELECTORS.THEME_TOGGLE)
-                ).toBeVisible();
-                await expect(
-                    page.locator(UI_SELECTORS.SETTINGS_BUTTON)
-                ).toBeVisible();
+                    // Verify header is present
+                    const header = page.getByRole("banner");
+                    await expect(header).toBeVisible();
 
-                // Verify controls have proper ARIA labels
-                await expect(
-                    page.locator(UI_SELECTORS.ADD_SITE_BUTTON)
-                ).toHaveAttribute("aria-label", "Add new site");
-                await expect(
-                    page.locator(UI_SELECTORS.THEME_TOGGLE)
-                ).toHaveAttribute("aria-label", "Toggle theme");
-                await expect(
-                    page.locator(UI_SELECTORS.SETTINGS_BUTTON)
-                ).toHaveAttribute("aria-label", "Settings");
+                    // Verify application title
+                    await expect(
+                        page.getByText("Uptime Watcher")
+                    ).toBeVisible();
+
+                    // Verify header controls are present
+                    await expect(
+                        page.locator(UI_SELECTORS.ADD_SITE_BUTTON)
+                    ).toBeVisible();
+                    await expect(
+                        page.locator(UI_SELECTORS.THEME_TOGGLE)
+                    ).toBeVisible();
+                    await expect(
+                        page.locator(UI_SELECTORS.SETTINGS_BUTTON)
+                    ).toBeVisible();
+
+                    // Verify controls have proper ARIA labels
+                    await expect(
+                        page.locator(UI_SELECTORS.ADD_SITE_BUTTON)
+                    ).toHaveAttribute("aria-label", "Add new site");
+                    await expect(
+                        page.locator(UI_SELECTORS.THEME_TOGGLE)
+                    ).toHaveAttribute("aria-label", "Toggle theme");
+                    await expect(
+                        page.locator(UI_SELECTORS.SETTINGS_BUTTON)
+                    ).toHaveAttribute("aria-label", "Settings");
+                } finally {
+                    await electronApp.close();
+                }
             }
         );
 
@@ -138,28 +166,37 @@ test.describe(
                         "Dashboard display and monitor count functionality",
                 },
             },
-            async ({ window: page }) => {
-                // Verify dashboard container
-                await expect(
-                    page.locator(UI_SELECTORS.DASHBOARD_CONTAINER)
-                ).toBeVisible();
+            async () => {
+                const electronApp = await launchElectronApp();
+                const page = await electronApp.firstWindow();
 
-                // Verify monitor count display
-                const monitorCountElement = page.getByText(
-                    /Monitored Sites \(\d+\)/
-                );
-                await expect(monitorCountElement).toBeVisible();
+                try {
+                    await waitForAppInitialization(page);
 
-                // Get the current count
-                const countText = await monitorCountElement.textContent();
-                expect(countText).toMatch(/Monitored Sites \(\d+\)/);
+                    // Verify dashboard container
+                    await expect(
+                        page.locator(UI_SELECTORS.DASHBOARD_CONTAINER)
+                    ).toBeVisible();
 
-                // Verify status summary is present
-                const statusElements = page.locator(
-                    ".status-up-badge, .status-down-badge, .status-pending-badge"
-                );
-                const statusCount = await statusElements.count();
-                expect(statusCount).toBeGreaterThanOrEqual(0); // Status indicators may or may not be present
+                    // Verify monitor count display
+                    const monitorCountElement = page.getByText(
+                        /Monitored Sites \(\d+\)/
+                    );
+                    await expect(monitorCountElement).toBeVisible();
+
+                    // Get the current count
+                    const countText = await monitorCountElement.textContent();
+                    expect(countText).toMatch(/Monitored Sites \(\d+\)/);
+
+                    // Verify status summary is present
+                    const statusElements = page.locator(
+                        ".status-up-badge, .status-down-badge, .status-pending-badge"
+                    );
+                    const statusCount = await statusElements.count();
+                    expect(statusCount).toBeGreaterThanOrEqual(0); // Status indicators may or may not be present
+                } finally {
+                    await electronApp.close();
+                }
             }
         );
 
@@ -177,44 +214,54 @@ test.describe(
                         "Settings modal opening and closing functionality",
                 },
             },
-            async ({ window: page }) => {
-                // Verify no modal is initially open
-                await expect(
-                    page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                ).toBeHidden();
+            async () => {
+                const electronApp = await launchElectronApp();
+                const page = await electronApp.firstWindow();
 
-                // Open settings modal
-                await openSettingsModal(page);
+                try {
+                    await waitForAppInitialization(page);
 
-                // Verify settings modal is visible
-                await expect(
-                    page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                ).toBeVisible();
-                await expect(
-                    page.locator(UI_SELECTORS.MODAL_DIALOG)
-                ).toBeVisible();
+                    // Verify no modal is initially open
+                    await expect(
+                        page.locator(UI_SELECTORS.MODAL_OVERLAY)
+                    ).toBeHidden();
 
-                // Look for settings-specific content
-                const settingsText = page.getByText(
-                    /Settings|Application Settings|Configuration/
-                );
-                const settingsInputs = page.locator(
-                    'select, input[type="checkbox"], input[type="radio"]'
-                );
+                    // Open settings modal
+                    await openSettingsModal(page);
 
-                // At least one settings indicator should be present
-                const hasSettingsText = (await settingsText.count()) > 0;
-                const hasSettingsInputs = (await settingsInputs.count()) > 0;
+                    // Verify settings modal is visible
+                    await expect(
+                        page.locator(UI_SELECTORS.MODAL_OVERLAY)
+                    ).toBeVisible();
+                    await expect(
+                        page.locator(UI_SELECTORS.MODAL_DIALOG)
+                    ).toBeVisible();
 
-                expect(hasSettingsText || hasSettingsInputs).toBe(true);
+                    // Look for settings-specific content
+                    const settingsText = page.getByText(
+                        /Settings|Application Settings|Configuration/
+                    );
+                    const settingsInputs = page.locator(
+                        'select, input[type="checkbox"], input[type="radio"]'
+                    );
 
-                // Close modal
-                await closeModal(page, "button");
+                    // At least one settings indicator should be present
+                    const hasSettingsText = (await settingsText.count()) > 0;
+                    const hasSettingsInputs =
+                        (await settingsInputs.count()) > 0;
 
-                // Verify modal is closed
-                await expect(
-                    page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                ).toBeHidden();
+                    expect(hasSettingsText || hasSettingsInputs).toBe(true);
+
+                    // Close modal
+                    await closeModal(page, "button");
+
+                    // Verify modal is closed
+                    await expect(
+                        page.locator(UI_SELECTORS.MODAL_OVERLAY)
+                    ).toBeHidden();
+                } finally {
+                    await electronApp.close();
+                }
             }
         );
 
@@ -231,51 +278,64 @@ test.describe(
                     description: "Theme switching functionality",
                 },
             },
-            async ({ window: page }) => {
-                // Get initial theme state by checking the app container class
-                const appContainer = page.locator(UI_SELECTORS.APP_CONTAINER);
-                const initialClasses = await appContainer.getAttribute("class");
-                expect(initialClasses).toBeTruthy();
+            async () => {
+                const electronApp = await launchElectronApp();
+                const page = await electronApp.firstWindow();
 
-                // Toggle theme
-                await toggleTheme(page);
+                try {
+                    await waitForAppInitialization(page);
 
-                // Wait for theme change to apply
-                await page.waitForFunction(
-                    () => {
-                        const container = document.querySelector(
-                            '[data-testid="app-container"]'
-                        );
-                        return container && container.className !== "";
-                    },
-                    { timeout: WAIT_TIMEOUTS.SHORT }
-                );
+                    // Get initial theme state by checking the app container class
+                    const appContainer = page.locator(
+                        UI_SELECTORS.APP_CONTAINER
+                    );
+                    const initialClasses =
+                        await appContainer.getAttribute("class");
+                    expect(initialClasses).toBeTruthy();
 
-                // Verify theme changed
-                const newClasses = await appContainer.getAttribute("class");
-                expect(newClasses).toBeTruthy();
-                expect(newClasses).not.toBe(initialClasses);
+                    // Toggle theme
+                    await toggleTheme(page);
 
-                // Theme toggle button should change icon
-                const themeButton = page.locator(UI_SELECTORS.THEME_TOGGLE);
-                const buttonText = await themeButton.textContent();
-                expect(buttonText).toMatch(/🌙|☀️/); // Should contain either moon or sun emoji
+                    // Wait for theme change to apply
+                    await page.waitForFunction(
+                        () => {
+                            const container = document.querySelector(
+                                '[data-testid="app-container"]'
+                            );
+                            return container && container.className !== "";
+                        },
+                        { timeout: WAIT_TIMEOUTS.SHORT }
+                    );
 
-                // Toggle back
-                await toggleTheme(page);
-                await page.waitForFunction(
-                    () => {
-                        const container = document.querySelector(
-                            '[data-testid="app-container"]'
-                        );
-                        return container && container.className !== "";
-                    },
-                    { timeout: WAIT_TIMEOUTS.SHORT }
-                );
+                    // Verify theme changed
+                    const newClasses = await appContainer.getAttribute("class");
+                    expect(newClasses).toBeTruthy();
+                    expect(newClasses).not.toBe(initialClasses);
 
-                // Should return to original state
-                const finalClasses = await appContainer.getAttribute("class");
-                expect(finalClasses).toBe(initialClasses);
+                    // Theme toggle button should change icon
+                    const themeButton = page.locator(UI_SELECTORS.THEME_TOGGLE);
+                    const buttonText = await themeButton.textContent();
+                    expect(buttonText).toMatch(/🌙|☀️/); // Should contain either moon or sun emoji
+
+                    // Toggle back
+                    await toggleTheme(page);
+                    await page.waitForFunction(
+                        () => {
+                            const container = document.querySelector(
+                                '[data-testid="app-container"]'
+                            );
+                            return container && container.className !== "";
+                        },
+                        { timeout: WAIT_TIMEOUTS.SHORT }
+                    );
+
+                    // Should return to original state
+                    const finalClasses =
+                        await appContainer.getAttribute("class");
+                    expect(finalClasses).toBe(initialClasses);
+                } finally {
+                    await electronApp.close();
+                }
             }
         );
 
@@ -293,38 +353,47 @@ test.describe(
                         "Keyboard navigation and accessibility support",
                 },
             },
-            async ({ window: page }) => {
-                // Test Tab navigation through controls
-                await page.keyboard.press("Tab");
-                let focusedElement = page.locator(":focus");
-                await expect(focusedElement).toBeVisible();
+            async () => {
+                const electronApp = await launchElectronApp();
+                const page = await electronApp.firstWindow();
 
-                // Continue tabbing through elements
-                await page.keyboard.press("Tab");
-                await page.keyboard.press("Tab");
-                await page.keyboard.press("Tab");
+                try {
+                    await waitForAppInitialization(page);
 
-                // Should be able to reach all interactive elements
-                focusedElement = page.locator(":focus");
-                await expect(focusedElement).toBeVisible();
+                    // Test Tab navigation through controls
+                    await page.keyboard.press("Tab");
+                    let focusedElement = page.locator(":focus");
+                    await expect(focusedElement).toBeVisible();
 
-                // Test Enter key on a button
-                const addSiteButton = page.locator(
-                    UI_SELECTORS.ADD_SITE_BUTTON
-                );
-                await addSiteButton.focus();
-                await page.keyboard.press("Enter");
+                    // Continue tabbing through elements
+                    await page.keyboard.press("Tab");
+                    await page.keyboard.press("Tab");
+                    await page.keyboard.press("Tab");
 
-                // Should open the add site modal
-                await expect(
-                    page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                    // Should be able to reach all interactive elements
+                    focusedElement = page.locator(":focus");
+                    await expect(focusedElement).toBeVisible();
 
-                // Close modal with Escape
-                await page.keyboard.press("Escape");
-                await expect(
-                    page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                ).toBeHidden();
+                    // Test Enter key on a button
+                    const addSiteButton = page.locator(
+                        UI_SELECTORS.ADD_SITE_BUTTON
+                    );
+                    await addSiteButton.focus();
+                    await page.keyboard.press("Enter");
+
+                    // Should open the add site modal
+                    await expect(
+                        page.locator(UI_SELECTORS.MODAL_OVERLAY)
+                    ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+
+                    // Close modal with Escape
+                    await page.keyboard.press("Escape");
+                    await expect(
+                        page.locator(UI_SELECTORS.MODAL_OVERLAY)
+                    ).toBeHidden();
+                } finally {
+                    await electronApp.close();
+                }
             }
         );
 
@@ -341,51 +410,60 @@ test.describe(
                     description: "Responsive design and window resizing",
                 },
             },
-            async ({ window: page }) => {
-                // Set initial window size
-                await page.setViewportSize({ width: 1200, height: 800 });
-                await page.waitForLoadState("networkidle", {
-                    timeout: WAIT_TIMEOUTS.SHORT,
-                });
+            async () => {
+                const electronApp = await launchElectronApp();
+                const page = await electronApp.firstWindow();
 
-                // Verify layout at normal size
-                await expect(
-                    page.locator(UI_SELECTORS.APP_CONTAINER)
-                ).toBeVisible();
-                await expect(
-                    page.locator(UI_SELECTORS.DASHBOARD_CONTAINER)
-                ).toBeVisible();
+                try {
+                    await waitForAppInitialization(page);
 
-                // Resize to smaller window
-                await page.setViewportSize({ width: 800, height: 600 });
-                await page.waitForLoadState("networkidle", {
-                    timeout: WAIT_TIMEOUTS.SHORT,
-                });
+                    // Set initial window size
+                    await page.setViewportSize({ width: 1200, height: 800 });
+                    await page.waitForLoadState("networkidle", {
+                        timeout: WAIT_TIMEOUTS.SHORT,
+                    });
 
-                // Should still be functional
-                await expect(
-                    page.locator(UI_SELECTORS.APP_CONTAINER)
-                ).toBeVisible();
-                await expect(
-                    page.locator(UI_SELECTORS.ADD_SITE_BUTTON)
-                ).toBeVisible();
+                    // Verify layout at normal size
+                    await expect(
+                        page.locator(UI_SELECTORS.APP_CONTAINER)
+                    ).toBeVisible();
+                    await expect(
+                        page.locator(UI_SELECTORS.DASHBOARD_CONTAINER)
+                    ).toBeVisible();
 
-                // Resize to very small window
-                await page.setViewportSize({ width: 480, height: 360 });
-                await page.waitForLoadState("networkidle", {
-                    timeout: WAIT_TIMEOUTS.SHORT,
-                });
+                    // Resize to smaller window
+                    await page.setViewportSize({ width: 800, height: 600 });
+                    await page.waitForLoadState("networkidle", {
+                        timeout: WAIT_TIMEOUTS.SHORT,
+                    });
 
-                // Core functionality should still work
-                await expect(
-                    page.locator(UI_SELECTORS.APP_CONTAINER)
-                ).toBeVisible();
+                    // Should still be functional
+                    await expect(
+                        page.locator(UI_SELECTORS.APP_CONTAINER)
+                    ).toBeVisible();
+                    await expect(
+                        page.locator(UI_SELECTORS.ADD_SITE_BUTTON)
+                    ).toBeVisible();
 
-                // Reset to normal size
-                await page.setViewportSize({ width: 1200, height: 800 });
-                await page.waitForLoadState("networkidle", {
-                    timeout: WAIT_TIMEOUTS.SHORT,
-                });
+                    // Resize to very small window
+                    await page.setViewportSize({ width: 480, height: 360 });
+                    await page.waitForLoadState("networkidle", {
+                        timeout: WAIT_TIMEOUTS.SHORT,
+                    });
+
+                    // Core functionality should still work
+                    await expect(
+                        page.locator(UI_SELECTORS.APP_CONTAINER)
+                    ).toBeVisible();
+
+                    // Reset to normal size
+                    await page.setViewportSize({ width: 1200, height: 800 });
+                    await page.waitForLoadState("networkidle", {
+                        timeout: WAIT_TIMEOUTS.SHORT,
+                    });
+                } finally {
+                    await electronApp.close();
+                }
             }
         );
 
@@ -402,38 +480,51 @@ test.describe(
                     description: "Error handling and graceful degradation",
                 },
             },
-            async ({ window: page }) => {
-                // App should be stable and not show any error alerts initially
-                const errorAlerts = page.locator(
-                    '[role="alert"], .error-alert, .alert-error'
-                );
-                const errorCount = await errorAlerts.count();
+            async () => {
+                const electronApp = await launchElectronApp();
+                const page = await electronApp.firstWindow();
 
-                // Check for errors and handle gracefully (up to 3 errors max)
-                for (let i = 0; i < Math.min(errorCount, 3); i++) {
-                    const errorAlert = errorAlerts.nth(i);
-                    await expect(errorAlert).toBeVisible();
+                try {
+                    await waitForAppInitialization(page);
 
-                    // Try to find and click dismiss button if available
-                    const dismissButton = errorAlert.getByRole("button");
-                    const dismissButtonCount = await dismissButton.count();
+                    // App should be stable and not show any error alerts initially
+                    const errorAlerts = page.locator(
+                        '[role="alert"], .error-alert, .alert-error'
+                    );
+                    const errorCount = await errorAlerts.count();
 
-                    // Click dismiss button if it exists
-                    expect(
-                        dismissButtonCount === 0 || dismissButtonCount > 0
-                    ).toBe(true);
-                    for (let j = 0; j < Math.min(dismissButtonCount, 1); j++) {
-                        await dismissButton.nth(j).click();
+                    // Check for errors and handle gracefully (up to 3 errors max)
+                    for (let i = 0; i < Math.min(errorCount, 3); i++) {
+                        const errorAlert = errorAlerts.nth(i);
+                        await expect(errorAlert).toBeVisible();
+
+                        // Try to find and click dismiss button if available
+                        const dismissButton = errorAlert.getByRole("button");
+                        const dismissButtonCount = await dismissButton.count();
+
+                        // Click dismiss button if it exists
+                        expect(
+                            dismissButtonCount === 0 || dismissButtonCount > 0
+                        ).toBe(true);
+                        for (
+                            let j = 0;
+                            j < Math.min(dismissButtonCount, 1);
+                            j++
+                        ) {
+                            await dismissButton.nth(j).click();
+                        }
                     }
-                }
 
-                // App should remain functional regardless
-                await expect(
-                    page.locator(UI_SELECTORS.APP_CONTAINER)
-                ).toBeVisible();
-                await expect(
-                    page.locator(UI_SELECTORS.ADD_SITE_BUTTON)
-                ).toBeVisible();
+                    // App should remain functional regardless
+                    await expect(
+                        page.locator(UI_SELECTORS.APP_CONTAINER)
+                    ).toBeVisible();
+                    await expect(
+                        page.locator(UI_SELECTORS.ADD_SITE_BUTTON)
+                    ).toBeVisible();
+                } finally {
+                    await electronApp.close();
+                }
             }
         );
 
@@ -450,52 +541,61 @@ test.describe(
                     description: "State management and navigation consistency",
                 },
             },
-            async ({ window: page }) => {
-                // Get initial state
-                const initialMonitorCount = await page
-                    .getByText(/Monitored Sites \(\d+\)/)
-                    .textContent();
+            async () => {
+                const electronApp = await launchElectronApp();
+                const page = await electronApp.firstWindow();
 
-                // Open and close various modals
-                await page.locator(UI_SELECTORS.ADD_SITE_BUTTON).click();
-                await expect(
-                    page.locator(UI_SELECTORS.MODAL_OVERLAY)
-                ).toBeVisible();
-                await closeModal(page, "escape");
+                try {
+                    await waitForAppInitialization(page);
 
-                await openSettingsModal(page);
-                await closeModal(page, "button");
+                    // Get initial state
+                    const initialMonitorCount = await page
+                        .getByText(/Monitored Sites \(\d+\)/)
+                        .textContent();
 
-                // Toggle theme multiple times
-                await toggleTheme(page);
-                await page.waitForLoadState("networkidle", {
-                    timeout: WAIT_TIMEOUTS.SHORT,
-                });
-                await toggleTheme(page);
-                await page.waitForLoadState("networkidle", {
-                    timeout: WAIT_TIMEOUTS.SHORT,
-                });
+                    // Open and close various modals
+                    await page.locator(UI_SELECTORS.ADD_SITE_BUTTON).click();
+                    await expect(
+                        page.locator(UI_SELECTORS.MODAL_OVERLAY)
+                    ).toBeVisible();
+                    await closeModal(page, "escape");
 
-                // Verify state is maintained
-                const finalMonitorCount = page.getByText(
-                    /Monitored Sites \(\d+\)/
-                );
-                // Compare with initial state if it was captured
-                expect(
-                    initialMonitorCount !== null &&
-                        typeof initialMonitorCount === "string"
-                ).toBe(true);
+                    await openSettingsModal(page);
+                    await closeModal(page, "button");
 
-                // Always expect some count text to be present
-                await expect(finalMonitorCount).toBeVisible();
+                    // Toggle theme multiple times
+                    await toggleTheme(page);
+                    await page.waitForLoadState("networkidle", {
+                        timeout: WAIT_TIMEOUTS.SHORT,
+                    });
+                    await toggleTheme(page);
+                    await page.waitForLoadState("networkidle", {
+                        timeout: WAIT_TIMEOUTS.SHORT,
+                    });
 
-                // App should still be fully functional
-                await expect(
-                    page.locator(UI_SELECTORS.APP_CONTAINER)
-                ).toBeVisible();
-                await expect(
-                    page.locator(UI_SELECTORS.DASHBOARD_CONTAINER)
-                ).toBeVisible();
+                    // Verify state is maintained
+                    const finalMonitorCount = page.getByText(
+                        /Monitored Sites \(\d+\)/
+                    );
+                    // Compare with initial state if it was captured
+                    expect(
+                        initialMonitorCount !== null &&
+                            typeof initialMonitorCount === "string"
+                    ).toBe(true);
+
+                    // Always expect some count text to be present
+                    await expect(finalMonitorCount).toBeVisible();
+
+                    // App should still be fully functional
+                    await expect(
+                        page.locator(UI_SELECTORS.APP_CONTAINER)
+                    ).toBeVisible();
+                    await expect(
+                        page.locator(UI_SELECTORS.DASHBOARD_CONTAINER)
+                    ).toBeVisible();
+                } finally {
+                    await electronApp.close();
+                }
             }
         );
     }
