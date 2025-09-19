@@ -6,7 +6,8 @@
  * complete application functionality works as intended.
  */
 
-import { test, expect, _electron as electron } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { test, expect } from "../fixtures/electron-test";
 import { ensureCleanState } from "../utils/modal-cleanup";
 
 // Test data for comprehensive workflows
@@ -55,32 +56,19 @@ test.describe(
         },
     },
     () => {
-        let electronApp: any;
-        let window: any;
-
         // Helper function to verify multiple elements visibility
-        const verifyElementsVisible = async (selectors: string[]) => {
+        const verifyElementsVisible = async (
+            window: Page,
+            selectors: string[]
+        ) => {
             for (const selector of selectors) {
                 await expect(window.getByText(selector)).toBeVisible();
             }
         };
 
-        test.beforeEach(async () => {
-            electronApp = await electron.launch({
-                args: ["."],
-                env: {
-                    ...process.env,
-                    NODE_ENV: "test",
-                    SKIP_AUTO_UPDATES: "true",
-                },
-                timeout: 30000,
-            });
-
-            window = await electronApp.firstWindow();
-            await window.waitForLoadState("domcontentloaded");
-
+        test.beforeEach(async ({ window }) => {
             // Clean up database state before each test to ensure isolation
-            await window.evaluate(async () => {
+            await window.evaluate(async ({ window }) => {
                 try {
                     console.log("Attempting to delete all sites...");
                     // @ts-ignore - electronAPI is available in the renderer context
@@ -100,12 +88,6 @@ test.describe(
             await ensureCleanState(window);
         });
 
-        test.afterEach(async () => {
-            if (electronApp) {
-                await electronApp.close();
-            }
-        });
-
         test(
             "complete Site Management Workflow",
             {
@@ -122,7 +104,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
+            async ({ window }) => {
                 // Debug: Check what's actually on the page
                 await window.evaluate(() => {
                     console.log(
@@ -208,14 +190,14 @@ test.describe(
                 await window.getByRole("button", { name: "Add Site" }).click();
 
                 // Verify both sites exist
-                await verifyElementsVisible([
+                await verifyElementsVisible(window, [
                     TEST_SITES.primary.name,
                     TEST_SITES.secondary.name,
                 ]);
 
                 // Test site details navigation
                 await window.getByText(TEST_SITES.primary.name).click();
-                await verifyElementsVisible([
+                await verifyElementsVisible(window, [
                     "Site Overview",
                     "Monitor Overview",
                     "HTTP Analytics",
@@ -267,7 +249,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
+            async ({ window }) => {
                 // Add test site
                 await window
                     .getByRole("button", { name: "Add new site" })
@@ -328,7 +310,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
+            async ({ window }) => {
                 // Test global settings access using the specific testid
                 await window.getByTestId("button-settings").click();
                 await expect(window.getByText("⚙️ Settings")).toBeVisible();
@@ -405,7 +387,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
+            async ({ window }) => {
                 // Test invalid URL handling
                 await window
                     .getByRole("button", { name: "Add new site" })
@@ -479,7 +461,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
+            async ({ window }) => {
                 // Add multiple sites to test persistence
                 const sitesToAdd = [TEST_SITES.primary, TEST_SITES.secondary];
 
@@ -548,7 +530,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
+            async ({ window }) => {
                 // Add a site for multi-monitor testing
                 await window
                     .getByRole("button", { name: "Add new site" })
@@ -621,7 +603,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
+            async ({ window }) => {
                 // Test keyboard navigation
                 await window.keyboard.press("Tab");
                 await window.keyboard.press("Tab");

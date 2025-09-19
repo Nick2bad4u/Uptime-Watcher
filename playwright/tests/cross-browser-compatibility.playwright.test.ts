@@ -6,22 +6,19 @@
  *   different browser engines and device types.
  */
 
-import { test, expect } from "@playwright/test";
-import { launchElectronApp } from "../fixtures/electron-helpers";
-import { waitForAppInitialization } from "../utils/ui-helpers";
+import { test, expect } from "../fixtures/electron-test";
 
 test.describe("cross-Browser Compatibility", () => {
     test.describe("core Browser Features", () => {
-        test("should support modern JavaScript features @compatibility @javascript @features", async () => {
-            const electronApp = await launchElectronApp();
-            const page = await electronApp.firstWindow();
-
-            await waitForAppInitialization(page);
-
+        test("should support modern JavaScript features @compatibility @javascript @features", async ({
+            window: page,
+        }) => {
             // Test modern JavaScript features
             const jsFeatures = await page.evaluate(() => {
                 return {
-                    asyncAwait: typeof (async () => {})().then === "function",
+                    asyncAwait:
+                        typeof (async ({ window: page }) => {})().then ===
+                        "function",
                     arrow: (() => true)(),
                     destructuring: (() => {
                         const [a, b] = [1, 2];
@@ -61,16 +58,11 @@ test.describe("cross-Browser Compatibility", () => {
 
             // Check advanced features
             expect(jsFeatures.weakMap && jsFeatures.proxy).toBe(true);
-
-            await electronApp.close();
         });
 
-        test("should support modern CSS features @compatibility @css @features", async () => {
-            const electronApp = await launchElectronApp();
-            const page = await electronApp.firstWindow();
-
-            await waitForAppInitialization(page);
-
+        test("should support modern CSS features @compatibility @css @features", async ({
+            window: page,
+        }) => {
             // Test CSS feature support
             const cssFeatures = await page.evaluate(() => {
                 const testElement = document.createElement("div");
@@ -107,16 +99,11 @@ test.describe("cross-Browser Compatibility", () => {
             expect(cssFeatures.boxShadow).toBe(true);
             expect(cssFeatures.borderRadius).toBe(true);
             expect(cssFeatures.gradients).toBe(true);
-
-            await electronApp.close();
         });
 
-        test("should handle DOM APIs correctly @compatibility @dom @apis", async () => {
-            const electronApp = await launchElectronApp();
-            const page = await electronApp.firstWindow();
-
-            await waitForAppInitialization(page);
-
+        test("should handle DOM APIs correctly @compatibility @dom @apis", async ({
+            window: page,
+        }) => {
             // Test DOM API support
             const domFeatures = await page.evaluate(() => {
                 return {
@@ -168,18 +155,13 @@ test.describe("cross-Browser Compatibility", () => {
             expect(
                 domFeatures.intersectionObserver && domFeatures.mutationObserver
             ).toBe(true);
-
-            await electronApp.close();
         });
     });
 
     test.describe("storage and Data Persistence", () => {
-        test("should support modern storage APIs @compatibility @storage @persistence", async () => {
-            const electronApp = await launchElectronApp();
-            const page = await electronApp.firstWindow();
-
-            await waitForAppInitialization(page);
-
+        test("should support modern storage APIs @compatibility @storage @persistence", async ({
+            window: page,
+        }) => {
             // Test storage API support
             const storageFeatures = await page.evaluate(() => {
                 return {
@@ -215,16 +197,11 @@ test.describe("cross-Browser Compatibility", () => {
                     throw new Error("sessionStorage not working");
                 }
             });
-
-            await electronApp.close();
         });
 
-        test("should handle JSON data correctly @compatibility @json @data", async () => {
-            const electronApp = await launchElectronApp();
-            const page = await electronApp.firstWindow();
-
-            await waitForAppInitialization(page);
-
+        test("should handle JSON data correctly @compatibility @json @data", async ({
+            window: page,
+        }) => {
             // Test JSON handling
             const jsonResult = await page.evaluate(() => {
                 const testData = {
@@ -256,18 +233,13 @@ test.describe("cross-Browser Compatibility", () => {
             expect(jsonResult.stringified).toBe("string");
             expect(jsonResult.parsedType).toBe("object");
             expect(jsonResult.dataIntegrity).toBe(true);
-
-            await electronApp.close();
         });
     });
 
     test.describe("network and Communication", () => {
-        test("should support fetch API @compatibility @network @fetch", async () => {
-            const electronApp = await launchElectronApp();
-            const page = await electronApp.firstWindow();
-
-            await waitForAppInitialization(page);
-
+        test("should support fetch API @compatibility @network @fetch", async ({
+            window: page,
+        }) => {
             // Test fetch API support
             const fetchSupport = await page.evaluate(() => {
                 return {
@@ -286,16 +258,11 @@ test.describe("cross-Browser Compatibility", () => {
             expect(fetchSupport.headers).toBe(true);
             expect(fetchSupport.url).toBe(true);
             expect(fetchSupport.urlSearchParams).toBe(true);
-
-            await electronApp.close();
         });
 
-        test("should handle WebSocket connections @compatibility @websocket @network", async () => {
-            const electronApp = await launchElectronApp();
-            const page = await electronApp.firstWindow();
-
-            await waitForAppInitialization(page);
-
+        test("should handle WebSocket connections @compatibility @websocket @network", async ({
+            window: page,
+        }) => {
             // Test WebSocket support
             const wsSupport = await page.evaluate(() => {
                 return {
@@ -310,18 +277,13 @@ test.describe("cross-Browser Compatibility", () => {
             expect(wsSupport.messageEvent).toBe(true);
             expect(wsSupport.closeEvent).toBe(true);
             expect(wsSupport.errorEvent).toBe(true);
-
-            await electronApp.close();
         });
     });
 
     test.describe("security and Compatibility", () => {
-        test("should support security features @compatibility @security @crypto", async () => {
-            const electronApp = await launchElectronApp();
-            const page = await electronApp.firstWindow();
-
-            await waitForAppInitialization(page);
-
+        test("should support security features @compatibility @security @crypto", async ({
+            window: page,
+        }) => {
             // Test security features
             const securityFeatures = await page.evaluate(() => {
                 return {
@@ -335,16 +297,11 @@ test.describe("cross-Browser Compatibility", () => {
 
             expect(securityFeatures.crypto).toBe(true);
             expect(securityFeatures.cryptoSubtle).toBe(true);
-
-            await electronApp.close();
         });
 
-        test("should handle origin context correctly @compatibility @security @origin", async () => {
-            const electronApp = await launchElectronApp();
-            const page = await electronApp.firstWindow();
-
-            await waitForAppInitialization(page);
-
+        test("should handle origin context correctly @compatibility @security @origin", async ({
+            window: page,
+        }) => {
             // Test origin and security context
             const originInfo = await page.evaluate(() => {
                 return {
@@ -359,8 +316,6 @@ test.describe("cross-Browser Compatibility", () => {
             expect(originInfo.sameOrigin).toBe(true);
             expect(originInfo.origin).toBeTruthy();
             expect(originInfo.protocol).toBeTruthy();
-
-            await electronApp.close();
         });
     });
 });

@@ -5,7 +5,8 @@
  * operations, performance testing, and advanced user workflows.
  */
 
-import { test, expect, _electron as electron } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { test, expect } from "../fixtures/electron-test";
 import { ensureCleanState } from "../utils/modal-cleanup";
 
 // Test data for advanced scenarios
@@ -42,11 +43,12 @@ test.describe(
         },
     },
     () => {
-        let electronApp: any;
-        let window: any;
-
         // Helper function to add bulk sites efficiently
-        const addBulkSites = async (sites: readonly any[], maxSites = 10) => {
+        const addBulkSites = async (
+            window: Page,
+            sites: readonly { name: string; url: string }[],
+            maxSites = 10
+        ) => {
             const sitesToAdd = sites.slice(0, maxSites);
             let addedCount = 0;
 
@@ -80,22 +82,9 @@ test.describe(
             return addedCount;
         };
 
-        test.beforeEach(async () => {
-            electronApp = await electron.launch({
-                args: ["."],
-                env: {
-                    ...process.env,
-                    NODE_ENV: "test",
-                    SKIP_AUTO_UPDATES: "true",
-                },
-                timeout: 45000,
-            });
-
-            window = await electronApp.firstWindow();
-            await window.waitForLoadState("domcontentloaded");
-
+        test.beforeEach(async ({ window }) => {
             // Enhanced cleanup for advanced tests
-            await window.evaluate(async () => {
+            await window.evaluate(async ({ window }) => {
                 try {
                     // @ts-ignore - electronAPI is available in the renderer context
                     const deletedCount = await (
@@ -110,12 +99,6 @@ test.describe(
             });
 
             await ensureCleanState(window);
-        });
-
-        test.afterEach(async () => {
-            if (electronApp) {
-                await electronApp.close();
-            }
         });
 
         test(
@@ -134,10 +117,10 @@ test.describe(
                     },
                 ],
             },
-            async () => {
+            async ({ window }) => {
                 // Add only 3 sites to prevent timeouts
                 const testSites = BULK_TEST_SITES.slice(0, 3);
-                const addedCount = await addBulkSites(testSites, 3);
+                const addedCount = await addBulkSites(window, testSites, 3);
 
                 // Verify sites were added
                 expect(addedCount).toBe(3);
@@ -179,7 +162,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
+            async ({ window }) => {
                 // Add a few sites for keyboard navigation testing
                 await addBulkSites(BULK_TEST_SITES, 3);
 
@@ -237,7 +220,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
+            async ({ window }) => {
                 // Add high-frequency monitoring sites (reduced to 2 for stability)
                 await addBulkSites(HIGH_FREQUENCY_SITES, 2);
 
@@ -282,7 +265,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
+            async ({ window }) => {
                 // Add fewer sites for stability
                 await addBulkSites(BULK_TEST_SITES, 3);
 
@@ -339,7 +322,7 @@ test.describe(
                     },
                 ],
             },
-            async () => {
+            async ({ window }) => {
                 // Add diverse monitoring sites (reduced for stability)
                 const monitoringSites = [
                     {

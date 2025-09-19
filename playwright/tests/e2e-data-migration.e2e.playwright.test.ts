@@ -5,7 +5,7 @@
  * handles site management properly, modeled after working edge-cases tests.
  */
 
-import { test, expect, _electron as electron } from "@playwright/test";
+import { test, expect } from "../fixtures/electron-test";
 
 test.describe(
     "data Migration & Import Tests - E2E",
@@ -22,32 +22,6 @@ test.describe(
         },
     },
     () => {
-        /**
-         * Helper to launch app for testing - exact copy of working edge-cases
-         * pattern.
-         */
-        async function launchAppForStressTesting() {
-            const electronApp = await electron.launch({
-                args: ["."],
-                env: {
-                    ...process.env,
-                    NODE_ENV: "test",
-                },
-            });
-
-            const window = await electronApp.firstWindow();
-            await window.waitForLoadState("domcontentloaded");
-
-            await expect(window.getByTestId("app-root")).toBeVisible({
-                timeout: 15000,
-            });
-            await expect(window.getByTestId("app-root")).not.toBeEmpty({
-                timeout: 10000,
-            });
-
-            return { electronApp, window };
-        }
-
         test(
             "single site data management",
             {
@@ -57,38 +31,27 @@ test.describe(
                     description: "Test basic site data operations",
                 },
             },
-            async () => {
-                const { electronApp, window } =
-                    await launchAppForStressTesting();
+            async ({ window }) => {
+                // Add a single test site
+                await window
+                    .getByRole("button", { name: "Add new site" })
+                    .click();
+                await window.waitForTimeout(1000);
 
-                try {
-                    // Add a single test site
-                    await window
-                        .getByRole("button", { name: "Add new site" })
-                        .click();
-                    await window.waitForTimeout(1000);
+                await window.getByLabel("Site Name").fill("Test Site 1");
+                await window
+                    .getByLabel("URL")
+                    .fill("https://httpbin.org/status/200");
+                await window.getByRole("button", { name: "Add Site" }).click();
+                await window.waitForTimeout(2000);
 
-                    await window.getByLabel("Site Name").fill("Test Site 1");
-                    await window
-                        .getByLabel("URL")
-                        .fill("https://httpbin.org/status/200");
-                    await window
-                        .getByRole("button", { name: "Add Site" })
-                        .click();
-                    await window.waitForTimeout(2000);
+                // Verify site was added
+                await expect(window.getByTestId("site-card")).toHaveCount(1);
 
-                    // Verify site was added
-                    await expect(window.getByTestId("site-card")).toHaveCount(
-                        1
-                    );
-
-                    await window.screenshot({
-                        path: "playwright/test-results/data-migration-01-single-site.png",
-                        fullPage: true,
-                    });
-                } finally {
-                    await electronApp.close();
-                }
+                await window.screenshot({
+                    path: "playwright/test-results/data-migration-01-single-site.png",
+                    fullPage: true,
+                });
             }
         );
 
@@ -101,27 +64,18 @@ test.describe(
                     description: "Test settings functionality",
                 },
             },
-            async () => {
-                const { electronApp, window } =
-                    await launchAppForStressTesting();
+            async ({ window }) => {
+                // Test settings access
+                await window.getByRole("button", { name: "Settings" }).click();
+                await window.waitForTimeout(1000);
+                await expect(window.getByText("⚙️ Settings")).toBeVisible();
+                await window.getByTestId("button-close-settings").click();
+                await window.waitForTimeout(500);
 
-                try {
-                    // Test settings access
-                    await window
-                        .getByRole("button", { name: "Settings" })
-                        .click();
-                    await window.waitForTimeout(1000);
-                    await expect(window.getByText("⚙️ Settings")).toBeVisible();
-                    await window.getByTestId("button-close-settings").click();
-                    await window.waitForTimeout(500);
-
-                    await window.screenshot({
-                        path: "playwright/test-results/data-migration-02-settings.png",
-                        fullPage: true,
-                    });
-                } finally {
-                    await electronApp.close();
-                }
+                await window.screenshot({
+                    path: "playwright/test-results/data-migration-02-settings.png",
+                    fullPage: true,
+                });
             }
         );
 
