@@ -7,14 +7,142 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[80a4732](https://github.com/Nick2bad4u/Uptime-Watcher/commit/80a4732902a06d280632acf6fbb0ef6d105be2ae)...
+[80a4732](https://github.com/Nick2bad4u/Uptime-Watcher/commit/80a4732902a06d280632acf6fbb0ef6d105be2ae)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/80a4732902a06d280632acf6fbb0ef6d105be2ae...80a4732902a06d280632acf6fbb0ef6d105be2ae))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 15.2.0 [`(80a4732)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/80a4732902a06d280632acf6fbb0ef6d105be2ae)
+
+
+
+
+
+
+## [15.2.0] - 2025-09-19
+
+
 [[c5480c7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c5480c780cf9fdcb09a3eab98306adf53568c18a)...
-[c5480c7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c5480c780cf9fdcb09a3eab98306adf53568c18a)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c5480c780cf9fdcb09a3eab98306adf53568c18a...c5480c780cf9fdcb09a3eab98306adf53568c18a))
+[3251410](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3251410faba3610d8da8735e2fcaed5573406404)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c5480c780cf9fdcb09a3eab98306adf53568c18a...3251410faba3610d8da8735e2fcaed5573406404))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 15.1.0 [`(c5480c7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c5480c780cf9fdcb09a3eab98306adf53568c18a)
+
+
+
+### 🛠️ Other Changes
+
+- Merge PR #72
+
+Revert "refactor: streamline playwright test suite" [`(f22c335)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f22c3354915f0c80c7d490f209d6c042024d710f)
+
+
+- Revert "refactor: streamline playwright test suite" [`(2bb7e01)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2bb7e01eb79e3e07dc77512643445fe7b041d50c)
+
+
+- Merge PR #71
+
+refactor: streamline playwright test suite [`(0829269)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/082926958e58244116ddd18f74fc43d661501005)
+
+
+
+### 🚜 Refactor
+
+- Streamline playwright test suite [`(fd117a8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fd117a8b7331ecf3138b72b2d888a8ddce3d0c40)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Establish unified docs standards and correct links
+
+- Introduces a comprehensive documentation style guide to enforce consistent Markdown formatting, naming conventions, and best practices across the project.
+- Renames multiple documentation files for uniform kebab-case naming, aligning with the new style guide.
+- Updates internal references and links in docs and guides to match revised filenames and structure.
+- Adds support and agent operation guides to clarify workflow expectations.
+- Performs extensive package upgrades and engine requirement bump to ensure compatibility and improved tooling.
+- Corrects references and improves clarity in architecture and testing docs.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2271fe6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2271fe64b31fb63d32546e7d983c9699febe9fd6)
+
+
+- 📝 [docs] Update and reorganize documentation structure
+
+- Removes emoji styling from section headers for consistency and clarity.
+- Standardizes capitalization and formatting across main and guide documentation files.
+- Adds comprehensive README files for Guides, TSDoc, and Testing directories, improving discoverability and onboarding.
+- Documents directory structures, content purpose, and navigation links to enhance contributor workflow.
+- Emphasizes best practices, usage guidelines, and contribution steps for development, testing, and documentation.
+- Improves documentation organization to support easier maintenance and future expansion.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(188ef64)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/188ef647f965a9a0c9291cbb74bfe2308bd67db0)
+
+
+- 📝 [docs] Update docs, templates, and version for project maturity
+
+- Modernizes and expands documentation, contributing guidelines, and templates to reflect improved architecture, code quality, and testing maturity
+- Introduces detailed documentation style guide and codebase analysis correction, clarifying previous recommendations and highlighting actual strengths
+- Refines issue, feature, and PR templates with clear sections, improved prompts, and emoji formatting for consistency
+- Updates project version to 15.0.0, refreshes dependency requirements, and reworks README for clarity, feature highlights, and future-oriented content
+- Improves quick start and internal links for developer onboarding and navigation
+- Emphasizes high testing standards, advanced contribution focus, and robust development workflows
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2e6d566)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2e6d566e59e2ac9e12c350084702839f098c052c)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Refactor Playwright tests to improve structure and increase timeout for complex workflows
+ - Consolidate test functions to utilize shared Electron fixtures
+ - Enhance timeout settings to 60 seconds for better handling of intricate test scenarios
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3251410)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3251410faba3610d8da8735e2fcaed5573406404)
+
+
+- 🧪 [test] Add comprehensive fuzzing and resilience tests for monitoring and database schema logic
+
+- Adds extensive property-based fuzzing tests for monitor type registry and database schema utilities, targeting edge cases, malformed input, error handling, SQL/XSS injection resistance, performance, and memory safety.
+- Improves reliability of HTTP monitor integration tests by adding transient error retry logic, reducing flakiness due to upstream/CDN issues.
+- Refines test generators to avoid empty or whitespace-only names for state management fuzzing.
+- Updates numeric and time-related assertions for better tolerance and correctness in conversion and timestamp tests.
+- Raises per-case async timeout for property-based tests to accommodate slower DOM and async scenarios.
+- Enables and disables Playwright raw locator rule at file boundaries for clarity.
+- Fixes race condition timing in abort signal fuzzing tests by adjusting abort delays.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(cdab7dc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cdab7dc34c1ba56c8473eeb19c8a1d4e9239e492)
+
+
+- 🧪 [test] Add comprehensive E2E tests for monitor types
+
+- Adds a full suite of Playwright tests covering HTTP, Port, and Ping monitor types, including validation, dynamic form fields, workflow, and config options
+- Increases timeout for complex workflows across all E2E test files to improve reliability
+- Updates AI prompt and chatmode docs to simplify settings and clarify testing best practices
+- Reduces Stryker concurrency default for more stable mutation testing runs
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6b01284)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6b01284df25a97aea917bb58c54910d5fbe85141)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v15.1.0 [skip ci] [`(2057824)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2057824380d8d96ca61c3f30bbb0b60168b042b7)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update thinking mode to 'Ultrathink' and exclude Playwright from coverage
+
+- Standardizes AI thinking mode to 'Ultrathink' in prompt and chatmode files for clarity and consistency.
+- Expands code coverage exclusions to omit Playwright files and directories, ensuring accurate coverage metrics by preventing E2E test code from inflating results.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(09a9f25)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/09a9f25392a3f7e3ed78daeceb4c164b123a947e)
 
 
 
