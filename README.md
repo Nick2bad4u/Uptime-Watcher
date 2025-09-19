@@ -302,8 +302,6 @@ HTTP/TCP/DNS/Ping']
     click SQLite 'docs/Architecture/ADRs/ADR-001-Repository-Pattern.md' 'Review repository pattern'
 ```
 
-
-
 ### **🔧 Core components**
 
 - **🖥️ Main Process (Electron)**: Service container with dependency injection
