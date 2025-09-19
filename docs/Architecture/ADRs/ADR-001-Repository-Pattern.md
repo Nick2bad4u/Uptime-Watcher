@@ -22,7 +22,6 @@ We will use the **Repository Pattern** for all database access with the followin
 ### Repository operation lifecycle
 
 ```mermaid
-%%{init: {'theme': 'neutral', 'themeVariables': { 'fontFamily': 'Inter, system-ui, sans-serif', 'primaryColor': '#0f172a', 'primaryTextColor': '#f8fafc', 'primaryBorderColor': '#38bdf8', 'lineColor': '#0ea5e9' }, 'state': { 'nodeSpacing': 55, 'useMaxWidth': true } }}%%
 stateDiagram-v2
     [*] --> PublicAsync: Public async method
     PublicAsync --> AcquireTx: executeTransaction() boundary

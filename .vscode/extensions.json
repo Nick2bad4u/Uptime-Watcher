@@ -27,6 +27,9 @@
         "michaelcurrin.auto-commit-msg",
         "rendinjast.amoled-black",
         "piotrpalarz.vscode-gitignore-generator",
-        "xyz.local-history"
+        "xyz.local-history",
+        "automatalabs.copilot-mcp",
+        "kevinkyang.auto-comment-blocks",
+        "edwinhuish.better-comments-next"
     ]
 }

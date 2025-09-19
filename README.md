@@ -235,7 +235,6 @@ The application follows a **service-oriented architecture** with clear separatio
 ### System architecture overview
 
 ```mermaid
-%%{init: {'theme': 'neutral', 'themeVariables': { 'fontFamily': 'Inter, system-ui, sans-serif', 'primaryColor': '#0f172a', 'primaryTextColor': '#f8fafc', 'primaryBorderColor': '#38bdf8', 'lineColor': '#0ea5e9', 'tertiaryColor': '#f1f5f9', 'clusterBkg': '#0f172a', 'clusterBorder': '#1e293b' }, 'flowchart': { 'curve': 'basis', 'htmlLabels': true } }}%%
 flowchart LR
     classDef persona fill:#fffbeb,stroke:#f97316,color:#9a3412,font-weight:bold;
     classDef main fill:#fdf2f8,stroke:#db2777,color:#831843;

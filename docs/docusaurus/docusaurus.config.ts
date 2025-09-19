@@ -438,6 +438,12 @@ const config: Config = {
             defaultLanguage: "typescript",
             theme: prismThemes.github,
         },
+        mermaid: {
+            theme: { dark: "dark", light: "neutral" },
+            options: {
+                configFile: "../../mermaid.config.json",
+            },
+        },
         zoom: {
             background: {
                 dark: "rgb(50, 50, 50)",
