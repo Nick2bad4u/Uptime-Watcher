@@ -22,6 +22,40 @@ docs/Architecture/
 └── tsdoc-standards.md           # Documentation standards
 ```
 
+### Architecture documentation map
+
+```mermaid
+flowchart TD
+    classDef hub fill:#0f172a,stroke:#0f172a,stroke-width:2px,color:#f8fafc;
+    classDef section fill:#e2e8f0,stroke:#1e293b,stroke-width:2px,color:#0f172a;
+    classDef file fill:#fef3c7,stroke:#c2410c,stroke-width:2px,color:#7c2d12;
+
+    Docs(("Architecture Knowledge Base"))
+    Docs --> ADRs["ADRs"]
+    Docs --> Patterns["Patterns"]
+    Docs --> Templates["Templates"]
+    Docs --> Standards["Standards"]
+    Docs --> Onboarding["Usage Guides"]
+
+    ADRs --> ADR1["ADR-001 Repository Pattern"]
+    ADRs --> ADR2["ADR-002 Event-Driven Architecture"]
+    ADRs --> ADR3["ADR-003 Error Handling Strategy"]
+    ADRs --> ADR4["ADR-004 Frontend State Management"]
+    ADRs --> ADR5["ADR-005 IPC Protocol"]
+
+    Patterns --> PatternGuide["Development Patterns Guide"]
+    Templates --> RepoTemplate["Repository Template"]
+    Templates --> StoreTemplate["Zustand Store Template"]
+    Templates --> IPCTemplate["IPC Handler Template"]
+    Standards --> TsdocStandards["TSDoc Standards"]
+    Onboarding --> QuickStart["Using This Documentation"]
+    Onboarding --> Compliance["Compliance Checklists"]
+
+    class Docs hub;
+    class ADRs,Patterns,Templates,Standards,Onboarding section;
+    class ADR1,ADR2,ADR3,ADR4,ADR5,PatternGuide,RepoTemplate,StoreTemplate,IPCTemplate,TsdocStandards,QuickStart,Compliance file;
+```
+
 ## 🏗️ Architecture Decision Records (ADRs)
 
 ADRs document the key architectural decisions made during development, their context, consequences, and implementation guidelines.

@@ -19,6 +19,26 @@ Traditional direct method calls would create tight coupling, make the system dif
 
 We will use an **Event-Driven Architecture** based on a custom `TypedEventBus` with the following characteristics:
 
+### Event propagation overview
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Service as Monitoring Service
+    participant EventBus as TypedEventBus
+    participant Middleware as Middleware Chain
+    participant IPC as Secure IPC Bridge
+    participant Renderer as Renderer Store/UI
+
+    Service->>EventBus: emitTyped("monitor:status-changed")
+    EventBus->>Middleware: Attach metadata & correlation IDs
+    Middleware->>Middleware: Logging / validation / rate limiting
+    Middleware->>EventBus: next()
+    EventBus->>IPC: Forward typed payload
+    IPC->>Renderer: Dispatch typed handler
+    Renderer->>Renderer: Update store & surface UI changes
+```
+
 ### 1. Enhanced Type Safety
 
 ```typescript

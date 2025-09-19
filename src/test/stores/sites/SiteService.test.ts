@@ -105,7 +105,10 @@ describe("SiteService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            mockElectronAPI.sites.getSites.mockResolvedValueOnce([]);
+            mockElectronAPI.sites.getSites.mockResolvedValueOnce({
+                success: true,
+                data: [],
+            });
 
             const sites = await SiteService.getSites();
 
@@ -191,7 +194,10 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce(createdSite);
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce({
+                success: true,
+                data: createdSite,
+            });
 
             const result = await SiteService.addSite(newSite);
 
@@ -501,9 +507,10 @@ describe("SiteService", () => {
                 fileName: "backup.db",
             };
 
-            mockElectronAPI.data.downloadSQLiteBackup.mockResolvedValueOnce(
-                backupData
-            );
+            mockElectronAPI.data.downloadSQLiteBackup.mockResolvedValueOnce({
+                success: true,
+                data: backupData,
+            });
 
             const result = await SiteService.downloadSQLiteBackup();
 
@@ -619,9 +626,10 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce(
-                validSite as Site
-            );
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce({
+                success: true,
+                data: validSite as Site,
+            });
 
             await SiteService.addSite(validSite);
 
@@ -672,9 +680,10 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce(
-                siteWithMonitors as Site
-            );
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce({
+                success: true,
+                data: siteWithMonitors as Site,
+            });
 
             const result = await SiteService.addSite(siteWithMonitors);
 
@@ -710,9 +719,10 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce(
-                siteWithSpecialChars as Site
-            );
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce({
+                success: true,
+                data: siteWithSpecialChars as Site,
+            });
 
             const result = await SiteService.addSite(siteWithSpecialChars);
 
@@ -748,9 +758,10 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce(
-                siteWithUnicode as Site
-            );
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce({
+                success: true,
+                data: siteWithUnicode as Site,
+            });
 
             const result = await SiteService.addSite(siteWithUnicode);
 

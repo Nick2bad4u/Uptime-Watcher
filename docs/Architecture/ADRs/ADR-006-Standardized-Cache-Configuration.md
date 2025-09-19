@@ -28,6 +28,69 @@ We will implement **Standardized Cache Configuration** using centralized constan
 
 ### 2. Configuration Structure
 
+```mermaid
+graph TB
+    subgraph "Cache Configuration Hierarchy"
+        CacheConfig["CACHE_CONFIG"]
+
+        subgraph "Domain-Specific Configurations"
+            SitesConfig["SITES<br/>TTL: 10 min<br/>Size: 500<br/>Stats: enabled"]
+            MonitorsConfig["MONITORS<br/>TTL: 5 min<br/>Size: 1000<br/>Stats: enabled"]
+            SettingsConfig["SETTINGS<br/>TTL: 30 min<br/>Size: 100<br/>Stats: enabled"]
+            ValidationConfig["VALIDATION<br/>TTL: 5 min<br/>Size: 200<br/>Stats: enabled"]
+            TemporaryConfig["TEMPORARY<br/>TTL: 5 min<br/>Size: 1000<br/>Stats: disabled"]
+        end
+
+        subgraph "Cache Implementation"
+            SitesCache["StandardizedCache&lt;Site&gt;"]
+            MonitorsCache["StandardizedCache&lt;Monitor&gt;"]
+            SettingsCache["StandardizedCache&lt;Setting&gt;"]
+            ValidationCache["StandardizedCache&lt;ValidationResult&gt;"]
+            TemporaryCache["StandardizedCache&lt;unknown&gt;"]
+        end
+
+        subgraph "Cache Names"
+            CacheNames["CACHE_NAMES"]
+            SitesNaming["sites() / sites-temp"]
+            MonitorsNaming["monitors() / monitors-backup"]
+            SettingsNaming["settings() / settings-temp"]
+            TemporaryNaming["temporary-import / temporary-export"]
+        end
+    end
+
+    CacheConfig --> SitesConfig
+    CacheConfig --> MonitorsConfig
+    CacheConfig --> SettingsConfig
+    CacheConfig --> ValidationConfig
+    CacheConfig --> TemporaryConfig
+
+    SitesConfig -.-> SitesCache
+    MonitorsConfig -.-> MonitorsCache
+    SettingsConfig -.-> SettingsCache
+    ValidationConfig -.-> ValidationCache
+    TemporaryConfig -.-> TemporaryCache
+
+    CacheNames --> SitesNaming
+    CacheNames --> MonitorsNaming
+    CacheNames --> SettingsNaming
+    CacheNames --> TemporaryNaming
+
+    SitesNaming -.-> SitesCache
+    MonitorsNaming -.-> MonitorsCache
+    SettingsNaming -.-> SettingsCache
+    TemporaryNaming -.-> TemporaryCache
+
+    classDef config fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef cache fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef naming fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
+    classDef main fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8
+
+    class CacheConfig main
+    class SitesConfig,MonitorsConfig,SettingsConfig,ValidationConfig,TemporaryConfig config
+    class SitesCache,MonitorsCache,SettingsCache,ValidationCache,TemporaryCache cache
+    class CacheNames,SitesNaming,MonitorsNaming,SettingsNaming,TemporaryNaming naming
+```
+
 ```typescript
 export const CACHE_CONFIG = Object.freeze({
  SITES: Object.freeze({
@@ -105,6 +168,46 @@ const sitesCache = new StandardizedCache<Site>({
 
 ### 5. TTL Reasoning
 
+### Cache Lifecycle and TTL Management
+
+```mermaid
+gantt
+    title Cache TTL Timeline and Data Freshness
+    dateFormat X
+    axisFormat %s
+
+    section Real-time Monitoring
+    Monitors (5 min)     :monitors, 0, 300
+    Validation (5 min)   :validation, 0, 300
+    Temporary (5 min)    :temporary, 0, 300
+
+    section Site Management
+    Sites (10 min)       :sites, 0, 600
+
+    section Configuration
+    Settings (30 min)    :settings, 0, 1800
+
+    section Refresh Cycles
+    Monitor Refresh      :milestone, monitors-refresh, 300
+    Site Refresh         :milestone, sites-refresh, 600
+    Settings Refresh     :milestone, settings-refresh, 1800
+```
+
+### Cache Size and Performance Relationship
+
+```mermaid
+quadrantChart
+    title Cache Configuration Matrix
+    x-axis Low Size Limit --> High Size Limit
+    y-axis Short TTL --> Long TTL
+
+    Temporary: [0.8, 0.2]
+    Monitors: [0.9, 0.2]
+    Validation: [0.4, 0.2]
+    Sites: [0.5, 0.6]
+    Settings: [0.1, 0.9]
+```
+
 - **SITES (10 minutes)**: Moderate expiration balancing freshness with performance for site management operations
 - **MONITORS (5 minutes)**: Shorter expiration for real-time monitoring requirements
 - **SETTINGS (30 minutes)**: Longer expiration since configuration changes are infrequent
@@ -151,6 +254,45 @@ const sitesCache = new StandardizedCache<Site>({
 4. **`electron/constants.ts`** - Extended `CACHE_TTL` and `CACHE_SIZE_LIMITS` for new cache types
 
 ### Configuration Matrix
+
+```mermaid
+flowchart LR
+    subgraph "Cache Type Decision Flow"
+        DataType{What type of data?}
+
+        DataType -->|Site Management| SiteDecision{Update Frequency?}
+        DataType -->|Real-time Monitoring| MonitorDecision{Performance Critical?}
+        DataType -->|Application Config| SettingsDecision{Change Frequency?}
+        DataType -->|Validation Results| ValidationDecision{Accuracy vs Performance?}
+        DataType -->|Short-term Operations| TemporaryDecision{Memory Constraints?}
+
+        SiteDecision -->|Moderate updates| SitesChoice["SITES Config<br/>10 min TTL, 500 size"]
+
+        MonitorDecision -->|High performance need| MonitorsChoice["MONITORS Config<br/>5 min TTL, 1000 size"]
+
+        SettingsDecision -->|Infrequent changes| SettingsChoice["SETTINGS Config<br/>30 min TTL, 100 size"]
+
+        ValidationDecision -->|Balance both| ValidationChoice["VALIDATION Config<br/>5 min TTL, 200 size"]
+
+        TemporaryDecision -->|Large operations| TemporaryChoice["TEMPORARY Config<br/>5 min TTL, 1000 size<br/>No stats for performance"]
+    end
+
+    subgraph "Configuration Properties"
+        SitesChoice --> SitesProps["Name: sites<br/>Stats: enabled<br/>Use case: Site management"]
+        MonitorsChoice --> MonitorsProps["Name: monitors<br/>Stats: enabled<br/>Use case: Real-time data"]
+        SettingsChoice --> SettingsProps["Name: settings<br/>Stats: enabled<br/>Use case: App configuration"]
+        ValidationChoice --> ValidationProps["Name: validation-results<br/>Stats: enabled<br/>Use case: Data validation"]
+        TemporaryChoice --> TemporaryProps["Name: temporary<br/>Stats: disabled<br/>Use case: Ephemeral ops"]
+    end
+
+    classDef decision fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
+    classDef config fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef properties fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+
+    class DataType,SiteDecision,MonitorDecision,SettingsDecision,ValidationDecision,TemporaryDecision decision
+    class SitesChoice,MonitorsChoice,SettingsChoice,ValidationChoice,TemporaryChoice config
+    class SitesProps,MonitorsProps,SettingsProps,ValidationProps,TemporaryProps properties
+```
 
 | Cache Type | TTL    | Max Size | Stats | Use Case                   |
 | ---------- | ------ | -------- | ----- | -------------------------- |

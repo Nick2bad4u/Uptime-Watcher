@@ -12,7 +12,7 @@ import type { Site } from "@shared/types";
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { logger } from "../../../services/logger";
-import { safeExtractIpcData } from "../../../types/ipc";
+import { extractIpcData } from "../../../types/ipc";
 import { waitForElectronAPI } from "../../utils";
 
 /**
@@ -48,7 +48,7 @@ export const SiteService = {
     async addSite(site: Site): Promise<Site> {
         await this.initialize();
         const response = await window.electronAPI.sites.addSite(site);
-        return safeExtractIpcData(response, site);
+        return extractIpcData<Site>(response);
     },
 
     /**
@@ -94,10 +94,10 @@ export const SiteService = {
     }> {
         await this.initialize();
         const response = await window.electronAPI.data.downloadSQLiteBackup();
-        return safeExtractIpcData(response, {
-            buffer: new ArrayBuffer(0),
-            fileName: "backup.db",
-        });
+        return extractIpcData<{
+            buffer: ArrayBuffer;
+            fileName: string;
+        }>(response);
     },
 
     /**
@@ -117,7 +117,7 @@ export const SiteService = {
     async getSites(): Promise<Site[]> {
         await this.initialize();
         const response = await window.electronAPI.sites.getSites();
-        return safeExtractIpcData(response, []);
+        return extractIpcData<Site[]>(response);
     },
 
     /**

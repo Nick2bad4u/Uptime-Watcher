@@ -166,7 +166,87 @@ const performAction = async () => {
 
 ## Store Categories
 
-### 1. Domain Stores
+### Store Architecture and Component Relationships
+
+````mermaid
+graph TB
+    subgraph "React Components"
+        SitesList["Sites List"]
+        SiteDetails["Site Details"]
+        MonitorConfig["Monitor Config"]
+        SettingsPanel["Settings Panel"]
+        ErrorDisplay["Error Display"]
+        UpdateNotification["Update Notification"]
+    end
+
+    subgraph "Zustand Stores"
+        subgraph "Domain Stores"
+            SitesStore["useSitesStore<br/>Complex - Modular Pattern"]
+            MonitorTypesStore["useMonitorTypesStore<br/>Simple - Direct Pattern"]
+        end
+
+        subgraph "UI Stores"
+            UIStore["useUIStore<br/>Simple - Direct Pattern<br/>+ Persistence"]
+            ErrorStore["useErrorStore<br/>Simple - Direct Pattern"]
+        end
+
+        subgraph "System Stores"
+            UpdatesStore["useUpdatesStore<br/>Simple - Direct Pattern"]
+            SettingsStore["useSettingsStore<br/>Simple - Direct Pattern<br/>+ Persistence"]
+        end
+    end
+
+    subgraph "External Systems"
+        IPC["IPC/Electron API"]
+        LocalStorage["Browser Storage"]
+        EventSystem["Event System"]
+    end
+
+    subgraph "Store Modules (Complex Stores)"
+        StateActions["State Actions Module"]
+        OperationsActions["Operations Actions Module"]
+        SyncActions["Sync Actions Module"]
+
+        SitesStore -.-> StateActions
+        SitesStore -.-> OperationsActions
+        SitesStore -.-> SyncActions
+    end
+
+    %% Component to Store connections
+    SitesList --> SitesStore
+    SiteDetails --> SitesStore
+    SiteDetails --> UIStore
+    MonitorConfig --> MonitorTypesStore
+    SettingsPanel --> SettingsStore
+    ErrorDisplay --> ErrorStore
+    UpdateNotification --> UpdatesStore
+
+    %% Store to External connections
+    SitesStore <--> IPC
+    MonitorTypesStore <--> IPC
+    SettingsStore <--> IPC
+    UpdatesStore <--> IPC
+
+    UIStore <--> LocalStorage
+    SettingsStore <--> LocalStorage
+
+    SitesStore <--> EventSystem
+    ErrorStore <--> EventSystem
+
+    classDef component fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef domainStore fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef uiStore fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
+    classDef systemStore fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8
+    classDef external fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#991b1b
+    classDef module fill:#e0f2fe,stroke:#0891b2,stroke-width:2px,color:#0e7490
+
+    class SitesList,SiteDetails,MonitorConfig,SettingsPanel,ErrorDisplay,UpdateNotification component
+    class SitesStore,MonitorTypesStore domainStore
+    class UIStore,ErrorStore uiStore
+    class UpdatesStore,SettingsStore systemStore
+    class IPC,LocalStorage,EventSystem external
+    class StateActions,OperationsActions,SyncActions module
+```### 1. Domain Stores
 
 Handle specific business domain state:
 
@@ -188,6 +268,113 @@ Handle application-level state:
 - `useSettingsStore` - Application settings and configuration
 
 ## State Update Patterns
+
+### Store Pattern Decision Flow
+
+```mermaid
+flowchart TD
+    NewStore["New Store Needed"] --> Assess{"Assess Store Requirements"}
+
+    Assess --> CheckResponsibility{"Single Responsibility?"}
+    CheckResponsibility -->|Yes| CheckSize{"Simple State Structure?<br/>< 200 lines"}
+    CheckResponsibility -->|No| UseModular["Use Modular Composition Pattern"]
+
+    CheckSize -->|Yes| CheckConcerns{"Limited Cross-cutting Concerns?"}
+    CheckSize -->|No| UseModular
+
+    CheckConcerns -->|Yes| CheckActions{"Straightforward Actions?"}
+    CheckConcerns -->|No| UseModular
+
+    CheckActions -->|Yes| UseDirect["Use Direct Create Pattern"]
+    CheckActions -->|No| UseModular
+
+    UseDirect --> DirectExamples["Examples:<br/>• useErrorStore<br/>• useUpdatesStore<br/>• useSettingsStore<br/>• useUIStore"]
+
+    UseModular --> ModularExamples["Examples:<br/>• useSitesStore<br/>• Complex domain stores<br/>• Multi-concern stores"]
+
+    DirectExamples --> Implementation["Implementation"]
+    ModularExamples --> Implementation
+
+    Implementation --> AddPersistence{"User Preferences?"}
+    AddPersistence -->|Yes| WithPersist["Add Persist Middleware"]
+    AddPersistence -->|No| WithoutPersist["No Persistence"]
+
+    WithPersist --> AddLogging["Add Action Logging"]
+    WithoutPersist --> AddLogging
+    AddLogging --> AddTypes["Define TypeScript Interfaces"]
+    AddTypes --> Complete["Store Complete"]
+
+    classDef decision fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
+    classDef pattern fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef example fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef complete fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8
+
+    class Assess,CheckResponsibility,CheckSize,CheckConcerns,CheckActions,AddPersistence decision
+    class UseDirect,UseModular pattern
+    class DirectExamples,ModularExamples,WithPersist,WithoutPersist,AddLogging,AddTypes example
+    class Implementation,Complete complete
+```### State Update Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant Component as React Component
+    participant Store as Zustand Store
+    participant Module as Store Module
+    participant IPC as IPC Layer
+    participant Backend as Backend Service
+    participant LocalStorage as Local Storage
+    participant EventSystem as Event System
+
+    Note over Component, EventSystem: State Update with Full Integration
+
+    Component->>Store: Trigger Action
+    Store->>Store: Log Action (logStoreAction)
+
+    alt Simple Store Pattern
+        Store->>Store: Direct State Update
+        Store->>LocalStorage: Persist (if configured)
+        Store->>Component: State Change Notification
+    else Modular Store Pattern
+        Store->>Module: Delegate to Module
+        Module->>Module: Process Business Logic
+
+        alt Async Operation Required
+            Module->>IPC: Call Backend API
+            IPC->>Backend: Service Operation
+            Backend-->>IPC: Response/Error
+            IPC-->>Module: Result
+
+            alt Success Path
+                Module->>Store: Update State (Immutable)
+                Store->>EventSystem: Emit Success Event
+            else Error Path
+                Module->>Store: Handle Error State
+                Store->>EventSystem: Emit Error Event
+            end
+        else Sync Operation
+            Module->>Store: Update State (Immutable)
+        end
+
+        Store->>LocalStorage: Persist Selected State
+        Store->>Component: State Change Notification
+    end
+
+    alt Optimistic Update
+        Note over Store: Immediate UI Update
+        Store->>Component: Optimistic State
+        Component->>Component: Update UI
+
+        alt Backend Confirms
+            Note over Store: Keep optimistic state
+        else Backend Rejects
+            Store->>Store: Rollback State
+            Store->>Component: Corrected State
+        end
+    end
+
+    Note over EventSystem: Events trigger other store updates
+    EventSystem->>Store: Cross-store Updates
+````
 
 ### 1. Immutable Updates
 
@@ -227,6 +414,72 @@ const sitesWithMonitorCount = useSitesStore((state) =>
 ```
 
 ## Integration with IPC
+
+### Store-IPC Integration and Event Flow
+
+```mermaid
+stateDiagram-v2
+    [*] --> StoreInitialized : Store Created
+
+    StoreInitialized --> ListeningForEvents : Setup Event Listeners
+    ListeningForEvents --> IdleState : Ready
+
+    IdleState --> UserAction : User Interaction
+    IdleState --> BackendEvent : Backend State Change
+    IdleState --> IPCEvent : IPC Event Received
+
+    UserAction --> OptimisticUpdate : Update UI Immediately
+    OptimisticUpdate --> IPCCall : Call Backend
+
+    IPCCall --> IPCPending : Awaiting Response
+    IPCPending --> IPCSuccess : Backend Confirms
+    IPCPending --> IPCFailure : Backend Rejects
+
+    IPCSuccess --> StateConfirmed : Keep Optimistic State
+    IPCFailure --> StateRollback : Revert to Previous State
+
+    StateConfirmed --> EventEmission : Emit Success Event
+    StateRollback --> ErrorHandling : Handle Error
+
+    BackendEvent --> StateSync : Sync from Backend
+    StateSync --> StateUpdated : Update Store State
+
+    IPCEvent --> EventProcessing : Process Event
+    EventProcessing --> ConditionalUpdate : Check if Update Needed
+    ConditionalUpdate --> StateUpdated : Update if Required
+    ConditionalUpdate --> IdleState : No Update Needed
+
+    StateUpdated --> ComponentRerender : Notify Components
+    EventEmission --> ComponentRerender
+    ErrorHandling --> ComponentRerender
+
+    ComponentRerender --> IdleState : Back to Idle
+
+    classDef activeState fill:#dcfce7,stroke:#16a34a,stroke-width:2px
+    classDef pendingState fill:#fef3c7,stroke:#d97706,stroke-width:2px
+    classDef errorState fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    classDef successState fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+
+    class StoreInitialized,IdleState,ComponentRerender activeState
+    class OptimisticUpdate,IPCPending,EventProcessing pendingState
+    class IPCFailure,StateRollback,ErrorHandling errorState
+    class IPCSuccess,StateConfirmed,EventEmission,StateUpdated successState
+
+    note right of OptimisticUpdate
+        Immediate UI feedback
+        for better UX
+    end note
+
+    note right of StateRollback
+        Preserve data integrity
+        on backend failure
+    end note
+
+    note right of StateSync
+        Keep frontend in sync
+        with backend changes
+    end note
+```
 
 ### Event-Driven Updates
 

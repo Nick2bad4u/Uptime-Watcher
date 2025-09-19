@@ -2,6 +2,83 @@
 
 This guide documents the established architectural patterns used throughout the Uptime-Watcher application. Following these patterns ensures consistency, maintainability, predictable behavior, and production-grade quality across the codebase.
 
+## Architectural Patterns Overview
+
+```mermaid
+graph TB
+    subgraph "Data Layer Patterns"
+        Repository[Repository Pattern<br/>• Transaction safety<br/>• Database operations<br/>• Dependency injection]
+        Cache[Standardized Cache<br/>• Configuration-driven<br/>• TTL management<br/>• Performance optimization]
+    end
+
+    subgraph "Communication Patterns"
+        Events[Event-Driven Communication<br/>• Typed events<br/>• Correlation tracking<br/>• Cross-system messaging]
+        IPC[IPC Communication<br/>• Security boundaries<br/>• Type safety<br/>• Channel isolation]
+    end
+
+    subgraph "State Management Patterns"
+        FrontendState[Frontend State Management<br/>• Zustand stores<br/>• Modular composition<br/>• Selective persistence]
+        ErrorHandling[Error Handling<br/>• Multi-layer strategy<br/>• Context preservation<br/>• Recovery mechanisms]
+    end
+
+    subgraph "Quality Assurance Patterns"
+        Memory[Memory Management<br/>• Resource cleanup<br/>• Leak prevention<br/>• Lifecycle management]
+        RaceCondition[Race Condition Prevention<br/>• Operation correlation<br/>• Atomic operations<br/>• State validation]
+        Testing[Testing Patterns<br/>• Mock strategies<br/>• Integration testing<br/>• Property-based testing]
+    end
+
+    subgraph "Production Concerns"
+        Monitoring[Monitoring & Observability<br/>• Event emission<br/>• Performance metrics<br/>• Correlation tracking]
+        Security[Security Patterns<br/>• Input validation<br/>• Boundary enforcement<br/>• Error sanitization]
+    end
+
+    %% Data Layer Relationships
+    Repository --> Cache
+    Repository --> Events
+    Repository --> ErrorHandling
+
+    %% Communication Relationships
+    Events --> IPC
+    Events --> FrontendState
+    Events --> Monitoring
+
+    IPC --> FrontendState
+    IPC --> Security
+    IPC --> ErrorHandling
+
+    %% State Management Relationships
+    FrontendState --> ErrorHandling
+    FrontendState --> Memory
+    FrontendState --> Events
+
+    ErrorHandling --> Events
+    ErrorHandling --> Monitoring
+
+    %% Quality Assurance Relationships
+    Memory --> RaceCondition
+    RaceCondition --> Events
+    Testing --> Repository
+    Testing --> FrontendState
+    Testing --> IPC
+
+    %% Production Relationships
+    Monitoring --> Events
+    Security --> IPC
+    Security --> ErrorHandling
+
+    classDef dataLayer fill:#e0f2fe,stroke:#0891b2,stroke-width:2px,color:#0e7490
+    classDef communication fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef stateManagement fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef quality fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
+    classDef production fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8
+
+    class Repository,Cache dataLayer
+    class Events,IPC communication
+    class FrontendState,ErrorHandling stateManagement
+    class Memory,RaceCondition,Testing quality
+    class Monitoring,Security production
+```
+
 ## Table of Contents
 
 1. [Repository Pattern](#repository-pattern)

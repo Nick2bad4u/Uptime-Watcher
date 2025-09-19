@@ -6,6 +6,34 @@ Thank you for using Uptime Watcher! This document provides information on how to
 
 ### 📚 Documentation
 
+### Support triage flow
+
+```mermaid
+flowchart TD
+    classDef action fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#075985;
+    classDef choice fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e;
+    classDef route fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d;
+    classDef alert fill:#fee2e2,stroke:#ef4444,stroke-width:2px,color:#991b1b;
+
+    NeedHelp(["Need assistance?"]):::action
+    Docs(["Review documentation"]):::route
+    Decide{"Still blocked?"}:::choice
+    Bug(["Bug or regression"]):::route
+    Feature(["Feature idea"]):::route
+    Question(["General question"]):::route
+    Security(["Security concern"]):::alert
+    IssueTemplate(["Use issue template"]):::route
+    Discussion(["Start discussion"]):::route
+    SecurityPolicy(["Follow security policy"]):::alert
+
+    NeedHelp --> Docs --> Decide
+    Decide -- yes --> Bug --> IssueTemplate
+    Decide -- yes --> Feature --> IssueTemplate
+    Decide -- yes --> Question --> Discussion
+    NeedHelp --> Security --> SecurityPolicy
+    Decide -- no --> NeedHelp
+```
+
 First, please check our comprehensive documentation:
 
 - **[README.md](README.md)** - Project overview and quick start

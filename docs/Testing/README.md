@@ -25,6 +25,28 @@ The Uptime Watcher application uses a comprehensive testing strategy with multip
 - **Fast-check** - Property-based testing and fuzzing
 - **Coverage analysis** - Comprehensive code coverage tracking
 
+### Test pipeline overview
+
+```mermaid
+flowchart LR
+    classDef stage fill:#dbeafe,stroke:#1d4ed8,stroke-width:2px,color:#1e3a8a;
+    classDef quality fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d;
+    classDef report fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95;
+
+    Trigger(["Push / PR / Nightly"]):::stage
+    Precommit(["Static checks\n(lint + type)"]):::quality
+    Unit(["Vitest unit suites"]):::quality
+    Electron(["Electron integration suites"]):::quality
+    Playwright(["Playwright e2e flows"]):::quality
+    Fuzz(["fast-check fuzzers"]):::quality
+    Coverage(["Coverage aggregation"]):::report
+    Artifacts(["Artifacts & dashboards"]):::report
+
+    Trigger --> Precommit --> Unit --> Electron --> Playwright --> Coverage
+    Unit --> Fuzz --> Coverage
+    Coverage --> Artifacts
+```
+
 ## 🚀 Quick start testing
 
 For new developers getting started with testing:

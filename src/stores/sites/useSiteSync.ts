@@ -61,7 +61,8 @@ export interface SiteSyncActions {
      * - Overall synchronization status
      * - Success/failure indicators
      *
-     * Uses `safeExtractIpcData` to handle IPC response safely.
+     * Uses `extractIpcData` to handle IPC response with proper error
+     * propagation.
      *
      * @returns Promise resolving to sync status information
      */

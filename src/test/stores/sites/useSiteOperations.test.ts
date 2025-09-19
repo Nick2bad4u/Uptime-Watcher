@@ -176,8 +176,11 @@ describe(createSiteOperationsActions, () => {
                 ],
             };
             void _newSite;
-            // Mock will return the passed site, but implementation uses safeExtractIpcData with completeSite as fallback
-            mockElectronAPI.sites.addSite.mockResolvedValue(undefined);
+            // Mock will return the passed site, but implementation uses extractIpcData
+            mockElectronAPI.sites.addSite.mockResolvedValue({
+                success: true,
+                data: expect.any(Object),
+            });
 
             await actions.createSite({
                 identifier: "new-site",
@@ -234,7 +237,10 @@ describe(createSiteOperationsActions, () => {
                 name: "Full Site",
             };
             const newSite = { ...mockSite, ...siteData };
-            mockElectronAPI.sites.addSite.mockResolvedValue(newSite);
+            mockElectronAPI.sites.addSite.mockResolvedValue({
+                success: true,
+                data: newSite,
+            });
 
             await actions.createSite(siteData);
 

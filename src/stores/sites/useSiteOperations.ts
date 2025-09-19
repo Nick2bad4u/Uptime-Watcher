@@ -17,7 +17,7 @@ import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
 
 import { logger } from "../../services/logger";
-import { safeExtractIpcData } from "../../types/ipc";
+import { extractIpcData } from "../../types/ipc";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
 import { normalizeMonitor } from "./utils/monitorOperations";
 import {
@@ -117,7 +117,7 @@ export const createSiteOperationsActions = (
 
                 const response =
                     await window.electronAPI.sites.addSite(completeSite);
-                const newSite = safeExtractIpcData(response, completeSite);
+                const newSite = extractIpcData<Site>(response);
                 deps.addSite(newSite);
             },
             { siteData },
@@ -172,9 +172,9 @@ export const createSiteOperationsActions = (
                     try {
                         const response =
                             await window.electronAPI.data.downloadSQLiteBackup();
-                        const result = safeExtractIpcData(response, {
-                            buffer: new ArrayBuffer(0),
-                        });
+                        const result = extractIpcData<{ buffer: ArrayBuffer }>(
+                            response
+                        );
                         return new Uint8Array(result.buffer);
                     } catch (error) {
                         logger.error(
@@ -199,7 +199,7 @@ export const createSiteOperationsActions = (
             "initializeSites",
             async () => {
                 const response = await window.electronAPI.sites.getSites();
-                const sites = safeExtractIpcData<Site[]>(response, []);
+                const sites = extractIpcData<Site[]>(response);
                 deps.setSites(sites);
                 return {
                     message: `Successfully loaded ${sites.length} sites`,
