@@ -7,14 +7,103 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[63f6932](https://github.com/Nick2bad4u/Uptime-Watcher/commit/63f6932d285d6857806305a143c427cf193dadb5)...
+[63f6932](https://github.com/Nick2bad4u/Uptime-Watcher/commit/63f6932d285d6857806305a143c427cf193dadb5)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/63f6932d285d6857806305a143c427cf193dadb5...63f6932d285d6857806305a143c427cf193dadb5))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 15.3.0 [`(63f6932)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/63f6932d285d6857806305a143c427cf193dadb5)
+
+
+
+
+
+
+## [15.3.0] - 2025-09-19
+
+
 [[80a4732](https://github.com/Nick2bad4u/Uptime-Watcher/commit/80a4732902a06d280632acf6fbb0ef6d105be2ae)...
-[80a4732](https://github.com/Nick2bad4u/Uptime-Watcher/commit/80a4732902a06d280632acf6fbb0ef6d105be2ae)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/80a4732902a06d280632acf6fbb0ef6d105be2ae...80a4732902a06d280632acf6fbb0ef6d105be2ae))
+[c4ca645](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c4ca645e64ae007c10407d3f001789f92f1d9963)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/80a4732902a06d280632acf6fbb0ef6d105be2ae...c4ca645e64ae007c10407d3f001789f92f1d9963))
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Round ping timeouts up to prevent premature expiration
+
+- Ensures requested ping timeouts are never shortened by rounding up to the next whole second, preserving expected duration and cross-platform reliability.
+- Adds targeted unit test to verify correct rounding behavior.
+- Updates documentation code block formats for improved clarity and consistency.
+- Adds linter ignores explaining centralized error handling in service and operations code.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a068cd8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a068cd809fe0b0f96b7e91bfe39dc4bd5e0fb1cf)
+
+
+- 🛠️ [fix] Ensure IPC errors propagate in site flows
+
+- Replaces fallback-based IPC response handling with strict error propagation for all site-related operations and backup downloads.
+- Updates tests and mocks to verify that backend failures are surfaced to callers, preventing silent error swallowing.
+- Adds regression tests to validate correct error propagation and minimal performance impact.
+- Improves documentation with architecture diagrams for workflows and system overviews.
+Fixes #ai-claims-validation
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8ef824d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8ef824d2394e4a13e3d888592f34e3e632eca3fa)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 15.2.0 [`(80a4732)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/80a4732902a06d280632acf6fbb0ef6d105be2ae)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Improve test mocks and error handling for site operations
+
+- Updates test mocks to return standardized IPC-style response structures for better consistency across tests.
+- Enhances error handling in site and monitoring operation tests to ensure exceptions are properly thrown and asserted.
+- Adds missing mock implementations for IPC extraction utilities to improve test isolation.
+- Increases timeouts and retry attempts for flaky HTTP monitor integration tests to reduce spurious failures.
+- Improves WASM asset path resolution in build config with fallback logic and clear error messaging, aiding reliability in development and CI.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5e72aa2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e72aa2253bf0ab548ebf4aa4f49beb75764aca8)
+
+
+- 🧪 [test] Add comprehensive Playwright E2E, Electron, and coverage tests
+
+- Introduces extensive Playwright test suites targeting edge cases, Electron-specific features, and simple component coverage to improve app robustness and reliability.
+- Expands E2E configuration with custom timeouts for comprehensive test scenarios.
+- Validates error handling, UI responsiveness, accessibility, data persistence, state management, and concurrent operations.
+- Enhances test tagging and annotation for better test organization and reporting.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b20df0a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b20df0a4dbc9db79cc5c157544255927d0f9d39a)
+
+
+- 🧪 [test] Refactors E2E tests to unify app launch and error handling
+
+- Simplifies Playwright test workflows by consistently launching the app within each test, removing legacy parameter usage and merge artifacts.
+- Wraps major test steps in try blocks for improved error reporting and robustness.
+- Enhances maintainability and clarity by using a unified approach across accessibility, workflow, and edge case tests.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5267e1a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5267e1a11ab75bdf5256adac0e6abc9fef0c66b1)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Remove redundant .github README and unify config formatting
+
+- Deletes the .github directory README to reduce duplication and centralize documentation.
+- Updates .editorconfig to use consistent key-value formatting, improving maintainability and editor compatibility.
+- Cleans up extraneous blank lines in main README and updates test documentation comments for clarity.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c4ca645)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c4ca645e64ae007c10407d3f001789f92f1d9963)
+
+
+- Update changelogs for v15.2.0 [skip ci] [`(66a04c3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66a04c36df685a86ae61380b5c50e1dcaf257514)
 
 
 
