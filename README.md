@@ -1,7 +1,7 @@
 # 📊 Uptime Watcher
 
 <div align="center"><a href="https://github.com/Nick2bad4u/Uptime-Watcher/releases">
-  <img src="https://img.shields.io/badge/version-12.9.0-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-15.0.0-blue.svg" alt="Version">
 </a>
 <a href="LICENSE">
   <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License">
@@ -42,7 +42,8 @@
 <strong>A Electron desktop application for uptime monitoring</strong>
 <em>Track multiple services simultaneously with real-time updates, response time analytics, and historical data visualization</em>
 
-<img src="./docs/assets/app-preview.png" alt="Application Preview WIP"></div>
+<!-- Application screenshots will be added here once available -->
+</div>
 
 ## <img src="./assets/UptimeWatcherMascot.png" alt="Uptime Watcher Mascot">
 
@@ -161,25 +162,16 @@ npm run electron-dev
 
 <div align="center">
 
-### <strong>Main Dashboard</strong>
+_Application screenshots and demo videos will be added in future releases._
 
-<img src="./docs/assets/dashboard-screenshot.png" alt="Main Dashboard">
-<em>Real-time monitoring dashboard with multiple service status overview</em>
+**Key Interface Components:**
 
-### <strong>Monitor Configuration</strong>
+- 📊 **Main Dashboard**: Real-time monitoring overview with service status
+- ⚙️ **Monitor Configuration**: Easy setup for HTTP, TCP, DNS, and ping monitoring
+- 📈 **Historical Analytics**: Response time graphs and uptime statistics
+- 🔔 **Notification System**: Customizable desktop alerts for status changes
 
-<img src="./docs/assets/monitor-config-screenshot.png" alt="Monitor Setup">
-<em>Easy-to-use monitor configuration with multiple protocol support</em>
-
-### <strong>Historical Analytics</strong>
-
-<img src="./docs/assets/analytics-screenshot.png" alt="Analytics View">
-<em>Comprehensive analytics with response time graphs and uptime statistics</em>
-
-### <strong>Notification System</strong>
-
-<img src="./docs/assets/notifications-screenshot.png" alt="Notifications">
-<em>Smart desktop notifications with customizable alert preferences</em></div>
+</div>
 
 ---
 
@@ -220,9 +212,9 @@ npm run dist
 
 ### Monitoring recommendations
 
-For practical guidance on configuring HTTP monitors and writing resilient integration tests (redirects, content negotiation, transient 5xx, timeouts), see:
+For practical guidance on configuring monitors and writing tests, see our comprehensive testing documentation:
 
-- HTTP Monitoring: Practical Recommendations → <a href="./docs/Testing/HTTP-Monitoring-Recommendations.md">docs/Testing/HTTP-Monitoring-Recommendations.md</a>
+- [Testing Documentation](./docs/Testing/) - Includes fuzzing coverage, Playwright guides, and testing best practices
 
 ### Fuzzing and property-based tests
 
@@ -301,4 +293,4 @@ We welcome contributions from the community! Here's how you can help:
 
 <div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 
-<em>Last updated: August 2025 • Version 12.9.0</em></div>
+<em>Last updated: September 2025 • Version 15.0.0</em></div>

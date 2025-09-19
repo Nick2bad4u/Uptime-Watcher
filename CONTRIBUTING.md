@@ -6,9 +6,9 @@ Thank you for considering contributing to Uptime Watcher! This document provides
 
 ### Prerequisites
 
-- Node.js 18 or higher
-- npm or yarn
-- Git
+- **Node.js** 22.0+ (recommended)
+- **npm** 11.5.2+ (included with Node.js)
+- **Git** (latest version)
 
 ### Development Setup
 
@@ -28,7 +28,7 @@ Thank you for considering contributing to Uptime Watcher! This document provides
 3. **Start Development Environment**
 
    ```bash
-   npm run electron-dev
+   npm run dev
    ```
 
 4. **Verify Setup**
@@ -37,12 +37,31 @@ Thank you for considering contributing to Uptime Watcher! This document provides
 
 ## 📋 Development Guidelines
 
-### Code Style
+### Code Quality Standards
 
-- **TypeScript**: Use TypeScript for all new code
-- **ESLint**: Follow the configured ESLint rules
-- **Prettier**: Code is auto-formatted with Prettier
-- **Tailwind CSS**: Use Tailwind classes for styling
+- **TypeScript**: Strict TypeScript with comprehensive type safety
+- **ESLint**: 50+ plugins configured for comprehensive code checking
+- **Testing**: >90% test coverage requirement with multiple test types
+- **Documentation**: TSDoc comments required for all public APIs
+
+### Development Scripts
+
+| Script                   | Purpose      | Description                                    |
+| ------------------------ | ------------ | ---------------------------------------------- |
+| `npm run dev`            | Development  | Start Vite dev server for frontend development |
+| `npm run start`          | Full App     | Launch complete application (dev + electron)   |
+| `npm run build`          | Production   | Build application for production               |
+| `npm run test`           | Testing      | Run all test suites (unit, integration, E2E)   |
+| `npm run lint`           | Code Quality | Check code formatting and style                |
+| `npm run lint:fix`       | Code Quality | Automatically fix linting issues               |
+| `npm run type-check:all` | Type Safety  | Verify TypeScript types across all modules     |
+
+### Architecture Standards
+
+- **State Management**: Zustand stores with domain separation
+- **Database**: Repository pattern with transaction safety
+- **IPC**: Secure contextBridge communication only
+- **Testing**: Vitest + Stryker + Playwright + fast-check coverage
 
 ### Git Workflow
 
@@ -154,53 +173,56 @@ Use the feature request template and include:
 
 ### Available Scripts
 
-```bash
-# Development
-npm run dev              # Start Vite dev server
-npm run electron         # Start Electron
-npm run electron-dev     # Start both concurrently
+| Category         | Script                   | Description                              |
+| ---------------- | ------------------------ | ---------------------------------------- |
+| **Development**  | `npm run dev`            | Start Vite dev server                    |
+|                  | `npm run start`          | Launch complete application              |
+|                  | `npm run start-both`     | Start dev server + electron concurrently |
+| **Building**     | `npm run build`          | Build for production                     |
+|                  | `npm run clean`          | Clean all build artifacts                |
+| **Code Quality** | `npm run lint`           | Run ESLint checks                        |
+|                  | `npm run lint:fix`       | Fix ESLint issues automatically          |
+|                  | `npm run format`         | Format code with Prettier                |
+|                  | `npm run type-check:all` | TypeScript type checking                 |
+| **Testing**      | `npm run test`           | Run all test suites                      |
+|                  | `npm run test:coverage`  | Generate coverage reports                |
+|                  | `npm run test:electron`  | Run Electron-specific tests              |
 
-# Building
-npm run build           # Build for production
-npm run dist            # Build and package app
+### Testing Requirements
 
-# Code Quality
-npm run lint            # Run ESLint
-npm run format          # Run Prettier
-```
+- **Unit Tests**: Required for all business logic components
+- **Integration Tests**: Required for IPC and database operations
+- **E2E Tests**: Required for critical user workflows using Playwright
+- **Property Tests**: Use fast-check for complex algorithmic functions
+- **Mutation Testing**: Stryker configuration validates test quality
+- **Coverage**: Maintain >90% coverage across all modules
 
-### Testing
+## � Priority Contribution Areas
 
-Currently, the project primarily relies on manual testing. When adding new features:
+### High Impact Opportunities
 
-1. Test in both development and production builds
-2. Test on multiple platforms (Windows, macOS, Linux) if possible
-3. Verify all monitoring functions work correctly
-4. Check that data persistence works
+- **Enhanced Monitoring**: Advanced notification rules and alerting systems
+- **Data Visualization**: Improved dashboard analytics and trending
+- **Configuration Management**: Import/export of monitoring configurations
+- **Performance Optimization**: Monitoring efficiency and UI responsiveness
+- **Accessibility**: Enhanced keyboard navigation and screen reader support
 
-## 🎯 Areas for Contribution
+### Technical Improvements
 
-### High Priority
+- **Additional Test Coverage**: Expand edge case testing
+- **Error Recovery**: Enhanced error handling and user feedback
+- **Internationalization**: Multi-language support infrastructure
+- **Advanced Analytics**: Historical data analysis and reporting
+- **Plugin Architecture**: Extensible monitoring modules
 
-- **Testing**: Add unit and integration tests
-- **Error Handling**: Improve error messages and recovery
-- **Performance**: Optimize monitoring and UI performance
-- **Accessibility**: Improve keyboard navigation and screen reader support
+### Documentation Enhancements
 
-### Features
+- **Tutorial Content**: Step-by-step usage guides with screenshots
+- **API Documentation**: Comprehensive API reference materials
+- **Migration Guides**: Version upgrade and data migration instructions
+- **Integration Examples**: Sample configurations and use cases
 
-- **Export/Import**: Configuration backup and restore
-- **Advanced Notifications**: Customizable notification rules
-- **Monitoring Presets**: Common monitoring configurations
-- **Dashboard Improvements**: Enhanced data visualization
-
-### Documentation
-
-- **Video Tutorials**: Screen recordings of key features
-- **Migration Guides**: Upgrade instructions between versions
-- **Integration Examples**: Examples of using the monitoring API
-
-## 🌟 Recognition
+## �🌟 Recognition
 
 Contributors are recognized in:
 

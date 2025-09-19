@@ -1,37 +1,36 @@
 ---
 name: General Pull Request
 about: Default template for pull requests
-title: ""
+title: "Brief description of changes"
 labels: []
 ---
 
-## Description
+## 📝 Description
 
 **What does this PR do?**
 A clear and concise description of what this pull request accomplishes.
 
 **Type of change:**
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-<!-- markdownlint-disable MD013 -->
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation update
-- [ ] Code refactoring/maintenance
-- [ ] Performance improvement
+- [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
+- [ ] ✨ New feature (non-breaking change which adds functionality)
+- [ ] 💥 Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] 📚 Documentation update
+- [ ] 🔧 Code refactoring/maintenance
+- [ ] ⚡ Performance improvement
+- [ ] 🧪 Test improvements
+- [ ] 🎨 UI/UX improvements
 - [ ] Other (please describe)
 
-## Related Issues
+## 🔗 Related Issues
 
 **Closes/Fixes/Resolves:**
-
-List any related issues this PR addresses:
 
 - Fixes #(issue number)
 - Closes #(issue number)
 - Related to #(issue number)
 
-## Changes Made
+## 🔄 Changes Made
 
 **Summary of changes:**
 
@@ -41,18 +40,19 @@ List any related issues this PR addresses:
 
 **Files modified:**
 
-- `electron-app/`
-- `utils/`
-- Other files...
+- `electron/` - Description of changes
+- `src/` - Description of changes
+- `docs/` - Documentation updates
 
-## Testing
+## 🧪 Testing
 
 **How has this been tested?**
 
-- [ ] Manual testing
+- [ ] Manual testing completed
 - [ ] Unit tests added/updated
 - [ ] Integration tests verified
-- [ ] Cross-platform testing (specify: Windows/macOS/Linux)
+- [ ] E2E tests pass
+- [ ] Cross-platform testing completed
 
 **Test scenarios covered:**
 
@@ -60,21 +60,26 @@ List any related issues this PR addresses:
 2. Test scenario 2
 3. Test scenario 3
 
-## Screenshots/Demo
+**Coverage:**
 
-If applicable, add screenshots or GIFs demonstrating the changes:
+- Current coverage: X%
+- Coverage impact: +/-X%
 
-## Compatibility
+## 📸 Screenshots/Demo
+
+<!-- If applicable, add screenshots or GIFs demonstrating the changes -->
+
+## ✅ Compatibility
 
 **Platform compatibility verified:**
 
-- [ ] Windows
-- [ ] macOS
-- [ ] Linux
+- [ ] Windows 10/11
+- [ ] macOS 12+
+- [ ] Linux (Ubuntu/Fedora)
 - [ ] Light theme
 - [ ] Dark theme
 
-## Performance
+## ⚡ Performance
 
 **Performance impact:**
 
@@ -82,17 +87,27 @@ If applicable, add screenshots or GIFs demonstrating the changes:
 - [ ] Performance improved
 - [ ] Performance may be affected (explain below)
 
-## Documentation
+**Benchmarks:** (if applicable)
 
-- [ ] Code is commented where needed
+- Before: X ms/op
+- After: X ms/op
+
+## 📚 Documentation
+
+- [ ] Code is commented where needed (TSDoc standards)
 - [ ] Documentation updated (if applicable)
 - [ ] CHANGELOG.md updated (for significant changes)
+- [ ] README.md updated (if needed)
 
-## Additional Context
+## 🔍 Code Quality
 
-Add any other context about the pull request here.
+- [ ] ESLint passes with no new warnings
+- [ ] TypeScript compiles without errors
+- [ ] All tests pass locally
+- [ ] Code follows project style guidelines
+- [ ] Self-review completed
 
-## Checklist
+## 📋 Checklist
 
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my own code
@@ -101,4 +116,8 @@ Add any other context about the pull request here.
 - [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
-- [ ] Any dependent changes have been merged and published in downstream modules
+- [ ] Any dependent changes have been merged and published
+
+## 📝 Additional Context
+
+<!-- Add any other context about the pull request here -->

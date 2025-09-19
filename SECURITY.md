@@ -14,12 +14,12 @@ If you discover a security vulnerability, please report it by emailing [20943337
 
 | Dependency       | Version  |
 | ---------------- | -------- |
-| electron         | 36.2.0   |
+| electron         | ^37.3.1  |
 | electron-builder | ^26.0.15 |
 | electron-store   | ^10.0.1  |
 | electron-updater | ^6.6.4   |
-| react            | ^18.3.1  |
-| typescript       | ^5.7.2   |
+| react            | ^19.1.1  |
+| typescript       | ^5.9.6   |
 | vite             | ^6.0.7   |
 | tailwindcss      | ^3.4.17  |
 

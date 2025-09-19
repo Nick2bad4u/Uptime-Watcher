@@ -10,8 +10,8 @@ Uptime Watcher is a sophisticated Electron desktop application for monitoring we
 
 ### Prerequisites
 
-- **Node.js**: 18+ (LTS recommended)
-- **npm**: 9+ (comes with Node.js)
+- **Node.js**: 22.0+ (LTS recommended)
+- **npm**: 11.5.2+ (comes with Node.js)
 - **Git**: Latest version
 
 ### 1. Clone & Install
@@ -26,11 +26,11 @@ npm install
 
 ```bash
 # Start both Vite dev server and Electron
-npm run electron-dev
+npm run start
 
 # Or start separately:
 npm run dev          # Vite dev server (port 5173)
-npm run electron     # Electron (waits for Vite)
+npm run start:electron     # Electron (waits for Vite)
 ```
 
 ### 3. Verify Setup
@@ -233,18 +233,18 @@ npm run electron-dev -- --log-info
 ### Architecture Understanding
 
 - [`docs/AI-CONTEXT.md`](./AI-CONTEXT.md) - AI assistant guide
-- [`docs/Architecture/ADRs/`](./Architecture/ADRs/) - Architectural decisions
-- [`docs/Architecture/Patterns/`](./Architecture/Patterns/) - Development patterns
+- [`docs/Architecture/ADRs/`](../Architecture/ADRs/) - Architectural decisions
+- [`docs/Architecture/Patterns/`](../Architecture/Patterns/) - Development patterns
 
 ### Implementation Guides
 
-- [`docs/Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md`](./Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md)
-- [`docs/Guides/UI-Feature-Development-Guide.md`](./Guides/UI-Feature-Development-Guide.md)
-- [`docs/Architecture/Templates/`](./Architecture/Templates/) - Code templates
+- [`docs/Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md`](./NEW_MONITOR_TYPE_IMPLEMENTATION.md)
+- [`docs/Guides/UI-Feature-Development-Guide.md`](./UI-Feature-Development-Guide.md)
+- [`docs/Architecture/Templates/`](../Architecture/Templates/) - Code templates
 
 ### Code Standards
 
-- [`docs/Architecture/TSDoc-Standards.md`](./Architecture/TSDoc-Standards.md)
+- [`docs/TSDoc/`](../TSDoc/) - TSDoc documentation standards
 
 ## 🎯 Next Steps
 
@@ -258,8 +258,8 @@ npm run electron-dev -- --log-info
 ### For AI Assistants
 
 1. **Context**: Load [`docs/AI-CONTEXT.md`](./AI-CONTEXT.md) for comprehensive context
-2. **Patterns**: Reference [`docs/Architecture/`](./Architecture/) for coding patterns
-3. **Examples**: Use templates in [`docs/Architecture/Templates/`](./Architecture/Templates/)
+2. **Patterns**: Reference [`docs/Architecture/`](../Architecture/) for coding patterns
+3. **Examples**: Use templates in [`docs/Architecture/Templates/`](../Architecture/Templates/)
 
 ---
 

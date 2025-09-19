@@ -1,40 +1,52 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ""
+name: Bug Report
+about: Create a report to help us improve Uptime Watcher
+title: "Brief description"
 labels: bug
 assignees: Nick2bad4u
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## 🐛 Bug Description
 
-**To Reproduce**
-Steps to reproduce the behavior:
+<!-- A clear and concise description of what the bug is -->
+
+## 📋 Steps to Reproduce
 
 1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
+2. Click on '...'
+3. Scroll down to '...'
 4. See error
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## ✅ Expected Behavior
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+<!-- A clear and concise description of what you expected to happen -->
 
-**Desktop (please complete the following information):**
+## ❌ Actual Behavior
 
-- OS: [e.g. iOS]
-- Browser [e.g. chrome, safari]
-- Version [e.g. 22]
+<!-- What actually happened instead -->
 
-**Smartphone (please complete the following information):**
+## 📸 Screenshots
 
-- Device: [e.g. iPhone6]
-- OS: [e.g. iOS8.1]
-- Browser [e.g. stock browser, safari]
-- Version [e.g. 22]
+<!-- If applicable, add screenshots to help explain your problem -->
 
-**Additional context**
-Add any other context about the problem here.
+## 💻 Environment Information
+
+**Application:**
+
+- Version: 15.0.0
+- Installation method: GitHub Release, built from source
+
+**System:**
+
+- OS: Windows 11, macOS Sonoma, Ubuntu 22.04
+- Architecture: x64, arm64
+- Node.js: 22.5.1 (if applicable)
+
+## 📝 Additional Context
+
+<!-- Add any other context about the problem here, including:
+- Error messages or console logs
+- Configuration details
+- Recent changes to your setup
+- Related issues or discussions
+-->
