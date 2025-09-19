@@ -2,23 +2,23 @@
 
 > **Navigation Hub**: Complete guide to all Uptime Watcher documentation with quick links and descriptions.
 
-## 🎯 Quick Links
+## Quick links
 
-### 🚀 Getting Started
+### Getting started
 
 - **[Developer Quick Start](./DEVELOPER-QUICK-START.md)** - Get up and running in minutes
 - **[Environment Setup](./ENVIRONMENT-SETUP.md)** - Complete development environment configuration
 - **[AI Context Guide](./AI-CONTEXT.md)** - Essential context for AI assistants
 
-### 📖 Core Documentation
+### Core documentation
 
 - **[API Documentation](./API-DOCUMENTATION.md)** - IPC interfaces and communication patterns
 - **[Troubleshooting Guide](./TROUBLESHOOTING.md)** - Common issues and solutions
 - **[Testing Guide](../Guides/TESTING.md)** - Testing setup and practices
 
-## 🗂️ Documentation Structure
+## � Documentation structure
 
-### 📁 Root Level (`/docs/`)
+### Root level (`/docs/`)
 
 Essential documentation for developers and contributors:
 
@@ -47,7 +47,7 @@ System design, patterns, and architectural decisions:
 | [ADR-004-Frontend-State-Management.md](../Architecture/ADRs/ADR-004-Frontend-State-Management.md)   | Zustand state management | ✅ Accepted |
 | [ADR-005-IPC-Communication-Protocol.md](../Architecture/ADRs/ADR-005-IPC-Communication-Protocol.md) | IPC communication design | ✅ Accepted |
 
-#### Patterns & Standards
+#### Patterns & standards
 
 | Document                                                                                | Purpose                  | Use When                      |
 | --------------------------------------------------------------------------------------- | ------------------------ | ----------------------------- |

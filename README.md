@@ -47,11 +47,11 @@
 
 ## <img src="./assets/UptimeWatcherMascot.png" alt="Uptime Watcher Mascot">
 
-## 🎯 **What is Uptime Watcher?**
+## What is Uptime Watcher?
 
 Uptime Watcher is a desktop application built with modern web technologies that provides **monitoring capabilities** for websites, APIs, servers, and network services. Unlike most monitoring tools, there's **no cloud dependency** or command-line interface required. You can monitor everything with ease from a GUI.
 
-## ✨ **Key Features**
+## ✨ Key features
 
 <div align="center">
 
@@ -64,7 +64,7 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 
 </div>
 
-## 🛠️ **Core Capabilities**
+## Core capabilities
 
 - **🎯 Multi-Service Monitoring**: Supports HTTP/HTTPS, TCP ports, ICMP ping, and DNS monitoring
 - **⚡ Real-Time Updates**: Live status changes with sub-second responsiveness
@@ -73,7 +73,7 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 - **⚙️ Flexible Configuration**: Customizable check intervals from 30 seconds to 30 minutes
 - **💾 Data Persistence**: Local SQLite database with backup/restore functionality
 
-## 📋 **Monitor Types**
+## Monitor types
 
 | Type           | Purpose                   | Features                                                                              |
 | -------------- | ------------------------- | ------------------------------------------------------------------------------------- |
@@ -82,7 +82,7 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 | **ICMP Ping**  | Network reachability      | Packet loss monitoring, latency measurement                                           |
 | **DNS**        | DNS resolution monitoring | Support for A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR, NAPTR, SOA, TLSA, ANY records |
 
-## 🛠️ **Technology Stack**
+## 🛠️ Technology stack
 
 <div align="center">
 
@@ -131,11 +131,11 @@ Uptime Watcher is a desktop application built with modern web technologies that 
   <img src="https://img.shields.io/badge/Prettier-Code_Formatting-F7B93E?logo=prettier&amp;logoColor=white" alt="Prettier">
 </a></div>
 
-## 🚀 **Quick Start**
+## 🚀 Quick start
 
 ### **Installation**
 
-#### **Option 1: Download Release (Recommended)**
+#### **Option 1: Download release (Recommended)**
 
 ```bash
 # Download the latest release from GitHub
@@ -144,7 +144,7 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 
 **👉 [Download Latest Release](https://github.com/Nick2bad4u/Uptime-Watcher/releases/latest)**
 
-#### **Option 2: Build from Source**
+#### **Option 2: Build from source**
 
 ```bash
 # Clone the repository
@@ -158,13 +158,13 @@ npm install
 npm run electron-dev
 ```
 
-## 🖼️ **Screenshots & Demo**
+## Screenshots & demo
 
 <div align="center">
 
 _Application screenshots and demo videos will be added in future releases._
 
-**Key Interface Components:**
+**Key interface components:**
 
 - 📊 **Main Dashboard**: Real-time monitoring overview with service status
 - ⚙️ **Monitor Configuration**: Easy setup for HTTP, TCP, DNS, and ping monitoring
@@ -175,9 +175,9 @@ _Application screenshots and demo videos will be added in future releases._
 
 ---
 
-## 👨‍💻 **Development**
+## 👨‍💻 Development
 
-### **Development Setup**
+### **Development setup**
 
 ```bash
 # Start Vite dev server only
@@ -196,7 +196,7 @@ npm run build
 npm run dist
 ```
 
-### **Development Prerequisites**
+### **Development prerequisites**
 
 <div align="center">
 
@@ -228,11 +228,11 @@ For comprehensive testing with Playwright, including setup, configuration, and t
 
 - Playwright Testing Guide → <a href="./docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md">docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md</a>
 
-## **Architectural Principles**
+## Architectural principles
 
 The application follows a **service-oriented architecture** with clear separation of concerns:
 
-### **🔧 Core Components**
+### **🔧 Core components**
 
 - **🖥️ Main Process (Electron)**: Service container with dependency injection
 - **🎨 Renderer Process (React)**: Component-based UI with Zustand state management
@@ -241,7 +241,7 @@ The application follows a **service-oriented architecture** with clear separatio
 - **📡 Event System**: TypedEventBus for cross-service communication
 - **📊 Monitoring System**: Enhanced monitoring with operation correlation
 
-### **🎯 Key Design Features**
+### **🎯 Key design features**
 
 - **🏗️ Service-Oriented Architecture**: Modular, testable service design
 - **🔒 Type Safety**: Strict TypeScript with comprehensive interfaces
@@ -249,11 +249,11 @@ The application follows a **service-oriented architecture** with clear separatio
 - **🗃️ Repository Pattern**: Transactional database operations
 - **🎯 Event-Driven**: Reactive communication between services
 
-## 🤝 **Contributing**
+## 🤝 Contributing
 
 We welcome contributions from the community! Here's how you can help:
 
-### **🎯 Ways to Contribute**
+### **🎯 Ways to contribute**
 
 - 🐛 **Bug Reports**: Found an issue? [Open an issue](https://github.com/Nick2bad4u/Uptime-Watcher/issues/new)
 - 💡 **Feature Requests**: Have an idea? [Start a discussion](https://github.com/Nick2bad4u/Uptime-Watcher/issues/new)
@@ -261,7 +261,7 @@ We welcome contributions from the community! Here's how you can help:
 - 📚 **Documentation**: Help improve our docs and guides
 - 🧪 **Testing**: Help test new features and report issues
 
-### **📋 Development Guidelines**
+### **📋 Development guidelines**
 
 1. **Fork the Repository** and create a feature branch
 2. **Follow Code Standards** (TypeScript, ESLint, Prettier)
@@ -271,7 +271,7 @@ We welcome contributions from the community! Here's how you can help:
 
 ---
 
-## 📄 **License**
+## 📄 License
 
 <div align="center"><a href="LICENSE">
   <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License">
@@ -283,7 +283,7 @@ We welcome contributions from the community! Here's how you can help:
 
 ---
 
-## **💬 Get Help**
+## Get help
 
 [![GitHub Issues](https://img.shields.io/badge/Issues-GitHub-blue?logo=github)](https://github.com/Nick2bad4u/Uptime-Watcher/issues) [![Documentation](https://img.shields.io/badge/Docs-Available-brightgreen)](./docs/)
 
