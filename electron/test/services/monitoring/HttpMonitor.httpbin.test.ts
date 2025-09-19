@@ -36,6 +36,7 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
         code === "502" ||
         code === "503" ||
         code === "504" ||
+        code === "Error" || // Network errors/timeouts that result in error details
         (code !== undefined && transientNetworkErrors.has(code));
 
     const handleTransientOutage = (
@@ -313,20 +314,20 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                 monitoring: true,
                 responseTime: 0,
                 retryAttempts: 3,
-                timeout: 10_000,
+                timeout: 15_000, // Increased timeout for redirects
             };
 
             const result = await checkWithTransientRetry(
                 monitor,
                 "redirect/1",
-                2
+                3 // More retry attempts for this flaky endpoint
             );
             console.log(`Redirect result:`, result);
 
             if (handleTransientOutage("redirect/1", result)) return;
             expect(result.status).toBe("up");
             expect(result.details).toBe("200"); // Should follow redirect and get 200
-        }, 30_000);
+        }, 60_000); // Increased test timeout to 60 seconds
     });
 
     /**

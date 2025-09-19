@@ -62,6 +62,7 @@ vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
 
 // Mock IPC extraction
 vi.mock("../../types/ipc", () => ({
+    extractIpcData: vi.fn((response) => response),
     safeExtractIpcData: vi.fn((response, fallback) => response ?? fallback),
 }));
 
@@ -161,25 +162,24 @@ describe(createSiteOperationsActions, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Constructor", "type");
 
-            const _newSite = {
+            const newSite = {
                 identifier: "new-site",
                 name: "New Site",
                 monitoring: true,
                 monitors: [
                     {
                         history: [],
-                        id: expect.any(String),
+                        id: "test-monitor-id",
                         monitoring: true,
-                        status: "pending",
-                        type: "http",
+                        status: "pending" as const,
+                        type: "http" as const,
                     },
                 ],
             };
-            void _newSite;
             // Mock will return the passed site, but implementation uses extractIpcData
             mockElectronAPI.sites.addSite.mockResolvedValue({
                 success: true,
-                data: expect.any(Object),
+                data: newSite,
             });
 
             await actions.createSite({

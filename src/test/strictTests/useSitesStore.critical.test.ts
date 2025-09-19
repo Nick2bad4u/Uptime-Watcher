@@ -10,6 +10,13 @@ import type { Site } from "../../../shared/types";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { mockElectronAPI } from "../setup";
 
+// Mock IPC functions that are used by the store operations
+vi.mock("../../types/ipc", () => ({
+    extractIpcData: vi.fn((data) => data),
+    safeExtractIpcData: vi.fn((data) => data),
+    isIpcResponse: vi.fn(() => true),
+}));
+
 describe("useSitesStore Function Coverage Tests", () => {
     beforeEach(() => {
         // Clear all mocks

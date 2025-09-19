@@ -340,31 +340,28 @@ describe("useSitesStore Function Coverage Tests", () => {
                 error: "Network error",
             });
 
-            // Test that errors are handled gracefully (not thrown)
+            // Test that errors are handled gracefully (thrown after state management)
             await expect(
                 store.createSite({
                     identifier: "test-site",
                     name: "Test Site",
                 })
-            ).resolves.toBeUndefined();
+            ).rejects.toThrow("Network error");
         });
 
         it("should handle errors in monitoring operations gracefully", async () => {
             const store = useSitesStore.getState();
 
             // Mock error for monitoring
-            // Mock error response
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                {
-                    success: false,
-                    error: "Monitoring error",
-                }
+            // Mock rejection for monitoring APIs (they don't use IPC wrapper)
+            mockElectronAPI.monitoring.startMonitoringForSite.mockRejectedValueOnce(
+                new Error("Monitoring error")
             );
 
-            // Test that errors are handled gracefully (not thrown)
+            // Test that errors are handled gracefully (thrown after state management)
             await expect(
                 store.startSiteMonitoring("test-site")
-            ).resolves.toBeUndefined();
+            ).rejects.toThrow("Monitoring error");
         });
 
         it("should handle errors in sync operations gracefully", async () => {

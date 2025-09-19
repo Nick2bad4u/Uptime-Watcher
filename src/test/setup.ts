@@ -262,24 +262,48 @@ const mockElectronAPI: {
         }),
     },
     settings: {
-        getHistoryLimit: vi.fn().mockResolvedValue(1000),
-        updateHistoryLimit: vi.fn().mockResolvedValue(undefined), // Returns void
+        getHistoryLimit: vi.fn().mockResolvedValue({
+            success: true,
+            data: 1000,
+        }),
+        updateHistoryLimit: vi.fn().mockResolvedValue({
+            success: true,
+            data: undefined,
+        }),
     },
     sites: {
         addSite: vi.fn().mockResolvedValue({
-            identifier: "test-site",
-            monitors: [],
-            name: "Test Site",
+            success: true,
+            data: {
+                identifier: "test-site",
+                monitors: [],
+                name: "Test Site",
+            },
         }),
         checkSiteNow: vi.fn().mockResolvedValue({
-            monitorId: "test-monitor",
-            status: "up",
-            timestamp: Date.now(),
+            success: true,
+            data: {
+                monitorId: "test-monitor",
+                status: "up",
+                timestamp: Date.now(),
+            },
         }),
-        getSites: vi.fn().mockResolvedValue([]),
-        removeMonitor: vi.fn().mockResolvedValue(true), // Returns boolean
-        removeSite: vi.fn().mockResolvedValue(true), // Returns boolean
-        updateSite: vi.fn().mockResolvedValue(undefined), // Returns void
+        getSites: vi.fn().mockResolvedValue({
+            success: true,
+            data: [],
+        }),
+        removeMonitor: vi.fn().mockResolvedValue({
+            success: true,
+            data: true,
+        }),
+        removeSite: vi.fn().mockResolvedValue({
+            success: true,
+            data: true,
+        }),
+        updateSite: vi.fn().mockResolvedValue({
+            success: true,
+            data: undefined,
+        }),
     },
     stateSync: {
         getSyncStatus: vi.fn().mockResolvedValue({
