@@ -13,8 +13,8 @@ vi.mock("../../../stores/utils", () => ({
 // Mock the electron window API
 const mockElectronAPI = {
     monitoring: {
-        startMonitoringForSite: vi.fn(),
-        stopMonitoringForSite: vi.fn(),
+        startMonitoringForSite: vi.fn().mockResolvedValue(true),
+        stopMonitoringForSite: vi.fn().mockResolvedValue(true),
     },
 };
 
@@ -42,7 +42,7 @@ describe("MonitoringService", () => {
             const monitorId = "test-monitor-id";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.startMonitoring(siteId, monitorId);
@@ -84,7 +84,7 @@ describe("MonitoringService", () => {
             const monitorId = "test-monitor-id";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.startMonitoring(siteId, monitorId);
@@ -104,7 +104,7 @@ describe("MonitoringService", () => {
             const monitorId = "";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.startMonitoring(siteId, monitorId);
@@ -127,7 +127,7 @@ describe("MonitoringService", () => {
             const monitorId = "test-monitor-id!@#";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.startMonitoring(siteId, monitorId);
@@ -150,7 +150,7 @@ describe("MonitoringService", () => {
             const monitorId = "test-monitor-id-💻";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.startMonitoring(siteId, monitorId);
@@ -175,7 +175,7 @@ describe("MonitoringService", () => {
             const monitorId = "test-monitor-id";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.stopMonitoring(siteId, monitorId);
@@ -217,7 +217,7 @@ describe("MonitoringService", () => {
             const monitorId = "test-monitor-id";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.stopMonitoring(siteId, monitorId);
@@ -237,7 +237,7 @@ describe("MonitoringService", () => {
             const monitorId = "";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.stopMonitoring(siteId, monitorId);
@@ -260,7 +260,7 @@ describe("MonitoringService", () => {
             const monitorId = "test-monitor-id!@#";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.stopMonitoring(siteId, monitorId);
@@ -283,7 +283,7 @@ describe("MonitoringService", () => {
             const monitorId = "test-monitor-id-💻";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.stopMonitoring(siteId, monitorId);
@@ -354,7 +354,7 @@ describe("MonitoringService", () => {
             const monitorId = "valid-monitor-id";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.startMonitoring(siteId, monitorId);
@@ -374,7 +374,7 @@ describe("MonitoringService", () => {
             const monitorId = "b".repeat(1000);
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.startMonitoring(siteId, monitorId);
@@ -397,7 +397,7 @@ describe("MonitoringService", () => {
             const monitorId = "67890";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.stopMonitoring(siteId, monitorId);
@@ -417,7 +417,7 @@ describe("MonitoringService", () => {
             const monitorId = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.startMonitoring(siteId, monitorId);
@@ -515,7 +515,7 @@ describe("MonitoringService", () => {
             );
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValue(
-                undefined
+                true
             );
 
             await Promise.all(operations);
@@ -539,7 +539,7 @@ describe("MonitoringService", () => {
             );
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
-                undefined
+                true
             );
 
             await Promise.all(operations);
@@ -569,10 +569,10 @@ describe("MonitoringService", () => {
             );
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValue(
-                undefined
+                true
             );
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
-                undefined
+                true
             );
 
             await Promise.all([...startOps, ...stopOps]);
@@ -595,9 +595,9 @@ describe("MonitoringService", () => {
             await annotate("Type: Error Handling", "type");
 
             mockElectronAPI.monitoring.startMonitoringForSite
-                .mockResolvedValueOnce(undefined)
+                .mockResolvedValueOnce(true)
                 .mockRejectedValueOnce(new Error("Failed"))
-                .mockResolvedValueOnce(undefined);
+                .mockResolvedValueOnce(true);
 
             const operations = [
                 MonitoringService.startMonitoring("site-1", "monitor-1"),

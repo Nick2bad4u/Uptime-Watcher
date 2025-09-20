@@ -178,7 +178,10 @@ describe("IpcService - Comprehensive Coverage", () => {
             setHistoryLimit: vi.fn().mockResolvedValue(undefined),
             getHistoryLimit: vi.fn().mockResolvedValue(1000),
             resetSettings: vi.fn().mockResolvedValue(undefined),
-            downloadBackup: vi.fn().mockResolvedValue("/path/to/backup.db"),
+            downloadBackup: vi.fn().mockResolvedValue({
+                buffer: Buffer.from("mock backup data"),
+                fileName: "/path/to/backup.db",
+            }),
             emitTyped: vi.fn().mockResolvedValue(undefined),
         } as unknown as UptimeOrchestrator;
 
@@ -1051,7 +1054,10 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(mockUptimeOrchestrator.downloadBackup).toHaveBeenCalled();
             expect(result).toEqual({
                 success: true,
-                data: "/path/to/backup.db",
+                data: {
+                    buffer: expect.any(ArrayBuffer),
+                    fileName: "/path/to/backup.db",
+                },
                 metadata: {
                     duration: expect.any(Number),
                     handler: "download-sqlite-backup",

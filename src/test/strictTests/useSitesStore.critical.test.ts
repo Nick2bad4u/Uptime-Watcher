@@ -191,10 +191,10 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             // Mock monitoring responses
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             // Test monitoring functions

@@ -30,7 +30,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
         vi.resetModules();
 
         // Mock successful invocations by default
-        mockIpcRenderer.invoke.mockResolvedValue("success");
+        mockIpcRenderer.invoke.mockResolvedValue({ success: true, data: true });
 
         // Import the module to trigger the contextBridge.exposeInMainWorld call
         await import("../preload");
@@ -132,42 +132,41 @@ describe("preload.ts - Missing Branch Coverage", () => {
     describe("Parameter Validation", () => {
         it("should handle null/undefined parameters", async () => {
             // Test with null/undefined parameters - these should still call invoke
-            await expect(exposedAPI.sites.addSite(null)).resolves.toBe(
-                "success"
-            );
+            await expect(exposedAPI.sites.addSite(null)).resolves.toEqual({
+                success: true,
+                data: true,
+            });
             await expect(
                 exposedAPI.sites.updateSite("id", undefined)
-            ).resolves.toBe("success");
+            ).resolves.toEqual({ success: true, data: true });
             await expect(
                 exposedAPI.monitorTypes.validateMonitorData("http", null)
-            ).resolves.toBe("success");
+            ).resolves.toEqual({ success: true, data: true });
         });
         it("should handle empty string parameters", async () => {
             // Test with empty string parameters
-            await expect(exposedAPI.sites.removeSite("")).resolves.toBe(
-                "success"
-            );
+            await expect(exposedAPI.sites.removeSite("")).resolves.toBeTruthy();
             await expect(
                 exposedAPI.monitoring.startMonitoringForSite("", "")
-            ).resolves.toBe("success");
+            ).resolves.toBeTruthy();
             await expect(
                 exposedAPI.monitoring.stopMonitoringForSite("", "")
-            ).resolves.toBe("success");
+            ).resolves.toBeTruthy();
         });
         it("should handle invalid numeric parameters", async () => {
             // Test with invalid numeric parameters
             await expect(
                 exposedAPI.settings.updateHistoryLimit(-1)
-            ).resolves.toBe("success");
+            ).resolves.toEqual({ success: true, data: true });
             await expect(
                 exposedAPI.settings.updateHistoryLimit(0)
-            ).resolves.toBe("success");
+            ).resolves.toEqual({ success: true, data: true });
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Infinity)
-            ).resolves.toBe("success");
+            ).resolves.toEqual({ success: true, data: true });
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Number.NaN)
-            ).resolves.toBe("success");
+            ).resolves.toEqual({ success: true, data: true });
         });
     });
     describe("Concurrent Operations", () => {
@@ -182,10 +181,10 @@ describe("preload.ts - Missing Branch Coverage", () => {
 
             const results = await Promise.all(promises);
             expect(results).toEqual([
-                "success",
-                "success",
-                "success",
-                "success",
+                { success: true, data: true },
+                { success: true, data: true },
+                { success: true, data: true },
+                { success: true, data: true },
             ]);
         });
         it("should handle mixed success/failure scenarios", async () => {

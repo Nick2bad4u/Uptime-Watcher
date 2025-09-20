@@ -66,6 +66,28 @@ describe("StatusUpdateHandler", () => {
         ],
     });
 
+    const createCompleteMonitorStatusEvent = (
+        siteId: string,
+        monitorId: string,
+        newStatus: "up" | "down" = "down",
+        previousStatus: "up" | "down" = "up"
+    ) => {
+        const mockSite = createMockSite(siteId, monitorId);
+        const mockMonitor = {
+            ...mockSite.monitors[0],
+            status: newStatus, // Set the monitor status to the new status
+        };
+        return {
+            siteId,
+            monitorId,
+            newStatus,
+            previousStatus,
+            monitor: mockMonitor,
+            site: mockSite,
+            timestamp: Date.now(),
+        };
+    };
+
     beforeEach(() => {
         vi.clearAllMocks();
 
@@ -353,12 +375,10 @@ describe("StatusUpdateHandler", () => {
             manager.subscribe();
 
             // Create proper MonitorStatusChangedEvent format (what the backend sends)
-            const monitorStatusEvent = {
-                siteId: "site1", // Note: siteId, not siteIdentifier
-                monitorId: "monitor1",
-                newStatus: "down" as const, // Note: newStatus, not status
-                previousStatus: "up" as const,
-            };
+            const monitorStatusEvent = createCompleteMonitorStatusEvent(
+                "site1",
+                "monitor1"
+            );
 
             // Trigger the callback and wait for async execution
             await statusChangedCallback(monitorStatusEvent);
@@ -439,12 +459,10 @@ describe("StatusUpdateHandler", () => {
             manager.subscribe();
 
             // Use proper MonitorStatusChangedEvent format
-            const monitorStatusEvent = {
-                siteId: "site1",
-                monitorId: "monitor1",
-                newStatus: "down" as const,
-                previousStatus: "up" as const,
-            };
+            const monitorStatusEvent = createCompleteMonitorStatusEvent(
+                "site1",
+                "monitor1"
+            );
 
             await statusChangedCallback(monitorStatusEvent);
 
@@ -594,12 +612,10 @@ describe("StatusUpdateHandler", () => {
 
             managerWithoutCallback.subscribe();
 
-            const monitorStatusEvent = {
-                siteId: "site1",
-                monitorId: "monitor1",
-                newStatus: "down" as const,
-                previousStatus: "up" as const,
-            };
+            const monitorStatusEvent = createCompleteMonitorStatusEvent(
+                "site1",
+                "monitor1"
+            );
 
             await statusChangedCallback(monitorStatusEvent);
             expect(mockSetSites).toHaveBeenCalled();
@@ -793,13 +809,11 @@ describe("StatusUpdateHandler", () => {
             manager.subscribe();
 
             // Test site not found branch with development logging
-            mockGetSites.mockReturnValue([]);
-            const monitorStatusEvent = {
-                siteId: "nonexistent-site",
-                monitorId: "monitor1",
-                newStatus: "down" as const,
-                previousStatus: "up" as const,
-            };
+            mockGetSites.mockReturnValue([]); // No sites in store
+            const monitorStatusEvent = createCompleteMonitorStatusEvent(
+                "nonexistent-site",
+                "monitor1"
+            );
 
             await statusChangedCallback(monitorStatusEvent);
             expect(logger.logger.debug).toHaveBeenCalledWith(
@@ -823,12 +837,17 @@ describe("StatusUpdateHandler", () => {
 
             manager.subscribe();
 
-            const monitorStatusEvent = {
-                siteId: "site1",
-                monitorId: "nonexistent-monitor",
-                newStatus: "down" as const,
-                previousStatus: "up" as const,
-            };
+            // Set up a site that exists but doesn't have the monitor we're looking for
+            const siteWithoutMonitor = createMockSite(
+                "site1",
+                "different-monitor"
+            );
+            mockGetSites.mockReturnValue([siteWithoutMonitor]);
+
+            const monitorStatusEvent = createCompleteMonitorStatusEvent(
+                "site1",
+                "nonexistent-monitor"
+            );
 
             await statusChangedCallback(monitorStatusEvent);
             expect(logger.logger.debug).toHaveBeenCalledWith(
@@ -850,12 +869,14 @@ describe("StatusUpdateHandler", () => {
 
             manager.subscribe();
 
-            const monitorStatusEvent = {
-                siteId: "site1",
-                monitorId: "monitor1",
-                newStatus: "down" as const,
-                previousStatus: "up" as const,
-            };
+            // Set up a site that exists with the monitor we're updating
+            const site = createMockSite("site1", "monitor1");
+            mockGetSites.mockReturnValue([site]);
+
+            const monitorStatusEvent = createCompleteMonitorStatusEvent(
+                "site1",
+                "monitor1"
+            );
 
             await statusChangedCallback(monitorStatusEvent);
             expect(logger.logger.debug).toHaveBeenCalledWith(
@@ -1012,25 +1033,28 @@ describe("StatusUpdateHandler", () => {
             manager.subscribe();
 
             // Use proper MonitorStatusChangedEvent format
+            const site = createMockSite("site1", "monitor1");
+            mockGetSites.mockReturnValue([site]);
+
             const updates = [
-                {
-                    siteId: "site1",
-                    monitorId: "monitor1",
-                    newStatus: "down" as const,
-                    previousStatus: "up" as const,
-                },
-                {
-                    siteId: "site1",
-                    monitorId: "monitor1",
-                    newStatus: "up" as const,
-                    previousStatus: "down" as const,
-                },
-                {
-                    siteId: "site1",
-                    monitorId: "monitor1",
-                    newStatus: "down" as const,
-                    previousStatus: "up" as const,
-                },
+                createCompleteMonitorStatusEvent(
+                    "site1",
+                    "monitor1",
+                    "down",
+                    "up"
+                ),
+                createCompleteMonitorStatusEvent(
+                    "site1",
+                    "monitor1",
+                    "up",
+                    "down"
+                ),
+                createCompleteMonitorStatusEvent(
+                    "site1",
+                    "monitor1",
+                    "down",
+                    "up"
+                ),
             ];
 
             await Promise.all(
@@ -1114,12 +1138,11 @@ describe("StatusUpdateHandler", () => {
 
             manager.subscribe();
 
-            const event = {
-                siteId: "site1",
-                monitorId: "monitor1",
-                newStatus: "down" as const,
-                previousStatus: "up" as const,
-            };
+            // Setup site with monitor
+            const site = createMockSite("site1", "monitor1");
+            mockGetSites.mockReturnValue([site]);
+
+            const event = createCompleteMonitorStatusEvent("site1", "monitor1");
 
             await statusChangedCallback(event);
 
@@ -1248,12 +1271,14 @@ describe("StatusUpdateHandler", () => {
 
             manager.subscribe();
 
-            const validEvent = {
-                siteId: "site1",
-                monitorId: "monitor1",
-                newStatus: "down" as const,
-                previousStatus: "up" as const,
-            };
+            // Setup site with monitor for successful update
+            const site = createMockSite("site1", "monitor1");
+            mockGetSites.mockReturnValue([site]);
+
+            const validEvent = createCompleteMonitorStatusEvent(
+                "site1",
+                "monitor1"
+            );
 
             await statusChangedCallback(validEvent);
 
@@ -1340,12 +1365,12 @@ describe("StatusUpdateHandler", () => {
 
             mockGetSites.mockReturnValue([siteWithMultipleMonitors]);
 
-            const event = {
-                siteId: "site1",
-                monitorId: "monitor2", // Target the second monitor
-                newStatus: "down" as const,
-                previousStatus: "up" as const,
-            };
+            const event = createCompleteMonitorStatusEvent(
+                "site1",
+                "monitor2", // Target the second monitor
+                "down",
+                "up"
+            );
 
             await statusChangedCallback(event);
 
@@ -1416,12 +1441,12 @@ describe("StatusUpdateHandler", () => {
                 }
             );
 
-            const event = {
-                siteId: "site1",
-                monitorId: "monitor1",
-                newStatus: "down" as const,
-                previousStatus: "up" as const,
-            };
+            const event = createCompleteMonitorStatusEvent(
+                "site1",
+                "monitor1",
+                "down",
+                "up"
+            );
 
             await statusChangedCallback(event);
 

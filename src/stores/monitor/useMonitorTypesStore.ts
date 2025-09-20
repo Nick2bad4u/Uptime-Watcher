@@ -463,14 +463,17 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                         }
                     );
 
-                    // Transform result to ensure all required properties are
-                    // present
+                    // Ensure the validation result has all required properties with safe fallbacks
                     const validationResult: ValidationResult = {
                         data: validationData.data,
-                        errors: validationData.errors,
+                        errors: Array.isArray(validationData.errors)
+                            ? validationData.errors
+                            : [],
                         metadata: validationData.metadata ?? {},
-                        success: validationData.success,
-                        warnings: validationData.warnings ?? [],
+                        success: validationData.success ?? false,
+                        warnings: Array.isArray(validationData.warnings)
+                            ? validationData.warnings
+                            : [],
                     };
 
                     logStoreAction("MonitorTypesStore", "validateMonitorData", {

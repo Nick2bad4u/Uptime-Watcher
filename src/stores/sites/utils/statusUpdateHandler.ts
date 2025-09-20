@@ -208,6 +208,14 @@ export class StatusUpdateManager {
         try {
             const currentSites = this.getSites();
 
+            // Log if site not found in development mode
+            const siteExists = currentSites.some(
+                (site) => site.identifier === event.siteId
+            );
+            if (!siteExists && isDevelopment()) {
+                logger.debug(`Site ${event.siteId} not found in store`);
+            }
+
             // Apply the update using the complete monitor object from the event
             const updatedSites = this.applyMonitorStatusUpdate(
                 currentSites,
@@ -429,6 +437,16 @@ export class StatusUpdateManager {
             // Only update the site that contains this monitor
             if (site.identifier !== event.siteId) {
                 return site;
+            }
+
+            // Log if monitor not found in site
+            const monitorExists = site.monitors.some(
+                (m) => m.id === event.monitorId
+            );
+            if (!monitorExists && isDevelopment()) {
+                logger.debug(
+                    `Monitor ${event.monitorId} not found in site ${event.siteId}`
+                );
             }
 
             // Update the specific monitor with fresh data from the event
