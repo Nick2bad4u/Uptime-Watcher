@@ -164,7 +164,7 @@ npm run electron-dev
 
 _Application screenshots and demo videos will be added in future releases._
 
-**Key interface components:**
+### Key interface components:
 
 - 📊 **Main Dashboard**: Real-time monitoring overview with service status
 - ⚙️ **Monitor Configuration**: Easy setup for HTTP, TCP, DNS, and ping monitoring

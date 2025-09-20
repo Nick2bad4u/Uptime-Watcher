@@ -2,7 +2,72 @@
 
 This guide establishes consistent formatting and content standards for all Markdown documentation in the Uptime Watcher project.
 
-## 📝 Formatting Standards
+## � File Naming Conventions
+
+### File naming standards
+
+All documentation files should follow consistent naming patterns:
+
+**Root-level files**: Use UPPERCASE for important project files
+
+- `README.md` - Project overview and getting started
+- `CONTRIBUTING.md` - Contribution guidelines
+- `CHANGELOG.md` - Version history and changes
+- `SECURITY.md` - Security policies and reporting
+- `LICENSE` - Project license
+
+**Documentation files**: Use lowercase kebab-case for all other documentation
+
+- `documentation-style-guide.md` (this file)
+- `api-documentation.md`
+- `developer-quick-start.md`
+- `testing-methodology-react-components.md`
+
+**Subdirectory files**: Use lowercase kebab-case throughout
+
+- `docs/TSDoc/tsdoc-home.md`
+- `docs/Testing/playwright-testing-guide.md`
+- `docs/Guides/environment-setup.md`
+- `.github/prompts/generate-test-coverage.prompt.md`
+
+### Examples
+
+✅ **Good examples:**
+
+```text
+README.md
+docs/developer-quick-start.md
+docs/TSDoc/tsdoc-tag-param.md
+docs/Testing/fast-check-fuzzing-coverage.md
+.github/prompts/performance-tests.prompt.md
+```
+
+❌ **Poor examples:**
+
+```text
+Read_Me.md
+docs/DeveloperQuickStart.md
+docs/TSDoc/TSDoc_Tag_Param.md
+docs/Testing/FAST_CHECK_FUZZING_COVERAGE.md
+.github/prompts/Performance_Tests.Prompt.md
+```
+
+### Multi-word handling
+
+- Separate words with hyphens (kebab-case)
+- Keep acronyms together when they form a single concept
+- Break up long compound words for readability
+
+✅ **Good multi-word examples:**
+
+```text
+playwright-testing-guide.md
+fast-check-fuzzing-coverage.md
+tsdoc-package-eslint-plugin-tsdoc.md
+circuit-breaker-implementation-plan.md
+```
+
+## �📝 Formatting Standards
 
 ### Headers
 
@@ -197,7 +262,7 @@ Brief description of what the project does.
 
 ### API Documentation
 
-````markdown
+`````markdown
 # API Reference
 
 ## Overview
@@ -220,11 +285,14 @@ Description of what the method does.
 
 **Example:**
 
+````typescript
+// Usage example
+const result = methodName(value);
 ```typescript
 // Usage example
 const result = methodName(value);
-```
 ````
+`````
 
 **Throws:**
 

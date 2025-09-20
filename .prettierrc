@@ -88,6 +88,17 @@
             }
         },
         {
+            "files": "*.mdx",
+            "options": {
+                "tabWidth": 2,
+                "printWidth": 100,
+                "plugins": [
+                    "prettier-plugin-sort-json",
+                    "prettier-plugin-jsdoc"
+                ]
+            }
+        },
+        {
             "files": [
                 "**/package.json",
                 "**/package-lock.json"
