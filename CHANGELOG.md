@@ -7,14 +7,126 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[3cab519](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3cab519fa54c8ef9e5ce0a4eb35ea1fbf0dc7c5d)...
+[3cab519](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3cab519fa54c8ef9e5ce0a4eb35ea1fbf0dc7c5d)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3cab519fa54c8ef9e5ce0a4eb35ea1fbf0dc7c5d...3cab519fa54c8ef9e5ce0a4eb35ea1fbf0dc7c5d))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 15.4.0 [`(3cab519)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3cab519fa54c8ef9e5ce0a4eb35ea1fbf0dc7c5d)
+
+
+
+
+
+
+## [15.4.0] - 2025-09-20
+
+
 [[63f6932](https://github.com/Nick2bad4u/Uptime-Watcher/commit/63f6932d285d6857806305a143c427cf193dadb5)...
-[63f6932](https://github.com/Nick2bad4u/Uptime-Watcher/commit/63f6932d285d6857806305a143c427cf193dadb5)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/63f6932d285d6857806305a143c427cf193dadb5...63f6932d285d6857806305a143c427cf193dadb5))
+[49a58d0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/49a58d0fc9768f7552f7eabe487b8e98bcc0a16a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/63f6932d285d6857806305a143c427cf193dadb5...49a58d0fc9768f7552f7eabe487b8e98bcc0a16a))
+
+
+### ✨ Features
+
+- ✨ [feat] Centralize IPC response extraction and improve error handling
+
+- Refactors client-side IPC usage to validate and extract response data in preload, removing redundant frontend type checks and simplifying service/store logic.
+- Improves error handling by returning extracted data directly from preload and wrapping API calls in try/catch with contextual error messages.
+- Updates monitor creation in forms to use a shared utility for consistency and maintainability.
+- Adds DNS as a selectable monitor type and ensures cache invalidation triggers monitor type refresh.
+- Unifies error handling utilities under shared module imports, removing obsolete local utility files.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(49a58d0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/49a58d0fc9768f7552f7eabe487b8e98bcc0a16a)
+
+
+- ✨ [feat] Add richer status change events and open-external IPC
+
+- Improves monitor status change events with complete monitor and site objects, ensuring updated history and accurate check counts for incremental updates.
+- Refactors frontend status update logic to leverage full event objects, reducing redundant data lookups and fallback full syncs.
+- Adds IPC support for opening external URLs from the renderer process, validating parameters for safety.
+- Unifies SQLite backup responses for compatibility and simplifies frontend usage.
+- Expands IPC validators and test coverage for new event fields and system handlers.
+
+Relates to improved real-time updates and external link handling.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6df6488)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6df64880fc24f82282281b87a89deadec2936ad9)
+
+
+- ✨ [feat] Add comprehensive Mermaid config with dark mode
+
+- Introduces detailed Mermaid configuration supporting dark mode, custom fonts, enhanced diagram styles, and strict security settings.
+- Enables deterministic IDs, improved rendering for multiple diagram types, and tailored color themes for better visual consistency.
+- Facilitates consistent diagram generation and project branding for Uptime-Watcher.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b565f61)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b565f619c1bb2e7ddb37f8d51373dfaf60a9d8fd)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Standardizes IPC response handling and validation logic
+
+- Unifies IPC response structures for monitoring and site operations, enforcing boolean success checks and explicit error handling.
+- Improves reliability by surfacing backend failures to callers and updating type definitions to reflect new return types.
+- Refactors store and service logic to unwrap and validate IPC results, ensuring failures are propagated and handled consistently.
+- Updates test mocks and cases to match new IPC response contracts, enhancing coverage for error scenarios and correct validation flows.
+
+Relates to improved error transparency and contract consistency across Electron IPC boundaries.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(17fb1b2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/17fb1b2259ba8a645f4c33103216779077662c11)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 15.3.0 [`(63f6932)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/63f6932d285d6857806305a143c427cf193dadb5)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Integrates remark linting and formatting for markdown/MDX
+
+- Adds comprehensive remark linting and formatting support for markdown and MDX files, including new configuration, ignore patterns, and ESLint integration
+- Updates formatting scripts to include remark lint/fix/check steps for improved documentation consistency and code quality
+- Renames documentation files for naming standardization and updates style guide to clarify conventions
+- Installs remark lint plugins and presets to enable advanced markdown quality checks and formatting automation
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3a019d2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a019d2c725e5fd2e48f0dd4256bec85f1a38390)
+
+
+- 📝 [docs] Add interactive architecture diagrams and CI optimizations docs
+
+- Documents Uptime Watcher’s system architecture, data models, monitoring workflows, deployment infrastructure, and performance metrics using interactive Mermaid diagrams for improved clarity and onboarding.
+- Introduces a CI optimization guide detailing Stryker mutation testing improvements for better reliability, memory usage, and workflow flexibility.
+- Enhances sidebar navigation with a new category for visual documentation.
+- Refactors Mermaid plugin configuration for Docusaurus for better maintainability.
+- Addresses CI resilience and reporting transparency, allowing mutation testing with failing tests when explicitly enabled.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4bd1407)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4bd140719f83467d6bda222fde4f31892c583294)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Unifies monitoring mocks and improves validation coverage
+
+- Standardizes mocked monitoring service responses to consistently resolve with boolean values for improved clarity and predictability.
+- Refines validation result handling and extraction in monitor type store tests to better reflect real implementation, increasing coverage and reliability for edge cases and IPC response scenarios.
+- Adds development-mode debug logging for missing sites or monitors in status update logic, with corresponding tests for logging branches and event formats.
+- Updates property and fuzz tests to exclude NaN values, preventing false positives and improving test robustness.
+- Adjusts handler registration and cleanup tests to dynamically reflect handler counts, reducing brittleness in IPC service tests.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4804e8a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4804e8a90652f5b208b5682a64d4d47a6e5dbd09)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v15.3.0 [skip ci] [`(7e751c6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e751c69bc2ed7184ee406c65e5380ff3c090295)
 
 
 
