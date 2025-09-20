@@ -1111,6 +1111,7 @@ export interface UptimeEvents extends UnknownRecord {
      * Emitted when a monitor's status changes.
      *
      * @param monitor - The monitor object.
+     * @param monitorId - The ID of the monitor.
      * @param newStatus - The new status string.
      * @param previousStatus - The previous status string.
      * @param responseTime - Optional response time in ms.
@@ -1121,6 +1122,8 @@ export interface UptimeEvents extends UnknownRecord {
     "monitor:status-changed": {
         /** The monitor object. */
         monitor: Monitor;
+        /** The ID of the monitor. */
+        monitorId: string;
         /** The new status string. */
         newStatus: string;
         /** The previous status string. */

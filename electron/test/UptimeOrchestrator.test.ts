@@ -793,6 +793,7 @@ describe(UptimeOrchestrator, () => {
                         retryAttempts: 3,
                         timeout: 5000,
                     },
+                    monitorId: "monitor-1",
                     newStatus: "up",
                     previousStatus: "down",
                     responseTime: 100,

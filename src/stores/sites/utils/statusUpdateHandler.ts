@@ -23,15 +23,28 @@ import { logger } from "../../../services/logger";
  *
  * @remarks
  * This represents the actual data structure sent from the backend when a
- * monitor's status changes. Used for efficient incremental updates.
+ * monitor's status changes. Includes the complete monitor and site objects with
+ * updated history for efficient incremental updates.
  *
  * @internal
  */
 interface MonitorStatusChangedEvent {
+    /** The complete monitor object with updated history. */
+    monitor: Monitor;
+    /** The ID of the monitor. */
     monitorId: string;
+    /** The new status string. */
     newStatus: MonitorStatus;
+    /** The previous status string. */
     previousStatus: MonitorStatus;
+    /** Optional response time in ms. */
+    responseTime?: number;
+    /** The complete site object. */
+    site: Site;
+    /** The ID of the site. */
     siteId: string;
+    /** Unix timestamp (ms) when the status changed. */
+    timestamp: number;
 }
 
 /**
@@ -178,15 +191,14 @@ export class StatusUpdateManager {
     private readonly setSites: (sites: Site[]) => void;
 
     /**
-     * Handle incremental status updates efficiently without full sync.
+     * Handle incremental status updates efficiently using complete event data.
      *
      * @remarks
-     * Applies status changes directly to existing site/monitor data in the
-     * store. This is much more efficient than triggering a full sync for every
-     * status change. Falls back to full sync only if the site/monitor cannot be
-     * found.
+     * Applies status changes using the complete monitor and site objects from
+     * the backend event. This preserves the updated history and ensures check
+     * counts increment correctly while providing real-time updates.
      *
-     * @param event - Monitor status changed event data
+     * @param event - Monitor status changed event with complete data
      *
      * @internal
      */
@@ -195,53 +207,24 @@ export class StatusUpdateManager {
     ): Promise<void> {
         try {
             const currentSites = this.getSites();
-            const site = this.findSiteInStore(currentSites, event.siteId);
 
-            if (!site) {
-                if (isDevelopment()) {
-                    logger.debug(
-                        `Site ${event.siteId} not found in store, triggering full sync`
-                    );
-                }
-                await this.fullResyncSites();
-                return;
-            }
-
-            const monitor = this.findMonitorInSite(site, event.monitorId);
-
-            if (!monitor) {
-                if (isDevelopment()) {
-                    logger.debug(
-                        `Monitor ${event.monitorId} not found in site ${event.siteId}, triggering full sync`
-                    );
-                }
-                await this.fullResyncSites();
-                return;
-            }
-
+            // Apply the update using the complete monitor object from the event
             const updatedSites = this.applyMonitorStatusUpdate(
                 currentSites,
-                site,
-                monitor,
                 event
             );
             this.setSites(updatedSites);
 
             // Call optional update callback
             if (this.onUpdate) {
-                const updatedSite = updatedSites.find(
-                    (s) => s.identifier === event.siteId
-                );
-                if (updatedSite) {
-                    this.onUpdate({
-                        monitorId: event.monitorId,
-                        previousStatus: event.previousStatus,
-                        site: updatedSite,
-                        siteIdentifier: event.siteId,
-                        status: event.newStatus,
-                        timestamp: new Date().toISOString(),
-                    });
-                }
+                this.onUpdate({
+                    monitorId: event.monitorId,
+                    previousStatus: event.previousStatus,
+                    site: event.site, // Use the complete site from event
+                    siteIdentifier: event.siteId,
+                    status: event.newStatus,
+                    timestamp: new Date(event.timestamp).toISOString(),
+                });
             }
 
             if (isDevelopment()) {
@@ -328,6 +311,9 @@ export class StatusUpdateManager {
                     void (async (): Promise<void> => {
                         try {
                             if (this.isMonitorStatusChangedEvent(data)) {
+                                console.log(
+                                    "DEBUG: Processing valid event data"
+                                );
                                 await this.handleIncrementalStatusUpdate(data);
                             } else {
                                 // Invalid data structure - trigger full sync
@@ -338,6 +324,9 @@ export class StatusUpdateManager {
                                         data
                                     );
                                 }
+                                console.log(
+                                    "DEBUG: Event failed type guard, triggering full sync"
+                                );
                                 await this.fullResyncSites();
                             }
                         } catch (error) {
@@ -417,12 +406,16 @@ export class StatusUpdateManager {
     }
 
     /**
-     * Apply monitor status update to sites array.
+     * Apply monitor status update using smart merging of fresh monitor data.
+     *
+     * @remarks
+     * Uses the fresh monitor object from the backend event to update the
+     * specific monitor while preserving the existing site structure and other
+     * monitors. This ensures updated history and response times are applied
+     * without losing site-level context.
      *
      * @param sites - Current sites array
-     * @param site - Site containing the monitor
-     * @param monitor - Monitor to update
-     * @param event - Status change event
+     * @param event - Status change event with fresh monitor data
      *
      * @returns Updated sites array
      *
@@ -430,66 +423,41 @@ export class StatusUpdateManager {
      */
     private applyMonitorStatusUpdate(
         sites: Site[],
-        site: Site,
-        monitor: Monitor,
         event: MonitorStatusChangedEvent
     ): Site[] {
-        const updatedMonitor: Monitor = {
-            ...monitor,
-            lastChecked: new Date(),
-            status: event.newStatus,
-        };
+        return sites.map((site) => {
+            // Only update the site that contains this monitor
+            if (site.identifier !== event.siteId) {
+                return site;
+            }
 
-        const updatedSite = {
-            ...site,
-            monitors: site.monitors.map((m) =>
-                m.id === event.monitorId ? updatedMonitor : m
-            ),
-        };
+            // Update the specific monitor with fresh data from the event
+            const updatedMonitors = site.monitors.map((monitor) => {
+                if (monitor.id !== event.monitorId) {
+                    return monitor;
+                }
 
-        return sites.map((s) =>
-            s.identifier === event.siteId ? updatedSite : s
-        );
+                // Use the fresh monitor data from the event which includes
+                // updated history, response time, and all database changes
+                return event.monitor;
+            });
+
+            // Preserve the existing site structure but update monitors
+            return {
+                ...site,
+                monitors: updatedMonitors,
+            };
+        });
     }
 
     /**
-     * Find a monitor in a site by monitor ID.
-     *
-     * @param site - Site to search for monitor
-     * @param monitorId - Monitor ID to find
-     *
-     * @returns Monitor if found, undefined otherwise
-     *
-     * @internal
-     */
-    private findMonitorInSite(
-        site: Site,
-        monitorId: string
-    ): Monitor | undefined {
-        return site.monitors.find((monitor) => monitor.id === monitorId);
-    }
-
-    /**
-     * Find a site in the store by identifier.
-     *
-     * @param sites - Array of sites to search
-     * @param siteId - Site identifier to find
-     *
-     * @returns Site if found, undefined otherwise
-     *
-     * @internal
-     */
-    private findSiteInStore(sites: Site[], siteId: string): Site | undefined {
-        return sites.find((site) => site.identifier === siteId);
-    }
-
-    /**
-     * Type guard to validate incoming data as MonitorStatusChangedEvent.
+     * Type guard to validate incoming data as complete
+     * MonitorStatusChangedEvent.
      *
      * @remarks
      * Performs structural validation to ensure the data has the expected shape
-     * for incremental processing. This helps prevent runtime errors from
-     * malformed data.
+     * for incremental processing with complete monitor and site objects. This
+     * helps prevent runtime errors from malformed data.
      *
      * @param data - Unknown data from IPC events
      *
@@ -506,15 +474,29 @@ export class StatusUpdateManager {
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Type guard with runtime validation following
         const record = data as UnknownRecord;
-        return (
+
+        // Validate basic event fields
+        const hasBasicFields =
             "monitorId" in data &&
             "newStatus" in data &&
             "previousStatus" in data &&
             "siteId" in data &&
+            "timestamp" in data &&
             typeof record["monitorId"] === "string" &&
             typeof record["newStatus"] === "string" &&
             typeof record["previousStatus"] === "string" &&
-            typeof record["siteId"] === "string"
-        );
+            typeof record["siteId"] === "string" &&
+            typeof record["timestamp"] === "number";
+
+        // Validate complete monitor and site objects are present
+        const hasCompleteObjects =
+            "monitor" in data &&
+            "site" in data &&
+            typeof record["monitor"] === "object" &&
+            record["monitor"] !== null &&
+            typeof record["site"] === "object" &&
+            record["site"] !== null;
+
+        return hasBasicFields && hasCompleteObjects;
     }
 }

@@ -26,21 +26,27 @@ import { contextBridge, ipcRenderer } from "electron";
 /**
  * Runtime validation helpers for IPC responses
  */
-function validateBackupResponse(value: unknown): {
+function validateBackupResponse(response: unknown): {
     buffer: ArrayBuffer;
     fileName: string;
 } {
+    // Handle standardized IPC response format
     if (
-        typeof value === "object" &&
-        value !== null &&
-        "buffer" in value &&
-        "fileName" in value &&
-        value.buffer instanceof ArrayBuffer &&
-        typeof value.fileName === "string"
+        typeof response === "object" &&
+        response !== null &&
+        "success" in response &&
+        response.success === true &&
+        "data" in response &&
+        typeof response.data === "object" &&
+        response.data !== null &&
+        "buffer" in response.data &&
+        "fileName" in response.data &&
+        response.data.buffer instanceof ArrayBuffer &&
+        typeof response.data.fileName === "string"
     ) {
         return {
-            buffer: value.buffer,
-            fileName: value.fileName,
+            buffer: response.data.buffer,
+            fileName: response.data.fileName,
         };
     }
     throw new Error("Invalid backup response format");

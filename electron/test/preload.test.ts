@@ -963,6 +963,7 @@ describe("Electron Preload Script", () => {
             const testData = {
                 siteId: "test-site",
                 monitor: { id: "test-monitor", type: "http" },
+                monitorId: "test-monitor",
                 newStatus: "up",
                 previousStatus: "down",
                 timestamp: Date.now(),

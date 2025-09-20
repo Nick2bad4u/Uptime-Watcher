@@ -11,7 +11,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { validateMonitorData } from "@shared/validation/schemas";
-import { BrowserWindow, ipcMain } from "electron";
+import { BrowserWindow, ipcMain, shell } from "electron";
 
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type { AutoUpdaterService } from "../updater/AutoUpdaterService";
@@ -31,6 +31,7 @@ import {
     MonitorTypeHandlerValidators,
     SiteHandlerValidators,
     StateSyncHandlerValidators,
+    SystemHandlerValidators,
 } from "./validators";
 
 /**
@@ -658,7 +659,18 @@ export class IpcService {
         // Download SQLite backup handler (no parameters)
         registerStandardizedIpcHandler(
             "download-sqlite-backup",
-            async () => this.uptimeOrchestrator.downloadBackup(),
+            async () => {
+                const result = await this.uptimeOrchestrator.downloadBackup();
+                // Convert Buffer to ArrayBuffer for frontend compatibility
+                const arrayBuffer = result.buffer.buffer.slice(
+                    result.buffer.byteOffset,
+                    result.buffer.byteOffset + result.buffer.byteLength
+                );
+                return {
+                    ...result,
+                    buffer: arrayBuffer,
+                };
+            },
             DataHandlerValidators.downloadSqliteBackup,
             this.registeredIpcHandlers
         );
@@ -1016,12 +1028,28 @@ export class IpcService {
      * Registers IPC handlers for system-level operations.
      *
      * @remarks
-     * Handles application quit and install events using event listeners. Event
-     * listeners must be removed via {@link cleanup}.
+     * Handles system-level operations like quit/install and external URL
+     * opening. Uses {@link ipcMain.on} for event-based handlers that don't
+     * return values, and {@link registerStandardizedIpcHandler} for handlers
+     * that return data. All registered handlers and listeners must be removed
+     * via {@link cleanup}.
      *
      * @internal
      */
     private setupSystemHandlers(): void {
+        // External URL handler with validation
+        registerStandardizedIpcHandler(
+            "open-external",
+            async (...args: unknown[]) => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+                const url = args[0] as string;
+                await shell.openExternal(url);
+                return true;
+            },
+            SystemHandlerValidators.openExternal,
+            this.registeredIpcHandlers
+        );
+
         this.registeredIpcHandlers.add("quit-and-install");
         ipcMain.on("quit-and-install", () => {
             logger.info(LOG_TEMPLATES.services.UPDATER_QUIT_INSTALL);

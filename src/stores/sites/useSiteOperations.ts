@@ -173,10 +173,8 @@ export const createSiteOperationsActions = (
                     try {
                         const response =
                             await window.electronAPI.data.downloadSQLiteBackup();
-                        const result = extractIpcData<{ buffer: ArrayBuffer }>(
-                            response
-                        );
-                        return new Uint8Array(result.buffer);
+                        // Response from preload is already unwrapped: { buffer: ArrayBuffer, fileName: string }
+                        return new Uint8Array(response.buffer);
                     } catch (error) {
                         logger.error(
                             "Failed to download SQLite backup:",

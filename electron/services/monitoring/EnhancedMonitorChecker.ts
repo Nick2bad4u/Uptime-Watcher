@@ -586,9 +586,22 @@ export class EnhancedMonitorChecker {
             return undefined;
         }
 
+        // Fetch the monitor's updated history to include in the event
+        const freshHistory =
+            await this.config.historyRepository.findByMonitorId(
+                checkResult.monitorId
+            );
+
+        // Create monitor with updated history for accurate check counts
+        const freshMonitorWithHistory = {
+            ...freshMonitor,
+            history: freshHistory,
+        };
+
         // Emit proper typed events like the traditional monitoring system
         await this.config.eventEmitter.emitTyped("monitor:status-changed", {
-            monitor: freshMonitor,
+            monitor: freshMonitorWithHistory,
+            monitorId: freshMonitorWithHistory.id,
             newStatus: checkResult.status,
             previousStatus: monitor.status,
             responseTime: checkResult.responseTime,
@@ -601,7 +614,7 @@ export class EnhancedMonitorChecker {
         await this.emitStatusChangeEvents(
             site,
             monitor,
-            freshMonitor,
+            freshMonitorWithHistory,
             checkResult
         );
 
@@ -764,9 +777,20 @@ export class EnhancedMonitorChecker {
                 return statusUpdate;
             }
 
+            // Fetch the monitor's updated history to include in the event
+            const freshHistory =
+                await this.config.historyRepository.findByMonitorId(monitor.id);
+
+            // Create monitor with updated history for accurate check counts
+            const freshMonitorWithHistory = {
+                ...freshMonitor,
+                history: freshHistory,
+            };
+
             // Emit proper typed events like the traditional monitoring system
             await this.config.eventEmitter.emitTyped("monitor:status-changed", {
-                monitor: freshMonitor,
+                monitor: freshMonitorWithHistory,
+                monitorId: freshMonitorWithHistory.id,
                 newStatus: finalStatus, // Use final status
                 previousStatus: monitor.status,
                 responseTime: serviceResult.responseTime,
@@ -780,7 +804,7 @@ export class EnhancedMonitorChecker {
             if (!isManualCheck || monitor.status !== "paused") {
                 if (serviceResult.status === "up" && monitor.status !== "up") {
                     await this.config.eventEmitter.emitTyped("monitor:up", {
-                        monitor: freshMonitor,
+                        monitor: freshMonitorWithHistory,
                         site: site,
                         siteId: site.identifier,
                         timestamp: checkResult.timestamp.getTime(),
@@ -790,7 +814,7 @@ export class EnhancedMonitorChecker {
                     monitor.status !== "down"
                 ) {
                     await this.config.eventEmitter.emitTyped("monitor:down", {
-                        monitor: freshMonitor,
+                        monitor: freshMonitorWithHistory,
                         site: site,
                         siteId: site.identifier,
                         timestamp: checkResult.timestamp.getTime(),
