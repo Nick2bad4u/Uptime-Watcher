@@ -8,7 +8,7 @@ import {
     convertError,
     ensureError,
     withUtilityErrorHandling,
-} from "../../utils/errorHandling";
+} from "@shared/utils/errorHandling";
 
 describe("Error Handling Utilities - Comprehensive Coverage", () => {
     describe(convertError, () => {

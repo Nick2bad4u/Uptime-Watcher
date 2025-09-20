@@ -30,7 +30,7 @@ vi.mock("../../services/logger", () => ({
 }));
 
 // Mock the error handling utilities
-vi.mock("../../utils/errorHandling", () => ({
+vi.mock("@shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
         error instanceof Error ? error : new Error(String(error))
     ),

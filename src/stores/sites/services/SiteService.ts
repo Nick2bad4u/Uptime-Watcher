@@ -12,7 +12,6 @@ import type { Site } from "@shared/types";
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { logger } from "../../../services/logger";
-import { extractIpcData } from "../../../types/ipc";
 import { waitForElectronAPI } from "../../utils";
 
 /**
@@ -47,9 +46,8 @@ export const SiteService = {
      */
     async addSite(site: Site): Promise<Site> {
         await this.initialize();
-        const response = await window.electronAPI.sites.addSite(site);
-        // eslint-disable-next-line ex/no-unhandled -- Error handled by caller's withErrorHandling wrapper
-        return extractIpcData<Site>(response);
+        // Preload now returns extracted data directly
+        return window.electronAPI.sites.addSite(site);
     },
 
     /**
@@ -94,12 +92,8 @@ export const SiteService = {
         fileName: string;
     }> {
         await this.initialize();
-        const response = await window.electronAPI.data.downloadSQLiteBackup();
-        // eslint-disable-next-line ex/no-unhandled -- Error handled by caller's withErrorHandling wrapper
-        return extractIpcData<{
-            buffer: ArrayBuffer;
-            fileName: string;
-        }>(response);
+        // Preload now returns extracted data directly
+        return window.electronAPI.data.downloadSQLiteBackup();
     },
 
     /**
@@ -118,9 +112,8 @@ export const SiteService = {
      */
     async getSites(): Promise<Site[]> {
         await this.initialize();
-        const response = await window.electronAPI.sites.getSites();
-        // eslint-disable-next-line ex/no-unhandled -- Error handled by caller's withErrorHandling wrapper
-        return extractIpcData<Site[]>(response);
+        // Preload now returns extracted data directly
+        return window.electronAPI.sites.getSites();
     },
 
     /**

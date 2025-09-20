@@ -17,7 +17,6 @@ import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
 
 import { logger } from "../../services/logger";
-import { extractIpcData } from "../../types/ipc";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
 import { normalizeMonitor } from "./utils/monitorOperations";
 import {
@@ -115,10 +114,9 @@ export const createSiteOperationsActions = (
                     name: siteData.name ?? "Unnamed Site", // Provide default name
                 };
 
-                const response =
+                // Preload now returns extracted data directly
+                const newSite =
                     await window.electronAPI.sites.addSite(completeSite);
-                // eslint-disable-next-line ex/no-unhandled -- Error handled by withSiteOperation's withErrorHandling wrapper
-                const newSite = extractIpcData<Site>(response);
                 deps.addSite(newSite);
             },
             { siteData },
@@ -203,9 +201,8 @@ export const createSiteOperationsActions = (
         withSiteOperationReturning(
             "initializeSites",
             async () => {
-                const response = await window.electronAPI.sites.getSites();
-                // eslint-disable-next-line ex/no-unhandled -- Error handled by withSiteOperationReturning's withErrorHandling wrapper
-                const sites = extractIpcData<Site[]>(response);
+                // Preload now returns extracted data directly
+                const sites = await window.electronAPI.sites.getSites();
                 deps.setSites(sites);
                 return {
                     message: `Successfully loaded ${sites.length} sites`,

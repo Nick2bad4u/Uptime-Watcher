@@ -16,7 +16,7 @@ vi.mock("../../types/ipc", () => ({
     ),
 }));
 
-vi.mock("../../utils/errorHandling", () => ({
+vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(async (fn, _description, fallback) => {
         try {
             return await fn();
