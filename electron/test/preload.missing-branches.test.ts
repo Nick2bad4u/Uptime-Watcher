@@ -25,12 +25,44 @@ vi.mock("electron", () => ({
 describe("preload.ts - Missing Branch Coverage", () => {
     let exposedAPI: any;
 
+    // Mock site object for testing
+    const mockSite = {
+        identifier: "test-site",
+        name: "Test Site",
+        monitoring: false,
+        monitors: [
+            {
+                id: "test-monitor",
+                type: "http",
+                url: "https://example.com",
+                checkInterval: 60_000,
+                timeout: 5000,
+                retryAttempts: 3,
+                status: "pending",
+                responseTime: 0,
+                monitoring: false,
+                history: [],
+            },
+        ],
+    };
+
     beforeEach(async () => {
         vi.clearAllMocks();
         vi.resetModules();
 
-        // Mock successful invocations by default
-        mockIpcRenderer.invoke.mockResolvedValue({ success: true, data: true });
+        // Mock successful invocations by default with proper response format
+        mockIpcRenderer.invoke.mockImplementation((channel: string) => {
+            // For site operations, return site data
+            if (channel === "add-site" || channel === "update-site") {
+                return Promise.resolve({ success: true, data: mockSite });
+            }
+            // For site array operations
+            if (channel === "get-sites") {
+                return Promise.resolve({ success: true, data: [mockSite] });
+            }
+            // For other operations, return generic success
+            return Promise.resolve({ success: true, data: true });
+        });
 
         // Import the module to trigger the contextBridge.exposeInMainWorld call
         await import("../preload");
@@ -132,13 +164,12 @@ describe("preload.ts - Missing Branch Coverage", () => {
     describe("Parameter Validation", () => {
         it("should handle null/undefined parameters", async () => {
             // Test with null/undefined parameters - these should still call invoke
-            await expect(exposedAPI.sites.addSite(null)).resolves.toEqual({
-                success: true,
-                data: true,
-            });
+            await expect(exposedAPI.sites.addSite(null)).resolves.toEqual(
+                mockSite
+            );
             await expect(
                 exposedAPI.sites.updateSite("id", undefined)
-            ).resolves.toEqual({ success: true, data: true });
+            ).resolves.toBeUndefined(); // UpdateSite returns void
             await expect(
                 exposedAPI.monitorTypes.validateMonitorData("http", null)
             ).resolves.toEqual({ success: true, data: true });
@@ -181,30 +212,30 @@ describe("preload.ts - Missing Branch Coverage", () => {
 
             const results = await Promise.all(promises);
             expect(results).toEqual([
-                { success: true, data: true },
-                { success: true, data: true },
+                [mockSite], // GetSites returns extracted Site array
+                { success: true, data: true }, // Other APIs return raw IPC response
                 { success: true, data: true },
                 { success: true, data: true },
             ]);
         });
         it("should handle mixed success/failure scenarios", async () => {
-            // Setup mixed responses
+            // Setup mixed responses with proper IPC response format
             mockIpcRenderer.invoke
-                .mockResolvedValueOnce("Success 1")
-                .mockRejectedValueOnce(new Error("Error 2"))
-                .mockResolvedValueOnce("Success 3")
-                .mockRejectedValueOnce(new Error("Error 4"));
+                .mockResolvedValueOnce({ success: true, data: [mockSite] }) // GetSites success
+                .mockRejectedValueOnce(new Error("Error 2")) // AddSite failure
+                .mockResolvedValueOnce({ success: true, data: true }) // GetMonitorTypes success
+                .mockRejectedValueOnce(new Error("Error 4")); // ExportData failure
 
             // Test mixed success/failure
-            await expect(exposedAPI.sites.getSites()).resolves.toBe(
-                "Success 1"
-            );
+            await expect(exposedAPI.sites.getSites()).resolves.toEqual([
+                mockSite,
+            ]);
             await expect(exposedAPI.sites.addSite({})).rejects.toThrow(
                 "Error 2"
             );
             await expect(
                 exposedAPI.monitorTypes.getMonitorTypes()
-            ).resolves.toBe("Success 3");
+            ).resolves.toEqual({ success: true, data: true });
             await expect(exposedAPI.data.exportData()).rejects.toThrow(
                 "Error 4"
             );

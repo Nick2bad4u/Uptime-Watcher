@@ -30,7 +30,7 @@ vi.mock("../../../../../shared/utils/environment", () => ({
 
 // Import after mocking
 import { StatusUpdateManager } from "../../../../stores/sites/utils/statusUpdateHandler";
-import { withUtilityErrorHandling } from "../../../../utils/errorHandling";
+import { withUtilityErrorHandling } from "../../../../../shared/utils/errorHandling";
 import { isDevelopment } from "../../../../../shared/utils/environment";
 
 const mockWithUtilityErrorHandling = vi.mocked(withUtilityErrorHandling);
@@ -94,8 +94,8 @@ describe("StatusUpdateHandler", () => {
         // Mock withUtilityErrorHandling to just call the function and handle parameters properly
         mockWithUtilityErrorHandling.mockImplementation(
             async (
-                fn,
-                operationName,
+                fn: () => Promise<any>,
+                operationName: string,
                 fallbackValue = undefined,
                 shouldThrow = false
             ) => {
@@ -658,8 +658,8 @@ describe("StatusUpdateHandler", () => {
             // Mock error handling to trigger fallback
             mockWithUtilityErrorHandling.mockImplementation(
                 async (
-                    fn,
-                    _operationName,
+                    fn: () => Promise<any>,
+                    _operationName: string,
                     fallbackValue = undefined,
                     shouldThrow = false
                 ) => {

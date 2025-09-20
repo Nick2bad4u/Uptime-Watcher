@@ -1041,7 +1041,7 @@ export class IpcService {
         registerStandardizedIpcHandler(
             "open-external",
             async (...args: unknown[]) => {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- URL parameter type validated by SystemHandlerValidators.openExternal
                 const url = args[0] as string;
                 await shell.openExternal(url);
                 return true;

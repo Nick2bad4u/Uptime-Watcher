@@ -89,12 +89,10 @@ describe("IPC Response Handling Regression Tests", () => {
 
     describe("Site Creation Failure Propagation", () => {
         it("should propagate backend failures in site creation", async () => {
-            // Mock a backend failure response
-            mockElectronAPI.sites.addSite.mockResolvedValue({
-                success: false,
-                error: "Site creation failed in backend",
-                data: null,
-            });
+            // Mock the electronAPI to throw an error directly (extraction happens in preload)
+            mockElectronAPI.sites.addSite.mockRejectedValue(
+                new Error("Site creation failed in backend")
+            );
 
             // Import the service after mocking
             const { SiteService } = await import(
@@ -116,12 +114,10 @@ describe("IPC Response Handling Regression Tests", () => {
 
     describe("Site Initialization Failure Propagation", () => {
         it("should propagate backend failures in site initialization", async () => {
-            // Mock a backend failure response
-            mockElectronAPI.sites.getSites.mockResolvedValue({
-                success: false,
-                error: "Database connection failed",
-                data: null,
-            });
+            // Mock the electronAPI to throw an error directly (extraction happens in preload)
+            mockElectronAPI.sites.getSites.mockRejectedValue(
+                new Error("Database connection failed")
+            );
 
             const { SiteService } = await import(
                 "../../../stores/sites/services/SiteService"
@@ -135,12 +131,10 @@ describe("IPC Response Handling Regression Tests", () => {
 
     describe("SQLite Backup Failure Propagation", () => {
         it("should propagate backend failures in backup download", async () => {
-            // Mock a backend failure response
-            mockElectronAPI.data.downloadSQLiteBackup.mockResolvedValue({
-                success: false,
-                error: "Backup generation failed",
-                data: null,
-            });
+            // Mock the electronAPI to throw an error directly (extraction happens in preload)
+            mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValue(
+                new Error("Backup generation failed")
+            );
 
             const { SiteService } = await import(
                 "../../../stores/sites/services/SiteService"
@@ -195,11 +189,9 @@ describe("IPC Response Handling Regression Tests", () => {
             // This test verifies that extractIpcData errors are not caught
             // at the wrong level and can reach the error handling middleware
 
-            mockElectronAPI.sites.addSite.mockResolvedValue({
-                success: false,
-                error: "Critical backend error",
-                data: null,
-            });
+            mockElectronAPI.sites.addSite.mockRejectedValue(
+                new Error("Critical backend error")
+            );
 
             const { SiteService } = await import(
                 "../../../stores/sites/services/SiteService"

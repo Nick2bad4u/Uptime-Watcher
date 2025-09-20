@@ -57,6 +57,7 @@
         "coverage",
         "node_modules",
         "test-results",
+        "reports/**",
         "../dist*/**",
         "../coverage/**",
         "../node_modules/**",

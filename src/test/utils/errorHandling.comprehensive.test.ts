@@ -1,6 +1,22 @@
 /**
- * Comprehensive test suite for error handling utilities. Provides 100% coverage
- * for error handling functions.
+ * Compre it("should return Error instance as-is", async ({ task, annotate, })
+ * => { await annotate(`Testing: ${task.name}`, "functional"); await
+ * annotate("Component: errorHandling", "component"); await annotate("Category:
+ * Utility", "category"); await annotate("Type: Error Handling", "type");
+ *
+ * ```
+ *         const originalError = new Error("test error");
+ *         const result = convertError(originalError);
+ *
+ *         expect(result.error).toBe(originalError);
+ *         expect(result.error).toBeInstanceOf(Error);
+ *         expect(result.error.message).toBe("test error");
+ *         expect(result.originalType).toBe("Error");
+ *         expect(result.wasError).toBeTruthy();
+ *     });te for error handling utilities. Provides 100% coverage
+ * ```
+ *
+ * For error handling functions.
  */
 
 import { describe, expect, it, vi } from "vitest";
@@ -24,9 +40,11 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             const originalError = new Error("test error");
             const result = convertError(originalError);
 
-            expect(result).toBe(originalError);
-            expect(result).toBeInstanceOf(Error);
-            expect(result.message).toBe("test error");
+            expect(result.error).toBe(originalError);
+            expect(result.error).toBeInstanceOf(Error);
+            expect(result.error.message).toBe("test error");
+            expect(result.wasError).toBeTruthy();
+            expect(result.originalType).toBe("Error");
         });
 
         it("should convert string to Error instance", async ({
@@ -40,8 +58,10 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             const result = convertError("string error");
 
-            expect(result).toBeInstanceOf(Error);
-            expect(result.message).toBe("string error");
+            expect(result.error).toBeInstanceOf(Error);
+            expect(result.error.message).toBe("string error");
+            expect(result.originalType).toBe("string");
+            expect(result.wasError).toBeFalsy();
         });
 
         it("should convert number to Error instance", async ({
@@ -55,8 +75,10 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             const result = convertError(404);
 
-            expect(result).toBeInstanceOf(Error);
-            expect(result.message).toBe("404");
+            expect(result.error).toBeInstanceOf(Error);
+            expect(result.error.message).toBe("404");
+            expect(result.originalType).toBe("number");
+            expect(result.wasError).toBeFalsy();
         });
 
         it("should convert undefined to Error instance", async ({
@@ -70,8 +92,10 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             const result = convertError(undefined);
 
-            expect(result).toBeInstanceOf(Error);
-            expect(result.message).toBe("undefined");
+            expect(result.error).toBeInstanceOf(Error);
+            expect(result.error.message).toBe("undefined");
+            expect(result.originalType).toBe("undefined");
+            expect(result.wasError).toBeFalsy();
         });
 
         it("should convert null to Error instance", async ({
@@ -85,8 +109,10 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             const result = convertError(null);
 
-            expect(result).toBeInstanceOf(Error);
-            expect(result.message).toBe("null");
+            expect(result.error).toBeInstanceOf(Error);
+            expect(result.error.message).toBe("null");
+            expect(result.originalType).toBe("object");
+            expect(result.wasError).toBeFalsy();
         });
 
         it("should convert object to Error instance", async ({
@@ -101,8 +127,10 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             const objectError = { message: "custom error", code: 500 };
             const result = convertError(objectError);
 
-            expect(result).toBeInstanceOf(Error);
-            expect(result.message).toBe("[object Object]");
+            expect(result.error).toBeInstanceOf(Error);
+            expect(result.error.message).toBe("[object Object]");
+            expect(result.originalType).toBe("object");
+            expect(result.wasError).toBeFalsy();
         });
     });
 
@@ -248,7 +276,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             await expect(
                 withUtilityErrorHandling(failingOperation, "test operation")
             ).rejects.toThrow(
-                "test operation failed and no fallback value provided"
+                "test operation failed and no fallback value provided. When shouldThrow is false, you must provide a fallbackValue parameter."
             );
 
             expect(consoleSpy).toHaveBeenCalledWith(
@@ -356,7 +384,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             } catch (error) {
                 expect(error).toBeInstanceOf(Error);
                 expect((error as Error).message).toBe(
-                    "test operation failed and no fallback value provided"
+                    "test operation failed and no fallback value provided. When shouldThrow is false, you must provide a fallbackValue parameter."
                 );
                 expect((error as Error).cause).toBe(originalError);
             }

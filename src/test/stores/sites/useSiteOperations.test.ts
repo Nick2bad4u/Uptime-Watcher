@@ -176,11 +176,8 @@ describe(createSiteOperationsActions, () => {
                     },
                 ],
             };
-            // Mock will return the passed site, but implementation uses extractIpcData
-            mockElectronAPI.sites.addSite.mockResolvedValue({
-                success: true,
-                data: newSite,
-            });
+            // Mock preload API to return extracted Site data directly
+            mockElectronAPI.sites.addSite.mockResolvedValue(newSite);
 
             await actions.createSite({
                 identifier: "new-site",
@@ -237,10 +234,8 @@ describe(createSiteOperationsActions, () => {
                 name: "Full Site",
             };
             const newSite = { ...mockSite, ...siteData };
-            mockElectronAPI.sites.addSite.mockResolvedValue({
-                success: true,
-                data: newSite,
-            });
+            // Mock preload API to return extracted Site data directly
+            mockElectronAPI.sites.addSite.mockResolvedValue(newSite);
 
             await actions.createSite(siteData);
 
@@ -302,10 +297,8 @@ describe(createSiteOperationsActions, () => {
             await annotate("Type: Initialization", "type");
 
             const mockSites = [mockSite];
-            mockElectronAPI.sites.getSites.mockResolvedValue({
-                success: true,
-                data: mockSites,
-            });
+            // Mock preload API to return extracted Site array directly
+            mockElectronAPI.sites.getSites.mockResolvedValue(mockSites);
 
             const result = await actions.initializeSites();
 
@@ -324,10 +317,8 @@ describe(createSiteOperationsActions, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            mockElectronAPI.sites.getSites.mockResolvedValue({
-                success: true,
-                data: [],
-            });
+            // Mock preload API to return extracted empty array directly
+            mockElectronAPI.sites.getSites.mockResolvedValue([]);
 
             const result = await actions.initializeSites();
 

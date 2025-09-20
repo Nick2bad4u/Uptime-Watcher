@@ -334,11 +334,10 @@ describe("useSitesStore Function Coverage Tests", () => {
             const store = useSitesStore.getState();
 
             // Mock error for create site
-            // Mock error response
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce({
-                success: false,
-                error: "Network error",
-            });
+            // Mock electronAPI to throw error directly (extraction happens in preload)
+            mockElectronAPI.sites.addSite.mockRejectedValueOnce(
+                new Error("Network error")
+            );
 
             // Test that errors are handled gracefully (thrown after state management)
             await expect(

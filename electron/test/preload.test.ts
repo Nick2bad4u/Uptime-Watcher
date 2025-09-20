@@ -31,8 +31,40 @@ describe("Electron Preload Script", () => {
             exposeInMainWorld: vi.fn(),
         };
 
+        // Mock site object for testing
+        const mockSite = {
+            identifier: "test-site",
+            name: "Test Site",
+            monitoring: false,
+            monitors: [
+                {
+                    id: "test-monitor",
+                    type: "http",
+                    url: "https://example.com",
+                    checkInterval: 60_000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    status: "pending",
+                    responseTime: 0,
+                    monitoring: false,
+                    history: [],
+                },
+            ],
+        };
+
         mockIpcRenderer = {
-            invoke: vi.fn(() => Promise.resolve({ success: true, data: true })),
+            invoke: vi.fn((channel: string) => {
+                // For site operations, return site data
+                if (channel === "add-site" || channel === "update-site") {
+                    return Promise.resolve({ success: true, data: mockSite });
+                }
+                // For site array operations
+                if (channel === "get-sites") {
+                    return Promise.resolve({ success: true, data: [mockSite] });
+                }
+                // For other operations, return generic success
+                return Promise.resolve({ success: true, data: true });
+            }),
             on: vi.fn(),
             removeAllListeners: vi.fn(),
             send: vi.fn(),

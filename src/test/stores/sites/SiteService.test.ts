@@ -88,10 +88,8 @@ describe("SiteService", () => {
                 },
             ];
 
-            mockElectronAPI.sites.getSites.mockResolvedValueOnce({
-                success: true,
-                data: mockSites,
-            });
+            // Mock electronAPI to return extracted data directly (no IPC wrapper)
+            mockElectronAPI.sites.getSites.mockResolvedValueOnce(mockSites);
 
             const sites = await SiteService.getSites();
 
@@ -105,10 +103,8 @@ describe("SiteService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            mockElectronAPI.sites.getSites.mockResolvedValueOnce({
-                success: true,
-                data: [],
-            });
+            // Mock electronAPI to return extracted data directly (no IPC wrapper)
+            mockElectronAPI.sites.getSites.mockResolvedValueOnce([]);
 
             const sites = await SiteService.getSites();
 
@@ -194,10 +190,8 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce({
-                success: true,
-                data: createdSite,
-            });
+            // Mock electronAPI to return extracted Site directly (no IPC wrapper)
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce(createdSite);
 
             const result = await SiteService.addSite(newSite);
 
@@ -507,10 +501,10 @@ describe("SiteService", () => {
                 fileName: "backup.db",
             };
 
-            mockElectronAPI.data.downloadSQLiteBackup.mockResolvedValueOnce({
-                success: true,
-                data: backupData,
-            });
+            // Mock electronAPI to return extracted data directly (no IPC wrapper)
+            mockElectronAPI.data.downloadSQLiteBackup.mockResolvedValueOnce(
+                backupData
+            );
 
             const result = await SiteService.downloadSQLiteBackup();
 
@@ -626,10 +620,10 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce({
-                success: true,
-                data: validSite as Site,
-            });
+            // Mock electronAPI to return extracted Site directly (no IPC wrapper)
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce(
+                validSite as Site
+            );
 
             await SiteService.addSite(validSite);
 
@@ -680,10 +674,10 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce({
-                success: true,
-                data: siteWithMonitors as Site,
-            });
+            // Mock electronAPI to return extracted Site directly (no IPC wrapper)
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce(
+                siteWithMonitors as Site
+            );
 
             const result = await SiteService.addSite(siteWithMonitors);
 
@@ -719,10 +713,10 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce({
-                success: true,
-                data: siteWithSpecialChars as Site,
-            });
+            // Mock electronAPI to return extracted Site directly (no IPC wrapper)
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce(
+                siteWithSpecialChars as Site
+            );
 
             const result = await SiteService.addSite(siteWithSpecialChars);
 
@@ -758,10 +752,10 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce({
-                success: true,
-                data: siteWithUnicode as Site,
-            });
+            // Mock electronAPI to return extracted Site directly (no IPC wrapper)
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce(
+                siteWithUnicode as Site
+            );
 
             const result = await SiteService.addSite(siteWithUnicode);
 

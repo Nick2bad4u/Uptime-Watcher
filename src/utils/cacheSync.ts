@@ -146,29 +146,38 @@ export function setupCacheSync(): () => void {
                     case "all": {
                         clearAllFrontendCaches();
                         // Refresh monitor types after clearing all caches
-                        void useMonitorTypesStore
-                            .getState()
-                            .refreshMonitorTypes()
-                            .catch((error: unknown) => {
+                        const refreshMonitorTypes = async (): Promise<void> => {
+                            try {
+                                await useMonitorTypesStore
+                                    .getState()
+                                    .refreshMonitorTypes();
+                            } catch (error) {
                                 logger.error(
                                     "Failed to refresh monitor types after cache invalidation:",
                                     ensureError(error)
                                 );
-                            });
+                            }
+                        };
+                        void refreshMonitorTypes();
                         break;
                     }
                     case "monitor": {
                         clearMonitorRelatedCaches(data.identifier);
                         // Refresh monitor types when monitor-related caches are cleared
-                        void useMonitorTypesStore
-                            .getState()
-                            .refreshMonitorTypes()
-                            .catch((error: unknown) => {
-                                logger.error(
-                                    "Failed to refresh monitor types after monitor cache invalidation:",
-                                    ensureError(error)
-                                );
-                            });
+                        const refreshMonitorTypesMonitor =
+                            async (): Promise<void> => {
+                                try {
+                                    await useMonitorTypesStore
+                                        .getState()
+                                        .refreshMonitorTypes();
+                                } catch (error) {
+                                    logger.error(
+                                        "Failed to refresh monitor types after monitor cache invalidation:",
+                                        ensureError(error)
+                                    );
+                                }
+                            };
+                        void refreshMonitorTypesMonitor();
                         break;
                     }
                     case "site": {
