@@ -156,7 +156,13 @@ export const createSiteOperationsActions = (
                         }
                     }
                 }
-                await window.electronAPI.sites.removeSite(identifier);
+                const success =
+                    await window.electronAPI.sites.removeSite(identifier);
+                if (!success) {
+                    throw new Error(
+                        `Failed to remove site ${identifier}: Backend operation failed`
+                    );
+                }
                 deps.removeSite(identifier);
             },
             { identifier },

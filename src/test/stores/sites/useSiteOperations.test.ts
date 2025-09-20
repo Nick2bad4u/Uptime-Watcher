@@ -263,7 +263,7 @@ describe(createSiteOperationsActions, () => {
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
                 undefined
             );
-            mockElectronAPI.sites.removeSite.mockResolvedValue(undefined);
+            mockElectronAPI.sites.removeSite.mockResolvedValue(true);
 
             await actions.deleteSite("test-site");
 

@@ -445,20 +445,32 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                         type,
                     });
 
-                    const result =
+                    const response =
                         await window.electronAPI.monitorTypes.validateMonitorData(
                             type,
                             data
                         );
 
+                    // Extract the actual validation result from the IPC response
+                    const validationData = safeExtractIpcData<ValidationResult>(
+                        response,
+                        {
+                            data: undefined,
+                            errors: ["Failed to validate monitor data"],
+                            metadata: {},
+                            success: false,
+                            warnings: [],
+                        }
+                    );
+
                     // Transform result to ensure all required properties are
                     // present
                     const validationResult: ValidationResult = {
-                        data: result.data,
-                        errors: result.errors,
-                        metadata: result.metadata ?? {},
-                        success: result.success,
-                        warnings: result.warnings ?? [],
+                        data: validationData.data,
+                        errors: validationData.errors,
+                        metadata: validationData.metadata ?? {},
+                        success: validationData.success,
+                        warnings: validationData.warnings ?? [],
                     };
 
                     logStoreAction("MonitorTypesStore", "validateMonitorData", {

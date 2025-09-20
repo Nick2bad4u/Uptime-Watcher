@@ -68,9 +68,15 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
 
         await withErrorHandling(
             async () => {
-                await window.electronAPI.monitoring.startMonitoringForSite(
-                    siteId
-                );
+                const success =
+                    await window.electronAPI.monitoring.startMonitoringForSite(
+                        siteId
+                    );
+                if (!success) {
+                    throw new Error(
+                        `Failed to start monitoring for site ${siteId}: Backend operation failed`
+                    );
+                }
                 // No need for manual sync - StatusUpdateHandler will update UI
                 // via events
             },
@@ -88,10 +94,16 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
 
         await withErrorHandling(
             async () => {
-                await window.electronAPI.monitoring.startMonitoringForSite(
-                    siteId,
-                    monitorId
-                );
+                const success =
+                    await window.electronAPI.monitoring.startMonitoringForSite(
+                        siteId,
+                        monitorId
+                    );
+                if (!success) {
+                    throw new Error(
+                        `Failed to start monitoring for monitor ${monitorId} of site ${siteId}: Backend operation failed`
+                    );
+                }
                 // No need for manual sync - StatusUpdateHandler will update UI
                 // via events
             },
@@ -106,9 +118,15 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
 
         await withErrorHandling(
             async () => {
-                await window.electronAPI.monitoring.stopMonitoringForSite(
-                    siteId
-                );
+                const success =
+                    await window.electronAPI.monitoring.stopMonitoringForSite(
+                        siteId
+                    );
+                if (!success) {
+                    throw new Error(
+                        `Failed to stop monitoring for site ${siteId}: Backend operation failed`
+                    );
+                }
                 // No need for manual sync - StatusUpdateHandler will update UI
                 // via events
             },
@@ -126,10 +144,16 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
 
         await withErrorHandling(
             async () => {
-                await window.electronAPI.monitoring.stopMonitoringForSite(
-                    siteId,
-                    monitorId
-                );
+                const success =
+                    await window.electronAPI.monitoring.stopMonitoringForSite(
+                        siteId,
+                        monitorId
+                    );
+                if (!success) {
+                    throw new Error(
+                        `Failed to stop monitoring for monitor ${monitorId} of site ${siteId}: Backend operation failed`
+                    );
+                }
                 // No need for manual sync - StatusUpdateHandler will update UI
                 // via events
             },

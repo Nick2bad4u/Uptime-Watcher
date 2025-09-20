@@ -26,6 +26,48 @@ import { contextBridge, ipcRenderer } from "electron";
 /**
  * Runtime validation helpers for IPC responses
  */
+
+/**
+ * Standardized IPC response structure interface.
+ */
+interface IpcResponse<T = unknown> {
+    data?: T;
+    error?: string;
+    metadata?: Record<string, unknown>;
+    success: boolean;
+}
+
+/**
+ * Validates and extracts boolean data from IPC responses.
+ *
+ * @param response - IPC response from main process
+ *
+ * @returns Boolean value from response data
+ *
+ * @throws Error if response is invalid or operation failed
+ */
+function extractBooleanIpcData(response: unknown): boolean {
+    if (
+        typeof response === "object" &&
+        response !== null &&
+        "success" in response &&
+        "data" in response
+    ) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type is validated through runtime checks above
+        const ipcResponse = response as IpcResponse<boolean>;
+
+        if (!ipcResponse.success) {
+            throw new Error(ipcResponse.error ?? "IPC operation failed");
+        }
+
+        if (typeof ipcResponse.data === "boolean") {
+            return ipcResponse.data;
+        }
+    }
+
+    throw new Error("Invalid IPC response format for boolean operation");
+}
+
 function validateBackupResponse(response: unknown): {
     buffer: ArrayBuffer;
     fileName: string;
@@ -113,10 +155,23 @@ const siteAPI = {
      *
      * @param identifier - Unique site identifier
      *
-     * @returns Promise resolving when site is completely removed
+     * @returns Promise resolving to boolean indicating operation success
      */
-    removeSite: (identifier: string): Promise<void> =>
-        ipcRenderer.invoke("remove-site", identifier),
+    removeSite: async (identifier: string): Promise<boolean> => {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- IPC response type validated at runtime
+            const response = await ipcRenderer.invoke(
+                "remove-site",
+                identifier
+            );
+            return extractBooleanIpcData(response);
+        } catch (error) {
+            throw new Error(
+                `Failed to remove site: ${getErrorMessage(error)}`,
+                { cause: error }
+            );
+        }
+    },
 
     /**
      * Update site properties (name, monitoring status, etc.).
@@ -154,13 +209,27 @@ const monitoringAPI = {
      * @param monitorId - Optional specific monitor ID (if omitted, starts all
      *   monitors for the site)
      *
-     * @returns Promise resolving when monitoring is started
+     * @returns Promise resolving to boolean indicating operation success
      */
-    startMonitoringForSite: (
+    startMonitoringForSite: async (
         identifier: string,
         monitorId?: string
-    ): Promise<void> =>
-        ipcRenderer.invoke("start-monitoring-for-site", identifier, monitorId),
+    ): Promise<boolean> => {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- IPC response type validated at runtime
+            const response = await ipcRenderer.invoke(
+                "start-monitoring-for-site",
+                identifier,
+                monitorId
+            );
+            return extractBooleanIpcData(response);
+        } catch (error) {
+            throw new Error(
+                `Failed to start monitoring for site: ${getErrorMessage(error)}`,
+                { cause: error }
+            );
+        }
+    },
 
     /**
      * Stop monitoring for all sites.
@@ -176,13 +245,27 @@ const monitoringAPI = {
      * @param monitorId - Optional specific monitor ID (if omitted, stops all
      *   monitors for the site)
      *
-     * @returns Promise resolving when monitoring is stopped
+     * @returns Promise resolving to boolean indicating operation success
      */
-    stopMonitoringForSite: (
+    stopMonitoringForSite: async (
         identifier: string,
         monitorId?: string
-    ): Promise<void> =>
-        ipcRenderer.invoke("stop-monitoring-for-site", identifier, monitorId),
+    ): Promise<boolean> => {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- IPC response type validated at runtime
+            const response = await ipcRenderer.invoke(
+                "stop-monitoring-for-site",
+                identifier,
+                monitorId
+            );
+            return extractBooleanIpcData(response);
+        } catch (error) {
+            throw new Error(
+                `Failed to stop monitoring for site: ${getErrorMessage(error)}`,
+                { cause: error }
+            );
+        }
+    },
 };
 
 /**
@@ -676,10 +759,24 @@ const monitorTypesAPI = {
      * @param type - Monitor type to validate
      * @param data - Monitor data to validate
      *
-     * @returns Promise resolving to validation result
+     * @returns Promise resolving to validation result wrapped in IPC response
      */
-    validateMonitorData: (type: string, data: unknown): Promise<unknown> =>
-        ipcRenderer.invoke("validate-monitor-data", type, data),
+    validateMonitorData: (
+        type: string,
+        data: unknown
+    ): Promise<{
+        data?: {
+            data?: unknown;
+            errors: readonly string[];
+            metadata?: unknown;
+            success: boolean;
+            warnings?: readonly string[];
+        };
+        error?: string;
+        metadata?: unknown;
+        success: boolean;
+        warnings?: readonly string[];
+    }> => ipcRenderer.invoke("validate-monitor-data", type, data),
 };
 
 /**

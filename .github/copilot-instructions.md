@@ -55,6 +55,7 @@ Remember you have access to tools and resources beyond just your own codebase kn
 **Always** wait for terminal output before proceeding to the next step. Do not assume commands succeeded without verification. Do not get stuck waiting for output. If output is taking too long, kill it or ask for the user to kill it. Always set a timeout of 5 minutes for any command that produces output. If the command takes longer than 5 minutes, kill it or ask the user to kill it.
 **Always** Research packages, libraries, and tools before using them. Do not assume you know how something works without verifying it in the documentation or codebase. **Never** assume function names, filenames, etc. are correct without checking.
 **Always** use Windows commands in the terminal unless specifically instructed otherwise. You are running on a Windows machine.
+**Always** Use the Electron MCP server to help diagnose and fix issues with the Electron app. The Electron MCP server has access to the full Electron app context and can help you understand how the app works and how to make changes. Use it when needed to get information about the app, run commands, make changes, and interact with the UI and logs. It's VERY powerful and can help you solve complex problems. Use it to its full potential.
 </instructions>
 
 <prohibitions>

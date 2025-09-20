@@ -105,7 +105,7 @@ describe("OperationHelpers", () => {
             getSites: vi.fn(() => mockSites),
             setSites: vi.fn(),
             addSite: vi.fn(),
-            removeSite: vi.fn(),
+            removeSite: vi.fn().mockResolvedValue(true),
             syncSites: vi.fn().mockResolvedValue(undefined),
         };
 

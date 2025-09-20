@@ -296,10 +296,7 @@ const mockElectronAPI: {
             success: true,
             data: true,
         }),
-        removeSite: vi.fn().mockResolvedValue({
-            success: true,
-            data: true,
-        }),
+        removeSite: vi.fn().mockResolvedValue(true),
         updateSite: vi.fn().mockResolvedValue({
             success: true,
             data: undefined,

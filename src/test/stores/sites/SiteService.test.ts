@@ -372,7 +372,7 @@ describe("SiteService", () => {
             await annotate("Type: Data Deletion", "type");
 
             const identifier = "site-to-remove";
-            mockElectronAPI.sites.removeSite.mockResolvedValueOnce(undefined);
+            mockElectronAPI.sites.removeSite.mockResolvedValueOnce(true);
 
             await SiteService.removeSite(identifier);
 
@@ -426,7 +426,7 @@ describe("SiteService", () => {
             await annotate("Type: Business Logic", "type");
 
             const identifier = "";
-            mockElectronAPI.sites.removeSite.mockResolvedValueOnce(undefined);
+            mockElectronAPI.sites.removeSite.mockResolvedValueOnce(true);
 
             await SiteService.removeSite(identifier);
 

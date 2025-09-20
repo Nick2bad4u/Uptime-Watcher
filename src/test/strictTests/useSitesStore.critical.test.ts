@@ -252,7 +252,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
                 undefined
             );
-            mockElectronAPI.sites.removeSite.mockResolvedValueOnce(undefined);
+            mockElectronAPI.sites.removeSite.mockResolvedValueOnce(true);
             mockElectronAPI.sites.getSites.mockResolvedValueOnce([]);
 
             // Test deleteSite
