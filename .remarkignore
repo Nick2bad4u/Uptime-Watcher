@@ -1,0 +1,29 @@
+# Remark ignore patterns
+# Configuration files
+*.config.*
+.remarkrc.*
+*.mjs
+*.js
+
+# Build and output directories
+dist/
+dist-*/
+node_modules/
+coverage/
+.cache/
+
+# Binary and media files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.wasm
+*.pdf
+
+# Documentation that may have different formatting requirements
+CHANGELOG.md
+LICENSE
+docs/docusaurus/node_modules/
+docs/Packages/
+docs/TSDoc/

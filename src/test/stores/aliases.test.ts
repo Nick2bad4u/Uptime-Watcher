@@ -24,6 +24,7 @@ vi.mock("../../constants", () => ({
 }));
 
 vi.mock("../../types/ipc", () => ({
+    extractIpcData: vi.fn((data) => data),
     safeExtractIpcData: vi.fn((data) => data),
 }));
 

@@ -21,7 +21,7 @@ const mockElectronAPI = {
         removeMonitor: vi.fn().mockResolvedValue(undefined),
     },
     monitoring: {
-        stopMonitoringForSite: vi.fn().mockResolvedValue(undefined),
+        stopMonitoringForSite: vi.fn().mockResolvedValue(true),
     },
 };
 

@@ -533,6 +533,10 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 }
             );
 
+            // Clear previous calls before testing validation logging
+            mockLogStoreAction.mockClear();
+            mockSafeExtractIpcData.mockClear();
+
             // Test validation logging
             const mockResult: ValidationResult = {
                 success: true,
@@ -545,6 +549,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
                 mockResult
             );
+
+            // Mock safeExtractIpcData to return the validation result directly
+            mockSafeExtractIpcData.mockReturnValueOnce(mockResult);
 
             await act(async () => {
                 await result.current.validateMonitorData("http", {});

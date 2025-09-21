@@ -70,6 +70,13 @@ interface StateSyncHandlerValidatorsInterface {
 }
 
 /**
+ * Interface for system handler validators.
+ */
+interface SystemHandlerValidatorsInterface {
+    openExternal: IpcParameterValidator;
+}
+
+/**
  * Helper function to create validators for handlers expecting no parameters.
  *
  * @returns A validator function that ensures no parameters are passed
@@ -557,4 +564,23 @@ export const StateSyncHandlerValidators: StateSyncHandlerValidatorsInterface = {
      * Expects no parameters.
      */
     requestFullSync: createNoParamsValidator(),
+} as const;
+
+/**
+ * System handler validators.
+ *
+ * @remarks
+ * Provides parameter validation for system operations. Each property is a
+ * validator for a specific system-related IPC channel.
+ *
+ * @public
+ */
+export const SystemHandlerValidators: SystemHandlerValidatorsInterface = {
+    /**
+     * Validates parameters for the "open-external" IPC handler.
+     *
+     * @remarks
+     * Expects exactly one string parameter (the URL to open).
+     */
+    openExternal: createSingleStringValidator("url"),
 } as const;

@@ -371,6 +371,12 @@ const config: Config = {
             playgroundPosition: "bottom",
         },
 
+        mermaid: {
+            options: {
+                configFile: "../../mermaid.config.json",
+            },
+            theme: { dark: "dark", light: "neutral" },
+        },
         metadata: [
             {
                 content:

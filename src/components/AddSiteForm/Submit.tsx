@@ -21,9 +21,9 @@ import type {
     AddSiteFormState,
 } from "../SiteDetails/useAddSiteForm";
 
-import { DEFAULT_REQUEST_TIMEOUT, RETRY_CONSTRAINTS } from "../../constants";
 import { truncateForLogging } from "../../utils/fallbacks";
 import {
+    createMonitorObject,
     validateMonitorFieldClientSide,
     validateMonitorFormData,
 } from "../../utils/monitorValidation";
@@ -97,63 +97,8 @@ export type FormSubmitProperties = Simplify<
  * @returns Monitor data object with type-specific fields
  */
 /**
- * Creates monitor-specific data based on the monitor type. Uses type-safe
- * object construction instead of dynamic property assignment.
- */
-function buildMonitorData(
-    monitorType: MonitorType,
-    formData: {
-        expectedValue: string;
-        host: string;
-        port: string;
-        recordType: string;
-        url: string;
-    }
-): Partial<Monitor> {
-    const baseData = {
-        type: monitorType,
-    };
-
-    // Build type-specific fields using discriminated unions
-    switch (monitorType) {
-        case "dns": {
-            return {
-                ...baseData,
-                host: safeTrim(formData.host),
-                recordType: safeTrim(formData.recordType),
-                ...(safeTrim(formData.expectedValue) && {
-                    expectedValue: safeTrim(formData.expectedValue),
-                }),
-            };
-        }
-        case "http": {
-            return {
-                ...baseData,
-                url: safeTrim(formData.url),
-            };
-        }
-        case "ping": {
-            return {
-                ...baseData,
-                host: safeTrim(formData.host),
-            };
-        }
-        case "port": {
-            return {
-                ...baseData,
-                host: safeTrim(formData.host),
-                port: Number(formData.port),
-            };
-        }
-        default: {
-            return baseData;
-        }
-    }
-}
-
-/**
- * Creates a monitor object based on the form data. Uses type-safe property
- * assignment instead of dynamic field copying.
+ * Creates a monitor object based on the form data using the shared utility.
+ * This ensures consistent monitor defaults and validation across the app.
  */
 function createMonitor(properties: FormSubmitProperties): Monitor {
     const {
@@ -167,29 +112,25 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
         url,
     } = properties;
 
-    // Get type-specific monitor data
-    const specificData = buildMonitorData(monitorType, {
+    // Convert form data to proper types for the shared utility
+    const formData = {
+        checkInterval,
         expectedValue,
         host,
-        port,
+        port: port ? Number.parseInt(port, 10) : undefined,
         recordType,
         url,
-    });
+    };
 
-    // Create monitor with all required fields and type-specific data
+    // Use shared monitor creation utility for consistency
+    const baseMonitor = createMonitorObject(monitorType, formData);
+
+    // Add required fields that aren't included in MonitorCreationData
     return {
+        ...baseMonitor,
         activeOperations: [],
-        checkInterval,
-        history: [] as Monitor["history"],
+        checkInterval, // Add back the checkInterval from form data
         id: generateUuid(),
-        monitoring: true, // Default to monitoring enabled
-        responseTime: -1, // Sentinel value for never checked
-        retryAttempts: RETRY_CONSTRAINTS.DEFAULT, // Explicit default retry attempts
-        status: "pending" as const,
-        timeout: DEFAULT_REQUEST_TIMEOUT, // Explicit default timeout
-        type: monitorType,
-        // Type-safe spread of monitor-specific data
-        ...specificData,
     };
 }
 

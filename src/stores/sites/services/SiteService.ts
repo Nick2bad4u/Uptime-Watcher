@@ -12,7 +12,6 @@ import type { Site } from "@shared/types";
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { logger } from "../../../services/logger";
-import { safeExtractIpcData } from "../../../types/ipc";
 import { waitForElectronAPI } from "../../utils";
 
 /**
@@ -47,8 +46,8 @@ export const SiteService = {
      */
     async addSite(site: Site): Promise<Site> {
         await this.initialize();
-        const response = await window.electronAPI.sites.addSite(site);
-        return safeExtractIpcData(response, site);
+        // Preload now returns extracted data directly
+        return window.electronAPI.sites.addSite(site);
     },
 
     /**
@@ -93,11 +92,8 @@ export const SiteService = {
         fileName: string;
     }> {
         await this.initialize();
-        const response = await window.electronAPI.data.downloadSQLiteBackup();
-        return safeExtractIpcData(response, {
-            buffer: new ArrayBuffer(0),
-            fileName: "backup.db",
-        });
+        // Preload now returns extracted data directly
+        return window.electronAPI.data.downloadSQLiteBackup();
     },
 
     /**
@@ -116,8 +112,8 @@ export const SiteService = {
      */
     async getSites(): Promise<Site[]> {
         await this.initialize();
-        const response = await window.electronAPI.sites.getSites();
-        return safeExtractIpcData(response, []);
+        // Preload now returns extracted data directly
+        return window.electronAPI.sites.getSites();
     },
 
     /**
@@ -186,7 +182,12 @@ export const SiteService = {
      */
     async removeSite(identifier: string): Promise<void> {
         await this.initialize();
-        await window.electronAPI.sites.removeSite(identifier);
+        const success = await window.electronAPI.sites.removeSite(identifier);
+        if (!success) {
+            throw new Error(
+                `Failed to remove site ${identifier}: Backend operation failed`
+            );
+        }
     },
 
     /**

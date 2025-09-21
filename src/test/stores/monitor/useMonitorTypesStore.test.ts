@@ -159,8 +159,19 @@ describe(useMonitorTypesStore, () => {
             metadata: {},
         };
 
+        // Mock the IPC response structure that the store expects
+        const mockIpcResponse: IpcResponse<ValidationResult> = {
+            success: true,
+            data: mockValidationResult,
+            metadata: {
+                timestamp: Date.now(),
+                correlationId: "test-correlation-id",
+                operation: "validate-monitor-data",
+            },
+        };
+
         mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
-            mockValidationResult
+            mockIpcResponse
         );
 
         const { result } = renderHook(() => useMonitorTypesStore());
@@ -289,5 +300,126 @@ describe(useMonitorTypesStore, () => {
         });
 
         expect(formatted!).toBe("Raw detail"); // Fallback value
+    });
+
+    describe("IPC Response Handling", () => {
+        it("should properly unwrap IPC validation responses for success case", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: IPC Response Handling", "type");
+
+            // Mock the actual IPC response structure with wrapped validation data
+            const mockIpcResponse: IpcResponse<ValidationResult> = {
+                success: true, // IPC operation succeeded
+                data: {
+                    success: true, // Validation passed
+                    data: { url: "https://example.com" },
+                    errors: [],
+                    warnings: [],
+                    metadata: {},
+                },
+            };
+
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
+                mockIpcResponse
+            );
+
+            const { result } = renderHook(() => useMonitorTypesStore());
+
+            let validationResult: ValidationResult;
+            await act(async () => {
+                validationResult = await result.current.validateMonitorData(
+                    "http",
+                    { url: "https://example.com" }
+                );
+            });
+
+            expect(validationResult!.success).toBeTruthy();
+            expect(validationResult!.data).toEqual({
+                url: "https://example.com",
+            });
+            expect(validationResult!.errors).toEqual([]);
+        });
+
+        it("should properly unwrap IPC validation responses for validation failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: IPC Response Handling", "type");
+
+            // Mock the actual IPC response structure with validation failure
+            const mockIpcResponse: IpcResponse<ValidationResult> = {
+                success: true, // IPC operation succeeded
+                data: {
+                    success: false, // Validation failed
+                    data: undefined,
+                    errors: ["URL is required"],
+                    warnings: [],
+                    metadata: {},
+                },
+            };
+
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
+                mockIpcResponse
+            );
+
+            const { result } = renderHook(() => useMonitorTypesStore());
+
+            let validationResult: ValidationResult;
+            await act(async () => {
+                validationResult = await result.current.validateMonitorData(
+                    "http",
+                    {} // Invalid empty data
+                );
+            });
+
+            // This is the critical test - validation should fail
+            expect(validationResult!.success).toBeFalsy();
+            expect(validationResult!.errors).toEqual(["URL is required"]);
+            expect(validationResult!.data).toBeUndefined();
+        });
+
+        it("should handle IPC operation failure with fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: IPC Response Handling", "type");
+
+            // Mock IPC operation failure
+            const mockIpcResponse = {
+                success: false, // IPC operation failed
+                error: "Backend unavailable",
+            };
+
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
+                mockIpcResponse
+            );
+
+            const { result } = renderHook(() => useMonitorTypesStore());
+
+            let validationResult: ValidationResult;
+            await act(async () => {
+                validationResult = await result.current.validateMonitorData(
+                    "http",
+                    { url: "https://example.com" }
+                );
+            });
+
+            // Should use fallback values when IPC operation fails
+            expect(validationResult!.success).toBeFalsy();
+            expect(validationResult!.errors).toEqual([
+                "Failed to validate monitor data",
+            ]);
+        });
     });
 });

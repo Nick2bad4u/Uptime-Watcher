@@ -7,10 +7,10 @@ import { act } from "@testing-library/react";
 
 // Mock the monitoring service first
 const mockMonitoringService = {
-    startSiteMonitoring: vi.fn(),
-    stopSiteMonitoring: vi.fn(),
-    startSiteMonitorMonitoring: vi.fn(),
-    stopSiteMonitorMonitoring: vi.fn(),
+    startSiteMonitoring: vi.fn().mockResolvedValue(true),
+    stopSiteMonitoring: vi.fn().mockResolvedValue(true),
+    startSiteMonitorMonitoring: vi.fn().mockResolvedValue(true),
+    stopSiteMonitorMonitoring: vi.fn().mockResolvedValue(true),
 };
 
 // Mock the stores and services
@@ -40,10 +40,10 @@ Object.defineProperty(globalThis, "electronAPI", {
 
 // Mock the sites store with monitoring functions
 const mockSitesStore = {
-    startSiteMonitoring: vi.fn(),
-    stopSiteMonitoring: vi.fn(),
-    startSiteMonitorMonitoring: vi.fn(),
-    stopSiteMonitorMonitoring: vi.fn(),
+    startSiteMonitoring: vi.fn().mockResolvedValue(true),
+    stopSiteMonitoring: vi.fn().mockResolvedValue(true),
+    startSiteMonitorMonitoring: vi.fn().mockResolvedValue(true),
+    stopSiteMonitorMonitoring: vi.fn().mockResolvedValue(true),
     sites: new Map(),
     loading: false,
     error: null,
@@ -67,7 +67,7 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Monitoring", "type");
 
-        mockSitesStore.startSiteMonitoring.mockResolvedValueOnce(undefined);
+        mockSitesStore.startSiteMonitoring.mockResolvedValueOnce(true);
 
         await act(async () => {
             await mockSitesStore.startSiteMonitoring("test-site-id");
@@ -112,7 +112,7 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Monitoring", "type");
 
-        mockSitesStore.stopSiteMonitoring.mockResolvedValueOnce(undefined);
+        mockSitesStore.stopSiteMonitoring.mockResolvedValueOnce(true);
 
         await act(async () => {
             await mockSitesStore.stopSiteMonitoring("test-site-id");
@@ -157,9 +157,7 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Monitoring", "type");
 
-        mockSitesStore.startSiteMonitorMonitoring.mockResolvedValueOnce(
-            undefined
-        );
+        mockSitesStore.startSiteMonitorMonitoring.mockResolvedValueOnce(true);
 
         await act(async () => {
             await mockSitesStore.startSiteMonitorMonitoring(
@@ -212,9 +210,7 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Monitoring", "type");
 
-        mockSitesStore.stopSiteMonitorMonitoring.mockResolvedValueOnce(
-            undefined
-        );
+        mockSitesStore.stopSiteMonitorMonitoring.mockResolvedValueOnce(true);
 
         await act(async () => {
             await mockSitesStore.stopSiteMonitorMonitoring(

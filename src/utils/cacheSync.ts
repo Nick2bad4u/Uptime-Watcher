@@ -6,6 +6,7 @@
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { logger } from "../services/logger";
+import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { clearMonitorTypeCache } from "./monitorTypeHelper";
 
 /**
@@ -144,10 +145,30 @@ export function setupCacheSync(): () => void {
                 switch (data.type) {
                     case "all": {
                         clearAllFrontendCaches();
+                        // Refresh monitor types after clearing all caches
+                        void useMonitorTypesStore
+                            .getState()
+                            .refreshMonitorTypes()
+                            .catch((error: unknown) => {
+                                logger.error(
+                                    "Failed to refresh monitor types after cache invalidation:",
+                                    ensureError(error)
+                                );
+                            });
                         break;
                     }
                     case "monitor": {
                         clearMonitorRelatedCaches(data.identifier);
+                        // Refresh monitor types when monitor-related caches are cleared
+                        void useMonitorTypesStore
+                            .getState()
+                            .refreshMonitorTypes()
+                            .catch((error: unknown) => {
+                                logger.error(
+                                    "Failed to refresh monitor types after monitor cache invalidation:",
+                                    ensureError(error)
+                                );
+                            });
                         break;
                     }
                     case "site": {

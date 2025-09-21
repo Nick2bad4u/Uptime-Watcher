@@ -71,6 +71,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             create: vi.fn(),
             findById: vi.fn(),
             findBySiteId: vi.fn(),
+            findByMonitorId: vi.fn().mockResolvedValue([]),
             findAll: vi.fn(),
             findByTimeRange: vi.fn(),
             update: vi.fn(),

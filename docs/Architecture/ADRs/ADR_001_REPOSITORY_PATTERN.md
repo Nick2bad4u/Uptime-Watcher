@@ -19,6 +19,31 @@ The application needed a consistent, testable, and transaction-safe approach to 
 
 We will use the **Repository Pattern** for all database access with the following characteristics:
 
+### Repository operation lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> PublicAsync: Public async method
+    PublicAsync --> AcquireTx: executeTransaction() boundary
+    note right of AcquireTx : Atomic commits with rollback on failure
+    AcquireTx --> InternalSync: *_Internal executes SQL
+    InternalSync --> EmitHooks: withDatabaseOperation middleware
+    note right of EmitHooks : Retries • metrics • event emission
+    EmitHooks --> RetryGate
+    state RetryGate <<choice>>
+    RetryGate --> AcquireTx: Retry (≤3 with backoff)
+    RetryGate --> ForkFan: Success path
+    state ForkFan <<fork>>
+    ForkFan --> CacheUpdate: Atomic cache refresh
+    note right of CacheUpdate : Swap caches only after success
+    ForkFan --> DomainEvents: Emit domain + telemetry events
+    CacheUpdate --> JoinSync
+    DomainEvents --> JoinSync
+    state JoinSync <<join>>
+    JoinSync --> Commit: Commit transaction
+    Commit --> [*]
+```
+
 ### 1. Dual Method Pattern
 
 - **Public async methods** that create transactions (`deleteAll()`)

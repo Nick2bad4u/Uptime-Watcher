@@ -120,7 +120,7 @@ export const SERVICE_LOGS = {
 
     /** Migration system */
     MIGRATION_APPLYING:
-        "Applying migration: {monitorType} {fromVersion} → {toVersion}",
+        "Applying migration: {monitorType} {fromVersion} -> {toVersion}",
 
     MIGRATION_REGISTERED:
         "Registered migration for {monitorType}: {fromVersion} → {toVersion}",

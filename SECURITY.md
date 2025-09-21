@@ -7,6 +7,26 @@ If you discover a security vulnerability, please report it by emailing [20943337
 - Please include as much detail as possible to help us reproduce and address the issue quickly.
 - We aim to respond to security reports within 7 days.
 
+### Vulnerability response workflow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Reporter
+    participant Maintainer
+    participant Triage as Security Triage
+    participant Fix as Engineering
+    participant Release
+
+    Reporter->>Maintainer: Submit responsible disclosure
+    Maintainer->>Triage: Acknowledge within 7 days
+    Triage->>Fix: Reproduce & classify severity
+    Fix->>Fix: Develop patch & regression tests
+    Fix->>Release: Prepare advisory & release
+    Release->>Reporter: Share patch & credit(optional)
+    Release->>Public: Publish fix after coordination
+```
+
 ## Security Best Practices
 
 - Always use the latest version of Uptime Watcher.

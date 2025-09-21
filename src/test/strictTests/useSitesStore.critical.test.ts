@@ -10,6 +10,13 @@ import type { Site } from "../../../shared/types";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { mockElectronAPI } from "../setup";
 
+// Mock IPC functions that are used by the store operations
+vi.mock("../../types/ipc", () => ({
+    extractIpcData: vi.fn((data) => data),
+    safeExtractIpcData: vi.fn((data) => data),
+    isIpcResponse: vi.fn(() => true),
+}));
+
 describe("useSitesStore Function Coverage Tests", () => {
     beforeEach(() => {
         // Clear all mocks
@@ -184,10 +191,10 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             // Mock monitoring responses
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             // Test monitoring functions
@@ -245,7 +252,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
                 undefined
             );
-            mockElectronAPI.sites.removeSite.mockResolvedValueOnce(undefined);
+            mockElectronAPI.sites.removeSite.mockResolvedValueOnce(true);
             mockElectronAPI.sites.getSites.mockResolvedValueOnce([]);
 
             // Test deleteSite

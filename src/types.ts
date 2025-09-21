@@ -231,12 +231,12 @@ declare global {
                  * @param siteId - The site identifier.
                  * @param monitorId - Optional monitor identifier.
                  *
-                 * @returns A promise that resolves when monitoring has started.
+                 * @returns A promise resolving to boolean indicating success.
                  */
                 startMonitoringForSite: (
                     siteId: string,
                     monitorId?: string
-                ) => Promise<void>;
+                ) => Promise<boolean>;
                 /**
                  * @remarks
                  * Stop monitoring for all sites.
@@ -251,12 +251,12 @@ declare global {
                  * @param siteId - The site identifier.
                  * @param monitorId - Optional monitor identifier.
                  *
-                 * @returns A promise that resolves when monitoring has stopped.
+                 * @returns A promise resolving to boolean indicating success.
                  */
                 stopMonitoringForSite: (
                     siteId: string,
                     monitorId?: string
-                ) => Promise<void>;
+                ) => Promise<boolean>;
             };
 
             /**
@@ -445,9 +445,9 @@ declare global {
                  *
                  * @param id - The site identifier.
                  *
-                 * @returns A promise that resolves when the site is removed.
+                 * @returns A promise resolving to boolean indicating success.
                  */
-                removeSite: (id: string) => Promise<void>;
+                removeSite: (id: string) => Promise<boolean>;
                 /**
                  * @remarks
                  * Update site configuration.

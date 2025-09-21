@@ -17,7 +17,6 @@ import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
 
 import { logger } from "../../services/logger";
-import { safeExtractIpcData } from "../../types/ipc";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
 import { normalizeMonitor } from "./utils/monitorOperations";
 import {
@@ -115,9 +114,9 @@ export const createSiteOperationsActions = (
                     name: siteData.name ?? "Unnamed Site", // Provide default name
                 };
 
-                const response =
+                // Preload now returns extracted data directly
+                const newSite =
                     await window.electronAPI.sites.addSite(completeSite);
-                const newSite = safeExtractIpcData(response, completeSite);
                 deps.addSite(newSite);
             },
             { siteData },
@@ -155,7 +154,13 @@ export const createSiteOperationsActions = (
                         }
                     }
                 }
-                await window.electronAPI.sites.removeSite(identifier);
+                const success =
+                    await window.electronAPI.sites.removeSite(identifier);
+                if (!success) {
+                    throw new Error(
+                        `Failed to remove site ${identifier}: Backend operation failed`
+                    );
+                }
                 deps.removeSite(identifier);
             },
             { identifier },
@@ -172,10 +177,8 @@ export const createSiteOperationsActions = (
                     try {
                         const response =
                             await window.electronAPI.data.downloadSQLiteBackup();
-                        const result = safeExtractIpcData(response, {
-                            buffer: new ArrayBuffer(0),
-                        });
-                        return new Uint8Array(result.buffer);
+                        // Response from preload is already unwrapped: { buffer: ArrayBuffer, fileName: string }
+                        return new Uint8Array(response.buffer);
                     } catch (error) {
                         logger.error(
                             "Failed to download SQLite backup:",
@@ -198,8 +201,8 @@ export const createSiteOperationsActions = (
         withSiteOperationReturning(
             "initializeSites",
             async () => {
-                const response = await window.electronAPI.sites.getSites();
-                const sites = safeExtractIpcData<Site[]>(response, []);
+                // Preload now returns extracted data directly
+                const sites = await window.electronAPI.sites.getSites();
                 deps.setSites(sites);
                 return {
                     message: `Successfully loaded ${sites.length} sites`,

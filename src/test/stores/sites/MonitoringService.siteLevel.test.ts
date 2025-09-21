@@ -8,14 +8,14 @@ import { MonitoringService } from "../../../stores/sites/services/MonitoringServ
 
 // Mock the waitForElectronAPI utility
 vi.mock("../../../stores/utils", () => ({
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
+    waitForElectronAPI: vi.fn().mockImplementation(() => Promise.resolve()),
 }));
 
 // Mock window.electronAPI
 const mockElectronAPI = {
     monitoring: {
-        startMonitoringForSite: vi.fn(),
-        stopMonitoringForSite: vi.fn(),
+        startMonitoringForSite: vi.fn().mockResolvedValue(true),
+        stopMonitoringForSite: vi.fn().mockResolvedValue(true),
     },
 };
 
@@ -45,7 +45,7 @@ describe("MonitoringService - Site-level monitoring", () => {
             const siteId = "example.com";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.startSiteMonitoring(siteId);
@@ -97,7 +97,7 @@ describe("MonitoringService - Site-level monitoring", () => {
             const siteId = "";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.startSiteMonitoring(siteId);
@@ -124,7 +124,7 @@ describe("MonitoringService - Site-level monitoring", () => {
             const siteId = "example.com";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.stopSiteMonitoring(siteId);
@@ -176,7 +176,7 @@ describe("MonitoringService - Site-level monitoring", () => {
             const siteId = "";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
 
             await MonitoringService.stopSiteMonitoring(siteId);
@@ -204,7 +204,7 @@ describe("MonitoringService - Site-level monitoring", () => {
             const monitorId = "monitor-1";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValue(
-                undefined
+                true
             );
 
             // Monitor-level call

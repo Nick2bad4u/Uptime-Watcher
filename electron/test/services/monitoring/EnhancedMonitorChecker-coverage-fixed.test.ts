@@ -58,6 +58,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
         mockHistoryRepository = {
             create: vi.fn(),
             addEntry: vi.fn().mockResolvedValue(undefined),
+            findByMonitorId: vi.fn().mockResolvedValue([]),
         };
 
         mockOperationRegistry = {

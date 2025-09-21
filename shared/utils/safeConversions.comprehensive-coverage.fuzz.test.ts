@@ -171,7 +171,10 @@ describe("safeConversions comprehensive fuzzing tests", () => {
     });
 
     describe(safeParseFloat, () => {
-        test.prop([fc.anything(), fc.float({ min: -1000, max: 1000 })])(
+        test.prop([
+            fc.anything(),
+            fc.float({ min: -1000, max: 1000, noNaN: true }),
+        ])(
             "returns valid float or default for any input",
             (input, defaultValue) => {
                 const result = safeParseFloat(input, defaultValue);

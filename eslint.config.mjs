@@ -35,6 +35,7 @@ import vitest from "@vitest/eslint-plugin";
 import gitignore from "eslint-config-flat-gitignore";
 import eslintConfigPrettier from "eslint-config-prettier";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import * as eslintMdx from 'eslint-mdx';
 import antfu from "eslint-plugin-antfu";
 import arrayFunc from "eslint-plugin-array-func";
 import pluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
@@ -582,28 +583,77 @@ export default [
     // ═══════════════════════════════════════════════════════════════════════════════
     // MDX Eslint Rules (mdx/*)
     // ═══════════════════════════════════════════════════════════════════════════════
+    // Main MDX Configuration - for MDX files with comprehensive remark linting
     {
         files: ["**/*.mdx"],
-        name: "MDX - **/*.MDX",
+        languageOptions: {
+            ecmaVersion: 'latest',
+            globals: {
+                React: false,
+            },
+            parser: eslintMdx,
+            sourceType: 'module',
+        },
+        name: "MDX - **/*.MDX (Main with Remark)",
         plugins: { mdx: mdx },
         rules: {
             ...mdx.flat.rules,
-            ...mdx.flatCodeBlocks.rules,
-            // Core Plugin ESLint Rules (Basic JavaScript)
-            "no-var": "error",
-            "prefer-const": "error",
+            // MDX-specific rules
+            "mdx/remark": "warn",
+            "no-unused-expressions": "error",
+            // React rules for MDX components
+            "react/react-in-jsx-scope": "off",
         },
         settings: {
             processor: mdx.createRemarkProcessor({
-                // Optional, same as the `parserOptions.ignoreRemarkConfig`, you have to specify it twice unfortunately
-                ignoreRemarkConfig: true,
-                // Optional, if you want to disable language mapper, set it to `false`
-                // If you want to override the default language mapper inside, you can provide your own
-                languageMapper: {},
+                // Enable remark configuration file (.remarkrc.js) for comprehensive linting
+                ignoreRemarkConfig: false,
+                // Language mapper for code blocks
+                languageMapper: {
+                    // Map file extensions to languages for better code block processing
+                    'cjs': 'javascript',
+                    'cts': 'typescript',
+                    'js': 'javascript',
+                    'json': 'json',
+                    'jsx': 'javascript',
+                    'md': 'markdown',
+                    'mdx': 'mdx',
+                    'mjs': 'javascript',
+                    'mts': 'typescript',
+                    'ts': 'typescript',
+                    'tsx': 'typescript',
+                    'yaml': 'yaml',
+                    'yml': 'yaml'
+                },
+                // Enable code block linting within MDX
                 lintCodeBlocks: true,
-                // Optional, same as the `parserOptions.remarkConfigPath`, you have to specify it twice unfortunately
-                // RemarkConfigPath: "path/to/your/remarkrc",
-            }),
+                // Path to remark config (optional, will auto-discover .remarkrc.js)
+                remarkConfigPath: '.remarkrc.mjs',
+            })
+        },
+    },
+
+    // MDX Code Blocks Configuration - for JavaScript/TypeScript code within MDX
+    {
+        files: ["**/*.mdx"],
+        languageOptions: {
+            ecmaVersion: 'latest',
+            globals: {
+                React: false,
+            },
+            parser: eslintMdx,
+            sourceType: 'module',
+        },
+        name: "MDX - **/*.MDX (Code Blocks)",
+        plugins: { mdx: mdx },
+        rules: {
+            ...mdx.flatCodeBlocks.rules,
+            // Additional rules for code blocks
+            "no-console": "warn",
+            "no-unused-vars": "error",
+            // Core Plugin ESLint Rules for code blocks
+            "no-var": "error",
+            "prefer-const": "error",
         },
     },
 
@@ -617,14 +667,15 @@ export default [
             "**/docs/TSDoc/**",
         ],
         language: "markdown/gfm",
-        name: "MD - **/*.{MD,MARKUP,ATOM,RSS,MARKDOWN}",
+        name: "MD - **/*.{MD,MARKUP,ATOM,RSS,MARKDOWN} (with Remark)",
         plugins: {
             markdown: markdown,
+            mdx: mdx,
         },
         rules: {
             // Markdown Plugin Eslint Rules (markdown/*)
-
             "markdown/fenced-code-language": "warn",
+
             "markdown/heading-increment": "warn",
             "markdown/no-bare-urls": "warn",
             "markdown/no-duplicate-definitions": "warn",
@@ -643,6 +694,18 @@ export default [
             "markdown/no-unused-definitions": "warn",
             "markdown/require-alt-text": "warn",
             "markdown/table-column-count": "warn",
+            // Remark linting integration
+            "mdx/remark": "warn",
+        },
+        settings: {
+            processor: mdx.createRemarkProcessor({
+                // Enable remark configuration file (.remarkrc.mjs) for comprehensive linting
+                ignoreRemarkConfig: false,
+                // Disable code block linting for regular markdown (use markdown plugin instead)
+                lintCodeBlocks: false,
+                // Path to remark config (optional, will auto-discover .remarkrc.mjs)
+                remarkConfigPath: '.remarkrc.mjs',
+            })
         },
     },
 
@@ -5359,7 +5422,6 @@ export default [
             depend: depend,
             // @ts-expect-error -- TS Error from fixupPluginRules
             deprecation: fixupPluginRules(pluginDeprecation),
-
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
             // @ts-expect-error -- TS Error from fixupPluginRules

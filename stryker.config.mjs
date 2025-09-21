@@ -24,7 +24,7 @@ const config = {
         skipFull: false, // Show all results
     },
 
-    concurrency: 1, // Reduce concurrency to avoid resource conflicts
+    concurrency: 1, // Reduce concurrency to avoid resource conflicts in CI
 
     // ⚡ COVERAGE ANALYSIS - Note: Vitest runner ignores this and forces "perTest" (optimal)
     coverageAnalysis: "perTest",
@@ -196,7 +196,7 @@ const config = {
     // watch: false, bail: (based on disableBail), onConsoleLog: () => false
     vitest: {
         configFile: "./vitest.stryker.config.ts", // Simplified config for Stryker
-        related: false, // Disable related file detection for mutation testing
+        related: false, // Disable related file detection for mutation testing to prevent CI issues
         // dir: "packages"                 // 📦 Optional: --dir for monorepo support
     },
 

@@ -43,10 +43,10 @@ const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
         removeAllListeners: vi.fn(),
     },
     monitoring: {
-        startMonitoring: vi.fn(),
-        startMonitoringForSite: vi.fn(),
-        stopMonitoring: vi.fn(),
-        stopMonitoringForSite: vi.fn(),
+        startMonitoring: vi.fn().mockResolvedValue(true),
+        startMonitoringForSite: vi.fn().mockResolvedValue(true),
+        stopMonitoring: vi.fn().mockResolvedValue(true),
+        stopMonitoringForSite: vi.fn().mockResolvedValue(true),
     },
     monitorTypes: {
         formatMonitorDetail: vi.fn(),
@@ -64,7 +64,7 @@ const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
         checkSiteNow: vi.fn(),
         getSites: vi.fn(),
         removeMonitor: vi.fn(),
-        removeSite: vi.fn(),
+        removeSite: vi.fn().mockResolvedValue(true),
         updateSite: vi.fn(),
     },
     stateSync: {

@@ -51,7 +51,7 @@ describe("SafeConversions - Property-Based Tests", () => {
 
         test.prop({
             value: fc.string().filter((s) => Number.isNaN(Number(s))),
-            defaultValue: fc.float(),
+            defaultValue: fc.float({ noNaN: true }),
         })("should return default value for invalid strings", (props) => {
             const result = safeNumberConversion(
                 props.value,

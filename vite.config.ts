@@ -8,6 +8,7 @@
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import reactScan from "@react-scan/vite-plugin-react-scan";
 import react from "@vitejs/plugin-react";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -31,6 +32,48 @@ const dirname = import.meta.dirname;
 const VITE_BUILD_TARGET = "esnext";
 
 /**
+ * Resolves the SQLite WASM source path with fallback logic. Returns a relative
+ * path suitable for vite-plugin-static-copy.
+ */
+const getWasmSourcePath = (): string => {
+    const primaryPath = "assets/node-sqlite3-wasm.wasm";
+    const fallbackPath =
+        "node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm";
+
+    // Check primary location (assets directory)
+    // eslint-disable-next-line security/detect-non-literal-fs-filename, n/no-sync -- Safe: checking build-time asset paths with known constants
+    if (existsSync(normalizePath(path.resolve(dirname, primaryPath)))) {
+        console.log(pc.green(`[WASM] ✅ Found SQLite WASM at ${primaryPath}`));
+        return primaryPath;
+    }
+
+    // Check fallback location (node_modules)
+    // eslint-disable-next-line security/detect-non-literal-fs-filename, n/no-sync -- Safe: checking build-time asset paths with known constants
+    if (existsSync(normalizePath(path.resolve(dirname, fallbackPath)))) {
+        console.log(
+            pc.yellow(
+                `[WASM] ⚠️  Using fallback SQLite WASM from ${fallbackPath}`
+            )
+        );
+        return fallbackPath;
+    }
+
+    // Neither location has the file
+    const errorMessage = [
+        pc.red("[WASM] ❌ SQLite WASM file not found in expected locations:"),
+        `  Primary: ${primaryPath}`,
+        `  Fallback: ${fallbackPath}`,
+        "",
+        "To fix this issue:",
+        "  1. Run 'npm run copy-wasm' to copy from node_modules",
+        "  2. Or run 'npm run download:sqlite' to download it",
+        "  3. Or ensure the postinstall script completed successfully",
+    ].join("\n");
+
+    throw new Error(errorMessage);
+};
+
+/**
  * @remarks
  * This configuration sets up build and development settings for both the React
  * renderer process and Electron main/preload scripts. It includes plugin
@@ -52,6 +95,8 @@ export default defineConfig(({ mode }) => {
     const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
     const isTestMode = mode === "test";
     const isDev = mode === "development";
+    const wasmSourcePath = getWasmSourcePath();
+
     return {
         appType: "spa", // Required for Electron renderer process (SPA mode ensures correct routing and asset loading)
         base: "./", // Ensures relative asset paths for Electron
@@ -365,7 +410,7 @@ export default defineConfig(({ mode }) => {
                         overwrite: true,
                         // Preserve file timestamps for better caching
                         preserveTimestamps: true,
-                        src: "assets/node-sqlite3-wasm.wasm",
+                        src: wasmSourcePath,
                         transform: {
                             encoding: "buffer" as const, // Use buffer encoding for binary WASM files
                             handler(contents: Buffer, filename: string) {

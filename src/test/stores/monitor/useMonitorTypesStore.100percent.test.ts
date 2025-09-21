@@ -89,9 +89,14 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             }
         });
 
-        // Set up default safeExtractIpcData behavior
+        // Set up default safeExtractIpcData behavior to match the real implementation
         originalSafeExtractIpcData.mockImplementation(
-            (response, fallback) => response || fallback
+            (response, fallback) => {
+                if (response && response.data !== undefined) {
+                    return response.data;
+                }
+                return fallback;
+            }
         );
 
         // Reset Zustand store to initial state
@@ -124,8 +129,8 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: IPC Response Handling", "type");
 
-            // Mock safeExtractIpcData to return null (simulating failed extraction)
-            originalSafeExtractIpcData.mockReturnValue([]);
+            // Mock safeExtractIpcData to return empty array (simulating failed extraction for loadMonitorTypes)
+            originalSafeExtractIpcData.mockImplementationOnce(() => []);
 
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
                 success: false,
@@ -272,8 +277,8 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             const mixedConfigs = [...malformedConfigs, validConfig];
 
-            originalSafeExtractIpcData.mockReturnValue(mixedConfigs);
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
+            originalSafeExtractIpcData.mockReturnValueOnce(mixedConfigs);
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValueOnce({
                 success: true,
                 data: mixedConfigs,
             });
@@ -342,8 +347,8 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 },
             ];
 
-            originalSafeExtractIpcData.mockReturnValue(complexConfigs);
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
+            originalSafeExtractIpcData.mockReturnValueOnce(complexConfigs);
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValueOnce({
                 success: true,
                 data: complexConfigs,
             });
@@ -636,9 +641,13 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 metadata: { timestamp: Date.now(), version: "1.0" },
             };
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce(
-                completeValidationResult
-            );
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce({
+                data: completeValidationResult
+            });
+
+            // Clear the default mock and set specific behavior for this test
+            originalSafeExtractIpcData.mockReset();
+            originalSafeExtractIpcData.mockImplementationOnce(() => completeValidationResult);
 
             let result1: ValidationResult;
             await act(async () => {
@@ -657,9 +666,13 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 // Missing warnings and metadata
             };
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce(
-                minimalValidationResult
-            );
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce({
+                data: minimalValidationResult
+            });
+
+            // Clear the default mock and set specific behavior for this test
+            originalSafeExtractIpcData.mockReset();
+            originalSafeExtractIpcData.mockImplementationOnce(() => minimalValidationResult);
 
             let result2: ValidationResult;
             await act(async () => {
@@ -683,9 +696,12 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 metadata: undefined,
             };
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce(
-                nullValidationResult
-            );
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce({
+                data: nullValidationResult
+            });
+
+            // Mock safeExtractIpcData to return the validation result
+            originalSafeExtractIpcData.mockReturnValueOnce(nullValidationResult);
 
             let result3: ValidationResult;
             await act(async () => {
@@ -737,9 +753,13 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 },
             };
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce(
-                complexValidationResult
-            );
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce({
+                data: complexValidationResult
+            });
+
+            // Clear the default mock and set specific behavior for this test
+            originalSafeExtractIpcData.mockReset();
+            originalSafeExtractIpcData.mockImplementationOnce(() => complexValidationResult);
 
             let result1: ValidationResult;
             await act(async () => {
@@ -767,7 +787,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Test loadMonitorTypes logging
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue([]);
-            originalSafeExtractIpcData.mockReturnValue([]);
+            originalSafeExtractIpcData.mockReturnValueOnce([]);
 
             await act(async () => {
                 await result.current.loadMonitorTypes();
@@ -787,6 +807,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 }
             );
 
+            // Clear previous calls before testing refreshMonitorTypes
+            originalLogStoreAction.mockClear();
+
             // Test refreshMonitorTypes logging
             await act(async () => {
                 await result.current.refreshMonitorTypes();
@@ -798,6 +821,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 {}
             );
 
+            // Clear previous calls before testing validateMonitorData
+            originalLogStoreAction.mockClear();
+
             // Test validateMonitorData logging
             const mockValidationResult: ValidationResult = {
                 success: true,
@@ -807,9 +833,13 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 metadata: {},
             };
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
-                mockValidationResult
-            );
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue({
+                data: mockValidationResult
+            });
+
+            // Clear the default mock and set specific behavior for this test
+            originalSafeExtractIpcData.mockReset();
+            originalSafeExtractIpcData.mockImplementationOnce(() => mockValidationResult);
 
             await act(async () => {
                 await result.current.validateMonitorData("http", {});
@@ -830,11 +860,14 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 }
             );
 
+            // Clear previous calls before testing formatMonitorDetail
+            originalLogStoreAction.mockClear();
+
             // Test formatMonitorDetail logging
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(
+            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValueOnce(
                 "formatted"
             );
-            originalSafeExtractIpcData.mockReturnValue("formatted");
+            originalSafeExtractIpcData.mockReturnValueOnce("formatted");
 
             await act(async () => {
                 await result.current.formatMonitorDetail("http", "details");
@@ -855,10 +888,10 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             );
 
             // Test formatMonitorTitleSuffix logging
-            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
+            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValueOnce(
                 "suffix"
             );
-            originalSafeExtractIpcData.mockReturnValue("suffix");
+            originalSafeExtractIpcData.mockReturnValueOnce("suffix");
 
             await act(async () => {
                 await result.current.formatMonitorTitleSuffix("http", {
@@ -902,15 +935,16 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             ];
 
             for (const edgeType of edgeCaseTypes) {
-                mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce(
-                    {
+                mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce({
+                    success: true,
+                    data: {
                         success: false,
                         data: null,
                         errors: ["Type validation failed"],
                         warnings: [],
                         metadata: {},
                     }
-                );
+                });
 
                 await act(async () => {
                     await result.current.validateMonitorData(edgeType, {});
@@ -991,7 +1025,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 resolveOperation = resolve;
             });
 
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockReturnValue(
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockReturnValueOnce(
                 operationPromise
             );
 
@@ -1039,8 +1073,8 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 })
             );
 
-            originalSafeExtractIpcData.mockReturnValue(largeDataset);
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
+            originalSafeExtractIpcData.mockReturnValueOnce(largeDataset);
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValueOnce(
                 largeDataset
             );
 

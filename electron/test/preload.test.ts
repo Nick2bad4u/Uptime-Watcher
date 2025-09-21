@@ -32,7 +32,7 @@ describe("Electron Preload Script", () => {
         };
 
         mockIpcRenderer = {
-            invoke: vi.fn(() => Promise.resolve()),
+            invoke: vi.fn(() => Promise.resolve({ success: true, data: true })),
             on: vi.fn(),
             removeAllListeners: vi.fn(),
             send: vi.fn(),
@@ -655,9 +655,13 @@ describe("Electron Preload Script", () => {
             );
 
             // Mock the IPC response with valid backup response format
-            const mockBackupResponse = {
+            const mockBackupData = {
                 buffer: new ArrayBuffer(1024),
                 fileName: "backup_test.db",
+            };
+            const mockBackupResponse = {
+                success: true,
+                data: mockBackupData,
             };
             mockIpcRenderer.invoke.mockResolvedValueOnce(mockBackupResponse);
 
@@ -670,7 +674,7 @@ describe("Electron Preload Script", () => {
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 "download-sqlite-backup"
             );
-            expect(result).toEqual(mockBackupResponse);
+            expect(result).toEqual(mockBackupData);
         });
     });
 
@@ -963,6 +967,7 @@ describe("Electron Preload Script", () => {
             const testData = {
                 siteId: "test-site",
                 monitor: { id: "test-monitor", type: "http" },
+                monitorId: "test-monitor",
                 newStatus: "up",
                 previousStatus: "down",
                 timestamp: Date.now(),

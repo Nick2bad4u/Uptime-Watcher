@@ -185,6 +185,25 @@ describe("pingRetry utilities", () => {
                 min_reply: 1,
             });
         });
+        it("should round timeouts up to preserve requested duration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
+            mockPing.promise.probe.mockResolvedValue(successfulPingResult);
+
+            await performSinglePingCheck("example.com", 1500); // 1.5 seconds request
+
+            expect(mockPing.promise.probe).toHaveBeenCalledWith("example.com", {
+                numeric: false,
+                timeout: 2, // Rounded up to avoid shortening timeout
+                min_reply: 1,
+            });
+        });
         it("should throw error on ping library failure", async ({
             task,
             annotate,

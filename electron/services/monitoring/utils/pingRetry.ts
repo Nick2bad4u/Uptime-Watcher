@@ -77,7 +77,11 @@ export async function performSinglePingCheck(
     timeout: number
 ): Promise<MonitorCheckResult> {
     const startTime = Date.now();
-    const timeoutInSeconds = Math.max(1, Math.floor(timeout / 1000)); // Convert to seconds, minimum 1
+    // Convert millisecond timeout to seconds while ensuring we never shorten
+    // the caller's requested duration. The ping library only accepts whole
+    // seconds, so we round up to preserve at least the original timeout and
+    // clamp to a minimum of 1 second for cross-platform compatibility.
+    const timeoutInSeconds = Math.max(1, Math.ceil(timeout / 1000));
 
     try {
         const pingResult = await ping.promise.probe(host, {

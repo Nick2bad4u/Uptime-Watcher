@@ -164,7 +164,7 @@ npm run electron-dev
 
 _Application screenshots and demo videos will be added in future releases._
 
-**Key interface components:**
+### Key interface components:
 
 - 📊 **Main Dashboard**: Real-time monitoring overview with service status
 - ⚙️ **Monitor Configuration**: Easy setup for HTTP, TCP, DNS, and ping monitoring
@@ -231,6 +231,75 @@ For comprehensive testing with Playwright, including setup, configuration, and t
 ## Architectural principles
 
 The application follows a **service-oriented architecture** with clear separation of concerns:
+
+### System architecture overview
+
+```mermaid
+flowchart LR
+    classDef persona fill:#fffbeb,stroke:#f97316,color:#9a3412,font-weight:bold;
+    classDef main fill:#fdf2f8,stroke:#db2777,color:#831843;
+    classDef renderer fill:#ecfeff,stroke:#0ea5e9,color:#0f172a;
+    classDef data fill:#ecfdf5,stroke:#10b981,color:#064e3b;
+    classDef service fill:#ede9fe,stroke:#7c3aed,color:#312e81;
+    classDef infra fill:#fef3c7,stroke:#f59e0b,color:#92400e;
+    linkStyle default stroke-width:2px;
+
+    User((👩‍💻 Operator)):::persona
+    subgraph Renderer['Renderer · React + Zustand']
+        direction TB
+        UI['React UI Components']
+        Store['Zustand Domain Stores']
+        Telemetry['UX Telemetry Hooks']
+    end
+    subgraph Main['Electron Main Process']
+        direction TB
+        Services['Monitoring Orchestrator']
+        IPC['Typed IPC Gateway']
+        Scheduler['Task Scheduler']
+        EventBus['TypedEventBus']
+    end
+    subgraph Persistence['Local Persistence & Cache']
+        direction TB
+        SQLite[(SQLite Database)]
+        Cache[(In-Memory Cache)]
+        Backups['Backup Service']
+    end
+    subgraph Integrations['Infrastructure & Services']
+        direction TB
+        Monitors['Protocol Workers
+HTTP/TCP/DNS/Ping']
+        Alerts['Notification Engine']
+    end
+
+    User -->|Configures| UI
+    UI --> Store
+    Store -->|Requests| IPC
+    IPC --> Services
+    Services --> EventBus
+    Services --> Scheduler
+    Scheduler --> Monitors
+    Monitors --> Services
+    Services -->|Status Events| IPC
+    IPC --> Store
+    Store --> Telemetry --> EventBus
+    Services --> SQLite
+    SQLite --> Cache
+    Cache --> Services
+    SQLite --> Backups
+    EventBus --> Alerts
+    Alerts --> User
+
+    class Services,IPC,Scheduler,EventBus,Monitors,Alerts service;
+    class SQLite,Cache,Backups data;
+    class UI,Store,Telemetry renderer;
+    class Integrations infra;
+
+    click Services 'docs/Architecture/README.md' 'Open architecture documentation'
+    click Store 'docs/Architecture/ADRs/ADR-004-Frontend-State-Management.md' 'Read ADR-004'
+    click IPC 'docs/Architecture/ADRs/ADR-005-IPC-Communication-Protocol.md' 'Read IPC protocol'
+    click EventBus 'docs/Architecture/ADRs/ADR-002-Event-Driven-Architecture.md' 'Read event-driven architecture'
+    click SQLite 'docs/Architecture/ADRs/ADR-001-Repository-Pattern.md' 'Review repository pattern'
+```
 
 ### **🔧 Core components**
 

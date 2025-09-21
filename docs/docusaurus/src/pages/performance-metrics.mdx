@@ -1,0 +1,355 @@
+import Layout from '@theme/Layout';
+import Mermaid from '@theme/Mermaid';
+
+export default function PerformanceMetrics() {
+  return (
+    <Layout
+      title="Performance Metrics"
+      description="Performance analysis and optimization strategies for Uptime Watcher"
+    >
+      <div className="container margin-vert--lg">
+        <div className="row">
+          <div className="col">
+
+# Performance Metrics
+
+This page visualizes performance characteristics and optimization strategies for Uptime Watcher.
+
+## Application Performance Overview
+
+This diagram shows key performance metrics and their relationships:
+
+<Mermaid value={`graph TB
+    subgraph "Frontend Performance"
+        ReactRender[React Rendering]
+        StateUpdates[State Updates]
+        UIResponsiveness[UI Responsiveness]
+        MemoryUsage[Memory Usage]
+    end
+
+    subgraph "Backend Performance"
+        IPCLatency[IPC Latency]
+        DatabaseOps[Database Operations]
+        NetworkRequests[Network Requests]
+        CPUUtilization[CPU Utilization]
+    end
+
+    subgraph "Monitoring Performance"
+        MonitorInterval[Monitor Intervals]
+        ConcurrentChecks[Concurrent Checks]
+        ResponseTime[Response Times]
+        ThroughputRate[Throughput Rate]
+    end
+
+    subgraph "System Resources"
+        RAMConsumption[RAM Consumption]
+        DiskUsage[Disk Usage]
+        NetworkBandwidth[Network Bandwidth]
+        ProcessThreads[Process Threads]
+    end
+
+    %% Performance relationships
+    ReactRender --> UIResponsiveness
+    StateUpdates --> ReactRender
+    IPCLatency --> StateUpdates
+
+    DatabaseOps --> IPCLatency
+    NetworkRequests --> MonitorInterval
+
+    MonitorInterval --> ConcurrentChecks
+    ConcurrentChecks --> ThroughputRate
+    NetworkRequests --> ResponseTime
+
+    CPUUtilization --> ProcessThreads
+    MemoryUsage --> RAMConsumption
+    DatabaseOps --> DiskUsage
+    NetworkRequests --> NetworkBandwidth
+
+    %% Performance optimization paths
+    ThroughputRate -.->|Optimize| ConcurrentChecks
+    ResponseTime -.->|Improve| NetworkRequests
+    UIResponsiveness -.->|Cache| StateUpdates
+    CPUUtilization -.->|Pool| ProcessThreads
+
+    %% Styling
+    classDef frontend fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef backend fill:#10b981,stroke:#059669,color:#ffffff
+    classDef monitoring fill:#f59e0b,stroke:#d97706,color:#ffffff
+    classDef resources fill:#8b5cf6,stroke:#7c3aed,color:#ffffff
+
+    class ReactRender,StateUpdates,UIResponsiveness,MemoryUsage frontend
+    class IPCLatency,DatabaseOps,NetworkRequests,CPUUtilization backend
+    class MonitorInterval,ConcurrentChecks,ResponseTime,ThroughputRate monitoring
+    class RAMConsumption,DiskUsage,NetworkBandwidth,ProcessThreads resources`} />
+
+## Performance Optimization Flow
+
+This flowchart shows the optimization process from detection to implementation:
+
+<Mermaid value={`flowchart TD
+    Monitor[Performance Monitoring] --> Collect[Collect Metrics]
+    Collect --> Analyze{Performance Issue?}
+
+    Analyze -->|No Issues| Continue[Continue Monitoring]
+    Continue --> Monitor
+
+    Analyze -->|Issue Detected| Identify[Identify Bottleneck]
+    Identify --> Categorize{Issue Category}
+
+    Categorize -->|Frontend| FrontendOpt[Frontend Optimization]
+    Categorize -->|Backend| BackendOpt[Backend Optimization]
+    Categorize -->|Database| DatabaseOpt[Database Optimization]
+    Categorize -->|Network| NetworkOpt[Network Optimization]
+
+    FrontendOpt --> ReactOpt[React Optimization<br/>• Memoization<br/>• Virtual Lists<br/>• Code Splitting]
+    FrontendOpt --> StateOpt[State Optimization<br/>• Selective Updates<br/>• Derived State<br/>• Lazy Loading]
+
+    BackendOpt --> IPCOpt[IPC Optimization<br/>• Message Batching<br/>• Async Processing<br/>• Queue Management]
+    BackendOpt --> ProcessOpt[Process Optimization<br/>• Worker Threads<br/>• Resource Pooling<br/>• Garbage Collection]
+
+    DatabaseOpt --> QueryOpt[Query Optimization<br/>• Index Creation<br/>• Query Planning<br/>• Connection Pooling]
+    DatabaseOpt --> SchemaOpt[Schema Optimization<br/>• Normalization<br/>• Partitioning<br/>• Archiving]
+
+    NetworkOpt --> RequestOpt[Request Optimization<br/>• HTTP/2<br/>• Compression<br/>• Keep-Alive]
+    NetworkOpt --> ConcurrencyOpt[Concurrency Optimization<br/>• Rate Limiting<br/>• Circuit Breakers<br/>• Load Balancing]
+
+    ReactOpt --> Test[Performance Testing]
+    StateOpt --> Test
+    IPCOpt --> Test
+    ProcessOpt --> Test
+    QueryOpt --> Test
+    SchemaOpt --> Test
+    RequestOpt --> Test
+    ConcurrencyOpt --> Test
+
+    Test --> Validate{Performance Improved?}
+    Validate -->|Yes| Deploy[Deploy Optimization]
+    Validate -->|No| Rollback[Rollback Changes]
+
+    Deploy --> Monitor
+    Rollback --> Identify
+
+    %% Styling
+    classDef monitoring fill:#e1f5fe,stroke:#0277bd,color:#000000
+    classDef decision fill:#fff3e0,stroke:#ef6c00,color:#000000
+    classDef frontend fill:#e8f5e8,stroke:#2e7d32,color:#000000
+    classDef backend fill:#f3e5f5,stroke:#7b1fa2,color:#000000
+    classDef database fill:#ffebee,stroke:#c62828,color:#000000
+    classDef network fill:#fce4ec,stroke:#ad1457,color:#000000
+    classDef testing fill:#e0f2f1,stroke:#00695c,color:#000000
+
+    class Monitor,Collect,Continue monitoring
+    class Analyze,Categorize,Validate decision
+    class FrontendOpt,ReactOpt,StateOpt frontend
+    class BackendOpt,IPCOpt,ProcessOpt backend
+    class DatabaseOpt,QueryOpt,SchemaOpt database
+    class NetworkOpt,RequestOpt,ConcurrencyOpt network
+    class Test,Deploy,Rollback testing
+    class Identify testing`} />
+
+## Memory Management Strategy
+
+This diagram illustrates memory usage patterns and optimization strategies:
+
+<Mermaid value={`stateDiagram-v2
+    [*] --> ApplicationStart : Initialize
+
+    ApplicationStart --> BaselineMemory : Allocate Core Components
+    BaselineMemory --> MonitoringActive : Start Monitoring
+
+    MonitoringActive --> MemoryGrowth : Data Accumulation
+    MemoryGrowth --> MemoryCheck : Check Usage
+
+    MemoryCheck --> Normal : < 80% Usage
+    MemoryCheck --> Warning : 80-90% Usage
+    MemoryCheck --> Critical : > 90% Usage
+
+    Normal --> MonitoringActive : Continue
+
+    Warning --> DataCleanup : Clean Old Data
+    DataCleanup --> CacheOptimization : Optimize Caches
+    CacheOptimization --> MemoryCheck
+
+    Critical --> GarbageCollection : Force GC
+    GarbageCollection --> EmergencyCleanup : Emergency Cleanup
+    EmergencyCleanup --> MemoryReallocation : Reallocate Resources
+    MemoryReallocation --> MemoryCheck
+
+    state MemoryOptimizations {
+        [*] --> WeakReferences
+        WeakReferences --> ObjectPooling
+        ObjectPooling --> LazyLoading
+        LazyLoading --> DataStreaming
+        DataStreaming --> [*]
+    }
+
+    CacheOptimization --> MemoryOptimizations
+    MemoryOptimizations --> MonitoringActive
+
+    state ErrorStates {
+        [*] --> OutOfMemory
+        OutOfMemory --> ApplicationRestart
+        ApplicationRestart --> [*]
+    }
+
+    Critical --> ErrorStates : If cleanup fails
+    ErrorStates --> [*] : Restart Required`} />
+
+## Performance Benchmarking Results
+
+This chart shows comparative performance across different scenarios:
+
+<Mermaid value={`xychart-beta
+    title "Response Time Performance (ms)"
+    x-axis [1-site, 5-sites, 10-sites, 25-sites, 50-sites, 100-sites]
+    y-axis "Response Time (ms)" 0 --> 1000
+    line [50, 75, 120, 200, 350, 680]
+    line [45, 65, 95, 150, 280, 520]
+    line [40, 55, 80, 125, 240, 450]`} />
+
+## System Resource Utilization
+
+This diagram shows resource usage patterns during different monitoring loads:
+
+<Mermaid value={`graph LR
+    subgraph "Low Load (1-10 sites)"
+        CPU1[CPU: 5-15%]
+        RAM1[RAM: 150-200MB]
+        Network1[Network: <1MB/min]
+        Disk1[Disk: <10MB/day]
+    end
+
+    subgraph "Medium Load (11-50 sites)"
+        CPU2[CPU: 15-35%]
+        RAM2[RAM: 250-400MB]
+        Network2[Network: 2-5MB/min]
+        Disk2[Disk: 25-50MB/day]
+    end
+
+    subgraph "High Load (51-100 sites)"
+        CPU3[CPU: 35-60%]
+        RAM3[RAM: 500-800MB]
+        Network3[Network: 8-15MB/min]
+        Disk3[Disk: 75-150MB/day]
+    end
+
+    subgraph "Performance Thresholds"
+        CPUThreshold[CPU Threshold: 70%]
+        RAMThreshold[RAM Threshold: 1GB]
+        NetworkThreshold[Network Threshold: 20MB/min]
+        DiskThreshold[Disk Threshold: 200MB/day]
+    end
+
+    CPU1 -.-> CPU2
+    CPU2 -.-> CPU3
+    CPU3 -.-> CPUThreshold
+
+    RAM1 -.-> RAM2
+    RAM2 -.-> RAM3
+    RAM3 -.-> RAMThreshold
+
+    Network1 -.-> Network2
+    Network2 -.-> Network3
+    Network3 -.-> NetworkThreshold
+
+    Disk1 -.-> Disk2
+    Disk2 -.-> Disk3
+    Disk3 -.-> DiskThreshold
+
+    %% Alert conditions
+    CPUThreshold -.->|Alert| OptimizeCPU[Optimize CPU Usage]
+    RAMThreshold -.->|Alert| OptimizeRAM[Optimize Memory]
+    NetworkThreshold -.->|Alert| OptimizeNetwork[Optimize Network]
+    DiskThreshold -.->|Alert| OptimizeDisk[Optimize Storage]
+
+    %% Styling
+    classDef lowLoad fill:#e8f5e8,stroke:#2e7d32,color:#000000
+    classDef mediumLoad fill:#fff3e0,stroke:#ef6c00,color:#000000
+    classDef highLoad fill:#ffebee,stroke:#c62828,color:#000000
+    classDef threshold fill:#f3e5f5,stroke:#7b1fa2,color:#000000
+    classDef optimization fill:#e1f5fe,stroke:#0277bd,color:#000000
+
+    class CPU1,RAM1,Network1,Disk1 lowLoad
+    class CPU2,RAM2,Network2,Disk2 mediumLoad
+    class CPU3,RAM3,Network3,Disk3 highLoad
+    class CPUThreshold,RAMThreshold,NetworkThreshold,DiskThreshold threshold
+    class OptimizeCPU,OptimizeRAM,OptimizeNetwork,OptimizeDisk optimization`} />
+
+## Database Performance Analysis
+
+This diagram shows database optimization strategies and their impact:
+
+<Mermaid value={`flowchart TB
+    subgraph "Query Performance"
+        SlowQuery[Slow Query Detection]
+        QueryAnalysis[Query Analysis]
+        IndexStrategy[Index Strategy]
+        QueryOptimization[Query Optimization]
+    end
+
+    subgraph "Connection Management"
+        ConnectionPool[Connection Pooling]
+        ConnectionReuse[Connection Reuse]
+        TransactionOptimization[Transaction Optimization]
+    end
+
+    subgraph "Data Management"
+        DataArchiving[Data Archiving]
+        PartitionStrategy[Partition Strategy]
+        CompressionStrategy[Compression Strategy]
+    end
+
+    subgraph "Performance Metrics"
+        QueryTime[Average Query Time]
+        ThroughputMetric[Database Throughput]
+        ConcurrentConnections[Concurrent Connections]
+        CacheHitRatio[Cache Hit Ratio]
+    end
+
+    SlowQuery --> QueryAnalysis
+    QueryAnalysis --> IndexStrategy
+    IndexStrategy --> QueryOptimization
+
+    QueryOptimization --> QueryTime
+    ConnectionPool --> ConcurrentConnections
+    TransactionOptimization --> ThroughputMetric
+
+    DataArchiving --> QueryTime
+    PartitionStrategy --> ThroughputMetric
+    CompressionStrategy --> QueryTime
+
+    %% Optimization feedback loops
+    QueryTime -.->|> 100ms| SlowQuery
+    ThroughputMetric -.->|< 1000 ops/sec| ConnectionPool
+    ConcurrentConnections -.->|> 50| ConnectionReuse
+    CacheHitRatio -.->|< 85%| IndexStrategy
+
+    %% Performance targets
+    QueryTime --> Target1[Target: <50ms]
+    ThroughputMetric --> Target2[Target: >2000 ops/sec]
+    ConcurrentConnections --> Target3[Target: <25 avg]
+    CacheHitRatio --> Target4[Target: >90%]
+
+    %% Styling
+    classDef query fill:#e1f5fe,stroke:#0277bd,color:#000000
+    classDef connection fill:#e8f5e8,stroke:#2e7d32,color:#000000
+    classDef data fill:#fff3e0,stroke:#ef6c00,color:#000000
+    classDef metrics fill:#f3e5f5,stroke:#7b1fa2,color:#000000
+    classDef targets fill:#ffebee,stroke:#c62828,color:#000000
+
+    class SlowQuery,QueryAnalysis,IndexStrategy,QueryOptimization query
+    class ConnectionPool,ConnectionReuse,TransactionOptimization connection
+    class DataArchiving,PartitionStrategy,CompressionStrategy data
+    class QueryTime,ThroughputMetric,ConcurrentConnections,CacheHitRatio metrics
+    class Target1,Target2,Target3,Target4 targets`} />
+
+---
+
+These performance metrics and visualizations help identify optimization opportunities and monitor system efficiency across all components of Uptime Watcher.
+
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+}

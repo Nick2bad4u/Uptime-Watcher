@@ -65,6 +65,33 @@ Thank you for considering contributing to Uptime Watcher! This document provides
 
 ### Git Workflow
 
+#### Contribution lifecycle
+
+```mermaid
+flowchart LR
+    classDef idea fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#075985;
+    classDef work fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d;
+    classDef review fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e;
+    classDef merge fill:#fae8ff,stroke:#a855f7,stroke-width:2px,color:#6b21a8;
+
+    Idea(["Idea or Bug Report"]):::idea
+    Issue{"Issue Created?"}:::review
+    Assign["Self-assign or Discuss"]:::idea
+    Branch["Create Feature Branch"]:::work
+    Implement["Implement & Write Tests"]:::work
+    Verify["Run lint / type / test suites"]:::work
+    PR["Open Pull Request"]:::review
+    Review{"Code Review"}:::review
+    Merge["Merge via PR Template"]:::merge
+    Celebrate(["Document & Release"]):::merge
+
+    Idea --> Issue
+    Issue -- yes --> Assign --> Branch --> Implement --> Verify --> PR --> Review
+    Issue -- no --> Idea
+    Review -- Changes requested --> Implement
+    Review -- Approved --> Merge --> Celebrate
+```
+
 1. **Create a Feature Branch**
 
    ```bash

@@ -10,11 +10,11 @@ import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonito
 // Mock electron API
 const mockElectronAPI = {
     sites: {
-        checkSiteNow: vi.fn(),
+        checkSiteNow: vi.fn().mockResolvedValue(true),
     },
     monitoring: {
-        startMonitoringForSite: vi.fn(),
-        stopMonitoringForSite: vi.fn(),
+        startMonitoringForSite: vi.fn().mockResolvedValue(true),
+        stopMonitoringForSite: vi.fn().mockResolvedValue(true),
     },
 };
 

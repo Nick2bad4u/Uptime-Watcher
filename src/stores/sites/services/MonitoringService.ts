@@ -82,10 +82,16 @@ export const MonitoringService = {
      */
     async startMonitoring(siteId: string, monitorId: string): Promise<void> {
         await this.initialize();
-        return window.electronAPI.monitoring.startMonitoringForSite(
-            siteId,
-            monitorId
-        );
+        const success =
+            await window.electronAPI.monitoring.startMonitoringForSite(
+                siteId,
+                monitorId
+            );
+        if (!success) {
+            throw new Error(
+                `Failed to start monitoring for monitor ${monitorId} of site ${siteId}: Backend operation failed`
+            );
+        }
     },
     /**
      * Start monitoring for all monitors of a site
@@ -108,7 +114,13 @@ export const MonitoringService = {
      */
     async startSiteMonitoring(siteId: string): Promise<void> {
         await this.initialize();
-        return window.electronAPI.monitoring.startMonitoringForSite(siteId);
+        const success =
+            await window.electronAPI.monitoring.startMonitoringForSite(siteId);
+        if (!success) {
+            throw new Error(
+                `Failed to start monitoring for site ${siteId}: Backend operation failed`
+            );
+        }
     },
     /**
      * Stop monitoring for a specific monitor
@@ -126,10 +138,16 @@ export const MonitoringService = {
      */
     async stopMonitoring(siteId: string, monitorId: string): Promise<void> {
         await this.initialize();
-        return window.electronAPI.monitoring.stopMonitoringForSite(
-            siteId,
-            monitorId
-        );
+        const success =
+            await window.electronAPI.monitoring.stopMonitoringForSite(
+                siteId,
+                monitorId
+            );
+        if (!success) {
+            throw new Error(
+                `Failed to stop monitoring for monitor ${monitorId} of site ${siteId}: Backend operation failed`
+            );
+        }
     },
     /**
      * Stop monitoring for all monitors of a site
@@ -152,6 +170,12 @@ export const MonitoringService = {
      */
     async stopSiteMonitoring(siteId: string): Promise<void> {
         await this.initialize();
-        return window.electronAPI.monitoring.stopMonitoringForSite(siteId);
+        const success =
+            await window.electronAPI.monitoring.stopMonitoringForSite(siteId);
+        if (!success) {
+            throw new Error(
+                `Failed to stop monitoring for site ${siteId}: Backend operation failed`
+            );
+        }
     },
 };

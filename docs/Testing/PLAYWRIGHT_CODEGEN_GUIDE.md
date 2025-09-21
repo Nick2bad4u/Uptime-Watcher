@@ -18,7 +18,7 @@ node scripts/codegen.mjs --output=my-test.ts
 node scripts/codegen.mjs --help
 ```
 
-The helper script automatically:
+Helper Script:
 
 - ✅ Starts the development server
 - ✅ Handles proper codegen command setup
@@ -209,9 +209,9 @@ npx playwright codegen --target=typescript --output=my-test.ts http://localhost:
 
 1. **Start your app in development mode:**
 
-   ```bash
-   npm run dev
-   ```
+```bash
+  npm run dev
+```
 
 2. **Open codegen:**
 

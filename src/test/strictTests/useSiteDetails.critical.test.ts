@@ -25,7 +25,7 @@ vi.mock("../../stores/error/useErrorStore", () => ({
     })),
 }));
 vi.mock("../../stores/ui/useUiStore");
-vi.mock("../../utils/errorHandling", () => ({
+vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(
         async (fn, _context, _defaultValue, _throwOnError) => await fn()
     ),

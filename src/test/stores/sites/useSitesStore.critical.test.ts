@@ -7,8 +7,8 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Site } from "@shared/types";
-import { useSitesStore } from "@app/stores/sites/useSitesStore";
+import type { Site } from "../../../../shared/types";
+import { useSitesStore } from "../../../stores/sites/useSitesStore";
 
 // Mock the electron API
 const mockElectronAPI = {
@@ -26,10 +26,10 @@ const mockElectronAPI = {
         checkSiteNow: vi.fn(),
     },
     monitoring: {
-        startMonitoringForSite: vi.fn(),
-        stopMonitoringForSite: vi.fn(),
-        startMonitoringForSiteMonitor: vi.fn(),
-        stopMonitoringForSiteMonitor: vi.fn(),
+        startMonitoringForSite: vi.fn().mockResolvedValue(true),
+        stopMonitoringForSite: vi.fn().mockResolvedValue(true),
+        startMonitoringForSiteMonitor: vi.fn().mockResolvedValue(true),
+        stopMonitoringForSiteMonitor: vi.fn().mockResolvedValue(true),
     },
     stateSync: {
         fullResyncSites: vi.fn(),
@@ -340,31 +340,28 @@ describe("useSitesStore Function Coverage Tests", () => {
                 error: "Network error",
             });
 
-            // Test that errors are handled gracefully (not thrown)
+            // Test that errors are handled gracefully (thrown after state management)
             await expect(
                 store.createSite({
                     identifier: "test-site",
                     name: "Test Site",
                 })
-            ).resolves.toBeUndefined();
+            ).rejects.toThrow("Network error");
         });
 
         it("should handle errors in monitoring operations gracefully", async () => {
             const store = useSitesStore.getState();
 
             // Mock error for monitoring
-            // Mock error response
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                {
-                    success: false,
-                    error: "Monitoring error",
-                }
+            // Mock rejection for monitoring APIs (they don't use IPC wrapper)
+            mockElectronAPI.monitoring.startMonitoringForSite.mockRejectedValueOnce(
+                new Error("Monitoring error")
             );
 
-            // Test that errors are handled gracefully (not thrown)
+            // Test that errors are handled gracefully (thrown after state management)
             await expect(
                 store.startSiteMonitoring("test-site")
-            ).resolves.toBeUndefined();
+            ).rejects.toThrow("Monitoring error");
         });
 
         it("should handle errors in sync operations gracefully", async () => {

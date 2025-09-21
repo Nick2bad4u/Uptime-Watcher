@@ -94,7 +94,77 @@ All error handling utilities preserve original errors:
 
 ## Error Handling Layers
 
-### Layer 1: Utility Level
+### Error Handling Architecture Overview
+
+````mermaid
+graph TB
+    subgraph "Frontend (React + Zustand)"
+        UI["User Interface"]
+        Store["Zustand Stores"]
+        Components["React Components"]
+        ErrorBoundary["Error Boundaries"]
+    end
+
+    subgraph "IPC Layer"
+        IPC["IPC Communication"]
+        ContextBridge["Context Bridge"]
+    end
+
+    subgraph "Backend (Electron Main)"
+        Services["Service Layer"]
+        Repositories["Repository Layer"]
+        Database["Database Layer"]
+        EventBus["Event Bus"]
+    end
+
+    subgraph "Error Handling Utilities"
+        WithErrorHandling["withErrorHandling"]
+        WithDatabaseOp["withDatabaseOperation"]
+        WithUtilityError["withUtilityErrorHandling"]
+        SafeStoreOp["safeStoreOperation"]
+    end
+
+    subgraph "Monitoring & Observability"
+        Correlation["Correlation IDs"]
+        Events["Error Events"]
+        Metrics["Performance Metrics"]
+        Logging["Structured Logging"]
+    end
+
+    UI --> Components
+    Components --> Store
+    Components --> ErrorBoundary
+    Store --> WithErrorHandling
+    Components --> WithErrorHandling
+
+    WithErrorHandling --> IPC
+    IPC --> ContextBridge
+    ContextBridge --> Services
+
+    Services --> WithDatabaseOp
+    Services --> EventBus
+    Repositories --> WithDatabaseOp
+    WithDatabaseOp --> Database
+
+    WithErrorHandling --> Events
+    WithDatabaseOp --> Events
+    WithUtilityError --> Events
+    SafeStoreOp --> Logging
+
+    Events --> Correlation
+    Events --> Metrics
+    Events --> Logging
+
+    classDef frontend fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef backend fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef utility fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
+    classDef monitoring fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8
+
+    class UI,Store,Components,ErrorBoundary frontend
+    class Services,Repositories,Database,EventBus backend
+    class WithErrorHandling,WithDatabaseOp,WithUtilityError,SafeStoreOp utility
+    class Correlation,Events,Metrics,Logging monitoring
+```### Layer 1: Utility Level
 
 ```typescript
 // Frontend utilities
@@ -113,7 +183,7 @@ export async function withUtilityErrorHandling<T>(
   throw error;
  }
 }
-```
+````
 
 ### Layer 2: Repository Level
 
@@ -160,6 +230,78 @@ const handleAction = async () => {
 
 ## Error Categories and Handling
 
+### Error Processing Pipeline
+
+```mermaid
+flowchart TD
+    ErrorOccurs["Error Occurs"] --> ErrorType{"Classify Error Type"}
+
+    ErrorType -->|Database Error| DatabaseError["Database Error Handler"]
+    ErrorType -->|Network Error| NetworkError["Network Error Handler"]
+    ErrorType -->|Validation Error| ValidationError["Validation Error Handler"]
+    ErrorType -->|UI Error| UIError["UI Error Handler"]
+
+    subgraph "Database Error Flow"
+        DatabaseError --> DatabaseRetry{Retryable?}
+        DatabaseRetry -->|Yes| ExponentialBackoff[Apply Exponential Backoff]
+        DatabaseRetry -->|No| DatabaseRollback[Transaction Rollback]
+        ExponentialBackoff --> DatabaseOperation[Retry Database Operation]
+        DatabaseOperation --> DatabaseSuccess{Success?}
+        DatabaseSuccess -->|Yes| DatabaseComplete[Operation Complete]
+        DatabaseSuccess -->|No| DatabaseRetry
+        DatabaseRollback --> DatabaseEvent[Emit Database Error Event]
+        DatabaseEvent --> DatabaseComplete
+    end
+
+    subgraph Network Error Flow
+        NetworkError --> NetworkRetry{Network Available?}
+        NetworkRetry -->|Yes| TimeoutCheck[Check Timeout]
+        NetworkRetry -->|No| OfflineFallback[Apply Offline Fallback]
+        TimeoutCheck --> NetworkOperation[Retry Network Call]
+        NetworkOperation --> NetworkSuccess{Success?}
+        NetworkSuccess -->|Yes| NetworkComplete[Operation Complete]
+        NetworkSuccess -->|No| NetworkRetry
+        OfflineFallback --> NetworkComplete
+    end
+
+    subgraph Validation Error Flow
+        ValidationError --> ValidationCheck["Type-Safe Validation"]
+        ValidationCheck --> UserFriendly["Generate User-Friendly Message"]
+        UserFriendly --> PreventPropagation[Prevent Invalid State Propagation]
+        PreventPropagation --> ValidationComplete["Show Field-Specific Error"]
+    end
+
+    subgraph UI Error Flow
+        UIError --> ErrorBoundary[Error Boundary Catches]
+        ErrorBoundary --> GracefulDegradation[Graceful UI Degradation]
+        GracefulDegradation --> FallbackUI[Show Fallback UI]
+        FallbackUI --> StateRecovery[Attempt State Recovery]
+        StateRecovery --> UIComplete[User Notification]
+    end
+
+    DatabaseComplete --> MonitoringSystem["Monitoring & Observability"]
+    NetworkComplete --> MonitoringSystem
+    ValidationComplete --> MonitoringSystem
+    UIComplete --> MonitoringSystem
+
+    subgraph Monitoring System
+        MonitoringSystem --> CorrelationTracking[Correlation ID Tracking]
+        MonitoringSystem --> EventEmission[Error Event Emission]
+        MonitoringSystem --> MetricsCollection[Metrics Collection]
+        MonitoringSystem --> StructuredLogging[Structured Logging]
+    end
+
+    classDef error fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#991b1b
+    classDef success fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef process fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef monitoring fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8
+
+    class ErrorOccurs,DatabaseError,NetworkError,ValidationError,UIError error
+    class DatabaseComplete,NetworkComplete,ValidationComplete,UIComplete success
+    class ExponentialBackoff,TimeoutCheck,ValidationCheck,ErrorBoundary process
+    class MonitoringSystem,CorrelationTracking,EventEmission,MetricsCollection,StructuredLogging monitoring
+```
+
 ### 1. Database Errors
 
 - **Transaction rollback** on failure
@@ -189,6 +331,73 @@ const handleAction = async () => {
 - **State recovery** mechanisms
 
 ## Monitoring and Observability
+
+### Error Event Flow and Correlation Tracking
+
+```mermaid
+sequenceDiagram
+    participant UI as Frontend UI
+    participant Store as Zustand Store
+    participant IPC as IPC Layer
+    participant Service as Service Layer
+    participant Repo as Repository
+    participant DB as Database
+    participant EventBus as Event Bus
+    participant Monitor as Monitoring System
+
+    Note over UI, Monitor: Error Handling with Full Observability
+
+    UI->>Store: User Action
+    Store->>+IPC: API Call with Correlation ID
+    Note right of IPC: correlationId: "op-12345"
+
+    IPC->>+Service: Service Operation
+    Service->>EventBus: Emit operation:started
+    EventBus->>Monitor: Log operation start
+
+    Service->>+Repo: Repository Call
+    Repo->>+DB: Database Operation
+
+    alt Database Operation Fails
+        DB-->>Repo: ❌ Database Error
+        Repo->>EventBus: Emit database:error
+        EventBus->>Monitor: Log database failure
+        Repo->>Repo: Apply Retry Logic
+        Repo->>+DB: Retry Operation
+
+        alt Retry Succeeds
+            DB-->>Repo: ✅ Success
+            Repo-->>Service: ✅ Result
+        else Retry Fails
+            DB-->>Repo: ❌ Final Failure
+            Repo->>EventBus: Emit operation:failed
+            EventBus->>Monitor: Record failure metrics
+            Repo-->>Service: ❌ Error (preserved)
+        end
+    else Database Operation Succeeds
+        DB-->>Repo: ✅ Success
+        Repo-->>Service: ✅ Result
+    end
+
+    alt Service Error Handling
+        Service->>EventBus: Emit operation:completed
+        EventBus->>Monitor: Record success metrics
+        Service-->>-IPC: ✅ Result
+        IPC-->>-Store: ✅ Success Response
+        Store->>UI: Update UI State
+    else Service Fails
+        Service->>EventBus: Emit operation:failed
+        EventBus->>Monitor: Track failure correlation
+        Service-->>-IPC: ❌ Error Response
+        IPC-->>-Store: ❌ Error (with correlation)
+        Store->>Store: Handle Error Gracefully
+        Store->>UI: Show Error Message
+    end
+
+    Note over Monitor: All events tracked with correlation ID "op-12345"
+    Monitor->>Monitor: Generate Error Report
+    Monitor->>Monitor: Update System Metrics
+```
 
 ### Event-Driven Error Tracking
 
@@ -223,18 +432,41 @@ useEffect(() => cleanup, []);
 
 ### Race Condition Protection
 
-```typescript
-// Operation correlation prevents race conditions
-const operationId = this.operationRegistry.initiateCheck(monitorId);
-try {
- const result = await performCheck();
- // Validate operation still active before updating state
- if (this.operationRegistry.validateOperation(operationId)) {
-  await updateMonitorStatus(result);
- }
-} finally {
- this.operationRegistry.completeOperation(operationId);
-}
+```mermaid
+stateDiagram-v2
+    [*] --> OperationInitiated : Start Operation
+
+    OperationInitiated --> OperationRegistered : Register with operationId
+    OperationRegistered --> OperationInProgress : Begin Async Work
+
+    OperationInProgress --> ValidationCheck : Operation Completes
+    OperationInProgress --> OperationCancelled : Race Condition Detected
+    OperationInProgress --> OperationFailed : Operation Error
+
+    ValidationCheck --> OperationValid : Operation Still Active
+    ValidationCheck --> OperationInvalid : Operation Superseded
+
+    OperationValid --> StateUpdate : Update Application State
+    OperationInvalid --> OperationCancelled : Discard Results
+
+    StateUpdate --> OperationCompleted : Success
+    OperationFailed --> ErrorHandling : Handle Error
+    OperationCancelled --> CleanupResources : Cleanup
+
+    ErrorHandling --> CleanupResources : After Error Processing
+    OperationCompleted --> CleanupResources : After Success
+
+    CleanupResources --> [*] : Operation Finalized
+
+    note right of ValidationCheck
+        Correlation ID validation prevents
+        race conditions and stale updates
+    end note
+
+    note right of ErrorHandling
+        Errors preserve context and
+        emit events for monitoring
+    end note
 ```
 
 ### Correlation ID Tracking
