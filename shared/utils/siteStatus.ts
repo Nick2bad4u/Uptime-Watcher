@@ -67,6 +67,7 @@ export function calculateSiteMonitoringStatus(
  *
  * - Returns `"up"` if all monitors are up.
  * - Returns `"down"` if all monitors are down.
+ * - Returns `"degraded"` if all monitors are degraded.
  * - Returns `"pending"` if all monitors are pending.
  * - Returns `"paused"` if all monitors are paused.
  * - Returns `"mixed"` if monitors have different statuses.
@@ -76,7 +77,7 @@ export function calculateSiteMonitoringStatus(
  *
  * ```typescript
  * const status = calculateSiteStatus(site);
- * // status: "up" | "down" | "pending" | "paused" | "mixed" | "unknown"
+ * // status: "up" | "down" | "degraded" | "pending" | "paused" | "mixed" | "unknown"
  * ```
  *
  * @param site - The {@link SiteForStatus} object representing the site to
@@ -108,6 +109,7 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
         if (
             status === "up" ||
             status === "down" ||
+            status === "degraded" ||
             status === "pending" ||
             status === "paused"
         ) {
@@ -196,6 +198,9 @@ export function getSiteStatusDescription(site: SiteForStatus): string {
     const runningCount = site.monitors.filter((m) => m.monitoring).length;
 
     switch (status) {
+        case "degraded": {
+            return `All ${monitorCount} monitors are degraded`;
+        }
         case "down": {
             return `All ${monitorCount} monitors are down`;
         }
@@ -250,6 +255,9 @@ export function getSiteStatusVariant(
     status: SiteStatus
 ): "error" | "info" | "success" | "warning" {
     switch (status) {
+        case "degraded": {
+            return "warning";
+        }
         case "down": {
             return "error";
         }

@@ -66,6 +66,8 @@ export interface DowntimePeriod {
 export interface SiteAnalytics {
     /** Average response time in milliseconds */
     avgResponseTime: number;
+    /** Number of degraded checks */
+    degradedCount: number;
     /** Number of failed checks */
     downCount: number;
     /** Array of downtime periods */
@@ -319,6 +321,9 @@ export function useSiteAnalytics(
         const downCount = filteredHistory.filter(
             (h) => h.status === "down"
         ).length;
+        const degradedCount = filteredHistory.filter(
+            (h) => h.status === "degraded"
+        ).length;
 
         // Basic metrics
         const uptimeRaw = totalChecks > 0 ? (upCount / totalChecks) * 100 : 0;
@@ -341,6 +346,7 @@ export function useSiteAnalytics(
 
         return {
             avgResponseTime,
+            degradedCount,
             downCount,
             downtimePeriods,
             filteredHistory,

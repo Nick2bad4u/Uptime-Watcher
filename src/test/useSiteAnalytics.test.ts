@@ -128,6 +128,7 @@ describe(useSiteAnalytics, () => {
 
             expect(result.current).toEqual({
                 avgResponseTime: 0,
+                degradedCount: 0,
                 downCount: 0,
                 downtimePeriods: [],
                 fastestResponse: 0,
@@ -161,6 +162,7 @@ describe(useSiteAnalytics, () => {
 
             expect(result.current).toEqual({
                 avgResponseTime: 0,
+                degradedCount: 0,
                 downCount: 0,
                 downtimePeriods: [],
                 fastestResponse: 0,

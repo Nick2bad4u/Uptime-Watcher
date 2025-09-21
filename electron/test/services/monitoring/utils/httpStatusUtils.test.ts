@@ -268,7 +268,11 @@ describe("HTTP Status Utils", () => {
 
             for (const code of testCodes) {
                 const result = determineMonitorStatus(code);
-                expect(["up", "down"]).toContain(result);
+                expect([
+                    "up",
+                    "down",
+                    "degraded",
+                ]).toContain(result);
 
                 // Verify the logic holds for each code
                 if (code >= 500 && code < 600) {

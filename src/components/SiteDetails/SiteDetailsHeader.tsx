@@ -106,7 +106,7 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
                 <div style={styles.contentStyle}>
                     {/* Left accent bar */}
                     <div className="site-details-header-accent" />
-                    <div className="site-details-header-info flex w-full items-start justify-between gap-6">
+                    <div className="site-details-header-info flex items-start justify-between gap-6">
                         {/* Left side: Screenshot, Status, and Site Info */}
                         <div className="flex min-w-0 flex-1 items-center gap-4">
                             {/* Website Screenshot Thumbnail - Only show URL for HTTP monitors */}

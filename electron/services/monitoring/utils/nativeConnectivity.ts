@@ -201,39 +201,43 @@ async function checkTcpPort(
         const socket = new net.Socket();
         let resolved = false;
 
-        const cleanup = () => {
+        const cleanup = (): void => {
             if (!resolved) {
                 resolved = true;
+                socket.removeAllListeners();
                 socket.destroy();
             }
         };
 
-        socket.setTimeout(timeout);
-
-        socket.on("connect", () => {
+        const handleConnect = (): void => {
             cleanup();
             resolve({
                 alive: true,
                 port,
                 responseTime: performance.now() - startTime,
             });
-        });
+        };
 
-        socket.on("timeout", () => {
+        const handleTimeout = (): void => {
             cleanup();
             resolve({
                 alive: false,
                 responseTime: performance.now() - startTime,
             });
-        });
+        };
 
-        socket.on("error", () => {
+        const handleError = (): void => {
             cleanup();
             resolve({
                 alive: false,
                 responseTime: performance.now() - startTime,
             });
-        });
+        };
+
+        socket.setTimeout(timeout);
+        socket.on("connect", handleConnect);
+        socket.on("timeout", handleTimeout);
+        socket.on("error", handleError);
 
         socket.connect(port, host);
     });

@@ -340,6 +340,18 @@ describe("Status Utilities", () => {
 
                 expect(formatStatusWithIcon("unknown")).toBe("❓ Unknown");
             });
+
+            it("should format 'degraded' status correctly", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
+
+                expect(formatStatusWithIcon("degraded")).toBe("⚠️ Degraded");
+            });
         });
 
         describe("Capitalization handling", () => {

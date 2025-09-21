@@ -225,15 +225,15 @@ export function createEventManager(channel: string): {
          * Add an event listener
          */
         on: (callback: EventCallback): RemoveListener => {
-            const eventListener = (
+            const handleEventCallback = (
                 _event: IpcRendererEvent,
                 ...args: unknown[]
             ): void => {
                 callback(...args);
             };
-            ipcRenderer.on(channel, eventListener);
+            ipcRenderer.on(channel, handleEventCallback);
             return (): void => {
-                ipcRenderer.removeListener(channel, eventListener);
+                ipcRenderer.removeListener(channel, handleEventCallback);
             };
         },
 

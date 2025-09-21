@@ -80,6 +80,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
 
     const mockAnalytics = {
         avgResponseTime: 100,
+        degradedCount: 0,
         downCount: 0,
         downtimePeriods: [],
         fastestResponse: 50,

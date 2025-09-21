@@ -31,19 +31,23 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
             await annotate("File: shared/validation/schemas.ts", "source");
             await annotate("Line: 56", "location");
             await annotate(
-                'Mutation: z.enum(["up", "down"]) → z.enum([])',
+                'Mutation: z.enum(["up", "down", "degraded"]) → z.enum([])',
                 "mutation"
             );
 
             // This tests the status enum array that could be mutated to empty
-            // status: z.enum(["up", "down"]) → status: z.enum([])
+            // status: z.enum(["up", "down", "degraded"]) → status: z.enum([])
 
             function createStatusHistorySchema() {
                 return z
                     .object({
                         details: z.string().optional(),
                         responseTime: z.number(),
-                        status: z.enum(["up", "down"]), // This array is mutation target
+                        status: z.enum([
+                            "up",
+                            "down",
+                            "degraded",
+                        ]), // This array is mutation target
                         timestamp: z.number(),
                     })
                     .strict();

@@ -53,7 +53,11 @@ const statusHistorySchema = z
     .object({
         details: z.string().optional(),
         responseTime: z.number(),
-        status: z.enum(["up", "down"]),
+        status: z.enum([
+            "up",
+            "down",
+            "degraded",
+        ]),
         timestamp: z.number(),
     })
     .strict();
@@ -123,6 +127,7 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
         status: z.enum([
             "up",
             "down",
+            "degraded",
             "pending",
             "paused",
         ]),

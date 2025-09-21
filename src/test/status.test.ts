@@ -131,7 +131,7 @@ describe("Status Utils", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(formatStatusWithIcon("maintenance")).toBe("⚪ Maintenance");
-            expect(formatStatusWithIcon("degraded")).toBe("⚪ Degraded");
+            expect(formatStatusWithIcon("degraded")).toBe("⚠️ Degraded");
         });
     });
 });

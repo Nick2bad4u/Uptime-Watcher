@@ -22,7 +22,7 @@ interface StatusCounterProperties {
     /** The label text to display */
     readonly label: string;
     /** The status type for the indicator */
-    readonly status: "down" | "up";
+    readonly status: "degraded" | "down" | "up";
 }
 
 /**

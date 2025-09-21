@@ -206,56 +206,96 @@ export const SiteDetails = ({
         [analytics.filteredHistory, currentTheme]
     );
 
-    const barChartData = useMemo(
-        () => ({
+    const barChartData = useMemo(() => {
+        // Build dynamic chart data based on which statuses exist
+        const chartLabels: string[] = [];
+        const chartData: number[] = [];
+        const chartBackgroundColors: string[] = [];
+        const chartBorderColors: string[] = [];
+
+        // Always include "Up" status
+        chartLabels.push("Up");
+        chartData.push(analytics.upCount);
+        chartBackgroundColors.push(currentTheme.colors.success);
+        chartBorderColors.push(currentTheme.colors.success);
+
+        // Include "Degraded" status if it exists
+        if (analytics.degradedCount > 0) {
+            chartLabels.push("Degraded");
+            chartData.push(analytics.degradedCount);
+            chartBackgroundColors.push(currentTheme.colors.warning);
+            chartBorderColors.push(currentTheme.colors.warning);
+        }
+
+        // Always include "Down" status
+        chartLabels.push("Down");
+        chartData.push(analytics.downCount);
+        chartBackgroundColors.push(currentTheme.colors.error);
+        chartBorderColors.push(currentTheme.colors.error);
+
+        return {
             datasets: [
                 {
-                    backgroundColor: [
-                        currentTheme.colors.success,
-                        currentTheme.colors.error,
-                    ],
-                    borderColor: [
-                        currentTheme.colors.success,
-                        currentTheme.colors.error,
-                    ],
+                    backgroundColor: chartBackgroundColors,
+                    borderColor: chartBorderColors,
                     borderWidth: 1,
-                    data: [analytics.upCount, analytics.downCount],
+                    data: chartData,
                     label: "Status Distribution",
                 },
             ],
-            labels: ["Up", "Down"],
-        }),
-        [
-            analytics.downCount,
-            analytics.upCount,
-            currentTheme,
-        ]
-    );
+            labels: chartLabels,
+        };
+    }, [
+        analytics.degradedCount,
+        analytics.downCount,
+        analytics.upCount,
+        currentTheme,
+    ]);
 
-    const doughnutChartData = useMemo(
-        () => ({
+    const doughnutChartData = useMemo(() => {
+        // Build dynamic chart data based on which statuses exist
+        const chartLabels: string[] = [];
+        const chartData: number[] = [];
+        const chartBackgroundColors: string[] = [];
+        const chartBorderColors: string[] = [];
+
+        // Always include "Up" status
+        chartLabels.push("Up");
+        chartData.push(analytics.upCount);
+        chartBackgroundColors.push(currentTheme.colors.success);
+        chartBorderColors.push(currentTheme.colors.success);
+
+        // Include "Degraded" status if it exists
+        if (analytics.degradedCount > 0) {
+            chartLabels.push("Degraded");
+            chartData.push(analytics.degradedCount);
+            chartBackgroundColors.push(currentTheme.colors.warning);
+            chartBorderColors.push(currentTheme.colors.warning);
+        }
+
+        // Always include "Down" status
+        chartLabels.push("Down");
+        chartData.push(analytics.downCount);
+        chartBackgroundColors.push(currentTheme.colors.error);
+        chartBorderColors.push(currentTheme.colors.error);
+
+        return {
             datasets: [
                 {
-                    backgroundColor: [
-                        currentTheme.colors.success,
-                        currentTheme.colors.error,
-                    ],
-                    borderColor: [
-                        currentTheme.colors.success,
-                        currentTheme.colors.error,
-                    ],
+                    backgroundColor: chartBackgroundColors,
+                    borderColor: chartBorderColors,
                     borderWidth: 1,
-                    data: [analytics.upCount, analytics.downCount],
+                    data: chartData,
                 },
             ],
-            labels: ["Up", "Down"],
-        }),
-        [
-            analytics.downCount,
-            analytics.upCount,
-            currentTheme,
-        ]
-    );
+            labels: chartLabels,
+        };
+    }, [
+        analytics.degradedCount,
+        analytics.downCount,
+        analytics.upCount,
+        currentTheme,
+    ]);
 
     // Memoized event handlers to prevent unnecessary re-renders
     const handleToggleCollapse = useCallback(() => {

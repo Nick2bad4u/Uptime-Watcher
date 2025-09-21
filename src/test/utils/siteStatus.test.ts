@@ -283,7 +283,11 @@ describe("siteStatus Property-based Tests", () => {
             "should return mixed when monitors have different statuses",
             (monitors) => {
                 // Ensure we have at least 2 different statuses
-                const differentStatuses: MonitorStatus[] = ["up", "down"];
+                const differentStatuses: MonitorStatus[] = [
+                    "up",
+                    "down",
+                    "degraded",
+                ];
                 const status1 = differentStatuses[0];
                 const status2 = differentStatuses[1];
                 if (!status1 || !status2) {

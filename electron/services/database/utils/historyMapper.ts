@@ -72,16 +72,18 @@ function safeNumber(value: unknown, fallback: number = 0): number {
  * value.
  *
  * @remarks
- * If the value is not "up" or "down", logs a warning and returns "down".
+ * If the value is not "up", "degraded", or "down", logs a warning and returns
+ * "down".
  *
  * @param status - The status value to validate.
  *
- * @returns The validated status value ("up" or "down").
+ * @returns The validated status value ("up", "degraded", or "down").
  *
  * @internal
  */
 function validateStatus(status: unknown): StatusHistory["status"] {
-    if (status === "up" || status === "down") return status;
+    if (status === "up" || status === "degraded" || status === "down")
+        return status;
     logger.warn(LOG_TEMPLATES.warnings.HISTORY_INVALID_STATUS, { status });
     return "down";
 }
@@ -149,7 +151,9 @@ export function isValidHistoryRow(row: DatabaseHistoryRow): boolean {
         row.status !== undefined &&
         row.timestamp !== undefined &&
         typeof row.monitorId === "string" &&
-        (row.status === "up" || row.status === "down") &&
+        (row.status === "up" ||
+            row.status === "degraded" ||
+            row.status === "down") &&
         !Number.isNaN(row.timestamp)
     );
 }

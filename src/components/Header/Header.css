@@ -76,6 +76,7 @@
 }
 
 .status-up-badge,
+.status-degraded-badge,
 .status-down-badge,
 .status-pending-badge,
 .status-paused-badge {
@@ -96,6 +97,13 @@
 .status-up-badge:hover {
     background-color: color-mix(in srgb, var(--color-success) 12%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-success-shadow, rgb(16 185 129 / 22%));
+    filter: brightness(1.03) saturate(1.08);
+    transform: scale(1.04) translateY(-1px);
+}
+
+.status-degraded-badge:hover {
+    background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
+    box-shadow: 0 2px 12px 0 var(--color-warning-shadow, rgb(251 191 36 / 22%));
     filter: brightness(1.03) saturate(1.08);
     transform: scale(1.04) translateY(-1px);
 }
@@ -181,6 +189,14 @@
     box-shadow: 0 2px 12px 0 var(--color-success-shadow, rgb(16 185 129 / 22%));
 }
 
+.status-degraded-badge:hover,
+.status-degraded-badge:focus-visible {
+    border-color: var(--color-warning);
+    background: rgb(251 191 36 / 8%); /* Fallback color */
+    background: color-mix(in srgb, var(--color-warning) 8%, transparent);
+    box-shadow: 0 2px 12px 0 var(--color-warning-shadow, rgb(251 191 36 / 22%));
+}
+
 .status-down-badge:hover,
 .status-down-badge:focus-visible {
     border-color: var(--color-error);
@@ -225,6 +241,7 @@
     .header-status-summary,
     .health-badge,
     .status-up-badge,
+    .status-degraded-badge,
     .status-down-badge,
     .status-pending-badge,
     .status-paused-badge,

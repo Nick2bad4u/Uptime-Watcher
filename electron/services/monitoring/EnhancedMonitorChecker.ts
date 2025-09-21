@@ -618,14 +618,19 @@ export class EnhancedMonitorChecker {
             checkResult
         );
 
+        // Determine details message based on status
+        let details: string;
+        if (checkResult.status === "up") {
+            details = "Monitor is responding";
+        } else if (checkResult.status === "degraded") {
+            details = "Monitor is partially responding";
+        } else {
+            details = "Monitor is not responding";
+        }
+
         // Return status update for event emission
         return {
-            details:
-                checkResult.status === "up"
-                    ? "Monitor is responding"
-                    : checkResult.status === "degraded"
-                      ? "Monitor is partially responding"
-                      : "Monitor is not responding",
+            details,
             monitorId: checkResult.monitorId,
             previousStatus: monitor.status,
             siteIdentifier: site.identifier,

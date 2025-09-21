@@ -37,12 +37,14 @@ import { StatusSummary } from "./StatusSummary";
  * @returns Initial monitor counts object with all values set to 0
  */
 const initializeMonitorCounts = (): {
+    degraded: number;
     down: number;
     paused: number;
     pending: number;
     total: number;
     up: number;
 } => ({
+    degraded: 0,
     down: 0,
     paused: 0,
     pending: 0,
@@ -62,6 +64,11 @@ const incrementCountByStatus = (
     status: string
 ): void => {
     switch (status) {
+        case "degraded": {
+            counts.total++;
+            counts.degraded++;
+            break;
+        }
         case "down": {
             counts.total++;
             counts.down++;
@@ -148,6 +155,7 @@ const aggregateMonitorCounts = (
     for (const site of sites) {
         // Defensive programming: countMonitorsInSite handles type validation internally
         const siteCounts = countMonitorsInSite(site);
+        totalCounts.degraded += siteCounts.degraded;
         totalCounts.down += siteCounts.down;
         totalCounts.paused += siteCounts.paused;
         totalCounts.pending += siteCounts.pending;
@@ -181,6 +189,7 @@ export const Header = (): JSX.Element => {
     const monitorCounts = useMemo(() => aggregateMonitorCounts(sites), [sites]);
 
     const {
+        degraded: degradedMonitors,
         down: downMonitors,
         paused: pausedMonitors,
         pending: pendingMonitors,
@@ -189,9 +198,13 @@ export const Header = (): JSX.Element => {
     } = monitorCounts;
 
     // Calculate overall uptime percentage across all monitors
-
+    // Up monitors count as 100%, degraded monitors count as 50%
     const uptimePercentage =
-        totalMonitors > 0 ? Math.round((upMonitors / totalMonitors) * 100) : 0;
+        totalMonitors > 0
+            ? Math.round(
+                  ((upMonitors + degradedMonitors * 0.5) / totalMonitors) * 100
+              )
+            : 0;
 
     // Memoized click handlers to prevent unnecessary re-renders
     const handleShowAddSiteModal = useCallback(() => {
@@ -228,6 +241,7 @@ export const Header = (): JSX.Element => {
 
                             {/* Status Summary - Enhanced */}
                             <StatusSummary
+                                degradedMonitors={degradedMonitors}
                                 downMonitors={downMonitors}
                                 getAvailabilityColor={getAvailabilityColor}
                                 pausedMonitors={pausedMonitors}

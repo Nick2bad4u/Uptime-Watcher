@@ -25,6 +25,9 @@ import type { CamelCase } from "type-fest";
  */
 export function getStatusIcon(status: string): string {
     switch (status.toLowerCase()) {
+        case "degraded": {
+            return "⚠️";
+        }
         case "down": {
             return "❌";
         }

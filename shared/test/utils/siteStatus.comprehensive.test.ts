@@ -156,10 +156,11 @@ describe(calculateSiteStatus, () => {
         await annotate("Type: Monitoring", "type");
 
         const testCases: MonitorStatus[] = [
-            "up",
+            "degraded",
             "down",
             "pending",
             "paused",
+            "up",
         ];
 
         for (const status of testCases) {
@@ -219,10 +220,11 @@ describe(calculateSiteStatus, () => {
         await annotate("Type: Monitoring", "type");
 
         const testCases: MonitorStatus[] = [
-            "up",
+            "degraded",
             "down",
             "pending",
             "paused",
+            "up",
         ];
 
         for (const status of testCases) {
@@ -309,9 +311,10 @@ describe(getSiteDisplayStatus, () => {
         await annotate("Type: Monitoring", "type");
 
         const testCases: MonitorStatus[] = [
-            "up",
+            "degraded",
             "down",
             "pending",
+            "up",
         ];
 
         for (const status of testCases) {

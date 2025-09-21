@@ -8,19 +8,18 @@
 
 import type { JSX } from "react";
 
-import { Fragment } from "react";
-
 import { StatusIndicator } from "../../theme/components/StatusIndicator";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { HealthIndicator } from "./HealthIndicator";
 import { StatusCounter } from "./StatusCounter";
-import { StatusDivider } from "./StatusDivider";
 
 /**
  * Properties for the StatusSummary component.
  */
 interface StatusSummaryProperties {
+    /** Number of degraded monitors */
+    readonly degradedMonitors: number;
     /** Number of down monitors */
     readonly downMonitors: number;
     /** Function to get availability color */
@@ -45,6 +44,7 @@ interface StatusSummaryProperties {
  * @returns JSX element representing the status summary
  */
 export const StatusSummary = ({
+    degradedMonitors,
     downMonitors,
     getAvailabilityColor,
     pausedMonitors,
@@ -54,7 +54,7 @@ export const StatusSummary = ({
     uptimePercentage,
 }: StatusSummaryProperties): JSX.Element => (
     <ThemedBox
-        className="header-status-summary-box flex min-w-85 items-center space-x-3 transition-all duration-300"
+        className="header-status-summary-box inline-flex w-fit min-w-0 flex-wrap items-center gap-2 transition-all duration-300 sm:gap-3"
         padding="sm"
         rounded="lg"
         shadow="sm"
@@ -62,36 +62,48 @@ export const StatusSummary = ({
     >
         {/* Overall Health Badge */}
         {totalMonitors > 0 && (
-            <HealthIndicator
-                getAvailabilityColor={getAvailabilityColor}
-                uptimePercentage={uptimePercentage}
-            />
+            <div className="shrink-0">
+                <HealthIndicator
+                    getAvailabilityColor={getAvailabilityColor}
+                    uptimePercentage={uptimePercentage}
+                />
+            </div>
         )}
 
-        {totalMonitors > 0 && <StatusDivider />}
-
         {/* Up Status */}
-        <StatusCounter
-            className="status-up-badge"
-            count={upMonitors}
-            label="Up"
-            status="up"
-        />
+        <div className="shrink-0">
+            <StatusCounter
+                className="status-up-badge"
+                count={upMonitors}
+                label="Up"
+                status="up"
+            />
+        </div>
 
-        <StatusDivider />
+        {/* Degraded Status - Only show if there are degraded monitors */}
+        {degradedMonitors > 0 && (
+            <div className="shrink-0">
+                <StatusCounter
+                    className="status-degraded-badge"
+                    count={degradedMonitors}
+                    label="Degraded"
+                    status="degraded"
+                />
+            </div>
+        )}
 
         {/* Down Status */}
-        <StatusCounter
-            className="status-down-badge"
-            count={downMonitors}
-            label="Down"
-            status="down"
-        />
-
-        <StatusDivider />
+        <div className="shrink-0">
+            <StatusCounter
+                className="status-down-badge"
+                count={downMonitors}
+                label="Down"
+                status="down"
+            />
+        </div>
 
         {/* Pending Status */}
-        <div className="group status-pending-badge flex items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
+        <div className="group status-pending-badge flex shrink-0 items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
             <StatusIndicator size="sm" status="pending" />
             <div className="flex flex-col">
                 <ThemedText size="sm" variant="primary" weight="semibold">
@@ -107,10 +119,8 @@ export const StatusSummary = ({
             </div>
         </div>
 
-        <StatusDivider />
-
         {/* Paused Status */}
-        <div className="group status-paused-badge flex items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
+        <div className="group status-paused-badge flex shrink-0 items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
             <StatusIndicator size="sm" status="paused" />
             <div className="flex flex-col">
                 <ThemedText size="sm" variant="primary" weight="semibold">
@@ -128,28 +138,21 @@ export const StatusSummary = ({
 
         {/* Total Sites Badge */}
         {totalMonitors > 0 && (
-            <Fragment>
-                <StatusDivider />
-                <div className="total-sites-badge bg-overlay-default/10 flex items-center space-x-2 rounded-md px-2 py-1">
-                    <div className="h-2 w-2 rounded-full bg-current opacity-50" />
-                    <div className="flex flex-col">
-                        <ThemedText
-                            size="sm"
-                            variant="primary"
-                            weight="semibold"
-                        >
-                            {totalMonitors}
-                        </ThemedText>
-                        <ThemedText
-                            className="leading-none"
-                            size="xs"
-                            variant="secondary"
-                        >
-                            Total
-                        </ThemedText>
-                    </div>
+            <div className="total-sites-badge bg-overlay-default/10 flex shrink-0 items-center space-x-2 rounded-md px-2 py-1">
+                <div className="h-2 w-2 rounded-full bg-current opacity-50" />
+                <div className="flex flex-col">
+                    <ThemedText size="sm" variant="primary" weight="semibold">
+                        {totalMonitors}
+                    </ThemedText>
+                    <ThemedText
+                        className="leading-none"
+                        size="xs"
+                        variant="secondary"
+                    >
+                        Total
+                    </ThemedText>
                 </div>
-            </Fragment>
+            </div>
         )}
     </ThemedBox>
 );
