@@ -143,9 +143,11 @@ export interface MonitorCheckResult {
      *
      * @remarks
      * - `"up"`: Monitor endpoint is healthy and responding normally
+     * - `"degraded"`: Monitor endpoint shows partial functionality (e.g., DNS
+     *   resolves but ports unreachable, HTTP responds with non-2xx status)
      * - `"down"`: Monitor endpoint is failing, unreachable, or returned an error
      */
-    status: "down" | "up";
+    status: "degraded" | "down" | "up";
 }
 
 /**

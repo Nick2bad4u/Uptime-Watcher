@@ -59,6 +59,7 @@ const baseTheme: Theme = {
             900: "#1e3a8a",
         },
         status: {
+            degraded: "#f97316",
             down: "#ef4444",
             mixed: "#8b5cf6",
             paused: "#6b7280",
@@ -214,6 +215,7 @@ export const darkTheme: Theme = createTheme({
             900: "#eff6ff",
         },
         status: {
+            degraded: "#fb923c",
             down: "#f87171",
             mixed: "#a78bfa",
             paused: "#9ca3af",
@@ -304,6 +306,7 @@ export const highContrastTheme: Theme = createTheme({
             900: "#ffffff",
         },
         status: {
+            degraded: "#ff8800",
             down: "#ff0000",
             mixed: "#ff00ff",
             paused: "#ffffff",

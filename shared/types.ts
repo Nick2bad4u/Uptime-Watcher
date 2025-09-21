@@ -17,7 +17,7 @@
  *
  * @public
  */
-export type MonitorStatus = "down" | "paused" | "pending" | "up";
+export type MonitorStatus = "degraded" | "down" | "paused" | "pending" | "up";
 
 /**
  * HTTP method types supported by the application.
@@ -50,6 +50,7 @@ export const BASE_MONITOR_TYPES = [
  * @public
  */
 export interface MonitorStatusConstants {
+    DEGRADED: "degraded";
     DOWN: "down";
     PAUSED: "paused";
     PENDING: "pending";
@@ -85,6 +86,7 @@ export type SiteStatus = "mixed" | "unknown" | MonitorStatus;
  * @public
  */
 export const MONITOR_STATUS: MonitorStatusConstants = {
+    DEGRADED: "degraded" as const,
     DOWN: "down" as const,
     PAUSED: "paused" as const,
     PENDING: "pending" as const,
@@ -208,7 +210,7 @@ export interface SiteForStatus {
 export interface StatusHistory {
     details?: string;
     responseTime: number;
-    status: "down" | "up";
+    status: "degraded" | "down" | "up";
     timestamp: number;
 }
 
@@ -255,6 +257,7 @@ export function isComputedSiteStatus(
 
 export function isMonitorStatus(status: string): status is MonitorStatus {
     return [
+        "degraded",
         "down",
         "paused",
         "pending",
@@ -264,6 +267,7 @@ export function isMonitorStatus(status: string): status is MonitorStatus {
 
 export function isSiteStatus(status: string): status is SiteStatus {
     return [
+        "degraded",
         "down",
         "mixed",
         "paused",

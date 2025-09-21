@@ -75,6 +75,7 @@ const primaryColorsArbitrary = fc.record({
 });
 
 const statusColorsArbitrary = fc.record({
+    degraded: colorArbitrary,
     down: colorArbitrary,
     mixed: colorArbitrary,
     paused: colorArbitrary,
@@ -509,7 +510,7 @@ describe("Theme Merging Property-Based Tests", () => {
 
             // Should preserve predefined theme quality
             expect(Object.keys(result.colors.primary)).toHaveLength(10); // 50-900 shades
-            expect(Object.keys(result.colors.status)).toHaveLength(6); // All status colors
+            expect(Object.keys(result.colors.status)).toHaveLength(7); // All status colors
         }
     );
 
@@ -551,7 +552,7 @@ describe("Theme Merging Property-Based Tests", () => {
 
             // Should maintain structural integrity after multiple merges
             expect(Object.keys(result!.colors.primary)).toHaveLength(10);
-            expect(Object.keys(result!.colors.status)).toHaveLength(6);
+            expect(Object.keys(result!.colors.status)).toHaveLength(7);
         }
     );
 

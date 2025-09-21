@@ -129,6 +129,8 @@ export interface ThemeColors {
      * Status colors for monitor states.
      */
     status: {
+        /** Color for degraded monitor status */
+        degraded: string;
         /** Color for down/offline monitor status */
         down: string;
         /** Color for mixed monitor status */

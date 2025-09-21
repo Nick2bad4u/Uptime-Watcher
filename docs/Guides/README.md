@@ -83,7 +83,7 @@ For new developers, start with these essential guides:
 
 When adding new guides:
 
-1. Follow the [documentation style guide](../documentation-style-guide.md)
+1. Follow the [documentation style guide](../../electron/documentation-style-guide.md)
 2. Update this README to include your new guide
 3. Add appropriate cross-references in [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md)
 4. Ensure your guide includes clear examples and practical guidance

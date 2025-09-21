@@ -140,7 +140,7 @@ export type ConfigValue = boolean | null | number | string | string[];
  *
  * @public
  */
-export type MonitorStatus = "down" | "paused" | "pending" | "up";
+export type MonitorStatus = "degraded" | "down" | "paused" | "pending" | "up";
 
 /**
  * Array of MonitorTypeConfig objects for caching.

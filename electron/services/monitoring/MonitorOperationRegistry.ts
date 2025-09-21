@@ -56,7 +56,7 @@ export interface MonitorCheckResult {
     /** Response time if successful */
     responseTime?: number;
     /** Check result */
-    status: "down" | "up";
+    status: "degraded" | "down" | "up";
     /** When check completed */
     timestamp: Date;
 }

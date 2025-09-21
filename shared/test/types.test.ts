@@ -168,6 +168,7 @@ describe(isComputedSiteStatus, () => {
 
 describe(isMonitorStatus, () => {
     const validStatuses: MonitorStatus[] = [
+        "degraded",
         "down",
         "paused",
         "pending",
@@ -310,6 +311,7 @@ describe(isMonitorStatus, () => {
 
 describe(isSiteStatus, () => {
     const validStatuses: SiteStatus[] = [
+        "degraded",
         "down",
         "mixed",
         "paused",

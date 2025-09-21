@@ -43,12 +43,13 @@ describe("Theme Types Module", () => {
                     900: "#0c4a6e",
                 },
                 status: {
-                    up: "#10b981",
+                    degraded: "#f97316",
                     down: "#ef4444",
+                    mixed: "#f59e0b",
+                    paused: "#6b7280",
                     pending: "#f59e0b",
                     unknown: "#6b7280",
-                    paused: "#6b7280",
-                    mixed: "#f59e0b",
+                    up: "#10b981",
                 },
                 success: "#10b981",
                 warning: "#f59e0b",
@@ -91,6 +92,7 @@ describe("Theme Types Module", () => {
 
             // Test status colors
             expect(colors.status.up).toBe("#10b981");
+            expect(colors.status.degraded).toBe("#f97316");
             expect(colors.status.down).toBe("#ef4444");
             expect(colors.status.pending).toBe("#f59e0b");
             expect(colors.status.unknown).toBe("#6b7280");
@@ -294,12 +296,13 @@ describe("Theme Types Module", () => {
                     900: "#0c4a6e",
                 },
                 status: {
-                    up: "#10b981",
+                    degraded: "#f97316",
                     down: "#ef4444",
+                    mixed: "",
+                    paused: "",
                     pending: "#f59e0b",
                     unknown: "#6b7280",
-                    paused: "",
-                    mixed: "",
+                    up: "#10b981",
                 },
                 success: "#10b981",
                 warning: "#f59e0b",
@@ -580,12 +583,13 @@ describe("Theme Types Module", () => {
                     900: "#0c4a6e",
                 },
                 status: {
-                    up: "#10b981",
+                    degraded: "#f97316",
                     down: "#ef4444",
+                    mixed: "",
+                    paused: "",
                     pending: "#f59e0b",
                     unknown: "#6b7280",
-                    paused: "",
-                    mixed: "",
+                    up: "#10b981",
                 },
                 success: "#10b981",
                 warning: "#f59e0b",

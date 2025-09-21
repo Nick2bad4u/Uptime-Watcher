@@ -623,11 +623,13 @@ export class EnhancedMonitorChecker {
             details:
                 checkResult.status === "up"
                     ? "Monitor is responding"
-                    : "Monitor is not responding",
+                    : checkResult.status === "degraded"
+                      ? "Monitor is partially responding"
+                      : "Monitor is not responding",
             monitorId: checkResult.monitorId,
             previousStatus: monitor.status,
             siteIdentifier: site.identifier,
-            status: checkResult.status === "up" ? "up" : "down",
+            status: checkResult.status, // Use actual status from check result
             timestamp: checkResult.timestamp.toISOString(),
         };
     }

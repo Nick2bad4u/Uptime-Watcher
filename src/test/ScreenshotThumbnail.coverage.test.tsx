@@ -4,7 +4,6 @@
 
 import { render, screen, act, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbnail";

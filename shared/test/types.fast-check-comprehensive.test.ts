@@ -80,6 +80,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
 
     describe("isMonitorStatus property-based tests", () => {
         const validMonitorStatuses = [
+            "degraded",
             "down",
             "paused",
             "pending",
@@ -136,6 +137,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
 
     describe("isSiteStatus property-based tests", () => {
         const validSiteStatuses = [
+            "degraded",
             "down",
             "mixed",
             "paused",

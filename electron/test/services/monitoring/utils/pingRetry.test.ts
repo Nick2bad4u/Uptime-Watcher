@@ -8,6 +8,7 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import type { MockedFunction } from "vitest";
+// @ts-expect-error - ping module has no type declarations
 import * as ping from "ping";
 
 import {

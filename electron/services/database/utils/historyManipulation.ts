@@ -105,8 +105,8 @@ export function addHistoryEntry(
  * The statement is properly finalized in the finally block to prevent resource
  * leaks.
  *
- * **Status Validation**: StatusHistory.status is always "up" or "down" per
- * domain contract.
+ * **Status Validation**: StatusHistory.status can be "up", "down", or
+ * "degraded" per domain contract.
  *
  * @param db - Database connection instance
  * @param monitorId - Unique identifier of the monitor
@@ -134,7 +134,7 @@ export function bulkInsertHistory(
                 stmt.run([
                     monitorId,
                     entry.timestamp,
-                    entry.status, // StatusHistory.status is always "up" or "down" per domain contract
+                    entry.status, // StatusHistory.status can be "up", "down", or "degraded" per domain contract
                     entry.responseTime,
                     entry.details ?? null,
                 ]);

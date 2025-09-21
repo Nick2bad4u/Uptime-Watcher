@@ -158,7 +158,7 @@ Test configuration files are located in the project root:
 
 When adding new tests or testing documentation:
 
-1. Follow the [documentation style guide](../documentation-style-guide.md)
+1. Follow the [documentation style guide](../../electron/documentation-style-guide.md)
 2. Update this README to include new testing guides
 3. Ensure tests follow established patterns and conventions
 4. Add appropriate coverage for new features

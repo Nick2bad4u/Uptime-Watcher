@@ -106,7 +106,7 @@ const sidebars: SidebarsConfig = {
         },
         {
             className: "sb-cat-charts",
-            collapsed: false,
+            collapsed: true,
             customProps: { badge: "visual" },
             items: [
                 {

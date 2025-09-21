@@ -1,44 +1,53 @@
 /**
- * Provides retry-enabled ping connectivity checks with exponential backoff and
+ * Provides retry-enabled connectivity checks with exponential backoff and
  * standardized error handling.
  *
  * @remarks
- * This module builds on the basic ping checking utilities by adding
+ * This module builds on the native connectivity checking utilities by adding
  * configurable retry logic, exponential backoff, and development-mode debug
  * logging. It integrates with the operational hooks system for consistent error
  * handling and event emission across the monitoring system.
  *
- * All ping operations use only cross-platform compatible options to ensure
- * consistent behavior across Windows, macOS, and Linux platforms. The module
- * provides both single-attempt and retry-enabled ping functions.
+ * All connectivity operations use native Node.js modules (net, dns, fetch) for
+ * consistent behavior across Windows, macOS, and Linux platforms without
+ * requiring elevated privileges or external system utilities. The module
+ * provides both single-attempt and retry-enabled connectivity functions.
  *
  * Key features:
  *
- * - Cross-platform ping execution using only compatible options
+ * - Cross-platform connectivity checking using native Node.js modules
+ * - Support for TCP, DNS, and HTTP/HTTPS connectivity checks
  * - Configurable retry logic with exponential backoff
  * - Integration with operational hooks for monitoring and debugging
  * - Standardized error handling and result formatting
  * - Development mode debug logging for troubleshooting
+ * - No external dependencies or elevated privileges required
  *
  * @example
  *
  * ```typescript
- * // Basic ping with retries
+ * // Basic connectivity check with retries
  * const result = await performPingCheckWithRetry("google.com", 5000, 3);
  *
- * // Single ping attempt
+ * // Single connectivity attempt
  * const result = await performSinglePingCheck("192.168.1.1", 3000);
+ *
+ * // HTTP/HTTPS connectivity check
+ * const result = await performSinglePingCheck(
+ *     "https://api.example.com",
+ *     5000
+ * );
  * ```
  *
  * @public
  *
- * @see {@link performPingCheckWithRetry} - Main retry-enabled ping function
- * @see {@link performSinglePingCheck} - Single-attempt ping function
+ * @see {@link performPingCheckWithRetry} - Main retry-enabled connectivity function
+ * @see {@link performSinglePingCheck} - Single-attempt connectivity function
  * @see {@link withOperationalHooks} - Operational hooks integration
  * @see {@link handlePingCheckError} - Error handling utilities
+ * @see {@link checkConnectivity} - Native connectivity checking
+ * @see {@link checkHttpConnectivity} - HTTP/HTTPS connectivity checking
  */
-
-import * as ping from "ping";
 
 import type { MonitorCheckResult } from "../types";
 
@@ -46,97 +55,73 @@ import { RETRY_BACKOFF } from "../../../constants";
 import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
 import { withOperationalHooks } from "../../../utils/operationalHooks";
+import { checkConnectivity, checkHttpConnectivity } from "./nativeConnectivity";
 import { handlePingCheckError } from "./pingErrorHandling";
 
 /**
- * Performs a single ping connectivity check without retry logic.
+ * Performs a single connectivity check without retry logic.
  *
  * @remarks
- * This function performs a single ping attempt to the specified host using the
- * node-ping library. It measures response time and returns a structured result.
- * This function is used internally by {@link performPingCheckWithRetry} and can
- * also be used directly for single-attempt checks.
+ * This function performs a single connectivity attempt to the specified host
+ * using native Node.js modules. It automatically detects HTTP/HTTPS URLs and
+ * uses appropriate connectivity check methods (HTTP for URLs, TCP/DNS for
+ * hosts). This function is used internally by {@link performPingCheckWithRetry}
+ * and can also be used directly for single-attempt checks.
  *
- * Uses only cross-platform ping options: numeric, timeout, and min_reply for
- * maximum compatibility.
+ * Uses native connectivity checking with TCP port scanning and DNS resolution
+ * for maximum compatibility without requiring elevated privileges.
  *
- * @param host - Target hostname or IP address to ping.
- * @param timeout - Maximum time to wait for the ping response in milliseconds.
+ * @param host - Target hostname, IP address, or URL to check connectivity for.
+ * @param timeout - Maximum time to wait for the connectivity response in
+ *   milliseconds.
  *
- * @returns A promise that resolves to a {@link MonitorCheckResult} with ping
- *   status and timing.
+ * @returns A promise that resolves to a {@link MonitorCheckResult} with
+ *   connectivity status and timing.
  *
- * @throws Error if the ping operation fails or times out.
+ * @throws Error if the connectivity operation fails or times out.
  *
  * @public
  *
  * @see {@link performPingCheckWithRetry}
+ * @see {@link checkConnectivity}
+ * @see {@link checkHttpConnectivity}
  */
 export async function performSinglePingCheck(
     host: string,
     timeout: number
 ): Promise<MonitorCheckResult> {
-    const startTime = Date.now();
-    // Convert millisecond timeout to seconds while ensuring we never shorten
-    // the caller's requested duration. The ping library only accepts whole
-    // seconds, so we round up to preserve at least the original timeout and
-    // clamp to a minimum of 1 second for cross-platform compatibility.
-    const timeoutInSeconds = Math.max(1, Math.ceil(timeout / 1000));
-
     try {
-        const pingResult = await ping.promise.probe(host, {
-            // Use only cross-platform options for maximum compatibility
-            min_reply: 1, // Exit after receiving 1 reply (faster response)
-            numeric: false, // Don't map IP addresses to hostnames
-            timeout: timeoutInSeconds, // Timeout in seconds
-        });
+        // Determine check type based on host format
+        const isHttpUrl = /^https?:\/\//iv.test(host);
 
-        const responseTime = Date.now() - startTime;
-
-        if (pingResult.alive) {
-            // Parse response time from ping result, fallback to measured time
-            const pingTime =
-                pingResult.time && typeof pingResult.time === "number"
-                    ? Math.round(pingResult.time)
-                    : responseTime;
-
-            return {
-                details: `Ping successful - packet loss: ${pingResult.packetLoss || "0"}%`,
-                responseTime: pingTime,
-                status: "up",
-            };
-        }
-        return {
-            details: "Host unreachable",
-            error: "Ping failed - host unreachable",
-            responseTime,
-            status: "down",
-        };
+        // Use native connectivity check instead of ping package
+        return isHttpUrl
+            ? await checkHttpConnectivity(host, timeout)
+            : await checkConnectivity(host, { retries: 0, timeout });
     } catch (error) {
-        const responseTime = Date.now() - startTime;
         const errorMessage =
             error instanceof Error ? error.message : String(error);
 
-        throw new Error(
-            `Ping failed: ${errorMessage} (response time: ${responseTime}ms)`,
-            { cause: error }
-        );
+        throw new Error(`Connectivity check failed: ${errorMessage}`, {
+            cause: error,
+        });
     }
 }
 
 /**
- * Performs a ping connectivity check with retry logic and exponential backoff.
+ * Performs a connectivity check with retry logic and exponential backoff.
  *
  * @remarks
  * This function wraps {@link performSinglePingCheck} with retry logic using
- * {@link withOperationalHooks}. It attempts to ping the specified host, retrying
- * on failure up to `maxRetries` times (for a total of `maxRetries` + `1`
- * attempts). Exponential backoff is applied between attempts.
+ * {@link withOperationalHooks}. It attempts to check connectivity to the
+ * specified host, retrying on failure up to `maxRetries` times (for a total of
+ * `maxRetries` + `1` attempts). Exponential backoff is applied between
+ * attempts.
  *
  * Process flow:
  *
  * 1. Validates input parameters
- * 2. Performs initial ping attempt
+ * 2. Performs initial connectivity attempt
  * 3. On failure, retries with exponential backoff
  * 4. Returns standardized result or error
  *
@@ -153,24 +138,25 @@ export async function performSinglePingCheck(
  * // Try 4 times total (1 initial + 3 retries) with 3-second timeout
  * const result = await performPingCheckWithRetry("google.com", 3000, 3);
  * if (result.status === "up") {
- *     console.log(`Ping successful: ${result.responseTime}ms`);
+ *     console.log(`Connectivity successful: ${result.responseTime}ms`);
  * } else {
- *     console.log(`Ping failed: ${result.error}`);
+ *     console.log(`Connectivity failed: ${result.error}`);
  * }
  * ```
  *
- * @param host - Target hostname or IP address to ping
- * @param timeout - Maximum time to wait for each ping attempt in milliseconds
+ * @param host - Target hostname, IP address, or URL to check connectivity for
+ * @param timeout - Maximum time to wait for each connectivity attempt in
+ *   milliseconds
  * @param maxRetries - Number of additional retry attempts after initial failure
  *   (0 = try once only)
  *
- * @returns Promise resolving to {@link MonitorCheckResult} with ping status,
- *   timing, and details
+ * @returns Promise resolving to {@link MonitorCheckResult} with connectivity
+ *   status, timing, and details
  *
  * @public
  *
  * @see {@link withOperationalHooks} - Retry logic implementation
- * @see {@link performSinglePingCheck} - Single ping attempt function
+ * @see {@link performSinglePingCheck} - Single connectivity attempt function
  * @see {@link handlePingCheckError} - Error handling utility
  */
 export async function performPingCheckWithRetry(
@@ -179,7 +165,7 @@ export async function performPingCheckWithRetry(
     maxRetries: number
 ): Promise<MonitorCheckResult> {
     if (isDev()) {
-        logger.debug("Starting ping check with retry", {
+        logger.debug("Starting connectivity check with retry", {
             host,
             maxRetries,
             timeout,
@@ -192,7 +178,7 @@ export async function performPingCheckWithRetry(
             {
                 initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
                 maxRetries,
-                operationName: "ping-check",
+                operationName: "connectivity-check",
             }
         );
     } catch (error) {

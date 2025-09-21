@@ -202,7 +202,7 @@ export class HistoryRepository {
                             stmt.run([
                                 monitorId,
                                 entry.timestamp,
-                                entry.status, // StatusHistoryType is always "up" or "down"
+                                entry.status, // StatusHistory.status can be "up", "down", or "degraded"
                                 entry.responseTime,
                                 entry.details ?? null,
                             ]);

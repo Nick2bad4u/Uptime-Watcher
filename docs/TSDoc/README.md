@@ -162,13 +162,13 @@ TSDoc configuration in the Uptime Watcher project:
 - **[Architecture documentation](../Architecture/README.md)** - System design and patterns
 - **[Guides documentation](../Guides/README.md)** - Development guides and tutorials
 - **[Testing documentation](../Testing/README.md)** - Testing guides and best practices
-- **[Documentation style guide](../documentation-style-guide.md)** - Markdown documentation standards
+- **[Documentation style guide](../../electron/documentation-style-guide.md)** - Markdown documentation standards
 
 ## 📝 Contributing
 
 When working with TSDoc documentation:
 
-1. Follow the established [documentation style guide](../documentation-style-guide.md)
+1. Follow the established [documentation style guide](../../electron/documentation-style-guide.md)
 2. Use appropriate TSDoc tags for all public APIs
 3. Provide comprehensive examples for complex functionality
 4. Ensure all links and references are valid
