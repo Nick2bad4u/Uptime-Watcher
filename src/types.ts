@@ -112,6 +112,29 @@ declare global {
                  *   false otherwise.
                  */
                 importData: (data: string) => Promise<boolean>;
+                /**
+                 * @remarks
+                 * Get the current history retention limit.
+                 *
+                 * @returns A promise resolving to the current history limit.
+                 */
+                getHistoryLimit: () => Promise<number>;
+                /**
+                 * @remarks
+                 * Reset all application settings to their default values.
+                 *
+                 * @returns A promise that resolves when settings are reset.
+                 */
+                resetSettings: () => Promise<void>;
+                /**
+                 * @remarks
+                 * Update the history retention limit.
+                 *
+                 * @param limit - The new history limit value.
+                 *
+                 * @returns A promise resolving to the updated limit.
+                 */
+                updateHistoryLimit: (limit: number) => Promise<number>;
             };
 
             /**

@@ -220,7 +220,10 @@ export async function waitForElectronAPI(
     )) {
         try {
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Runtime API availability check during initialization
-            if (typeof window.electronAPI?.sites?.getSites === "function") {
+            if (
+                typeof window.electronAPI?.sites?.getSites === "function" &&
+                typeof window.electronAPI?.data?.getHistoryLimit === "function"
+            ) {
                 return; // API is ready
             }
         } catch {

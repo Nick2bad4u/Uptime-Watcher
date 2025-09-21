@@ -42,8 +42,8 @@ export const SettingsService = {
      *   fails.
      */
     async getHistoryLimit(): Promise<number> {
-        await this.initialize();
-        return window.electronAPI.settings.getHistoryLimit();
+        await SettingsService.initialize();
+        return window.electronAPI.data.getHistoryLimit();
     },
 
     /**
@@ -84,8 +84,8 @@ export const SettingsService = {
      *   fails.
      */
     async resetSettings(): Promise<void> {
-        await this.initialize();
-        await window.electronAPI.settings.resetSettings();
+        await SettingsService.initialize();
+        await window.electronAPI.data.resetSettings();
     },
 
     /**
@@ -108,7 +108,7 @@ export const SettingsService = {
      *   fails.
      */
     async updateHistoryLimit(limit: number): Promise<void> {
-        await this.initialize();
-        await window.electronAPI.settings.updateHistoryLimit(limit);
+        await SettingsService.initialize();
+        await window.electronAPI.data.updateHistoryLimit(limit);
     },
 };

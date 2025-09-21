@@ -633,8 +633,12 @@ export class IpcService {
         // Update history limit handler with validation
         registerStandardizedIpcHandler(
             "update-history-limit",
-            async (...args: unknown[]) =>
-                this.uptimeOrchestrator.setHistoryLimit(args[0] as number),
+            async (...args: unknown[]) => {
+                await this.uptimeOrchestrator.setHistoryLimit(
+                    args[0] as number
+                );
+                return this.uptimeOrchestrator.getHistoryLimit();
+            },
             DataHandlerValidators.updateHistoryLimit,
             this.registeredIpcHandlers
         );

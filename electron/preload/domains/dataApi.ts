@@ -123,7 +123,7 @@ export const dataApi: DataApiInterface = {
      *
      * @param limitDays - New history limit in days
      *
-     * @returns Promise resolving to the updated limit value
+     * @returns Promise that resolves to the updated limit value
      */
     updateHistoryLimit: createTypedInvoker<number>(
         "update-history-limit"
