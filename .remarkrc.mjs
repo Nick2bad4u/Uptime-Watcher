@@ -7,11 +7,51 @@
  *   - Content structure validation
  *   - GitHub Flavored Markdown support
  *   - Integration with Prettier for formatting
- * @type {import("remark-lint-ordered-list-marker-value").Options}
+ *
  * @see {@link https://github.com/remarkjs/remark-lint} for available rules
  * @see {@link https://github.com/remarkjs/remark-gfm} for GitHub Flavored Markdown
  */
-;
+
+// Type definitions for remark configuration
+/** @typedef {import("unified").Preset} Preset */
+/** @typedef {import("unified").Plugin} Plugin */
+/** @typedef {string | [string, ...unknown[]]} PluginTuple */
+/** @typedef {string | Plugin | Preset | PluginTuple} PluginEntry */
+
+/**
+ * Remark settings for markdown processing
+ *
+ * @typedef {Object} RemarkSettings
+ *
+ * @property {boolean} [yaml] - Handle frontmatter in markdown files
+ * @property {boolean} [commonmark] - Enable commonmark compliance
+ * @property {boolean} [gfm] - Enable GitHub Flavored Markdown features
+ * @property {"tab" | "one" | "mixed"} [listItemIndent] - List item indentation
+ *   style
+ * @property {"*" | "_"} [emphasis] - Character to use for emphasis
+ * @property {"*" | "_"} [strong] - Character to use for strong emphasis
+ * @property {boolean} [fences] - Use fenced code blocks
+ * @property {"`" | "~"} [fence] - Character to use for fences
+ * @property {"ordered"} [style] - List style preference
+ * @property {boolean} [referenceLinks] - Use reference-style links
+ * @property {boolean} [incrementListMarker] - Increment ordered list markers
+ */
+
+/**
+ * @typedef {Object} RemarkConfig
+ *
+ * @property {PluginEntry[]} plugins - Array of plugins and presets
+ * @property {RemarkSettings} settings - Remark processing settings
+ */
+
+// Plugin-specific options types (using generic unknown where specific types aren't exported)
+/** @typedef {{ schemas?: Record<string, unknown> }} FrontmatterSchemaOptions */
+/** @typedef {'"' | "'"} QuoteStyle */
+/** @typedef {"consistent" | "*" | "_"} EmphasisStyle */
+/** @typedef {"one" | "ordered" | "single"} OrderedListMarkerValue */
+/** @typedef {{ allowExtensionless?: boolean; extensions?: string[] }} FileExtensionOptions */
+
+/** @type {RemarkConfig} */
 const remarkConfig = {
     // Core plugins for GitHub Flavored Markdown and formatting integration
     plugins: [
@@ -31,7 +71,10 @@ const remarkConfig = {
         // Allow project naming conventions
         ["remark-lint-no-file-name-irregular-characters", /[^-._\dA-Za-z]/], // Allow underscores in filenames
         ["remark-lint-no-file-name-mixed-case", true], // Allow mixed case in filenames
-        ["remark-lint-file-extension", { allowExtensionless: false, extensions: ["mdx", "md"] }], // Allow .mdx files
+        [
+            "remark-lint-file-extension",
+            { allowExtensionless: false, extensions: ["mdx", "md"] },
+        ], // Allow .mdx files
 
         // Disable problematic rules or override with more lenient settings
         ["remark-lint-maximum-line-length", 200], // Allow longer lines
@@ -77,9 +120,6 @@ const remarkConfig = {
 
     // Settings for processing
     settings: {
-        // Use position tracking for better error reporting
-        position: true,
-
         // Handle frontmatter in markdown files
         yaml: true,
 

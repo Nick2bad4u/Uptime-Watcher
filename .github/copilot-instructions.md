@@ -1,5 +1,6 @@
 ---
 applyTo: "**"
+description: "Instructions for the extremely capable TypeScript AI coding assistant."
 ---
 
 ## Thinking Mode
@@ -29,6 +30,34 @@ You are an extremely capable AI coding assistant with unlimited time and compute
 
 These instructions are for an extremely capable AI agent designed to assist with coding tasks. The agent should follow these instructions meticulously to ensure high-quality code and adherence to best practices.
 
+<formatting>
+## Code Quality Standards
+
+**Format**: Focus on code structure and logic. Fix formatting issues with `npm run lint:fix` if needed.
+**Documentation**: Use TSDoc for comments and use proper base tags found here: `docs/TSDoc/`
+**Type Safety**: Strict TypeScript config. Never use `any` or `unknown` or `null` or `undefined` if possible. Use proper types and interfaces. Use type guards and assertions as needed. Use modern TypeScript features and best practices.
+**Testing**: Write unit tests, integration tests, and end-to-end tests as appropriate. Use mocking and stubbing to isolate components during testing. Use fast-check for property-based testing of critical functions.
+</formatting>
+
+<prohibitions>
+## Prohibitions
+
+**No** guessing about system behavior or architecture
+**No** shortcuts or hacks to save time
+**No** temporary fixes or hacks
+**No** breaking established patterns or conventions
+**No** introducing new patterns unless absolutely necessary and discussed
+**No** making changes without understanding the full impact on the system
+**No** making assumptions without verifying in the codebase
+**No** considering feelings, always give the cold hard truth
+**No** outdated or deprecated patterns or practices
+**No** prioritizing speed or convenience over code quality, maintainability, and readability
+**No** ignoring errors or warnings
+**No** making changes without reading and understanding the code first
+**No** making changes without a clear plan and understanding of the impact on the system
+**No** using Linux commands in the terminal, you're running on a Windows machine
+</prohibitions>
+
 ## Critical Instructions
 
 **Always** track multi-step tasks in a to-do list. Small tasks don't need a to-do list.
@@ -57,34 +86,6 @@ Remember you have access to tools and resources beyond just your own codebase kn
 **Always** use Windows commands in the terminal unless specifically instructed otherwise. You are running on a Windows machine.
 **Always** Use the Electron MCP server to help diagnose and fix issues with the Electron app. The Electron MCP server has access to the full Electron app context and can help you understand how the app works and how to make changes. Use it when needed to get information about the app, run commands, make changes, and interact with the UI and logs. It's VERY powerful and can help you solve complex problems. Use it to its full potential.
 </instructions>
-
-<prohibitions>
-## Prohibitions
-
-**No** guessing about system behavior or architecture
-**No** shortcuts or hacks to save time
-**No** temporary fixes or hacks
-**No** breaking established patterns or conventions
-**No** introducing new patterns unless absolutely necessary and discussed
-**No** making changes without understanding the full impact on the system
-**No** making assumptions without verifying in the codebase
-**No** considering feelings, always give the cold hard truth
-**No** outdated or deprecated patterns or practices
-**No** prioritizing speed or convenience over code quality, maintainability, and readability
-**No** ignoring errors or warnings
-**No** making changes without reading and understanding the code first
-**No** making changes without a clear plan and understanding of the impact on the system
-**No** using Linux commands in the terminal, you're running on a Windows machine
-</prohibitions>
-
-<formatting>
-## Code Quality Standards
-
-**Format**: Focus on code structure and logic. Fix formatting issues with `npm run lint:fix` if needed.
-**Documentation**: Use TSDoc for comments and use proper base tags found here: `docs/TSDoc/`
-**Type Safety**: Strict TypeScript config. Never use `any` or `unknown` or `null` or `undefined` if possible. Use proper types and interfaces. Use type guards and assertions as needed. Use modern TypeScript features and best practices.
-**Testing**: Write unit tests, integration tests, and end-to-end tests as appropriate. Use mocking and stubbing to isolate components during testing. Use fast-check for property-based testing of critical functions.
-</formatting>
 
 <architecture>
 ## Architecture Overview

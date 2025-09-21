@@ -7850,6 +7850,7 @@ export default [
                         "playwright.config.ts",
                         "vitest.shared.config.ts",
                         "vitest.stryker.config.ts",
+                        "config/tools/knip.config.ts"
                     ],
                     defaultProject: "config/testing/tsconfig.configs.json",
                 },
