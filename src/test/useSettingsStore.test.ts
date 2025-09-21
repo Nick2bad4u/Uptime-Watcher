@@ -182,9 +182,16 @@ describe(useSettingsStore, () => {
                 new Error("Backend error")
             );
 
-            await expect(
-                useSettingsStore.getState().initializeSettings()
-            ).rejects.toThrow("Backend error");
+            const result = await useSettingsStore
+                .getState()
+                .initializeSettings();
+
+            // Should handle error gracefully and return fallback result
+            expect(result.success).toBeFalsy();
+            expect(result.message).toBe(
+                "Settings initialized with default values"
+            );
+            expect(result.settingsLoaded).toBeTruthy();
         });
     });
 

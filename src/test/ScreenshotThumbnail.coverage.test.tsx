@@ -2,13 +2,12 @@
  * Test to cover remaining uncovered lines in ScreenshotThumbnail component
  */
 
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, act, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbnail";
-import { logger } from "../services/logger";
 
 // Mock logger
 vi.mock("../services/logger", () => ({
@@ -52,9 +51,23 @@ vi.mock("../stores/ui/useUiStore", () => ({
 }));
 
 // Mock useMount hook
-vi.mock("../hooks/useMount", () => ({
-    useMount: vi.fn(),
-}));
+vi.mock("../hooks/useMount", () => {
+    const calledCallbacks = new WeakSet();
+    return {
+        useMount: vi.fn(
+            (callback: () => void, cleanupCallback?: () => void) => {
+                // Only call the callback once per component instance to avoid infinite loops
+                // This simulates the real useMount behavior
+                if (!calledCallbacks.has(callback)) {
+                    calledCallbacks.add(callback);
+                    callback();
+                }
+                // Return cleanup function if provided (for testing unmount behavior)
+                return cleanupCallback;
+            }
+        ),
+    };
+});
 
 // Prevent JSDOM navigation errors by mocking HTMLAnchorElement.prototype.click
 HTMLAnchorElement.prototype.click = vi.fn();
@@ -99,9 +112,9 @@ const createMockBoundingClientRect = (overrides = {}) => ({
 });
 
 // Set global electronAPI once (check if it exists first)
-if (globalThis.electronAPI) {
+if ((globalThis as any).electronAPI) {
     // Update existing electronAPI
-    Object.assign(globalThis.electronAPI, mockElectronAPI);
+    Object.assign((globalThis as any).electronAPI, mockElectronAPI);
 } else {
     Object.defineProperty(globalThis, "electronAPI", {
         configurable: true,
@@ -275,21 +288,14 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         annotate("Category: Core", "category");
         annotate("Type: Event Processing", "type");
 
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: ScreenshotThumbnail", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Event Processing", "type");
-
         const props = defaultProps;
 
         render(<ScreenshotThumbnail {...props} />);
 
         const thumbnail = screen.getByRole("link");
 
-        const user = userEvent.setup();
-        await act(async () => {
-            await user.click(thumbnail);
-        });
+        // Use fireEvent instead of userEvent to avoid timer complications
+        fireEvent.click(thumbnail);
 
         // Verify UI store openExternal was called with correct arguments
         expect(mockOpenExternal).toHaveBeenCalledWith("https://example.com", {
@@ -303,19 +309,14 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: ScreenshotThumbnail", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
-        const props = {
-            siteName: "Test Site",
-            url: "https://test.com",
-        };
+        const props = defaultProps; // Use consistent props
 
         render(<ScreenshotThumbnail {...props} />);
 
-        const thumbnail = screen.getByRole("link");
+        // Use the aria-label to find the link (based on defaultProps URL)
+        const thumbnail = screen.getByRole("link", {
+            name: /open.*example\.com.*in browser/i,
+        });
 
         // Rapid hover/unhover to test timeout handling
         act(() => {

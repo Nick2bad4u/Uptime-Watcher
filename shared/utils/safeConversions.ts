@@ -131,15 +131,12 @@ export function safeParseFloat(value: unknown, defaultValue = 0): number {
  */
 export function safeParseInt(value: unknown, defaultValue = 0): number {
     if (isNumber(value)) {
-        // Handle finite numbers only - Infinity/-Infinity should use default
-        if (Number.isInteger(value) && Number.isFinite(value)) {
-            return value;
+        // Return default value for non-finite numbers (Infinity, -Infinity, NaN)
+        if (!Number.isFinite(value)) {
+            return defaultValue;
         }
-        if (Number.isFinite(value)) {
-            // For numeric inputs, align with floor semantics used in property tests
-            return Math.floor(value);
-        }
-        return defaultValue;
+        // For finite numeric inputs, apply Math.floor to get integer
+        return Math.floor(value);
     }
 
     if (isString(value)) {

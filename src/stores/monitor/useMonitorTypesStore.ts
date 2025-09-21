@@ -462,13 +462,20 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                             data
                         );
 
+                    // Ensure defaults for optional fields
+                    const normalizedResult: ValidationResult = {
+                        ...validationResult,
+                        metadata: validationResult.metadata ?? {},
+                        warnings: validationResult.warnings ?? [],
+                    };
+
                     logStoreAction("MonitorTypesStore", "validateMonitorData", {
-                        errorCount: validationResult.errors.length,
-                        success: validationResult.success,
+                        errorCount: normalizedResult.errors.length,
+                        success: normalizedResult.success,
                         type,
                     });
 
-                    return validationResult;
+                    return normalizedResult;
                 },
                 {
                     clearError: get().clearError,

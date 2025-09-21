@@ -884,8 +884,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 "MonitorTypesStore",
                 "formatMonitorDetail",
                 {
-                    type: "http",
+                    resultLength: expect.any(Number),
                     success: true,
+                    type: "http",
                 }
             );
 
@@ -910,8 +911,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 "MonitorTypesStore",
                 "formatMonitorTitleSuffix",
                 {
-                    type: "http",
+                    resultLength: expect.any(Number),
                     success: true,
+                    type: "http",
                 }
             );
         });

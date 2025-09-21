@@ -311,6 +311,11 @@ describe("SiteWriterService Coverage Tests", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Deletion", "type");
 
+            // Mock successful database deletion and cache presence
+            (
+                mockSiteRepository.deleteInternal as MockedFunction<any>
+            ).mockReturnValue(true);
+            (mockSitesCache.has as MockedFunction<any>).mockReturnValue(true);
             (mockSitesCache.delete as MockedFunction<any>).mockReturnValue(
                 true
             );
@@ -331,7 +336,7 @@ describe("SiteWriterService Coverage Tests", () => {
             );
             expect(result).toBeTruthy();
             expect(mockLogger.info).toHaveBeenCalledWith(
-                "Site removed successfully: test-site"
+                "Site removed successfully from database: test-site"
             );
         });
 
@@ -347,6 +352,10 @@ describe("SiteWriterService Coverage Tests", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
+            // Mock database deletion failure (site not found in database)
+            (
+                mockSiteRepository.deleteInternal as MockedFunction<any>
+            ).mockReturnValue(false);
             (mockSitesCache.delete as MockedFunction<any>).mockReturnValue(
                 false
             );
@@ -363,7 +372,7 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(mockSiteRepository.deleteInternal).toHaveBeenCalled();
             expect(result).toBeFalsy();
             expect(mockLogger.warn).toHaveBeenCalledWith(
-                "Site not found in cache for removal: nonexistent-site"
+                "Site not found in database for removal: nonexistent-site"
             );
         });
 

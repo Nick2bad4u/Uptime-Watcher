@@ -47,6 +47,29 @@ vi.mock("./monitorTypeHelper", () => ({
     getMonitorTypeConfig: mockGetMonitorTypeConfig,
 }));
 
+// Mock MonitorTypesService
+vi.mock("../../services/MonitorTypesService", () => ({
+    MonitorTypesService: {
+        formatMonitorDetail: vi.fn(),
+        formatMonitorTitleSuffix: vi.fn(),
+        getMonitorTypes: vi.fn(),
+        validateMonitorData: vi.fn(),
+        initialize: vi.fn(),
+    },
+}));
+
+// Mock useMonitorTypesStore to delegate to MonitorTypesService mocks
+vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
+    useMonitorTypesStore: {
+        getState: () => ({
+            formatMonitorDetail: (type: string, details: string) =>
+                MonitorTypesService.formatMonitorDetail(type, details),
+            formatMonitorTitleSuffix: (type: string, monitor: any) =>
+                MonitorTypesService.formatMonitorTitleSuffix(type, monitor),
+        }),
+    },
+}));
+
 const mockElectronAPI = {
     monitorTypes: {
         formatMonitorDetail: vi.fn(),
@@ -57,6 +80,10 @@ const mockElectronAPI = {
 // Expose mock variables for easier access in tests
 const getAvailableMonitorTypes = mockGetAvailableMonitorTypes;
 const getMonitorTypeConfig = mockGetMonitorTypeConfig;
+
+// Import mocked services for setup
+import { MonitorTypesService } from "../../services/MonitorTypesService";
+import type { ValidationResult } from "../../../shared/types/validation";
 
 describe("Monitor UI Helpers", () => {
     let originalWindow: Window | undefined;
@@ -86,6 +113,42 @@ describe("Monitor UI Helpers", () => {
 
         // Clear all mocks
         vi.clearAllMocks();
+
+        // Reset cache mocks
+        mockCacheGet.mockReturnValue(undefined);
+        mockCacheSet.mockReturnValue(undefined);
+        mockCacheClear.mockReturnValue(undefined);
+
+        // Reset helper mocks
+        vi.mocked(getMonitorTypeConfig).mockImplementation(
+            async () => undefined
+        );
+        vi.mocked(getAvailableMonitorTypes).mockImplementation(async () => []);
+
+        // Setup MonitorTypesService mocks with correct return values for tests
+        vi.mocked(MonitorTypesService.formatMonitorDetail).mockResolvedValue(
+            "Response Code: 200"
+        );
+        vi.mocked(
+            MonitorTypesService.formatMonitorTitleSuffix
+        ).mockResolvedValue(" (https://example.com)");
+        vi.mocked(MonitorTypesService.getMonitorTypes).mockResolvedValue([]);
+        vi.mocked(MonitorTypesService.validateMonitorData).mockResolvedValue({
+            success: true,
+            errors: [],
+        } as ValidationResult);
+
+        // Setup electron API mocks for backward compatibility
+        mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue({
+            success: true,
+            data: "Response Code: 200",
+        });
+        mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
+            {
+                success: true,
+                data: " (https://example.com)",
+            }
+        );
     });
 
     afterEach(() => {
@@ -228,7 +291,7 @@ describe("Monitor UI Helpers", () => {
             const result = await formatMonitorDetail("http", "200");
             expect(result).toBe("Response Code: 200");
             expect(
-                mockElectronAPI.monitorTypes.formatMonitorDetail
+                MonitorTypesService.formatMonitorDetail
             ).toHaveBeenCalledWith("http", "200");
         });
 
@@ -245,7 +308,10 @@ describe("Monitor UI Helpers", () => {
                 "../../utils/monitorUiHelpers"
             );
 
-            globalThis.window = {} as any;
+            // Mock the service to simulate failure, triggering fallback behavior
+            vi.mocked(
+                MonitorTypesService.formatMonitorDetail
+            ).mockRejectedValue(new Error("Service unavailable"));
 
             const result = await formatMonitorDetail("http", "200");
             expect(result).toBe("200"); // Fallback to original details
@@ -264,10 +330,10 @@ describe("Monitor UI Helpers", () => {
                 "../../utils/monitorUiHelpers"
             );
 
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue({
-                success: false,
-                error: "API Error",
-            });
+            // Mock the service to simulate error, triggering fallback behavior
+            vi.mocked(
+                MonitorTypesService.formatMonitorDetail
+            ).mockRejectedValue(new Error("API Error"));
 
             const result = await formatMonitorDetail("http", "200");
             expect(result).toBe("200"); // Fallback to original details
@@ -317,7 +383,10 @@ describe("Monitor UI Helpers", () => {
                 "../../utils/monitorUiHelpers"
             );
 
-            globalThis.window = {} as any;
+            // Mock the service to simulate failure, triggering fallback behavior
+            vi.mocked(
+                MonitorTypesService.formatMonitorTitleSuffix
+            ).mockRejectedValue(new Error("Service unavailable"));
 
             const result = await formatMonitorTitleSuffix(
                 "http",
@@ -341,12 +410,10 @@ describe("Monitor UI Helpers", () => {
                 "../../utils/monitorUiHelpers"
             );
 
-            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
-                {
-                    success: false,
-                    error: "API Error",
-                }
-            );
+            // Mock the service to simulate error, triggering fallback behavior
+            vi.mocked(
+                MonitorTypesService.formatMonitorTitleSuffix
+            ).mockRejectedValue(new Error("API Error"));
 
             const result = await formatMonitorTitleSuffix(
                 "http",
@@ -821,6 +888,11 @@ describe("Monitor UI Helpers", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
+            // Configure service to fail for this edge case test
+            (
+                MonitorTypesService.formatMonitorDetail as Mock
+            ).mockRejectedValueOnce(new Error("Service unavailable"));
+
             const { formatMonitorDetail } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -843,6 +915,11 @@ describe("Monitor UI Helpers", () => {
             await annotate("Component: monitorUiHelpers", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
+
+            // Configure service to fail for this edge case test
+            (
+                MonitorTypesService.formatMonitorDetail as Mock
+            ).mockRejectedValueOnce(new Error("Service unavailable"));
 
             const { formatMonitorDetail } = await import(
                 "../../utils/monitorUiHelpers"

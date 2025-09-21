@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { Monitor } from "../types";
+import type { Monitor } from "@shared/types";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 import { TypedCache } from "../utils/cache";

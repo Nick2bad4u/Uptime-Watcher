@@ -7,6 +7,22 @@ import type { Logger } from "../../../services/logger";
 
 // Mock the validation functions
 vi.mock("../../../utils/monitorValidation", () => ({
+    createMonitorObject: vi.fn(() => ({
+        id: "mock-monitor-id",
+        type: "http",
+        status: "up",
+        monitoring: false,
+        checkInterval: 60_000,
+        lastChecked: new Date(),
+        responseTime: 0,
+        retryAttempts: 3,
+        timeout: 30_000,
+        history: [],
+        name: "Mock Monitor",
+        config: {},
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+    })),
     validateMonitorFormData: vi.fn(),
     validateMonitorFieldClientSide: vi.fn(),
 }));

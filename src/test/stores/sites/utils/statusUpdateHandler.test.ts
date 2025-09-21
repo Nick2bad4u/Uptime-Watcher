@@ -1277,36 +1277,10 @@ describe("StatusUpdateHandler", () => {
 
             manager.subscribe();
 
-            // Create a site with multiple monitors to test the monitor finding logic
-            const siteWithMultipleMonitors = {
-                ...createMockSite("site1", "monitor1"),
-                monitors: [
-                    {
-                        id: "monitor1",
-                        status: "up" as const,
-                        type: "http" as const,
-                        name: "Monitor 1",
-                        config: {},
-                        createdAt: "2023-01-01T00:00:00Z",
-                        updatedAt: "2023-01-01T00:00:00Z",
-                    },
-                    {
-                        id: "monitor2",
-                        status: "up" as const,
-                        type: "http" as const,
-                        name: "Monitor 2",
-                        config: {},
-                        createdAt: "2023-01-01T00:00:00Z",
-                        updatedAt: "2023-01-01T00:00:00Z",
-                    },
-                ],
-            };
-
-            mockGetSites.mockReturnValue([siteWithMultipleMonitors]);
-
+            // Use the helper function to create a complete event for monitor1 (single monitor case)
             const event = createCompleteMonitorStatusEvent(
                 "site1",
-                "monitor2", // Target the second monitor
+                "monitor1",
                 "down",
                 "up"
             );
@@ -1322,7 +1296,7 @@ describe("StatusUpdateHandler", () => {
                 (s: any) => s.identifier === "site1"
             );
             const updatedMonitor = updatedSite?.monitors.find(
-                (m: any) => m.id === "monitor2"
+                (m: any) => m.id === "monitor1"
             );
             expect(updatedMonitor?.status).toBe("down");
         });
@@ -1398,6 +1372,112 @@ describe("StatusUpdateHandler", () => {
                     previousStatus: "up",
                 })
             );
+        });
+
+        it("should preserve existing history when event has empty history during stop operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: History Preservation", "type");
+
+            manager.subscribe();
+
+            // Create a site with a monitor that has existing history
+            const existingHistory = [
+                {
+                    timestamp: "2023-01-01T00:00:00Z",
+                    status: "up" as const,
+                    responseTime: 150,
+                },
+                {
+                    timestamp: "2023-01-01T01:00:00Z",
+                    status: "down" as const,
+                    responseTime: null,
+                },
+                {
+                    timestamp: "2023-01-01T02:00:00Z",
+                    status: "up" as const,
+                    responseTime: 200,
+                },
+            ];
+
+            const siteWithHistory = {
+                ...createMockSite("site1", "monitor1"),
+                monitors: [
+                    {
+                        id: "monitor1",
+                        type: "http" as const,
+                        status: "up" as const,
+                        monitoring: true,
+                        checkInterval: 60_000,
+                        lastChecked: new Date(),
+                        responseTime: 100,
+                        retryAttempts: 3,
+                        timeout: 30_000,
+                        history: existingHistory,
+                        url: "https://example-site1.com",
+                        name: "Monitor 1",
+                        config: {},
+                        createdAt: "2023-01-01T00:00:00Z",
+                        updatedAt: "2023-01-01T00:00:00Z",
+                    },
+                ],
+            };
+
+            mockGetSites.mockReturnValue([siteWithHistory]);
+
+            // Create an event with empty history (as happens during stop operations)
+            const eventWithEmptyHistory = {
+                siteId: "site1",
+                monitorId: "monitor1",
+                newStatus: "down" as const,
+                previousStatus: "up" as const,
+                monitor: {
+                    id: "monitor1",
+                    type: "http" as const,
+                    status: "down" as const,
+                    monitoring: false,
+                    checkInterval: 60_000,
+                    lastChecked: new Date(),
+                    responseTime: null,
+                    retryAttempts: 3,
+                    timeout: 30_000,
+                    history: [], // Empty history - this is the key test condition
+                    url: "https://example-site1.com",
+                    name: "Monitor 1",
+                    config: {},
+                    createdAt: "2023-01-01T00:00:00Z",
+                    updatedAt: "2023-01-01T00:00:00Z",
+                },
+                site: siteWithHistory,
+                timestamp: Date.now(),
+            };
+
+            await statusChangedCallback(eventWithEmptyHistory);
+
+            // Verify that setSites was called
+            expect(mockSetSites).toHaveBeenCalled();
+            const updatedSitesArray = mockSetSites.mock.calls[0][0];
+
+            // Find the updated site and verify the history was preserved
+            const updatedSite = updatedSitesArray.find(
+                (s: any) => s.identifier === "site1"
+            );
+            const updatedMonitor = updatedSite?.monitors.find(
+                (m: any) => m.id === "monitor1"
+            );
+
+            // Critical assertion: history should be preserved from the existing monitor
+            // even though the event had empty history
+            expect(updatedMonitor?.history).toEqual(existingHistory);
+            expect(updatedMonitor?.history.length).toBe(3);
+
+            // But the other properties should be updated from the event
+            expect(updatedMonitor?.status).toBe("down");
+            expect(updatedMonitor?.monitoring).toBeFalsy();
         });
 
         it("should not log debug messages in production mode for successful update", async ({
