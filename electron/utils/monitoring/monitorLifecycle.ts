@@ -305,29 +305,29 @@ async function startSpecificMonitor(
     try {
         // Note: Database update is performed before starting the monitor
         // scheduler This design choice ensures status consistency even if
-        // scheduler fails Use operational hooks for database update
-        await withDatabaseOperation(
-            () => {
-                const db = config.databaseService.getDatabase();
+        // scheduler fails Use executeTransaction for atomic updates per ADR-001
+        await config.databaseService.executeTransaction((db) => {
+            // Update monitor status to monitoring
+            config.monitorRepository.updateInternal(db, monitorId, {
+                monitoring: true,
+                status: MONITOR_STATUS.PENDING,
+            });
 
-                // Update monitor status to monitoring
-                config.monitorRepository.updateInternal(db, monitorId, {
-                    monitoring: true,
-                    status: MONITOR_STATUS.PENDING,
-                });
+            // Clear any stale active operations when starting monitoring
+            config.monitorRepository.clearActiveOperationsInternal(
+                db,
+                monitorId
+            );
 
-                // Clear any stale active operations when starting monitoring
-                config.monitorRepository.clearActiveOperationsInternal(
-                    db,
-                    monitorId
-                );
+            return Promise.resolve();
+        });
 
-                return Promise.resolve();
-            },
-            "monitor-start-specific",
-            config.eventEmitter,
-            { identifier, monitorId }
-        );
+        // Emit event for observability after successful transaction
+        await config.eventEmitter.emitTyped("monitor:statusUpdated", {
+            monitorId,
+            newStatus: MONITOR_STATUS.PENDING,
+            timestamp: Date.now(),
+        });
 
         // Refresh the site cache after monitor operation
         await refreshSiteCache(config, identifier, "start");
@@ -384,29 +384,29 @@ async function stopSpecificMonitor(
     }
 
     try {
-        // Use operational hooks for database update
-        await withDatabaseOperation(
-            () => {
-                const db = config.databaseService.getDatabase();
+        // Use executeTransaction for atomic updates per ADR-001
+        await config.databaseService.executeTransaction((db) => {
+            // Update monitor status to paused
+            config.monitorRepository.updateInternal(db, monitorId, {
+                monitoring: false,
+                status: MONITOR_STATUS.PAUSED,
+            });
 
-                // Update monitor status to paused
-                config.monitorRepository.updateInternal(db, monitorId, {
-                    monitoring: false,
-                    status: MONITOR_STATUS.PAUSED,
-                });
+            // Clear active operations as part of stopping monitor
+            config.monitorRepository.clearActiveOperationsInternal(
+                db,
+                monitorId
+            );
 
-                // Clear active operations as part of stopping monitor
-                config.monitorRepository.clearActiveOperationsInternal(
-                    db,
-                    monitorId
-                );
+            return Promise.resolve();
+        });
 
-                return Promise.resolve();
-            },
-            "monitor-stop-specific",
-            config.eventEmitter,
-            { identifier, monitorId }
-        );
+        // Emit event for observability after successful transaction
+        await config.eventEmitter.emitTyped("monitor:statusUpdated", {
+            monitorId,
+            newStatus: MONITOR_STATUS.PAUSED,
+            timestamp: Date.now(),
+        });
 
         // Refresh the site cache after monitor operation
         await refreshSiteCache(config, identifier, "stop");
@@ -470,12 +470,11 @@ export async function startAllMonitoring(
         for (const monitor of site.monitors) {
             if (monitor.id) {
                 try {
-                    // Use operational hooks for database update
+                    // Use withDatabaseOperation to maintain ADR-001/003 retry/telemetry wrapper
                     // eslint-disable-next-line no-await-in-loop -- Sequential initialization to avoid startup conflicts
                     await withDatabaseOperation(
-                        () => {
-                            const db = config.databaseService.getDatabase();
-                            if (monitor.id) {
+                        () =>
+                            config.databaseService.executeTransaction((db) => {
                                 config.monitorRepository.updateInternal(
                                     db,
                                     monitor.id,
@@ -484,12 +483,26 @@ export async function startAllMonitoring(
                                         status: MONITOR_STATUS.PENDING,
                                     }
                                 );
-                            }
-                            return Promise.resolve();
-                        },
-                        "monitor-start-all-update",
-                        config.eventEmitter,
-                        { monitorId: monitor.id }
+                                return Promise.resolve();
+                            }),
+                        `startAllMonitoring-${monitor.id}`,
+                        config.eventEmitter
+                    );
+
+                    // Emit proper event with full payload per contract in eventTypes.ts:1122
+                    // eslint-disable-next-line no-await-in-loop -- Event emission after database transaction
+                    await config.eventEmitter.emitTyped(
+                        "monitor:status-changed",
+                        {
+                            monitor,
+                            monitorId: monitor.id,
+                            newStatus: MONITOR_STATUS.PENDING,
+                            previousStatus: monitor.status,
+                            responseTime: monitor.responseTime,
+                            site,
+                            siteId: site.identifier,
+                            timestamp: Date.now(),
+                        }
                     );
                 } catch (error) {
                     config.logger.error(
@@ -566,12 +579,11 @@ export async function stopAllMonitoring(
         for (const monitor of site.monitors) {
             if (monitor.id && monitor.monitoring) {
                 try {
-                    // Use operational hooks for database update
+                    // Use withDatabaseOperation to maintain ADR-001/003 retry/telemetry wrapper
                     // eslint-disable-next-line no-await-in-loop -- Sequential shutdown to avoid conflicts
                     await withDatabaseOperation(
-                        () => {
-                            const db = config.databaseService.getDatabase();
-                            if (monitor.id) {
+                        () =>
+                            config.databaseService.executeTransaction((db) => {
                                 // Update monitor status to paused
                                 config.monitorRepository.updateInternal(
                                     db,
@@ -582,18 +594,31 @@ export async function stopAllMonitoring(
                                     }
                                 );
 
-                                // Clear active operations when stopping
-                                // monitoring
+                                // Clear active operations when stopping monitoring
                                 config.monitorRepository.clearActiveOperationsInternal(
                                     db,
                                     monitor.id
                                 );
-                            }
-                            return Promise.resolve();
-                        },
-                        "monitor-stop-all-update",
-                        config.eventEmitter,
-                        { monitorId: monitor.id }
+                                return Promise.resolve();
+                            }),
+                        `stopAllMonitoring-${monitor.id}`,
+                        config.eventEmitter
+                    );
+
+                    // Emit proper event with full payload per contract in eventTypes.ts:1122
+                    // eslint-disable-next-line no-await-in-loop -- Event emission after database transaction
+                    await config.eventEmitter.emitTyped(
+                        "monitor:status-changed",
+                        {
+                            monitor,
+                            monitorId: monitor.id,
+                            newStatus: MONITOR_STATUS.PAUSED,
+                            previousStatus: monitor.status,
+                            responseTime: monitor.responseTime,
+                            site,
+                            siteId: site.identifier,
+                            timestamp: Date.now(),
+                        }
                     );
                 } catch (error) {
                     config.logger.error(

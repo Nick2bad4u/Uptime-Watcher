@@ -430,8 +430,18 @@ const monitoringAPI = {
      *
      * @returns Promise resolving when all monitors are started
      */
-    startMonitoring: (): Promise<void> =>
-        ipcRenderer.invoke("start-monitoring"),
+    startMonitoring: async (): Promise<void> => {
+        try {
+            const response: unknown =
+                await ipcRenderer.invoke("start-monitoring");
+            extractVoidIpcData(response);
+        } catch (error) {
+            throw new Error(
+                `Failed to start monitoring: ${error instanceof Error ? error.message : "Unknown error"}`,
+                { cause: error }
+            );
+        }
+    },
 
     /**
      * Start monitoring for a specific site or individual monitor.
@@ -467,7 +477,18 @@ const monitoringAPI = {
      *
      * @returns Promise resolving when all monitors are stopped
      */
-    stopMonitoring: (): Promise<void> => ipcRenderer.invoke("stop-monitoring"),
+    stopMonitoring: async (): Promise<void> => {
+        try {
+            const response: unknown =
+                await ipcRenderer.invoke("stop-monitoring");
+            extractVoidIpcData(response);
+        } catch (error) {
+            throw new Error(
+                `Failed to stop monitoring: ${error instanceof Error ? error.message : "Unknown error"}`,
+                { cause: error }
+            );
+        }
+    },
 
     /**
      * Stop monitoring for a specific site or individual monitor.
@@ -925,8 +946,20 @@ const systemAPI = {
      *
      * @param url - The URL to open in the external browser
      */
-    openExternal: (url: string): Promise<void> =>
-        ipcRenderer.invoke("open-external", url),
+    openExternal: async (url: string): Promise<void> => {
+        try {
+            const response: unknown = await ipcRenderer.invoke(
+                "open-external",
+                url
+            );
+            extractVoidIpcData(response);
+        } catch (error) {
+            throw new Error(
+                `Failed to open external URL: ${error instanceof Error ? error.message : "Unknown error"}`,
+                { cause: error }
+            );
+        }
+    },
 
     /**
      * Quit the application and install a pending update.
@@ -996,8 +1029,50 @@ const stateSyncAPI = {
      *
      * @returns Promise resolving when sync is complete
      */
-    requestFullSync: (): Promise<{ siteCount: number; success: boolean }> =>
-        ipcRenderer.invoke("request-full-sync"),
+    requestFullSync: async (): Promise<{
+        siteCount: number;
+        success: boolean;
+    }> => {
+        try {
+            const response: unknown =
+                await ipcRenderer.invoke("request-full-sync");
+
+            // Validate IPC response format
+            if (
+                typeof response === "object" &&
+                response !== null &&
+                "success" in response &&
+                "data" in response
+            ) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type is validated through runtime checks above
+                const ipcResponse = response as IpcResponse<{
+                    siteCount: number;
+                    success: boolean;
+                }>;
+
+                if (!ipcResponse.success) {
+                    throw new Error(
+                        ipcResponse.error ?? "IPC operation failed"
+                    );
+                }
+
+                if (!ipcResponse.data) {
+                    throw new Error("Missing data in IPC response");
+                }
+
+                return ipcResponse.data;
+            }
+
+            throw new Error(
+                "Invalid IPC response format for requestFullSync operation"
+            );
+        } catch (error) {
+            throw new Error(
+                `Failed to request full sync: ${error instanceof Error ? error.message : "Unknown error"}`,
+                { cause: error }
+            );
+        }
+    },
 };
 
 /**

@@ -468,6 +468,14 @@ export class SiteWriterService {
             updateData.url = newMonitor.url;
         }
 
+        // DNS-specific fields for DNS monitor support
+        if (newMonitor.recordType !== undefined) {
+            updateData.recordType = newMonitor.recordType;
+        }
+        if (newMonitor.expectedValue !== undefined) {
+            updateData.expectedValue = newMonitor.expectedValue;
+        }
+
         return updateData;
     }
 

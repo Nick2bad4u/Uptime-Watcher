@@ -99,15 +99,15 @@ const createMockBoundingClientRect = (overrides = {}) => ({
 });
 
 // Set global electronAPI once (check if it exists first)
-if (!globalThis.electronAPI) {
+if (globalThis.electronAPI) {
+    // Update existing electronAPI
+    Object.assign(globalThis.electronAPI, mockElectronAPI);
+} else {
     Object.defineProperty(globalThis, "electronAPI", {
         configurable: true,
         value: mockElectronAPI,
         writable: true,
     });
-} else {
-    // Update existing electronAPI
-    Object.assign(globalThis.electronAPI, mockElectronAPI);
 }
 
 describe("ScreenshotThumbnail - Complete Coverage", () => {

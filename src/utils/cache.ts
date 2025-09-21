@@ -38,6 +38,24 @@ import type { CacheValue } from "@shared/types/configTypes";
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 
 /**
+ * Adapter function to convert CACHE_CONFIG format to TypedCache options.
+ *
+ * @remarks
+ * Maps `defaultTTL` from CACHE_CONFIG to `ttl` expected by TypedCache, ensuring
+ * renderer caches respect configured TTL values per ADR-006.
+ *
+ * @param config - Cache configuration from CACHE_CONFIG
+ *
+ * @returns CacheOptions compatible with TypedCache constructor
+ */
+function adaptCacheConfig(config: typeof CACHE_CONFIG.MONITORS): CacheOptions {
+    return {
+        maxSize: config.maxSize,
+        ttl: config.defaultTTL,
+    };
+}
+
+/**
  * Predefined application cache collection interface.
  *
  * @remarks
@@ -323,10 +341,14 @@ export class TypedCache<K, V> {
  */
 export const AppCaches: AppCachesInterface = {
     /** General purpose cache for common values */
-    general: new TypedCache<string, CacheValue>(CACHE_CONFIG.TEMPORARY),
+    general: new TypedCache<string, CacheValue>(
+        adaptCacheConfig(CACHE_CONFIG.TEMPORARY)
+    ),
 
     /** Monitor type configurations and related data */
-    monitorTypes: new TypedCache<string, CacheValue>(CACHE_CONFIG.MONITORS),
+    monitorTypes: new TypedCache<string, CacheValue>(
+        adaptCacheConfig(CACHE_CONFIG.MONITORS)
+    ),
 
     /** UI helper data and component state */
     uiHelpers: new TypedCache<string, CacheValue>(CACHE_CONFIG.VALIDATION),
