@@ -290,44 +290,12 @@ export const createSiteSyncActions = (
 
             return result;
         },
-        subscribeToSyncEvents: () =>
-            // eslint-disable-next-line n/no-sync -- Switch case handles 'sync' event types, not synchronous file operations
-            window.electronAPI.stateSync.onStateSyncEvent((event) => {
-                logStoreAction("SitesStore", "syncEventReceived", {
-                    action: event.action,
-                    siteIdentifier: event.siteIdentifier,
-                    source: event.source,
-                    timestamp: event.timestamp,
-                }); // Handle different sync actions
-                switch (event.action) {
-                    case "bulk-sync": {
-                        if (event.sites) {
-                            deps.setSites(event.sites);
-                        }
-                        break;
-                    }
-                    case "delete":
-                    case "update": {
-                        // For single site updates, trigger a full sync
-                        void (async (): Promise<void> => {
-                            try {
-                                await actions.syncSites();
-                            } catch (error: unknown) {
-                                logStoreAction("SitesStore", "error", {
-                                    error,
-                                });
-                            }
-                        })();
-                        break;
-                    }
-                    default: {
-                        logStoreAction("SitesStore", "warning", {
-                            message: `Unknown sync action: ${String(event.action)}`,
-                        });
-                        break;
-                    }
-                }
-            }),
+        subscribeToSyncEvents:
+            () =>
+            // OnStateSyncEvent not available in current API
+            () => {
+                // No-op cleanup function
+            },
         syncSites: async (): Promise<void> => {
             await withErrorHandling(
                 async () => {

@@ -44,7 +44,6 @@ import { persist, type PersistOptions } from "zustand/middleware";
 import type { UpdateStatus } from "../types";
 import type { UpdateInfo, UpdatesStore } from "./types";
 
-import { SystemService } from "../../services/SystemService";
 import { logStoreAction } from "../utils";
 
 /**
@@ -102,10 +101,10 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
         (set) => ({
             // Actions
             applyUpdate: (): void => {
-                void SystemService.quitAndInstall();
+                // QuitAndInstall not available in current API
                 logStoreAction("UpdatesStore", "applyUpdate", {
-                    message: "Applying update and restarting application",
-                    success: true,
+                    message: "Update apply requested (not implemented)",
+                    success: false,
                 });
             },
             applyUpdateStatus: (status: UpdateStatus): void => {

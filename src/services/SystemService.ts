@@ -63,20 +63,6 @@ export const SystemService = {
      */
     async openExternal(url: string): Promise<void> {
         await this.initialize();
-        window.electronAPI.system.openExternal(url);
-    },
-
-    /**
-     * Quits the application and installs a pending update.
-     *
-     * @remarks
-     * Only effective when an update has been downloaded and is ready to
-     * install. This will close the application and start the update installer.
-     *
-     * @throws If the electron API is unavailable.
-     */
-    async quitAndInstall(): Promise<void> {
-        await this.initialize();
-        window.electronAPI.system.quitAndInstall();
+        await window.electronAPI.system.openExternal(url);
     },
 };

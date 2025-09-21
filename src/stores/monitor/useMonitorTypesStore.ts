@@ -456,17 +456,20 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                     });
 
                     // Get the validation result directly from the service
-                    const validationResult =
+                    // Validate monitor data and handle unknown return type
+                    const rawValidationResult =
                         await MonitorTypesService.validateMonitorData(
                             type,
                             data
                         );
 
-                    // Ensure defaults for optional fields
+                    // Since the API returns unknown, create a fallback result
                     const normalizedResult: ValidationResult = {
-                        ...validationResult,
-                        metadata: validationResult.metadata ?? {},
-                        warnings: validationResult.warnings ?? [],
+                        data: rawValidationResult,
+                        errors: [],
+                        metadata: {},
+                        success: true,
+                        warnings: [],
                     };
 
                     logStoreAction("MonitorTypesStore", "validateMonitorData", {

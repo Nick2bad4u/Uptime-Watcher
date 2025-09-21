@@ -50,7 +50,7 @@ export const DataService = {
         fileName: string;
     }> {
         await this.initialize();
-        return window.electronAPI.data.downloadSQLiteBackup();
+        return window.electronAPI.data.downloadSqliteBackup();
     },
 
     /**
@@ -92,7 +92,7 @@ export const DataService = {
      *
      * @throws If the electron API is unavailable or the import operation fails.
      */
-    async importData(data: string): Promise<boolean> {
+    async importData(data: string): Promise<string> {
         await this.initialize();
         return window.electronAPI.data.importData(data);
     },

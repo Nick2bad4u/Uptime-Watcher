@@ -57,20 +57,23 @@ export const SiteService = {
      * @example
      *
      * ```typescript
-     * await SiteService.checkSiteNow("site123", "monitor456");
+     * const updatedSite = await SiteService.checkSiteNow(
+     *     "site123",
+     *     "monitor456"
+     * );
      * ```
      *
      * @param siteId - The identifier of the site to check.
      * @param monitorId - The identifier of the monitor to check.
      *
-     * @returns A promise that resolves when the check is triggered.
+     * @returns A promise that resolves to the updated site.
      *
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    async checkSiteNow(siteId: string, monitorId: string): Promise<void> {
+    async checkSiteNow(siteId: string, monitorId: string): Promise<Site> {
         await this.initialize();
-        await window.electronAPI.sites.checkSiteNow(siteId, monitorId);
+        return window.electronAPI.sites.checkSiteNow(siteId, monitorId);
     },
 
     /**
@@ -162,7 +165,10 @@ export const SiteService = {
         monitorId: string
     ): Promise<void> {
         await this.initialize();
-        await window.electronAPI.sites.removeMonitor(siteIdentifier, monitorId);
+        await window.electronAPI.monitoring.removeMonitor(
+            siteIdentifier,
+            monitorId
+        );
     },
 
     /**

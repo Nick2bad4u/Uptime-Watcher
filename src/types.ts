@@ -18,8 +18,6 @@ import type {
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
-import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
-import type { ValidationResult } from "@shared/types/validation";
 // Additional global types
 
 // Re-export core types for convenience
@@ -90,7 +88,7 @@ declare global {
                  * @returns A promise resolving to an object containing the
                  *   backup buffer and file name.
                  */
-                downloadSQLiteBackup: () => Promise<{
+                downloadSqliteBackup: () => Promise<{
                     buffer: ArrayBuffer;
                     fileName: string;
                 }>;
@@ -104,21 +102,20 @@ declare global {
                 exportData: () => Promise<string>;
                 /**
                  * @remarks
-                 * Import application data from a JSON string.
-                 *
-                 * @param data - The JSON string to import.
-                 *
-                 * @returns A promise resolving to true if import succeeded,
-                 *   false otherwise.
-                 */
-                importData: (data: string) => Promise<boolean>;
-                /**
-                 * @remarks
                  * Get the current history retention limit.
                  *
                  * @returns A promise resolving to the current history limit.
                  */
                 getHistoryLimit: () => Promise<number>;
+                /**
+                 * @remarks
+                 * Import application data from a JSON string.
+                 *
+                 * @param data - The JSON string to import.
+                 *
+                 * @returns A promise resolving to import status message.
+                 */
+                importData: (data: string) => Promise<string>;
                 /**
                  * @remarks
                  * Reset all application settings to their default values.
@@ -230,13 +227,6 @@ declare global {
                 onUpdateStatus: (
                     callback: (data: UpdateStatusEventData) => void
                 ) => () => void;
-                /**
-                 * @remarks
-                 * Remove all listeners for a specific event.
-                 *
-                 * @param event - The event name.
-                 */
-                removeAllListeners: (event: string) => void;
             };
 
             /**
@@ -248,35 +238,48 @@ declare global {
                  * @remarks
                  * Format monitor detail using backend registry.
                  *
-                 * @param type - The monitor type.
-                 * @param details - The monitor details as a string.
+                 * @param monitorType - The monitor type identifier.
+                 * @param details - Raw detail text to format.
                  *
                  * @returns A promise resolving to the formatted detail string.
                  */
                 formatMonitorDetail: (
-                    type: string,
+                    monitorType: string,
                     details: string
                 ) => Promise<string>;
                 /**
                  * @remarks
                  * Format monitor title suffix using backend registry.
                  *
-                 * @param type - The monitor type.
-                 * @param monitor - The monitor data.
+                 * @param monitorType - The monitor type identifier.
+                 * @param monitor - The monitor configuration object.
                  *
                  * @returns A promise resolving to the formatted title suffix.
                  */
                 formatMonitorTitleSuffix: (
-                    type: string,
+                    monitorType: string,
                     monitor: Monitor
                 ) => Promise<string>;
                 /**
                  * @remarks
+                 * Remove a monitor from a site.
+                 *
+                 * @param siteId - The site identifier.
+                 * @param monitorId - The monitor identifier.
+                 *
+                 * @returns A promise that resolves when monitor is removed.
+                 */
+                removeMonitor: (
+                    siteId: string,
+                    monitorId: string
+                ) => Promise<void>;
+                /**
+                 * @remarks
                  * Start monitoring for all configured sites.
                  *
-                 * @returns A promise that resolves when monitoring has started.
+                 * @returns A promise resolving to boolean indicating success.
                  */
-                startMonitoring: () => Promise<void>;
+                startMonitoring: () => Promise<boolean>;
                 /**
                  * @remarks
                  * Start monitoring for a specific site or monitor.
@@ -294,9 +297,9 @@ declare global {
                  * @remarks
                  * Stop monitoring for all sites.
                  *
-                 * @returns A promise that resolves when monitoring has stopped.
+                 * @returns A promise resolving to boolean indicating success.
                  */
-                stopMonitoring: () => Promise<void>;
+                stopMonitoring: () => Promise<boolean>;
                 /**
                  * @remarks
                  * Stop monitoring for a specific site or monitor.
@@ -314,15 +317,15 @@ declare global {
                  * @remarks
                  * Validate monitor data using backend registry.
                  *
-                 * @param type - The monitor type.
-                 * @param data - The monitor data to validate.
+                 * @param monitorType - The monitor type.
+                 * @param monitorData - The monitor data to validate.
                  *
                  * @returns A promise resolving to the validation result.
                  */
                 validateMonitorData: (
-                    type: string,
-                    data: unknown
-                ) => Promise<ValidationResult>;
+                    monitorType: string,
+                    monitorData: unknown
+                ) => Promise<unknown>;
             };
 
             /**
@@ -336,38 +339,7 @@ declare global {
                  *
                  * @returns A promise resolving to monitor type definitions.
                  */
-                getMonitorTypes: () => Promise<MonitorTypeConfig[]>;
-            };
-
-            /**
-             * @remarks
-             * Application settings and configuration management.
-             */
-            settings: {
-                /**
-                 * @remarks
-                 * Get current history retention limit.
-                 *
-                 * @returns A promise resolving to the history limit number.
-                 */
-                getHistoryLimit: () => Promise<number>;
-                /**
-                 * @remarks
-                 * Reset all application settings to their default values.
-                 *
-                 * @returns A promise that resolves when all settings have been
-                 *   reset.
-                 */
-                resetSettings: () => Promise<void>;
-                /**
-                 * @remarks
-                 * Update history retention limit.
-                 *
-                 * @param limit - The new history limit.
-                 *
-                 * @returns A promise that resolves when the update is complete.
-                 */
-                updateHistoryLimit: (limit: number) => Promise<void>;
+                getMonitorTypes: () => Promise<unknown>;
             };
 
             /**
@@ -386,17 +358,25 @@ declare global {
                 addSite: (site: Site) => Promise<Site>;
                 /**
                  * @remarks
-                 * Perform immediate manual check for a specific monitor.
+                 * Perform immediate manual check for a site.
                  *
                  * @param siteId - The site identifier.
                  * @param monitorId - The monitor identifier.
                  *
-                 * @returns A promise that resolves when the check is complete.
+                 * @returns A promise resolving to the updated site with latest
+                 *   status.
                  */
                 checkSiteNow: (
                     siteId: string,
                     monitorId: string
-                ) => Promise<void>;
+                ) => Promise<Site>;
+                /**
+                 * @remarks
+                 * Delete all sites (dangerous operation).
+                 *
+                 * @returns A promise resolving to the count of deleted sites.
+                 */
+                deleteAllSites: () => Promise<number>;
                 /**
                  * @remarks
                  * Retrieve all configured sites with their monitors.
@@ -406,26 +386,31 @@ declare global {
                 getSites: () => Promise<Site[]>;
                 /**
                  * @remarks
-                 * Remove a specific monitor from a site.
-                 *
-                 * @param siteIdentifier - The site identifier.
-                 * @param monitorId - The monitor identifier.
-                 *
-                 * @returns A promise that resolves when the monitor is removed.
-                 */
-                removeMonitor: (
-                    siteIdentifier: string,
-                    monitorId: string
-                ) => Promise<void>;
-                /**
-                 * @remarks
                  * Remove a site and all its monitors.
                  *
                  * @param id - The site identifier.
                  *
-                 * @returns A promise resolving to boolean indicating success.
+                 * @returns A promise resolving to the removed site.
                  */
-                removeSite: (id: string) => Promise<boolean>;
+                removeSite: (id: string) => Promise<Site>;
+                /**
+                 * @remarks
+                 * Start monitoring for a specific site.
+                 *
+                 * @param siteId - The site identifier.
+                 *
+                 * @returns A promise resolving to the updated site.
+                 */
+                startMonitoringForSite: (siteId: string) => Promise<Site>;
+                /**
+                 * @remarks
+                 * Stop monitoring for a specific site.
+                 *
+                 * @param siteId - The site identifier.
+                 *
+                 * @returns A promise resolving to the updated site.
+                 */
+                stopMonitoringForSite: (siteId: string) => Promise<Site>;
                 /**
                  * @remarks
                  * Update site configuration.
@@ -433,12 +418,12 @@ declare global {
                  * @param id - The site identifier.
                  * @param updates - Partial site updates.
                  *
-                 * @returns A promise that resolves when the update is complete.
+                 * @returns A promise resolving to the updated site.
                  */
                 updateSite: (
                     id: string,
                     updates: Partial<Site>
-                ) => Promise<void>;
+                ) => Promise<Site>;
             };
 
             /**
@@ -450,41 +435,16 @@ declare global {
                  * @remarks
                  * Get current synchronization status.
                  *
-                 * @returns A promise resolving to the sync status.
+                 * @returns A promise resolving to array of sites.
                  */
-                getSyncStatus: () => Promise<{
-                    lastSync: null | number;
-                    siteCount: number;
-                    success: boolean;
-                    synchronized: boolean;
-                }>;
-                /**
-                 * @remarks
-                 * Register listener for state synchronization events.
-                 *
-                 * @param callback - Function to invoke on sync event.
-                 *
-                 * @returns A function to remove the listener.
-                 */
-                onStateSyncEvent: (
-                    callback: (event: {
-                        action: "bulk-sync" | "delete" | "update";
-                        siteIdentifier?: string;
-                        sites?: Site[];
-                        source?: "cache" | "database" | "frontend";
-                        timestamp?: number;
-                    }) => void
-                ) => () => void;
+                getSyncStatus: () => Promise<Site[]>;
                 /**
                  * @remarks
                  * Manually request full state synchronization.
                  *
-                 * @returns A promise resolving to the sync result.
+                 * @returns A promise resolving to array of synchronized sites.
                  */
-                requestFullSync: () => Promise<{
-                    siteCount: number;
-                    success: boolean;
-                }>;
+                requestFullSync: () => Promise<Site[]>;
             };
 
             /**
@@ -497,13 +457,11 @@ declare global {
                  * Open a URL in the external browser.
                  *
                  * @param url - The URL to open.
+                 *
+                 * @returns A promise resolving to true if URL was opened
+                 *   successfully.
                  */
-                openExternal: (url: string) => void;
-                /**
-                 * @remarks
-                 * Quit application and install pending update.
-                 */
-                quitAndInstall: () => void;
+                openExternal: (url: string) => Promise<boolean>;
             };
         };
     }

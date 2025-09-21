@@ -4,8 +4,8 @@
  *
  * @remarks
  * All methods ensure the electron API is available before making calls. This
- * service manages event listener registration and cleanup to prevent memory
- * leaks with automatic service initialization.
+ * service manages event registration and cleanup to prevent memory leaks with
+ * automatic service initialization.
  *
  * @packageDocumentation
  */
@@ -258,23 +258,5 @@ export const EventsService = {
     ): Promise<() => void> {
         await this.initialize();
         return window.electronAPI.events.onUpdateStatus(callback);
-    },
-
-    /**
-     * Remove all listeners for a specific event.
-     *
-     * @example
-     *
-     * ```typescript
-     * await EventsService.removeAllListeners("monitor-status-changed");
-     * ```
-     *
-     * @param event - The event name.
-     *
-     * @throws If the electron API is unavailable.
-     */
-    async removeAllListeners(event: string): Promise<void> {
-        await this.initialize();
-        window.electronAPI.events.removeAllListeners(event);
     },
 };
