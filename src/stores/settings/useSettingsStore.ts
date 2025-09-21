@@ -180,42 +180,74 @@ export const useSettingsStore: UseBoundStore<
                 settingsLoaded: boolean;
                 success: boolean;
             }> => {
-                const result = await withErrorHandling(
-                    async () => {
-                        // Fetch all available settings from backend
-                        const historyLimit =
-                            await SettingsService.getHistoryLimit();
+                try {
+                    const result = await withErrorHandling(
+                        async () => {
+                            // Fetch all available settings from backend
+                            const historyLimit =
+                                await SettingsService.getHistoryLimit();
 
-                        // Get current settings to preserve user preferences
-                        const currentSettings = get().settings;
+                            // Get current settings to preserve user preferences
+                            const currentSettings = get().settings;
 
-                        // Update local state with backend values while preserving
-                        // user preferences like theme choice
-                        const updatedSettings = {
-                            ...defaultSettings,
-                            ...currentSettings, // Preserve persisted user preferences
-                            historyLimit, // Use actual backend value
-                        };
+                            // Update local state with backend values while preserving
+                            // user preferences like theme choice
+                            const updatedSettings = {
+                                ...defaultSettings,
+                                ...currentSettings, // Preserve persisted user preferences
+                                historyLimit, // Use actual backend value
+                            };
 
-                        // Update state while preserving user preferences
-                        set({ settings: updatedSettings });
+                            // Update state while preserving user preferences
+                            set({ settings: updatedSettings });
 
-                        return {
-                            message: "Successfully loaded settings",
-                            settingsLoaded: true,
-                            success: true,
-                        };
-                    },
-                    createStoreErrorHandler("settings", "initializeSettings")
-                );
+                            return {
+                                message: "Successfully loaded settings",
+                                settingsLoaded: true,
+                                success: true,
+                            };
+                        },
+                        createStoreErrorHandler(
+                            "settings",
+                            "initializeSettings"
+                        )
+                    );
 
-                logStoreAction("SettingsStore", "initializeSettings", {
-                    message: result.message,
-                    settingsLoaded: result.settingsLoaded,
-                    success: result.success,
-                });
+                    logStoreAction("SettingsStore", "initializeSettings", {
+                        message: result.message,
+                        settingsLoaded: result.settingsLoaded,
+                        success: result.success,
+                    });
 
-                return result;
+                    return result;
+                } catch (error) {
+                    // If backend fails, use default settings gracefully
+                    const currentSettings = get().settings;
+                    const fallbackSettings = {
+                        ...defaultSettings,
+                        ...currentSettings, // Preserve any existing user preferences
+                    };
+
+                    set({ settings: fallbackSettings });
+
+                    const fallbackResult = {
+                        message: "Settings initialized with default values",
+                        settingsLoaded: true,
+                        success: false,
+                    };
+
+                    logStoreAction("SettingsStore", "initializeSettings", {
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : String(error),
+                        message: fallbackResult.message,
+                        settingsLoaded: fallbackResult.settingsLoaded,
+                        success: fallbackResult.success,
+                    });
+
+                    return fallbackResult;
+                }
             },
             persistHistoryLimit: async (limit: number): Promise<void> => {
                 logStoreAction("SettingsStore", "persistHistoryLimit", {

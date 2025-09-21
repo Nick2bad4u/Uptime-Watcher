@@ -51,7 +51,6 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 import type { BaseStore } from "../types";
 
 import { MonitorTypesService } from "../../services/MonitorTypesService";
-import { safeExtractIpcData } from "../../types/ipc";
 import { logStoreAction } from "../utils";
 
 /**
@@ -290,17 +289,19 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                         type,
                     });
 
-                    const response =
+                    const result =
                         await MonitorTypesService.formatMonitorDetail(
                             type,
                             details
                         );
+
                     logStoreAction("MonitorTypesStore", "formatMonitorDetail", {
+                        resultLength: result.length,
                         success: true,
                         type,
                     });
 
-                    return safeExtractIpcData<string>(response, details);
+                    return result;
                 },
                 {
                     clearError: get().clearError,
@@ -321,21 +322,23 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                         { type }
                     );
 
-                    const response =
+                    const result =
                         await MonitorTypesService.formatMonitorTitleSuffix(
                             type,
                             monitor
                         );
+
                     logStoreAction(
                         "MonitorTypesStore",
                         "formatMonitorTitleSuffix",
                         {
+                            resultLength: result.length,
                             success: true,
                             type,
                         }
                     );
 
-                    return safeExtractIpcData<string>(response, "");
+                    return result;
                 },
                 {
                     clearError: get().clearError,
@@ -368,19 +371,25 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                 async () => {
                     logStoreAction("MonitorTypesStore", "loadMonitorTypes", {});
 
-                    const response =
+                    const rawConfigs =
                         await MonitorTypesService.getMonitorTypes();
-                    const rawConfigs = safeExtractIpcData<MonitorTypeConfig[]>(
-                        response,
-                        []
-                    );
+
+                    // Ensure rawConfigs is an array before filtering
+                    const configsArray = Array.isArray(rawConfigs)
+                        ? rawConfigs
+                        : [];
 
                     // Filter out invalid/malformed configs
-                    const configs = rawConfigs.filter(
-                        (config): config is MonitorTypeConfig =>
-                            typeof config === "object" &&
-                            typeof config.type === "string" &&
-                            config.type.length > 0
+                    const configs = configsArray.filter(
+                        (config): config is MonitorTypeConfig => {
+                            if (typeof config !== "object") return false;
+                            if (!("type" in config)) return false;
+                            const typedConfig = config as { type: unknown };
+                            return (
+                                typeof typedConfig.type === "string" &&
+                                typedConfig.type.length > 0
+                            );
+                        }
                     );
 
                     // Build field configs map
@@ -446,36 +455,12 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                         type,
                     });
 
-                    const response =
+                    // Get the validation result directly from the service
+                    const validationResult =
                         await MonitorTypesService.validateMonitorData(
                             type,
                             data
                         );
-
-                    // Extract the actual validation result from the IPC response
-                    const validationData = safeExtractIpcData<ValidationResult>(
-                        response,
-                        {
-                            data: undefined,
-                            errors: ["Failed to validate monitor data"],
-                            metadata: {},
-                            success: false,
-                            warnings: [],
-                        }
-                    );
-
-                    // Ensure the validation result has all required properties with safe fallbacks
-                    const validationResult: ValidationResult = {
-                        data: validationData.data,
-                        errors: Array.isArray(validationData.errors)
-                            ? validationData.errors
-                            : [],
-                        metadata: validationData.metadata ?? {},
-                        success: validationData.success ?? false,
-                        warnings: Array.isArray(validationData.warnings)
-                            ? validationData.warnings
-                            : [],
-                    };
 
                     logStoreAction("MonitorTypesStore", "validateMonitorData", {
                         errorCount: validationResult.errors.length,

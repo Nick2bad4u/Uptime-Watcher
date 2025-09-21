@@ -18,6 +18,7 @@ import type { ValidationResult } from "@shared/types/validation";
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { waitForElectronAPI } from "../stores/utils";
+import { safeExtractIpcData } from "../types/ipc";
 import { logger } from "./logger";
 
 /**
@@ -59,20 +60,7 @@ export const MonitorTypesService = {
                 type,
                 details
             );
-
-        if (!response.success) {
-            throw new Error(
-                response.error ?? "Format monitor detail operation failed"
-            );
-        }
-
-        if (typeof response.data !== "string") {
-            throw new TypeError(
-                "Invalid response format for monitor detail formatting"
-            );
-        }
-
-        return response.data;
+        return safeExtractIpcData(response, details);
     },
 
     /**
@@ -105,20 +93,7 @@ export const MonitorTypesService = {
                 type,
                 monitor
             );
-
-        if (!response.success) {
-            throw new Error(
-                response.error ?? "Format monitor title suffix operation failed"
-            );
-        }
-
-        if (typeof response.data !== "string") {
-            throw new TypeError(
-                "Invalid response format for monitor title suffix formatting"
-            );
-        }
-
-        return response.data;
+        return safeExtractIpcData(response, "");
     },
 
     /**
@@ -139,18 +114,7 @@ export const MonitorTypesService = {
         await this.initialize();
         const response =
             await window.electronAPI.monitorTypes.getMonitorTypes();
-
-        if (!response.success) {
-            throw new Error(
-                response.error ?? "Get monitor types operation failed"
-            );
-        }
-
-        if (!Array.isArray(response.data)) {
-            throw new TypeError("Invalid response format for monitor types");
-        }
-
-        return response.data as MonitorTypeConfig[];
+        return safeExtractIpcData(response, []);
     },
 
     /**
@@ -212,15 +176,12 @@ export const MonitorTypesService = {
                 type,
                 data
             );
-
-        // The validateMonitorData response has a different structure
-        // It contains validation result directly, not wrapped in data property
-        return {
-            data: response.data,
-            errors: response.errors,
-            metadata: response.metadata ?? {},
-            success: response.success,
-            warnings: response.warnings ?? [],
-        };
+        return safeExtractIpcData(response, {
+            data: undefined,
+            errors: ["Unexpected response format from electronAPI"],
+            metadata: {},
+            success: false,
+            warnings: [],
+        });
     },
 };

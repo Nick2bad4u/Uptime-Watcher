@@ -338,10 +338,10 @@ export class StatusUpdateManager {
                                                 "Invalid monitor status changed event data, triggering full sync",
                                                 data
                                             );
+                                            logger.debug(
+                                                "Event failed type guard, triggering full sync"
+                                            );
                                         }
-                                        logger.debug(
-                                            "Event failed type guard, triggering full sync"
-                                        );
                                         await this.fullResyncSites();
                                     }
                                 } catch (error) {
