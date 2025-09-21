@@ -174,6 +174,21 @@ function findAndValidateMonitor(
 }
 
 /**
+ * Update monitor in site's monitors array to maintain consistency.
+ *
+ * @param site - Site containing the monitor
+ * @param monitor - Updated monitor object
+ *
+ * @internal Helper function to update site's monitors array
+ */
+function updateMonitorInSite(site: Site, monitor: Site["monitors"][0]): void {
+    const monitorIndex = site.monitors.findIndex((m) => m.id === monitor.id);
+    if (monitorIndex !== -1) {
+        site.monitors[monitorIndex] = monitor;
+    }
+}
+
+/**
  * Helper function to refresh site cache after monitor operations, eliminating
  * duplication.
  *
@@ -181,13 +196,16 @@ function findAndValidateMonitor(
  * @param identifier - Site identifier
  * @param operation - Operation type for logging ("start" or "stop")
  *
+ * @returns Promise resolving to fresh site data if available, undefined
+ *   otherwise
+ *
  * @internal Helper function to eliminate site cache refresh duplication
  */
 async function refreshSiteCache(
     config: MonitoringLifecycleConfig,
     identifier: string,
     operation: "start" | "stop"
-): Promise<void> {
+): Promise<Site | undefined> {
     if (config.siteService) {
         try {
             const freshSiteData =
@@ -199,6 +217,7 @@ async function refreshSiteCache(
                 config.logger.debug(
                     `Refreshed site cache for ${identifier} after monitor ${operation}`
                 );
+                return freshSiteData;
             }
         } catch (error) {
             config.logger.error(
@@ -207,6 +226,7 @@ async function refreshSiteCache(
             );
         }
     }
+    return undefined;
 }
 
 /**
@@ -303,34 +323,55 @@ async function startSpecificMonitor(
     }
 
     try {
-        // Note: Database update is performed before starting the monitor
-        // scheduler This design choice ensures status consistency even if
-        // scheduler fails Use executeTransaction for atomic updates per ADR-001
-        await config.databaseService.executeTransaction((db) => {
-            // Update monitor status to monitoring
-            config.monitorRepository.updateInternal(db, monitorId, {
-                monitoring: true,
-                status: MONITOR_STATUS.PENDING,
-            });
+        // Use withDatabaseOperation to maintain ADR-001/003 retry/telemetry wrapper
+        await withDatabaseOperation(
+            () =>
+                config.databaseService.executeTransaction((db) => {
+                    // Update monitor status to monitoring
+                    config.monitorRepository.updateInternal(db, monitorId, {
+                        monitoring: true,
+                        status: MONITOR_STATUS.PENDING,
+                    });
 
-            // Clear any stale active operations when starting monitoring
-            config.monitorRepository.clearActiveOperationsInternal(
-                db,
-                monitorId
-            );
+                    // Clear any stale active operations when starting monitoring
+                    config.monitorRepository.clearActiveOperationsInternal(
+                        db,
+                        monitorId
+                    );
 
-            return Promise.resolve();
-        });
+                    return Promise.resolve();
+                }),
+            `startSpecificMonitor-${monitorId}`,
+            config.eventEmitter
+        );
 
-        // Emit event for observability after successful transaction
-        await config.eventEmitter.emitTyped("monitor:statusUpdated", {
+        // Update cached monitor object to reflect database changes
+        const previousStatus = monitor.status;
+        monitor.monitoring = true;
+        monitor.status = MONITOR_STATUS.PENDING;
+
+        // Update the monitor in the site's monitors array
+        updateMonitorInSite(site, monitor);
+
+        // Refresh the site cache after monitor operation to get full data including history
+        const freshSite = await refreshSiteCache(config, identifier, "start");
+
+        // Use fresh site and monitor data if available, otherwise fall back to cached data
+        const siteForEvent = freshSite ?? site;
+        const monitorForEvent =
+            freshSite?.monitors.find((m) => m.id === monitorId) ?? monitor;
+
+        // Emit proper event with full payload per contract in eventTypes.ts:1122
+        await config.eventEmitter.emitTyped("monitor:status-changed", {
+            monitor: monitorForEvent,
             monitorId,
             newStatus: MONITOR_STATUS.PENDING,
+            previousStatus,
+            responseTime: monitorForEvent.responseTime,
+            site: siteForEvent,
+            siteId: siteForEvent.identifier,
             timestamp: Date.now(),
         });
-
-        // Refresh the site cache after monitor operation
-        await refreshSiteCache(config, identifier, "start");
 
         const started = config.monitorScheduler.startMonitor(
             identifier,
@@ -384,32 +425,55 @@ async function stopSpecificMonitor(
     }
 
     try {
-        // Use executeTransaction for atomic updates per ADR-001
-        await config.databaseService.executeTransaction((db) => {
-            // Update monitor status to paused
-            config.monitorRepository.updateInternal(db, monitorId, {
-                monitoring: false,
-                status: MONITOR_STATUS.PAUSED,
-            });
+        // Use withDatabaseOperation to maintain ADR-001/003 retry/telemetry wrapper
+        await withDatabaseOperation(
+            () =>
+                config.databaseService.executeTransaction((db) => {
+                    // Update monitor status to paused
+                    config.monitorRepository.updateInternal(db, monitorId, {
+                        monitoring: false,
+                        status: MONITOR_STATUS.PAUSED,
+                    });
 
-            // Clear active operations as part of stopping monitor
-            config.monitorRepository.clearActiveOperationsInternal(
-                db,
-                monitorId
-            );
+                    // Clear active operations as part of stopping monitor
+                    config.monitorRepository.clearActiveOperationsInternal(
+                        db,
+                        monitorId
+                    );
 
-            return Promise.resolve();
-        });
+                    return Promise.resolve();
+                }),
+            `stopSpecificMonitor-${monitorId}`,
+            config.eventEmitter
+        );
 
-        // Emit event for observability after successful transaction
-        await config.eventEmitter.emitTyped("monitor:statusUpdated", {
+        // Update cached monitor object to reflect database changes
+        const previousStatus = monitor.status;
+        monitor.monitoring = false;
+        monitor.status = MONITOR_STATUS.PAUSED;
+
+        // Update the monitor in the site's monitors array
+        updateMonitorInSite(site, monitor);
+
+        // Refresh the site cache after monitor operation to get full data including history
+        const freshSite = await refreshSiteCache(config, identifier, "stop");
+
+        // Use fresh site and monitor data if available, otherwise fall back to cached data
+        const siteForEvent = freshSite ?? site;
+        const monitorForEvent =
+            freshSite?.monitors.find((m) => m.id === monitorId) ?? monitor;
+
+        // Emit proper event with full payload per contract in eventTypes.ts:1122
+        await config.eventEmitter.emitTyped("monitor:status-changed", {
+            monitor: monitorForEvent,
             monitorId,
             newStatus: MONITOR_STATUS.PAUSED,
+            previousStatus,
+            responseTime: monitorForEvent.responseTime,
+            site: siteForEvent,
+            siteId: siteForEvent.identifier,
             timestamp: Date.now(),
         });
-
-        // Refresh the site cache after monitor operation
-        await refreshSiteCache(config, identifier, "stop");
 
         const stopped = config.monitorScheduler.stopMonitor(
             identifier,
@@ -489,6 +553,11 @@ export async function startAllMonitoring(
                         config.eventEmitter
                     );
 
+                    // Update cached monitor object to reflect database changes
+                    const previousStatus = monitor.status;
+                    monitor.monitoring = true;
+                    monitor.status = MONITOR_STATUS.PENDING;
+
                     // Emit proper event with full payload per contract in eventTypes.ts:1122
                     // eslint-disable-next-line no-await-in-loop -- Event emission after database transaction
                     await config.eventEmitter.emitTyped(
@@ -497,7 +566,7 @@ export async function startAllMonitoring(
                             monitor,
                             monitorId: monitor.id,
                             newStatus: MONITOR_STATUS.PENDING,
-                            previousStatus: monitor.status,
+                            previousStatus,
                             responseTime: monitor.responseTime,
                             site,
                             siteId: site.identifier,
@@ -605,6 +674,14 @@ export async function stopAllMonitoring(
                         config.eventEmitter
                     );
 
+                    // Update cached monitor object to reflect database changes
+                    const previousStatus = monitor.status;
+                    monitor.monitoring = false;
+                    monitor.status = MONITOR_STATUS.PAUSED;
+
+                    // Update the monitor in the site's monitors array
+                    updateMonitorInSite(site, monitor);
+
                     // Emit proper event with full payload per contract in eventTypes.ts:1122
                     // eslint-disable-next-line no-await-in-loop -- Event emission after database transaction
                     await config.eventEmitter.emitTyped(
@@ -613,7 +690,7 @@ export async function stopAllMonitoring(
                             monitor,
                             monitorId: monitor.id,
                             newStatus: MONITOR_STATUS.PAUSED,
-                            previousStatus: monitor.status,
+                            previousStatus,
                             responseTime: monitor.responseTime,
                             site,
                             siteId: site.identifier,

@@ -197,31 +197,44 @@ export class SiteWriterService {
             async () => {
                 this.logger.info(`Removing site: ${identifier}`);
 
-                // Remove from cache
-                const removed = sitesCache.delete(identifier);
+                // Use executeTransaction for atomic multi-table deletion and capture result
+                const dbDeletionSuccess =
+                    await this.databaseService.executeTransaction((db) => {
+                        // Remove from database using internal methods
+                        this.repositories.monitor.deleteBySiteIdentifierInternal(
+                            db,
+                            identifier
+                        );
+                        const deletionResult =
+                            this.repositories.site.deleteInternal(
+                                db,
+                                identifier
+                            );
+                        return Promise.resolve(deletionResult);
+                    });
 
-                // Use executeTransaction for atomic multi-table deletion
-                await this.databaseService.executeTransaction((db) => {
-                    // Remove from database using internal methods
-                    this.repositories.monitor.deleteBySiteIdentifierInternal(
-                        db,
-                        identifier
-                    );
-                    this.repositories.site.deleteInternal(db, identifier);
-                    return Promise.resolve();
-                });
+                // Only remove from cache if database deletion was successful
+                let removed = false;
+                if (dbDeletionSuccess && sitesCache.has(identifier)) {
+                    removed = sitesCache.delete(identifier);
+                }
 
-                if (removed) {
+                if (dbDeletionSuccess) {
                     this.logger.info(
-                        `Site removed successfully: ${identifier}`
+                        `Site removed successfully from database: ${identifier}`
                     );
                 } else {
                     this.logger.warn(
-                        `Site not found in cache for removal: ${identifier}`
+                        `Site not found in database for removal: ${identifier}`
                     );
                 }
 
-                return removed;
+                if (removed) {
+                    this.logger.debug(`Site removed from cache: ${identifier}`);
+                }
+
+                // Return actual database deletion result, not cache status
+                return dbDeletionSuccess;
             },
             "site-writer-delete",
             undefined,
@@ -347,12 +360,12 @@ export class SiteWriterService {
                 // Validate input
                 const site = this.validateSiteExists(sitesCache, identifier);
 
-                // Create updated site
-                const updatedSite = this.createUpdatedSite(
-                    sitesCache,
-                    site,
-                    updates
-                );
+                // Create updated site object without updating cache yet
+                const updatedSite: Site = {
+                    ...site,
+                    ...updates,
+                    monitors: updates.monitors ?? site.monitors,
+                };
 
                 // Use executeTransaction for atomic multi-step operation
                 await this.databaseService.executeTransaction((db) => {
@@ -371,6 +384,9 @@ export class SiteWriterService {
 
                     return Promise.resolve();
                 });
+
+                // Update cache only after successful transaction
+                sitesCache.set(identifier, updatedSite);
 
                 this.logger.info(`Site updated successfully: ${identifier}`);
                 return updatedSite;
@@ -523,23 +539,6 @@ export class SiteWriterService {
         this.logger.debug(
             `Created new monitor ${newId} for site ${siteIdentifier}${reasonSuffix}`
         );
-    }
-
-    /**
-     * Create updated site object with new values.
-     */
-    private createUpdatedSite(
-        sitesCache: StandardizedCache<Site>,
-        site: Site,
-        updates: Partial<Site>
-    ): Site {
-        const updatedSite: Site = {
-            ...site,
-            ...updates,
-            monitors: updates.monitors ?? site.monitors,
-        };
-        sitesCache.set(site.identifier, updatedSite);
-        return updatedSite;
     }
 
     /**

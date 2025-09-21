@@ -38,24 +38,6 @@ import type { CacheValue } from "@shared/types/configTypes";
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 
 /**
- * Adapter function to convert CACHE_CONFIG format to TypedCache options.
- *
- * @remarks
- * Maps `defaultTTL` from CACHE_CONFIG to `ttl` expected by TypedCache, ensuring
- * renderer caches respect configured TTL values per ADR-006.
- *
- * @param config - Cache configuration from CACHE_CONFIG
- *
- * @returns CacheOptions compatible with TypedCache constructor
- */
-function adaptCacheConfig(config: typeof CACHE_CONFIG.MONITORS): CacheOptions {
-    return {
-        maxSize: config.maxSize,
-        ttl: config.defaultTTL,
-    };
-}
-
-/**
  * Predefined application cache collection interface.
  *
  * @remarks
@@ -133,6 +115,18 @@ export interface CacheOptions {
 }
 
 /**
+ * Extended cache configuration interface compatible with CACHE_CONFIG format.
+ */
+export interface ExtendedCacheOptions extends CacheOptions {
+    /** Default TTL in milliseconds (alias for ttl) */
+    defaultTTL?: number;
+    /** Whether to enable statistics collection */
+    enableStats?: boolean;
+    /** Cache name for identification and debugging */
+    name?: string;
+}
+
+/**
  * Generic in-memory cache with optional TTL and LRU eviction.
  *
  * @remarks
@@ -187,11 +181,27 @@ export class TypedCache<K, V> {
      *
      * @defaultValue An instance will use `maxSize` 100 and no default TTL when omitted.
      *
-     * @param options - Optional cache configuration.
+     * @param options - Cache configuration. Accepts either CacheOptions or
+     *   CACHE_CONFIG format.
      */
-    public constructor(options: CacheOptions = {}) {
+    public constructor(options: CacheOptions | ExtendedCacheOptions = {}) {
         this.maxSize = options.maxSize ?? 100;
-        this.defaultTtl = options.ttl;
+
+        // Support both ttl and defaultTTL for backwards compatibility
+        const extendedOptions = options as ExtendedCacheOptions;
+        this.defaultTtl = options.ttl ?? extendedOptions.defaultTTL;
+
+        // Runtime validation for TTL configuration per ADR-006
+        if (
+            extendedOptions.defaultTTL &&
+            (!this.defaultTtl || this.defaultTtl <= 0)
+        ) {
+            console.warn(
+                `[Cache] Missing or invalid TTL configuration: ${this.defaultTtl}. ` +
+                    `Cache will use no TTL (infinite duration). ` +
+                    `Consider setting a positive TTL value for proper cache lifecycle management.`
+            );
+        }
     }
 
     /**
@@ -341,14 +351,10 @@ export class TypedCache<K, V> {
  */
 export const AppCaches: AppCachesInterface = {
     /** General purpose cache for common values */
-    general: new TypedCache<string, CacheValue>(
-        adaptCacheConfig(CACHE_CONFIG.TEMPORARY)
-    ),
+    general: new TypedCache<string, CacheValue>(CACHE_CONFIG.TEMPORARY),
 
     /** Monitor type configurations and related data */
-    monitorTypes: new TypedCache<string, CacheValue>(
-        adaptCacheConfig(CACHE_CONFIG.MONITORS)
-    ),
+    monitorTypes: new TypedCache<string, CacheValue>(CACHE_CONFIG.MONITORS),
 
     /** UI helper data and component state */
     uiHelpers: new TypedCache<string, CacheValue>(CACHE_CONFIG.VALIDATION),
