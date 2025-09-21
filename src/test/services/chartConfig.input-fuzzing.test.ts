@@ -66,6 +66,7 @@ describe("ChartConfigService - Property-Based Fuzzing Tests", () => {
                     dark: "#e2e8f0",
                 },
                 status: {
+                    degraded: "#f97316",
                     up: "#10b981",
                     down: "#ef4444",
                     pending: "#f59e0b",

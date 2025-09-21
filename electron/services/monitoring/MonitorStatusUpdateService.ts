@@ -127,7 +127,7 @@ export class MonitorStatusUpdateService {
             const updates: Partial<Monitor> = {
                 lastChecked: result.timestamp,
                 responseTime: result.responseTime,
-                status: result.status === "up" ? "up" : "down",
+                status: result.status,
             };
 
             // Remove operation from active operations

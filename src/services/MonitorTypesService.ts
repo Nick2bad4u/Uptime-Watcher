@@ -5,8 +5,8 @@
  * @remarks
  * All methods ensure the electron API is available before making calls. All
  * backend communication is performed via IPC and follows strict typing with
- * automatic error handling and logging. This service handles the complex
- * IpcResponse extraction for monitor types operations.
+ * automatic error handling and logging. The preload bridge automatically
+ * unwraps IPC responses, so no manual extraction is needed.
  *
  * @packageDocumentation
  */
@@ -18,7 +18,6 @@ import type { ValidationResult } from "@shared/types/validation";
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { waitForElectronAPI } from "../stores/utils";
-import { safeExtractIpcData } from "../types/ipc";
 import { logger } from "./logger";
 
 /**
@@ -55,12 +54,18 @@ export const MonitorTypesService = {
      */
     async formatMonitorDetail(type: string, details: string): Promise<string> {
         await this.initialize();
-        const response =
-            await window.electronAPI.monitorTypes.formatMonitorDetail(
+        try {
+            return await window.electronAPI.monitoring.formatMonitorDetail(
                 type,
                 details
             );
-        return safeExtractIpcData(response, details);
+        } catch (error) {
+            const typedError = ensureError(error);
+            logger.error("Failed to format monitor detail", typedError, {
+                tag: "MonitorTypesService",
+            });
+            return details;
+        }
     },
 
     /**
@@ -88,12 +93,18 @@ export const MonitorTypesService = {
         monitor: Monitor
     ): Promise<string> {
         await this.initialize();
-        const response =
-            await window.electronAPI.monitorTypes.formatMonitorTitleSuffix(
+        try {
+            return await window.electronAPI.monitoring.formatMonitorTitleSuffix(
                 type,
                 monitor
             );
-        return safeExtractIpcData(response, "");
+        } catch (error) {
+            const typedError = ensureError(error);
+            logger.error("Failed to format monitor title suffix", typedError, {
+                tag: "MonitorTypesService",
+            });
+            return "";
+        }
     },
 
     /**
@@ -112,9 +123,15 @@ export const MonitorTypesService = {
      */
     async getMonitorTypes(): Promise<MonitorTypeConfig[]> {
         await this.initialize();
-        const response =
-            await window.electronAPI.monitorTypes.getMonitorTypes();
-        return safeExtractIpcData(response, []);
+        try {
+            return await window.electronAPI.monitorTypes.getMonitorTypes();
+        } catch (error) {
+            const typedError = ensureError(error);
+            logger.error("Failed to get monitor types", typedError, {
+                tag: "MonitorTypesService",
+            });
+            return [];
+        }
     },
 
     /**
@@ -171,17 +188,23 @@ export const MonitorTypesService = {
         data: unknown
     ): Promise<ValidationResult> {
         await this.initialize();
-        const response =
-            await window.electronAPI.monitorTypes.validateMonitorData(
+        try {
+            return await window.electronAPI.monitoring.validateMonitorData(
                 type,
                 data
             );
-        return safeExtractIpcData(response, {
-            data: undefined,
-            errors: ["Unexpected response format from electronAPI"],
-            metadata: {},
-            success: false,
-            warnings: [],
-        });
+        } catch (error) {
+            const typedError = ensureError(error);
+            logger.error("Failed to validate monitor data", typedError, {
+                tag: "MonitorTypesService",
+            });
+            return {
+                data: undefined,
+                errors: [`Validation failed: ${typedError.message}`],
+                metadata: {},
+                success: false,
+                warnings: [],
+            };
+        }
     },
 };

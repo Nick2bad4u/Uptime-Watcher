@@ -249,9 +249,11 @@ function applyDnsMonitorDefaults(
     monitor.recordType = isNonEmptyString(recordTypeValue)
         ? recordTypeValue
         : "A";
-    monitor.expectedValue = isNonEmptyString(expectedValueValue)
-        ? expectedValueValue
-        : "0.0.0.0";
+    // Only set expectedValue if a non-empty value is provided
+    // Leave undefined for "accept any response" behavior
+    if (isNonEmptyString(expectedValueValue)) {
+        monitor.expectedValue = expectedValueValue;
+    }
 }
 
 /**

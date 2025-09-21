@@ -18,7 +18,9 @@ import type {
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
-import type { UnknownRecord } from "type-fest";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { ValidationResult } from "@shared/types/validation";
+// Additional global types
 
 // Re-export core types for convenience
 
@@ -221,6 +223,32 @@ declare global {
             monitoring: {
                 /**
                  * @remarks
+                 * Format monitor detail using backend registry.
+                 *
+                 * @param type - The monitor type.
+                 * @param details - The monitor details as a string.
+                 *
+                 * @returns A promise resolving to the formatted detail string.
+                 */
+                formatMonitorDetail: (
+                    type: string,
+                    details: string
+                ) => Promise<string>;
+                /**
+                 * @remarks
+                 * Format monitor title suffix using backend registry.
+                 *
+                 * @param type - The monitor type.
+                 * @param monitor - The monitor data.
+                 *
+                 * @returns A promise resolving to the formatted title suffix.
+                 */
+                formatMonitorTitleSuffix: (
+                    type: string,
+                    monitor: Monitor
+                ) => Promise<string>;
+                /**
+                 * @remarks
                  * Start monitoring for all configured sites.
                  *
                  * @returns A promise that resolves when monitoring has started.
@@ -259,82 +287,6 @@ declare global {
                     siteId: string,
                     monitorId?: string
                 ) => Promise<boolean>;
-            };
-
-            /**
-             * @remarks
-             * Monitor type registry and configuration operations.
-             */
-            monitorTypes: {
-                /**
-                 * @remarks
-                 * Format monitor detail using backend registry.
-                 *
-                 * @param type - The monitor type.
-                 * @param details - The monitor details as a string.
-                 *
-                 * @returns A promise resolving to an IPC response containing
-                 *   the formatted detail string.
-                 */
-                formatMonitorDetail: (
-                    type: string,
-                    details: string
-                ) => Promise<{
-                    data?: string;
-                    error?: string;
-                    metadata?: UnknownRecord;
-                    success: boolean;
-                    warnings?: string[];
-                }>;
-                /**
-                 * @remarks
-                 * Format monitor title suffix using backend registry.
-                 *
-                 * @param type - The monitor type.
-                 * @param monitor - The monitor data.
-                 *
-                 * @returns A promise resolving to an IPC response containing
-                 *   the formatted title suffix.
-                 */
-                formatMonitorTitleSuffix: (
-                    type: string,
-                    monitor: Monitor
-                ) => Promise<{
-                    data?: string;
-                    error?: string;
-                    metadata?: UnknownRecord;
-                    success: boolean;
-                    warnings?: string[];
-                }>;
-                /**
-                 * @remarks
-                 * Get all available monitor type configurations.
-                 *
-                 * @returns A promise resolving to an IPC response containing
-                 *   monitor type definitions.
-                 */
-                getMonitorTypes: () => Promise<{
-                    data?: Array<{
-                        description: string;
-                        displayName: string;
-                        fields: Array<{
-                            helpText?: string;
-                            label: string;
-                            max?: number;
-                            min?: number;
-                            name: string;
-                            placeholder?: string;
-                            required: boolean;
-                            type: string;
-                        }>;
-                        type: string;
-                        version: string;
-                    }>;
-                    error?: string;
-                    metadata?: UnknownRecord;
-                    success: boolean;
-                    warnings?: string[];
-                }>;
                 /**
                  * @remarks
                  * Validate monitor data using backend registry.
@@ -347,13 +299,21 @@ declare global {
                 validateMonitorData: (
                     type: string,
                     data: unknown
-                ) => Promise<{
-                    data?: unknown;
-                    errors: readonly string[];
-                    metadata?: UnknownRecord;
-                    success: boolean;
-                    warnings?: readonly string[];
-                }>;
+                ) => Promise<ValidationResult>;
+            };
+
+            /**
+             * @remarks
+             * Monitor type registry and configuration operations.
+             */
+            monitorTypes: {
+                /**
+                 * @remarks
+                 * Get all available monitor type configurations.
+                 *
+                 * @returns A promise resolving to monitor type definitions.
+                 */
+                getMonitorTypes: () => Promise<MonitorTypeConfig[]>;
             };
 
             /**

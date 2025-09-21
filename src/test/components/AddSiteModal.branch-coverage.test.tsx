@@ -127,6 +127,7 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
                         overlay: "#ffffff",
                     },
                     status: {
+                        degraded: "#f97316",
                         up: "#22c55e",
                         down: "#ef4444",
                         mixed: "#f59e0b",

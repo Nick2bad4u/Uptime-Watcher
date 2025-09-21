@@ -932,10 +932,7 @@ export class EnhancedMonitorChecker {
 
         const historyEntry = {
             responseTime: checkResult.responseTime,
-            status:
-                checkResult.status === "up"
-                    ? ("up" as const)
-                    : ("down" as const),
+            status: checkResult.status,
             timestamp: checkResult.timestamp.getTime(),
         };
 

@@ -54,6 +54,7 @@ const mockTheme: Theme = {
             900: "#0c4a6e",
         },
         status: {
+            degraded: "#f97316",
             down: "#ef4444",
             mixed: "#8b5cf6",
             paused: "#9ca3af",

@@ -114,6 +114,7 @@ const primaryColorsArbitrary = fc.record({
 });
 
 const statusColorsArbitrary = fc.record({
+    degraded: colorArbitrary,
     down: colorArbitrary,
     mixed: colorArbitrary,
     paused: colorArbitrary,
