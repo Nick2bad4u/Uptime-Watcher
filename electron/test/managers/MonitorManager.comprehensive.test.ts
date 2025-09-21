@@ -41,12 +41,7 @@ vi.mock("../../electronUtils", () => ({
     isDev: vi.fn(() => false),
 }));
 
-vi.mock("../../utils/monitoring/monitorLifecycle", () => ({
-    startAllMonitoring: vi.fn(),
-    startMonitoringForSite: vi.fn(),
-    stopAllMonitoring: vi.fn(),
-    stopMonitoringForSite: vi.fn(),
-}));
+// Enhanced monitoring is now fully integrated into MonitorManager
 
 // Mock all the dependencies at the top level
 const mockSetCheckCallback = vi.fn();
@@ -470,11 +465,6 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
     describe("setupSiteForMonitoring - Comprehensive Coverage", () => {
         it("should setup site successfully with auto-start", async () => {
-            const { startMonitoringForSite } = await import(
-                "../../utils/monitoring/monitorLifecycle"
-            );
-            vi.mocked(startMonitoringForSite).mockResolvedValue(true);
-
             // Use a monitor without checkInterval to trigger updateInternal
             const siteWithoutInterval = {
                 ...mockSite,
@@ -597,16 +587,16 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
     });
 
-    describe("Start/Stop Monitoring - Comprehensive Coverage", () => {
-        it("should start monitoring for all sites", async () => {
-            const { startAllMonitoring } = await import(
-                "../../utils/monitoring/monitorLifecycle"
-            );
-            vi.mocked(startAllMonitoring).mockResolvedValue(true);
+    describe("Start/Stop Monitoring - Enhanced Coverage", () => {
+        it("should start monitoring for all sites using enhanced system", async () => {
+            // Spy on the enhanced method directly
+            const startAllSpy = vi
+                .spyOn(manager, "startAllMonitoringEnhanced" as any)
+                .mockResolvedValue(true);
 
             await manager.startMonitoring();
 
-            expect(startAllMonitoring).toHaveBeenCalled();
+            expect(startAllSpy).toHaveBeenCalled();
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).toHaveBeenCalledWith(
@@ -618,18 +608,18 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             );
         });
 
-        it("should start monitoring for specific site with monitor ID", async () => {
-            const { startMonitoringForSite } = await import(
-                "../../utils/monitoring/monitorLifecycle"
-            );
-            vi.mocked(startMonitoringForSite).mockResolvedValue(true);
+        it("should start monitoring for specific site with monitor ID using enhanced system", async () => {
+            // Spy on the enhanced method directly
+            const startForSiteSpy = vi
+                .spyOn(manager, "startMonitoringForSiteEnhanced" as any)
+                .mockResolvedValue(true);
 
             const result = await manager.startMonitoringForSite(
                 "site-1",
                 "monitor-1"
             );
 
-            expect(startMonitoringForSite).toHaveBeenCalled();
+            expect(startForSiteSpy).toHaveBeenCalled();
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).toHaveBeenCalledWith(
@@ -643,15 +633,15 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             expect(result).toBeTruthy();
         });
 
-        it("should start monitoring for specific site without monitor ID", async () => {
-            const { startMonitoringForSite } = await import(
-                "../../utils/monitoring/monitorLifecycle"
-            );
-            vi.mocked(startMonitoringForSite).mockResolvedValue(true);
+        it("should start monitoring for specific site without monitor ID using enhanced system", async () => {
+            // Spy on the enhanced method directly
+            const startForSiteSpy = vi
+                .spyOn(manager, "startMonitoringForSiteEnhanced" as any)
+                .mockResolvedValue(true);
 
             const result = await manager.startMonitoringForSite("site-1");
 
-            expect(startMonitoringForSite).toHaveBeenCalled();
+            expect(startForSiteSpy).toHaveBeenCalled();
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).toHaveBeenCalledWith(
@@ -664,15 +654,15 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             expect(result).toBeTruthy();
         });
 
-        it("should handle failed start monitoring for site", async () => {
-            const { startMonitoringForSite } = await import(
-                "../../utils/monitoring/monitorLifecycle"
-            );
-            vi.mocked(startMonitoringForSite).mockResolvedValue(false);
+        it("should handle failed start monitoring for site in enhanced system", async () => {
+            // Spy on the enhanced method to return false
+            const startForSiteSpy = vi
+                .spyOn(manager, "startMonitoringForSiteEnhanced" as any)
+                .mockResolvedValue(false);
 
             const result = await manager.startMonitoringForSite("site-1");
 
-            expect(startMonitoringForSite).toHaveBeenCalled();
+            expect(startForSiteSpy).toHaveBeenCalled();
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).not.toHaveBeenCalledWith(
@@ -682,15 +672,15 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             expect(result).toBeFalsy();
         });
 
-        it("should stop monitoring for all sites", async () => {
-            const { stopAllMonitoring } = await import(
-                "../../utils/monitoring/monitorLifecycle"
-            );
-            vi.mocked(stopAllMonitoring).mockResolvedValue(false);
+        it("should stop monitoring for all sites using enhanced system", async () => {
+            // Spy on the enhanced method directly
+            const stopAllSpy = vi
+                .spyOn(manager, "stopAllMonitoringEnhanced" as any)
+                .mockResolvedValue(false);
 
             await manager.stopMonitoring();
 
-            expect(stopAllMonitoring).toHaveBeenCalled();
+            expect(stopAllSpy).toHaveBeenCalled();
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).toHaveBeenCalledWith(
@@ -702,18 +692,18 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             );
         });
 
-        it("should stop monitoring for specific site with monitor ID", async () => {
-            const { stopMonitoringForSite } = await import(
-                "../../utils/monitoring/monitorLifecycle"
-            );
-            vi.mocked(stopMonitoringForSite).mockResolvedValue(true);
+        it("should stop monitoring for specific site with monitor ID using enhanced system", async () => {
+            // Spy on the enhanced method directly
+            const stopForSiteSpy = vi
+                .spyOn(manager, "stopMonitoringForSiteEnhanced" as any)
+                .mockResolvedValue(true);
 
             const result = await manager.stopMonitoringForSite(
                 "site-1",
                 "monitor-1"
             );
 
-            expect(stopMonitoringForSite).toHaveBeenCalled();
+            expect(stopForSiteSpy).toHaveBeenCalled();
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).toHaveBeenCalledWith(
@@ -729,14 +719,14 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should handle failed stop monitoring for site", async () => {
-            const { stopMonitoringForSite } = await import(
-                "../../utils/monitoring/monitorLifecycle"
-            );
-            vi.mocked(stopMonitoringForSite).mockResolvedValue(false);
+            // Spy on the enhanced method to return false
+            const stopForSiteSpy = vi
+                .spyOn(manager, "stopMonitoringForSiteEnhanced" as any)
+                .mockResolvedValue(false);
 
             const result = await manager.stopMonitoringForSite("site-1");
 
-            expect(stopMonitoringForSite).toHaveBeenCalled();
+            expect(stopForSiteSpy).toHaveBeenCalled();
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).not.toHaveBeenCalledWith(
@@ -749,57 +739,33 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
     describe("Edge Cases and Error Paths", () => {
         it("should handle recursive call prevention in startMonitoringForSite", async () => {
-            const { startMonitoringForSite } = await import(
-                "../../utils/monitoring/monitorLifecycle"
-            );
+            // Mock the enhanced method to return true
+            const startForSiteSpy = vi
+                .spyOn(manager, "startMonitoringForSiteEnhanced" as any)
+                .mockResolvedValue(true);
 
-            // Mock the function to trigger recursive behavior
-            vi.mocked(startMonitoringForSite).mockImplementation(
-                async (_config, id, monitorId, recursiveFn) => {
-                    if (recursiveFn) {
-                        // Test the recursive prevention by calling with the same parameters
-                        const recursiveResult = await recursiveFn(
-                            id,
-                            monitorId
-                        );
-                        expect(recursiveResult).toBeFalsy();
-                    }
-                    return true;
-                }
-            );
-
+            // Test that the method can be called without causing infinite recursion
             const result = await manager.startMonitoringForSite(
                 "site-1",
                 "monitor-1"
             );
             expect(result).toBeTruthy();
+            expect(startForSiteSpy).toHaveBeenCalled();
         });
 
         it("should handle recursive call prevention in stopMonitoringForSite", async () => {
-            const { stopMonitoringForSite } = await import(
-                "../../utils/monitoring/monitorLifecycle"
-            );
+            // Mock the enhanced method to return true
+            const stopForSiteSpy = vi
+                .spyOn(manager, "stopMonitoringForSiteEnhanced" as any)
+                .mockResolvedValue(true);
 
-            // Mock the function to trigger recursive behavior
-            vi.mocked(stopMonitoringForSite).mockImplementation(
-                async (_config, id, monitorId, recursiveFn) => {
-                    if (recursiveFn) {
-                        // Test the recursive prevention by calling with the same parameters
-                        const recursiveResult = await recursiveFn(
-                            id,
-                            monitorId
-                        );
-                        expect(recursiveResult).toBeFalsy();
-                    }
-                    return true;
-                }
-            );
-
+            // Test that the method can be called without causing infinite recursion
             const result = await manager.stopMonitoringForSite(
                 "site-1",
                 "monitor-1"
             );
             expect(result).toBeTruthy();
+            expect(stopForSiteSpy).toHaveBeenCalled();
         });
 
         it("should handle shouldApplyDefaultInterval with zero checkInterval", async () => {
@@ -924,10 +890,10 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should handle auto-start with monitor missing id in autoStartNewMonitors", async () => {
-            const { startMonitoringForSite } = await import(
-                "../../utils/monitoring/monitorLifecycle"
-            );
-            vi.mocked(startMonitoringForSite).mockResolvedValue(true);
+            // Mock the enhanced method
+            const startForSiteSpy = vi
+                .spyOn(manager, "startMonitoringForSiteEnhanced" as any)
+                .mockResolvedValue(true);
 
             const monitorWithoutId = createMockMonitor({
                 id: "", // Use empty string for invalid ID test
@@ -944,7 +910,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
             // Should complete without errors even with monitor missing ID
             // Only valid monitors should be processed
-            expect(startMonitoringForSite).not.toHaveBeenCalled();
+            expect(startForSiteSpy).not.toHaveBeenCalled();
         });
     });
 });

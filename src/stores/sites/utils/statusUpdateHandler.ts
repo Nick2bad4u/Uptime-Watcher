@@ -486,9 +486,19 @@ export class StatusUpdateManager {
                     return monitor;
                 }
 
-                // Use the fresh monitor data from the event which includes
-                // updated history, response time, and all database changes
-                return event.monitor;
+                // Preserve existing history if the event has empty history
+                // This prevents the UI from flashing to zero during stop operations
+                const mergedHistory =
+                    event.monitor.history.length === 0 &&
+                    monitor.history.length > 0
+                        ? monitor.history
+                        : event.monitor.history;
+
+                // Use the fresh monitor data from the event but with preserved history
+                return {
+                    ...event.monitor,
+                    history: mergedHistory,
+                };
             });
 
             // Preserve the existing site structure but update monitors

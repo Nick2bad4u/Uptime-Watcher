@@ -56,8 +56,9 @@
  * @public
  */
 
-import type { Site, StatusUpdate } from "@shared/types";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
+import { MONITOR_STATUS } from "@shared/types";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -72,17 +73,12 @@ import type { SiteRepository } from "../services/database/SiteRepository";
 import type { EnhancedMonitoringServices } from "../services/monitoring/EnhancedMonitoringServiceFactory";
 import type { SiteService } from "../services/site/SiteService";
 import type { StandardizedCache } from "../utils/cache/StandardizedCache";
+import type { Logger } from "../utils/interfaces";
 
 import { DEFAULT_CHECK_INTERVAL } from "../constants";
 import { isDev } from "../electronUtils";
 import { MonitorScheduler } from "../services/monitoring/MonitorScheduler";
 import { logger } from "../utils/logger";
-import {
-    startAllMonitoring,
-    startMonitoringForSite,
-    stopAllMonitoring,
-    stopMonitoringForSite,
-} from "../utils/monitoring/monitorLifecycle";
 import { withDatabaseOperation } from "../utils/operationalHooks";
 
 /**
@@ -424,7 +420,7 @@ export class MonitorManager {
      * @public
      */
     public async startMonitoring(): Promise<void> {
-        this.isMonitoring = await startAllMonitoring(
+        this.isMonitoring = await this.startAllMonitoringEnhanced(
             {
                 databaseService: this.dependencies.databaseService,
                 eventEmitter: this.eventEmitter,
@@ -479,9 +475,9 @@ export class MonitorManager {
         identifier: string,
         monitorId?: string
     ): Promise<boolean> {
-        // Proceed with traditional monitoring lifecycle which handles
+        // Proceed with enhanced monitoring lifecycle which handles
         // operation cleanup
-        const result = await startMonitoringForSite(
+        const result = await this.startMonitoringForSiteEnhanced(
             {
                 databaseService: this.dependencies.databaseService,
                 eventEmitter: this.eventEmitter,
@@ -552,8 +548,8 @@ export class MonitorManager {
      * @public
      */
     public async stopMonitoring(): Promise<void> {
-        // Use traditional monitoring lifecycle which handles operation cleanup
-        this.isMonitoring = await stopAllMonitoring({
+        // Use enhanced monitoring lifecycle which handles operation cleanup
+        this.isMonitoring = await this.stopAllMonitoringEnhanced({
             databaseService: this.dependencies.databaseService,
             eventEmitter: this.eventEmitter,
             logger,
@@ -600,9 +596,9 @@ export class MonitorManager {
         identifier: string,
         monitorId?: string
     ): Promise<boolean> {
-        // Proceed with traditional monitoring lifecycle which handles
+        // Proceed with enhanced monitoring lifecycle which handles
         // operation cleanup
-        const result = await stopMonitoringForSite(
+        const result = await this.stopMonitoringForSiteEnhanced(
             {
                 databaseService: this.dependencies.databaseService,
                 eventEmitter: this.eventEmitter,
@@ -652,6 +648,412 @@ export class MonitorManager {
         }
 
         return result;
+    }
+
+    /**
+     * Enhanced start all monitoring - replaces legacy startAllMonitoring
+     * function.
+     *
+     * @param config - Configuration object with required dependencies
+     * @param isMonitoring - Current monitoring state
+     *
+     * @returns Promise<boolean> - New monitoring state
+     *
+     * @internal
+     */
+    private async startAllMonitoringEnhanced(
+        config: {
+            databaseService: DatabaseService;
+            eventEmitter: TypedEventBus<UptimeEvents>;
+            logger: Logger;
+            monitorRepository: MonitorRepository;
+            monitorScheduler: MonitorScheduler;
+            sites: StandardizedCache<Site>;
+            siteService?: {
+                findByIdentifierWithDetails: (
+                    identifier: string
+                ) => Promise<Site | undefined>;
+            };
+        },
+        isMonitoring: boolean
+    ): Promise<boolean> {
+        if (isMonitoring) {
+            config.logger.debug("Monitoring already running");
+            return isMonitoring;
+        }
+
+        config.logger.info(
+            `Starting monitoring with ${config.sites.size} sites (enhanced system)`
+        );
+
+        const sites = config.sites.getAll();
+
+        // Process all sites in parallel to avoid sequential await-in-loop
+        const sitePromises = sites.map(async (site) => {
+            try {
+                // Start monitoring for all monitors in this site using enhanced services
+                const monitorPromises = site.monitors
+                    .filter((monitor) => monitor.id && monitor.checkInterval)
+                    .map(async (monitor) => {
+                        const started =
+                            await this.enhancedMonitoringServices.checker.startMonitoring(
+                                site.identifier,
+                                monitor.id
+                            );
+
+                        if (started) {
+                            // Update cached monitor state and emit events
+                            await this.applyMonitorState(
+                                site,
+                                monitor,
+                                {
+                                    activeOperations: [],
+                                    monitoring: true,
+                                    status: MONITOR_STATUS.PENDING,
+                                },
+                                MONITOR_STATUS.PENDING
+                            );
+                        }
+                    });
+
+                // Wait for all monitors in this site to be processed
+                await Promise.all(monitorPromises);
+
+                // Start the site in the scheduler
+                config.monitorScheduler.startSite(site);
+            } catch (error) {
+                config.logger.error(
+                    `Failed to start monitoring for site ${site.identifier}`,
+                    error
+                );
+            }
+        });
+
+        // Wait for all sites to be processed
+        await Promise.all(sitePromises);
+
+        config.logger.info("Started all monitoring operations (enhanced)");
+        return true;
+    }
+
+    /**
+     * Enhanced stop all monitoring - replaces legacy stopAllMonitoring
+     * function.
+     *
+     * @param config - Configuration object with required dependencies
+     *
+     * @returns Promise<boolean> - Always false (monitoring stopped)
+     *
+     * @internal
+     */
+    private async stopAllMonitoringEnhanced(config: {
+        databaseService: DatabaseService;
+        eventEmitter: TypedEventBus<UptimeEvents>;
+        logger: Logger;
+        monitorRepository: MonitorRepository;
+        monitorScheduler: MonitorScheduler;
+        sites: StandardizedCache<Site>;
+        siteService?: {
+            findByIdentifierWithDetails: (
+                identifier: string
+            ) => Promise<Site | undefined>;
+        };
+    }): Promise<boolean> {
+        config.logger.info(
+            "Stopping all monitoring operations (enhanced system)"
+        );
+
+        const sites = config.sites.getAll();
+
+        // Process all sites in parallel to avoid sequential await-in-loop
+        const sitePromises = sites.map(async (site) => {
+            try {
+                // Stop monitoring for all monitors in this site using enhanced services
+                const monitorPromises = site.monitors
+                    .filter((monitor) => monitor.id && monitor.monitoring)
+                    .map(async (monitor) => {
+                        const stopped =
+                            await this.enhancedMonitoringServices.checker.stopMonitoring(
+                                site.identifier,
+                                monitor.id
+                            );
+
+                        if (stopped) {
+                            // Update cached monitor state and emit events
+                            await this.applyMonitorState(
+                                site,
+                                monitor,
+                                {
+                                    activeOperations: [],
+                                    monitoring: false,
+                                    status: MONITOR_STATUS.PAUSED,
+                                },
+                                MONITOR_STATUS.PAUSED
+                            );
+                        }
+                    });
+
+                // Wait for all monitors in this site to be processed
+                await Promise.all(monitorPromises);
+            } catch (error) {
+                config.logger.error(
+                    `Failed to stop monitoring for site ${site.identifier}`,
+                    error
+                );
+            }
+        });
+
+        // Wait for all sites to be processed
+        await Promise.all(sitePromises);
+
+        // Stop all scheduled operations after state updates are complete
+        config.monitorScheduler.stopAll();
+
+        config.logger.info("Stopped all monitoring operations (enhanced)");
+        return false;
+    }
+
+    /**
+     * Enhanced start monitoring for site - replaces legacy
+     * startMonitoringForSite function.
+     *
+     * @param config - Configuration object with required dependencies
+     * @param identifier - Site identifier
+     * @param monitorId - Optional monitor ID
+     * @param callback - Optional callback for recursive calls
+     *
+     * @returns Promise<boolean> - True if operation succeeded
+     *
+     * @internal
+     */
+    private async startMonitoringForSiteEnhanced(
+        config: {
+            databaseService: DatabaseService;
+            eventEmitter: TypedEventBus<UptimeEvents>;
+            logger: Logger;
+            monitorRepository: MonitorRepository;
+            monitorScheduler: MonitorScheduler;
+            sites: StandardizedCache<Site>;
+            siteService?: {
+                findByIdentifierWithDetails: (
+                    identifier: string
+                ) => Promise<Site | undefined>;
+            };
+        },
+        identifier: string,
+        monitorId?: string,
+        callback?: (identifier: string, monitorId?: string) => Promise<boolean>
+    ): Promise<boolean> {
+        const site = config.sites.get(identifier);
+        if (!site) {
+            config.logger.warn(`Site not found: ${identifier}`);
+            return false;
+        }
+
+        if (monitorId) {
+            // Start specific monitor
+            const monitor = site.monitors.find((m) => m.id === monitorId);
+            if (!monitor?.id) {
+                config.logger.warn(
+                    `Monitor ${monitorId} not found in site ${identifier}`
+                );
+                return false;
+            }
+
+            if (!monitor.checkInterval) {
+                config.logger.warn(
+                    `Monitor ${identifier}:${monitorId} has no valid check interval set`
+                );
+                return false;
+            }
+
+            try {
+                const result =
+                    await this.enhancedMonitoringServices.checker.startMonitoring(
+                        identifier,
+                        monitorId
+                    );
+
+                if (result) {
+                    // Update cached monitor state and emit events
+                    await this.applyMonitorState(
+                        site,
+                        monitor,
+                        {
+                            activeOperations: [],
+                            monitoring: true,
+                            status: MONITOR_STATUS.PENDING,
+                        },
+                        MONITOR_STATUS.PENDING
+                    );
+
+                    // Start monitor in scheduler and return result
+                    config.logger.debug(
+                        `Started monitoring for ${identifier}:${monitorId} (enhanced)`
+                    );
+                    return config.monitorScheduler.startMonitor(
+                        identifier,
+                        monitor
+                    );
+                }
+                return false;
+            } catch (error) {
+                config.logger.error(
+                    `Enhanced start failed for ${identifier}:${monitorId}`,
+                    error
+                );
+                return false;
+            }
+        }
+
+        // Start all monitors in site - optimistic logic (succeed if ANY monitor starts)
+        // Filter monitors that have IDs and process them in parallel
+        const validMonitors = site.monitors.filter((monitor) => monitor.id);
+
+        const results = await Promise.allSettled(
+            validMonitors.map(async (monitor) => {
+                try {
+                    // Initialize result based on callback availability
+                    return callback
+                        ? await callback(identifier, monitor.id)
+                        : await this.startMonitoringForSiteEnhanced(
+                              config,
+                              identifier,
+                              monitor.id
+                          );
+                } catch (error) {
+                    config.logger.error(
+                        `Enhanced start failed for ${identifier}:${monitor.id}`,
+                        error
+                    );
+                    return false;
+                }
+            })
+        );
+
+        // Check if any monitor started successfully and return directly
+        return results.some(
+            (result) => result.status === "fulfilled" && result.value
+        );
+    }
+
+    /**
+     * Enhanced stop monitoring for site - replaces legacy stopMonitoringForSite
+     * function.
+     *
+     * @param config - Configuration object with required dependencies
+     * @param identifier - Site identifier
+     * @param monitorId - Optional monitor ID
+     * @param callback - Optional callback for recursive calls
+     *
+     * @returns Promise<boolean> - True if operation succeeded
+     *
+     * @internal
+     */
+    private async stopMonitoringForSiteEnhanced(
+        config: {
+            databaseService: DatabaseService;
+            eventEmitter: TypedEventBus<UptimeEvents>;
+            logger: Logger;
+            monitorRepository: MonitorRepository;
+            monitorScheduler: MonitorScheduler;
+            sites: StandardizedCache<Site>;
+            siteService?: {
+                findByIdentifierWithDetails: (
+                    identifier: string
+                ) => Promise<Site | undefined>;
+            };
+        },
+        identifier: string,
+        monitorId?: string,
+        callback?: (identifier: string, monitorId?: string) => Promise<boolean>
+    ): Promise<boolean> {
+        const site = config.sites.get(identifier);
+        if (!site) {
+            config.logger.warn(`Site not found: ${identifier}`);
+            return false;
+        }
+
+        if (monitorId) {
+            // Stop specific monitor
+            const monitor = site.monitors.find((m) => m.id === monitorId);
+            if (!monitor?.id) {
+                config.logger.warn(
+                    `Monitor ${monitorId} not found in site ${identifier}`
+                );
+                return false;
+            }
+
+            try {
+                const result =
+                    await this.enhancedMonitoringServices.checker.stopMonitoring(
+                        identifier,
+                        monitorId
+                    );
+
+                if (result) {
+                    // Update cached monitor state and emit events
+                    await this.applyMonitorState(
+                        site,
+                        monitor,
+                        {
+                            activeOperations: [],
+                            monitoring: false,
+                            status: MONITOR_STATUS.PAUSED,
+                        },
+                        MONITOR_STATUS.PAUSED
+                    );
+
+                    // Stop monitor in scheduler and return result
+                    config.logger.debug(
+                        `Stopped monitoring for ${identifier}:${monitorId} (enhanced)`
+                    );
+                    return config.monitorScheduler.stopMonitor(
+                        identifier,
+                        monitorId
+                    );
+                }
+                return false;
+            } catch (error) {
+                config.logger.error(
+                    `Enhanced stop failed for ${identifier}:${monitorId}`,
+                    error
+                );
+                return false;
+            }
+        }
+
+        // Stop all monitors in site - pessimistic logic (fail if ANY monitor fails to stop)
+        // Filter monitors that have IDs and are monitoring, then process them in parallel
+        const validMonitors = site.monitors.filter(
+            (monitor) => monitor.id && monitor.monitoring
+        );
+
+        const results = await Promise.allSettled(
+            validMonitors.map(async (monitor) => {
+                try {
+                    // Initialize result based on callback availability
+                    return callback
+                        ? await callback(identifier, monitor.id)
+                        : await this.stopMonitoringForSiteEnhanced(
+                              config,
+                              identifier,
+                              monitor.id
+                          );
+                } catch (error) {
+                    config.logger.error(
+                        `Enhanced stop failed for ${identifier}:${monitor.id}`,
+                        error
+                    );
+                    return false;
+                }
+            })
+        );
+
+        // Check if all monitors stopped successfully and return directly
+        return results.every(
+            (result) => result.status === "fulfilled" && result.value
+        );
     }
 
     /**
@@ -962,6 +1364,74 @@ export class MonitorManager {
                 )
             );
         }
+    }
+
+    /**
+     * Applies monitor state changes to cache, database, and emits
+     * status-changed events.
+     *
+     * @remarks
+     * This helper ensures consistency between cache updates, database
+     * persistence, and event emission for monitor status changes. Used by
+     * enhanced lifecycle methods to maintain parity with legacy monitoring
+     * behavior.
+     *
+     * @param site - Site containing the monitor
+     * @param monitor - Monitor to update
+     * @param changes - Partial monitor changes to apply
+     * @param newStatus - New monitor status for event emission
+     *
+     * @internal
+     */
+    private async applyMonitorState(
+        site: Site,
+        monitor: Monitor,
+        changes: Partial<Monitor>,
+        newStatus: string
+    ): Promise<void> {
+        const previousStatus = monitor.status;
+
+        // Update cached monitor object
+        Object.assign(monitor, changes);
+
+        // Update monitor in cached site
+        const monitorIndex = site.monitors.findIndex(
+            (m) => m.id === monitor.id
+        );
+        if (monitorIndex !== -1) {
+            site.monitors[monitorIndex] = monitor;
+        }
+
+        // Update cached site
+        this.dependencies.getSitesCache().set(site.identifier, site);
+
+        // Persist to database within transaction
+        await withDatabaseOperation(
+            async () =>
+                this.dependencies.databaseService.executeTransaction((db) => {
+                    this.dependencies.repositories.monitor.updateInternal(
+                        db,
+                        monitor.id,
+                        changes
+                    );
+                    return Promise.resolve();
+                }),
+            "monitor-manager-apply-state-change",
+            this.eventEmitter,
+            { changes, monitorId: monitor.id }
+        );
+
+        // Emit status-changed event with full payload
+        await this.eventEmitter.emitTyped("monitor:status-changed", {
+            monitor: monitor,
+            monitorId: monitor.id,
+            newStatus: newStatus,
+            previousStatus: previousStatus,
+            responseTime: monitor.responseTime,
+            site: site,
+            siteId: site.identifier,
+            timestamp: Date.now(),
+        });
     }
 
     /**

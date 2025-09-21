@@ -20,6 +20,8 @@ import type {
 } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
+// Re-export core types for convenience
+
 /**
  * Re-export monitor form-specific types for UI components.
  *

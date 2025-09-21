@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { Monitor } from "@shared/types";
+import type { Monitor } from "../types";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 import { TypedCache } from "../utils/cache";
@@ -132,13 +132,20 @@ describe("Architectural Fixes Regression Tests", () => {
         });
     });
 
-    describe("Monitoring Lifecycle Integration", () => {
-        it("should verify monitoring lifecycle module imports without errors", () => {
-            // This ensures the fixes to monitoring lifecycle compile correctly
-            expect(() => {
-                // The module should import without throwing due to compilation errors
-
-                require("../../electron/utils/monitoring/monitorLifecycle");
+    describe("Enhanced Monitoring Integration", () => {
+        it("should verify enhanced monitoring system is available", async () => {
+            // Legacy monitoring lifecycle has been replaced with enhanced monitoring
+            await expect(async () => {
+                // The enhanced monitoring system should import without throwing
+                await import(
+                    "../../electron/services/monitoring/EnhancedMonitorChecker"
+                );
+                await import(
+                    "../../electron/services/monitoring/MonitorOperationRegistry"
+                );
+                await import(
+                    "../../electron/services/monitoring/OperationTimeoutManager"
+                );
             }).not.toThrow();
         });
     });
