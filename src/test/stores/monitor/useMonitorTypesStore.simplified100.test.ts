@@ -25,10 +25,14 @@ const mockSafeExtractIpcData = vi.hoisted(() => vi.fn());
 // Mock dependencies
 vi.mock("@shared/utils/errorHandling", () => ({
     withErrorHandling: mockWithErrorHandling,
+    ensureError: vi.fn((error) =>
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: mockLogStoreAction,
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("../../../types/ipc", () => ({

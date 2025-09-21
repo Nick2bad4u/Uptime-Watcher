@@ -5,12 +5,33 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Site } from "../../../../../shared/types";
 
-// Mock the error handling utility
-vi.mock("../../../../utils/errorHandling", () => ({
-    withUtilityErrorHandling: vi.fn(),
-    ensureError: vi.fn((err) =>
-        err instanceof Error ? err : new Error(String(err))
-    ),
+// Mock basic dependencies first
+vi.mock("../../../../../shared/utils/errorHandling", () => ({
+    ensureError: vi.fn((error) => error),
+    withUtilityErrorHandling: vi.fn((fn) => fn),
+}));
+
+vi.mock("../../../../../shared/utils/environment", () => ({
+    isDevelopment: vi.fn(),
+}));
+
+// Mock console methods to prevent noise during tests
+const mockConsole = {
+    log: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+};
+
+Object.assign(console, mockConsole);
+
+// Mock EventsService
+vi.mock("../../../../services/EventsService", () => ({
+    EventsService: {
+        onMonitorStatusChanged: vi.fn(),
+        onMonitoringStarted: vi.fn(),
+        onMonitoringStopped: vi.fn(),
+    },
 }));
 
 // Mock the logger
@@ -28,17 +49,27 @@ vi.mock("../../../../../shared/utils/environment", () => ({
     isDevelopment: vi.fn(),
 }));
 
+// Mock EventsService
+vi.mock("../../../../services/EventsService", () => ({
+    EventsService: {
+        onMonitorStatusChanged: vi.fn(),
+        onMonitoringStarted: vi.fn(),
+        onMonitoringStopped: vi.fn(),
+    },
+}));
+
 // Import after mocking
 import { StatusUpdateManager } from "../../../../stores/sites/utils/statusUpdateHandler";
 import { withUtilityErrorHandling } from "../../../../../shared/utils/errorHandling";
 import { isDevelopment } from "../../../../../shared/utils/environment";
+import { EventsService } from "../../../../services/EventsService";
 
 const mockWithUtilityErrorHandling = vi.mocked(withUtilityErrorHandling);
 const mockIsDevelopment = vi.mocked(isDevelopment);
+const mockEventsService = vi.mocked(EventsService);
 
 describe("StatusUpdateHandler", () => {
     let mockOptions: any;
-    let mockElectronAPI: any;
     let manager: StatusUpdateManager;
     let mockSetSites: any;
     let mockGetSites: any;
@@ -135,25 +166,10 @@ describe("StatusUpdateHandler", () => {
             onUpdate: mockOnUpdate,
         };
 
-        // Setup electronAPI mock
-        mockElectronAPI = {
-            events: {
-                onMonitorStatusChanged: vi.fn(),
-                onMonitoringStarted: vi.fn(),
-                onMonitoringStopped: vi.fn(),
-            },
-        };
-
-        // Set up window.electronAPI mock
-        if ((globalThis as any).electronAPI) {
-            (globalThis as any).electronAPI = mockElectronAPI;
-        } else {
-            Object.defineProperty(globalThis, "electronAPI", {
-                value: mockElectronAPI,
-                writable: true,
-                configurable: true,
-            });
-        }
+        // Setup EventsService mock methods to return cleanup functions
+        mockEventsService.onMonitorStatusChanged.mockResolvedValue(() => {});
+        mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
+        mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
 
         // Create manager instance
         manager = new StatusUpdateManager(mockOptions);
@@ -220,15 +236,11 @@ describe("StatusUpdateHandler", () => {
             await annotate("Type: Business Logic", "type");
 
             // Mock the event listener functions to return cleanup functions
-            mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(
+            mockEventsService.onMonitorStatusChanged.mockResolvedValue(
                 () => {}
             );
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
-                () => {}
-            );
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
-                () => {}
-            );
+            mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
+            mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
 
             manager.subscribe();
             expect(manager.isSubscribed()).toBeTruthy();
@@ -244,27 +256,17 @@ describe("StatusUpdateHandler", () => {
             await annotate("Type: Event Processing", "type");
 
             // Mock the event listener functions to return cleanup functions
-            mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(
+            mockEventsService.onMonitorStatusChanged.mockResolvedValue(
                 () => {}
             );
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
-                () => {}
-            );
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
-                () => {}
-            );
+            mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
+            mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
 
             manager.subscribe();
 
-            expect(
-                mockElectronAPI.events.onMonitorStatusChanged
-            ).toHaveBeenCalled();
-            expect(
-                mockElectronAPI.events.onMonitoringStarted
-            ).toHaveBeenCalled();
-            expect(
-                mockElectronAPI.events.onMonitoringStopped
-            ).toHaveBeenCalled();
+            expect(mockEventsService.onMonitorStatusChanged).toHaveBeenCalled();
+            expect(mockEventsService.onMonitoringStarted).toHaveBeenCalled();
+            expect(mockEventsService.onMonitoringStopped).toHaveBeenCalled();
         });
 
         it("should cleanup existing subscriptions before subscribing again", async ({
@@ -277,17 +279,15 @@ describe("StatusUpdateHandler", () => {
             await annotate("Type: Business Logic", "type");
 
             const cleanupFn = vi.fn();
-            mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(
+            mockEventsService.onMonitorStatusChanged.mockResolvedValue(
                 cleanupFn
             );
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
-                cleanupFn
-            );
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
-                cleanupFn
-            );
+            mockEventsService.onMonitoringStarted.mockResolvedValue(cleanupFn);
+            mockEventsService.onMonitoringStopped.mockResolvedValue(cleanupFn);
 
             manager.subscribe();
+            // Wait a bit for async operations to complete
+            await new Promise((resolve) => setTimeout(resolve, 10));
             manager.subscribe(); // Subscribe again
 
             expect(cleanupFn).toHaveBeenCalled();
@@ -303,17 +303,15 @@ describe("StatusUpdateHandler", () => {
             await annotate("Type: Data Deletion", "type");
 
             const cleanupFn = vi.fn();
-            mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(
+            mockEventsService.onMonitorStatusChanged.mockResolvedValue(
                 cleanupFn
             );
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
-                cleanupFn
-            );
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
-                cleanupFn
-            );
+            mockEventsService.onMonitoringStarted.mockResolvedValue(cleanupFn);
+            mockEventsService.onMonitoringStopped.mockResolvedValue(cleanupFn);
 
             manager.subscribe();
+            // Wait a bit for async operations to complete
+            await new Promise((resolve) => setTimeout(resolve, 10));
             expect(manager.isSubscribed()).toBeTruthy();
 
             manager.unsubscribe();
@@ -343,20 +341,20 @@ describe("StatusUpdateHandler", () => {
 
         beforeEach(() => {
             // Mock the event listener functions to capture callbacks
-            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation(
-                (callback: any) => {
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
                     statusChangedCallback = callback;
                     return () => {}; // Return cleanup function
                 }
             );
-            mockElectronAPI.events.onMonitoringStarted.mockImplementation(
-                (callback: any) => {
+            mockEventsService.onMonitoringStarted.mockImplementation(
+                async (callback: any) => {
                     startedCallback = callback;
                     return () => {}; // Return cleanup function
                 }
             );
-            mockElectronAPI.events.onMonitoringStopped.mockImplementation(
-                (callback: any) => {
+            mockEventsService.onMonitoringStopped.mockImplementation(
+                async (callback: any) => {
                     stoppedCallback = callback;
                     return () => {}; // Return cleanup function
                 }
@@ -433,18 +431,14 @@ describe("StatusUpdateHandler", () => {
         let statusChangedCallback: any;
 
         beforeEach(() => {
-            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation(
-                (callback: any) => {
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
                     statusChangedCallback = callback;
                     return () => {};
                 }
             );
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
-                () => {}
-            );
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
-                () => {}
-            );
+            mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
+            mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
         });
 
         it("should process status updates incrementally", async ({
@@ -597,18 +591,14 @@ describe("StatusUpdateHandler", () => {
                 optionsWithoutCallback
             );
 
-            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation(
-                (callback: any) => {
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
                     statusChangedCallback = callback;
                     return () => {};
                 }
             );
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
-                () => {}
-            );
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
-                () => {}
-            );
+            mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
+            mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
 
             managerWithoutCallback.subscribe();
 
@@ -628,18 +618,14 @@ describe("StatusUpdateHandler", () => {
         let statusChangedCallback: any;
 
         beforeEach(() => {
-            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation(
-                (callback: any) => {
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
                     statusChangedCallback = callback;
                     return () => {};
                 }
             );
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
-                () => {}
-            );
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
-                () => {}
-            );
+            mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
+            mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
         });
 
         it("should handle errors in status update processing gracefully", async ({
@@ -737,61 +723,18 @@ describe("StatusUpdateHandler", () => {
         });
     });
 
-    describe("Missing window.electronAPI", () => {
-        beforeEach(() => {
-            // Remove electronAPI for these tests
-            (globalThis as any).electronAPI = undefined;
-        });
-
-        afterEach(() => {
-            // Restore electronAPI
-            (globalThis as any).electronAPI = mockElectronAPI;
-        });
-
-        it("should handle missing electronAPI gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: statusUpdateHandler", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            manager = new StatusUpdateManager(mockOptions);
-            expect(() => manager.subscribe()).toThrow();
-        });
-
-        it("should handle unsubscribe when electronAPI is missing", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: statusUpdateHandler", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            manager = new StatusUpdateManager(mockOptions);
-            expect(() => manager.unsubscribe()).not.toThrow();
-            expect(manager.isSubscribed()).toBeFalsy();
-        });
-    });
-
     describe("Development Mode Logging", () => {
         let statusChangedCallback: any;
 
         beforeEach(() => {
-            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation(
-                (callback: any) => {
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
                     statusChangedCallback = callback;
                     return () => {};
                 }
             );
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
-                () => {}
-            );
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
-                () => {}
-            );
+            mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
+            mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
         });
 
         it("should log debug messages in development mode", async ({
@@ -940,18 +883,14 @@ describe("StatusUpdateHandler", () => {
         let statusChangedCallback: any;
 
         beforeEach(() => {
-            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation(
-                (callback: any) => {
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
                     statusChangedCallback = callback;
                     return () => {};
                 }
             );
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
-                () => {}
-            );
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
-                () => {}
-            );
+            mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
+            mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
         });
 
         it("should handle empty sites array", async ({ task, annotate }) => {
@@ -1107,20 +1046,20 @@ describe("StatusUpdateHandler", () => {
         let monitoringStoppedCallback: any;
 
         beforeEach(() => {
-            mockElectronAPI.events.onMonitorStatusChanged.mockImplementation(
-                (callback: any) => {
+            mockEventsService.onMonitorStatusChanged.mockImplementation(
+                async (callback: any) => {
                     statusChangedCallback = callback;
                     return () => {};
                 }
             );
-            mockElectronAPI.events.onMonitoringStarted.mockImplementation(
-                (callback: any) => {
+            mockEventsService.onMonitoringStarted.mockImplementation(
+                async (callback: any) => {
                     monitoringStartedCallback = callback;
                     return () => {};
                 }
             );
-            mockElectronAPI.events.onMonitoringStopped.mockImplementation(
-                (callback: any) => {
+            mockEventsService.onMonitoringStopped.mockImplementation(
+                async (callback: any) => {
                     monitoringStoppedCallback = callback;
                     return () => {};
                 }

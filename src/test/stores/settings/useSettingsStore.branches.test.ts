@@ -40,11 +40,15 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 // Mock store utils
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock withErrorHandling from shared utils
 vi.mock("../../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn(),
+    ensureError: vi.fn((error) =>
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 // Import mocked modules to get references
@@ -162,10 +166,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             // Mock a successful response
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
-                success: true,
-                data: 2000,
-            });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(2000);
 
             const { result } = renderHook(() => useSettingsStore());
 
@@ -238,10 +239,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 data: 5000, // Valid positive number
             });
 
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
-                success: true,
-                data: 5000,
-            });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(5000);
 
             await act(async () => {
                 await result.current.persistHistoryLimit(3000);

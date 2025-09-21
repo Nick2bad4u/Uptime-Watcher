@@ -38,6 +38,7 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
     withErrorHandling: vi.fn(async (fn) => await fn()),
+    waitForElectronAPI: vi.fn().mockResolvedValue(true),
 }));
 
 describe("useSiteMonitoring", () => {

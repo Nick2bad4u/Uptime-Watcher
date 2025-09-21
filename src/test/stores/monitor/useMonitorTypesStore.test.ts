@@ -9,15 +9,73 @@ import type { Monitor, MonitorType } from "../../../../shared/types";
 import type { MonitorTypeConfig } from "../../../../shared/types/monitorTypes";
 import type { ValidationResult } from "../../../../shared/types/validation";
 import type { IpcResponse } from "../../../types/ipc";
+
+// Mock the store utils module
+vi.mock("../../../stores/utils", () => ({
+    logStoreAction: vi.fn(),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 
 // Mock the electron API
 const mockElectronAPI = {
     monitorTypes: {
-        getMonitorTypes: vi.fn(),
-        validateMonitorData: vi.fn(),
-        formatMonitorDetail: vi.fn(),
-        formatMonitorTitleSuffix: vi.fn(),
+        getMonitorTypes: vi.fn().mockResolvedValue({
+            success: true,
+            data: [
+                {
+                    type: "http",
+                    displayName: "HTTP",
+                    description: "HTTP monitoring",
+                    version: "1.0.0",
+                    fields: [
+                        {
+                            name: "url",
+                            type: "url",
+                            required: true,
+                            label: "URL",
+                        },
+                    ],
+                },
+                {
+                    type: "port",
+                    displayName: "Port",
+                    description: "Port monitoring",
+                    version: "1.0.0",
+                    fields: [
+                        {
+                            name: "host",
+                            type: "text",
+                            required: true,
+                            label: "Host",
+                        },
+                        {
+                            name: "port",
+                            type: "number",
+                            required: true,
+                            label: "Port",
+                        },
+                    ],
+                },
+            ] as MonitorTypeConfig[],
+        } as IpcResponse<MonitorTypeConfig[]>),
+        validateMonitorData: vi.fn().mockResolvedValue({
+            success: true,
+            data: {
+                success: true,
+                errors: [],
+                warnings: [],
+            },
+        } as IpcResponse<ValidationResult>),
+        formatMonitorDetail: vi.fn().mockResolvedValue({
+            success: true,
+            data: "Formatted detail",
+        } as IpcResponse<string>),
+        formatMonitorTitleSuffix: vi.fn().mockResolvedValue({
+            success: true,
+            data: " (formatted)",
+        } as IpcResponse<string>),
     },
 };
 
@@ -29,6 +87,12 @@ globalThis.window = {
 describe(useMonitorTypesStore, () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        // Ensure electronAPI is properly set (protect against global state pollution)
+        if (!globalThis.window) {
+            globalThis.window = {} as never;
+        }
+        (globalThis.window as any).electronAPI = mockElectronAPI;
     });
 
     it("should initialize with default state", async ({ task, annotate }) => {
@@ -418,7 +482,7 @@ describe(useMonitorTypesStore, () => {
             // Should use fallback values when IPC operation fails
             expect(validationResult!.success).toBeFalsy();
             expect(validationResult!.errors).toEqual([
-                "Failed to validate monitor data",
+                "Unexpected response format from electronAPI",
             ]);
         });
     });

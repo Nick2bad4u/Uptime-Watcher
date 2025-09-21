@@ -27,9 +27,20 @@
 import { beforeEach, describe, expect, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
+
+// Mock SystemService for openExternal functionality
+vi.mock("../../../services/SystemService", () => ({
+    SystemService: {
+        openExternal: vi.fn().mockResolvedValue(undefined),
+    },
+}));
+import { SystemService } from "../../../services/SystemService";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 // Removed unused Site type import
 import type { ChartTimeRange } from "../../../stores/types";
+
+// Get the mocked SystemService function
+const mockOpenExternal = vi.mocked(SystemService.openExternal);
 
 // Test utilities for UI store state management
 const resetUIStore = () => {
@@ -509,11 +520,8 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
         fcTest.prop([arbitraries.url])(
             "should handle external URL opening",
             (url) => {
-                // Mock the shell API
-                const mockOpenExternal = vi.fn().mockResolvedValue(undefined);
-                vi.mocked(
-                    (window as any).electronAPI.system.openExternal
-                ).mockImplementation(mockOpenExternal);
+                // Clear any previous calls
+                mockOpenExternal.mockClear();
 
                 // Act
                 useUIStore.getState().openExternal(url);
@@ -526,11 +534,8 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
         fcTest.prop([arbitraries.url, arbitraries.siteName])(
             "should handle external URL opening with context",
             (url, siteName) => {
-                // Mock the shell API
-                const mockOpenExternal = vi.fn().mockResolvedValue(undefined);
-                vi.mocked(
-                    (window as any).electronAPI.system.openExternal
-                ).mockImplementation(mockOpenExternal);
+                // Clear any previous calls
+                mockOpenExternal.mockClear();
 
                 // Act
                 useUIStore.getState().openExternal(url, { siteName });
@@ -546,11 +551,8 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
         fcTest.prop([
             fc.array(arbitraries.url, { minLength: 1, maxLength: 5 }),
         ])("should handle multiple external URL operations", (urls) => {
-            // Mock the shell API
-            const mockOpenExternal = vi.fn().mockResolvedValue(undefined);
-            vi.mocked(
-                (window as any).electronAPI.system.openExternal
-            ).mockImplementation(mockOpenExternal);
+            // Clear any previous calls
+            mockOpenExternal.mockClear();
 
             // Act
             for (const url of urls) useUIStore.getState().openExternal(url);
@@ -761,11 +763,8 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
         ])(
             "should handle concurrent site selection and URL operations",
             (sites, urls) => {
-                // Mock the shell API
-                const mockOpenExternal = vi.fn().mockResolvedValue(undefined);
-                vi.mocked(
-                    (window as any).electronAPI.system.openExternal
-                ).mockImplementation(mockOpenExternal);
+                // Clear any previous calls
+                mockOpenExternal.mockClear();
 
                 // Act - interleave site selection and URL operations
                 for (let i = 0; i < Math.max(sites.length, urls.length); i++) {

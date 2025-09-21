@@ -16,6 +16,7 @@ const mockMonitoringService = {
 // Mock the stores and services
 vi.mock("../stores/utils", () => ({
     logStoreAction: vi.fn(),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("../stores/error/withErrorHandling", () => ({

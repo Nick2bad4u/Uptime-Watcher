@@ -35,10 +35,12 @@ const originalSafeExtractIpcData = vi.hoisted(() => vi.fn());
 // Mock dependencies with full control over their behavior
 vi.mock("@shared/utils/errorHandling", () => ({
     withErrorHandling: originalWithErrorHandling,
+    ensureError: vi.fn((error) => error instanceof Error ? error : new Error(String(error))),
 }));
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: originalLogStoreAction,
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("../../../types/ipc", () => ({

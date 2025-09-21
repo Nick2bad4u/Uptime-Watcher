@@ -13,6 +13,7 @@ import { useUIStore } from "../../../stores/ui/useUiStore";
 // Mock the shared utils
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock localStorage for persistence testing

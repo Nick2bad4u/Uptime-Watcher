@@ -4,6 +4,8 @@
 
 import { render, screen, act } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
 
 import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbnail";
 import { logger } from "../services/logger";
@@ -19,34 +21,120 @@ vi.mock("../services/logger", () => ({
     },
 }));
 
+// Mock stores/utils
+vi.mock("../stores/utils", () => ({
+    logStoreAction: vi.fn(),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
+}));
+
+// Mock SystemService
+vi.mock("../services/SystemService", () => ({
+    SystemService: {
+        openExternal: vi.fn().mockResolvedValue(undefined),
+    },
+}));
+
 // Mock useTheme hook
 vi.mock("../theme/useTheme", () => ({
     useTheme: () => ({
-        currentTheme: {
-            isDark: true,
-            name: "dark",
-        },
-        themeName: "dark",
+        themeName: "dark" as const,
     }),
 }));
 
-// Mock window.electronAPI
+// Mock the services and stores
+const mockOpenExternal = vi.fn();
+
+// Mock useUIStore hook
+vi.mock("../stores/ui/useUiStore", () => ({
+    useUIStore: () => ({
+        openExternal: mockOpenExternal,
+    }),
+}));
+
+// Mock useMount hook
+vi.mock("../hooks/useMount", () => ({
+    useMount: vi.fn(),
+}));
+
+// Prevent JSDOM navigation errors by mocking HTMLAnchorElement.prototype.click
+HTMLAnchorElement.prototype.click = vi.fn();
+
+// Mock the anchor element href setter to use hash URLs to prevent JSDOM navigation errors
+const originalSetAttribute = Element.prototype.setAttribute;
+Element.prototype.setAttribute = function (name: string, value: string) {
+    if (
+        this instanceof HTMLAnchorElement &&
+        name === "href" &&
+        value.startsWith("http")
+    ) {
+        // Use a hash URL instead of the actual URL to prevent JSDOM navigation
+        return originalSetAttribute.call(this, name, "#");
+    }
+    return originalSetAttribute.call(this, name, value);
+};
+
+// Mock window properties
+const mockWindowOpen = vi.fn();
 const mockElectronAPI = {
+    sites: {
+        getSites: vi.fn(),
+    },
     system: {
         openExternal: vi.fn().mockResolvedValue(undefined),
     },
 };
 
-Object.defineProperty(globalThis, "electronAPI", {
-    value: mockElectronAPI,
-    writable: true,
+// Create a mock for getBoundingClientRect
+const createMockBoundingClientRect = (overrides = {}) => ({
+    bottom: 150,
+    height: 50,
+    left: 200,
+    right: 250,
+    toJSON: () => ({}),
+    top: 100,
+    width: 50,
+    x: 200,
+    y: 100,
+    ...overrides,
 });
 
+// Set global electronAPI once (check if it exists first)
+if (!globalThis.electronAPI) {
+    Object.defineProperty(globalThis, "electronAPI", {
+        configurable: true,
+        value: mockElectronAPI,
+        writable: true,
+    });
+} else {
+    // Update existing electronAPI
+    Object.assign(globalThis.electronAPI, mockElectronAPI);
+}
+
 describe("ScreenshotThumbnail - Complete Coverage", () => {
+    const defaultProps = {
+        siteName: "Example Site",
+        url: "https://example.com",
+    };
+
     beforeEach(() => {
         vi.clearAllMocks();
+        mockOpenExternal.mockClear();
         // Clear any existing timeouts
         vi.useFakeTimers();
+
+        // Mock window.open to prevent navigation
+        Object.defineProperty(globalThis, "open", {
+            configurable: true,
+            value: mockWindowOpen,
+        });
+
+        // Mock getBoundingClientRect for all elements
+        Element.prototype.getBoundingClientRect = vi
+            .fn()
+            .mockReturnValue(createMockBoundingClientRect());
+
+        // Set up document.body for portal mounting
+        document.body.innerHTML = "";
     });
 
     afterEach(() => {
@@ -178,7 +266,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         expect(true).toBeTruthy(); // If we get here, cleanup worked correctly
     });
 
-    it("should handle click event and log user action", ({
+    it("should handle click event and log user action", async ({
         task,
         annotate,
     }) => {
@@ -192,29 +280,21 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         annotate("Category: Core", "category");
         annotate("Type: Event Processing", "type");
 
-        const props = {
-            siteName: "Test Site",
-            url: "https://test.com",
-        };
+        const props = defaultProps;
 
         render(<ScreenshotThumbnail {...props} />);
 
         const thumbnail = screen.getByRole("link");
 
-        act(() => {
-            thumbnail.click();
+        const user = userEvent.setup();
+        await act(async () => {
+            await user.click(thumbnail);
         });
 
-        // Verify logger was called with correct action
-        expect(logger.user.action).toHaveBeenCalledWith("External URL opened", {
-            siteName: "Test Site",
-            url: "https://test.com",
+        // Verify UI store openExternal was called with correct arguments
+        expect(mockOpenExternal).toHaveBeenCalledWith("https://example.com", {
+            siteName: "Example Site",
         });
-
-        // Verify electronAPI was called
-        expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith(
-            "https://test.com"
-        );
     });
 
     it("should handle rapid hover/unhover cycles", ({ task, annotate }) => {

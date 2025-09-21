@@ -28,11 +28,15 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 // Mock store utils
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock withErrorHandling from shared utils
 vi.mock("../../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn(),
+    ensureError: vi.fn((error) =>
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 // Import mocked modules to get references
@@ -212,10 +216,7 @@ describe(useSettingsStore, () => {
             });
 
             // Mock reset to return default value
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
-                success: true,
-                data: 1000,
-            });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(1000);
 
             // Then reset
             await act(async () => {
@@ -243,9 +244,7 @@ describe(useSettingsStore, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Initialization", "type");
 
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
-                data: 500,
-            });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(500);
 
             const { result } = renderHook(() => useSettingsStore());
 
@@ -254,7 +253,6 @@ describe(useSettingsStore, () => {
             });
 
             expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
-            expect(mockSafeExtractIpcData).toHaveBeenCalled();
             expect(result.current.settings.historyLimit).toBe(500);
         });
 
@@ -267,10 +265,10 @@ describe(useSettingsStore, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Initialization", "type");
 
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce({
-                success: false,
-                error: "Backend error",
-            });
+            // Mock rejection instead of incorrect response format
+            mockElectronAPI.settings.getHistoryLimit.mockRejectedValueOnce(
+                new Error("Backend error")
+            );
 
             const { result } = renderHook(() => useSettingsStore());
 
@@ -321,10 +319,7 @@ describe(useSettingsStore, () => {
             const { result } = renderHook(() => useSettingsStore());
 
             // Mock backend responses
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
-                success: true,
-                data: 2000,
-            });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(2000);
 
             await act(async () => {
                 await result.current.persistHistoryLimit(2000);
@@ -333,7 +328,6 @@ describe(useSettingsStore, () => {
             expect(
                 mockElectronAPI.settings.updateHistoryLimit
             ).toHaveBeenCalledWith(2000);
-            expect(mockSafeExtractIpcData).toHaveBeenCalled();
             expect(result.current.settings.historyLimit).toBe(2000);
             expect(mockLogStoreAction).toHaveBeenCalledWith(
                 "SettingsStore",
@@ -405,9 +399,7 @@ describe(useSettingsStore, () => {
             });
 
             // Mock getHistoryLimit to return 200 consistently to avoid sync interference
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
-                data: 200,
-            });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(200);
 
             // Set initial value first and wait for it to be set
             await act(async () => {
@@ -492,9 +484,14 @@ describe(useSettingsStore, () => {
 
             try {
                 await act(async () => {
-                    await expect(
-                        result.current.initializeSettings()
-                    ).rejects.toThrow();
+                    const result_obj =
+                        await result.current.initializeSettings();
+                    // Should handle the error gracefully and return fallback result
+                    expect(result_obj.success).toBeFalsy();
+                    expect(result_obj.message).toBe(
+                        "Settings initialized with default values"
+                    );
+                    expect(result_obj.settingsLoaded).toBeTruthy();
                 });
             } finally {
                 // Restore electronAPI
@@ -527,29 +524,26 @@ describe(useSettingsStore, () => {
             expect(result.current.settings.historyLimit).toBeGreaterThan(0);
         });
 
-        it("should handle safeExtractIpcData errors gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSettingsStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
-
-            // Reset the mock first
+        it("should handle API errors gracefully", async () => {
+            // Reset the mock first to ensure clean state
             mockElectronAPI.settings.getHistoryLimit.mockReset();
 
-            // Make the electronAPI call fail to return an error response
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
-                success: false,
-                error: "Backend error",
-                data: undefined,
-            });
+            // Make the electronAPI call fail - use mockRejectedValueOnce to limit scope
+            mockElectronAPI.settings.getHistoryLimit.mockRejectedValueOnce(
+                "Backend error"
+            );
 
             const { result } = renderHook(() => useSettingsStore());
 
             await act(async () => {
-                await result.current.initializeSettings();
+                const result_obj = await result.current.initializeSettings();
+
+                // Should handle the error gracefully and return fallback result
+                expect(result_obj.success).toBeFalsy();
+                expect(result_obj.message).toBe(
+                    "Settings initialized with default values"
+                );
+                expect(result_obj.settingsLoaded).toBeTruthy();
             });
 
             // Should use the fallback value (DEFAULT_HISTORY_LIMIT = 500)

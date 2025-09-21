@@ -27,6 +27,7 @@ Object.defineProperty(globalThis, "electronAPI", {
 // Mock utils
 vi.mock("../stores/utils", () => ({
     logStoreAction: vi.fn(),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
     withErrorHandling: vi.fn((asyncFn, handlers) =>
         asyncFn().catch((error: Error) => {
             handlers.setError(error);
@@ -124,10 +125,7 @@ describe(useSettingsStore, () => {
                 success: true,
                 message: "Settings reset successfully",
             });
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
-                success: true,
-                data: 100,
-            });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(100);
 
             // First modify settings
             useSettingsStore.getState().updateSettings({
@@ -161,10 +159,7 @@ describe(useSettingsStore, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Initialization", "type");
 
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
-                success: true,
-                data: 250,
-            });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(250);
 
             await useSettingsStore.getState().initializeSettings();
 
@@ -302,10 +297,7 @@ describe(useSettingsStore, () => {
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(
                 undefined
             );
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
-                success: true,
-                data: 300,
-            });
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(300);
 
             await useSettingsStore.getState().persistHistoryLimit(300);
 

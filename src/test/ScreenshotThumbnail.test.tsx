@@ -28,6 +28,12 @@ vi.mock("../services/logger", () => ({
     },
 }));
 
+// Mock the store utils
+vi.mock("../stores/utils", () => ({
+    logStoreAction: vi.fn(),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
+}));
+
 // Mock the theme hook
 vi.mock("../theme/useTheme", () => ({
     useTheme: () => ({
@@ -55,6 +61,9 @@ Element.prototype.setAttribute = function (name: string, value: string) {
 // Mock window properties
 const mockWindowOpen = vi.fn();
 const mockElectronAPI = {
+    sites: {
+        getSites: vi.fn(),
+    },
     system: {
         openExternal: vi.fn(),
     },
@@ -283,7 +292,7 @@ describe(ScreenshotThumbnail, () => {
             expect(preventDefaultSpy).toHaveBeenCalled();
         });
 
-        it("should handle electronAPI without openExternal method", ({
+        it("should handle electronAPI without openExternal method", async ({
             task,
             annotate,
         }) => {
@@ -300,6 +309,9 @@ describe(ScreenshotThumbnail, () => {
             // Mock electronAPI without system.openExternal that throws an error
             Object.defineProperty(globalThis, "electronAPI", {
                 value: {
+                    sites: {
+                        getSites: vi.fn(),
+                    },
                     system: {
                         openExternal: vi.fn().mockImplementation(() => {
                             throw new Error("openExternal not available");
@@ -312,20 +324,11 @@ describe(ScreenshotThumbnail, () => {
             // Mock window.open function directly
             vi.spyOn(globalThis, "open").mockImplementation(mockWindowOpen);
 
-            // Render the component
+            const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
 
-            // Find the link element
             const link = screen.getByRole("link");
-
-            // Create a click event with preventDefault
-            const clickEvent = createEvent.click(link);
-            Object.defineProperty(clickEvent, "preventDefault", {
-                value: vi.fn(),
-            });
-
-            // Directly dispatch the event
-            link.dispatchEvent(clickEvent);
+            await user.click(link);
 
             // Verify window.open was called with the correct parameters (due to fallback)
             expect(mockWindowOpen).toHaveBeenCalledWith(
@@ -1006,7 +1009,7 @@ describe(ScreenshotThumbnail, () => {
     });
 
     describe("Type Guard Functionality", () => {
-        it("should use electronAPI when openExternal is available", ({
+        it("should use electronAPI when openExternal is available", async ({
             task,
             annotate,
         }) => {
@@ -1021,6 +1024,9 @@ describe(ScreenshotThumbnail, () => {
             annotate("Type: Business Logic", "type");
 
             const apiWithOpenExternal = {
+                sites: {
+                    getSites: vi.fn(),
+                },
                 system: {
                     openExternal: vi.fn(),
                 },
@@ -1031,13 +1037,12 @@ describe(ScreenshotThumbnail, () => {
                 writable: true,
             });
 
+            const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
 
             const link = screen.getByRole("link");
 
-            // Use fireEvent instead of userEvent to avoid JSDOM navigation errors
-
-            fireEvent.click(link);
+            await user.click(link);
 
             // If hasOpenExternal works correctly, electronAPI.openExternal should be called
             expect(
@@ -1045,7 +1050,7 @@ describe(ScreenshotThumbnail, () => {
             ).toHaveBeenCalledWith("https://example.com");
         });
 
-        it("should fallback to window.open when openExternal is not available", ({
+        it("should fallback to window.open when openExternal is not available", async ({
             task,
             annotate,
         }) => {
@@ -1060,6 +1065,9 @@ describe(ScreenshotThumbnail, () => {
             annotate("Type: Business Logic", "type");
 
             const apiWithoutOpenExternal = {
+                sites: {
+                    getSites: vi.fn(),
+                },
                 system: {
                     openExternal: vi.fn().mockImplementation(() => {
                         throw new Error("openExternal not available");
@@ -1072,14 +1080,12 @@ describe(ScreenshotThumbnail, () => {
                 writable: true,
             });
 
+            const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
 
             const link = screen.getByRole("link");
 
-            // Use fireEvent with preventDefault to avoid JSDOM navigation errors
-            const clickEvent = createEvent.click(link);
-
-            fireEvent(link, clickEvent);
+            await user.click(link);
 
             // Should fall back to window.open
             expect(mockWindowOpen).toHaveBeenCalledWith(

@@ -33,10 +33,14 @@ vi.mock("@shared/utils/errorHandling", () => ({
             store.setLoading(false);
         }
     }),
+    ensureError: vi.fn((error) =>
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("../../../types/ipc", () => ({

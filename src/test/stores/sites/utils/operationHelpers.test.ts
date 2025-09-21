@@ -18,11 +18,15 @@ vi.mock("../../../../../shared/utils/errorCatalog", () => ({
 // Mock the error handling utility
 vi.mock("../../../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn(),
+    ensureError: vi.fn((error) =>
+        error instanceof Error ? error : new Error(String(error))
+    ),
 }));
 
 // Mock the store action logging
 vi.mock("../../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock the store error handling

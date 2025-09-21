@@ -14,10 +14,20 @@ import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
 // Mock the logger
 vi.mock("../stores/utils", () => ({
     logStoreAction: vi.fn(),
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
-// Mock window.electronAPI
-const mockQuitAndInstall = vi.fn();
+vi.mock("../services/SystemService", () => ({
+    SystemService: {
+        quitAndInstall: vi.fn(),
+    },
+}));
+
+import { SystemService } from "../services/SystemService";
+
+// Mock window.electronAPI with fresh mock function
+const mockElectronAPIQuitAndInstall = vi.fn();
+const mockQuitAndInstall = vi.mocked(SystemService.quitAndInstall); // Mock window.electronAPI
 
 // Helper to setup electronAPI mock
 const setupElectronAPIMock = (mockAPI: unknown) => {
@@ -29,7 +39,7 @@ const setupElectronAPIMock = (mockAPI: unknown) => {
 // Setup default mock
 setupElectronAPIMock({
     system: {
-        quitAndInstall: mockQuitAndInstall,
+        quitAndInstall: mockElectronAPIQuitAndInstall,
     },
 });
 
