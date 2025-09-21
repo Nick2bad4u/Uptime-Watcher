@@ -187,6 +187,37 @@ function extractVoidIpcData(response: unknown): void {
     throw new Error("Invalid IPC response format for void operation");
 }
 
+/**
+ * Validates and extracts string data from IPC responses.
+ *
+ * @param response - IPC response from main process
+ *
+ * @returns String from response data
+ *
+ * @throws Error if response is invalid or operation failed
+ */
+function extractStringIpcData(response: unknown): string {
+    if (
+        typeof response === "object" &&
+        response !== null &&
+        "success" in response &&
+        "data" in response
+    ) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type is validated through runtime checks above
+        const ipcResponse = response as IpcResponse<string>;
+
+        if (!ipcResponse.success) {
+            throw new Error(ipcResponse.error ?? "IPC operation failed");
+        }
+
+        if (typeof ipcResponse.data === "string") {
+            return ipcResponse.data;
+        }
+    }
+
+    throw new Error("Invalid IPC response format for string operation");
+}
+
 function validateBackupResponse(response: unknown): {
     buffer: ArrayBuffer;
     fileName: string;
@@ -515,7 +546,20 @@ const dataAPI = {
      * @returns Promise resolving to JSON string containing all sites, monitors,
      *   and settings
      */
-    exportData: (): Promise<string> => ipcRenderer.invoke("export-data"),
+    exportData: async (): Promise<string> => {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- IPC response type validated at runtime
+            const response = await ipcRenderer.invoke("export-data");
+            return extractStringIpcData(response);
+        } catch (error) {
+            throw new Error(
+                `Failed to export data: ${getErrorMessage(error)}`,
+                {
+                    cause: error,
+                }
+            );
+        }
+    },
 
     /**
      * Import application data from JSON string.
@@ -525,8 +569,20 @@ const dataAPI = {
      * @returns Promise resolving to true if import was successful, false
      *   otherwise
      */
-    importData: (data: string): Promise<boolean> =>
-        ipcRenderer.invoke("import-data", data),
+    importData: async (data: string): Promise<boolean> => {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- IPC response type validated at runtime
+            const response = await ipcRenderer.invoke("import-data", data);
+            return extractBooleanIpcData(response);
+        } catch (error) {
+            throw new Error(
+                `Failed to import data: ${getErrorMessage(error)}`,
+                {
+                    cause: error,
+                }
+            );
+        }
+    },
 };
 
 /**
@@ -543,8 +599,20 @@ const settingsAPI = {
      * @returns Promise resolving to the number of history records kept per
      *   monitor
      */
-    getHistoryLimit: (): Promise<number> =>
-        ipcRenderer.invoke("get-history-limit"),
+    getHistoryLimit: async (): Promise<number> => {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- IPC response type validated at runtime
+            const response = await ipcRenderer.invoke("get-history-limit");
+            return extractNumberIpcData(response);
+        } catch (error) {
+            throw new Error(
+                `Failed to get history limit: ${getErrorMessage(error)}`,
+                {
+                    cause: error,
+                }
+            );
+        }
+    },
 
     /**
      * Reset all application settings to their default values.
@@ -558,7 +626,20 @@ const settingsAPI = {
      *
      * @returns Promise resolving when all settings have been reset to defaults
      */
-    resetSettings: (): Promise<void> => ipcRenderer.invoke("reset-settings"),
+    resetSettings: async (): Promise<void> => {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- IPC response type validated at runtime
+            const response = await ipcRenderer.invoke("reset-settings");
+            extractVoidIpcData(response);
+        } catch (error) {
+            throw new Error(
+                `Failed to reset settings: ${getErrorMessage(error)}`,
+                {
+                    cause: error,
+                }
+            );
+        }
+    },
 
     /**
      * Update the history retention limit and prune existing history.
@@ -573,8 +654,23 @@ const settingsAPI = {
      * @returns Promise resolving when the limit is updated and old records are
      *   pruned
      */
-    updateHistoryLimit: (limit: number): Promise<void> =>
-        ipcRenderer.invoke("update-history-limit", limit),
+    updateHistoryLimit: async (limit: number): Promise<void> => {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- IPC response type validated at runtime
+            const response = await ipcRenderer.invoke(
+                "update-history-limit",
+                limit
+            );
+            extractVoidIpcData(response);
+        } catch (error) {
+            throw new Error(
+                `Failed to update history limit: ${getErrorMessage(error)}`,
+                {
+                    cause: error,
+                }
+            );
+        }
+    },
 };
 
 /**

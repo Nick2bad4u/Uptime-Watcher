@@ -90,8 +90,8 @@ export class WindowService {
 
         // Check for headless mode (for testing environments)
         const isHeadless =
-            process.env["HEADLESS"] === "true" ||
-            process.env["CI"] === "true" ||
+            this.getEnvFlag("HEADLESS") ||
+            this.getEnvFlag("CI") ||
             process.argv.includes("--headless") ||
             process.argv.includes("--test-headless");
 
@@ -590,5 +590,26 @@ export class WindowService {
             this.handleDidFailLoad
         );
         this.mainWindow.removeListener("closed", this.handleClosed);
+    }
+
+    /**
+     * Safe environment flag checker following shared utility patterns.
+     *
+     * @param name - Environment variable name to check
+     *
+     * @returns True if the environment variable is set to "true", false
+     *   otherwise
+     */
+    private getEnvFlag(name: string): boolean {
+        try {
+            if (typeof process === "undefined") {
+                return false;
+            }
+            // eslint-disable-next-line n/no-process-env -- Controlled environment access following shared patterns
+            const val = process.env[name];
+            return val === "true";
+        } catch {
+            return false;
+        }
     }
 }

@@ -151,9 +151,17 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
 // Security / performance tunables (can be overridden via env for emergency mitigation)
 // Centralized accessor to satisfy lint rules about environment usage
 function getEnv(name: string, fallback: string): string {
-    // eslint-disable-next-line n/no-process-env -- Controlled, centralized access
-    const val = process.env[name];
-    return val === undefined || val === "" ? fallback : val;
+    try {
+        // Use safe process.env access pattern from shared utilities
+        if (typeof process === "undefined") {
+            return fallback;
+        }
+        // eslint-disable-next-line n/no-process-env -- Controlled environment access following shared patterns
+        const val = process.env[name];
+        return val === undefined || val === "" ? fallback : val;
+    } catch {
+        return fallback;
+    }
 }
 
 const DEFAULT_MAX_REDIRECTS =

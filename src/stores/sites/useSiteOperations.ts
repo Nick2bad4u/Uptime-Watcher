@@ -16,7 +16,10 @@ import { getErrorMessage } from "@shared/utils/errorUtils";
 import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
 
+import { DataService } from "../../services/DataService";
 import { logger } from "../../services/logger";
+import { MonitoringService } from "./services/MonitoringService";
+import { SiteService } from "./services/SiteService";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
 import { normalizeMonitor } from "./utils/monitorOperations";
 import {
@@ -64,7 +67,7 @@ export const createSiteOperationsActions = (
 
                 // Allow multiple monitors of the same type
                 const updatedMonitors = [...site.monitors, monitor];
-                await window.electronAPI.sites.updateSite(siteId, {
+                await SiteService.updateSite(siteId, {
                     monitors: updatedMonitors,
                 });
             },
@@ -115,8 +118,7 @@ export const createSiteOperationsActions = (
                 };
 
                 // Preload now returns extracted data directly
-                const newSite =
-                    await window.electronAPI.sites.addSite(completeSite);
+                const newSite = await SiteService.addSite(completeSite);
                 deps.addSite(newSite);
             },
             { siteData },
@@ -137,7 +139,7 @@ export const createSiteOperationsActions = (
                     for (const monitor of site.monitors) {
                         try {
                             // eslint-disable-next-line no-await-in-loop -- Sequential monitor stop operations required
-                            await window.electronAPI.monitoring.stopMonitoringForSite(
+                            await MonitoringService.stopMonitoring(
                                 identifier,
                                 monitor.id
                             );
@@ -154,13 +156,7 @@ export const createSiteOperationsActions = (
                         }
                     }
                 }
-                const success =
-                    await window.electronAPI.sites.removeSite(identifier);
-                if (!success) {
-                    throw new Error(
-                        `Failed to remove site ${identifier}: Backend operation failed`
-                    );
-                }
+                await SiteService.removeSite(identifier);
                 deps.removeSite(identifier);
             },
             { identifier },
@@ -176,7 +172,7 @@ export const createSiteOperationsActions = (
                 await handleSQLiteBackupDownload(async () => {
                     try {
                         const response =
-                            await window.electronAPI.data.downloadSQLiteBackup();
+                            await DataService.downloadSQLiteBackup();
                         // Response from preload is already unwrapped: { buffer: ArrayBuffer, fileName: string }
                         return new Uint8Array(response.buffer);
                     } catch (error) {
@@ -202,7 +198,7 @@ export const createSiteOperationsActions = (
             "initializeSites",
             async () => {
                 // Preload now returns extracted data directly
-                const sites = await window.electronAPI.sites.getSites();
+                const sites = await SiteService.getSites();
                 deps.setSites(sites);
                 return {
                     message: `Successfully loaded ${sites.length} sites`,
@@ -221,7 +217,7 @@ export const createSiteOperationsActions = (
         await withSiteOperation(
             "modifySite",
             async () => {
-                await window.electronAPI.sites.updateSite(identifier, updates);
+                await SiteService.updateSite(identifier, updates);
             },
             { identifier, updates },
             deps
@@ -241,10 +237,7 @@ export const createSiteOperationsActions = (
 
                 // Stop monitoring for this specific monitor first
                 try {
-                    await window.electronAPI.monitoring.stopMonitoringForSite(
-                        siteId,
-                        monitorId
-                    );
+                    await MonitoringService.stopMonitoring(siteId, monitorId);
                 } catch (error) {
                     // Log but do not block removal if stopping fails
                     if (isDevelopment()) {
@@ -258,7 +251,7 @@ export const createSiteOperationsActions = (
                 }
 
                 // Remove the monitor via backend
-                await window.electronAPI.sites.removeMonitor(siteId, monitorId);
+                await SiteService.removeMonitor(siteId, monitorId);
             },
             { monitorId, siteId },
             deps

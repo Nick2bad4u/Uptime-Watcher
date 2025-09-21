@@ -619,13 +619,22 @@ describe("Electron Preload Script", () => {
                 "purpose"
             );
 
+            // Mock IPC response for exportData
+            const mockExportedData = JSON.stringify({ sites: [], events: [] });
+            const mockExportResponse = {
+                success: true,
+                data: mockExportedData,
+            };
+            mockIpcRenderer.invoke.mockResolvedValueOnce(mockExportResponse);
+
             await import("../preload");
 
             const exposedAPI = getExposedAPI();
 
-            await exposedAPI.data.exportData();
+            const result = await exposedAPI.data.exportData();
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("export-data");
+            expect(result).toBe(mockExportedData);
         });
 
         it("should properly invoke IPC for importData", async ({
@@ -764,15 +773,26 @@ describe("Electron Preload Script", () => {
                 "purpose"
             );
 
+            // Mock IPC response for getHistoryLimit
+            const mockHistoryLimit = 100;
+            const mockHistoryLimitResponse = {
+                success: true,
+                data: mockHistoryLimit,
+            };
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                mockHistoryLimitResponse
+            );
+
             await import("../preload");
 
             const exposedAPI = getExposedAPI();
 
-            await exposedAPI.settings.getHistoryLimit();
+            const result = await exposedAPI.settings.getHistoryLimit();
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 "get-history-limit"
             );
+            expect(result).toBe(mockHistoryLimit);
         });
 
         it("should properly invoke IPC for updateHistoryLimit", async ({

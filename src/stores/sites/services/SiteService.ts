@@ -11,6 +11,7 @@ import type { Site } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
+import { DataService } from "../../../services/DataService";
 import { logger } from "../../../services/logger";
 import { waitForElectronAPI } from "../../utils";
 
@@ -93,7 +94,7 @@ export const SiteService = {
     }> {
         await this.initialize();
         // Preload now returns extracted data directly
-        return window.electronAPI.data.downloadSQLiteBackup();
+        return DataService.downloadSQLiteBackup();
     },
 
     /**

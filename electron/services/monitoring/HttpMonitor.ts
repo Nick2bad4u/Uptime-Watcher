@@ -226,9 +226,17 @@ export class HttpMonitor implements IMonitorService {
     private config: MonitorConfig;
 
     private static getEnv(name: string, fallback: string): string {
-        // eslint-disable-next-line n/no-process-env -- centralized access
-        const val = process.env[name];
-        return val === undefined || val === "" ? fallback : val;
+        try {
+            // Use safe process.env access pattern from shared utilities
+            if (typeof process === "undefined") {
+                return fallback;
+            }
+            // eslint-disable-next-line n/no-process-env -- Controlled environment access following shared patterns
+            const val = process.env[name];
+            return val === undefined || val === "" ? fallback : val;
+        } catch {
+            return fallback;
+        }
     }
     /**
      * Axios instance configured for monitoring.

@@ -44,6 +44,7 @@ import { persist, type PersistOptions } from "zustand/middleware";
 import type { UpdateStatus } from "../types";
 import type { UpdateInfo, UpdatesStore } from "./types";
 
+import { SystemService } from "../../services/SystemService";
 import { logStoreAction } from "../utils";
 
 /**
@@ -101,7 +102,7 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
         (set) => ({
             // Actions
             applyUpdate: (): void => {
-                window.electronAPI.system.quitAndInstall();
+                void SystemService.quitAndInstall();
                 logStoreAction("UpdatesStore", "applyUpdate", {
                     message: "Applying update and restarting application",
                     success: true,

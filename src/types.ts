@@ -363,16 +363,9 @@ declare global {
                  * @remarks
                  * Get current history retention limit.
                  *
-                 * @returns A promise resolving to an IPC response containing
-                 *   the history limit.
+                 * @returns A promise resolving to the history limit number.
                  */
-                getHistoryLimit: () => Promise<{
-                    data?: number;
-                    error?: string;
-                    metadata?: UnknownRecord;
-                    success: boolean;
-                    warnings?: string[];
-                }>;
+                getHistoryLimit: () => Promise<number>;
                 /**
                  * @remarks
                  * Reset all application settings to their default values.

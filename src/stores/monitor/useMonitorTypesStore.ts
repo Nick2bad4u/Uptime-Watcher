@@ -50,6 +50,7 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { BaseStore } from "../types";
 
+import { MonitorTypesService } from "../../services/MonitorTypesService";
 import { safeExtractIpcData } from "../../types/ipc";
 import { logStoreAction } from "../utils";
 
@@ -290,7 +291,7 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                     });
 
                     const response =
-                        await window.electronAPI.monitorTypes.formatMonitorDetail(
+                        await MonitorTypesService.formatMonitorDetail(
                             type,
                             details
                         );
@@ -321,7 +322,7 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                     );
 
                     const response =
-                        await window.electronAPI.monitorTypes.formatMonitorTitleSuffix(
+                        await MonitorTypesService.formatMonitorTitleSuffix(
                             type,
                             monitor
                         );
@@ -368,7 +369,7 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                     logStoreAction("MonitorTypesStore", "loadMonitorTypes", {});
 
                     const response =
-                        await window.electronAPI.monitorTypes.getMonitorTypes();
+                        await MonitorTypesService.getMonitorTypes();
                     const rawConfigs = safeExtractIpcData<MonitorTypeConfig[]>(
                         response,
                         []
@@ -446,7 +447,7 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                     });
 
                     const response =
-                        await window.electronAPI.monitorTypes.validateMonitorData(
+                        await MonitorTypesService.validateMonitorData(
                             type,
                             data
                         );

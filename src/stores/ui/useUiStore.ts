@@ -39,6 +39,7 @@ import type { ChartTimeRange } from "../types";
 import type { UIStore } from "./types";
 
 import { logger } from "../../services/logger";
+import { SystemService } from "../../services/SystemService";
 import { logStoreAction } from "../utils";
 
 /**
@@ -109,13 +110,12 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 // Use electronAPI to open external URL
                 // In test environments, this might fallback to window.open via
                 // mocking
-                try {
-                    window.electronAPI.system.openExternal(url);
-                } catch {
+                /* eslint-disable-next-line promise/prefer-await-to-then -- Fire-and-forget pattern for external URL opening */
+                void SystemService.openExternal(url).catch(() => {
                     // Fallback for test environments where electronAPI might
                     // throw
                     window.open(url, "_blank", "noopener");
-                }
+                });
             },
             selectedSiteId: undefined,
             selectSite: (site: Site | undefined): void => {

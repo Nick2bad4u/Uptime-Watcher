@@ -185,23 +185,43 @@ describe("preload.ts - Missing Branch Coverage", () => {
             ).resolves.toBeTruthy();
         });
         it("should handle invalid numeric parameters", async () => {
-            // Test with invalid numeric parameters
+            // Test with invalid numeric parameters - updateHistoryLimit returns void
             await expect(
                 exposedAPI.settings.updateHistoryLimit(-1)
-            ).resolves.toEqual({ success: true, data: true });
+            ).resolves.toBeUndefined();
             await expect(
                 exposedAPI.settings.updateHistoryLimit(0)
-            ).resolves.toEqual({ success: true, data: true });
+            ).resolves.toBeUndefined();
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Infinity)
-            ).resolves.toEqual({ success: true, data: true });
+            ).resolves.toBeUndefined();
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Number.NaN)
-            ).resolves.toEqual({ success: true, data: true });
+            ).resolves.toBeUndefined();
         });
     });
     describe("Concurrent Operations", () => {
         it("should handle concurrent API calls", async () => {
+            // Set up specific mock responses for each API call
+            mockIpcRenderer.invoke.mockImplementation((channel: string) => {
+                if (channel === "get-sites") {
+                    return Promise.resolve({ success: true, data: [mockSite] });
+                }
+                if (channel === "get-monitor-types") {
+                    return Promise.resolve({ success: true, data: [] });
+                }
+                if (channel === "get-history-limit") {
+                    return Promise.resolve({ success: true, data: 100 });
+                }
+                if (channel === "export-data") {
+                    return Promise.resolve({
+                        success: true,
+                        data: '{"sites":[],"events":[]}',
+                    });
+                }
+                return Promise.resolve({ success: true, data: true });
+            });
+
             // Test concurrent API calls
             const promises = [
                 exposedAPI.sites.getSites(),
@@ -213,9 +233,9 @@ describe("preload.ts - Missing Branch Coverage", () => {
             const results = await Promise.all(promises);
             expect(results).toEqual([
                 [mockSite], // GetSites returns extracted Site array
-                { success: true, data: true }, // Other APIs return raw IPC response
-                { success: true, data: true },
-                { success: true, data: true },
+                { success: true, data: [] }, // GetMonitorTypes returns raw IPC response
+                100, // GetHistoryLimit returns extracted number
+                '{"sites":[],"events":[]}', // ExportData returns extracted string
             ]);
         });
         it("should handle mixed success/failure scenarios", async () => {
