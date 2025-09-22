@@ -129,6 +129,14 @@ const surfaceColorsArbitrary = fc.record({
     overlay: colorArbitrary,
 });
 
+const shadowColorsArbitrary = fc.record({
+    degraded: colorArbitrary,
+    error: colorArbitrary,
+    paused: colorArbitrary,
+    success: colorArbitrary,
+    warning: colorArbitrary,
+});
+
 const textColorsArbitrary = fc.record({
     inverse: colorArbitrary,
     primary: colorArbitrary,
@@ -144,6 +152,7 @@ const themeColorsArbitrary: fc.Arbitrary<ThemeColors> = fc.record({
     hover: hoverColorsArbitrary,
     info: colorArbitrary,
     primary: primaryColorsArbitrary,
+    shadows: shadowColorsArbitrary,
     status: statusColorsArbitrary,
     success: colorArbitrary,
     surface: surfaceColorsArbitrary,

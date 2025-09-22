@@ -142,11 +142,11 @@ Look for sequential import chains in the CPU profile.
 ```typescript
 // vite.config.ts
 export default defineConfig({
-  build: {
-    target: 'esnext', // Use latest JS features for smaller bundles
-    minify: 'esbuild', // Fast minification
-    sourcemap: true, // Enable for debugging
-  }
+ build: {
+  target: "esnext", // Use latest JS features for smaller bundles
+  minify: "esbuild", // Fast minification
+  sourcemap: true, // Enable for debugging
+ },
 });
 ```
 
@@ -160,13 +160,13 @@ build: {
         // Framework chunks
         'react-vendor': ['react', 'react-dom'],
         'electron-vendor': ['electron'],
-        
+
         // Chart.js (large library)
         'chart-vendor': ['chart.js', 'chartjs-adapter-date-fns'],
-        
+
         // UI framework
         'ui-vendor': ['@headlessui/react', 'react-hot-toast'],
-        
+
         // Utilities
         'utils-vendor': ['date-fns', 'lodash-es', 'zustand'],
       }
@@ -195,35 +195,35 @@ server: {
 
 ```typescript
 plugins: [
-  react({
-    fastRefresh: true, // Enable React Fast Refresh
-    jsxRuntime: 'automatic', // Modern JSX runtime
-  }),
-]
+ react({
+  fastRefresh: true, // Enable React Fast Refresh
+  jsxRuntime: "automatic", // Modern JSX runtime
+ }),
+];
 ```
 
 #### CSS Modules Enhancement
 
 ```typescript
-import { patchCssModules } from 'vite-css-modules';
+import { patchCssModules } from "vite-css-modules";
 
 plugins: [
-  patchCssModules(), // Enhanced CSS modules support
-]
+ patchCssModules(), // Enhanced CSS modules support
+];
 ```
 
 #### Bundle Analysis
 
 ```typescript
 // Development bundle analysis
-import { analyzer } from 'vite-bundle-analyzer';
+import { analyzer } from "vite-bundle-analyzer";
 
 plugins: [
-  analyzer({
-    analyzerMode: 'server',
-    openAnalyzer: false,
-  }),
-]
+ analyzer({
+  analyzerMode: "server",
+  openAnalyzer: false,
+ }),
+];
 ```
 
 ### Performance Monitoring
@@ -248,15 +248,17 @@ Watch console for warmup effectiveness and transform times.
 ### Component Optimization
 
 1. **Use React.memo for expensive components**:
+
    ```tsx
    const SiteCard = React.memo(({ site }: { site: Site }) => {
-     return <div>...</div>;
+    return <div>...</div>;
    });
    ```
 
 2. **Lazy load heavy components**:
+
    ```tsx
-   const ChartComponent = lazy(() => import('./ChartComponent'));
+   const ChartComponent = lazy(() => import("./ChartComponent"));
    ```
 
 3. **Minimize prop drilling with Zustand stores**:
@@ -268,36 +270,40 @@ Watch console for warmup effectiveness and transform times.
 ### Import Optimization
 
 1. **Use barrel exports sparingly**:
+
    ```typescript
    // Prefer direct imports
-   import { Button } from './components/Button';
-   
+   import { Button } from "./components/Button";
+
    // Over barrel imports
-   import { Button } from './components';
+   import { Button } from "./components";
    ```
 
 2. **Import only what you need**:
+
    ```typescript
    // Good
-   import { format } from 'date-fns';
-   
+   import { format } from "date-fns";
+
    // Avoid
-   import * as dateFns from 'date-fns';
+   import * as dateFns from "date-fns";
    ```
 
 3. **Use dynamic imports for large libraries**:
    ```typescript
-   const chartJs = await import('chart.js');
+   const chartJs = await import("chart.js");
    ```
 
 ### Build Optimization
 
 1. **Monitor bundle size regularly**:
+
    ```bash
    npm run analyze:bundle
    ```
 
 2. **Use profiling to identify bottlenecks**:
+
    ```bash
    npm run profile:transform
    npm run dev:profile

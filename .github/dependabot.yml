@@ -11,6 +11,9 @@
 version: 2
 updates:
     - package-ecosystem: github-actions
+      cooldown:
+          default-days: 3
+          include: ["*"]
       directory: /
       schedule:
           interval: daily
@@ -56,6 +59,15 @@ updates:
           - dependency-name: "@shared/utils"
             versions: ["*"]
           - dependency-name: "@shared/validation"
+            versions: ["*"]
+            # Ignore local file dependencies - these are not external packages
+          - dependency-name: "file:./shared/constants"
+            versions: ["*"]
+          - dependency-name: "file:./shared/types"
+            versions: ["*"]
+          - dependency-name: "file:./shared/utils"
+            versions: ["*"]
+          - dependency-name: "file:./shared/validation"
             versions: ["*"]
 
       labels:

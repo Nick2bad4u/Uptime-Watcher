@@ -161,9 +161,12 @@ Always follow this order to minimize breaking changes:
 
 **Current Implementation Pattern:**
 
-```tsx
+````tsx
 // Import standardized prop types for consistency
-import type { ComponentSize, ComponentVariant } from "@shared/types/componentProps";
+import type {
+ ComponentSize,
+ ComponentVariant,
+} from "@shared/types/componentProps";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useEffect, useState } from "react";
@@ -180,10 +183,10 @@ import { useCallback, useEffect, useState } from "react";
  *
  * ```tsx
  * <MyComponent
- *   siteName="Example Site"
- *   onAction={handleAction}
- *   isLoading={false}
- * />
+ *  siteName="Example Site"
+ *  onAction={handleAction}
+ *  isLoading={false}
+ * />;
  * ```
  *
  * @param props - Component properties using standardized patterns
@@ -193,64 +196,66 @@ import { useCallback, useEffect, useState } from "react";
  * @public
  */
 export const MyComponent = ({
-  // Core props
-  siteName,
-  className = "",
-  disabled = false,
+ // Core props
+ siteName,
+ className = "",
+ disabled = false,
 
-  // Event handlers
-  onAction,
-  onChange,
+ // Event handlers
+ onAction,
+ onChange,
 
-  // Component-specific props
-  customProp,
+ // Component-specific props
+ customProp,
 }: MyComponentProperties): JSX.Element => {
-  // State and hooks
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+ // State and hooks
+ const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Event handlers with proper typing
-  const handleClick = useCallback(
-    (event: React.MouseEvent) => {
-      event?.stopPropagation(); // Prevent event bubbling
-      if (disabled || isLoading) return;
-      onAction?.(event);
-    },
-    [onAction, disabled, isLoading]
-  );
+ // Event handlers with proper typing
+ const handleClick = useCallback(
+  (event: React.MouseEvent) => {
+   event?.stopPropagation(); // Prevent event bubbling
+   if (disabled || isLoading) return;
+   onAction?.(event);
+  },
+  [onAction, disabled, isLoading]
+ );
 
-  const handleChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value;
-      onChange?.(value, event);
-    },
-    [onChange]
-  );
+ const handleChange = useCallback(
+  (event: React.ChangeEvent<HTMLInputElement>) => {
+   const value = event.target.value;
+   onChange?.(value, event);
+  },
+  [onChange]
+ );
 
-  // Effect cleanup pattern
-  useEffect(
-    function setupComponent() {
-      // Setup logic here
-      
-      return function cleanup() {
-        // Cleanup logic here
-      };
-    },
-    [/* dependencies */]
-  );
+ // Effect cleanup pattern
+ useEffect(
+  function setupComponent() {
+   // Setup logic here
 
-  // Early returns for conditional rendering
-  if (conditionalReturn) {
-    return <></>;
-  }
+   return function cleanup() {
+    // Cleanup logic here
+   };
+  },
+  [
+   /* dependencies */
+  ]
+ );
 
-  // Main render
-  return (
-    <div className={className} data-testid={`my-component-${siteName}`}>
-      {/* Component content */}
-    </div>
-  );
+ // Early returns for conditional rendering
+ if (conditionalReturn) {
+  return <></>;
+ }
+
+ // Main render
+ return (
+  <div className={className} data-testid={`my-component-${siteName}`}>
+   {/* Component content */}
+  </div>
+ );
 };
-```
+````
 
 ### Props Interface
 
@@ -260,46 +265,50 @@ export const MyComponent = ({
  *
  * @remarks
  * Uses modern TypeScript interfaces with proper typing and optional properties.
- * Components receive specific props rather than extending large base interfaces.
+ * Components receive specific props rather than extending large base
+ * interfaces.
  *
  * @public
  */
 export interface MyComponentProperties {
-  /** Site name for identification and display */
-  readonly siteName: string;
-  /** Additional CSS classes for styling customization */
-  readonly className?: string;
-  /** Whether the component is disabled and non-interactive */
-  readonly disabled?: boolean;
-  /** Component-specific configuration prop */
-  readonly customProp: string;
-  /** Optional feature toggle */
-  readonly enableFeature?: boolean;
-  
-  /** Event handlers with proper typing */
-  readonly onAction?: (event: React.MouseEvent) => void;
-  readonly onChange?: (value: string, event: React.ChangeEvent<HTMLInputElement>) => void;
+ /** Site name for identification and display */
+ readonly siteName: string;
+ /** Additional CSS classes for styling customization */
+ readonly className?: string;
+ /** Whether the component is disabled and non-interactive */
+ readonly disabled?: boolean;
+ /** Component-specific configuration prop */
+ readonly customProp: string;
+ /** Optional feature toggle */
+ readonly enableFeature?: boolean;
+
+ /** Event handlers with proper typing */
+ readonly onAction?: (event: React.MouseEvent) => void;
+ readonly onChange?: (
+  value: string,
+  event: React.ChangeEvent<HTMLInputElement>
+ ) => void;
 }
 
 // For complex components, use specific interfaces
 export interface ComplexComponentProperties {
-  /** Component identification */
-  readonly siteName: string;
-  readonly className?: string;
-  readonly disabled?: boolean;
+ /** Component identification */
+ readonly siteName: string;
+ readonly className?: string;
+ readonly disabled?: boolean;
 
-  /** Event handlers group */
-  readonly onClick?: (event: React.MouseEvent) => void;
-  readonly onSubmit?: (event: React.FormEvent) => void;
-  readonly onKeyDown?: (event: React.KeyboardEvent) => void;
+ /** Event handlers group */
+ readonly onClick?: (event: React.MouseEvent) => void;
+ readonly onSubmit?: (event: React.FormEvent) => void;
+ readonly onKeyDown?: (event: React.KeyboardEvent) => void;
 
-  /** Component configuration */
-  readonly variant?: ComponentVariant;
-  readonly size?: ComponentSize;
+ /** Component configuration */
+ readonly variant?: ComponentVariant;
+ readonly size?: ComponentSize;
 
-  /** Data props */
-  readonly items: Array<{ id: string; label: string }>;
-  readonly selectedItemId?: string;
+ /** Data props */
+ readonly items: Array<{ id: string; label: string }>;
+ readonly selectedItemId?: string;
 }
 ```
 
@@ -324,16 +333,16 @@ The application provides reusable prop type definitions in `shared/types/compone
 
 ```tsx
 import type {
-  ComponentSize,
-  ComponentVariant,
-  SubmitHandler,
+ ComponentSize,
+ ComponentVariant,
+ SubmitHandler,
 } from "@shared/types/componentProps";
 
 // Use standardized size and variant types
 interface ButtonProperties {
-  readonly size?: ComponentSize; // "xs" | "sm" | "md" | "lg" | "xl"
-  readonly variant?: ComponentVariant; // "primary" | "secondary" | "danger" | etc.
-  readonly onSubmit?: SubmitHandler; // Standardized form submission handler
+ readonly size?: ComponentSize; // "xs" | "sm" | "md" | "lg" | "xl"
+ readonly variant?: ComponentVariant; // "primary" | "secondary" | "danger" | etc.
+ readonly onSubmit?: SubmitHandler; // Standardized form submission handler
 }
 ```
 
@@ -342,31 +351,31 @@ interface ButtonProperties {
 ```tsx
 // Standard event handlers used in current implementation
 const handleClick = useCallback(
-  (event: React.MouseEvent) => {
-    event?.stopPropagation();
-    if (disabled) return;
-    onClick?.(event);
-  },
-  [onClick, disabled]
+ (event: React.MouseEvent) => {
+  event?.stopPropagation();
+  if (disabled) return;
+  onClick?.(event);
+ },
+ [onClick, disabled]
 );
 
 // Input change handler
 const handleChange = useCallback(
-  (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    onChange?.(value, event);
-  },
-  [onChange]
+ (event: React.ChangeEvent<HTMLInputElement>) => {
+  const value = event.target.value;
+  onChange?.(value, event);
+ },
+ [onChange]
 );
 
 // Form submission handler
 const handleSubmit = useCallback(
-  (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    onSubmit?.(formData, event);
-  },
-  [onSubmit]
+ (event: React.FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
+  const formData = new FormData(event.currentTarget);
+  onSubmit?.(formData, event);
+ },
+ [onSubmit]
 );
 ```
 
@@ -386,49 +395,49 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export const useUIStore = create<UIStore>()(
-  persist(
-    (set, get) => ({
-      // Initial state
-      showAddSiteModal: false,
-      showSettings: false,
-      showSiteDetails: false,
-      selectedSiteId: undefined,
-      activeTab: "dashboard",
+ persist(
+  (set, get) => ({
+   // Initial state
+   showAddSiteModal: false,
+   showSettings: false,
+   showSiteDetails: false,
+   selectedSiteId: undefined,
+   activeTab: "dashboard",
 
-      // Actions
-      setShowAddSiteModal: (show: boolean) => {
-        logStoreAction("UIStore", "setShowAddSiteModal", { show });
-        set({ showAddSiteModal: show });
-      },
+   // Actions
+   setShowAddSiteModal: (show: boolean) => {
+    logStoreAction("UIStore", "setShowAddSiteModal", { show });
+    set({ showAddSiteModal: show });
+   },
 
-      setShowSettings: (show: boolean) => {
-        logStoreAction("UIStore", "setShowSettings", { show });
-        set({ showSettings: show });
-      },
+   setShowSettings: (show: boolean) => {
+    logStoreAction("UIStore", "setShowSettings", { show });
+    set({ showSettings: show });
+   },
 
-      setSelectedSiteId: (siteId: string | undefined) => {
-        logStoreAction("UIStore", "setSelectedSiteId", { siteId });
-        set({ selectedSiteId: siteId });
-      },
+   setSelectedSiteId: (siteId: string | undefined) => {
+    logStoreAction("UIStore", "setSelectedSiteId", { siteId });
+    set({ selectedSiteId: siteId });
+   },
 
-      // Compound actions
-      showSiteDetails: (siteId: string) => {
-        logStoreAction("UIStore", "showSiteDetails", { siteId });
-        set({
-          selectedSiteId: siteId,
-          showSiteDetails: true,
-        });
-      },
-    }),
-    {
-      name: "ui-store",
-      partialize: (state) => ({
-        // Persist user preferences only
-        activeTab: state.activeTab,
-        // Don't persist modal states or temporary selections
-      }),
-    }
-  )
+   // Compound actions
+   showSiteDetails: (siteId: string) => {
+    logStoreAction("UIStore", "showSiteDetails", { siteId });
+    set({
+     selectedSiteId: siteId,
+     showSiteDetails: true,
+    });
+   },
+  }),
+  {
+   name: "ui-store",
+   partialize: (state) => ({
+    // Persist user preferences only
+    activeTab: state.activeTab,
+    // Don't persist modal states or temporary selections
+   }),
+  }
+ )
 );
 ```
 
@@ -441,46 +450,48 @@ For complex stores with multiple concerns:
 import { create } from "zustand";
 
 export const useSitesStore = create<SitesStore>()((set, get) => {
-  // Create state actions module
-  const stateActions = createSitesStateActions(set, get);
+ // Create state actions module
+ const stateActions = createSitesStateActions(set, get);
 
-  // Create specialized operation modules with dependencies
-  const operationsActions = createSiteOperationsActions({
-    addSite: stateActions.addSite,
-    removeSite: stateActions.removeSite,
-    setSites: stateActions.setSites,
-    getSites: () => get().sites,
-  });
+ // Create specialized operation modules with dependencies
+ const operationsActions = createSiteOperationsActions({
+  addSite: stateActions.addSite,
+  removeSite: stateActions.removeSite,
+  setSites: stateActions.setSites,
+  getSites: () => get().sites,
+ });
 
-  const monitoringActions = createSiteMonitoringActions();
-  
-  const syncActions = createSiteSyncActions({
-    setSites: stateActions.setSites,
-    getSites: () => get().sites,
-  });
+ const monitoringActions = createSiteMonitoringActions();
 
-  return {
-    // Initial state
-    ...initialSitesState,
-    
-    // Composed actions from modules
-    ...stateActions,
-    ...operationsActions,
-    ...monitoringActions,
-    ...syncActions,
-  };
+ const syncActions = createSiteSyncActions({
+  setSites: stateActions.setSites,
+  getSites: () => get().sites,
+ });
+
+ return {
+  // Initial state
+  ...initialSitesState,
+
+  // Composed actions from modules
+  ...stateActions,
+  ...operationsActions,
+  ...monitoringActions,
+  ...syncActions,
+ };
 });
 ```
 
 #### Current Store Examples by Pattern
 
 **Direct Pattern Stores:**
+
 - `useUIStore` - Modal states, tab selections, user preferences
 - `useErrorStore` - Error handling and loading states
 - `useUpdatesStore` - Application update management
 - `useSettingsStore` - Configuration and user settings
 
 **Modular Pattern Stores:**
+
 - `useSitesStore` - Sites, monitors, operations, synchronization
 
 ### Store Module Structure
@@ -565,32 +576,32 @@ export const useDomainStore = create<DomainStore>()(
 ```tsx
 // Standard button click handling
 const handleButtonClick = useCallback(
-  (event: React.MouseEvent) => {
-    event?.stopPropagation(); // Prevents event bubbling to parent cards
-    if (disabled || isLoading) return;
-    onAction?.();
-  },
-  [onAction, disabled, isLoading]
+ (event: React.MouseEvent) => {
+  event?.stopPropagation(); // Prevents event bubbling to parent cards
+  if (disabled || isLoading) return;
+  onAction?.();
+ },
+ [onAction, disabled, isLoading]
 );
 
 // Input change handling
 const handleInputChange = useCallback(
-  (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setValue(value);
-    onChange?.(value, event);
-  },
-  [onChange]
+ (event: React.ChangeEvent<HTMLInputElement>) => {
+  const value = event.target.value;
+  setValue(value);
+  onChange?.(value, event);
+ },
+ [onChange]
 );
 
 // Form submission
 const handleFormSubmit = useCallback(
-  (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    onSubmit?.(formData);
-  },
-  [onSubmit]
+ (event: React.FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
+  const formData = new FormData(event.currentTarget);
+  onSubmit?.(formData);
+ },
+ [onSubmit]
 );
 ```
 
@@ -599,31 +610,31 @@ const handleFormSubmit = useCallback(
 ```tsx
 // Modal escape key handling
 useEffect(
-  function setupKeyboardHandlers() {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
+ function setupKeyboardHandlers() {
+  const handleKeyDown = (event: KeyboardEvent) => {
+   if (event.key === "Escape") {
+    onClose();
+   }
+  };
 
-    document.addEventListener("keydown", handleKeyDown);
-    
-    return function cleanup() {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  },
-  [onClose]
+  document.addEventListener("keydown", handleKeyDown);
+
+  return function cleanup() {
+   document.removeEventListener("keydown", handleKeyDown);
+  };
+ },
+ [onClose]
 );
 
 // Component-specific keyboard handling
 const handleKeyDown = useCallback(
-  (event: React.KeyboardEvent) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      handleSubmit();
-    }
-  },
-  [handleSubmit]
+ (event: React.KeyboardEvent) => {
+  if (event.key === "Enter" && !event.shiftKey) {
+   event.preventDefault();
+   handleSubmit();
+  }
+ },
+ [handleSubmit]
 );
 ```
 
@@ -809,7 +820,7 @@ describe('MyComponent', () => {
   it('handles click events correctly', () => {
     const mockOnAction = vi.fn();
     render(<MyComponent siteName="test-site" onAction={mockOnAction} />);
-    
+
     fireEvent.click(screen.getByRole('button'));
     expect(mockOnAction).toHaveBeenCalledTimes(1);
   });
@@ -817,13 +828,13 @@ describe('MyComponent', () => {
   it('prevents event propagation', () => {
     const mockOnAction = vi.fn();
     const mockParentClick = vi.fn();
-    
+
     render(
       <div onClick={mockParentClick}>
         <MyComponent siteName="test-site" onAction={mockOnAction} />
       </div>
     );
-    
+
     fireEvent.click(screen.getByRole('button'));
     expect(mockOnAction).toHaveBeenCalledTimes(1);
     expect(mockParentClick).not.toHaveBeenCalled();
@@ -835,35 +846,35 @@ describe('MyComponent', () => {
 
 ```typescript
 // Zustand store testing with act
-import { act, renderHook } from '@testing-library/react';
-import { useSitesStore } from './useSitesStore';
+import { act, renderHook } from "@testing-library/react";
+import { useSitesStore } from "./useSitesStore";
 
-describe('useSitesStore', () => {
-  beforeEach(() => {
-    // Reset store state before each test
-    useSitesStore.getState().setSites([]);
+describe("useSitesStore", () => {
+ beforeEach(() => {
+  // Reset store state before each test
+  useSitesStore.getState().setSites([]);
+ });
+
+ it("adds site correctly", () => {
+  const { result } = renderHook(() => useSitesStore());
+  const newSite = { id: "test-1", name: "Test Site", monitors: [] };
+
+  act(() => {
+   result.current.addSite(newSite);
   });
 
-  it('adds site correctly', () => {
-    const { result } = renderHook(() => useSitesStore());
-    const newSite = { id: 'test-1', name: 'Test Site', monitors: [] };
+  expect(result.current.sites).toContain(newSite);
+ });
 
-    act(() => {
-      result.current.addSite(newSite);
-    });
+ it("handles async operations", async () => {
+  const { result } = renderHook(() => useSitesStore());
 
-    expect(result.current.sites).toContain(newSite);
+  await act(async () => {
+   await result.current.syncSitesFromBackend();
   });
 
-  it('handles async operations', async () => {
-    const { result } = renderHook(() => useSitesStore());
-
-    await act(async () => {
-      await result.current.syncSitesFromBackend();
-    });
-
-    expect(result.current.sites.length).toBeGreaterThan(0);
-  });
+  expect(result.current.sites.length).toBeGreaterThan(0);
+ });
 });
 ```
 
@@ -872,22 +883,22 @@ describe('useSitesStore', () => {
 ```typescript
 // ElectronAPI mocking for components
 const mockElectronAPI = {
-  sites: {
-    addSite: vi.fn(),
-    deleteSite: vi.fn(),
-    getSites: vi.fn().mockResolvedValue([]),
-  },
-  events: {
-    onMonitorStatusChanged: vi.fn(() => () => {}),
-    onMonitorUp: vi.fn(() => () => {}),
-    onMonitorDown: vi.fn(() => () => {}),
-  },
+ sites: {
+  addSite: vi.fn(),
+  deleteSite: vi.fn(),
+  getSites: vi.fn().mockResolvedValue([]),
+ },
+ events: {
+  onMonitorStatusChanged: vi.fn(() => () => {}),
+  onMonitorUp: vi.fn(() => () => {}),
+  onMonitorDown: vi.fn(() => () => {}),
+ },
 };
 
 // Global mock setup
-Object.defineProperty(window, 'electronAPI', {
-  value: mockElectronAPI,
-  writable: true,
+Object.defineProperty(window, "electronAPI", {
+ value: mockElectronAPI,
+ writable: true,
 });
 ```
 
@@ -910,7 +921,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 describe('MyIntegratedComponent Integration', () => {
   it('updates UI when store changes', async () => {
     renderWithProviders(<MyIntegratedComponent />);
-    
+
     // Trigger store update
     act(() => {
       useSitesStore.getState().addSite(mockSite);
@@ -1064,55 +1075,56 @@ Backend Services → TypedEventBus → IPC → EventsService → React Component
 
 ```typescript
 // Component or hook event listener setup
-import { EventsService } from '../services/EventsService';
+import { EventsService } from "../services/EventsService";
 
 export const useMonitorEventIntegration = () => {
-  const sitesStore = useSitesStore();
+ const sitesStore = useSitesStore();
 
-  useEffect(
-    function setupEventListeners() {
-      const cleanupFunctions: Array<() => void> = [];
+ useEffect(
+  function setupEventListeners() {
+   const cleanupFunctions: Array<() => void> = [];
 
-      const initializeEventListeners = async () => {
-        try {
-          // Monitor status change events
-          const statusCleanup = await EventsService.onMonitorStatusChanged((data) => {
-            sitesStore.updateMonitorStatus(data.siteId, data.monitor);
-          });
-          cleanupFunctions.push(statusCleanup);
+   const initializeEventListeners = async () => {
+    try {
+     // Monitor status change events
+     const statusCleanup = await EventsService.onMonitorStatusChanged(
+      (data) => {
+       sitesStore.updateMonitorStatus(data.siteId, data.monitor);
+      }
+     );
+     cleanupFunctions.push(statusCleanup);
 
-          // Monitor up/down events
-          const upCleanup = await EventsService.onMonitorUp((data) => {
-            sitesStore.handleMonitorUp(data.siteId, data.monitorId);
-          });
-          cleanupFunctions.push(upCleanup);
+     // Monitor up/down events
+     const upCleanup = await EventsService.onMonitorUp((data) => {
+      sitesStore.handleMonitorUp(data.siteId, data.monitorId);
+     });
+     cleanupFunctions.push(upCleanup);
 
-          const downCleanup = await EventsService.onMonitorDown((data) => {
-            sitesStore.handleMonitorDown(data.siteId, data.monitorId);
-          });
-          cleanupFunctions.push(downCleanup);
+     const downCleanup = await EventsService.onMonitorDown((data) => {
+      sitesStore.handleMonitorDown(data.siteId, data.monitorId);
+     });
+     cleanupFunctions.push(downCleanup);
 
-          // Cache invalidation events
-          const cacheCleanup = await EventsService.onCacheInvalidated((data) => {
-            if (data.domain === 'sites') {
-              sitesStore.syncSitesFromBackend();
-            }
-          });
-          cleanupFunctions.push(cacheCleanup);
+     // Cache invalidation events
+     const cacheCleanup = await EventsService.onCacheInvalidated((data) => {
+      if (data.domain === "sites") {
+       sitesStore.syncSitesFromBackend();
+      }
+     });
+     cleanupFunctions.push(cacheCleanup);
+    } catch (error) {
+     logger.error("Failed to setup event listeners:", error);
+    }
+   };
 
-        } catch (error) {
-          logger.error('Failed to setup event listeners:', error);
-        }
-      };
+   initializeEventListeners();
 
-      initializeEventListeners();
-
-      return function cleanup() {
-        cleanupFunctions.forEach(cleanup => cleanup());
-      };
-    },
-    [sitesStore]
-  );
+   return function cleanup() {
+    cleanupFunctions.forEach((cleanup) => cleanup());
+   };
+  },
+  [sitesStore]
+ );
 };
 ```
 
@@ -1120,27 +1132,27 @@ export const useMonitorEventIntegration = () => {
 
 ```typescript
 // Current cache sync implementation (used in App.tsx)
-import { setupCacheSync } from '../utils/cacheSync';
+import { setupCacheSync } from "../utils/cacheSync";
 
 useMount(
-  useCallback(async function initializeApp() {
-    // Initialize stores first
-    await sitesStore.syncSitesFromBackend();
-    await settingsStore.initializeSettings();
+ useCallback(async function initializeApp() {
+  // Initialize stores first
+  await sitesStore.syncSitesFromBackend();
+  await settingsStore.initializeSettings();
 
-    // Setup automatic cache sync
-    const cacheSyncCleanup = setupCacheSync();
-    cacheSyncCleanupRef.current = cacheSyncCleanup;
+  // Setup automatic cache sync
+  const cacheSyncCleanup = setupCacheSync();
+  cacheSyncCleanupRef.current = cacheSyncCleanup;
 
-    setIsInitialized(true);
-  }, []),
-  
-  useCallback(function cleanup() {
-    // Cleanup cache sync on unmount
-    if (cacheSyncCleanupRef.current) {
-      cacheSyncCleanupRef.current();
-    }
-  }, [])
+  setIsInitialized(true);
+ }, []),
+
+ useCallback(function cleanup() {
+  // Cleanup cache sync on unmount
+  if (cacheSyncCleanupRef.current) {
+   cacheSyncCleanupRef.current();
+  }
+ }, [])
 );
 ```
 

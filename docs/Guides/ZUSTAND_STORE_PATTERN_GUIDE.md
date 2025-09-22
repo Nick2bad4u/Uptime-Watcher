@@ -24,40 +24,40 @@ Is your store managing multiple domains/entities?
 ```typescript
 // Main store file: useSitesStore.ts
 export const useSitesStore = create<SitesStore>()((set, get) => {
-  // Create state actions
-  const stateActions = createSitesStateActions(set, get);
+ // Create state actions
+ const stateActions = createSitesStateActions(set, get);
 
-  // Shared helper function - eliminates duplication
-  const getSites = (): Site[] => get().sites;
+ // Shared helper function - eliminates duplication
+ const getSites = (): Site[] => get().sites;
 
-  // Create sync actions (needed by other modules)
-  const syncActions = createSiteSyncActions({
-    getSites,
-    setSites: stateActions.setSites,
-  });
+ // Create sync actions (needed by other modules)
+ const syncActions = createSiteSyncActions({
+  getSites,
+  setSites: stateActions.setSites,
+ });
 
-  // Create monitoring actions
-  const monitoringActions = createSiteMonitoringActions();
+ // Create monitoring actions
+ const monitoringActions = createSiteMonitoringActions();
 
-  // Create operations actions with dependencies
-  const operationsActions = createSiteOperationsActions({
-    addSite: stateActions.addSite,
-    getSites,
-    removeSite: stateActions.removeSite,
-    setSites: stateActions.setSites,
-    syncSites: syncActions.syncSites,
-  });
+ // Create operations actions with dependencies
+ const operationsActions = createSiteOperationsActions({
+  addSite: stateActions.addSite,
+  getSites,
+  removeSite: stateActions.removeSite,
+  setSites: stateActions.setSites,
+  syncSites: syncActions.syncSites,
+ });
 
-  return {
-    // Initial state
-    ...initialSitesState,
-    
-    // Composed modules
-    ...stateActions,      // Core state management
-    ...operationsActions, // CRUD operations  
-    ...monitoringActions, // Monitoring lifecycle
-    ...syncActions,       // Backend synchronization
-  };
+ return {
+  // Initial state
+  ...initialSitesState,
+
+  // Composed modules
+  ...stateActions, // Core state management
+  ...operationsActions, // CRUD operations
+  ...monitoringActions, // Monitoring lifecycle
+  ...syncActions, // Backend synchronization
+ };
 });
 ```
 
@@ -66,69 +66,69 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
 ```typescript
 // useSitesState.ts - Core state management
 export const createSitesStateActions = (set, get) => ({
-  setSites: (sites: Site[]) => {
-    logStoreAction("SitesStore", "setSites", { count: sites.length });
-    set({ sites });
-  },
-  
-  addSite: (site: Site) => {
-    logStoreAction("SitesStore", "addSite", { siteId: site.id });
-    set((state) => ({ sites: [...state.sites, site] }));
-  },
-  
-  removeSite: (siteId: string) => {
-    logStoreAction("SitesStore", "removeSite", { siteId });
-    set((state) => ({ sites: state.sites.filter(s => s.id !== siteId) }));
-  },
+ setSites: (sites: Site[]) => {
+  logStoreAction("SitesStore", "setSites", { count: sites.length });
+  set({ sites });
+ },
+
+ addSite: (site: Site) => {
+  logStoreAction("SitesStore", "addSite", { siteId: site.id });
+  set((state) => ({ sites: [...state.sites, site] }));
+ },
+
+ removeSite: (siteId: string) => {
+  logStoreAction("SitesStore", "removeSite", { siteId });
+  set((state) => ({ sites: state.sites.filter((s) => s.id !== siteId) }));
+ },
 });
 
 // useSiteOperations.ts - CRUD operations with IPC
 export const createSiteOperationsActions = (deps) => ({
-  createSite: async (siteData: SiteCreationData): Promise<Site> => {
-    logStoreAction("SitesStore", "createSite", { name: siteData.name });
-    
-    try {
-      const newSite = await window.electronAPI.sites.create(siteData);
-      deps.addSite(newSite);
-      await deps.syncSites(); // Ensure backend consistency
-      return newSite;
-    } catch (error) {
-      console.error('Failed to create site:', error);
-      throw error;
-    }
-  },
-  
-  deleteSite: async (siteId: string): Promise<void> => {
-    logStoreAction("SitesStore", "deleteSite", { siteId });
-    
-    try {
-      await window.electronAPI.sites.delete(siteId);
-      deps.removeSite(siteId);
-    } catch (error) {
-      console.error('Failed to delete site:', error);
-      throw error;
-    }
-  },
+ createSite: async (siteData: SiteCreationData): Promise<Site> => {
+  logStoreAction("SitesStore", "createSite", { name: siteData.name });
+
+  try {
+   const newSite = await window.electronAPI.sites.create(siteData);
+   deps.addSite(newSite);
+   await deps.syncSites(); // Ensure backend consistency
+   return newSite;
+  } catch (error) {
+   console.error("Failed to create site:", error);
+   throw error;
+  }
+ },
+
+ deleteSite: async (siteId: string): Promise<void> => {
+  logStoreAction("SitesStore", "deleteSite", { siteId });
+
+  try {
+   await window.electronAPI.sites.delete(siteId);
+   deps.removeSite(siteId);
+  } catch (error) {
+   console.error("Failed to delete site:", error);
+   throw error;
+  }
+ },
 });
 
 // useSiteSync.ts - Backend synchronization
 export const createSiteSyncActions = (deps) => ({
-  syncSites: async (): Promise<void> => {
-    logStoreAction("SitesStore", "syncSites", {});
-    
-    try {
-      const sites = await window.electronAPI.sites.getAll();
-      deps.setSites(sites);
-    } catch (error) {
-      console.error('Failed to sync sites:', error);
-      throw error;
-    }
-  },
-  
-  handleSiteAdded: (site: Site) => {
-    // Called by event listeners
-    deps.addSite(site);
-  },
+ syncSites: async (): Promise<void> => {
+  logStoreAction("SitesStore", "syncSites", {});
+
+  try {
+   const sites = await window.electronAPI.sites.getAll();
+   deps.setSites(sites);
+  } catch (error) {
+   console.error("Failed to sync sites:", error);
+   throw error;
+  }
+ },
+
+ handleSiteAdded: (site: Site) => {
+  // Called by event listeners
+  deps.addSite(site);
+ },
 });
 ```
 
@@ -136,7 +136,7 @@ export const createSiteSyncActions = (deps) => ({
 
 - ✅ **Clear Separation of Concerns**: Each module has a focused responsibility
 - ✅ **Dependency Injection**: Modules receive only what they need
-- ✅ **Independent Testing**: Each module can be tested in isolation  
+- ✅ **Independent Testing**: Each module can be tested in isolation
 - ✅ **Reusability**: Modules can be shared across similar stores
 - ✅ **Maintainability**: Changes are localized to specific modules
 - ✅ **Type Safety**: Full TypeScript support with interface composition
@@ -150,41 +150,41 @@ export const createSiteSyncActions = (deps) => ({
 ```typescript
 // Direct pattern for simple state management
 export const useUIStore = create<UIStore>()((set, get) => ({
-  // Initial state
-  sidebarOpen: false,
-  theme: 'light',
-  isLoading: false,
-  notifications: [],
+ // Initial state
+ sidebarOpen: false,
+ theme: "light",
+ isLoading: false,
+ notifications: [],
 
-  // Simple actions
-  toggleSidebar: () => {
-    logStoreAction("UIStore", "toggleSidebar", {});
-    set((state) => ({ sidebarOpen: !state.sidebarOpen }));
-  },
+ // Simple actions
+ toggleSidebar: () => {
+  logStoreAction("UIStore", "toggleSidebar", {});
+  set((state) => ({ sidebarOpen: !state.sidebarOpen }));
+ },
 
-  setTheme: (theme: 'light' | 'dark') => {
-    logStoreAction("UIStore", "setTheme", { theme });
-    set({ theme });
-  },
+ setTheme: (theme: "light" | "dark") => {
+  logStoreAction("UIStore", "setTheme", { theme });
+  set({ theme });
+ },
 
-  setLoading: (isLoading: boolean) => {
-    logStoreAction("UIStore", "setLoading", { isLoading });
-    set({ isLoading });
-  },
+ setLoading: (isLoading: boolean) => {
+  logStoreAction("UIStore", "setLoading", { isLoading });
+  set({ isLoading });
+ },
 
-  addNotification: (notification: Notification) => {
-    logStoreAction("UIStore", "addNotification", { type: notification.type });
-    set((state) => ({
-      notifications: [...state.notifications, notification],
-    }));
-  },
+ addNotification: (notification: Notification) => {
+  logStoreAction("UIStore", "addNotification", { type: notification.type });
+  set((state) => ({
+   notifications: [...state.notifications, notification],
+  }));
+ },
 
-  removeNotification: (id: string) => {
-    logStoreAction("UIStore", "removeNotification", { id });
-    set((state) => ({
-      notifications: state.notifications.filter(n => n.id !== id),
-    }));
-  },
+ removeNotification: (id: string) => {
+  logStoreAction("UIStore", "removeNotification", { id });
+  set((state) => ({
+   notifications: state.notifications.filter((n) => n.id !== id),
+  }));
+ },
 }));
 ```
 
@@ -214,30 +214,30 @@ Both patterns integrate with the TypedEventBus for real-time updates:
 ```typescript
 // Event listener setup (usually in root component)
 export const useStoreEventListeners = () => {
-  const sitesStore = useSitesStore();
-  const settingsStore = useSettingsStore();
+ const sitesStore = useSitesStore();
+ const settingsStore = useSettingsStore();
 
-  useEffect(() => {
-    const cleanupFunctions = [
-      // Sites events
-      window.electronAPI.events.onSiteAdded((data) => {
-        sitesStore.handleSiteAdded(data.site);
-      }),
-      
-      window.electronAPI.events.onSiteDeleted((data) => {
-        sitesStore.handleSiteDeleted(data.siteId);
-      }),
-      
-      // Settings events
-      window.electronAPI.events.onSettingsUpdated((data) => {
-        settingsStore.updateFromBackend(data.settings);
-      }),
-    ];
+ useEffect(() => {
+  const cleanupFunctions = [
+   // Sites events
+   window.electronAPI.events.onSiteAdded((data) => {
+    sitesStore.handleSiteAdded(data.site);
+   }),
 
-    return () => {
-      cleanupFunctions.forEach(cleanup => cleanup());
-    };
-  }, []);
+   window.electronAPI.events.onSiteDeleted((data) => {
+    sitesStore.handleSiteDeleted(data.siteId);
+   }),
+
+   // Settings events
+   window.electronAPI.events.onSettingsUpdated((data) => {
+    settingsStore.updateFromBackend(data.settings);
+   }),
+  ];
+
+  return () => {
+   cleanupFunctions.forEach((cleanup) => cleanup());
+  };
+ }, []);
 };
 ```
 
@@ -246,21 +246,22 @@ export const useStoreEventListeners = () => {
 ```typescript
 // Selective persistence for appropriate stores
 export const useUIStore = create<UIStore>()(
-  persist(
-    (set, get) => ({
-      // Store implementation
-    }),
-    {
-      name: 'ui-store',
-      partialize: (state) => ({
-        theme: state.theme,
-        sidebarOpen: state.sidebarOpen,
-        // Don't persist notifications or loading states
-      }),
-    }
-  )
+ persist(
+  (set, get) => ({
+   // Store implementation
+  }),
+  {
+   name: "ui-store",
+   partialize: (state) => ({
+    theme: state.theme,
+    sidebarOpen: state.sidebarOpen,
+    // Don't persist notifications or loading states
+   }),
+  }
+ )
 );
 ```
+
 - Typically >300 lines of code
 - Complex business logic
 - Requires dependency injection between modules

@@ -79,6 +79,13 @@ describe("ChartConfigService - Property-Based Fuzzing Tests", () => {
                 success: "#10b981",
                 warning: "#f59e0b",
                 info: "#3b82f6",
+                shadows: {
+                    degraded: "rgb(249 115 22 / 22%)",
+                    error: "rgb(239 68 68 / 22%)",
+                    paused: "rgb(156 163 175 / 22%)",
+                    success: "rgb(16 185 129 / 22%)",
+                    warning: "rgb(251 191 36 / 22%)",
+                },
             },
             typography: {
                 fontFamily: {

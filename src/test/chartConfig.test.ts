@@ -53,6 +53,13 @@ const mockTheme: Theme = {
             800: "#075985",
             900: "#0c4a6e",
         },
+        shadows: {
+            degraded: "rgb(249 115 22 / 22%)",
+            error: "rgb(239 68 68 / 22%)",
+            paused: "rgb(156 163 175 / 22%)",
+            success: "rgb(16 185 129 / 22%)",
+            warning: "rgb(251 191 36 / 22%)",
+        },
         status: {
             degraded: "#f97316",
             down: "#ef4444",

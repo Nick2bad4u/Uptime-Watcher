@@ -157,6 +157,13 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
                         800: "#1e293b",
                         900: "#0f172a",
                     },
+                    shadows: {
+                        degraded: "rgb(249 115 22 / 22%)",
+                        error: "rgb(239 68 68 / 22%)",
+                        paused: "rgb(156 163 175 / 22%)",
+                        success: "rgb(16 185 129 / 22%)",
+                        warning: "rgb(251 191 36 / 22%)",
+                    },
                 },
                 spacing: {
                     xs: "0.25rem",

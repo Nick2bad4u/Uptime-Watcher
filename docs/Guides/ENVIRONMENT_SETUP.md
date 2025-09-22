@@ -327,7 +327,7 @@ npm run test:watch
 
 # Run specific test suites
 npm run test:electron  # Backend tests
-npm run test:frontend  # Frontend tests  
+npm run test:frontend  # Frontend tests
 npm run test:shared    # Shared utility tests
 ```
 

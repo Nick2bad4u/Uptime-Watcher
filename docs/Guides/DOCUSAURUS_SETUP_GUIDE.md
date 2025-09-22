@@ -314,22 +314,22 @@ Customize appearance via:
 
 ### Common Issues
 
-1. **Missing sidebar items**: 
+1. **Missing sidebar items**:
    - Check TypeDoc `projectDocuments` configuration in `typedoc.config.json`
    - Verify markdown file paths and glob patterns
    - Run `npm run docs:typedoc` to regenerate sidebar
 
-2. **Broken links**: 
+2. **Broken links**:
    - Use broken link checker: `npm run docusaurus:broken-links`
    - Verify relative paths and TypeDoc link syntax
    - Check cross-references between project documents and API docs
 
-3. **Build failures**: 
+3. **Build failures**:
    - Review TypeScript configuration in `tsconfig.typedoc.json`
    - Check exclude patterns for test files and build outputs
    - Verify all dependencies are installed in `docs/docusaurus/`
 
-4. **Search not working**: 
+4. **Search not working**:
    - Ensure proper indexing configuration in Docusaurus
    - Check search plugin configuration
    - Verify content is being generated correctly

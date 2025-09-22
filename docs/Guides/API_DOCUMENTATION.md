@@ -26,22 +26,22 @@ The `window.electronAPI` is organized into focused domains:
 
 ```typescript
 interface ElectronAPI {
-  /** Site management operations (CRUD, monitoring control) */
-  sites: SitesAPI;
-  /** Data management operations (import/export, settings, backup) */
-  data: DataAPI;
-  /** Event listener registration for various system events */
-  events: EventsAPI;
-  /** Monitoring control operations (start/stop, validation, formatting) */
-  monitoring: MonitoringAPI;
-  /** Monitor type registry operations */
-  monitorTypes: MonitorTypesAPI;
-  /** Settings management operations */
-  settings: SettingsAPI;
-  /** State synchronization operations */
-  stateSync: StateSyncAPI;
-  /** System-level operations (external links, etc.) */
-  system: SystemAPI;
+ /** Site management operations (CRUD, monitoring control) */
+ sites: SitesAPI;
+ /** Data management operations (import/export, settings, backup) */
+ data: DataAPI;
+ /** Event listener registration for various system events */
+ events: EventsAPI;
+ /** Monitoring control operations (start/stop, validation, formatting) */
+ monitoring: MonitoringAPI;
+ /** Monitor type registry operations */
+ monitorTypes: MonitorTypesAPI;
+ /** Settings management operations */
+ settings: SettingsAPI;
+ /** State synchronization operations */
+ stateSync: StateSyncAPI;
+ /** System-level operations (external links, etc.) */
+ system: SystemAPI;
 }
 ```
 
@@ -58,7 +58,7 @@ registerStandardizedIpcHandler(
     return await this.siteManager.createSite(data);
   },
   // Validation function ensures type safety
-  (data): data is SiteCreationData => 
+  (data): data is SiteCreationData =>
     siteCreationSchema.safeParse(data).success
 );
 
@@ -89,21 +89,21 @@ Creates a new site with associated monitors using transaction safety.
 
 ```typescript
 const newSite = await window.electronAPI.sites.create({
-  name: "My Website",
-  url: "https://mywebsite.com",
-  description: "Production website monitoring",
-  monitors: [
-    {
-      type: "http",
-      config: {
-        url: "https://mywebsite.com",
-        method: "GET",
-        timeout: 10000,
-        checkInterval: 30000,
-        retryAttempts: 3,
-      },
-    },
-  ],
+ name: "My Website",
+ url: "https://mywebsite.com",
+ description: "Production website monitoring",
+ monitors: [
+  {
+   type: "http",
+   config: {
+    url: "https://mywebsite.com",
+    method: "GET",
+    timeout: 10000,
+    checkInterval: 30000,
+    retryAttempts: 3,
+   },
+  },
+ ],
 });
 ```
 
@@ -113,9 +113,9 @@ Updates an existing site and/or its monitors.
 
 ```typescript
 const updatedSite = await window.electronAPI.sites.update(siteId, {
-  name: "New Site Name",
-  description: "Updated description",
-  monitors: [...updatedMonitors],
+ name: "New Site Name",
+ description: "Updated description",
+ monitors: [...updatedMonitors],
 });
 ```
 
@@ -154,13 +154,13 @@ Performs a manual health check for a specific monitor.
 
 ```typescript
 const result = await window.electronAPI.monitoring.checkManually(
-  siteId,
-  monitorId
+ siteId,
+ monitorId
 );
-// Returns: { 
-//   status: "up" | "down", 
-//   responseTime: number, 
-//   details?: string, 
+// Returns: {
+//   status: "up" | "down",
+//   responseTime: number,
+//   details?: string,
 //   error?: string,
 //   timestamp: number
 // }
@@ -172,8 +172,8 @@ Validates monitor configuration against type-specific schemas.
 
 ```typescript
 const validation = await window.electronAPI.monitoring.validateMonitorConfig({
-  type: "http",
-  config: { url: "https://example.com", timeout: 5000 }
+ type: "http",
+ config: { url: "https://example.com", timeout: 5000 },
 });
 // Returns: { isValid: boolean, errors?: string[] }
 ```
@@ -186,9 +186,9 @@ Exports application data (sites, monitors, history, settings).
 
 ```typescript
 const exportResult = await window.electronAPI.data.exportData({
-  includeHistory: true,
-  dateRange: { start: startDate, end: endDate },
-  format: 'json'
+ includeHistory: true,
+ dateRange: { start: startDate, end: endDate },
+ format: "json",
 });
 ```
 
@@ -198,8 +198,8 @@ Imports previously exported data with conflict resolution.
 
 ```typescript
 const importResult = await window.electronAPI.data.importData(importData, {
-  overwriteExisting: false,
-  validateBeforeImport: true
+ overwriteExisting: false,
+ validateBeforeImport: true,
 });
 ```
 
@@ -219,7 +219,7 @@ const monitorTypes = await window.electronAPI.monitorTypes.getAll();
 Retrieves configuration for a specific monitor type.
 
 ```typescript
-const httpConfig = await window.electronAPI.monitorTypes.getByType('http');
+const httpConfig = await window.electronAPI.monitorTypes.getByType("http");
 ```
 
 ### Settings API (`window.electronAPI.settings`)
@@ -238,16 +238,16 @@ Updates application settings with validation.
 
 ```typescript
 const updated = await window.electronAPI.settings.update({
-  notifications: {
-    enabled: true,
-    onStatusChange: true,
-    onFailure: true,
-  },
-  theme: "dark",
-  monitoring: {
-    defaultCheckInterval: 60000,
-    maxRetryAttempts: 3,
-  },
+ notifications: {
+  enabled: true,
+  onStatusChange: true,
+  onFailure: true,
+ },
+ theme: "dark",
+ monitoring: {
+  defaultCheckInterval: 60000,
+  maxRetryAttempts: 3,
+ },
 });
 ```
 
@@ -258,7 +258,7 @@ const updated = await window.electronAPI.settings.update({
 Invalidates specific cache keys to force data refresh.
 
 ```typescript
-await window.electronAPI.stateSync.invalidateCache(['sites', 'settings']);
+await window.electronAPI.stateSync.invalidateCache(["sites", "settings"]);
 // Triggers cache refresh for specified domains
 ```
 
@@ -269,7 +269,7 @@ await window.electronAPI.stateSync.invalidateCache(['sites', 'settings']);
 Opens URLs in the default external browser.
 
 ```typescript
-await window.electronAPI.system.openExternal('https://example.com');
+await window.electronAPI.system.openExternal("https://example.com");
 ```
 
 ## 🎭 Event System & Real-time Updates
@@ -301,35 +301,35 @@ All event listeners are accessed through `window.electronAPI.events`:
 ```typescript
 // Site events
 const cleanup1 = window.electronAPI.events.onSiteAdded((data) => {
-  sitesStore.addSite(data.site);
-  showNotification(`Site ${data.site.name} added`);
+ sitesStore.addSite(data.site);
+ showNotification(`Site ${data.site.name} added`);
 });
 
 const cleanup2 = window.electronAPI.events.onSiteDeleted((data) => {
-  sitesStore.removeSite(data.siteId);
+ sitesStore.removeSite(data.siteId);
 });
 
 // Monitor events
 const cleanup3 = window.electronAPI.events.onMonitorStatusChanged((data) => {
-  sitesStore.updateMonitorStatus(data.monitorId, data.newStatus);
-  if (data.newStatus === 'down') {
-    showNotification(`Monitor ${data.monitorId} is down!`, 'error');
-  }
+ sitesStore.updateMonitorStatus(data.monitorId, data.newStatus);
+ if (data.newStatus === "down") {
+  showNotification(`Monitor ${data.monitorId} is down!`, "error");
+ }
 });
 
 // Settings events
 const cleanup4 = window.electronAPI.events.onSettingsUpdated((data) => {
-  settingsStore.updateSettings(data.settings);
+ settingsStore.updateSettings(data.settings);
 });
 
 // Clean up listeners (important for preventing memory leaks)
 useEffect(() => {
-  return () => {
-    cleanup1();
-    cleanup2();
-    cleanup3();
-    cleanup4();
-  };
+ return () => {
+  cleanup1();
+  cleanup2();
+  cleanup3();
+  cleanup4();
+ };
 }, []);
 ```
 
@@ -339,16 +339,16 @@ All events include automatic metadata injection:
 
 ```typescript
 interface EventMetadata {
-  correlationId: string;    // Unique ID for tracing
-  timestamp: number;        // Event emission time
-  source: string;          // Service that emitted the event
+ correlationId: string; // Unique ID for tracing
+ timestamp: number; // Event emission time
+ source: string; // Service that emitted the event
 }
 
 interface SiteAddedEvent {
-  site: Site;
-  timestamp: number;
-  // Automatic metadata is available but not in the interface
-  // Access via event._meta property
+ site: Site;
+ timestamp: number;
+ // Automatic metadata is available but not in the interface
+ // Access via event._meta property
 }
 ```
 
@@ -359,17 +359,17 @@ Events are emitted from service managers using TypedEventBus:
 ```typescript
 // In SiteManager service
 export class SiteManager {
-  async createSite(data: SiteCreationData): Promise<Site> {
-    const site = await this.siteRepository.create(data);
-    
-    // Emit typed event with automatic metadata injection
-    await this.eventBus.emitTyped("sites:added", {
-      site,
-      timestamp: Date.now(),
-    });
-    
-    return site;
-  }
+ async createSite(data: SiteCreationData): Promise<Site> {
+  const site = await this.siteRepository.create(data);
+
+  // Emit typed event with automatic metadata injection
+  await this.eventBus.emitTyped("sites:added", {
+   site,
+   timestamp: Date.now(),
+  });
+
+  return site;
+ }
 }
 ```
 
@@ -450,13 +450,13 @@ await eventBus.emitTyped("sites:added", {
 import { useSitesStore } from "../stores/useSitesStore";
 
 function SiteManager() {
-  const { 
-    sites, 
-    addSite, 
-    updateSite, 
-    removeSite, 
+  const {
+    sites,
+    addSite,
+    updateSite,
+    removeSite,
     startMonitoring,
-    isLoading 
+    isLoading
   } = useSitesStore();
 
   // Optimistic updates with error handling
@@ -465,10 +465,10 @@ function SiteManager() {
       // Optimistic update to UI
       const optimisticSite = { ...siteData, id: 'temp-id' };
       addSite(optimisticSite);
-      
+
       // Call backend
       const newSite = await window.electronAPI.sites.create(siteData);
-      
+
       // Replace optimistic entry with real data
       updateSite('temp-id', newSite);
     } catch (error) {
@@ -481,9 +481,9 @@ function SiteManager() {
   return (
     <div>
       {sites.map((site) => (
-        <SiteCard 
-          key={site.id} 
-          site={site} 
+        <SiteCard
+          key={site.id}
+          site={site}
           onStartMonitoring={() => startMonitoring(site.id)}
         />
       ))}
@@ -497,68 +497,69 @@ function SiteManager() {
 ```typescript
 // Zustand store with comprehensive IPC and event integration
 export const useSitesStore = create<SitesStore>()((set, get) => ({
-  sites: [],
-  isLoading: false,
-  lastSyncTime: null,
+ sites: [],
+ isLoading: false,
+ lastSyncTime: null,
 
-  // State actions
-  setSites: (sites: Site[]) => set({ sites }),
-  addSite: (site: Site) => set((state) => ({ 
-    sites: [...state.sites, site] 
+ // State actions
+ setSites: (sites: Site[]) => set({ sites }),
+ addSite: (site: Site) =>
+  set((state) => ({
+   sites: [...state.sites, site],
   })),
 
-  // Operations actions  
-  fetchSites: async () => {
-    set({ isLoading: true });
-    try {
-      const sites = await window.electronAPI.sites.getAll();
-      set({ sites, lastSyncTime: Date.now() });
-    } catch (error) {
-      console.error('Failed to fetch sites:', error);
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+ // Operations actions
+ fetchSites: async () => {
+  set({ isLoading: true });
+  try {
+   const sites = await window.electronAPI.sites.getAll();
+   set({ sites, lastSyncTime: Date.now() });
+  } catch (error) {
+   console.error("Failed to fetch sites:", error);
+  } finally {
+   set({ isLoading: false });
+  }
+ },
 
-  createSite: async (siteData: SiteCreationData) => {
-    const newSite = await window.electronAPI.sites.create(siteData);
-    // Don't manually add - event listener will handle it
-    return newSite;
-  },
+ createSite: async (siteData: SiteCreationData) => {
+  const newSite = await window.electronAPI.sites.create(siteData);
+  // Don't manually add - event listener will handle it
+  return newSite;
+ },
 
-  // Event-driven sync (called by event listeners)
-  syncFromBackend: async () => {
-    const sites = await window.electronAPI.sites.getAll();
-    set({ sites, lastSyncTime: Date.now() });
-  },
+ // Event-driven sync (called by event listeners)
+ syncFromBackend: async () => {
+  const sites = await window.electronAPI.sites.getAll();
+  set({ sites, lastSyncTime: Date.now() });
+ },
 }));
 
 // Setup event listeners (typically in root component or hook)
 export const useSiteEventListeners = () => {
-  const syncFromBackend = useSitesStore(state => state.syncFromBackend);
-  const addSite = useSitesStore(state => state.addSite);
-  const removeSite = useSitesStore(state => state.removeSite);
+ const syncFromBackend = useSitesStore((state) => state.syncFromBackend);
+ const addSite = useSitesStore((state) => state.addSite);
+ const removeSite = useSitesStore((state) => state.removeSite);
 
-  useEffect(() => {
-    const cleanupFunctions = [
-      window.electronAPI.events.onSiteAdded((data) => {
-        addSite(data.site);
-      }),
-      
-      window.electronAPI.events.onSiteDeleted((data) => {
-        removeSite(data.siteId);
-      }),
-      
-      window.electronAPI.events.onSiteUpdated((data) => {
-        // Full sync to ensure consistency
-        syncFromBackend();
-      }),
-    ];
+ useEffect(() => {
+  const cleanupFunctions = [
+   window.electronAPI.events.onSiteAdded((data) => {
+    addSite(data.site);
+   }),
 
-    return () => {
-      cleanupFunctions.forEach(cleanup => cleanup());
-    };
-  }, [syncFromBackend, addSite, removeSite]);
+   window.electronAPI.events.onSiteDeleted((data) => {
+    removeSite(data.siteId);
+   }),
+
+   window.electronAPI.events.onSiteUpdated((data) => {
+    // Full sync to ensure consistency
+    syncFromBackend();
+   }),
+  ];
+
+  return () => {
+   cleanupFunctions.forEach((cleanup) => cleanup());
+  };
+ }, [syncFromBackend, addSite, removeSite]);
 };
 ```
 
@@ -567,47 +568,47 @@ export const useSiteEventListeners = () => {
 ```typescript
 // Custom hook for site operations with loading states
 export const useSiteOperations = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+ const [isLoading, setIsLoading] = useState(false);
+ const [error, setError] = useState<string | null>(null);
 
-  const createSite = useCallback(async (siteData: SiteCreationData) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const newSite = await window.electronAPI.sites.create(siteData);
-      return newSite;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+ const createSite = useCallback(async (siteData: SiteCreationData) => {
+  setIsLoading(true);
+  setError(null);
 
-  const deleteSite = useCallback(async (siteId: string) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      await window.electronAPI.sites.delete(siteId);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  try {
+   const newSite = await window.electronAPI.sites.create(siteData);
+   return newSite;
+  } catch (err) {
+   const errorMessage = err instanceof Error ? err.message : "Unknown error";
+   setError(errorMessage);
+   throw err;
+  } finally {
+   setIsLoading(false);
+  }
+ }, []);
 
-  return {
-    createSite,
-    deleteSite,
-    isLoading,
-    error,
-    clearError: () => setError(null),
-  };
+ const deleteSite = useCallback(async (siteId: string) => {
+  setIsLoading(true);
+  setError(null);
+
+  try {
+   await window.electronAPI.sites.delete(siteId);
+  } catch (err) {
+   const errorMessage = err instanceof Error ? err.message : "Unknown error";
+   setError(errorMessage);
+   throw err;
+  } finally {
+   setIsLoading(false);
+  }
+ }, []);
+
+ return {
+  createSite,
+  deleteSite,
+  isLoading,
+  error,
+  clearError: () => setError(null),
+ };
 };
 ```
 

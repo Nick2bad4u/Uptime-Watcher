@@ -181,45 +181,49 @@ export const SitesProvider: React.FC = ({ children }) => {
 
 ```typescript
 // Modular store composition for complex stores
-export const createSitesStateActions = (set: SetState<SitesStore>, get: GetState<SitesStore>) => ({
-  addSite: async (siteData: SiteCreationData) => {
-    const newSite = await window.electronAPI.sites.create(siteData);
-    set((state) => ({ sites: [...state.sites, newSite] }));
-    return newSite;
-  },
-  updateSite: async (siteId: string, updates: Partial<Site>) => {
-    const updatedSite = await window.electronAPI.sites.update(siteId, updates);
-    set((state) => ({
-      sites: state.sites.map(site => 
-        site.id === siteId ? updatedSite : site
-      )
-    }));
-  },
+export const createSitesStateActions = (
+ set: SetState<SitesStore>,
+ get: GetState<SitesStore>
+) => ({
+ addSite: async (siteData: SiteCreationData) => {
+  const newSite = await window.electronAPI.sites.create(siteData);
+  set((state) => ({ sites: [...state.sites, newSite] }));
+  return newSite;
+ },
+ updateSite: async (siteId: string, updates: Partial<Site>) => {
+  const updatedSite = await window.electronAPI.sites.update(siteId, updates);
+  set((state) => ({
+   sites: state.sites.map((site) => (site.id === siteId ? updatedSite : site)),
+  }));
+ },
 });
 
-export const createSiteOperationsActions = (set: SetState<SitesStore>, get: GetState<SitesStore>) => ({
-  deleteSite: async (siteId: string) => {
-    await window.electronAPI.sites.delete(siteId);
-    set((state) => ({
-      sites: state.sites.filter(site => site.id !== siteId)
-    }));
-  },
+export const createSiteOperationsActions = (
+ set: SetState<SitesStore>,
+ get: GetState<SitesStore>
+) => ({
+ deleteSite: async (siteId: string) => {
+  await window.electronAPI.sites.delete(siteId);
+  set((state) => ({
+   sites: state.sites.filter((site) => site.id !== siteId),
+  }));
+ },
 });
 
 // Main store combines modular actions
 export const useSitesStore = create<SitesStore>()((set, get) => ({
-  sites: [],
-  loading: false,
-  
-  // Combine modular action sets
-  ...createSitesStateActions(set, get),
-  ...createSiteOperationsActions(set, get),
+ sites: [],
+ loading: false,
+
+ // Combine modular action sets
+ ...createSitesStateActions(set, get),
+ ...createSiteOperationsActions(set, get),
 }));
 
 // Simple stores use direct create pattern
 export const useUIStore = create<UIStore>((set) => ({
-  sidebarOpen: false,
-  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+ sidebarOpen: false,
+ toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
 }));
 ```
 
@@ -255,13 +259,13 @@ export const useUIStore = create<UIStore>((set) => ({
 
 ```typescript
 // No type safety, manual IPC forwarding
-emitter.emit('site:updated', someData); // any type
-ipcMain.emit('forward-to-renderer', 'site:updated', someData); // manual forwarding
+emitter.emit("site:updated", someData); // any type
+ipcMain.emit("forward-to-renderer", "site:updated", someData); // manual forwarding
 
 // In renderer
-ipcRenderer.on('site:updated', (event, data) => {
-  // data is any, no correlation info
-  handleSiteUpdate(data);
+ipcRenderer.on("site:updated", (event, data) => {
+ // data is any, no correlation info
+ handleSiteUpdate(data);
 });
 ```
 
@@ -270,22 +274,22 @@ ipcRenderer.on('site:updated', (event, data) => {
 ```typescript
 // Type-safe events with automatic metadata
 interface AppEvents {
-  'site:updated': { siteId: string; changes: Partial<Site> };
+ "site:updated": { siteId: string; changes: Partial<Site> };
 }
 
-const eventBus = new TypedEventBus<AppEvents>('app-events');
+const eventBus = new TypedEventBus<AppEvents>("app-events");
 
 // Backend emission with automatic metadata
-await eventBus.emitTyped('site:updated', {
-  siteId: 'site_123',
-  changes: { name: 'New Name' }
+await eventBus.emitTyped("site:updated", {
+ siteId: "site_123",
+ changes: { name: "New Name" },
 });
 
 // Frontend handling via EventsService
 const cleanup = await EventsService.onSiteUpdated((data) => {
-  // data is fully typed with automatic metadata
-  console.log(`Site ${data.siteId} updated`, data._meta.correlationId);
-  handleSiteUpdate(data);
+ // data is fully typed with automatic metadata
+ console.log(`Site ${data.siteId} updated`, data._meta.correlationId);
+ handleSiteUpdate(data);
 });
 ```
 
@@ -381,31 +385,31 @@ ipcMain.handle("create-site", async (event, data) => {
 ```typescript
 // Complete type safety with validation
 export class IPCService {
-  registerStandardizedIpcHandler<T, R>(
-    channel: string,
-    handler: (data: T) => Promise<R> | R,
-    validator: (data: unknown) => data is T,
-    options?: IpcHandlerOptions
-  ): void {
-    ipcMain.handle(channel, async (event, data: unknown) => {
-      // Automatic validation
-      if (!validator(data)) {
-        throw new Error(`Invalid data for channel ${channel}`);
-      }
-      
-      // Type-safe handler execution
-      return await handler(data);
-    });
-  }
+ registerStandardizedIpcHandler<T, R>(
+  channel: string,
+  handler: (data: T) => Promise<R> | R,
+  validator: (data: unknown) => data is T,
+  options?: IpcHandlerOptions
+ ): void {
+  ipcMain.handle(channel, async (event, data: unknown) => {
+   // Automatic validation
+   if (!validator(data)) {
+    throw new Error(`Invalid data for channel ${channel}`);
+   }
+
+   // Type-safe handler execution
+   return await handler(data);
+  });
+ }
 }
 
 // Usage with type guards
 ipcService.registerStandardizedIpcHandler(
-  'sites:create',
-  async (data: SiteCreationData) => {
-    return await siteManager.createSite(data);
-  },
-  isSiteCreationData // Type guard ensures validation
+ "sites:create",
+ async (data: SiteCreationData) => {
+  return await siteManager.createSite(data);
+ },
+ isSiteCreationData // Type guard ensures validation
 );
 ```
 
