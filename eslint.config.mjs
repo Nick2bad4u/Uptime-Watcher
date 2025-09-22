@@ -35,7 +35,7 @@ import vitest from "@vitest/eslint-plugin";
 import gitignore from "eslint-config-flat-gitignore";
 import eslintConfigPrettier from "eslint-config-prettier";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
-import * as eslintMdx from 'eslint-mdx';
+import * as eslintMdx from "eslint-mdx";
 import antfu from "eslint-plugin-antfu";
 import arrayFunc from "eslint-plugin-array-func";
 import pluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
@@ -587,12 +587,12 @@ export default [
     {
         files: ["**/*.mdx"],
         languageOptions: {
-            ecmaVersion: 'latest',
+            ecmaVersion: "latest",
             globals: {
                 React: false,
             },
             parser: eslintMdx,
-            sourceType: 'module',
+            sourceType: "module",
         },
         name: "MDX - **/*.MDX (Main with Remark)",
         plugins: { mdx: mdx },
@@ -611,25 +611,25 @@ export default [
                 // Language mapper for code blocks
                 languageMapper: {
                     // Map file extensions to languages for better code block processing
-                    'cjs': 'javascript',
-                    'cts': 'typescript',
-                    'js': 'javascript',
-                    'json': 'json',
-                    'jsx': 'javascript',
-                    'md': 'markdown',
-                    'mdx': 'mdx',
-                    'mjs': 'javascript',
-                    'mts': 'typescript',
-                    'ts': 'typescript',
-                    'tsx': 'typescript',
-                    'yaml': 'yaml',
-                    'yml': 'yaml'
+                    cjs: "javascript",
+                    cts: "typescript",
+                    js: "javascript",
+                    json: "json",
+                    jsx: "javascript",
+                    md: "markdown",
+                    mdx: "mdx",
+                    mjs: "javascript",
+                    mts: "typescript",
+                    ts: "typescript",
+                    tsx: "typescript",
+                    yaml: "yaml",
+                    yml: "yaml",
                 },
                 // Enable code block linting within MDX
                 lintCodeBlocks: true,
                 // Path to remark config (optional, will auto-discover .remarkrc.js)
-                remarkConfigPath: '.remarkrc.mjs',
-            })
+                remarkConfigPath: ".remarkrc.mjs",
+            }),
         },
     },
 
@@ -637,12 +637,12 @@ export default [
     {
         files: ["**/*.mdx"],
         languageOptions: {
-            ecmaVersion: 'latest',
+            ecmaVersion: "latest",
             globals: {
                 React: false,
             },
             parser: eslintMdx,
-            sourceType: 'module',
+            sourceType: "module",
         },
         name: "MDX - **/*.MDX (Code Blocks)",
         plugins: { mdx: mdx },
@@ -704,8 +704,8 @@ export default [
                 // Disable code block linting for regular markdown (use markdown plugin instead)
                 lintCodeBlocks: false,
                 // Path to remark config (optional, will auto-discover .remarkrc.mjs)
-                remarkConfigPath: '.remarkrc.mjs',
-            })
+                remarkConfigPath: ".remarkrc.mjs",
+            }),
         },
     },
 
@@ -7850,7 +7850,7 @@ export default [
                         "playwright.config.ts",
                         "vitest.shared.config.ts",
                         "vitest.stryker.config.ts",
-                        "config/tools/knip.config.ts"
+                        "config/tools/knip.config.ts",
                     ],
                     defaultProject: "config/testing/tsconfig.configs.json",
                 },
