@@ -86,7 +86,7 @@ describe("Settings Component", () => {
     };
 
     const mockSitesStore = {
-        downloadSQLiteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn(),
         fullResyncSites: vi.fn().mockResolvedValue(undefined),
     };
 
@@ -358,7 +358,7 @@ describe("Settings Component", () => {
         const downloadButton = screen.getByText("Download SQLite Backup");
         fireEvent.click(downloadButton);
 
-        expect(mockSitesStore.downloadSQLiteBackup).toHaveBeenCalled();
+        expect(mockSitesStore.downloadSqliteBackup).toHaveBeenCalled();
     });
 
     it("should handle theme changes", ({ task, annotate }) => {

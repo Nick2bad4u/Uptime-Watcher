@@ -22,7 +22,7 @@ export interface BaseSiteOperations {
     /** Delete a site */
     deleteSite: (identifier: string) => Promise<void>;
     /** Download SQLite backup */
-    downloadSQLiteBackup: () => Promise<void>;
+    downloadSqliteBackup: () => Promise<void>;
     /** Remove a monitor from a site */
     removeMonitorFromSite: (siteId: string, monitorId: string) => Promise<void>;
     /** Update monitor retry attempts */

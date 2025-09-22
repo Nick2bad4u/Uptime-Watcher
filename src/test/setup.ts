@@ -101,7 +101,7 @@ globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
 // Global test configuration and mocks
 const mockElectronAPI: {
     data: {
-        downloadSQLiteBackup: Mock<(...args: any[]) => any>;
+        downloadSqliteBackup: Mock<(...args: any[]) => any>;
         exportData: Mock<(...args: any[]) => any>;
         importData: Mock<(...args: any[]) => any>;
     };
@@ -122,10 +122,15 @@ const mockElectronAPI: {
         removeAllListeners: Mock<(...args: any[]) => any>;
     };
     monitoring: {
+        removeMonitor: Mock<(...args: any[]) => any>;
+        startMonitor: Mock<(...args: any[]) => any>;
         startMonitoring: Mock<(...args: any[]) => any>;
         startMonitoringForSite: Mock<(...args: any[]) => any>;
+        stopMonitor: Mock<(...args: any[]) => any>;
         stopMonitoring: Mock<(...args: any[]) => any>;
         stopMonitoringForSite: Mock<(...args: any[]) => any>;
+        validateMonitorConfig: Mock<(...args: any[]) => any>;
+        formatHttpStatus: Mock<(...args: any[]) => any>;
     };
     monitorTypes: {
         formatMonitorDetail: Mock<(...args: any[]) => any>;
@@ -156,7 +161,7 @@ const mockElectronAPI: {
     };
 } = {
     data: {
-        downloadSQLiteBackup: vi.fn().mockResolvedValue({
+        downloadSqliteBackup: vi.fn().mockResolvedValue({
             buffer: new ArrayBuffer(8),
             fileName: "test-backup.sqlite",
         }),
@@ -202,10 +207,15 @@ const mockElectronAPI: {
         removeAllListeners: vi.fn(),
     },
     monitoring: {
+        removeMonitor: vi.fn().mockResolvedValue(true),
+        startMonitor: vi.fn().mockResolvedValue(true),
         startMonitoring: vi.fn().mockResolvedValue(true),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
+        stopMonitor: vi.fn().mockResolvedValue(true),
         stopMonitoring: vi.fn().mockResolvedValue(true),
         stopMonitoringForSite: vi.fn().mockResolvedValue(true),
+        validateMonitorConfig: vi.fn().mockReturnValue(true),
+        formatHttpStatus: vi.fn().mockReturnValue("up"),
     },
     monitorTypes: {
         formatMonitorDetail: vi.fn().mockResolvedValue({

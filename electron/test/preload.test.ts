@@ -578,7 +578,7 @@ describe("Electron Preload Script", () => {
                 "complexity"
             );
             await annotate(
-                "Methods: exportData, importData, downloadSQLiteBackup",
+                "Methods: exportData, importData, downloadSqliteBackup",
                 "methods"
             );
             await annotate(
@@ -593,7 +593,7 @@ describe("Electron Preload Script", () => {
 
             expect(dataAPI).toHaveProperty("exportData");
             expect(dataAPI).toHaveProperty("importData");
-            expect(dataAPI).toHaveProperty("downloadSQLiteBackup");
+            expect(dataAPI).toHaveProperty("downloadSqliteBackup");
         });
 
         it("should properly invoke IPC for exportData", async ({
@@ -672,7 +672,7 @@ describe("Electron Preload Script", () => {
             );
         });
 
-        it("should properly invoke IPC for downloadSQLiteBackup", async ({
+        it("should properly invoke IPC for downloadSqliteBackup", async ({
             annotate,
         }) => {
             await annotate("Component: Data API", "component");
@@ -710,7 +710,7 @@ describe("Electron Preload Script", () => {
 
             const exposedAPI = getExposedAPI();
 
-            const result = await exposedAPI.data.downloadSQLiteBackup();
+            const result = await exposedAPI.data.downloadSqliteBackup();
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 "download-sqlite-backup"

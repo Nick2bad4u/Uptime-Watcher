@@ -58,6 +58,37 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
     },
 }));
 
+// Mock useMonitorTypesStore to provide monitor types configurations
+const mockMonitorTypes = [
+    {
+        type: "http",
+        name: "HTTP",
+        fields: [{ name: "url", type: "text", label: "URL", required: true }],
+    },
+    {
+        type: "port",
+        name: "Port",
+        fields: [
+            { name: "host", type: "text", label: "Host", required: true },
+            { name: "port", type: "number", label: "Port", required: true },
+        ],
+    },
+    {
+        type: "ping",
+        name: "Ping",
+        fields: [{ name: "host", type: "text", label: "Host", required: true }],
+    },
+];
+
+vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
+    useMonitorTypesStore: vi.fn(() => ({
+        isLoaded: true,
+        lastError: undefined,
+        monitorTypes: mockMonitorTypes,
+        loadMonitorTypes: vi.fn(),
+    })),
+}));
+
 vi.mock("../../../constants", () => ({
     ARIA_LABEL: "aria-label",
     TRANSITION_ALL: "all 0.2s ease-in-out",

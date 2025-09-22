@@ -80,7 +80,7 @@ describe("Settings - Branch Coverage Tests", () => {
     };
 
     const mockSitesStore = {
-        downloadSQLiteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn(),
         fullResyncSites: vi.fn(),
     };
 
@@ -457,7 +457,7 @@ describe("Settings - Branch Coverage Tests", () => {
             const backupError = new Error("Backup failed");
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
-                downloadSQLiteBackup: vi.fn().mockRejectedValue(backupError),
+                downloadSqliteBackup: vi.fn().mockRejectedValue(backupError),
             });
 
             render(<Settings onClose={mockOnClose} />);
@@ -666,7 +666,7 @@ describe("Settings - Branch Coverage Tests", () => {
             const errorWithoutMessage = { code: "ERROR_CODE" };
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
-                downloadSQLiteBackup: vi
+                downloadSqliteBackup: vi
                     .fn()
                     .mockRejectedValue(errorWithoutMessage),
             });
@@ -857,7 +857,7 @@ describe("Settings - Branch Coverage Tests", () => {
 
             vi.mocked(useSitesStore).mockReturnValue({
                 ...mockSitesStore,
-                downloadSQLiteBackup: mockDownloadBackup,
+                downloadSqliteBackup: mockDownloadBackup,
             });
 
             render(<Settings onClose={mockOnClose} />);

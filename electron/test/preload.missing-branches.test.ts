@@ -60,6 +60,10 @@ describe("preload.ts - Missing Branch Coverage", () => {
             if (channel === "get-sites") {
                 return Promise.resolve({ success: true, data: [mockSite] });
             }
+            // For void operations (settings), return null data (void is represented as null in JSON)
+            if (channel === "update-history-limit") {
+                return Promise.resolve({ success: true, data: null });
+            }
             // For other operations, return generic success
             return Promise.resolve({ success: true, data: true });
         });
@@ -123,7 +127,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 "Data failed"
             );
             await expect(
-                exposedAPI.data.downloadSQLiteBackup()
+                exposedAPI.data.downloadSqliteBackup()
             ).rejects.toThrow("Data failed");
         });
         it("should handle invoke errors in settings API", async () => {
@@ -169,10 +173,11 @@ describe("preload.ts - Missing Branch Coverage", () => {
             );
             await expect(
                 exposedAPI.sites.updateSite("id", undefined)
-            ).resolves.toBeUndefined(); // UpdateSite returns void
-            await expect(
-                exposedAPI.monitorTypes.validateMonitorData("http", null)
-            ).resolves.toEqual({ success: true, data: true });
+            ).resolves.toEqual(mockSite); // UpdateSite returns Site object
+            // Note: validateMonitorData function doesn't exist in current API
+            // await expect(
+            //     exposedAPI.monitorTypes.validateMonitorData("http", null)
+            // ).resolves.toEqual({ success: true, data: true });
         });
         it("should handle empty string parameters", async () => {
             // Test with empty string parameters
@@ -185,19 +190,19 @@ describe("preload.ts - Missing Branch Coverage", () => {
             ).resolves.toBeTruthy();
         });
         it("should handle invalid numeric parameters", async () => {
-            // Test with invalid numeric parameters - updateHistoryLimit returns void
+            // Test with invalid numeric parameters - updateHistoryLimit returns null (void as JSON)
             await expect(
                 exposedAPI.settings.updateHistoryLimit(-1)
-            ).resolves.toBeUndefined();
+            ).resolves.toBeNull();
             await expect(
                 exposedAPI.settings.updateHistoryLimit(0)
-            ).resolves.toBeUndefined();
+            ).resolves.toBeNull();
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Infinity)
-            ).resolves.toBeUndefined();
+            ).resolves.toBeNull();
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Number.NaN)
-            ).resolves.toBeUndefined();
+            ).resolves.toBeNull();
         });
     });
     describe("Concurrent Operations", () => {
@@ -233,7 +238,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             const results = await Promise.all(promises);
             expect(results).toEqual([
                 [mockSite], // GetSites returns extracted Site array
-                { success: true, data: [] }, // GetMonitorTypes returns raw IPC response
+                [], // GetMonitorTypes returns extracted array
                 100, // GetHistoryLimit returns extracted number
                 '{"sites":[],"events":[]}', // ExportData returns extracted string
             ]);
@@ -255,7 +260,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             );
             await expect(
                 exposedAPI.monitorTypes.getMonitorTypes()
-            ).resolves.toEqual({ success: true, data: true });
+            ).resolves.toEqual(true); // Returns extracted data, not raw response
             await expect(exposedAPI.data.exportData()).rejects.toThrow(
                 "Error 4"
             );
@@ -380,7 +385,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
             expect(typeof exposedAPI.sites.addSite).toBe("function");
             expect(typeof exposedAPI.sites.updateSite).toBe("function");
             expect(typeof exposedAPI.sites.removeSite).toBe("function");
-            expect(typeof exposedAPI.sites.removeMonitor).toBe("function");
             expect(typeof exposedAPI.sites.checkSiteNow).toBe("function");
         });
         it("should expose all monitoring API methods", async ({
@@ -405,6 +409,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             expect(typeof exposedAPI.monitoring.stopMonitoringForSite).toBe(
                 "function"
             );
+            expect(typeof exposedAPI.monitoring.removeMonitor).toBe("function");
         });
     });
 });

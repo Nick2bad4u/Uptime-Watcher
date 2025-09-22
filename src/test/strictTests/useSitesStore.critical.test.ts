@@ -22,6 +22,17 @@ describe("useSitesStore Function Coverage Tests", () => {
         // Clear all mocks
         vi.clearAllMocks();
 
+        // Set up default mock responses to prevent hanging
+        mockElectronAPI.sites.getSites.mockResolvedValue([]);
+        mockElectronAPI.sites.addSite.mockResolvedValue(undefined);
+        mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
+        mockElectronAPI.sites.removeSite.mockResolvedValue(undefined);
+        mockElectronAPI.stateSync.getSyncStatus.mockResolvedValue({
+            success: true,
+            sites: { pending: false, lastUpdate: Date.now() },
+            events: { pending: false, lastUpdate: Date.now() },
+        });
+
         // Reset store to initial state before each test
         const store = useSitesStore.getState();
         store.setSites([]);

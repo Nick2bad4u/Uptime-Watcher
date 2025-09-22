@@ -440,6 +440,24 @@ declare global {
                 getSyncStatus: () => Promise<Site[]>;
                 /**
                  * @remarks
+                 * Subscribe to state synchronization events.
+                 *
+                 * @param callback - Function to call when sync events are
+                 *   received
+                 *
+                 * @returns Cleanup function to remove the event listener
+                 */
+                onStateSyncEvent: (
+                    callback: (data: {
+                        action: "bulk-sync" | "create" | "delete" | "update";
+                        siteId?: string;
+                        sites?: Site[];
+                        source: "backend" | "cache" | "manual";
+                        timestamp: number;
+                    }) => void
+                ) => () => void;
+                /**
+                 * @remarks
                  * Manually request full state synchronization.
                  *
                  * @returns A promise resolving to array of synchronized sites.

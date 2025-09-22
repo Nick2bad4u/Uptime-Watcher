@@ -404,17 +404,18 @@ describe(createSiteOperationsActions, () => {
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
                 undefined
             );
-            mockElectronAPI.sites.removeMonitor.mockResolvedValue(undefined);
+            mockElectronAPI.monitoring.removeMonitor.mockResolvedValue(
+                undefined
+            );
 
             await actions.removeMonitorFromSite("test-site", "monitor-1");
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
-                "test-site",
-                "monitor-1"
-            );
+            expect(
+                mockElectronAPI.monitoring.removeMonitor
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
             expect(mockDeps.syncSites).toHaveBeenCalled();
         });
     });
@@ -478,22 +479,22 @@ describe(createSiteOperationsActions, () => {
         });
     });
 
-    describe("downloadSQLiteBackup", () => {
+    describe("downloadSqliteBackup", () => {
         it("should download SQLite backup", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteOperations", "component");
             await annotate("Category: Store", "category");
             await annotate("Type: Backup Operation", "type");
 
-            mockElectronAPI.data.downloadSQLiteBackup.mockResolvedValue({
+            mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue({
                 success: true,
                 data: { buffer: new ArrayBuffer(8), fileName: "backup.sqlite" },
             });
 
-            await actions.downloadSQLiteBackup();
+            await actions.downloadSqliteBackup();
 
             expect(
-                mockElectronAPI.data.downloadSQLiteBackup
+                mockElectronAPI.data.downloadSqliteBackup
             ).toHaveBeenCalled();
         });
     });

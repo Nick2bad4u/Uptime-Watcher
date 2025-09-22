@@ -40,7 +40,7 @@ vi.mock("../../types/ipc", () => ({
 // Mock the window.electronAPI
 const mockElectronAPI = {
     data: {
-        downloadSQLiteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn(),
         exportData: vi.fn(),
         importData: vi.fn(),
     },

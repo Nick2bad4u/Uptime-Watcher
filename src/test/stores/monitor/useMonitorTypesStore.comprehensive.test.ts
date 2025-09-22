@@ -549,7 +549,7 @@ describe(useMonitorTypesStore, () => {
             expect(result.current.lastError).toBe("Formatting failed");
         });
 
-        it("should handle null response with fallback", async ({
+        it("should handle null response as error", async ({
             task,
             annotate,
         }) => {
@@ -558,22 +558,22 @@ describe(useMonitorTypesStore, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const originalDetails = "Response time: 150ms";
+            // Mock null response which should be treated as an API error
             mockElectronAPI.monitoring.formatMonitorDetail.mockResolvedValue(
                 null
             );
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
-            let formatted: string;
-            await act(async () => {
-                formatted = await result.current.formatMonitorDetail(
-                    "http",
-                    originalDetails
-                );
-            });
-
-            expect(formatted!).toBe(originalDetails); // Should fallback to original
+            // Since withErrorHandling re-throws errors, we expect the function to throw
+            await expect(async () => {
+                await act(async () => {
+                    await result.current.formatMonitorDetail(
+                        "http",
+                        "Response time: 150ms"
+                    );
+                });
+            }).rejects.toThrow(); // Should throw an error due to unexpected null response
         });
     });
 
@@ -650,7 +650,7 @@ describe(useMonitorTypesStore, () => {
             expect(result.current.lastError).toBe("Title formatting failed");
         });
 
-        it("should handle null response with empty string fallback", async ({
+        it("should handle null response as error", async ({
             task,
             annotate,
         }) => {
@@ -659,21 +659,22 @@ describe(useMonitorTypesStore, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
+            // Mock null response which should be treated as an API error
             mockElectronAPI.monitoring.formatMonitorTitleSuffix.mockResolvedValue(
                 null
             );
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
-            let formatted: string;
-            await act(async () => {
-                formatted = await result.current.formatMonitorTitleSuffix(
-                    "http",
-                    mockMonitor
-                );
-            });
-
-            expect(formatted!).toBe(""); // Should fallback to empty string
+            // Since withErrorHandling re-throws errors, we expect the function to throw
+            await expect(async () => {
+                await act(async () => {
+                    await result.current.formatMonitorTitleSuffix(
+                        "http",
+                        mockMonitor
+                    );
+                });
+            }).rejects.toThrow(); // Should throw an error due to unexpected null response
         });
     });
 

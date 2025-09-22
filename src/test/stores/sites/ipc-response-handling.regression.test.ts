@@ -19,7 +19,7 @@ const mockElectronAPI = {
         getSites: vi.fn(),
     },
     data: {
-        downloadSQLiteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn(),
     },
     stateSync: {
         getSyncStatus: vi.fn(),
@@ -52,6 +52,19 @@ vi.mock("@shared/utils/errorHandling", () => ({
 describe("IPC Response Handling Regression Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        // Set up default mock responses to prevent hanging
+        mockElectronAPI.sites.getSites.mockResolvedValue([]);
+        mockElectronAPI.sites.addSite.mockResolvedValue(undefined);
+        mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue({
+            success: true,
+            data: "backup-data",
+        });
+        mockElectronAPI.stateSync.getSyncStatus.mockResolvedValue({
+            success: true,
+            sites: { pending: false, lastUpdate: Date.now() },
+            events: { pending: false, lastUpdate: Date.now() },
+        });
     });
 
     describe("extractIpcData behavior verification", () => {
@@ -132,7 +145,7 @@ describe("IPC Response Handling Regression Tests", () => {
     describe("SQLite Backup Failure Propagation", () => {
         it("should propagate backend failures in backup download", async () => {
             // Mock the electronAPI to throw an error directly (extraction happens in preload)
-            mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValue(
+            mockElectronAPI.data.downloadSqliteBackup.mockRejectedValue(
                 new Error("Backup generation failed")
             );
 
@@ -140,7 +153,7 @@ describe("IPC Response Handling Regression Tests", () => {
                 "../../../stores/sites/services/SiteService"
             );
 
-            await expect(SiteService.downloadSQLiteBackup()).rejects.toThrow(
+            await expect(SiteService.downloadSqliteBackup()).rejects.toThrow(
                 "Backup generation failed"
             );
         });

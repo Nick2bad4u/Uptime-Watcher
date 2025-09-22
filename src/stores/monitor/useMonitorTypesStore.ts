@@ -295,6 +295,16 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                             details
                         );
 
+                    // Handle unexpected null/undefined responses (runtime safety check)
+                    if (
+                        (result as unknown) === null ||
+                        (result as unknown) === undefined
+                    ) {
+                        throw new Error(
+                            `formatMonitorDetail returned null for type: ${type}`
+                        );
+                    }
+
                     logStoreAction("MonitorTypesStore", "formatMonitorDetail", {
                         resultLength: result.length,
                         success: true,
@@ -327,6 +337,16 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                             type,
                             monitor
                         );
+
+                    // Handle unexpected null/undefined responses (runtime safety check)
+                    if (
+                        (result as unknown) === null ||
+                        (result as unknown) === undefined
+                    ) {
+                        throw new Error(
+                            `formatMonitorTitleSuffix returned null for type: ${type}`
+                        );
+                    }
 
                     logStoreAction(
                         "MonitorTypesStore",
@@ -458,21 +478,45 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                     });
 
                     // Get the validation result directly from the service
-                    // Validate monitor data and handle unknown return type
                     const rawValidationResult =
                         await MonitorTypesService.validateMonitorData(
                             type,
                             data
                         );
 
-                    // Since the API returns unknown, create a fallback result
-                    const normalizedResult: ValidationResult = {
-                        data: rawValidationResult,
-                        errors: [],
-                        metadata: {},
-                        success: true,
-                        warnings: [],
-                    };
+                    // Try to parse as ValidationResult, with fallback
+                    let normalizedResult: ValidationResult;
+
+                    if (
+                        rawValidationResult &&
+                        typeof rawValidationResult === "object" &&
+                        "success" in rawValidationResult
+                    ) {
+                        // It's a ValidationResult - ensure all required properties exist
+                        const partialResult =
+                            rawValidationResult as Partial<ValidationResult> & {
+                                success: boolean;
+                            };
+                        normalizedResult = {
+                            // Preserve original ValidationResult properties
+                            ...partialResult,
+                            // Ensure required properties have defaults
+                            errors: partialResult.errors ?? [],
+                            metadata: partialResult.metadata ?? {},
+                            warnings: partialResult.warnings ?? [],
+                            data: partialResult.data,
+                            success: partialResult.success,
+                        };
+                    } else {
+                        // Not a ValidationResult - create normalized structure
+                        normalizedResult = {
+                            data: rawValidationResult,
+                            errors: [],
+                            metadata: {},
+                            success: true,
+                            warnings: [],
+                        };
+                    }
 
                     logStoreAction("MonitorTypesStore", "validateMonitorData", {
                         errorCount: normalizedResult.errors.length,

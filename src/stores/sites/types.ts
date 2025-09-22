@@ -34,7 +34,7 @@ export interface SitesActions {
     /** Delete a site */
     deleteSite: (identifier: string) => Promise<void>;
     /** Download SQLite backup */
-    downloadSQLiteBackup: () => Promise<void>;
+    downloadSqliteBackup: () => Promise<void>;
     /**
      * Performs complete resynchronization of all sites data from backend.
      *

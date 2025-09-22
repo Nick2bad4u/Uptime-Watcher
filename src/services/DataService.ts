@@ -32,7 +32,7 @@ export const DataService = {
      * @example
      *
      * ```typescript
-     * const backup = await DataService.downloadSQLiteBackup();
+     * const backup = await DataService.downloadSqliteBackup();
      * const blob = new Blob([backup.buffer], {
      *     type: "application/octet-stream",
      * });
@@ -43,7 +43,7 @@ export const DataService = {
      *
      * @throws If the electron API is unavailable or the backup operation fails.
      */
-    async downloadSQLiteBackup(): Promise<{
+    async downloadSqliteBackup(): Promise<{
         /** SQLite database backup as binary data */
         buffer: ArrayBuffer;
         /** Generated filename for the backup file */

@@ -116,7 +116,7 @@ export const Settings = ({
     const { clearError, isLoading, lastError, setError } = useErrorStore();
     const { persistHistoryLimit, resetSettings, settings, updateSettings } =
         useSettingsStore();
-    const { downloadSQLiteBackup, fullResyncSites } = useSitesStore();
+    const { downloadSqliteBackup, fullResyncSites } = useSitesStore();
 
     const { availableThemes, setTheme } = useTheme();
 
@@ -260,7 +260,7 @@ export const Settings = ({
     const handleDownloadSQLite = useCallback(async () => {
         clearError();
         try {
-            await downloadSQLiteBackup();
+            await downloadSqliteBackup();
             logger.user.action("Downloaded SQLite backup");
         } catch (error: unknown) {
             logger.error(
@@ -277,7 +277,7 @@ export const Settings = ({
         }
     }, [
         clearError,
-        downloadSQLiteBackup,
+        downloadSqliteBackup,
         setError,
     ]);
     /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe file system operations */

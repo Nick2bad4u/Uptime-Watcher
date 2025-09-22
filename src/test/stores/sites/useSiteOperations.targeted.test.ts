@@ -141,10 +141,6 @@ describe("useSiteOperations - Targeted Coverage", () => {
                     success: true,
                     data: { buffer: new ArrayBuffer(1024) },
                 }),
-                downloadSQLiteBackup: vi.fn().mockResolvedValue({
-                    success: true,
-                    data: { buffer: new ArrayBuffer(1024) },
-                }),
             },
         };
 
@@ -229,7 +225,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
         });
     });
 
-    describe("downloadSQLiteBackup Error Handling (Lines 147-151)", () => {
+    describe("downloadSqliteBackup Error Handling (Lines 147-151)", () => {
         it("should handle and rethrow errors when SQLite backup download fails", async ({
             task,
             annotate,
@@ -240,14 +236,14 @@ describe("useSiteOperations - Targeted Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const downloadError = new Error("Backup download failed");
-            mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValueOnce(
+            mockElectronAPI.data.downloadSqliteBackup.mockRejectedValueOnce(
                 downloadError
             );
 
             // Logger.error should be called and error should be rethrown
             (logger.error as any).mockClear?.();
 
-            await expect(actions.downloadSQLiteBackup()).rejects.toThrow(
+            await expect(actions.downloadSqliteBackup()).rejects.toThrow(
                 "Backup download failed"
             );
 
@@ -267,10 +263,10 @@ describe("useSiteOperations - Targeted Coverage", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Backup Operation", "type");
 
-            await actions.downloadSQLiteBackup();
+            await actions.downloadSqliteBackup();
 
             expect(
-                mockElectronAPI.data.downloadSQLiteBackup
+                mockElectronAPI.data.downloadSqliteBackup
             ).toHaveBeenCalled();
         });
     });
@@ -297,7 +293,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).not.toHaveBeenCalled();
-            expect(mockElectronAPI.sites.removeMonitor).not.toHaveBeenCalled();
+            expect(
+                mockElectronAPI.monitoring.removeMonitor
+            ).not.toHaveBeenCalled();
         });
     });
 
@@ -331,7 +329,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
             );
 
             // Verify monitor removal still proceeded
-            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
+            expect(
+                mockElectronAPI.monitoring.removeMonitor
+            ).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
                 mockSiteWithMultipleMonitors.monitors[0]!.id
             );
@@ -386,7 +386,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 mockSiteWithMultipleMonitors.identifier,
                 mockSiteWithMultipleMonitors.monitors[0]!.id
             );
-            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
+            expect(
+                mockElectronAPI.monitoring.removeMonitor
+            ).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
                 mockSiteWithMultipleMonitors.monitors[0]!.id
             );
@@ -407,7 +409,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 mockSiteWithMultipleMonitors.monitors[1]!.id
             );
 
-            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
+            expect(
+                mockElectronAPI.monitoring.removeMonitor
+            ).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
                 mockSiteWithMultipleMonitors.monitors[1]!.id
             );

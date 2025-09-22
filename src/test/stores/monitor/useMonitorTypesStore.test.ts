@@ -308,22 +308,22 @@ describe(useMonitorTypesStore, () => {
         await annotate("Category: Store", "category");
         await annotate("Type: Error Handling", "type");
 
-        // Simulate service error handling by returning fallback value
+        // Simulate service error handling by throwing error (service now re-throws)
         mockElectronAPI.monitoring.formatMonitorDetail.mockRejectedValue(
             new Error("Formatting failed")
         );
 
         const { result } = renderHook(() => useMonitorTypesStore());
 
-        let formatted: string;
-        await act(async () => {
-            formatted = await result.current.formatMonitorDetail(
-                "http",
-                "Raw detail"
-            );
-        });
+        // Since withErrorHandling re-throws errors, we expect the function to throw
+        await expect(async () => {
+            await act(async () => {
+                await result.current.formatMonitorDetail("http", "Raw detail");
+            });
+        }).rejects.toThrow("Formatting failed");
 
-        expect(formatted!).toBe("Raw detail"); // Fallback value
+        // Error should be set in store state
+        expect(result.current.lastError).toBe("Formatting failed");
     });
 
     describe("IPC Response Handling", () => {
@@ -392,13 +392,17 @@ describe(useMonitorTypesStore, () => {
                 );
             });
 
-            // Since store always wraps results as successful, the failure info is in the data field
-            expect(validationResult!.success).toBeTruthy(); // Store always returns success
-            expect(validationResult!.data).toEqual(mockValidationFailureData); // Failure data is wrapped
-            expect(validationResult!.errors).toEqual([]); // Store level errors (not validation errors)
+            // Store now preserves the original ValidationResult structure when API returns one
+            expect(validationResult!.success).toBeFalsy(); // Preserves original validation failure
+            expect(validationResult!.data).toEqual(
+                mockValidationFailureData.data
+            ); // Validation failure data
+            expect(validationResult!.errors).toEqual(
+                mockValidationFailureData.errors
+            ); // Validation errors
         });
 
-        it("should handle IPC operation failure with fallback", async ({
+        it("should handle IPC operation failure with error throwing", async ({
             task,
             annotate,
         }) => {
@@ -407,30 +411,24 @@ describe(useMonitorTypesStore, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: IPC Response Handling", "type");
 
-            // Mock service error handling by returning fallback validation result
-            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue({
-                data: undefined,
-                errors: ["Validation failed: Backend unavailable"],
-                metadata: {},
-                success: false,
-                warnings: [],
-            });
+            // Mock service error handling by throwing error (service now re-throws)
+            mockElectronAPI.monitoring.validateMonitorData.mockRejectedValue(
+                new Error("Backend unavailable")
+            );
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
-            let validationResult: ValidationResult;
-            await act(async () => {
-                validationResult = await result.current.validateMonitorData(
-                    "http",
-                    { url: "https://example.com" }
-                );
-            });
+            // Since withErrorHandling re-throws errors, we expect the function to throw
+            await expect(async () => {
+                await act(async () => {
+                    await result.current.validateMonitorData("http", {
+                        url: "https://example.com",
+                    });
+                });
+            }).rejects.toThrow("Backend unavailable");
 
-            // Should use fallback values when IPC operation fails
-            expect(validationResult!.success).toBeFalsy();
-            expect(validationResult!.errors).toEqual([
-                "Validation failed: Backend unavailable",
-            ]);
+            // Error should be set in store state
+            expect(result.current.lastError).toBe("Backend unavailable");
         });
     });
 });

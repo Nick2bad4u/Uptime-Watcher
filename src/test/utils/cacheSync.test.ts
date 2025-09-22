@@ -25,7 +25,7 @@ vi.mock("../../utils/monitorTypeHelper", () => ({
 // Mock electronAPI for various scenarios
 const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
     data: {
-        downloadSQLiteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn(),
         exportData: vi.fn(),
         importData: vi.fn(),
     },

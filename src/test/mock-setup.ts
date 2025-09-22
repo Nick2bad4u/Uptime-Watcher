@@ -73,12 +73,9 @@ const mockElectronAPI: any = {
         resetSettings: vi.fn().mockResolvedValue(undefined),
 
         // Backup operations
-        downloadSQLiteBackup: vi
-            .fn()
-            .mockResolvedValue({ filePath: "backup.db", size: 1024 }),
         downloadSqliteBackup: vi
             .fn()
-            .mockResolvedValue({ filePath: "backup.db", size: 1024 }), // alias for compatibility
+            .mockResolvedValue({ filePath: "backup.db", size: 1024 }),
 
         // Import/Export operations
         importData: vi.fn().mockResolvedValue(undefined),
@@ -97,6 +94,7 @@ const mockElectronAPI: any = {
         removeMonitor: vi.fn().mockResolvedValue(undefined),
         startMonitor: vi.fn().mockResolvedValue(undefined),
         stopMonitor: vi.fn().mockResolvedValue(undefined),
+        stopMonitoringForSite: vi.fn().mockResolvedValue(undefined),
         validateMonitorConfig: vi.fn().mockResolvedValue(true),
         formatHttpStatus: vi.fn().mockReturnValue("up"),
     },

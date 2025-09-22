@@ -26,6 +26,47 @@ export interface BaseEventData {
 }
 
 /**
+ * Payload for state synchronization events.
+ *
+ * @remarks
+ * Used to notify frontend about state changes that occurred in the backend.
+ * Supports various sync actions including bulk updates, deletions, and
+ * individual updates.
+ *
+ * @example Bulk sync event
+ *
+ * ```typescript
+ * const event: StateSyncEventData = {
+ *     action: "bulk-sync",
+ *     sites: updatedSites,
+ *     source: "backend",
+ *     timestamp: Date.now(),
+ * };
+ * ```
+ *
+ * @example Individual delete event
+ *
+ * ```typescript
+ * const event: StateSyncEventData = {
+ *     action: "delete",
+ *     siteId: "site_123",
+ *     source: "backend",
+ *     timestamp: Date.now(),
+ * };
+ * ```
+ */
+export interface StateSyncEventData extends BaseEventData {
+    /** The synchronization action being performed */
+    readonly action: "bulk-sync" | "delete" | "update" | "create";
+    /** Site ID for targeted operations (delete, update, create) */
+    readonly siteId?: string;
+    /** Site data for bulk sync operations */
+    readonly sites?: Site[];
+    /** Source system that triggered the sync */
+    readonly source: "backend" | "cache" | "manual";
+}
+
+/**
  * Payload for cache invalidation events.
  *
  * @remarks

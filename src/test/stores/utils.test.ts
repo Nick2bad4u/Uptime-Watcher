@@ -448,8 +448,12 @@ describe("Store Utils", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            (globalThis as any).electronAPI = {
-                sites: { getSites: vi.fn() },
+            // Set up window.electronAPI (not globalThis)
+            (global as any).window = {
+                electronAPI: {
+                    sites: { getSites: vi.fn() },
+                    data: { getHistoryLimit: vi.fn() },
+                },
             };
 
             await expect(waitForElectronAPI()).resolves.toBeUndefined();
@@ -464,8 +468,12 @@ describe("Store Utils", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            (globalThis as any).electronAPI = {
-                sites: { getSites: vi.fn() },
+            // Set up window.electronAPI (not globalThis)
+            (global as any).window = {
+                electronAPI: {
+                    sites: { getSites: vi.fn() },
+                    data: { getHistoryLimit: vi.fn() },
+                },
             };
 
             await expect(waitForElectronAPI(10, 50)).resolves.toBeUndefined();

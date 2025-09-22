@@ -22,7 +22,7 @@ const mockElectronAPI = {
         updateMonitorTimeout: vi.fn(),
         updateMonitorRetryAttempts: vi.fn(),
         updateSiteCheckInterval: vi.fn(),
-        downloadSQLiteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn(),
         checkSiteNow: vi.fn(),
     },
     monitoring: {
@@ -56,6 +56,17 @@ describe("useSitesStore Function Coverage Tests", () => {
         // Reset all mocks
         vi.clearAllMocks();
 
+        // Set up default mock responses to prevent hanging
+        mockElectronAPI.sites.getSites.mockResolvedValue([]);
+        mockElectronAPI.sites.addSite.mockResolvedValue(undefined);
+        mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
+        mockElectronAPI.sites.deleteSite.mockResolvedValue(undefined);
+        mockElectronAPI.stateSync.getSyncStatus.mockResolvedValue({
+            success: true,
+            sites: { pending: false, lastUpdate: Date.now() },
+            events: { pending: false, lastUpdate: Date.now() },
+        });
+
         // Reset store state
         const store = useSitesStore.getState();
         store.setSites([]);
@@ -84,7 +95,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             expect(typeof store.updateMonitorTimeout).toBe("function");
             expect(typeof store.updateMonitorRetryAttempts).toBe("function");
             expect(typeof store.updateSiteCheckInterval).toBe("function");
-            expect(typeof store.downloadSQLiteBackup).toBe("function");
+            expect(typeof store.downloadSqliteBackup).toBe("function");
 
             // Verify all monitoring functions exist
             expect(typeof store.checkSiteNow).toBe("function");

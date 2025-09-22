@@ -549,8 +549,8 @@ describe(useUpdatesStore, () => {
                 "UpdatesStore",
                 "applyUpdate",
                 {
-                    message: "Applying update and restarting application",
-                    success: true,
+                    message: "Update apply requested (not implemented)",
+                    success: false,
                 }
             );
         });

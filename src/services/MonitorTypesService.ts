@@ -62,7 +62,8 @@ export const MonitorTypesService = {
             logger.error("Failed to format monitor detail", typedError, {
                 tag: "MonitorTypesService",
             });
-            return details;
+            // Re-throw to allow store error handling
+            throw typedError;
         }
     },
 
@@ -101,7 +102,8 @@ export const MonitorTypesService = {
             logger.error("Failed to format monitor title suffix", typedError, {
                 tag: "MonitorTypesService",
             });
-            return "";
+            // Re-throw to allow store error handling
+            throw typedError;
         }
     },
 
@@ -128,7 +130,8 @@ export const MonitorTypesService = {
             logger.error("Failed to get monitor types", typedError, {
                 tag: "MonitorTypesService",
             });
-            return [];
+            // Re-throw to allow store error handling
+            throw typedError;
         }
     },
 
@@ -193,13 +196,8 @@ export const MonitorTypesService = {
             logger.error("Failed to validate monitor data", typedError, {
                 tag: "MonitorTypesService",
             });
-            return {
-                data: undefined,
-                errors: [`Validation failed: ${typedError.message}`],
-                metadata: {},
-                success: false,
-                warnings: [],
-            };
+            // Re-throw to allow store error handling
+            throw typedError;
         }
     },
 };

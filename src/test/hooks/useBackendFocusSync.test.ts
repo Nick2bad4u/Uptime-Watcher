@@ -27,7 +27,7 @@ const createMockStore = (): Partial<SitesStore> => ({
     checkSiteNow: vi.fn(),
     createSite: vi.fn(),
     deleteSite: vi.fn(),
-    downloadSQLiteBackup: vi.fn(),
+    downloadSqliteBackup: vi.fn(),
     getSelectedMonitorId: vi.fn(),
     getSelectedSite: vi.fn(),
     getSyncStatus: vi.fn(),

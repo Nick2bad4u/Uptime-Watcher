@@ -16,7 +16,7 @@ vi.mock("../../../stores/utils", () => ({
 const mockElectronAPI = {
     data: {
         downloadSqliteBackup: vi.fn(),
-        downloadSQLiteBackup: vi.fn(),
+        exportData: vi.fn(),
     },
     sites: {
         addSite: vi.fn(),
@@ -487,32 +487,25 @@ describe("SiteService", () => {
         });
     });
 
-    describe("downloadSQLiteBackup", () => {
-        it("should download SQLite backup successfully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteService", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Backup Operation", "type");
-
-            const backupData = {
-                buffer: new ArrayBuffer(100),
-                fileName: "backup.db",
+    describe("downloadSqliteBackup", () => {
+        it("should successfully download SQLite backup", async () => {
+            // Mock the API response
+            const mockBackupData = new ArrayBuffer(1024);
+            const mockResponse = {
+                buffer: mockBackupData,
+                fileName: "backup_20240101_120000.sqlite",
             };
 
-            // Mock electronAPI to return extracted data directly (no IPC wrapper)
-            mockElectronAPI.data.downloadSQLiteBackup.mockResolvedValueOnce(
-                backupData
+            mockElectronAPI.data.downloadSqliteBackup.mockResolvedValueOnce(
+                mockResponse
             );
 
-            const result = await SiteService.downloadSQLiteBackup();
+            const result = await SiteService.downloadSqliteBackup();
 
+            expect(result).toEqual(mockResponse);
             expect(
-                mockElectronAPI.data.downloadSQLiteBackup
-            ).toHaveBeenCalledTimes(1);
-            expect(result).toEqual(backupData);
+                mockElectronAPI.data.downloadSqliteBackup
+            ).toHaveBeenCalledOnce();
         });
 
         it("should handle download errors", async ({ task, annotate }) => {
@@ -522,11 +515,11 @@ describe("SiteService", () => {
             await annotate("Type: Error Handling", "type");
 
             const error = new Error("Failed to download backup");
-            mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValueOnce(
+            mockElectronAPI.data.downloadSqliteBackup.mockRejectedValueOnce(
                 error
             );
 
-            await expect(SiteService.downloadSQLiteBackup()).rejects.toThrow(
+            await expect(SiteService.downloadSqliteBackup()).rejects.toThrow(
                 "Failed to download backup"
             );
         });
@@ -547,7 +540,7 @@ describe("SiteService", () => {
             expect(SiteService.updateSite).toBeDefined();
             expect(SiteService.removeSite).toBeDefined();
             expect(SiteService.checkSiteNow).toBeDefined();
-            expect(SiteService.downloadSQLiteBackup).toBeDefined();
+            expect(SiteService.downloadSqliteBackup).toBeDefined();
         });
 
         it("should handle undefined window.electronAPI gracefully", async ({
@@ -585,7 +578,7 @@ describe("SiteService", () => {
             await expect(
                 SiteService.checkSiteNow("test", "test")
             ).rejects.toThrow("ElectronAPI not available");
-            await expect(SiteService.downloadSQLiteBackup()).rejects.toThrow(
+            await expect(SiteService.downloadSqliteBackup()).rejects.toThrow(
                 "ElectronAPI not available"
             );
 
@@ -824,11 +817,11 @@ describe("SiteService", () => {
             await annotate("Type: Error Handling", "type");
 
             const dbError = new Error("Database connection failed");
-            mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValueOnce(
+            mockElectronAPI.data.downloadSqliteBackup.mockRejectedValueOnce(
                 dbError
             );
 
-            await expect(SiteService.downloadSQLiteBackup()).rejects.toThrow(
+            await expect(SiteService.downloadSqliteBackup()).rejects.toThrow(
                 "Database connection failed"
             );
         });

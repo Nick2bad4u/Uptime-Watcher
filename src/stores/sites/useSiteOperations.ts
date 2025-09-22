@@ -164,15 +164,15 @@ export const createSiteOperationsActions = (
             false // Don't sync after as we're removing directly from deps
         );
     },
-    downloadSQLiteBackup: async (): Promise<void> => {
+    downloadSqliteBackup: async (): Promise<void> => {
         await withSiteOperation(
-            "downloadSQLiteBackup",
+            "downloadSqliteBackup",
             async () => {
                 /* eslint-disable-next-line ex/no-unhandled -- Exception is handled by the try-catch block */
                 await handleSQLiteBackupDownload(async () => {
                     try {
                         const response =
-                            await DataService.downloadSQLiteBackup();
+                            await DataService.downloadSqliteBackup();
                         // Response from preload is already unwrapped: { buffer: ArrayBuffer, fileName: string }
                         return new Uint8Array(response.buffer);
                     } catch (error) {

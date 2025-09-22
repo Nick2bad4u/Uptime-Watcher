@@ -27,6 +27,13 @@ import { SiteService } from "./services/SiteService";
 import { StatusUpdateManager } from "./utils/statusUpdateHandler";
 
 /**
+ * No-op cleanup implementation.
+ */
+const noOpCleanup = (): void => {
+    // No cleanup needed
+};
+
+/**
  * Site synchronization actions interface.
  *
  * @remarks
@@ -290,12 +297,70 @@ export const createSiteSyncActions = (
 
             return result;
         },
-        subscribeToSyncEvents:
-            () =>
-            // OnStateSyncEvent not available in current API
-            () => {
-                // No-op cleanup function
-            },
+        subscribeToSyncEvents: (): (() => void) => {
+            try {
+                // eslint-disable-next-line n/no-sync -- Method name contains 'sync' but refers to state synchronization, not file operations
+                return window.electronAPI.stateSync.onStateSyncEvent(
+                    (event) => {
+                        logStoreAction("SitesStore", "syncEventReceived", {
+                            action: event.action,
+                            message: `Received sync event: ${event.action}`,
+                            siteId: event.siteId,
+                            sitesCount: event.sites?.length,
+                            source: event.source,
+                            timestamp: event.timestamp,
+                        });
+
+                        switch (event.action) {
+                            case "bulk-sync": {
+                                if (event.sites) {
+                                    deps.setSites(event.sites);
+                                }
+                                break;
+                            }
+                            case "create":
+                            case "delete":
+                            case "update": {
+                                // For individual site updates/creates/deletes, trigger full resync
+                                // to ensure consistency
+                                void (async (): Promise<void> => {
+                                    try {
+                                        await actions.syncSites();
+                                    } catch (error: unknown) {
+                                        logStoreAction("SitesStore", "error", {
+                                            error: ensureError(error),
+                                        });
+                                    }
+                                })();
+                                break;
+                            }
+                            default: {
+                                logger.warn(
+                                    "Unknown sync event action:",
+                                    event.action
+                                );
+                            }
+                        }
+                    }
+                );
+            } catch (error) {
+                logger.error(
+                    "Failed to subscribe to sync events:",
+                    ensureError(error)
+                );
+                logStoreAction("SitesStore", "subscribeToSyncEvents", {
+                    error: ensureError(error).message,
+                    message: "Failed to subscribe to sync events",
+                    success: false,
+                });
+                return noOpCleanup;
+            } finally {
+                logStoreAction("SitesStore", "subscribeToSyncEvents", {
+                    message: "Sync event subscription setup completed",
+                    success: true,
+                });
+            }
+        },
         syncSites: async (): Promise<void> => {
             await withErrorHandling(
                 async () => {

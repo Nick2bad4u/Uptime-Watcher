@@ -82,14 +82,14 @@ export const SiteService = {
      * @example
      *
      * ```typescript
-     * const backup = await SiteService.downloadSQLiteBackup();
+     * const backup = await SiteService.downloadSqliteBackup();
      * ```
      *
      * @returns An object containing the backup buffer and the file name.
      *
      * @throws If the electron API is unavailable or the backup operation fails.
      */
-    async downloadSQLiteBackup(): Promise<{
+    async downloadSqliteBackup(): Promise<{
         /** SQLite database backup as binary data */
         buffer: ArrayBuffer;
         /** Generated filename for the backup file */
@@ -97,7 +97,7 @@ export const SiteService = {
     }> {
         await this.initialize();
         // Preload now returns extracted data directly
-        return DataService.downloadSQLiteBackup();
+        return DataService.downloadSqliteBackup();
     },
 
     /**

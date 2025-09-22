@@ -500,7 +500,7 @@ describe("Types Module", () => {
                 data: {
                     exportData: () => Promise.resolve("data"),
                     importData: () => Promise.resolve(true),
-                    downloadSQLiteBackup: () =>
+                    downloadSqliteBackup: () =>
                         Promise.resolve({
                             buffer: new ArrayBuffer(0),
                             fileName: "backup.db",
@@ -566,7 +566,7 @@ describe("Types Module", () => {
             // Validate structure
             expect(typeof mockAPI.data.exportData).toBe("function");
             expect(typeof mockAPI.data.importData).toBe("function");
-            expect(typeof mockAPI.data.downloadSQLiteBackup).toBe("function");
+            expect(typeof mockAPI.data.downloadSqliteBackup).toBe("function");
 
             expect(typeof mockAPI.events.onMonitorStatusChanged).toBe(
                 "function"

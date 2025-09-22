@@ -650,14 +650,8 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 });
             });
 
-            // Store wraps the raw data in ValidationResult structure
-            const expectedValidationResult = {
-                success: true,
-                data: completeValidationData,
-                errors: [],
-                warnings: [],
-                metadata: {},
-            };
+            // Store preserves the original ValidationResult structure when API returns one
+            const expectedValidationResult = completeValidationData; // No wrapping needed
 
             expect(result1!).toEqual(expectedValidationResult);
 
@@ -772,13 +766,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 );
             });
 
-            expect(result1!).toEqual({
-                success: true,
-                data: complexValidationResult,
-                errors: [],
-                warnings: [],
-                metadata: {},
-            });
+            expect(result1!).toEqual(complexValidationResult);
         });
     });
 
