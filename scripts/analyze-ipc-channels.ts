@@ -10,8 +10,8 @@
  * @packageDocumentation
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
 
 /**
  * Represents an IPC channel definition extracted from the backend
@@ -55,7 +55,7 @@ export class IpcChannelAnalyzer {
             "ipc",
             "IpcService.ts"
         );
-        this.sourceCode = fs.readFileSync(this.ipcServicePath, "utf-8");
+        this.sourceCode = readFileSync(this.ipcServicePath, "utf8");
     }
 
     /**
@@ -75,16 +75,13 @@ export class IpcChannelAnalyzer {
 
         // Regex to match registerStandardizedIpcHandler calls
         const handlerRegex =
-            /registerStandardizedIpcHandler\s*\(\s*["']([^"']+)["']\s*,\s*([^,]+),\s*([^,]+),/g;
+            /registerStandardizedIpcHandler\s*\(\s*["'](?<channelName>[^"']+)["']\s*,\s*(?<handlerCode>[^,]+),\s*(?<validatorCode>[^,]+),/g;
 
         let match;
         while ((match = handlerRegex.exec(this.sourceCode)) !== null) {
-            const [
-                ,
-                channelName,
-                handlerCode,
-                validatorCode,
-            ] = match;
+            const channelName = match.groups?.channelName ?? "";
+            const handlerCode = match.groups?.handlerCode ?? "";
+            const validatorCode = match.groups?.validatorCode ?? "";
 
             channels.push({
                 channel: channelName,
@@ -195,9 +192,11 @@ export class IpcChannelAnalyzer {
         }
 
         // Extract validator function name (e.g., "DataHandlerValidators.exportData")
-        const match = validatorCode.match(/([A-Za-z]+)\.([A-Za-z]+)/);
-        if (match) {
-            return `${match[1]}.${match[2]}`;
+        const match = validatorCode.match(
+            /(?<validatorClass>[A-Za-z]+)\.(?<validatorMethod>[A-Za-z]+)/
+        );
+        if (match?.groups) {
+            return `${match.groups.validatorClass}.${match.groups.validatorMethod}`;
         }
 
         return validatorCode.trim();
@@ -266,7 +265,7 @@ export class IpcChannelAnalyzer {
                 report += `- **Parameters**: ${channel.hasParameters ? "Yes" : "No"}\n`;
                 report += `- **Validator**: ${channel.validator || "None"}\n`;
                 report += `- **Return Type**: \`${channel.returnType}\`\n`;
-                report += `- **Handler**: \`${channel.handlerMethod.substring(0, 50)}...\`\n\n`;
+                report += `- **Handler**: \`${channel.handlerMethod.slice(0, 50)}...\`\n\n`;
             }
         }
 
@@ -293,12 +292,12 @@ export function runAnalysis(projectRoot: string): void {
 
     // Save reports
     const reportsDir = path.join(projectRoot, "docs", "preload-refactor");
-    if (!fs.existsSync(reportsDir)) {
-        fs.mkdirSync(reportsDir, { recursive: true });
+    if (!existsSync(reportsDir)) {
+        mkdirSync(reportsDir, { recursive: true });
     }
 
-    fs.writeFileSync(path.join(reportsDir, "ipc-channel-analysis.md"), report);
-    fs.writeFileSync(path.join(reportsDir, "ipc-channel-mapping.json"), json);
+    writeFileSync(path.join(reportsDir, "ipc-channel-analysis.md"), report);
+    writeFileSync(path.join(reportsDir, "ipc-channel-mapping.json"), json);
 
     console.log("📊 Analysis complete!");
     console.log(
@@ -307,11 +306,11 @@ export function runAnalysis(projectRoot: string): void {
     console.log(
         `📋 JSON mapping saved to: ${path.join(reportsDir, "ipc-channel-mapping.json")}`
     );
-    console.log("\n" + report);
+    console.log(`\n${report}`);
 }
 
 // If this file is run directly, execute the analysis
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     const projectRoot = process.cwd();
     runAnalysis(projectRoot);
 }

@@ -51,6 +51,8 @@ vi.mock("../../../types/ipc", () => ({
 const mockElectronAPI = {
     monitorTypes: {
         getMonitorTypes: vi.fn(),
+    },
+    monitoring: {
         validateMonitorData: vi.fn(),
         formatMonitorDetail: vi.fn(),
         formatMonitorTitleSuffix: vi.fn(),
@@ -351,12 +353,16 @@ describe(useMonitorTypesStore, () => {
     });
 
     describe("validateMonitorData", () => {
-        const mockValidationResult: ValidationResult = {
+        // Mock returns just the data that backend would return, not the wrapped ValidationResult
+        const mockValidationData = { url: "https://example.com" };
+
+        // This is what the store will create when wrapping the backend data
+        const expectedValidationResult: ValidationResult = {
             success: true,
-            data: { url: "https://example.com" },
+            data: mockValidationData,
             errors: [],
             warnings: [],
-            metadata: { validatedAt: Date.now() },
+            metadata: {},
         };
 
         it("should validate monitor data successfully", async ({
@@ -368,8 +374,8 @@ describe(useMonitorTypesStore, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Validation", "type");
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
-                mockValidationResult
+            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
+                mockValidationData
             );
 
             const { result } = renderHook(() => useMonitorTypesStore());
@@ -382,9 +388,9 @@ describe(useMonitorTypesStore, () => {
                 );
             });
 
-            expect(validationResult!).toEqual(mockValidationResult);
+            expect(validationResult!).toEqual(expectedValidationResult);
             expect(
-                mockElectronAPI.monitorTypes.validateMonitorData
+                mockElectronAPI.monitoring.validateMonitorData
             ).toHaveBeenCalledWith("http", { url: "https://example.com" });
         });
 
@@ -405,7 +411,7 @@ describe(useMonitorTypesStore, () => {
                 metadata: {},
             };
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
+            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
                 errorResult
             );
 
@@ -439,7 +445,7 @@ describe(useMonitorTypesStore, () => {
                 // Missing warnings and metadata
             };
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
+            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
                 partialResult
             );
 
@@ -464,7 +470,7 @@ describe(useMonitorTypesStore, () => {
             await annotate("Type: Error Handling", "type");
 
             const errorMessage = "Validation service unavailable";
-            mockElectronAPI.monitorTypes.validateMonitorData.mockRejectedValue(
+            mockElectronAPI.monitoring.validateMonitorData.mockRejectedValue(
                 new Error(errorMessage)
             );
 
@@ -493,7 +499,7 @@ describe(useMonitorTypesStore, () => {
             await annotate("Type: Monitoring", "type");
 
             const formattedDetail = "Response time: 150ms (Excellent)";
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(
+            mockElectronAPI.monitoring.formatMonitorDetail.mockResolvedValue(
                 formattedDetail
             );
 
@@ -509,7 +515,7 @@ describe(useMonitorTypesStore, () => {
 
             expect(formatted!).toBe(formattedDetail);
             expect(
-                mockElectronAPI.monitorTypes.formatMonitorDetail
+                mockElectronAPI.monitoring.formatMonitorDetail
             ).toHaveBeenCalledWith("http", "Response time: 150ms");
         });
 
@@ -523,7 +529,7 @@ describe(useMonitorTypesStore, () => {
             await annotate("Type: Error Handling", "type");
 
             const originalDetails = "Response time: 150ms";
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockRejectedValue(
+            mockElectronAPI.monitoring.formatMonitorDetail.mockRejectedValue(
                 new Error("Formatting failed")
             );
 
@@ -553,7 +559,7 @@ describe(useMonitorTypesStore, () => {
             await annotate("Type: Business Logic", "type");
 
             const originalDetails = "Response time: 150ms";
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(
+            mockElectronAPI.monitoring.formatMonitorDetail.mockResolvedValue(
                 null
             );
 
@@ -595,7 +601,7 @@ describe(useMonitorTypesStore, () => {
             await annotate("Type: Monitoring", "type");
 
             const titleSuffix = "(https://example.com)";
-            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
+            mockElectronAPI.monitoring.formatMonitorTitleSuffix.mockResolvedValue(
                 titleSuffix
             );
 
@@ -611,7 +617,7 @@ describe(useMonitorTypesStore, () => {
 
             expect(formatted!).toBe(titleSuffix);
             expect(
-                mockElectronAPI.monitorTypes.formatMonitorTitleSuffix
+                mockElectronAPI.monitoring.formatMonitorTitleSuffix
             ).toHaveBeenCalledWith("http", mockMonitor);
         });
 
@@ -624,7 +630,7 @@ describe(useMonitorTypesStore, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockRejectedValue(
+            mockElectronAPI.monitoring.formatMonitorTitleSuffix.mockRejectedValue(
                 new Error("Title formatting failed")
             );
 
@@ -653,7 +659,7 @@ describe(useMonitorTypesStore, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
+            mockElectronAPI.monitoring.formatMonitorTitleSuffix.mockResolvedValue(
                 null
             );
 
@@ -822,9 +828,10 @@ describe(useMonitorTypesStore, () => {
                 },
             ];
 
-            const mockValidationResult: ValidationResult = {
+            const mockValidationData = { url: "https://example.com" };
+            const expectedValidationResult: ValidationResult = {
                 success: true,
-                data: { url: "https://example.com" },
+                data: mockValidationData,
                 errors: [],
                 warnings: [],
                 metadata: {},
@@ -833,10 +840,10 @@ describe(useMonitorTypesStore, () => {
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
                 mockMonitorTypes
             );
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
-                mockValidationResult
+            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
+                mockValidationData
             );
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(
+            mockElectronAPI.monitoring.formatMonitorDetail.mockResolvedValue(
                 "Formatted: 150ms"
             );
 

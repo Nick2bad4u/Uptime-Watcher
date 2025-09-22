@@ -12,6 +12,8 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
+import { ipcRenderer } from "electron";
+
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
@@ -26,6 +28,16 @@ export interface SystemApiInterface {
      * @returns Promise resolving to true if URL was opened successfully
      */
     openExternal: (...args: unknown[]) => Promise<boolean>;
+
+    /**
+     * Quits the application and installs a pending update
+     *
+     * @remarks
+     * This method triggers the app to quit and automatically install a
+     * downloaded update. This is typically called after the user confirms they
+     * want to install an available update.
+     */
+    quitAndInstall: () => void;
 }
 
 /**
@@ -42,6 +54,18 @@ export const systemApi: SystemApiInterface = {
     openExternal: createTypedInvoker<boolean>("open-external") satisfies (
         ...args: unknown[]
     ) => Promise<boolean>,
+
+    /**
+     * Quits the application and installs a pending update
+     *
+     * @remarks
+     * This method triggers the app to quit and automatically install a
+     * downloaded update. This is typically called after the user confirms they
+     * want to install an available update.
+     */
+    quitAndInstall: (): void => {
+        ipcRenderer.send("quit-and-install");
+    },
 } as const;
 
 export type SystemApi = SystemApiInterface;

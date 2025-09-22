@@ -189,12 +189,7 @@ export const SiteService = {
      */
     async removeSite(identifier: string): Promise<void> {
         await this.initialize();
-        const success = await window.electronAPI.sites.removeSite(identifier);
-        if (!success) {
-            throw new Error(
-                `Failed to remove site ${identifier}: Backend operation failed`
-            );
-        }
+        await window.electronAPI.sites.removeSite(identifier);
     },
 
     /**

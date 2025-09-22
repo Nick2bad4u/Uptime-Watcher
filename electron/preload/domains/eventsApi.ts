@@ -17,6 +17,8 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Event data type casting is safe in this context */
 
+import { ipcRenderer } from "electron";
+
 import type { StatusUpdate } from "@shared/types";
 import type {
     CacheInvalidatedEventData,
@@ -55,6 +57,7 @@ export function createEventsApi(): {
     onUpdateStatus: (
         callback: (data: UpdateStatusEventData) => void
     ) => () => void;
+    removeAllListeners: () => void;
 } {
     return {
         /**
@@ -168,6 +171,31 @@ export function createEventsApi(): {
             createEventManager("update-status").on((data: unknown) => {
                 callback(data as UpdateStatusEventData);
             }),
+
+        /**
+         * Remove all event listeners for all channels
+         *
+         * @remarks
+         * This method removes all registered event listeners across all event
+         * channels managed by this API. Use with caution as this will affect
+         * all active listeners.
+         */
+        removeAllListeners: (): void => {
+            const channels = [
+                "cache:invalidated",
+                "monitor:down",
+                "monitoring:started",
+                "monitoring:stopped",
+                "monitor:status-changed",
+                "monitor:up",
+                "test-event",
+                "update-status",
+            ];
+
+            for (const channel of channels) {
+                ipcRenderer.removeAllListeners(channel);
+            }
+        },
     };
 }
 

@@ -129,14 +129,18 @@ describe("useSiteOperations - Targeted Coverage", () => {
         mockElectronAPI = {
             sites: {
                 removeSite: vi.fn().mockResolvedValue({ success: true }),
-                removeMonitor: vi.fn().mockResolvedValue({ success: true }),
             },
             monitoring: {
+                removeMonitor: vi.fn().mockResolvedValue({ success: true }),
                 stopMonitoringForSite: vi
                     .fn()
                     .mockResolvedValue({ success: true }),
             },
             data: {
+                downloadSqliteBackup: vi.fn().mockResolvedValue({
+                    success: true,
+                    data: { buffer: new ArrayBuffer(1024) },
+                }),
                 downloadSQLiteBackup: vi.fn().mockResolvedValue({
                     success: true,
                     data: { buffer: new ArrayBuffer(1024) },
@@ -144,10 +148,11 @@ describe("useSiteOperations - Targeted Coverage", () => {
             },
         };
 
-        // @ts-expect-error - Mocking global electronAPI
+        // Mock global electronAPI
         globalThis.window = {
+            ...globalThis.window,
             electronAPI: mockElectronAPI,
-        };
+        } as any;
 
         mockSiteDeps = {
             getSites: vi.fn(() => [

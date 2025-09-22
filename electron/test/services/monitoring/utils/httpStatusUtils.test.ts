@@ -94,11 +94,11 @@ describe("HTTP Status Utils", () => {
             await annotate("Type: Error Handling", "type");
 
             expect(determineMonitorStatus(500)).toBe("down"); // Internal Server Error
-            expect(determineMonitorStatus(501)).toBe("down"); // Not Implemented
+            expect(determineMonitorStatus(501)).toBe("degraded"); // Not Implemented
             expect(determineMonitorStatus(502)).toBe("down"); // Bad Gateway
             expect(determineMonitorStatus(503)).toBe("down"); // Service Unavailable
             expect(determineMonitorStatus(504)).toBe("down"); // Gateway Timeout
-            expect(determineMonitorStatus(505)).toBe("down"); // HTTP Version Not Supported
+            expect(determineMonitorStatus(505)).toBe("degraded"); // HTTP Version Not Supported
             expect(determineMonitorStatus(599)).toBe("down"); // Edge of 5xx range
         });
         it('should return "down" for invalid status codes below 100', async ({

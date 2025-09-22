@@ -43,6 +43,8 @@ vi.mock("../../../types/ipc", () => ({
 const mockElectronAPI = {
     monitorTypes: {
         getMonitorTypes: vi.fn(),
+    },
+    monitoring: {
         validateMonitorData: vi.fn(),
         formatMonitorDetail: vi.fn(),
         formatMonitorTitleSuffix: vi.fn(),
@@ -118,10 +120,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 },
             ];
 
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
-                success: true,
-                data: mockConfigs,
-            });
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
+                mockConfigs
+            );
             mockSafeExtractIpcData.mockReturnValue(mockConfigs);
 
             const { result } = renderHook(() => useMonitorTypesStore());
@@ -177,10 +178,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 },
             ];
 
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
-                success: true,
-                data: mixedConfigs,
-            });
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
+                mixedConfigs
+            );
             mockSafeExtractIpcData.mockReturnValue(mixedConfigs);
 
             const { result } = renderHook(() => useMonitorTypesStore());
@@ -213,16 +213,20 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
     describe("Validation Operations", () => {
         it("should handle successful validation", async () => {
-            const mockResult: ValidationResult = {
+            // Mock returns just the data that backend would return, not the wrapped ValidationResult
+            const mockValidationData = { url: "https://example.com" };
+
+            // This is what the store will create when wrapping the backend data
+            const expectedValidationResult: ValidationResult = {
                 success: true,
-                data: { url: "https://example.com" },
+                data: mockValidationData,
                 errors: [],
                 warnings: [],
                 metadata: {},
             };
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
-                mockResult
+            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
+                mockValidationData
             );
 
             const { result } = renderHook(() => useMonitorTypesStore());
@@ -237,7 +241,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 );
             });
 
-            expect(validationResult!).toEqual(mockResult);
+            expect(validationResult!).toEqual(expectedValidationResult);
         });
 
         it("should handle validation with missing optional fields", async () => {
@@ -248,7 +252,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 // Missing warnings and metadata
             };
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
+            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
                 mockResult
             );
 
@@ -270,7 +274,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
         it("should handle validation errors", async () => {
             const testError = new Error("Validation service unavailable");
-            mockElectronAPI.monitorTypes.validateMonitorData.mockRejectedValue(
+            mockElectronAPI.monitoring.validateMonitorData.mockRejectedValue(
                 testError
             );
 
@@ -293,7 +297,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
     describe("Formatting Operations", () => {
         it("should format monitor details successfully", async () => {
             const formattedDetail = "Formatted detail text";
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(
+            mockElectronAPI.monitoring.formatMonitorDetail.mockResolvedValue(
                 formattedDetail
             );
             mockSafeExtractIpcData.mockReturnValue(formattedDetail);
@@ -313,7 +317,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
         it("should handle format detail errors", async () => {
             const testError = new Error("Format service error");
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockRejectedValue(
+            mockElectronAPI.monitoring.formatMonitorDetail.mockRejectedValue(
                 testError
             );
 
@@ -332,7 +336,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
         it("should format monitor title suffix", async () => {
             const suffix = " - example.com";
-            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
+            mockElectronAPI.monitoring.formatMonitorTitleSuffix.mockResolvedValue(
                 suffix
             );
             mockSafeExtractIpcData.mockReturnValue(suffix);
@@ -354,7 +358,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
         });
 
         it("should handle fallback values for formatting", async () => {
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(
+            mockElectronAPI.monitoring.formatMonitorDetail.mockResolvedValue(
                 null
             );
             mockSafeExtractIpcData.mockReturnValue("fallback");
@@ -445,10 +449,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 },
             ];
 
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
-                success: true,
-                data: mockConfigs,
-            });
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
+                mockConfigs
+            );
             mockSafeExtractIpcData.mockReturnValue(mockConfigs);
 
             const { result } = renderHook(() => useMonitorTypesStore());
@@ -483,10 +486,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
         it("should reload if there was an error", async () => {
             const mockConfigs: MonitorTypeConfig[] = [];
 
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
-                success: true,
-                data: mockConfigs,
-            });
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
+                mockConfigs
+            );
             mockSafeExtractIpcData.mockReturnValue(mockConfigs);
 
             // Set up state with error
@@ -511,10 +513,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
     describe("Logging Verification", () => {
         it("should log all operations correctly", async () => {
             const mockConfigs: MonitorTypeConfig[] = [];
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
-                success: true,
-                data: mockConfigs,
-            });
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
+                mockConfigs
+            );
             mockSafeExtractIpcData.mockReturnValue(mockConfigs);
 
             const { result } = renderHook(() => useMonitorTypesStore());
@@ -542,20 +543,23 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             mockSafeExtractIpcData.mockClear();
 
             // Test validation logging
-            const mockResult: ValidationResult = {
+            const mockValidationData = {};
+            const expectedValidationResult: ValidationResult = {
                 success: true,
-                data: {},
+                data: mockValidationData,
                 errors: [],
                 warnings: [],
                 metadata: {},
             };
 
-            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
-                mockResult
+            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
+                mockValidationData
             );
 
             // Mock safeExtractIpcData to return the validation result directly
-            mockSafeExtractIpcData.mockReturnValueOnce(mockResult);
+            mockSafeExtractIpcData.mockReturnValueOnce(
+                expectedValidationResult
+            );
 
             await act(async () => {
                 await result.current.validateMonitorData("http", {});
@@ -596,10 +600,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 })
             );
 
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
-                success: true,
-                data: largeConfigs,
-            });
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
+                largeConfigs
+            );
             mockSafeExtractIpcData.mockReturnValue(largeConfigs);
 
             const { result } = renderHook(() => useMonitorTypesStore());
@@ -631,10 +634,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 },
             ];
 
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue({
-                success: true,
-                data: specialConfigs,
-            });
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
+                specialConfigs
+            );
             mockSafeExtractIpcData.mockReturnValue(specialConfigs);
 
             const { result } = renderHook(() => useMonitorTypesStore());

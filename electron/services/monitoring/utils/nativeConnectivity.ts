@@ -85,101 +85,6 @@ interface DnsCheckResult {
 }
 
 /**
- * Main connectivity check function that replaces ping.promise.probe
- *
- * @example
- *
- * ```typescript
- * // Basic TCP connectivity check
- * const result = await checkConnectivity("google.com");
- *
- * // HTTP connectivity check with custom timeout
- * const result = await checkConnectivity("https://api.example.com", {
- *     method: "http",
- *     timeout: 10000,
- * });
- *
- * // TCP check on specific ports
- * const result = await checkConnectivity("example.com", {
- *     method: "tcp",
- *     ports: [443, 80],
- *     timeout: 3000,
- * });
- * ```
- *
- * @param host - Target hostname or IP address to check
- * @param options - Configuration options for the connectivity check
- *
- * @returns Promise resolving to MonitorCheckResult with connectivity status
- *
- * @throws Error if the connectivity check encounters an unexpected error
- */
-export async function checkConnectivity(
-    host: string,
-    options: ConnectivityOptions = {}
-): Promise<MonitorCheckResult> {
-    const opts = { ...DEFAULT_OPTIONS, ...options };
-    const startTime = performance.now();
-
-    try {
-        // Remove protocol if present for non-HTTP checks
-        const cleanHost = host.replace(/^https?:\/\//v, "");
-
-        // Handle HTTP/HTTPS URLs directly
-        if (/^https?:\/\//v.test(host)) {
-            return await checkHttpConnectivity(host, opts.timeout);
-        }
-
-        // Try TCP connectivity on multiple ports
-        if (opts.method === "tcp" || opts.method === "http") {
-            for (const port of opts.ports) {
-                const result = await checkTcpPort(
-                    cleanHost,
-                    port,
-                    opts.timeout
-                );
-                if (result.alive) {
-                    return {
-                        details: `TCP connection successful on port ${port}`,
-                        responseTime: Math.round(result.responseTime),
-                        status: "up",
-                    };
-                }
-            }
-        }
-
-        // If TCP fails or method is DNS, try DNS resolution as fallback
-        if (opts.method === "dns" || opts.method === "tcp") {
-            const dnsResult = await checkDnsResolution(cleanHost, opts.timeout);
-            if (dnsResult.alive) {
-                // DNS resolution works but no TCP ports are accessible - degraded state
-                return {
-                    details:
-                        "DNS resolution successful, but no open ports found",
-                    responseTime: Math.round(dnsResult.responseTime),
-                    status: "degraded",
-                };
-            }
-        }
-
-        // All checks failed
-        return {
-            details: `Failed to connect to ${host}`,
-            error: "Host unreachable - all connectivity checks failed",
-            responseTime: Math.round(performance.now() - startTime),
-            status: "down",
-        };
-    } catch (error) {
-        return {
-            details: `Connectivity check failed for ${host}`,
-            error: error instanceof Error ? error.message : String(error),
-            responseTime: Math.round(performance.now() - startTime),
-            status: "down",
-        };
-    }
-}
-
-/**
  * TCP port connectivity check using Node.js net module
  *
  * @param host - Target hostname or IP address
@@ -226,13 +131,7 @@ async function checkTcpPort(
             });
         };
 
-        const handleError = (): void => {
-            cleanup();
-            resolve({
-                alive: false,
-                responseTime: performance.now() - startTime,
-            });
-        };
+        const handleError = handleTimeout;
 
         socket.setTimeout(timeout);
         socket.on("connect", handleConnect);
@@ -262,11 +161,10 @@ async function checkDnsResolution(
     try {
         // Create timeout promise that rejects after specified time
         const timeoutPromise = new Promise<never>((_resolve, reject) => {
-            const timerId = setTimeout(() => {
+            // eslint-disable-next-line clean-timer/assign-timer-id -- Timer cleanup not needed for rejection promise
+            setTimeout(() => {
                 reject(new Error(`DNS resolution timeout after ${timeout}ms`));
             }, timeout);
-            // eslint-disable-next-line @typescript-eslint/no-unused-expressions -- Timer ID captured for linting compliance
-            timerId;
         });
 
         // Race between DNS resolution and timeout
@@ -287,6 +185,52 @@ async function checkDnsResolution(
             responseTime: performance.now() - startTime,
         };
     }
+}
+
+/**
+ * Checks multiple TCP ports sequentially without await-in-loop
+ *
+ * @param host - Target host to check
+ * @param ports - Array of ports to check
+ * @param timeout - Timeout for each port check
+ *
+ * @returns Promise resolving to MonitorCheckResult if any port is open, null
+ *   otherwise
+ *
+ * @internal
+ */
+async function checkTcpPorts(
+    host: string,
+    ports: number[],
+    timeout: number
+): Promise<MonitorCheckResult | null> {
+    // Check ports sequentially using recursion to avoid await-in-loop
+    const checkPortsRecursively = async (
+        portIndex: number
+    ): Promise<MonitorCheckResult | null> => {
+        if (portIndex >= ports.length) {
+            return null;
+        }
+
+        const port = ports[portIndex];
+        if (port === undefined) {
+            return null;
+        }
+        const result = await checkTcpPort(host, port, timeout);
+
+        if (result.alive) {
+            return {
+                details: `TCP connection successful on port ${port}`,
+                responseTime: Math.round(result.responseTime),
+                status: "up",
+            };
+        }
+
+        // Recursively check next port
+        return checkPortsRecursively(portIndex + 1);
+    };
+
+    return checkPortsRecursively(0);
 }
 
 /**
@@ -363,6 +307,95 @@ export async function checkHttpConnectivity(
 }
 
 /**
+ * Main connectivity check function that replaces ping.promise.probe
+ *
+ * @example
+ *
+ * ```typescript
+ * // Basic TCP connectivity check
+ * const result = await checkConnectivity("google.com");
+ *
+ * // HTTP connectivity check with custom timeout
+ * const result = await checkConnectivity("https://api.example.com", {
+ *     method: "http",
+ *     timeout: 10000,
+ * });
+ *
+ * // TCP check on specific ports
+ * const result = await checkConnectivity("example.com", {
+ *     method: "tcp",
+ *     ports: [443, 80],
+ *     timeout: 3000,
+ * });
+ * ```
+ *
+ * @param host - Target hostname or IP address to check
+ * @param options - Configuration options for the connectivity check
+ *
+ * @returns Promise resolving to MonitorCheckResult with connectivity status
+ *
+ * @throws Error if the connectivity check encounters an unexpected error
+ */
+export async function checkConnectivity(
+    host: string,
+    options: ConnectivityOptions = {}
+): Promise<MonitorCheckResult> {
+    const opts = { ...DEFAULT_OPTIONS, ...options };
+    const startTime = performance.now();
+
+    try {
+        // Remove protocol if present for non-HTTP checks
+        const cleanHost = host.replace(/^https?:\/\//v, "");
+
+        // Handle HTTP/HTTPS URLs directly
+        if (/^https?:\/\//v.test(host)) {
+            return await checkHttpConnectivity(host, opts.timeout);
+        }
+
+        // Try TCP connectivity on multiple ports
+        if (opts.method === "tcp" || opts.method === "http") {
+            const tcpResult = await checkTcpPorts(
+                cleanHost,
+                opts.ports,
+                opts.timeout
+            );
+            if (tcpResult) {
+                return tcpResult;
+            }
+        }
+
+        // If TCP fails or method is DNS, try DNS resolution as fallback
+        if (opts.method === "dns" || opts.method === "tcp") {
+            const dnsResult = await checkDnsResolution(cleanHost, opts.timeout);
+            if (dnsResult.alive) {
+                // DNS resolution works but no TCP ports are accessible - degraded state
+                return {
+                    details:
+                        "DNS resolution successful, but no open ports found",
+                    responseTime: Math.round(dnsResult.responseTime),
+                    status: "degraded",
+                };
+            }
+        }
+
+        // All checks failed
+        return {
+            details: `Failed to connect to ${host}`,
+            error: "Host unreachable - all connectivity checks failed",
+            responseTime: Math.round(performance.now() - startTime),
+            status: "down",
+        };
+    } catch (error) {
+        return {
+            details: `Connectivity check failed for ${host}`,
+            error: error instanceof Error ? error.message : String(error),
+            responseTime: Math.round(performance.now() - startTime),
+            status: "down",
+        };
+    }
+}
+
+/**
  * Performs a connectivity check with automatic retry logic
  *
  * @example
@@ -386,43 +419,58 @@ export async function checkConnectivityWithRetry(
     options: ConnectivityOptions = {}
 ): Promise<MonitorCheckResult> {
     const opts = { ...DEFAULT_OPTIONS, ...options };
-    let lastError: MonitorCheckResult | null = null;
 
-    for (let attempt = 1; attempt <= opts.retries + 1; attempt++) {
+    const attemptCheck = async (
+        attemptsLeft: number
+    ): Promise<MonitorCheckResult> => {
         try {
             const result = await checkConnectivity(host, {
                 ...opts,
                 retries: 0, // Prevent nested retries
             });
 
-            if (result.status === "up") {
+            if (result.status === "up" || attemptsLeft === 0) {
                 return result;
             }
 
-            lastError = result;
-
-            // Wait before retry (except on last attempt)
-            if (attempt <= opts.retries) {
-                await new Promise((resolve) =>
-                    setTimeout(resolve, opts.retryDelay * attempt)
+            // Wait before retry
+            await new Promise<void>((resolve) => {
+                // eslint-disable-next-line clean-timer/assign-timer-id -- Timer cleanup not needed for simple delay
+                setTimeout(
+                    () => {
+                        resolve();
+                    },
+                    opts.retryDelay * (opts.retries - attemptsLeft + 2)
                 );
-            }
+            });
+
+            return await attemptCheck(attemptsLeft - 1);
         } catch (error) {
-            lastError = {
-                details: `Check failed on attempt ${attempt}`,
+            const errorResult: MonitorCheckResult = {
+                details: `Check failed on attempt ${opts.retries - attemptsLeft + 2}`,
                 error: error instanceof Error ? error.message : String(error),
                 responseTime: opts.timeout,
                 status: "down",
             };
-        }
-    }
 
-    return (
-        lastError || {
-            details: `Failed after ${opts.retries + 1} attempts`,
-            error: "All connectivity checks failed",
-            responseTime: opts.timeout,
-            status: "down",
+            if (attemptsLeft === 0) {
+                return errorResult;
+            }
+
+            // Wait before retry
+            await new Promise<void>((resolve) => {
+                // eslint-disable-next-line clean-timer/assign-timer-id -- Timer cleanup not needed for simple delay
+                setTimeout(
+                    () => {
+                        resolve();
+                    },
+                    opts.retryDelay * (opts.retries - attemptsLeft + 2)
+                );
+            });
+
+            return attemptCheck(attemptsLeft - 1);
         }
-    );
+    };
+
+    return attemptCheck(opts.retries);
 }

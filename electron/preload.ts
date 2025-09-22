@@ -16,6 +16,7 @@ import { dataApi } from "./preload/domains/dataApi";
 import { createEventsApi } from "./preload/domains/eventsApi";
 import { monitoringApi } from "./preload/domains/monitoringApi";
 import { monitorTypesApi } from "./preload/domains/monitorTypesApi";
+import { settingsApi } from "./preload/domains/settingsApi";
 import { sitesApi } from "./preload/domains/sitesApi";
 import { stateSyncApi } from "./preload/domains/stateSyncApi";
 import { systemApi } from "./preload/domains/systemApi";
@@ -32,6 +33,8 @@ interface ElectronAPI {
     monitoring: typeof monitoringApi;
     /** Monitor type registry operations */
     monitorTypes: typeof monitorTypesApi;
+    /** Settings management operations */
+    settings: typeof settingsApi;
     /** Site management operations (CRUD, monitoring control) */
     sites: typeof sitesApi;
     /** State synchronization operations */
@@ -48,6 +51,7 @@ const electronAPI: ElectronAPI = {
     events: createEventsApi(),
     monitoring: monitoringApi,
     monitorTypes: monitorTypesApi,
+    settings: settingsApi,
     sites: sitesApi,
     stateSync: stateSyncApi,
     system: systemApi,

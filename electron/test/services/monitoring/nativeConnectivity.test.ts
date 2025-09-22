@@ -27,19 +27,20 @@ import {
     checkConnectivityWithRetry,
 } from "../../../services/monitoring/utils/nativeConnectivity";
 
-// Mock Node.js modules
-const mockDns = {
-    resolve4: vi.fn(),
-};
-
-const mockNet = {
-    Socket: vi.fn(),
-};
-
+// Mock objects must be declared before vi.mock() calls to avoid hoisting issues
+const mockDnsResolve4 = vi.fn();
+const mockSocketClass = vi.fn();
 const mockFetch = vi.fn();
 
-vi.mock("node:dns/promises", () => mockDns);
-vi.mock("node:net", () => mockNet);
+// Mock Node.js modules
+vi.mock("node:dns/promises", () => ({
+    resolve4: mockDnsResolve4,
+}));
+
+vi.mock("node:net", () => ({
+    Socket: mockSocketClass,
+}));
+
 vi.mock("node:perf_hooks", () => ({
     performance: {
         now: vi.fn().mockReturnValue(100),
@@ -52,7 +53,7 @@ global.fetch = mockFetch;
 describe("Native Connectivity with Degraded State", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.mocked(mockDns.resolve4).mockClear();
+        vi.mocked(mockDnsResolve4).mockClear();
         vi.mocked(mockFetch).mockClear();
 
         // Reset performance.now to return predictable values

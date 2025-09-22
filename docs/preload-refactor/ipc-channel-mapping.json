@@ -3,228 +3,228 @@
     {
       "channel": "export-data",
       "domain": "data",
-      "methodName": "exportData",
+      "handlerMethod": "async () => this.uptimeOrchestrator.exportData()",
       "hasParameters": false,
-      "validator": "DataHandlerValidators.exportData",
+      "methodName": "exportData",
       "returnType": "string",
-      "handlerMethod": "async () => this.uptimeOrchestrator.exportData()"
+      "validator": "DataHandlerValidators.exportData"
     },
     {
       "channel": "import-data",
       "domain": "data",
-      "methodName": "importData",
+      "handlerMethod": "async (...args: unknown[]) =>\n                this.uptimeOrchestrator.importData(args[0] as string)",
       "hasParameters": true,
-      "validator": "DataHandlerValidators.importData",
+      "methodName": "importData",
       "returnType": "string",
-      "handlerMethod": "async (...args: unknown[]) =>\n                this.uptimeOrchestrator.importData(args[0] as string)"
+      "validator": "DataHandlerValidators.importData"
     },
     {
       "channel": "update-history-limit",
       "domain": "data",
-      "methodName": "updateHistoryLimit",
+      "handlerMethod": "async (...args: unknown[]) =>\n                this.uptimeOrchestrator.setHistoryLimit(args[0] as number)",
       "hasParameters": true,
-      "validator": "DataHandlerValidators.updateHistoryLimit",
+      "methodName": "updateHistoryLimit",
       "returnType": "number",
-      "handlerMethod": "async (...args: unknown[]) =>\n                this.uptimeOrchestrator.setHistoryLimit(args[0] as number)"
+      "validator": "DataHandlerValidators.updateHistoryLimit"
     },
     {
       "channel": "get-history-limit",
       "domain": "data",
-      "methodName": "getHistoryLimit",
+      "handlerMethod": "() => this.uptimeOrchestrator.getHistoryLimit()",
       "hasParameters": false,
-      "validator": "DataHandlerValidators.getHistoryLimit",
+      "methodName": "getHistoryLimit",
       "returnType": "number",
-      "handlerMethod": "() => this.uptimeOrchestrator.getHistoryLimit()"
+      "validator": "DataHandlerValidators.getHistoryLimit"
     },
     {
       "channel": "reset-settings",
       "domain": "data",
-      "methodName": "resetSettings",
+      "handlerMethod": "async () => this.uptimeOrchestrator.resetSettings()",
       "hasParameters": false,
-      "validator": "DataHandlerValidators.resetSettings",
+      "methodName": "resetSettings",
       "returnType": "unknown",
-      "handlerMethod": "async () => this.uptimeOrchestrator.resetSettings()"
+      "validator": "DataHandlerValidators.resetSettings"
     },
     {
       "channel": "download-sqlite-backup",
       "domain": "data",
+      "handlerMethod": "async () => {\n                const result = await this.uptimeOrchestrator.downloadBackup();\n                // Convert Buffer to ArrayBuffer for frontend compatibility\n                const arrayBuffer = result.buffer.buffer.slice(\n                    result.buffer.byteOffset",
+      "hasParameters": false,
       "methodName": "downloadSqliteBackup",
-      "hasParameters": false,
-      "validator": "result.buffer",
       "returnType": "unknown",
-      "handlerMethod": "async () => {\n                const result = await this.uptimeOrchestrator.downloadBackup();\n                // Convert Buffer to ArrayBuffer for frontend compatibility\n                const arrayBuffer = result.buffer.buffer.slice(\n                    result.buffer.byteOffset"
-    }
-  ],
-  "monitoring": [
-    {
-      "channel": "start-monitoring",
-      "domain": "monitoring",
-      "methodName": "startMonitoring",
-      "hasParameters": false,
-      "validator": "MonitoringHandlerValidators.startMonitoring",
-      "returnType": "boolean",
-      "handlerMethod": "async () => {\n                await this.uptimeOrchestrator.startMonitoring();\n                return true;\n            }"
-    },
-    {
-      "channel": "stop-monitoring",
-      "domain": "monitoring",
-      "methodName": "stopMonitoring",
-      "hasParameters": false,
-      "validator": "MonitoringHandlerValidators.stopMonitoring",
-      "returnType": "boolean",
-      "handlerMethod": "async () => {\n                await this.uptimeOrchestrator.stopMonitoring();\n                return true;\n            }"
-    },
-    {
-      "channel": "format-monitor-detail",
-      "domain": "monitoring",
-      "methodName": "formatMonitorDetail",
-      "hasParameters": true,
-      "validator": "config.uiConfig",
-      "returnType": "unknown",
-      "handlerMethod": "(...args: unknown[]) => {\n                const monitorType = args[0] as string;\n                const details = args[1] as string;\n\n                const config = getMonitorTypeConfig(monitorType.trim());\n                if (!config) {\n                    logger.warn(\n                        LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_DETAIL"
-    },
-    {
-      "channel": "format-monitor-title-suffix",
-      "domain": "monitoring",
-      "methodName": "formatMonitorTitleSuffix",
-      "hasParameters": true,
-      "validator": "config.uiConfig",
-      "returnType": "unknown",
-      "handlerMethod": "(...args: unknown[]) => {\n                const monitorType = args[0] as string;\n                const monitor = args[1] as Monitor;\n\n                const config = getMonitorTypeConfig(monitorType.trim());\n                if (!config) {\n                    logger.warn(\n                        LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_TITLE"
-    },
-    {
-      "channel": "validate-monitor-data",
-      "domain": "monitoring",
-      "methodName": "validateMonitorData",
-      "hasParameters": true,
-      "validator": "data] = args as [string",
-      "returnType": "unknown",
-      "handlerMethod": "(...args: unknown[]) => {\n                const [monitorType"
-    },
-    {
-      "channel": "remove-monitor",
-      "domain": "monitoring",
-      "methodName": "removeMonitor",
-      "hasParameters": true,
-      "validator": "args[1] as string\n                )",
-      "returnType": "unknown",
-      "handlerMethod": "async (...args: unknown[]) =>\n                this.uptimeOrchestrator.removeMonitor(\n                    args[0] as string"
-    }
-  ],
-  "sites": [
-    {
-      "channel": "start-monitoring-for-site",
-      "domain": "sites",
-      "methodName": "startMonitoringForSite",
-      "hasParameters": true,
-      "validator": "monitorId\n                );\n            }",
-      "returnType": "Site",
-      "handlerMethod": "async (...args: unknown[]) => {\n                const identifier = args[0] as string;\n                const monitorId = args[1] as string | undefined;\n                return this.uptimeOrchestrator.startMonitoringForSite(\n                    identifier"
-    },
-    {
-      "channel": "stop-monitoring-for-site",
-      "domain": "sites",
-      "methodName": "stopMonitoringForSite",
-      "hasParameters": true,
-      "validator": "monitorId\n                );\n            }",
-      "returnType": "Site",
-      "handlerMethod": "async (...args: unknown[]) => {\n                const identifier = args[0] as string;\n                const monitorId = args[1] as string | undefined;\n                return this.uptimeOrchestrator.stopMonitoringForSite(\n                    identifier"
-    },
-    {
-      "channel": "check-site-now",
-      "domain": "sites",
-      "methodName": "checkSiteNow",
-      "hasParameters": true,
-      "validator": "monitorId\n                );\n            }",
-      "returnType": "Site",
-      "handlerMethod": "async (...args: unknown[]) => {\n                const identifier = args[0] as string;\n                const monitorId = args[1] as string;\n                return this.uptimeOrchestrator.checkSiteManually(\n                    identifier"
-    },
-    {
-      "channel": "add-site",
-      "domain": "sites",
-      "methodName": "addSite",
-      "hasParameters": true,
-      "validator": "SiteHandlerValidators.addSite",
-      "returnType": "Site",
-      "handlerMethod": "async (...args: unknown[]) =>\n                this.uptimeOrchestrator.addSite(args[0] as Site)"
-    },
-    {
-      "channel": "delete-all-sites",
-      "domain": "sites",
-      "methodName": "deleteAllSites",
-      "hasParameters": false,
-      "validator": "deleted ${result} sites`\n                );\n                return result;\n            }",
-      "returnType": "Site",
-      "handlerMethod": "async () => {\n                logger.info(\"delete-all-sites IPC handler called\");\n                const result = await this.uptimeOrchestrator.deleteAllSites();\n                logger.info(\n                    `delete-all-sites completed"
-    },
-    {
-      "channel": "remove-site",
-      "domain": "sites",
-      "methodName": "removeSite",
-      "hasParameters": true,
-      "validator": "SiteHandlerValidators.removeSite",
-      "returnType": "Site",
-      "handlerMethod": "async (...args: unknown[]) =>\n                this.uptimeOrchestrator.removeSite(args[0] as string)"
-    },
-    {
-      "channel": "get-sites",
-      "domain": "sites",
-      "methodName": "getSites",
-      "hasParameters": false,
-      "validator": "SiteHandlerValidators.getSites",
-      "returnType": "Site[]",
-      "handlerMethod": "async () => this.uptimeOrchestrator.getSites()"
-    },
-    {
-      "channel": "update-site",
-      "domain": "sites",
-      "methodName": "updateSite",
-      "hasParameters": true,
-      "validator": "args[1] as Partial<Site>\n                )",
-      "returnType": "Site",
-      "handlerMethod": "async (...args: unknown[]) =>\n                this.uptimeOrchestrator.updateSite(\n                    args[0] as string"
+      "validator": "result.buffer"
     }
   ],
   "monitorTypes": [
     {
       "channel": "get-monitor-types",
       "domain": "monitorTypes",
-      "methodName": "getMonitorTypes",
+      "handlerMethod": "() => {\n                // Get all monitor type configs and serialize them safely for\n                // IPC\n                const configs = getAllMonitorTypeConfigs();\n                return configs.map((config) =>\n                    this.serializeMonitorTypeConfig(config)\n                );\n            }",
       "hasParameters": false,
-      "validator": "MonitorTypeHandlerValidators.getMonitorTypes",
+      "methodName": "getMonitorTypes",
       "returnType": "unknown",
-      "handlerMethod": "() => {\n                // Get all monitor type configs and serialize them safely for\n                // IPC\n                const configs = getAllMonitorTypeConfigs();\n                return configs.map((config) =>\n                    this.serializeMonitorTypeConfig(config)\n                );\n            }"
+      "validator": "MonitorTypeHandlerValidators.getMonitorTypes"
+    }
+  ],
+  "monitoring": [
+    {
+      "channel": "start-monitoring",
+      "domain": "monitoring",
+      "handlerMethod": "async () => {\n                await this.uptimeOrchestrator.startMonitoring();\n                return true;\n            }",
+      "hasParameters": false,
+      "methodName": "startMonitoring",
+      "returnType": "boolean",
+      "validator": "MonitoringHandlerValidators.startMonitoring"
+    },
+    {
+      "channel": "stop-monitoring",
+      "domain": "monitoring",
+      "handlerMethod": "async () => {\n                await this.uptimeOrchestrator.stopMonitoring();\n                return true;\n            }",
+      "hasParameters": false,
+      "methodName": "stopMonitoring",
+      "returnType": "boolean",
+      "validator": "MonitoringHandlerValidators.stopMonitoring"
+    },
+    {
+      "channel": "format-monitor-detail",
+      "domain": "monitoring",
+      "handlerMethod": "(...args: unknown[]) => {\n                const monitorType = args[0] as string;\n                const details = args[1] as string;\n\n                const config = getMonitorTypeConfig(monitorType.trim());\n                if (!config) {\n                    logger.warn(\n                        LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_DETAIL",
+      "hasParameters": true,
+      "methodName": "formatMonitorDetail",
+      "returnType": "unknown",
+      "validator": "config.uiConfig"
+    },
+    {
+      "channel": "format-monitor-title-suffix",
+      "domain": "monitoring",
+      "handlerMethod": "(...args: unknown[]) => {\n                const monitorType = args[0] as string;\n                const monitor = args[1] as Monitor;\n\n                const config = getMonitorTypeConfig(monitorType.trim());\n                if (!config) {\n                    logger.warn(\n                        LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_TITLE",
+      "hasParameters": true,
+      "methodName": "formatMonitorTitleSuffix",
+      "returnType": "unknown",
+      "validator": "config.uiConfig"
+    },
+    {
+      "channel": "validate-monitor-data",
+      "domain": "monitoring",
+      "handlerMethod": "(...args: unknown[]) => {\n                const [monitorType",
+      "hasParameters": true,
+      "methodName": "validateMonitorData",
+      "returnType": "unknown",
+      "validator": "data] = args as [string"
+    },
+    {
+      "channel": "remove-monitor",
+      "domain": "monitoring",
+      "handlerMethod": "async (...args: unknown[]) =>\n                this.uptimeOrchestrator.removeMonitor(\n                    args[0] as string",
+      "hasParameters": true,
+      "methodName": "removeMonitor",
+      "returnType": "unknown",
+      "validator": "args[1] as string\n                )"
+    }
+  ],
+  "sites": [
+    {
+      "channel": "start-monitoring-for-site",
+      "domain": "sites",
+      "handlerMethod": "async (...args: unknown[]) => {\n                const identifier = args[0] as string;\n                const monitorId = args[1] as string | undefined;\n                return this.uptimeOrchestrator.startMonitoringForSite(\n                    identifier",
+      "hasParameters": true,
+      "methodName": "startMonitoringForSite",
+      "returnType": "Site",
+      "validator": "monitorId\n                );\n            }"
+    },
+    {
+      "channel": "stop-monitoring-for-site",
+      "domain": "sites",
+      "handlerMethod": "async (...args: unknown[]) => {\n                const identifier = args[0] as string;\n                const monitorId = args[1] as string | undefined;\n                return this.uptimeOrchestrator.stopMonitoringForSite(\n                    identifier",
+      "hasParameters": true,
+      "methodName": "stopMonitoringForSite",
+      "returnType": "Site",
+      "validator": "monitorId\n                );\n            }"
+    },
+    {
+      "channel": "check-site-now",
+      "domain": "sites",
+      "handlerMethod": "async (...args: unknown[]) => {\n                const identifier = args[0] as string;\n                const monitorId = args[1] as string;\n                return this.uptimeOrchestrator.checkSiteManually(\n                    identifier",
+      "hasParameters": true,
+      "methodName": "checkSiteNow",
+      "returnType": "Site",
+      "validator": "monitorId\n                );\n            }"
+    },
+    {
+      "channel": "add-site",
+      "domain": "sites",
+      "handlerMethod": "async (...args: unknown[]) =>\n                this.uptimeOrchestrator.addSite(args[0] as Site)",
+      "hasParameters": true,
+      "methodName": "addSite",
+      "returnType": "Site",
+      "validator": "SiteHandlerValidators.addSite"
+    },
+    {
+      "channel": "delete-all-sites",
+      "domain": "sites",
+      "handlerMethod": "async () => {\n                logger.info(\"delete-all-sites IPC handler called\");\n                const result = await this.uptimeOrchestrator.deleteAllSites();\n                logger.info(\n                    `delete-all-sites completed",
+      "hasParameters": false,
+      "methodName": "deleteAllSites",
+      "returnType": "Site",
+      "validator": "deleted ${result} sites`\n                );\n                return result;\n            }"
+    },
+    {
+      "channel": "remove-site",
+      "domain": "sites",
+      "handlerMethod": "async (...args: unknown[]) =>\n                this.uptimeOrchestrator.removeSite(args[0] as string)",
+      "hasParameters": true,
+      "methodName": "removeSite",
+      "returnType": "Site",
+      "validator": "SiteHandlerValidators.removeSite"
+    },
+    {
+      "channel": "get-sites",
+      "domain": "sites",
+      "handlerMethod": "async () => this.uptimeOrchestrator.getSites()",
+      "hasParameters": false,
+      "methodName": "getSites",
+      "returnType": "Site[]",
+      "validator": "SiteHandlerValidators.getSites"
+    },
+    {
+      "channel": "update-site",
+      "domain": "sites",
+      "handlerMethod": "async (...args: unknown[]) =>\n                this.uptimeOrchestrator.updateSite(\n                    args[0] as string",
+      "hasParameters": true,
+      "methodName": "updateSite",
+      "returnType": "Site",
+      "validator": "args[1] as Partial<Site>\n                )"
     }
   ],
   "stateSync": [
     {
       "channel": "request-full-sync",
       "domain": "stateSync",
-      "methodName": "requestFullSync",
+      "handlerMethod": "async () => {\n                // Get all sites and send to frontend\n                const sites = await this.uptimeOrchestrator.getSites();\n\n                // Emit proper typed sync event\n                await this.uptimeOrchestrator.emitTyped(\n                    \"sites:state-synchronized\"",
       "hasParameters": false,
-      "validator": "{\n                        action: \"bulk-sync\"",
+      "methodName": "requestFullSync",
       "returnType": "Site[]",
-      "handlerMethod": "async () => {\n                // Get all sites and send to frontend\n                const sites = await this.uptimeOrchestrator.getSites();\n\n                // Emit proper typed sync event\n                await this.uptimeOrchestrator.emitTyped(\n                    \"sites:state-synchronized\""
+      "validator": "{\n                        action: \"bulk-sync\""
     },
     {
       "channel": "get-sync-status",
       "domain": "stateSync",
-      "methodName": "getSyncStatus",
+      "handlerMethod": "async () => {\n                const sites = await this.uptimeOrchestrator.getSites();\n                return {\n                    lastSync: Date.now()",
       "hasParameters": false,
-      "validator": "sites.length",
+      "methodName": "getSyncStatus",
       "returnType": "Site[]",
-      "handlerMethod": "async () => {\n                const sites = await this.uptimeOrchestrator.getSites();\n                return {\n                    lastSync: Date.now()"
+      "validator": "sites.length"
     }
   ],
   "system": [
     {
       "channel": "open-external",
       "domain": "system",
-      "methodName": "openExternal",
+      "handlerMethod": "async (...args: unknown[]) => {\n                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- URL parameter type validated by SystemHandlerValidators.openExternal\n                const url = args[0] as string;\n                await shell.openExternal(url);\n                return true;\n            }",
       "hasParameters": true,
-      "validator": "SystemHandlerValidators.openExternal",
+      "methodName": "openExternal",
       "returnType": "boolean",
-      "handlerMethod": "async (...args: unknown[]) => {\n                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- URL parameter type validated by SystemHandlerValidators.openExternal\n                const url = args[0] as string;\n                await shell.openExternal(url);\n                return true;\n            }"
+      "validator": "SystemHandlerValidators.openExternal"
     }
   ]
 }

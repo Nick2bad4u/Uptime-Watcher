@@ -33,20 +33,35 @@ vi.mock("../../services/logger", () => ({
     },
 }));
 
+// Set up global electronAPI mock before tests
+(globalThis as any).electronAPI = {
+    monitoring: {
+        removeMonitor: vi.fn(),
+    },
+};
+
+// Also set up window.electronAPI for JSDOM environment
+(globalThis as any).window = globalThis;
+(globalThis.window as any).electronAPI = {
+    monitoring: {
+        removeMonitor: vi.fn(),
+    },
+};
+
 describe("SiteService Critical Coverage Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
         // Reset the mock functions on the global electronAPI that's already defined
         vi.mocked(
-            (globalThis as any).electronAPI.sites.removeMonitor
+            (globalThis as any).electronAPI.monitoring.removeMonitor
         ).mockReset();
         vi.mocked(storeUtils.waitForElectronAPI).mockReset();
 
         // Set default resolved values
         vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(undefined);
         vi.mocked(
-            (globalThis as any).electronAPI.sites.removeMonitor
+            (globalThis as any).electronAPI.monitoring.removeMonitor
         ).mockResolvedValue({ success: true });
     });
 
@@ -60,7 +75,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 undefined
             );
             vi.mocked(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).mockResolvedValue({
                 success: true,
             });
@@ -71,10 +86,10 @@ describe("SiteService Critical Coverage Tests", () => {
             // Assert
             expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
             expect(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
             expect(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).toHaveBeenCalledTimes(1);
         });
 
@@ -95,7 +110,7 @@ describe("SiteService Critical Coverage Tests", () => {
 
             expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
             expect(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).not.toHaveBeenCalled();
         });
 
@@ -109,7 +124,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 undefined
             );
             vi.mocked(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).mockRejectedValue(ipcError);
 
             // Act & Assert
@@ -119,7 +134,7 @@ describe("SiteService Critical Coverage Tests", () => {
 
             expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
             expect(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
@@ -132,7 +147,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 undefined
             );
             vi.mocked(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).mockResolvedValue({
                 success: true,
             });
@@ -143,7 +158,7 @@ describe("SiteService Critical Coverage Tests", () => {
             // Assert
             expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
             expect(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).toHaveBeenCalledWith("", "");
         });
 
@@ -156,7 +171,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 undefined
             );
             vi.mocked(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).mockResolvedValue({
                 success: true,
             });
@@ -167,7 +182,7 @@ describe("SiteService Critical Coverage Tests", () => {
             // Assert
             expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
             expect(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
@@ -185,7 +200,7 @@ describe("SiteService Critical Coverage Tests", () => {
             );
 
             vi.mocked(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).mockImplementation(async () => {
                 callOrder.push("removeMonitor");
                 return { success: true };
@@ -207,7 +222,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 undefined
             );
             vi.mocked(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).mockImplementation(
                 () =>
                     new Promise((_, reject) => {
@@ -234,9 +249,10 @@ describe("SiteService Critical Coverage Tests", () => {
             );
 
             // Temporarily remove the removeMonitor method
-            const originalRemoveMonitor = (globalThis as any).electronAPI.sites
-                .removeMonitor;
-            (globalThis as any).electronAPI.sites.removeMonitor = undefined;
+            const originalRemoveMonitor = (globalThis as any).electronAPI
+                .monitoring.removeMonitor;
+            (globalThis as any).electronAPI.monitoring.removeMonitor =
+                undefined;
 
             try {
                 // Act & Assert
@@ -245,7 +261,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 ).rejects.toThrow();
             } finally {
                 // Restore the original method
-                (globalThis as any).electronAPI.sites.removeMonitor =
+                (globalThis as any).electronAPI.monitoring.removeMonitor =
                     originalRemoveMonitor;
             }
         });
@@ -295,7 +311,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 undefined
             );
             vi.mocked(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).mockResolvedValue({ success: true });
 
             // Act
@@ -306,12 +322,12 @@ describe("SiteService Critical Coverage Tests", () => {
             // Assert
             expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(3);
             expect(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).toHaveBeenCalledTimes(3);
 
             for (const [index, { siteId, monitorId }] of operations.entries()) {
                 expect(
-                    (globalThis as any).electronAPI.sites.removeMonitor
+                    (globalThis as any).electronAPI.monitoring.removeMonitor
                 ).toHaveBeenNthCalledWith(index + 1, siteId, monitorId);
             }
         });
@@ -328,7 +344,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 undefined
             );
             vi.mocked(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).mockResolvedValue({ success: true });
 
             // Act
@@ -341,7 +357,7 @@ describe("SiteService Critical Coverage Tests", () => {
             // Assert
             expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(3);
             expect(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).toHaveBeenCalledTimes(3);
         });
 
@@ -354,7 +370,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 undefined
             );
             vi.mocked(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).mockResolvedValue({ success: true });
 
             // Act
@@ -362,7 +378,7 @@ describe("SiteService Critical Coverage Tests", () => {
 
             // Assert
             expect(
-                (globalThis as any).electronAPI.sites.removeMonitor
+                (globalThis as any).electronAPI.monitoring.removeMonitor
             ).toHaveBeenCalledWith(longSiteId, longMonitorId);
         });
     });

@@ -14,7 +14,7 @@ EventEmitter.defaultMaxListeners = MAX_LISTENERS;
 // Set max listeners specifically for the process object
 process.setMaxListeners(MAX_LISTENERS);
 
-import { vi, type MockedFunction } from "vitest";
+import { vi } from "vitest";
 import fc from "fast-check";
 
 // Configure fast-check for property-based testing
@@ -63,188 +63,187 @@ fc.configureGlobal({
     // asyncReporter: async (runDetails) => { /* async reporting */ },
 });
 
-// Mock Electron APIs (not available in test environment)
-const mockElectronAPI: {
-    invoke: MockedFunction<(...args: any[]) => Promise<any>>;
-    on: MockedFunction<(...args: any[]) => void>;
-    off: MockedFunction<(...args: any[]) => void>;
-    removeAllListeners: MockedFunction<(...args: any[]) => void>;
-    sites: {
-        getAll: MockedFunction<() => Promise<any[]>>;
-        create: MockedFunction<(...args: any[]) => Promise<any>>;
-        update: MockedFunction<(...args: any[]) => Promise<any>>;
-        delete: MockedFunction<(...args: any[]) => Promise<boolean>>;
-        getById: MockedFunction<(...args: any[]) => Promise<any>>;
-    };
+// Mock Electron APIs (not available in test environment) - matches new domain-based preload API structure
+const mockElectronAPI: any = {
+    // Data management operations (import/export, settings, backup)
+    data: {
+        // Settings operations
+        getHistoryLimit: vi.fn().mockResolvedValue(1000),
+        updateHistoryLimit: vi.fn().mockResolvedValue(undefined),
+        resetSettings: vi.fn().mockResolvedValue(undefined),
+
+        // Backup operations
+        downloadSQLiteBackup: vi
+            .fn()
+            .mockResolvedValue({ filePath: "backup.db", size: 1024 }),
+        downloadSqliteBackup: vi
+            .fn()
+            .mockResolvedValue({ filePath: "backup.db", size: 1024 }), // alias for compatibility
+
+        // Import/Export operations
+        importData: vi.fn().mockResolvedValue(undefined),
+        exportData: vi.fn().mockResolvedValue(undefined),
+    },
+
+    // Event listener registration for various system events
+    events: {
+        removeAllListeners: vi.fn().mockReturnValue(undefined),
+        on: vi.fn().mockReturnValue(undefined),
+        off: vi.fn().mockReturnValue(undefined),
+    },
+
+    // Monitoring control operations (start/stop, validation, formatting)
+    monitoring: {
+        removeMonitor: vi.fn().mockResolvedValue(undefined),
+        startMonitor: vi.fn().mockResolvedValue(undefined),
+        stopMonitor: vi.fn().mockResolvedValue(undefined),
+        validateMonitorConfig: vi.fn().mockResolvedValue(true),
+        formatHttpStatus: vi.fn().mockReturnValue("up"),
+    },
+
+    // Monitor type registry operations
+    monitorTypes: {
+        getAll: vi.fn().mockResolvedValue({
+            success: true,
+            data: [
+                { type: "http", name: "HTTP", fields: [] },
+                { type: "ping", name: "Ping", fields: [] },
+                { type: "port", name: "Port", fields: [] },
+                { type: "dns", name: "DNS", fields: [] },
+            ],
+        }),
+        getMonitorTypes: vi.fn().mockResolvedValue([
+            {
+                type: "http",
+                displayName: "HTTP",
+                description: "HTTP monitoring",
+                version: "1.0.0",
+                fields: [
+                    {
+                        name: "url",
+                        type: "url",
+                        required: true,
+                        label: "URL",
+                    },
+                ],
+            },
+            {
+                type: "port",
+                displayName: "Port",
+                description: "Port monitoring",
+                version: "1.0.0",
+                fields: [
+                    {
+                        name: "host",
+                        type: "text",
+                        required: true,
+                        label: "Host",
+                    },
+                    {
+                        name: "port",
+                        type: "number",
+                        required: true,
+                        label: "Port",
+                    },
+                ],
+            },
+            {
+                type: "ping",
+                displayName: "Ping",
+                description: "Ping monitoring",
+                version: "1.0.0",
+                fields: [
+                    {
+                        name: "host",
+                        type: "text",
+                        required: true,
+                        label: "Host",
+                    },
+                ],
+            },
+            {
+                type: "dns",
+                displayName: "DNS",
+                description: "DNS monitoring",
+                version: "1.0.0",
+                fields: [
+                    {
+                        name: "host",
+                        type: "text",
+                        required: true,
+                        label: "Host",
+                    },
+                ],
+            },
+        ]),
+        getByType: vi.fn().mockResolvedValue({
+            success: true,
+            data: { type: "http", name: "HTTP", fields: [] },
+        }),
+        validateMonitorData: vi.fn().mockResolvedValue({
+            success: true,
+            data: {
+                success: true,
+                errors: [],
+                warnings: [],
+                metadata: {},
+            },
+        }),
+        formatMonitorDetail: vi.fn().mockResolvedValue({
+            success: true,
+            data: "Formatted detail",
+        }),
+        formatMonitorTitleSuffix: vi.fn().mockResolvedValue({
+            success: true,
+            data: " (formatted)",
+        }),
+    },
+
+    // Settings management operations
     settings: {
-        get: MockedFunction<(...args: any[]) => Promise<any>>;
-        set: MockedFunction<(...args: any[]) => Promise<boolean>>;
-        getAll: MockedFunction<() => Promise<any>>;
-    };
-    monitor: {
-        start: MockedFunction<(...args: any[]) => Promise<boolean>>;
-        stop: MockedFunction<(...args: any[]) => Promise<boolean>>;
-        getStatus: MockedFunction<() => Promise<string>>;
-    };
-    window: {
-        minimize: MockedFunction<() => void>;
-        maximize: MockedFunction<() => void>;
-        close: MockedFunction<() => void>;
-        isMaximized: MockedFunction<() => boolean>;
-    };
-    app: {
-        getVersion: MockedFunction<() => string>;
-        getName: MockedFunction<() => string>;
-        quit: MockedFunction<() => void>;
-    };
-    database: {
-        backup: MockedFunction<(...args: any[]) => Promise<boolean>>;
-        restore: MockedFunction<(...args: any[]) => Promise<boolean>>;
-        optimize: MockedFunction<(...args: any[]) => Promise<boolean>>;
-    };
-    fs: {
-        readFile: MockedFunction<(...args: any[]) => Promise<string>>;
-        writeFile: MockedFunction<(...args: any[]) => Promise<boolean>>;
-        exists: MockedFunction<(...args: any[]) => Promise<boolean>>;
-        showOpenDialog: MockedFunction<
-            (...args: any[]) => Promise<{ canceled: boolean }>
-        >;
-        showSaveDialog: MockedFunction<
-            (...args: any[]) => Promise<{ canceled: boolean }>
-        >;
-    };
-} = {
-    // IPC Communication
-    invoke: vi.fn().mockResolvedValue({}) satisfies MockedFunction<
-        (...args: any[]) => Promise<any>
-    > as MockedFunction<(...args: any[]) => Promise<any>>,
-    on: vi.fn() satisfies MockedFunction<
-        (...args: any[]) => void
-    > as MockedFunction<(...args: any[]) => void>,
-    off: vi.fn() satisfies MockedFunction<
-        (...args: any[]) => void
-    > as MockedFunction<(...args: any[]) => void>,
-    removeAllListeners: vi.fn() satisfies MockedFunction<
-        (...args: any[]) => void
-    > as MockedFunction<(...args: any[]) => void>,
+        getHistoryLimit: vi.fn().mockResolvedValue(1000),
+        updateHistoryLimit: vi.fn().mockResolvedValue(undefined),
+    },
 
-    // Site Management
+    // Site management operations (CRUD, monitoring control)
     sites: {
-        getAll: vi.fn().mockResolvedValue([]) satisfies MockedFunction<
-            () => Promise<any[]>
-        > as MockedFunction<() => Promise<any[]>>,
-        create: vi.fn().mockResolvedValue({}) satisfies MockedFunction<
-            (...args: any[]) => Promise<any>
-        > as MockedFunction<(...args: any[]) => Promise<any>>,
-        update: vi.fn().mockResolvedValue({}) satisfies MockedFunction<
-            (...args: any[]) => Promise<any>
-        > as MockedFunction<(...args: any[]) => Promise<any>>,
-        delete: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
-            (...args: any[]) => Promise<boolean>
-        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        getById: vi.fn().mockResolvedValue(null) satisfies MockedFunction<
-            (...args: any[]) => Promise<any>
-        > as MockedFunction<(...args: any[]) => Promise<any>>,
+        getSites: vi.fn().mockResolvedValue([]),
+        addSite: vi.fn().mockResolvedValue(undefined),
+        updateSite: vi.fn().mockResolvedValue(undefined),
+        removeSite: vi.fn().mockResolvedValue(undefined),
+        removeMonitor: vi.fn().mockResolvedValue(undefined),
+        getAll: vi.fn().mockResolvedValue([]), // legacy alias
+        create: vi.fn().mockResolvedValue({}), // legacy alias
+        update: vi.fn().mockResolvedValue({}), // legacy alias
+        delete: vi.fn().mockResolvedValue(true), // legacy alias
+        getById: vi.fn().mockResolvedValue(null), // legacy alias
     },
 
-    // Settings Management
-    settings: {
-        get: vi.fn().mockResolvedValue(null) satisfies MockedFunction<
-            (...args: any[]) => Promise<any>
-        > as MockedFunction<(...args: any[]) => Promise<any>>,
-        set: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
-            (...args: any[]) => Promise<boolean>
-        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        getAll: vi.fn().mockResolvedValue({}) satisfies MockedFunction<
-            () => Promise<any>
-        > as MockedFunction<() => Promise<any>>,
+    // State synchronization operations
+    stateSync: {
+        onStateSyncEvent: vi.fn().mockReturnValue(() => {}),
+        offStateSyncEvent: vi.fn().mockReturnValue(undefined),
     },
 
-    // Monitor Management
-    monitor: {
-        start: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
-            (...args: any[]) => Promise<boolean>
-        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        stop: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
-            (...args: any[]) => Promise<boolean>
-        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        getStatus: vi
-            .fn()
-            .mockResolvedValue("stopped") satisfies MockedFunction<
-            () => Promise<string>
-        > as MockedFunction<() => Promise<string>>,
-    },
-
-    // Window Management
-    window: {
-        minimize: vi.fn() satisfies MockedFunction<
-            () => void
-        > as MockedFunction<() => void>,
-        maximize: vi.fn() satisfies MockedFunction<
-            () => void
-        > as MockedFunction<() => void>,
-        close: vi.fn() satisfies MockedFunction<() => void> as MockedFunction<
-            () => void
-        >,
-        isMaximized: vi.fn().mockReturnValue(false) satisfies MockedFunction<
-            () => boolean
-        > as MockedFunction<() => boolean>,
-    },
-
-    // App Information
-    app: {
-        getVersion: vi.fn().mockReturnValue("1.0.0") satisfies MockedFunction<
-            () => string
-        > as MockedFunction<() => string>,
-        getName: vi
-            .fn()
-            .mockReturnValue("Uptime Watcher") satisfies MockedFunction<
-            () => string
-        > as MockedFunction<() => string>,
-        quit: vi.fn() satisfies MockedFunction<() => void> as MockedFunction<
-            () => void
-        >,
-    },
-
-    // Database Operations
-    database: {
-        backup: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
-            (...args: any[]) => Promise<boolean>
-        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        restore: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
-            (...args: any[]) => Promise<boolean>
-        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        optimize: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
-            (...args: any[]) => Promise<boolean>
-        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
-    },
-
-    // File System Operations
-    fs: {
-        readFile: vi.fn().mockResolvedValue("") satisfies MockedFunction<
-            (...args: any[]) => Promise<string>
-        > as MockedFunction<(...args: any[]) => Promise<string>>,
-        writeFile: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
-            (...args: any[]) => Promise<boolean>
-        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        exists: vi.fn().mockResolvedValue(false) satisfies MockedFunction<
-            (...args: any[]) => Promise<boolean>
-        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        showOpenDialog: vi
-            .fn()
-            .mockResolvedValue({ canceled: true }) satisfies MockedFunction<
-            (...args: any[]) => Promise<{ canceled: boolean }>
-        > as MockedFunction<(...args: any[]) => Promise<{ canceled: boolean }>>,
-        showSaveDialog: vi
-            .fn()
-            .mockResolvedValue({ canceled: true }) satisfies MockedFunction<
-            (...args: any[]) => Promise<{ canceled: boolean }>
-        > as MockedFunction<(...args: any[]) => Promise<{ canceled: boolean }>>,
+    // System-level operations (external links, etc.)
+    system: {
+        openExternal: vi.fn().mockResolvedValue(undefined),
+        quitAndInstall: vi.fn().mockResolvedValue(undefined),
+        getVersion: vi.fn().mockReturnValue("1.0.0"),
+        getName: vi.fn().mockReturnValue("Uptime Watcher"),
+        quit: vi.fn().mockReturnValue(undefined),
     },
 };
 
 // Mock window.electronAPI
 Object.defineProperty(globalThis, "electronAPI", {
+    writable: true,
+    configurable: true,
+    value: mockElectronAPI,
+});
+
+// Also assign to window for tests that access it via window.electronAPI
+Object.defineProperty(window, "electronAPI", {
     writable: true,
     configurable: true,
     value: mockElectronAPI,

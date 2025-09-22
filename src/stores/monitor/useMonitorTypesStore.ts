@@ -384,6 +384,8 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                         (config): config is MonitorTypeConfig => {
                             if (typeof config !== "object") return false;
                             if (!("type" in config)) return false;
+                            // Safe assertion after validation
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type validated to have 'type' property above
                             const typedConfig = config as { type: unknown };
                             return (
                                 typeof typedConfig.type === "string" &&

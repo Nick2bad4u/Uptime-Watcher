@@ -60,7 +60,7 @@ export class IpcError extends Error {
         channel: string,
         originalError?: Error
     ) {
-        super(message);
+        super(message, { cause: originalError });
         this.name = "IpcError";
         this.channel = channel;
         this.originalError = originalError;
@@ -108,6 +108,7 @@ function convertChannelToCamelCase(channel: string): string {
  *
  * @throws Error if response is invalid or operation failed
  */
+// eslint-disable-next-line etc/no-misused-generics, @typescript-eslint/no-unnecessary-type-parameters -- Type parameter T is provided by caller for return type
 function validateIpcResponse<T>(response: unknown): T {
     if (!isIpcResponse(response)) {
         throw new Error(
@@ -125,6 +126,8 @@ function validateIpcResponse<T>(response: unknown): T {
         throw new Error("IPC response missing data field");
     }
 
+    // Type assertion is necessary here as we cannot validate the actual data type
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- IPC response validation ensures structure but not data type
     return response.data as T;
 }
 
@@ -156,6 +159,7 @@ function validateVoidIpcResponse(response: unknown): void {
  *
  * @returns A function that safely invokes the IPC channel with validation
  */
+// eslint-disable-next-line etc/no-misused-generics -- TOutput type parameter is provided by caller for return type
 export function createTypedInvoker<TOutput>(
     channel: string
 ): (...args: unknown[]) => Promise<TOutput> {
@@ -169,6 +173,7 @@ export function createTypedInvoker<TOutput>(
         } catch (error) {
             const errorMessage =
                 error instanceof Error ? error.message : String(error);
+            // eslint-disable-next-line ex/use-error-cause -- Using custom IpcError class with cause handling
             throw new IpcError(
                 `IPC call failed for channel '${channel}': ${errorMessage}`,
                 channel,
@@ -199,6 +204,7 @@ export function createVoidInvoker(
         } catch (error) {
             const errorMessage =
                 error instanceof Error ? error.message : String(error);
+            // eslint-disable-next-line ex/use-error-cause -- Using custom IpcError class with cause handling
             throw new IpcError(
                 `IPC call failed for channel '${channel}': ${errorMessage}`,
                 channel,
@@ -241,7 +247,7 @@ export function createEventManager(channel: string): {
          * Add a one-time event listener
          */
         once: (callback: EventCallback): void => {
-            ipcRenderer.once(channel, (_event, ...args) => {
+            ipcRenderer.once(channel, (_event, ...args: unknown[]) => {
                 callback(...args);
             });
         },
@@ -286,6 +292,7 @@ export function defineChannel<TOutput = unknown>(
  * @returns Object with typed methods for each channel
  */
 export function createDomainBridge<
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- Type parameter provides type safety for channel configurations
     TChannels extends Record<string, ChannelConfig>,
 >(
     channels: TChannels

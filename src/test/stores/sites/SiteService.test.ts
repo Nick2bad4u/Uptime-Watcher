@@ -15,6 +15,7 @@ vi.mock("../../../stores/utils", () => ({
 // Mock the electron window API
 const mockElectronAPI = {
     data: {
+        downloadSqliteBackup: vi.fn(),
         downloadSQLiteBackup: vi.fn(),
     },
     sites: {

@@ -8514,6 +8514,11 @@ export default [
                 process: "readonly",
                 require: "readonly",
             },
+            parser: tseslintParser,
+            parserOptions: {
+                ecmaVersion: "latest",
+                sourceType: "module",
+            },
         },
         name: "Scripts - scripts/**/*.{TS,TSX,CTS,MTS,MJS,JS,JSX,CJS}",
         plugins: {

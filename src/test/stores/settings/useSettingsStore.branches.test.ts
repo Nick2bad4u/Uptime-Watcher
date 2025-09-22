@@ -60,7 +60,7 @@ const mockWithErrorHandling = vi.mocked(withErrorHandling);
 
 // Mock the entire electronAPI
 const mockElectronAPI = {
-    settings: {
+    data: {
         getHistoryLimit: vi.fn(),
         updateHistoryLimit: vi.fn(),
         resetToDefaults: vi.fn(),
@@ -88,11 +88,11 @@ describe("useSettingsStore Branch Coverage Tests", () => {
         vi.clearAllMocks();
 
         // Setup default mock returns
-        mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+        mockElectronAPI.data.getHistoryLimit.mockResolvedValue({
             success: true,
             data: 1000,
         });
-        mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
+        mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
             success: true,
             data: 1000,
         });
@@ -151,9 +151,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             });
 
             // Should not make API calls when state is null/empty during first load
-            expect(
-                mockElectronAPI.settings.getHistoryLimit
-            ).not.toHaveBeenCalled();
+            expect(mockElectronAPI.data.getHistoryLimit).not.toHaveBeenCalled();
         });
 
         it("should handle successful API response in async rehydration", async ({
@@ -166,7 +164,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             // Mock a successful response
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(2000);
+            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(2000);
 
             const { result } = renderHook(() => useSettingsStore());
 
@@ -182,7 +180,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 await new Promise((resolve) => setTimeout(resolve, 150));
             });
 
-            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
+            expect(mockElectronAPI.data.getHistoryLimit).toHaveBeenCalled();
             expect(result.current.settings.historyLimit).toBe(2000);
         });
 
@@ -196,7 +194,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             await annotate("Type: Error Handling", "type");
 
             // Make the API call reject to trigger catch block
-            mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(
+            mockElectronAPI.data.getHistoryLimit.mockRejectedValue(
                 new Error("Network failure")
             );
 
@@ -214,7 +212,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 await new Promise((resolve) => setTimeout(resolve, 150));
             });
 
-            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
+            expect(mockElectronAPI.data.getHistoryLimit).toHaveBeenCalled();
             expect(logger.warn).toHaveBeenCalledWith(
                 "Failed to sync settings after rehydration:",
                 expect.any(Error)
@@ -234,12 +232,12 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
                 success: true,
                 data: 5000, // Valid positive number
             });
 
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(5000);
+            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(5000);
 
             await act(async () => {
                 await result.current.persistHistoryLimit(3000);
@@ -260,12 +258,12 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
                 success: true,
                 data: -1, // Invalid negative number
             });
 
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+            mockElectronAPI.data.getHistoryLimit.mockResolvedValue({
                 success: true,
                 data: -1,
             });
@@ -289,12 +287,12 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
                 success: true,
                 data: 0, // Zero is not considered valid (not > 0)
             });
 
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+            mockElectronAPI.data.getHistoryLimit.mockResolvedValue({
                 success: true,
                 data: 0,
             });
@@ -318,12 +316,12 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
                 success: true,
                 data: "invalid" as any, // Non-number type
             });
 
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+            mockElectronAPI.data.getHistoryLimit.mockResolvedValue({
                 success: true,
                 data: "invalid" as any,
             });
@@ -349,12 +347,12 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
                 success: true,
                 data: "not-a-number" as any, // Typeof will be "string", not "number"
             });
 
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+            mockElectronAPI.data.getHistoryLimit.mockResolvedValue({
                 success: true,
                 data: "not-a-number" as any,
             });
@@ -378,12 +376,12 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
                 success: true,
                 data: -500, // Typeof is "number" but value is not > 0
             });
 
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+            mockElectronAPI.data.getHistoryLimit.mockResolvedValue({
                 success: true,
                 data: -500,
             });
