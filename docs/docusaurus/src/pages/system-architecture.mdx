@@ -1,31 +1,29 @@
-***
-
+---
 title: System Architecture Overview
-description: Comprehensive system architecture and component relationships for Uptime Watcher
----------------------------------------------------------------------------------------------
-
-/\* eslint-disable no-unused-vars -- JSX imports used in components \*/
+description: Comprehensive system architecture and component relationships
+---
+/* eslint-disable no-unused-vars -- Import in JSX */
 import Mermaid from '@theme/Mermaid';
 
 export default function SystemArchitecture() {
-  return (
-    <Layout
-      title="System Architecture Overview"
-      description="Comprehensive system architecture and component relationships for Uptime Watcher"
-    >
-      <div className="container margin-vert--lg">
-        <div className="row">
-          <div className="col">
+    return (
+        <Layout
+            title="System Architecture Overview"
+            description="Comprehensive system architecture and component relationships for Uptime Watcher"
+        >
+            <div className="container margin-vert--lg">
+                <div className="row">
+                    <div className="col">
 
-# System Architecture Overview
+                        # System Architecture Overview
 
-This page provides a comprehensive view of the Uptime Watcher system architecture using interactive Mermaid diagrams.
+                        This page provides a comprehensive view of the Uptime Watcher system architecture using interactive Mermaid diagrams.
 
-## High-Level System Architecture
+                        ## High-Level System Architecture
 
-The following diagram shows the overall system architecture and how the main components interact:
+                        The following diagram shows the overall system architecture and how the main components interact:
 
-<Mermaid value={`graph TB
+                        <Mermaid value={`graph TB
     %% Main Application Layer
     UI[Frontend UI<br/>React + TypeScript]
     Store[State Management<br/>Zustand Stores]
@@ -85,11 +83,11 @@ The following diagram shows the overall system architecture and how the main com
     class Network external
     class IPC ipc`} />
 
-## Component Interaction Flow
+                        ## Component Interaction Flow
 
-This diagram illustrates how different components interact during a typical monitoring cycle:
+                        This diagram illustrates how different components interact during a typical monitoring cycle:
 
-<Mermaid value={`sequenceDiagram
+                        <Mermaid value={`sequenceDiagram
     participant UI as Frontend UI
     participant Store as Zustand Store
     participant IPC as IPC Bridge
@@ -128,11 +126,11 @@ This diagram illustrates how different components interact during a typical moni
     SM-->>Store: History data
     Store-->>UI: Display charts`} />
 
-## Monitor Type Hierarchy
+                        ## Monitor Type Hierarchy
 
-This diagram shows the different types of monitors and their relationships:
+                        This diagram shows the different types of monitors and their relationships:
 
-<Mermaid value={`classDiagram
+                        <Mermaid value={`classDiagram
     class BaseMonitor {
         <<abstract>>
         +id: string
@@ -196,11 +194,11 @@ This diagram shows the different types of monitors and their relationships:
 
     MonitorFactory ..> BaseMonitor : creates`} />
 
-## State Management Architecture
+                        ## State Management Architecture
 
-This diagram shows how state is managed across the application:
+                        This diagram shows how state is managed across the application:
 
-<Mermaid value={`graph TB
+                        <Mermaid value={`graph TB
     subgraph "Frontend State Management"
         UI[React Components]
 
@@ -274,13 +272,13 @@ This diagram shows how state is managed across the application:
     class ServiceContainer,SiteManager,MonitorManager,ConfigManager backendLayer
     class Repositories,Database dataLayer`} />
 
----
+                        ---
 
-These diagrams provide a comprehensive overview of the Uptime Watcher architecture. Each component is designed to be modular, testable, and maintainable while providing robust monitoring capabilities.
+                        The diagrams above illustrate the core architecture and component interactions of Uptime Watcher. For deeper insights into each module, see the [API documentation](../api/overview.md) and [code references](../../src) for implementation details and maintainability guidelines.
 
-          </div>
-        </div>
-      </div>
-    </Layout>
-  );
+                    </div>
+                </div>
+            </div>
+        </Layout>
+    );
 }

@@ -8,7 +8,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Monitor, MonitorType } from "../../../../shared/types";
 import type { MonitorTypeConfig } from "../../../../shared/types/monitorTypes";
 import type { ValidationResult } from "../../../../shared/types/validation";
-import type { IpcResponse } from "../../../types/ipc";
 
 // Mock the store utils module
 vi.mock("../../../stores/utils", () => ({

@@ -17,8 +17,6 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Event data type casting is safe in this context */
 
-import { ipcRenderer } from "electron";
-
 import type { StatusUpdate } from "@shared/types";
 import type {
     CacheInvalidatedEventData,
@@ -28,6 +26,8 @@ import type {
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
+
+import { ipcRenderer } from "electron";
 
 import { createEventManager } from "../core/bridgeFactory";
 

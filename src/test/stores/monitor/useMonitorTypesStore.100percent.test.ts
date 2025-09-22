@@ -477,7 +477,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Mock withErrorHandling that doesn't properly manage loading state
             originalWithErrorHandling.mockImplementation(
-                async (operation, store) => {
+                async (_operation, store) => {
                     // Simulate error handling that forgets to set loading to false
                     store.clearError();
                     store.setLoading(true);

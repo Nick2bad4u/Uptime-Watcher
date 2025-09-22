@@ -57,7 +57,7 @@ export interface BaseEventData {
  */
 export interface StateSyncEventData extends BaseEventData {
     /** The synchronization action being performed */
-    readonly action: "bulk-sync" | "delete" | "update" | "create";
+    readonly action: "bulk-sync" | "create" | "delete" | "update";
     /** Site ID for targeted operations (delete, update, create) */
     readonly siteId?: string;
     /** Site data for bulk sync operations */

@@ -505,7 +505,7 @@ describe("SiteService", () => {
             expect(result).toEqual(mockResponse);
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
-            ).toHaveBeenCalledOnce();
+            ).toHaveBeenCalledTimes(1);
         });
 
         it("should handle download errors", async ({ task, annotate }) => {

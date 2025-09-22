@@ -32,6 +32,15 @@ const mockDnsResolve4 = vi.fn();
 const mockSocketClass = vi.fn();
 const mockFetch = vi.fn();
 
+// Create mock objects that match the usage in tests
+const mockDns = {
+    resolve4: mockDnsResolve4,
+};
+
+const mockNet = {
+    Socket: mockSocketClass,
+};
+
 // Mock Node.js modules
 vi.mock("node:dns/promises", () => ({
     resolve4: mockDnsResolve4,

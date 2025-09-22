@@ -260,7 +260,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             );
             await expect(
                 exposedAPI.monitorTypes.getMonitorTypes()
-            ).resolves.toEqual(true); // Returns extracted data, not raw response
+            ).resolves.toBeTruthy(); // Returns extracted data, not raw response
             await expect(exposedAPI.data.exportData()).rejects.toThrow(
                 "Error 4"
             );

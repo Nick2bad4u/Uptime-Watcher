@@ -485,6 +485,7 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                         );
 
                     // Try to parse as ValidationResult, with fallback
+                    // eslint-disable-next-line @typescript-eslint/init-declarations -- Variable is always assigned in conditional branches
                     let normalizedResult: ValidationResult;
 
                     if (
@@ -493,19 +494,34 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                         "success" in rawValidationResult
                     ) {
                         // It's a ValidationResult - ensure all required properties exist
-                        const partialResult =
-                            rawValidationResult as Partial<ValidationResult> & {
-                                success: boolean;
-                            };
+                        const result = rawValidationResult as Record<
+                            string,
+                            unknown
+                        >;
+                        const success = Boolean(result["success"]);
+                        const resultData = result["data"];
+                        const errors = Array.isArray(result["errors"])
+                            ? (result["errors"] as string[]) // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Array type check ensures string array
+                            : [];
+                        const metadata =
+                            typeof result["metadata"] === "object" &&
+                            result["metadata"] !== null
+                                ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Object type check ensures record structure
+                                  (result["metadata"] as Record<
+                                      string,
+                                      unknown
+                                  >)
+                                : {};
+                        const warnings = Array.isArray(result["warnings"])
+                            ? (result["warnings"] as string[]) // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Array type check ensures string array
+                            : [];
+
                         normalizedResult = {
-                            // Preserve original ValidationResult properties
-                            ...partialResult,
-                            // Ensure required properties have defaults
-                            errors: partialResult.errors ?? [],
-                            metadata: partialResult.metadata ?? {},
-                            warnings: partialResult.warnings ?? [],
-                            data: partialResult.data,
-                            success: partialResult.success,
+                            data: resultData,
+                            errors,
+                            metadata,
+                            success,
+                            warnings,
                         };
                     } else {
                         // Not a ValidationResult - create normalized structure

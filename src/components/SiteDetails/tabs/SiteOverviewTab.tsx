@@ -165,6 +165,9 @@ export const SiteOverviewTab = ({
         // Use getColor to safely access theme colors with proper validation
         const siteStatusColor = ((): string => {
             switch (siteDisplayStatus) {
+                case "degraded": {
+                    return currentTheme.colors.status.degraded;
+                }
                 case "down": {
                     return currentTheme.colors.status.down;
                 }

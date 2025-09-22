@@ -830,13 +830,6 @@ describe(useMonitorTypesStore, () => {
             ];
 
             const mockValidationData = { url: "https://example.com" };
-            const expectedValidationResult: ValidationResult = {
-                success: true,
-                data: mockValidationData,
-                errors: [],
-                warnings: [],
-                metadata: {},
-            };
 
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
                 mockMonitorTypes

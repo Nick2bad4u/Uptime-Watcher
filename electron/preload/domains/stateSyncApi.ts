@@ -11,12 +11,38 @@
  * @packageDocumentation
  */
 
-/* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
-
 import type { Site } from "@shared/types";
 import type { StateSyncEventData } from "@shared/types/events";
 
 import { createEventManager, createTypedInvoker } from "../core/bridgeFactory";
+
+/**
+ * Type guard to validate StateSyncEventData structure
+ */
+const isStateSyncEventData = (data: unknown): data is StateSyncEventData => {
+    if (typeof data !== "object" || data === null) {
+        return false;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type guard validation requires assertion
+    const event = data as Record<string, unknown>;
+    return (
+        typeof event["action"] === "string" &&
+        [
+            "bulk-sync",
+            "create",
+            "delete",
+            "update",
+        ].includes(event["action"]) &&
+        typeof event["source"] === "string" &&
+        [
+            "backend",
+            "cache",
+            "manual",
+        ].includes(event["source"]) &&
+        typeof event["timestamp"] === "number"
+    );
+};
 
 /**
  * Interface defining the state sync domain API operations
@@ -72,7 +98,10 @@ export const stateSyncApi: StateSyncApiInterface = {
         callback: (data: StateSyncEventData) => void
     ): (() => void) =>
         createEventManager("state:sync").on((data: unknown) => {
-            callback(data as StateSyncEventData);
+            if (isStateSyncEventData(data)) {
+                // eslint-disable-next-line n/callback-return -- Callback Return not required here as we just invoke the callback
+                callback(data);
+            }
         }),
 
     /**
@@ -86,5 +115,3 @@ export const stateSyncApi: StateSyncApiInterface = {
 } as const;
 
 export type StateSyncApi = StateSyncApiInterface;
-
-/* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

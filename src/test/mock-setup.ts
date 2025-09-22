@@ -210,11 +210,11 @@ const mockElectronAPI: any = {
         updateSite: vi.fn().mockResolvedValue(undefined),
         removeSite: vi.fn().mockResolvedValue(undefined),
         removeMonitor: vi.fn().mockResolvedValue(undefined),
-        getAll: vi.fn().mockResolvedValue([]), // legacy alias
-        create: vi.fn().mockResolvedValue({}), // legacy alias
-        update: vi.fn().mockResolvedValue({}), // legacy alias
-        delete: vi.fn().mockResolvedValue(true), // legacy alias
-        getById: vi.fn().mockResolvedValue(null), // legacy alias
+        getAll: vi.fn().mockResolvedValue([]), // Legacy alias
+        create: vi.fn().mockResolvedValue({}), // Legacy alias
+        update: vi.fn().mockResolvedValue({}), // Legacy alias
+        delete: vi.fn().mockResolvedValue(true), // Legacy alias
+        getById: vi.fn().mockResolvedValue(null), // Legacy alias
     },
 
     // State synchronization operations

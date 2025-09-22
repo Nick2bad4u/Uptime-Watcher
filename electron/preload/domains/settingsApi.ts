@@ -9,7 +9,9 @@
  * @packageDocumentation
  */
 
-import { createTypedInvoker } from "../core/bridgeFactory";
+/* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
+
+import { createTypedInvoker, createVoidInvoker } from "../core/bridgeFactory";
 
 /**
  * Interface defining the settings domain API operations
@@ -52,9 +54,11 @@ export const settingsApi: SettingsApiInterface = {
      *
      * @returns Promise that resolves when the limit is updated
      */
-    updateHistoryLimit: createTypedInvoker<void>(
-        "update-history-limit"
-    ) satisfies (...args: unknown[]) => Promise<void>,
+    updateHistoryLimit: createVoidInvoker("update-history-limit") satisfies (
+        ...args: unknown[]
+    ) => Promise<void>,
 } as const;
 
 export type SettingsApi = SettingsApiInterface;
+
+/* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */
