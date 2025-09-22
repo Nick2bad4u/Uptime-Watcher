@@ -151,7 +151,7 @@
         "vite.config.ts",
         "vite/client",
         "vitest.config.ts",
-        "config/testing/vitest.shared.config.ts",
+        "vitest.shared.config.ts",
         "tailwind.config.mjs"
     ],
     "references": [

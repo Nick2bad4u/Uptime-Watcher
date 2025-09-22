@@ -164,15 +164,15 @@ jobs:
                   # 📊 GitHub Actions automatically provides these for dashboard reporting
                   # GITHUB_REPOSITORY and GITHUB_SHA are automatically available
                   CI: true
-                  # 🚀 Allocate additional memory for Stryker mutation testing in CI
-                  NODE_OPTIONS: --max_old_space_size=8192
+                  # 🚀 Allocate additional memory for Stryker mutation testing in CI (increased to 12GB for stability)
+                  NODE_OPTIONS: --max_old_space_size=12288
               shell: pwsh
               run: |
                   Write-Host "🧬 Starting Stryker mutation testing..."
                   Write-Host "📊 Project: github.com/${{ github.repository }}"
                   Write-Host "🏷️ Version: ${{ github.ref_name }}-${{ github.sha }}"
                   Write-Host "📁 Reports will be saved to: reports/mutation/"
-                  Write-Host "💾 Node memory allocation set to 8GB for CI environment"
+                  Write-Host "💾 Node memory allocation set to 12GB for CI environment"
 
                   # Check if running with test failures allowed
                   if ("${{ github.event.inputs.allow-test-failures }}" -eq "true" -and "${{ steps.run-tests.outputs.tests_status }}" -eq "failed") {
@@ -190,7 +190,15 @@ jobs:
 
                   # Add additional performance optimizations for CI
                   Write-Host "⚡ Applying CI performance optimizations..."
-                  npx stryker run --concurrency "$CONCURRENCY" --logLevel warn --fileLogLevel error
+                  try {
+                    # Added timeout (10 minutes per mutation) and max concurrent test runners to prevent resource exhaustion
+                    npx stryker run --concurrency "$CONCURRENCY" --maxConcurrentTestRunners 1 --timeoutMS 600000 --logLevel warn --fileLogLevel error
+                    Write-Host "✅ Stryker completed successfully"
+                  } catch {
+                    Write-Host "❌ Stryker failed with error: $($_.Exception.Message)"
+                    Write-Host "🔧 Check logs for details; consider reducing concurrency or increasing timeout"
+                    throw
+                  }
               continue-on-error: true
 
             - name: Verify Stryker report files

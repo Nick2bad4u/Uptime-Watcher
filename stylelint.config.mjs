@@ -72,7 +72,7 @@ import defineConfig from "stylelint-define-config";
  *
  * @public
  */
-export default defineConfig({
+const config = defineConfig({
     /**
      * Controls whether Stylelint should allow empty input files.
      *
@@ -1030,3 +1030,6 @@ export default defineConfig({
     },
     // Validate: true, -- Disabled: not real config option only CLI flag
 });
+
+// Export the configuration
+export default config;

@@ -7,8 +7,8 @@ const knipConfig: KnipConfig = {
         "electron/preload.ts",
         "vite.config.ts",
         "vitest.config.ts",
-        "config/testing/vitest.electron.config.ts",
-        "config/testing/vitest.shared.config.ts",
+        "vitest.electron.config.ts",
+        "vitest.shared.config.ts",
     ],
     ignore: [
         "shared/types/monitorTypes.ts",

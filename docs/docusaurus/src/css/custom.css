@@ -118,6 +118,7 @@
     --docusaurus-highlighted-code-line-bg: rgb(
         47 125 83 / 30%
     ); /* Increased opacity for code highlights */
+
     --ifm-color-primary-rgb: 120, 227, 39; /* Used for shadows and gradients */
 
     /* Adobe Compound Palette - Dark Mode Additional Colors */
@@ -3363,12 +3364,6 @@ html {
         );
         transform: scale(1.1);
     }
-}
-
-/* Firefox thumb styling */
-html {
-    scrollbar-width: thin;
-    scrollbar-color: var(--ifm-color-primary) var(--ifm-background-color);
 }
 
 /* Morphing border animations for interactive elements */

@@ -48,8 +48,16 @@ updates:
             versions: ["< 26.0.18"]
           - dependency-name: "electron-builder-squirrel-windows"
             versions: ["< 26.0.18"]
-          - dependency-name: "@shared/constants"
             # Ignore local file dependencies - these are not external packages
+          - dependency-name: "@shared/constants"
+            versions: ["*"]
+          - dependency-name: "@shared/types"
+            versions: ["*"]
+          - dependency-name: "@shared/utils"
+            versions: ["*"]
+          - dependency-name: "@shared/validation"
+            versions: ["*"]
+
       labels:
           - "npm"
           - "dependabot"

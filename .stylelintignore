@@ -31,6 +31,7 @@ icons/
 **/*.log
 **/*.pdf
 **/*.env
+**/*.mdx
 **/*.key
 **/*.pem
 **/*.pub
