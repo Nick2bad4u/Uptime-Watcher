@@ -7,14 +7,329 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[1751b4b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1751b4b4ab1b9e8207bb132c182227f24c83e050)...
+[1751b4b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1751b4b4ab1b9e8207bb132c182227f24c83e050)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1751b4b4ab1b9e8207bb132c182227f24c83e050...1751b4b4ab1b9e8207bb132c182227f24c83e050))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 15.5.0 [`(1751b4b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1751b4b4ab1b9e8207bb132c182227f24c83e050)
+
+
+
+
+
+
+## [15.5.0] - 2025-09-22
+
+
 [[3cab519](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3cab519fa54c8ef9e5ce0a4eb35ea1fbf0dc7c5d)...
-[3cab519](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3cab519fa54c8ef9e5ce0a4eb35ea1fbf0dc7c5d)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3cab519fa54c8ef9e5ce0a4eb35ea1fbf0dc7c5d...3cab519fa54c8ef9e5ce0a4eb35ea1fbf0dc7c5d))
+[47bcf6d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/47bcf6d1a8c84fbaaa7ef6305ff9e6a32b35a041)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3cab519fa54c8ef9e5ce0a4eb35ea1fbf0dc7c5d...47bcf6d1a8c84fbaaa7ef6305ff9e6a32b35a041))
+
+
+### ✨ Features
+
+- ✨ [feat] Adds state synchronization event subscription support
+
+Implements real-time state synchronization between backend and frontend through event-based updates. The system now actively listens for state changes and automatically syncs data when backend modifications occur.
+
+Key improvements:
+ - Adds `onStateSyncEvent` API method to subscribe to backend state changes 🔄
+ - Implements `StateSyncEventData` interface for typed event handling
+   - Supports bulk-sync, create, update, and delete actions
+   - Tracks event source (backend/cache/manual) for debugging
+ - Integrates event subscription into sites store for automatic UI updates
+   - Bulk sync immediately updates all sites
+   - Individual operations trigger full resync for consistency
+
+🛠️ [fix] Corrects method naming inconsistencies
+ - Renames `downloadSQLiteBackup` to `downloadSqliteBackup` throughout codebase
+   - Updates all references in components, stores, and tests
+   - Maintains backward compatibility with consistent camelCase naming
+
+🧪 [test] Updates test expectations for improved error handling
+ - MonitorTypesService now properly re-throws errors instead of silently failing
+ - Validation results preserve original structure when API returns ValidationResult
+ - Test assertions updated to expect thrown errors for null/undefined responses
+ - Fixes test mocks to prevent async operation hanging
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b676247)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b676247f3b57e9d2d2fb1e94ba83a09a5218e9f1)
+
+
+- ✨ [feat] Unifies settings API under data domain
+
+- Moves settings-related methods to a consolidated data API for improved organization and maintainability
+- Updates IPC handler to return updated history limit for better client feedback
+- Expands type definitions to expose new data API methods for history limit and settings management
+- Ensures readiness check validates both data and sites APIs for robust initialization
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(253f7bc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/253f7bca9008253ecfb8ee2d0122deb4ac759780)
+
+
+- ✨ [feat] Add support for 'degraded' monitor status
+
+- Expands status logic and UI to recognize and display 'degraded' state for monitors.
+- Updates validation, analytics, summary components, and styling to treat 'degraded' as a first-class status.
+- Adjusts uptime calculations and chart data to factor in degraded monitors.
+- Improves iconography and descriptions for degraded status.
+- Enhances test coverage to include scenarios for degraded status.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ac735da)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ac735da4bed88850e70da37b7a5f506bafb3c5e4)
+
+
+- ✨ [feat] Add "degraded" monitor status and improve IPC usage
+
+- Introduces a three-state monitor status model ("up", "degraded", "down") for enhanced server health classification, with logic to distinguish degraded 5xx responses.
+- Refactors frontend IPC methods to directly unwrap responses via the preload bridge, removing manual extraction and simplifying error handling.
+- Updates theme, tests, and related utilities to support the new "degraded" status color.
+- Unifies monitor detail/title formatting under a single API namespace for consistency.
+- Documents agent and prompt configurations with model metadata.
+
+Relates to ongoing improvements in monitoring accuracy and frontend/backend API alignment.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(482e037)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/482e037f51543702c5ab625fb160387e21263dc8)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Ensure cache TTL config and DNS monitor field mapping
+
+- Adapts cache configuration mapping so renderer caches use correct TTL values, preventing cache expiry misconfigurations per ADR-006.
+- Adds DNS-specific fields to monitor update logic to support DNS health checks and improve monitoring accuracy.
+- Refactors monitor lifecycle updates to use atomic database transactions and event emissions for system consistency.
+- Fixes test setup for global electron API mocking and introduces regression tests to guard against architectural mistakes.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0062edd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0062edd26575c3ee6f98910bb4837c091b929bba)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 15.4.0 [`(3cab519)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3cab519fa54c8ef9e5ce0a4eb35ea1fbf0dc7c5d)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Alphabetizes JSON properties in IPC channel mapping
+
+Reorders all properties in the IPC channel mapping configuration to follow alphabetical order for improved consistency and maintainability. This systematic reorganization makes the configuration file more predictable and easier to navigate.
+
+Key improvements:
+ - Sorts object properties alphabetically throughout the entire JSON structure
+ - Maintains functional equivalence while improving readability
+ - Standardizes property ordering across all channel definitions:
+   - `channel` → `domain` → `handlerMethod` → `hasParameters` → `methodName` → `returnType` → `validator`
+ - Reorders top-level domain sections: `data` → `monitorTypes` → `monitoring` → `sites` → `stateSync` → `system`
+
+The refactoring touches every channel definition but preserves all existing functionality, making future maintenance and additions more straightforward by establishing a consistent property ordering convention.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f5ae9eb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f5ae9eb0b867598544905627186b5394f3c5f414)
+
+
+- 🚜 [refactor] Aligns service layer with updated Electron API interface
+
+Updates service methods to match the current Electron API contract after backend changes:
+ - Renames `downloadSQLiteBackup` to `downloadSqliteBackup` for consistency
+ - Changes return types to reflect actual API responses:
+   - `importData` now returns string message instead of boolean
+   - `validateMonitorData` returns unknown pending proper type definition
+   - `checkSiteNow` returns updated Site object instead of void
+   - Site operations return Site objects for better state management
+ - Removes unavailable API methods:
+   - `removeAllListeners` event cleanup method
+   - `quitAndInstall` auto-update functionality
+   - `onStateSyncEvent` real-time synchronization
+ - Migrates monitor removal to correct namespace (`monitoring` vs `sites`)
+ - Updates async operation handling with proper await statements
+ - Simplifies monitor type validation with fallback result structure
+ - Adjusts test expectations for removed functionality
+
+These changes ensure frontend services correctly interact with the backend API,
+preventing runtime errors from mismatched method signatures and improving
+type safety throughout the application.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(29dc730)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/29dc730e5965e1a54df9dc16a415cfb342fefa37)
+
+
+- 🚜 [refactor] Modularize preload API and add degraded status support
+
+- Refactors the Electron preload script into a modular, domain-based architecture for type-safe IPC bridging, auto-generating domain APIs from backend channel definitions
+- Adds native connectivity checks replacing the ping library, including robust support for "degraded" monitor status to distinguish partial connectivity (e.g., DNS resolves but ports unreachable, HTTP non-2xx responses)
+- Updates all monitor, site, and theme status types to include "degraded", ensuring consistent handling and UI coloring for partial failures
+- Improves CSS documentation and sidebar/category styling; enhances theme color configurations to support new status
+- Removes obsolete dependencies and test imports; adds comprehensive tests for degraded state handling and modular connectivity logic
+- Documents and auto-generates IPC channel analysis reports for maintainability and future automation
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(04f054c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/04f054cd5fa34f2ea6c140c418ce6921cc21feae)
+
+
+- 🚜 [refactor] Replace legacy monitor lifecycle with enhanced system
+
+- Migrates monitor management to fully use the enhanced monitoring system, removing legacy lifecycle utilities and tests.
+- Updates all logic and tests to invoke enhanced monitor start/stop functions, improving reliability and consistency.
+- Preserves monitor history in UI during stop events to prevent empty history flashes.
+- Modernizes architectural regression tests to validate enhanced system imports rather than legacy modules.
+- Cleans up type imports and re-exports for core monitoring types.
+
+Improves maintainability and prepares for future advanced monitoring features.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6c4e493)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6c4e493e4cc2aba87ffab90ec21adcc88a42f962)
+
+
+- 🚜 [refactor] Improve cache and monitor status consistency
+
+- Refactors cache configuration to support both legacy and extended TTL options, removing redundant adapter logic and improving runtime validation for cache lifecycle management.
+- Enhances site and monitor update operations for transactional integrity, ensuring cached state aligns with database changes and avoiding stale or inconsistent data.
+- Updates monitor lifecycle event emission to provide richer, more accurate payloads, including full site and monitor details and previous status information, improving observability and debugging.
+- Simplifies and clarifies site cache refresh logic, consolidating duplicate code and making cache updates more predictable.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(49bc618)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/49bc6185c2b2006421274956dcd018baa9383ad2)
+
+
+- 🚜 [refactor] Streamline IPC response handling and improve settings fallback
+
+- Refactors IPC response handling by replacing repetitive format and validation logic with a unified extraction utility, improving maintainability and error safety.
+- Updates settings initialization to gracefully fallback to defaults if backend retrieval fails, ensuring user preferences persist and enhancing robustness.
+- Cleans up unnecessary imports and redundant code, making codebase easier to follow.
+- Improves array type checking and filtering for configuration data to prevent malformed entries.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(91a099b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/91a099ba5f7a5be44e86c26204e83a422124efdd)
+
+
+- 🚜 [refactor] Introduces service layer for IPC and refactors store usage
+
+- Decouples direct Electron IPC calls from store logic by introducing dedicated service modules for data, events, monitor types, settings, and system operations.
+- Refactors all major store actions to use these new service abstractions, improving maintainability, testability, and type safety.
+- Updates IPC response handling for settings and data flows, ensuring all extracted values are properly typed and error handling is centralized.
+- Refines environment variable access for enhanced compatibility and robustness, particularly in Electron main process and HTTP monitoring.
+- Enhances unit tests for missing branches and correct result extraction, aligning with new service logic.
+
+Facilitates cleaner separation of concerns and eases future backend changes.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(eaaaa02)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eaaaa02d77de3d1fdbf3ae1ed78825ea0d03dda5)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Refactors and improves test suites for robustness and accuracy
+
+This commit introduces a wide range of improvements across the testing landscape, focusing on enhancing mock implementations, correcting assertions, and refactoring test structures for better maintainability and accuracy.
+
+*   ✨ **IPC Handler Enhancement**:
+    *   The `update-history-limit` IPC handler now returns the updated value upon success, providing immediate feedback to the client.
+
+*   🧪 **Test Suite Improvements**:
+    *   Updates tests for `updateHistoryLimit` to assert for `undefined` instead of `null` on invalid input, aligning with the actual return type.
+    *   Refactors `nativeConnectivity.test.ts` to use a more robust mocking strategy for Node.js modules (`dns`, `net`), preventing potential hoisting issues with `vi.mock`.
+    *   Improves `net.Socket` mocks by adding `removeAllListeners` to prevent listener leaks during tests.
+    *   Enhances IPC service tests by implementing stateful mocks for `getHistoryLimit` and `setHistoryLimit`, allowing for more realistic behavior simulation.
+    *   Strengthens `useMonitorTypesStore` tests by asserting that API failures correctly propagate as thrown errors rather than returning fallback values, ensuring proper error handling.
+    *   Modifies regression tests to use `try/catch` blocks for asserting thrown errors, improving reliability.
+
+*   🚜 **Refactoring and Consistency**:
+    *   Replaces direct store calls to `electronAPI` with calls to abstracted `SiteService` and `MonitoringService` in `useSitesStore.critical.test.ts`, respecting the new architecture.
+    *   Introduces the `isNonEmptyString` utility in fuzzing tests for consistent validation logic.
+    *   Makes the `expectedValue` field optional for DNS monitors in property-based tests, reflecting its optional nature in the application logic.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c3876c2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c3876c237ce8c663a8a52ef7f2a3a793045a9636)
+
+
+- 🧪 [test] Improve test coverage and mocks for monitor utilities
+
+- Expands unit test coverage for monitor and site utilities, including history preservation and error handling scenarios.
+- Refines monitor validation and formatting logic in tests to ensure robust fallback behaviors and accurate result normalization.
+- Updates mock implementations for services and hooks to more closely simulate real-world behavior, reducing flakiness and improving reliability.
+- Enhances logging expectations for test runs, clarifies event and cache handling, and aligns test assertions with application semantics.
+- Improves default value handling and error management in conversion helpers and store initialization logic.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5a71de4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5a71de49eb6579aba9ca08c6352c08ead9b362b7)
+
+
+- 🧪 [test] Unifies mocks and improves test reliability for stores and UI
+
+- Standardizes and extends mocking of utility modules, services, and Electron APIs across test suites to reduce global state pollution and flakiness
+- Refactors tests to use consistent, direct mocking of service functions (e.g., SystemService, EventsService) instead of window.electronAPI where possible
+- Updates test logic to avoid navigation errors in JSDOM, simplifies click handling, and ensures async operations are properly awaited
+- Improves error handling and fallback logic in store-related tests for more robust coverage
+- Removes obsolete debug store test to streamline suite
+- Clarifies intent by making API error scenarios explicit and cleaning up redundant data extraction steps
+Relates to ongoing test coverage and reliability improvements
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a2fa209)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a2fa209d75fba61fb6dac8a26dbb11008be49a0d)
+
+
+- 🧪 [test] Refactors IPC test mocks and improves error handling coverage
+
+- Unifies and modernizes IPC response mocks in tests, returning extracted data directly instead of wrapped objects.
+- Upgrades error handling tests for increased coverage, validating error conversion and propagation in more scenarios.
+- Updates monitor type tests to expect an added type and adjusts related assertions.
+- Refactors cache sync logic for improved async error robustness after cache invalidations.
+- Cleans up imports and typings in utility tests for clarity and maintainability.
+
+Relates to improved reliability and future-proofing of IPC and error handling logic.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c09af75)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c09af75c203449b95d6631736ae84c685cf67e51)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Remove obsolete documentation and apply style fixes
+
+This commit cleans up the repository by removing outdated files and applying minor code style adjustments.
+
+-   📝 [docs] Deletes obsolete documentation and generated analysis files.
+    -   Removes IPC channel analysis (`ipc-channel-analysis.md`, `ipc-channel-mapping.json`) related to the completed preload refactor.
+    -   Removes cached documentation, examples, and sync logs for the `node-ping` package.
+-   🎨 [style] Applies minor formatting adjustments to the ESLint configuration (`eslint.config.mjs`) for consistency, such as correcting quote styles and trailing commas.
+-   🧪 [test] Cleans up JSDoc comments in the settings input fuzzing test file by removing empty code blocks.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(47bcf6d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/47bcf6d1a8c84fbaaa7ef6305ff9e6a32b35a041)
+
+
+- 🧹 [chore] Refactor preload APIs, enhance type safety, and update docs
+
+This commit introduces a series of improvements across the application, focusing on refactoring, enhancing type safety, fixing bugs, and updating documentation.
+
+✨ [feat] Adds support for 'degraded' status in the site overview tab, ensuring the correct status color is displayed.
+
+🛠️ [fix] Corrects the normalization of `ValidationResult` in `useMonitorTypesStore`.
+ - This change ensures that even if the raw validation result from the backend is a partial object, it is correctly reconstructed into a full `ValidationResult` with default values for missing properties like `errors`, `metadata`, and `warnings`.
+
+🚜 [refactor] Improves type safety and robustness in several areas.
+ - Introduces a type guard in `stateSyncApi.ts` to validate incoming `StateSyncEventData` before processing, preventing potential runtime errors from malformed event data.
+ - Simplifies the `waitForElectronAPI` utility by removing unnecessary optional chaining, making the check for API availability more direct.
+ - Replaces `createTypedInvoker` with `createVoidInvoker` in `settingsApi.ts` for operations that do not return a value, improving clarity and intent.
+
+📝 [docs] Updates documentation to improve clarity and formatting.
+ - Refines the system architecture documentation with better formatting and a more concise conclusion.
+ - Improves the readability of the IPC channel analysis report by adding spacing and consistent formatting.
+
+🎨 [style] Applies minor code style and formatting adjustments across multiple files for consistency and readability.
+
+🧪 [test] Updates tests to align with source code changes and improve coverage.
+ - Adjusts mocks and assertions in unit and integration tests to reflect the refactored logic, particularly for API calls and store behavior.
+ - Corrects test assertions from `toHaveBeenCalledOnce()` to `toHaveBeenCalledTimes(1)` for consistency.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(58f5ace)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/58f5ace00b6e39047931f7c184bcb911efeee8bc)
+
+
+- 🧹 [chore] Migrate Knip config to TypeScript and improve linting flow
+
+- Migrates Knip configuration from JSON to TypeScript for enhanced type safety and maintainability.
+- Updates linting scripts to use the new TypeScript config and streamlines the lint:all job for greater efficiency.
+- Improves documentation and markdown lint configs with clearer type annotations and disables unused var warnings for MDX pages.
+- Expands TypeScript project references to include new Knip config locations, ensuring unified tooling support.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(75b9c5c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/75b9c5c7b36ea4fb54d9749736a73dbf6f1857ba)
+
+
+- Update changelogs for v15.4.0 [skip ci] [`(321c7a6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/321c7a60ae74d45821cebc3be4a3d1d9dea6503e)
 
 
 
