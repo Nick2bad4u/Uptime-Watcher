@@ -14,6 +14,13 @@
  * @packageDocumentation
  */
 
+import type {
+    AppLogger,
+    SiteLogger,
+    SystemLogger,
+    UnifiedLogger,
+    UserLogger,
+} from "@shared/utils/logger/interfaces";
 import type { RendererLogger } from "electron-log";
 import type { UnknownRecord } from "type-fest";
 
@@ -21,21 +28,16 @@ import log from "electron-log/renderer";
 
 /**
  * Interface for the logger configuration.
+ *
+ * @remarks
+ * Extends the unified logger interface with specialized logging methods for
+ * frontend-specific functionality while maintaining compatibility with the
+ * backend logger interface.
  */
-interface LoggerInterface {
+interface LoggerInterface extends UnifiedLogger {
+    // Specialized logging methods for common scenarios
     // Log application lifecycle events
-    app: {
-        error: (context: string, error: Error) => void;
-        performance: (operation: string, duration: number) => void;
-        started: () => void;
-        stopped: () => void;
-    };
-    // Debug level - for development debugging
-    debug: (message: string, ...args: unknown[]) => void;
-    // Error level - errors that should be investigated
-    error: (message: string, error?: Error, ...args: unknown[]) => void;
-    // Info level - general application flow
-    info: (message: string, ...args: unknown[]) => void;
+    app: AppLogger;
     /**
      * Raw access to the underlying electron-log instance.
      *
@@ -54,44 +56,12 @@ interface LoggerInterface {
     raw: RendererLogger & {
         default: RendererLogger;
     };
-    // Silly level - extremely detailed debugging
-    silly: (message: string, ...args: unknown[]) => void;
-    // Specialized logging methods for common scenarios
     // Log site monitoring events
-    site: {
-        added: (identifier: string) => void;
-        check: (
-            identifier: string,
-            status: string,
-            responseTime?: number
-        ) => void;
-        error: (identifier: string, error: Error | string) => void;
-        removed: (identifier: string) => void;
-        statusChange: (
-            identifier: string,
-            oldStatus: string,
-            newStatus: string
-        ) => void;
-    };
+    site: SiteLogger;
     // Log system/electron events
-    system: {
-        notification: (title: string, body: string) => void;
-        tray: (action: string) => void;
-        window: (action: string, windowName?: string) => void;
-    };
+    system: SystemLogger;
     // Log user actions
-    user: {
-        action: (action: string, details?: unknown) => void;
-        settingsChange: (
-            setting: string,
-            oldValue: unknown,
-            newValue: unknown
-        ) => void;
-    };
-    // Verbose level - very detailed debugging
-    verbose: (message: string, ...args: unknown[]) => void;
-    // Warn level - something unexpected but not an error
-    warn: (message: string, ...args: unknown[]) => void;
+    user: UserLogger;
 }
 
 /**
@@ -148,25 +118,8 @@ if (fileTransport && typeof window !== "undefined") {
     fileTransport.level = "info";
 }
 
-// Create logger with app context
-const loggerInstance: LoggerInterface = {
-    // Log application lifecycle events
-    app: {
-        error: (context: string, error: Error): void => {
-            loggerInstance.error(`Application error in ${context}`, error);
-        },
-        performance: (operation: string, duration: number): void => {
-            loggerInstance.debug(
-                `Performance: ${operation} took ${duration}ms`
-            );
-        },
-        started: (): void => {
-            loggerInstance.info("Application started");
-        },
-        stopped: (): void => {
-            loggerInstance.info("Application stopped");
-        },
-    },
+// Create base logger methods
+const baseLoggerMethods = {
     // Debug level - for development debugging
     debug: (message: string, ...args: unknown[]): void => {
         try {
@@ -180,7 +133,7 @@ const loggerInstance: LoggerInterface = {
         }
     },
     // Error level - errors that should be investigated
-    error: (message: string, error?: Error, ...args: unknown[]): void => {
+    error: (message: string, error?: unknown, ...args: unknown[]): void => {
         try {
             if (error instanceof Error) {
                 const errorData = {
@@ -197,10 +150,19 @@ const loggerInstance: LoggerInterface = {
                 } else {
                     log.error(`[UPTIME-WATCHER] ${message}`, errorData);
                 }
+            } else if (error === undefined) {
+                // No error object, just message and args
+                if (args.length > 0) {
+                    log.error(`[UPTIME-WATCHER] ${message}`, ...args);
+                } else {
+                    log.error(`[UPTIME-WATCHER] ${message}`);
+                }
             } else if (args.length > 0) {
-                log.error(`[UPTIME-WATCHER] ${message}`, ...args);
+                // Error is defined but not an Error instance
+                log.error(`[UPTIME-WATCHER] ${message}`, error, ...args);
             } else {
-                log.error(`[UPTIME-WATCHER] ${message}`);
+                // Error is defined but not an Error instance, no additional args
+                log.error(`[UPTIME-WATCHER] ${message}`, error);
             }
         } catch {
             // Silently ignore logging errors to prevent application crashes
@@ -218,102 +180,28 @@ const loggerInstance: LoggerInterface = {
             // Silently ignore logging errors to prevent application crashes
         }
     },
-    /**
-     * Raw access to the underlying electron-log instance.
-     *
-     * @remarks
-     * Use with caution! Direct access bypasses the application's logging
-     * conventions and structured format. Only use for advanced scenarios where
-     * the standard logger methods are insufficient.
-     *
-     * @example
-     *
-     * ```typescript
-     * // Only use when absolutely necessary
-     * logger.raw.transports.file.level = "warn";
-     * ```
-     */
-    raw: log,
     // Silly level - extremely detailed debugging
     silly: (message: string, ...args: unknown[]): void => {
-        if (args.length > 0) {
-            log.silly(`[UPTIME-WATCHER] ${message}`, ...args);
-        } else {
-            log.silly(`[UPTIME-WATCHER] ${message}`);
-        }
-    },
-    // Specialized logging methods for common scenarios
-    // Log site monitoring events
-    site: {
-        added: (identifier: string): void => {
-            loggerInstance.info(`Site added: ${identifier}`);
-        },
-        check: (
-            identifier: string,
-            status: string,
-            responseTime?: number
-        ): void => {
-            const timeInfo = responseTime ? ` (${responseTime}ms)` : "";
-            loggerInstance.info(
-                `Site check: ${identifier} - Status: ${status}${timeInfo}`
-            );
-        },
-        error: (identifier: string, error: Error | string): void => {
-            if (typeof error === "string") {
-                loggerInstance.error(
-                    `Site check error: ${identifier} - ${error}`
-                );
+        try {
+            if (args.length > 0) {
+                log.silly(`[UPTIME-WATCHER] ${message}`, ...args);
             } else {
-                loggerInstance.error(`Site check error: ${identifier}`, error);
+                log.silly(`[UPTIME-WATCHER] ${message}`);
             }
-        },
-        removed: (identifier: string): void => {
-            loggerInstance.info(`Site removed: ${identifier}`);
-        },
-        statusChange: (
-            identifier: string,
-            oldStatus: string,
-            newStatus: string
-        ): void => {
-            loggerInstance.info(
-                `Site status change: ${identifier} - ${oldStatus} -> ${newStatus}`
-            );
-        },
-    },
-    // Log system/electron events
-    system: {
-        notification: (title: string, body: string): void => {
-            loggerInstance.debug(`Notification sent: ${title} - ${body}`);
-        },
-        tray: (action: string): void => {
-            loggerInstance.debug(`Tray action: ${action}`);
-        },
-        window: (action: string, windowName?: string): void => {
-            const nameInfo = windowName ? ` (${windowName})` : "";
-            loggerInstance.debug(`Window ${action}${nameInfo}`);
-        },
-    },
-    // Log user actions
-    user: {
-        action: (action: string, details?: unknown): void => {
-            loggerInstance.info(`User action: ${action}`, details ?? "");
-        },
-        settingsChange: (
-            setting: string,
-            oldValue: unknown,
-            newValue: unknown
-        ): void => {
-            loggerInstance.info(
-                `Settings change: ${setting} - ${String(oldValue)} -> ${String(newValue)}`
-            );
-        },
+        } catch {
+            // Silently ignore logging errors to prevent application crashes
+        }
     },
     // Verbose level - very detailed debugging
     verbose: (message: string, ...args: unknown[]): void => {
-        if (args.length > 0) {
-            log.verbose(`[UPTIME-WATCHER] ${message}`, ...args);
-        } else {
-            log.verbose(`[UPTIME-WATCHER] ${message}`);
+        try {
+            if (args.length > 0) {
+                log.verbose(`[UPTIME-WATCHER] ${message}`, ...args);
+            } else {
+                log.verbose(`[UPTIME-WATCHER] ${message}`);
+            }
+        } catch {
+            // Silently ignore logging errors to prevent application crashes
         }
     },
     // Warn level - something unexpected but not an error
@@ -328,6 +216,111 @@ const loggerInstance: LoggerInterface = {
             // Silently ignore logging errors to prevent application crashes
         }
     },
+};
+
+// Create logger with app context
+const loggerInstance: LoggerInterface = {
+    // Log application lifecycle events
+    app: {
+        error: (context: string, error: Error): void => {
+            baseLoggerMethods.error(`Application error in ${context}`, error);
+        },
+        performance: (operation: string, duration: number): void => {
+            baseLoggerMethods.debug(
+                `Performance: ${operation} took ${duration}ms`
+            );
+        },
+        started: (): void => {
+            baseLoggerMethods.info("Application started");
+        },
+        stopped: (): void => {
+            baseLoggerMethods.info("Application stopped");
+        },
+    },
+
+    // Implement the base logger methods from UnifiedLogger interface
+    debug: baseLoggerMethods.debug,
+    error: baseLoggerMethods.error,
+    info: baseLoggerMethods.info,
+
+    // Raw access to the underlying electron-log instance
+    raw: log as RendererLogger & { default: RendererLogger },
+
+    silly: baseLoggerMethods.silly,
+
+    // Log site monitoring events
+    site: {
+        added: (identifier: string): void => {
+            baseLoggerMethods.info(`Site added: ${identifier}`);
+        },
+        check: (
+            identifier: string,
+            status: string,
+            responseTime?: number
+        ): void => {
+            const timeInfo = responseTime ? ` (${responseTime}ms)` : "";
+            baseLoggerMethods.info(
+                `Site check: ${identifier} - Status: ${status}${timeInfo}`
+            );
+        },
+        error: (identifier: string, error: Error | string): void => {
+            if (typeof error === "string") {
+                baseLoggerMethods.error(
+                    `Site check error: ${identifier} - ${error}`
+                );
+            } else {
+                baseLoggerMethods.error(
+                    `Site check error: ${identifier}`,
+                    error
+                );
+            }
+        },
+        removed: (identifier: string): void => {
+            baseLoggerMethods.info(`Site removed: ${identifier}`);
+        },
+        statusChange: (
+            identifier: string,
+            oldStatus: string,
+            newStatus: string
+        ): void => {
+            baseLoggerMethods.info(
+                `Site status change: ${identifier} - ${oldStatus} -> ${newStatus}`
+            );
+        },
+    },
+
+    // Log system/electron events
+    system: {
+        notification: (title: string, body: string): void => {
+            baseLoggerMethods.debug(`Notification sent: ${title} - ${body}`);
+        },
+        tray: (action: string): void => {
+            baseLoggerMethods.debug(`Tray action: ${action}`);
+        },
+        window: (action: string, windowName?: string): void => {
+            const nameInfo = windowName ? ` (${windowName})` : "";
+            baseLoggerMethods.debug(`Window ${action}${nameInfo}`);
+        },
+    },
+
+    // Log user actions
+    user: {
+        action: (action: string, details?: unknown): void => {
+            baseLoggerMethods.info(`User action: ${action}`, details ?? "");
+        },
+        settingsChange: (
+            setting: string,
+            oldValue: unknown,
+            newValue: unknown
+        ): void => {
+            baseLoggerMethods.info(
+                `Settings change: ${setting} - ${String(oldValue)} -> ${String(newValue)}`
+            );
+        },
+    },
+
+    verbose: baseLoggerMethods.verbose,
+    warn: baseLoggerMethods.warn,
 };
 
 /**

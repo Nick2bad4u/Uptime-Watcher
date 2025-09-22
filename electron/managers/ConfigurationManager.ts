@@ -49,16 +49,12 @@
 import type { Site } from "@shared/types";
 import type { ConfigValue } from "@shared/types/configTypes";
 
+import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 import { CacheKeys } from "@shared/utils/cacheKeys";
 
 import type { ValidationResult } from "./validators/interfaces";
 
-import {
-    CACHE_SIZE_LIMITS,
-    CACHE_TTL,
-    DEFAULT_CHECK_INTERVAL,
-    DEFAULT_HISTORY_LIMIT,
-} from "../constants";
+import { DEFAULT_CHECK_INTERVAL, DEFAULT_HISTORY_LIMIT } from "../constants";
 import { isDev } from "../electronUtils";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { MonitorValidator } from "./validators/MonitorValidator";
@@ -273,16 +269,16 @@ export class ConfigurationManager {
 
         // Initialize standardized caches
         this.validationCache = new StandardizedCache<ValidationResult>({
-            defaultTTL: CACHE_TTL.VALIDATION_RESULTS,
+            defaultTTL: CACHE_CONFIG.VALIDATION.defaultTTL,
             enableStats: true,
-            maxSize: CACHE_SIZE_LIMITS.VALIDATION_RESULTS,
+            maxSize: CACHE_CONFIG.VALIDATION.maxSize,
             name: "validation-results",
         });
 
         this.configCache = new StandardizedCache<ConfigValue>({
-            defaultTTL: CACHE_TTL.CONFIGURATION_VALUES,
+            defaultTTL: CACHE_CONFIG.SETTINGS.defaultTTL,
             enableStats: true,
-            maxSize: CACHE_SIZE_LIMITS.CONFIGURATION_VALUES,
+            maxSize: CACHE_CONFIG.SETTINGS.maxSize,
             name: "configuration-values",
         });
     }

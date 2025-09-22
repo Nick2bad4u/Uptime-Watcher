@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import type { Logger } from "../../utils/interfaces";
+import type { Logger } from "@shared/utils/logger/interfaces";
 
 describe("Interfaces Utility", () => {
     describe("Logger Interface", () => {

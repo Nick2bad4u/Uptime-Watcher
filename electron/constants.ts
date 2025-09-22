@@ -8,30 +8,6 @@
  * @packageDocumentation
  */
 
-import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
-
-/**
- * Interface for cache size limits configuration.
- */
-interface CacheSizeLimitsConfig {
-    readonly CONFIGURATION_VALUES: number;
-    readonly MONITORS: number;
-    readonly SITES: number;
-    readonly TEMPORARY: number;
-    readonly VALIDATION_RESULTS: number;
-}
-
-/**
- * Interface for cache TTL configuration.
- */
-interface CacheTtlConfig {
-    readonly CONFIGURATION_VALUES: number;
-    readonly MONITORS: number;
-    readonly SITES: number;
-    readonly TEMPORARY: number;
-    readonly VALIDATION_RESULTS: number;
-}
-
 /**
  * Interface for retry backoff configuration.
  */
@@ -106,46 +82,6 @@ export const RETRY_BACKOFF: RetryBackoffConfig = Object.freeze({
  * @defaultValue 500
  */
 export const DEFAULT_HISTORY_LIMIT = 500;
-
-/**
- * Cache TTL values for standardized caching in milliseconds.
- *
- * @remarks
- * Used by ConfigurationManager and other backend services to provide consistent
- * cache expiration behavior. References shared cache configuration.
- */
-export const CACHE_TTL: CacheTtlConfig = Object.freeze({
-    /** TTL for configuration values cache. */
-    CONFIGURATION_VALUES: CACHE_CONFIG.SETTINGS.defaultTTL,
-    /** TTL for monitor data cache. */
-    MONITORS: CACHE_CONFIG.MONITORS.defaultTTL,
-    /** TTL for site data cache. */
-    SITES: CACHE_CONFIG.SITES.defaultTTL,
-    /** TTL for temporary cache operations. */
-    TEMPORARY: CACHE_CONFIG.TEMPORARY.defaultTTL,
-    /** TTL for validation results cache. */
-    VALIDATION_RESULTS: CACHE_CONFIG.VALIDATION.defaultTTL,
-});
-
-/**
- * Cache size limits for standardized caching.
- *
- * @remarks
- * Used by ConfigurationManager and other backend services to provide consistent
- * cache size constraints. References shared cache configuration.
- */
-export const CACHE_SIZE_LIMITS: CacheSizeLimitsConfig = Object.freeze({
-    /** Maximum entries for configuration values cache. */
-    CONFIGURATION_VALUES: CACHE_CONFIG.SETTINGS.maxSize,
-    /** Maximum entries for monitor data cache. */
-    MONITORS: CACHE_CONFIG.MONITORS.maxSize,
-    /** Maximum entries for site data cache. */
-    SITES: CACHE_CONFIG.SITES.maxSize,
-    /** Maximum entries for temporary cache operations. */
-    TEMPORARY: CACHE_CONFIG.TEMPORARY.maxSize,
-    /** Maximum entries for validation results cache. */
-    VALIDATION_RESULTS: CACHE_CONFIG.VALIDATION.maxSize,
-});
 
 /**
  * Main database file name.

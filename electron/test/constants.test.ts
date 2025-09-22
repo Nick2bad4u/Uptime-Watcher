@@ -7,8 +7,6 @@ import { describe, expect, it } from "vitest";
 
 import {
     BACKUP_DB_FILE_NAME,
-    CACHE_SIZE_LIMITS,
-    CACHE_TTL,
     DB_FILE_NAME,
     DEFAULT_CHECK_INTERVAL,
     DEFAULT_HISTORY_LIMIT,
@@ -182,99 +180,6 @@ describe("Electron Constants", () => {
         });
     });
 
-    describe("Cache Configuration", () => {
-        it("should export CACHE_TTL with correct structure and values", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Backend Constants", "component");
-            await annotate("Operation: Cache TTL Validation", "operation");
-            await annotate(
-                "Expected Values: 30 min config, 5 min validation",
-                "expected"
-            );
-            await annotate(
-                "Priority: Medium - Performance Configuration",
-                "priority"
-            );
-
-            expect(CACHE_TTL).toBeDefined();
-            expect(typeof CACHE_TTL).toBe("object");
-            expect(CACHE_TTL.CONFIGURATION_VALUES).toBe(1_800_000); // 30 minutes
-            expect(CACHE_TTL.VALIDATION_RESULTS).toBe(300_000); // 5 minutes
-
-            // Verify object is frozen
-            expect(Object.isFrozen(CACHE_TTL)).toBeTruthy();
-        });
-
-        it("should export CACHE_SIZE_LIMITS with correct structure and values", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Backend Constants", "component");
-            await annotate(
-                "Operation: Cache Size Limits Validation",
-                "operation"
-            );
-            await annotate(
-                "Expected Values: 100 config, 200 validation",
-                "expected"
-            );
-            await annotate("Priority: Medium - Memory Management", "priority");
-
-            expect(CACHE_SIZE_LIMITS).toBeDefined();
-            expect(typeof CACHE_SIZE_LIMITS).toBe("object");
-            expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBe(100);
-            expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBe(200);
-
-            // Verify object is frozen
-            expect(Object.isFrozen(CACHE_SIZE_LIMITS)).toBeTruthy();
-        });
-
-        it("should have reasonable cache TTL values", async ({ annotate }) => {
-            await annotate(
-                "Test Case: Cache TTL Range Validation",
-                "test-case"
-            );
-            await annotate("Valid Range: TTLs should be > 0", "range");
-            await annotate(
-                "Performance Impact: High - Affects Cache Efficiency",
-                "performance"
-            );
-
-            // All TTL values should be positive
-            expect(CACHE_TTL.CONFIGURATION_VALUES).toBeGreaterThan(0);
-            expect(CACHE_TTL.VALIDATION_RESULTS).toBeGreaterThan(0);
-
-            // Configuration TTL should be longer than validation TTL (more stable data)
-            expect(CACHE_TTL.CONFIGURATION_VALUES).toBeGreaterThan(
-                CACHE_TTL.VALIDATION_RESULTS
-            );
-        });
-
-        it("should have reasonable cache size limits", async ({ annotate }) => {
-            await annotate(
-                "Test Case: Cache Size Range Validation",
-                "test-case"
-            );
-            await annotate("Valid Range: Sizes should be > 0", "range");
-            await annotate(
-                "Memory Impact: Medium - Affects Memory Usage",
-                "memory"
-            );
-
-            // All size limits should be positive
-            expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBeGreaterThan(0);
-            expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBeGreaterThan(0);
-
-            // Size limits should be reasonable (not too large)
-            expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBeLessThanOrEqual(
-                1000
-            );
-            expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBeLessThanOrEqual(
-                1000
-            );
-        });
-    });
-
     describe("Database Configuration", () => {
         it("should export DB_FILE_NAME with correct value", async ({
             annotate,
@@ -385,8 +290,6 @@ describe("Electron Constants", () => {
 
             const constants = {
                 BACKUP_DB_FILE_NAME,
-                CACHE_SIZE_LIMITS,
-                CACHE_TTL,
                 DB_FILE_NAME,
                 DEFAULT_CHECK_INTERVAL,
                 DEFAULT_HISTORY_LIMIT,

@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, type MockedFunction } from "vitest";
-import type { Logger } from "../../utils/interfaces";
+import type { Logger } from "@shared/utils/logger/interfaces";
 
 describe("Interfaces Coverage Tests", () => {
     describe("Logger Interface Implementation", () => {

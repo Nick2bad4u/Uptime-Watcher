@@ -9,10 +9,11 @@
  * @packageDocumentation
  */
 
+import type { Logger } from "@shared/utils/logger/interfaces";
+
 import type { DatabaseService } from "../../services/database/DatabaseService";
 import type { HistoryRepository } from "../../services/database/HistoryRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
-import type { Logger } from "../interfaces";
 
 import { withDatabaseOperation } from "../operationalHooks";
 

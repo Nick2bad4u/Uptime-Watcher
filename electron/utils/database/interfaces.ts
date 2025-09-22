@@ -4,6 +4,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { Logger } from "@shared/utils/logger/interfaces";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -11,7 +12,6 @@ import type { HistoryRepository } from "../../services/database/HistoryRepositor
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../services/database/SiteRepository";
-import type { Logger } from "../interfaces";
 
 // Logger type available for internal use - external consumers should import
 // from ../interfaces

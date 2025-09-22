@@ -57,6 +57,7 @@
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { MONITOR_STATUS } from "@shared/types";
 import {
@@ -73,7 +74,6 @@ import type { SiteRepository } from "../services/database/SiteRepository";
 import type { EnhancedMonitoringServices } from "../services/monitoring/EnhancedMonitoringServiceFactory";
 import type { SiteService } from "../services/site/SiteService";
 import type { StandardizedCache } from "../utils/cache/StandardizedCache";
-import type { Logger } from "../utils/interfaces";
 
 import { DEFAULT_CHECK_INTERVAL } from "../constants";
 import { isDev } from "../electronUtils";

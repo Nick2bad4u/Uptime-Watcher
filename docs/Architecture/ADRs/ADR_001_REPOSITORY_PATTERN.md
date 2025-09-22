@@ -60,7 +60,7 @@ stateDiagram-v2
 
 ````typescript
 import { Database } from "node-sqlite3-wasm";
-import { logger } from "@shared/utils/logger";
+import type { Logger } from "@shared/utils/logger/interfaces";
 import { withDatabaseOperation } from "@electron/utils/operationalHooks";
 import type { DatabaseService } from "@electron/services/database/DatabaseService";
 

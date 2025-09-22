@@ -24,8 +24,6 @@ import {
     USER_AGENT,
     RETRY_BACKOFF,
     DEFAULT_HISTORY_LIMIT,
-    CACHE_TTL,
-    CACHE_SIZE_LIMITS,
     DB_FILE_NAME,
     DEFAULT_SITE_NAME,
     BACKUP_DB_FILE_NAME,
@@ -231,249 +229,6 @@ describe("Backend Constants", () => {
         });
     });
 
-    describe("CACHE_TTL Configuration", () => {
-        it("should export CACHE_TTL with correct structure", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Export Operation", "type");
-
-            expect(CACHE_TTL).toBeDefined();
-            expect(typeof CACHE_TTL).toBe("object");
-            expect(CACHE_TTL).toHaveProperty("CONFIGURATION_VALUES");
-            expect(CACHE_TTL).toHaveProperty("MONITORS");
-            expect(CACHE_TTL).toHaveProperty("SITES");
-            expect(CACHE_TTL).toHaveProperty("TEMPORARY");
-            expect(CACHE_TTL).toHaveProperty("VALIDATION_RESULTS");
-        });
-
-        it("should have correct CONFIGURATION_VALUES TTL", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(CACHE_TTL.CONFIGURATION_VALUES).toBe(1_800_000); // 30 minutes
-            expect(typeof CACHE_TTL.CONFIGURATION_VALUES).toBe("number");
-            expect(CACHE_TTL.CONFIGURATION_VALUES).toBeGreaterThan(0);
-        });
-
-        it("should have correct MONITORS TTL", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
-
-            expect(CACHE_TTL.MONITORS).toBe(300_000); // 5 minutes
-            expect(typeof CACHE_TTL.MONITORS).toBe("number");
-            expect(CACHE_TTL.MONITORS).toBeGreaterThan(0);
-        });
-
-        it("should have correct SITES TTL", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(CACHE_TTL.SITES).toBe(600_000); // 10 minutes
-            expect(typeof CACHE_TTL.SITES).toBe("number");
-            expect(CACHE_TTL.SITES).toBeGreaterThan(0);
-        });
-
-        it("should have correct TEMPORARY TTL", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(CACHE_TTL.TEMPORARY).toBe(300_000); // 5 minutes
-            expect(typeof CACHE_TTL.TEMPORARY).toBe("number");
-            expect(CACHE_TTL.TEMPORARY).toBeGreaterThan(0);
-        });
-
-        it("should have correct VALIDATION_RESULTS TTL", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Validation", "type");
-
-            expect(CACHE_TTL.VALIDATION_RESULTS).toBe(300_000); // 5 minutes
-            expect(typeof CACHE_TTL.VALIDATION_RESULTS).toBe("number");
-            expect(CACHE_TTL.VALIDATION_RESULTS).toBeGreaterThan(0);
-        });
-
-        it("should be frozen to prevent modification", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Event Processing", "type");
-
-            expect(Object.isFrozen(CACHE_TTL)).toBeTruthy();
-        });
-
-        it("should have reasonable TTL values for different cache types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Caching", "type");
-
-            // Configuration values should have longer TTL than validation results
-            expect(CACHE_TTL.CONFIGURATION_VALUES).toBeGreaterThan(
-                CACHE_TTL.VALIDATION_RESULTS
-            );
-
-            // Both should be reasonable for caching
-            expect(CACHE_TTL.VALIDATION_RESULTS).toBeGreaterThan(60_000); // At least 1 minute
-            expect(CACHE_TTL.CONFIGURATION_VALUES).toBeLessThan(3_600_000); // Less than 1 hour
-        });
-
-        it("should convert to human-readable time units correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            // Test that the values represent expected time units
-            expect(CACHE_TTL.VALIDATION_RESULTS / 60_000).toBe(5); // 5 minutes
-            expect(CACHE_TTL.CONFIGURATION_VALUES / 60_000).toBe(30); // 30 minutes
-        });
-    });
-
-    describe("CACHE_SIZE_LIMITS Configuration", () => {
-        it("should export CACHE_SIZE_LIMITS with correct structure", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Export Operation", "type");
-
-            expect(CACHE_SIZE_LIMITS).toBeDefined();
-            expect(typeof CACHE_SIZE_LIMITS).toBe("object");
-            expect(CACHE_SIZE_LIMITS).toHaveProperty("CONFIGURATION_VALUES");
-            expect(CACHE_SIZE_LIMITS).toHaveProperty("MONITORS");
-            expect(CACHE_SIZE_LIMITS).toHaveProperty("SITES");
-            expect(CACHE_SIZE_LIMITS).toHaveProperty("TEMPORARY");
-            expect(CACHE_SIZE_LIMITS).toHaveProperty("VALIDATION_RESULTS");
-        });
-
-        it("should have correct CONFIGURATION_VALUES limit", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Configuration", "type");
-
-            expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBe(100);
-            expect(typeof CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBe(
-                "number"
-            );
-            expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBeGreaterThan(0);
-        });
-
-        it("should have correct VALIDATION_RESULTS limit", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Validation", "type");
-
-            expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBe(200);
-            expect(typeof CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBe("number");
-            expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBeGreaterThan(0);
-        });
-
-        it("should have correct MONITORS limit", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
-
-            expect(CACHE_SIZE_LIMITS.MONITORS).toBe(1000);
-            expect(typeof CACHE_SIZE_LIMITS.MONITORS).toBe("number");
-            expect(CACHE_SIZE_LIMITS.MONITORS).toBeGreaterThan(0);
-        });
-
-        it("should have correct SITES limit", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Configuration", "type");
-
-            expect(CACHE_SIZE_LIMITS.SITES).toBe(500);
-            expect(typeof CACHE_SIZE_LIMITS.SITES).toBe("number");
-            expect(CACHE_SIZE_LIMITS.SITES).toBeGreaterThan(0);
-        });
-
-        it("should have correct TEMPORARY limit", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Configuration", "type");
-
-            expect(CACHE_SIZE_LIMITS.TEMPORARY).toBe(1000);
-            expect(typeof CACHE_SIZE_LIMITS.TEMPORARY).toBe("number");
-            expect(CACHE_SIZE_LIMITS.TEMPORARY).toBeGreaterThan(0);
-        });
-
-        it("should be frozen to prevent modification", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Event Processing", "type");
-
-            expect(Object.isFrozen(CACHE_SIZE_LIMITS)).toBeTruthy();
-        });
-
-        it("should have reasonable size limits for memory efficiency", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Configuration", "type");
-
-            // Configuration values cache should be smaller (less frequently changing)
-            expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBeLessThan(
-                CACHE_SIZE_LIMITS.VALIDATION_RESULTS
-            );
-
-            // Both should be reasonable for memory usage
-            expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBeGreaterThan(10);
-            expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBeLessThan(1000);
-        });
-    });
-
     describe("Database Constants", () => {
         it("should export DB_FILE_NAME with correct value", async ({
             task,
@@ -595,8 +350,6 @@ describe("Backend Constants", () => {
 
             // Object constants
             expect(typeof RETRY_BACKOFF).toBe("object");
-            expect(typeof CACHE_TTL).toBe("object");
-            expect(typeof CACHE_SIZE_LIMITS).toBe("object");
         });
 
         it("should have all object constants frozen", async ({
@@ -609,8 +362,6 @@ describe("Backend Constants", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(Object.isFrozen(RETRY_BACKOFF)).toBeTruthy();
-            expect(Object.isFrozen(CACHE_TTL)).toBeTruthy();
-            expect(Object.isFrozen(CACHE_SIZE_LIMITS)).toBeTruthy();
         });
 
         it("should not allow modification of frozen objects", async ({
@@ -646,11 +397,6 @@ describe("Backend Constants", () => {
             expect(DEFAULT_CHECK_INTERVAL).toBeGreaterThan(
                 DEFAULT_REQUEST_TIMEOUT * 10
             );
-
-            // Cache TTLs should be reasonable (validation cache is equal to check interval)
-            expect(CACHE_TTL.VALIDATION_RESULTS).toBeGreaterThanOrEqual(
-                DEFAULT_CHECK_INTERVAL
-            );
         });
 
         it("should have all constants properly exported", async ({
@@ -669,15 +415,13 @@ describe("Backend Constants", () => {
                 "USER_AGENT",
                 "RETRY_BACKOFF",
                 "DEFAULT_HISTORY_LIMIT",
-                "CACHE_TTL",
-                "CACHE_SIZE_LIMITS",
                 "DB_FILE_NAME",
                 "DEFAULT_SITE_NAME",
                 "BACKUP_DB_FILE_NAME",
             ];
 
             // This test ensures we've covered all exported constants
-            expect(expectedExports).toHaveLength(10);
+            expect(expectedExports).toHaveLength(8);
         });
 
         it("should use consistent naming conventions", async ({
@@ -696,8 +440,6 @@ describe("Backend Constants", () => {
                 "USER_AGENT",
                 "RETRY_BACKOFF",
                 "DEFAULT_HISTORY_LIMIT",
-                "CACHE_TTL",
-                "CACHE_SIZE_LIMITS",
                 "DB_FILE_NAME",
                 "DEFAULT_SITE_NAME",
                 "BACKUP_DB_FILE_NAME",
@@ -760,27 +502,6 @@ describe("Backend Constants", () => {
 
             // Total retry time should be reasonable (less than 30 seconds)
             expect(totalTime).toBeLessThan(30_000);
-        });
-
-        it("should have cache configurations that balance performance and freshness", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Caching", "type");
-
-            // Validation cache should refresh more frequently than configuration cache
-            expect(CACHE_TTL.VALIDATION_RESULTS).toBeLessThan(
-                CACHE_TTL.CONFIGURATION_VALUES
-            );
-
-            // Size limits should prevent excessive memory usage
-            const totalCacheSlots =
-                CACHE_SIZE_LIMITS.CONFIGURATION_VALUES +
-                CACHE_SIZE_LIMITS.VALIDATION_RESULTS;
-            expect(totalCacheSlots).toBeLessThan(500); // Reasonable total cache size
         });
     });
 });

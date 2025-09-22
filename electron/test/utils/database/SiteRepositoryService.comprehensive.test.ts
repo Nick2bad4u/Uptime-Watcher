@@ -19,7 +19,7 @@ import type { SettingsRepository } from "../../../services/database/SettingsRepo
 import type { SiteRepository } from "../../../services/database/SiteRepository";
 import type { SiteRow } from "../../../services/database/utils/siteMapper";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
-import type { Logger } from "../../../utils/interfaces";
+import type { Logger } from "@shared/utils/logger/interfaces";
 import type {
     MonitoringConfig,
     SiteLoadingConfig,

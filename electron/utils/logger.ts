@@ -20,9 +20,9 @@
  * @packageDocumentation
  */
 
-import log from "electron-log/main";
+import type { Logger } from "@shared/utils/logger/interfaces";
 
-import type { Logger } from "./interfaces";
+import log from "electron-log/main";
 
 /**
  * Creates a logger with a specific prefix for categorization.

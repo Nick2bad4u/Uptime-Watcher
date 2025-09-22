@@ -21,7 +21,7 @@ import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
 import type { MonitorRepository } from "../../../services/database/MonitorRepository";
 import type { SiteRepository } from "../../../services/database/SiteRepository";
-import type { Logger } from "../../../utils/interfaces";
+import type { Logger } from "@shared/utils/logger/interfaces";
 import type { MonitoringConfig } from "../../../utils/database/interfaces";
 
 // Helper function to create complete Monitor objects

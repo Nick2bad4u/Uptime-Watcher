@@ -34,6 +34,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { getErrorMessage } from "@shared/utils/errorUtils";
 
@@ -45,7 +46,6 @@ import type { SettingsRepository } from "../../services/database/SettingsReposit
 import type { SiteRepository } from "../../services/database/SiteRepository";
 import type { SiteRow } from "../../services/database/utils/siteMapper";
 import type { StandardizedCache } from "../cache/StandardizedCache";
-import type { Logger } from "../interfaces";
 import type { MonitoringConfig, SiteLoadingConfig } from "./interfaces";
 
 import { DEFAULT_SITE_NAME } from "../../constants";

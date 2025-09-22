@@ -7,6 +7,7 @@
  */
 
 import type { Site, StatusHistory } from "@shared/types";
+import type { Logger } from "@shared/utils/logger/interfaces";
 import type { Database } from "node-sqlite3-wasm";
 import type { UnknownRecord } from "type-fest";
 
@@ -23,7 +24,6 @@ import type { HistoryRepository } from "../../services/database/HistoryRepositor
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../services/database/SiteRepository";
-import type { Logger } from "../interfaces";
 
 import { withDatabaseOperation } from "../operationalHooks";
 import { SiteLoadingError } from "./interfaces";

@@ -5,7 +5,9 @@
  * Contains common interface definitions used across multiple utility files
  * providing consistent contracts for logging, error handling, and operations.
  * These interfaces ensure standardized behavior patterns throughout the backend
- * service layer.
+ * service layer. Logger interfaces are now imported from
+ * shared/utils/logger/interfaces to ensure consistency between frontend and
+ * backend logging.
  *
  * Key interfaces:
  *
@@ -17,7 +19,7 @@
  * @example
  *
  * ```typescript
- * import { Logger } from "./interfaces";
+ * import { Logger } from "@shared/utils/logger/interfaces";
  *
  * class MyUtility {
  *     constructor(private logger: Logger) {}
@@ -38,49 +40,17 @@
  * @packageDocumentation
  */
 
+// This file serves as documentation for interface usage in the backend.
+// All logger interfaces are now imported from @shared/utils/logger/interfaces
+// to ensure consistency between frontend and backend logging.
+//
+// For logger interfaces, import directly from the shared module:
+// import type { Logger } from "@shared/utils/logger/interfaces";
+
 /**
- * Standardized logging interface used throughout utilities.
- *
- * @remarks
- * Provides consistent logging patterns and error reporting across all utility
- * modules. All logging methods accept a message string followed by optional
- * additional arguments for structured logging and context information.
+ * Placeholder export to satisfy module requirements. All actual logger
+ * interfaces are now defined in the shared module at
+ * shared/utils/logger/interfaces.
  */
-export interface Logger {
-    /**
-     * Log debug information for development and troubleshooting.
-     *
-     * @param message - The debug message to log
-     * @param args - Additional arguments for context
-     */
-    debug: (message: string, ...args: unknown[]) => void;
-
-    /**
-     * Log error messages with optional error objects.
-     *
-     * @remarks
-     * When an Error object is provided, the logger should extract and format
-     * the error message and stack trace appropriately for debugging.
-     *
-     * @param message - The error message to log
-     * @param error - Optional error object or additional context
-     * @param args - Additional arguments for context
-     */
-    error: (message: string, error?: unknown, ...args: unknown[]) => void;
-
-    /**
-     * Log general informational messages.
-     *
-     * @param message - The information message to log
-     * @param args - Additional arguments for context
-     */
-    info: (message: string, ...args: unknown[]) => void;
-
-    /**
-     * Log warning messages for potential issues.
-     *
-     * @param message - The warning message to log
-     * @param args - Additional arguments for context
-     */
-    warn: (message: string, ...args: unknown[]) => void;
-}
+export const BACKEND_INTERFACES_DOC: string =
+    "Use @shared/utils/logger/interfaces for logger types";
