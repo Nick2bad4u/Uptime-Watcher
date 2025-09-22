@@ -1,8 +1,8 @@
 /**
  * Site Repository Performance Benchmarks
  *
- * @file Performance benchmarks for site repository operations including CRUD
- *   operations, bulk operations, and query performance.
+ * @file Performance benchmarks for site repository operations using real
+ *   SiteRepository implementation with mock database for performance testing.
  *
  * @author GitHub Copilot
  *
@@ -10,264 +10,410 @@
  *
  * @category Performance
  *
+ * @updated 2025-09-22 - Updated to use real SiteRepository implementation
+ *
  * @benchmark Database-SiteRepository
  *
  * @tags ["performance", "database", "repository", "sites", "crud"]
  */
 
-import { bench, describe } from "vitest";
+import { bench, describe, beforeEach, vi } from "vitest";
+import { SiteRepository } from "../../electron/services/database/SiteRepository";
+import type { DatabaseService } from "../../electron/services/database/DatabaseService";
+import type { SiteRow } from "../../electron/services/database/utils/siteMapper";
+import type { Database } from "node-sqlite3-wasm";
+import { randomUUID } from "node:crypto";
 
-// Mock database connection
+// Mock database that simulates real database operations but with in-memory performance
 class MockDatabase {
-    private sites: any[] = [];
-    private nextId = 1;
+    private sites = new Map<string, SiteRow>();
 
-    prepare(sql: string) {
-        return {
-            run: (...params: any[]) => {
-                if (sql.includes("INSERT")) {
-                    const site = { id: this.nextId++, ...params };
-                    this.sites.push(site);
-                    return { lastInsertRowid: site.id };
-                }
-                if (sql.includes("UPDATE")) {
-                    const index = this.sites.findIndex(
-                        (s) => s.id === params.at(-1)
-                    );
-                    if (index !== -1) {
-                        this.sites[index] = { ...this.sites[index], ...params };
-                    }
-                    return { changes: index === -1 ? 0 : 1 };
-                }
-                if (sql.includes("DELETE")) {
-                    const index = this.sites.findIndex(
-                        (s) => s.id === params[0]
-                    );
-                    if (index !== -1) {
-                        this.sites.splice(index, 1);
-                    }
-                    return { changes: index === -1 ? 0 : 1 };
-                }
-                return {};
-            },
-            get: (...params: any[]) => {
-                if (sql.includes("SELECT") && params.length > 0) {
-                    return this.sites.find((s) => s.id === params[0]);
-                }
-                return this.sites[0];
-            },
-            all: () => this.sites,
-        };
+    all(query: string): SiteRow[] {
+        if (query.includes("SELECT")) {
+            return Array.from(this.sites.values());
+        }
+        return [];
     }
 
-    exec(sql: string) {
+    get(query: string, params: string[]): SiteRow | undefined {
+        if (query.includes("SELECT") && params.length > 0) {
+            return this.sites.get(params[0]);
+        }
+        return undefined;
+    }
+
+    run(query: string, params: string[]): { changes: number } {
+        if (query.includes("INSERT") || query.includes("REPLACE")) {
+            const [
+                identifier,
+                name,
+                monitoring,
+            ] = params;
+            this.sites.set(identifier, {
+                identifier,
+                name,
+                monitoring: monitoring === "1" || monitoring === "true",
+            });
+            return { changes: 1 };
+        }
+        if (query.includes("DELETE")) {
+            const deleted = this.sites.delete(params[0]);
+            return { changes: deleted ? 1 : 0 };
+        }
+        return { changes: 0 };
+    }
+
+    exec(query: string): this {
+        if (query.includes("DELETE FROM sites")) {
+            this.sites.clear();
+        }
         return this;
     }
 }
 
-// Mock SiteRepository
-class MockSiteRepository {
-    private db: MockDatabase;
+// Data generators for realistic benchmarking data
+function generateSiteData(index: number): SiteRow {
+    return {
+        identifier: `site-${index}-${randomUUID()}`,
+        name: `Performance Test Site ${index}`,
+        monitoring: Math.random() > 0.3, // 70% enabled
+    };
+}
 
-    constructor() {
-        this.db = new MockDatabase();
-        this.initialize();
-    }
-
-    private initialize() {
-        // Seed with test data
-        for (let i = 0; i < 1000; i++) {
-            this.create({
-                name: `Site ${i}`,
-                url: `https://example${i}.com`,
-                isActive: Math.random() > 0.5,
-                checkInterval: 60_000,
-                timeout: 5000,
-                metadata: JSON.stringify({ type: "test", priority: i % 5 }),
-            });
-        }
-    }
-
-    create(site: any) {
-        const stmt = this.db.prepare(`
-            INSERT INTO sites (name, url, isActive, checkInterval, timeout, metadata)
-            VALUES (?, ?, ?, ?, ?, ?)
-        `);
-        return stmt.run(
-            site.name,
-            site.url,
-            site.isActive,
-            site.checkInterval,
-            site.timeout,
-            site.metadata
-        );
-    }
-
-    findById(id: number) {
-        const stmt = this.db.prepare("SELECT * FROM sites WHERE id = ?");
-        return stmt.get(id);
-    }
-
-    findAll() {
-        const stmt = this.db.prepare("SELECT * FROM sites");
-        return stmt.all();
-    }
-
-    findActive() {
-        const stmt = this.db.prepare("SELECT * FROM sites WHERE isActive = 1");
-        return stmt.all();
-    }
-
-    update(id: number, updates: any) {
-        const stmt = this.db.prepare(`
-            UPDATE sites SET name = ?, url = ?, isActive = ?, checkInterval = ?, timeout = ?, metadata = ?
-            WHERE id = ?
-        `);
-        return stmt.run(
-            updates.name,
-            updates.url,
-            updates.isActive,
-            updates.checkInterval,
-            updates.timeout,
-            updates.metadata,
-            id
-        );
-    }
-
-    delete(id: number) {
-        const stmt = this.db.prepare("DELETE FROM sites WHERE id = ?");
-        return stmt.run(id);
-    }
-
-    bulkCreate(sites: any[]) {
-        const stmt = this.db.prepare(`
-            INSERT INTO sites (name, url, isActive, checkInterval, timeout, metadata)
-            VALUES (?, ?, ?, ?, ?, ?)
-        `);
-        return sites.map((site) =>
-            stmt.run(
-                site.name,
-                site.url,
-                site.isActive,
-                site.checkInterval,
-                site.timeout,
-                site.metadata
-            )
-        );
-    }
-
-    search(query: string) {
-        const stmt = this.db.prepare(
-            "SELECT * FROM sites WHERE name LIKE ? OR url LIKE ?"
-        );
-        return stmt.all();
-    }
+function generateBulkSiteData(count: number): SiteRow[] {
+    return Array.from({ length: count }, (_, i) => generateSiteData(i));
 }
 
 describe("Site Repository Performance", () => {
-    let repository: MockSiteRepository;
+    let repository: SiteRepository;
+    let mockDatabase: MockDatabase;
+    let mockDatabaseService: DatabaseService;
 
-    bench(
-        "repository initialization",
-        () => {
-            repository = new MockSiteRepository();
-        },
-        { warmupIterations: 10, iterations: 100 }
-    );
+    beforeEach(() => {
+        // Create mock database
+        mockDatabase = new MockDatabase();
 
-    bench(
-        "create single site",
-        () => {
-            repository = new MockSiteRepository();
-            repository.create({
-                name: "Test Site",
-                url: "https://test.com",
-                isActive: true,
-                checkInterval: 60_000,
-                timeout: 5000,
-                metadata: JSON.stringify({ type: "test" }),
-            });
-        },
-        { warmupIterations: 5, iterations: 1000 }
-    );
+        // Create mock database service
+        mockDatabaseService = {
+            getDatabase: () => mockDatabase as unknown as Database,
+            executeTransaction: async (
+                callback: (db: Database) => Promise<unknown>
+            ) => callback(mockDatabase as unknown as Database),
+            initialize: vi.fn(),
+            close: vi.fn(),
+            isInitialized: vi.fn().mockReturnValue(true),
+        } as unknown as DatabaseService;
 
+        // Initialize real repository with mock database service
+        repository = new SiteRepository({
+            databaseService: mockDatabaseService,
+        });
+    });
+
+    // Basic CRUD Operations
     bench(
-        "find site by id",
-        () => {
-            repository = new MockSiteRepository();
-            repository.findById(Math.floor(Math.random() * 1000) + 1);
+        "Single site creation (upsert)",
+        async () => {
+            const siteData = generateSiteData(Date.now());
+            await repository.upsert(siteData);
         },
         { warmupIterations: 5, iterations: 10_000 }
     );
 
     bench(
-        "find all sites",
-        () => {
-            repository = new MockSiteRepository();
-            repository.findAll();
+        "Single site lookup by identifier",
+        async () => {
+            // Pre-populate with test data
+            const testSites = generateBulkSiteData(1000);
+            await repository.bulkInsert(testSites);
+
+            // Benchmark lookup
+            const randomSite =
+                testSites[Math.floor(Math.random() * testSites.length)];
+            await repository.findByIdentifier(randomSite.identifier);
         },
-        { warmupIterations: 5, iterations: 100 }
+        { warmupIterations: 10, iterations: 50_000 }
     );
 
     bench(
-        "find active sites",
-        () => {
-            repository = new MockSiteRepository();
-            repository.findActive();
+        "Check site existence",
+        async () => {
+            // Pre-populate with test data
+            const testSites = generateBulkSiteData(1000);
+            await repository.bulkInsert(testSites);
+
+            // Benchmark existence check
+            const randomSite =
+                testSites[Math.floor(Math.random() * testSites.length)];
+            await repository.exists(randomSite.identifier);
         },
-        { warmupIterations: 5, iterations: 500 }
+        { warmupIterations: 10, iterations: 50_000 }
     );
 
     bench(
-        "update site",
-        () => {
-            repository = new MockSiteRepository();
-            const id = Math.floor(Math.random() * 1000) + 1;
-            repository.update(id, {
-                name: "Updated Site",
-                url: "https://updated.com",
-                isActive: false,
-                checkInterval: 120_000,
-                timeout: 10_000,
-                metadata: JSON.stringify({ type: "updated" }),
-            });
+        "Find all sites - Small dataset (100 sites)",
+        async () => {
+            // Pre-populate with test data
+            const testSites = generateBulkSiteData(100);
+            await repository.bulkInsert(testSites);
+
+            // Benchmark find all
+            await repository.findAll();
+        },
+        { warmupIterations: 5, iterations: 10_000 }
+    );
+
+    bench(
+        "Find all sites - Medium dataset (1K sites)",
+        async () => {
+            // Pre-populate with test data
+            const testSites = generateBulkSiteData(1000);
+            await repository.bulkInsert(testSites);
+
+            // Benchmark find all
+            await repository.findAll();
+        },
+        { warmupIterations: 3, iterations: 1000 }
+    );
+
+    bench(
+        "Find all sites - Large dataset (10K sites)",
+        async () => {
+            // Pre-populate with test data
+            const testSites = generateBulkSiteData(10_000);
+            await repository.bulkInsert(testSites);
+
+            // Benchmark find all
+            await repository.findAll();
+        },
+        { warmupIterations: 2, iterations: 100 }
+    );
+
+    // Bulk Operations
+    bench(
+        "Bulk insert - Small batch (100 sites)",
+        async () => {
+            const testSites = generateBulkSiteData(100);
+            await repository.bulkInsert(testSites);
         },
         { warmupIterations: 5, iterations: 1000 }
     );
 
     bench(
-        "delete site",
-        () => {
-            repository = new MockSiteRepository();
-            const id = Math.floor(Math.random() * 1000) + 1;
-            repository.delete(id);
+        "Bulk insert - Medium batch (1K sites)",
+        async () => {
+            const testSites = generateBulkSiteData(1000);
+            await repository.bulkInsert(testSites);
+        },
+        { warmupIterations: 3, iterations: 100 }
+    );
+
+    bench(
+        "Bulk insert - Large batch (10K sites)",
+        async () => {
+            const testSites = generateBulkSiteData(10_000);
+            await repository.bulkInsert(testSites);
+        },
+        { warmupIterations: 2, iterations: 10 }
+    );
+
+    // Update Operations
+    bench(
+        "Site upsert operations - Mixed create/update",
+        async () => {
+            // Pre-populate with initial data
+            const initialSites = generateBulkSiteData(500);
+            await repository.bulkInsert(initialSites);
+
+            // Perform mixed upsert operations
+            for (let i = 0; i < 100; i++) {
+                const isUpdate = Math.random() < 0.5;
+                if (isUpdate) {
+                    // 50% updates to existing sites
+                    const existingSite =
+                        initialSites[
+                            Math.floor(Math.random() * initialSites.length)
+                        ];
+                    await repository.upsert({
+                        identifier: existingSite.identifier,
+                        name: `Updated ${existingSite.name}`,
+                        monitoring: !existingSite.monitoring,
+                    });
+                } else {
+                    // 50% new sites
+                    const newSite = generateSiteData(i + 1000);
+                    await repository.upsert(newSite);
+                }
+            }
+        },
+        { warmupIterations: 3, iterations: 100 }
+    );
+
+    // Delete Operations
+    bench(
+        "Single site deletion",
+        async () => {
+            // Pre-populate with test data
+            const testSites = generateBulkSiteData(1000);
+            await repository.bulkInsert(testSites);
+
+            // Benchmark deletion
+            const randomSite =
+                testSites[Math.floor(Math.random() * testSites.length)];
+            await repository.delete(randomSite.identifier);
+        },
+        { warmupIterations: 5, iterations: 10_000 }
+    );
+
+    bench(
+        "Bulk deletion - Delete all sites",
+        async () => {
+            // Pre-populate with test data
+            const testSites = generateBulkSiteData(1000);
+            await repository.bulkInsert(testSites);
+
+            // Benchmark delete all
+            await repository.deleteAll();
+        },
+        { warmupIterations: 3, iterations: 1000 }
+    );
+
+    // Export Operations
+    bench(
+        "Export all sites - Small dataset (100 sites)",
+        async () => {
+            // Pre-populate with test data
+            const testSites = generateBulkSiteData(100);
+            await repository.bulkInsert(testSites);
+
+            // Benchmark export
+            await repository.exportAll();
+        },
+        { warmupIterations: 5, iterations: 10_000 }
+    );
+
+    bench(
+        "Export all sites - Medium dataset (1K sites)",
+        async () => {
+            // Pre-populate with test data
+            const testSites = generateBulkSiteData(1000);
+            await repository.bulkInsert(testSites);
+
+            // Benchmark export
+            await repository.exportAll();
+        },
+        { warmupIterations: 3, iterations: 1000 }
+    );
+
+    bench(
+        "Export all sites - Large dataset (10K sites)",
+        async () => {
+            // Pre-populate with test data
+            const testSites = generateBulkSiteData(10_000);
+            await repository.bulkInsert(testSites);
+
+            // Benchmark export
+            await repository.exportAll();
+        },
+        { warmupIterations: 2, iterations: 100 }
+    );
+
+    // Memory and Performance Under Load
+    bench(
+        "Repository memory usage - Rapid operations",
+        async () => {
+            // Simulate rapid repository operations
+            for (let i = 0; i < 50; i++) {
+                const siteData = generateSiteData(i);
+                await repository.upsert(siteData);
+
+                // Alternate between create and read operations
+                const operation =
+                    i % 2 === 0
+                        ? repository.findAll()
+                        : repository.exists(siteData.identifier);
+                await operation;
+            }
+        },
+        { warmupIterations: 3, iterations: 1000 }
+    );
+
+    // Concurrent Operation Simulation
+    bench(
+        "Concurrent site operations simulation",
+        async () => {
+            // Simulate concurrent operations using Promise.all
+            const operations = [];
+
+            for (let i = 0; i < 20; i++) {
+                if (i % 3 === 0) {
+                    // Create operations
+                    operations.push(repository.upsert(generateSiteData(i)));
+                } else if (i % 3 === 1) {
+                    // Read operations
+                    operations.push(repository.findAll());
+                } else {
+                    // Existence checks
+                    operations.push(repository.exists(`site-${i}`));
+                }
+            }
+
+            await Promise.all(operations);
+        },
+        { warmupIterations: 3, iterations: 1000 }
+    );
+
+    // Edge Cases and Error Handling
+    bench(
+        "Repository error handling - Invalid operations",
+        async () => {
+            try {
+                // Test various edge cases
+                await repository.findByIdentifier("");
+                await repository.exists("");
+                await repository.bulkInsert([]);
+            } catch {
+                // Expected to handle errors gracefully
+            }
+        },
+        { warmupIterations: 5, iterations: 10_000 }
+    );
+
+    // Transaction Simulation
+    bench(
+        "Transaction overhead simulation",
+        async () => {
+            // Simulate transaction by performing multiple operations
+            const sites = generateBulkSiteData(50);
+            await repository.bulkInsert(sites);
+
+            // Verify all sites were inserted
+            const allSites = await repository.findAll();
+
+            // Clean up
+            await repository.deleteAll();
+
+            // Verify deletion
+            await repository.findAll();
+        },
+        { warmupIterations: 3, iterations: 500 }
+    );
+
+    // High-frequency operations
+    bench(
+        "High-frequency lookups",
+        async () => {
+            // Pre-populate with test data
+            const testSites = generateBulkSiteData(100);
+            await repository.bulkInsert(testSites);
+
+            // Perform rapid lookups
+            for (let i = 0; i < 100; i++) {
+                const randomSite =
+                    testSites[Math.floor(Math.random() * testSites.length)];
+                await repository.findByIdentifier(randomSite.identifier);
+            }
         },
         { warmupIterations: 5, iterations: 1000 }
-    );
-
-    bench(
-        "bulk create sites (100 sites)",
-        () => {
-            repository = new MockSiteRepository();
-            const sites = Array.from({ length: 100 }, (_, i) => ({
-                name: `Bulk Site ${i}`,
-                url: `https://bulk${i}.com`,
-                isActive: true,
-                checkInterval: 60_000,
-                timeout: 5000,
-                metadata: JSON.stringify({ type: "bulk" }),
-            }));
-            repository.bulkCreate(sites);
-        },
-        { warmupIterations: 2, iterations: 50 }
-    );
-
-    bench(
-        "search sites",
-        () => {
-            repository = new MockSiteRepository();
-            repository.search("Site");
-        },
-        { warmupIterations: 5, iterations: 500 }
     );
 });

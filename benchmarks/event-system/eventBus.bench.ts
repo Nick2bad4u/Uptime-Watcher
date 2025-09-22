@@ -1,7 +1,8 @@
 /**
  * Event Bus Performance Benchmarks
  *
- * @file Performance benchmarks for TypedEventBus operations.
+ * @file Performance benchmarks for TypedEventBus operations using real
+ *   implementation.
  *
  * @author GitHub Copilot
  *
@@ -9,101 +10,31 @@
  *
  * @category Performance
  *
+ * @updated 2025-09-22 - Updated to use real TypedEventBus implementation
+ *
  * @benchmark Event-EventBus
  *
  * @tags ["performance", "events", "event-bus", "messaging"]
  */
 
 import { bench, describe } from "vitest";
+import { TypedEventBus } from "../../electron/events/TypedEventBus";
+import type { UptimeEvents } from "../../electron/events/eventTypes";
 
-interface EventData {
-    id: string;
-    timestamp: number;
-    payload: any;
-}
-
-class MockTypedEventBus {
-    private listeners = new Map<string, Function[]>();
-    private middleware: Function[] = [];
-    private eventHistory: EventData[] = [];
-
-    on(eventType: string, listener: Function): void {
-        if (!this.listeners.has(eventType)) {
-            this.listeners.set(eventType, []);
-        }
-        this.listeners.get(eventType)!.push(listener);
-    }
-
-    off(eventType: string, listener: Function): void {
-        const listeners = this.listeners.get(eventType);
-        if (listeners) {
-            const index = listeners.indexOf(listener);
-            if (index !== -1) {
-                listeners.splice(index, 1);
-            }
-        }
-    }
-
-    emit(eventType: string, data: any): void {
-        const eventData: EventData = {
-            id: `event-${Date.now()}-${Math.random()}`,
-            timestamp: Date.now(),
-            payload: data,
-        };
-
-        // Apply middleware
-        let processedData = eventData;
-        for (const middleware of this.middleware) {
-            processedData = middleware(processedData);
-        }
-
-        // Store in history
-        this.eventHistory.push(processedData);
-        if (this.eventHistory.length > 1000) {
-            this.eventHistory.shift();
-        }
-
-        // Notify listeners
-        const listeners = this.listeners.get(eventType);
-        if (listeners) {
-            for (const listener of listeners) {
-                try {
-                    listener(processedData.payload);
-                } catch (error) {
-                    console.error("Event listener error:", error);
-                }
-            }
-        }
-    }
-
-    addMiddleware(middleware: Function): void {
-        this.middleware.push(middleware);
-    }
-
-    removeAllListeners(eventType?: string): void {
-        if (eventType) {
-            this.listeners.delete(eventType);
-        } else {
-            this.listeners.clear();
-        }
-    }
-
-    getListenerCount(eventType: string): number {
-        return this.listeners.get(eventType)?.length || 0;
-    }
-
-    getAllEvents(): EventData[] {
-        return [...this.eventHistory];
-    }
+// Real event interfaces from the actual codebase
+interface TestEventTypes extends UptimeEvents {
+    "benchmark:test": { id: string; payload: any; timestamp: number };
+    "benchmark:heavy": { data: any[]; processing: boolean };
+    "benchmark:simple": { message: string };
 }
 
 describe("Event Bus Performance", () => {
-    let eventBus: MockTypedEventBus;
+    let eventBus: TypedEventBus<TestEventTypes>;
 
     bench(
         "event bus initialization",
         () => {
-            eventBus = new MockTypedEventBus();
+            eventBus = new TypedEventBus<TestEventTypes>("benchmark-bus");
         },
         { warmupIterations: 10, iterations: 1000 }
     );
@@ -111,8 +42,8 @@ describe("Event Bus Performance", () => {
     bench(
         "register single listener",
         () => {
-            eventBus = new MockTypedEventBus();
-            eventBus.on("test-event", () => {});
+            eventBus = new TypedEventBus<TestEventTypes>("benchmark-bus");
+            eventBus.onTyped("benchmark:simple", () => {});
         },
         { warmupIterations: 10, iterations: 10_000 }
     );
@@ -120,9 +51,13 @@ describe("Event Bus Performance", () => {
     bench(
         "register multiple listeners",
         () => {
-            eventBus = new MockTypedEventBus();
-            for (let i = 0; i < 10; i++) {
-                eventBus.on(`event-${i}`, () => {});
+            eventBus = new TypedEventBus<TestEventTypes>("benchmark-bus");
+            eventBus.onTyped("benchmark:test", () => {});
+            eventBus.onTyped("benchmark:simple", () => {});
+            eventBus.onTyped("benchmark:heavy", () => {});
+            // Add more listeners for realistic testing
+            for (let i = 0; i < 7; i++) {
+                eventBus.onTyped("benchmark:simple", () => {});
             }
         },
         { warmupIterations: 10, iterations: 1000 }
@@ -131,8 +66,8 @@ describe("Event Bus Performance", () => {
     bench(
         "emit event with no listeners",
         () => {
-            eventBus = new MockTypedEventBus();
-            eventBus.emit("non-existent-event", { data: "test" });
+            eventBus = new TypedEventBus<TestEventTypes>("benchmark-bus");
+            eventBus.emitTyped("benchmark:simple", { message: "test" });
         },
         { warmupIterations: 10, iterations: 10_000 }
     );
@@ -140,9 +75,9 @@ describe("Event Bus Performance", () => {
     bench(
         "emit event with single listener",
         () => {
-            eventBus = new MockTypedEventBus();
-            eventBus.on("test-event", () => {});
-            eventBus.emit("test-event", { data: "test" });
+            eventBus = new TypedEventBus<TestEventTypes>("benchmark-bus");
+            eventBus.onTyped("benchmark:simple", () => {});
+            eventBus.emitTyped("benchmark:simple", { message: "test" });
         },
         { warmupIterations: 10, iterations: 5000 }
     );
@@ -150,11 +85,11 @@ describe("Event Bus Performance", () => {
     bench(
         "emit event with multiple listeners",
         () => {
-            eventBus = new MockTypedEventBus();
+            eventBus = new TypedEventBus<TestEventTypes>("benchmark-bus");
             for (let i = 0; i < 10; i++) {
-                eventBus.on("test-event", () => {});
+                eventBus.onTyped("benchmark:simple", () => {});
             }
-            eventBus.emit("test-event", { data: "test" });
+            eventBus.emitTyped("benchmark:simple", { message: "test" });
         },
         { warmupIterations: 10, iterations: 2000 }
     );
@@ -162,17 +97,21 @@ describe("Event Bus Performance", () => {
     bench(
         "emit events with middleware",
         () => {
-            eventBus = new MockTypedEventBus();
-            eventBus.addMiddleware((data: EventData) => ({
-                ...data,
-                processed: true,
-            }));
-            eventBus.addMiddleware((data: EventData) => ({
-                ...data,
+            eventBus = new TypedEventBus<TestEventTypes>("benchmark-bus");
+            eventBus.addMiddleware(async (eventName, data, next) => {
+                // Process the data and continue to next middleware
+                await next();
+            });
+            eventBus.addMiddleware(async (eventName, data, next) => {
+                // Another middleware layer
+                await next();
+            });
+            eventBus.onTyped("benchmark:test", () => {});
+            eventBus.emitTyped("benchmark:test", {
+                id: "test-id",
+                payload: { data: "test" },
                 timestamp: Date.now(),
-            }));
-            eventBus.on("test-event", () => {});
-            eventBus.emit("test-event", { data: "test" });
+            });
         },
         { warmupIterations: 10, iterations: 2000 }
     );
@@ -180,10 +119,10 @@ describe("Event Bus Performance", () => {
     bench(
         "unregister listeners",
         () => {
-            eventBus = new MockTypedEventBus();
+            eventBus = new TypedEventBus<TestEventTypes>("benchmark-bus");
             const listener = () => {};
-            eventBus.on("test-event", listener);
-            eventBus.off("test-event", listener);
+            eventBus.onTyped("benchmark:simple", listener);
+            eventBus.offTyped("benchmark:simple", listener);
         },
         { warmupIterations: 10, iterations: 5000 }
     );
@@ -191,24 +130,32 @@ describe("Event Bus Performance", () => {
     bench(
         "bulk event emission",
         () => {
-            eventBus = new MockTypedEventBus();
-            eventBus.on("bulk-event", () => {});
+            eventBus = new TypedEventBus<TestEventTypes>("benchmark-bus");
+            eventBus.onTyped("benchmark:heavy", () => {});
             for (let i = 0; i < 100; i++) {
-                eventBus.emit("bulk-event", { index: i });
+                eventBus.emitTyped("benchmark:heavy", {
+                    data: Array.from({ length: 10 }, (_, idx) => ({
+                        index: idx,
+                        value: Math.random(),
+                    })),
+                    processing: i % 2 === 0,
+                });
             }
         },
         { warmupIterations: 5, iterations: 100 }
     );
 
     bench(
-        "event history management",
+        "event diagnostics and introspection",
         () => {
-            eventBus = new MockTypedEventBus();
-            for (let i = 0; i < 1500; i++) {
-                eventBus.emit("history-event", { index: i });
-            }
-            eventBus.getAllEvents();
+            eventBus = new TypedEventBus<TestEventTypes>("benchmark-bus");
+            eventBus.onTyped("benchmark:test", () => {});
+            eventBus.onTyped("benchmark:simple", () => {});
+            eventBus.onTyped("benchmark:heavy", () => {});
+            const diagnostics = eventBus.getDiagnostics();
+            // Access diagnostic properties to ensure they're computed
+            const { busId, listenerCounts, middlewareCount } = diagnostics;
         },
-        { warmupIterations: 5, iterations: 50 }
+        { warmupIterations: 5, iterations: 1000 }
     );
 });
