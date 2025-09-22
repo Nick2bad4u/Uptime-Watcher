@@ -58,6 +58,13 @@ const baseTheme: Theme = {
             800: "#1e40af",
             900: "#1e3a8a",
         },
+        shadows: {
+            degraded: "rgb(249 115 22 / 22%)",
+            error: "rgb(239 68 68 / 22%)",
+            paused: "rgb(156 163 175 / 22%)",
+            success: "rgb(16 185 129 / 22%)",
+            warning: "rgb(251 191 36 / 22%)",
+        },
         status: {
             degraded: "#f97316",
             down: "#ef4444",
@@ -214,6 +221,13 @@ export const darkTheme: Theme = createTheme({
             800: "#dbeafe",
             900: "#eff6ff",
         },
+        shadows: {
+            degraded: "rgb(251 146 60 / 30%)",
+            error: "rgb(248 113 113 / 30%)",
+            paused: "rgb(156 163 175 / 30%)",
+            success: "rgb(52 211 153 / 30%)",
+            warning: "rgb(251 191 36 / 30%)",
+        },
         status: {
             degraded: "#fb923c",
             down: "#f87171",
@@ -304,6 +318,13 @@ export const highContrastTheme: Theme = createTheme({
             700: "#ffffff",
             800: "#ffffff",
             900: "#ffffff",
+        },
+        shadows: {
+            degraded: "rgb(255 136 0 / 50%)",
+            error: "rgb(255 0 0 / 50%)",
+            paused: "rgb(255 255 255 / 50%)",
+            success: "rgb(0 255 0 / 50%)",
+            warning: "rgb(255 255 0 / 50%)",
         },
         status: {
             degraded: "#ff8800",

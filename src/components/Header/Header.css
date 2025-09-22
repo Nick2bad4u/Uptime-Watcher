@@ -67,7 +67,7 @@
     border-width: 1px;
     border-color: var(--color-success-border, rgb(16 185 129 / 33%));
     background-color: color-mix(in srgb, var(--color-success) 10%, transparent);
-    box-shadow: 0 0 0 0 var(--color-success-shadow, rgb(16 185 129 / 22%));
+    box-shadow: 0 0 0 0 var(--color-shadows-success, rgb(16 185 129 / 22%));
     transition:
         box-shadow 0.22s cubic-bezier(0.4, 1.2, 0.4, 1),
         background 0.22s,
@@ -89,35 +89,40 @@
 
 .health-badge:hover {
     background-color: color-mix(in srgb, var(--color-success) 18%, transparent);
-    box-shadow: 0 4px 18px 0 var(--color-success-shadow, rgb(16 185 129 / 33%));
+    box-shadow: 0 4px 18px 0 var(--color-shadows-success, rgb(16 185 129 / 33%));
     filter: brightness(1.04) saturate(1.1);
     transform: scale(1.045) translateY(-2px);
 }
 
 .status-up-badge:hover {
     background-color: color-mix(in srgb, var(--color-success) 12%, transparent);
-    box-shadow: 0 2px 12px 0 var(--color-success-shadow, rgb(16 185 129 / 22%));
+    box-shadow: 0 2px 12px 0 var(--color-shadows-success, rgb(16 185 129 / 22%));
     filter: brightness(1.03) saturate(1.08);
     transform: scale(1.04) translateY(-1px);
 }
 
 .status-degraded-badge:hover {
-    background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
-    box-shadow: 0 2px 12px 0 var(--color-warning-shadow, rgb(251 191 36 / 22%));
+    background-color: color-mix(
+        in srgb,
+        var(--color-status-degraded) 12%,
+        transparent
+    );
+    box-shadow: 0 2px 12px 0
+        var(--color-shadows-degraded, rgb(249 115 22 / 22%));
     filter: brightness(1.03) saturate(1.08);
     transform: scale(1.04) translateY(-1px);
 }
 
 .status-down-badge:hover {
     background-color: color-mix(in srgb, var(--color-error) 12%, transparent);
-    box-shadow: 0 2px 12px 0 var(--color-error-shadow, rgb(239 68 68 / 22%));
+    box-shadow: 0 2px 12px 0 var(--color-shadows-error, rgb(239 68 68 / 22%));
     filter: brightness(1.03) saturate(1.08);
     transform: scale(1.04) translateY(-1px);
 }
 
 .status-pending-badge:hover {
     background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
-    box-shadow: 0 2px 12px 0 var(--color-warning-shadow, rgb(251 191 36 / 22%));
+    box-shadow: 0 2px 12px 0 var(--color-shadows-warning, rgb(251 191 36 / 22%));
     filter: brightness(1.03) saturate(1.08);
     transform: scale(1.04) translateY(-1px);
 }
@@ -128,8 +133,7 @@
         var(--color-status-paused) 12%,
         transparent
     );
-    box-shadow: 0 2px 12px 0
-        var(--color-status-paused-shadow, rgb(156 163 175 / 22%));
+    box-shadow: 0 2px 12px 0 var(--color-shadows-paused, rgb(156 163 175 / 22%));
     filter: brightness(1.03) saturate(1.08);
     transform: scale(1.04) translateY(-1px);
 }
@@ -178,7 +182,7 @@
         var(--color-success, var(--color-accent)) 8%,
         transparent
     );
-    box-shadow: 0 4px 18px 0 var(--color-success-shadow, rgb(16 185 129 / 33%));
+    box-shadow: 0 4px 18px 0 var(--color-shadows-success, rgb(16 185 129 / 33%));
 }
 
 .status-up-badge:hover,
@@ -186,15 +190,20 @@
     border-color: var(--color-success);
     background: rgb(16 185 129 / 8%); /* Fallback color */
     background: color-mix(in srgb, var(--color-success) 8%, transparent);
-    box-shadow: 0 2px 12px 0 var(--color-success-shadow, rgb(16 185 129 / 22%));
+    box-shadow: 0 2px 12px 0 var(--color-shadows-success, rgb(16 185 129 / 22%));
 }
 
 .status-degraded-badge:hover,
 .status-degraded-badge:focus-visible {
-    border-color: var(--color-warning);
-    background: rgb(251 191 36 / 8%); /* Fallback color */
-    background: color-mix(in srgb, var(--color-warning) 8%, transparent);
-    box-shadow: 0 2px 12px 0 var(--color-warning-shadow, rgb(251 191 36 / 22%));
+    border-color: var(--color-status-degraded);
+    background: rgb(249 115 22 / 8%); /* Fallback color */
+    background: color-mix(
+        in srgb,
+        var(--color-status-degraded) 8%,
+        transparent
+    );
+    box-shadow: 0 2px 12px 0
+        var(--color-shadows-degraded, rgb(249 115 22 / 22%));
 }
 
 .status-down-badge:hover,
@@ -202,7 +211,7 @@
     border-color: var(--color-error);
     background: rgb(239 68 68 / 8%); /* Fallback color */
     background: color-mix(in srgb, var(--color-error) 8%, transparent);
-    box-shadow: 0 2px 12px 0 var(--color-error-shadow, rgb(239 68 68 / 22%));
+    box-shadow: 0 2px 12px 0 var(--color-shadows-error, rgb(239 68 68 / 22%));
 }
 
 .status-pending-badge:hover,
@@ -210,7 +219,7 @@
     border-color: var(--color-warning);
     background: rgb(251 191 36 / 8%); /* Fallback color */
     background: color-mix(in srgb, var(--color-warning) 8%, transparent);
-    box-shadow: 0 2px 12px 0 var(--color-warning-shadow, rgb(251 191 36 / 22%));
+    box-shadow: 0 2px 12px 0 var(--color-shadows-warning, rgb(251 191 36 / 22%));
 }
 
 .status-paused-badge:hover,
@@ -218,8 +227,7 @@
     border-color: var(--color-status-paused);
     background: rgb(156 163 175 / 8%); /* Fallback color */
     background: color-mix(in srgb, var(--color-status-paused) 8%, transparent);
-    box-shadow: 0 2px 12px 0
-        var(--color-status-paused-shadow, rgb(156 163 175 / 22%));
+    box-shadow: 0 2px 12px 0 var(--color-shadows-paused, rgb(156 163 175 / 22%));
 }
 
 .total-sites-badge:hover,

@@ -126,6 +126,22 @@ export interface ThemeColors {
     };
 
     /**
+     * Shadow colors for box-shadow CSS variables.
+     */
+    shadows: {
+        /** Shadow color for degraded status elements */
+        degraded: string;
+        /** Shadow color for error status elements */
+        error: string;
+        /** Shadow color for paused status elements */
+        paused: string;
+        /** Shadow color for success status elements */
+        success: string;
+        /** Shadow color for warning status elements */
+        warning: string;
+    };
+
+    /**
      * Status colors for monitor states.
      */
     status: {
