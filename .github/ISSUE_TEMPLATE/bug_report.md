@@ -40,7 +40,7 @@ assignees: Nick2bad4u
 
 - OS: Windows 11, macOS Sonoma, Ubuntu 22.04
 - Architecture: x64, arm64
-- Node.js: 22.5.1 (if applicable)
+- Node.js: 24.8.0 (if applicable)
 
 ## 📝 Additional Context
 

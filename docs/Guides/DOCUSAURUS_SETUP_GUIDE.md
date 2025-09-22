@@ -154,30 +154,72 @@ The `projectDocuments` feature in TypeDoc allows including standalone markdown f
 
 ```bash
 # Start Docusaurus development server
-npm run docs:dev
+npm run docusaurus:start
 
-# Generate TypeDoc documentation
+# Start with local configuration (optimized for Windows development)
+npm run docusaurus:start:local
+
+# Generate TypeDoc documentation only
 npm run docs:typedoc
 
-# Build static site
+# Generate with local configuration
+npm run docs:typedoc:local
+
+# Build static site (includes TypeDoc generation and ESLint inspector)
 npm run docs:build
+
+# Build with local configuration
+npm run docs:build:local
+
+# Serve built documentation locally
+npm run docusaurus:serve
+
+# Preview basic docs output
+npm run docs:preview
 ```
 
-### 2. Generation Steps
+### 2. Documentation Download Scripts
+
+The project includes scripts to download external documentation for better offline development:
+
+```bash
+# Download all external documentation
+npm run docs:download:all
+
+# Individual package documentation
+npm run docs:download:react
+npm run docs:download:electron
+npm run docs:download:chartjs
+npm run docs:download:zustand
+npm run docs:download:axios
+npm run docs:download:zod
+npm run docs:download:validator
+npm run docs:download:sqlite3
+npm run docs:download:sqlite3-wasm
+npm run docs:download:nodeping
+npm run docs:download:tsdoc
+```
+
+### 3. Generation Steps
 
 1. **TypeDoc Generation**:
-   - Parses TypeScript source files
-   - Processes project documents from markdown files
-   - Generates unified documentation in `docs/` directory
+   - Parses TypeScript source files from `src/`, `electron/`, and `shared/`
+   - Processes project documents from markdown files in `docs/` hierarchy
+   - Generates unified documentation in `docs/docusaurus/docs/` directory
    - Creates `typedoc-sidebar.cjs` with navigation structure
 
-2. **Docusaurus Build**:
-   - Imports TypeDoc-generated content
+2. **ESLint Inspector Build**:
+   - Generates interactive ESLint configuration inspector
+   - Outputs to `docs/docusaurus/static/eslint-inspector/`
+   - Accessible via `/eslint-inspector/` route in documentation
+
+3. **Docusaurus Build**:
+   - Imports TypeDoc-generated content and ESLint inspector
    - Applies Docusaurus theme and navigation
    - Generates static HTML with search indexing
    - Optimizes assets for deployment
 
-### 3. Deployment
+### 4. Deployment
 
 The documentation is deployed to GitHub Pages via:
 
@@ -185,6 +227,14 @@ The documentation is deployed to GitHub Pages via:
 - **Organization**: `Nick2bad4u`
 - **Repository**: `Uptime-Watcher`
 - **Branch**: `gh-pages`
+
+```bash
+# Deploy to GitHub Pages
+npm run docs:deploy
+
+# Deploy with local configuration
+npm run docs:deploy:local
+```
 
 ## Key Features
 
@@ -264,37 +314,152 @@ Customize appearance via:
 
 ### Common Issues
 
-1. **Missing sidebar items**: Check TypeDoc projectDocuments configuration
-2. **Broken links**: Verify relative paths and TypeDoc link syntax
-3. **Build failures**: Review TypeScript configuration and exclude patterns
-4. **Search not working**: Ensure proper indexing and search configuration
+1. **Missing sidebar items**: 
+   - Check TypeDoc `projectDocuments` configuration in `typedoc.config.json`
+   - Verify markdown file paths and glob patterns
+   - Run `npm run docs:typedoc` to regenerate sidebar
+
+2. **Broken links**: 
+   - Use broken link checker: `npm run docusaurus:broken-links`
+   - Verify relative paths and TypeDoc link syntax
+   - Check cross-references between project documents and API docs
+
+3. **Build failures**: 
+   - Review TypeScript configuration in `tsconfig.typedoc.json`
+   - Check exclude patterns for test files and build outputs
+   - Verify all dependencies are installed in `docs/docusaurus/`
+
+4. **Search not working**: 
+   - Ensure proper indexing configuration in Docusaurus
+   - Check search plugin configuration
+   - Verify content is being generated correctly
+
+5. **Local vs CI differences**:
+   - Use `npm run docs:typedoc:local` for Windows development
+   - Use `npm run docs:typedoc` for CI/CD environments
+   - Check path differences between configurations
 
 ### Debug Commands
 
 ```bash
 # Validate TypeDoc configuration
-npx typedoc --help
+cd docs/docusaurus && npx typedoc --help
 
-# Check TypeScript compilation
+# Check TypeScript compilation for docs
 npm run type-check:all
 
-# Validate Docusaurus configuration
-npm run docs:build --verbose
+# Validate Docusaurus configuration and check for broken links
+npm run docusaurus:broken-links
 
-# Clear caches
-npm run docs:clear
+# Build with verbose output
+npm run docs:build -- --verbose
+
+# Clear TypeDoc and Docusaurus caches
+npm run docs:clean
+cd docs/docusaurus && npm run clear
+
+# Test local development setup
+npm run docs:typedoc:local
+npm run docusaurus:start:local
+```
+
+### Configuration Validation
+
+```bash
+# Test TypeDoc configuration
+cd docs/docusaurus
+npx typedoc --options typedoc.config.json --dry-run
+
+# Test local TypeDoc configuration
+npx typedoc --options typedoc.local.config.json --dry-run
+
+# Validate Docusaurus config
+npx docusaurus validate
+
+# Check for duplicate routes
+npx docusaurus check
 ```
 
 ## Scripts Reference
 
 Available npm scripts for documentation:
 
-- `docs:dev` - Start development server
-- `docs:build` - Build static documentation
-- `docs:serve` - Serve built documentation locally
-- `docs:typedoc` - Generate TypeDoc documentation only
-- `docs:clear` - Clear Docusaurus build cache
-- `docs:preview` - Preview built documentation
+### Core Documentation Scripts
+
+- `docs:typedoc` - Generate TypeDoc documentation (standard config)
+- `docs:typedoc:local` - Generate TypeDoc with local config (Windows optimized)
+- `docs:build` - Build complete documentation site (TypeDoc + ESLint inspector + Docusaurus)
+- `docs:build:local` - Build with local configuration
+- `docs:preview` - Preview basic docs output using serve
+- `docs:clean` - Remove generated documentation files
+
+### Docusaurus Development Scripts
+
+- `docusaurus:start` - Start Docusaurus development server
+- `docusaurus:start:local` - Start with local configuration
+- `docusaurus:serve` - Serve built documentation locally
+- `docusaurus:serve:local` - Serve with local configuration
+- `docusaurus:broken-links` - Check for broken links in documentation
+
+### Deployment Scripts
+
+- `docs:deploy` - Deploy to GitHub Pages
+- `docs:deploy:local` - Deploy with local configuration
+
+### External Documentation Downloads
+
+- `docs:download:all` - Download all external package documentation
+- `docs:download:react` - Download React documentation
+- `docs:download:electron` - Download Electron documentation
+- `docs:download:chartjs` - Download Chart.js documentation
+- `docs:download:zustand` - Download Zustand documentation
+- `docs:download:axios` - Download Axios documentation
+- `docs:download:zod` - Download Zod documentation
+- `docs:download:validator` - Download Validator.js documentation
+- `docs:download:sqlite3` - Download node-sqlite3 documentation
+- `docs:download:sqlite3-wasm` - Download node-sqlite3-wasm documentation
+- `docs:download:nodeping` - Download NodePing API documentation
+- `docs:download:tsdoc` - Download TSDoc tag specifications
+
+### Build Enhancement Scripts
+
+- `build:eslint-inspector` - Build ESLint configuration inspector
+- `build:eslint-inspector:local` - Build ESLint inspector with local paths
+
+## 🎯 Quick Reference
+
+### Development Workflow
+
+```bash
+# Start local development (recommended for Windows)
+npm run docs:typedoc:local
+npm run docusaurus:start:local
+
+# Build and test locally
+npm run docs:build:local
+npm run docusaurus:serve:local
+
+# Check for issues
+npm run docusaurus:broken-links
+npm run type-check:all
+```
+
+### Production Deployment
+
+```bash
+# Full production build and deploy
+npm run docs:download:all  # Optional: update external docs
+npm run docs:deploy
+```
+
+### Key Files
+
+- `docs/docusaurus/typedoc.config.json` - Standard TypeDoc configuration
+- `docs/docusaurus/typedoc.local.config.json` - Local development configuration
+- `docs/docusaurus/docusaurus.config.ts` - Main Docusaurus configuration
+- `docs/docusaurus/sidebars.ts` - Sidebar navigation configuration
+- `docs/docusaurus/tsconfig.typedoc.json` - TypeScript config for TypeDoc
+- `scripts/download-*-docs.mjs` - External documentation download scripts
 
 ---
 

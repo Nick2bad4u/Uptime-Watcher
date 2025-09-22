@@ -20,7 +20,7 @@ All documentation files should follow consistent naming patterns:
 
 - `documentation-style-guide.md` (this file)
 - `api-documentation.md`
-- `developer-quick-start.md`
+- `DEVELOPER-QUICK-START.md`
 - `testing-methodology-react-components.md`
 
 **Subdirectory files**: Use lowercase kebab-case throughout
@@ -36,7 +36,7 @@ All documentation files should follow consistent naming patterns:
 
 ```text
 README.md
-docs/developer-quick-start.md
+docs/DEVELOPER-QUICK-START.md
 docs/TSDoc/tsdoc-tag-param.md
 docs/Testing/fast-check-fuzzing-coverage.md
 .github/prompts/performance-tests.prompt.md
@@ -174,7 +174,7 @@ The `package.json` file contains all _dependencies_ and **scripts**.
 - Use absolute URLs for external resources
 
 ```markdown
-See the [installation guide](./docs/INSTALLATION.md) for setup instructions.
+See the [environment setup guide](./environment-setup.md) for setup instructions.
 
 Learn more about [TypeScript](https://www.typescriptlang.org/) documentation.
 ```

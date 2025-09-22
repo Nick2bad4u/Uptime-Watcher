@@ -9,6 +9,9 @@ This document provides comprehensive patterns for integrating type-fest utilitie
 - [Pattern 2: LiteralUnion Enhancement](#pattern-2-literalunion-enhancement)
 - [Pattern 3: Simplify Union Types](#pattern-3-simplify-union-types)
 - [Pattern 4: SetOptional API Design](#pattern-4-setoptional-api-design)
+- [Pattern 5: CamelCase String Transformation](#pattern-5-camelcase-string-transformation)
+- [Pattern 6: ReadonlyDeep Immutability](#pattern-6-readonlydeep-immutability)
+- [Pattern 7: PartialDeep Testing Utilities](#pattern-7-partialdeep-testing-utilities)
 - [Multi-Feature Enhancement Strategy](#multi-feature-enhancement-strategy)
 - [Implementation Guidelines](#implementation-guidelines)
 - [Validation Checklist](#validation-checklist)
@@ -296,6 +299,242 @@ function createDefaultFormData(data: Partial<FormData>): FormData;
 - Improved function overloading
 - Clear intent about required vs optional properties
 
+## Pattern 5: CamelCase String Transformation
+
+### CamelCase - When to Apply
+
+- Converting user-provided strings to valid identifiers
+- Creating type-safe property names from dynamic strings
+- Template variable processing and code generation
+- String transformation with compile-time type safety
+
+### CamelCase - Before/After Examples
+
+#### Example 1: Status String Transformation (Real Implementation)
+
+```typescript
+// ❌ Before - Unsafe string transformation
+function createStatusClass(status: string): string {
+ return `status-${status.toLowerCase().replace(/\s+/g, "")}`;
+}
+
+// ✅ After - Type-safe CamelCase transformation
+import type { CamelCase } from "type-fest";
+
+/**
+ * Creates type-safe camelCase identifiers from status strings. Uses type-fest's
+ * CamelCase utility to generate type-safe identifiers from status strings. This
+ * demonstrates the practical usage of type-fest string manipulation utilities
+ * for runtime type safety.
+ */
+export const createStatusIdentifier = <T extends string>(
+ status: T
+): CamelCase<T> => {
+ const camelCased = status
+  .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => {
+   return index === 0 ? word.toLowerCase() : word.toUpperCase();
+  })
+  .replace(/\s+/g, "");
+
+ return camelCased as CamelCase<T>;
+};
+```
+
+#### Example 2: Template Variable Processing
+
+```typescript
+// ❌ Before - String manipulation without type safety
+function processTemplateVariable(variable: string): string {
+ return variable.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+}
+
+// ✅ After - Type-safe template variable transformation
+import type { CamelCase } from "type-fest";
+
+function createTemplateVariable<T extends string>(name: T): CamelCase<T> {
+ const processed = name.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+ return processed as CamelCase<T>;
+}
+```
+
+### CamelCase - Benefits
+
+- Compile-time type safety for string transformations
+- Predictable identifier generation
+- Type-safe code generation patterns
+- Enhanced IntelliSense for generated identifiers
+
+## Pattern 6: ReadonlyDeep Immutability
+
+### ReadonlyDeep - When to Apply
+
+- Configuration objects that should never be modified
+- Fallback data structures requiring immutability
+- Constants and default values that need deep protection
+- API response data that should remain unchanged
+
+### ReadonlyDeep - Before/After Examples
+
+#### Example 1: Fallback Configuration (Real Implementation)
+
+```typescript
+// ❌ Before - Shallow readonly protection
+const fallbackConfig: Readonly<FallbackConfig> = {
+ retryAttempts: 3,
+ timeouts: { connect: 5000, request: 10000 }, // Still mutable
+ messages: { error: "Failed", retry: "Retrying..." }, // Still mutable
+};
+
+// ✅ After - Deep immutability protection
+import type { ReadonlyDeep } from "type-fest";
+
+const fallbackConfig: ReadonlyDeep<FallbackConfig> = {
+ retryAttempts: 3,
+ timeouts: { connect: 5000, request: 10000 }, // Now readonly
+ messages: { error: "Failed", retry: "Retrying..." }, // Now readonly
+} as const;
+```
+
+#### Example 2: Default Monitor Configuration
+
+```typescript
+// ❌ Before - Potential accidental modification
+const defaultMonitorConfig = {
+ interval: 60000,
+ timeout: 5000,
+ retries: 3,
+ settings: {
+  followRedirects: true,
+  validateSsl: true,
+ },
+};
+
+// ✅ After - Deep readonly protection
+import type { ReadonlyDeep } from "type-fest";
+
+const defaultMonitorConfig: ReadonlyDeep<MonitorConfig> = {
+ interval: 60000,
+ timeout: 5000,
+ retries: 3,
+ settings: {
+  followRedirects: true,
+  validateSsl: true,
+ },
+} as const;
+```
+
+### ReadonlyDeep - Benefits
+
+- Prevents accidental mutations at any nesting level
+- Clear intent for immutable data structures
+- Compile-time protection against modifications
+- Enhanced type safety for configuration objects
+
+## Pattern 7: PartialDeep Testing Utilities
+
+### PartialDeep - When to Apply
+
+- Test data creation with minimal required properties
+- Mock object generation for complex interfaces
+- Factory functions for test fixtures
+- Partial object matching in tests
+
+### PartialDeep - Before/After Examples
+
+#### Example 1: Test Mock Factory (Real Implementation)
+
+```typescript
+// ❌ Before - Unsafe test object creation
+function createMockSite(overrides: any = {}): Site {
+ return {
+  id: "test-id",
+  name: "Test Site",
+  url: "https://test.com",
+  monitors: [],
+  ...overrides, // Unsafe - could override with wrong types
+ };
+}
+
+// ✅ After - Type-safe partial mock creation
+import type { PartialDeep, SetOptional } from "type-fest";
+
+export function createMockSite(overrides: PartialDeep<Site> = {}): Site {
+ const defaults: SetOptional<Site, "id"> = {
+  name: "Test Site",
+  url: "https://test.com",
+  monitors: [],
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
+ };
+
+ return {
+  id: `test-${Date.now()}`,
+  ...defaults,
+  ...overrides,
+ } as Site;
+}
+```
+
+#### Example 2: Component Test Props
+
+```typescript
+// ❌ Before - All props required in tests
+interface ComponentProps {
+ site: Site;
+ monitors: Monitor[];
+ config: ComponentConfig;
+ handlers: EventHandlers;
+}
+
+const TestComponent = (props: ComponentProps) => {
+ // Component implementation
+};
+
+// ✅ After - Flexible test props with defaults
+import type { PartialDeep } from "type-fest";
+
+type TestComponentProps = PartialDeep<ComponentProps>;
+
+const createTestProps = (
+ overrides: TestComponentProps = {}
+): ComponentProps => {
+ return {
+  site: createMockSite(),
+  monitors: [],
+  config: defaultConfig,
+  handlers: mockHandlers,
+  ...overrides,
+ };
+};
+```
+
+#### Example 3: Deep Partial Assertions
+
+```typescript
+// ❌ Before - Exact object matching required
+expect(result).toEqual({
+ site: { id: "123", name: "Test", url: "https://test.com", monitors: [] },
+ status: "success",
+});
+
+// ✅ After - Flexible deep partial matching
+import type { PartialDeep } from "type-fest";
+
+const expectedPartial: PartialDeep<Result> = {
+ site: { id: "123", name: "Test" }, // Only test relevant properties
+ status: "success",
+};
+
+expect(result).toMatchObject(expectedPartial);
+```
+
+### PartialDeep - Benefits
+
+- Type-safe test fixture creation
+- Flexible mock object generation
+- Reduced test boilerplate
+- Precise test assertions with partial matching
+
 ## Multi-Feature Enhancement Strategy
 
 ### "Easy Wins" Approach
@@ -315,20 +554,42 @@ interface ComponentState {
  theme: "dark" | "light";
  context?: Record<string, unknown>;
  data?: Record<string, unknown>;
+ config: Readonly<{ setting: string; value: number }>;
 }
 
 type AllStates = ComponentState | ErrorState | LoadingState;
 
+function createTestState(overrides: any): ComponentState {
+ return { theme: "dark", ...overrides };
+}
+
 // ✅ After - Multiple type-fest features applied
-import type { LiteralUnion, Simplify, UnknownRecord } from "type-fest";
+import type {
+ LiteralUnion,
+ Simplify,
+ UnknownRecord,
+ ReadonlyDeep,
+ PartialDeep,
+} from "type-fest";
 
 interface ComponentState {
  theme: LiteralUnion<"dark" | "light", string>;
  context?: UnknownRecord;
  data?: UnknownRecord;
+ config: ReadonlyDeep<{ setting: string; value: number }>;
 }
 
 type AllStates = Simplify<ComponentState | ErrorState | LoadingState>;
+
+function createTestState(
+ overrides: PartialDeep<ComponentState> = {}
+): ComponentState {
+ return {
+  theme: "dark",
+  config: { setting: "default", value: 0 },
+  ...overrides,
+ } as ComponentState;
+}
 ```
 
 ## Implementation Guidelines
@@ -340,16 +601,27 @@ type AllStates = Simplify<ComponentState | ErrorState | LoadingState>;
 - Group type-fest imports together
 
 ```typescript
-import type { LiteralUnion, Simplify, UnknownRecord } from "type-fest";
+import type {
+ CamelCase,
+ LiteralUnion,
+ PartialDeep,
+ ReadonlyDeep,
+ SetOptional,
+ Simplify,
+ UnknownRecord,
+} from "type-fest";
 ```
 
 ### 2. File Enhancement Order
 
 1. Add type-fest imports
 2. Apply UnknownRecord replacements
-3. Enhance with LiteralUnion
+3. Enhance string literals with LiteralUnion
 4. Apply Simplify to union types
 5. Add SetOptional where beneficial
+6. Use ReadonlyDeep for immutable data
+7. Apply PartialDeep in test utilities
+8. Use CamelCase for string transformations
 
 ### 3. Documentation Requirements
 
@@ -379,6 +651,9 @@ import type { LiteralUnion, Simplify, UnknownRecord } from "type-fest";
 - [ ] String literal unions enhanced with LiteralUnion
 - [ ] Complex unions simplified with Simplify
 - [ ] Optional parameters optimized with SetOptional
+- [ ] Immutable data protected with ReadonlyDeep
+- [ ] Test utilities use PartialDeep for flexibility
+- [ ] String transformations use CamelCase where applicable
 
 ### After Implementation
 
@@ -396,6 +671,9 @@ import type { LiteralUnion, Simplify, UnknownRecord } from "type-fest";
 - [ ] All eligible string unions use LiteralUnion
 - [ ] Complex unions use Simplify where beneficial
 - [ ] Optional parameters use SetOptional appropriately
+- [ ] Immutable configurations use ReadonlyDeep
+- [ ] Test utilities leverage PartialDeep patterns
+- [ ] String transformations use CamelCase for type safety
 
 ## Search Patterns for Global Application
 

@@ -1,7 +1,7 @@
 # 📊 Uptime Watcher
 
 <div align="center"><a href="https://github.com/Nick2bad4u/Uptime-Watcher/releases">
-  <img src="https://img.shields.io/badge/version-15.0.0-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-15.5.0-blue.svg" alt="Version">
 </a>
 <a href="LICENSE">
   <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License">
@@ -107,7 +107,7 @@ Uptime Watcher is a desktop application built with modern web technologies that 
   <img src="https://img.shields.io/badge/Electron-37.3.1-47848F?logo=electron&amp;logoColor=white" alt="Electron">
 </a>
 <a href="https://nodejs.org/">
-  <img src="https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&amp;logoColor=white" alt="Node.js">
+  <img src="https://img.shields.io/badge/Node.js-24.8+-339933?logo=node.js&amp;logoColor=white" alt="Node.js">
 </a>
 
 ### <strong>State &amp; Data Management</strong>
@@ -202,7 +202,7 @@ npm run dist
 
 | Requirement              | Version                         | Download                                    |
 | ------------------------ | ------------------------------- | ------------------------------------------- |
-| <strong>Node.js</strong> | 22.0+ (recommended)             | <a href="https://nodejs.org/">Download</a>  |
+| <strong>Node.js</strong> | 24.8+ (required)                | <a href="https://nodejs.org/">Download</a>  |
 | <strong>npm</strong>     | 11.5.2+ (included with Node.js) | <a href="https://www.npmjs.com/">Docs</a>   |
 | <strong>Git</strong>     | Latest version                  | <a href="https://git-scm.com/">Download</a> |
 
@@ -220,7 +220,7 @@ For practical guidance on configuring monitors and writing tests, see our compre
 
 For running and tuning our fast-check based fuzzing suites, see:
 
-- Fast-Check Fuzzing Coverage Guide → <a href="./docs/Testing/FAST-CHECK-FUZZING-COVERAGE.md">docs/Testing/FAST-CHECK-FUZZING-COVERAGE.md</a>
+- Fast-Check Fuzzing Coverage Guide → <a href="./docs/Testing/FAST-CHECK-FUZZING-GUIDE.md">docs/Testing/FAST-CHECK-FUZZING-GUIDE.md</a>
 
 ### End-to-end testing with Playwright
 
@@ -362,4 +362,4 @@ We welcome contributions from the community! Here's how you can help:
 
 <div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 
-<em>Last updated: September 2025 • Version 15.0.0</em></div>
+<em>Last updated: September 2025 • Version 15.5.0</em></div>

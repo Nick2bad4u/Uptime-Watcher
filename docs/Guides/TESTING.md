@@ -1,47 +1,58 @@
 # Testing and Coverage Setup
 
-This project uses Vitest for testing with separate configurations for frontend (React) and backend (Electron) code, integrated with Codecov for coverage reporting.
+This project uses Vitest for testing with separate configurations for frontend (React), backend (Electron), and shared utilities, integrated with comprehensive mocking strategies and coverage reporting.
 
 ## Setup Summary
 
-### Dual Test Configuration
+### Triple Test Configuration
 
-The project has two separate Vitest configurations:
+The project has three separate Vitest configurations:
 
 1. **Frontend Tests** (`vitest.config.ts`):
    - Tests React components in `src/` directory
    - Merges configuration from `vite.config.ts`
-   - Uses jsdom environment
+   - Uses jsdom environment with React Testing Library
+   - Comprehensive ElectronAPI mocking
    - Coverage reports to `./coverage/`
 
-2. **Backend Tests** (`config/testing/vitest.electron.config.ts`):
+2. **Backend Tests** (`vitest.electron.config.ts`):
    - Tests Electron main process code in `electron/` directory
    - Uses Node.js environment
+   - Database and service layer testing
    - Coverage reports to `./coverage/electron/`
+
+3. **Shared Tests** (`vitest.shared.config.ts`):
+   - Tests shared utilities in `shared/` directory
+   - Cross-platform utility testing
+   - Type validation and error handling
+   - Coverage reports to `./coverage/shared/`
 
 ### Files Created/Modified
 
-1. **`vitest.config.ts`** - Vitest configuration for frontend tests (merges with vite.config.ts)
-2. **`config/testing/vitest.electron.config.ts`** - Vitest configuration for Electron backend
-3. **`codecov.yml`** - Codecov configuration for multi-flag reporting
-4. **`src/test/setup.ts`** - Test setup file for React components
-5. **`electron/test/setup.ts`** - Test setup file for Electron tests
-6. **`.github/workflows/codecov.yml`** - GitHub Actions workflow for dual coverage upload
+1. **`vitest.config.ts`** - Frontend test configuration with React Testing Library setup
+2. **`vitest.electron.config.ts`** - Electron backend test configuration
+3. **`vitest.shared.config.ts`** - Shared utilities test configuration
+4. **`src/test/setup.ts`** - Test setup with comprehensive ElectronAPI mocking
+5. **`electron/test/setup.ts`** - Backend test setup with database mocking
+6. **`shared/test/setup.ts`** - Shared utilities test setup
 7. **Test files**:
-   - `src/constants.test.ts` - Tests for application constants
-   - `src/utils/time.test.ts` - Tests for time utility functions
+   - Component tests in `src/components/`
+   - Store tests in `src/stores/`
+   - Service tests in `electron/services/`
+   - Utility tests in `shared/utils/`
 
 ### Coverage Configuration
 
 - **Provider**: V8 (fast and accurate)
-- **Reporters**: text, json, lcov, html (for Codecov and local viewing)
+- **Reporters**: text, json, lcov, html
 - **Environments**:
-  - jsdom (for React component testing)
-  - node (for Electron backend testing)
-- **Codecov Flags**:
-  - `frontend` - for React/src code coverage
-  - `electron` - for Electron/backend code coverage
-- **Excludes**: Electron main process, build artifacts, configuration files
+  - jsdom (for React component testing with full DOM simulation)
+  - node (for Electron backend and shared utilities)
+- **Coverage Flags**:
+  - `frontend` - React/src code coverage
+  - `electron` - Electron/backend code coverage
+  - `shared` - Shared utilities coverage
+- **Excludes**: Build artifacts, configuration files, test files
 
 ### Commands
 
@@ -81,7 +92,115 @@ npm run test:shared:watch    # Shared tests in watch mode
 
 Notes:
 
-- `npm run test:all` executes all three test configurations: shared, electron, and frontend tests sequentially.
+- `npm run test` executes all three test configurations: shared, electron, and frontend tests sequentially.
+
+### ElectronAPI Mocking Strategy
+
+The frontend tests use comprehensive ElectronAPI mocking to simulate IPC communication:
+
+```typescript
+// src/test/setup.ts
+const mockElectronAPI = {
+ sites: {
+  create: vi.fn(),
+  update: vi.fn(),
+  delete: vi.fn(),
+  getAll: vi.fn(),
+ },
+ monitors: {
+  create: vi.fn(),
+  update: vi.fn(),
+  delete: vi.fn(),
+  getAll: vi.fn(),
+ },
+ events: {
+  onSiteUpdated: vi.fn(),
+  onMonitorStatus: vi.fn(),
+  onCacheInvalidated: vi.fn(),
+  onStateSync: vi.fn(),
+ },
+ system: {
+  getVersion: vi.fn(),
+  getPlatform: vi.fn(),
+ },
+};
+
+vi.stubGlobal("window", {
+ electronAPI: mockElectronAPI,
+});
+```
+
+### Testing Patterns
+
+#### Component Testing with Mocked APIs
+
+```typescript
+import { render, screen, waitFor } from '@testing-library/react';
+import { SiteCard } from '../SiteCard';
+
+describe('SiteCard', () => {
+  it('should handle site deletion', async () => {
+    const mockDeleteSite = vi.fn().mockResolvedValue(undefined);
+    window.electronAPI.sites.delete = mockDeleteSite;
+
+    render(<SiteCard site={mockSite} />);
+
+    const deleteButton = screen.getByRole('button', { name: /delete/i });
+    fireEvent.click(deleteButton);
+
+    await waitFor(() => {
+      expect(mockDeleteSite).toHaveBeenCalledWith(mockSite.id);
+    });
+  });
+});
+```
+
+#### Store Testing
+
+```typescript
+import { act, renderHook } from "@testing-library/react";
+import { useSitesStore } from "../useSitesStore";
+
+describe("useSitesStore", () => {
+ beforeEach(() => {
+  useSitesStore.getState().reset();
+ });
+
+ it("should add site via API", async () => {
+  const mockSite = { id: "1", name: "Test Site", url: "https://test.com" };
+  window.electronAPI.sites.create.mockResolvedValue(mockSite);
+
+  const { result } = renderHook(() => useSitesStore());
+
+  await act(async () => {
+   await result.current.addSite({ name: "Test Site", url: "https://test.com" });
+  });
+
+  expect(result.current.sites).toContain(mockSite);
+ });
+});
+```
+
+#### Event System Testing
+
+```typescript
+import { EventsService } from "../EventsService";
+
+describe("EventsService", () => {
+ it("should register event listeners", async () => {
+  const callback = vi.fn();
+  const cleanup = vi.fn();
+  window.electronAPI.events.onSiteUpdated.mockReturnValue(cleanup);
+
+  const result = await EventsService.onSiteUpdated(callback);
+
+  expect(window.electronAPI.events.onSiteUpdated).toHaveBeenCalledWith(
+   callback
+  );
+  expect(result).toBe(cleanup);
+ });
+});
+```
 
 ### Coverage Reports
 
@@ -99,14 +218,21 @@ Coverage reports are generated in separate directories:
 - `coverage-final.json` - JSON coverage data
 - `index.html` - HTML coverage report
 
-### Codecov Integration
+**Shared Coverage** (`./coverage/shared/`):
 
-The project uses Codecov flags to separate frontend and backend coverage:
+- `lcov.info` - For coverage integration (shared flag)
+- `coverage-final.json` - JSON coverage data
+- `index.html` - HTML coverage report
 
-- **frontend** flag: Covers `src/` directory (React components, utilities)
-- **electron** flag: Covers `electron/` directory (main process, services)
+### Integration with CI/CD
 
-Both reports are automatically merged by Codecov to provide a complete picture of your application's test coverage.
+The project uses Codecov flags to separate coverage across domains:
+
+- **frontend** flag: Covers `src/` directory (React components, stores, services)
+- **electron** flag: Covers `electron/` directory (main process, services, IPC)
+- **shared** flag: Covers `shared/` directory (utilities, types, validation)
+
+All reports are automatically merged to provide complete application coverage.
 
 ### GitHub Actions
 
@@ -121,62 +247,79 @@ The workflow:
 2. Runs tests with coverage
 3. Uploads coverage to Codecov
 
-### Current Coverage
+### Current Testing Approach
 
-As of the latest test run, we have achieved comprehensive test coverage across the application:
+The test suite implements modern testing patterns:
+
+**Frontend Testing**:
+
+- **Component Tests**: React Testing Library with comprehensive ElectronAPI mocking
+- **Store Tests**: Zustand store testing with action verification
+- **Service Tests**: EventsService and utility function testing
+- **Type Safety Tests**: TypeScript interface and type guard validation
+
+**Backend Testing**:
+
+- **Service Layer Tests**: Database services, IPC handlers, business logic
+- **Repository Tests**: Database operations with transaction safety
+- **Event System Tests**: TypedEventBus with middleware testing
+- **Integration Tests**: Service interactions and data flow
+
+**Shared Testing**:
+
+- **Utility Functions**: Cross-platform utility testing
+- **Type Validation**: Zod schema and type guard testing
+- **Error Handling**: Shared error utilities and patterns
+- **Cross-Platform Logic**: Platform-agnostic functionality
+
+### Coverage Achievements
 
 **Frontend Coverage** (`src/` directory):
 
-- **Constants**: 100% coverage
-- **Time utilities**: 100% coverage (includes formatDuration, timeAgo, shuffle)
-- **Theme configuration**: 100% coverage
-- **Type guards and validation**: 100% coverage
-- **Store management (Zustand)**: 100% coverage
-- **React components**: High coverage for core components
-- **Utility functions**: Near 100% coverage
+- **React Components**: High coverage with user interaction testing
+- **Store Management**: Complete Zustand store action and state testing
+- **Service Layer**: EventsService and utility functions fully tested
+- **Type Guards**: All validation functions tested with edge cases
+- **Error Handling**: Comprehensive error boundary and handling tests
 - **Overall Frontend**: ~95%+ coverage
 
-**Test Files Created**:
+**Backend Coverage** (`electron/` directory):
 
-**Core Utilities**:
+- **Service Layer**: Database services and IPC handlers fully tested
+- **Repository Pattern**: All database operations tested with mocking
+- **Event System**: TypedEventBus and middleware comprehensively tested
+- **Manager Classes**: Business logic and orchestration tested
+- **Overall Backend**: ~90%+ coverage
 
-- `src/constants.test.ts` - Application constants
-- `src/utils/time.test.ts` - Time formatting and utility functions
-- `src/utils/validation.test.ts` - Data validation utilities
-- `src/utils/site.test.ts` - Site-related utilities
+**Shared Coverage** (`shared/` directory):
 
-**Type Systems**:
+- **Utility Functions**: All cross-platform utilities tested
+- **Type Validation**: Zod schemas and type guards fully tested
+- **Error Handling**: Shared error utilities completely covered
+- **Type Definitions**: Interface and type consistency verified
+- **Overall Shared**: ~95%+ coverage
 
-- `src/types/site.test.ts` - Site data types and interfaces
-- `src/types/monitor.test.ts` - Monitor form data types
-- `src/types/theme.test.ts` - Theme configuration types
-- `src/types/ipc.test.ts` - IPC message types
+**Current Test Structure**:
 
-**State Management**:
+**Frontend Tests** (`src/`):
 
-- `src/stores/theme.test.ts` - Theme store (Zustand)
-- `src/stores/monitor.test.ts` - Monitor store management
-- `src/stores/site.test.ts` - Site store management
+- `src/components/**/*.test.tsx` - React component tests
+- `src/stores/**/*.test.ts` - Zustand store tests
+- `src/services/**/*.test.ts` - Service layer tests
+- `src/utils/**/*.test.ts` - Utility function tests
 
-**Configuration**:
+**Backend Tests** (`electron/`):
 
-- `src/config/app.test.ts` - Application configuration
-- `src/config/theme.test.ts` - Theme configuration settings
+- `electron/services/**/*.test.ts` - Service layer tests
+- `electron/repositories/**/*.test.ts` - Database tests
+- `electron/events/**/*.test.ts` - Event system tests
+- `electron/managers/**/*.test.ts` - Business logic tests
 
-**React Components**:
+**Shared Tests** (`shared/`):
 
-- `src/components/SiteCard.test.tsx` - Site card component
-- `src/components/theme/ThemeProvider.test.tsx` - Theme context provider
-
-**Event System**:
-
-- `src/events/typed-event-bus.test.ts` - Event bus implementation
-- `src/events/electron-events.test.ts` - Electron IPC events
-
-**Database & Logging**:
-
-- `src/database/utils.test.ts` - Database utility functions
-- `src/utils/logging.test.ts` - Logging utilities
+- `shared/utils/**/*.test.ts` - Cross-platform utilities
+- `shared/types/**/*.test.ts` - Type validation tests
+- `shared/validation/**/*.test.ts` - Schema validation tests
 
 ### Coverage Quality
 
@@ -190,21 +333,30 @@ The test suite includes:
 
 ### Testing Best Practices Implemented
 
-1. **Comprehensive Type Testing**: All TypeScript interfaces and types are tested
-2. **Store Pattern Testing**: Zustand stores tested for state mutations and actions
-3. **Event System Testing**: TypedEventBus and IPC events thoroughly tested
-4. **Utility Function Coverage**: All utility functions tested with edge cases
-5. **Component Testing**: React components tested with React Testing Library
-6. **Mock Strategy**: Proper mocking of external dependencies and Electron APIs
+1. **Comprehensive ElectronAPI Mocking**: Full simulation of IPC communication for frontend tests
+2. **Modular Store Testing**: Zustand stores tested for both state changes and action execution
+3. **Event System Testing**: TypedEventBus, middleware, and IPC events thoroughly tested
+4. **Repository Pattern Testing**: Database operations tested with proper transaction mocking
+5. **Component Testing**: React components tested with React Testing Library and user interactions
+6. **Cross-Domain Testing**: Shared utilities tested across frontend, backend, and shared domains
+7. **Type Safety Testing**: TypeScript interfaces, type guards, and Zod schemas validated
+8. **Error Scenario Testing**: Comprehensive error handling and edge case coverage
 
 ### Next Steps for Maintaining Coverage
 
 To maintain high coverage:
 
-1. **Add tests for new features**: Always include tests when adding new functionality
-2. **Test React hooks**: Add tests for custom hooks as they're created
-3. **Integration testing**: Add more end-to-end test scenarios
-4. **Performance testing**: Consider adding performance benchmarks
-5. **Error boundary testing**: Test error handling and recovery scenarios
+1. **Test-Driven Development**: Write tests before implementing new features
+2. **Component Testing**: Add comprehensive tests for new React components
+3. **API Integration Testing**: Test new IPC handlers and service integrations
+4. **Event Testing**: Test new event types and event-driven flows
+5. **Error Boundary Testing**: Test error handling and recovery scenarios
+6. **Performance Testing**: Add benchmarks for critical operations
 
 Place test files next to the code they test with `.test.ts` or `.test.tsx` extensions. The current test structure follows co-location patterns for easy maintenance.
+
+### Related Documentation
+
+- [Testing Methodology - React Components](./testing-methodology-react-components.md) - Detailed React testing patterns
+- [Error Handling Guide](./error-handling-guide.md) - Error handling patterns and testing
+- [Event System Guide](./event-system-guide.md) - Event testing and debugging

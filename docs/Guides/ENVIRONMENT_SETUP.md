@@ -6,8 +6,8 @@
 
 ### Required Software
 
-- **Node.js**: 18+ LTS (recommended: 18.17.0 or later)
-- **npm**: 9+ (comes with Node.js)
+- **Node.js**: 20.15+ LTS (required)
+- **npm**: 10+ (comes with Node.js)
 - **Git**: Latest version
 - **VS Code**: Recommended IDE (with extensions)
 
@@ -27,11 +27,11 @@
 # Using Node Version Manager (recommended)
 # macOS/Linux
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-nvm install 18
-nvm use 18
+nvm install 20.15
+nvm use 20.15
 
 # Windows (using Chocolatey)
-choco install nodejs --version=18.17.0
+choco install nodejs --version=20.15.0
 
 # Or download directly from nodejs.org
 ```
@@ -39,8 +39,8 @@ choco install nodejs --version=18.17.0
 #### Verification
 
 ```bash
-node --version  # Should be 18+
-npm --version   # Should be 9+
+node --version  # Should be 20.15+
+npm --version   # Should be 10+
 ```
 
 ### 2. VS Code Configuration
@@ -169,9 +169,9 @@ cd Uptime-Watcher
 npm install
 
 # Verify installation
-npm run check-types
+npm run type-check:all
 npm run lint
-npm test
+npm run test
 ```
 
 ### 2. Environment Variables
@@ -197,7 +197,7 @@ The SQLite database is automatically initialized:
 
 ```bash
 # Copy WASM files (should happen automatically)
-npm run postbuild
+npm run copy-wasm
 
 # Verify database setup
 npm run electron-dev
@@ -207,19 +207,21 @@ npm run electron-dev
 
 ```bash
 # Type checking
-npm run check-types
+npm run type-check:all
 
 # Linting
 npm run lint
 
 # Testing
-npm test
+npm run test
 
 # Build verification
 npm run build
 
 # Start development
-npm run electron-dev
+npm run dev                # Vite dev server only
+npm run electron-dev       # Concurrent Vite + Electron
+npm run start-both         # Alias for electron-dev
 ```
 
 ## 🔍 Development Tools
@@ -318,22 +320,22 @@ The test environment uses an in-memory SQLite database:
 
 ```bash
 # Run all tests
-npm run test:all
+npm run test
 
 # Run tests in watch mode
 npm run test:watch
 
 # Run specific test suites
 npm run test:electron  # Backend tests
-npm run test:frontend  # Frontend tests
-npm run test:shared     # Shared utility tests
+npm run test:frontend  # Frontend tests  
+npm run test:shared    # Shared utility tests
 ```
 
 ### Coverage Reports
 
 ```bash
 # Generate coverage reports
-npm run test:all:coverage
+npm run test:coverage
 
 # View coverage reports
 open coverage/index.html          # macOS
@@ -373,7 +375,7 @@ For consistent development environments:
 
 ```dockerfile
 # Dockerfile.dev
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 COPY package*.json ./
@@ -409,13 +411,50 @@ services:
 
 ```bash
 # Enable TypeScript project references for faster builds
-npm run build:references
+npm run type-check:all
 
 # Use incremental TypeScript compilation
-tsc --incremental
+npm run build
 
 # Optimize VS Code for large projects
 code --max-memory=8192
+```
+
+### Available Development Scripts
+
+```bash
+# Main development commands
+npm run dev                    # Start Vite dev server only
+npm run electron-dev           # Start both Vite and Electron (recommended)
+npm run start-both             # Alias for electron-dev
+npm run electron               # Start Electron main process only
+
+# Development with debugging
+npm run electron-dev:debug     # Start with debugging enabled
+npm run debug:electron         # Debug Electron main process
+
+# Build commands
+npm run build                  # Build both Vite and Electron
+npm run build:electron-vite    # Build using Vite configuration
+npm run copy-wasm              # Copy SQLite WASM files
+
+# Testing commands
+npm run test                   # Run all tests
+npm run test:coverage          # Run tests with coverage
+npm run test:electron          # Run Electron/backend tests
+npm run test:frontend          # Run frontend tests
+npm run test:shared            # Run shared utility tests
+
+# Quality assurance
+npm run lint                   # Run ESLint
+npm run lint:fix               # Fix ESLint issues automatically
+npm run type-check:all         # TypeScript type checking
+npm run format                 # Format code with Prettier
+
+# Utility commands
+npm run clean                  # Clean build directories
+npm run deps:check             # Check for outdated dependencies
+npm run deps:update            # Update dependencies
 ```
 
 ### Build Performance
@@ -458,7 +497,7 @@ sudo apt update
 sudo apt install build-essential git curl
 
 # Install Node.js via NodeSource
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
@@ -466,16 +505,17 @@ sudo apt-get install -y nodejs
 
 ### Environment Verification
 
-- [ ] Node.js 18+ installed and active
-- [ ] npm 9+ available
+- [ ] Node.js 20.15+ installed and active
+- [ ] npm 10+ available
 - [ ] Git configured with user details
 - [ ] VS Code with recommended extensions
 - [ ] Project cloned and dependencies installed
 
 ### Development Verification
 
-- [ ] `npm run electron-dev` starts successfully
-- [ ] Hot reload works for both frontend and backend
+- [ ] `npm run dev` starts Vite dev server successfully
+- [ ] `npm run electron-dev` starts both Vite and Electron
+- [ ] Hot reload works for both frontend and backend changes
 - [ ] TypeScript compilation works without errors
 - [ ] Linting passes without errors
 - [ ] Tests run successfully

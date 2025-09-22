@@ -159,345 +159,329 @@ Always follow this order to minimize breaking changes:
 
 ### Component Structure
 
-````tsx
+**Current Implementation Pattern:**
+
+```tsx
 // Import standardized prop types for consistency
-import type {
- CoreComponentProperties,
- EventHandlers,
- ComponentProperties,
-} from "shared/types/componentProps";
+import type { ComponentSize, ComponentVariant } from "@shared/types/componentProps";
+import type { JSX } from "react/jsx-runtime";
+
+import { useCallback, useEffect, useState } from "react";
 
 /**
  * Component description following TSDoc guidelines
  *
  * @remarks
- * Detailed remarks about the component's purpose and behavior. See
- * {@link https://github.com/nick2bad4u/uptime-watcher/blob/main/docs/Architecture/Patterns/Component-Props-Standards.md | Component Props Standards}
- * for prop naming and structure guidelines.
+ * Detailed remarks about the component's purpose and behavior. Components
+ * should be functional components using hooks for state management and
+ * lifecycle operations.
  *
  * @example
  *
  * ```tsx
  * <MyComponent
- *  identifier="unique-id"
- *  onClick={handleClick}
- *  isLoading={false}
- * />;
+ *   siteName="Example Site"
+ *   onAction={handleAction}
+ *   isLoading={false}
+ * />
  * ```
  *
- * @param props - Component props following standardized patterns
+ * @param props - Component properties using standardized patterns
  *
  * @returns JSX element description
  *
  * @public
  */
-export const MyComponent = React.memo(function MyComponent({
- // Core props (always first)
- identifier,
- className = "",
- isDisabled = false,
+export const MyComponent = ({
+  // Core props
+  siteName,
+  className = "",
+  disabled = false,
 
- // Event handlers (using standardized signatures)
- onClick,
- onChange,
+  // Event handlers
+  onAction,
+  onChange,
 
- // Component-specific props
- customProp,
-}: MyComponentProperties) {
- // State and hooks
- const { state } = useAppropriateStore();
+  // Component-specific props
+  customProp,
+}: MyComponentProperties): JSX.Element => {
+  // State and hooks
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
- // Event handlers with standardized patterns
- const handleClick = useCallback<EventHandlers.ClickHandler>(
-  (event) => {
-   event?.stopPropagation(); // Prevent event bubbling
-   if (isDisabled) return;
-   onClick?.(event);
-  },
-  [onClick, isDisabled]
- );
+  // Event handlers with proper typing
+  const handleClick = useCallback(
+    (event: React.MouseEvent) => {
+      event?.stopPropagation(); // Prevent event bubbling
+      if (disabled || isLoading) return;
+      onAction?.(event);
+    },
+    [onAction, disabled, isLoading]
+  );
 
- const handleChange = useCallback<EventHandlers.ChangeHandler<string>>(
-  (event) => {
-   const value = event.target.value;
-   onChange?.(value, event);
-  },
-  [onChange]
- );
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value;
+      onChange?.(value, event);
+    },
+    [onChange]
+  );
 
- // Early returns
- if (conditionalReturn) {
-  return <></>;
- }
+  // Effect cleanup pattern
+  useEffect(
+    function setupComponent() {
+      // Setup logic here
+      
+      return function cleanup() {
+        // Cleanup logic here
+      };
+    },
+    [/* dependencies */]
+  );
 
- // Main render
- return (
-  <ThemedBox className={className} data-testid={`my-component-${identifier}`}>
-   {/* Component content */}
-  </ThemedBox>
- );
-});
-````
+  // Early returns for conditional rendering
+  if (conditionalReturn) {
+    return <></>;
+  }
 
-// Main render
-return <ThemedBox>{/_Component content_/}</ThemedBox>;
-});
+  // Main render
+  return (
+    <div className={className} data-testid={`my-component-${siteName}`}>
+      {/* Component content */}
+    </div>
+  );
+};
+```
 
 ### Props Interface
 
 ```tsx
 /**
- * Props for the MyComponent component following standardized patterns.
+ * Props for the MyComponent component following current patterns.
  *
  * @remarks
- * Extends CoreComponentProperties for consistent base props across all
- * components. Uses standardized event handler signatures from EventHandlers
- * namespace.
+ * Uses modern TypeScript interfaces with proper typing and optional properties.
+ * Components receive specific props rather than extending large base interfaces.
  *
  * @public
  */
-export interface MyComponentProperties
- extends ComponentProperties<{
-  /** Component-specific prop with clear description */
-  customProp: string;
-  /** Optional configuration prop */
-  enableFeature?: boolean;
- }> {
- /** Standard click handler following EventHandlers pattern */
- onClick?: EventHandlers.ClickHandler;
- /** Standard change handler with typed value */
- onChange?: EventHandlers.ChangeHandler<string>;
+export interface MyComponentProperties {
+  /** Site name for identification and display */
+  readonly siteName: string;
+  /** Additional CSS classes for styling customization */
+  readonly className?: string;
+  /** Whether the component is disabled and non-interactive */
+  readonly disabled?: boolean;
+  /** Component-specific configuration prop */
+  readonly customProp: string;
+  /** Optional feature toggle */
+  readonly enableFeature?: boolean;
+  
+  /** Event handlers with proper typing */
+  readonly onAction?: (event: React.MouseEvent) => void;
+  readonly onChange?: (value: string, event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-// Alternative: For components with extensive props, use intersection types
-export interface MyComplexComponentProperties
- extends CoreComponentProperties,
-  AccessibilityProperties {
- /** Event handlers group */
- onClick?: EventHandlers.ClickHandler;
- onSubmit?: EventHandlers.SubmitHandler;
- onKeyDown?: EventHandlers.KeyboardHandler;
+// For complex components, use specific interfaces
+export interface ComplexComponentProperties {
+  /** Component identification */
+  readonly siteName: string;
+  readonly className?: string;
+  readonly disabled?: boolean;
 
- /** Component configuration */
- variant?: "primary" | "secondary" | "danger";
- size?: "sm" | "md" | "lg";
+  /** Event handlers group */
+  readonly onClick?: (event: React.MouseEvent) => void;
+  readonly onSubmit?: (event: React.FormEvent) => void;
+  readonly onKeyDown?: (event: React.KeyboardEvent) => void;
 
- /** Data props */
- items: Array<{ id: string; label: string }>;
- selectedItemId?: string;
+  /** Component configuration */
+  readonly variant?: ComponentVariant;
+  readonly size?: ComponentSize;
+
+  /** Data props */
+  readonly items: Array<{ id: string; label: string }>;
+  readonly selectedItemId?: string;
 }
 ```
 
-### Key Guidelines
+### Key Guidelines for Current Implementation
 
-- **Always use React.memo**: Prevents unnecessary re-renders
-- **Extend standardized interfaces**: Use `ComponentProperties<T>` or intersect with `CoreComponentProperties`
-- **Standardized event handlers**: Use types from `EventHandlers` namespace for consistent signatures
-- **Alphabetical prop ordering**: Core props first, then event handlers, then component-specific props
-- **Event handler naming**: Use `handle` prefix for internal handlers, standardized signatures for props
-- **Proper prop typing**: Never use `any` or `unknown`, leverage standardized types
+- **Functional Components**: Use functional components with hooks (no React.memo unless performance issues)
+- **Specific Interfaces**: Create specific prop interfaces rather than extending large base types
+- **Readonly Properties**: Mark all props as readonly for immutability
+- **Proper Event Typing**: Use specific React event types rather than generic handlers
+- **JSX.Element Return**: Use `JSX.Element` as return type for clarity
+- **Named Functions in useEffect**: Use named functions in useEffect for better debugging
+- **Event handler naming**: Use `handle` prefix for internal handlers
 - **Stop event propagation**: Add `event?.stopPropagation()` in button click handlers within cards
-- **Accessibility first**: Include `data-testid` attributes using component identifier
-- **Import standardized types**: Always import from `shared/types/componentProps` for consistency
+- **Accessibility**: Include `data-testid` attributes using component identifier
+- **Import standardized types**: Import types from `@shared/types/componentProps` when available
 
 ## Component Props Standards
 
-For comprehensive prop interface guidelines, see the [Component Props Standards](../Architecture/Patterns/Component-Props-Standards.md) documentation.
+The application provides reusable prop type definitions in `shared/types/componentProps.ts` for common patterns:
 
-### Using Standardized Prop Types
-
-The application provides reusable prop type definitions in `shared/types/componentProps.ts`:
-
-#### Core Properties
+### Using Standardized Types
 
 ```tsx
 import type {
- CoreComponentProperties,
- AccessibilityProperties,
- ComponentProperties,
-} from "shared/types/componentProps";
+  ComponentSize,
+  ComponentVariant,
+  SubmitHandler,
+} from "@shared/types/componentProps";
 
-// Simple component extending core properties
-interface SimpleButtonProperties extends CoreComponentProperties {
- label: string;
- onClick?: EventHandlers.ClickHandler;
-}
-
-// Component with accessibility features
-interface AccessibleFormProperties
- extends CoreComponentProperties,
-  AccessibilityProperties {
- onSubmit: EventHandlers.SubmitHandler;
-}
-
-// Complex component using utility type
-interface ComplexComponentProperties
- extends ComponentProperties<{
-  items: Array<{ id: string; name: string }>;
-  selectedId?: string;
-  onSelectionChange: (id: string) => void;
- }> {
- // Event handlers are included via ComponentProperties
- // Core props (className, isDisabled, etc.) are included
+// Use standardized size and variant types
+interface ButtonProperties {
+  readonly size?: ComponentSize; // "xs" | "sm" | "md" | "lg" | "xl"
+  readonly variant?: ComponentVariant; // "primary" | "secondary" | "danger" | etc.
+  readonly onSubmit?: SubmitHandler; // Standardized form submission handler
 }
 ```
 
-#### Event Handler Standards
+### Current Event Handler Patterns
 
 ```tsx
-import type { EventHandlers } from "shared/types/componentProps";
-
-// Standard click handler
-const handleClick: EventHandlers.ClickHandler = useCallback((event) => {
- event?.stopPropagation();
- // Handle click logic
-}, []);
-
-// Change handler with typed value
-const handleNameChange: EventHandlers.ChangeHandler<string> = useCallback(
- (value, event) => {
-  setName(value);
-  onChange?.(value, event);
- },
- [onChange]
+// Standard event handlers used in current implementation
+const handleClick = useCallback(
+  (event: React.MouseEvent) => {
+    event?.stopPropagation();
+    if (disabled) return;
+    onClick?.(event);
+  },
+  [onClick, disabled]
 );
 
-// Submit handler with form data
-const handleSubmit: EventHandlers.SubmitHandler = useCallback(
- (event) => {
-  event.preventDefault();
-  const formData = new FormData(event.currentTarget);
-  onSubmit?.(formData, event);
- },
- [onSubmit]
+// Input change handler
+const handleChange = useCallback(
+  (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    onChange?.(value, event);
+  },
+  [onChange]
 );
-```
 
-#### Standard Button Properties
-
-```tsx
-import type { StandardButtonProperties } from "shared/types/componentProps";
-
-// Button component using standard properties
-interface ActionButtonProperties extends StandardButtonProperties {
- action: "save" | "cancel" | "delete";
- confirmationRequired?: boolean;
-}
-
-const ActionButton: React.FC<ActionButtonProperties> = ({
- // Standard button props
- variant = "primary",
- size = "md",
- isLoading = false,
- isDisabled = false,
- onClick,
-
- // Component-specific props
- action,
- confirmationRequired = false,
-
- // Core props
- className = "",
- children,
-}) => {
- // Implementation using standardized patterns
-};
+// Form submission handler
+const handleSubmit = useCallback(
+  (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    onSubmit?.(formData, event);
+  },
+  [onSubmit]
+);
 ```
 
 ## State Management
 
-### Modular Zustand Store Architecture
+### Current Store Architecture
 
-The application uses **two store patterns** based on complexity requirements:
+The application uses **Zustand** for state management with two main patterns:
 
 #### Pattern 1: Direct Create (Simple Stores)
 
 For simple stores with single responsibility:
 
 ```typescript
-// ✅ Good: Direct create pattern for simple stores
+// Current implementation example - UI Store
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-export const useErrorStore = create<ErrorStore>()((set, get) => ({
- // Initial state
- isLoading: false,
- lastError: undefined,
- storeErrors: {},
+export const useUIStore = create<UIStore>()(
+  persist(
+    (set, get) => ({
+      // Initial state
+      showAddSiteModal: false,
+      showSettings: false,
+      showSiteDetails: false,
+      selectedSiteId: undefined,
+      activeTab: "dashboard",
 
- // Actions
- setError: (error: string | undefined) => {
-  logStoreAction("ErrorStore", "setError", { error });
-  set({ lastError: error });
- },
- setLoading: (loading: boolean) => {
-  logStoreAction("ErrorStore", "setLoading", { loading });
-  set({ isLoading: loading });
- },
-}));
+      // Actions
+      setShowAddSiteModal: (show: boolean) => {
+        logStoreAction("UIStore", "setShowAddSiteModal", { show });
+        set({ showAddSiteModal: show });
+      },
+
+      setShowSettings: (show: boolean) => {
+        logStoreAction("UIStore", "setShowSettings", { show });
+        set({ showSettings: show });
+      },
+
+      setSelectedSiteId: (siteId: string | undefined) => {
+        logStoreAction("UIStore", "setSelectedSiteId", { siteId });
+        set({ selectedSiteId: siteId });
+      },
+
+      // Compound actions
+      showSiteDetails: (siteId: string) => {
+        logStoreAction("UIStore", "showSiteDetails", { siteId });
+        set({
+          selectedSiteId: siteId,
+          showSiteDetails: true,
+        });
+      },
+    }),
+    {
+      name: "ui-store",
+      partialize: (state) => ({
+        // Persist user preferences only
+        activeTab: state.activeTab,
+        // Don't persist modal states or temporary selections
+      }),
+    }
+  )
+);
 ```
 
 #### Pattern 2: Modular Composition (Complex Stores)
 
-For complex stores with multiple domains and extensive operations:
+For complex stores with multiple concerns:
 
 ```typescript
-// ✅ Good: Modular composition for complex stores
+// Current implementation example - Sites Store
 import { create } from "zustand";
 
 export const useSitesStore = create<SitesStore>()((set, get) => {
- // Create state actions
- const stateActions = createSitesStateActions(set, get);
+  // Create state actions module
+  const stateActions = createSitesStateActions(set, get);
 
- // Shared functions between modules
- const getSites = () => get().sites;
+  // Create specialized operation modules with dependencies
+  const operationsActions = createSiteOperationsActions({
+    addSite: stateActions.addSite,
+    removeSite: stateActions.removeSite,
+    setSites: stateActions.setSites,
+    getSites: () => get().sites,
+  });
 
- // Create specialized action modules
- const syncActions = createSiteSyncActions({
-  getSites,
-  setSites: stateActions.setSites,
- });
+  const monitoringActions = createSiteMonitoringActions();
+  
+  const syncActions = createSiteSyncActions({
+    setSites: stateActions.setSites,
+    getSites: () => get().sites,
+  });
 
- const monitoringActions = createSiteMonitoringActions();
- const operationsActions = createSiteOperationsActions({
-  addSite: stateActions.addSite,
-  getSites,
-  removeSite: stateActions.removeSite,
-  setSites: stateActions.setSites,
-  syncSitesFromBackend: syncActions.syncSitesFromBackend,
- });
-
- return {
-  // Initial state
-  ...initialSitesState,
-  // Composed actions from modules
-  ...stateActions,
-  ...operationsActions,
-  ...monitoringActions,
-  ...syncActions,
- };
+  return {
+    // Initial state
+    ...initialSitesState,
+    
+    // Composed actions from modules
+    ...stateActions,
+    ...operationsActions,
+    ...monitoringActions,
+    ...syncActions,
+  };
 });
 ```
 
-#### Choosing the Right Pattern
+#### Current Store Examples by Pattern
 
-**Use Direct Create Pattern when:**
+**Direct Pattern Stores:**
+- `useUIStore` - Modal states, tab selections, user preferences
+- `useErrorStore` - Error handling and loading states
+- `useUpdatesStore` - Application update management
+- `useSettingsStore` - Configuration and user settings
 
-- Single responsibility/domain (error handling, settings, UI state)
-- Simple state structure (typically <200 lines)
-- Limited cross-cutting concerns
-- Straightforward action implementations
-
-**Use Modular Composition Pattern when:**
-
-- Multiple interconnected domains (sites + monitors + history)
-- Complex business logic requiring separation of concerns
-- Extensive operations requiring dependency injection
-- Large stores benefiting from module separation (typically >300 lines)
-
-**Current Store Examples:**
-
-- **Direct Pattern**: `useErrorStore`, `useUpdatesStore`, `useSettingsStore`, `useUIStore`, `useMonitorTypesStore`
-- **Modular Pattern**: `useSitesStore` (manages sites, monitors, sync, operations)
+**Modular Pattern Stores:**
+- `useSitesStore` - Sites, monitors, operations, synchronization
 
 ### Store Module Structure
 
@@ -576,40 +560,71 @@ export const useDomainStore = create<DomainStore>()(
 
 ## Event Handling
 
-### Button Event Handling
+### Event Handler Implementation
 
 ```tsx
-// Correct: Prevents event bubbling to parent card
+// Standard button click handling
 const handleButtonClick = useCallback(
- (event: React.MouseEvent) => {
-  event?.stopPropagation();
-  onAction();
- },
- [onAction]
+  (event: React.MouseEvent) => {
+    event?.stopPropagation(); // Prevents event bubbling to parent cards
+    if (disabled || isLoading) return;
+    onAction?.();
+  },
+  [onAction, disabled, isLoading]
 );
 
-// Incorrect: Event bubbles up to parent card
-const handleButtonClick = useCallback(() => {
- onAction();
-}, [onAction]);
+// Input change handling
+const handleInputChange = useCallback(
+  (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setValue(value);
+    onChange?.(value, event);
+  },
+  [onChange]
+);
+
+// Form submission
+const handleFormSubmit = useCallback(
+  (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    onSubmit?.(formData);
+  },
+  [onSubmit]
+);
 ```
 
-### Keyboard Events
+### Keyboard Event Handling
 
 ```tsx
 // Modal escape key handling
-useEffect(() => {
- const handleKeyDown = (event: KeyboardEvent) => {
-  if (event.key === "Escape") {
-   onClose();
-  }
- };
+useEffect(
+  function setupKeyboardHandlers() {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
 
- document.addEventListener("keydown", handleKeyDown);
- return () => {
-  document.removeEventListener("keydown", handleKeyDown);
- };
-}, [onClose]);
+    document.addEventListener("keydown", handleKeyDown);
+    
+    return function cleanup() {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  },
+  [onClose]
+);
+
+// Component-specific keyboard handling
+const handleKeyDown = useCallback(
+  (event: React.KeyboardEvent) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSubmit();
+    }
+  },
+  [handleSubmit]
+);
 ```
 
 ## Modal Development
@@ -773,25 +788,138 @@ const handleStartMonitoring = useCallback<EventHandlers.ClickHandler>(
 
 ## Testing Strategy
 
-### Component Testing
+### Current Testing Approach
 
-- **Render Tests**: Verify component renders without errors
-- **Interaction Tests**: Test button clicks, form submissions
-- **State Tests**: Verify state updates work correctly
-- **Integration Tests**: Test component integration with stores
-- **Accessibility Tests**: Verify keyboard navigation and screen reader support
+The application uses **Vitest** for unit testing with comprehensive mocking strategies:
 
-### Testing Hooks
+#### Component Testing
 
-```tsx
-// Test custom hooks with renderHook
-import { renderHook } from "@testing-library/react";
+```typescript
+// Component render and interaction testing
+import { render, screen, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest';
+import { MyComponent } from './MyComponent';
 
-test("useSiteActions provides correct handlers", () => {
- const { result } = renderHook(() => useSiteActions(mockSite, mockMonitor));
+describe('MyComponent', () => {
+  it('renders without errors', () => {
+    render(<MyComponent siteName="test-site" />);
+    expect(screen.getByTestId('my-component-test-site')).toBeInTheDocument();
+  });
 
- expect(result.current.handleStartMonitoring).toBeDefined();
- expect(result.current.handleStopMonitoring).toBeDefined();
+  it('handles click events correctly', () => {
+    const mockOnAction = vi.fn();
+    render(<MyComponent siteName="test-site" onAction={mockOnAction} />);
+    
+    fireEvent.click(screen.getByRole('button'));
+    expect(mockOnAction).toHaveBeenCalledTimes(1);
+  });
+
+  it('prevents event propagation', () => {
+    const mockOnAction = vi.fn();
+    const mockParentClick = vi.fn();
+    
+    render(
+      <div onClick={mockParentClick}>
+        <MyComponent siteName="test-site" onAction={mockOnAction} />
+      </div>
+    );
+    
+    fireEvent.click(screen.getByRole('button'));
+    expect(mockOnAction).toHaveBeenCalledTimes(1);
+    expect(mockParentClick).not.toHaveBeenCalled();
+  });
+});
+```
+
+#### Store Testing
+
+```typescript
+// Zustand store testing with act
+import { act, renderHook } from '@testing-library/react';
+import { useSitesStore } from './useSitesStore';
+
+describe('useSitesStore', () => {
+  beforeEach(() => {
+    // Reset store state before each test
+    useSitesStore.getState().setSites([]);
+  });
+
+  it('adds site correctly', () => {
+    const { result } = renderHook(() => useSitesStore());
+    const newSite = { id: 'test-1', name: 'Test Site', monitors: [] };
+
+    act(() => {
+      result.current.addSite(newSite);
+    });
+
+    expect(result.current.sites).toContain(newSite);
+  });
+
+  it('handles async operations', async () => {
+    const { result } = renderHook(() => useSitesStore());
+
+    await act(async () => {
+      await result.current.syncSitesFromBackend();
+    });
+
+    expect(result.current.sites.length).toBeGreaterThan(0);
+  });
+});
+```
+
+#### Mock Strategies
+
+```typescript
+// ElectronAPI mocking for components
+const mockElectronAPI = {
+  sites: {
+    addSite: vi.fn(),
+    deleteSite: vi.fn(),
+    getSites: vi.fn().mockResolvedValue([]),
+  },
+  events: {
+    onMonitorStatusChanged: vi.fn(() => () => {}),
+    onMonitorUp: vi.fn(() => () => {}),
+    onMonitorDown: vi.fn(() => () => {}),
+  },
+};
+
+// Global mock setup
+Object.defineProperty(window, 'electronAPI', {
+  value: mockElectronAPI,
+  writable: true,
+});
+```
+
+#### Integration Testing
+
+```typescript
+// Testing component integration with stores
+import { render, screen, waitFor } from '@testing-library/react';
+import { ThemeProvider } from '../theme/components/ThemeProvider';
+import { MyIntegratedComponent } from './MyIntegratedComponent';
+
+const renderWithProviders = (component: React.ReactElement) => {
+  return render(
+    <ThemeProvider>
+      {component}
+    </ThemeProvider>
+  );
+};
+
+describe('MyIntegratedComponent Integration', () => {
+  it('updates UI when store changes', async () => {
+    renderWithProviders(<MyIntegratedComponent />);
+    
+    // Trigger store update
+    act(() => {
+      useSitesStore.getState().addSite(mockSite);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Site')).toBeInTheDocument();
+    });
+  });
 });
 ```
 
@@ -922,25 +1050,99 @@ try {
 }
 ```
 
-## Real-Time Updates & Event System Debugging
+## Real-Time Updates & Event Integration
 
-### Event Flow Architecture
+### Current EventsService Architecture
 
-Understanding the complete event flow is crucial for debugging real-time UI updates:
+The application uses **EventsService** abstraction for backend event integration:
 
 ```text
-Enhanced/Traditional Monitoring → Event Bus → ServiceContainer →
-UptimeOrchestrator → ApplicationService → IPC → Preload → Frontend
+Backend Services → TypedEventBus → IPC → EventsService → React Components
 ```
 
-### Key Lessons from Monitor Status Update Issues
+### Setting Up Event Listeners
 
-When UI doesn't update after backend operations:
+```typescript
+// Component or hook event listener setup
+import { EventsService } from '../services/EventsService';
 
-1. **Verify Event Emission**: Check if the backend service is emitting the correct events
-2. **Check Event Types**: Ensure emitted events match the defined UptimeEvents interface
-3. **Trace Event Forwarding**: Verify events flow through the complete chain
-4. **Validate Event Payloads**: Ensure event data matches expected interface structure
+export const useMonitorEventIntegration = () => {
+  const sitesStore = useSitesStore();
+
+  useEffect(
+    function setupEventListeners() {
+      const cleanupFunctions: Array<() => void> = [];
+
+      const initializeEventListeners = async () => {
+        try {
+          // Monitor status change events
+          const statusCleanup = await EventsService.onMonitorStatusChanged((data) => {
+            sitesStore.updateMonitorStatus(data.siteId, data.monitor);
+          });
+          cleanupFunctions.push(statusCleanup);
+
+          // Monitor up/down events
+          const upCleanup = await EventsService.onMonitorUp((data) => {
+            sitesStore.handleMonitorUp(data.siteId, data.monitorId);
+          });
+          cleanupFunctions.push(upCleanup);
+
+          const downCleanup = await EventsService.onMonitorDown((data) => {
+            sitesStore.handleMonitorDown(data.siteId, data.monitorId);
+          });
+          cleanupFunctions.push(downCleanup);
+
+          // Cache invalidation events
+          const cacheCleanup = await EventsService.onCacheInvalidated((data) => {
+            if (data.domain === 'sites') {
+              sitesStore.syncSitesFromBackend();
+            }
+          });
+          cleanupFunctions.push(cacheCleanup);
+
+        } catch (error) {
+          logger.error('Failed to setup event listeners:', error);
+        }
+      };
+
+      initializeEventListeners();
+
+      return function cleanup() {
+        cleanupFunctions.forEach(cleanup => cleanup());
+      };
+    },
+    [sitesStore]
+  );
+};
+```
+
+### Cache Synchronization Pattern
+
+```typescript
+// Current cache sync implementation (used in App.tsx)
+import { setupCacheSync } from '../utils/cacheSync';
+
+useMount(
+  useCallback(async function initializeApp() {
+    // Initialize stores first
+    await sitesStore.syncSitesFromBackend();
+    await settingsStore.initializeSettings();
+
+    // Setup automatic cache sync
+    const cacheSyncCleanup = setupCacheSync();
+    cacheSyncCleanupRef.current = cacheSyncCleanup;
+
+    setIsInitialized(true);
+  }, []),
+  
+  useCallback(function cleanup() {
+    // Cleanup cache sync on unmount
+    if (cacheSyncCleanupRef.current) {
+      cacheSyncCleanupRef.current();
+    }
+  }, [])
+);
+```
 
 ### Common Event System Issues
 
@@ -1084,16 +1286,30 @@ try {
 
 ## Summary
 
-This guide provides a foundation for consistent, maintainable UI development in the Uptime Watcher application. Always:
+This guide provides comprehensive guidelines for UI development in the Uptime Watcher application based on current implementation patterns. Always follow these practices:
 
-1. Follow established architectural patterns
-2. Plan before implementing
-3. Consider reusability from the start
-4. Implement proper error handling and logging
-5. Write comprehensive tests and documentation
-6. **Verify real-time event flows work end-to-end**
-7. **Use existing services rather than creating placeholders**
-8. **Ensure event names match the UptimeEvents interface**
-9. Review code against these guidelines before submission
+### Core Development Principles
 
-By following these practices, we ensure a consistent, maintainable, and scalable codebase that follows React and TypeScript best practices while adhering to the application's specific architectural requirements.
+1. **Follow Current Architecture**: Use functional components with hooks, Zustand stores, and EventsService integration
+2. **Plan Before Implementing**: Understand data flows and integration points before writing code
+3. **Use Specific Types**: Create focused prop interfaces rather than extending large base types
+4. **Implement Proper Event Handling**: Include `event?.stopPropagation()` and proper error boundaries
+5. **Write Comprehensive Tests**: Include component, integration, and store testing with proper mocking
+
+### Current Implementation Standards
+
+6. **Component Structure**: Use `JSX.Element` return types, named functions in useEffect, and proper cleanup patterns
+7. **Store Patterns**: Choose between direct create (simple stores) and modular composition (complex stores) appropriately
+8. **Event Integration**: Use EventsService abstraction for backend communication and cache synchronization
+9. **Type Safety**: Use readonly props, specific React event types, and avoid `any` or `unknown`
+10. **Testing Strategy**: Use Vitest with comprehensive mocking and proper store state management
+
+### Quality Assurance
+
+- **Code Review**: Verify implementation follows established patterns before submission
+- **Performance**: Use proper dependency arrays in useCallback and useEffect
+- **Accessibility**: Include data-testid attributes and proper keyboard navigation
+- **Security**: Validate all inputs and use secure JSON parsing patterns
+- **Documentation**: Maintain TSDoc comments following project guidelines
+
+By following these practices, we ensure a consistent, maintainable, and scalable codebase that reflects the current architectural patterns and provides excellent developer experience.

@@ -38,7 +38,7 @@ First, please check our comprehensive documentation:
 
 - **[README.md](README.md)** - Project overview and quick start
 - **[docs/](docs/)** - Detailed documentation and guides
-- **[Developer Quick Start](docs/Guides/developer-quick-start.md)** - Getting started with development
+- **[Developer Quick Start](docs/Guides/DEVELOPER-QUICK-START.md)** - Getting started with development
 - **[Troubleshooting Guide](docs/Guides/troubleshooting.md)** - Common issues and solutions
 
 ### 🐛 Reporting Bugs
@@ -88,7 +88,7 @@ Please follow these guidelines when seeking support:
 
 ### Common Issues
 
-1. **Application won't start**: Check Node.js version (>=24.0.0 required)
+1. **Application won't start**: Check Node.js version (>=24.8.0 required)
 2. **Build failures**: Try `npm clean-install` to refresh dependencies
 3. **Test failures**: Ensure you're using the correct Node.js version
 4. **Electron issues**: Check our [Electron troubleshooting guide](docs/Guides/troubleshooting.md)
@@ -97,7 +97,7 @@ Please follow these guidelines when seeking support:
 
 If you're having trouble setting up the development environment:
 
-1. Follow the [developer quick start guide](docs/Guides/developer-quick-start.md)
+1. Follow the [developer quick start guide](docs/Guides/DEVELOPER-QUICK-START.md)
 2. Check the [environment setup documentation](docs/Guides/environment-setup.md)
 3. Ensure you meet all [requirements](README.md)
 

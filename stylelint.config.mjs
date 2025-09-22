@@ -1,27 +1,107 @@
 /**
- * Stylelint configuration for the Uptime Watcher project. Enforces modern CSS
- * coding standards, logical properties, OKLCH colors, and best practices.
+ * Comprehensive Stylelint configuration for the Uptime Watcher project.
  *
- * Extends stylelint-config-standard which provides sensible defaults for CSS
- * property order, formatting, and modern CSS practices.
+ * @remarks
+ * This configuration enforces modern CSS coding standards, logical properties,
+ * OKLCH colors, and accessibility best practices. It extends stylelint-config-standard
+ * which provides sensible defaults for CSS property order, formatting, and modern CSS practices.
  *
- * Now includes comprehensive support for:
- *
+ * The configuration includes comprehensive support for multiple file types and syntax variations:
  * - HTML files with inline CSS
  * - TypeScript/JavaScript React components with CSS-in-JS
  * - Styled JSX components
- * - CSS Modules
- * - SCSS/Sass files
+ * - CSS Modules with scoped class names
+ * - SCSS/Sass files with full preprocessing support
+ *
+ * @see {@link https://stylelint.io/user-guide/configure | Stylelint Configuration Guide}
+ * @see {@link https://github.com/stylelint/stylelint-config-standard | stylelint-config-standard}
+ *
+ * @public
  */
 
+/**
+ * Type definition for the complete Stylelint configuration object.
+ *
+ * @see {@link https://stylelint.io/user-guide/configure | Stylelint Config Schema}
+ */
 /** @type {import("stylelint").Config} */
 
+/**
+ * Enhanced configuration helper that provides TypeScript intellisense and validation.
+ *
+ * @remarks
+ * The stylelint-define-config package wraps the configuration object with proper
+ * TypeScript type checking while preserving runtime behavior.
+ *
+ * @see {@link https://github.com/stylelint-types/stylelint-define-config | stylelint-define-config}
+ */
 // eslint-disable-next-line n/no-unpublished-import, import-x/no-named-as-default -- dev tools
 import defineConfig from "stylelint-define-config";
 
+/**
+ * Complete Stylelint configuration object defining all linting rules and settings.
+ *
+ * @remarks
+ * This configuration provides a comprehensive setup for CSS/SCSS linting across
+ * the entire Uptime Watcher project. It combines multiple plugin ecosystems to
+ * enforce modern CSS standards, accessibility guidelines, and performance best practices.
+ *
+ * The configuration is structured in several key sections:
+ * - Basic options (allowEmptyInput, defaultSeverity, fix, etc.)
+ * - Extended configurations from popular rule sets
+ * - File-type specific overrides for different syntax requirements
+ * - Plugin definitions for enhanced functionality
+ * - Comprehensive rule definitions with custom settings
+ *
+ * @example
+ * ```typescript
+ * // Basic usage in a project
+ * import config from './stylelint.config.mjs';
+ *
+ * // The configuration handles multiple file types automatically:
+ * // - .css, .scss files with full preprocessing
+ * // - .html files with inline styles
+ * // - .tsx, .jsx files with CSS-in-JS
+ * // - .module.css files with CSS Modules scoping
+ * ```
+ *
+ * @returns The complete Stylelint configuration object with all rules and plugins
+ *
+ * @see {@link https://stylelint.io/user-guide/configure | Stylelint Configuration Documentation}
+ * @see {@link https://github.com/stylelint/stylelint-config-standard | stylelint-config-standard Rules}
+ *
+ * @public
+ */
 export default defineConfig({
+    /**
+     * Controls whether Stylelint should allow empty input files.
+     *
+     * @defaultValue false
+     * @see {@link https://stylelint.io/user-guide/configure/#allowemptyinput | allowEmptyInput Documentation}
+     */
     allowEmptyInput: false,
+
+    /**
+     * Default severity level for all rules that don't specify their own severity.
+     *
+     * @defaultValue "warning"
+     * @see {@link https://stylelint.io/user-guide/configure/#defaultseverity | defaultSeverity Documentation}
+     */
     defaultSeverity: "warning",
+
+    /**
+     * Baseline configuration sets that provide foundational rules and standards.
+     *
+     * @remarks
+     * These configurations are applied in order, with later configurations potentially
+     * overriding rules from earlier ones. The combination provides:
+     * - Standard CSS linting rules
+     * - Property ordering based on logical groupings
+     * - SCSS-specific enhancements
+     * - Tailwind CSS compatibility
+     *
+     * @see {@link https://stylelint.io/user-guide/configure/#extends | extends Documentation}
+     */
     extends: [
         "stylelint-config-standard",
         "stylelint-config-recess-order",
@@ -29,11 +109,50 @@ export default defineConfig({
         "stylelint-config-standard-scss",
         "stylelint-config-tailwindcss",
     ],
+
+    /**
+     * Controls whether Stylelint should automatically fix problems where possible.
+     *
+     * @defaultValue false
+     * @remarks
+     * Set to false to prevent automatic modifications. Use CLI --fix flag instead
+     * for controlled fixing when desired.
+     *
+     * @see {@link https://stylelint.io/user-guide/configure/#fix | fix Documentation}
+     */
     fix: false,
+
+    /**
+     * Controls whether disable comments are ignored.
+     *
+     * @defaultValue false
+     * @see {@link https://stylelint.io/user-guide/configure/#ignoredisables | ignoreDisables Documentation}
+     */
     ignoreDisables: false,
+
+    /**
+     * File-type specific configuration overrides for different CSS syntaxes and contexts.
+     *
+     * @remarks
+     * Each override object targets specific file patterns and applies custom rules
+     * appropriate for that context. This allows the same configuration to handle
+     * multiple CSS paradigms and frameworks effectively.
+     *
+     * The overrides are processed in order and can cascade, with later overrides
+     * potentially modifying rules from earlier ones for overlapping file patterns.
+     *
+     * @see {@link https://stylelint.io/user-guide/configure/#overrides | overrides Documentation}
+     */
     // Override configurations for different file types
     overrides: [
         {
+            /**
+             * Configuration for HTML files containing inline CSS styles.
+             *
+             * @remarks
+             * Uses postcss-html parser to extract and lint CSS from style attributes
+             * and style elements. Relaxes some rules that are impractical for inline styles.
+             */
             // HTML files with inline CSS
             customSyntax: "postcss-html",
             files: ["**/*.html"],
@@ -46,6 +165,14 @@ export default defineConfig({
             },
         },
         {
+            /**
+             * Configuration for TypeScript/JavaScript React files using CSS-in-JS.
+             *
+             * @remarks
+             * Uses postcss-styled-syntax to parse CSS within template literals,
+             * styled-components, emotion, and similar CSS-in-JS solutions.
+             * Allows patterns that are common in CSS-in-JS but invalid in regular CSS.
+             */
             // TypeScript and JavaScript React files with CSS-in-JS
             customSyntax: "postcss-styled-syntax",
             files: ["**/*.{tsx,jsx,ts,js}"],
@@ -62,6 +189,13 @@ export default defineConfig({
             },
         },
         {
+            /**
+             * Configuration for styled-jsx syntax in React components.
+             *
+             * @remarks
+             * Styled-jsx uses a different syntax pattern than other CSS-in-JS solutions,
+             * requiring a specialized parser and rule adjustments.
+             */
             // Styled JSX files
             customSyntax: "postcss-styled-jsx",
             files: ["**/*.{jsx,tsx}"],
@@ -75,6 +209,14 @@ export default defineConfig({
             },
         },
         {
+            /**
+             * Configuration for CSS Modules with local scoping.
+             *
+             * @remarks
+             * CSS Modules automatically scope class and ID names, making global
+             * naming conventions less relevant. Relaxes pattern-based rules that
+             * would otherwise conflict with generated class names.
+             */
             // CSS modules
             files: ["**/*.module.{css,scss,sass}"],
             rules: {
@@ -84,6 +226,14 @@ export default defineConfig({
             },
         },
         {
+            /**
+             * Configuration for Docusaurus documentation CSS files.
+             *
+             * @remarks
+             * Docusaurus themes often require specific CSS patterns for UI components
+             * and animations. This override accommodates theme-specific requirements
+             * while maintaining code quality standards.
+             */
             // Docusaurus documentation files
             files: ["docs/docusaurus/**/*.{css,scss}"],
             rules: {
@@ -100,6 +250,14 @@ export default defineConfig({
             },
         },
         {
+            /**
+             * Configuration for SCSS/Sass preprocessor files.
+             *
+             * @remarks
+             * Uses postcss-scss parser to handle SCSS syntax including variables,
+             * mixins, functions, and nesting. Enables SCSS-specific rules while
+             * disabling conflicting standard CSS rules.
+             */
             // SCSS files
             customSyntax: "postcss-scss",
             files: ["**/*.{scss,sass}"],
@@ -111,9 +269,31 @@ export default defineConfig({
         },
     ],
 
+    /**
+     * Collection of Stylelint plugins providing specialized linting capabilities.
+     *
+     * @remarks
+     * Plugins extend Stylelint's core functionality with additional rules for:
+     * - Accessibility compliance (a11y rules)
+     * - Performance optimization (defensive CSS, high-performance animations)
+     * - Modern CSS standards (logical properties, color gamut validation)
+     * - Code organization (BEM patterns, grouped selectors)
+     * - Browser compatibility (feature detection, hack prevention)
+     *
+     * Disabled plugins are documented with specific reasons for future reference.
+     *
+     * @see {@link https://stylelint.io/user-guide/configure/#plugins | plugins Documentation}
+     */
     plugins: [
+        /**
+         * Accessibility-focused linting rules for inclusive CSS.
+         * @see {@link https://github.com/double-great/stylelint-a11y | @double-great/stylelint-a11y}
+         */
         "@double-great/stylelint-a11y", // Accessibility rules
 
+        /**
+         * Core functional plugins for CSS best practices and performance.
+         */
         // Core functional plugins
         "stylelint-plugin-defensive-css",
         "stylelint-plugin-logical-css",
@@ -122,6 +302,9 @@ export default defineConfig({
         "stylelint-prettier",
         "stylelint-high-performance-animation",
 
+        /**
+         * Modern CSS standards and feature plugins.
+         */
         // Modern CSS and Standards plugins
         "@stylistic/stylelint-plugin", // Styling rules removed in Stylelint 16
         "stylelint-scales", // Enforce numeric value scales
@@ -132,29 +315,123 @@ export default defineConfig({
         "stylelint-no-unresolved-module", // Check for unresolved imports/urls
         "stylelint-selector-bem-pattern", // BEM pattern enforcement
 
+        /**
+         * Browser compatibility and cross-platform plugins.
+         */
         // Browser compatibility plugins
         "stylelint-no-browser-hacks", // Disallow browser hacks
         "stylelint-no-unsupported-browser-features", // Check browser support
 
+        /**
+         * Code organization and maintenance utility plugins.
+         */
         // Utility plugins
         "stylelint-order",
         "stylelint-declaration-block-no-ignored-properties",
         "stylelint-declaration-strict-value",
         "stylelint-group-selectors",
 
+        /**
+         * Disabled plugins with documented reasons for exclusion.
+         *
+         * @remarks
+         * These plugins are intentionally disabled due to compatibility issues,
+         * framework conflicts, or project-specific requirements. See individual
+         * comments for specific reasons and potential future updates.
+         */
         // Disabled plugins with reasons:
-        // "stylelint-a11y", // Disabled: Not supported in Stylelint 16. See https://github.com/YozhikM/stylelint-a11y/issues/186 for future updates or consider using postcss-a11y or other accessibility tools.
+        // "stylelint-a11y", // Disabled: Not supported in Stylelint 16. See https://github.com/YozhikM/stylelint-a11y for future updates or consider using postcss-a11y or other accessibility tools.
         // "stylelint-csstree-validator", // Disabled due to media query parsing issues: see https://github.com/csstree/stylelint-validator/issues/27 for details and future updates.
         // "stylelint-no-indistinguishable-colors", // Disabled: Tailwind intentionally uses subtle color variations for design flexibility, which may reduce strict color distinguishability. Accessibility concerns (e.g., sufficient contrast) should be addressed via design review and dedicated contrast checking tools rather than enforced by this rule.
     ],
 
+    /**
+     * Controls console output verbosity during linting.
+     *
+     * @defaultValue false
+     * @remarks
+     * When false, shows all rule violations and informational messages.
+     * Set to true to suppress non-essential output.
+     *
+     * @see {@link https://stylelint.io/user-guide/configure/#quiet | quiet Documentation}
+     */
     quiet: false,
+
+    /**
+     * Reports disable comments that lack a description explaining why the rule was disabled.
+     *
+     * @defaultValue true
+     * @remarks
+     * Encourages documented disable comments for better code maintainability.
+     * Prefer descriptive disable comments over plain rule disabling.
+     *
+     * @see {@link https://stylelint.io/user-guide/configure/#reportdescriptionlessdisables | reportDescriptionlessDisables Documentation}
+     */
     reportDescriptionlessDisables: true,
+
+    /**
+     * Reports disable comments that target rules not applicable to the current context.
+     *
+     * @defaultValue true
+     * @see {@link https://stylelint.io/user-guide/configure/#reportinvalidscopedisables | reportInvalidScopeDisables Documentation}
+     */
     reportInvalidScopeDisables: true,
+
+    /**
+     * Reports disable comments for rules that didn't produce any violations.
+     *
+     * @defaultValue true
+     * @remarks
+     * Helps maintain clean codebase by identifying unnecessary disable comments
+     * that can be safely removed.
+     *
+     * @see {@link https://stylelint.io/user-guide/configure/#reportneedlessdisables | reportNeedlessDisables Documentation}
+     */
     reportNeedlessDisables: true,
+
+    /**
+     * Reports disable comments that don't specify which rule(s) they disable.
+     *
+     * @defaultValue true
+     * @remarks
+     * Encourages specific disable comments over broad disable directives.
+     * Specific rule targeting improves code maintainability and clarity.
+     *
+     * @see {@link https://stylelint.io/user-guide/configure/#reportunscopeddisables | reportUnscopedDisables Documentation}
+     */
     reportUnscopedDisables: true,
 
+    /**
+     * Comprehensive rule configuration defining specific linting behavior.
+     *
+     * @remarks
+     * Rules are organized into logical groups for maintainability:
+     * - Stylistic rules (@stylistic/stylelint-plugin) - Code formatting and style
+     * - Accessibility rules (a11y) - WCAG compliance and inclusive design
+     * - Core Stylelint rules - Standard CSS validation and best practices
+     * - Plugin-specific rules - Extended functionality from third-party plugins
+     * - SCSS rules (scss/) - Sass/SCSS preprocessing support
+     *
+     * Each rule can be:
+     * - `true` or `false` - Enable/disable with default settings
+     * - `null` - Explicitly disable rule
+     * - Array with options - Enable with custom configuration
+     * - String value - Enable with specific mode/setting
+     *
+     * @see {@link https://stylelint.io/user-guide/configure/#rules | rules Documentation}
+     * @see {@link https://stylelint.io/user-guide/rules | Complete Rule List}
+     */
     rules: {
+        /**
+         * Stylistic rules from @stylistic/stylelint-plugin.
+         *
+         * @remarks
+         * Most stylistic rules are disabled (set to null) because code formatting
+         * is handled by Prettier. Only rules that provide value beyond formatting
+         * are enabled, such as color-hex-case and string-quotes for consistency.
+         *
+         * @see {@link https://github.com/stylelint-stylistic/stylelint-stylistic | @stylistic/stylelint-plugin Documentation}
+         */
         // Stylistic Rules (@stylistic/stylelint-plugin)
         "@stylistic/at-rule-name-case": null,
         "@stylistic/at-rule-name-newline-after": null,
@@ -234,12 +511,31 @@ export default defineConfig({
         "@stylistic/value-list-comma-space-before": null,
         "@stylistic/value-list-max-empty-lines": null,
 
+        /**
+         * Accessibility rules from @double-great/stylelint-a11y plugin.
+         *
+         * @remarks
+         * These rules help ensure CSS follows WCAG guidelines and inclusive design principles.
+         * Some rules are disabled where they conflict with legitimate design patterns
+         * (e.g., content property for icons) or framework requirements (e.g., Tailwind's color system).
+         *
+         * @see {@link https://github.com/double-great/stylelint-a11y | stylelint-a11y Documentation}
+         * @see {@link https://www.w3.org/WAI/WCAG21/quickref/ | WCAG 2.1 Quick Reference}
+         */
         // A11y Plugin Rules (@double-great/stylelint-a11y)
         // Disable static content rule as we use it legitimately for checkmarks, tooltips, and visual indicators
         "a11y/content-property-no-static-value": null,
         "a11y/font-size-is-readable": [
             true,
             {
+                /**
+                 * Configuration for readable font size enforcement.
+                 *
+                 * @remarks
+                 * Allows smaller font sizes for tooltips and visual indicators
+                 * where reduced size is acceptable for user experience.
+                 * The `content` property is ignored as it's used for decorative elements.
+                 */
                 // Allow smaller font sizes for tooltips and visual indicators
                 ignoreProperties: ["content"],
                 severity: "warning",
@@ -256,6 +552,16 @@ export default defineConfig({
         "a11y/no-text-align-justify": true,
         "a11y/selector-pseudo-class-focus": true,
 
+        /**
+         * Core Stylelint built-in rules for standard CSS validation.
+         *
+         * @remarks
+         * These rules provide fundamental CSS linting including syntax validation,
+         * security checks, and modern CSS feature support. Comments indicate
+         * specific reasoning for enabled/disabled rules.
+         *
+         * @see {@link https://stylelint.io/user-guide/rules | Stylelint Core Rules}
+         */
         // Stylelint built in rules
         "at-rule-allowed-list": null,
         "at-rule-disallowed-list": null,
@@ -315,10 +621,26 @@ export default defineConfig({
         "order/properties-alphabetical-order": null,
         // Plugin rules
         "plugin/declaration-block-no-ignored-properties": true,
+
+        /**
+         * Browser compatibility rules with specific browser support targets.
+         *
+         * @remarks
+         * Configurations target the project's supported browser matrix,
+         * focusing on modern browsers while maintaining compatibility
+         * with the most recent versions.
+         */
         // Plugin rules
         "plugin/no-browser-hacks": [
             true,
             {
+                /**
+                 * Browser list defining minimum supported versions.
+                 *
+                 * @remarks
+                 * Matches the project's browserslist configuration to ensure
+                 * consistent targeting across build tools and linting.
+                 */
                 browsers: [
                     "last 2 chrome versions",
                     "last 2 node major versions",
@@ -326,9 +648,27 @@ export default defineConfig({
                 ],
             },
         ],
+        /**
+         * Performance optimization rules for animations and high-impact properties.
+         *
+         * @remarks
+         * Prevents use of animation properties that can cause performance
+         * degradation by triggering expensive layout or paint operations.
+         * Some properties are ignored if they're commonly used despite
+         * performance implications.
+         *
+         * @see {@link https://web.dev/animations-guide/ | Web.dev Animation Performance Guide}
+         */
         "plugin/no-low-performance-animation-properties": [
             true,
             {
+                /**
+                 * Properties to ignore despite performance implications.
+                 *
+                 * @remarks
+                 * These properties are commonly animated and their performance
+                 * impact is acceptable for this project's use cases.
+                 */
                 ignoreProperties: [
                     "all",
                     "background",
@@ -344,19 +684,66 @@ export default defineConfig({
         ],
         "plugin/no-restricted-syntax": null,
         "plugin/no-unresolved-module": null,
+        /**
+         * Browser feature compatibility validation.
+         *
+         * @remarks
+         * Warns about CSS features that may not be supported in the
+         * project's target browsers. Uses the same browser list as
+         * other compatibility tools for consistency.
+         *
+         * @see {@link https://caniuse.com/ | Can I Use Compatibility Data}
+         */
         "plugin/no-unsupported-browser-features": [
             true,
             {
+                /**
+                 * Target browser versions for compatibility checks.
+                 *
+                 * @remarks
+                 * Aligned with project's browserslist configuration.
+                 */
                 browsers: [
                     "last 2 chrome versions",
                     "last 2 node major versions",
                     "not dead",
                 ],
+                /**
+                 * Features to ignore despite browser support concerns.
+                 *
+                 * @remarks
+                 * Empty array allows modern CSS features that may have
+                 * limited support but are acceptable for this project.
+                 */
                 ignore: [], // Allow modern CSS features
+                /**
+                 * Severity level for unsupported feature detection.
+                 *
+                 * @remarks
+                 * Set to "warning" to inform about compatibility issues
+                 * without blocking the build process.
+                 */
                 severity: "warning",
             },
         ],
+        /**
+         * BEM (Block Element Modifier) pattern enforcement.
+         *
+         * @remarks
+         * Enforces BEM naming convention while allowing exceptions for
+         * utility classes, data attributes, and CSS modules. Uses a
+         * project-specific namespace for consistency.
+         *
+         * @see {@link http://getbem.com/ | BEM Methodology}
+         */
         "plugin/selector-bem-pattern": {
+            /**
+             * Selectors to ignore from BEM pattern validation.
+             *
+             * @remarks
+             * Includes utility classes (Tailwind), data attributes,
+             * pseudo-elements/classes, and CSS modules with PascalCase.
+             */
             ignoreSelectors: [
                 String.raw`/^\.tw-/`, // Tailwind utilities
                 String.raw`/^\[data-/`, // Data attributes
@@ -364,16 +751,50 @@ export default defineConfig({
                 String.raw`/^:/`, // Pseudo-classes
                 String.raw`/^\.` + String.raw`/[A-Z]/`, // CSS Modules (PascalCase)
             ],
+            /**
+             * BEM preset configuration.
+             *
+             * @remarks
+             * Uses standard BEM preset with project-specific namespace.
+             */
             preset: "bem",
             presetOptions: {
+                /**
+                 * Project namespace for BEM classes.
+                 *
+                 * @remarks
+                 * "uw" stands for UptimeWatcher, providing consistent
+                 * class prefixing across the application.
+                 */
                 namespace: "uw", // UptimeWatcher namespace
             },
         },
         "plugin/stylelint-group-selectors": true,
         "plugin/use-baseline": null,
+        /**
+         * Defensive CSS practices enforcement.
+         *
+         * @remarks
+         * Promotes defensive coding patterns that prevent common CSS
+         * issues and improve layout stability. Some practices are
+         * disabled based on project preferences.
+         *
+         * @see {@link https://defensivecss.dev/ | Defensive CSS Guide}
+         */
         "plugin/use-defensive-css": [
             true,
             {
+                /**
+                 * Defensive CSS practice configurations.
+                 *
+                 * @remarks
+                 * Each option enables specific defensive practices:
+                 * - background-repeat: Ensures backgrounds don't repeat unexpectedly
+                 * - flex-wrapping: Disabled to allow explicit control over flex behavior
+                 * - scroll-chaining: Prevents unwanted scroll behavior propagation
+                 * - scrollbar-gutter: Reserves space for scrollbars to prevent layout shift
+                 * - vendor-prefix-grouping: Groups vendor prefixes for consistency
+                 */
                 "background-repeat": true,
                 "flex-wrapping": false,
                 "scroll-chaining": true,
@@ -381,12 +802,36 @@ export default defineConfig({
                 "vendor-prefix-grouping": true,
             },
         ],
+        /**
+         * Logical properties and values promotion.
+         *
+         * @remarks
+         * Encourages use of logical properties (e.g., margin-inline-start
+         * instead of margin-left) for better internationalization support.
+         * Set to warning level to gradually adopt these practices.
+         *
+         * @see {@link https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Logical_Properties | MDN Logical Properties}
+         */
         "plugin/use-logical-properties-and-values": [
             true,
             { severity: "warning" },
         ],
+        /**
+         * Logical units enforcement.
+         *
+         * @remarks
+         * Promotes logical units (e.g., inline-size instead of width)
+         * for improved internationalization and writing mode support.
+         */
         "plugin/use-logical-units": [true, { severity: "warning" }],
 
+        /**
+         * Prettier integration for code formatting.
+         *
+         * @remarks
+         * Enables Prettier formatting rules within Stylelint to ensure
+         * consistent code style. Prettier handles most formatting concerns.
+         */
         // Prettier integration
 
         "prettier/prettier": true,
@@ -395,13 +840,38 @@ export default defineConfig({
         "rule-nesting-at-rule-required-list": null,
         "rule-selector-property-disallowed-list": null,
 
+        /**
+         * Scale-based design system rules.
+         *
+         * @remarks
+         * Rules from stylelint-scales plugin for enforcing consistent
+         * design tokens and scale-based values. Currently disabled
+         * to allow flexibility during development.
+         *
+         * @see {@link https://github.com/jeddy3/stylelint-scales | stylelint-scales Documentation}
+         */
         // Scale rules (stylelint-scales)
         "scale-unlimited/declaration-strict-value": null,
         "scales/alpha-values": null,
         "scales/border-widths": null,
+        /**
+         * Font size scale configuration.
+         *
+         * @remarks
+         * Defines allowed font sizes in both pixel and relative units.
+         * Supports a modular scale approach for consistent typography
+         * throughout the application.
+         */
         "scales/font-sizes": [
             [
                 {
+                    /**
+                     * Pixel-based font size scale.
+                     *
+                     * @remarks
+                     * Provides precise sizing for components that require
+                     * exact pixel values.
+                     */
                     scale: [
                         10,
                         12,
@@ -421,6 +891,13 @@ export default defineConfig({
                     units: ["px"],
                 },
                 {
+                    /**
+                     * Relative unit font size scale.
+                     *
+                     * @remarks
+                     * Uses rem and em units for responsive and accessible
+                     * typography that scales with user preferences.
+                     */
                     scale: [
                         0.625,
                         0.75,
@@ -443,6 +920,13 @@ export default defineConfig({
         ],
         "scales/font-weights": null,
         "scales/letter-spacings": null,
+        /**
+         * Line height scale configuration.
+         *
+         * @remarks
+         * Defines a scale of line-height values for consistent
+         * vertical rhythm and typography spacing.
+         */
         "scales/line-heights": [
             1,
             1.125,
@@ -459,6 +943,16 @@ export default defineConfig({
         "scales/word-spacings": null,
         "scales/z-indices": null,
 
+        /**
+         * SCSS (Sass) specific linting rules.
+         *
+         * @remarks
+         * Rules specific to SCSS syntax and features including mixins,
+         * functions, variables, and preprocessing directives. These rules
+         * enhance SCSS code quality and consistency.
+         *
+         * @see {@link https://github.com/stylelint-scss/stylelint-scss | stylelint-scss Documentation}
+         */
         // SCSS specific rules (stylelint-scss)
         "scss/at-each-key-value-single-line": true,
         "scss/at-function-named-arguments": "always",
@@ -520,6 +1014,16 @@ export default defineConfig({
         "selector-pseudo-element-allowed-list": null,
         "selector-pseudo-element-disallowed-list": null,
         // Time rules
+        /**
+         * Minimum animation/transition duration.
+         *
+         * @remarks
+         * Enforces a minimum of 100ms for animations and transitions
+         * to ensure they are perceptible and provide good user experience.
+         * Values below this threshold may cause accessibility issues.
+         *
+         * @see {@link https://web.dev/animations-guide/ | Animation Performance Guidelines}
+         */
         "time-min-milliseconds": 100, // Minimum 100ms for animations/transitions (performance) (verified working)
         "unit-allowed-list": null,
         "unit-disallowed-list": null,

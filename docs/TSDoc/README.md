@@ -61,7 +61,7 @@ TSDoc is a markup language for documenting TypeScript code with structured comme
 For developers new to TSDoc:
 
 1. **[TSDoc home](./tsdoc-home.md)** - Overview and introduction
-2. **[Using TSDoc](./tsdoc-intro-using-tsdoc.md)** - Practical usage guide
+2. **[Using TSDoc](./TSDoc-Intro-UsingTsdoc.md)** - Practical usage guide
 3. **[Base tags reference](./tsdoc-base-tags.md)** - Essential tags for documentation
 
 ## 📖 Documentation standards
@@ -72,23 +72,23 @@ For developers new to TSDoc:
 |----------|-------------|---------|
 | [TSDoc home](./tsdoc-home.md) | Overview of TSDoc system | Understanding TSDoc fundamentals |
 | [TSDoc approach](./tsdoc-intro-approach.md) | Documentation philosophy and approach | Establishing documentation standards |
-| [Using TSDoc](./tsdoc-intro-using-tsdoc.md) | Practical implementation guide | Day-to-day documentation practices |
+| [Using TSDoc](./TSDoc-Intro-UsingTsdoc.md) | Practical implementation guide | Day-to-day documentation practices |
 
 ### Specification and standards
 
 | Document | Description | Purpose |
 |----------|-------------|---------|
 | [Specification overview](./tsdoc-spec-overview.md) | TSDoc specification details | Understanding formal standards |
-| [Standardization groups](./tsdoc-spec-standardization-groups.md) | Governance and standardization | Standards compliance |
-| [Tag kinds](./tsdoc-spec-tag-kinds.md) | Tag classification system | Proper tag usage |
+| [Standardization groups](./TSDoc-Spec-StandardizationGroups.md) | Governance and standardization | Standards compliance |
+| [Tag kinds](./TSDoc-Spec-TagKinds.md) | Tag classification system | Proper tag usage |
 
 ### Package integration
 
 | Document | Description | Purpose |
 |----------|-------------|---------|
 | [Core TSDoc package](./tsdoc-package-tsdoc.md) | Main TSDoc package documentation | Core functionality |
-| [ESLint plugin](./tsdoc-package-eslint-plugin-tsdoc.md) | ESLint integration for TSDoc | Automated linting |
-| [Configuration](./tsdoc-package-tsdoc-config.md) | TSDoc configuration options | Project setup |
+| [ESLint plugin](./TSDoc-Package-EslintPluginTsdoc.md) | ESLint integration for TSDoc | Automated linting |
+| [Configuration](./TSDoc-Package-TsdocConfig.md) | TSDoc configuration options | Project setup |
 
 ## 🏷️ Tag reference
 
@@ -162,13 +162,13 @@ TSDoc configuration in the Uptime Watcher project:
 - **[Architecture documentation](../Architecture/README.md)** - System design and patterns
 - **[Guides documentation](../Guides/README.md)** - Development guides and tutorials
 - **[Testing documentation](../Testing/README.md)** - Testing guides and best practices
-- **[Documentation style guide](../../electron/documentation-style-guide.md)** - Markdown documentation standards
+- **[Documentation style guide](../DOCUMENTATION_STYLE_GUIDE.md)** - Markdown documentation standards
 
 ## 📝 Contributing
 
 When working with TSDoc documentation:
 
-1. Follow the established [documentation style guide](../../electron/documentation-style-guide.md)
+1. Follow the established [documentation style guide](../DOCUMENTATION_STYLE_GUIDE.md)
 2. Use appropriate TSDoc tags for all public APIs
 3. Provide comprehensive examples for complex functionality
 4. Ensure all links and references are valid

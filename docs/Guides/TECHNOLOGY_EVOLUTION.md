@@ -52,23 +52,27 @@ Architecture: Separated concerns
 
 ```yaml
 Frontend: React + TypeScript + Tailwind CSS + Vite
-State: Zustand (domain-specific stores)
-Database: SQLite (node-sqlite3-wasm)
-IPC: Type-safe Electron contextBridge
-Events: Custom TypedEventBus with middleware
+State: Zustand (modular composition pattern)
+Database: SQLite (node-sqlite3-wasm) with repository pattern
+IPC: Type-safe Electron contextBridge with validation
+Events: TypedEventBus with middleware and automatic metadata
 Architecture: Service-oriented with dependency injection
-Testing: Vitest (dual configuration)
+Testing: Vitest (dual configuration) with comprehensive mocking
 Monitoring: Enhanced monitoring with race condition prevention
+Error Handling: Centralized error store with withErrorHandling utility
 ```
 
 **Transformation Highlights:**
 
-- 🚀 **Complete database migration**: LowDB → SQLite
-- 🏗️ **Architectural overhaul**: Monolithic → Service-oriented
-- 🔒 **Enhanced security**: Type-safe IPC communication
+- 🚀 **Complete database migration**: LowDB → SQLite with transaction safety
+- 🏗️ **Architectural overhaul**: Monolithic → Service-oriented with DI
+- 🔒 **Enhanced security**: Type-safe IPC with registerStandardizedIpcHandler
 - 📊 **Advanced monitoring**: Operation correlation and race condition prevention
-- 🧪 **Comprehensive testing**: Dual test configuration
-- 📚 **Extensive documentation**: ADRs, guides, and patterns
+- 🎯 **Event-driven architecture**: TypedEventBus with automatic metadata and IPC forwarding
+- 🧪 **Comprehensive testing**: Dual test configuration with ElectronAPI mocking
+- 📚 **Extensive documentation**: ADRs, guides, and current implementation patterns
+- 🛡️ **Robust error handling**: Centralized error management with domain isolation
+- 🔄 **Modular state management**: Zustand composition pattern for complex stores
 
 ## 🗃️ Database Migration: LowDB → SQLite
 
@@ -173,21 +177,49 @@ export const SitesProvider: React.FC = ({ children }) => {
 };
 ```
 
-**After (Zustand)**:
+**After (Zustand with Modular Composition)**:
 
 ```typescript
-// Simple, powerful store
+// Modular store composition for complex stores
+export const createSitesStateActions = (set: SetState<SitesStore>, get: GetState<SitesStore>) => ({
+  addSite: async (siteData: SiteCreationData) => {
+    const newSite = await window.electronAPI.sites.create(siteData);
+    set((state) => ({ sites: [...state.sites, newSite] }));
+    return newSite;
+  },
+  updateSite: async (siteId: string, updates: Partial<Site>) => {
+    const updatedSite = await window.electronAPI.sites.update(siteId, updates);
+    set((state) => ({
+      sites: state.sites.map(site => 
+        site.id === siteId ? updatedSite : site
+      )
+    }));
+  },
+});
+
+export const createSiteOperationsActions = (set: SetState<SitesStore>, get: GetState<SitesStore>) => ({
+  deleteSite: async (siteId: string) => {
+    await window.electronAPI.sites.delete(siteId);
+    set((state) => ({
+      sites: state.sites.filter(site => site.id !== siteId)
+    }));
+  },
+});
+
+// Main store combines modular actions
 export const useSitesStore = create<SitesStore>()((set, get) => ({
- sites: [],
- loading: false,
+  sites: [],
+  loading: false,
+  
+  // Combine modular action sets
+  ...createSitesStateActions(set, get),
+  ...createSiteOperationsActions(set, get),
+}));
 
- addSite: async (siteData) => {
-  const newSite = await window.electronAPI.sites.create(siteData);
-  set((state) => ({ sites: [...state.sites, newSite] }));
-  return newSite;
- },
-
- // Domain-specific actions...
+// Simple stores use direct create pattern
+export const useUIStore = create<UIStore>((set) => ({
+  sidebarOpen: false,
+  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
 }));
 ```
 
@@ -199,6 +231,63 @@ export const useSitesStore = create<SitesStore>()((set, get) => ({
 - **HMR**: Better hot module replacement
 - **Simplicity**: Less configuration
 - **Modern**: ES modules and tree shaking
+
+### Event System: Basic Events → TypedEventBus
+
+#### Problems with Basic Event System
+
+- **Type Safety**: No compile-time validation of event data
+- **Debugging**: Difficult to trace event flow
+- **Metadata**: No automatic event correlation or debugging information
+- **IPC Integration**: Manual event forwarding between main and renderer processes
+
+#### TypedEventBus Benefits
+
+- **Type Safety**: Compile-time validation of event names and data
+- **Automatic Metadata**: Correlation IDs, timestamps, and debugging info
+- **Middleware Support**: Cross-cutting concerns like logging and validation
+- **IPC Integration**: Automatic event forwarding via EventsService
+- **Debugging**: Comprehensive diagnostics and event tracing
+
+#### Event System Migration Example
+
+**Before (Basic Events)**:
+
+```typescript
+// No type safety, manual IPC forwarding
+emitter.emit('site:updated', someData); // any type
+ipcMain.emit('forward-to-renderer', 'site:updated', someData); // manual forwarding
+
+// In renderer
+ipcRenderer.on('site:updated', (event, data) => {
+  // data is any, no correlation info
+  handleSiteUpdate(data);
+});
+```
+
+**After (TypedEventBus)**:
+
+```typescript
+// Type-safe events with automatic metadata
+interface AppEvents {
+  'site:updated': { siteId: string; changes: Partial<Site> };
+}
+
+const eventBus = new TypedEventBus<AppEvents>('app-events');
+
+// Backend emission with automatic metadata
+await eventBus.emitTyped('site:updated', {
+  siteId: 'site_123',
+  changes: { name: 'New Name' }
+});
+
+// Frontend handling via EventsService
+const cleanup = await EventsService.onSiteUpdated((data) => {
+  // data is fully typed with automatic metadata
+  console.log(`Site ${data.siteId} updated`, data._meta.correlationId);
+  handleSiteUpdate(data);
+});
+```
 
 ## 🔧 Architecture Transformation
 
@@ -287,16 +376,36 @@ ipcMain.handle("create-site", async (event, data) => {
 });
 ```
 
-**After**: Fully typed
+**After**: Fully typed with validation
 
 ```typescript
-// Complete type safety
+// Complete type safety with validation
+export class IPCService {
+  registerStandardizedIpcHandler<T, R>(
+    channel: string,
+    handler: (data: T) => Promise<R> | R,
+    validator: (data: unknown) => data is T,
+    options?: IpcHandlerOptions
+  ): void {
+    ipcMain.handle(channel, async (event, data: unknown) => {
+      // Automatic validation
+      if (!validator(data)) {
+        throw new Error(`Invalid data for channel ${channel}`);
+      }
+      
+      // Type-safe handler execution
+      return await handler(data);
+    });
+  }
+}
+
+// Usage with type guards
 ipcService.registerStandardizedIpcHandler(
- "sites:create",
- async (data: SiteCreationData) => {
-  return await siteManager.createSite(data);
- },
- isSiteCreationData // Type guard
+  'sites:create',
+  async (data: SiteCreationData) => {
+    return await siteManager.createSite(data);
+  },
+  isSiteCreationData // Type guard ensures validation
 );
 ```
 
@@ -388,13 +497,15 @@ npm run test:all:coverage     # Coverage reports (all configurations)
 ### ✅ Completed Migrations
 
 - [x] **Database**: LowDB → SQLite (COMPLETE)
-- [x] **State Management**: React Context → Zustand (COMPLETE)
+- [x] **State Management**: React Context → Zustand with modular composition (COMPLETE)
 - [x] **Build System**: webpack → Vite (COMPLETE)
 - [x] **Architecture**: Monolithic → Service-oriented (COMPLETE)
-- [x] **IPC**: Untyped → Type-safe (COMPLETE)
-- [x] **Monitoring**: Basic → Enhanced (COMPLETE)
-- [x] **Testing**: Manual → Automated (COMPLETE)
-- [x] **Documentation**: Minimal → Comprehensive (COMPLETE)
+- [x] **IPC**: Untyped → Type-safe with validation (COMPLETE)
+- [x] **Event System**: Basic events → TypedEventBus with metadata (COMPLETE)
+- [x] **Monitoring**: Basic → Enhanced with race condition prevention (COMPLETE)
+- [x] **Testing**: Manual → Automated with comprehensive mocking (COMPLETE)
+- [x] **Documentation**: Minimal → Comprehensive with current patterns (COMPLETE)
+- [x] **Error Handling**: Scattered → Centralized with withErrorHandling utility (COMPLETE)
 
 ### 🔧 Ongoing Improvements
 

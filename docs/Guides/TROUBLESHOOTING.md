@@ -1,4 +1,14 @@
-# 🔧 Troubleshooting Guide
+# 🔧 Trouble**Solutions**:
+
+```bash
+# Copy WASM file to dist-electron
+npm run copy-wasm
+
+# Verify WASM files are present
+ls dist-electron/*.wasm
+```
+
+**Prevention**: The `postbuild` script should handle this automatically, but sometimes fails in certain environments.uide
 
 > **Debug Like a Pro**: Common issues, solutions, and debugging techniques for Uptime Watcher development.
 
@@ -43,7 +53,7 @@ npm run dev -- --port 5174
 
 1. **Check Vite dev server**: Ensure `npm run dev` is running on port 5173
 2. **Clear cache**: Delete `.vite` and `dist-electron` directories
-3. **Rebuild**: `npm run clean && npm install && npm run postbuild`
+3. **Rebuild**: `npm run clean && npm install && npm run copy-wasm`
 
 #### 4. Hot Reload Not Working
 
@@ -52,6 +62,7 @@ npm run dev -- --port 5174
 1. **Restart dev server**: Stop and restart `npm run electron-dev`
 2. **Check file watchers**: Ensure file system watchers aren't exceeded
 3. **Reload manually**: Use Ctrl+R in Electron window
+4. **Check HMR logs**: Look for HMR errors in the console
 
 ### Database Issues
 
@@ -107,6 +118,155 @@ await databaseService.executeTransaction(async (db) => {
 });
 ```
 
+### Event System Issues
+
+#### 1. Events Not Reaching Listeners
+
+**Error**: Event listeners not triggering
+
+**Solutions**:
+
+1. **Check event names**: Ensure exact name matching (case-sensitive)
+2. **Verify listener registration**: Check that listeners are registered before emission
+3. **Check middleware errors**: Look for middleware that might prevent emission
+4. **Debug correlation IDs**: Use correlation IDs to trace event flow
+
+```typescript
+// Debug event emission
+eventBus.onTyped("site:updated", (data) => {
+ console.log("Event received:", data._meta.correlationId);
+});
+
+await eventBus.emitTyped("site:updated", { siteId: "123" });
+```
+
+#### 2. IPC Events Not Crossing Boundary
+
+**Error**: Events emitted in backend not reaching frontend
+
+**Solutions**:
+
+1. **Check EventsService initialization**: Ensure service is properly initialized
+2. **Verify electronAPI availability**: Check that `window.electronAPI` is available
+3. **Check preload script**: Ensure proper API exposure in preload
+4. **Debug IPC bridge**: Check if events are being forwarded
+
+```typescript
+// Frontend debugging
+console.log("ElectronAPI available:", !!window.electronAPI);
+console.log("Events API:", !!window.electronAPI?.events);
+
+// Backend debugging
+eventBus.use(async (event, data, next) => {
+ logger.debug("Event middleware", {
+  event,
+  correlationId: data._meta?.correlationId,
+ });
+ await next();
+});
+```
+
+#### 3. Memory Leaks from Event Listeners
+
+**Error**: Growing memory usage from uncleaned listeners
+
+**Solutions**:
+
+1. **Always clean up listeners**: Use cleanup functions returned by EventsService
+2. **Use AbortController**: For automatic cleanup on component unmount
+3. **Monitor listener counts**: Check event bus diagnostics
+
+```typescript
+// Proper cleanup pattern
+useEffect(() => {
+ const cleanupFunctions: (() => void)[] = [];
+
+ const setupListeners = async () => {
+  cleanupFunctions.push(
+   await EventsService.onSiteUpdated(handleSiteUpdate),
+   await EventsService.onMonitorStatus(handleMonitorStatus)
+  );
+ };
+
+ setupListeners().catch(console.error);
+
+ return () => {
+  cleanupFunctions.forEach((fn) => fn());
+ };
+}, []);
+```
+
+### Error Handling Issues
+
+#### 1. Unhandled Promise Rejections
+
+**Error**: Uncaught promise rejections in async operations
+
+**Solutions**:
+
+1. **Use withErrorHandling utility**: Wrap async operations
+2. **Check error boundaries**: Ensure React error boundaries are in place
+3. **Centralized error handling**: Use error store for consistent handling
+
+```typescript
+// Use withErrorHandling wrapper
+const handleSiteCreation = withErrorHandling(
+ async (siteData: SiteCreationData) => {
+  const newSite = await window.electronAPI.sites.create(siteData);
+  addSite(newSite);
+ },
+ {
+  context: "SiteCreation",
+  notifyUser: true,
+ }
+);
+```
+
+#### 2. Type Guard Failures
+
+**Error**: Type validation failures in IPC communication
+
+**Solutions**:
+
+1. **Check type guard implementations**: Ensure type guards match current interfaces
+2. **Validate data shapes**: Check that data being sent matches expected types
+3. **Update shared types**: Ensure frontend and backend use same type definitions
+
+```typescript
+// Debug type validation
+const data = { name: "Test Site", url: "https://test.com" };
+console.log("Is valid site data:", isSiteCreationData(data));
+
+if (!isSiteCreationData(data)) {
+ console.error("Invalid data shape:", data);
+}
+```
+
+#### 3. Store State Corruption
+
+**Error**: Zustand store state becomes inconsistent
+
+**Solutions**:
+
+1. **Check action implementations**: Ensure state updates are immutable
+2. **Use store debugging**: Enable Zustand devtools
+3. **Reset store state**: Provide reset functionality for development
+
+```typescript
+// Store debugging
+import { subscribeWithSelector } from "zustand/middleware";
+import { devtools } from "zustand/middleware";
+
+export const useSitesStore = create<SitesStore>()(
+ devtools(
+  subscribeWithSelector((set, get) => ({
+   // ... store implementation
+  })),
+  { name: "sites-store" }
+ )
+);
+```
+
 ### TypeScript Issues
 
 #### 1. Type Errors in IPC
@@ -144,7 +304,7 @@ npm install
 npm run build
 
 # Check TypeScript
-npm run check-types
+npm run type-check:all
 
 # Check linting
 npm run lint
@@ -164,14 +324,14 @@ npm run lint
 
 **Error**: SQLite WASM not found in packaged app
 
-**Solution**: Ensure `postbuild` script runs:
+**Solution**: Ensure `copy-wasm` script runs:
 
 ```json
 // package.json
 {
  "scripts": {
-  "build": "... && npm run postbuild",
-  "postbuild": "npx cpy node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm dist-electron/ --flat"
+  "build": "... && npm run copy-wasm",
+  "copy-wasm": "copyfiles node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm dist-electron"
  }
 }
 ```
@@ -225,14 +385,14 @@ console.log(eventBus.listenerCount());
 #### Enable Debug Logging
 
 ```bash
-# Maximum debugging
-npm run electron-dev -- --debug
+# Maximum debugging with Electron
+npm run electron-dev:debug
 
-# Production-level logging
-npm run electron-dev -- --log-production
+# Development logging
+npm run dev
 
-# Info-level logging
-npm run electron-dev -- --log-info
+# Electron main process debugging
+npm run debug:electron
 ```
 
 #### Backend Logging
@@ -304,15 +464,25 @@ logger.debug("Transaction completed", {
 #### Event Bus
 
 ```typescript
-// Monitor event flow
-eventBus.use(async (eventName, data, correlationId, next) => {
- logger.debug(`[Event] ${eventName}`, { correlationId });
+// Monitor event flow with middleware
+eventBus.use(async (eventName, data, next) => {
+ logger.debug(`[Event] ${eventName}`, {
+  correlationId: data._meta?.correlationId,
+ });
  const start = Date.now();
  await next();
  logger.debug(`[Event] ${eventName} completed`, {
-  correlationId,
+  correlationId: data._meta?.correlationId,
   duration: Date.now() - start,
  });
+});
+
+// Get event bus diagnostics
+const diagnostics = eventBus.getDiagnostics();
+console.log("Event Bus Stats:", {
+ listenerCounts: diagnostics.listenerCounts,
+ middlewareCount: diagnostics.middlewareCount,
+ middlewareUtilization: diagnostics.middlewareUtilization,
 });
 ```
 
@@ -350,11 +520,10 @@ Recommended extensions for optimal development:
 
 ```bash
 # Debug specific areas
-npm run debug:electron      # Debug Electron main process
-npm run debug:renderer      # Debug renderer with source maps
-npm run lint:circular       # Check for circular dependencies
-npm run lint:complexity     # Check code complexity
-npm run lint:duplicates     # Check for code duplication
+npm run debug:electron        # Debug Electron main process
+npm run electron-dev:debug    # Debug Electron with Vite
+npm run type-check:all        # Check TypeScript across all configs
+npm run lint:fix              # Auto-fix linting issues
 ```
 
 ### Testing During Debugging
@@ -364,13 +533,16 @@ npm run lint:duplicates     # Check for code duplication
 npm run test:watch
 
 # Test specific files
-npm test -- --testNamePattern="SitesStore"
+npm run test -- --run SitesStore
 
 # Backend tests only
 npm run test:electron
 
 # Frontend tests only
-npm run test:frontend
+npm run test
+
+# Shared tests only
+npm run test:shared
 ```
 
 ## 🔧 Performance Optimization
