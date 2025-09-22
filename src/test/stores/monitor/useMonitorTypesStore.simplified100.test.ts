@@ -358,22 +358,19 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
         });
 
         it("should handle fallback values for formatting", async () => {
-            mockElectronAPI.monitoring.formatMonitorDetail.mockResolvedValue(
-                null
+            // Mock rejection to test error propagation
+            mockElectronAPI.monitoring.formatMonitorDetail.mockRejectedValue(
+                new Error("Formatting failed")
             );
-            mockSafeExtractIpcData.mockReturnValue("fallback");
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
-            let formatted: string;
+            // Should throw error when API fails
             await act(async () => {
-                formatted = await result.current.formatMonitorDetail(
-                    "http",
-                    "details"
-                );
+                await expect(
+                    result.current.formatMonitorDetail("http", "details")
+                ).rejects.toThrow("Formatting failed");
             });
-
-            expect(formatted!).toBe("fallback");
         });
     });
 

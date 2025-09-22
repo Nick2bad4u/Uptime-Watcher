@@ -8,6 +8,53 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "../../../../shared/types";
+
+// Mock services first - these need to be hoisted above imports
+vi.mock("../../../services/DataService", () => ({
+    DataService: {
+        isConnected: vi.fn().mockReturnValue(true),
+        downloadSqliteBackup: vi
+            .fn()
+            .mockRejectedValue(new Error("Mock download error")),
+        // Add other required methods
+        getSiteStatus: vi.fn().mockResolvedValue({ status: "active" }),
+        validateSiteConfiguration: vi.fn().mockResolvedValue({ isValid: true }),
+    },
+}));
+
+vi.mock("../../../services/logger", () => ({
+    logger: {
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        debug: vi.fn(),
+    },
+}));
+
+vi.mock("../../../../shared/utils/errorHandling", () => ({
+    ensureError: vi.fn((error) =>
+        error instanceof Error ? error : new Error(String(error))
+    ),
+    withErrorHandling: vi.fn(async (operation, context) => {
+        try {
+            return await operation();
+        } catch (error) {
+            context?.onError?.(error);
+            throw error;
+        }
+    }),
+}));
+
+vi.mock("../../../../shared/utils", () => ({
+    // Add any shared utils that might be imported
+    validateInput: vi.fn().mockReturnValue({ isValid: true }),
+    formatError: vi.fn((error) => error.message),
+}));
+
+vi.mock("../../utils", () => ({
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
 
 // Mock the electron API
@@ -24,6 +71,9 @@ const mockElectronAPI = {
         updateSiteCheckInterval: vi.fn(),
         downloadSqliteBackup: vi.fn(),
         checkSiteNow: vi.fn(),
+    },
+    data: {
+        getHistoryLimit: vi.fn().mockReturnValue(1000), // Required by waitForElectronAPI
     },
     monitoring: {
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
@@ -222,7 +272,7 @@ describe("useSitesStore Function Coverage Tests", () => {
         it("should properly integrate sync functions", async () => {
             const store = useSitesStore.getState();
 
-            // Mock sync operations
+            // Mock sync operations - return data directly as that's what safeExtractIpcData expects
             const mockSyncStatus = {
                 success: true,
                 synchronized: true,

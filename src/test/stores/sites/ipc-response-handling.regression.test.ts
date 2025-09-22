@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Site } from "@shared/types";
+import type { Site } from "../../../../shared/types";
 import { extractIpcData } from "../../../types/ipc";
 
 // Mock the electron API
@@ -20,6 +20,7 @@ const mockElectronAPI = {
     },
     data: {
         downloadSqliteBackup: vi.fn(),
+        getHistoryLimit: vi.fn().mockReturnValue(1000), // Required by waitForElectronAPI
     },
     stateSync: {
         getSyncStatus: vi.fn(),
@@ -43,10 +44,23 @@ vi.mock("../../../services/logger", () => ({
 }));
 
 // Mock error handling utilities
-vi.mock("@shared/utils/errorHandling", () => ({
+vi.mock("../../../../shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
         error instanceof Error ? error : new Error(String(error))
     ),
+}));
+
+// Mock DataService to prevent actual backend calls
+vi.mock("../../../services/DataService", () => ({
+    DataService: {
+        isConnected: vi.fn().mockReturnValue(true),
+        downloadSqliteBackup: vi.fn(),
+    },
+}));
+
+// Mock utility functions
+vi.mock("../../utils", () => ({
+    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe("IPC Response Handling Regression Tests", () => {
@@ -119,9 +133,14 @@ describe("IPC Response Handling Regression Tests", () => {
                 monitors: [],
             };
 
-            await expect(SiteService.addSite(testSite)).rejects.toThrow(
-                "Site creation failed in backend"
-            );
+            try {
+                await SiteService.addSite(testSite);
+                expect.fail("Expected error to be thrown");
+            } catch (error) {
+                expect(String(error)).toContain(
+                    "Site creation failed in backend"
+                );
+            }
         });
     });
 
@@ -136,16 +155,22 @@ describe("IPC Response Handling Regression Tests", () => {
                 "../../../stores/sites/services/SiteService"
             );
 
-            await expect(SiteService.getSites()).rejects.toThrow(
-                "Database connection failed"
-            );
+            try {
+                await SiteService.getSites();
+                expect.fail("Expected error to be thrown");
+            } catch (error) {
+                expect(String(error)).toContain("Database connection failed");
+            }
         });
     });
 
     describe("SQLite Backup Failure Propagation", () => {
         it("should propagate backend failures in backup download", async () => {
-            // Mock the electronAPI to throw an error directly (extraction happens in preload)
-            mockElectronAPI.data.downloadSqliteBackup.mockRejectedValue(
+            // Mock the DataService to throw an error (not electronAPI directly)
+            const { DataService } = await import(
+                "../../../services/DataService"
+            );
+            vi.mocked(DataService.downloadSqliteBackup).mockRejectedValue(
                 new Error("Backup generation failed")
             );
 
@@ -153,9 +178,12 @@ describe("IPC Response Handling Regression Tests", () => {
                 "../../../stores/sites/services/SiteService"
             );
 
-            await expect(SiteService.downloadSqliteBackup()).rejects.toThrow(
-                "Backup generation failed"
-            );
+            try {
+                await SiteService.downloadSqliteBackup();
+                expect.fail("Expected error to be thrown");
+            } catch (error) {
+                expect(String(error)).toContain("Backup generation failed");
+            }
         });
     });
 

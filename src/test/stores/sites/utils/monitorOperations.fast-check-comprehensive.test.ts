@@ -411,12 +411,14 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         case "dns": {
                             expect(normalized.host).toBeDefined();
                             expect(normalized.recordType).toBeDefined();
-                            expect(normalized.expectedValue).toBeDefined();
+                            // expectedValue is optional for DNS monitors (allows "accept any response" behavior)
                             expect(typeof normalized.host).toBe("string");
                             expect(typeof normalized.recordType).toBe("string");
-                            expect(typeof normalized.expectedValue).toBe(
-                                "string"
-                            );
+                            if (normalized.expectedValue !== undefined) {
+                                expect(typeof normalized.expectedValue).toBe(
+                                    "string"
+                                );
+                            }
                             break;
                         }
                     }

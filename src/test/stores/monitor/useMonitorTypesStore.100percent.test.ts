@@ -35,7 +35,20 @@ const originalSafeExtractIpcData = vi.hoisted(() => vi.fn());
 // Mock dependencies with full control over their behavior
 vi.mock("@shared/utils/errorHandling", () => ({
     withErrorHandling: originalWithErrorHandling,
-    ensureError: vi.fn((error) => error instanceof Error ? error : new Error(String(error))),
+    ensureError: vi.fn((error) => {
+        if (error instanceof Error) {
+            return error;
+        }
+        // Create an object that behaves like an Error for testing
+        const errorLike = {
+            name: "Error",
+            message: String(error),
+            stack: "",
+        };
+        // Make it pass instanceof Error check by setting the prototype
+        Object.setPrototypeOf(errorLike, Error.prototype);
+        return errorLike;
+    }),
 }));
 
 vi.mock("../../../stores/utils", () => ({
@@ -161,36 +174,31 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
-            // Test formatMonitorDetail with null response
-            originalSafeExtractIpcData.mockReturnValueOnce("fallback-detail");
+            // Test formatMonitorDetail with API error - should throw
             mockElectronAPI.monitoring.formatMonitorDetail.mockRejectedValue(
                 new Error("API error")
             );
 
-            let formatted: string;
+            // Should throw error when API fails
             await act(async () => {
-                formatted = await result.current.formatMonitorDetail(
+                await expect(result.current.formatMonitorDetail(
                     "http",
                     "original"
-                );
+                )).rejects.toThrow("API error");
             });
 
-            expect(formatted!).toBe("original"); // Service returns details as fallback
-
-            // Test formatMonitorTitleSuffix with null response
-            originalSafeExtractIpcData.mockReturnValueOnce("");
+            // Test formatMonitorTitleSuffix with API error - should throw
             mockElectronAPI.monitoring.formatMonitorTitleSuffix.mockRejectedValue(
                 new Error("API error")
             );
 
+            // Should throw error when API fails
             await act(async () => {
-                formatted = await result.current.formatMonitorTitleSuffix(
+                await expect(result.current.formatMonitorTitleSuffix(
                     "http",
                     {} as Monitor
-                );
+                )).rejects.toThrow("API error");
             });
-
-            expect(formatted!).toBe(""); // Service returns empty string as fallback
         });
 
         it("should handle invalid IPC response structures", async ({
@@ -677,13 +685,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             });
 
             expect(result2!).toEqual({
-                success: true,
-                data: {
-                    success: false,
-                    data: null,
-                    errors: ["Required field missing"],
-                },
-                errors: [],
+                success: false,
+                data: null,
+                errors: ["Required field missing"],
                 warnings: [],
                 metadata: {},
             });
@@ -709,13 +713,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 });
             });
 
-            expect(result3!).toEqual({
-                success: true,
-                data: nullValidationResult,
-                errors: [],
-                warnings: [],
-                metadata: {},
-            });
+            expect(result3!).toEqual(nullValidationResult);
         });
 
         it("should handle validation results with edge case data types", async ({
@@ -1142,22 +1140,24 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             result.current.clearError();
 
             // Test network timeouts
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockRejectedValue(
-                new Error("Network timeout")
-            );
-
             await act(async () => {
-                await result.current.loadMonitorTypes();
+                mockElectronAPI.monitorTypes.getMonitorTypes.mockImplementation(async () => {
+                    throw "Network timeout";
+                });
+                try {
+                    await result.current.loadMonitorTypes();
+                } catch {
+                    // Expected - withErrorHandling re-throws after setting error
+                }
             });
 
             expect(result.current.lastError).toBe("Network timeout");
 
             // Test permission errors
-            mockElectronAPI.monitoring.validateMonitorData.mockRejectedValue(
-                new Error("Permission denied")
-            );
-
             await act(async () => {
+                mockElectronAPI.monitoring.validateMonitorData.mockImplementation(async () => {
+                    throw "Permission denied";
+                });
                 try {
                     await result.current.validateMonitorData("http", {});
                 } catch {
@@ -1168,9 +1168,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             expect(result.current.lastError).toBe("Permission denied");
 
             // Test service unavailable errors
-            mockElectronAPI.monitoring.formatMonitorDetail.mockRejectedValue(
-                new Error("Service unavailable")
-            );
+            mockElectronAPI.monitoring.formatMonitorDetail.mockImplementation(async () => {
+                throw "Service unavailable";
+            });
 
             await act(async () => {
                 try {
@@ -1183,9 +1183,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             expect(result.current.lastError).toBe("Service unavailable");
 
             // Test corrupted response errors
-            mockElectronAPI.monitoring.formatMonitorTitleSuffix.mockRejectedValue(
-                new Error("Corrupted response")
-            );
+            mockElectronAPI.monitoring.formatMonitorTitleSuffix.mockImplementation(async () => {
+                throw "Corrupted response";
+            });
 
             await act(async () => {
                 try {

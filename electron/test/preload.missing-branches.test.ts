@@ -190,19 +190,19 @@ describe("preload.ts - Missing Branch Coverage", () => {
             ).resolves.toBeTruthy();
         });
         it("should handle invalid numeric parameters", async () => {
-            // Test with invalid numeric parameters - updateHistoryLimit returns null (void as JSON)
+            // Test with invalid numeric parameters - updateHistoryLimit returns undefined (void)
             await expect(
                 exposedAPI.settings.updateHistoryLimit(-1)
-            ).resolves.toBeNull();
+            ).resolves.toBeUndefined();
             await expect(
                 exposedAPI.settings.updateHistoryLimit(0)
-            ).resolves.toBeNull();
+            ).resolves.toBeUndefined();
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Infinity)
-            ).resolves.toBeNull();
+            ).resolves.toBeUndefined();
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Number.NaN)
-            ).resolves.toBeNull();
+            ).resolves.toBeUndefined();
         });
     });
     describe("Concurrent Operations", () => {

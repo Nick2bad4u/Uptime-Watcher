@@ -22,6 +22,10 @@ vi.mock("../../../stores/utils", () => ({
 }));
 
 vi.mock("../../../../shared/utils/errorHandling", () => ({
+    ensureError: vi.fn((error: unknown): Error => {
+        if (error instanceof Error) return error;
+        return new Error(String(error));
+    }),
     withErrorHandling: vi.fn(async (operation) => {
         try {
             return await operation();

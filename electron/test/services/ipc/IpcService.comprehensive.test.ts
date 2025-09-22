@@ -162,6 +162,7 @@ describe("IpcService - Comprehensive Coverage", () => {
         } as unknown as IpcMainEvent;
 
         // Create mock services with all required methods
+        let historyLimit = 1000; // Track the history limit value
         mockUptimeOrchestrator = {
             addSite: vi.fn().mockResolvedValue(true),
             removeSite: vi.fn().mockResolvedValue(true),
@@ -175,8 +176,12 @@ describe("IpcService - Comprehensive Coverage", () => {
             checkSiteManually: vi.fn().mockResolvedValue(true),
             exportData: vi.fn().mockResolvedValue("export-data"),
             importData: vi.fn().mockResolvedValue(true),
-            setHistoryLimit: vi.fn().mockResolvedValue(undefined),
-            getHistoryLimit: vi.fn().mockResolvedValue(1000),
+            setHistoryLimit: vi
+                .fn()
+                .mockImplementation(async (limit: number) => {
+                    historyLimit = limit;
+                }),
+            getHistoryLimit: vi.fn().mockImplementation(() => historyLimit),
             resetSettings: vi.fn().mockResolvedValue(undefined),
             downloadBackup: vi.fn().mockResolvedValue({
                 buffer: Buffer.from("mock backup data"),
@@ -970,6 +975,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             );
             expect(result).toEqual({
                 success: true,
+                data: 5000,
                 metadata: {
                     duration: expect.any(Number),
                     handler: "update-history-limit",

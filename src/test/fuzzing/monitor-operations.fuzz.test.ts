@@ -29,6 +29,7 @@ import {
     findMonitorInSite,
     validateMonitorExists,
 } from "../../stores/sites/utils/monitorOperations";
+import { isNonEmptyString } from "../../../shared/validation/validatorUtils";
 
 // Test data generators using fast-check
 const arbitraryMonitorType = (): fc.Arbitrary<MonitorType> =>
@@ -418,7 +419,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
                                 if (
                                     partial.expectedValue &&
                                     typeof partial.expectedValue === "string" &&
-                                    partial.expectedValue.length > 0
+                                    isNonEmptyString(partial.expectedValue)
                                 ) {
                                     expect(normalized).toHaveProperty(
                                         "expectedValue"

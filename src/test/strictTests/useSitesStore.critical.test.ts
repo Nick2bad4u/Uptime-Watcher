@@ -9,12 +9,37 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "../../../shared/types";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { mockElectronAPI } from "../setup";
+import { SiteService } from "../../stores/sites/services/SiteService";
+import { MonitoringService } from "../../stores/sites/services/MonitoringService";
 
 // Mock IPC functions that are used by the store operations
 vi.mock("../../types/ipc", () => ({
     extractIpcData: vi.fn((data) => data),
     safeExtractIpcData: vi.fn((data) => data),
     isIpcResponse: vi.fn(() => true),
+}));
+
+// Mock SiteService that the store operations use
+vi.mock("../../stores/sites/services/SiteService", () => ({
+    SiteService: {
+        addSite: vi.fn(),
+        getSites: vi.fn(),
+        updateSite: vi.fn(),
+        removeSite: vi.fn(),
+        checkSiteNow: vi.fn(),
+        initialize: vi.fn(),
+    },
+}));
+
+// Mock MonitoringService that monitoring operations use
+vi.mock("../../stores/sites/services/MonitoringService", () => ({
+    MonitoringService: {
+        startSiteMonitoring: vi.fn(),
+        stopSiteMonitoring: vi.fn(),
+        startMonitoring: vi.fn(),
+        stopMonitoring: vi.fn(),
+        initialize: vi.fn(),
+    },
 }));
 
 describe("useSitesStore Function Coverage Tests", () => {
@@ -32,6 +57,34 @@ describe("useSitesStore Function Coverage Tests", () => {
             sites: { pending: false, lastUpdate: Date.now() },
             events: { pending: false, lastUpdate: Date.now() },
         });
+
+        // Set up SiteService mocks
+        vi.mocked(SiteService.addSite).mockResolvedValue({
+            identifier: "new-site",
+            name: "New Site",
+            monitoring: true,
+            monitors: [],
+        } as Site);
+        vi.mocked(SiteService.getSites).mockResolvedValue([]);
+        vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
+        vi.mocked(SiteService.removeSite).mockResolvedValue(undefined);
+        vi.mocked(SiteService.checkSiteNow).mockResolvedValue({} as Site);
+        vi.mocked(SiteService.initialize).mockResolvedValue(undefined);
+
+        // Set up MonitoringService mocks
+        vi.mocked(MonitoringService.startSiteMonitoring).mockResolvedValue(
+            undefined
+        );
+        vi.mocked(MonitoringService.stopSiteMonitoring).mockResolvedValue(
+            undefined
+        );
+        vi.mocked(MonitoringService.startMonitoring).mockResolvedValue(
+            undefined
+        );
+        vi.mocked(MonitoringService.stopMonitoring).mockResolvedValue(
+            undefined
+        );
+        vi.mocked(MonitoringService.initialize).mockResolvedValue(undefined);
 
         // Reset store to initial state before each test
         const store = useSitesStore.getState();
@@ -155,8 +208,8 @@ describe("useSitesStore Function Coverage Tests", () => {
                 name: "New Site",
             });
 
-            // Verify electronAPI was called
-            expect(mockElectronAPI.sites.addSite).toHaveBeenCalled();
+            // Verify SiteService was called instead of electronAPI directly
+            expect(SiteService.addSite).toHaveBeenCalled();
         });
 
         it("should exercise sync status functions", async () => {
@@ -194,30 +247,22 @@ describe("useSitesStore Function Coverage Tests", () => {
             expect(typeof result.success).toBe("boolean");
             expect(typeof result.sitesLoaded).toBe("number");
             expect(typeof result.message).toBe("string");
-            expect(mockElectronAPI.sites.getSites).toHaveBeenCalled();
+            expect(SiteService.getSites).toHaveBeenCalled();
         });
 
         it("should exercise monitoring operations", async () => {
             const store = useSitesStore.getState();
 
-            // Mock monitoring responses
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                true
-            );
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
-                true
-            );
-
             // Test monitoring functions
             await store.startSiteMonitoring("site-id");
-            expect(
-                mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith("site-id");
+            expect(MonitoringService.startSiteMonitoring).toHaveBeenCalledWith(
+                "site-id"
+            );
 
             await store.stopSiteMonitoring("site-id");
-            expect(
-                mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith("site-id");
+            expect(MonitoringService.stopSiteMonitoring).toHaveBeenCalledWith(
+                "site-id"
+            );
         });
 
         it("should exercise site modification operations", async () => {
@@ -229,10 +274,9 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             // Test modifySite
             await store.modifySite("site-id", { name: "Updated Name" });
-            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(
-                "site-id",
-                { name: "Updated Name" }
-            );
+            expect(SiteService.updateSite).toHaveBeenCalledWith("site-id", {
+                name: "Updated Name",
+            });
         });
 
         it("should exercise deletion operations", async () => {
@@ -268,9 +312,7 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             // Test deleteSite
             await store.deleteSite("delete-site");
-            expect(mockElectronAPI.sites.removeSite).toHaveBeenCalledWith(
-                "delete-site"
-            );
+            expect(SiteService.removeSite).toHaveBeenCalledWith("delete-site");
         });
 
         it("should exercise sync operations", async () => {
@@ -281,12 +323,12 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             // Test syncSites
             await store.syncSites();
-            expect(mockElectronAPI.sites.getSites).toHaveBeenCalled();
+            expect(SiteService.getSites).toHaveBeenCalled();
 
             // Test fullResyncSites
             await store.fullResyncSites();
             // Should call getSites again for full sync
-            expect(mockElectronAPI.sites.getSites).toHaveBeenCalledTimes(2);
+            expect(SiteService.getSites).toHaveBeenCalledTimes(2);
         });
     });
 
@@ -311,7 +353,7 @@ describe("useSitesStore Function Coverage Tests", () => {
 
         it("should handle operation errors gracefully", async () => {
             // Mock error responses
-            mockElectronAPI.sites.addSite.mockRejectedValueOnce(
+            vi.mocked(SiteService.addSite).mockRejectedValueOnce(
                 new Error("Add failed")
             );
 
