@@ -5,7 +5,7 @@
         "composite": true,
         "incremental": true,
         "isolatedDeclarations": false,
-        "outDir": "../../dist-electron",
+        "outDir": "../../.cache/builds/dist-electron-test",
         "paths": {
             "@app/*": [
                 "src/*"
@@ -18,11 +18,11 @@
             ]
         },
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../dist-electron/tsconfig.electron.test.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/builds/dist-electron-test/tsconfig.electron.test.tsbuildinfo"
     },
     "exclude": [
         "node_modules",
-        "../../dist-electron"
+        "../../.cache/builds/dist-electron-test"
     ],
     "extends": "../../tsconfig.json",
     "include": [

@@ -13,7 +13,7 @@ import { defineConfig } from "vitest/config";
 const dirname = import.meta.dirname;
 
 const config: UserConfig = defineConfig({
-    cacheDir: "./.cache/.vitest-stryker",
+    cacheDir: "./.cache/vitest/.vitest-stryker",
     esbuild: {
         keepNames: true,
         target: "esnext",
@@ -28,7 +28,7 @@ const config: UserConfig = defineConfig({
         },
     },
     test: {
-        attachmentsDir: "./.cache/.vitest-attachments-stryker",
+        attachmentsDir: "./.cache/vitest/.vitest-attachments-stryker",
         bail: 100, // Stop after 100 failures to avoid excessive output
         chaiConfig: {
             includeStack: false,

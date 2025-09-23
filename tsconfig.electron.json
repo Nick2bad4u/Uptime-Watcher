@@ -3,7 +3,7 @@
     "compilerOptions": {
         "composite": true,
         "incremental": true,
-        "outDir": "dist-electron",
+        "outDir": "dist",
         "paths": {
             "@app/*": [
                 "src/*"
@@ -15,7 +15,7 @@
                 "shared/*"
             ]
         },
-        "tsBuildInfoFile": "./dist-electron/tsconfig.electron.tsbuildinfo"
+        "tsBuildInfoFile": "./dist/tsconfig.electron.tsbuildinfo"
     },
     "exclude": [
         "electron/**/*.spec.ts",

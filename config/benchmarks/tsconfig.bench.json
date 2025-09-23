@@ -11,7 +11,7 @@
         "noUncheckedIndexedAccess": false,
         "noUnusedLocals": false,
         "noUnusedParameters": false,
-        "outDir": "../../dist-bench",
+        "outDir": "../../.cache/builds/dist-bench",
         "paths": {
             "@app/*": [
                 "src/*"
@@ -26,7 +26,7 @@
         "rootDir": "../..",
         "strictNullChecks": false,
         "strictPropertyInitialization": false,
-        "tsBuildInfoFile": "../../dist-bench/tsconfig.bench.tsbuildinfo",
+        "tsBuildInfoFile": "../../.cache/builds/dist-bench/tsconfig.bench.tsbuildinfo",
         "useUnknownInCatchVariables": false
     },
     "exclude": [

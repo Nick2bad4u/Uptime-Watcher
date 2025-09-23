@@ -133,7 +133,7 @@ export default defineConfig(({ mode }) => {
             sourcemap: true, // Recommended for Electron debugging
             target: VITE_BUILD_TARGET, // Updated to esnext for CSS Modules compatibility
         },
-        cacheDir: "./.cache/.vite", // Separate cache to avoid conflicts
+        cacheDir: "./.cache/vitest/", // Separate cache to avoid conflicts
         css: {
             devSourcemap: true, // Enable source maps for CSS in development
             modules: {
@@ -649,7 +649,7 @@ export default defineConfig(({ mode }) => {
         test: {
             // Directory for storing Vitest test attachments (screenshots, logs, etc.) in a hidden cache folder.
             // This helps keep test artifacts organized and out of the main source tree.
-            attachmentsDir: "./.cache/.vitest-attachments",
+            attachmentsDir: "./.cache/vitest/.vitest-attachments",
             bail: 200, // Stop after 200 failures to avoid excessive output
             benchmark: {
                 exclude: [

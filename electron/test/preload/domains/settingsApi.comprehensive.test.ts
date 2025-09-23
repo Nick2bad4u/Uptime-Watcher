@@ -20,6 +20,15 @@ import {
     type SettingsApiInterface,
 } from "../../../preload/domains/settingsApi";
 
+// Helper functions for creating properly formatted IPC responses
+function createIpcResponse<T>(data: T): { success: true; data: T } {
+    return { success: true, data };
+}
+
+function createVoidIpcResponse(): { success: true } {
+    return { success: true };
+}
+
 describe("Settings Domain API", () => {
     let api: SettingsApiInterface;
 
@@ -50,7 +59,9 @@ describe("Settings Domain API", () => {
     describe("getHistoryLimit", () => {
         it("should call IPC with correct channel and return history limit", async () => {
             const mockLimit = 30; // 30 days
-            mockIpcRenderer.invoke.mockResolvedValue(mockLimit);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockLimit)
+            );
 
             const result = await api.getHistoryLimit();
 
@@ -72,7 +83,9 @@ describe("Settings Domain API", () => {
             ]; // 1 day to 3 years
 
             for (const limit of validLimits) {
-                mockIpcRenderer.invoke.mockResolvedValue(limit);
+                mockIpcRenderer.invoke.mockResolvedValue(
+                    createIpcResponse(limit)
+                );
 
                 const result = await api.getHistoryLimit();
 
@@ -90,7 +103,9 @@ describe("Settings Domain API", () => {
             ];
 
             for (const limit of edgeCases) {
-                mockIpcRenderer.invoke.mockResolvedValue(limit);
+                mockIpcRenderer.invoke.mockResolvedValue(
+                    createIpcResponse(limit)
+                );
 
                 const result = await api.getHistoryLimit();
 
@@ -106,7 +121,9 @@ describe("Settings Domain API", () => {
             ];
 
             for (const limit of largeLimits) {
-                mockIpcRenderer.invoke.mockResolvedValue(limit);
+                mockIpcRenderer.invoke.mockResolvedValue(
+                    createIpcResponse(limit)
+                );
 
                 const result = await api.getHistoryLimit();
 
@@ -122,7 +139,9 @@ describe("Settings Domain API", () => {
             ];
 
             for (const limit of floatLimits) {
-                mockIpcRenderer.invoke.mockResolvedValue(limit);
+                mockIpcRenderer.invoke.mockResolvedValue(
+                    createIpcResponse(limit)
+                );
 
                 const result = await api.getHistoryLimit();
 
@@ -141,7 +160,7 @@ describe("Settings Domain API", () => {
 
         it("should handle concurrent calls", async () => {
             const limit = 30;
-            mockIpcRenderer.invoke.mockResolvedValue(limit);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(limit));
 
             const promises = Array.from({ length: 5 }, () =>
                 api.getHistoryLimit()
@@ -170,15 +189,14 @@ describe("Settings Domain API", () => {
             for (const response of malformedResponses) {
                 mockIpcRenderer.invoke.mockResolvedValue(response);
 
-                const result = await api.getHistoryLimit();
-                expect(result).toBe(response);
+                await expect(api.getHistoryLimit()).rejects.toThrow();
             }
         });
     });
 
     describe("updateHistoryLimit", () => {
         it("should call IPC with correct channel and parameter", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             const newLimit = 60;
             const result = await api.updateHistoryLimit(newLimit);
@@ -191,7 +209,7 @@ describe("Settings Domain API", () => {
         });
 
         it("should handle various valid limit updates", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             const validLimits = [
                 1,
@@ -218,7 +236,7 @@ describe("Settings Domain API", () => {
         });
 
         it("should handle edge case limits", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             const edgeCases = [
                 0,
@@ -238,7 +256,7 @@ describe("Settings Domain API", () => {
         });
 
         it("should handle floating point limits", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             const floatLimits = [
                 30.5,
@@ -277,7 +295,7 @@ describe("Settings Domain API", () => {
         });
 
         it("should handle multiple parameter scenarios", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             // Test with various argument counts
             await api.updateHistoryLimit(30);
@@ -288,7 +306,7 @@ describe("Settings Domain API", () => {
         });
 
         it("should handle concurrent updates", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             const limits = [
                 30,
@@ -315,7 +333,7 @@ describe("Settings Domain API", () => {
         });
 
         it("should handle special number values", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             const specialValues = [
                 Number.NaN,
@@ -340,7 +358,9 @@ describe("Settings Domain API", () => {
                 fc.asyncProperty(
                     fc.integer({ min: -1000, max: 10_000 }),
                     async (limit) => {
-                        mockIpcRenderer.invoke.mockResolvedValue(limit);
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createIpcResponse(limit)
+                        );
 
                         const result = await api.getHistoryLimit();
                         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
@@ -358,7 +378,9 @@ describe("Settings Domain API", () => {
                 fc.asyncProperty(
                     fc.integer({ min: 1, max: 3650 }), // 1 day to 10 years
                     async (limit) => {
-                        mockIpcRenderer.invoke.mockResolvedValue(undefined);
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createVoidIpcResponse()
+                        );
 
                         await api.updateHistoryLimit(limit);
                         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
@@ -374,9 +396,14 @@ describe("Settings Domain API", () => {
         it("should handle floating point limits with property-based testing", async () => {
             await fc.assert(
                 fc.asyncProperty(
-                    fc.float({ min: 0.1, max: 999.9 }),
+                    fc.float({
+                        min: Math.fround(0.1),
+                        max: Math.fround(999.9),
+                    }),
                     async (limit) => {
-                        mockIpcRenderer.invoke.mockResolvedValue(limit);
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createIpcResponse(limit)
+                        );
 
                         const result = await api.getHistoryLimit();
                         expect(result).toBe(limit);
@@ -416,7 +443,10 @@ describe("Settings Domain API", () => {
                         maxLength: 10,
                     }),
                     async (limits) => {
-                        mockIpcRenderer.invoke.mockResolvedValue(undefined);
+                        mockIpcRenderer.invoke.mockClear();
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createVoidIpcResponse()
+                        );
 
                         const promises = limits.map((limit) =>
                             api.updateHistoryLimit(limit)
@@ -436,16 +466,18 @@ describe("Settings Domain API", () => {
     describe("Integration and workflow scenarios", () => {
         it("should handle complete settings workflow", async () => {
             // Get current limit
-            mockIpcRenderer.invoke.mockResolvedValueOnce(30);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(createIpcResponse(30));
             const currentLimit = await api.getHistoryLimit();
             expect(currentLimit).toBe(30);
 
             // Update to new limit
-            mockIpcRenderer.invoke.mockResolvedValueOnce(undefined);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createVoidIpcResponse()
+            );
             await api.updateHistoryLimit(60);
 
             // Verify new limit
-            mockIpcRenderer.invoke.mockResolvedValueOnce(60);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(createIpcResponse(60));
             const newLimit = await api.getHistoryLimit();
             expect(newLimit).toBe(60);
 
@@ -455,19 +487,27 @@ describe("Settings Domain API", () => {
         it("should handle settings backup and restore scenario", async () => {
             // Get current settings for backup
             const originalLimit = 30;
-            mockIpcRenderer.invoke.mockResolvedValueOnce(originalLimit);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(originalLimit)
+            );
             const backup = await api.getHistoryLimit();
 
             // Update to temporary limit
-            mockIpcRenderer.invoke.mockResolvedValueOnce(undefined);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createVoidIpcResponse()
+            );
             await api.updateHistoryLimit(90);
 
             // Restore from backup
-            mockIpcRenderer.invoke.mockResolvedValueOnce(undefined);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createVoidIpcResponse()
+            );
             await api.updateHistoryLimit(backup);
 
             // Verify restoration
-            mockIpcRenderer.invoke.mockResolvedValueOnce(originalLimit);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(originalLimit)
+            );
             const restored = await api.getHistoryLimit();
 
             expect(restored).toBe(originalLimit);
@@ -483,11 +523,15 @@ describe("Settings Domain API", () => {
 
             for (const limit of testLimits) {
                 // Try to update
-                mockIpcRenderer.invoke.mockResolvedValueOnce(undefined);
+                mockIpcRenderer.invoke.mockResolvedValueOnce(
+                    createVoidIpcResponse()
+                );
                 await api.updateHistoryLimit(limit);
 
                 // Verify the update
-                mockIpcRenderer.invoke.mockResolvedValueOnce(limit);
+                mockIpcRenderer.invoke.mockResolvedValueOnce(
+                    createIpcResponse(limit)
+                );
                 const verified = await api.getHistoryLimit();
                 expect(verified).toBe(limit);
             }
@@ -498,15 +542,21 @@ describe("Settings Domain API", () => {
             const oldDefault = 7;
             const newDefault = 30;
 
-            mockIpcRenderer.invoke.mockResolvedValueOnce(oldDefault);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(oldDefault)
+            );
             const currentSetting = await api.getHistoryLimit();
 
             if (currentSetting === oldDefault) {
-                mockIpcRenderer.invoke.mockResolvedValueOnce(undefined);
+                mockIpcRenderer.invoke.mockResolvedValueOnce(
+                    createVoidIpcResponse()
+                );
                 await api.updateHistoryLimit(newDefault);
             }
 
-            mockIpcRenderer.invoke.mockResolvedValueOnce(newDefault);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(newDefault)
+            );
             const migrated = await api.getHistoryLimit();
 
             expect(migrated).toBe(newDefault);
@@ -518,12 +568,16 @@ describe("Settings Domain API", () => {
             // Multiple components checking and syncing
             const promises = Array.from({ length: 3 }, async () => {
                 // Each component gets current setting
-                mockIpcRenderer.invoke.mockResolvedValueOnce(syncedLimit);
+                mockIpcRenderer.invoke.mockResolvedValueOnce(
+                    createIpcResponse(syncedLimit)
+                );
                 const current = await api.getHistoryLimit();
 
                 // Update if needed
                 if (current !== syncedLimit) {
-                    mockIpcRenderer.invoke.mockResolvedValueOnce(undefined);
+                    mockIpcRenderer.invoke.mockResolvedValueOnce(
+                        createVoidIpcResponse()
+                    );
                     await api.updateHistoryLimit(syncedLimit);
                 }
 
@@ -575,7 +629,9 @@ describe("Settings Domain API", () => {
 
         it("should handle corrupted settings data", async () => {
             // Corrupted data returns non-number
-            mockIpcRenderer.invoke.mockResolvedValue("corrupted");
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse("corrupted")
+            );
 
             const result = await api.getHistoryLimit();
 
@@ -584,7 +640,7 @@ describe("Settings Domain API", () => {
 
         it("should handle extremely large limits", async () => {
             const extremeLimit = Number.MAX_SAFE_INTEGER;
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             await api.updateHistoryLimit(extremeLimit);
 
@@ -595,7 +651,7 @@ describe("Settings Domain API", () => {
         });
 
         it("should handle rapid fire updates", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             // Fire 100 updates rapidly
             const promises = Array.from({ length: 100 }, (_, i) =>
@@ -609,9 +665,9 @@ describe("Settings Domain API", () => {
 
         it("should handle mixed success and failure scenarios", async () => {
             const responses = [
-                30, // Success
+                createIpcResponse(30), // Success
                 Promise.reject(new Error("Temporary failure")), // Failure
-                60, // Success
+                createIpcResponse(60), // Success
                 Promise.reject(new Error("Another failure")), // Failure
             ];
 
@@ -658,7 +714,9 @@ describe("Settings Domain API", () => {
     describe("Type safety and contract validation", () => {
         it("should maintain proper typing for getHistoryLimit", async () => {
             const numericLimit = 42;
-            mockIpcRenderer.invoke.mockResolvedValue(numericLimit);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(numericLimit)
+            );
 
             const result = await api.getHistoryLimit();
 
@@ -668,7 +726,7 @@ describe("Settings Domain API", () => {
         });
 
         it("should maintain proper typing for updateHistoryLimit", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             const result = await api.updateHistoryLimit(30);
 
@@ -679,11 +737,11 @@ describe("Settings Domain API", () => {
         it("should handle function context properly", async () => {
             const { getHistoryLimit, updateHistoryLimit } = api;
 
-            mockIpcRenderer.invoke.mockResolvedValue(30);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(30));
             const limit = await getHistoryLimit();
             expect(limit).toBe(30);
 
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
             const updateResult = await updateHistoryLimit(60);
             expect(updateResult).toBeUndefined();
         });
@@ -698,7 +756,7 @@ describe("Settings Domain API", () => {
 
         it("should handle method signature compatibility", async () => {
             // These should compile without TypeScript errors
-            mockIpcRenderer.invoke.mockResolvedValue(30);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(30));
 
             // No arguments
             const result1 = await api.getHistoryLimit();
@@ -708,7 +766,7 @@ describe("Settings Domain API", () => {
             const result2 = await api.getHistoryLimit("extra" as never);
             expect(result2).toBe(30);
 
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             // Single argument
             await api.updateHistoryLimit(60);
@@ -723,7 +781,7 @@ describe("Settings Domain API", () => {
     describe("Performance and optimization scenarios", () => {
         it("should handle high-frequency polling", async () => {
             const limit = 30;
-            mockIpcRenderer.invoke.mockResolvedValue(limit);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(limit));
 
             const start = Date.now();
 
@@ -744,7 +802,7 @@ describe("Settings Domain API", () => {
         });
 
         it("should handle burst configuration updates", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             const start = Date.now();
 
@@ -765,10 +823,10 @@ describe("Settings Domain API", () => {
 
             mockIpcRenderer.invoke.mockImplementation((channel, ...args) => {
                 if (channel === "get-history-limit") {
-                    return Promise.resolve(currentLimit);
+                    return Promise.resolve(createIpcResponse(currentLimit));
                 } else if (channel === "update-history-limit") {
                     currentLimit = args[0] as number;
-                    return Promise.resolve(undefined);
+                    return Promise.resolve(createVoidIpcResponse());
                 }
                 return Promise.reject(new Error("Unknown channel"));
             });

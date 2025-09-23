@@ -32,7 +32,7 @@
         "noUncheckedSideEffectImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "outDir": "dist-scripts",
+        "outDir": ".cache/builds/dist-scripts",
         "pretty": true,
         "removeComments": false,
         "resolveJsonModule": true,
@@ -47,7 +47,7 @@
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
-        "tsBuildInfoFile": "./dist-scripts/tsconfig.scripts.tsbuildinfo",
+        "tsBuildInfoFile": "./.cache/builds/dist-scripts/tsconfig.scripts.tsbuildinfo",
         "types": [
             "node"
         ],

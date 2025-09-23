@@ -235,7 +235,13 @@ export function createEventManager(channel: string): {
                 _event: IpcRendererEvent,
                 ...args: unknown[]
             ): void => {
-                callback(...args);
+                try {
+                    // eslint-disable-next-line n/callback-return -- Event handler callback, no return needed
+                    callback(...args);
+                } catch (error) {
+                    // Log callback errors but don't propagate them to prevent event system crashes
+                    console.warn("Event callback error:", error);
+                }
             };
             ipcRenderer.on(channel, handleEventCallback);
             return (): void => {
@@ -248,7 +254,13 @@ export function createEventManager(channel: string): {
          */
         once: (callback: EventCallback): void => {
             ipcRenderer.once(channel, (_event, ...args: unknown[]) => {
-                callback(...args);
+                try {
+                    // eslint-disable-next-line n/callback-return -- Event handler callback, no return needed
+                    callback(...args);
+                } catch (error) {
+                    // Log callback errors but don't propagate them to prevent event system crashes
+                    console.warn("Event callback error:", error);
+                }
             });
         },
 

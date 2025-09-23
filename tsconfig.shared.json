@@ -3,7 +3,7 @@
     "compilerOptions": {
         "composite": true,
         "incremental": true,
-        "outDir": "dist-shared",
+        "outDir": "dist",
         "paths": {
             "@app/*": [
                 "src/*"
@@ -15,7 +15,7 @@
                 "shared/*"
             ]
         },
-        "tsBuildInfoFile": "./dist-shared/tsconfig.shared.tsbuildinfo"
+        "tsBuildInfoFile": "./dist/tsconfig.shared.tsbuildinfo"
     },
     "exclude": [
         "shared/**/*.spec.ts",

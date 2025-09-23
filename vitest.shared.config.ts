@@ -20,7 +20,7 @@ import {
 const dirname = import.meta.dirname;
 
 const vitestConfig = defineConfig({
-    cacheDir: "./.cache/.vitest-shared",
+    cacheDir: "./.cache/vitest/.vitest-shared",
     esbuild: {
         // Combine JS/TS and module variants into a single glob for brevity.
         include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
@@ -40,7 +40,7 @@ const vitestConfig = defineConfig({
         },
     },
     test: {
-        attachmentsDir: "./.cache/.vitest-attachments-shared",
+        attachmentsDir: "./.cache/vitest/.vitest-attachments-shared",
         bail: 100,
         benchmark: {
             exclude: [

@@ -9,26 +9,10 @@
         "forceConsistentCasingInFileNames": true,
         "isolatedDeclarations": false,
         "isolatedModules": true,
-        "lib": [
-            "DOM.Iterable",
-            "DOM",
-            "ES2015",
-            "ES2016",
-            "ES2017",
-            "ES2018",
-            "ES2019",
-            "ES2020",
-            "ES2021",
-            "ES2022",
-            "ES2023",
-            "ES6",
-            "ES7",
-            "ESNext"
-        ],
         "module": "ESNext",
         "moduleResolution": "bundler",
         "noEmit": true,
-        "outDir": "../dist-playwright",
+        "outDir": "../.cache/builds/dist-playwright",
         "paths": {
             "@/*": [
                 "../src/*"
@@ -48,7 +32,7 @@
         "skipLibCheck": false,
         "strict": true,
         "target": "ES2024",
-        "tsBuildInfoFile": "../dist-playwright/tsconfig.playwright.tsbuildinfo",
+        "tsBuildInfoFile": "../.cache/builds/dist-playwright/tsconfig.playwright.tsbuildinfo",
         "types": [
             "@playwright/test",
             "node"
@@ -59,7 +43,7 @@
         "node_modules",
         "test-results",
         "reports/**",
-        "../dist*/**",
+        "../.cache/builds/dist-playwright",
         "../coverage/**",
         "../node_modules/**",
         "codegen-template.mjs"

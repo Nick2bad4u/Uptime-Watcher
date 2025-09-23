@@ -25,6 +25,11 @@ import {
 import type { Site } from "../../../../shared/types";
 import type { StateSyncEventData } from "../../../../shared/types/events";
 
+// Helper functions for creating properly formatted IPC responses
+function createIpcResponse<T>(data: T): { success: true; data: T } {
+    return { success: true, data };
+}
+
 describe("State Sync Domain API", () => {
     let api: StateSyncApiInterface;
 
@@ -73,7 +78,9 @@ describe("State Sync Domain API", () => {
                 },
             ];
 
-            mockIpcRenderer.invoke.mockResolvedValue(mockSites);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockSites)
+            );
 
             const result = await api.getSyncStatus();
 
@@ -85,7 +92,7 @@ describe("State Sync Domain API", () => {
         });
 
         it("should handle empty sync status", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue([]);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse([]));
 
             const result = await api.getSyncStatus();
 
@@ -113,7 +120,9 @@ describe("State Sync Domain API", () => {
                 })
             );
 
-            mockIpcRenderer.invoke.mockResolvedValue(largeSiteList);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(largeSiteList)
+            );
 
             const result = await api.getSyncStatus();
             expect(result).toHaveLength(500);
@@ -138,7 +147,9 @@ describe("State Sync Domain API", () => {
                 },
             ];
 
-            mockIpcRenderer.invoke.mockResolvedValue(mockSyncedSites);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockSyncedSites)
+            );
 
             const result = await api.requestFullSync();
 
@@ -150,7 +161,7 @@ describe("State Sync Domain API", () => {
         });
 
         it("should handle full sync with no sites", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue([]);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse([]));
 
             const result = await api.requestFullSync();
 
@@ -204,7 +215,10 @@ describe("State Sync Domain API", () => {
 
         it("should call callback with valid StateSyncEventData", () => {
             const mockCallback = vi.fn();
-            let registeredHandler: (data: unknown) => void = () => {};
+            let registeredHandler: (
+                event: unknown,
+                ...args: unknown[]
+            ) => void = () => {};
 
             mockIpcRenderer.on.mockImplementation((_, handler) => {
                 registeredHandler = handler;
@@ -219,14 +233,17 @@ describe("State Sync Domain API", () => {
                 siteId: "test-site",
             };
 
-            registeredHandler(validEventData);
+            registeredHandler({}, validEventData);
 
             expect(mockCallback).toHaveBeenCalledWith(validEventData);
         });
 
         it("should not call callback with invalid event data", () => {
             const mockCallback = vi.fn();
-            let registeredHandler: (data: unknown) => void = () => {};
+            let registeredHandler: (
+                event: unknown,
+                ...args: unknown[]
+            ) => void = () => {};
 
             mockIpcRenderer.on.mockImplementation((_, handler) => {
                 registeredHandler = handler;
@@ -239,14 +256,17 @@ describe("State Sync Domain API", () => {
                 timestamp: "not-a-number",
             };
 
-            registeredHandler(invalidEventData);
+            registeredHandler({}, invalidEventData);
 
             expect(mockCallback).not.toHaveBeenCalled();
         });
 
         it("should handle various event action types", () => {
             const mockCallback = vi.fn();
-            let registeredHandler: (data: unknown) => void = () => {};
+            let registeredHandler: (
+                event: unknown,
+                ...args: unknown[]
+            ) => void = () => {};
 
             mockIpcRenderer.on.mockImplementation((_, handler) => {
                 registeredHandler = handler;
@@ -268,7 +288,7 @@ describe("State Sync Domain API", () => {
                     timestamp: Date.now(),
                 };
 
-                registeredHandler(eventData);
+                registeredHandler({}, eventData);
             }
 
             expect(mockCallback).toHaveBeenCalledTimes(4);
@@ -276,7 +296,10 @@ describe("State Sync Domain API", () => {
 
         it("should handle various event source types", () => {
             const mockCallback = vi.fn();
-            let registeredHandler: (data: unknown) => void = () => {};
+            let registeredHandler: (
+                event: unknown,
+                ...args: unknown[]
+            ) => void = () => {};
 
             mockIpcRenderer.on.mockImplementation((_, handler) => {
                 registeredHandler = handler;
@@ -297,7 +320,7 @@ describe("State Sync Domain API", () => {
                     timestamp: Date.now(),
                 };
 
-                registeredHandler(eventData);
+                registeredHandler({}, eventData);
             }
 
             expect(mockCallback).toHaveBeenCalledTimes(3);
@@ -337,7 +360,9 @@ describe("State Sync Domain API", () => {
                             monitors: [],
                         }));
 
-                        mockIpcRenderer.invoke.mockResolvedValue(mockSites);
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createIpcResponse(mockSites)
+                        );
 
                         const result = await api.getSyncStatus();
                         expect(result).toEqual(mockSites);
@@ -364,7 +389,9 @@ describe("State Sync Domain API", () => {
                             })
                         );
 
-                        mockIpcRenderer.invoke.mockResolvedValue(mockSites);
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createIpcResponse(mockSites)
+                        );
 
                         const result = await api.requestFullSync();
                         expect(result).toHaveLength(siteCount);
@@ -413,17 +440,16 @@ describe("State Sync Domain API", () => {
                         ),
                         source: fc.constantFrom("backend", "cache", "manual"),
                         timestamp: fc.integer({ min: 0 }),
-                        data: fc.option(
-                            fc.record({
-                                identifier: fc.string({ minLength: 1 }),
-                                name: fc.string({ minLength: 1 }),
-                            })
-                        ),
+                        siteId: fc.option(fc.string({ minLength: 1 })),
                     }),
                     (eventData) => {
+                        // Clear mocks for each property test run
+                        vi.clearAllMocks();
+
                         const mockCallback = vi.fn();
                         let registeredHandler: (
-                            data: unknown
+                            _event: unknown,
+                            ...args: unknown[]
                         ) => void = () => {};
 
                         mockIpcRenderer.on.mockImplementation((_, handler) => {
@@ -431,7 +457,7 @@ describe("State Sync Domain API", () => {
                         });
 
                         api.onStateSyncEvent(mockCallback);
-                        registeredHandler(eventData);
+                        registeredHandler({}, eventData);
 
                         expect(mockCallback).toHaveBeenCalledWith(eventData);
                     }
@@ -500,7 +526,8 @@ describe("State Sync Domain API", () => {
                     (invalidEventData) => {
                         const mockCallback = vi.fn();
                         let registeredHandler: (
-                            data: unknown
+                            _event: unknown,
+                            ...args: unknown[]
                         ) => void = () => {};
 
                         mockIpcRenderer.on.mockImplementation((_, handler) => {
@@ -508,7 +535,7 @@ describe("State Sync Domain API", () => {
                         });
 
                         api.onStateSyncEvent(mockCallback);
-                        registeredHandler(invalidEventData);
+                        registeredHandler({}, invalidEventData);
 
                         expect(mockCallback).not.toHaveBeenCalled();
                     }
@@ -521,7 +548,10 @@ describe("State Sync Domain API", () => {
     describe("Integration and workflow scenarios", () => {
         it("should handle complete sync workflow", async () => {
             const mockCallback = vi.fn();
-            let registeredHandler: (data: unknown) => void = () => {};
+            let registeredHandler: (
+                event: unknown,
+                ...args: unknown[]
+            ) => void = () => {};
 
             mockIpcRenderer.on.mockImplementation((_, handler) => {
                 registeredHandler = handler;
@@ -539,7 +569,9 @@ describe("State Sync Domain API", () => {
                     monitors: [],
                 },
             ];
-            mockIpcRenderer.invoke.mockResolvedValueOnce(initialSites);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(initialSites)
+            );
             const status = await api.getSyncStatus();
             expect(status).toEqual(initialSites);
 
@@ -550,7 +582,7 @@ describe("State Sync Domain API", () => {
                 timestamp: Date.now(),
                 siteId: "new-site",
             };
-            registeredHandler(syncEvent);
+            registeredHandler({}, syncEvent);
             expect(mockCallback).toHaveBeenCalledWith(syncEvent);
 
             // Request full sync
@@ -563,7 +595,9 @@ describe("State Sync Domain API", () => {
                     monitors: [],
                 },
             ];
-            mockIpcRenderer.invoke.mockResolvedValueOnce(syncedSites);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(syncedSites)
+            );
             const fullSync = await api.requestFullSync();
             expect(fullSync).toEqual(syncedSites);
 
@@ -590,7 +624,9 @@ describe("State Sync Domain API", () => {
                     monitors: [],
                 },
             ];
-            mockIpcRenderer.invoke.mockResolvedValueOnce(resolvedSites);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(resolvedSites)
+            );
             const result = await api.requestFullSync();
             expect(result).toEqual(resolvedSites);
         });
@@ -611,7 +647,9 @@ describe("State Sync Domain API", () => {
                 },
             ];
 
-            mockIpcRenderer.invoke.mockResolvedValue(mockSites);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockSites)
+            );
 
             const promises = [
                 api.getSyncStatus(),
@@ -676,7 +714,9 @@ describe("State Sync Domain API", () => {
 
         it("should handle malformed sync data gracefully", async () => {
             const malformedData = { invalid: "sync data structure" };
-            mockIpcRenderer.invoke.mockResolvedValue(malformedData);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(malformedData)
+            );
 
             const result = await api.getSyncStatus();
             expect(result).toEqual(malformedData);
@@ -687,7 +727,10 @@ describe("State Sync Domain API", () => {
                 throw new Error("Callback error");
             });
 
-            let registeredHandler: (data: unknown) => void = () => {};
+            let registeredHandler: (
+                event: unknown,
+                ...args: unknown[]
+            ) => void = () => {};
 
             mockIpcRenderer.on.mockImplementation((_, handler) => {
                 registeredHandler = handler;
@@ -702,13 +745,16 @@ describe("State Sync Domain API", () => {
             };
 
             // Should not throw despite callback error
-            expect(() => registeredHandler(validEventData)).not.toThrow();
+            expect(() => registeredHandler({}, validEventData)).not.toThrow();
             expect(throwingCallback).toHaveBeenCalledWith(validEventData);
         });
 
         it("should handle rapid event sequences", () => {
             const mockCallback = vi.fn();
-            let registeredHandler: (data: unknown) => void = () => {};
+            let registeredHandler: (
+                event: unknown,
+                ...args: unknown[]
+            ) => void = () => {};
 
             mockIpcRenderer.on.mockImplementation((_, handler) => {
                 registeredHandler = handler;
@@ -728,7 +774,7 @@ describe("State Sync Domain API", () => {
             );
 
             for (const event of events) {
-                registeredHandler(event);
+                registeredHandler({}, event);
             }
 
             expect(mockCallback).toHaveBeenCalledTimes(100);
@@ -745,7 +791,9 @@ describe("State Sync Domain API", () => {
                 },
             ];
 
-            mockIpcRenderer.invoke.mockResolvedValue(edgeCaseSites);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(edgeCaseSites)
+            );
 
             const status = await api.getSyncStatus();
             const fullSync = await api.requestFullSync();
@@ -767,7 +815,9 @@ describe("State Sync Domain API", () => {
                     monitors: [],
                 },
             ];
-            mockIpcRenderer.invoke.mockResolvedValue(mockSites);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockSites)
+            );
 
             const statusResult = await api.getSyncStatus();
             const syncResult = await api.requestFullSync();
@@ -786,7 +836,7 @@ describe("State Sync Domain API", () => {
         it("should handle function context properly", async () => {
             const { getSyncStatus, requestFullSync, onStateSyncEvent } = api;
 
-            mockIpcRenderer.invoke.mockResolvedValue([]);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse([]));
 
             const status = await getSyncStatus();
             const sync = await requestFullSync();

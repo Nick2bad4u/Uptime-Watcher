@@ -41,6 +41,7 @@
         "noUncheckedSideEffectImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
+        "outDir": "../../.cache/builds/dist-docusaurus",
         "paths": {
             "@docusaurus/*": [
                 "./.docusaurus/docusaurus/*"
@@ -66,6 +67,7 @@
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
         "target": "ESNext",
+        "tsBuildInfoFile": "../../.cache/builds/dist-docusaurus/tsconfig.docusaurus.tsbuildinfo",
         "useDefineForClassFields": true,
         "useUnknownInCatchVariables": true
     },

@@ -23,6 +23,7 @@
         "moduleDetection": "auto",
         "moduleResolution": "bundler",
         "noEmit": true,
+        "outDir": "../../.cache/builds/dist-typedoc-eslint",
         "paths": {
             "@docusaurus/*": [
                 "./.docusaurus/docusaurus/*"
@@ -38,7 +39,8 @@
         "skipLibCheck": true,
         "sourceMap": false,
         "strict": true,
-        "target": "ESNext"
+        "target": "ESNext",
+        "tsBuildInfoFile": "../../.cache/builds/dist-typedoc-eslint/typedoc.tsbuildinfo"
     },
     "exclude": [
         "node_modules/**",

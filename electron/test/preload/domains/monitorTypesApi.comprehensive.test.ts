@@ -20,6 +20,9 @@ import {
     type MonitorTypesApiInterface,
 } from "../../../preload/domains/monitorTypesApi";
 
+// Helper functions for IPC response format
+const createIpcResponse = <T>(data: T) => ({ success: true, data });
+
 describe("Monitor Types Domain API", () => {
     let api: MonitorTypesApiInterface;
 
@@ -68,7 +71,9 @@ describe("Monitor Types Domain API", () => {
                 },
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(mockMonitorTypes);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockMonitorTypes)
+            );
 
             const result = await api.getMonitorTypes();
 
@@ -80,7 +85,9 @@ describe("Monitor Types Domain API", () => {
 
         it("should handle empty monitor types registry", async () => {
             const emptyRegistry = {};
-            mockIpcRenderer.invoke.mockResolvedValue(emptyRegistry);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(emptyRegistry)
+            );
 
             const result = await api.getMonitorTypes();
 
@@ -150,7 +157,9 @@ describe("Monitor Types Domain API", () => {
                 },
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(complexTypes);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(complexTypes)
+            );
 
             const result = await api.getMonitorTypes();
 
@@ -161,14 +170,15 @@ describe("Monitor Types Domain API", () => {
         });
 
         it("should handle null and undefined responses", async () => {
-            const testValues = [null, undefined];
+            // Test null response
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(null));
+            const nullResult = await api.getMonitorTypes();
+            expect(nullResult).toEqual(null);
 
-            for (const value of testValues) {
-                mockIpcRenderer.invoke.mockResolvedValue(value);
-
-                const result = await api.getMonitorTypes();
-                expect(result).toEqual(value);
-            }
+            // Test undefined by passing empty object (undefined not allowed in data field)
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse({}));
+            const emptyResult = await api.getMonitorTypes();
+            expect(emptyResult).toEqual({});
         });
 
         it("should handle very large monitor type registry", async () => {
@@ -190,7 +200,9 @@ describe("Monitor Types Domain API", () => {
                 ])
             );
 
-            mockIpcRenderer.invoke.mockResolvedValue(largeRegistry);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(largeRegistry)
+            );
 
             const result = await api.getMonitorTypes();
 
@@ -203,7 +215,9 @@ describe("Monitor Types Domain API", () => {
                 http: { name: "HTTP" },
                 ping: { name: "Ping" },
             };
-            mockIpcRenderer.invoke.mockResolvedValue(mockTypes);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockTypes)
+            );
 
             const promises = Array.from({ length: 5 }, () =>
                 api.getMonitorTypes()
@@ -226,7 +240,9 @@ describe("Monitor Types Domain API", () => {
             ];
 
             for (const response of malformedResponses) {
-                mockIpcRenderer.invoke.mockResolvedValue(response);
+                mockIpcRenderer.invoke.mockResolvedValue(
+                    createIpcResponse(response)
+                );
 
                 const result = await api.getMonitorTypes();
                 expect(result).toEqual(response);
@@ -250,7 +266,9 @@ describe("Monitor Types Domain API", () => {
                         })
                     ),
                     async (monitorTypes) => {
-                        mockIpcRenderer.invoke.mockResolvedValue(monitorTypes);
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createIpcResponse(monitorTypes)
+                        );
 
                         const result = await api.getMonitorTypes();
                         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
@@ -283,7 +301,9 @@ describe("Monitor Types Domain API", () => {
                         ),
                     }),
                     async (complexData) => {
-                        mockIpcRenderer.invoke.mockResolvedValue(complexData);
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createIpcResponse(complexData)
+                        );
 
                         const result = await api.getMonitorTypes();
                         expect(result).toEqual(complexData);
@@ -321,7 +341,10 @@ describe("Monitor Types Domain API", () => {
                     fc.integer({ min: 1, max: 10 }),
                     fc.object(),
                     async (callCount, mockData) => {
-                        mockIpcRenderer.invoke.mockResolvedValue(mockData);
+                        vi.clearAllMocks(); // Clear mocks for each iteration
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createIpcResponse(mockData)
+                        );
 
                         const promises = Array.from({ length: callCount }, () =>
                             api.getMonitorTypes()
@@ -349,7 +372,9 @@ describe("Monitor Types Domain API", () => {
                 port: { name: "Port Monitor", enabled: false }, // Disabled type
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(startupTypes);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(startupTypes)
+            );
 
             const result = await api.getMonitorTypes();
 
@@ -360,7 +385,9 @@ describe("Monitor Types Domain API", () => {
         it("should handle monitor type registry updates", async () => {
             // Initial load
             const initialTypes = { http: { name: "HTTP" } };
-            mockIpcRenderer.invoke.mockResolvedValueOnce(initialTypes);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(initialTypes)
+            );
 
             const initial = await api.getMonitorTypes();
             expect(initial).toEqual(initialTypes);
@@ -370,7 +397,9 @@ describe("Monitor Types Domain API", () => {
                 http: { name: "HTTP", version: "2.0" },
                 dns: { name: "DNS", version: "1.0" },
             };
-            mockIpcRenderer.invoke.mockResolvedValueOnce(updatedTypes);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(updatedTypes)
+            );
 
             const updated = await api.getMonitorTypes();
             expect(updated).toEqual(updatedTypes);
@@ -388,7 +417,9 @@ describe("Monitor Types Domain API", () => {
                 },
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(cachedTypes);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(cachedTypes)
+            );
 
             // Multiple calls should all get the cached data
             const results = await Promise.all([
@@ -423,7 +454,9 @@ describe("Monitor Types Domain API", () => {
                 },
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(pluginTypes);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(pluginTypes)
+            );
 
             const result = await api.getMonitorTypes();
 
@@ -460,7 +493,9 @@ describe("Monitor Types Domain API", () => {
                 dns: { incomplete: true }, // Missing required fields
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(corruptedData);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(corruptedData)
+            );
 
             const result = await api.getMonitorTypes();
 
@@ -483,7 +518,9 @@ describe("Monitor Types Domain API", () => {
                 ])
             );
 
-            mockIpcRenderer.invoke.mockResolvedValue(hugeRegistry);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(hugeRegistry)
+            );
 
             const result = await api.getMonitorTypes();
             const duration = Date.now() - start;
@@ -499,7 +536,9 @@ describe("Monitor Types Domain API", () => {
             // Create circular reference
             (circularData.http as any)["parent"] = circularData;
 
-            mockIpcRenderer.invoke.mockResolvedValue(circularData);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(circularData)
+            );
 
             const result = await api.getMonitorTypes();
 
@@ -513,9 +552,9 @@ describe("Monitor Types Domain API", () => {
             // Mix of success and failure
             mockIpcRenderer.invoke
                 .mockRejectedValueOnce(error)
-                .mockResolvedValueOnce(successData)
+                .mockResolvedValueOnce(createIpcResponse(successData))
                 .mockRejectedValueOnce(error)
-                .mockResolvedValueOnce(successData);
+                .mockResolvedValueOnce(createIpcResponse(successData));
 
             // Test mixed results
             await expect(api.getMonitorTypes()).rejects.toThrow(
@@ -540,7 +579,9 @@ describe("Monitor Types Domain API", () => {
                 },
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(largeData);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(largeData)
+            );
 
             // Multiple concurrent calls with large data
             const promises = Array.from({ length: 5 }, () =>
@@ -568,7 +609,9 @@ describe("Monitor Types Domain API", () => {
                 },
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(typedData);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(typedData)
+            );
 
             const result = await api.getMonitorTypes();
 
@@ -584,7 +627,9 @@ describe("Monitor Types Domain API", () => {
         it("should handle function context properly", async () => {
             const { getMonitorTypes } = api;
             const mockData = { test: "data" };
-            mockIpcRenderer.invoke.mockResolvedValue(mockData);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockData)
+            );
 
             // Destructured function should work correctly
             const result = await getMonitorTypes();
@@ -600,7 +645,9 @@ describe("Monitor Types Domain API", () => {
 
         it("should handle method chaining scenarios", async () => {
             const chainData = { chain: "test" };
-            mockIpcRenderer.invoke.mockResolvedValue(chainData);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(chainData)
+            );
 
             // Method should be callable and chainable
             const result = await api.getMonitorTypes();
@@ -613,7 +660,9 @@ describe("Monitor Types Domain API", () => {
     describe("Performance and optimization scenarios", () => {
         it("should handle repeated calls efficiently", async () => {
             const testData = { perf: "test" };
-            mockIpcRenderer.invoke.mockResolvedValue(testData);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(testData)
+            );
 
             const start = Date.now();
 
@@ -630,7 +679,9 @@ describe("Monitor Types Domain API", () => {
 
         it("should handle burst traffic scenarios", async () => {
             const burstData = { burst: "test" };
-            mockIpcRenderer.invoke.mockResolvedValue(burstData);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(burstData)
+            );
 
             // Simulate burst of concurrent requests
             const burstSize = 20;

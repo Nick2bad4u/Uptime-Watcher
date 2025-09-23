@@ -21,6 +21,11 @@ import {
     type SystemApiInterface,
 } from "../../../preload/domains/systemApi";
 
+// Helper functions for creating properly formatted IPC responses
+function createIpcResponse<T>(data: T): { success: true; data: T } {
+    return { success: true, data };
+}
+
 describe("System Domain API", () => {
     let api: SystemApiInterface;
 
@@ -51,7 +56,7 @@ describe("System Domain API", () => {
     describe("openExternal", () => {
         it("should call IPC with correct channel and URL", async () => {
             const testUrl = "https://example.com";
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const result = await api.openExternal(testUrl);
 
@@ -73,7 +78,9 @@ describe("System Domain API", () => {
             ];
 
             for (const url of urls) {
-                mockIpcRenderer.invoke.mockResolvedValue(true);
+                mockIpcRenderer.invoke.mockResolvedValue(
+                    createIpcResponse(true)
+                );
                 const result = await api.openExternal(url);
                 expect(result).toBeTruthy();
                 expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
@@ -85,7 +92,7 @@ describe("System Domain API", () => {
 
         it("should handle failed URL opening", async () => {
             const failedUrl = "https://invalid-url-that-fails.com";
-            mockIpcRenderer.invoke.mockResolvedValue(false);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(false));
 
             const result = await api.openExternal(failedUrl);
 
@@ -114,7 +121,9 @@ describe("System Domain API", () => {
             ];
 
             for (const url of malformedUrls) {
-                mockIpcRenderer.invoke.mockResolvedValue(false);
+                mockIpcRenderer.invoke.mockResolvedValue(
+                    createIpcResponse(false)
+                );
                 const result = await api.openExternal(url);
                 expect(typeof result).toBe("boolean");
             }
@@ -149,7 +158,7 @@ describe("System Domain API", () => {
                 "https://site5.com",
             ];
 
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const promises = urls.map((url) => api.openExternal(url));
             const results = await Promise.all(promises);
@@ -214,7 +223,9 @@ describe("System Domain API", () => {
         it("should handle various URL formats for openExternal", async () => {
             await fc.assert(
                 fc.asyncProperty(fc.webUrl(), async (url) => {
-                    mockIpcRenderer.invoke.mockResolvedValue(true);
+                    mockIpcRenderer.invoke.mockResolvedValue(
+                        createIpcResponse(true)
+                    );
 
                     const result = await api.openExternal(url);
 
@@ -232,7 +243,9 @@ describe("System Domain API", () => {
         it("should handle various string inputs for openExternal", async () => {
             await fc.assert(
                 fc.asyncProperty(fc.string(), async (input) => {
-                    mockIpcRenderer.invoke.mockResolvedValue(false);
+                    mockIpcRenderer.invoke.mockResolvedValue(
+                        createIpcResponse(false)
+                    );
 
                     const result = await api.openExternal(input);
 
@@ -275,7 +288,9 @@ describe("System Domain API", () => {
                     fc.boolean(),
                     fc.webUrl(),
                     async (returnValue, url) => {
-                        mockIpcRenderer.invoke.mockResolvedValue(returnValue);
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createIpcResponse(returnValue)
+                        );
 
                         const result = await api.openExternal(url);
 
@@ -320,7 +335,7 @@ describe("System Domain API", () => {
                 "https://github.com/app/repo/issues",
             ];
 
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             for (const url of urls) {
                 const result = await api.openExternal(url);
@@ -349,7 +364,9 @@ describe("System Domain API", () => {
             );
 
             // Fallback succeeds
-            mockIpcRenderer.invoke.mockResolvedValueOnce(true);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(true)
+            );
             const result = await api.openExternal(fallbackUrl);
             expect(result).toBeTruthy();
         });
@@ -362,7 +379,9 @@ describe("System Domain API", () => {
             ];
 
             for (const testCase of testCases) {
-                mockIpcRenderer.invoke.mockResolvedValueOnce(testCase.result);
+                mockIpcRenderer.invoke.mockResolvedValueOnce(
+                    createIpcResponse(testCase.result)
+                );
                 const result = await api.openExternal(testCase.url);
                 expect(result).toBe(testCase.result);
             }
@@ -386,7 +405,7 @@ describe("System Domain API", () => {
     describe("Error handling and edge cases", () => {
         it("should handle very long URLs", async () => {
             const longUrl = `https://example.com/${"a".repeat(2000)}`;
-            mockIpcRenderer.invoke.mockResolvedValue(false);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(false));
 
             const result = await api.openExternal(longUrl);
             expect(typeof result).toBe("boolean");
@@ -402,14 +421,16 @@ describe("System Domain API", () => {
             ];
 
             for (const url of specialUrls) {
-                mockIpcRenderer.invoke.mockResolvedValue(true);
+                mockIpcRenderer.invoke.mockResolvedValue(
+                    createIpcResponse(true)
+                );
                 const result = await api.openExternal(url);
                 expect(typeof result).toBe("boolean");
             }
         });
 
         it("should handle null and undefined inputs gracefully", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(false);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(false));
 
             // These should still call IPC but likely return false
             const nullResult = await api.openExternal(
@@ -467,7 +488,7 @@ describe("System Domain API", () => {
                 (_, i) => `https://rapid-${i}.com`
             );
 
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const promises = rapidUrls.map((url) => api.openExternal(url));
             const results = await Promise.all(promises);
@@ -482,7 +503,9 @@ describe("System Domain API", () => {
             const testCases = [true, false];
 
             for (const expectedResult of testCases) {
-                mockIpcRenderer.invoke.mockResolvedValue(expectedResult);
+                mockIpcRenderer.invoke.mockResolvedValue(
+                    createIpcResponse(expectedResult)
+                );
                 const result = await api.openExternal("https://example.com");
 
                 expect(typeof result).toBe("boolean");
@@ -493,7 +516,7 @@ describe("System Domain API", () => {
         it("should handle function context properly", async () => {
             const { openExternal, quitAndInstall } = api;
 
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const result = await openExternal("https://example.com");
             expect(typeof result).toBe("boolean");
@@ -509,7 +532,7 @@ describe("System Domain API", () => {
 
         it("should handle parameter types correctly", async () => {
             // String parameter
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
             await api.openExternal("https://example.com");
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 "open-external",
@@ -538,7 +561,7 @@ describe("System Domain API", () => {
         it("should handle edge case return values gracefully", async () => {
             // Non-boolean return value should still be handled
             mockIpcRenderer.invoke.mockResolvedValue(
-                "not-boolean" as unknown as boolean
+                createIpcResponse("not-boolean" as unknown as boolean)
             );
             const result = await api.openExternal("https://example.com");
 
@@ -552,7 +575,7 @@ describe("System Domain API", () => {
             const startTime = Date.now();
             const urlCount = 100;
 
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const promises = Array.from({ length: urlCount }, (_, i) =>
                 api.openExternal(`https://perf-test-${i}.com`)
@@ -573,7 +596,7 @@ describe("System Domain API", () => {
 
         it("should handle memory efficiency with large data", async () => {
             const largeUrl = `https://example.com/${"x".repeat(10_000)}`;
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const result = await api.openExternal(largeUrl);
             expect(result).toBeTruthy();
@@ -584,7 +607,9 @@ describe("System Domain API", () => {
 
             // Start multiple operations
             for (let i = 0; i < 10; i++) {
-                mockIpcRenderer.invoke.mockResolvedValue(true);
+                mockIpcRenderer.invoke.mockResolvedValue(
+                    createIpcResponse(true)
+                );
                 operationPromises.push(
                     api.openExternal(`https://responsive-${i}.com`)
                 );
@@ -604,7 +629,7 @@ describe("System Domain API", () => {
             // Simulate some failures under load
             mockIpcRenderer.invoke.mockImplementation((_, url) => {
                 const urlIndex = Number.parseInt(url.split("-")[2], 10);
-                return Promise.resolve(urlIndex % 3 !== 0); // Fail every 3rd request
+                return Promise.resolve(createIpcResponse(urlIndex % 3 !== 0)); // Fail every 3rd request
             });
 
             const results = await Promise.allSettled(

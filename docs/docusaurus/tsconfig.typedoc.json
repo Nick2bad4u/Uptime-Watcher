@@ -30,7 +30,7 @@
         "moduleDetection": "auto",
         "moduleResolution": "bundler",
         "noEmit": false,
-        "outDir": "dist",
+        "outDir": "../../.cache/builds/dist-typedoc",
         "paths": {
             "@app/*": [
                 "../../src/*"
@@ -47,7 +47,7 @@
         "sourceMap": true,
         "strict": true,
         "target": "ESNext",
-        "tsBuildInfoFile": "./dist/typedoc.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/builds/dist-typedoc/typedoc.tsbuildinfo"
     },
     "exclude": [
         "../../node_modules/**",

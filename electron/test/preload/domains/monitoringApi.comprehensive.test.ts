@@ -20,6 +20,16 @@ import {
     type MonitoringApiInterface,
 } from "../../../preload/domains/monitoringApi";
 
+// Helper function to create proper IPC response format
+function createIpcResponse<T>(data: T, success = true, error?: string) {
+    return { success, data, error };
+}
+
+// Helper function to create void IPC response format
+function createVoidIpcResponse(success = true, error?: string) {
+    return { success, error };
+}
+
 describe("Monitoring Domain API", () => {
     let api: MonitoringApiInterface;
 
@@ -59,7 +69,9 @@ describe("Monitoring Domain API", () => {
     describe("formatMonitorDetail", () => {
         it("should call IPC with correct channel and return formatted string", async () => {
             const mockResponse = "Monitor: HTTP Check - Status: Active";
-            mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockResponse)
+            );
 
             const monitorData = { type: "http", url: "https://example.com" };
             const result = await api.formatMonitorDetail(monitorData);
@@ -87,7 +99,9 @@ describe("Monitoring Domain API", () => {
 
             for (const monitorData of testCases) {
                 const mockResponse = `Formatted: ${JSON.stringify(monitorData)}`;
-                mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
+                mockIpcRenderer.invoke.mockResolvedValue(
+                    createIpcResponse(mockResponse)
+                );
 
                 const result = await api.formatMonitorDetail(monitorData);
 
@@ -112,7 +126,9 @@ describe("Monitoring Domain API", () => {
     describe("formatMonitorTitleSuffix", () => {
         it("should call IPC with correct channel and return title suffix", async () => {
             const mockResponse = "(Active)";
-            mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockResponse)
+            );
 
             const monitorData = { status: "active", responseTime: 150 };
             const result = await api.formatMonitorTitleSuffix(monitorData);
@@ -125,7 +141,7 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle empty responses", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue("");
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(""));
 
             const result = await api.formatMonitorTitleSuffix({});
 
@@ -144,7 +160,7 @@ describe("Monitoring Domain API", () => {
 
     describe("removeMonitor", () => {
         it("should call IPC with correct channel for monitor removal", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             const siteId = "site-123";
             const monitorId = "monitor-456";
@@ -167,7 +183,7 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle various ID formats", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             const testCases = [
                 ["site-1", "monitor-1"],
@@ -193,7 +209,7 @@ describe("Monitoring Domain API", () => {
 
     describe("startMonitoring", () => {
         it("should call IPC and return boolean result", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const result = await api.startMonitoring();
 
@@ -204,7 +220,7 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle start failure", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(false);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(false));
 
             const result = await api.startMonitoring();
 
@@ -221,7 +237,7 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle multiple consecutive start calls", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const results = await Promise.all([
                 api.startMonitoring(),
@@ -240,7 +256,7 @@ describe("Monitoring Domain API", () => {
 
     describe("stopMonitoring", () => {
         it("should call IPC and return boolean result", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const result = await api.stopMonitoring();
 
@@ -251,7 +267,7 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle stop failure", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(false);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(false));
 
             const result = await api.stopMonitoring();
 
@@ -270,7 +286,7 @@ describe("Monitoring Domain API", () => {
 
     describe("startMonitoringForSite", () => {
         it("should call IPC with site parameters", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const siteId = "site-123";
             const monitorId = "monitor-456";
@@ -285,7 +301,7 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle site monitoring start without monitor ID", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const siteId = "site-123";
             const result = await api.startMonitoringForSite(siteId);
@@ -298,7 +314,7 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle site monitoring failures", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(false);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(false));
 
             const result = await api.startMonitoringForSite("invalid-site");
 
@@ -308,7 +324,7 @@ describe("Monitoring Domain API", () => {
 
     describe("stopMonitoringForSite", () => {
         it("should call IPC with site parameters", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const siteId = "site-123";
             const monitorId = "monitor-456";
@@ -323,7 +339,7 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle site monitoring stop without monitor ID", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const siteId = "site-123";
             const result = await api.stopMonitoringForSite(siteId);
@@ -336,7 +352,7 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle stop failures", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(false);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(false));
 
             const result = await api.stopMonitoringForSite("site");
 
@@ -347,7 +363,9 @@ describe("Monitoring Domain API", () => {
     describe("validateMonitorData", () => {
         it("should call IPC with validation parameters", async () => {
             const mockValidation = { valid: true, errors: [] };
-            mockIpcRenderer.invoke.mockResolvedValue(mockValidation);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockValidation)
+            );
 
             const monitorType = "http";
             const monitorData = { url: "https://example.com", timeout: 5000 };
@@ -369,7 +387,9 @@ describe("Monitoring Domain API", () => {
                 valid: false,
                 errors: ["Invalid URL", "Timeout too high"],
             };
-            mockIpcRenderer.invoke.mockResolvedValue(mockValidation);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockValidation)
+            );
 
             const result = await api.validateMonitorData("http", {
                 url: "invalid",
@@ -380,7 +400,9 @@ describe("Monitoring Domain API", () => {
 
         it("should handle various monitor types", async () => {
             const mockValidation = { valid: true };
-            mockIpcRenderer.invoke.mockResolvedValue(mockValidation);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockValidation)
+            );
 
             const testCases = [
                 ["http", { url: "https://example.com" }],
@@ -417,7 +439,9 @@ describe("Monitoring Domain API", () => {
                     }),
                     async (monitorData) => {
                         const mockResponse = `Formatted: ${JSON.stringify(monitorData)}`;
-                        mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createIpcResponse(mockResponse)
+                        );
 
                         const result =
                             await api.formatMonitorDetail(monitorData);
@@ -440,7 +464,9 @@ describe("Monitoring Domain API", () => {
                         monitorId: fc.string({ minLength: 1, maxLength: 50 }),
                     }),
                     async ({ siteId, monitorId }) => {
-                        mockIpcRenderer.invoke.mockResolvedValue(true);
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createIpcResponse(true)
+                        );
 
                         const result = await api.startMonitoringForSite(
                             siteId,
@@ -474,7 +500,7 @@ describe("Monitoring Domain API", () => {
                     async ({ monitorType, valid, errors }) => {
                         const mockValidation = { valid, errors };
                         mockIpcRenderer.invoke.mockResolvedValue(
-                            mockValidation
+                            createIpcResponse(mockValidation)
                         );
 
                         const monitorData = { test: "data" };
@@ -513,7 +539,10 @@ describe("Monitoring Domain API", () => {
                         { minLength: 1, maxLength: 5 }
                     ),
                     async (operations) => {
-                        mockIpcRenderer.invoke.mockResolvedValue(true);
+                        mockIpcRenderer.invoke.mockClear();
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createIpcResponse(true)
+                        );
 
                         const promises = operations.map((op) => {
                             if (typeof op === "string") {
@@ -567,7 +596,7 @@ describe("Monitoring Domain API", () => {
 
     describe("Integration and workflow scenarios", () => {
         it("should handle complete monitoring lifecycle", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             // Start global monitoring
             const startResult = await api.startMonitoring();
@@ -595,13 +624,15 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle monitor management workflow", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
 
             const monitorData = { type: "http", url: "https://example.com" };
 
             // Validate monitor data
             const validationResult = { valid: true, errors: [] };
-            mockIpcRenderer.invoke.mockResolvedValueOnce(validationResult);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(validationResult)
+            );
             const validation = await api.validateMonitorData(
                 "http",
                 monitorData
@@ -610,13 +641,17 @@ describe("Monitoring Domain API", () => {
 
             // Format monitor details
             const detailResult = "HTTP Monitor: https://example.com";
-            mockIpcRenderer.invoke.mockResolvedValueOnce(detailResult);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(detailResult)
+            );
             const details = await api.formatMonitorDetail(monitorData);
             expect(details).toBe(detailResult);
 
             // Format title suffix
             const suffixResult = "(Active)";
-            mockIpcRenderer.invoke.mockResolvedValueOnce(suffixResult);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(suffixResult)
+            );
             const suffix = await api.formatMonitorTitleSuffix(monitorData);
             expect(suffix).toBe(suffixResult);
 
@@ -634,7 +669,9 @@ describe("Monitoring Domain API", () => {
             await expect(api.startMonitoring()).rejects.toThrow("Start failed");
 
             // Retry with success
-            mockIpcRenderer.invoke.mockResolvedValueOnce(true);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(true)
+            );
             const retryResult = await api.startMonitoring();
             expect(retryResult).toBeTruthy();
 
@@ -643,10 +680,10 @@ describe("Monitoring Domain API", () => {
 
         it("should handle mixed success and failure responses", async () => {
             const responses = [
-                true,
-                false,
-                true,
-                false,
+                createIpcResponse(true),
+                createIpcResponse(false),
+                createIpcResponse(true),
+                createIpcResponse(false),
             ];
             let callIndex = 0;
 
@@ -690,7 +727,9 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle null and undefined parameters", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue("result");
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse("result")
+            );
 
             await api.formatMonitorDetail(null);
             await api.formatMonitorDetail(undefined);
@@ -710,7 +749,9 @@ describe("Monitoring Domain API", () => {
                 })),
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue("formatted");
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse("formatted")
+            );
 
             const result = await api.formatMonitorDetail(largeData);
 
@@ -725,7 +766,9 @@ describe("Monitoring Domain API", () => {
             const circularData: Record<string, unknown> = { type: "http" };
             circularData["self"] = circularData;
 
-            mockIpcRenderer.invoke.mockResolvedValue("formatted");
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse("formatted")
+            );
 
             const result = await api.formatMonitorDetail(circularData);
 
@@ -733,7 +776,7 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle empty strings and special characters in IDs", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const specialIds = [
                 "",
@@ -758,7 +801,9 @@ describe("Monitoring Domain API", () => {
     describe("Type safety and contract validation", () => {
         it("should maintain proper typing for all methods", async () => {
             // Format methods should return strings
-            mockIpcRenderer.invoke.mockResolvedValue("string result");
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse("string result")
+            );
             const detailResult = await api.formatMonitorDetail({});
             const suffixResult = await api.formatMonitorTitleSuffix({});
 
@@ -766,7 +811,7 @@ describe("Monitoring Domain API", () => {
             expect(typeof suffixResult).toBe("string");
 
             // Boolean returning methods
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
             const startResult = await api.startMonitoring();
             const stopResult = await api.stopMonitoring();
             const siteStartResult = await api.startMonitoringForSite("site");
@@ -778,14 +823,16 @@ describe("Monitoring Domain API", () => {
             expect(typeof siteStopResult).toBe("boolean");
 
             // Void returning method
-            mockIpcRenderer.invoke.mockResolvedValue(undefined);
+            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
             const removeResult = await api.removeMonitor("site", "monitor");
 
             expect(removeResult).toBeUndefined();
 
             // Validation returns any structure
             const validationData = { valid: true, errors: [] };
-            mockIpcRenderer.invoke.mockResolvedValue(validationData);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(validationData)
+            );
             const validationResult = await api.validateMonitorData("http", {});
 
             expect(validationResult).toEqual(validationData);
@@ -794,13 +841,15 @@ describe("Monitoring Domain API", () => {
         it("should handle function context properly", async () => {
             const { startMonitoring, stopMonitoring, formatMonitorDetail } =
                 api;
-            mockIpcRenderer.invoke.mockResolvedValue(true);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             // Destructured functions should work correctly
             await expect(startMonitoring()).resolves.toBeDefined();
             await expect(stopMonitoring()).resolves.toBeDefined();
 
-            mockIpcRenderer.invoke.mockResolvedValue("formatted");
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse("formatted")
+            );
             await expect(formatMonitorDetail({})).resolves.toBeDefined();
         });
 

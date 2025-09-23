@@ -20,6 +20,11 @@ import {
     type SitesApiInterface,
 } from "../../../preload/domains/sitesApi";
 
+// Helper functions for creating properly formatted IPC responses
+function createIpcResponse<T>(data: T): { success: true; data: T } {
+    return { success: true, data };
+}
+
 describe("Sites Domain API", () => {
     let api: SitesApiInterface;
 
@@ -73,7 +78,9 @@ describe("Sites Domain API", () => {
                 },
             ];
 
-            mockIpcRenderer.invoke.mockResolvedValue(mockSites);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockSites)
+            );
 
             const result = await api.getSites();
 
@@ -83,7 +90,7 @@ describe("Sites Domain API", () => {
         });
 
         it("should handle empty sites array", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue([]);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse([]));
 
             const result = await api.getSites();
 
@@ -113,7 +120,9 @@ describe("Sites Domain API", () => {
                 monitors: [],
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(mockCreatedSite);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockCreatedSite)
+            );
 
             const result = await api.addSite(siteData);
 
@@ -146,7 +155,9 @@ describe("Sites Domain API", () => {
                 monitors: [],
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(mockUpdatedSite);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockUpdatedSite)
+            );
 
             const result = await api.updateSite(siteId, updateData);
 
@@ -178,7 +189,9 @@ describe("Sites Domain API", () => {
                 monitors: [],
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(mockRemovedSite);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockRemovedSite)
+            );
 
             const result = await api.removeSite(siteId);
 
@@ -209,7 +222,9 @@ describe("Sites Domain API", () => {
                 monitors: [],
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(mockCheckedSite);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockCheckedSite)
+            );
 
             const result = await api.checkSiteNow(siteId);
 
@@ -240,7 +255,9 @@ describe("Sites Domain API", () => {
                 monitors: [],
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(mockSite);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockSite)
+            );
 
             const result = await api.startMonitoringForSite(siteId);
 
@@ -260,7 +277,9 @@ describe("Sites Domain API", () => {
                 monitors: [],
             };
 
-            mockIpcRenderer.invoke.mockResolvedValue(mockSite);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockSite)
+            );
 
             const result = await api.stopMonitoringForSite(siteId);
 
@@ -287,7 +306,9 @@ describe("Sites Domain API", () => {
     describe("deleteAllSites", () => {
         it("should call IPC and return count of deleted sites", async () => {
             const deletedCount = 5;
-            mockIpcRenderer.invoke.mockResolvedValue(deletedCount);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(deletedCount)
+            );
 
             const result = await api.deleteAllSites();
 
@@ -299,7 +320,7 @@ describe("Sites Domain API", () => {
         });
 
         it("should handle deletion when no sites exist", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(0);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(0));
 
             const result = await api.deleteAllSites();
 
@@ -331,7 +352,9 @@ describe("Sites Domain API", () => {
                             monitoring: false,
                             monitors: [],
                         };
-                        mockIpcRenderer.invoke.mockResolvedValue(mockSite);
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createIpcResponse(mockSite)
+                        );
 
                         const result = await api.addSite(siteConfig);
                         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
@@ -356,7 +379,9 @@ describe("Sites Domain API", () => {
                             monitoring: true,
                             monitors: [],
                         };
-                        mockIpcRenderer.invoke.mockResolvedValue(mockSite);
+                        mockIpcRenderer.invoke.mockResolvedValue(
+                            createIpcResponse(mockSite)
+                        );
 
                         const result = await api.checkSiteNow(siteId);
                         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
@@ -385,7 +410,7 @@ describe("Sites Domain API", () => {
                             monitors: [],
                         };
                         mockIpcRenderer.invoke.mockResolvedValue(
-                            mockUpdatedSite
+                            createIpcResponse(mockUpdatedSite)
                         );
 
                         const result = await api.updateSite(siteId, updateData);
@@ -434,20 +459,26 @@ describe("Sites Domain API", () => {
                 monitoring: false,
                 monitors: [],
             };
-            mockIpcRenderer.invoke.mockResolvedValueOnce(mockCreatedSite);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(mockCreatedSite)
+            );
             const created = await api.addSite(siteData);
             expect(created.identifier).toBe("lifecycle-site");
 
             // Start monitoring
             const mockMonitoringSite = { ...mockCreatedSite, monitoring: true };
-            mockIpcRenderer.invoke.mockResolvedValueOnce(mockMonitoringSite);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(mockMonitoringSite)
+            );
             const monitoring = await api.startMonitoringForSite(
                 created.identifier
             );
             expect(monitoring.monitoring).toBeTruthy();
 
             // Check site
-            mockIpcRenderer.invoke.mockResolvedValueOnce(mockMonitoringSite);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(mockMonitoringSite)
+            );
             const checked = await api.checkSiteNow(created.identifier);
             expect(checked.identifier).toBe(created.identifier);
 
@@ -457,7 +488,9 @@ describe("Sites Domain API", () => {
                 ...mockMonitoringSite,
                 name: "Updated Test Site",
             };
-            mockIpcRenderer.invoke.mockResolvedValueOnce(mockUpdatedSite);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(mockUpdatedSite)
+            );
             const updated = await api.updateSite(
                 created.identifier,
                 updateData
@@ -466,12 +499,16 @@ describe("Sites Domain API", () => {
 
             // Stop monitoring
             const mockStoppedSite = { ...mockUpdatedSite, monitoring: false };
-            mockIpcRenderer.invoke.mockResolvedValueOnce(mockStoppedSite);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(mockStoppedSite)
+            );
             const stopped = await api.stopMonitoringForSite(created.identifier);
             expect(stopped.monitoring).toBeFalsy();
 
             // Remove site
-            mockIpcRenderer.invoke.mockResolvedValueOnce(mockStoppedSite);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(mockStoppedSite)
+            );
             const removed = await api.removeSite(created.identifier);
             expect(removed.identifier).toBe(created.identifier);
 
@@ -500,14 +537,18 @@ describe("Sites Domain API", () => {
                 },
             ];
 
-            mockIpcRenderer.invoke.mockResolvedValueOnce(mockSites);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(mockSites)
+            );
             const sites = await api.getSites();
             expect(sites).toHaveLength(3);
 
             // Start monitoring for all sites
             for (const site of sites) {
                 const mockMonitoring = { ...site, monitoring: true };
-                mockIpcRenderer.invoke.mockResolvedValueOnce(mockMonitoring);
+                mockIpcRenderer.invoke.mockResolvedValueOnce(
+                    createIpcResponse(mockMonitoring)
+                );
                 await api.startMonitoringForSite(site.identifier);
             }
 
@@ -532,7 +573,9 @@ describe("Sites Domain API", () => {
                 monitoring: true,
                 monitors: [],
             };
-            mockIpcRenderer.invoke.mockResolvedValueOnce(mockSite);
+            mockIpcRenderer.invoke.mockResolvedValueOnce(
+                createIpcResponse(mockSite)
+            );
             const recovered = await api.checkSiteNow(siteId);
             expect(recovered.identifier).toBe(siteId);
         });
@@ -566,7 +609,9 @@ describe("Sites Domain API", () => {
 
         it("should handle malformed responses", async () => {
             const malformedSite = { invalid: "structure" };
-            mockIpcRenderer.invoke.mockResolvedValue(malformedSite);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(malformedSite)
+            );
 
             const result = await api.checkSiteNow("malformed");
             expect(result).toEqual(malformedSite);
@@ -580,7 +625,9 @@ describe("Sites Domain API", () => {
                 monitors: [],
             }));
 
-            mockIpcRenderer.invoke.mockResolvedValue(largeSiteList);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(largeSiteList)
+            );
 
             const result = await api.getSites();
             expect(result).toHaveLength(1000);
@@ -597,12 +644,14 @@ describe("Sites Domain API", () => {
             ];
 
             mockIpcRenderer.invoke.mockImplementation((_, siteId) =>
-                Promise.resolve({
-                    identifier: siteId,
-                    name: `Site ${siteId}`,
-                    monitoring: true,
-                    monitors: [],
-                })
+                Promise.resolve(
+                    createIpcResponse({
+                        identifier: siteId,
+                        name: `Site ${siteId}`,
+                        monitoring: true,
+                        monitors: [],
+                    })
+                )
             );
 
             const promises = siteIds.map((id) => api.checkSiteNow(id));
@@ -630,7 +679,9 @@ describe("Sites Domain API", () => {
                 monitoring: true,
                 monitors: [],
             };
-            mockIpcRenderer.invoke.mockResolvedValue(mockSite);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockSite)
+            );
 
             const addResult = await api.addSite({});
             const checkResult = await api.checkSiteNow("site");
@@ -643,12 +694,14 @@ describe("Sites Domain API", () => {
             expect(Array.isArray(removeResult.monitors)).toBeTruthy();
 
             // Array operation should return array
-            mockIpcRenderer.invoke.mockResolvedValue([mockSite]);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse([mockSite])
+            );
             const sitesResult = await api.getSites();
             expect(Array.isArray(sitesResult)).toBeTruthy();
 
             // Delete operation should return number
-            mockIpcRenderer.invoke.mockResolvedValue(5);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(5));
             const deleteResult = await api.deleteAllSites();
             expect(typeof deleteResult).toBe("number");
         });
@@ -656,7 +709,7 @@ describe("Sites Domain API", () => {
         it("should handle function context properly", async () => {
             const { getSites, addSite, checkSiteNow } = api;
 
-            mockIpcRenderer.invoke.mockResolvedValue([]);
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse([]));
             const sites = await getSites();
             expect(Array.isArray(sites)).toBeTruthy();
 
@@ -666,7 +719,9 @@ describe("Sites Domain API", () => {
                 monitoring: false,
                 monitors: [],
             };
-            mockIpcRenderer.invoke.mockResolvedValue(mockSite);
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(mockSite)
+            );
 
             const added = await addSite({});
             const checked = await checkSiteNow("test");

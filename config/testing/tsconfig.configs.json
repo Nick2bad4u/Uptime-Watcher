@@ -5,7 +5,7 @@
         "composite": true,
         "incremental": true,
         "isolatedDeclarations": false,
-        "outDir": "../../dist-configs",
+        "outDir": "../../.cache/builds/dist-configs",
         "paths": {
             "@app/*": [
                 "src/*"
@@ -18,10 +18,15 @@
             ]
         },
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../dist-configs/tsconfig.configs.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/builds/dist-configs/tsconfig.configs.tsbuildinfo"
     },
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "**/*.d.ts",
+        "**/.cache/builds/dist-configs/**/*.d.ts",
+        "**/config/tools/knip.config.ts",
+        "../../config/tools/knip.config.ts",
+        "config/tools/knip.config.ts"
     ],
     "extends": "../../tsconfig.json",
     "include": [
@@ -51,9 +56,7 @@
         "../../vitest.shared.config.ts",
         "../../vitest.stryker.config.ts",
         "docs/docusaurus/stylelint.config.mjs",
-        "**/playwright.config.ts",
-        "**/config/tools/**.ts",
-        "../../**/config/tools/**.ts"
+        "**/playwright.config.ts"
     ],
     "references": [
         {

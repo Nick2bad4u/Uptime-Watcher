@@ -19,7 +19,7 @@ import {
 const dirname = import.meta.dirname;
 
 const vitestConfig = defineConfig({
-    cacheDir: "./.cache/.vitest-backend",
+    cacheDir: "./.cache/vitest/.vitest-backend",
     esbuild: {
         include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
         keepNames: true,
@@ -38,7 +38,7 @@ const vitestConfig = defineConfig({
         },
     },
     test: {
-        attachmentsDir: "./.cache/.vitest-attachments-electron",
+        attachmentsDir: "./.cache/vitest/.vitest-attachments-electron",
         bail: 100,
         benchmark: {
             exclude: [

@@ -69,7 +69,13 @@ describe("Events Domain API", () => {
             const api2 = createEventsApi();
 
             expect(api1).not.toBe(api2);
-            expect(api1).toEqual(api2);
+            // Check that both APIs have the same structure (methods)
+            expect(Object.keys(api1)).toEqual(Object.keys(api2));
+            // Check that all methods are functions
+            for (const key of Object.keys(api1)) {
+                expect(typeof api1[key as keyof typeof api1]).toBe("function");
+                expect(typeof api2[key as keyof typeof api2]).toBe("function");
+            }
         });
     });
 
@@ -297,7 +303,7 @@ describe("Events Domain API", () => {
             const cleanup = eventsApi.onTestEvent(callback);
 
             expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "test:event",
+                "test-event",
                 expect.any(Function)
             );
             expect(typeof cleanup).toBe("function");
@@ -327,7 +333,7 @@ describe("Events Domain API", () => {
             const cleanup = eventsApi.onUpdateStatus(callback);
 
             expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "update:status",
+                "update-status",
                 expect.any(Function)
             );
             expect(typeof cleanup).toBe("function");
@@ -360,8 +366,8 @@ describe("Events Domain API", () => {
                 "monitoring:stopped",
                 "monitor:status-changed",
                 "monitor:up",
-                "test:event",
-                "update:status",
+                "test-event",
+                "update-status",
             ];
 
             expect(mockIpcRenderer.removeAllListeners).toHaveBeenCalledTimes(
@@ -431,7 +437,7 @@ describe("Events Domain API", () => {
                 },
                 { method: eventsApi.onMonitorDown, channel: "monitor:down" },
                 { method: eventsApi.onMonitorUp, channel: "monitor:up" },
-                { method: eventsApi.onTestEvent, channel: "test:event" },
+                { method: eventsApi.onTestEvent, channel: "test-event" },
             ];
 
             fc.assert(
@@ -521,7 +527,7 @@ describe("Events Domain API", () => {
                 expect.any(Function)
             );
             expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "test:event",
+                "test-event",
                 expect.any(Function)
             );
         });
