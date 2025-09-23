@@ -90,7 +90,7 @@ export class SiteWriterService {
      *         },
      *     ],
      * });
-     * console.log(newSite.monitors[0].id); // Generated ID like 'mon_123'
+     * logger.info(`Monitor ID: ${newSite.monitors[0].id}`); // Generated ID like 'mon_123'
      * ```
      *
      * @param siteData - Site configuration including monitors to create
@@ -174,9 +174,9 @@ export class SiteWriterService {
      *     "my-site-id"
      * );
      * if (deleted) {
-     *     console.log("Site deleted successfully");
+     *     logger.info("Site deleted successfully");
      * } else {
-     *     console.log("Site not found");
+     *     logger.info("Site not found");
      * }
      * ```
      *

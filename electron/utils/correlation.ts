@@ -23,7 +23,7 @@
  *
  * // Generate secure correlation ID
  * const operationId = generateCorrelationId();
- * console.log(operationId); // "a1b2c3d4e5f67890"
+ * logger.info(`Operation ID: ${operationId}`); // "a1b2c3d4e5f67890"
  *
  * // Throw validation errors with multiple messages
  * throw new ValidationError([
@@ -73,7 +73,7 @@ export class ValidationError extends Error {
  *
  * ```typescript
  * const correlationId = generateCorrelationId();
- * console.log(correlationId); // "a1b2c3d4e5f67890"
+ * logger.debug(`Correlation ID: ${correlationId}`); // "a1b2c3d4e5f67890"
  * ```
  *
  * @returns A unique correlation ID string (16 hex characters)

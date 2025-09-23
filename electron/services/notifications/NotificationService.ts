@@ -29,6 +29,23 @@ export interface NotificationConfig {
 }
 
 /**
+ * Dependencies required by the NotificationService for proper operation.
+ *
+ * @remarks
+ * Follows the standardized dependency injection pattern used throughout the
+ * application. Provides optional configuration with sensible defaults.
+ *
+ * @public
+ */
+export interface NotificationServiceDependencies {
+    /**
+     * Optional configuration for notification behavior. Defaults to enabled
+     * alerts.
+     */
+    config?: NotificationConfig;
+}
+
+/**
  * Service responsible for handling system notifications for monitor status
  * changes.
  *
@@ -62,8 +79,10 @@ export interface NotificationConfig {
  *
  * ```typescript
  * const notificationService = new NotificationService({
- *     showDownAlerts: true,
- *     showUpAlerts: false,
+ *     config: {
+ *         showDownAlerts: true,
+ *         showUpAlerts: false,
+ *     },
  * });
  *
  * // Show notification when a monitor goes down
@@ -89,14 +108,18 @@ export class NotificationService {
      * Create a new notification service instance.
      *
      * @remarks
-     * If no configuration is provided, both down and up alerts are enabled by
+     * Uses the standardized dependency injection pattern. If no configuration
+     * is provided in dependencies, both down and up alerts are enabled by
      * default. The configuration can be updated later using
      * {@link NotificationService.updateConfig}.
      *
-     * @param config - Optional configuration for notification behavior
+     * @param dependencies - Dependencies containing optional configuration
      */
-    public constructor(config?: NotificationConfig) {
-        this.config = config ?? { showDownAlerts: true, showUpAlerts: true };
+    public constructor(dependencies: NotificationServiceDependencies = {}) {
+        this.config = dependencies.config ?? {
+            showDownAlerts: true,
+            showUpAlerts: true,
+        };
     }
 
     /**

@@ -1,15 +1,23 @@
 {
     "tasks": [
         {
+            "detail": "Starts the Vite development server for the application.",
             "group": "build",
+            "icon": {
+                "color": "terminal.ansiGreen",
+                "id": "debug-start"
+            },
             "isBackground": true,
             "label": "Start Vite Dev Server",
             "presentation": {
                 "clear": false,
+                "close": false,
                 "echo": true,
                 "focus": false,
+                "group": "build",
                 "panel": "shared",
                 "reveal": "always",
+                "revealProblems": "onProblem",
                 "showReuseMessage": true
             },
             "problemMatcher": {
@@ -20,78 +28,338 @@
                 },
                 "owner": "vite",
                 "pattern": {
-                    "regexp": ".*"
-                }
+                    "column": 3,
+                    "file": 1,
+                    "line": 2,
+                    "message": 5,
+                    "regexp": "^(?:\\u001b\\[[0-9;]*m)*(?:File:\\s+)?((?:[A-Za-z]:)?[^:\\r\\n]+):(\\d+):(\\d+):\\s*(?:(error|warning)(?::|\\s+-)?\\s*)?(.*)$",
+                    "severity": 4
+                },
+                "severity": "error"
+            },
+            "promptOnClose": false,
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
             },
             "script": "dev",
             "type": "npm"
         },
         {
+            "detail": "Builds the Vite application for Development.",
             "group": "build",
+            "icon": {
+                "color": "terminal.ansiBlue",
+                "id": "package"
+            },
+            "isBackground": false,
             "label": "Build Application",
             "presentation": {
+                "clear": false,
+                "close": false,
                 "echo": true,
                 "focus": false,
+                "group": "build",
                 "panel": "shared",
-                "reveal": "always"
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+            "problemMatcher": {
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".*VITE v.*",
+                    "endsPattern": ".*ready in.*"
+                },
+                "owner": "vite",
+                "pattern": {
+                    "column": 3,
+                    "file": 1,
+                    "line": 2,
+                    "message": 5,
+                    "regexp": "^(?:\\u001b\\[[0-9;]*m)*(?:File:\\s+)?((?:[A-Za-z]:)?[^:\\r\\n]+):(\\d+):(\\d+):\\s*(?:(error|warning)(?::|\\s+-)?\\s*)?(.*)$",
+                    "severity": 4
+                },
+                "severity": "error"
+            },
+            "promptOnClose": false,
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
             },
             "script": "build",
             "type": "npm"
         },
         {
-            "group": "build",
-            "label": "Build Electron Main (Dev)",
+            "detail": "Lints all source files using ESLint.",
+            "group": "test",
+            "icon": {
+                "color": "terminal.ansiYellow",
+                "id": "search"
+            },
+            "label": "Lint",
             "presentation": {
+                "clear": true,
+                "close": false,
                 "echo": true,
                 "focus": false,
+                "group": "test",
                 "panel": "shared",
-                "reveal": "always"
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
             },
-            "script": "build",
+            "problemMatcher": {
+                "owner": "eslint",
+                "pattern": {
+                    "column": 2,
+                    "file": 1,
+                    "line": 3,
+                    "message": 4,
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)\\s+\\[(error|warning)\\]$",
+                    "severity": 5
+                },
+                "severity": "error"
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "lint",
             "type": "npm"
         },
         {
-            "command": "npm run build",
-            "group": {
-                "isDefault": true,
-                "kind": "build"
+            "detail": "Lints all CSS and style files using Stylelint.",
+            "group": "test",
+            "icon": {
+                "color": "terminal.ansiMagenta",
+                "id": "symbol-color"
             },
-            "label": "Build (Vite + Electron)",
-            "type": "shell"
-        },
-        {
-            "command": "npm run start",
-            "group": {
-                "isDefault": true,
-                "kind": "test"
+            "label": "Lint:CSS",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": false,
+                "group": "test",
+                "panel": "shared",
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
             },
-            "label": "Start App (Dev)",
-            "type": "shell"
+            "problemMatcher": {
+                "owner": "stylelint",
+                "pattern": {
+                    "column": 3,
+                    "file": 1,
+                    "line": 2,
+                    "message": 4,
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$"
+                },
+                "severity": "error"
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "lint:css",
+            "type": "npm"
         },
         {
-            "command": "npm run lint",
-            "label": "Lint All",
-            "type": "shell"
+            "detail": "Runs TypeScript type-checking for all source files.",
+            "group": "test",
+            "icon": {
+                "color": "terminal.ansiCyan",
+                "id": "check-all"
+            },
+            "label": "Type-check:All",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": false,
+                "group": "test",
+                "panel": "shared",
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+            "problemMatcher": {
+                "owner": "typescript",
+                "pattern": {
+                    "column": 3,
+                    "file": 1,
+                    "line": 2,
+                    "message": 4,
+                    "regexp": "^(.*)\\((\\d+),(\\d+)\\):\\s+(.*)$"
+                },
+                "severity": "error"
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "type-check:all",
+            "type": "npm"
         },
         {
-            "command": "npm run lint:fix",
-            "label": "Lint All (Fix)",
-            "type": "shell"
+            "detail": "Fixes linting issues in source files using ESLint.",
+            "group": "test",
+            "icon": {
+                "color": "terminal.ansiMagenta",
+                "id": "tools"
+            },
+            "label": "Lint:Fix",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": false,
+                "group": "test",
+                "panel": "shared",
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+            "problemMatcher": {
+                "owner": "eslint",
+                "pattern": {
+                    "column": 2,
+                    "file": 1,
+                    "line": 3,
+                    "message": 4,
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)\\s+\\[(error|warning)\\]$",
+                    "severity": 5
+                },
+                "severity": "error"
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "lint:fix",
+            "type": "npm"
         },
         {
-            "command": "npm run test",
-            "label": "Test All",
-            "type": "shell"
+            "detail": "Runs the test suite using Vitest.",
+            "group": "test",
+            "icon": {
+                "color": "terminal.ansiGreen",
+                "id": "beaker"
+            },
+            "label": "Test",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": false,
+                "group": "test",
+                "panel": "shared",
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+            "problemMatcher": {
+                "owner": "vitest",
+                "pattern": [
+                    {
+                        "message": 1,
+                        "regexp": "^\\s*(?:AssertionError|Error|RangeError|ReferenceError|TypeError):\\s+(.*)$"
+                    },
+                    {
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "regexp": "^\\s*at\\s+(?:.+\\()?((?:[A-Za-z]:)?[^:\\r\\n]+):(\\d+):(\\d+)\\)?$"
+                    }
+                ],
+                "severity": "error"
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "test",
+            "type": "npm"
         },
         {
-            "command": "npm run context",
-            "label": "Context Compress",
-            "type": "shell"
+            "detail": "Runs the test suite using Playwright.",
+            "group": "test",
+            "icon": {
+                "color": "terminal.ansiGreen",
+                "id": "beaker-stop"
+            },
+            "label": "Test:Playwright",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": false,
+                "group": "test",
+                "panel": "shared",
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+            "problemMatcher": {
+                "owner": "playwright",
+                "pattern": {
+                    "column": 3,
+                    "file": 1,
+                    "line": 2,
+                    "message": 4,
+                    "regexp": "^\\s*(?:\\d+\\)\\s*)?((?:[A-Za-z]:)?[^:\\r\\n]+):(\\d+):(\\d+)\\s+›\\s+(.*)$"
+                },
+                "severity": "error"
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "test:playwright",
+            "type": "npm"
         },
         {
-            "command": "npm run test:coverage",
-            "label": "Final Coverage Analysis",
-            "type": "shell"
+            "detail": "Runs the test suite with coverage reporting using Vitest.",
+            "group": "test",
+            "icon": {
+                "color": "terminal.ansiRed",
+                "id": "graph"
+            },
+            "label": "Test:Coverage",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": false,
+                "group": "test",
+                "panel": "shared",
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+            "problemMatcher": {
+                "owner": "vitest",
+                "pattern": [
+                    {
+                        "message": 1,
+                        "regexp": "^\\s*(?:AssertionError|Error|RangeError|ReferenceError|TypeError):\\s+(.*)$"
+                    },
+                    {
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "regexp": "^\\s*at\\s+(?:.+\\()?((?:[A-Za-z]:)?[^:\\r\\n]+):(\\d+):(\\d+)\\)?$"
+                    }
+                ],
+                "severity": "error"
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "test:coverage",
+            "type": "npm"
         }
     ],
     "version": "2.0.0"

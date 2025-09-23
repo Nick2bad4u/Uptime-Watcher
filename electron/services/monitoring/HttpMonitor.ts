@@ -20,7 +20,7 @@
  *     url: "https://example.com",
  *     status: "pending",
  * });
- * console.log(
+ * logger.info(
  *     `Status: ${result.status}, Response time: ${result.responseTime}ms`
  * );
  * ```
@@ -271,6 +271,7 @@ export class HttpMonitor implements IMonitorService {
      *     type: "http",
      *     url: "https://example.com",
      * });
+     * logger.info(`HTTP check result: ${result.status}`);
      * ```
      *
      * @param monitor - Monitor configuration object (must be type "http").

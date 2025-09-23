@@ -30,7 +30,7 @@
  *     responseTime: -1,
  *     history: [],
  * });
- * console.log(
+ * logger.info(
  *     `Status: ${result.status}, Response time: ${result.responseTime}ms`
  * );
  * ```
@@ -103,7 +103,7 @@ import {
  *
  * const result = await monitor.check(dnsMonitorData);
  * if (result.status === "up") {
- *     console.log(`DNS resolution successful: ${result.responseTime}ms`);
+ *     logger.info(`DNS resolution successful: ${result.responseTime}ms`);
  * }
  * ```
  *
@@ -145,7 +145,7 @@ export class DnsMonitor implements IMonitorService {
      * };
      *
      * const result = await dnsMonitor.check(monitor);
-     * console.log(
+     * logger.info(
      *     `DNS ${monitor.hostname}: ${result.status} (${result.responseTime}ms)`
      * );
      * ```

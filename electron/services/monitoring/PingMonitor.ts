@@ -29,7 +29,7 @@
  *     responseTime: -1,
  *     history: [],
  * });
- * console.log(
+ * logger.info(
  *     `Status: ${result.status}, Response time: ${result.responseTime}ms`
  * );
  * ```
@@ -89,7 +89,7 @@ import { performPingCheckWithRetry } from "./utils/pingRetry";
  *
  * const result = await monitor.check(pingMonitorData);
  * if (result.status === "up") {
- *     console.log(`Ping successful: ${result.responseTime}ms`);
+ *     logger.info(`Ping successful: ${result.responseTime}ms`);
  * }
  * ```
  *
@@ -130,7 +130,7 @@ export class PingMonitor implements IMonitorService {
      * };
      *
      * const result = await pingMonitor.check(monitor);
-     * console.log(
+     * logger.info(
      *     `Ping ${monitor.host}: ${result.status} (${result.responseTime}ms)`
      * );
      * ```

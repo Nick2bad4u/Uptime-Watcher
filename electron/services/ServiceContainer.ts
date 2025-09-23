@@ -608,6 +608,8 @@ export class ServiceContainer {
         if (!this.notificationService) {
             this.notificationService = new NotificationService(
                 this.config.notificationConfig
+                    ? { config: this.config.notificationConfig }
+                    : {}
             );
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created NotificationService");

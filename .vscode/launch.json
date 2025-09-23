@@ -1,13 +1,27 @@
 {
     "compounds": [
         {
-            "configurations": ["🚀 Start Development Mode"],
-            "name": "🎯 Normal Development",
+            "configurations": [
+                "🚀 Start Development Mode"
+            ],
+            "name": "🚀 Normal Development",
+            "presentation": {
+                "group": "Development",
+                "hidden": false,
+                "order": 2
+            },
             "stopAll": true
         },
         {
-            "configurations": ["🔄 Vite + Electron Dev"],
+            "configurations": [
+                "🔄 Vite + Electron Dev"
+            ],
             "name": "⚡ Vite + Electron Debug",
+            "presentation": {
+                "group": "Debugging",
+                "hidden": false,
+                "order": 2
+            },
             "stopAll": true
         },
         {
@@ -17,90 +31,153 @@
                 "🌐 Electron Renderer"
             ],
             "name": "🔬 Full Debug Suite (Recommended)",
+            "presentation": {
+                "group": "Debugging",
+                "hidden": false,
+                "order": 2
+            },
             "stopAll": true
         }
     ],
     "configurations": [
         {
-            "console": "integratedTerminal",
-            "env": {
-                "NODE_ENV": "development"
-            },
-            "name": "🚀 Start Development Mode",
-            "request": "launch",
-            "runtimeArgs": [
-                "run",
-                "dev:with-sqlite3"
-            ],
-            "runtimeExecutable": "npm",
-            "skipFiles": ["<node_internals>/**"],
-            "type": "node"
-        },
-        {
+            "autoAttachChildProcesses": true,
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "name": "🔧 Vite Dev Server",
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "experimentalNetworking": "auto",
+            "name": "🚀 Start Development Mode",
+            "nodeVersionHint": 24,
+            "presentation": {
+                "group": "Development",
+                "hidden": true,
+                "order": 1
+            },
             "request": "launch",
             "runtimeArgs": [
                 "run",
                 "dev:with-sqlite3"
             ],
             "runtimeExecutable": "npm",
-            "skipFiles": ["<node_internals>/**"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "sourceMaps": true,
             "type": "node"
         },
         {
+            "autoAttachChildProcesses": true,
             "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "experimentalNetworking": "auto",
+            "name": "🔧 Vite Dev Server",
+            "nodeVersionHint": 24,
+            "presentation": {
+                "group": "Development",
+                "hidden": true,
+                "order": 1
+            },
+            "request": "launch",
+            "runtimeArgs": [
+                "run",
+                "dev:with-sqlite3"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "sourceMaps": true,
+            "type": "node"
+        },
+        {
+            "autoAttachChildProcesses": true,
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
             "env": {
                 "NODE_ENV": "development"
             },
+            "experimentalNetworking": "auto",
             "name": "🔄 Vite + Electron Dev",
+            "nodeVersionHint": 24,
+            "presentation": {
+                "group": "Development",
+                "hidden": true,
+                "order": 1
+            },
             "request": "launch",
             "runtimeArgs": [
                 "run",
                 "electron-dev"
             ],
             "runtimeExecutable": "npm",
-            "skipFiles": ["<node_internals>/**"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "sourceMaps": true,
             "type": "node",
             "windows": {
                 "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
             }
         },
         {
+            "autoAttachChildProcesses": true,
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
                 "ELECTRON_IS_DEV": "true",
                 "NODE_ENV": "development"
             },
+            "experimentalNetworking": "auto",
             "name": "🐛 Debug Electron Main",
-            "outFiles": ["${workspaceFolder}/dist-electron/**/*.js"],
+            "nodeVersionHint": 24,
+            "outFiles": [
+                "${workspaceFolder}/dist-electron/**/*.js"
+            ],
             "outputCapture": "std",
             "preLaunchTask": "Build Electron Main (Dev)",
+            "presentation": {
+                "group": "Debugging",
+                "hidden": true,
+                "order": 1
+            },
             "request": "launch",
             "runtimeArgs": [
                 "${workspaceFolder}/dist-electron/main.js",
                 "--remote-debugging-port=9223"
             ],
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-            "skipFiles": ["<node_internals>/**"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "sourceMaps": true,
             "type": "node",
             "windows": {
                 "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
             }
         },
         {
+            "autoAttachChildProcesses": true,
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
                 "ELECTRON_IS_DEV": "true",
                 "NODE_ENV": "development"
             },
+            "experimentalNetworking": "auto",
             "name": "🗄️ Debug Electron Main (Fixed DB)",
-            "outFiles": ["${workspaceFolder}/dist-electron/**/*.js"],
+            "nodeVersionHint": 24,
+            "outFiles": [
+                "${workspaceFolder}/dist-electron/**/*.js"
+            ],
             "outputCapture": "std",
             "preLaunchTask": "Build Electron Main (Dev)",
+            "presentation": {
+                "group": "Debugging",
+                "hidden": true,
+                "order": 1
+            },
             "request": "launch",
             "runtimeArgs": [
                 "${workspaceFolder}/dist-electron/main.js",
@@ -108,7 +185,10 @@
                 "--user-data-dir=${env:APPDATA}\\uptime-watcher"
             ],
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-            "skipFiles": ["<node_internals>/**"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "sourceMaps": true,
             "type": "node",
             "windows": {
                 "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
@@ -117,23 +197,45 @@
         {
             "name": "🌐 Electron Renderer",
             "port": 9223,
+            "presentation": {
+                "group": "Debugging",
+                "hidden": true,
+                "order": 1
+            },
             "request": "attach",
             "timeout": 30000,
             "type": "chrome",
             "webRoot": "${workspaceFolder}"
         },
         {
-            "args": ["--ui"],
+            "args": [
+                "--ui"
+            ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
+            "experimentalNetworking": "auto",
             "name": "🧪 Vitest Debug UI",
+            "nodeVersionHint": 24,
+            "presentation": {
+                "group": "Debugging",
+                "hidden": true,
+                "order": 1
+            },
             "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
             "request": "launch",
+            "sourceMaps": true,
             "type": "node"
         },
         {
             "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "experimentalNetworking": "auto",
             "name": "🧪 Run Tests",
+            "presentation": {
+                "group": "Testing",
+                "hidden": false,
+                "order": 1
+            },
             "request": "launch",
             "runtimeArgs": [
                 "run",
@@ -149,7 +251,15 @@
             ],
             "autoAttachChildProcesses": true,
             "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "experimentalNetworking": "auto",
             "name": "🔍 Debug Current Test File",
+            "nodeVersionHint": 24,
+            "presentation": {
+                "group": "Testing",
+                "hidden": false,
+                "order": 1
+            },
             "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
             "request": "launch",
             "skipFiles": [
@@ -157,22 +267,25 @@
                 "**/node_modules/**"
             ],
             "smartStep": true,
+            "sourceMaps": true,
             "type": "node"
-        },
+        }
+    ],
+    "inputs": [
         {
-            "console": "integratedTerminal",
-            "env": {
-                "NODE_ENV": "production"
-            },
-            "name": "🚀 Launch Production Build",
-            "request": "launch",
-            "runtimeArgs": [
-                "run",
-                "start:prod"
+            "description": "Select the environment to use",
+            "id": "selectEnvironment",
+            "options": [
+                {
+                    "label": "Development",
+                    "value": "development"
+                },
+                {
+                    "label": "Production",
+                    "value": "production"
+                }
             ],
-            "runtimeExecutable": "npm",
-            "skipFiles": ["<node_internals>/**"],
-            "type": "node"
+            "type": "pickString"
         }
     ],
     "version": "0.2.0"

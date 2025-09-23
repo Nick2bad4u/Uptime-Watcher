@@ -1,6 +1,10 @@
 # File created using '.gitignore Generator' for Visual Studio Code: https://bit.ly/vscode-gig
-# Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,typings,testinfra,testcomplete,tags,reactnative,react,python,powershell,node,nextjs,java,docusaurus,executable
-# Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,typings,testinfra,testcomplete,tags,reactnative,react,python,powershell,node,nextjs,java,docusaurus,executable
+# Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,typings,testinfra,testcomplete,tags,reactnative,react,python,powershell,node,nextjs,java,executable,docusaurus,chocolatey
+# Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,typings,testinfra,testcomplete,tags,reactnative,react,python,powershell,node,nextjs,java,executable,docusaurus,chocolatey
+
+### Chocolatey ###
+# Exclude packaged modules
+*.nupkg
 
 ### Docusaurus ###
 # Docusaurus cache and generated files
@@ -753,7 +757,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,typings,testinfra,testcomplete,tags,reactnative,react,python,powershell,node,nextjs,java,docusaurus,executable
+# End of https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,typings,testinfra,testcomplete,tags,reactnative,react,python,powershell,node,nextjs,java,executable,docusaurus,chocolatey
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
@@ -834,3 +838,4 @@ docs/docusaurus/stylelintcache
 dist-bench/
 dist-configs/
 dist-playwright/
+.vscode/mcp.json

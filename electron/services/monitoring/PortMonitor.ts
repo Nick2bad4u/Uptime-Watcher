@@ -19,7 +19,7 @@
  *     status: "pending",
  *     // ... other monitor properties
  * });
- * console.log(
+ * logger.info(
  *     `Status: ${result.status}, Response time: ${result.responseTime}ms`
  * );
  * ```

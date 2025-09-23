@@ -3,12 +3,16 @@
  *
  * @remarks
  * Handles the creation, configuration, and lifecycle management of Electron
- * browser windows. Provides a centralized service for window operations
- * including content loading, event handling, and communication with renderers.
+ * browser windows. Provides a centralized servic { logger: logger as { error:
+ * (msg: string, err: unknown) => void }, operationName:
+ * 'loadDevelopmentContent', }r window operations including content loading,
+ * event handling, and communication with renderers.
  *
  * Key responsibilities:
  *
- * - Create and configure the main application window
+ * - Cr { logger: logger as { error: (msg: string, err: unknown) => void },
+ *   operationName: 'loadProductionContent', } and configure the main
+ *   application window
  * - Load appropriate content based on environment (dev/prod)
  * - Handle window lifecycle events (ready-to-show, closed, etc.)
  * - Manage window state and provide access methods
@@ -40,6 +44,7 @@
 import type { Event } from "electron";
 
 import { getNodeEnv } from "@shared/utils/environment";
+import { withErrorHandling } from "@shared/utils/errorHandling";
 import { getErrorMessage } from "@shared/utils/errorUtils";
 import { BrowserWindow } from "electron";
 // eslint-disable-next-line unicorn/import-style -- Need namespace import for path operations
@@ -173,54 +178,48 @@ export class WindowService {
      * @returns Promise that resolves when content is loaded or rejects on error
      */
     private async loadDevelopmentContent(): Promise<void> {
-        try {
-            await this.waitForViteServer();
+        return withErrorHandling(
+            async () => {
+                await this.waitForViteServer();
 
-            if (!this.mainWindow || this.mainWindow.isDestroyed()) {
-                throw new Error(
-                    "Main window was destroyed while waiting for Vite server"
-                );
-            }
-
-            await this.mainWindow.loadURL(
-                WindowService.VITE_SERVER_CONFIG.SERVER_URL
-            );
-
-            // Delay opening DevTools to ensure renderer is ready
-            // eslint-disable-next-line clean-timer/assign-timer-id -- One-time dev tools initialization
-            setTimeout(() => {
-                if (this.mainWindow && !this.mainWindow.isDestroyed()) {
-                    try {
-                        this.mainWindow.webContents.openDevTools();
-                    } catch (error) {
-                        logger.warn("[WindowService] Failed to open DevTools", {
-                            error:
-                                error instanceof Error
-                                    ? error.message
-                                    : String(error),
-                            windowState: this.mainWindow.isDestroyed()
-                                ? "destroyed"
-                                : "active",
-                        });
-                    }
+                if (!this.mainWindow || this.mainWindow.isDestroyed()) {
+                    throw new Error(
+                        "Main window was destroyed while waiting for Vite server"
+                    );
                 }
-            }, 1000);
-        } catch (error) {
-            const errorContext = {
-                environment: getNodeEnv(),
-                error: error instanceof Error ? error.message : String(error),
-                serverUrl: WindowService.VITE_SERVER_CONFIG.SERVER_URL,
-                windowState: this.mainWindow?.isDestroyed()
-                    ? "destroyed"
-                    : "active",
-            };
 
-            logger.error(
-                "[WindowService] Failed to load development content",
-                errorContext
-            );
-            throw error; // Re-throw to allow caller to handle
-        }
+                await this.mainWindow.loadURL(
+                    WindowService.VITE_SERVER_CONFIG.SERVER_URL
+                );
+
+                // Delay opening DevTools to ensure renderer is ready
+                // eslint-disable-next-line clean-timer/assign-timer-id -- One-time dev tools initialization
+                setTimeout(() => {
+                    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+                        try {
+                            this.mainWindow.webContents.openDevTools();
+                        } catch (error) {
+                            logger.warn(
+                                "[WindowService] Failed to open DevTools",
+                                {
+                                    error:
+                                        error instanceof Error
+                                            ? error.message
+                                            : String(error),
+                                    windowState: this.mainWindow.isDestroyed()
+                                        ? "destroyed"
+                                        : "active",
+                                }
+                            );
+                        }
+                    }
+                }, 1000);
+            },
+            {
+                logger,
+                operationName: "loadDevelopmentContent",
+            }
+        );
     }
 
     /**
@@ -517,32 +516,19 @@ export class WindowService {
             void this.loadDevelopmentContent();
         } else {
             logger.debug("[WindowService] Production mode: loading from dist");
-            void (async (): Promise<void> => {
-                try {
+            void withErrorHandling(
+                async () => {
                     if (this.mainWindow) {
                         await this.mainWindow.loadFile(
                             path.join(currentDirectory, "../dist/index.html")
                         );
                     }
-                } catch (error) {
-                    logger.error(
-                        "[WindowService] Failed to load production file",
-                        {
-                            error:
-                                error instanceof Error
-                                    ? error.message
-                                    : String(error),
-                            filePath: path.join(
-                                currentDirectory,
-                                "../dist/index.html"
-                            ),
-                            windowState: this.mainWindow?.isDestroyed()
-                                ? "destroyed"
-                                : "active",
-                        }
-                    );
+                },
+                {
+                    logger,
+                    operationName: "loadProductionContent",
                 }
-            })();
+            );
         }
     }
 
