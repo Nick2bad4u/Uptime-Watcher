@@ -126,11 +126,20 @@ const locatorTransforms = /** @type {Record<string, string>} */ ({
     'locator(".input")': 'getByRole("textbox")',
     'locator(".link")': 'getByRole("link")',
 
-    // Body/html replacements (often problematic)
-    // Retained for legacy compatibility; prefer semantic locators (e.g., getByRole, getByTestId) for maintainability.
-    // TODO: Replace with semantic locator where possible.
-    'locator("body")': 'locator("body")',
-    'locator("html")': 'locator("html")',
+    // Note: Body/html locators are intentionally not mapped here because there are no semantic
+    // alternatives. These broad selectors are generally problematic and should be avoided:
+    // - They match too many elements, making tests brittle
+    // - They don't reflect how users interact with the page
+    // - They're not accessible/semantic
+    //
+    // Instead of locator("body") or locator("html"), consider:
+    // - Targeting specific semantic elements with getByRole(), getByText(), etc.
+    // - Using page-level methods like page.title(), page.url() for page properties
+    // - Using page.scrollBy() or targeting scrollable containers for scrolling
+    // - Using getByTestId() for elements that lack semantic meaning
+    //
+    // The post-processing function will add TODO comments when these locators
+    // are encountered in generated code to guide developers toward better alternatives.
 });
 
 /**
@@ -258,8 +267,8 @@ function applyLintCompliantTransforms(codegenOutput) {
         const describeName =
             firstTestTitleMatch && firstTestTitleMatch[1]
                 ? firstTestTitleMatch[1]
-                      .replace(/^should\s+/, "")
-                      .replace(/\s+/g, " ")
+                    .replace(/^should\s+/, "")
+                    .replace(/\s+/g, " ")
                 : "Generated Test";
 
         // Insert describe block after last import
