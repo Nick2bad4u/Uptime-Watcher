@@ -82,6 +82,7 @@ const mockTheme: Theme = {
             tertiary: "#94a3b8",
         },
         warning: "#f59e0b",
+        white: "#ffffff",
     },
     isDark: false,
     name: "light",
@@ -208,11 +209,13 @@ describe(ChartConfigService, () => {
 
             const config = chartService.getLineChartConfig();
 
-            expect(config.plugins?.zoom?.pan?.enabled).toBeTruthy();
-            expect(config.plugins?.zoom?.pan?.mode).toBe("x");
-            expect(config.plugins?.zoom?.zoom?.mode).toBe("x");
-            expect(config.plugins?.zoom?.zoom?.pinch?.enabled).toBeTruthy();
-            expect(config.plugins?.zoom?.zoom?.wheel?.enabled).toBeTruthy();
+            // TypeScript doesn't recognize zoom plugin types, so we use type assertions
+            const plugins = config.plugins as any;
+            expect(plugins?.zoom?.pan?.enabled).toBeTruthy();
+            expect(plugins?.zoom?.pan?.mode).toBe("x");
+            expect(plugins?.zoom?.zoom?.mode).toBe("x");
+            expect(plugins?.zoom?.zoom?.pinch?.enabled).toBeTruthy();
+            expect(plugins?.zoom?.zoom?.wheel?.enabled).toBeTruthy();
         });
 
         it("should have correct scale configuration", async ({

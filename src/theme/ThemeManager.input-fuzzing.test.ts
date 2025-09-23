@@ -158,6 +158,7 @@ const themeColorsArbitrary: fc.Arbitrary<ThemeColors> = fc.record({
     surface: surfaceColorsArbitrary,
     text: textColorsArbitrary,
     warning: colorArbitrary,
+    white: colorArbitrary,
 });
 
 const fontSizeArbitrary = fc.record({

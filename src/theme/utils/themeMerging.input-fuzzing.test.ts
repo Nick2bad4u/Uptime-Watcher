@@ -119,6 +119,7 @@ const themeColorsArbitrary = fc.record({
     surface: surfaceColorsArbitrary,
     text: textColorsArbitrary,
     warning: colorArbitrary,
+    white: colorArbitrary,
 });
 
 const fontFamilyArbitrary = fc.record({

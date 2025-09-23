@@ -28,6 +28,7 @@
         "module": "ESNext",
         "moduleResolution": "bundler",
         "noEmit": true,
+        "outDir": "../dist-playwright",
         "paths": {
             "@/*": [
                 "../src/*"
@@ -47,7 +48,7 @@
         "skipLibCheck": false,
         "strict": true,
         "target": "ES2024",
-        "tsBuildInfoFile": "../dist-test/tsconfig.test..playwright.tsbuildinfo",
+        "tsBuildInfoFile": "../dist-playwright/tsconfig.playwright.tsbuildinfo",
         "types": [
             "@playwright/test",
             "node"

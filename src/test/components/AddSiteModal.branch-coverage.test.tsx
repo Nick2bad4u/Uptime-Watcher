@@ -13,6 +13,7 @@
  */
 
 import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useUIStore } from "../../stores/ui/useUiStore";
@@ -140,6 +141,7 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
                     info: "#3b82f6",
                     success: "#22c55e",
                     warning: "#f59e0b",
+                    white: "#ffffff",
                     hover: {
                         dark: "#1e293b",
                         light: "#f8fafc",
@@ -259,8 +261,8 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
                 <AddSiteModal onClose={mockOnClose} />
             );
             expect(container.firstChild).not.toBeNull();
-            expect(screen.getByTestId("modal-outer-box")).toBeInTheDocument();
-            expect(screen.getByText("Add New Site")).toBeInTheDocument();
+            expect(screen.getByTestId("modal-outer-box")).toBeDefined();
+            expect(screen.getByText("Add New Site")).toBeDefined();
         });
 
         it("should render modal when showAddSiteModal is true", ({
@@ -292,8 +294,8 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             });
 
             render(<AddSiteModal onClose={mockOnClose} />);
-            expect(screen.getByTestId("modal-outer-box")).toBeInTheDocument();
-            expect(screen.getByText("Add New Site")).toBeInTheDocument();
+            expect(screen.getByTestId("modal-outer-box")).toBeDefined();
+            expect(screen.getByText("Add New Site")).toBeDefined();
         });
     });
 
@@ -342,7 +344,7 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
 
             render(<AddSiteModal onClose={mockOnClose} />);
             const backdrop = document.querySelector(".fixed.inset-0");
-            expect(backdrop).toHaveClass("dark");
+            expect(backdrop?.classList.contains("dark")).toBeTruthy();
         });
 
         it("should not apply dark theme classes when isDark is false", ({
@@ -390,7 +392,7 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             render(<AddSiteModal onClose={mockOnClose} />);
             // Check that the backdrop div exists and verify dark class is absent
             const backdrop = document.querySelector(".fixed.inset-0");
-            expect(backdrop).not.toHaveClass("dark");
+            expect(backdrop?.classList.contains("dark")).toBeFalsy();
         });
     });
 

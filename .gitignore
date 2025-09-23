@@ -831,3 +831,6 @@ test-results/
 /playwright/.cache/
 docs/docusaurus/stylelintcache
 .npmrc
+dist-bench/
+dist-configs/
+dist-playwright/
