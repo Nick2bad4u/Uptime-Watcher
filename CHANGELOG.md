@@ -7,14 +7,246 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[939f32f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/939f32fdb707d161b9119bf57acc6b7d7955d763)...
+[939f32f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/939f32fdb707d161b9119bf57acc6b7d7955d763)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/939f32fdb707d161b9119bf57acc6b7d7955d763...939f32fdb707d161b9119bf57acc6b7d7955d763))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 15.6.0 [`(939f32f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/939f32fdb707d161b9119bf57acc6b7d7955d763)
+
+
+
+
+
+
+## [15.6.0] - 2025-09-22
+
+
 [[1751b4b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1751b4b4ab1b9e8207bb132c182227f24c83e050)...
-[1751b4b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1751b4b4ab1b9e8207bb132c182227f24c83e050)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1751b4b4ab1b9e8207bb132c182227f24c83e050...1751b4b4ab1b9e8207bb132c182227f24c83e050))
+[4cb4094](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4cb409492576a9de14af1bf1aa631d2ec2d2bc71)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1751b4b4ab1b9e8207bb132c182227f24c83e050...4cb409492576a9de14af1bf1aa631d2ec2d2bc71))
+
+
+### ✨ Features
+
+- ✨ [feat] Introduce shadow colors to theme and refine configurations
+
+This update introduces several enhancements across the project, focusing on theming, dependency management, and documentation consistency.
+
+✨ [feat] **Theme System Enhancement**
+ - Adds a new `shadows` property to the theme object. This provides dedicated shadow colors for various component statuses (e.g., `success`, `error`, `warning`), allowing for more nuanced and consistent UI styling.
+
+👷 [ci] **Dependabot Configuration**
+ - Implements a 3-day cooldown for `github-actions` updates to reduce the frequency of pull requests.
+ - Configures Dependabot to ignore local `file:` dependencies, preventing erroneous update attempts on internal packages.
+
+📝 [docs] **Documentation Formatting**
+ - Applies consistent formatting across all Markdown documentation files. This includes standardizing indentation, spacing, and quote usage within code blocks for improved readability.
+
+🎨 [style] **Stylelint Configuration**
+ - Refines and enhances the JSDoc comments within `stylelint.config.mjs` for better clarity and maintainability.
+
+🧪 [test] **Test Updates**
+ - Updates theme-related tests, including unit, branch coverage, and fuzzing tests, to incorporate the new `shadows` theme property.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4cb4094)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4cb409492576a9de14af1bf1aa631d2ec2d2bc71)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 15.5.0 [`(1751b4b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1751b4b4ab1b9e8207bb132c182227f24c83e050)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Centralize shadow colors into the theme system
+
+This refactoring introduces a new `shadows` object to the theme, centralizing the definition of shadow colors used for status badges and other elements.
+
+*   ✨ **Theme System (`themes.ts`, `types.ts`):**
+    *   Adds a `shadows` property to the `Theme` type to hold status-specific shadow colors (`degraded`, `error`, `paused`, `success`, `warning`).
+    *   Defines these new shadow colors for the `baseTheme`, `darkTheme`, and `highContrastTheme`, allowing for better theming capabilities.
+
+*   🎨 **CSS (`Header.css`):**
+    *   Updates status badge styles to use the new, systematically named CSS variables for shadows (e.g., `--color-success-shadow` becomes `--color-shadows-success`). This improves readability and maintainability.
+    *   Corrects the `.status-degraded-badge` to use its own dedicated `degraded` status colors and shadows instead of reusing the `warning` colors, ensuring visual consistency.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(baf1790)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/baf1790cbbb1b1e320d1eecb193e09893c37aa5a)
+
+
+- 🚜 [refactor] Centralize cache configuration and logger interfaces
+
+This refactoring consolidates shared code by moving cache constants and logger interfaces to the `shared` directory, improving code reuse and consistency between the frontend and backend.
+
+### Source Code Changes
+
+*   **⚡ [perf] Direct Cache Configuration Usage**
+    *   Removes the intermediate `CACHE_TTL` and `CACHE_SIZE_LIMITS` constants from the Electron backend.
+    *   The `ConfigurationManager` now directly consumes cache settings (TTL and max size) from the centralized `CACHE_CONFIG` object located in the `shared` directory. This eliminates redundant declarations and centralizes cache management.
+
+*   **🚜 [refactor] Unified Logger Interface**
+    *   Creates a new shared logger interface file at `@shared/utils/logger/interfaces.ts`, defining `BaseLogger`, `ExtendedLogger`, and other specialized logger types.
+    *   The `Logger` type is now a `BaseLogger` for backward compatibility.
+    *   All backend files are updated to import the `Logger` type from this new shared location instead of the local `electron/utils/interfaces.ts`.
+    *   The frontend logger service is refactored to implement the `UnifiedLogger` interface, ensuring a consistent logging contract across the entire application.
+    *   The now-redundant `Logger` interface definition is removed from `electron/utils/interfaces.ts`.
+
+### Test and Documentation Changes
+
+*   **🧪 [test] Update Constant Tests**
+    *   Removes tests for the now-deleted `CACHE_TTL` and `CACHE_SIZE_LIMITS` constants.
+    *   The test suites are updated to reflect the new state of the backend constants file.
+
+*   **📝 [docs] Update Interface Documentation**
+    *   Adds documentation to `electron/utils/interfaces.ts` to guide developers to import logger types from the new shared path.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(653d053)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/653d053f6f324e303b1f9b4e7a99225985b7f88d)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Enhance documentation and standardize project requirements
+
+This commit introduces a comprehensive overhaul of the project's documentation, standardizes file naming conventions, and updates project-wide requirements.
+
+### ✨ [feat] Major Documentation Enhancements:
+- 📝 **API Documentation**: Rewrites and significantly expands the API & IPC documentation.
+    - Introduces a domain-based API organization (`sites`, `data`, `events`, `monitoring`, etc.).
+    - Details the `TypedEventBus` architecture, event listener registration, and real-time frontend integration patterns.
+    - Adds advanced frontend patterns like optimistic updates, custom hooks for IPC operations, and modular store integration.
+- 🚀 **Developer Quick Start Guide**: Overhauls the guide to reflect current architectural patterns.
+    - Updates Node.js requirement to `24.8+`.
+    - Adds a new "Data Flow Architecture" section to explain the modern data flow from React components to the SQLite database.
+    - Updates code examples for the repository pattern, IPC validation, `TypedEventBus`, modular Zustand stores, and shared validation schemas.
+- 🛠️ **New Guides**: Adds several new detailed guides to improve developer experience.
+    - `ERROR_HANDLING_GUIDE.md`: A comprehensive guide on the application's multi-layered error handling strategy.
+    - `EVENT_SYSTEM_GUIDE.md`: Documents the `TypedEventBus` architecture, middleware, and real-time communication patterns.
+    - `TESTING_METHODOLOGY_REACT_COMPONENTS.md`: Outlines the current testing approach for React components using Vitest and React Testing Library.
+    - `ZUSTAND_STORE_PATTERN_GUIDE.md`: Provides a decision guide for choosing between direct and modular Zustand store patterns.
+
+### 🚜 [refactor] Documentation & Project Standardization:
+- 🧹 **Node.js Version**: Standardizes the required Node.js version to `24.8.0` across `README.md`, `CONTRIBUTING.md`, `SUPPORT.md`, and issue templates.
+- 📁 **File Naming**: Enforces consistent file naming conventions (UPPER_SNAKE_CASE or kebab-case) across the `docs` and `.github/prompts` directories.
+- 🎨 **Stylelint Configuration**: Massively expands the `stylelint.config.mjs` to include comprehensive support for HTML, CSS-in-JS, SCSS, and CSS Modules, along with detailed comments and plugin configurations for better code quality enforcement.
+- 🔄 **Documentation Updates**: Updates numerous guides (`TECHNOLOGY_EVOLUTION`, `TESTING`, `TROUBLESHOOTING`, `VITE_PERFORMANCE`, etc.) to reflect the latest project architecture, dependencies, and best practices.
+
+### 🛠️ [fix] Minor Fixes & Cleanups:
+- 🧹 Removes a duplicate `model` entry in the `BeastMode.prompt.md` prompt.
+- 🏷️ Updates the project version badge in `README.md` to `15.5.0`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9bea8f4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9bea8f478a589804477554d8ffbb127b50ff2645)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Refactor benchmark tests to use real implementations
+
+This commit overhauls the performance benchmark suite to enhance accuracy and relevance by replacing mock objects with real application components. By testing against the actual `StandardizedCache`, `SiteRepository`, `TypedEventBus`, `Zustand` stores, and monitoring services, the benchmarks now provide a much more realistic measure of the application's performance characteristics.
+
+Key improvements across the benchmark suite include:
+
+*   🧪 **[test]** Replaces mock classes in benchmark tests with the actual application services and data structures. This ensures performance is measured against the production code, not simplified imitations.
+*   ⚡ **[perf]** Introduces more comprehensive and realistic benchmark scenarios, covering a wider range of operations, edge cases, and data sizes (small, medium, large).
+*   ✨ **[feat]** Adds new benchmarks for features that were not covered by the old mocks, such as cache statistics, event emission, invalidation callbacks, and complex state store interactions.
+*   🚜 **[refactor]** Updates test data generation to produce more realistic and complex data structures, better simulating real-world usage patterns.
+*   🧹 **[chore]** Standardizes the use of `vitest` configuration options like `warmupIterations` and `iterations` to improve the stability and reliability of benchmark results.
+*   📝 **[docs]** Updates file-level documentation in each benchmark file to reflect the use of real implementations and the expanded scope of testing.
+
+**Specific Changes by File:**
+
+*   **Cache Benchmarks:**
+    *   Removes the `BenchmarkCache` mock in favor of the real `StandardizedCache`.
+    *   Adds tests for statistics access (`getStats`), event emission, and invalidation handlers, which are features of the real implementation.
+
+*   **Site Repository Benchmarks:**
+    *   Replaces `MockSiteRepository` with the actual `SiteRepository`, using a mock database service.
+    *   Tests are now asynchronous to match the real repository's API.
+    *   Adds extensive new tests for `upsert`, `bulkInsert`, `exportAll`, and concurrent operation simulation.
+
+*   **Event Bus Benchmarks:**
+    *   Swaps the `MockTypedEventBus` for the real `TypedEventBus`.
+    *   Introduces tests for middleware processing and diagnostic introspection (`getDiagnostics`).
+
+*   **State Management & Zustand Benchmarks:**
+    *   Replaces a complex, custom mock state manager with tests for real `Zustand` store patterns used in the application (`sites`, `settings`, `ui`).
+    *   Adds benchmarks for multi-store interactions, subscriptions, and performance with large datasets.
+
+*   **Monitoring & Alerting Benchmarks:**
+    *   Updates the alert system benchmark to use the real `NotificationService`, testing the performance of triggering `up`/`down` alerts.
+    *   Refactors the health check engine benchmark to use the real `EnhancedMonitorChecker` with its full dependency tree (mocked at the repository level), providing a holistic performance view.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(af16e92)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/af16e92c6b9e8e0085d6cf408272f8d3246706ae)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Consolidate configs, optimize CI, and clean up docs
+
+This commit introduces several improvements to the project's configuration, CI workflows, and documentation.
+
+*   **🔧 [build] Consolidates Vitest configuration files**
+    *   Moves `vitest.electron.config.ts` and `vitest.shared.config.ts` from the `config/testing/` directory to the project root for better organization and easier access.
+    *   Updates all relevant configuration files (`.codecov.yml`, `knip.config.ts`, `tsconfig.json`, CI workflows) to reflect the new locations.
+
+*   **👷 [ci] Optimizes CI workflows for stability and efficiency**
+    *   Increases the memory allocation for the Stryker mutation testing job from 8GB to 12GB to prevent heap out-of-memory errors.
+    *   Adds a 10-minute timeout per mutation and limits concurrent test runners to 1 during the Stryker run to improve stability.
+    *   Enhances Stryker error handling in the workflow with a `try...catch` block for better failure diagnostics.
+    *   Switches the test reporter in the Codecov workflow from `verbose` to `dot` to reduce log noise.
+    *   Prevents the `summary.yml` workflow from running on Dependabot PRs to reduce unnecessary CI runs.
+    *   Configures Dependabot to ignore local `@shared/*` packages, preventing erroneous update attempts.
+
+*   **📝 [docs] Removes obsolete analysis and planning documents**
+    *   Deletes outdated and irrelevant Markdown files related to codebase analysis, circuit breaker implementation plans, and CI optimizations, as they are no longer current.
+    *   Removes the extensive `AI_CONTEXT.md` guide.
+
+*   **🎨 [style] Updates Stylelint configuration**
+    *   Adds `*.mdx` files to the `.stylelintignore` to prevent linting on documentation files.
+    *   Removes unused custom scrollbar styling from the Docusaurus CSS.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bceb3b4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bceb3b45aa35d186ab5a6aec16e90782b252438e)
+
+
+- Update changelogs for v15.5.0 [skip ci] [`(680289f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/680289f453c3f488c792e390f35e9684ebe3070f)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies and Prettier cache strategy
+
+This commit updates various development and production dependencies to their latest versions, bringing in new features, bug fixes, and performance improvements. It also adjusts the Prettier caching strategy for better performance.
+
+*   🎨 [style] Modifies Prettier scripts (`lint:prettier`, `lint:prettier-fix`) to use `--cache-strategy=content`. This improves caching efficiency by invalidating the cache based on file content changes rather than timestamps.
+
+*   🧹 [chore] [dependency] Updates project version from `15.4.0` to `15.5.0`.
+
+*   🧹 [chore] Updates the following dependencies:
+    *   `@eslint/js`: `9.35.0` → `9.36.0`
+    *   `@stylistic/eslint-plugin`: `5.3.1` → `5.4.0`
+    *   `@tailwindcss/typography`: `0.5.16` → `0.5.18`
+    *   `eslint`: `9.35.0` → `9.36.0`
+    *   `eslint-plugin-depend`: `1.2.0` → `1.3.1`
+    *   `eslint-plugin-testing-library`: `7.8.0` → `7.8.1`
+    *   `git-cliff`: `2.10.0` → `2.10.1`
+    *   `jsonc-eslint-parser`: `2.4.0` → `2.4.1`
+    *   `knip`: `5.63.1` → `5.64.0`
+    *   `msw`: `2.11.2` → `2.11.3`
+    *   `stylelint-plugin-use-baseline`: `0.9.1` → `0.9.2`
+    *   `typedoc-plugin-dt-links`: `2.0.19` → `2.0.20`
+    *   `typedoc-plugin-markdown`: `4.8.1` → `4.9.0`
+    *   `vite`: `7.1.6` → `7.1.7`
+    *   `wait-on`: `9.0.0` → `9.0.1`
+    *   `zod`: `4.1.9` → `4.1.11`
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(98c298d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/98c298dc255122d68dcd10776ec708e8700add43)
 
 
 
