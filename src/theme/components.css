@@ -601,7 +601,7 @@
 
         &::after {
             position: absolute;
-            color: var(--color-white);
+            color: var(--color-text-inverse);
             content: "✓";
             font-size: 0.875rem;
             font-weight: 700;
@@ -1284,7 +1284,7 @@
         padding: 0.5rem 0.75rem;
         border-radius: var(--border-radius-md);
         background: rgb(0 0 0 / 90%);
-        color: var(--color-white);
+        color: var(--color-text-inverse);
         content: attr(data-tooltip);
         font-size: 0.875rem;
         inset-block-end: 100%;
@@ -1852,7 +1852,7 @@
         padding: 0.5rem 0.75rem;
         border-radius: var(--border-radius-sm);
         background: rgb(0 0 0 / 90%);
-        color: var(--color-white);
+        color: var(--color-text-inverse);
         content: attr(title);
         font-size: 0.875rem;
         inset-block-end: 100%;

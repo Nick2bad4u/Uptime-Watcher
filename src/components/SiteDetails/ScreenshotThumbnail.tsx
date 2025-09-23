@@ -125,8 +125,8 @@ export const ScreenshotThumbnail = ({
     const placeholderStyle = useMemo(
         () => ({
             alignItems: "center" as const,
-            backgroundColor: "var(--color-neutral-200)",
-            color: "var(--color-neutral-600)",
+            backgroundColor: "var(--color-background-secondary)",
+            color: "var(--color-text-secondary)",
             display: "flex" as const,
             fontSize: "12px",
             height: "60px",

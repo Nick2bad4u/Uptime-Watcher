@@ -98,7 +98,6 @@ export interface ThemeColors {
 
     /** Information color for informational messages and states */
     info: string;
-
     /**
      * Primary color palette with multiple shades.
      */
@@ -192,6 +191,9 @@ export interface ThemeColors {
 
     /** Warning color for warning states and messages */
     warning: string;
+
+    /** White color definition */
+    white: string;
 }
 
 /**

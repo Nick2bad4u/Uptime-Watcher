@@ -19,13 +19,13 @@
     padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-md)
         var(--spacing-xl);
     background: var(--color-surface-elevated);
-    border-block-end: 1px solid var(--color-border);
-    box-shadow: 0 2px 12px 0 var(--color-shadow);
+    border-block-end: 1px solid var(--color-border-primary);
+    box-shadow: 0 2px 12px 0 var(--shadow-md);
 }
 
 .header-title {
     position: relative;
-    color: var(--color-accent);
+    color: var(--color-primary-500);
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
     letter-spacing: 0.01em;
@@ -37,7 +37,7 @@
         border-radius: 2px;
         background: linear-gradient(
             90deg,
-            var(--color-accent),
+            var(--color-primary-500),
             transparent 80%
         );
         block-size: 3px;
@@ -163,23 +163,19 @@
 .header-interval-box:focus-visible,
 .header-controls-box:hover,
 .header-controls-box:focus-visible {
-    border-color: var(--color-accent, var(--color-primary));
+    border-color: var(--color-primary-500);
     background: rgb(37 99 235 / 6%); /* Fallback color */
-    background: color-mix(
-        in srgb,
-        var(--color-accent, var(--color-primary)) 6%,
-        transparent
-    );
-    box-shadow: 0 2px 12px 0 var(--color-accent, rgb(37 99 235 / 22%));
+    background: color-mix(in srgb, var(--color-primary-500) 6%, transparent);
+    box-shadow: 0 2px 12px 0 var(--color-primary-500, rgb(37 99 235 / 22%));
 }
 
 .health-badge:hover,
 .health-badge:focus-visible {
-    border-color: var(--color-success, var(--color-accent));
+    border-color: var(--color-success, var(--color-primary-500));
     background: rgb(16 185 129 / 8%); /* Fallback color */
     background: color-mix(
         in srgb,
-        var(--color-success, var(--color-accent)) 8%,
+        var(--color-success, var(--color-primary-500)) 8%,
         transparent
     );
     box-shadow: 0 4px 18px 0 var(--color-shadows-success, rgb(16 185 129 / 33%));
@@ -232,14 +228,10 @@
 
 .total-sites-badge:hover,
 .total-sites-badge:focus-visible {
-    border-color: var(--color-border, var(--color-accent));
+    border-color: var(--color-border-primary);
     background: rgb(37 99 235 / 6%); /* Fallback color */
-    background: color-mix(
-        in srgb,
-        var(--color-border, var(--color-accent)) 6%,
-        transparent
-    );
-    box-shadow: 0 2px 12px 0 var(--color-shadow, #0002);
+    background: color-mix(in srgb, var(--color-border-primary) 6%, transparent);
+    box-shadow: 0 2px 12px 0 var(--shadow-md);
 }
 
 /* Accessibility: reduce motion */

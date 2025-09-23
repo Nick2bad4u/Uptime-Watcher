@@ -15,8 +15,8 @@
     box-shadow: var(--shadow-xl);
     color: var(--color-text-inverse);
     transition:
-        box-shadow 0.3s var(--ease-in-out),
-        background 0.3s var(--ease-in-out);
+        box-shadow 0.3s var(--ease-smooth),
+        background 0.3s var(--ease-smooth);
 
     &:hover {
         background: linear-gradient(
@@ -25,13 +25,14 @@
             var(--color-primary-400)
         );
         box-shadow:
-            0 12px 36px 0 var(--color-primary-400-33),
-            var(--shadow-2xl);
+            0 12px 36px 0
+                color-mix(in srgb, var(--color-primary-400) 33%, transparent),
+            var(--shadow-xl);
         filter: brightness(1.04) saturate(1.1);
         transform: scale(1.012);
         transition:
-            box-shadow 0.25s var(--ease-in-out),
-            background 0.25s var(--ease-in-out),
+            box-shadow 0.25s var(--ease-smooth),
+            background 0.25s var(--ease-smooth),
             filter 0.25s,
             transform 0.25s;
     }
@@ -51,8 +52,8 @@
     opacity: 0.85;
     pointer-events: none;
     transition:
-        background 0.3s var(--ease-in-out),
-        opacity 0.3s var(--ease-in-out);
+        background 0.3s var(--ease-smooth),
+        opacity 0.3s var(--ease-smooth);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -87,7 +88,7 @@
     background: transparent;
     gap: var(--spacing-2xl);
     padding-inline: var(--spacing-xl) var(--spacing-xl);
-    transition: background 0.3s var(--ease-in-out);
+    transition: background 0.3s var(--ease-smooth);
 }
 
 /* Responsive header adjustments */
@@ -152,7 +153,7 @@
         content: "";
         inline-size: 0;
         margin-block-start: 6px;
-        transition: inline-size 0.3s var(--ease-in-out);
+        transition: inline-size 0.3s var(--ease-smooth);
     }
 
     &:hover {
@@ -192,7 +193,7 @@
     max-inline-size: 100%;
     opacity: 1;
     transition:
-        color 0.3s var(--ease-in-out),
+        color 0.3s var(--ease-smooth),
         opacity 0.3s;
     word-break: break-all;
 }
