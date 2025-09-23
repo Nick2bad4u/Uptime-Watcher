@@ -1,6 +1,6 @@
 ``` typescript
 import type {Primitive} from './primitive.d.ts';
-import type {Numeric} from './numeric.d.ts';
+import type {_Numeric} from './numeric.d.ts';
 import type {CollapseLiterals, IfNotAnyOrNever, IsNotFalse, IsPrimitive} from './internal/index.d.ts';
 import type {IsNever} from './is-never.d.ts';
 import type {TagContainer, UnwrapTagged} from './tagged.d.ts';
@@ -148,7 +148,7 @@ Useful for:
 @category Utilities
 
 ``` typescript
-export type IsNumericLiteral<T> = LiteralChecks<T, Numeric>;
+export type IsNumericLiteral<T> = LiteralChecks<T, _Numeric>;
 ```
 
 Returns a boolean for whether the given type is a `true` or `false` [literal type](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types).

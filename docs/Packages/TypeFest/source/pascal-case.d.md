@@ -1,5 +1,5 @@
 ``` typescript
-import type {CamelCase, CamelCaseOptions, DefaultCamelCaseOptions} from './camel-case.d.ts';
+import type {CamelCase, CamelCaseOptions, _DefaultCamelCaseOptions} from './camel-case.d.ts';
 import type {ApplyDefaultOptions} from './internal/index.d.ts';
 ```
 
@@ -36,7 +36,7 @@ Converts a string literal to pascal-case.
 
 ``` typescript
 export type PascalCase<Value, Options extends CamelCaseOptions = {}> =
-    _PascalCase<Value, ApplyDefaultOptions<CamelCaseOptions, DefaultCamelCaseOptions, Options>>;
+    _PascalCase<Value, ApplyDefaultOptions<CamelCaseOptions, _DefaultCamelCaseOptions, Options>>;
 ```
 
 ``` typescript

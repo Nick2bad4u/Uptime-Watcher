@@ -4,11 +4,11 @@ import type {IsInteger} from './is-integer.d.ts';
 ```
 
 ``` typescript
-export type Numeric = number | bigint;
+export type _Numeric = number | bigint;
 ```
 
 ``` typescript
-export type Zero = 0 | 0n;
+type Zero = 0 | 0n;
 ```
 
 Matches the hidden `Infinity` type.
@@ -116,7 +116,7 @@ Use-case: Validating and documenting parameters.
 @category Numeric
 
 ``` typescript
-export type Negative<T extends Numeric> = T extends Zero ? never : `${T}` extends `-${string}` ? T : never;
+export type Negative<T extends _Numeric> = T extends Zero ? never : `${T}` extends `-${string}` ? T : never;
 ```
 
 A negative (`-∞ < x < 0`) `number` that is an integer.
@@ -143,7 +143,7 @@ Use-case: Validating and documenting parameters.
 @category Numeric
 
 ``` typescript
-export type NonNegative<T extends Numeric> = T extends Zero ? T : Negative<T> extends never ? T : never;
+export type NonNegative<T extends _Numeric> = T extends Zero ? T : Negative<T> extends never ? T : never;
 ```
 
 A non-negative (`0 <= x < ∞`) `number` that is an integer.
@@ -174,5 +174,5 @@ Returns a boolean for whether the given number is a negative number.
 @category Numeric
 
 ``` typescript
-export type IsNegative<T extends Numeric> = T extends Negative<T> ? true : false;
+export type IsNegative<T extends _Numeric> = T extends Negative<T> ? true : false;
 ```

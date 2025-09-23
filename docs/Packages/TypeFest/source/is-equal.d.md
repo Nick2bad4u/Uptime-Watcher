@@ -22,7 +22,15 @@ Use-cases:
 @category Utilities
 
 ``` typescript
+import type {IsNever} from './is-never.d.ts';
 export type IsEqual<A, B> =
+    [A, B] extends [infer A, infer B]
+        ? _IsEqual<A, B>
+        : false;
+```
+
+``` typescript
+type _IsEqual<A, B> =
     (<G>() => G extends A & G | G ? 1 : 2) extends
     (<G>() => G extends B & G | G ? 1 : 2)
         ? true

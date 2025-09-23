@@ -23,7 +23,7 @@ type UndefinedToNull<T> = T extends undefined ? null : T;
 type JsonifyList<T extends UnknownArray> = T extends readonly []
     ? []
     : T extends readonly [infer F, ...infer R]
-        ? [F, ...R] extends T // With TS 5.8.3, if `string[] & ['foo']`, `R` is `unknown[]` here, making the infered types neq to the original one
+        ? [F, ...R] extends T // With TS 5.8.3, if `string[] & ['foo']`, `R` is `unknown[]` here, making the inferred types not equal to the original one
             ? [NeverToNull<Jsonify<F>>, ...JsonifyList<R>]
             : [NeverToNull<Jsonify<F>>]
         : IsUnknown<T[number]> extends true
@@ -51,7 +51,7 @@ This includes:
 1.  Transforming JSON `interface` to a `type` that is assignable to `JsonValue`.
 2.  Transforming non-JSON value that is *jsonable* to a type that is assignable to `JsonValue`, where *jsonable* means the non-JSON value implements the `.toJSON()` method that returns a value that is assignable to `JsonValue`.
     @remarks
-    An interface cannot be structurally compared to `JsonValue` because an interface can be re-opened to add properties that may not be satisfy `JsonValue`.
+    An interface cannot be structurally compared to `JsonValue` because an interface can be re-opened to add properties that may not satisfy `JsonValue`.
     @example
 
 <!-- -->
@@ -73,7 +73,7 @@ This includes:
         // Does something with data
     };
     fixedFn(point); // Good: point is assignable. Jsonify<T> transforms Geometry into value assignable to JsonValue
-    fixedFn(new Date()); // Error: As expected, Date is not assignable. Jsonify<T> cannot transforms Date into value assignable to JsonValue
+    fixedFn(new Date()); // Error: As expected, Date is not assignable. Jsonify<T> cannot transform Date into a value assignable to JsonValue
 
 Non-JSON values such as `Date` implement `.toJSON()`, so they can be transformed to a value assignable to `JsonValue`:
 @example

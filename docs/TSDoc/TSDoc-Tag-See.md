@@ -1,5 +1,5 @@
 ---
-title: "@see"
+title: '@see'
 ---
 
 <!-- prettier-ignore-start -->
@@ -22,15 +22,12 @@ current item.
 ```ts
 /**
  * Parses a string containing a Uniform Resource Locator (URL).
- *
- * @param url - The string to be parsed
- *
- * @returns The parsed result
- *
  * @see {@link ParsedUrl} for the returned data structure
  * @see {@link https://tools.ietf.org/html/rfc1738|RFC 1738}
  * for syntax
  * @see your developer SDK for code samples
+ * @param url - the string to be parsed
+ * @returns the parsed result
  */
 function parseURL(url: string): ParsedUrl;
 ```

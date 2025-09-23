@@ -1,5 +1,5 @@
 ---
-title: "@readonly"
+title: '@readonly'
 ---
 
 <!-- prettier-ignore-start -->
@@ -20,18 +20,17 @@ can be added so that the property is shown as read-only in the documentation.
 
 ```ts
 export class Book {
- /**
-  * Technically property has a setter, but for documentation purposes it should
-  * be presented as readonly.
-  *
-  * @readonly
-  */
- public get title(): string {
-  return this._title;
- }
+  /**
+   * Technically property has a setter, but for documentation purposes it should
+   * be presented as readonly.
+   * @readonly
+   */
+  public get title(): string {
+    return this._title;
+  }
 
- public set title(value: string) {
-  throw new Error("This property is read-only!");
- }
+  public set title(value: string) {
+    throw new Error('This property is read-only!');
+  }
 }
 ```

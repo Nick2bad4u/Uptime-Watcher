@@ -1,5 +1,5 @@
 ---
-title: "@example"
+title: '@example'
 ---
 
 <!-- prettier-ignore-start -->
@@ -22,22 +22,19 @@ as a title for the example. Otherwise, the documentation tool can index the exam
 For this code sample, the generated titles might be **"Example"** and **"Example 2"**:
 
 ````ts
-
 /**
  * Adds two numbers together.
- *
- * @example Here's a simple example:
- *
+ * @example
+ * Here's a simple example:
  * ```
  * // Prints "2":
- * console.log(add(1, 1));
+ * console.log(add(1,1));
  * ```
- *
- * @example Here's an example with negative numbers:
- *
+ * @example
+ * Here's an example with negative numbers:
  * ```
  * // Prints "0":
- * console.log(add(1, -1));
+ * console.log(add(1,-1));
  * ```
  */
 export function add(x: number, y: number): number {}
@@ -48,37 +45,32 @@ export function add(x: number, y: number): number {}
 For this code sample, the generated title might be **"Example: Parsing a basic JSON file"**:
 
 ````ts
-
 /**
  * Parses a JSON file.
+ *
+ * @param path - Full path to the file.
+ * @returns An object containing the JSON data.
  *
  * @example Parsing a basic JSON file
  *
  * # Contents of `file.json`
- *
  * ```json
  * {
- *  "exampleItem": "text"
+ *   "exampleItem": "text"
  * }
  * ```
  *
  * # Usage
- *
  * ```ts
  * const result = parseFile("file.json");
  * ```
  *
  * # Result
- *
  * ```ts
  * {
- *  "exampleItem": "text"
+ *   exampleItem: 'text',
  * }
  * ```
- *
- * @param path - Full path to the file.
- *
- * @returns An object containing the JSON data.
  */
 ````
 

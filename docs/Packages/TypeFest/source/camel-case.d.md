@@ -16,7 +16,7 @@ export type CamelCaseOptions = {
 ```
 
 ``` typescript
-export type DefaultCamelCaseOptions = {
+export type _DefaultCamelCaseOptions = {
     preserveConsecutiveUppercase: false;
 };
 ```
@@ -77,7 +77,7 @@ export type CamelCase<Type, Options extends CamelCaseOptions = {}> = Type extend
         ? Type
         : Uncapitalize<CamelCaseFromArray<
             Words<Type extends Uppercase<Type> ? Lowercase<Type> : Type>,
-            ApplyDefaultOptions<CamelCaseOptions, DefaultCamelCaseOptions, Options>
+            ApplyDefaultOptions<CamelCaseOptions, _DefaultCamelCaseOptions, Options>
         >>
     : Type;
 ```

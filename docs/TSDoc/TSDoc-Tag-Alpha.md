@@ -1,5 +1,5 @@
 ---
-title: "@alpha"
+title: '@alpha'
 ---
 
 <!-- prettier-ignore-start -->
@@ -20,21 +20,19 @@ a public release.
 ```ts
 /**
  * Represents a book in the catalog.
- *
  * @public
  */
 export class Book {
- /**
-  * The title of the book.
-  *
-  * @alpha
-  */
- public get title(): string;
+  /**
+   * The title of the book.
+   * @alpha
+   */
+  public get title(): string;
 
- /**
-  * The author of the book.
-  */
- public get author(): string;
+  /**
+   * The author of the book.
+   */
+  public get author(): string;
 }
 ```
 

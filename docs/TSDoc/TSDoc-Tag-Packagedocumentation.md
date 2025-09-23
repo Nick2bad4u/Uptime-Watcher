@@ -1,5 +1,5 @@
 ---
-title: "@packageDocumentation"
+title: '@packageDocumentation'
 ---
 
 <!-- prettier-ignore-start -->
@@ -25,22 +25,21 @@ a `@packageDocumentation` tag should never be used to describe an individual API
  * A library for building widgets.
  *
  * @remarks
- * The `widget-lib` defines the {@link IWidget} interface and {@link Widget}
- * class, which are used to build widgets.
+ * The `widget-lib` defines the {@link IWidget} interface and {@link Widget} class,
+ * which are used to build widgets.
  *
  * @packageDocumentation
  */
 
 /**
  * Interface implemented by all widgets.
- *
  * @public
  */
 export interface IWidget {
- /**
-  * Draws the widget on the screen.
-  */
- render(): void;
+  /**
+   * Draws the widget on the screen.
+   */
+  render(): void;
 }
 ```
 

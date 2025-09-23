@@ -508,3 +508,64 @@
 
 ---
 
+## 🕓 TypeFest docs sync @ 2025-09-23T04:48:56.886Z
+
+### Summary
+- Total files: 78
+- Successful: 77
+- Failed: 1
+- Changed: 15
+
+### Changed Files
+- ✅ readme.md
+  ↳ Hash: `13f9f4d4394239fda3ba6b16f242d8fecd87cf711211dd9d1bf385dd320a732f`
+  ↳ Size: 62503 bytes
+- ✅ index.d.ts
+  ↳ Hash: `219277a722c6111b6d0d68579f3cbf890800975ab74f8f83e9e8be2e9ef3c5c7`
+  ↳ Size: 11924 bytes
+- ✅ source/merge-deep.d.ts
+  ↳ Hash: `7acfe4a9401ee10ce4b0e21d249bcaf4d19faba1b1879a8b1c8ebd34e4cb9e51`
+  ↳ Size: 18426 bytes
+- ✅ source/required-deep.d.ts
+  ↳ Hash: `aadbd65c1782e15ecd415151f48c4cbefc5dd8f3d259c393030edc2c6e8c794d`
+  ↳ Size: 3013 bytes
+- ✅ source/is-literal.d.ts
+  ↳ Hash: `c83c7ccfe930d0f51148d7c7fca9e37d3a84ae051779b4fd964b785465972ed1`
+  ↳ Size: 8782 bytes
+- ✅ source/is-equal.d.ts
+  ↳ Hash: `d7115d88346417f72f6e94a15a6a3e1519b727b97ab5e1bd0f0cdfe2adfb8ebd`
+  ↳ Size: 1306 bytes
+- ✅ source/literal-union.d.ts
+  ↳ Hash: `f3ec6dab77eab3ee0b88a4a193ec494e4b5f76bba28cb498ec0dd81fd3f4647a`
+  ↳ Size: 1353 bytes
+- ✅ source/entries.d.ts
+  ↳ Hash: `ff9578db8de8194ca6405d21b373ce081cf2fa0141f58a0f0c840057799789a6`
+  ↳ Size: 3271 bytes
+- ✅ source/camel-case.d.ts
+  ↳ Hash: `6cde1ed42e51fab9fdd59b6a22409e60d8415540948d86fcb9d0e65824ce7ad5`
+  ↳ Size: 2591 bytes
+- ✅ source/kebab-case.d.ts
+  ↳ Hash: `77724d6c9e2fdaf6d303bb7b5b3f57ac2cc764a63684f95824ce138144e54c60`
+  ↳ Size: 1270 bytes
+- ✅ source/pascal-case.d.ts
+  ↳ Hash: `b86d298c5c0f836c884ff688ed6927e7b7bf8c72761e177819dc3e35c7c81341`
+  ↳ Size: 1468 bytes
+- ✅ source/snake-case.d.ts
+  ↳ Hash: `043d9b75f1d32f0493d9b3b4daffc3b0b09d5a95b7ce9f8fb282f275d9c5b0f2`
+  ↳ Size: 1314 bytes
+- ✅ source/jsonify.d.ts
+  ↳ Hash: `3d32327681899ed1571563ee03bd563a92280d568bfc767c8c56bc2ae2cc9aad`
+  ↳ Size: 5399 bytes
+- ✅ source/get.d.ts
+  ↳ Hash: `e0889d840b8f44bf95a76b2040616a2944de61273dcea58b2a794b7b57116a83`
+  ↳ Size: 8142 bytes
+- ✅ source/numeric.d.ts
+  ↳ Hash: `dbb5f072ba4ca622d33451c5d44ca249d2a7ed1f4ff8cc32917ca3fca8e32c9b`
+  ↳ Size: 5048 bytes
+
+### Failed Files
+- ❌ source/is-empty-object.d.ts
+  ↳ Error: HTTP 404: Not Found
+
+---
+

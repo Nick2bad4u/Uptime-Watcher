@@ -1,12 +1,12 @@
 ``` typescript
-import type {ArrayEntry, MapEntry, ObjectEntry, SetEntry} from './entry.d.ts';
+import type {_ArrayEntry, _MapEntry, _ObjectEntry, _SetEntry} from './entry.d.ts';
 ```
 
 ``` typescript
-type ArrayEntries<BaseType extends readonly unknown[]> = Array<ArrayEntry<BaseType>>;
-type MapEntries<BaseType> = Array<MapEntry<BaseType>>;
-type ObjectEntries<BaseType> = Array<ObjectEntry<BaseType>>;
-type SetEntries<BaseType extends Set<unknown>> = Array<SetEntry<BaseType>>;
+type ArrayEntries<BaseType extends readonly unknown[]> = Array<_ArrayEntry<BaseType>>;
+type MapEntries<BaseType> = Array<_MapEntry<BaseType>>;
+type ObjectEntries<BaseType> = Array<_ObjectEntry<BaseType>>;
+type SetEntries<BaseType extends Set<unknown>> = Array<_SetEntry<BaseType>>;
 ```
 
 Many collections have an `entries` method which returns an array of a given object's own enumerable string-keyed property \[key, value\] pairs. The `Entries` type will return the type of that collection's entries.

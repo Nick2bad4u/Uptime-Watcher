@@ -1,5 +1,5 @@
 ---
-title: "@throws"
+title: '@throws'
 ---
 
 <!-- prettier-ignore-start -->
@@ -23,14 +23,14 @@ For example:
 /**
  * Retrieves metadata about a book from the catalog.
  *
- * @param isbnCode - The ISBN number for the book
+ * @param isbnCode - the ISBN number for the book
+ * @returns the retrieved book object
  *
- * @returns The retrieved book object
+ * @throws {@link IsbnSyntaxError}
+ * This exception is thrown if the input is not a valid ISBN number.
  *
- * @throws {@link IsbnSyntaxError} This exception is thrown if the input is not
- *   a valid ISBN number.
- * @throws {@link book-lib#BookNotFoundError} Thrown if the ISBN number is
- *   valid, but no such book exists in the catalog.
+ * @throws {@link book-lib#BookNotFoundError}
+ * Thrown if the ISBN number is valid, but no such book exists in the catalog.
  *
  * @public
  */

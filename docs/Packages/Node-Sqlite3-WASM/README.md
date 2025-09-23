@@ -1,7 +1,7 @@
 ***node-sqlite3-wasm***
 
 [![npm](https://img.shields.io/npm/v/node-sqlite3-wasm.svg)](https://www.npmjs.com/package/node-sqlite3-wasm)
-[![SQLite](https://img.shields.io/badge/SQLite-3.50.3-blue)](https://www.sqlite.org/index.html)
+[![SQLite](https://img.shields.io/badge/SQLite-3.50.4-blue)](https://www.sqlite.org/index.html)
 
 # WebAssembly build of SQLite3 for Node.js
 
@@ -26,7 +26,7 @@ implementing an [SQLite OS Interface or "VFS"](https://www.sqlite.org/vfs.html)
 that translates SQLite file access to [Node.js' file system
 API](https://nodejs.org/api/fs.html).
 
-*node-sqlite3-wasm* is currently based on SQLite 3.50.3.
+*node-sqlite3-wasm* is currently based on SQLite 3.50.4.
 
 ## Getting Started
 

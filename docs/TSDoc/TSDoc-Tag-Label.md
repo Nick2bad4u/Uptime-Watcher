@@ -1,5 +1,5 @@
 ---
-title: "@label"
+title: '@label'
 ---
 
 <!-- prettier-ignore-start -->
@@ -21,36 +21,36 @@ the TSDoc declaration reference notation.
 
 ```ts
 export interface Interface {
- /**
-  * Shortest name: {@link InterfaceL1.(:STRING_INDEXER)} Full name:
-  * {@link (InterfaceL1:interface).(:STRING_INDEXER)}
-  *
-  * {@label STRING_INDEXER}
-  */
- [key: string]: number;
+  /**
+   * Shortest name:  {@link InterfaceL1.(:STRING_INDEXER)}
+   * Full name:      {@link (InterfaceL1:interface).(:STRING_INDEXER)}
+   *
+   * {@label STRING_INDEXER}
+   */
+  [key: string]: number;
 
- /**
-  * Shortest name: {@link InterfaceL1.(:NUMBER_INDEXER)} Full name:
-  * {@link (InterfaceL1:interface).(:NUMBER_INDEXER)}
-  *
-  * {@label NUMBER_INDEXER}
-  */
- [key: number]: number;
+  /**
+   * Shortest name:  {@link InterfaceL1.(:NUMBER_INDEXER)}
+   * Full name:      {@link (InterfaceL1:interface).(:NUMBER_INDEXER)}
+   *
+   * {@label NUMBER_INDEXER}
+   */
+  [key: number]: number;
 
- /**
-  * Shortest name: {@link InterfaceL1.(:FUNCTOR)} Full name:
-  * {@link (InterfaceL1:interface).(:FUNCTOR)}
-  *
-  * {@label FUNCTOR}
-  */
- (source: string, subString: string): boolean;
+  /**
+   * Shortest name:  {@link InterfaceL1.(:FUNCTOR)}
+   * Full name:      {@link (InterfaceL1:interface).(:FUNCTOR)}
+   *
+   * {@label FUNCTOR}
+   */
+  (source: string, subString: string): boolean;
 
- /**
-  * Shortest name: {@link InterfaceL1.(:CONSTRUCTOR)} Full name:
-  * {@link (InterfaceL1:interface).(:CONSTRUCTOR)}
-  *
-  * {@label CONSTRUCTOR}
-  */
- new (hour: number, minute: number);
+  /**
+   * Shortest name:  {@link InterfaceL1.(:CONSTRUCTOR)}
+   * Full name:      {@link (InterfaceL1:interface).(:CONSTRUCTOR)}
+   *
+   * {@label CONSTRUCTOR}
+   */
+  new (hour: number, minute: number);
 }
 ```

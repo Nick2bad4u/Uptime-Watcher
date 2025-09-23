@@ -1,5 +1,5 @@
 ---
-title: "@sealed"
+title: '@sealed'
 ---
 
 <!-- prettier-ignore-start -->
@@ -25,16 +25,16 @@ but `Base.initialize()` must not be overridden because it is marked as "sealed".
 
 ```ts
 class Base {
- /** @abstract */
- public render(): void {}
+  /** @virtual */
+  public render(): void {}
 
- /** @sealed */
- public initialize(): void {}
+  /** @sealed */
+  public initialize(): void {}
 }
 
 class Child extends Base {
- /** @override */
- public render(): void;
+  /** @override */
+  public render(): void;
 }
 ```
 
