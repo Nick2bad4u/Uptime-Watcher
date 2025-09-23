@@ -19,6 +19,7 @@ description: "Generate 100% Test Coverage"
    - `npm run test:coverage`
    - `npm run test:electron:coverage`
    - `npm run test:shared:coverage`
+   - Note: Do not run vitest coverage without these commands above or you will get a massive text output which will ruin your context window. Always run for either a specific file, or use the commands above. If you have to pipe output to a file, use the npm commands above.
 5. Scan source code to create intelligent tests for all branches and edge cases.
 6. Ensure comprehensive tests for all edge cases.
 7. Use unlimited requests and time as needed.

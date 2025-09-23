@@ -46,8 +46,8 @@ const config: PlaywrightTestConfig = defineConfig({
      * Electron, seeding databases, etc. See:
      * https://playwright.dev/docs/test-global-setup-teardown
      */
-    globalSetup: require.resolve("./playwright/fixtures/global-setup.ts"),
-    globalTeardown: require.resolve("./playwright/fixtures/global-teardown.ts"),
+    globalSetup: "./playwright/fixtures/global-setup.ts",
+    globalTeardown: "./playwright/fixtures/global-teardown.ts",
     // Output and artifacts configuration - organized within playwright directory
     outputDir: "playwright/test-results/",
     // Multiple projects for different test types
