@@ -22,7 +22,6 @@
         "**/**.xml",
         "**/build/**",
         "**/coverage/**",
-        "**/dist-electron/**",
         "**/dist/**",
         "**/docs/TSDoc/**",
         "**/libs/**",

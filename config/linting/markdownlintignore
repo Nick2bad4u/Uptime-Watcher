@@ -1,6 +1,5 @@
 node*modulesdocs/docusaurus/
 docs/Packages/
-dist-electron/
 docs/Validator.md
 .github/instructions/*.md
 .github/prompts/*.md
@@ -19,7 +18,6 @@ release/
 deps/
 .cache/
 docs/docusaurus/
-dist-electron/
 docs/Validator.md
 .github/instructions/\_.md
 .github/prompts/\*.md

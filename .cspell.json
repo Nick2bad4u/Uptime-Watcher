@@ -92,7 +92,6 @@
         "**/test/**",
         "scripts",
         "**CHANGELOG.md",
-        "dist-electron",
         "config/tools/knip.json",
         "package.json",
         "repomix.config.json",

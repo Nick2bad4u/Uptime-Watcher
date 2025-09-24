@@ -29,9 +29,8 @@ default_language_version:
 # Global configuration
 exclude: |
     (?x)^(
-        node_modules/.*|        # Dependencies
-        dist/.*|               # Build output (Vite)
-        dist-electron/.*|      # Electron build output
+    node_modules/.*|        # Dependencies
+    dist/.*|               # Build output
         coverage/.*|           # Test coverage reports
         \.git/.*|              # Git internals
         .*\.min\.(js|css)$|    # Minified files

@@ -10,7 +10,6 @@ coverage/
 *.min.js
 *.min.css
 dist/
-dist-electron/
 docs/docusaurus/docs/
 docs/docusaurus/build/
 docs/docusaurus/.docusaurus/

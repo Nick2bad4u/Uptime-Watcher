@@ -689,7 +689,6 @@ export default defineConfig(({ mode }) => {
                     "src/test/**",
                     "shared/test",
                     "coverage/**",
-                    "dist-electron/**",
                     "electron/**", // Exclude all electron files from frontend coverage
                     "playwright/**", // Exclude all playwright files from coverage
                     "**/playwright/**", // Exclude playwright directories anywhere
@@ -773,7 +772,6 @@ export default defineConfig(({ mode }) => {
                 "**/node_modules/**",
                 "**/docs/**",
                 "**/dist/**",
-                "**/dist-electron/**",
                 "electron/**",
                 "**/coverage/**",
                 ...defaultExclude,

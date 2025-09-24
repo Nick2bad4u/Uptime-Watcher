@@ -344,7 +344,6 @@ coverage:
     ignore:
         # Build outputs and compiled files
         - "dist/**/*"
-        - "dist-electron/**/*"
         - "**/dist/**/*"
         - "electron/dist/**/*"
         - "coverage/**/*"

@@ -22,7 +22,6 @@ exclude-paths:
     # Build and dependencies
     - "node_modules/**"
     - "dist/**"
-    - "dist-electron/**"
     - "coverage/**"
     - "build/**"
     - ".next/**"

@@ -4,7 +4,6 @@
         "customPatterns": [
             "**/node_modules/**",
             "**/dist/**",
-            "**/dist-electron/**",
             "**/build/**",
             "**/coverage/**",
             "**/release/**",

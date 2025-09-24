@@ -64,7 +64,7 @@ const vitestConfig = defineConfig({
             exclude: [
                 "**/*.config.*",
                 "**/*.d.ts",
-                "**/dist*/**", // Covers dist/, dist-electron/, dist-shared/, etc.
+                "**/dist*/**", // Covers dist/ plus any dist-* cache directories
                 "**/node_modules/**",
                 "**/docs/**",
                 "**/coverage/**",
@@ -132,7 +132,6 @@ const vitestConfig = defineConfig({
         exclude: [
             "**/dist*/**",
             "**/html/**",
-            "**/dist-electron/**",
             "**/src/**",
             "**/coverage/**",
             "**/docs/**",

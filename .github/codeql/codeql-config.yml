@@ -16,7 +16,6 @@ analysis:
 exclude:
     - node_modules/**
     - dist/**
-    - dist-electron/**
     - coverage/**
     - public/**
     - "**/*.test.*"

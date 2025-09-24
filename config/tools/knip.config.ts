@@ -218,7 +218,6 @@ const knipConfig: KnipConfig = {
         "!**/*.d.ts",
         "!**/node_modules/**",
         "!**/dist/**",
-        "!**/dist-electron/**",
         "!**/coverage/**",
     ],
     rules: {

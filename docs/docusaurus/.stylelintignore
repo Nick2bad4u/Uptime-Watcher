@@ -1,6 +1,6 @@
 node_modules/
 dist/
-dist-electron/
+**/dist/**
 release/
 build/
 package.json

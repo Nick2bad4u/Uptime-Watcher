@@ -110,8 +110,6 @@
         "useUnknownInCatchVariables": true
     },
     "exclude": [
-        "**/dist-electron",
-        "**/dist-electron/**",
         "**/dist",
         "**/dist/**",
         "**/docs/**",
@@ -121,10 +119,7 @@
         "**/node_modules/**",
         "**/node_modules/typescript/**",
         "coverage",
-        "dist-electron",
         "dist",
-        "dist-shared",
-        "**/dist-shared/**",
         "electron",
         "shared",
         "node_modules",

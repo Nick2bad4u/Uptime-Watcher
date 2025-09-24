@@ -769,13 +769,6 @@ node_modules_backup/
 # Electron build output directories
 dist/
 **/dist/
-dist-electron/
-**/dist-electron/
-dist-shared/
-**/dist-shared/
-dist-shared-test/
-**/dist-shared-test/
-**/dist-electron/test
 dist/test/
 **/dist/test/
 # HTML Build output directories

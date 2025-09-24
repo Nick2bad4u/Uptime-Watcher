@@ -71,9 +71,7 @@ const vitestConfig = defineConfig({
                 "**/node_modules/**",
                 // Build/artifact/docs/coverage
                 "**/dist/**",
-                "**/dist-shared/**",
                 "dist/**",
-                "dist-electron/**",
                 "docs/**",
                 "coverage/**",
                 // Release, scripts, and tooling outputs
@@ -151,7 +149,7 @@ const vitestConfig = defineConfig({
         environment: "node",
         exclude: [
             "**/dist*/**",
-            "**/dist-electron/**",
+            "**/dist*/**",
             "**/src/**",
             "**/electron/**",
             "**/coverage/**",

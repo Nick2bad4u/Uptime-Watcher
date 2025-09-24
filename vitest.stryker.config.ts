@@ -56,7 +56,6 @@ const config: UserConfig = defineConfig({
         exclude: [
             "**/node_modules/**",
             "**/dist/**",
-            "**/dist-electron/**",
             "**/coverage/**",
             "**/docs/**",
             "**/release/**",

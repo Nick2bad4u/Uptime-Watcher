@@ -30,7 +30,6 @@
         "experimentalScannerIgnores": [
             "node_modules",
             "dist",
-            "dist-electron",
             "coverage",
             "release",
             ".git",
@@ -273,8 +272,7 @@
             },
             "includes": [
                 "**/node_modules/**",
-                "**/dist/**",
-                "**/dist-electron/**"
+                "**/dist/**"
             ],
             "linter": {
                 "enabled": false

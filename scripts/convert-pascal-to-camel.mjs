@@ -63,7 +63,6 @@ function processDirectory(dirPath, dryRun = false) {
                     "node_modules",
                     ".git",
                     "dist",
-                    "dist-electron",
                     "coverage",
                     ".vscode",
                     ".vs",

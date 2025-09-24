@@ -27,8 +27,6 @@
     ],
     "exclude": [
         "**/dist/**",
-        "**/dist-electron/**",
-        "**/dist-shared/**",
         "**/node_modules/**",
         "**/coverage/**",
         "**/build/**",

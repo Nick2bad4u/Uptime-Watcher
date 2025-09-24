@@ -4,9 +4,9 @@
         "composite": true,
         "incremental": true,
         "isolatedDeclarations": false,
-        "outDir": "../../.cache/builds/dist-shared-test",
+        "outDir": "../../.cache/builds/dist/test/shared",
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../.cache/builds/dist-shared-test/tsconfig.shared.test.tsbuildinfo",
+        "tsBuildInfoFile": "../../.cache/builds/dist/test/shared/tsconfig.shared.test.tsbuildinfo",
         "types": [
             "node",
             "vitest/globals"

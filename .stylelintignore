@@ -48,8 +48,6 @@ node_modules/
 
 # Ignore build and distribution directories
 dist/
-dist-electron/
-dist-shared/
 dist-benchmark/
 dist**/
 **/dist/** */

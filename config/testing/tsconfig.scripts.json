@@ -55,14 +55,12 @@
         "useUnknownInCatchVariables": true
     },
     "exclude": [
-        "../../scripts/download**",
-        "node_modules",
-        "**/node_modules/**",
-        "**/dist**/**",
-        "**/dist-electron/**",
-        "**/dist-shared/**",
-        "**/dist-scripts/**",
-        "**/coverage/**",
+    "../../scripts/download**",
+    "node_modules",
+    "**/node_modules/**",
+    "**/dist**/**",
+    "**/dist-scripts/**",
+    "**/coverage/**",
         "**/release/**"
     ],
     "extends": "../../tsconfig.json",

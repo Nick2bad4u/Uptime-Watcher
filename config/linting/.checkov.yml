@@ -57,7 +57,6 @@ skip-check:
 skip-path:
     - node_modules/
     - dist/
-    - dist-electron/
     - coverage/
     - .vscode/
     - docs/assets/

@@ -6,7 +6,6 @@
         "**/.git/**",
         "**/.github/**",
         "**/dist/**",
-        "**/dist-electron/**",
         "**/build/**",
         "**/coverage/**",
         "**/report/**",
@@ -64,9 +63,7 @@
         "markdown",
         "json",
         "console",
-        "sarif",
         "xml",
-        "badge",
         "csv"
     ],
     "threshold": 50

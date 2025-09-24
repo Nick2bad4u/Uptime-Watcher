@@ -2,7 +2,6 @@
 # Standard ignore patterns
 node_modules/
 dist/
-dist-electron/
 coverage/
 release/
 .git/
