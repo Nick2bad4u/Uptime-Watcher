@@ -920,7 +920,20 @@ const config = defineConfig({
                      * pixel values.
                      */
                     scale: [
-                        10, 12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64, 80, 96,
+                        10,
+                        12,
+                        14,
+                        16,
+                        18,
+                        20,
+                        24,
+                        28,
+                        32,
+                        40,
+                        48,
+                        64,
+                        80,
+                        96,
                     ],
                     units: ["px"],
                 },
@@ -933,8 +946,20 @@ const config = defineConfig({
                      * typography that scales with user preferences.
                      */
                     scale: [
-                        0.625, 0.75, 0.875, 1, 1.125, 1.25, 1.5, 1.75, 2, 2.5,
-                        3, 4, 5, 6,
+                        0.625,
+                        0.75,
+                        0.875,
+                        1,
+                        1.125,
+                        1.25,
+                        1.5,
+                        1.75,
+                        2,
+                        2.5,
+                        3,
+                        4,
+                        5,
+                        6,
                     ],
                     units: ["rem", "em"],
                 },
@@ -949,7 +974,16 @@ const config = defineConfig({
          * Defines a scale of line-height values for consistent vertical rhythm
          * and typography spacing.
          */
-        "scales/line-heights": [1, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 2],
+        "scales/line-heights": [
+            1,
+            1.125,
+            1.25,
+            1.375,
+            1.5,
+            1.625,
+            1.75,
+            2,
+        ],
         "scales/radii": null,
         "scales/sizes": null,
         "scales/space": null,

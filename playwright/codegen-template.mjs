@@ -267,8 +267,8 @@ function applyLintCompliantTransforms(codegenOutput) {
         const describeName =
             firstTestTitleMatch && firstTestTitleMatch[1]
                 ? firstTestTitleMatch[1]
-                    .replace(/^should\s+/, "")
-                    .replace(/\s+/g, " ")
+                      .replace(/^should\s+/, "")
+                      .replace(/\s+/g, " ")
                 : "Generated Test";
 
         // Insert describe block after last import
