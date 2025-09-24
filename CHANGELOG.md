@@ -7,14 +7,71 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[37b36d5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/37b36d5cf7edd3c37fa607ccb8586dfcb103a079)...
+[37b36d5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/37b36d5cf7edd3c37fa607ccb8586dfcb103a079)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/37b36d5cf7edd3c37fa607ccb8586dfcb103a079...37b36d5cf7edd3c37fa607ccb8586dfcb103a079))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 15.8.0 [`(37b36d5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/37b36d5cf7edd3c37fa607ccb8586dfcb103a079)
+
+
+
+
+
+
+## [15.8.0] - 2025-09-24
+
+
 [[e5b25f0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e5b25f00d30423b08814257978049554341da981)...
-[e5b25f0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e5b25f00d30423b08814257978049554341da981)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e5b25f00d30423b08814257978049554341da981...e5b25f00d30423b08814257978049554341da981))
+[8a0d1ff](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a0d1ff1e1cf26d8e9484c5ac483a4b1fd975b5a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e5b25f00d30423b08814257978049554341da981...8a0d1ff1e1cf26d8e9484c5ac483a4b1fd975b5a))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 15.7.0 [`(e5b25f0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e5b25f00d30423b08814257978049554341da981)
+
+
+
+### 🛠️ Other Changes
+
+- Weird vscode bug [`(4ca4d28)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4ca4d2805745e9e44feb4a2dc4e0d55443a559cc)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Centralize monitor interval constants and logic
+
+This commit refactors monitor interval handling to improve consistency, robustness, and performance across the application.
+
+*   ✨ [feat] Introduces a new shared module `shared/constants/monitoring.ts` to act as a single source of truth for:
+    *   `DEFAULT_MONITOR_CHECK_INTERVAL_MS` (5 minutes)
+    *   `MIN_MONITOR_CHECK_INTERVAL_MS` (5 seconds)
+    *   A new utility function `shouldRemediateMonitorInterval` to centralize the logic for determining if an interval is invalid (e.g., `null`, `NaN`, or below the minimum).
+
+*   🚜 [refactor] Updates multiple parts of the codebase to use these new shared constants and logic:
+    *   The minimum interval validation in Zod schemas and the `ConfigurationManager` now use `MIN_MONITOR_CHECK_INTERVAL_MS`.
+    *   The logic for applying default intervals in `MonitorManager` and `MonitorValidator` is now delegated to the `shouldRemediateMonitorInterval` function, making it more robust.
+    *   Frontend monitor normalization (`normalizeMonitor`) now clamps check intervals to the new shared minimum.
+
+*   ⚡ [perf] Improves the performance of applying default monitor intervals in `MonitorManager`:
+    *   Instead of updating each monitor with an invalid interval individually, all required updates are now batched into a single database transaction.
+    *   The in-memory cache is now explicitly updated after remediation to prevent state inconsistencies.
+
+*   🧪 [test] Updates and expands test suites to cover the new logic:
+    *   Tests for `MonitorValidator` and `monitorOperations` are updated to reflect the new minimum interval rules and remediation logic.
+    *   Tests for `MonitorManager` are enhanced to verify that the cache is correctly updated and that database operations are batched in a transaction.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8a0d1ff)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a0d1ff1e1cf26d8e9484c5ac483a4b1fd975b5a)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v15.7.0 [skip ci] [`(7e2cc81)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e2cc81a6d5cda123f7250804caa7933df38701c)
 
 
 
