@@ -7,14 +7,286 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[e5b25f0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e5b25f00d30423b08814257978049554341da981)...
+[e5b25f0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e5b25f00d30423b08814257978049554341da981)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e5b25f00d30423b08814257978049554341da981...e5b25f00d30423b08814257978049554341da981))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 15.7.0 [`(e5b25f0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e5b25f00d30423b08814257978049554341da981)
+
+
+
+
+
+
+## [15.7.0] - 2025-09-24
+
+
 [[939f32f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/939f32fdb707d161b9119bf57acc6b7d7955d763)...
-[939f32f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/939f32fdb707d161b9119bf57acc6b7d7955d763)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/939f32fdb707d161b9119bf57acc6b7d7955d763...939f32fdb707d161b9119bf57acc6b7d7955d763))
+[7276b59](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7276b591b4847fb690c1a238f86d6dccd88cad51)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/939f32fdb707d161b9119bf57acc6b7d7955d763...7276b591b4847fb690c1a238f86d6dccd88cad51))
+
+
+### ✨ Features
+
+- ✨ [feat] Improve IPC API contracts and cache invalidation
+
+This commit refactors key Inter-Process Communication (IPC) APIs for better type safety and introduces a cache invalidation mechanism to ensure the UI stays synchronized with backend data changes.
+
+### Source Code Changes
+
+*   **✨ [feat] Add Cache Invalidation on Data Import:**
+    *   After successfully importing data, the backend now emits a `cache:invalidated` event.
+    *   This proactively notifies the renderer process that its data (specifically the site list) is stale and needs to be resynchronized, preventing inconsistent states.
+
+*   **🚜 [refactor] Enhance `updateHistoryLimit` API:**
+    *   The `updateHistoryLimit` function in the settings API now returns the updated `number` value from the backend instead of `void`.
+    *   This provides immediate feedback to the frontend, allowing the UI store to confirm and sanitize the value received from the backend, improving data consistency.
+
+*   **🚜 [refactor] Standardize `importData` API Return Type:**
+    *   The `importData` function now returns a `Promise<boolean>` instead of a `Promise<string>`.
+    *   This simplifies the API contract to a clear success/failure flag, making it easier for the frontend to handle the operation's outcome.
+
+*   **⚡ [perf] Implement Frontend Cache Syncing:**
+    *   A new `cacheSync` utility is introduced in the renderer to listen for `cache:invalidated` events.
+    *   When an event is received, it triggers a full resynchronization of the relevant data stores (e.g., `useSitesStore`, `useMonitorTypesStore`), ensuring the UI always reflects the latest backend state.
+
+*   **📝 [docs] Clean Up `WindowService` Documentation:**
+    *   Removes corrupted text and clarifies comments in the `WindowService` for better readability.
+
+### Development & Build Changes
+
+*   **🧪 [test] Update Tests for API and Event Changes:**
+    *   Unit and comprehensive tests for preload scripts, services, and stores are updated to align with the new API return types and behaviors.
+    *   Tests now validate the `boolean` return from `importData` and the `number` return from `updateHistoryLimit`.
+    *   A test is added to confirm the `cache:invalidated` event is emitted correctly during data import.
+    *   Asynchronous test logic is improved to prevent race conditions.
+
+*   **🔧 [build] Refine ESLint and Knip Configurations:**
+    *   Removes the `eslint-plugin-boundaries` configuration, which is no longer needed.
+    *   Updates the `knip` configuration to correctly identify entry points and dependencies, reducing false positives.
+
+*   **🧹 [chore] Update Dependencies:**
+    *   [dependency] Updates versions for numerous development dependencies, including `@typescript-eslint`, `@playwright/test`, and various ESLint plugins.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9db4f09)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9db4f09514c041c511ae41225d78f0c4387f2f54)
+
+
+- ✨ [feat] Replace websearch tool with Tavily suite in BeastMode
+
+✨ [feat] Updates the `BeastMode` chatmode to use the Tavily AI search tool suite.
+ - Replaces the generic `websearch` tool.
+ - Adds `tavily_extract`, `tavily_map`, and `tavily_search` for more specialized search capabilities.
+
+🧹 [chore] Removes the now-obsolete `.vscode/mcp.json` configuration file.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(72f9c60)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/72f9c60a456f19875c14a38e3e14fc37ea37ca91)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 15.6.0 [`(939f32f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/939f32fdb707d161b9119bf57acc6b7d7955d763)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Standardize DI, logging, docs & VS Code config
+
+- Refactors notification service to use explicit dependency injection pattern, aligning with consistency standards and enabling better extensibility/configurability.
+- Replaces remaining `console.*` usage and JSDoc examples with structured `logger` calls across all monitoring, utility, and database services for consistency and observability.
+- Consolidates and improves service configuration patterns (e.g., notification config now always injected as an object), ensuring consistent usage throughout the codebase.
+- Adopts `withErrorHandling()` utility for robust error handling in migration and window management services, improving logging structure and reducing manual try/catch boilerplate.
+- Extensively enhances and standardizes documentation, TSDoc, and code comments for maintainability and developer onboarding; adds a detailed Consistency Guide outlining all architectural, error handling, and documentation standards.
+- Updates `.gitignore` and linter configs for better environment, cache, and generated file exclusion, including Chocolatey and VS Code specifics.
+- Upgrades VS Code launch and task configurations: improves grouping, icons, presentation, run options, and test/lint task structure for a clearer, more productive developer experience.
+- Makes minor algorithmic and documentation improvements in migration, service container, and monitoring implementations for clarity and safety.
+
+These changes aim to improve maintainability, enforce standard patterns, and ensure robust, observable behavior across the application.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a954a26)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a954a268dce6ddcb8a1819d1742dd78df541caaa)
+
+
+- 🚜 [refactor] Consolidate build outputs and enhance IPC stability
+
+This commit introduces several refactoring and stability improvements across the project. Build output directories are consolidated into a centralized `.cache` folder, and IPC event handling is made more robust. Additionally, comprehensive tests are added for renderer-side services.
+
+### Source Code Changes
+
+*   **⚡ [perf] Improve IPC Event Handling Stability**
+    *   Wraps event listener callbacks in the IPC `bridgeFactory` with `try...catch` blocks.
+    *   This prevents a single misbehaving event handler from crashing the entire event system for a channel. Errors are now logged as warnings without halting execution. 🛡️
+
+### Build and Configuration Changes
+
+*   **🔧 [build] Consolidate Build Artifacts**
+    *   Relocates all TypeScript build outputs (`dist-*` folders) and `tsBuildInfoFile`s into a unified `.cache/builds/` directory.
+    *   This cleans up the project root and simplifies gitignore rules.
+
+*   **🔧 [build] Unify Electron and Shared Output**
+    *   Changes the output directory for `electron` and `shared` modules from `dist-electron` and `dist-shared` to a single `dist` directory.
+
+*   **🧹 [chore] Refine VS Code Tasks**
+    *   Removes numerous outdated or redundant npm script tasks from `tasks.json` to simplify the developer workflow.
+
+*   **🎨 [style] Clean Up ESLint Configuration**
+    *   Removes several `@ts-expect-error` comments, indicating that underlying type issues in ESLint plugins have been resolved.
+
+### Testing Improvements
+
+*   **🧪 [test] Add Comprehensive Service Tests**
+    *   Introduces new comprehensive test suites for `DataService`, `EventsService`, `SettingsService`, and `SystemService`.
+    *   These tests ensure high code coverage and validate service initialization, API interactions, error handling, and edge cases.
+
+*   **🧪 [test] Update Preload API Tests for IPC Response Format**
+    *   Adapts preload domain API tests (`monitoring`, `settings`, `sites`, etc.) to align with a new standardized IPC response format (`{ success: true, data: ... }`).
+    *   This ensures tests accurately reflect the updated data contract between the main and renderer processes.
+
+*   **🧪 [test] Correct IPC Channel Names in Tests**
+    *   Fixes incorrect event channel names (e.g., `test:event` to `test-event`) in tests to match the implementation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(cb7534a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cb7534a2b6e3f07f528e4ed30e7724d8e11660f5)
+
+
+- 🚜 [refactor] Refactor styles to use centralized design system tokens
+
+This commit refactors the application's styling to adopt a more robust and centralized design token system for improved consistency and theming.
+
+*   🎨 **Color Variables**: Replaces component-specific or generic color variables with new semantic theme tokens.
+    *   `--color-accent` is now `--color-primary-500`.
+    *   `--color-border` and `--color-neutral-*` are replaced with semantic alternatives like `--color-border-primary` and `--color-background-secondary`.
+    *   Hardcoded `--color-white` for text is replaced with `--color-text-inverse` for better theme adaptability.
+*   🖌️ **Shadows & Effects**: Updates shadow and easing function variables to align with the new design system.
+    *   `--color-shadow` is replaced by `--shadow-md`.
+    *   A hardcoded box-shadow color is now generated dynamically using `color-mix` with a theme variable.
+    *   Transition timing `ease-in-out` is updated to a new standard, `ease-smooth`.
+*   🔧 **Theme Structure**: Adds a `white` property to the theme color definition and type interface, ensuring its availability across all themes.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6d7605d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6d7605d8d4af655228874a54b3ab2e63f96d392e)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Consolidate documentation and update file naming conventions
+
+🧹 [chore] This commit streamlines the project's documentation and improves testing infrastructure.
+
+📝 [docs] Removes the extensive `DOCUMENTATION_STYLE_GUIDE.md`.
+ - This file is being deprecated in favor of a more simplified and centrally managed approach to documentation standards.
+
+🎨 [style] Renames several documentation files from kebab-case to UPPERCASE_SNAKE_CASE to align with new project conventions.
+ - `TSDoc-Standards.md` -> `TSDOC_STANDARDS.md`
+ - `CODEGEN-BEST-PRACTICES.md` -> `CODEGEN_BEST_PRACTICES.md`
+ - `FAST-CHECK-FUZZING-GUIDE.md` -> `FAST_CHECK_FUZZING_GUIDE.md`
+
+🚜 [refactor] Updates the Playwright codegen template to discourage the use of brittle locators.
+ - Removes transformations for `locator("body")` and `locator("html")`.
+ - Adds detailed comments explaining why these broad selectors are problematic and guides developers toward more semantic and robust alternatives like `getByRole()` or `getByTestId()`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(81a247f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/81a247f1e7da3d711e761bae38fc0eba6e5025d4)
+
+
+- 📝 [docs] Sync latest upstream documentation changes for packages and TSDoc
+
+This commit updates the documentation for several packages and refines the TSDoc content.
+
+✨ **New Features**
+- Introduces the `IsUndefined` type guard to `TypeFest`.
+- Exports `Options` types for several `TypeFest` utilities, enhancing configurability.
+
+🚜 **Refactoring & Improvements**
+- **TypeFest**:
+  - Renames several internal helper types with a leading underscore (`_`) for clarity (e.g., `_Numeric`, `_LiteralStringUnion`).
+  - Removes unused types and consolidates internal imports.
+  - Improves the `IsEqual` type to handle `never` more robustly.
+- **TSDoc**:
+  - Standardizes code block formatting and cleans up whitespace for better readability.
+  - Corrects tag names in titles (e.g., `@alpha` instead of `"@alpha"`) and improves comment formatting across multiple files.
+  - Updates the `@override` example to use `@virtual` for the base method, reflecting more accurate usage.
+
+🧹 **Chore**
+- Updates `node-sqlite3-wasm` documentation to reflect the new SQLite version `3.50.4`.
+- Syncs the latest documentation content and file hashes for `TypeFest` and `node-sqlite3-wasm`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2150780)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/215078099a30a8c0cb30b2c0aefa34d224527df2)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improve code formatting and readability across configurations and tests
+
+This commit applies several stylistic and formatting improvements to enhance code readability and maintain consistency.
+
+*   **`stylelint.config.mjs`**
+    *   🎨 [style] Reformats numeric scale arrays for `font-sizes`, `font-sizes-rem`, and `line-heights`.
+        *   Each value is now on its own line, making the scales easier to read and manage.
+
+*   **`playwright/codegen-template.mjs`**
+    *   🎨 [style] Adjusts indentation for chained `.replace()` method calls to improve alignment and clarity.
+
+*   **`Settings.input-fuzzing.test.tsx`**
+    *   📝 [docs] Corrects formatting within a JSDoc comment block by properly closing and re-opening a code block fence.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7276b59)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7276b591b4847fb690c1a238f86d6dccd88cad51)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add comprehensive tests for Electron preload APIs
+
+Adds an extensive suite of comprehensive tests for the Electron preload bridge APIs, significantly improving test coverage, robustness, and confidence in the IPC layer. These tests utilize `vitest` for the testing framework and `fast-check` for property-based testing to cover a wide range of scenarios, including edge cases and concurrency.
+
+✨ **Key Improvements:**
+-   **Comprehensive Testing:** Introduces new, detailed test files for each major preload API domain:
+    -   `bridgeFactory`: The core infrastructure for creating IPC invokers and event managers.
+    -   `dataApi`: Data import/export and backup functionality.
+    -   `eventsApi`: Event subscription handling.
+    -   `monitoringApi`: Monitor control and management.
+    -   `monitorTypesApi`: Fetching monitor type definitions.
+    -   `settingsApi`: Application settings management.
+    -   `sitesApi`: Site CRUD and monitoring operations.
+    -   `stateSyncApi`: Real-time state synchronization.
+    -   `systemApi`: System-level interactions like opening external links.
+-   **Robustness with Property-Based Testing:** Leverages `fast-check` to automatically generate a wide variety of inputs, ensuring the APIs are resilient against unexpected data, edge cases, and malformed payloads.
+-   **Concurrency and Integration Scenarios:** Includes tests for concurrent API calls, mixed success/failure responses, and common user workflows to validate the stability of the system under load.
+
+🔧 **Build & Tooling:**
+-   Updates `package.json` scripts to use `tsc --build` instead of `--noEmit`, enabling faster incremental type-checking across the project.
+-   Adds `dist-bench/` to `.gitignore` to exclude benchmark build artifacts from version control.
+
+🛠️ **Minor Test Fixes:**
+-   Adds `@testing-library/jest-dom` to the `AddSiteModal` test setup for improved DOM assertions.
+-   Updates theme mocks in several test files to include a new `white` color property, aligning them with recent theme changes.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7283961)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/72839615b98521bb8bb99bf519e9bcc1ce33d398)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Refine AI configurations and Playwright setup
+
+This commit introduces several small refinements to development tooling and AI configurations.
+
+*   🚜 **`playwright.config.ts`**: Simplifies the paths for `globalSetup` and `globalTeardown` by removing the unnecessary `require.resolve()` wrapper. Playwright can handle direct string paths.
+
+*   🧹 **`BeastMode.chatmode.md`**: Adjusts the available tools for the Beast Mode agent.
+    - Removes the `vscodeAPI` and `openSimpleBrowser` tools.
+    - Adds the `think` tool to enhance reasoning capabilities.
+
+*   📝 **`Generate-100%-Test-Coverage.prompt.md`**: Updates the documentation for generating test coverage.
+    - Adds a note to explicitly use the provided `npm` scripts instead of running `vitest coverage` directly. This prevents excessive terminal output that could overwhelm the AI's context window.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6c5e780)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6c5e780aa096041722d582dec1bb2b4f577bd85b)
+
+
+- Update changelogs for v15.6.0 [skip ci] [`(a653266)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a6532661925d825c36822adc21a74c1e04c432fb)
 
 
 
