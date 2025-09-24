@@ -113,9 +113,9 @@ declare global {
                  *
                  * @param data - The JSON string to import.
                  *
-                 * @returns A promise resolving to import status message.
+                 * @returns A promise resolving to a boolean success flag.
                  */
-                importData: (data: string) => Promise<string>;
+                importData: (data: string) => Promise<boolean>;
                 /**
                  * @remarks
                  * Reset all application settings to their default values.

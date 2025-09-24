@@ -85,9 +85,8 @@ describe(useSettingsStore, () => {
 
         // Setup default mock returns - direct data values (preload APIs extract data automatically)
         mockElectronAPI.data.getHistoryLimit.mockResolvedValue(500);
-        mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(undefined);
+        mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(500);
         mockElectronAPI.data.resetSettings.mockResolvedValue(undefined);
-        mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(undefined);
         mockElectronAPI.data.getHistoryLimit.mockResolvedValue(500); // This is what SettingsService actually calls
         mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue(
             new ArrayBuffer(100)
@@ -329,7 +328,7 @@ describe(useSettingsStore, () => {
             const { result } = renderHook(() => useSettingsStore());
 
             // Mock backend responses - SettingsService uses data API
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(2000);
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(2000);
 
             await act(async () => {
                 await result.current.persistHistoryLimit(2000);
@@ -360,7 +359,7 @@ describe(useSettingsStore, () => {
             const { result } = renderHook(() => useSettingsStore());
 
             // Mock backend to return the same value (no clamping on frontend)
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(50);
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(50);
 
             // Test update with small value
             await act(async () => {
@@ -370,7 +369,7 @@ describe(useSettingsStore, () => {
             expect(result.current.settings.historyLimit).toBe(50); // No clamping in frontend
 
             // Test large value
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(100_000);
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(100_000);
 
             await act(async () => {
                 await result.current.persistHistoryLimit(100_000);
@@ -681,8 +680,8 @@ describe(useSettingsStore, () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            // Mock backend response for getHistoryLimit
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(500);
+            // Mock backend response for updateHistoryLimit
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(500);
 
             await act(async () => {
                 await result.current.persistHistoryLimit(500);

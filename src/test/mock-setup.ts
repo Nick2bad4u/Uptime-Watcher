@@ -69,17 +69,18 @@ const mockElectronAPI: any = {
     data: {
         // Settings operations
         getHistoryLimit: vi.fn().mockResolvedValue(1000),
-        updateHistoryLimit: vi.fn().mockResolvedValue(undefined),
+        updateHistoryLimit: vi.fn().mockResolvedValue(30),
         resetSettings: vi.fn().mockResolvedValue(undefined),
 
         // Backup operations
-        downloadSqliteBackup: vi
-            .fn()
-            .mockResolvedValue({ filePath: "backup.db", size: 1024 }),
+        downloadSqliteBackup: vi.fn().mockResolvedValue({
+            buffer: new ArrayBuffer(8),
+            fileName: "backup.db",
+        }),
 
         // Import/Export operations
-        importData: vi.fn().mockResolvedValue(undefined),
-        exportData: vi.fn().mockResolvedValue(undefined),
+        importData: vi.fn().mockResolvedValue(true),
+        exportData: vi.fn().mockResolvedValue("{}"),
     },
 
     // Event listener registration for various system events
@@ -200,7 +201,7 @@ const mockElectronAPI: any = {
     // Settings management operations
     settings: {
         getHistoryLimit: vi.fn().mockResolvedValue(1000),
-        updateHistoryLimit: vi.fn().mockResolvedValue(undefined),
+        updateHistoryLimit: vi.fn().mockResolvedValue(1000),
     },
 
     // Site management operations (CRUD, monitoring control)

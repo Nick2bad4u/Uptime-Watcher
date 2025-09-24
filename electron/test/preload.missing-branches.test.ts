@@ -190,19 +190,29 @@ describe("preload.ts - Missing Branch Coverage", () => {
             ).resolves.toBeTruthy();
         });
         it("should handle invalid numeric parameters", async () => {
-            // Test with invalid numeric parameters - updateHistoryLimit returns undefined (void)
+            mockIpcRenderer.invoke.mockImplementation((channel, value) => {
+                if (channel === "update-history-limit") {
+                    return Promise.resolve({
+                        success: true,
+                        data: value as number,
+                    });
+                }
+                return Promise.resolve({ success: true, data: null });
+            });
+
+            // Test with invalid numeric parameters - bridge still mirrors backend data
             await expect(
                 exposedAPI.settings.updateHistoryLimit(-1)
-            ).resolves.toBeUndefined();
+            ).resolves.toBe(-1);
             await expect(
                 exposedAPI.settings.updateHistoryLimit(0)
-            ).resolves.toBeUndefined();
+            ).resolves.toBe(0);
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Infinity)
-            ).resolves.toBeUndefined();
+            ).resolves.toBe(Infinity);
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Number.NaN)
-            ).resolves.toBeUndefined();
+            ).resolves.toSatisfy(Number.isNaN);
         });
     });
     describe("Concurrent Operations", () => {
@@ -216,6 +226,9 @@ describe("preload.ts - Missing Branch Coverage", () => {
                     return Promise.resolve({ success: true, data: [] });
                 }
                 if (channel === "get-history-limit") {
+                    return Promise.resolve({ success: true, data: 100 });
+                }
+                if (channel === "update-history-limit") {
                     return Promise.resolve({ success: true, data: 100 });
                 }
                 if (channel === "export-data") {

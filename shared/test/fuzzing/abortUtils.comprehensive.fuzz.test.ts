@@ -135,12 +135,17 @@ describeFn("AbortUtils Comprehensive Fuzzing Tests", () => {
                     sleep(duration, abortController.signal)
                 ).resolves.toBeUndefined();
             } else {
+                const effectiveDuration = duration + 32;
+                const sleepPromise = sleep(
+                    effectiveDuration,
+                    abortController.signal
+                );
+
                 setTimeout(() => {
                     abortController.abort("Test timeout");
-                }, 2); // Reduced timeout
-                await expect(
-                    sleep(duration, abortController.signal)
-                ).rejects.toThrow();
+                }, 1);
+
+                await expect(sleepPromise).rejects.toThrow("Sleep was aborted");
             }
         });
     });

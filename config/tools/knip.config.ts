@@ -9,6 +9,9 @@ const knipConfig: KnipConfig = {
         "vitest.config.ts",
         "vitest.electron.config.ts",
         "vitest.shared.config.ts",
+        "src/App.tsx",
+        "src/main.tsx",
+        "shared/types.ts",
     ],
     ignore: [
         "shared/types/monitorTypes.ts",
@@ -123,7 +126,6 @@ const knipConfig: KnipConfig = {
         "chartjs-adapter-date-fns",
         "chartjs-plugin-zoom",
         "react-icons",
-        "zustand",
         "eslint-config-eslint.config.mjs",
         "@secretlint/secretlint-rule-no-dotenv",
         "@secretlint/secretlint-rule-no-homedir",

@@ -81,9 +81,9 @@ describe("useSettingsStore - Additional Coverage", () => {
         localStorage.clear();
         sessionStorage.clear();
 
-        mockGetHistoryLimit.mockResolvedValue({ success: true, data: 1000 });
+        mockGetHistoryLimit.mockResolvedValue(1000);
         mockResetSettings.mockResolvedValue({ success: true });
-        mockUpdateHistoryLimit.mockResolvedValue({ success: true });
+        mockUpdateHistoryLimit.mockResolvedValue(1000);
     });
 
     it("should test basic functionality", async ({ task, annotate }) => {

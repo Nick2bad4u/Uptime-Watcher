@@ -584,13 +584,12 @@ describe(WindowService, () => {
                 // Trigger the content loading
                 await (windowService as any).loadContent();
 
+                // Allow the asynchronous withErrorHandling call to complete
+                await new Promise((resolve) => setTimeout(resolve, 0));
+
                 expect(logger.error).toHaveBeenCalledWith(
-                    "[WindowService] Failed to load production file",
-                    expect.objectContaining({
-                        error: "File not found",
-                        filePath: expect.stringContaining("index.html"),
-                        windowState: "active",
-                    })
+                    "Failed to loadProductionContent",
+                    expect.objectContaining({ message: "File not found" })
                 );
             });
         });
@@ -639,15 +638,6 @@ describe(WindowService, () => {
                         signal: expect.any(AbortSignal),
                     })
                 );
-            });
-
-            it("should load URL when server is ready", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: WindowService", "component");
-                await annotate("Category: Service", "category");
                 await annotate("Type: Data Loading", "type");
 
                 const window = windowService.createMainWindow();
@@ -694,12 +684,10 @@ describe(WindowService, () => {
 
                 expect(waitForViteServerSpy).toHaveBeenCalled();
                 expect(logger.error).toHaveBeenCalledWith(
-                    "[WindowService] Failed to load development content",
+                    "Failed to loadDevelopmentContent",
                     expect.objectContaining({
-                        error: expect.stringContaining(
-                            "Vite dev server did not become available"
-                        ),
-                        serverUrl: "http://localhost:5173",
+                        message:
+                            "Vite dev server did not become available after 20 attempts",
                     })
                 );
             });
@@ -734,9 +722,10 @@ describe(WindowService, () => {
                 ).rejects.toThrow();
 
                 expect(logger.error).toHaveBeenCalledWith(
-                    "[WindowService] Failed to load development content",
+                    "Failed to loadDevelopmentContent",
                     expect.objectContaining({
-                        error: "Main window was destroyed while waiting for Vite server",
+                        message:
+                            "Main window was destroyed while waiting for Vite server",
                     })
                 );
             });
@@ -847,10 +836,10 @@ describe(WindowService, () => {
 
             expect(waitForViteServerSpy).toHaveBeenCalled();
             expect(logger.error).toHaveBeenCalledWith(
-                "[WindowService] Failed to load development content",
+                "Failed to loadDevelopmentContent",
                 expect.objectContaining({
-                    error: expect.stringContaining(
-                        "Vite dev server did not become available"
+                    message: expect.stringContaining(
+                        "Vite dev server did not become available after 20 attempts"
                     ),
                 })
             );

@@ -823,12 +823,18 @@ describe("Electron Preload Script", () => {
             const exposedAPI = getExposedAPI();
             const limit = 1000;
 
-            await exposedAPI.settings.updateHistoryLimit(limit);
+            mockIpcRenderer.invoke.mockResolvedValue({
+                success: true,
+                data: limit,
+            });
+
+            const result = await exposedAPI.settings.updateHistoryLimit(limit);
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 "update-history-limit",
                 limit
             );
+            expect(result).toBe(limit);
         });
     });
 

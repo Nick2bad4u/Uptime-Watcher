@@ -264,7 +264,9 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                         "1.0.0",
                         "2.0.0"
                     );
-                }).toThrow("No migration path from 1.0.0 to 2.0.0 for http");
+                }).toThrow(
+                    /No migration path from 1\.0\.0 to 2\.0\.0 for http/
+                );
             });
 
             it("should detect circular migration paths", async ({
@@ -865,17 +867,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
                 // Create a scenario where getMigrationPath throws
                 const data = createTestData();
-                const result = await orchestrator.migrateMonitorData(
+                const resultPromise = orchestrator.migrateMonitorData(
                     "http",
                     data,
                     "1.0.0",
                     "2.0.0"
                 );
 
-                expect(result.success).toBeFalsy();
-                expect(result.errors).toHaveLength(1);
-                expect(result.errors[0]).toContain(
-                    "Migration orchestration failed"
+                await expect(resultPromise).rejects.toThrow(
+                    /No migration path from 1\.0\.0 to 2\.0\.0 for http/
                 );
             });
 

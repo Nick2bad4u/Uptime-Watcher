@@ -66,16 +66,22 @@ interface Alert {
 
 // Real notification service instances for benchmarking
 const downAlertsService = new NotificationService({
-    showDownAlerts: true,
-    showUpAlerts: false,
+    config: {
+        showDownAlerts: true,
+        showUpAlerts: false,
+    },
 });
 const upAlertsService = new NotificationService({
-    showDownAlerts: false,
-    showUpAlerts: true,
+    config: {
+        showDownAlerts: false,
+        showUpAlerts: true,
+    },
 });
 const fullAlertsService = new NotificationService({
-    showDownAlerts: true,
-    showUpAlerts: true,
+    config: {
+        showDownAlerts: true,
+        showUpAlerts: true,
+    },
 });
 
 // Mock monitor data generators

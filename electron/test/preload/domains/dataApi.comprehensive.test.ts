@@ -262,9 +262,9 @@ describe("Data Domain API", () => {
     describe("importData", () => {
         it("should call correct IPC channel with data and return status", async () => {
             const importData = JSON.stringify({ sites: [], settings: {} });
-            const mockResponse: IpcResponse<string> = {
+            const mockResponse: IpcResponse<boolean> = {
                 success: true,
-                data: "Import completed successfully",
+                data: true,
             };
             mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
 
@@ -274,20 +274,20 @@ describe("Data Domain API", () => {
                 "import-data",
                 importData
             );
-            expect(result).toBe("Import completed successfully");
+            expect(result).toBeTruthy();
         });
 
         it("should handle empty import data", async () => {
             const emptyData = "{}";
-            const mockResponse: IpcResponse<string> = {
+            const mockResponse: IpcResponse<boolean> = {
                 success: true,
-                data: "No data to import",
+                data: false,
             };
             mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
 
             const result = await dataApi.importData(emptyData);
 
-            expect(result).toBe("No data to import");
+            expect(result).toBeFalsy();
         });
 
         it("should handle malformed JSON gracefully", async () => {
@@ -310,15 +310,15 @@ describe("Data Domain API", () => {
                     name: `Large Site ${i}`,
                 })),
             });
-            const mockResponse: IpcResponse<string> = {
+            const mockResponse: IpcResponse<boolean> = {
                 success: true,
-                data: "Large import completed",
+                data: true,
             };
             mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
 
             const result = await dataApi.importData(largeData);
 
-            expect(result).toBe("Large import completed");
+            expect(result).toBeTruthy();
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 "import-data",
                 largeData
@@ -473,22 +473,30 @@ describe("Data Domain API", () => {
 
         it("should handle various JSON import data", async () => {
             await fc.assert(
-                fc.asyncProperty(fc.jsonValue(), async (jsonData) => {
-                    const jsonString = JSON.stringify(jsonData);
-                    const mockResponse: IpcResponse<string> = {
-                        success: true,
-                        data: "Import successful",
-                    };
-                    mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
+                fc.asyncProperty(
+                    fc.jsonValue(),
+                    fc.boolean(),
+                    async (jsonData, expectedResult) => {
+                        const jsonString = JSON.stringify(jsonData);
+                        const mockResponse: IpcResponse<boolean> = {
+                            success: true,
+                            data: expectedResult,
+                        };
+                        mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
 
-                    const result = await dataApi.importData(jsonString);
+                        const result = await dataApi.importData(jsonString);
 
-                    expect(result).toBe("Import successful");
-                    expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                        "import-data",
-                        jsonString
-                    );
-                }),
+                        if (expectedResult) {
+                            expect(result).toBeTruthy();
+                        } else {
+                            expect(result).toBeFalsy();
+                        }
+                        expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                            "import-data",
+                            jsonString
+                        );
+                    }
+                ),
                 { numRuns: 20 }
             );
         });
@@ -657,36 +665,48 @@ describe("Data Domain API", () => {
         });
 
         it("should handle undefined and null arguments gracefully", async () => {
-            const mockResponse: IpcResponse<string> = {
-                success: true,
-                data: "handled",
-            };
-            mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
+            mockIpcRenderer.invoke
+                .mockResolvedValueOnce({
+                    success: true,
+                    data: true,
+                } as IpcResponse<boolean>)
+                .mockResolvedValueOnce({
+                    success: true,
+                    data: false,
+                } as IpcResponse<boolean>)
+                .mockResolvedValueOnce({
+                    success: true,
+                    data: 42,
+                } as IpcResponse<number>);
 
             // These should not throw during the call itself (IPC will handle them)
             await expect(
                 dataApi.importData(undefined as unknown as string)
-            ).resolves.toBe("handled");
+            ).resolves.toBeTruthy();
             await expect(
                 dataApi.importData(null as unknown as string)
-            ).resolves.toBe("handled");
+            ).resolves.toBeFalsy();
             await expect(
                 dataApi.updateHistoryLimit(undefined as unknown as number)
-            ).resolves.toBe("handled");
+            ).resolves.toBe(42);
         });
 
         it("should preserve method context and this binding", async () => {
-            const mockResponse: IpcResponse<string> = {
-                success: true,
-                data: "test",
-            };
-            mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
+            mockIpcRenderer.invoke
+                .mockResolvedValueOnce({
+                    success: true,
+                    data: "export",
+                } as IpcResponse<string>)
+                .mockResolvedValueOnce({
+                    success: true,
+                    data: true,
+                } as IpcResponse<boolean>);
 
             // Destructuring should not break the methods
             const { exportData, importData } = dataApi;
 
-            await expect(exportData()).resolves.toBe("test");
-            await expect(importData("{}")).resolves.toBe("test");
+            await expect(exportData()).resolves.toBe("export");
+            await expect(importData("{}")).resolves.toBeTruthy();
         });
     });
 });

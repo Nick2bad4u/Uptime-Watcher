@@ -474,8 +474,8 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
         fcTest.prop([fc.integer({ min: 10, max: 100 })])(
             "should handle concurrent operations",
-            (operationCount) => {
-                const results: Promise<void>[] = [];
+            async (operationCount) => {
+                const operations: Promise<void>[] = [];
 
                 // Simulate concurrent event operations
                 for (let i = 0; i < operationCount; i++) {
@@ -493,10 +493,12 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                         }, Math.random() * 10);
                     });
 
-                    results.push(operation);
+                    operations.push(operation);
                 }
 
-                expect(results).toHaveLength(operationCount);
+                expect(operations).toHaveLength(operationCount);
+                await Promise.all(operations);
+                expect(eventBus.listenerCount("system:health:check")).toBe(0);
             }
         );
     });

@@ -88,14 +88,8 @@ describe("useSettingsStore Branch Coverage Tests", () => {
         vi.clearAllMocks();
 
         // Setup default mock returns
-        mockElectronAPI.data.getHistoryLimit.mockResolvedValue({
-            success: true,
-            data: 1000,
-        });
-        mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
-            success: true,
-            data: 1000,
-        });
+        mockElectronAPI.data.getHistoryLimit.mockResolvedValue(1000);
+        mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(1000);
 
         mockSafeExtractIpcData.mockImplementation(
             (response: any, fallback: any) => {
@@ -232,12 +226,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
-                success: true,
-                data: 5000, // Valid positive number
-            });
-
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(5000);
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(5000);
 
             await act(async () => {
                 await result.current.persistHistoryLimit(3000);
@@ -258,15 +247,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
-                success: true,
-                data: -1, // Invalid negative number
-            });
-
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue({
-                success: true,
-                data: -1,
-            });
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(-1);
 
             await act(async () => {
                 await result.current.persistHistoryLimit(3000);
@@ -287,15 +268,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
-                success: true,
-                data: 0, // Zero is not considered valid (not > 0)
-            });
-
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue({
-                success: true,
-                data: 0,
-            });
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(0);
 
             await act(async () => {
                 await result.current.persistHistoryLimit(2500);
@@ -316,15 +289,9 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
-                success: true,
-                data: "invalid" as any, // Non-number type
-            });
-
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue({
-                success: true,
-                data: "invalid" as any,
-            });
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(
+                "invalid" as unknown as number
+            );
 
             await act(async () => {
                 await result.current.persistHistoryLimit(1500);
@@ -347,15 +314,9 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
-                success: true,
-                data: "not-a-number" as any, // Typeof will be "string", not "number"
-            });
-
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue({
-                success: true,
-                data: "not-a-number" as any,
-            });
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(
+                "not-a-number" as unknown as number
+            );
 
             await act(async () => {
                 await result.current.persistHistoryLimit(4000);
@@ -376,15 +337,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue({
-                success: true,
-                data: -500, // Typeof is "number" but value is not > 0
-            });
-
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue({
-                success: true,
-                data: -500,
-            });
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(-500);
 
             await act(async () => {
                 await result.current.persistHistoryLimit(3500);

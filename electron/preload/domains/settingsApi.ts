@@ -11,7 +11,7 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
-import { createTypedInvoker, createVoidInvoker } from "../core/bridgeFactory";
+import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
  * Interface defining the settings domain API operations
@@ -29,9 +29,9 @@ export interface SettingsApiInterface {
      *
      * @param limitDays - New history limit in days
      *
-     * @returns Promise that resolves when the limit is updated
+     * @returns Promise resolving to the updated history limit value
      */
-    updateHistoryLimit: (...args: unknown[]) => Promise<void>;
+    updateHistoryLimit: (...args: unknown[]) => Promise<number>;
 }
 
 /**
@@ -52,11 +52,11 @@ export const settingsApi: SettingsApiInterface = {
      *
      * @param limitDays - New history limit in days
      *
-     * @returns Promise that resolves when the limit is updated
+     * @returns Promise resolving to the updated history limit value
      */
-    updateHistoryLimit: createVoidInvoker("update-history-limit") satisfies (
-        ...args: unknown[]
-    ) => Promise<void>,
+    updateHistoryLimit: createTypedInvoker<number>(
+        "update-history-limit"
+    ) satisfies (...args: unknown[]) => Promise<number>,
 } as const;
 
 export type SettingsApi = SettingsApiInterface;

@@ -11,6 +11,7 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { safeNumberConversion } from "@shared/utils/safeConversions";
 
 import { waitForElectronAPI } from "../stores/utils";
 import { logger } from "./logger";
@@ -101,14 +102,30 @@ export const SettingsService = {
      * @param limit - The new maximum number of history records to keep per
      *   monitor.
      *
-     * @returns A promise that resolves when the limit is updated and old
-     *   records are pruned.
+     * @returns Sanitized history limit after update. If the backend returns a
+     *   non-numeric value, the requested limit is used instead and a warning is
+     *   logged.
      *
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    async updateHistoryLimit(limit: number): Promise<void> {
+    async updateHistoryLimit(limit: number): Promise<number> {
         await SettingsService.initialize();
-        await window.electronAPI.data.updateHistoryLimit(limit);
+        const updatedLimit =
+            await window.electronAPI.data.updateHistoryLimit(limit);
+        const sanitizedLimit = safeNumberConversion(updatedLimit, limit);
+
+        if (sanitizedLimit !== updatedLimit) {
+            logger.warn(
+                "Received invalid history limit from backend; falling back to requested value",
+                {
+                    receivedValue: updatedLimit,
+                    requestedLimit: limit,
+                    sanitizedLimit,
+                }
+            );
+        }
+
+        return sanitizedLimit;
     },
 };

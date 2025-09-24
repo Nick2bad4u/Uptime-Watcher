@@ -3,25 +3,21 @@
  *
  * @remarks
  * Handles the creation, configuration, and lifecycle management of Electron
- * browser windows. Provides a centralized servic { logger: logger as { error:
- * (msg: string, err: unknown) => void }, operationName:
- * 'loadDevelopmentContent', }r window operations including content loading,
- * event handling, and communication with renderers.
+ * browser windows. Provides a centralized service for window operations
+ * including content loading, event handling, and renderer communication.
  *
  * Key responsibilities:
  *
- * - Cr { logger: logger as { error: (msg: string, err: unknown) => void },
- *   operationName: 'loadProductionContent', } and configure the main
- *   application window
- * - Load appropriate content based on environment (dev/prod)
+ * - Create and configure the main application window
+ * - Load appropriate content based on the current environment
  * - Handle window lifecycle events (ready-to-show, closed, etc.)
- * - Manage window state and provide access methods
+ * - Manage window state and provide convenience accessors
  * - Facilitate communication between main and renderer processes
  *
  * The service automatically handles environment-specific loading:
  *
- * - Development: Loads from Vite dev server with DevTools
- * - Production: Loads from built static files
+ * - Development: Loads from the Vite dev server and opens DevTools
+ * - Production: Loads from built static files in the application bundle
  *
  * @example
  *
@@ -29,10 +25,8 @@
  * const windowService = new WindowService();
  * const mainWindow = windowService.createMainWindow();
  *
- * // Send data to renderer
  * windowService.sendToRenderer("status-update", { status: "up" });
  *
- * // Check if window exists
  * if (windowService.hasMainWindow()) {
  *     // Window operations...
  * }

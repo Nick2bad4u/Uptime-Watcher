@@ -262,15 +262,12 @@ export const useSettingsStore: UseBoundStore<
                         get().updateSettings({ historyLimit: limit });
 
                         // Call backend to update and prune history
-                        await SettingsService.updateHistoryLimit(limit);
-
-                        // Verify the value from backend to ensure sync
                         const backendLimit =
-                            await SettingsService.getHistoryLimit();
+                            await SettingsService.updateHistoryLimit(limit);
 
                         // Ensure we have a valid number from backend
                         const validBackendLimit =
-                            typeof backendLimit === "number" && backendLimit > 0
+                            Number.isFinite(backendLimit) && backendLimit > 0
                                 ? backendLimit
                                 : limit;
 

@@ -78,7 +78,7 @@ describe(NotificationService, () => {
                 showUpAlerts: true,
             };
 
-            const service = new NotificationService(customConfig);
+            const service = new NotificationService({ config: customConfig });
             const config = service.getConfig();
 
             expect(config).toEqual(customConfig);

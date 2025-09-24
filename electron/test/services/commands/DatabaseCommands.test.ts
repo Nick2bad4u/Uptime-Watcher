@@ -775,11 +775,21 @@ describe("DatabaseCommands", () => {
             ).toHaveBeenCalled();
             expect(mockCache.clear).toHaveBeenCalledTimes(1); // Clear once before reloading
             expect(mockCache.set).toHaveBeenCalledTimes(2); // For reloaded sites
-            expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
+            expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
+                1,
                 "internal:database:data-imported",
                 expect.objectContaining({
                     success: true,
                     operation: "data-imported",
+                })
+            );
+            expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
+                2,
+                "cache:invalidated",
+                expect.objectContaining({
+                    reason: "update",
+                    timestamp: expect.any(Number),
+                    type: "site",
                 })
             );
         });

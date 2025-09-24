@@ -92,7 +92,7 @@ export const DataService = {
      *
      * @throws If the electron API is unavailable or the import operation fails.
      */
-    async importData(data: string): Promise<string> {
+    async importData(data: string): Promise<boolean> {
         await this.initialize();
         return window.electronAPI.data.importData(data);
     },

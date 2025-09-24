@@ -258,7 +258,7 @@ describe("SettingsService", () => {
 
             await expect(
                 SettingsService.updateHistoryLimit(newLimit)
-            ).resolves.toBeUndefined();
+            ).resolves.toBe(newLimit);
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.data.updateHistoryLimit
@@ -306,10 +306,11 @@ describe("SettingsService", () => {
                 mockElectronAPI.data.updateHistoryLimit.mockResolvedValueOnce(
                     limit
                 );
-                await SettingsService.updateHistoryLimit(limit);
+                const result = await SettingsService.updateHistoryLimit(limit);
                 expect(
                     mockElectronAPI.data.updateHistoryLimit
                 ).toHaveBeenCalledWith(limit);
+                expect(result).toBe(limit);
             }
 
             expect(
@@ -330,10 +331,11 @@ describe("SettingsService", () => {
                 mockElectronAPI.data.updateHistoryLimit.mockResolvedValueOnce(
                     limit
                 );
-                await SettingsService.updateHistoryLimit(limit);
+                const result = await SettingsService.updateHistoryLimit(limit);
                 expect(
                     mockElectronAPI.data.updateHistoryLimit
                 ).toHaveBeenCalledWith(limit);
+                expect(result).toBe(limit);
             }
         });
 
@@ -349,10 +351,11 @@ describe("SettingsService", () => {
                 mockElectronAPI.data.updateHistoryLimit.mockResolvedValueOnce(
                     Math.floor(limit)
                 );
-                await SettingsService.updateHistoryLimit(limit);
+                const result = await SettingsService.updateHistoryLimit(limit);
                 expect(
                     mockElectronAPI.data.updateHistoryLimit
                 ).toHaveBeenCalledWith(limit);
+                expect(result).toBe(Math.floor(limit));
             }
         });
     });
@@ -585,12 +588,31 @@ describe("SettingsService", () => {
             ];
 
             for (const returnValue of returnValues) {
+                mockLogger.warn.mockClear();
                 mockElectronAPI.data.updateHistoryLimit.mockResolvedValueOnce(
                     returnValue
                 );
+                const expectedResult =
+                    typeof returnValue === "number" &&
+                    Number.isFinite(returnValue)
+                        ? returnValue
+                        : 100;
                 await expect(
                     SettingsService.updateHistoryLimit(100)
-                ).resolves.toBeUndefined();
+                ).resolves.toBe(expectedResult);
+
+                if (expectedResult === returnValue) {
+                    expect(mockLogger.warn).not.toHaveBeenCalled();
+                } else {
+                    expect(mockLogger.warn).toHaveBeenCalledWith(
+                        "Received invalid history limit from backend; falling back to requested value",
+                        expect.objectContaining({
+                            receivedValue: returnValue,
+                            requestedLimit: 100,
+                            sanitizedLimit: expectedResult,
+                        })
+                    );
+                }
             }
         });
     });

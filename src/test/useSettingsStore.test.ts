@@ -306,17 +306,14 @@ describe(useSettingsStore, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Data Update", "type");
 
-            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(
-                undefined
-            );
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(300);
+            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(300);
 
             await useSettingsStore.getState().persistHistoryLimit(300);
 
             expect(
                 mockElectronAPI.data.updateHistoryLimit
             ).toHaveBeenCalledWith(300);
-            expect(mockElectronAPI.data.getHistoryLimit).toHaveBeenCalled();
+            expect(mockElectronAPI.data.getHistoryLimit).not.toHaveBeenCalled();
 
             const state = useSettingsStore.getState();
             expect(state.settings.historyLimit).toBe(300);

@@ -545,7 +545,7 @@ describe("Types Module", () => {
                 },
                 settings: {
                     getHistoryLimit: () => Promise.resolve(100),
-                    updateHistoryLimit: () => Promise.resolve(),
+                    updateHistoryLimit: () => Promise.resolve(100),
                 },
                 sites: {
                     getSites: () => Promise.resolve([]),

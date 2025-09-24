@@ -1041,53 +1041,6 @@ export default [
                 // Tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
                 entryPoint: "./src/index.css",
             },
-            "boundaries/elements": [
-                { pattern: "src/App.tsx", type: "app" },
-                { pattern: "src/main.tsx", type: "main" },
-                { pattern: "src/index.css", type: "styles" },
-                { pattern: "src/constants.ts", type: "constants" },
-                { pattern: "src/types.ts", type: "types" },
-                {
-                    capture: ["elementName"],
-                    pattern: "src/components/**/*",
-                    type: "components",
-                },
-                {
-                    capture: ["elementName"],
-                    pattern: "src/hooks/**/*",
-                    type: "hooks",
-                },
-                {
-                    capture: ["elementName"],
-                    pattern: "src/services/**/*",
-                    type: "services",
-                },
-                {
-                    capture: ["elementName"],
-                    pattern: "src/stores/**/*",
-                    type: "stores",
-                },
-                {
-                    capture: ["elementName"],
-                    pattern: "src/theme/**/*",
-                    type: "theme",
-                },
-                {
-                    capture: ["elementName"],
-                    pattern: "src/utils/**/*",
-                    type: "utils",
-                },
-                {
-                    capture: ["elementName"],
-                    pattern: "src/types/**/*",
-                    type: "types",
-                },
-                {
-                    capture: ["elementName"],
-                    pattern: "src/test/**/*",
-                    type: "test",
-                },
-            ],
             react: { version: "19" },
             tailwindcss: {
                 config: `${ROOT_DIR}/src/index.css`,
@@ -1267,6 +1220,7 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
+            // @ts-expect-error -- Throws false `Property 'recommended' does not exist on type '{}'.` error due to ESLint v9 changes
             ...etc.configs.recommended.rules,
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/no-untranslated-text": "off",
@@ -2624,6 +2578,7 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
+            // @ts-expect-error -- Throws false `Property 'recommended' does not exist on type '{}'.` error due to ESLint v9 changes
             ...etc.configs.recommended.rules,
             ...pluginBetterTailwindcss.configs.correctness.rules,
             "@arthurgeron/react-usememo/require-memo": "off",
@@ -4229,6 +4184,7 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
+            // @ts-expect-error -- Throws false `Property 'recommended' does not exist on type '{}'.` error due to ESLint v9 changes
             ...etc.configs.recommended.rules,
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
@@ -8406,63 +8362,6 @@ export default [
             "xss/no-location-href-assign": "error",
         },
         settings: {
-            "boundaries/elements": [
-                {
-                    capture: ["main"],
-                    pattern: "electron/main.ts",
-                    type: "main",
-                },
-                {
-                    capture: ["preload"],
-                    pattern: "electron/preload.ts",
-                    type: "preload",
-                },
-                {
-                    capture: ["constants"],
-                    pattern: "electron/constants.ts",
-                    type: "constants",
-                },
-                {
-                    capture: ["electronUtils"],
-                    pattern: "electron/electronUtils.ts",
-                    type: "utils",
-                },
-                {
-                    capture: ["orchestrator"],
-                    pattern: "electron/UptimeOrchestrator.ts",
-                    type: "orchestrator",
-                },
-                {
-                    capture: ["manager"],
-                    pattern: "electron/managers/**/*",
-                    type: "managers",
-                },
-                {
-                    capture: ["service"],
-                    pattern: "electron/services/**/*",
-                    type: "services",
-                },
-                {
-                    capture: ["util"],
-                    pattern: "electron/utils/**/*",
-                    type: "utils",
-                },
-                {
-                    capture: ["event"],
-                    pattern: "electron/events/**/*",
-                    type: "events",
-                },
-                {
-                    capture: ["type"],
-                    pattern: "electron/types.ts",
-                    type: "types",
-                },
-                {
-                    capture: ["test"],
-                    pattern: "electron/test/**/*",
-                    type: "test",
-                },
-            ],
             "import-x/resolver": {
                 node: true,
                 project: ["config/testing/tsconfig.electron.test.json"],

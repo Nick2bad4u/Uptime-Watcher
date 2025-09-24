@@ -176,10 +176,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
                 .mockImplementation(() => {});
 
             // Mock successful API call but safeExtractIpcData throws
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue({
-                success: true,
-                data: 200,
-            });
+            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(200);
 
             mockSafeExtractIpcData.mockImplementation(() => {
                 throw new Error("Data extraction failed");

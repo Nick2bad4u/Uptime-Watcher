@@ -7,6 +7,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 
 import { logger } from "../services/logger";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
+import { useSitesStore } from "../stores/sites/useSitesStore";
 import { clearMonitorTypeCache } from "./monitorTypeHelper";
 
 /**
@@ -117,7 +118,8 @@ function clearSiteRelatedCaches(identifier?: string): void {
 
 /**
  * Set up automatic cache synchronization with backend. Listens for cache
- * invalidation events and clears appropriate frontend caches.
+ * invalidation events, clears appropriate frontend caches, and triggers
+ * asynchronous store refreshes for sites and monitor types when needed.
  *
  * @returns Cleanup function to remove event listeners. Call this function when
  *   the component unmounts or cache sync is no longer needed to prevent memory
@@ -141,6 +143,19 @@ export function setupCacheSync(): () => void {
             try {
                 logger.debug("Received cache invalidation event", data);
 
+                const syncSitesFromBackend = async (
+                    context: "all" | "site"
+                ): Promise<void> => {
+                    try {
+                        await useSitesStore.getState().fullResyncSites();
+                    } catch (error) {
+                        logger.error(
+                            `Failed to resynchronize sites after cache invalidation (${context}):`,
+                            ensureError(error)
+                        );
+                    }
+                };
+
                 // Clear appropriate frontend caches based on invalidation type
                 switch (data.type) {
                     case "all": {
@@ -159,6 +174,7 @@ export function setupCacheSync(): () => void {
                             }
                         };
                         void refreshMonitorTypes();
+                        void syncSitesFromBackend("all");
                         break;
                     }
                     case "monitor": {
@@ -182,6 +198,7 @@ export function setupCacheSync(): () => void {
                     }
                     case "site": {
                         clearSiteRelatedCaches(data.identifier);
+                        void syncSitesFromBackend("site");
                         break;
                     }
                     default: {

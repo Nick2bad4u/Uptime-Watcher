@@ -46,9 +46,9 @@ export interface DataApiInterface {
      *
      * @param jsonData - JSON string containing application data to import
      *
-     * @returns Promise resolving to import status message
+     * @returns Promise resolving to a boolean success flag
      */
-    importData: (...args: unknown[]) => Promise<string>;
+    importData: (...args: unknown[]) => Promise<boolean>;
 
     /**
      * Resets all application settings to defaults
@@ -103,11 +103,11 @@ export const dataApi: DataApiInterface = {
      *
      * @param jsonData - JSON string containing application data to import
      *
-     * @returns Promise resolving to import status message
+     * @returns Promise resolving to a boolean success flag
      */
-    importData: createTypedInvoker<string>("import-data") satisfies (
+    importData: createTypedInvoker<boolean>("import-data") satisfies (
         ...args: unknown[]
-    ) => Promise<string>,
+    ) => Promise<boolean>,
 
     /**
      * Resets all application settings to defaults

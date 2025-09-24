@@ -69,7 +69,7 @@ vi.mock("../../../shared/utils/errorHandling", () => ({
 const mockElectronAPI = {
     settings: {
         getHistoryLimit: vi.fn().mockResolvedValue(100),
-        updateHistoryLimit: vi.fn().mockResolvedValue(undefined),
+        updateHistoryLimit: vi.fn().mockResolvedValue(100),
         resetSettings: vi.fn().mockResolvedValue(undefined),
         loadSettings: vi.fn().mockResolvedValue({}),
         syncSettings: vi.fn().mockResolvedValue(undefined),

@@ -413,8 +413,9 @@ export class ExportDataCommand extends DatabaseCommand<string> {
  *
  * @remarks
  * Encapsulates the logic for importing data, updating the cache, and emitting a
- * success event. Rollback restores the previous cache state. Validation checks
- * for valid JSON and non-empty input.
+ * success event. Also emits a `cache:invalidated` event so renderer caches can
+ * resynchronize with freshly imported data. Rollback restores the previous
+ * cache state. Validation checks for valid JSON and non-empty input.
  *
  * @public
  */
@@ -451,6 +452,12 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
 
         await this.emitSuccessEvent("internal:database:data-imported", {
             operation: "data-imported",
+        });
+
+        await this.eventEmitter.emitTyped("cache:invalidated", {
+            reason: "update",
+            timestamp: Date.now(),
+            type: "site",
         });
 
         return true;

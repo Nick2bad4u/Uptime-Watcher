@@ -51,7 +51,7 @@ function createMockDataApi() {
         exportData: vi.fn(() =>
             Promise.resolve('{"sites":[],"monitors":[],"settings":{}}')
         ),
-        importData: vi.fn(() => Promise.resolve("Import successful")),
+        importData: vi.fn(() => Promise.resolve(true)),
     };
 }
 
@@ -273,8 +273,7 @@ describe("DataService", () => {
         it("should import data successfully after initialization", async () => {
             const importData =
                 '{"sites":[{"id":"1","name":"Imported Site"}],"monitors":[]}';
-            const successMessage = "Import completed successfully";
-            mockElectronAPI.data.importData.mockResolvedValue(successMessage);
+            mockElectronAPI.data.importData.mockResolvedValue(true);
 
             const result = await DataService.importData(importData);
 
@@ -282,7 +281,7 @@ describe("DataService", () => {
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
                 importData
             );
-            expect(result).toBe(successMessage);
+            expect(result).toBeTruthy();
         });
 
         it("should fail if initialization fails", async () => {
@@ -312,30 +311,28 @@ describe("DataService", () => {
             );
         });
 
-        it("should handle empty import data", async () => {
+        it("should return false when backend signals failure", async () => {
             const emptyData = "";
-            const warningMessage = "No data to import";
-            mockElectronAPI.data.importData.mockResolvedValue(warningMessage);
+            mockElectronAPI.data.importData.mockResolvedValue(false);
 
             const result = await DataService.importData(emptyData);
 
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
                 emptyData
             );
-            expect(result).toBe(warningMessage);
+            expect(result).toBeFalsy();
         });
 
-        it("should handle invalid JSON import data", async () => {
+        it("should propagate backend failure for invalid JSON", async () => {
             const invalidJson = '{"sites": [invalid json}';
-            const errorMessage = "Invalid JSON format";
-            mockElectronAPI.data.importData.mockResolvedValue(errorMessage);
+            mockElectronAPI.data.importData.mockResolvedValue(false);
 
             const result = await DataService.importData(invalidJson);
 
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
                 invalidJson
             );
-            expect(result).toBe(errorMessage);
+            expect(result).toBeFalsy();
         });
 
         it("should handle various import data formats", async () => {
@@ -356,22 +353,21 @@ describe("DataService", () => {
                     },
                 },
             });
-            const successMessage = "Complex data imported successfully";
-            mockElectronAPI.data.importData.mockResolvedValue(successMessage);
+            mockElectronAPI.data.importData.mockResolvedValue(true);
 
             const result = await DataService.importData(complexData);
 
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
                 complexData
             );
-            expect(result).toBe(successMessage);
+            expect(result).toBeTruthy();
         });
     });
 
     describe("Integration Testing", () => {
         it("should handle multiple operations in sequence", async () => {
             const exportData = '{"sites":[],"monitors":[]}';
-            const importResult = "Import successful";
+            const importResult = true;
             const backupResult = createMockBackupResult();
 
             mockElectronAPI.data.exportData.mockResolvedValue(exportData);
@@ -395,7 +391,7 @@ describe("DataService", () => {
 
         it("should handle concurrent operations", async () => {
             const exportData = '{"sites":[],"monitors":[]}';
-            const importResult = "Import successful";
+            const importResult = true;
             const backupResult = createMockBackupResult();
 
             mockElectronAPI.data.exportData.mockResolvedValue(exportData);
@@ -507,15 +503,13 @@ describe("DataService", () => {
             });
 
             mockElectronAPI.data.exportData.mockResolvedValue(unicodeData);
-            mockElectronAPI.data.importData.mockResolvedValue(
-                "Unicode import successful"
-            );
+            mockElectronAPI.data.importData.mockResolvedValue(true);
 
             const exported = await DataService.exportData();
             const imported = await DataService.importData(unicodeData);
 
             expect(exported).toBe(unicodeData);
-            expect(imported).toBe("Unicode import successful");
+            expect(imported).toBeTruthy();
         });
 
         it("should handle special filename characters in backup", async () => {

@@ -302,9 +302,10 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
                 initialDelay: 100,
             });
 
-            await vi.runAllTimersAsync(); // Run all timers to completion
-
-            await expect(promise).rejects.toThrow("Always fails");
+            await Promise.all([
+                vi.runAllTimersAsync(), // Run all timers to completion
+                expect(promise).rejects.toThrow("Always fails"),
+            ]);
             expect(operation).toHaveBeenCalledTimes(3); // Initial + 2 retries
         });
 
@@ -320,9 +321,11 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
             // Abort after the first failure during delay
             setTimeout(() => controller.abort(), 50);
-            await vi.runAllTimersAsync();
 
-            await expect(promise).rejects.toThrow("Operation was aborted");
+            await Promise.all([
+                vi.runAllTimersAsync(),
+                expect(promise).rejects.toThrow("Operation was aborted"),
+            ]);
         });
 
         it("should throw immediately if signal already aborted", async () => {
@@ -348,10 +351,10 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
                 backoffMultiplier: 2,
             });
 
-            // Run all timers to completion
-            await vi.runAllTimersAsync();
-
-            await expect(promise).rejects.toThrow("Fails");
+            await Promise.all([
+                vi.runAllTimersAsync(), // Run all timers to completion
+                expect(promise).rejects.toThrow("Fails"),
+            ]);
             expect(operation).toHaveBeenCalledTimes(3); // Initial + 2 retries
         });
 
@@ -365,10 +368,10 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
                 maxDelay: 2000,
             });
 
-            // Run all timers to completion
-            await vi.runAllTimersAsync();
-
-            await expect(promise).rejects.toThrow("Fails");
+            await Promise.all([
+                vi.runAllTimersAsync(), // Run all timers to completion
+                expect(promise).rejects.toThrow("Fails"),
+            ]);
             expect(operation).toHaveBeenCalledTimes(4); // Initial + 3 retries
         });
 
@@ -385,9 +388,10 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
             const promise = retryWithAbort(operation, { maxRetries: 1 });
 
-            await vi.runAllTimersAsync();
-
-            await expect(promise).rejects.toThrow("string error");
+            await Promise.all([
+                vi.runAllTimersAsync(),
+                expect(promise).rejects.toThrow("string error"),
+            ]);
             expect(operation).toHaveBeenCalledTimes(2); // Initial + 1 retry
         });
 
