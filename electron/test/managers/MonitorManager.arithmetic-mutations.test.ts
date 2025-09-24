@@ -100,6 +100,18 @@ describe("MonitorManager arithmetic mutations", () => {
             },
             historyRepository: {},
             databaseService: {
+                executeTransaction: vi
+                    .fn()
+                    .mockImplementation(
+                        async (
+                            handler: (
+                                db: Record<string, unknown>
+                            ) => Promise<unknown> | unknown
+                        ) => {
+                            const db = {} as Record<string, unknown>;
+                            return handler(db);
+                        }
+                    ),
                 getDatabase: vi.fn().mockReturnValue({}),
             },
             cache: {

@@ -198,7 +198,7 @@ describe(ConfigurationManager, () => {
             await annotate("Type: Business Logic", "type");
 
             const minInterval = configManager.getMinimumCheckInterval();
-            expect(minInterval).toBe(1000);
+            expect(minInterval).toBe(5000);
         });
     });
 

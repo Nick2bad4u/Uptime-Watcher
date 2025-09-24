@@ -20,6 +20,15 @@ import type {
     PortMonitorSchemaType,
     SiteSchemaType,
 } from "@shared/types/schemaTypes";
+import type { ValidationResult } from "@shared/types/validation";
+import type { UnknownRecord } from "type-fest";
+
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import validator from "validator";
+import * as z from "zod";
+
+import { isValidHost, isValidPort } from "./validatorUtils";
+
 /**
  * Result object returned by validation functions.
  *
@@ -27,13 +36,6 @@ import type {
  * Contains the validated data (if successful), errors, warnings, and metadata.
  */
 // Import from unified validation system
-import type { ValidationResult } from "@shared/types/validation";
-import type { UnknownRecord } from "type-fest";
-
-import validator from "validator";
-import * as z from "zod";
-
-import { isValidHost, isValidPort } from "./validatorUtils";
 
 /**
  * Reusable host validation schema for monitors. Eliminates duplication between
@@ -71,7 +73,7 @@ const statusHistorySchema = z
 const VALIDATION_CONSTRAINTS = {
     CHECK_INTERVAL: {
         MAX: 2_592_000_000, // 30 days (maximum from CHECK_INTERVALS)
-        MIN: 5000, // 5 seconds (minimum from CHECK_INTERVALS)
+        MIN: MIN_MONITOR_CHECK_INTERVAL_MS,
     },
     RETRY_ATTEMPTS: {
         MAX: 10, // 10 retries maximum (from RETRY_CONSTRAINTS)

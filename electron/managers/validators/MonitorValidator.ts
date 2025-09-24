@@ -21,6 +21,7 @@
 
 import type { Site } from "@shared/types";
 
+import { shouldRemediateMonitorInterval } from "@shared/constants/monitoring";
 import { validateMonitorData } from "@shared/validation/schemas";
 
 import type { ValidationResult } from "./interfaces";
@@ -65,7 +66,7 @@ export class MonitorValidator {
      *   otherwise, `false`.
      */
     public shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
-        return monitor.checkInterval === 0;
+        return shouldRemediateMonitorInterval(monitor.checkInterval);
     }
 
     /**

@@ -59,6 +59,7 @@
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { shouldRemediateMonitorInterval } from "@shared/constants/monitoring";
 import { MONITOR_STATUS } from "@shared/types";
 import {
     interpolateLogTemplate,
@@ -1085,48 +1086,67 @@ export class MonitorManager {
             )
         );
 
-        // Apply default intervals to monitors in parallel
-        const updatePromises = site.monitors
-            .filter(
-                (monitor) =>
-                    monitor.id && this.shouldApplyDefaultInterval(monitor)
-            )
-            .map(async (monitor) => {
-                if (!monitor.id) return;
+        const monitorsNeedingRemediation = site.monitors.filter(
+            (monitor): monitor is Site["monitors"][0] & { id: string } =>
+                Boolean(monitor.id) && this.shouldApplyDefaultInterval(monitor)
+        );
 
-                // Update database first (state management compliance)
-                await withDatabaseOperation(
-                    () => {
-                        const db =
-                            this.dependencies.databaseService.getDatabase();
-                        if (monitor.id) {
-                            this.dependencies.repositories.monitor.updateInternal(
-                                db,
-                                monitor.id,
+        if (monitorsNeedingRemediation.length === 0) {
+            logger.debug(
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.debug.MONITOR_MANAGER_VALID_MONITORS,
+                    {
+                        identifier: site.identifier,
+                    }
+                )
+            );
+            return;
+        }
+
+        await withDatabaseOperation(
+            async () =>
+                this.dependencies.databaseService.executeTransaction((db) => {
+                    for (const monitor of monitorsNeedingRemediation) {
+                        this.dependencies.repositories.monitor.updateInternal(
+                            db,
+                            monitor.id,
+                            { checkInterval: DEFAULT_CHECK_INTERVAL }
+                        );
+
+                        logger.debug(
+                            interpolateLogTemplate(
+                                LOG_TEMPLATES.debug.MONITOR_INTERVALS_APPLIED,
                                 {
-                                    checkInterval: DEFAULT_CHECK_INTERVAL,
+                                    interval: DEFAULT_CHECK_INTERVAL / 1000,
+                                    monitorId: monitor.id,
                                 }
-                            );
-                        }
-                        return Promise.resolve();
-                    },
-                    "monitor-manager-apply-default-interval",
-                    undefined,
-                    { interval: DEFAULT_CHECK_INTERVAL, monitorId: monitor.id }
-                );
+                            )
+                        );
+                    }
 
-                logger.debug(
-                    interpolateLogTemplate(
-                        LOG_TEMPLATES.debug.MONITOR_INTERVALS_APPLIED,
-                        {
-                            interval: DEFAULT_CHECK_INTERVAL / 1000,
-                            monitorId: monitor.id,
-                        }
-                    )
-                );
-            });
+                    return Promise.resolve();
+                }),
+            "monitor-manager-apply-default-interval",
+            undefined,
+            {
+                identifier: site.identifier,
+                interval: DEFAULT_CHECK_INTERVAL,
+                monitorCount: monitorsNeedingRemediation.length,
+            }
+        );
 
-        await Promise.all(updatePromises);
+        for (const monitor of monitorsNeedingRemediation) {
+            monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
+        }
+
+        const updatedSite: Site = {
+            ...site,
+            monitors: Array.from(site.monitors),
+        };
+
+        site.monitors = updatedSite.monitors;
+
+        this.dependencies.getSitesCache().set(site.identifier, updatedSite);
 
         logger.info(
             interpolateLogTemplate(
@@ -1605,6 +1625,6 @@ export class MonitorManager {
      * @internal
      */
     private shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
-        return !monitor.checkInterval;
+        return shouldRemediateMonitorInterval(monitor.checkInterval);
     }
 }

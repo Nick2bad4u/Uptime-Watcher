@@ -15,6 +15,7 @@ import {
     RETRY_BACKOFF,
     USER_AGENT,
 } from "../constants";
+import { DEFAULT_MONITOR_CHECK_INTERVAL_MS } from "../../shared/constants/monitoring";
 
 describe("Electron Constants", () => {
     describe("Timeout Constants", () => {
@@ -60,7 +61,9 @@ describe("Electron Constants", () => {
                 "criticality"
             );
 
-            expect(DEFAULT_CHECK_INTERVAL).toBe(300_000); // 5 minutes
+            expect(DEFAULT_CHECK_INTERVAL).toBe(
+                DEFAULT_MONITOR_CHECK_INTERVAL_MS
+            );
             expect(typeof DEFAULT_CHECK_INTERVAL).toBe("number");
         });
 

@@ -69,6 +69,11 @@ describe("MonitorManager - Comprehensive Coverage", () => {
     let mockEnhancedServices: any;
     let mockSite: Site;
     let mockMonitor: Site["monitors"][0];
+    let mockSitesCache: {
+        get: ReturnType<typeof vi.fn>;
+        getAll: ReturnType<typeof vi.fn>;
+        set: ReturnType<typeof vi.fn>;
+    };
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -93,18 +98,26 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             monitors: [mockMonitor],
         };
 
+        mockSitesCache = {
+            get: vi.fn(() => mockSite),
+            getAll: vi.fn(() => [mockSite]),
+            set: vi.fn(),
+        };
+
         mockDependencies = {
             databaseService: {
+                executeTransaction: vi.fn(
+                    async (fn: (db: unknown) => Promise<void>) => {
+                        await fn({});
+                    }
+                ),
                 getDatabase: vi.fn(() => ({})),
             },
             eventEmitter: {
                 emitTyped: vi.fn(),
             },
             getHistoryLimit: vi.fn(() => 10),
-            getSitesCache: vi.fn(() => ({
-                get: vi.fn(() => mockSite),
-                getAll: vi.fn(() => [mockSite]),
-            })),
+            getSitesCache: vi.fn(() => mockSitesCache),
             repositories: {
                 history: {},
                 monitor: {
@@ -787,6 +800,21 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             ).toHaveBeenCalledWith({}, "monitor-1", {
                 checkInterval: DEFAULT_CHECK_INTERVAL,
             });
+            expect(mockSitesCache.set).toHaveBeenCalledWith(
+                siteWithZeroInterval.identifier,
+                expect.objectContaining({
+                    monitors: [
+                        expect.objectContaining({
+                            checkInterval: DEFAULT_CHECK_INTERVAL,
+                        }),
+                    ],
+                })
+            );
+            const remediatedMonitor = siteWithZeroInterval.monitors[0];
+            expect(remediatedMonitor).toBeDefined();
+            expect(remediatedMonitor?.checkInterval).toBe(
+                DEFAULT_CHECK_INTERVAL
+            );
         });
 
         it("should handle shouldApplyDefaultInterval with null checkInterval", async () => {
@@ -806,6 +834,21 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             ).toHaveBeenCalledWith({}, "monitor-1", {
                 checkInterval: DEFAULT_CHECK_INTERVAL,
             });
+            expect(mockSitesCache.set).toHaveBeenCalledWith(
+                siteWithNullInterval.identifier,
+                expect.objectContaining({
+                    monitors: [
+                        expect.objectContaining({
+                            checkInterval: DEFAULT_CHECK_INTERVAL,
+                        }),
+                    ],
+                })
+            );
+            const remediatedNullMonitor = siteWithNullInterval.monitors[0];
+            expect(remediatedNullMonitor).toBeDefined();
+            expect(remediatedNullMonitor?.checkInterval).toBe(
+                DEFAULT_CHECK_INTERVAL
+            );
         });
 
         it("should handle shouldApplyDefaultInterval with undefined checkInterval", async () => {
@@ -825,6 +868,45 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             ).toHaveBeenCalledWith({}, "monitor-1", {
                 checkInterval: DEFAULT_CHECK_INTERVAL,
             });
+            expect(mockSitesCache.set).toHaveBeenCalledWith(
+                siteWithUndefinedInterval.identifier,
+                expect.objectContaining({
+                    monitors: [
+                        expect.objectContaining({
+                            checkInterval: DEFAULT_CHECK_INTERVAL,
+                        }),
+                    ],
+                })
+            );
+            const remediatedUndefinedMonitor =
+                siteWithUndefinedInterval.monitors[0];
+            expect(remediatedUndefinedMonitor).toBeDefined();
+            expect(remediatedUndefinedMonitor?.checkInterval).toBe(
+                DEFAULT_CHECK_INTERVAL
+            );
+        });
+
+        it("should auto-start monitoring after default interval remediation", async () => {
+            const monitorWithoutInterval = {
+                ...mockMonitor,
+                checkInterval: 0,
+                monitoring: true,
+            };
+            const siteNeedingRemediation = {
+                ...mockSite,
+                monitors: [monitorWithoutInterval],
+            };
+
+            const startSpy = vi
+                .spyOn(manager, "startMonitoringForSite")
+                .mockResolvedValue(true);
+
+            await manager.setupSiteForMonitoring(siteNeedingRemediation);
+
+            expect(startSpy).toHaveBeenCalledWith(
+                siteNeedingRemediation.identifier,
+                "monitor-1"
+            );
         });
 
         it("should handle site not found in cache during scheduled check", async () => {

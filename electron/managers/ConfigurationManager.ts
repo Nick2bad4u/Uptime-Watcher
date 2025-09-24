@@ -50,6 +50,7 @@ import type { Site } from "@shared/types";
 import type { ConfigValue } from "@shared/types/configTypes";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { CacheKeys } from "@shared/utils/cacheKeys";
 
 import type { ValidationResult } from "./validators/interfaces";
@@ -369,7 +370,7 @@ export class ConfigurationManager {
      * @returns The minimum allowed check interval in milliseconds (1000 ms).
      */
     public getMinimumCheckInterval(): number {
-        return 1000; // 1 second minimum
+        return MIN_MONITOR_CHECK_INTERVAL_MS;
     }
 
     /**

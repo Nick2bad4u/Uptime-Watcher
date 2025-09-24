@@ -107,7 +107,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             expect(result).toBeFalsy();
         });
 
-        it("should return false when checkInterval is a positive number", async ({
+        it("should return false when checkInterval exceeds minimum", async ({
             task,
             annotate,
         }) => {
@@ -122,7 +122,22 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             expect(result).toBeFalsy();
         });
 
-        it("should return false when checkInterval is negative", async ({
+        it("should return true when checkInterval is below minimum", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const monitor = createMockMonitor({ checkInterval: 2500 });
+
+            const result = validator.shouldApplyDefaultInterval(monitor);
+            expect(result).toBeTruthy();
+        });
+
+        it("should return true when checkInterval is negative", async ({
             task,
             annotate,
         }) => {
@@ -134,7 +149,22 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             const monitor = createMockMonitor({ checkInterval: -1000 });
 
             const result = validator.shouldApplyDefaultInterval(monitor);
-            expect(result).toBeFalsy();
+            expect(result).toBeTruthy();
+        });
+
+        it("should return true when checkInterval is NaN", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const monitor = createMockMonitor({ checkInterval: Number.NaN });
+
+            const result = validator.shouldApplyDefaultInterval(monitor);
+            expect(result).toBeTruthy();
         });
     });
 

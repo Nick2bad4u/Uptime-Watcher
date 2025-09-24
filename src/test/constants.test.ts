@@ -27,6 +27,7 @@ import {
     type IntervalOption,
     type ChartTimePeriods,
 } from "../constants";
+import { DEFAULT_MONITOR_CHECK_INTERVAL_MS } from "../../shared/constants/monitoring";
 
 describe("Application Constants", () => {
     describe("UI Animation Constants", () => {
@@ -292,7 +293,9 @@ describe("Application Constants", () => {
 
             expect(DEFAULT_CHECK_INTERVAL).toBeDefined();
             expect(typeof DEFAULT_CHECK_INTERVAL).toBe("number");
-            expect(DEFAULT_CHECK_INTERVAL).toBe(300_000); // 5 minutes
+            expect(DEFAULT_CHECK_INTERVAL).toBe(
+                DEFAULT_MONITOR_CHECK_INTERVAL_MS
+            );
         });
 
         it("should export DEFAULT_REQUEST_TIMEOUT", async ({

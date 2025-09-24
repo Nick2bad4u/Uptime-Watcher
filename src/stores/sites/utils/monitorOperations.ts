@@ -9,6 +9,10 @@
 import type { UnknownRecord } from "type-fest";
 
 import {
+    DEFAULT_MONITOR_CHECK_INTERVAL_MS,
+    MIN_MONITOR_CHECK_INTERVAL_MS,
+} from "@shared/constants/monitoring";
+import {
     BASE_MONITOR_TYPES,
     DEFAULT_MONITOR_STATUS,
     isMonitorStatus,
@@ -16,6 +20,7 @@ import {
     type MonitorType,
     type Site,
 } from "@shared/types";
+import { DEFAULT_MONITOR_CONFIG as SHARED_MONITOR_CONFIG } from "@shared/types/monitorConfig";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
 import {
@@ -30,22 +35,81 @@ import { logger } from "../../../services/logger";
 // Import validateMonitor directly from "@shared/types" if needed
 
 /**
- * Default monitor configuration values. Centralized to ensure consistency
- * between createDefaultMonitor and normalizeMonitor.
- *
- * @internal
+ * Baseline defaults applied to every monitor regardless of type.
  */
-const DEFAULT_MONITOR_CONFIG = {
+const BASE_MONITOR_DEFAULTS = {
     activeOperations: [] as string[],
-    checkInterval: 300_000, // 5 minutes default
     history: [] as Monitor["history"],
-    monitoring: true,
-    responseTime: -1, // Sentinel value for never checked
-    retryAttempts: 3, // Default retry attempts
+    responseTime: -1,
     status: DEFAULT_MONITOR_STATUS,
-    timeout: 5000, // Default timeout
-    type: BASE_MONITOR_TYPES[0] as MonitorType, // Use first available monitor type (http)
 } as const;
+
+const HTTP_SHARED_DEFAULTS = SHARED_MONITOR_CONFIG.http;
+
+function ensureNumberOrFallback(value: unknown, fallback: number): number {
+    return typeof value === "number" && Number.isFinite(value)
+        ? value
+        : fallback;
+}
+
+function ensureBooleanOrFallback(value: unknown, fallback: boolean): boolean {
+    return typeof value === "boolean" ? value : fallback;
+}
+
+const DEFAULT_SHARED_CHECK_INTERVAL = ensureNumberOrFallback(
+    HTTP_SHARED_DEFAULTS.checkInterval,
+    DEFAULT_MONITOR_CHECK_INTERVAL_MS
+);
+const DEFAULT_SHARED_RETRY_ATTEMPTS = ensureNumberOrFallback(
+    HTTP_SHARED_DEFAULTS.retryAttempts,
+    3
+);
+const DEFAULT_SHARED_TIMEOUT = ensureNumberOrFallback(
+    HTTP_SHARED_DEFAULTS.timeout,
+    30_000
+);
+const DEFAULT_SHARED_ENABLED = ensureBooleanOrFallback(
+    HTTP_SHARED_DEFAULTS.enabled,
+    true
+);
+
+interface MonitorTypeDefaults {
+    checkInterval: number;
+    enabled: boolean;
+    retryAttempts: number;
+    timeout: number;
+}
+
+function hasSharedMonitorDefaults(
+    type: MonitorType
+): type is keyof typeof SHARED_MONITOR_CONFIG {
+    return Object.hasOwn(SHARED_MONITOR_CONFIG, type);
+}
+
+function getMonitorTypeDefaults(type: MonitorType): MonitorTypeDefaults {
+    const sharedDefaults = hasSharedMonitorDefaults(type)
+        ? SHARED_MONITOR_CONFIG[type]
+        : undefined;
+
+    return {
+        checkInterval: ensureNumberOrFallback(
+            sharedDefaults?.checkInterval,
+            DEFAULT_SHARED_CHECK_INTERVAL
+        ),
+        enabled: ensureBooleanOrFallback(
+            sharedDefaults?.enabled,
+            DEFAULT_SHARED_ENABLED
+        ),
+        retryAttempts: ensureNumberOrFallback(
+            sharedDefaults?.retryAttempts,
+            DEFAULT_SHARED_RETRY_ATTEMPTS
+        ),
+        timeout: ensureNumberOrFallback(
+            sharedDefaults?.timeout,
+            DEFAULT_SHARED_TIMEOUT
+        ),
+    };
+}
 
 /**
  * Validates and returns a monitor type or default
@@ -322,30 +386,32 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
     const rawId = filteredData["id"] as string | undefined;
     const validId = isNonEmptyString(rawId) ? rawId : crypto.randomUUID();
 
+    const monitorTypeDefaults = getMonitorTypeDefaults(finalizedType);
+
     // Build base monitor object with guaranteed required fields
     const baseMonitor: Monitor = {
         activeOperations: Array.isArray(filteredData["activeOperations"])
             ? (filteredData["activeOperations"] as string[])
-            : DEFAULT_MONITOR_CONFIG.activeOperations,
+            : BASE_MONITOR_DEFAULTS.activeOperations,
         checkInterval: safeInteger(
             filteredData["checkInterval"] as number | undefined,
-            DEFAULT_MONITOR_CONFIG.checkInterval,
-            5000
+            monitorTypeDefaults.checkInterval,
+            MIN_MONITOR_CHECK_INTERVAL_MS
         ),
         history: Array.isArray(filteredData["history"])
             ? (filteredData["history"] as Monitor["history"])
-            : DEFAULT_MONITOR_CONFIG.history,
+            : BASE_MONITOR_DEFAULTS.history,
         id: validId,
         monitoring:
             (filteredData["monitoring"] as boolean | undefined) ??
-            DEFAULT_MONITOR_CONFIG.monitoring,
+            monitorTypeDefaults.enabled,
         responseTime:
             typeof filteredData["responseTime"] === "number"
                 ? filteredData["responseTime"]
-                : DEFAULT_MONITOR_CONFIG.responseTime,
+                : BASE_MONITOR_DEFAULTS.responseTime,
         retryAttempts: safeInteger(
             filteredData["retryAttempts"] as number | undefined,
-            DEFAULT_MONITOR_CONFIG.retryAttempts,
+            monitorTypeDefaults.retryAttempts,
             0,
             10
         ),
@@ -353,10 +419,10 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
             filteredData["status"] &&
             isMonitorStatus(filteredData["status"] as string)
                 ? (filteredData["status"] as Monitor["status"])
-                : DEFAULT_MONITOR_CONFIG.status,
+                : BASE_MONITOR_DEFAULTS.status,
         timeout: safeInteger(
             filteredData["timeout"] as number | undefined,
-            DEFAULT_MONITOR_CONFIG.timeout,
+            monitorTypeDefaults.timeout,
             1000,
             300_000
         ),
