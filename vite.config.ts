@@ -250,7 +250,7 @@ export default defineConfig(({ mode }) => {
                     },
                     vite: {
                         build: {
-                            outDir: "dist-electron",
+                            outDir: "dist",
                             sourcemap: true, // Enable sourcemaps for main process
                             target: VITE_BUILD_TARGET, // Ensure CSS Modules compatibility
                         },
@@ -280,7 +280,7 @@ export default defineConfig(({ mode }) => {
                     },
                     vite: {
                         build: {
-                            outDir: "dist-electron",
+                            outDir: "dist",
                             rollupOptions: {
                                 output: {
                                     // Ensure preload scripts are not code-split for nodeIntegration: false compatibility
@@ -405,7 +405,7 @@ export default defineConfig(({ mode }) => {
                     {
                         // Enable symlink dereferencing for reliability
                         dereference: true,
-                        dest: "../dist-electron", // Copies to dist-electron/
+                        dest: "../dist", // Copies to dist/
                         // Overwrite existing files
                         overwrite: true,
                         // Preserve file timestamps for better caching

@@ -83,7 +83,7 @@ function findTestFiles(dirPath, testFiles = []) {
                         "node_modules",
                         ".git",
                         "dist",
-                        "dist-electron",
+                        "dist",
                         "coverage",
                         ".vscode",
                         ".vs",

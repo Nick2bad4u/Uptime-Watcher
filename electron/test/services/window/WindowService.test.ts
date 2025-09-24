@@ -749,9 +749,7 @@ describe(WindowService, () => {
             expect(BrowserWindow).toHaveBeenCalledWith(
                 expect.objectContaining({
                     webPreferences: expect.objectContaining({
-                        preload: expect.stringContaining(
-                            "dist-electron/preload.js"
-                        ),
+                        preload: expect.stringContaining("dist/preload.js"),
                     }),
                 })
             );

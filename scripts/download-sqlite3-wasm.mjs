@@ -1,7 +1,7 @@
 /**
  * Build script to download the SQLite3 WASM binary for Electron distribution.
  * Downloads the required WASM file from the node-sqlite3-wasm repository and
- * places it in the dist-electron directory for bundling.
+ * places it in the dist directory for bundling.
  *
  * @global process
  */
@@ -19,12 +19,12 @@ const __dirname = path.dirname(__filename);
 const url =
     process.env.SQLITE3_WASM_URL ||
     "https://github.com/tndrle/node-sqlite3-wasm/raw/refs/heads/main/dist/node-sqlite3-wasm.wasm";
-const destDir = path.resolve(__dirname, "../dist-electron");
+const destDir = path.resolve(__dirname, "../dist");
 const dest = path.join(destDir, "node-sqlite3-wasm.wasm");
 const scriptsDir = path.resolve(__dirname, "../assets");
 const scriptsDest = path.join(scriptsDir, "node-sqlite3-wasm.wasm");
 
-// Ensure dist-electron directory exists
+// Ensure dist directory exists
 if (!fs.existsSync(destDir)) {
     fs.mkdirSync(destDir, { recursive: true });
 }
@@ -237,7 +237,7 @@ function download(urlToFetch, destPath, redirectCount = 0) {
                 if (!verifyHash(actual, EXPECTED_SHA256)) {
                     try {
                         fs.unlinkSync(tempPath);
-                    } catch {}
+                    } catch { }
                     failAndExit("Hash verification failed");
                 }
                 fs.renameSync(tempPath, destPath);
@@ -376,7 +376,7 @@ async function main() {
                 } else if (!fs.existsSync(dest) && fs.existsSync(scriptsDest)) {
                     fs.copyFileSync(scriptsDest, dest);
                     console.log(
-                        "Copied existing file to dist-electron directory:",
+                        "Copied existing file to dist directory:",
                         dest
                     );
                 }

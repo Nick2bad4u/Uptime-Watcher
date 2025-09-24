@@ -89,7 +89,7 @@ jobs:
                       ~/.npm
                       .cache
                       node_modules/.cache
-                      dist-electron
+                      dist
                       **/.rspack-cache
                       **/.webpack-cache
                   key: ${{ runner.os }}-flatpak-build-${{ hashFiles('**/package-lock.json') }}
@@ -110,16 +110,16 @@ jobs:
 
             - name: Smoke-check build artifacts
               run: |
-                  echo "Checking for dist-electron/main.js and sqlite wasm..."
-                  if [ ! -f "dist-electron/main.js" ]; then
-                    echo "Error: dist-electron/main.js not found"
-                    ls -la dist-electron || true
+                  echo "Checking for dist/main.js and sqlite wasm..."
+                  if [ ! -f "dist/main.js" ]; then
+                    echo "Error: dist/main.js not found"
+                    ls -la dist || true
                     exit 1
                   fi
-                  if [ ! -f "dist-electron/node-sqlite3-wasm.wasm" ] && [ ! -f "dist-electron/node-sqlite3-wasm.wasm" ]; then
+                  if [ ! -f "dist/node-sqlite3-wasm.wasm" ] && [ ! -f "dist/node-sqlite3-wasm.wasm" ]; then
                     # check typical wasm locations
-                    echo "Warning: node-sqlite3-wasm.wasm not found in dist-electron"
-                    ls -la dist-electron || true
+                    echo "Warning: node-sqlite3-wasm.wasm not found in dist"
+                    ls -la dist || true
                     exit 1
                   fi
               env:
@@ -145,7 +145,7 @@ jobs:
                   echo "Build completed. Checking outputs:"
                   ls -la flatpak-repo/ || echo "flatpak-repo not created"
                   ls -la build-dir/ || echo "build-dir not created"
-                  ls -la dist-electron/ || echo "dist-electron not found"
+                  ls -la dist/ || echo "dist not found"
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

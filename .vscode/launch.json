@@ -133,7 +133,7 @@
             "name": "🐛 Debug Electron Main",
             "nodeVersionHint": 24,
             "outFiles": [
-                "${workspaceFolder}/dist-electron/**/*.js"
+                "${workspaceFolder}/dist/**/*.js"
             ],
             "outputCapture": "std",
             "preLaunchTask": "Build Electron Main (Dev)",
@@ -144,7 +144,7 @@
             },
             "request": "launch",
             "runtimeArgs": [
-                "${workspaceFolder}/dist-electron/main.js",
+                "${workspaceFolder}/dist/main.js",
                 "--remote-debugging-port=9223"
             ],
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
@@ -169,7 +169,7 @@
             "name": "🗄️ Debug Electron Main (Fixed DB)",
             "nodeVersionHint": 24,
             "outFiles": [
-                "${workspaceFolder}/dist-electron/**/*.js"
+                "${workspaceFolder}/dist/**/*.js"
             ],
             "outputCapture": "std",
             "preLaunchTask": "Build Electron Main (Dev)",
@@ -180,7 +180,7 @@
             },
             "request": "launch",
             "runtimeArgs": [
-                "${workspaceFolder}/dist-electron/main.js",
+                "${workspaceFolder}/dist/main.js",
                 "--remote-debugging-port=9223",
                 "--user-data-dir=${env:APPDATA}\\uptime-watcher"
             ],

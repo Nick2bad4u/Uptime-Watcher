@@ -118,7 +118,7 @@ Debugging configuration (`.vscode/launch.json`):
    "name": "Debug Electron Main",
    "type": "node",
    "request": "launch",
-   "program": "${workspaceFolder}/dist-electron/main.js",
+   "program": "${workspaceFolder}/dist/main.js",
    "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
    "runtimeArgs": ["--remote-debugging-port=9229"],
    "console": "integratedTerminal"
@@ -296,7 +296,7 @@ Create `.vscode/uptime-watcher.code-workspace`:
   "files.exclude": {
    "**/node_modules": true,
    "**/dist": true,
-   "**/dist-electron": true,
+   "**/dist": true,
    "**/.git": true,
    "**/.DS_Store": true,
    "**/coverage": true

@@ -125,7 +125,7 @@ modules:
 
           # Verify required files exist
           - test -f package.json || (echo "package.json not found" && exit 1)
-          - test -d dist-electron || (echo "dist-electron directory not found" && exit 1)
+          - test -d dist || (echo "dist directory not found" && exit 1)
           - test -f io.github.uptimewatcher.desktop || (echo "Desktop file not found" && exit 1)
           - test -f io.github.uptimewatcher.metainfo.xml || (echo "MetaInfo file not found" && exit 1)
 
@@ -133,8 +133,8 @@ modules:
           - mkdir -p /app/{bin,lib,share/{applications,icons/hicolor,metainfo}}
 
           # Copy built application files with proper permissions
-          - cp -r dist-electron /app/
-          - chmod +x /app/dist-electron/main.js 2>/dev/null || true
+          - cp -r dist /app/
+          - chmod +x /app/dist/main.js 2>/dev/null || true
 
           # Copy distribution files
           - mkdir -p /app/dist
@@ -188,7 +188,7 @@ modules:
           - desktop-file-validate /app/share/applications/io.github.uptimewatcher.desktop || echo "Desktop file validation warnings"
 
           # Fix desktop file name for Flatpak compatibility
-          - patch-desktop-filename /app/dist-electron/resources/app.asar 2>/dev/null || echo "Desktop filename patch not needed"
+          - patch-desktop-filename /app/dist/resources/app.asar 2>/dev/null || echo "Desktop filename patch not needed"
 
           # Security: Remove unnecessary files and set proper permissions
           - find /app -name "*.md" -delete 2>/dev/null || true

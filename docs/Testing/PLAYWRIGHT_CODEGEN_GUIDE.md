@@ -61,14 +61,14 @@ npx playwright codegen --target=electron path/to/your/electron/app
 npm run build
 
 # Verify the build exists
-ls dist-electron/
+ls dist/
 ```
 
 ### **Step 2: Start Codegen with Electron**
 
 ```bash
 # Option A: Direct Electron codegen (if supported)
-npx playwright codegen --browser=electron ./dist-electron/main.js
+npx playwright codegen --browser=electron ./dist/main.js
 
 # Option B: Use development server approach
 npm run dev &  # Start dev server in background
@@ -90,7 +90,7 @@ test.describe("My Generated Tests", () => {
  test("my generated test", async () => {
   // Launch Electron app
   const electronApp = await electron.launch({
-   args: [path.join(__dirname, "../../dist-electron/main.js")],
+   args: [path.join(__dirname, "../../dist/main.js")],
    env: {
     ...process.env,
     NODE_ENV: "test",
@@ -228,7 +228,7 @@ npx playwright codegen --target=typescript --output=my-test.ts http://localhost:
    ```typescript
    // Replace browser.newPage() with Electron launch pattern
    const electronApp = await electron.launch({
-    args: [path.join(__dirname, "../../dist-electron/main.js")],
+    args: [path.join(__dirname, "../../dist/main.js")],
     env: { ...process.env, NODE_ENV: "test" },
    });
    const window = await electronApp.firstWindow();
@@ -325,7 +325,7 @@ test.describe(
  () => {
   test("should add a new site successfully", async () => {
    const electronApp = await electron.launch({
-    args: [path.join(__dirname, "../../dist-electron/main.js")],
+    args: [path.join(__dirname, "../../dist/main.js")],
     env: { ...process.env, NODE_ENV: "test" },
    });
 

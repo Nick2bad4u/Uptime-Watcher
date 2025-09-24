@@ -458,7 +458,7 @@ export class WindowService {
 
         // Use ternary for simple conditional path selection
         return isDev()
-            ? path.join(process.cwd(), "dist-electron", preloadFileName) // Development: look in dist-electron directory
+            ? path.join(process.cwd(), "dist", preloadFileName) // Development: look in dist directory
             : path.join(currentDirectory, preloadFileName); // Production: relative to current directory
     }
 

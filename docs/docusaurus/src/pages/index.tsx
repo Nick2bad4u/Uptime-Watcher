@@ -29,7 +29,7 @@ const handleCopyCode = (() => {
   "name": "uptime-watcher",
   "version": "12.5.0",
   "description": "Desktop uptime monitoring",
-  "main": "dist-electron/main.js",
+  "main": "dist/main.js",
   "scripts": {
     "start": "electron .",
     "build": "npm run build:electron-vite",
@@ -396,7 +396,7 @@ const HomepageHeader = (): JSX.Element => (
   "name": "uptime-watcher",
   "version": "12.5.0",
   "description": "Desktop uptime monitoring",
-  "main": "dist-electron/main.js",
+  "main": "dist/main.js",
   "scripts": {
     "start": "electron .",
     "build": "npm run build:electron-vite",

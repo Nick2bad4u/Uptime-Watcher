@@ -1,11 +1,11 @@
 # 🔧 Trouble**Solutions**:
 
 ```bash
-# Copy WASM file to dist-electron
+# Copy WASM file to dist
 npm run copy-wasm
 
 # Verify WASM files are present
-ls dist-electron/*.wasm
+ls dist/*.wasm
 ```
 
 **Prevention**: The `postbuild` script should handle this automatically, but sometimes fails in certain environments.uide
@@ -23,7 +23,7 @@ ls dist-electron/*.wasm
 **Solution**:
 
 ```bash
-# Copy WASM file to dist-electron
+# Copy WASM file to dist
 npm run postbuild
 # Or manually copy
 npm run copy-wasm
@@ -52,7 +52,7 @@ npm run dev -- --port 5174
 **Solutions**:
 
 1. **Check Vite dev server**: Ensure `npm run dev` is running on port 5173
-2. **Clear cache**: Delete `.vite` and `dist-electron` directories
+2. **Clear cache**: Delete `.vite` and `dist` directories
 3. **Rebuild**: `npm run clean && npm install && npm run copy-wasm`
 
 #### 4. Hot Reload Not Working
@@ -331,7 +331,7 @@ npm run lint
 {
  "scripts": {
   "build": "... && npm run copy-wasm",
-  "copy-wasm": "copyfiles node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm dist-electron"
+  "copy-wasm": "copyfiles node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm dist"
  }
 }
 ```
@@ -439,7 +439,7 @@ Configuration available in `.vscode/launch.json`:
 ```json
 {
  "name": "Debug Electron Main",
- "program": "${workspaceFolder}/dist-electron/main.js",
+ "program": "${workspaceFolder}/dist/main.js",
  "request": "launch",
  "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
  "type": "node"

@@ -82,7 +82,7 @@ playwright/
 export async function launchElectronApp() {
  return await electron.launch({
   args: [
-   path.join(__dirname, "../../dist-electron/main.js"), // ❌ Absolute path
+   path.join(__dirname, "../../dist/main.js"), // ❌ Absolute path
    // ...
   ],
   env: {
@@ -116,7 +116,7 @@ export async function launchElectronApp() {
 **Why This Works:**
 
 1. `args: ["."]` launches from project root directory
-2. Electron reads `package.json` to find `"main": "dist-electron/main.js"`
+2. Electron reads `package.json` to find `"main": "dist/main.js"`
 3. Preserves proper working directory context
 4. Allows correct relative path resolution
 5. Maintains environment inheritance for dev/prod detection
@@ -271,7 +271,7 @@ for (let i = 0; i < buttons.length; i++) {
    echo $NODE_ENV  # Should be 'development' for dev mode
 
    # Verify build exists
-   ls dist-electron/main.js
+   ls dist/main.js
 
    # Check if dev server is running
    curl http://localhost:5173

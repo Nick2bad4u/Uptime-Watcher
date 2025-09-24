@@ -35,7 +35,7 @@ async function globalSetup(_config: FullConfig): Promise<void> {
     }
 
     // Verify that the main process file exists
-    const mainPath = path.resolve(__dirname, "../../dist-electron/main.js");
+    const mainPath = path.resolve(__dirname, "../../dist/main.js");
     try {
         await import("node:fs/promises").then((fs) => fs.access(mainPath));
         console.log("✅ Main process file found at:", mainPath);
