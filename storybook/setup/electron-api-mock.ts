@@ -1,0 +1,358 @@
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Context: Storybook mock for Electron API
+/* eslint-disable @typescript-eslint/require-await, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-parameters, @typescript-eslint/no-unnecessary-condition, sonarjs/pseudo-random -- Disable Strict Rules */
+import type { Site } from "@shared/types";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+
+import type { ElectronAPI } from "../types/electron-api";
+
+interface ElectronMockState {
+    historyLimit: number;
+    monitorTypes: MonitorTypeConfig[];
+    sites: Site[];
+}
+
+const DEFAULT_HISTORY_LIMIT = 30;
+
+const clone = <Value>(value: Value): Value => {
+    if (typeof globalThis.structuredClone === "function") {
+        return globalThis.structuredClone(value);
+    }
+
+    return value;
+};
+
+const mockState: ElectronMockState = {
+    historyLimit: DEFAULT_HISTORY_LIMIT,
+    monitorTypes: [],
+    sites: [],
+};
+
+const noop = (): void => {
+    // Intentional noop
+};
+
+const noopCleanup = (): (() => void) => noop;
+
+const registerListener = <Value>(
+    listener: (value: Value) => void
+): (() => void) => {
+    const listenerReference: (value: Value) => void = listener;
+
+    if (typeof listenerReference !== "function") {
+        return noopCleanup();
+    }
+
+    return noopCleanup();
+};
+
+const normalizeLimit = (limit: number): number => {
+    if (!Number.isFinite(limit)) {
+        return mockState.historyLimit;
+    }
+
+    return Math.max(0, Math.round(limit));
+};
+
+const findSiteIndex = (identifier: string): number =>
+    mockState.sites.findIndex((site) => site.identifier === identifier);
+
+const ensureSite = (identifier: string): Site => {
+    const index = findSiteIndex(identifier);
+    if (index < 0) {
+        throw new Error(
+            `Storybook electron mock: site '${identifier}' was not found.`
+        );
+    }
+
+    const site = mockState.sites[index];
+    if (!site) {
+        throw new Error(
+            `Storybook electron mock: site '${identifier}' was removed unexpectedly.`
+        );
+    }
+
+    return site;
+};
+
+const applySiteMutation = (
+    identifier: string,
+    mutator: (site: Site) => Site
+): Site => {
+    const current = clone(ensureSite(identifier));
+    const next = mutator(current);
+    const index = findSiteIndex(identifier);
+
+    mockState.sites[index] = clone(next);
+    return clone(next);
+};
+
+export const electronAPIMock: ElectronAPI = {
+    data: {
+        downloadSqliteBackup: async (): Promise<{
+            buffer: ArrayBuffer;
+            fileName: string;
+        }> => ({
+            buffer: new ArrayBuffer(0),
+            fileName: "uptime-watcher-backup.sqlite",
+        }),
+        exportData: async (): Promise<string> =>
+            JSON.stringify({
+                historyLimit: mockState.historyLimit,
+                monitorTypes: mockState.monitorTypes,
+                sites: mockState.sites,
+            }),
+        getHistoryLimit: async (): Promise<number> => mockState.historyLimit,
+        importData: async (payload: string): Promise<boolean> => {
+            try {
+                const parsed = JSON.parse(payload) as Partial<{
+                    historyLimit: number;
+                    monitorTypes: MonitorTypeConfig[];
+                    sites: Site[];
+                }>;
+
+                if (Array.isArray(parsed.sites)) {
+                    mockState.sites = clone(parsed.sites);
+                }
+
+                if (Array.isArray(parsed.monitorTypes)) {
+                    mockState.monitorTypes = clone(parsed.monitorTypes);
+                }
+
+                if (typeof parsed.historyLimit === "number") {
+                    mockState.historyLimit = normalizeLimit(
+                        parsed.historyLimit
+                    );
+                }
+
+                return true;
+            } catch {
+                return false;
+            }
+        },
+        resetSettings: async (): Promise<void> => {
+            mockState.historyLimit = DEFAULT_HISTORY_LIMIT;
+        },
+        updateHistoryLimit: async (limit: number): Promise<number> => {
+            mockState.historyLimit = normalizeLimit(limit);
+            return mockState.historyLimit;
+        },
+    },
+    events: {
+        onCacheInvalidated: registerListener,
+        onMonitorDown: registerListener,
+        onMonitoringStarted: registerListener,
+        onMonitoringStopped: registerListener,
+        onMonitorStatusChanged: registerListener,
+        onMonitorUp: registerListener,
+        onTestEvent: registerListener,
+        onUpdateStatus: registerListener,
+    },
+    monitoring: {
+        formatMonitorDetail: async (
+            monitorType: string,
+            details: string
+        ): Promise<string> => `${monitorType}: ${details}`,
+        formatMonitorTitleSuffix: async (
+            monitorType: string,
+            monitor: Site["monitors"][number]
+        ): Promise<string> => `${monitor.id} · ${monitorType}`,
+        removeMonitor: async (
+            siteIdentifier: string,
+            monitorId: string
+        ): Promise<void> => {
+            applySiteMutation(siteIdentifier, (site) => ({
+                ...site,
+                monitors: site.monitors.filter(
+                    (monitor) => monitor.id !== monitorId
+                ),
+            }));
+        },
+        startMonitoring: async (): Promise<boolean> => {
+            mockState.sites = mockState.sites.map((site) => ({
+                ...site,
+                monitoring: true,
+                monitors: site.monitors.map((monitor) => ({
+                    ...monitor,
+                    monitoring: true,
+                })),
+            }));
+            return true;
+        },
+        startMonitoringForSite: async (
+            siteIdentifier: string,
+            monitorId?: string
+        ): Promise<boolean> => {
+            applySiteMutation(siteIdentifier, (site) => ({
+                ...site,
+                monitoring: true,
+                monitors: site.monitors.map((monitor) =>
+                    monitorId && monitor.id !== monitorId
+                        ? monitor
+                        : {
+                              ...monitor,
+                              monitoring: true,
+                          }
+                ),
+            }));
+            return true;
+        },
+        stopMonitoring: async (): Promise<boolean> => {
+            mockState.sites = mockState.sites.map((site) => ({
+                ...site,
+                monitoring: false,
+                monitors: site.monitors.map((monitor) => ({
+                    ...monitor,
+                    monitoring: false,
+                })),
+            }));
+            return true;
+        },
+        stopMonitoringForSite: async (
+            siteIdentifier: string,
+            monitorId?: string
+        ): Promise<boolean> => {
+            applySiteMutation(siteIdentifier, (site) => ({
+                ...site,
+                monitoring: monitorId ? site.monitoring : false,
+                monitors: site.monitors.map((monitor) =>
+                    monitorId && monitor.id !== monitorId
+                        ? monitor
+                        : {
+                              ...monitor,
+                              monitoring: false,
+                          }
+                ),
+            }));
+            return true;
+        },
+        validateMonitorData: async (
+            _monitorType: string,
+            monitorData: unknown
+        ): Promise<{
+            data: unknown;
+            errors: readonly string[];
+            metadata: Record<string, never>;
+            success: true;
+            warnings: readonly string[];
+        }> => ({
+            data: monitorData ?? {},
+            errors: [],
+            metadata: {},
+            success: true,
+            warnings: [],
+        }),
+    },
+    monitorTypes: {
+        getMonitorTypes: async (): Promise<MonitorTypeConfig[]> =>
+            clone(mockState.monitorTypes),
+    },
+    sites: {
+        addSite: async (site: Site): Promise<Site> => {
+            mockState.sites = [...mockState.sites, clone(site)];
+            return clone(site);
+        },
+        checkSiteNow: async (
+            siteIdentifier: string,
+            monitorId: string
+        ): Promise<Site> =>
+            applySiteMutation(siteIdentifier, (site) => ({
+                ...site,
+                monitors: site.monitors.map((monitor) =>
+                    monitor.id === monitorId
+                        ? {
+                              ...monitor,
+                              lastChecked: new Date(),
+                              responseTime: Math.max(
+                                  10,
+                                  Math.round(Math.random() * 250)
+                              ),
+                              status: "up",
+                          }
+                        : monitor
+                ),
+            })),
+        deleteAllSites: async (): Promise<number> =>
+            mockState.sites.splice(0).length,
+        getSites: async (): Promise<Site[]> => clone(mockState.sites),
+        removeSite: async (identifier: string): Promise<Site> => {
+            const index = findSiteIndex(identifier);
+            if (index < 0) {
+                throw new Error(
+                    `Storybook electron mock: cannot remove site '${identifier}'.`
+                );
+            }
+
+            const [removed] = mockState.sites.splice(index, 1);
+            if (!removed) {
+                throw new Error(
+                    `Storybook electron mock: failed to remove site '${identifier}'.`
+                );
+            }
+
+            return clone(removed);
+        },
+        startMonitoringForSite: async (siteIdentifier: string): Promise<Site> =>
+            applySiteMutation(siteIdentifier, (site) => ({
+                ...site,
+                monitoring: true,
+                monitors: site.monitors.map((monitor) => ({
+                    ...monitor,
+                    monitoring: true,
+                })),
+            })),
+        stopMonitoringForSite: async (siteIdentifier: string): Promise<Site> =>
+            applySiteMutation(siteIdentifier, (site) => ({
+                ...site,
+                monitoring: false,
+                monitors: site.monitors.map((monitor) => ({
+                    ...monitor,
+                    monitoring: false,
+                })),
+            })),
+        updateSite: async (
+            identifier: string,
+            updates: Partial<Site>
+        ): Promise<Site> =>
+            applySiteMutation(identifier, (site) => ({
+                ...site,
+                ...updates,
+                monitors: updates.monitors
+                    ? clone(updates.monitors)
+                    : site.monitors,
+            })),
+    },
+    stateSync: {
+        getSyncStatus: async (): Promise<Site[]> => clone(mockState.sites),
+        onStateSyncEvent: registerListener,
+        requestFullSync: async (): Promise<Site[]> => clone(mockState.sites),
+    },
+    system: {
+        openExternal: async (url: string): Promise<boolean> =>
+            typeof url === "string" && url.length > 0,
+    },
+};
+
+export const electronMockState: ElectronMockState = mockState;
+
+export const setMockSites = (sites: Site[]): void => {
+    mockState.sites = clone(sites);
+};
+
+export const setMockMonitorTypes = (
+    monitorTypes: MonitorTypeConfig[]
+): void => {
+    mockState.monitorTypes = clone(monitorTypes);
+};
+
+export const setMockHistoryLimit = (historyLimit: number): void => {
+    mockState.historyLimit = normalizeLimit(historyLimit);
+};
+
+export const installElectronAPIMock = (): ElectronAPI => {
+    if (typeof window !== "undefined" && !window.electronAPI) {
+        window.electronAPI = electronAPIMock;
+    }
+    return electronAPIMock;
+};
+
+installElectronAPIMock();

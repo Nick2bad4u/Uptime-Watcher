@@ -17,7 +17,7 @@ title = "Uptime Watcher - Enhanced Secret Detection Configuration"
 
     # Disable overly broad rules that generate false positives
     # in JavaScript/TypeScript development environments
-    disabledRules = ["generic-api-key"]
+    disabledRules = [ "generic-api-key" ]
 
     # Performance optimizations enabled by default in v8.28+
     # - Stopword optimization (promoted from experimental)
@@ -45,9 +45,9 @@ title = "Uptime Watcher - Enhanced Secret Detection Configuration"
 
     [[rules.allowlists]]
         description = "Allow example values in documentation"
-        paths       = ['''docs/.*\.(md|txt|rst)$''']
+        paths = [ '''docs/.*\.(md|txt|rst)$''' ]
         regexTarget = "secret"
-        regexes     = ['''(?i)(example|demo|placeholder|test|sample)''']
+        regexes = [ '''(?i)(example|demo|placeholder|test|sample)''' ]
 
 [[rules]]
     id = "database-connection-strings"
@@ -68,9 +68,9 @@ title = "Uptime Watcher - Enhanced Secret Detection Configuration"
 
     [[rules.allowlists]]
         description = "Allow example connection strings in documentation"
-        paths       = ['''docs/.*\.(md|txt|rst)$''']
+        paths = [ '''docs/.*\.(md|txt|rst)$''' ]
         regexTarget = "secret"
-        regexes     = ['''(?i)(example|localhost|127\.0\.0\.1|test|demo)''']
+        regexes = [ '''(?i)(example|localhost|127\.0\.0\.1|test|demo)''' ]
 
 [[rules]]
     id = "vite-env-secrets"
@@ -119,7 +119,7 @@ title = "Uptime Watcher - Enhanced Secret Detection Configuration"
     id = "perplexity-api-detection"
     description = "Detect Perplexity AI API keys"
     regex = '''\b(pplx-[a-zA-Z0-9]{48})(?:[\x60'"\s;]|\\[nr]|$)'''
-    keywords = ["pplx-"]
+    keywords = [ "pplx-" ]
     tags = [
         "ai",
         "api-key",
@@ -186,9 +186,9 @@ title = "Uptime Watcher - Enhanced Secret Detection Configuration"
 
 [[allowlists]]
     description = "Ignore Chart.js usage documentation with cubeToken example"
-    paths       = ['''docs/Packages/Chart\.js/getting-started/usage\.md''']
+    paths = [ '''docs/Packages/Chart\.js/getting-started/usage\.md''' ]
     regexTarget = "line"
-    regexes     = ['''cubeToken''']
+    regexes = [ '''cubeToken''' ]
 
 # Enhanced allowlist for common development patterns (v8.28+ optimizations)
 [[allowlists]]
@@ -276,4 +276,4 @@ title = "Uptime Watcher - Enhanced Secret Detection Configuration"
 
 [[allowlists]]
     description = "Ignore all secrets in .secretlintrc.json (contains placeholder values)"
-    paths       = ['''\.secretlintrc\.json$''']
+    paths = [ '''\.secretlintrc\.json$''' ]
