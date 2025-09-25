@@ -1,3 +1,4 @@
+import type { AddonOptionsVite } from "@storybook/addon-coverage";
 import type { StorybookConfig } from "@storybook/react-vite";
 import type { PluginOption } from "vite";
 
@@ -60,11 +61,48 @@ const loadReactCompilerPlugins = (): readonly BabelPlugin[] => {
     return [];
 };
 
+// Keep globs aligned with vitest.storybook.config.ts coverage filters.
+const coverageIncludeGlobs = [
+    "src/**/*.{ts,tsx}",
+    "shared/**/*.{ts,tsx}",
+] as const;
+
+const coverageExcludeGlobs = [
+    "electron/**",
+    "shared/test/**",
+    "src/test/**",
+    "storybook/**",
+    "**/*.stories.*",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*.bench.*",
+    "**/*.d.ts",
+] as const;
+
+const coverageOptions: AddonOptionsVite = {
+    istanbul: {
+        exclude: Array.from(coverageExcludeGlobs),
+        extension: [
+            ".ts",
+            ".tsx",
+            ".js",
+            ".jsx",
+        ],
+        include: Array.from(coverageIncludeGlobs),
+        requireEnv: true,
+    },
+};
+
 const config: StorybookConfig = {
     addons: [
         "@storybook/addon-a11y",
         "@storybook/addon-docs",
+        {
+            name: "@storybook/addon-coverage",
+            options: coverageOptions,
+        },
         "@storybook/addon-vitest",
+        "msw-storybook-addon",
     ],
     framework: {
         name: "@storybook/react-vite",
@@ -140,10 +178,11 @@ const config: StorybookConfig = {
                     include: [
                         "@storybook/addon-a11y",
                         "@storybook/addon-docs",
+                        "@storybook/addon-coverage",
                         "@storybook/addon-vitest",
+                        "msw-storybook-addon",
                         "react",
                         "react-dom",
-                        "storybook/actions",
                     ],
                 },
                 resolve: {

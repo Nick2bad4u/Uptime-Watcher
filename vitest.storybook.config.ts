@@ -7,6 +7,7 @@ import type { PluginOption } from "vite";
 
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import react from "@vitejs/plugin-react";
+import fs from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { defineConfig } from "vitest/config";
@@ -72,6 +73,21 @@ const storybookPluginOptions: StorybookTestOptions = {
     storybookUrl: "http://localhost:6006",
 };
 
+const storybookCoverageDirectory = path.resolve(
+    projectRoot,
+    "coverage/storybook"
+);
+const sonarReportOutputPath = path.join(
+    storybookCoverageDirectory,
+    "sonar-report.xml"
+);
+const vitestJsonOutputPath = path.join(
+    storybookCoverageDirectory,
+    "test-results.json"
+);
+
+fs.mkdirSync(storybookCoverageDirectory, { recursive: true });
+
 const config: ReturnType<typeof defineConfig> = defineConfig({
     cacheDir: "./.cache/vitest/storybook",
     css: {
@@ -84,6 +100,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig({
     optimizeDeps: {
         include: [
             "@storybook/addon-a11y",
+            "@storybook/addon-coverage",
             "@storybook/addon-docs",
             "@storybook/addon-vitest",
             "@storybook/react",
@@ -91,6 +108,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig({
             "chartjs-adapter-date-fns",
             "chartjs-plugin-zoom",
             "markdown-to-jsx",
+            "msw-storybook-addon",
             "react",
             "react-chartjs-2",
             "react-dom",
@@ -129,12 +147,10 @@ const config: ReturnType<typeof defineConfig> = defineConfig({
     test: {
         browser: {
             enabled: true,
+            headless: true,
             instances: [
                 {
                     browser: "chromium",
-                    launch: {
-                        headless: true,
-                    },
                 },
             ],
             provider: "playwright",
@@ -160,7 +176,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig({
                 "json-summary",
                 "lcov",
             ],
-            reportsDirectory: "./coverage/storybook",
+            reportsDirectory: storybookCoverageDirectory,
         },
         css: {
             modules: {
@@ -175,9 +191,19 @@ const config: ReturnType<typeof defineConfig> = defineConfig({
             label: "Storybook",
         },
         outputFile: {
-            json: "./coverage/storybook/test-results.json",
+            json: vitestJsonOutputPath,
         },
-        reporters: ["dot", "hanging-process"],
+        reporters: [
+            "dot",
+            "hanging-process",
+            [
+                "vitest-sonar-reporter",
+                {
+                    outputFile: sonarReportOutputPath,
+                    silent: true,
+                },
+            ],
+        ],
         setupFiles: ["./storybook/vitest.setup.ts"],
         snapshotSerializers: [],
         typecheck: {

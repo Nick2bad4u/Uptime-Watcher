@@ -9112,6 +9112,5 @@ export default [
             "write-good-comments/write-good-comments": "off", // Too strict
         },
     }, // eslint-config-prettier MUST be last to override conflicting rules
-    eslintConfigPrettier,
-    ...storybook.configs["flat/recommended"],
+    eslintConfigPrettier
 ];

@@ -1,5 +1,6 @@
 import type { Decorator, Preview } from "@storybook/react-vite";
 
+import { initialize, mswLoader } from "msw-storybook-addon";
 import { createElement } from "react";
 
 import themeStyles from "../src/index.css?inline";
@@ -15,7 +16,7 @@ const injectThemeStyles = (() => {
         }
 
         const styleElement = document.createElement("style");
-        styleElement.setAttribute("data-storybook-theme", "app");
+        styleElement.dataset["storybookTheme"] = "app";
         styleElement.textContent = themeStyles;
         document.head.append(styleElement);
 
@@ -30,8 +31,15 @@ const withThemeProvider: Decorator = (Story) => {
     return createElement(ThemeProvider, undefined, createElement(Story));
 };
 
+const mswInitializeOptions: Parameters<typeof initialize>[0] = {
+    onUnhandledRequest: "bypass",
+};
+
+initialize(mswInitializeOptions);
+
 const preview: Preview = {
     decorators: [withThemeProvider],
+    loaders: [mswLoader],
     parameters: {
         controls: {
             matchers: {

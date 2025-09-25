@@ -12,7 +12,8 @@
             "vite/client",
             "@storybook/react-vite",
             "storybook/actions",
-            "storybook/test"
+            "storybook/test",
+            "msw-storybook-addon"
         ]
     },
     "exclude": [
