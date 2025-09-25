@@ -307,7 +307,7 @@ export default defineConfig(({ mode }) => {
                     babelrc: false,
                     configFile: false,
                     // Add any custom babel plugins here if needed
-                    plugins: [],
+                    plugins: ["babel-plugin-react-compiler"],
                 },
 
                 // Enable Fast Refresh for better development experience
