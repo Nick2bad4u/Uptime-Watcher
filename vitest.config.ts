@@ -16,6 +16,7 @@ export default defineConfig((configEnv) =>
     mergeConfig(
         viteConfig(configEnv),
         defineConfig({
+            cacheDir: "./.cache/vitest/", // Separate cache to avoid conflicts
             test: {
                 name: {
                     color: "cyan",

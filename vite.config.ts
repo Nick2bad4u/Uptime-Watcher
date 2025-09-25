@@ -133,7 +133,7 @@ export default defineConfig(({ mode }) => {
             sourcemap: true, // Recommended for Electron debugging
             target: VITE_BUILD_TARGET, // Updated to esnext for CSS Modules compatibility
         },
-        cacheDir: "./.cache/vitest/", // Separate cache to avoid conflicts
+        cacheDir: "./.cache/vite/", // Separate cache to avoid conflicts
         css: {
             devSourcemap: true, // Enable source maps for CSS in development
             modules: {
@@ -709,7 +709,7 @@ export default defineConfig(({ mode }) => {
                     ...coverageConfigDefaults.exclude,
                 ],
                 excludeAfterRemap: true, // Exclude files after remapping for accuracy
-                experimentalAstAwareRemapping: false, // Temporarily disabled due to ast-v8-to-istanbul column parsing error
+                experimentalAstAwareRemapping: true, // Temporarily disabled due to ast-v8-to-istanbul column parsing error
                 ignoreEmptyLines: true, // Ignore empty lines, comments, and TypeScript interfaces
                 // V8 Provider Configuration (Recommended since Vitest v3.2.0)
                 provider: "v8" as const, // Switch to V8 for better TypeScript support
@@ -792,7 +792,7 @@ export default defineConfig(({ mode }) => {
             include: [
                 "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
             ],
-            includeTaskLocations: true,
+            includeTaskLocation: true,
             isolate: true,
             logHeapUsage: true,
             name: {
@@ -807,9 +807,16 @@ export default defineConfig(({ mode }) => {
             poolOptions: {
                 threads: {
                     isolate: true, // Isolate tests for better reliability
-                    maxThreads: 24, // Reduced from 24 to prevent resource contention in multi-project setup
+                    maxThreads: Math.max(
+                        1,
+                        Number(
+                            // eslint-disable-next-line n/no-process-env -- safe for test time use
+                            process.env["MAX_THREADS"] ??
+                                (process.env["CI"] ? "1" : "16")
+                        )
+                    ), // 16 threads on local, 1 thread on CI by default
                     minThreads: 1, // Ensure at least one thread
-                    singleThread: false, // Enable multi-threading
+                    singleThread: Boolean(process.env["CI"]), // Enable single-threading in CI
                     useAtomics: true,
                 },
             },
@@ -822,14 +829,14 @@ export default defineConfig(({ mode }) => {
             // Improve test output
             reporters: [
                 "default",
-                "json",
-                "verbose",
+                // "json",
+                // "verbose",
                 "hanging-process",
-                "dot",
+                // "dot",
                 // "tap",
                 // "tap-flat",
                 // "junit",
-                "html",
+                // "html",
             ],
             retry: 0, // No retries to surface issues immediately
             sequence: {

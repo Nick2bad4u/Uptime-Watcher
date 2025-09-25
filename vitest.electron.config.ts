@@ -167,23 +167,30 @@ const vitestConfig = defineConfig({
         poolOptions: {
             threads: {
                 isolate: true, // Isolate tests for better reliability
-                maxThreads: 24, // Limit concurrent threads for electron tests
+                maxThreads: Math.max(
+                    1,
+                    Number(
+                        // eslint-disable-next-line n/no-process-env -- safe for test time use
+                        process.env["MAX_THREADS"] ??
+                            (process.env["CI"] ? "1" : "16")
+                    )
+                ), // 16 threads on local, 1 thread on CI by default
                 minThreads: 1, // Ensure at least one thread
-                singleThread: false, // Enable multi-threading
+                singleThread: Boolean(process.env["CI"]), // Enable single-threading in CI
                 useAtomics: true,
             },
         },
         printConsoleTrace: false,
         reporters: [
             "default",
-            "json",
-            "verbose",
+            // "json",
+            // "verbose",
             "hanging-process",
-            "dot",
+            // "dot",
             // "tap",
             // "tap-flat",
             // "junit",
-            "html",
+            // "html",
         ],
         restoreMocks: true,
         retry: 0,

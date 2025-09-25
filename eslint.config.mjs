@@ -246,7 +246,7 @@ export default [
             "report/**",
             "reports/**",
             "playwright/codegen-template.mjs",
-            // "config/testing/vitest.electron.config.ts", // Ignore vitest electron config
+            // "config/testing/vitest.electron.config.ts", // Ignore Vitest electron config
             // "config/testing/vitest.shared.config.ts", // Ignore vitest shared config
             // "vite.config.ts", // Ignore vite config due to parsing issues
             // "vitest.config.ts", // Ignore vitest config due to parsing issues
@@ -7771,6 +7771,7 @@ export default [
         files: [
             "**/*.config.{ts,tsx,mts,cts}", // Configuration files
             "**/*.config.**.*.{ts,tsx,mts,cts}",
+            "config/testing/utils/**/*.ts",
         ],
         ignores: [],
         languageOptions: {

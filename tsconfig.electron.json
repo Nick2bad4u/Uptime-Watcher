@@ -15,7 +15,7 @@
                 "shared/*"
             ]
         },
-        "tsBuildInfoFile": "./dist/tsconfig.electron.tsbuildinfo"
+        "tsBuildInfoFile": "./cache/tsconfig.electron.tsbuildinfo"
     },
     "exclude": [
         "electron/**/*.spec.ts",
@@ -29,11 +29,7 @@
     ],
     "extends": "./tsconfig.json",
     "include": [
-        "electron/**/*.css",
-        "electron/**/*.ts",
-        "electron/**/*.mts",
-        "electron/**/*.cts",
-        "electron/**/*.tsx",
+        "electron/**/*",
         "vite/client",
         "vitest.electron.config.ts"
     ],

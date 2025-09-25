@@ -15,7 +15,7 @@
                 "shared/*"
             ]
         },
-        "tsBuildInfoFile": "./dist/tsconfig.shared.tsbuildinfo"
+        "tsBuildInfoFile": "./cache/tsconfig.shared.tsbuildinfo"
     },
     "exclude": [
         "shared/**/*.spec.ts",
@@ -23,15 +23,10 @@
         "shared/test/**/*",
         "node_modules",
         "electron/**/*",
-        "src/**/*",
-        "**/scripts/**"
+        "src/**/*"
     ],
     "extends": "./tsconfig.json",
     "include": [
-        "shared/**/*.css",
-        "shared/**/*.ts",
-        "shared/**/*.mts",
-        "shared/**/*.cts",
-        "shared/**/*.tsx"
+        "shared/**/*"
     ]
 }
