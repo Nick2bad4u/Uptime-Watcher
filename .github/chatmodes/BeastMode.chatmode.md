@@ -1,7 +1,6 @@
 ---
 description: Beast Mode 3.1 [Custom]
 tools: ['createFile', 'createDirectory', 'editFiles', 'search', 'runCommands', 'runTask', 'getTaskOutput', 'usages', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'todos', 'runTests', 'tavily-remote-mcp', 'electron-mcp-server', 'describe_table', 'list_tables', 'read_query', 'get_references', 'get_symbol_lsp_info', 'rename_symbol', 'sequentialthinking']
-model: Claude Sonnet 4 (copilot)
 ---
 
 # Beast Mode 3.1
