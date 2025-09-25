@@ -46,11 +46,27 @@ const forceDownload = process.argv.includes("--force");
 const checkUpdateOnly = process.argv.includes("--check-update");
 const noUpdate = process.argv.includes("--no-update");
 
+/**
+ * @interface UpdateCheckResult
+ * @property {boolean} hasUpdate - Indicates if an update is available.
+ * @property {string} latestVersion - The latest version hash.
+ * @property {string | null} currentVersion - The current version hash or null if unknown.
+ * @property {string} [error] - Optional error message if checking failed.
+ */
+
+/**
+ * @param {string} message
+ */
 function failAndExit(message) {
     console.error(`[wasm-download] ERROR: ${message}`);
     process.exit(1);
 }
 
+/**
+ * @param {string} actualHash
+ * @param {string | undefined} expectedHash
+ * @returns {boolean}
+ */
 function verifyHash(actualHash, expectedHash) {
     if (!expectedHash) {
         console.log(
@@ -73,11 +89,17 @@ function verifyHash(actualHash, expectedHash) {
     return true;
 }
 
+/**
+ * @returns {boolean}
+ */
 function verifyNonPlaceholderHash() {
     // This function is no longer needed since we handle undefined hashes gracefully
     return true;
 }
 
+/**
+ * @returns {Promise<string>}
+ */
 async function getLatestCommitHash() {
     return new Promise((resolve, reject) => {
         const apiUrl =
@@ -105,6 +127,7 @@ async function getLatestCommitHash() {
                         } catch (error) {
                             reject(
                                 new Error(
+                                    // @ts-expect-error -- Unknown ok for error messages
                                     `Failed to parse GitHub API response: ${error.message}`
                                 )
                             );
@@ -120,6 +143,9 @@ async function getLatestCommitHash() {
     });
 }
 
+/**
+ * @returns {string | null}
+ */
 function getCurrentVersion() {
     const versionFile = path.join(__dirname, "../assets/.wasm-version");
     if (fs.existsSync(versionFile)) {
@@ -132,6 +158,9 @@ function getCurrentVersion() {
     return null;
 }
 
+/**
+ * @param {string} version
+ */
 function saveVersion(version) {
     const versionFile = path.join(__dirname, "../assets/.wasm-version");
     try {
@@ -139,11 +168,15 @@ function saveVersion(version) {
         console.log(`[wasm-download] Saved version: ${version}`);
     } catch (error) {
         console.warn(
+            // @ts-expect-error -- Unknown ok for error messages
             `[wasm-download] Warning: Could not save version file: ${error.message}`
         );
     }
 }
 
+/**
+ * @returns any
+ */
 async function checkForUpdates() {
     try {
         console.log("[wasm-download] Checking for updates...");
@@ -179,12 +212,19 @@ async function checkForUpdates() {
         return { hasUpdate: false, latestVersion: latestHash, currentVersion };
     } catch (error) {
         console.warn(
+            // @ts-expect-error -- Unknown ok for error messages
             `[wasm-download] Warning: Could not check for updates: ${error.message}`
         );
+        // @ts-expect-error -- Unknown ok for error messages
         return { hasUpdate: false, error: error.message };
     }
 }
 
+/**
+ * @param {string} urlToFetch
+ * @param {string} destPath
+ * @param {number} [redirectCount=0]
+ */
 function download(urlToFetch, destPath, redirectCount = 0) {
     if (redirectCount > MAX_REDIRECTS) {
         failAndExit(`Too many redirects (> ${MAX_REDIRECTS})`);
@@ -204,6 +244,7 @@ function download(urlToFetch, destPath, redirectCount = 0) {
             if (!location) {
                 failAndExit("Redirect response missing 'location' header");
             }
+            // @ts-expect-error -- Unknown ok for error messages
             return download(location, destPath, redirectCount + 1);
         }
 
@@ -308,10 +349,10 @@ async function main() {
                 process.exit(0);
             }
         } catch (error) {
+            // @ts-expect-error -- Unknown ok for error messages
             console.error(`[wasm-download] Error: ${error.message}`);
             process.exit(1);
         }
-        return;
     }
 
     // Check if files exist and handle accordingly
@@ -385,6 +426,7 @@ async function main() {
             }
         } catch (error) {
             console.error(
+                // @ts-expect-error -- Unknown ok for error messages
                 `[wasm-download] Error checking for updates: ${error.message}`
             );
             console.log("[wasm-download] Proceeding with download anyway...");

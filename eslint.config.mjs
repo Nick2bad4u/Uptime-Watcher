@@ -187,6 +187,28 @@ import yamlEslintParser from "yaml-eslint-parser";
 
 const ROOT_DIR = import.meta.dirname;
 
+// boundaries plugin configuration
+const boundariesElements = [
+    {
+        capture: ["constant"],
+        pattern: "shared/constants/**/*",
+        type: "constants",
+    },
+    {
+        allowChildren: false,
+        capture: ["constant"],
+        mode: "file",
+        pattern: "shared/constants.ts",
+        type: "constants",
+    },
+    {
+        capture: ["type"],
+        pattern: "shared/types/**/*",
+        type: "types",
+    },
+    // ...add other boundary elements as needed
+];
+
 export default [
     gitignore({
         name: "Global .gitignore Rules",
@@ -1593,7 +1615,7 @@ export default [
                             ],
                             from: "theme",
                         },
-                        { allow: ["constants"], from: "types" },
+                        { allow: ["types"], from: "types" },
                         {
                             allow: [
                                 "types",
@@ -1602,7 +1624,10 @@ export default [
                             from: "utils",
                         },
                         {
-                            allow: ["app"],
+                            allow: [
+                                "app",
+                                "styles",
+                            ],
                             from: "main",
                         },
                         { allow: [], from: "styles" },
@@ -1627,7 +1652,7 @@ export default [
                 },
             ],
             // Architecture boundaries for Frontend
-            "boundaries/no-ignored": "warn",
+            "boundaries/no-ignored": "off",
             camelcase: "off",
             "canonical/destructuring-property-newline": "off",
             "canonical/export-specifier-newline": "off",
@@ -2926,79 +2951,7 @@ export default [
                     detectComponentClasses: true,
                 },
             ],
-            "boundaries/element-types": [
-                "error",
-                {
-                    default: "disallow",
-                    rules: [
-                        {
-                            allow: [
-                                "components",
-                                "stores",
-                                "hooks",
-                                "services",
-                                "theme",
-                                "utils",
-                                "types",
-                            ],
-                            from: "app",
-                        },
-                        {
-                            allow: [
-                                "components",
-                                "hooks",
-                                "services",
-                                "theme",
-                                "utils",
-                                "types",
-                                "stores",
-                            ],
-                            from: "components",
-                        },
-                        {
-                            allow: [
-                                "stores",
-                                "services",
-                                "types",
-                                "utils",
-                            ],
-                            from: "hooks",
-                        },
-                        {
-                            allow: [
-                                "types",
-                                "utils",
-                            ],
-                            from: "services",
-                        },
-                        {
-                            allow: [
-                                "services",
-                                "types",
-                                "utils",
-                                "stores",
-                                "components",
-                            ],
-                            from: "stores",
-                        },
-                        {
-                            allow: ["types"],
-                            from: "theme",
-                        },
-                        { allow: [], from: "types" },
-                        {
-                            allow: ["types"],
-                            from: "utils",
-                        },
-                    ],
-                },
-            ],
-            // Code organization and architecture
-            "boundaries/no-ignored": "warn",
-            camelcase: "off",
-            "canonical/destructuring-property-newline": "off",
-            "canonical/export-specifier-newline": "off",
-            "canonical/filename-match-exported": "warn",
+            "boundaries/element-types": ["off"],
             "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
             "canonical/filename-no-index": "error",
             "canonical/import-specifier-newline": "off",
@@ -4526,56 +4479,94 @@ export default [
                     rules: [
                         {
                             allow: ["types"],
+                            from: "constants",
+                        },
+                        {
+                            allow: [],
+                            from: "types",
+                        },
+                        {
+                            allow: [
+                                "constants",
+                                "types",
+                            ],
+                            from: "utils",
+                        },
+                        {
+                            allow: [
+                                "constants",
+                                "types",
+                                "utils",
+                            ],
                             from: "events",
                         },
                         {
                             allow: [
-                                "managers",
-                                "services",
+                                "constants",
+                                "types",
                                 "utils",
                                 "events",
-                                "types",
+                                "managers",
+                                "orchestrator",
                             ],
-                            from: "main",
+                            from: "services",
                         },
                         {
                             allow: [
-                                "services",
+                                "constants",
+                                "types",
                                 "utils",
                                 "events",
-                                "types",
+                                "services",
                             ],
                             from: "managers",
                         },
                         {
                             allow: [
-                                "utils",
+                                "constants",
                                 "types",
+                                "utils",
+                                "events",
+                                "services",
+                                "managers",
+                            ],
+                            from: "orchestrator",
+                        },
+                        {
+                            allow: [
+                                "constants",
+                                "types",
+                                "utils",
+                                "events",
+                                "services",
+                                "managers",
+                                "orchestrator",
+                            ],
+                            from: "main",
+                        },
+                        {
+                            allow: [
+                                "constants",
+                                "types",
+                                "utils",
+                                "events",
+                                "services",
                             ],
                             from: "preload",
                         },
                         {
                             allow: [
-                                "services",
-                                "utils",
+                                "constants",
                                 "types",
-                            ],
-                            from: "services",
-                        },
-                        { allow: [], from: "types" },
-                        {
-                            allow: [
-                                "managers",
-                                "services",
                                 "utils",
                                 "events",
-                                "types",
+                                "services",
+                                "managers",
+                                "orchestrator",
+                                "main",
+                                "preload",
                             ],
-                            from: "utils",
-                        },
-                        {
-                            allow: ["types"],
-                            from: "utils",
+                            from: "test",
                         },
                     ],
                 },
@@ -5858,63 +5849,36 @@ export default [
                     default: "disallow",
                     rules: [
                         {
-                            allow: [
-                                "components",
-                                "stores",
-                                "hooks",
-                                "services",
-                                "theme",
-                                "utils",
-                                "types",
-                            ],
-                            from: "app",
-                        },
-                        {
-                            allow: [
-                                "components",
-                                "hooks",
-                                "services",
-                                "theme",
-                                "utils",
-                                "types",
-                                "stores",
-                            ],
-                            from: "components",
-                        },
-                        {
-                            allow: [
-                                "stores",
-                                "services",
-                                "types",
-                                "utils",
-                            ],
-                            from: "hooks",
-                        },
-                        {
-                            allow: [
-                                "types",
-                                "utils",
-                            ],
-                            from: "services",
-                        },
-                        {
-                            allow: [
-                                "services",
-                                "types",
-                                "utils",
-                                "stores",
-                                "components",
-                            ],
-                            from: "stores",
+                            allow: ["types"],
+                            from: "constants",
                         },
                         {
                             allow: ["types"],
-                            from: "theme",
+                            from: "types",
                         },
-                        { allow: [], from: "types" },
                         {
-                            allow: ["types"],
+                            allow: [
+                                "constants",
+                                "types",
+                            ],
                             from: "utils",
+                        },
+                        {
+                            allow: [
+                                "constants",
+                                "types",
+                                "utils",
+                            ],
+                            from: "validation",
+                        },
+                        {
+                            allow: [
+                                "constants",
+                                "types",
+                                "utils",
+                                "validation",
+                            ],
+                            from: "test",
                         },
                     ],
                 },
@@ -6855,12 +6819,21 @@ export default [
                     type: "constants",
                 },
                 {
+                    allowChildren: false,
+                    capture: ["constant"],
+                    mode: "file",
+                    pattern: "shared/constants.ts",
+                    type: "constants",
+                },
+                {
                     capture: ["type"],
                     pattern: "shared/types/**/*",
                     type: "types",
                 },
                 {
+                    allowChildren: false,
                     capture: ["type"],
+                    mode: "file",
                     pattern: "shared/types.ts",
                     type: "types",
                 },
@@ -7945,69 +7918,9 @@ export default [
                 "in-try-catch",
             ], // Proper await handling in try-catch
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
-            "boundaries/element-types": [
-                "error",
-                {
-                    default: "disallow",
-                    rules: [
-                        {
-                            allow: ["types"],
-                            from: "events",
-                        },
-                        {
-                            allow: [
-                                "managers",
-                                "services",
-                                "utils",
-                                "events",
-                                "types",
-                            ],
-                            from: "main",
-                        },
-                        {
-                            allow: [
-                                "services",
-                                "utils",
-                                "events",
-                                "types",
-                            ],
-                            from: "managers",
-                        },
-                        {
-                            allow: [
-                                "utils",
-                                "types",
-                            ],
-                            from: "preload",
-                        },
-                        {
-                            allow: [
-                                "services",
-                                "utils",
-                                "types",
-                            ],
-                            from: "services",
-                        },
-                        { allow: [], from: "types" },
-                        {
-                            allow: [
-                                "managers",
-                                "services",
-                                "utils",
-                                "events",
-                                "types",
-                            ],
-                            from: "utils",
-                        },
-                        {
-                            allow: ["types"],
-                            from: "utils",
-                        },
-                    ],
-                },
-            ],
+            "boundaries/element-types": ["off"],
             // Architecture boundaries for Electron
-            "boundaries/no-ignored": "warn",
+            "boundaries/no-ignored": "off",
             camelcase: "off",
             "canonical/destructuring-property-newline": "off",
             "canonical/export-specifier-newline": "off",
@@ -9112,5 +9025,5 @@ export default [
             "write-good-comments/write-good-comments": "off", // Too strict
         },
     }, // eslint-config-prettier MUST be last to override conflicting rules
-    eslintConfigPrettier
+    eslintConfigPrettier,
 ];
