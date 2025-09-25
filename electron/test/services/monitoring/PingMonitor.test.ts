@@ -10,11 +10,11 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import type { MockedFunction } from "vitest";
 
 import { PingMonitor } from "../../../services/monitoring/PingMonitor";
-import {
+import type {
     MonitorConfig,
     MonitorCheckResult,
 } from "../../../services/monitoring/types.js";
-import { Site } from "../../../../shared/types.js";
+import type { Site } from "../../../../shared/types.js";
 import { isNonEmptyString } from "../../../../shared/validation/validatorUtils";
 import * as pingRetryModule from "../../../services/monitoring/utils/pingRetry";
 

@@ -4,10 +4,10 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ConfigurationManager } from "../../managers/ConfigurationManager";
-import { Site, Monitor } from "../../../shared/types.js";
+import type { Site, Monitor } from "../../../shared/types.js";
 import { MonitorValidator } from "../../managers/validators/MonitorValidator";
 import { SiteValidator } from "../../managers/validators/SiteValidator";
-import { ValidationResult } from "../../managers/validators/interfaces";
+import type { ValidationResult } from "../../managers/validators/interfaces";
 import * as electronUtils from "../../electronUtils";
 
 // Mock the electron utils

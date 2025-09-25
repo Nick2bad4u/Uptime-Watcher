@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentProps, ReactElement } from "react";
 
 import { useState } from "react";
 
@@ -32,6 +33,33 @@ const meta: Meta<typeof SettingItem> = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+type SettingItemProps = ComponentProps<typeof SettingItem>;
+
+const WithSelectStory = (args: SettingItemProps): ReactElement => {
+    const rest = { ...args };
+    const [selectedInterval, setSelectedInterval] = useState<string>("1");
+
+    return (
+        <SettingItem
+            {...rest}
+            control={
+                <ThemedSelect
+                    aria-label="Check interval"
+                    onChange={(event) => {
+                        setSelectedInterval(event.target.value);
+                    }}
+                    value={selectedInterval}
+                >
+                    <option value="1">Every minute</option>
+                    <option value="5">Every 5 minutes</option>
+                    <option value="15">Every 15 minutes</option>
+                </ThemedSelect>
+            }
+            description="Choose how often uptime checks should run."
+            title="Check interval"
+        />
+    );
+};
 
 export const CheckboxControl: Story = {};
 
@@ -42,28 +70,5 @@ export const Disabled: Story = {
 };
 
 export const WithSelect: Story = {
-    render: (args) => {
-        const [interval, setInterval] = useState<string>("1");
-
-        return (
-            <SettingItem
-                {...args}
-                control={
-                    <ThemedSelect
-                        aria-label="Check interval"
-                        onChange={(event) => {
-                            setInterval(event.target.value);
-                        }}
-                        value={interval}
-                    >
-                        <option value="1">Every minute</option>
-                        <option value="5">Every 5 minutes</option>
-                        <option value="15">Every 15 minutes</option>
-                    </ThemedSelect>
-                }
-                description="Choose how often uptime checks should run."
-                title="Check interval"
-            />
-        );
-    },
+    render: (args) => <WithSelectStory {...args} />,
 };

@@ -10,7 +10,7 @@
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 // Import components and utilities to test
 import { AddSiteForm } from "../components/AddSiteForm/AddSiteForm";

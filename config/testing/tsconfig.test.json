@@ -25,6 +25,7 @@
     "extends": "../../tsconfig.json",
     "include": [
         "../../.storybook/**/*",
+        "../../storybook/**/*",
         "../../*.config.js",
         "../../*.config.mjs",
         "../../*.config.ts",

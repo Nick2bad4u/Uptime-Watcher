@@ -8,10 +8,8 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
-import {
-    handlePingCheckError,
-    PingOperationContext,
-} from "../../../../services/monitoring/utils/pingErrorHandling";
+import { handlePingCheckError } from "../../../../services/monitoring/utils/pingErrorHandling";
+import type { PingOperationContext } from "../../../../services/monitoring/utils/pingErrorHandling";
 import * as loggerModule from "../../../../utils/logger";
 
 // Mock the logger

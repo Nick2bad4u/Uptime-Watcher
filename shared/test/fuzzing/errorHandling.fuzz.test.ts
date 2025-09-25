@@ -320,8 +320,13 @@ describe("withErrorHandling backend fuzz coverage", () => {
                 throw new Error(errorMessage);
             };
 
+            const backendContext: ErrorHandlingBackendContext =
+                operationName && operationName.length > 0
+                    ? { logger, operationName }
+                    : { logger };
+
             await expect(
-                withErrorHandling(failingOperation, { logger, operationName })
+                withErrorHandling(failingOperation, backendContext)
             ).rejects.toThrow(errorMessage);
 
             const expectedMessage = operationName
@@ -363,10 +368,10 @@ describe("withErrorHandling backend fuzz coverage", () => {
 
             try {
                 await expect(
-                    withErrorHandling(failingOperation, {
-                        logger,
-                        operationName,
-                    })
+                    withErrorHandling(
+                        failingOperation,
+                        operationName ? { logger, operationName } : { logger }
+                    )
                 ).rejects.toThrow(errorMessage);
 
                 const expectedMessage = operationName

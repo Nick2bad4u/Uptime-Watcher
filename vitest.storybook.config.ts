@@ -7,10 +7,14 @@ import type { PluginOption } from "vite";
 
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import react from "@vitejs/plugin-react";
-import fs from "node:fs";
+import { mkdir } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
-import { defineConfig } from "vitest/config";
+import {
+    defineConfig,
+    type UserConfigExport,
+    type ViteUserConfig,
+} from "vitest/config";
 
 const projectRoot = import.meta.dirname;
 const require = createRequire(import.meta.url);
@@ -86,130 +90,152 @@ const vitestJsonOutputPath = path.join(
     "test-results.json"
 );
 
-fs.mkdirSync(storybookCoverageDirectory, { recursive: true });
+const ensureCoverageDirectory = async (): Promise<void> => {
+    if (!storybookCoverageDirectory.startsWith(projectRoot)) {
+        throw new Error(
+            "Storybook coverage directory must reside within the project root."
+        );
+    }
 
-const config: ReturnType<typeof defineConfig> = defineConfig({
-    cacheDir: "./.cache/vitest/storybook",
-    css: {
-        devSourcemap: true,
-        modules: {
-            generateScopedName: "[name]__[local]___[hash:base64:5]",
-            localsConvention: "camelCase",
-        },
-    },
-    optimizeDeps: {
-        include: [
-            "@storybook/addon-a11y",
-            "@storybook/addon-coverage",
-            "@storybook/addon-docs",
-            "@storybook/addon-vitest",
-            "@storybook/react",
-            "chart.js",
-            "chartjs-adapter-date-fns",
-            "chartjs-plugin-zoom",
-            "markdown-to-jsx",
-            "msw-storybook-addon",
-            "react",
-            "react-chartjs-2",
-            "react-dom",
-            "react-dom/client",
-            "react-icons/fa",
-            "react-icons/md",
-            "storybook/actions",
-            "storybook/internal/channels",
-            "validator",
-            "zod",
-        ],
-    },
-    plugins: [
-        react(reactPluginOptions) as PluginOption,
-        storybookTest(storybookPluginOptions),
-    ],
-    publicDir: "public",
-    resolve: {
-        alias: {
-            "@app": path.resolve(projectRoot, "src"),
-            "@electron": path.resolve(projectRoot, "electron"),
-            "@shared": path.resolve(projectRoot, "shared"),
-        },
-        extensions: [
-            ".mjs",
-            ".js",
-            ".mts",
-            ".ts",
-            ".jsx",
-            ".tsx",
-            ".json",
-            ".cjs",
-            ".cts",
-        ],
-    },
-    test: {
-        browser: {
-            enabled: true,
-            headless: true,
-            instances: [
-                {
-                    browser: "chromium",
-                },
-            ],
-            provider: "playwright",
-        },
-        cache: {
-            dir: "./.cache/vitest/storybook/browser",
-        },
-        coverage: {
-            enabled: false,
-            exclude: [
-                "**/*.stories.*",
-                "**/*.test.*",
-                "**/*.spec.*",
-                "**/*.bench.*",
-                "**/*.d.ts",
-                "electron/**",
-                "storybook/**",
-            ],
-            include: ["src/**/*.{ts,tsx}", "shared/**/*.{ts,tsx}"],
-            provider: "v8",
-            reporter: [
-                "text",
-                "json-summary",
-                "lcov",
-            ],
-            reportsDirectory: storybookCoverageDirectory,
-        },
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Path validated to stay within the project root.
+    await mkdir(storybookCoverageDirectory, { recursive: true });
+};
+
+const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
+    await ensureCoverageDirectory();
+
+    return {
+        cacheDir: "./.cache/vitest/storybook",
         css: {
+            devSourcemap: true,
             modules: {
-                classNameStrategy: "stable",
+                generateScopedName: "[name]__[local]___[hash:base64:5]",
+                localsConvention: "camelCase",
             },
         },
-        environment: "browser",
-        globals: true,
-        isolate: true,
-        name: {
-            color: "magenta",
-            label: "Storybook",
-        },
-        outputFile: {
-            json: vitestJsonOutputPath,
-        },
-        reporters: [
-            "dot",
-            "hanging-process",
-            [
-                "vitest-sonar-reporter",
-                {
-                    outputFile: sonarReportOutputPath,
-                    silent: true,
-                },
+        optimizeDeps: {
+            include: [
+                "@storybook/addon-a11y",
+                "@storybook/addon-coverage",
+                "@storybook/addon-docs",
+                "@storybook/addon-vitest",
+                "@storybook/react",
+                "chart.js",
+                "chartjs-adapter-date-fns",
+                "chartjs-plugin-zoom",
+                "electron-log/renderer",
+                "msw-storybook-addon",
+                "react",
+                "react-chartjs-2",
+                "react-dom",
+                "react-dom/client",
+                "react-icons/fa",
+                "react-icons/fi",
+                "react-icons/md",
+                "react/compiler-runtime",
+                "storybook/actions",
+                "storybook/internal/channels",
+                "validator",
+                "zustand",
+                "zustand/middleware",
+                "zod",
             ],
-        ],
-        setupFiles: ["./storybook/vitest.setup.ts"],
-        snapshotSerializers: [],
-        typecheck: {
-            enabled: false,
         },
-    },
-});
+        plugins: [
+            react(reactPluginOptions) as PluginOption,
+            storybookTest(storybookPluginOptions),
+        ],
+        publicDir: "public",
+        resolve: {
+            alias: {
+                "@app": path.resolve(projectRoot, "src"),
+                "@electron": path.resolve(projectRoot, "electron"),
+                "@shared": path.resolve(projectRoot, "shared"),
+            },
+            extensions: [
+                ".mjs",
+                ".js",
+                ".mts",
+                ".ts",
+                ".jsx",
+                ".tsx",
+                ".json",
+                ".cjs",
+                ".cts",
+            ],
+        },
+        test: {
+            browser: {
+                enabled: true,
+                headless: true,
+                instances: [
+                    {
+                        browser: "chromium",
+                    },
+                ],
+                provider: "playwright",
+            },
+            cache: {
+                dir: "./.cache/vitest/storybook/browser",
+            },
+            coverage: {
+                enabled: false,
+                exclude: [
+                    "**/*.stories.*",
+                    "**/*.test.*",
+                    "**/*.spec.*",
+                    "**/*.bench.*",
+                    "**/*.d.ts",
+                    "electron/**",
+                    "storybook/**",
+                ],
+                experimentalAstAwareRemapping: false,
+                include: ["src/**/*.{ts,tsx}", "shared/**/*.{ts,tsx}"],
+                provider: "v8",
+                reporter: [
+                    "text",
+                    "json-summary",
+                    "lcov",
+                ],
+                reportsDirectory: storybookCoverageDirectory,
+            },
+            css: {
+                modules: {
+                    classNameStrategy: "stable",
+                },
+            },
+            environment: "browser",
+            globals: true,
+            isolate: true,
+            name: {
+                color: "magenta",
+                label: "Storybook",
+            },
+            outputFile: {
+                json: vitestJsonOutputPath,
+            },
+            reporters: [
+                "dot",
+                "hanging-process",
+                [
+                    "vitest-sonar-reporter",
+                    {
+                        outputFile: sonarReportOutputPath,
+                        silent: true,
+                    },
+                ],
+            ],
+            setupFiles: ["./storybook/vitest.setup.ts"],
+            snapshotSerializers: [],
+            typecheck: {
+                enabled: false,
+            },
+        },
+    };
+};
 
-export default config;
+const storybookVitestConfig: UserConfigExport = defineConfig(
+    createStorybookVitestConfig
+);
+
+export default storybookVitestConfig;

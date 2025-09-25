@@ -5,14 +5,12 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import {
-    UptimeOrchestrator,
-    UptimeOrchestratorDependencies,
-} from "../UptimeOrchestrator";
+import { UptimeOrchestrator } from "../UptimeOrchestrator";
+import type { UptimeOrchestratorDependencies } from "../UptimeOrchestrator";
 import { DatabaseManager } from "../managers/DatabaseManager";
 import { MonitorManager } from "../managers/MonitorManager";
 import { SiteManager } from "../managers/SiteManager";
-import { Site, Monitor, StatusUpdate } from "../../shared/types.js";
+import type { Site, Monitor, StatusUpdate } from "../../shared/types.js";
 
 // Mock all dependencies with proper typing
 const mockDatabaseManager = {

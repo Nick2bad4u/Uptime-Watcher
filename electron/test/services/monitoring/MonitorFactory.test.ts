@@ -9,7 +9,7 @@ import {
     clearMonitorFactoryCache,
     updateMonitorConfig,
 } from "../../../services/monitoring/MonitorFactory";
-import { MonitorConfig } from "../../../services/monitoring/types.js";
+import type { MonitorConfig } from "../../../services/monitoring/types.js";
 
 describe("MonitorFactory - Fixed", () => {
     let mockMonitorConfig: MonitorConfig;

@@ -8,7 +8,7 @@ import {
     ChartConfigService,
     createChartConfigs,
 } from "../services/chartConfig";
-import { Theme } from "../theme/types";
+import type { Theme } from "../theme/types";
 import { getScaleProperty, getNestedScaleProperty } from "../utils/chartUtils";
 
 // Mock theme object for testing

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { JSX } from "react";
+import type { ComponentProps, ReactElement } from "react";
 
 import { useState } from "react";
 import { action } from "storybook/actions";
@@ -33,6 +33,30 @@ const meta: Meta<typeof ErrorAlert> = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+type ErrorAlertProps = ComponentProps<typeof ErrorAlert>;
+
+const DismissibleStory = (args: ErrorAlertProps): ReactElement => {
+    const { onDismiss, ...rest } = args;
+    const [visible, setVisible] = useState<boolean>(true);
+
+    if (!visible) {
+        return (
+            <ThemedText size="sm" variant="secondary">
+                Alert dismissed
+            </ThemedText>
+        );
+    }
+
+    return (
+        <ErrorAlert
+            {...rest}
+            onDismiss={() => {
+                setVisible(false);
+                onDismiss?.();
+            }}
+        />
+    );
+};
 
 export const ErrorVariant: Story = {};
 
@@ -56,27 +80,5 @@ export const Dismissible: Story = {
         onDismiss: action("dismiss"),
         variant: "warning",
     },
-    render: (args): JSX.Element => {
-        const [visible, setVisible] = useState<boolean>(true);
-
-        if (!visible) {
-            return (
-                <ThemedText size="sm" variant="secondary">
-                    Alert dismissed
-                </ThemedText>
-            );
-        }
-
-        return (
-            <ErrorAlert
-                {...args}
-                onDismiss={() => {
-                    setVisible(false);
-                    if (args.onDismiss) {
-                        args.onDismiss();
-                    }
-                }}
-            />
-        );
-    },
+    render: (args) => <DismissibleStory {...args} />,
 };

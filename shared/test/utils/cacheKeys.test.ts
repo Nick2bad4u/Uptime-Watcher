@@ -11,7 +11,7 @@ import {
     CacheKeys,
     isStandardizedCacheKey,
     parseCacheKey,
-    StandardizedCacheKey,
+    type StandardizedCacheKey,
 } from "../../utils/cacheKeys.js";
 
 // Import all exports for function coverage validation

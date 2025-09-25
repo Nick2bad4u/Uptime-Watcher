@@ -14,7 +14,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { Settings } from "../components/Settings/Settings";
 import { logger } from "../services/logger";
-import { ThemeName } from "../theme/types";
+import type { ThemeName } from "../theme/types";
 
 // Mock constants
 vi.mock("../constants", () => ({

@@ -10,7 +10,7 @@ import {
 
 import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
 import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
-import { Site } from "../../../../shared/types.js";
+import type { Site } from "../../../../shared/types.js";
 import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
 

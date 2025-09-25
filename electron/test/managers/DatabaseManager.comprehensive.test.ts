@@ -97,12 +97,10 @@ vi.mock("../../utils/database/SiteRepositoryService", () => ({
     })),
 }));
 
-import {
-    DatabaseManager,
-    DatabaseManagerDependencies,
-} from "../../managers/DatabaseManager";
+import { DatabaseManager } from "../../managers/DatabaseManager";
+import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
 import { TypedEventBus } from "../../events/TypedEventBus";
-import { UptimeEvents } from "../../events/eventTypes.js";
+import type { UptimeEvents } from "../../events/eventTypes.js";
 
 // Mock DataImportExportService
 vi.mock("../../utils/database/DataImportExportService", () => ({

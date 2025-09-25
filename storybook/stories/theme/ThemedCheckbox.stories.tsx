@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentProps, ReactElement } from "react";
 
 import { ThemedCheckbox } from "@app/theme/components/ThemedCheckbox";
 import { ThemedText } from "@app/theme/components/ThemedText";
@@ -22,27 +23,29 @@ const meta: Meta<typeof ThemedCheckbox> = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+type ThemedCheckboxProps = ComponentProps<typeof ThemedCheckbox>;
+
+const CheckboxWithState = (args: ThemedCheckboxProps): ReactElement => {
+    const { checked = false, onChange, ...rest } = args;
+    const [isChecked, setIsChecked] = useState(checked);
+
+    return (
+        <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <ThemedCheckbox
+                {...rest}
+                checked={isChecked}
+                onChange={(event) => {
+                    setIsChecked(event.currentTarget.checked);
+                    onChange?.(event);
+                }}
+            />
+            <ThemedText>Enable downtime alerts</ThemedText>
+        </label>
+    );
+};
 
 export const Basic: Story = {
-    render: (args) => {
-        const [checked, setChecked] = useState(args.checked ?? false);
-
-        return (
-            <label
-                style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
-            >
-                <ThemedCheckbox
-                    {...args}
-                    checked={checked}
-                    onChange={(event) => {
-                        setChecked(event.currentTarget.checked);
-                        args.onChange?.(event);
-                    }}
-                />
-                <ThemedText>Enable downtime alerts</ThemedText>
-            </label>
-        );
-    },
+    render: (args) => <CheckboxWithState {...args} />,
 };
 
 export const Disabled: Story = {

@@ -6,12 +6,10 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import {
-    DatabaseManager,
-    DatabaseManagerDependencies,
-} from "../../managers/DatabaseManager";
+import { DatabaseManager } from "../../managers/DatabaseManager";
+import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
 import { TypedEventBus } from "../../events/TypedEventBus";
-import { UptimeEvents } from "../../events/eventTypes.js";
+import type { UptimeEvents } from "../../events/eventTypes.js";
 import { DatabaseService } from "../../services/database/DatabaseService";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";

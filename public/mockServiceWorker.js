@@ -1,4 +1,5 @@
-/* eslint-disable */
+// @ts-nocheck
+/* eslint-env serviceworker */
 /* tslint:disable */
 
 /**

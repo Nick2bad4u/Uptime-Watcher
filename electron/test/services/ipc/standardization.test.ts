@@ -15,7 +15,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { IpcResponse } from "../../../services/ipc/types";
+import type { IpcResponse } from "../../../services/ipc/types";
 
 describe("IPC Standardization Concepts", () => {
     /**
@@ -450,16 +450,16 @@ registerStandardizedIpcHandler(
     (params: unknown[]): null | string[] => {
         // Parameter validation
         const errors: string[] = [];
-        
+
         if (params.length !== 1) {
             errors.push("Expected exactly 1 parameter");
         }
-        
+
         const param1Error = validateRequiredString(params[0], "param1");
         if (param1Error) {
             errors.push(param1Error);
         }
-        
+
         return errors.length > 0 ? errors : null;
     },
     registeredHandlers

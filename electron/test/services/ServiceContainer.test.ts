@@ -5,10 +5,8 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import {
-    ServiceContainer,
-    ServiceContainerConfig,
-} from "../../services/ServiceContainer";
+import { ServiceContainer } from "../../services/ServiceContainer";
+import type { ServiceContainerConfig } from "../../services/ServiceContainer";
 
 describe(ServiceContainer, () => {
     let container: ServiceContainer;

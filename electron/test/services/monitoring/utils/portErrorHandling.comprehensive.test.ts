@@ -36,9 +36,9 @@ vi.mock("../../../../utils/logger", () => ({
 import {
     PORT_NOT_REACHABLE,
     PortCheckError,
-    PortCheckErrorResult,
     handlePortCheckError,
 } from "../../../../services/monitoring/utils/portErrorHandling";
+import type { PortCheckErrorResult } from "../../../../services/monitoring/utils/portErrorHandling";
 import { isDev } from "../../../../electronUtils";
 import { logger } from "../../../../utils/logger";
 
