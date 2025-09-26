@@ -1,94 +1,81 @@
 ---
 mode: "BeastMode"
 tools: ['createFile', 'createDirectory', 'editFiles', 'search', 'runCommands', 'runTasks', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests', 'context7', 'append_insight', 'describe_table', 'list_insights', 'list_tables', 'read_query', 'sequentialthinking', 'electron-mcp-server', 'execute_command', 'get_diagnostics', 'get_references', 'get_symbol_lsp_info', 'open_files', 'rename_symbol', 'review', 'reviewStaged', 'reviewUnstaged', 'websearch']
-
-description: "Conduct a thorough review of the codebase for consistency"
+description: "Run a consistency audit tailored for the Uptime Watcher Electron + React stack."
 ---
 
-# Codebase Consistency Audit Prompt
+# Uptime Watcher Consistency Audit Prompt
 
 ## Objective
 
-Perform a comprehensive analysis of the **entire codebase** (scan **ALL** files, not just a subset) to identify and resolve any inconsistencies in logic, data flow, and architectural patterns before implementing new features. Start with small utility files and work your way back to the larger files like main.ts and app.tsx
+Execute a repository-wide consistency review across all **implementation** files (ignore tests). Begin with foundational utilities and domain repositories before moving through the Electron main process, shared modules, and finally the renderer (`app.tsx`, routing, Zustand stores, UI components). Ensure alignment with the established Electron + React + SQLite architecture.
 
 ## Analysis Requirements
 
 ### 1. Structural Consistency Check
 
-- [ ] Verify uniform implementation of design patterns across all files
-- [ ] Identify any divergent architectural approaches (e.g., mixed MVC vs MVVM)
-- [ ] Check for consistent layer separation (presentation, business logic, data access)
+- [ ] Confirm uniform usage of the repository pattern, TypedEventBus, and contextBridge IPC wrappers.
+- [ ] Flag any divergence from the layered separation: Electron main (infrastructure), shared/domain modules, renderer (presentation + state).
+- [ ] Validate consistent application of dependency injection, factory helpers, and transaction wrappers.
 
 ### 2. Data Flow Audit
 
-- [ ] Map all data pathways and transformations
-- [ ] Flag any inconsistent data handling (e.g., different validation approaches for similar data types)
-- [ ] Verify uniform error handling patterns for data operations
+- [ ] Trace data paths end-to-end: database repositories → service/domain layer → IPC → renderer stores/components.
+- [ ] Highlight inconsistent validation, sanitization, or transformation logic for comparable entities (e.g., monitors, heartbeats).
+- [ ] Verify error propagation and logging follow the standardized structured logging approach across layers.
 
 ### 3. Logic Uniformity Review
 
-- [ ] Detect duplicate or similar functions with different implementations
-- [ ] Identify business logic that's implemented differently in various components
-- [ ] Check for consistent state management approaches
+- [ ] Detect duplicated domain logic implemented differently across repositories, services, or Zustand stores.
+- [ ] Ensure Zustand slices share consistent patterns for selectors, actions, and async flows.
+- [ ] Review side-effect management (async tasks, timers, Electron background work) for adherence to existing abstractions.
 
 ### 4. Interface Consistency
 
-- [ ] Verify API endpoint patterns follow consistent conventions
-- [ ] Check for uniform parameter handling and response formats
-- [ ] Audit internal component interfaces for consistency
+- [ ] Check IPC channel naming, payload schemas, and TypeScript contracts against current conventions.
+- [ ] Confirm shared DTOs/types are reused instead of ad-hoc interfaces in renderer or main process code.
+- [ ] Audit component props and service method signatures for alignment with documented types in `docs/TSDoc/`.
 
 ### 5. Inconsistency Detection
 
-- [ ] Highlight areas where similar operations are handled differently
-- [ ] Flag any anti-patterns or deviations from established conventions
-- [ ] Identify "special case" implementations that should be generalized
+- [ ] Surface areas where similar operations (e.g., monitor CRUD, notification dispatching) diverge in implementation strategy.
+- [ ] Identify anti-patterns (direct DB access in renderer, bypassing transaction helpers, untyped IPC calls).
+- [ ] Flag “special case” code paths that should be generalized or expressed via shared utilities/hooks.
 
 ## Output Requirements
 
 ### 1. Categorized Report
 
-For each inconsistency found:
-
-- File locations
-- Specific code snippets
-- Description of the inconsistency
-- Recommended standardization approach
+For each inconsistency provide:
+- File path(s) and focused code excerpts.
+- Description of the inconsistency, referencing affected layer or pattern.
+- Recommended alignment strategy referencing current best practice within the codebase.
 
 ### 2. Prioritization
 
-Findings should be prioritized by:
-
-- Impact on system stability
-- Potential for bugs
-- Effect on maintainability
+Rank findings by:
+- Risk to application stability or correctness.
+- Likelihood of introducing bugs during upcoming feature development.
+- Impact on maintainability and developer onboarding.
 
 ### 3. Improvement Suggestions
 
-For each major inconsistency category:
-
-- A unified approach to adopt
-- Required refactoring steps
-- Impact analysis of proposed changes
+For each inconsistency category supply:
+- The unified approach to adopt (cite specific files or patterns as exemplars).
+- Concrete refactoring steps (ordered list).
+- Impact analysis covering affected modules, IPC contracts, data schemas, and documentation.
 
 ### 4. Roadmap
 
-Create a consistency improvement roadmap with:
+Deliver a staged remediation plan:
+- **Quick Wins** – low-effort standardizations (naming, shared utility adoption) with high payoff.
+- **Medium-Term** – coordinated refactors (store consolidation, IPC contract normalization).
+- **Long-Term** – architectural alignments (event bus middleware, shared validation layer).
 
-- Quick wins (easy fixes with high impact)
-- Medium-term standardization projects
-- Long-term architectural alignment
+## Additional Guidance
 
-## Additional Instructions
-
-- Pay special attention to boundary areas between components/modules
-- Consider both horizontal (same-layer) and vertical (cross-layer) consistency
-- Don't worry about test files for this task.
-- Focus on implementation files only
-- Don't worry about minor formatting issues when making changes. (Can always fix with (eslint . --fix))
-- Highlight any inconsistencies that might affect upcoming feature work
-
-- **Time constraint setting:** `unlimited`
-- **Compute Resource setting:** `unlimited`
-- **Compute Constraint setting:** `unlimited`
-- **Thinking Mode setting:** `Super Think` `Deep Think` `Think step by step` `think harder`
-- **Thinking Constraint Time setting:** `unlimited`
+- Focus solely on implementation files; exclude `*.test.*`, Playwright specs, and storybook examples.
+- Pay special attention to boundaries: repository ↔ service, main ↔ renderer IPC, renderer state ↔ components.
+- Defer formatting concerns; structural consistency takes precedence (run `npm run lint:fix` after code changes).
+- Reference existing documentation in `docs/TSDoc/` for canonical definitions before suggesting schema changes.
+- Use the Electron MCP server to inspect runtime behavior or UI state if deeper context is required.
