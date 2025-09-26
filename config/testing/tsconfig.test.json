@@ -3,6 +3,7 @@
     "compilerOptions": {
         "baseUrl": "../..",
         "composite": true,
+        "declarationDir": ".cache/builds/docusaurus/eslint/types",
         "incremental": true,
         "paths": {
             "@app/*": [

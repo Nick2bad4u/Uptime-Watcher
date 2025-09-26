@@ -11,7 +11,7 @@
         "baseUrl": ".",
         "checkJs": false,
         "declaration": true,
-        "declarationDir": "dist/types",
+        "declarationDir": ".cache/builds/app/types",
         "declarationMap": true,
         "diagnostics": false,
         "disableSizeLimit": true,
@@ -39,6 +39,7 @@
         "moduleResolution": "bundler",
         "newLine": "crlf",
         "noCheck": false,
+        "noEmit": false,
         "noErrorTruncation": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
@@ -52,7 +53,7 @@
         "noUncheckedSideEffectImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "outDir": "dist",
+        "outDir": ".cache/builds/app",
         "paths": {
             "@app/*": [
                 "src/*"
@@ -86,7 +87,7 @@
         "suppressExcessPropertyErrors": false,
         "suppressImplicitAnyIndexErrors": false,
         "target": "ES2024",
-        "tsBuildInfoFile": "./cache/tsconfig.tsbuildinfo",
+        "tsBuildInfoFile": "./.cache/tsconfig.tsbuildinfo",
         "types": [
             "@testing-library/jest-dom",
             "electron",

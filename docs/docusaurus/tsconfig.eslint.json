@@ -7,6 +7,7 @@
         "checkJs": false,
         "composite": true,
         "declaration": false,
+        "declarationDir": ".cache/builds/docusaurus/eslint/types",
         "declarationMap": false,
         "emitDeclarationOnly": false,
         "esModuleInterop": true,
@@ -22,8 +23,8 @@
         "module": "ESNext",
         "moduleDetection": "auto",
         "moduleResolution": "bundler",
-        "noEmit": true,
-        "outDir": "../../.cache/builds/dist-typedoc-eslint",
+        "noEmit": false,
+        "outDir": "../../.cache/builds/docusaurus/eslint",
         "paths": {
             "@docusaurus/*": [
                 "./.docusaurus/docusaurus/*"
@@ -40,7 +41,7 @@
         "sourceMap": false,
         "strict": true,
         "target": "ESNext",
-        "tsBuildInfoFile": "../../.cache/builds/dist-typedoc-eslint/typedoc.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/typedoc-eslint.tsbuildinfo"
     },
     "exclude": [
         "node_modules/**",

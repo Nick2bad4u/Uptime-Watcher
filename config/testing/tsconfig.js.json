@@ -5,11 +5,15 @@
         "baseUrl": "../..",
         "checkJs": true,
         "composite": true,
+        "declaration": true,
+        "declarationDir": ".cache/builds/test/js/types",
         "incremental": true,
         "isolatedDeclarations": false,
+        "noEmit": false,
         "noImplicitAny": false,
         "noPropertyAccessFromIndexSignature": false,
         "noUncheckedIndexedAccess": false,
+        "outDir": "../../.cache/builds/test/js",
         "paths": {
             "@app/*": [
                 "src/*"
@@ -22,7 +26,7 @@
             ]
         },
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../dist/tsconfig.js.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/tsconfig.js.tsbuildinfo"
     },
     "exclude": [
         "../../electron/**/*.test.ts",

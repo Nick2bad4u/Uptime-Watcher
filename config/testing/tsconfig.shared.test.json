@@ -2,11 +2,14 @@
     "$schema": "https://www.schemastore.org/tsconfig.json",
     "compilerOptions": {
         "composite": true,
+        "declaration": true,
+        "declarationDir": ".cache/builds/test/shared/types",
         "incremental": true,
         "isolatedDeclarations": false,
-        "outDir": "../../.cache/builds/dist/test/shared",
+        "noEmit": false,
+        "outDir": "../../.cache/builds/test/shared",
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../.cache/builds/dist/test/shared/tsconfig.shared.test.tsbuildinfo",
+        "tsBuildInfoFile": "../../.cache/tsconfig.shared.test.tsbuildinfo",
         "types": [
             "node",
             "vitest/globals"

@@ -11,6 +11,7 @@
         "checkJs": true,
         "composite": true,
         "declaration": true,
+        "declarationDir": ".cache/builds/scripts/types",
         "declarationMap": true,
         "disableSizeLimit": true,
         "downlevelIteration": true,
@@ -21,6 +22,7 @@
         "isolatedDeclarations": false,
         "isolatedModules": true,
         "noCheck": false,
+        "noEmit": false,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": false,
         "noImplicitOverride": false,
@@ -32,7 +34,7 @@
         "noUncheckedSideEffectImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "outDir": ".cache/builds/dist-scripts",
+        "outDir": ".cache/builds/scripts",
         "pretty": true,
         "removeComments": false,
         "resolveJsonModule": true,
@@ -47,7 +49,7 @@
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
-        "tsBuildInfoFile": "./.cache/builds/dist-scripts/tsconfig.scripts.tsbuildinfo",
+        "tsBuildInfoFile": "./.cache/tsconfig.scripts.tsbuildinfo",
         "types": [
             "node"
         ],
@@ -55,12 +57,12 @@
         "useUnknownInCatchVariables": true
     },
     "exclude": [
-    "../../scripts/download**",
-    "node_modules",
-    "**/node_modules/**",
-    "**/dist**/**",
-    "**/dist-scripts/**",
-    "**/coverage/**",
+        "../../scripts/download**",
+        "node_modules",
+        "**/node_modules/**",
+        "**/dist**/**",
+        "**/dist-scripts/**",
+        "**/coverage/**",
         "**/release/**"
     ],
     "extends": "../../tsconfig.json",

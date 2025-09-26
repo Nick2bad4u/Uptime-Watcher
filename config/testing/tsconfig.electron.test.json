@@ -3,9 +3,11 @@
     "compilerOptions": {
         "baseUrl": "../..",
         "composite": true,
+        "declaration": true,
+        "declarationDir": ".cache/builds/test/electron/types",
         "incremental": true,
         "isolatedDeclarations": false,
-    "outDir": "../../.cache/builds/dist/test/electron",
+        "outDir": "../../.cache/builds/test/electron",
         "paths": {
             "@app/*": [
                 "src/*"
@@ -18,11 +20,11 @@
             ]
         },
         "rootDir": "../..",
-    "tsBuildInfoFile": "../../.cache/builds/dist/test/electron/tsconfig.electron.test.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/tsconfig.electron.test.tsbuildinfo"
     },
     "exclude": [
         "node_modules",
-    "../../.cache/builds/dist/test/electron"
+        "../../.cache/builds/test/electron"
     ],
     "extends": "../../tsconfig.json",
     "include": [

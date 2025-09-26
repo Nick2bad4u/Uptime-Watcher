@@ -3,6 +3,8 @@
     "compilerOptions": {
         "baseUrl": "../..",
         "composite": true,
+        "declaration": true,
+        "declarationDir": ".cache/builds/test/bench/types",
         "exactOptionalPropertyTypes": false,
         "incremental": true,
         "isolatedDeclarations": false,
@@ -11,7 +13,7 @@
         "noUncheckedIndexedAccess": false,
         "noUnusedLocals": false,
         "noUnusedParameters": false,
-        "outDir": "../../.cache/builds/dist-bench",
+        "outDir": "../../.cache/builds/test/bench",
         "paths": {
             "@app/*": [
                 "src/*"
@@ -26,7 +28,7 @@
         "rootDir": "../..",
         "strictNullChecks": false,
         "strictPropertyInitialization": false,
-        "tsBuildInfoFile": "../../.cache/builds/dist-bench/tsconfig.bench.tsbuildinfo",
+        "tsBuildInfoFile": "../../.cache/tsconfig.bench.tsbuildinfo",
         "useUnknownInCatchVariables": false
     },
     "exclude": [

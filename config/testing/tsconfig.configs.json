@@ -3,9 +3,12 @@
     "compilerOptions": {
         "baseUrl": "../..",
         "composite": true,
+        "declaration": true,
+        "declarationDir": ".cache/builds/configs/types",
         "incremental": true,
         "isolatedDeclarations": false,
-        "outDir": "../../.cache/builds/dist-configs",
+        "noEmit": false,
+        "outDir": "../../.cache/builds/configs",
         "paths": {
             "@app/*": [
                 "src/*"
@@ -18,12 +21,12 @@
             ]
         },
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../.cache/builds/dist-configs/tsconfig.configs.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/tsconfig.configs.tsbuildinfo"
     },
     "exclude": [
         "node_modules",
         "**/*.d.ts",
-        "**/.cache/builds/dist-configs/**/*.d.ts",
+        "**/.cache/builds/configs/**/*.d.ts",
         "**/config/tools/knip.config.ts",
         "../../config/tools/knip.config.ts",
         "config/tools/knip.config.ts"

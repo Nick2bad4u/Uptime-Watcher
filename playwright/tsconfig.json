@@ -5,14 +5,16 @@
         "allowSyntheticDefaultImports": true,
         "baseUrl": ".",
         "checkJs": true,
+        "declaration": true,
+        "declarationDir": ".cache/builds/test/playwright/types",
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "isolatedDeclarations": false,
         "isolatedModules": true,
         "module": "ESNext",
         "moduleResolution": "bundler",
-        "noEmit": true,
-        "outDir": "../.cache/builds/dist-playwright",
+        "noEmit": false,
+        "outDir": "../.cache/builds/test/playwright",
         "paths": {
             "@/*": [
                 "../src/*"
@@ -32,7 +34,7 @@
         "skipLibCheck": false,
         "strict": true,
         "target": "ES2024",
-        "tsBuildInfoFile": "../.cache/builds/dist-playwright/tsconfig.playwright.tsbuildinfo",
+        "tsBuildInfoFile": "../.cache/tsconfig.playwright.tsbuildinfo",
         "types": [
             "@playwright/test",
             "node"

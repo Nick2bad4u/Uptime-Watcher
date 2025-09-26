@@ -5,6 +5,7 @@
         "allowSyntheticDefaultImports": true,
         "checkJs": false,
         "declaration": true,
+        "declarationDir": ".cache/builds/docusaurus/typedoc/types",
         "declarationMap": true,
         "emitDeclarationOnly": true,
         "esModuleInterop": true,
@@ -30,7 +31,7 @@
         "moduleDetection": "auto",
         "moduleResolution": "bundler",
         "noEmit": false,
-        "outDir": "../../.cache/builds/dist-typedoc",
+        "outDir": "../../.cache/builds/docusaurus/typedoc",
         "paths": {
             "@app/*": [
                 "../../src/*"
@@ -47,7 +48,7 @@
         "sourceMap": true,
         "strict": true,
         "target": "ESNext",
-        "tsBuildInfoFile": "../../.cache/builds/dist-typedoc/typedoc.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/typedoc.tsbuildinfo"
     },
     "exclude": [
         "../../node_modules/**",

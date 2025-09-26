@@ -10,6 +10,7 @@
         "baseUrl": ".",
         "checkJs": false,
         "declaration": true,
+        "declarationDir": ".cache/builds/docusaurus/site/types",
         "declarationMap": true,
         "disableSizeLimit": true,
         "downlevelIteration": true,
@@ -41,7 +42,7 @@
         "noUncheckedSideEffectImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "outDir": "../../.cache/builds/dist-docusaurus",
+        "outDir": "../../.cache/builds/docusaurus/site",
         "paths": {
             "@docusaurus/*": [
                 "./.docusaurus/docusaurus/*"
@@ -67,7 +68,7 @@
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
         "target": "ESNext",
-        "tsBuildInfoFile": "../../.cache/builds/dist-docusaurus/tsconfig.docusaurus.tsbuildinfo",
+        "tsBuildInfoFile": "../../.cache/tsconfig.docusaurus.tsbuildinfo",
         "useDefineForClassFields": true,
         "useUnknownInCatchVariables": true
     },
