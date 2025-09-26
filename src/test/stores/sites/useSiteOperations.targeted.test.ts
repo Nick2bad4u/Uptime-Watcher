@@ -128,18 +128,16 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
         mockElectronAPI = {
             sites: {
-                removeSite: vi.fn().mockResolvedValue({ success: true }),
+                removeSite: vi.fn().mockResolvedValue(true),
             },
             monitoring: {
-                removeMonitor: vi.fn().mockResolvedValue({ success: true }),
-                stopMonitoringForSite: vi
-                    .fn()
-                    .mockResolvedValue({ success: true }),
+                removeMonitor: vi.fn().mockResolvedValue(true),
+                stopMonitoringForSite: vi.fn().mockResolvedValue(true),
             },
             data: {
                 downloadSqliteBackup: vi.fn().mockResolvedValue({
-                    success: true,
-                    data: { buffer: new ArrayBuffer(1024) },
+                    buffer: new ArrayBuffer(1024),
+                    fileName: "backup.db",
                 }),
             },
         };
@@ -176,7 +174,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             // Make stopMonitoringForSite throw an error for the second monitor
             mockElectronAPI.monitoring.stopMonitoringForSite
-                .mockResolvedValueOnce({ success: true }) // First monitor succeeds
+                .mockResolvedValueOnce(true) // First monitor succeeds
                 .mockRejectedValueOnce(new Error("Monitor stop failed")); // Second monitor fails
 
             // Delete site should still succeed despite monitor stop failure

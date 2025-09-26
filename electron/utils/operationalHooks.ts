@@ -65,6 +65,8 @@ import type { TypedEventBus } from "../events/TypedEventBus";
 
 import { logger } from "./logger";
 
+type OperationalLogLevel = "debug" | "error" | "info" | "warn";
+
 /**
  * Configuration for operational hooks.
  */
@@ -92,6 +94,24 @@ export interface OperationalHooksConfig<T = unknown> {
      * Event emitter for operation events.
      */
     eventEmitter?: TypedEventBus<UptimeEvents>;
+
+    /**
+     * Customize the log level used when the operation fails permanently.
+     *
+     * @remarks
+     * Accepts either a static level or a callback that derives the level from
+     * the caught error context. Invalid values fall back to the default
+     * setting.
+     *
+     * @defaultValue "error"
+     */
+    failureLogLevel?:
+        | ((
+              error: Error,
+              attempt: number,
+              maxRetries: number
+          ) => OperationalLogLevel)
+        | OperationalLogLevel;
 
     /**
      * Initial delay between retries in milliseconds.
@@ -193,6 +213,43 @@ async function emitStartEvent(
     }
 }
 
+function isOperationalLogLevel(value: unknown): value is OperationalLogLevel {
+    return (
+        value === "debug" ||
+        value === "info" ||
+        value === "warn" ||
+        value === "error"
+    );
+}
+
+function resolveFailureLogLevel<T>(
+    config: OperationalHooksConfig<T>,
+    error: Error,
+    attempt: number,
+    maxRetries: number
+): OperationalLogLevel {
+    const { failureLogLevel, operationName } = config;
+
+    if (failureLogLevel === undefined) {
+        return "error";
+    }
+
+    if (typeof failureLogLevel === "function") {
+        try {
+            const resolved = failureLogLevel(error, attempt, maxRetries);
+            return isOperationalLogLevel(resolved) ? resolved : "error";
+        } catch (classificationError) {
+            /* V8 ignore next 2 */ logger.debug(
+                `[OperationalHooks] failureLogLevel callback failed for ${operationName}`,
+                classificationError
+            );
+            return "error";
+        }
+    }
+
+    return isOperationalLogLevel(failureLogLevel) ? failureLogLevel : "error";
+}
+
 /**
  * Handle operation failure.
  */
@@ -203,7 +260,8 @@ async function handleFailure<T>(
     startTime: number,
     attempt: number,
     operationId: string,
-    throwOnFailure: boolean = true
+    throwOnFailure: boolean = true,
+    logLevel: OperationalLogLevel = "error"
 ): Promise<T> {
     const { context = {}, emitEvents, eventEmitter, onFailure } = config;
     const duration = Date.now() - startTime;
@@ -237,14 +295,49 @@ async function handleFailure<T>(
         }
     }
 
-    /* V8 ignore next 2 */ logger.error(
-        `[OperationalHooks] ${operationName} failed permanently after ${attempt} attempts`,
-        {
-            duration,
-            error,
-            operationId,
+    const logMessage = `[OperationalHooks] ${operationName} failed permanently after ${attempt} attempts`;
+    const logMetadata = {
+        duration,
+        error,
+        operationId,
+    } as const;
+
+    switch (logLevel) {
+        case "debug": {
+            /* V8 ignore next 2 */ logger.debug(logMessage, logMetadata);
+            break;
         }
-    );
+        case "error": {
+            /* V8 ignore next 2 */ logger.error(logMessage, error, {
+                duration,
+                operationId,
+            });
+            break;
+        }
+        case "info": {
+            /* V8 ignore next 2 */ logger.info(logMessage, logMetadata);
+            break;
+        }
+        case "warn": {
+            /* V8 ignore next 2 */ logger.warn(logMessage, logMetadata);
+            break;
+        }
+        default: {
+            /* V8 ignore next 4 */ logger.warn(
+                `[OperationalHooks] Unknown failure log level, defaulting to error`,
+                {
+                    duration,
+                    operationId,
+                    providedLevel: logLevel,
+                }
+            );
+            /* V8 ignore next 2 */ logger.error(logMessage, error, {
+                duration,
+                operationId,
+            });
+            break;
+        }
+    }
 
     if (throwOnFailure) {
         throw error;
@@ -418,6 +511,13 @@ export async function withOperationalHooks<T>(
                 }
             );
 
+            const failureLogLevel = resolveFailureLogLevel(
+                config,
+                lastError,
+                attempt,
+                maxRetries
+            );
+
             // If this was the last attempt, handle failure
             if (attempt === maxRetries) {
                 return handleFailure(
@@ -427,7 +527,8 @@ export async function withOperationalHooks<T>(
                     startTime,
                     attempt,
                     operationId,
-                    throwOnFailure
+                    throwOnFailure,
+                    failureLogLevel
                 );
             }
 

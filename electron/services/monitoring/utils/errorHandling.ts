@@ -69,6 +69,52 @@ export function createErrorResult(
     };
 }
 
+const CANCELLATION_ERROR_CODES = new Set(["ECONNABORTED", "ERR_CANCELED"]);
+const CANCELLATION_ERROR_NAMES = new Set([
+    "AbortError",
+    "CanceledError",
+    "TimeoutError",
+]);
+
+function normalizeErrorCode(error: Error): string | undefined {
+    const candidate: unknown = Reflect.get(error as object, "code");
+
+    if (typeof candidate === "string" && candidate.trim() !== "") {
+        return candidate.toUpperCase();
+    }
+
+    return undefined;
+}
+
+/**
+ * Determine whether an error represents an expected cancellation scenario.
+ */
+export function isCancellationError(
+    error: unknown
+): error is Error & { code?: string } {
+    if (!(error instanceof Error)) {
+        return false;
+    }
+
+    const normalizedCode = normalizeErrorCode(error);
+    if (normalizedCode && CANCELLATION_ERROR_CODES.has(normalizedCode)) {
+        return true;
+    }
+
+    if (CANCELLATION_ERROR_NAMES.has(error.name)) {
+        return true;
+    }
+
+    if (axios.isAxiosError(error)) {
+        const axiosCode = normalizeErrorCode(error);
+        if (axiosCode && CANCELLATION_ERROR_CODES.has(axiosCode)) {
+            return true;
+        }
+    }
+
+    return typeof axios.isCancel === "function" && axios.isCancel(error);
+}
+
 /**
  * Handles Axios-specific errors encountered during HTTP monitoring.
  *
@@ -105,7 +151,15 @@ export function handleAxiosError(
     correlationId?: string
 ): MonitorCheckResult {
     // Network errors, timeouts, DNS failures, etc.
-    const errorMessage = error.message || "Network error";
+    let errorMessage = error.message || "Network error";
+
+    const normalizedCode = normalizeErrorCode(error);
+
+    if (isCancellationError(error)) {
+        errorMessage = "Request canceled";
+    } else if (normalizedCode === "ECONNABORTED") {
+        errorMessage = "Request timed out";
+    }
 
     if (isDev()) {
         const logData = correlationId ? { correlationId, error } : { error };
@@ -154,18 +208,29 @@ export function handleCheckError(
     url: string,
     correlationId?: string
 ): MonitorCheckResult {
-    const responseTime =
-        axios.isAxiosError(error) && error.responseTime
-            ? error.responseTime
-            : 0;
+    const axiosError = axios.isAxiosError(error) ? error : undefined;
+    const responseTime = axiosError?.responseTime ?? 0;
 
-    if (axios.isAxiosError(error)) {
-        return handleAxiosError(
-            error as AxiosError,
-            url,
+    if (isCancellationError(error)) {
+        if (isDev()) {
+            const logContext = correlationId
+                ? { correlationId, error }
+                : { error };
+            logger.debug(
+                `[HttpMonitor] Request for ${url} was canceled before completion`,
+                logContext
+            );
+        }
+
+        return createErrorResult(
+            "Request canceled",
             responseTime,
             correlationId
         );
+    }
+
+    if (axiosError) {
+        return handleAxiosError(axiosError, url, responseTime, correlationId);
     }
 
     // Non-Axios errors (shouldn't happen, but defensive programming)

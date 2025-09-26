@@ -59,7 +59,7 @@ import {
     extractMonitorConfig,
     validateMonitorUrl,
 } from "./shared/monitorServiceHelpers";
-import { handleCheckError } from "./utils/errorHandling";
+import { handleCheckError, isCancellationError } from "./utils/errorHandling";
 import { createHttpClient } from "./utils/httpClient";
 import { determineMonitorStatus } from "./utils/httpStatusUtils";
 
@@ -396,6 +396,10 @@ export class HttpMonitor implements IMonitorService {
             return await withOperationalHooks(
                 () => this.performSingleHealthCheck(url, timeout, signal),
                 {
+                    failureLogLevel: (encounteredError) =>
+                        isCancellationError(encounteredError)
+                            ? "warn"
+                            : "error",
                     initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
                     maxRetries: totalAttempts,
                     operationName: `HTTP check for ${url}`,

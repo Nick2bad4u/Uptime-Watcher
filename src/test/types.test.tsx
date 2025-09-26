@@ -538,10 +538,14 @@ describe("Types Module", () => {
                     removeAllListeners: () => {},
                 },
                 monitoring: {
-                    startMonitoring: () => Promise.resolve(),
-                    stopMonitoring: () => Promise.resolve(),
-                    startMonitoringForSite: () => Promise.resolve(),
-                    stopMonitoringForSite: () => Promise.resolve(),
+                    formatMonitorDetail: () => Promise.resolve("detail"),
+                    formatMonitorTitleSuffix: () => Promise.resolve("suffix"),
+                    removeMonitor: () => Promise.resolve(true),
+                    startMonitoring: () => Promise.resolve(true),
+                    startMonitoringForSite: () => Promise.resolve(true),
+                    stopMonitoring: () => Promise.resolve(true),
+                    stopMonitoringForSite: () => Promise.resolve(true),
+                    validateMonitorData: () => Promise.resolve({}),
                 },
                 settings: {
                     getHistoryLimit: () => Promise.resolve(100),
@@ -554,9 +558,21 @@ describe("Types Module", () => {
                             ...site,
                             identifier: "new-id",
                         } as Site),
-                    removeSite: () => Promise.resolve(),
-                    updateSite: () => Promise.resolve(),
-                    checkSiteNow: () => Promise.resolve(),
+                    removeSite: () => Promise.resolve(true),
+                    updateSite: () =>
+                        Promise.resolve({
+                            identifier: "updated-id",
+                            monitors: [],
+                            monitoring: false,
+                            name: "Updated",
+                        } as Site),
+                    checkSiteNow: () =>
+                        Promise.resolve({
+                            identifier: "checked-id",
+                            monitors: [],
+                            monitoring: true,
+                            name: "Checked",
+                        } as Site),
                 },
                 system: {
                     quitAndInstall: () => {},
@@ -576,11 +592,21 @@ describe("Types Module", () => {
             expect(typeof mockAPI.events.removeAllListeners).toBe("function");
 
             expect(typeof mockAPI.monitoring.startMonitoring).toBe("function");
+            expect(typeof mockAPI.monitoring.formatMonitorDetail).toBe(
+                "function"
+            );
+            expect(typeof mockAPI.monitoring.formatMonitorTitleSuffix).toBe(
+                "function"
+            );
+            expect(typeof mockAPI.monitoring.removeMonitor).toBe("function");
             expect(typeof mockAPI.monitoring.stopMonitoring).toBe("function");
             expect(typeof mockAPI.monitoring.startMonitoringForSite).toBe(
                 "function"
             );
             expect(typeof mockAPI.monitoring.stopMonitoringForSite).toBe(
+                "function"
+            );
+            expect(typeof mockAPI.monitoring.validateMonitorData).toBe(
                 "function"
             );
 

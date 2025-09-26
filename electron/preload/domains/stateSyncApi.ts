@@ -33,11 +33,17 @@ const VALID_STATE_SYNC_SOURCES = [
 type ValidStateSyncAction = (typeof VALID_STATE_SYNC_ACTIONS)[number];
 type ValidStateSyncSource = (typeof VALID_STATE_SYNC_SOURCES)[number];
 
-const isValidStateSyncAction = (value: string): value is ValidStateSyncAction =>
-    VALID_STATE_SYNC_ACTIONS.some((candidate) => candidate === value);
+const isValidStateSyncAction = (
+    value: unknown
+): value is ValidStateSyncAction =>
+    typeof value === "string" &&
+    (VALID_STATE_SYNC_ACTIONS as readonly string[]).includes(value);
 
-const isValidStateSyncSource = (value: string): value is ValidStateSyncSource =>
-    VALID_STATE_SYNC_SOURCES.some((candidate) => candidate === value);
+const isValidStateSyncSource = (
+    value: unknown
+): value is ValidStateSyncSource =>
+    typeof value === "string" &&
+    (VALID_STATE_SYNC_SOURCES as readonly string[]).includes(value);
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null;

@@ -418,6 +418,68 @@ describe("operationalHooks.ts - Branch Coverage", () => {
 
             expect(result).toBe("success");
         });
+        it("should downgrade failure logging when configured", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const mockOperation = vi
+                .fn()
+                .mockRejectedValue(new Error("Cancellation"));
+            const loggerModule = await import("../../utils/logger.js");
+
+            await expect(
+                operationalHooks.withOperationalHooks(mockOperation, {
+                    operationName: "failureLogLevelTest",
+                    maxRetries: 1,
+                    failureLogLevel: () => "warn",
+                })
+            ).rejects.toThrow("Cancellation");
+
+            expect(loggerModule.logger.warn).toHaveBeenCalled();
+            expect(loggerModule.logger.error).not.toHaveBeenCalled();
+        });
+        it("should fallback gracefully when failureLogLevel callback throws", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const mockOperation = vi
+                .fn()
+                .mockRejectedValue(new Error("classification failure"));
+            const loggerModule = await import("../../utils/logger.js");
+            const classifierError = new Error("classifier error");
+
+            await expect(
+                operationalHooks.withOperationalHooks(mockOperation, {
+                    operationName: "failureClassifierThrows",
+                    maxRetries: 1,
+                    failureLogLevel: () => {
+                        throw classifierError;
+                    },
+                })
+            ).rejects.toThrow("classification failure");
+
+            expect(loggerModule.logger.debug).toHaveBeenCalledWith(
+                expect.stringContaining("failureLogLevel callback failed"),
+                classifierError
+            );
+            expect(loggerModule.logger.error).toHaveBeenCalled();
+        });
     });
     describe("withDatabaseOperation - Specialized Wrapper", () => {
         it("should execute database operation successfully", async ({

@@ -18,7 +18,7 @@ import type { Site, Monitor, MonitorStatus } from "../../../../shared/types";
 const mockElectronAPI = {
     sites: {
         updateSite: vi.fn().mockResolvedValue(undefined),
-        removeMonitor: vi.fn().mockResolvedValue(undefined),
+        removeSite: vi.fn().mockResolvedValue(true),
     },
     monitoring: {
         stopMonitoringForSite: vi.fn().mockResolvedValue(true),

@@ -62,7 +62,7 @@ describe("SiteService Critical Coverage Tests", () => {
         vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(undefined);
         vi.mocked(
             (globalThis as any).electronAPI.monitoring.removeMonitor
-        ).mockResolvedValue({ success: true });
+        ).mockResolvedValue(true);
     });
 
     describe("removeMonitor method - Lines 157-162 Coverage", () => {
@@ -76,9 +76,7 @@ describe("SiteService Critical Coverage Tests", () => {
             );
             vi.mocked(
                 (globalThis as any).electronAPI.monitoring.removeMonitor
-            ).mockResolvedValue({
-                success: true,
-            });
+            ).mockResolvedValue(true);
 
             // Act
             await SiteService.removeMonitor(siteIdentifier, monitorId);
@@ -148,9 +146,7 @@ describe("SiteService Critical Coverage Tests", () => {
             );
             vi.mocked(
                 (globalThis as any).electronAPI.monitoring.removeMonitor
-            ).mockResolvedValue({
-                success: true,
-            });
+            ).mockResolvedValue(true);
 
             // Act
             await SiteService.removeMonitor(siteIdentifier, monitorId);
@@ -172,9 +168,7 @@ describe("SiteService Critical Coverage Tests", () => {
             );
             vi.mocked(
                 (globalThis as any).electronAPI.monitoring.removeMonitor
-            ).mockResolvedValue({
-                success: true,
-            });
+            ).mockResolvedValue(true);
 
             // Act
             await SiteService.removeMonitor(siteIdentifier, monitorId);
@@ -203,7 +197,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 (globalThis as any).electronAPI.monitoring.removeMonitor
             ).mockImplementation(async () => {
                 callOrder.push("removeMonitor");
-                return { success: true };
+                return true;
             });
 
             // Act
@@ -265,6 +259,24 @@ describe("SiteService Critical Coverage Tests", () => {
                     originalRemoveMonitor;
             }
         });
+
+        it("should throw when backend reports unsuccessful removal", async () => {
+            const siteIdentifier = "site-123";
+            const monitorId = "monitor-456";
+
+            vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
+                undefined
+            );
+            vi.mocked(
+                (globalThis as any).electronAPI.monitoring.removeMonitor
+            ).mockResolvedValue(false);
+
+            await expect(
+                SiteService.removeMonitor(siteIdentifier, monitorId)
+            ).rejects.toThrow(
+                `Monitor removal failed for monitor ${monitorId} on site ${siteIdentifier}`
+            );
+        });
     });
 
     describe("Initialize method coverage", () => {
@@ -312,7 +324,7 @@ describe("SiteService Critical Coverage Tests", () => {
             );
             vi.mocked(
                 (globalThis as any).electronAPI.monitoring.removeMonitor
-            ).mockResolvedValue({ success: true });
+            ).mockResolvedValue(true);
 
             // Act
             for (const { siteId, monitorId } of operations) {
@@ -345,7 +357,7 @@ describe("SiteService Critical Coverage Tests", () => {
             );
             vi.mocked(
                 (globalThis as any).electronAPI.monitoring.removeMonitor
-            ).mockResolvedValue({ success: true });
+            ).mockResolvedValue(true);
 
             // Act
             const promises = operations.map(({ siteId, monitorId }) =>
@@ -371,7 +383,7 @@ describe("SiteService Critical Coverage Tests", () => {
             );
             vi.mocked(
                 (globalThis as any).electronAPI.monitoring.removeMonitor
-            ).mockResolvedValue({ success: true });
+            ).mockResolvedValue(true);
 
             // Act
             await SiteService.removeMonitor(longSiteId, longMonitorId);
