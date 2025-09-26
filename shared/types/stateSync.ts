@@ -25,7 +25,7 @@ export type StateSyncAction = "bulk-sync" | "delete" | "update";
  */
 export interface StateSyncStatusSummary {
     /** Timestamp (ms since epoch) of the last successful sync, if available. */
-    lastSyncAt: number | null;
+    lastSyncAt: null | number;
     /** Total number of sites currently known to the backend. */
     siteCount: number;
     /** Source that most recently produced the synchronized state. */
@@ -40,10 +40,10 @@ export interface StateSyncStatusSummary {
 export interface StateSyncFullSyncResult {
     /** Timestamp (ms since epoch) when the sync completed. */
     completedAt: number;
-    /** Full set of sites returned by the backend. */
-    sites: Site[];
     /** Total number of sites contained in {@link sites}. */
     siteCount: number;
+    /** Full set of sites returned by the backend. */
+    sites: Site[];
     /** Origin that produced the synchronized payload. */
     source: StateSyncSource;
     /** Indicates whether the sync finished successfully. */

@@ -51,49 +51,60 @@ import {
 import "@testing-library/jest-dom";
 import type { JSX } from "react/jsx-runtime";
 import { FormErrorAlert } from "../../../components/shared/FormErrorAlert";
+import { sanitizeDomProps } from "../../utils/domPropSanitizer";
 
 // Mock themed components
 vi.mock("../../../theme/components/ThemedBox", () => ({
-    ThemedBox: vi.fn(({ children, className, variant, ...props }) => (
-        <div
-            className={className}
-            data-testid="themed-box"
-            data-variant={variant}
-            {...props}
-        >
-            {children}
-        </div>
-    )),
+    ThemedBox: vi.fn(({ children, className, variant, ...props }) => {
+        const safeProps = sanitizeDomProps(props);
+        return (
+            <div
+                className={className}
+                data-testid="themed-box"
+                data-variant={variant}
+                {...safeProps}
+            >
+                {children}
+            </div>
+        );
+    }),
 }));
 
 vi.mock("../../../theme/components/ThemedText", () => ({
-    ThemedText: vi.fn(({ children, className, size, variant, ...props }) => (
-        <span
-            className={className}
-            data-testid="themed-text"
-            data-size={size}
-            data-variant={variant}
-            {...props}
-        >
-            {children}
-        </span>
-    )),
+    ThemedText: vi.fn(({ children, className, size, variant, ...props }) => {
+        const safeProps = sanitizeDomProps(props);
+        return (
+            <span
+                className={className}
+                data-testid="themed-text"
+                data-size={size}
+                data-variant={variant}
+                {...safeProps}
+            >
+                {children}
+            </span>
+        );
+    }),
 }));
 
 vi.mock("../../../theme/components/ThemedButton", () => ({
     ThemedButton: vi.fn(
-        ({ children, onClick, className, size, variant, ...props }) => (
-            <button
-                className={className}
-                onClick={onClick}
-                data-testid="themed-button"
-                data-size={size}
-                data-variant={variant}
-                {...props}
-            >
-                {children}
-            </button>
-        )
+        ({ children, onClick, className, size, variant, ...props }) => {
+            const safeProps = sanitizeDomProps(props);
+            return (
+                <button
+                    type="button"
+                    className={className}
+                    onClick={onClick}
+                    data-testid="themed-button"
+                    data-size={size}
+                    data-variant={variant}
+                    {...safeProps}
+                >
+                    {children}
+                </button>
+            );
+        }
     ),
 }));
 

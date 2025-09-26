@@ -34,6 +34,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import type { JSX } from "react/jsx-runtime";
 import { SaveButton } from "../../../components/shared/SaveButton";
+import { sanitizeDomProps } from "../../utils/domPropSanitizer";
 
 // Mock ThemedButton component
 vi.mock("../../../theme/components/ThemedButton", () => ({
@@ -48,21 +49,25 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
             icon,
             "aria-label": ariaLabel,
             ...props
-        }) => (
-            <button
-                className={className}
-                onClick={onClick}
-                disabled={disabled}
-                data-testid="themed-button"
-                data-variant={variant}
-                data-size={size}
-                aria-label={ariaLabel}
-                {...props}
-            >
-                {icon && <span data-testid="button-icon">{icon}</span>}
-                {children}
-            </button>
-        )
+        }) => {
+            const safeProps = sanitizeDomProps(props);
+            return (
+                <button
+                    type="button"
+                    className={className}
+                    onClick={onClick}
+                    disabled={disabled}
+                    data-testid="themed-button"
+                    data-variant={variant}
+                    data-size={size}
+                    aria-label={ariaLabel}
+                    {...safeProps}
+                >
+                    {icon && <span data-testid="button-icon">{icon}</span>}
+                    {children}
+                </button>
+            );
+        }
     ),
 }));
 
@@ -546,8 +551,16 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
 
                     const button = screen.getByTestId("themed-button");
 
-                    if (className) {
-                        expect(button).toHaveClass(className);
+                    const normalizedClassName = className.trim();
+
+                    if (normalizedClassName.length > 0) {
+                        const expectedClasses = normalizedClassName
+                            .split(/\s+/u)
+                            .filter((candidate) => candidate.length > 0);
+
+                        if (expectedClasses.length > 0) {
+                            expect(button).toHaveClass(...expectedClasses);
+                        }
                     }
 
                     // Should not crash with any className

@@ -10,6 +10,7 @@
 
 import type { Monitor, Site } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
+
 import type { StateSyncAction, StateSyncSource } from "./stateSync";
 
 /**

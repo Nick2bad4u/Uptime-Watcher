@@ -1,998 +1,601 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Mock } from "vitest";
-import type { Monitor } from "../../../shared/types";
+import type { Monitor, MonitorType } from "../../../shared/types";
+import type { MonitorTypeConfig } from "../../../shared/types/monitorTypes";
+import { CacheKeys } from "../../../shared/utils/cacheKeys";
 
-/**
- * Test suite for src/utils/monitorUiHelpers.ts
- *
- * @file Comprehensive tests for monitor UI helper utilities
- */
-
-// Mock dependencies
-vi.mock("../types/ipc", () => ({
-    safeExtractIpcData: vi.fn((response, fallback) =>
-        response.success ? response.data : fallback
-    ),
+const cacheMocks = vi.hoisted(() => ({
+    get: vi.fn(),
+    set: vi.fn(),
+    clear: vi.fn(),
 }));
 
-const mockCacheGet = vi.fn();
-const mockCacheSet = vi.fn();
-const mockCacheClear = vi.fn();
+const monitorTypeHelperMocks = vi.hoisted(() => ({
+    getAvailableMonitorTypes: vi.fn(),
+    getMonitorTypeConfig: vi.fn(),
+}));
 
-vi.mock("./cache", () => ({
+const monitorTypesServiceMocks = vi.hoisted(() => ({
+    formatMonitorDetail: vi.fn(),
+    formatMonitorTitleSuffix: vi.fn(),
+    getMonitorTypes: vi.fn(),
+    validateMonitorData: vi.fn(),
+    initialize: vi.fn(),
+}));
+
+const monitorTypesStoreState = vi.hoisted(() => ({
+    clearError: vi.fn(),
+    fieldConfigs: {} as Record<string, unknown>,
+    formatMonitorDetail: vi.fn(),
+    formatMonitorTitleSuffix: vi.fn(),
+    getFieldConfig: vi.fn(),
+    isLoaded: true,
+    isLoading: false,
+    lastError: undefined as unknown,
+    loadMonitorTypes: vi.fn(),
+    monitorTypes: [] as MonitorTypeConfig[],
+    refreshMonitorTypes: vi.fn(),
+    setError: vi.fn(),
+    setLoading: vi.fn(),
+    validateMonitorData: vi.fn(),
+}));
+
+const mockCacheGet = cacheMocks.get;
+const mockCacheSet = cacheMocks.set;
+const mockCacheClear = cacheMocks.clear;
+
+vi.mock("../../utils/cache", () => ({
     AppCaches: {
         uiHelpers: {
-            get: mockCacheGet,
-            set: mockCacheSet,
-            clear: mockCacheClear,
+            get: cacheMocks.get,
+            set: cacheMocks.set,
+            clear: cacheMocks.clear,
         },
     },
 }));
 
-vi.mock("./errorHandling", () => ({
-    withUtilityErrorHandling: vi.fn(async (operation, _context, fallback) => {
-        try {
-            return await operation();
-        } catch {
-            return fallback;
+vi.mock("@shared/utils/errorHandling", () => ({
+    withUtilityErrorHandling: vi.fn(
+        async <T>(
+            operation: () => Promise<T>,
+            _context: string,
+            fallback: T
+        ) => {
+            try {
+                return await operation();
+            } catch {
+                return fallback;
+            }
         }
-    }),
+    ),
 }));
 
-const mockGetAvailableMonitorTypes = vi.fn();
-const mockGetMonitorTypeConfig = vi.fn();
+const mockGetAvailableMonitorTypes =
+    monitorTypeHelperMocks.getAvailableMonitorTypes;
+const mockGetMonitorTypeConfig = monitorTypeHelperMocks.getMonitorTypeConfig;
 
-vi.mock("./monitorTypeHelper", () => ({
-    getAvailableMonitorTypes: mockGetAvailableMonitorTypes,
-    getMonitorTypeConfig: mockGetMonitorTypeConfig,
+vi.mock("../../utils/monitorTypeHelper", () => ({
+    getAvailableMonitorTypes: monitorTypeHelperMocks.getAvailableMonitorTypes,
+    getMonitorTypeConfig: monitorTypeHelperMocks.getMonitorTypeConfig,
 }));
 
-// Mock MonitorTypesService
 vi.mock("../../services/MonitorTypesService", () => ({
-    MonitorTypesService: {
-        formatMonitorDetail: vi.fn(),
-        formatMonitorTitleSuffix: vi.fn(),
-        getMonitorTypes: vi.fn(),
-        validateMonitorData: vi.fn(),
-        initialize: vi.fn(),
-    },
+    MonitorTypesService: monitorTypesServiceMocks,
 }));
 
-// Mock useMonitorTypesStore to delegate to MonitorTypesService mocks
+const loadMonitorTypesMock = monitorTypesStoreState.loadMonitorTypes;
+
 vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
     useMonitorTypesStore: {
-        getState: () => ({
-            formatMonitorDetail: (type: string, details: string) =>
-                MonitorTypesService.formatMonitorDetail(type, details),
-            formatMonitorTitleSuffix: (type: string, monitor: any) =>
-                MonitorTypesService.formatMonitorTitleSuffix(type, monitor),
-        }),
+        getState: () => monitorTypesStoreState,
     },
 }));
 
-const mockElectronAPI = {
-    monitorTypes: {
-        formatMonitorDetail: vi.fn(),
-        formatMonitorTitleSuffix: vi.fn(),
-    },
+import {
+    allSupportsAdvancedAnalytics,
+    allSupportsResponseTime,
+    clearConfigCache,
+    formatMonitorDetail,
+    formatMonitorTitleSuffix,
+    getAnalyticsLabel,
+    getDefaultMonitorId,
+    getMonitorHelpTexts,
+    getTypesWithFeature,
+    shouldShowUrl,
+    supportsAdvancedAnalytics,
+    supportsResponseTime,
+} from "../../utils/monitorUiHelpers";
+import { MonitorTypesService } from "../../services/MonitorTypesService";
+
+const configMap = new Map<string, MonitorTypeConfig>();
+
+const getCacheKeyForType = (type: string): string =>
+    CacheKeys.config.byName(`monitor-config-${type}`);
+
+const createConfig = (
+    type: string,
+    overrides: Partial<MonitorTypeConfig> = {}
+): MonitorTypeConfig => {
+    if (overrides.uiConfig === null) {
+        return {
+            type: overrides.type ?? type,
+            displayName:
+                overrides.displayName ??
+                `${String(type).toUpperCase()} Monitor`,
+            description: overrides.description ?? "Monitor configuration",
+            fields: overrides.fields ?? [],
+            version: overrides.version ?? "1.0.0",
+            uiConfig: undefined,
+        };
+    }
+
+    const detailFormats = overrides.uiConfig?.detailFormats ?? {};
+    const display = overrides.uiConfig?.display ?? {};
+    const helpTexts = overrides.uiConfig?.helpTexts ?? {};
+
+    const { analyticsLabel, ...detailFormatsRest } = detailFormats;
+    const { showUrl, ...displayRest } = display;
+    const { primary, secondary, ...helpTextsRest } = helpTexts;
+
+    return {
+        type: overrides.type ?? type,
+        displayName:
+            overrides.displayName ?? `${String(type).toUpperCase()} Monitor`,
+        description: overrides.description ?? "Monitor configuration",
+        fields: overrides.fields ?? [],
+        version: overrides.version ?? "1.0.0",
+        uiConfig: {
+            detailFormats: {
+                ...detailFormatsRest,
+                analyticsLabel:
+                    analyticsLabel ??
+                    `${String(type).toUpperCase()} Response Time`,
+            },
+            display: {
+                ...displayRest,
+                showUrl: showUrl ?? true,
+            },
+            helpTexts: {
+                ...helpTextsRest,
+                primary: primary ?? "Primary help",
+                secondary: secondary ?? "Secondary help",
+            },
+            supportsAdvancedAnalytics:
+                overrides.uiConfig?.supportsAdvancedAnalytics ?? false,
+            supportsResponseTime:
+                overrides.uiConfig?.supportsResponseTime ?? false,
+        },
+    };
 };
 
-// Expose mock variables for easier access in tests
-const getAvailableMonitorTypes = mockGetAvailableMonitorTypes;
-const getMonitorTypeConfig = mockGetMonitorTypeConfig;
+const storeConfig = (
+    type: string,
+    overrides: Partial<MonitorTypeConfig> = {}
+): MonitorTypeConfig => {
+    const config = createConfig(type, overrides);
+    configMap.set(getCacheKeyForType(type), config);
+    return config;
+};
 
-// Import mocked services for setup
-import { MonitorTypesService } from "../../services/MonitorTypesService";
-import type { ValidationResult } from "../../../shared/types/validation";
+const buildMonitor = (overrides: Partial<Monitor> = {}): Monitor => ({
+    checkInterval: 30_000,
+    history: [],
+    id: "monitor-id",
+    monitoring: true,
+    responseTime: 100,
+    retryAttempts: 3,
+    status: "up",
+    timeout: 5000,
+    type: "http",
+    url: "https://example.com",
+    ...overrides,
+});
 
-describe("Monitor UI Helpers", () => {
-    let originalWindow: Window | undefined;
+beforeEach(() => {
+    configMap.clear();
+    vi.clearAllMocks();
 
-    // Helper function to create mock Monitor objects
-    const createMockMonitor = (partial: Partial<Monitor> = {}): Monitor => ({
-        checkInterval: 30_000,
-        history: [],
-        id: "test-monitor-id",
-        monitoring: true,
-        responseTime: 100,
-        retryAttempts: 3,
-        status: "up" as const,
-        timeout: 5000,
-        type: "http" as const,
-        url: "https://example.com",
-        ...partial,
+    mockCacheGet.mockImplementation((key: string) => configMap.get(key));
+    mockCacheSet.mockImplementation((key: string, value: MonitorTypeConfig) => {
+        configMap.set(key, value);
+    });
+    mockCacheClear.mockImplementation(() => {
+        configMap.clear();
     });
 
-    beforeEach(() => {
-        originalWindow = globalThis.window;
+    mockGetMonitorTypeConfig.mockResolvedValue(undefined);
+    mockGetAvailableMonitorTypes.mockResolvedValue([]);
 
-        // Mock window.electronAPI
-        globalThis.window = {
-            electronAPI: mockElectronAPI,
-        } as unknown as Window & typeof globalThis;
+    monitorTypesStoreState.monitorTypes = [];
+    monitorTypesStoreState.isLoaded = true;
+    monitorTypesStoreState.isLoading = false;
+    monitorTypesStoreState.lastError = undefined;
+    monitorTypesStoreState.fieldConfigs = {};
 
-        // Clear all mocks
-        vi.clearAllMocks();
+    loadMonitorTypesMock.mockResolvedValue(undefined);
 
-        // Reset cache mocks
-        mockCacheGet.mockReturnValue(undefined);
-        mockCacheSet.mockReturnValue(undefined);
-        mockCacheClear.mockReturnValue(undefined);
+    monitorTypesStoreState.formatMonitorDetail.mockImplementation(
+        (type, details) =>
+            MonitorTypesService.formatMonitorDetail(type, details)
+    );
+    monitorTypesStoreState.formatMonitorTitleSuffix.mockImplementation(
+        (type, monitor) =>
+            MonitorTypesService.formatMonitorTitleSuffix(type, monitor)
+    );
 
-        // Reset helper mocks
-        vi.mocked(getMonitorTypeConfig).mockImplementation(
-            async () => undefined
-        );
-        vi.mocked(getAvailableMonitorTypes).mockImplementation(async () => []);
+    const mockedService = vi.mocked(MonitorTypesService);
+    mockedService.formatMonitorDetail.mockResolvedValue("Formatted detail");
+    mockedService.formatMonitorTitleSuffix.mockResolvedValue(" (suffix)");
+    mockedService.getMonitorTypes.mockResolvedValue([]);
+    mockedService.validateMonitorData.mockResolvedValue({
+        success: true,
+        errors: [],
+    });
+});
 
-        // Setup MonitorTypesService mocks with correct return values for tests
-        vi.mocked(MonitorTypesService.formatMonitorDetail).mockResolvedValue(
-            "Response Code: 200"
-        );
-        vi.mocked(
-            MonitorTypesService.formatMonitorTitleSuffix
-        ).mockResolvedValue(" (https://example.com)");
-        vi.mocked(MonitorTypesService.getMonitorTypes).mockResolvedValue([]);
-        vi.mocked(MonitorTypesService.validateMonitorData).mockResolvedValue({
-            success: true,
-            errors: [],
-        } as ValidationResult);
+afterEach(() => {
+    monitorTypesStoreState.formatMonitorDetail.mockReset();
+    monitorTypesStoreState.formatMonitorTitleSuffix.mockReset();
+});
 
-        // Setup electron API mocks for backward compatibility
-        mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue({
-            success: true,
-            data: "Response Code: 200",
+describe(supportsAdvancedAnalytics, () => {
+    it("returns true when the configuration enables the feature", async () => {
+        storeConfig("http", {
+            uiConfig: {
+                supportsAdvancedAnalytics: true,
+            },
         });
-        mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
-            {
-                success: true,
-                data: " (https://example.com)",
-            }
-        );
+
+        const result = await supportsAdvancedAnalytics("http");
+        expect(result).toBeTruthy();
     });
 
-    afterEach(() => {
-        if (originalWindow) {
-            globalThis.window = originalWindow as Window & typeof globalThis;
-        }
+    it("returns false when the configuration does not enable the feature", async () => {
+        storeConfig("http", {
+            uiConfig: {
+                supportsAdvancedAnalytics: false,
+            },
+        });
+
+        const result = await supportsAdvancedAnalytics("http");
+        expect(result).toBeFalsy();
     });
 
-    describe("allSupportsAdvancedAnalytics", () => {
-        it("should return true when all monitor types support advanced analytics", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const { allSupportsAdvancedAnalytics } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            // Mock supportsAdvancedAnalytics to return true for all types
-            vi.doMock("../../utils/monitorUiHelpers", async () => {
-                const actual = await vi.importActual(
-                    "../../utils/monitorUiHelpers"
-                );
-                return {
-                    ...actual,
-                    supportsAdvancedAnalytics: vi.fn().mockResolvedValue(true),
-                };
-            });
-
-            const result = await allSupportsAdvancedAnalytics(["http", "port"]);
-            expect(result).toBeFalsy(); // Default fallback when no mocking works
-        });
-
-        it("should return false when any monitor type doesn't support advanced analytics", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const { allSupportsAdvancedAnalytics } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            const result = await allSupportsAdvancedAnalytics(["http", "port"]);
-            expect(result).toBeFalsy();
-        });
-
-        it("should return true for empty array", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { allSupportsAdvancedAnalytics } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            const result = await allSupportsAdvancedAnalytics([]);
-            expect(result).toBeTruthy(); // Empty array means all elements satisfy the condition (vacuous truth)
-        });
-    });
-
-    describe("allSupportsResponseTime", () => {
-        it("should return false as fallback when checking response time support", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { allSupportsResponseTime } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            const result = await allSupportsResponseTime(["http", "port"]);
-            expect(result).toBeFalsy(); // Default fallback
-        });
-
-        it("should handle empty array", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { allSupportsResponseTime } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            const result = await allSupportsResponseTime([]);
-            expect(result).toBeTruthy(); // Empty array means all elements satisfy the condition (vacuous truth)
-        });
-    });
-
-    describe("clearConfigCache", () => {
-        it("should call cache clear method", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Caching", "type");
-
-            const { clearConfigCache } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            clearConfigCache();
-
-            // Since mock setup might not work in some environments, just verify the function exists
-            expect(typeof clearConfigCache).toBe("function");
-        });
-    });
-
-    describe("formatMonitorDetail", () => {
-        it("should format monitor detail when electronAPI is available", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const { formatMonitorDetail } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue({
-                success: true,
-                data: "Response Code: 200",
-            });
-
-            const result = await formatMonitorDetail("http", "200");
-            expect(result).toBe("Response Code: 200");
-            expect(
-                MonitorTypesService.formatMonitorDetail
-            ).toHaveBeenCalledWith("http", "200");
-        });
-
-        it("should return fallback when electronAPI is not available", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { formatMonitorDetail } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            // Mock the service to simulate failure, triggering fallback behavior
-            vi.mocked(
-                MonitorTypesService.formatMonitorDetail
-            ).mockRejectedValue(new Error("Service unavailable"));
-
-            const result = await formatMonitorDetail("http", "200");
-            expect(result).toBe("200"); // Fallback to original details
-        });
-
-        it("should handle API errors gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const { formatMonitorDetail } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            // Mock the service to simulate error, triggering fallback behavior
-            vi.mocked(
-                MonitorTypesService.formatMonitorDetail
-            ).mockRejectedValue(new Error("API Error"));
-
-            const result = await formatMonitorDetail("http", "200");
-            expect(result).toBe("200"); // Fallback to original details
-        });
-    });
-
-    describe("formatMonitorTitleSuffix", () => {
-        it("should format monitor title suffix when electronAPI is available", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const { formatMonitorTitleSuffix } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
-                {
-                    success: true,
-                    data: " (https://example.com)",
-                }
-            );
-
-            const result = await formatMonitorTitleSuffix(
-                "http",
-                createMockMonitor({
-                    url: "https://example.com",
-                })
-            );
-            expect(result).toBe(" (https://example.com)");
-        });
-
-        it("should return empty string when electronAPI is not available", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { formatMonitorTitleSuffix } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            // Mock the service to simulate failure, triggering fallback behavior
-            vi.mocked(
-                MonitorTypesService.formatMonitorTitleSuffix
-            ).mockRejectedValue(new Error("Service unavailable"));
-
-            const result = await formatMonitorTitleSuffix(
-                "http",
-                createMockMonitor({
-                    url: "https://example.com",
-                })
-            );
-            expect(result).toBe(""); // Fallback to empty string
-        });
-
-        it("should handle API errors gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const { formatMonitorTitleSuffix } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            // Mock the service to simulate error, triggering fallback behavior
-            vi.mocked(
-                MonitorTypesService.formatMonitorTitleSuffix
-            ).mockRejectedValue(new Error("API Error"));
-
-            const result = await formatMonitorTitleSuffix(
-                "http",
-                createMockMonitor({
-                    url: "https://example.com",
-                })
-            );
-            expect(result).toBe(""); // Fallback to empty string
-        });
-    });
-
-    describe("getAnalyticsLabel", () => {
-        it("should return analytics label from config", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { getAnalyticsLabel } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            mockCacheGet.mockReturnValue({
-                uiConfig: {
-                    detailFormats: {
-                        analyticsLabel: "Custom Response Time",
-                    },
-                },
-            });
-
-            const result = await getAnalyticsLabel("http");
-            // In test environment, may fallback to default
-            expect(result).toBe("HTTP Response Time");
-        });
-
-        it("should return fallback when config not available", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { getAnalyticsLabel } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            mockCacheGet.mockReturnValue(undefined);
-
-            const result = await getAnalyticsLabel("http");
-            expect(result).toBe("HTTP Response Time");
-        });
-
-        it("should handle missing uiConfig gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { getAnalyticsLabel } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            mockCacheGet.mockReturnValue({});
-
-            const result = await getAnalyticsLabel("port");
-            expect(result).toBe("PORT Response Time");
-        });
-    });
-
-    describe("getDefaultMonitorId", () => {
-        it("should return first monitor ID from array", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const { getDefaultMonitorId } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            const result = getDefaultMonitorId([
-                "monitor-1",
-                "monitor-2",
-                "monitor-3",
-            ]);
-            expect(result).toBe("monitor-1");
-        });
-
-        it("should return empty string for empty array", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { getDefaultMonitorId } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            const result = getDefaultMonitorId([]);
-            expect(result).toBe("");
-        });
-
-        it("should return single element from single-element array", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { getDefaultMonitorId } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            const result = getDefaultMonitorId(["only-monitor"]);
-            expect(result).toBe("only-monitor");
-        });
-
-        it("should handle array with empty string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { getDefaultMonitorId } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            const result = getDefaultMonitorId([""]);
-            expect(result).toBe("");
-        });
-    });
-
-    describe("getMonitorHelpTexts", () => {
-        it("should return help texts from config", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { getMonitorHelpTexts } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            mockCacheGet.mockReturnValue({
-                uiConfig: {
-                    helpTexts: {
-                        primary: "Enter the URL to monitor",
-                        secondary: "Use HTTPS when possible",
-                    },
-                },
-            });
-
-            const result = await getMonitorHelpTexts("http");
-            // In test environment, may fallback to empty object
-            expect(result).toEqual({});
-        });
-
-        it("should return empty object when config not available", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { getMonitorHelpTexts } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            mockCacheGet.mockReturnValue(undefined);
-
-            const result = await getMonitorHelpTexts("http");
-            expect(result).toEqual({});
-        });
-    });
-
-    describe("getTypesWithFeature", () => {
-        it("should return types that support response time", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { getTypesWithFeature } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            (getAvailableMonitorTypes as Mock).mockResolvedValue([
-                { type: "http", uiConfig: { supportsResponseTime: true } },
-                { type: "port", uiConfig: { supportsResponseTime: false } },
-            ]);
-
-            const result = await getTypesWithFeature("responseTime");
-            // In test environment, may fallback to empty array
-            expect(result).toEqual([]);
-        });
-
-        it("should return types that support advanced analytics", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { getTypesWithFeature } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            (getAvailableMonitorTypes as Mock).mockResolvedValue([
-                { type: "http", uiConfig: { supportsAdvancedAnalytics: true } },
-                {
-                    type: "port",
-                    uiConfig: { supportsAdvancedAnalytics: false },
-                },
-            ]);
-
-            const result = await getTypesWithFeature("advancedAnalytics");
-            // In test environment, may fallback to empty array
-            expect(result).toEqual([]);
-        });
-
-        it("should return empty array when no types support feature", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { getTypesWithFeature } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            (getAvailableMonitorTypes as Mock).mockResolvedValue([
-                { type: "http", uiConfig: { supportsResponseTime: false } },
-                { type: "port", uiConfig: { supportsResponseTime: false } },
-            ]);
-
-            const result = await getTypesWithFeature("responseTime");
-            expect(result).toEqual([]);
-        });
-
-        it("should handle missing uiConfig gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { getTypesWithFeature } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            (getAvailableMonitorTypes as Mock).mockResolvedValue([
-                { type: "http" },
-                { type: "port", uiConfig: {} },
-            ]);
-
-            const result = await getTypesWithFeature("responseTime");
-            expect(result).toEqual([]);
-        });
-    });
-
-    describe("shouldShowUrl", () => {
-        it("should return true when config shows URL", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { shouldShowUrl } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            mockCacheGet.mockReturnValue({
-                uiConfig: {
-                    display: {
-                        showUrl: true,
-                    },
-                },
-            });
-
-            const result = await shouldShowUrl("http");
-            // In test environment, may fallback to false
-            expect(result).toBeFalsy();
-        });
-
-        it("should return false when config doesn't show URL", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { shouldShowUrl } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            mockCacheGet.mockReturnValue({
-                uiConfig: {
-                    display: {
-                        showUrl: false,
-                    },
-                },
-            });
-
-            const result = await shouldShowUrl("http");
-            expect(result).toBeFalsy();
-        });
-
-        it("should return false when config not available", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { shouldShowUrl } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            mockCacheGet.mockReturnValue(undefined);
-
-            const result = await shouldShowUrl("http");
-            expect(result).toBeFalsy();
-        });
-    });
-
-    describe("supportsAdvancedAnalytics", () => {
-        it("should return true when config supports advanced analytics", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { supportsAdvancedAnalytics } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            mockCacheGet.mockReturnValue({
+    it("fetches configuration when cache is empty", async () => {
+        configMap.clear();
+        mockCacheGet.mockImplementation(() => undefined);
+
+        mockGetMonitorTypeConfig.mockResolvedValueOnce(
+            createConfig("http", {
                 uiConfig: {
                     supportsAdvancedAnalytics: true,
                 },
-            });
+            })
+        );
 
-            const result = await supportsAdvancedAnalytics("http");
-            expect(result).toBeTruthy();
+        const result = await supportsAdvancedAnalytics("http");
+
+        expect(result).toBeTruthy();
+        expect(mockGetMonitorTypeConfig).toHaveBeenCalledWith("http");
+        expect(mockCacheSet).toHaveBeenCalledWith(
+            getCacheKeyForType("http"),
+            expect.objectContaining({
+                uiConfig: expect.objectContaining({
+                    supportsAdvancedAnalytics: true,
+                }),
+            })
+        );
+    });
+
+    it("returns false when fetching configuration throws", async () => {
+        configMap.clear();
+        mockCacheGet.mockImplementation(() => undefined);
+        mockGetMonitorTypeConfig.mockRejectedValueOnce(new Error("boom"));
+
+        const result = await supportsAdvancedAnalytics("http");
+        expect(result).toBeFalsy();
+    });
+});
+
+describe(supportsResponseTime, () => {
+    it("returns true when the configuration enables response time support", async () => {
+        storeConfig("ping", {
+            uiConfig: {
+                supportsResponseTime: true,
+            },
         });
 
-        it("should return false when config doesn't support advanced analytics", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        const result = await supportsResponseTime("ping");
+        expect(result).toBeTruthy();
+    });
 
-            const { supportsAdvancedAnalytics } = await import(
-                "../../utils/monitorUiHelpers"
-            );
+    it("returns false when response time support is absent", async () => {
+        storeConfig("ping", {
+            uiConfig: {
+                supportsResponseTime: false,
+            },
+        });
 
-            mockCacheGet.mockReturnValue({
-                uiConfig: {
-                    supportsAdvancedAnalytics: false,
+        const result = await supportsResponseTime("ping");
+        expect(result).toBeFalsy();
+    });
+
+    it("returns false when configuration retrieval fails", async () => {
+        configMap.clear();
+        mockCacheGet.mockImplementation(() => undefined);
+        mockGetMonitorTypeConfig.mockRejectedValueOnce(new Error("failed"));
+
+        const result = await supportsResponseTime("ping");
+        expect(result).toBeFalsy();
+    });
+});
+
+describe(allSupportsAdvancedAnalytics, () => {
+    it("returns true when every type supports advanced analytics", async () => {
+        storeConfig("http", {
+            uiConfig: {
+                supportsAdvancedAnalytics: true,
+            },
+        });
+        storeConfig("port", {
+            uiConfig: {
+                supportsAdvancedAnalytics: true,
+            },
+        });
+
+        const result = await allSupportsAdvancedAnalytics(["http", "port"]);
+        expect(result).toBeTruthy();
+    });
+
+    it("returns false when at least one type does not support advanced analytics", async () => {
+        storeConfig("http", {
+            uiConfig: {
+                supportsAdvancedAnalytics: true,
+            },
+        });
+        storeConfig("port", {
+            uiConfig: {
+                supportsAdvancedAnalytics: false,
+            },
+        });
+
+        const result = await allSupportsAdvancedAnalytics(["http", "port"]);
+        expect(result).toBeFalsy();
+    });
+});
+
+describe(allSupportsResponseTime, () => {
+    it("returns true when every type supports response time", async () => {
+        storeConfig("http", {
+            uiConfig: {
+                supportsResponseTime: true,
+            },
+        });
+        storeConfig("dns", {
+            uiConfig: {
+                supportsResponseTime: true,
+            },
+        });
+
+        const result = await allSupportsResponseTime(["http", "dns"]);
+        expect(result).toBeTruthy();
+    });
+
+    it("returns false when any type lacks response time support", async () => {
+        storeConfig("http", {
+            uiConfig: {
+                supportsResponseTime: true,
+            },
+        });
+        storeConfig("dns", {
+            uiConfig: {
+                supportsResponseTime: false,
+            },
+        });
+
+        const result = await allSupportsResponseTime(["http", "dns"]);
+        expect(result).toBeFalsy();
+    });
+});
+
+describe(formatMonitorDetail, () => {
+    it("delegates to the monitor types service", async () => {
+        const result = await formatMonitorDetail("http", "200");
+
+        expect(result).toBe("Formatted detail");
+        expect(MonitorTypesService.formatMonitorDetail).toHaveBeenCalledWith(
+            "http",
+            "200"
+        );
+    });
+
+    it("returns the fallback value when the service throws", async () => {
+        vi.mocked(
+            MonitorTypesService.formatMonitorDetail
+        ).mockRejectedValueOnce(new Error("service down"));
+
+        const result = await formatMonitorDetail("http", "200");
+        expect(result).toBe("200");
+    });
+});
+
+describe(formatMonitorTitleSuffix, () => {
+    it("uses the monitor types service to format the suffix", async () => {
+        const monitor = buildMonitor();
+        const result = await formatMonitorTitleSuffix("http", monitor);
+
+        expect(result).toBe(" (suffix)");
+        expect(
+            MonitorTypesService.formatMonitorTitleSuffix
+        ).toHaveBeenCalledWith("http", monitor);
+    });
+
+    it("returns an empty string when formatting fails", async () => {
+        const monitor = buildMonitor();
+        vi.mocked(
+            MonitorTypesService.formatMonitorTitleSuffix
+        ).mockRejectedValueOnce(new Error("bad format"));
+
+        const result = await formatMonitorTitleSuffix("http", monitor);
+        expect(result).toBe("");
+    });
+});
+
+describe(getAnalyticsLabel, () => {
+    it("returns the configured analytics label when available", async () => {
+        storeConfig("http", {
+            uiConfig: {
+                detailFormats: {
+                    analyticsLabel: "Custom Analytics",
                 },
-            });
+            },
+        });
 
-            const result = await supportsAdvancedAnalytics("http");
-            // In test environment, this seems to be inverted - let's check actual behavior
-            expect(typeof result).toBe("boolean");
+        const result = await getAnalyticsLabel("http");
+        expect(result).toBe("Custom Analytics");
+    });
+
+    it("falls back to an upper-case monitor type when configuration is missing", async () => {
+        configMap.clear();
+
+        const result = await getAnalyticsLabel("http");
+        expect(result).toBe("HTTP Response Time");
+    });
+
+    it("stores fetched configuration in the cache on miss", async () => {
+        configMap.clear();
+        mockCacheGet.mockImplementation(() => undefined);
+
+        mockGetMonitorTypeConfig.mockResolvedValueOnce(
+            createConfig("http", {
+                uiConfig: {
+                    detailFormats: {
+                        analyticsLabel: "Fetched Label",
+                    },
+                },
+            })
+        );
+
+        const result = await getAnalyticsLabel("http");
+        expect(result).toBe("Fetched Label");
+        expect(mockCacheSet).toHaveBeenCalledWith(
+            getCacheKeyForType("http"),
+            expect.objectContaining({
+                uiConfig: expect.objectContaining({
+                    detailFormats: expect.objectContaining({
+                        analyticsLabel: "Fetched Label",
+                    }),
+                }),
+            })
+        );
+    });
+});
+
+describe(getMonitorHelpTexts, () => {
+    it("returns help texts from configuration", async () => {
+        storeConfig("http", {
+            uiConfig: {
+                helpTexts: {
+                    primary: "Primary text",
+                    secondary: "Secondary text",
+                },
+            },
+        });
+
+        const result = await getMonitorHelpTexts("http");
+        expect(result).toEqual({
+            primary: "Primary text",
+            secondary: "Secondary text",
         });
     });
 
-    describe("supportsResponseTime", () => {
-        it("should return true when config supports response time", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+    it("returns an empty object when help texts are unavailable", async () => {
+        configMap.clear();
+        const result = await getMonitorHelpTexts("http");
+        expect(result).toEqual({});
+    });
+});
 
-            const { supportsResponseTime } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            mockCacheGet.mockReturnValue({
+describe(getTypesWithFeature, () => {
+    it("returns monitor types that support response time", async () => {
+        mockGetAvailableMonitorTypes.mockResolvedValueOnce([
+            createConfig("http", {
                 uiConfig: {
                     supportsResponseTime: true,
                 },
-            });
-
-            const result = await supportsResponseTime("http");
-            // In test environment, may fallback to false
-            expect(result).toBeFalsy();
-        });
-
-        it("should return false when config doesn't support response time", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { supportsResponseTime } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            mockCacheGet.mockReturnValue({
+            }),
+            createConfig("port", {
                 uiConfig: {
                     supportsResponseTime: false,
                 },
-            });
+            }),
+            createConfig("invalid", {
+                uiConfig: {
+                    supportsResponseTime: true,
+                },
+            }),
+        ]);
 
-            const result = await supportsResponseTime("http");
-            expect(result).toBeFalsy();
-        });
+        const result = await getTypesWithFeature("responseTime");
+        expect(result).toEqual(["http"]);
     });
 
-    describe("Edge cases and error handling", () => {
-        it("should handle electronAPI with missing methods", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            // Configure service to fail for this edge case test
-            (
-                MonitorTypesService.formatMonitorDetail as Mock
-            ).mockRejectedValueOnce(new Error("Service unavailable"));
-
-            const { formatMonitorDetail } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            globalThis.window = {
-                electronAPI: {
-                    monitorTypes: {},
-                },
-            } as any;
-
-            const result = await formatMonitorDetail("http", "200");
-            expect(result).toBe("200");
-        });
-
-        it("should handle window without electronAPI", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            // Configure service to fail for this edge case test
-            (
-                MonitorTypesService.formatMonitorDetail as Mock
-            ).mockRejectedValueOnce(new Error("Service unavailable"));
-
-            const { formatMonitorDetail } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            globalThis.window = {} as any;
-
-            const result = await formatMonitorDetail("http", "200");
-            expect(result).toBe("200");
-        });
-
-        it("should handle cache operations", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Caching", "type");
-
-            const { getAnalyticsLabel } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            // First call - cache miss
-            mockCacheGet.mockReturnValueOnce(undefined);
-            (getMonitorTypeConfig as Mock).mockResolvedValueOnce({
+    it("returns monitor types that support advanced analytics", async () => {
+        mockGetAvailableMonitorTypes.mockResolvedValueOnce([
+            createConfig("http", {
                 uiConfig: {
-                    detailFormats: {
-                        analyticsLabel: "Cached Response Time",
-                    },
+                    supportsAdvancedAnalytics: true,
                 },
-            });
-
-            const result1 = await getAnalyticsLabel("http");
-            // In test environment, may fallback to default
-            expect(result1).toBe("HTTP Response Time");
-            // Mock might not be called in test environment
-            // expect(mockCacheSet).toHaveBeenCalled();
-
-            // Second call - cache hit
-            mockCacheGet.mockReturnValueOnce({
+            }),
+            createConfig("dns", {
                 uiConfig: {
-                    detailFormats: {
-                        analyticsLabel: "Cached Response Time",
-                    },
+                    supportsAdvancedAnalytics: false,
                 },
-            });
+            }),
+        ]);
 
-            const result2 = await getAnalyticsLabel("http");
-            expect(result2).toBe("HTTP Response Time");
+        const result = await getTypesWithFeature("advancedAnalytics");
+        expect(result).toEqual(["http"]);
+    });
+});
+
+describe(shouldShowUrl, () => {
+    it("returns the display preference from configuration", async () => {
+        storeConfig("http", {
+            uiConfig: {
+                display: {
+                    showUrl: true,
+                },
+            },
         });
 
-        it("should sanitize cache keys", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Caching", "type");
+        const result = await shouldShowUrl("http");
+        expect(result).toBeTruthy();
+    });
 
-            const { getAnalyticsLabel } = await import(
-                "../../utils/monitorUiHelpers"
-            );
+    it("returns false when configuration is missing", async () => {
+        configMap.clear();
+        const result = await shouldShowUrl("http");
+        expect(result).toBeFalsy();
+    });
+});
 
-            mockCacheGet.mockReturnValue({
-                uiConfig: {
-                    detailFormats: {
-                        analyticsLabel: "Test Response Time",
-                    },
-                },
-            });
+describe(getDefaultMonitorId, () => {
+    it("returns the first monitor identifier", () => {
+        expect(getDefaultMonitorId(["mon-1", "mon-2"])).toBe("mon-1");
+    });
 
-            await getAnalyticsLabel("http" as any);
+    it("returns an empty string when list is empty", () => {
+        expect(getDefaultMonitorId([])).toBe("");
+    });
+});
 
-            // Verify cache functionality exists - exact call verification may not work in test environment
-            // expect(mockCacheGet).toHaveBeenCalledWith("config_test_type_with_special_chars_v1");
-            expect(typeof mockCacheGet).toBe("function");
-        });
+describe(clearConfigCache, () => {
+    it("clears the cached configuration entries", () => {
+        storeConfig("http");
+        expect(configMap.size).toBe(1);
+
+        clearConfigCache();
+
+        expect(mockCacheClear).toHaveBeenCalledTimes(1);
     });
 });

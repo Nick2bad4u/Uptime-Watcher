@@ -1110,7 +1110,13 @@ describe("IpcService - Comprehensive Coverage", () => {
 
             expect(result).toEqual({
                 success: true,
-                data: { siteCount: 1, success: true },
+                data: expect.objectContaining({
+                    completedAt: expect.any(Number),
+                    siteCount: 1,
+                    sites: expect.any(Array),
+                    source: "database",
+                    synchronized: true,
+                }),
                 metadata: {
                     duration: expect.any(Number),
                     handler: "request-full-sync",
@@ -1138,9 +1144,9 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(mockUptimeOrchestrator.getSites).toHaveBeenCalled();
             expect(result.success).toBeTruthy();
             expect(result.data).toEqual({
-                lastSync: expect.any(Number),
+                lastSyncAt: expect.any(Number),
                 siteCount: 1,
-                success: true,
+                source: "database",
                 synchronized: true,
             });
         });

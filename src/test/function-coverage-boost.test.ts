@@ -3,7 +3,8 @@
  * Targets specific uncovered functions identified in coverage analysis
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+import type { MonitorTypeConfig } from "../../shared/types/monitorTypes";
 
 describe("Function Coverage Boost Tests", () => {
     describe("Uncovered validation functions", () => {
@@ -388,25 +389,135 @@ describe("Function Coverage Boost Tests", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Monitoring", "type");
 
-            try {
-                const monitorUiModule = await import(
-                    "../utils/monitorUiHelpers"
-                );
+            const createCache = () => {
+                const store = new Map<string, unknown>();
+                return {
+                    get: (key: string) => store.get(key),
+                    set: (key: string, value: unknown) => {
+                        store.set(key, value);
+                    },
+                    clear: () => {
+                        store.clear();
+                    },
+                };
+            };
 
+            const monitorTypes: MonitorTypeConfig[] = [
+                {
+                    description: "HTTP monitor",
+                    displayName: "HTTP",
+                    fields: [],
+                    type: "http",
+                    version: "1.0.0",
+                    uiConfig: {
+                        detailFormats: {},
+                        display: {},
+                        helpTexts: {},
+                        supportsAdvancedAnalytics: true,
+                        supportsResponseTime: true,
+                    },
+                },
+                {
+                    description: "Ping monitor",
+                    displayName: "Ping",
+                    fields: [],
+                    type: "ping",
+                    version: "1.0.0",
+                    uiConfig: {
+                        detailFormats: {},
+                        display: {},
+                        helpTexts: {},
+                        supportsAdvancedAnalytics: false,
+                        supportsResponseTime: false,
+                    },
+                },
+            ];
+
+            vi.resetModules();
+
+            vi.doMock("../utils/cache", () => ({
+                AppCaches: {
+                    general: createCache(),
+                    monitorTypes: createCache(),
+                    uiHelpers: createCache(),
+                },
+            }));
+
+            vi.doMock("@shared/utils/errorHandling", () => ({
+                withUtilityErrorHandling: vi.fn(
+                    async <T>(
+                        operation: () => Promise<T>,
+                        _context: string,
+                        fallback: T
+                    ) => {
+                        try {
+                            return await operation();
+                        } catch {
+                            return fallback;
+                        }
+                    }
+                ),
+            }));
+
+            vi.doMock("../stores/monitor/useMonitorTypesStore", () => {
+                const loadMonitorTypes = vi.fn().mockResolvedValue(undefined);
+                const state = {
+                    clearError: vi.fn(),
+                    fieldConfigs: {},
+                    formatMonitorDetail: vi.fn(),
+                    formatMonitorTitleSuffix: vi.fn(),
+                    getFieldConfig: vi.fn(),
+                    isLoaded: true,
+                    isLoading: false,
+                    lastError: undefined,
+                    loadMonitorTypes,
+                    monitorTypes: [...monitorTypes],
+                    refreshMonitorTypes: vi.fn(),
+                    setError: vi.fn(),
+                    setLoading: vi.fn(),
+                    validateMonitorData: vi.fn(),
+                };
+
+                return {
+                    useMonitorTypesStore: {
+                        getState: () => state,
+                    },
+                };
+            });
+
+            vi.doMock("../services/MonitorTypesService", () => ({
+                MonitorTypesService: {
+                    formatMonitorDetail: vi.fn().mockResolvedValue("detail"),
+                    formatMonitorTitleSuffix: vi
+                        .fn()
+                        .mockResolvedValue("suffix"),
+                    getMonitorTypes: vi
+                        .fn()
+                        .mockResolvedValue([...monitorTypes]),
+                    validateMonitorData: vi
+                        .fn()
+                        .mockResolvedValue({ success: true, errors: [] }),
+                    initialize: vi.fn(),
+                },
+            }));
+
+            const monitorUiModule = await import("../utils/monitorUiHelpers");
+
+            try {
                 if (monitorUiModule.getTypesWithFeature) {
-                    // Test with different feature types
                     const responseTimeTypes =
-                        monitorUiModule.getTypesWithFeature("responseTime");
+                        await monitorUiModule.getTypesWithFeature(
+                            "responseTime"
+                        );
                     expect(Array.isArray(responseTimeTypes)).toBeTruthy();
 
                     const analyticsTypes =
-                        monitorUiModule.getTypesWithFeature(
+                        await monitorUiModule.getTypesWithFeature(
                             "advancedAnalytics"
                         );
                     expect(Array.isArray(analyticsTypes)).toBeTruthy();
                 }
 
-                // Test other exported functions
                 const moduleKeys = Object.keys(monitorUiModule);
                 for (const key of moduleKeys) {
                     const exportedValue = (monitorUiModule as any)[key];
@@ -419,6 +530,12 @@ describe("Function Coverage Boost Tests", () => {
                     "Monitor UI helpers module not available for testing:",
                     error
                 );
+            } finally {
+                vi.doUnmock("../utils/cache");
+                vi.doUnmock("@shared/utils/errorHandling");
+                vi.doUnmock("../stores/monitor/useMonitorTypesStore");
+                vi.doUnmock("../services/MonitorTypesService");
+                vi.resetModules();
             }
         });
 

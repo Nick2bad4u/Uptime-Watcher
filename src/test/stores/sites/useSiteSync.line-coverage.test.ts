@@ -111,8 +111,8 @@ describe("useSiteSync - Line Coverage Completion", () => {
         syncActions = createSiteSyncActions(mockDeps);
     });
 
-    describe("Lines 224-230: getSyncStatus error handlers", () => {
-        it("should call clearError, setError, and setLoading handlers", async ({
+    describe("Lines 224-230: getSyncStatus error handling", () => {
+        it("should return fallback status when API call fails", async ({
             task,
             annotate,
         }) => {
@@ -131,56 +131,25 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 mockErrorStore as any
             );
 
-            // Mock withErrorHandling to call the handlers
-            vi.mocked(withErrorHandling).mockImplementationOnce(
-                async (_operation, handlers) => {
-                    // Call all the handlers to cover lines 224-230
-                    const frontendHandlers = handlers as any;
-                    if (frontendHandlers?.clearError)
-                        frontendHandlers.clearError();
-                    if (frontendHandlers?.setError)
-                        frontendHandlers.setError(new Error("test"));
-                    if (frontendHandlers?.setLoading)
-                        frontendHandlers.setLoading(true);
-                    if (frontendHandlers?.setLoading)
-                        frontendHandlers.setLoading(false);
-
-                    return {
-                        siteCount: 5,
-                        synchronized: true,
-                        lastSync: 1_640_995_200_000,
-                        success: true,
-                    };
-                }
+            vi.mocked(withErrorHandling).mockImplementation(
+                async (operation) => await operation()
             );
 
             vi.mocked(
                 mockElectronAPI.stateSync.getSyncStatus
-            ).mockResolvedValue({
-                siteCount: 5,
-                synchronized: true,
-                lastSync: 1_640_995_200_000,
-                success: true,
+            ).mockRejectedValue(new Error("status fetch failed"));
+
+            const result = await syncActions.getSyncStatus();
+
+            expect(result).toEqual({
+                lastSyncAt: null,
+                siteCount: 0,
+                source: "frontend",
+                synchronized: false,
             });
-
-            await syncActions.getSyncStatus();
-
-            // Verify the specific error handlers were called (lines 224-230)
-            expect(mockErrorStore.clearStoreError).toHaveBeenCalledWith(
-                "sites-sync"
-            );
-            expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
-                "sites-sync",
-                expect.any(Error)
-            );
-            expect(mockErrorStore.setOperationLoading).toHaveBeenCalledWith(
-                "getSyncStatus",
-                true
-            );
-            expect(mockErrorStore.setOperationLoading).toHaveBeenCalledWith(
-                "getSyncStatus",
-                false
-            );
+            expect(mockErrorStore.clearStoreError).not.toHaveBeenCalled();
+            expect(mockErrorStore.setStoreError).not.toHaveBeenCalled();
+            expect(mockErrorStore.setOperationLoading).not.toHaveBeenCalled();
         });
     });
 
@@ -250,7 +219,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
             const deleteEvent = {
                 action: "delete",
                 siteIdentifier: "site-1",
-                source: "backend",
+                source: "database",
                 timestamp: Date.now(),
             };
 
@@ -290,7 +259,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
             const updateEvent = {
                 action: "update",
                 siteIdentifier: "site-1",
-                source: "backend",
+                source: "database",
                 timestamp: Date.now(),
             };
 
@@ -330,7 +299,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
             const deleteEvent = {
                 action: "delete",
                 siteIdentifier: "site-1",
-                source: "backend",
+                source: "database",
                 timestamp: Date.now(),
             };
 
@@ -428,7 +397,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
             const bulkSyncEvent = {
                 action: "bulk-sync",
                 sites: mockSites,
-                source: "backend",
+                source: "database",
                 timestamp: Date.now(),
             };
 

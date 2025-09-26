@@ -5,6 +5,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "../../../../shared/types";
+import type { StateSyncStatusSummary } from "../../../../shared/types/stateSync";
 
 // Mock all dependencies
 vi.mock("../../../stores/error/useErrorStore", () => ({
@@ -46,10 +47,6 @@ vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     })),
 }));
 
-vi.mock("../../../types/ipc", () => ({
-    safeExtractIpcData: vi.fn((response, fallback) => response ?? fallback),
-}));
-
 // Mock window.electronAPI
 const mockElectronAPI = {
     stateSync: {
@@ -70,7 +67,6 @@ import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
 import { SiteService } from "../../../stores/sites/services/SiteService";
 import { withErrorHandling } from "../../../../shared/utils/errorHandling";
 import { logStoreAction } from "../../../stores/utils";
-import { safeExtractIpcData } from "../../../types/ipc";
 
 describe("useSiteSync - Final 100% Coverage", () => {
     let mockDeps: any;
@@ -146,19 +142,16 @@ describe("useSiteSync - Final 100% Coverage", () => {
             await annotate("Type: Data Retrieval", "type");
 
             const mockStatus = {
+                lastSyncAt: 1_640_995_200_000,
                 siteCount: 10,
+                source: "database",
                 synchronized: true,
-                lastSync: 1_640_995_200_000,
-                success: true,
-            };
+            } satisfies StateSyncStatusSummary;
 
             // Mock electronAPI response
             vi.mocked(
                 mockElectronAPI.stateSync.getSyncStatus
             ).mockResolvedValue(mockStatus);
-
-            // Mock safeExtractIpcData to return the status
-            vi.mocked(safeExtractIpcData).mockReturnValue(mockStatus);
 
             // Mock withErrorHandling to execute operation normally
             vi.mocked(withErrorHandling).mockImplementation(
@@ -167,20 +160,15 @@ describe("useSiteSync - Final 100% Coverage", () => {
 
             const result = await syncActions.getSyncStatus();
 
-            // Verify lines 207-220: electronAPI was called, safeExtractIpcData was called, and logStoreAction was called
             expect(mockElectronAPI.stateSync.getSyncStatus).toHaveBeenCalled();
-            expect(safeExtractIpcData).toHaveBeenCalledWith(mockStatus, {
-                lastSync: undefined,
-                siteCount: 0,
-                success: false,
-                synchronized: false,
-            });
             expect(logStoreAction).toHaveBeenCalledWith(
                 "SitesStore",
                 "getSyncStatus",
                 {
+                    lastSyncAt: mockStatus.lastSyncAt,
                     message: "Sync status retrieved",
                     siteCount: mockStatus.siteCount,
+                    source: mockStatus.source,
                     success: true,
                     synchronized: mockStatus.synchronized,
                 }
@@ -190,7 +178,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
     });
 
     describe("Line 239: getSyncStatus catch block fallback", () => {
-        it("should return fallback when withErrorHandling throws", async ({
+        it("should return fallback when stateSync API throws", async ({
             task,
             annotate,
         }) => {
@@ -202,18 +190,20 @@ describe("useSiteSync - Final 100% Coverage", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            // Mock withErrorHandling to throw an error
-            vi.mocked(withErrorHandling).mockImplementation(() => {
-                throw new Error("withErrorHandling failed");
-            });
+            vi.mocked(withErrorHandling).mockImplementation(
+                async (operation) => await operation()
+            );
+
+            vi.mocked(
+                mockElectronAPI.stateSync.getSyncStatus
+            ).mockRejectedValue(new Error("status fetch failed"));
 
             const result = await syncActions.getSyncStatus();
 
-            // Verify line 239: fallback return statement is executed
             expect(result).toEqual({
-                lastSync: undefined,
+                lastSyncAt: null,
                 siteCount: 0,
-                success: false,
+                source: "frontend",
                 synchronized: false,
             });
         });

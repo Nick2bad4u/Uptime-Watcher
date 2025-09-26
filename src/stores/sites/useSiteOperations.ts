@@ -29,6 +29,22 @@ import {
     withSiteOperationReturning,
 } from "./utils/operationHelpers";
 
+const normalizeMonitorOrThrow = (
+    monitor: Partial<Monitor>,
+    contextMessage: string
+): Monitor => {
+    try {
+        return normalizeMonitor(monitor);
+    } catch (error) {
+        const safeError = ensureError(error);
+        logger.error(contextMessage, safeError);
+        throw new Error(
+            `Monitor normalization failed: ${getErrorMessage(safeError)}`,
+            { cause: error }
+        );
+    }
+};
+
 export interface SiteOperationsActions extends BaseSiteOperations {
     /** Initialize sites data from backend */
     initializeSites: () => Promise<{
@@ -65,20 +81,10 @@ export const createSiteOperationsActions = (
                 // Get the current site
                 const site = getSiteById(siteId, deps);
 
-                let normalizedMonitor: Monitor;
-                try {
-                    normalizedMonitor = normalizeMonitor(monitor);
-                } catch (error) {
-                    const safeError = ensureError(error);
-                    logger.error(
-                        "Failed to normalize monitor before adding to site",
-                        safeError
-                    );
-                    throw new Error(
-                        `Monitor normalization failed: ${getErrorMessage(safeError)}`,
-                        { cause: safeError }
-                    );
-                }
+                const normalizedMonitor = normalizeMonitorOrThrow(
+                    monitor,
+                    "Failed to normalize monitor before adding to site"
+                );
 
                 // Allow multiple monitors of the same type
                 const updatedMonitors = [...site.monitors, normalizedMonitor];
@@ -107,22 +113,12 @@ export const createSiteOperationsActions = (
                                   type: "http" as MonitorType,
                               },
                           ]
-                ).map((monitor) => {
-                    try {
-                        return normalizeMonitor(monitor);
-                    } catch (error) {
-                        logger.error(
-                            "Failed to normalize monitor",
-                            error instanceof Error
-                                ? error
-                                : new Error(String(error))
-                        );
-                        throw new Error(
-                            `Monitor normalization failed: ${getErrorMessage(error)}`,
-                            { cause: error }
-                        );
-                    }
-                });
+                ).map((monitor) =>
+                    normalizeMonitorOrThrow(
+                        monitor,
+                        "Failed to normalize monitor during site creation"
+                    )
+                );
 
                 // Construct a complete Site object
                 const completeSite: Site = {

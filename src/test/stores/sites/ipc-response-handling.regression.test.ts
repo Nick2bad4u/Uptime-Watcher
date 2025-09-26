@@ -193,11 +193,9 @@ describe("IPC Response Handling Regression Tests", () => {
     describe("Sync Status Failure Propagation", () => {
         it("should handle backend failures in sync status retrieval gracefully", async () => {
             // Mock a backend failure response
-            mockElectronAPI.stateSync.getSyncStatus.mockResolvedValue({
-                success: false,
-                error: "Sync service unavailable",
-                data: null,
-            });
+            mockElectronAPI.stateSync.getSyncStatus.mockRejectedValue(
+                new Error("Sync service unavailable")
+            );
 
             // Import the sync module after mocking
             const { createSiteSyncActions } = await import(
@@ -220,9 +218,9 @@ describe("IPC Response Handling Regression Tests", () => {
             const result = await syncActions.getSyncStatus();
 
             expect(result).toEqual({
-                lastSync: undefined,
+                lastSyncAt: null,
                 siteCount: 0,
-                success: false,
+                source: "frontend",
                 synchronized: false,
             });
         });

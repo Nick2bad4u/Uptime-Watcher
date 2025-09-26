@@ -71,13 +71,12 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
                 vi.fn(),
                 vi.fn(),
             ];
-            let currentSetterIndex = 0;
 
-            function TestComponent() {
-                const currentSetter = mockSetters[currentSetterIndex];
+            function TestComponent({ setterIndex }: { setterIndex: number }) {
+                const currentSetter = mockSetters[setterIndex];
 
                 const handleClick = React.useCallback(() => {
-                    currentSetter!();
+                    currentSetter();
                 }, [currentSetter]); // Original: [currentSetter]
 
                 return (
@@ -87,63 +86,79 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
                 );
             }
 
-            const { rerender } = render(<TestComponent />);
+            const { rerender } = render(<TestComponent setterIndex={0} />);
 
-            // Click with first setter
             fireEvent.click(screen.getByTestId("settings-button"));
             expect(mockSetters[0]).toHaveBeenCalledTimes(1);
 
-            // Change to second setter and rerender
-            currentSetterIndex = 1;
-            rerender(<TestComponent />);
+            rerender(<TestComponent setterIndex={1} />);
 
-            // Click should use new setter
             fireEvent.click(screen.getByTestId("settings-button"));
             expect(mockSetters[1]).toHaveBeenCalledTimes(1);
             expect(mockSetters[0]).toHaveBeenCalledTimes(1); // Should not be called again
 
-            // With mutation [], the callback would be stale and keep using mockSetters[0]
+            rerender(<TestComponent setterIndex={2} />);
+
+            fireEvent.click(screen.getByTestId("settings-button"));
+            expect(mockSetters[2]).toHaveBeenCalledTimes(1);
+            expect(mockSetters[1]).toHaveBeenCalledTimes(1);
         });
     });
 
     describe("Settings.tsx Line 139: [settings, updateSettings] dependencies", () => {
         it("should update effect when dependencies change (detect [] mutation)", () => {
             const effectCallback = vi.fn();
-            let settingsValue = { theme: "light" };
-            let updateSettingsValue = vi.fn();
 
-            function TestComponent() {
-                React.useEffect(effectCallback, [
-                    settingsValue,
-                    updateSettingsValue,
-                ]);
+            function TestComponent({
+                settings,
+                updateSettings,
+            }: {
+                settings: { theme: string };
+                updateSettings: () => void;
+            }) {
+                React.useEffect(effectCallback, [settings, updateSettings]);
                 return <div data-testid="settings-component">Settings</div>;
             }
 
-            const { rerender } = render(<TestComponent />);
+            const initialUpdate = vi.fn();
+            const { rerender } = render(
+                <TestComponent
+                    settings={{ theme: "light" }}
+                    updateSettings={initialUpdate}
+                />
+            );
             expect(effectCallback).toHaveBeenCalledTimes(1);
 
-            // Change settings value
-            settingsValue = { theme: "dark" };
-            rerender(<TestComponent />);
+            rerender(
+                <TestComponent
+                    settings={{ theme: "dark" }}
+                    updateSettings={initialUpdate}
+                />
+            );
             expect(effectCallback).toHaveBeenCalledTimes(2);
 
-            // Change updateSettings function
-            updateSettingsValue = vi.fn();
-            rerender(<TestComponent />);
+            const nextUpdate = vi.fn();
+            rerender(
+                <TestComponent
+                    settings={{ theme: "dark" }}
+                    updateSettings={nextUpdate}
+                />
+            );
             expect(effectCallback).toHaveBeenCalledTimes(3);
-
-            // With mutation [], effect would only run once regardless of changes
         });
     });
 
     describe("Settings.tsx Line 166: [settings.historyLimit, persistHistoryLimit] dependencies", () => {
         it("should respond to historyLimit changes (detect [] mutation)", () => {
             const effectCallback = vi.fn();
-            let historyLimit = 100;
-            let persistHistoryLimit = vi.fn();
 
-            function TestComponent() {
+            function TestComponent({
+                historyLimit,
+                persistHistoryLimit,
+            }: {
+                historyLimit: number;
+                persistHistoryLimit: () => void;
+            }) {
                 const settings = { historyLimit };
 
                 React.useEffect(effectCallback, [
@@ -155,48 +170,76 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
                 );
             }
 
-            const { rerender } = render(<TestComponent />);
+            const persistHistory = vi.fn();
+            const { rerender } = render(
+                <TestComponent
+                    historyLimit={100}
+                    persistHistoryLimit={persistHistory}
+                />
+            );
             expect(effectCallback).toHaveBeenCalledTimes(1);
 
-            // Change history limit
-            historyLimit = 200;
-            rerender(<TestComponent />);
+            rerender(
+                <TestComponent
+                    historyLimit={200}
+                    persistHistoryLimit={persistHistory}
+                />
+            );
             expect(effectCallback).toHaveBeenCalledTimes(2);
 
-            // Change update function
-            persistHistoryLimit = vi.fn();
-            rerender(<TestComponent />);
+            const nextPersist = vi.fn();
+            rerender(
+                <TestComponent
+                    historyLimit={200}
+                    persistHistoryLimit={nextPersist}
+                />
+            );
             expect(effectCallback).toHaveBeenCalledTimes(3);
-
-            // With mutation [], effect wouldn't re-run for changes
         });
     });
 
     describe("Settings.tsx Line 182: [clearError, resetSettings] dependencies", () => {
         it("should re-run effect when error handling functions change (detect [] mutation)", () => {
             const effectCallback = vi.fn();
-            let clearError = vi.fn();
-            let resetSettings = vi.fn();
 
-            function TestComponent() {
+            function TestComponent({
+                clearError,
+                resetSettings,
+            }: {
+                clearError: () => void;
+                resetSettings: () => void;
+            }) {
                 React.useEffect(effectCallback, [clearError, resetSettings]);
                 return <div data-testid="error-component">Error Handling</div>;
             }
 
-            const { rerender } = render(<TestComponent />);
+            const initialClearError = vi.fn();
+            const initialReset = vi.fn();
+            const { rerender } = render(
+                <TestComponent
+                    clearError={initialClearError}
+                    resetSettings={initialReset}
+                />
+            );
             expect(effectCallback).toHaveBeenCalledTimes(1);
 
-            // Change clearError function
-            clearError = vi.fn();
-            rerender(<TestComponent />);
+            const nextClearError = vi.fn();
+            rerender(
+                <TestComponent
+                    clearError={nextClearError}
+                    resetSettings={initialReset}
+                />
+            );
             expect(effectCallback).toHaveBeenCalledTimes(2);
 
-            // Change resetSettings function
-            resetSettings = vi.fn();
-            rerender(<TestComponent />);
+            const nextReset = vi.fn();
+            rerender(
+                <TestComponent
+                    clearError={nextClearError}
+                    resetSettings={nextReset}
+                />
+            );
             expect(effectCallback).toHaveBeenCalledTimes(3);
-
-            // With mutation [], effect would be stale and not update
         });
     });
 

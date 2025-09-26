@@ -1,12 +1,12 @@
 // eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Context: Storybook mock for Electron API
 /* eslint-disable @typescript-eslint/require-await, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-parameters, @typescript-eslint/no-unnecessary-condition, sonarjs/pseudo-random -- Disable Strict Rules */
 import type { Site } from "@shared/types";
+import type { StateSyncEventData } from "@shared/types/events";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type {
     StateSyncFullSyncResult,
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
-import type { StateSyncEventData } from "@shared/types/events";
 
 import type { ElectronAPI } from "../types/electron-api";
 
@@ -106,6 +106,7 @@ export const electronAPIMock: ElectronAPI = {
                 monitorTypes: mockState.monitorTypes,
                 sites: mockState.sites,
             }),
+        getHistoryLimit: async (): Promise<number> => mockState.historyLimit,
         importData: async (payload: string): Promise<boolean> => {
             try {
                 const parsed = JSON.parse(payload) as Partial<{
@@ -133,7 +134,6 @@ export const electronAPIMock: ElectronAPI = {
                 return false;
             }
         },
-        getHistoryLimit: async (): Promise<number> => mockState.historyLimit,
         resetSettings: async (): Promise<void> => {
             mockState.historyLimit = DEFAULT_HISTORY_LIMIT;
         },

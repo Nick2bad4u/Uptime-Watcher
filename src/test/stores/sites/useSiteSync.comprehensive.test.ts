@@ -5,6 +5,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "../../../../shared/types";
+import type { StateSyncStatusSummary } from "../../../../shared/types/stateSync";
 
 // Mock all the dependencies
 vi.mock("../../../stores/error/useErrorStore", () => ({
@@ -133,11 +134,11 @@ describe("useSiteSync", () => {
             await annotate("Type: Data Retrieval", "type");
 
             const mockStatus = {
+                lastSyncAt: 1_640_995_200_000,
                 siteCount: 5,
+                source: "database",
                 synchronized: true,
-                lastSync: 1_640_995_200_000,
-                success: true,
-            };
+            } satisfies StateSyncStatusSummary;
 
             vi.mocked(
                 mockElectronAPI.stateSync.getSyncStatus
@@ -166,9 +167,9 @@ describe("useSiteSync", () => {
 
             // Should return fallback values due to catch block (lines 83-105)
             expect(result).toEqual({
-                lastSync: undefined,
+                lastSyncAt: null,
                 siteCount: 0,
-                success: false,
+                source: "frontend",
                 synchronized: false,
             });
         });
@@ -194,9 +195,9 @@ describe("useSiteSync", () => {
 
             // Should use fallback values when withErrorHandling throws
             expect(result).toEqual({
-                lastSync: undefined,
+                lastSyncAt: null,
                 siteCount: 0,
-                success: false,
+                source: "frontend",
                 synchronized: false,
             });
         });

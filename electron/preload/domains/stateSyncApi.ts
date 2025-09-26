@@ -30,6 +30,15 @@ const VALID_STATE_SYNC_SOURCES = [
     "frontend",
 ] as const;
 
+type ValidStateSyncAction = (typeof VALID_STATE_SYNC_ACTIONS)[number];
+type ValidStateSyncSource = (typeof VALID_STATE_SYNC_SOURCES)[number];
+
+const isValidStateSyncAction = (value: string): value is ValidStateSyncAction =>
+    VALID_STATE_SYNC_ACTIONS.some((candidate) => candidate === value);
+
+const isValidStateSyncSource = (value: string): value is ValidStateSyncSource =>
+    VALID_STATE_SYNC_SOURCES.some((candidate) => candidate === value);
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null;
 
@@ -41,19 +50,13 @@ const isStateSyncEventData = (data: unknown): data is StateSyncEventData => {
         return false;
     }
 
-    const { action, source, timestamp, siteIdentifier, sites } = data;
+    const { action, siteIdentifier, sites, source, timestamp } = data;
 
-    if (
-        typeof action !== "string" ||
-        !VALID_STATE_SYNC_ACTIONS.some((candidate) => candidate === action)
-    ) {
+    if (typeof action !== "string" || !isValidStateSyncAction(action)) {
         return false;
     }
 
-    if (
-        typeof source !== "string" ||
-        !VALID_STATE_SYNC_SOURCES.some((candidate) => candidate === source)
-    ) {
+    if (typeof source !== "string" || !isValidStateSyncSource(source)) {
         return false;
     }
 

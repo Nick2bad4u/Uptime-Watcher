@@ -28,22 +28,39 @@ import type {
     StateSyncFullSyncResult,
     StateSyncStatusSummary,
 } from "../../../../shared/types/stateSync";
+import type { IpcResponse } from "../../../preload/core/bridgeFactory";
 
 // Helper functions for creating properly formatted IPC responses
-function createIpcResponse<T>(data: T): T {
-    return data;
+function createIpcResponse<T>(data: T): IpcResponse<T> {
+    return {
+        data,
+        success: true,
+    };
 }
 
-const VALID_STATE_SYNC_ACTIONS: ReadonlyArray<StateSyncEventData["action"]> = [
+const VALID_STATE_SYNC_ACTIONS: readonly StateSyncEventData["action"][] = [
     "bulk-sync",
     "delete",
     "update",
 ] as const;
-const VALID_STATE_SYNC_SOURCES: ReadonlyArray<StateSyncEventData["source"]> = [
+const VALID_STATE_SYNC_SOURCES: readonly StateSyncEventData["source"][] = [
     "cache",
     "database",
     "frontend",
 ] as const;
+
+const buildStateSyncEventData = (
+    action: StateSyncEventData["action"],
+    source: StateSyncEventData["source"],
+    timestamp: number,
+    siteIdentifier: string | null
+): StateSyncEventData => {
+    if (siteIdentifier === null) {
+        return { action, source, timestamp };
+    }
+
+    return { action, source, timestamp, siteIdentifier };
+};
 
 describe("State Sync Domain API", () => {
     let api: StateSyncApiInterface;
@@ -240,7 +257,7 @@ describe("State Sync Domain API", () => {
             const cleanup = api.onStateSyncEvent(mockCallback);
 
             expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "state:sync",
+                "state-sync-event",
                 expect.any(Function)
             );
             expect(typeof cleanup).toBe("function");
@@ -488,17 +505,13 @@ describe("State Sync Domain API", () => {
                         source,
                         timestamp,
                         siteIdentifier,
-                    ]) => {
-                        const eventData: StateSyncEventData = {
+                    ]) =>
+                        buildStateSyncEventData(
                             action,
                             source,
                             timestamp,
-                            ...(siteIdentifier === null
-                                ? {}
-                                : { siteIdentifier }),
-                        };
-                        return eventData;
-                    }
+                            siteIdentifier
+                        )
                 );
 
             fc.assert(

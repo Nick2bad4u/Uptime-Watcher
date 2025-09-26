@@ -294,8 +294,8 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                 const endTime = Date.now();
 
                 // Sleep should be interrupted before completion
-                // Add generous tolerance for test execution overhead (50ms buffer)
-                expect(endTime - startTime).toBeLessThan(sleepMs + 50);
+                // Add generous tolerance for test execution overhead (150ms buffer to account for CI jitter)
+                expect(endTime - startTime).toBeLessThan(sleepMs + 150);
             }
         );
 

@@ -128,9 +128,9 @@ describe("useSitesStore Function Coverage Tests", () => {
             source: "cache",
             synchronized: true,
         });
-        mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(() => {
-            return vi.fn();
-        });
+        mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(() =>
+            vi.fn()
+        );
         mockElectronAPI.stateSync.requestFullSync.mockResolvedValue({
             completedAt: Date.now(),
             sites: [],

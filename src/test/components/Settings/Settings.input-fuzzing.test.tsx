@@ -70,6 +70,8 @@
  *       expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
  * ```
  *
+ * ```
+ *
  * - Error handling and recovery
  *
  * Focus areas:
@@ -80,9 +82,11 @@
  * - Error handling and user feedback
  * - Performance with large configuration changes
  * - Accessibility and keyboard navigation
+ * ```
  */
 
 import { describe, expect, vi, beforeEach, afterEach } from "vitest";
+import type { Mock } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
@@ -90,6 +94,7 @@ import "@testing-library/jest-dom";
 import type { AppSettings } from "../../../stores/types";
 import type { ThemeName } from "../../../theme/types";
 import { Settings } from "../../../components/Settings/Settings";
+import { sanitizeDomProps } from "../../utils/domPropSanitizer";
 
 // Mock state for settings store
 let mockSettingsState: AppSettings = {
@@ -156,6 +161,7 @@ const mockDownloadSQLiteBackup = vi.fn(async () => {
 });
 
 const mockOnClose = vi.fn();
+let windowConfirmMock: ReturnType<typeof vi.fn>;
 
 // Mock stores
 vi.mock("../../../stores/settings/useSettingsStore", () => ({
@@ -205,62 +211,82 @@ vi.mock("../../../theme/useTheme", () => ({
 
 // Mock themed components
 vi.mock("../../../theme/components/ThemedBox", () => ({
-    ThemedBox: vi.fn(({ children, className, ...props }) => (
-        <div className={className} data-testid="themed-box" {...props}>
-            {children}
-        </div>
-    )),
+    ThemedBox: vi.fn(({ children, className, ...props }) => {
+        const safeProps = sanitizeDomProps(props);
+        return (
+            <div className={className} data-testid="themed-box" {...safeProps}>
+                {children}
+            </div>
+        );
+    }),
 }));
 
 vi.mock("../../../theme/components/ThemedText", () => ({
-    ThemedText: vi.fn(({ children, className, ...props }) => (
-        <span className={className} data-testid="themed-text" {...props}>
-            {children}
-        </span>
-    )),
+    ThemedText: vi.fn(({ children, className, ...props }) => {
+        const safeProps = sanitizeDomProps(props);
+        return (
+            <span
+                className={className}
+                data-testid="themed-text"
+                {...safeProps}
+            >
+                {children}
+            </span>
+        );
+    }),
 }));
 
 vi.mock("../../../theme/components/ThemedButton", () => ({
     ThemedButton: vi.fn(
-        ({ children, onClick, disabled, className, ...props }) => (
-            <button
-                className={className}
-                onClick={onClick}
-                disabled={disabled}
-                data-testid="themed-button"
-                {...props}
-            >
-                {children}
-            </button>
-        )
+        ({ children, onClick, disabled, className, ...props }) => {
+            const safeProps = sanitizeDomProps(props);
+            return (
+                <button
+                    type="button"
+                    className={className}
+                    onClick={onClick}
+                    disabled={disabled}
+                    data-testid="themed-button"
+                    {...safeProps}
+                >
+                    {children}
+                </button>
+            );
+        }
     ),
 }));
 
 vi.mock("../../../theme/components/ThemedSelect", () => ({
-    ThemedSelect: vi.fn(({ children, onChange, value, disabled, ...props }) => (
-        <select
-            onChange={onChange}
-            value={value}
-            disabled={disabled}
-            data-testid="themed-select"
-            {...props}
-        >
-            {children}
-        </select>
-    )),
+    ThemedSelect: vi.fn(({ children, onChange, value, disabled, ...props }) => {
+        const safeProps = sanitizeDomProps(props);
+        return (
+            <select
+                onChange={onChange}
+                value={value}
+                disabled={disabled}
+                data-testid="themed-select"
+                {...safeProps}
+            >
+                {children}
+            </select>
+        );
+    }),
 }));
 
 vi.mock("../../../theme/components/ThemedCheckbox", () => ({
-    ThemedCheckbox: vi.fn(({ checked, onChange, disabled, ...props }) => (
-        <input
-            type="checkbox"
-            checked={checked}
-            onChange={onChange}
-            disabled={disabled}
-            data-testid="themed-checkbox"
-            {...props}
-        />
-    )),
+    ThemedCheckbox: vi.fn(({ checked, onChange, disabled, ...props }) => {
+        const safeProps = sanitizeDomProps(props);
+        return (
+            <input
+                type="checkbox"
+                checked={checked}
+                onChange={onChange}
+                disabled={disabled}
+                data-testid="themed-checkbox"
+                {...safeProps}
+            />
+        );
+    }),
 }));
 
 vi.mock("../../../theme/components/StatusIndicator", () => ({
@@ -396,9 +422,10 @@ describe("Settings Component - Property-Based Fuzzing", () => {
         };
 
         // Mock window.confirm for reset tests
+        windowConfirmMock = vi.fn(() => true);
         Object.defineProperty(window, "confirm", {
             writable: true,
-            value: vi.fn(() => true),
+            value: windowConfirmMock,
         });
     });
 
@@ -715,7 +742,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
-                (window.confirm as any).mockReturnValue(confirmReset);
+                windowConfirmMock.mockReturnValue(confirmReset);
 
                 render(<Settings onClose={mockOnClose} />);
 

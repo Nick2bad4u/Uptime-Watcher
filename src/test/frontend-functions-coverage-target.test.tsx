@@ -260,16 +260,27 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             const mountEffect = vi.fn();
             const unmountEffect = vi.fn();
 
-            const TestComponent = () => {
+            const TestComponent = ({
+                onMount,
+                onUnmount,
+            }: {
+                onMount: () => void;
+                onUnmount: () => void;
+            }) => {
                 useEffect(() => {
-                    mountEffect();
-                    return unmountEffect;
-                }, []);
+                    onMount();
+                    return onUnmount;
+                }, [onMount, onUnmount]);
 
                 return <div>Test Component</div>;
             };
 
-            const { unmount } = render(<TestComponent />);
+            const { unmount } = render(
+                <TestComponent
+                    onMount={mountEffect}
+                    onUnmount={unmountEffect}
+                />
+            );
 
             expect(mountEffect).toHaveBeenCalled();
 

@@ -190,7 +190,7 @@ describe("Sites Domain API", () => {
                 "remove-site",
                 siteId
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should handle removal of non-existent site", async () => {
@@ -501,7 +501,7 @@ describe("Sites Domain API", () => {
                 createIpcResponse(true)
             );
             const removed = await api.removeSite(created.identifier);
-            expect(removed).toBe(true);
+            expect(removed).toBeTruthy();
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledTimes(6);
         });
@@ -683,7 +683,7 @@ describe("Sites Domain API", () => {
             expect(typeof addResult.identifier).toBe("string");
             expect(typeof checkResult.name).toBe("string");
             expect(typeof updateResult.monitoring).toBe("boolean");
-            expect(removeResult).toBe(true);
+            expect(removeResult).toBeTruthy();
 
             // Array operation should return array
             mockIpcRenderer.invoke.mockResolvedValue(

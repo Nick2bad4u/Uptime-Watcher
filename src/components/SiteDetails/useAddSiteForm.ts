@@ -144,6 +144,13 @@ export type UseAddSiteFormReturn = Simplify<
 // composition)
 const resetFieldsForMonitorType = (
     currentFieldNames: Set<string>,
+    currentValues: {
+        expectedValue: string;
+        host: string;
+        port: string;
+        recordType: string;
+        url: string;
+    },
     setters: {
         setExpectedValue: (value: string) => void;
         setHost: (value: string) => void;
@@ -153,19 +160,25 @@ const resetFieldsForMonitorType = (
     }
 ): void => {
     // Reset fields that are not used by the current monitor type
-    if (!currentFieldNames.has("url")) {
+    if (!currentFieldNames.has("url") && currentValues.url !== "") {
         setters.setUrl("");
     }
-    if (!currentFieldNames.has("host")) {
+    if (!currentFieldNames.has("host") && currentValues.host !== "") {
         setters.setHost("");
     }
-    if (!currentFieldNames.has("port")) {
+    if (!currentFieldNames.has("port") && currentValues.port !== "") {
         setters.setPort("");
     }
-    if (!currentFieldNames.has("recordType")) {
+    if (
+        !currentFieldNames.has("recordType") &&
+        currentValues.recordType !== "A"
+    ) {
         setters.setRecordType("A");
     }
-    if (!currentFieldNames.has("expectedValue")) {
+    if (
+        !currentFieldNames.has("expectedValue") &&
+        currentValues.expectedValue !== ""
+    ) {
         setters.setExpectedValue("");
     }
 };
@@ -279,30 +292,44 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
     // Use monitor fields hook for dynamic validation
     const { getFields } = useMonitorFields();
 
-    // Compute effective field values based on monitor type during render
-    const currentFields = getFields(monitorType);
-
     // Reset fields when monitor type changes - using useEffect to avoid render-time setState
     useEffect(
         function resetFieldsOnMonitorTypeChange() {
+            const fieldDefinitions = getFields(monitorType);
             const currentFieldNames = new Set(
-                currentFields.map((field) => field.name)
+                fieldDefinitions.map((field) => field.name)
             );
-            resetFieldsForMonitorType(currentFieldNames, {
-                setExpectedValue,
-                setHost,
-                setPort,
-                setRecordType,
-                setUrl,
-            });
+            resetFieldsForMonitorType(
+                currentFieldNames,
+                {
+                    expectedValue,
+                    host,
+                    port,
+                    recordType,
+                    url,
+                },
+                {
+                    setExpectedValue,
+                    setHost,
+                    setPort,
+                    setRecordType,
+                    setUrl,
+                }
+            );
         },
         [
-            currentFields,
+            expectedValue,
+            getFields,
+            host,
+            monitorType,
+            port,
+            recordType,
             setExpectedValue,
             setHost,
             setPort,
             setRecordType,
             setUrl,
+            url,
         ]
     );
 

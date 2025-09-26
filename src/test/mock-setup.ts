@@ -70,13 +70,21 @@ fc.configureGlobal({
 });
 
 // Mock Electron APIs (not available in test environment) - matches new domain-based preload API structure
-const cloneMonitor = (monitor: Monitor): Monitor => ({
-    ...monitor,
-    ...(monitor.activeOperations !== undefined
-        ? { activeOperations: [...monitor.activeOperations] }
-        : {}),
-    history: monitor.history.map((entry) => ({ ...entry })),
-});
+const cloneMonitor = (monitor: Monitor): Monitor => {
+    const clonedMonitor: Monitor = {
+        ...monitor,
+        history: monitor.history.map((entry) => ({ ...entry })),
+    };
+
+    if (monitor.activeOperations === undefined) {
+        return clonedMonitor;
+    }
+
+    return {
+        ...clonedMonitor,
+        activeOperations: [...monitor.activeOperations],
+    };
+};
 
 const cloneSite = (site: Site): Site => ({
     ...site,

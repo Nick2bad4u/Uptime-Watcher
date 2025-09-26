@@ -222,22 +222,17 @@ export const createSiteSyncActions = (
         },
         getSyncStatus: async () => {
             try {
-                return await withErrorHandling(
-                    async () => {
-                        const status =
-                            await window.electronAPI.stateSync.getSyncStatus();
-                        logStoreAction("SitesStore", "getSyncStatus", {
-                            lastSyncAt: status.lastSyncAt,
-                            message: "Sync status retrieved",
-                            siteCount: status.siteCount,
-                            source: status.source,
-                            success: true,
-                            synchronized: status.synchronized,
-                        });
-                        return status;
-                    },
-                    createStoreErrorHandler("sites-sync", "getSyncStatus")
-                );
+                const stateSyncApi = window.electronAPI.stateSync;
+                const status = await stateSyncApi.getSyncStatus();
+                logStoreAction("SitesStore", "getSyncStatus", {
+                    lastSyncAt: status.lastSyncAt,
+                    message: "Sync status retrieved",
+                    siteCount: status.siteCount,
+                    source: status.source,
+                    success: true,
+                    synchronized: status.synchronized,
+                });
+                return status;
             } catch {
                 // Fallback for error case
                 return {
@@ -282,46 +277,45 @@ export const createSiteSyncActions = (
         },
         subscribeToSyncEvents: (): (() => void) => {
             try {
-                return window.electronAPI.stateSync.onStateSyncEvent(
-                    (event) => {
-                        logStoreAction("SitesStore", "syncEventReceived", {
-                            action: event.action,
-                            message: `Received sync event: ${event.action}`,
-                            siteIdentifier: event.siteIdentifier,
-                            sitesCount: event.sites?.length,
-                            source: event.source,
-                            timestamp: event.timestamp,
-                        });
+                const stateSyncApi = window.electronAPI.stateSync;
+                return stateSyncApi.onStateSyncEvent((event) => {
+                    logStoreAction("SitesStore", "syncEventReceived", {
+                        action: event.action,
+                        message: `Received sync event: ${event.action}`,
+                        siteIdentifier: event.siteIdentifier,
+                        sitesCount: event.sites?.length,
+                        source: event.source,
+                        timestamp: event.timestamp,
+                    });
 
-                        switch (event.action) {
-                            case "bulk-sync": {
-                                if (event.sites) {
-                                    deps.setSites(event.sites);
+                    switch (event.action) {
+                        case "bulk-sync": {
+                            if (event.sites) {
+                                deps.setSites(event.sites);
+                            }
+                            break;
+                        }
+                        case "delete":
+                        case "update": {
+                            void (async (): Promise<void> => {
+                                try {
+                                    await actions.syncSites();
+                                } catch (error: unknown) {
+                                    logStoreAction("SitesStore", "error", {
+                                        error: ensureError(error),
+                                    });
                                 }
-                                break;
-                            }
-                            case "delete":
-                            case "update": {
-                                void (async (): Promise<void> => {
-                                    try {
-                                        await actions.syncSites();
-                                    } catch (error: unknown) {
-                                        logStoreAction("SitesStore", "error", {
-                                            error: ensureError(error),
-                                        });
-                                    }
-                                })();
-                                break;
-                            }
-                            default: {
-                                logger.warn(
-                                    "Unknown sync event action:",
-                                    event.action
-                                );
-                            }
+                            })();
+                            break;
+                        }
+                        default: {
+                            logger.warn(
+                                "Unknown sync event action:",
+                                event.action
+                            );
                         }
                     }
-                );
+                });
             } catch (error) {
                 logger.error(
                     "Failed to subscribe to sync events:",

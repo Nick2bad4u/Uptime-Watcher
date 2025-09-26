@@ -404,9 +404,7 @@ describe(createSiteOperationsActions, () => {
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
                 undefined
             );
-            mockElectronAPI.monitoring.removeMonitor.mockResolvedValue(
-                undefined
-            );
+            mockElectronAPI.monitoring.removeMonitor.mockResolvedValue(true);
 
             await actions.removeMonitorFromSite("test-site", "monitor-1");
 

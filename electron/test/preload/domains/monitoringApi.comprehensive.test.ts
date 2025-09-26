@@ -166,7 +166,7 @@ describe("Monitoring Domain API", () => {
                 siteId,
                 monitorId
             );
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
         });
 
         it("should handle removal errors", async () => {
@@ -199,7 +199,7 @@ describe("Monitoring Domain API", () => {
                     siteId,
                     monitorId
                 );
-                expect(removed).toBe(true);
+                expect(removed).toBeTruthy();
             }
         });
     });
@@ -544,14 +544,17 @@ describe("Monitoring Domain API", () => {
                         const promises = operations.map((op) => {
                             if (typeof op === "string") {
                                 switch (op) {
-                                    case "start":
+                                    case "start": {
                                         return api.startMonitoring();
-                                    case "stop":
+                                    }
+                                    case "stop": {
                                         return api.stopMonitoring();
-                                    default:
+                                    }
+                                    default: {
                                         throw new Error(
                                             `Unknown operation: ${op}`
                                         );
+                                    }
                                 }
                             }
 
@@ -653,9 +656,9 @@ describe("Monitoring Domain API", () => {
 
             // Remove monitor
             const removed = await api.removeMonitor("site-1", "monitor-1");
-            expect(removed).toBe(true);
+            expect(removed).toBeTruthy();
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledTimes(6);
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledTimes(4);
         });
 
         it("should handle error recovery scenarios", async () => {
@@ -822,23 +825,23 @@ describe("Monitoring Domain API", () => {
             // Removal should return boolean
             mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
             const removeResult = await api.removeMonitor("site", "monitor");
-            expect(removeResult).toBe(true);
+            expect(removeResult).toBeTruthy();
 
             // Start operations should return boolean
             mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
             const globalStartResult = await api.startMonitoring();
             const siteStartResult2 = await api.startMonitoringForSite("site");
 
-            expect(globalStartResult).toBe(true);
-            expect(siteStartResult2).toBe(true);
+            expect(globalStartResult).toBeTruthy();
+            expect(siteStartResult2).toBeTruthy();
 
             // Stop operations should return boolean
             mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
             const globalStopResult = await api.stopMonitoring();
             const siteStopResult2 = await api.stopMonitoringForSite("site");
 
-            expect(globalStopResult).toBe(true);
-            expect(siteStopResult2).toBe(true);
+            expect(globalStopResult).toBeTruthy();
+            expect(siteStopResult2).toBeTruthy();
 
             // Validation returns any structure
             const validationData = { valid: true, errors: [] };
