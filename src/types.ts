@@ -15,9 +15,14 @@ import type {
     MonitorDownEventData,
     MonitoringControlEventData,
     MonitorUpEventData,
+    StateSyncEventData,
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
+import type {
+    StateSyncFullSyncResult,
+    StateSyncStatusSummary,
+} from "@shared/types/stateSync";
 // Additional global types
 
 // Re-export core types for convenience
@@ -227,6 +232,13 @@ declare global {
                 onUpdateStatus: (
                     callback: (data: UpdateStatusEventData) => void
                 ) => () => void;
+                /**
+                 * @remarks
+                 * Remove all registered event listeners across event channels.
+                 *
+                 * @returns Nothing. Invoking the cleanup clears listeners.
+                 */
+                removeAllListeners: () => void;
             };
 
             /**
@@ -267,12 +279,13 @@ declare global {
                  * @param siteId - The site identifier.
                  * @param monitorId - The monitor identifier.
                  *
-                 * @returns A promise that resolves when monitor is removed.
+                 * @returns A promise resolving to true when the monitor is
+                 *   removed.
                  */
                 removeMonitor: (
                     siteId: string,
                     monitorId: string
-                ) => Promise<void>;
+                ) => Promise<boolean>;
                 /**
                  * @remarks
                  * Start monitoring for all configured sites.
@@ -344,6 +357,31 @@ declare global {
 
             /**
              * @remarks
+             * Application settings management operations.
+             */
+            settings: {
+                /**
+                 * @remarks
+                 * Get the current history retention limit.
+                 *
+                 * @returns A promise resolving to the current history limit in
+                 *   days.
+                 */
+                getHistoryLimit: () => Promise<number>;
+                /**
+                 * @remarks
+                 * Update the history retention limit.
+                 *
+                 * @param limit - The new history limit in days.
+                 *
+                 * @returns A promise resolving to the updated history limit
+                 *   value.
+                 */
+                updateHistoryLimit: (limit: number) => Promise<number>;
+            };
+
+            /**
+             * @remarks
              * Site and monitor CRUD operations.
              */
             sites: {
@@ -390,9 +428,10 @@ declare global {
                  *
                  * @param id - The site identifier.
                  *
-                 * @returns A promise resolving to the removed site.
+                 * @returns A promise resolving to true when the site is
+                 *   removed.
                  */
-                removeSite: (id: string) => Promise<Site>;
+                removeSite: (id: string) => Promise<boolean>;
                 /**
                  * @remarks
                  * Start monitoring for a specific site.
@@ -435,9 +474,10 @@ declare global {
                  * @remarks
                  * Get current synchronization status.
                  *
-                 * @returns A promise resolving to array of sites.
+                 * @returns A promise resolving to the latest synchronization
+                 *   summary.
                  */
-                getSyncStatus: () => Promise<Site[]>;
+                getSyncStatus: () => Promise<StateSyncStatusSummary>;
                 /**
                  * @remarks
                  * Subscribe to state synchronization events.
@@ -448,21 +488,16 @@ declare global {
                  * @returns Cleanup function to remove the event listener
                  */
                 onStateSyncEvent: (
-                    callback: (data: {
-                        action: "bulk-sync" | "create" | "delete" | "update";
-                        siteId?: string;
-                        sites?: Site[];
-                        source: "backend" | "cache" | "manual";
-                        timestamp: number;
-                    }) => void
+                    callback: (data: StateSyncEventData) => void
                 ) => () => void;
                 /**
                  * @remarks
                  * Manually request full state synchronization.
                  *
-                 * @returns A promise resolving to array of synchronized sites.
+                 * @returns A promise resolving to the synchronized site
+                 *   payload.
                  */
-                requestFullSync: () => Promise<Site[]>;
+                requestFullSync: () => Promise<StateSyncFullSyncResult>;
             };
 
             /**
@@ -480,7 +515,22 @@ declare global {
                  *   successfully.
                  */
                 openExternal: (url: string) => Promise<boolean>;
+                /**
+                 * @remarks
+                 * Quit the application and install any pending update.
+                 *
+                 * @returns Nothing. Triggers the main process to handle
+                 *   quitting.
+                 */
+                quitAndInstall: () => void;
             };
         };
     }
 }
+
+/**
+ * Electron API type alias for consumers that need the renderer surface.
+ *
+ * @public
+ */
+export type ElectronAPI = Window["electronAPI"];

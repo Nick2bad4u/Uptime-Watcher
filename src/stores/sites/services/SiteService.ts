@@ -155,7 +155,7 @@ export const SiteService = {
      * @param siteIdentifier - The identifier of the site.
      * @param monitorId - The identifier of the monitor to remove.
      *
-     * @returns A promise that resolves when the monitor is removed.
+     * @returns A promise resolving to true when the monitor is removed.
      *
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
@@ -163,12 +163,20 @@ export const SiteService = {
     async removeMonitor(
         siteIdentifier: string,
         monitorId: string
-    ): Promise<void> {
+    ): Promise<boolean> {
         await this.initialize();
-        await window.electronAPI.monitoring.removeMonitor(
+        const removed = await window.electronAPI.monitoring.removeMonitor(
             siteIdentifier,
             monitorId
         );
+
+        if (!removed) {
+            throw new Error(
+                `Monitor removal failed for monitor ${monitorId} on site ${siteIdentifier}`
+            );
+        }
+
+        return true;
     },
 
     /**
@@ -182,14 +190,14 @@ export const SiteService = {
      *
      * @param identifier - The identifier of the site to remove.
      *
-     * @returns A promise that resolves when the site is removed.
+     * @returns A promise resolving to true when the site is removed.
      *
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    async removeSite(identifier: string): Promise<void> {
+    async removeSite(identifier: string): Promise<boolean> {
         await this.initialize();
-        await window.electronAPI.sites.removeSite(identifier);
+        return window.electronAPI.sites.removeSite(identifier);
     },
 
     /**

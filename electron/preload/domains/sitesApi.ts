@@ -57,9 +57,9 @@ export interface SitesApiInterface {
      *
      * @param siteId - ID of the site to remove
      *
-     * @returns Promise resolving to the removed site
+     * @returns Promise resolving to a boolean indicating removal success
      */
-    removeSite: (...args: unknown[]) => Promise<Site>;
+    removeSite: (...args: unknown[]) => Promise<boolean>;
 
     /**
      * Starts monitoring for a specific site
@@ -139,11 +139,11 @@ export const sitesApi: SitesApiInterface = {
      *
      * @param siteId - ID of the site to remove
      *
-     * @returns Promise resolving to the removed site
+     * @returns Promise resolving to a boolean indicating removal success
      */
-    removeSite: createTypedInvoker<Site>("remove-site") satisfies (
+    removeSite: createTypedInvoker<boolean>("remove-site") satisfies (
         ...args: unknown[]
-    ) => Promise<Site>,
+    ) => Promise<boolean>,
 
     /**
      * Starts monitoring for a specific site

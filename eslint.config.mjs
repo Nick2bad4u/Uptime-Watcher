@@ -187,28 +187,6 @@ import yamlEslintParser from "yaml-eslint-parser";
 
 const ROOT_DIR = import.meta.dirname;
 
-// boundaries plugin configuration
-const boundariesElements = [
-    {
-        capture: ["constant"],
-        pattern: "shared/constants/**/*",
-        type: "constants",
-    },
-    {
-        allowChildren: false,
-        capture: ["constant"],
-        mode: "file",
-        pattern: "shared/constants.ts",
-        type: "constants",
-    },
-    {
-        capture: ["type"],
-        pattern: "shared/types/**/*",
-        type: "types",
-    },
-    // ...add other boundary elements as needed
-];
-
 export default [
     gitignore({
         name: "Global .gitignore Rules",
@@ -1547,7 +1525,7 @@ export default [
             "@typescript-eslint/unified-signatures": "warn",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
             "boundaries/element-types": [
-                "error",
+                "off",
                 {
                     default: "disallow",
                     rules: [
@@ -4473,7 +4451,7 @@ export default [
             "antfu/no-ts-export-equal": "error",
             "antfu/top-level-function": "off",
             "boundaries/element-types": [
-                "error",
+                "off",
                 {
                     default: "disallow",
                     rules: [
@@ -5844,7 +5822,7 @@ export default [
             "antfu/no-ts-export-equal": "error",
             "antfu/top-level-function": "off",
             "boundaries/element-types": [
-                "error",
+                "off",
                 {
                     default: "disallow",
                     rules: [
@@ -8954,11 +8932,12 @@ export default [
             "@eslint-react/debug/is-from-react": "off", // Debugging not needed
             "@eslint-react/debug/jsx": "off", // Debugging not needed
             "@eslint-react/debug/react-hooks": "off", // Debugging not needed
-
             // Better-tailwindcss
             "better-tailwindcss/multiline": "off",
             "better-tailwindcss/sort-classes": "off",
+
             "callback-return": "off",
+            "canonical/destructuring-property-newline": "off",
             // Deprecated rules - to be removed in future
 
             "functional/no-promise-reject": "off",

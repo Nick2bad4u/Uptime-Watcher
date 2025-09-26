@@ -11,37 +11,65 @@
  * @packageDocumentation
  */
 
-import type { Site } from "@shared/types";
 import type { StateSyncEventData } from "@shared/types/events";
+import type {
+    StateSyncFullSyncResult,
+    StateSyncStatusSummary,
+} from "@shared/types/stateSync";
 
 import { createEventManager, createTypedInvoker } from "../core/bridgeFactory";
+
+const VALID_STATE_SYNC_ACTIONS = [
+    "bulk-sync",
+    "delete",
+    "update",
+] as const;
+const VALID_STATE_SYNC_SOURCES = [
+    "cache",
+    "database",
+    "frontend",
+] as const;
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === "object" && value !== null;
 
 /**
  * Type guard to validate StateSyncEventData structure
  */
 const isStateSyncEventData = (data: unknown): data is StateSyncEventData => {
-    if (typeof data !== "object" || data === null) {
+    if (!isRecord(data)) {
         return false;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type guard validation requires assertion
-    const event = data as Record<string, unknown>;
-    return (
-        typeof event["action"] === "string" &&
-        [
-            "bulk-sync",
-            "create",
-            "delete",
-            "update",
-        ].includes(event["action"]) &&
-        typeof event["source"] === "string" &&
-        [
-            "backend",
-            "cache",
-            "manual",
-        ].includes(event["source"]) &&
-        typeof event["timestamp"] === "number"
-    );
+    const { action, source, timestamp, siteIdentifier, sites } = data;
+
+    if (
+        typeof action !== "string" ||
+        !VALID_STATE_SYNC_ACTIONS.some((candidate) => candidate === action)
+    ) {
+        return false;
+    }
+
+    if (
+        typeof source !== "string" ||
+        !VALID_STATE_SYNC_SOURCES.some((candidate) => candidate === source)
+    ) {
+        return false;
+    }
+
+    if (typeof timestamp !== "number") {
+        return false;
+    }
+
+    if (siteIdentifier !== undefined && typeof siteIdentifier !== "string") {
+        return false;
+    }
+
+    if (sites !== undefined && !Array.isArray(sites)) {
+        return false;
+    }
+
+    return true;
 };
 
 /**
@@ -53,7 +81,7 @@ export interface StateSyncApiInterface {
      *
      * @returns Promise resolving to current sync status information
      */
-    getSyncStatus: (...args: unknown[]) => Promise<Site[]>;
+    getSyncStatus: () => Promise<StateSyncStatusSummary>;
 
     /**
      * Subscribe to state synchronization events
@@ -71,7 +99,7 @@ export interface StateSyncApiInterface {
      *
      * @returns Promise resolving to synchronized site data
      */
-    requestFullSync: (...args: unknown[]) => Promise<Site[]>;
+    requestFullSync: (...args: unknown[]) => Promise<StateSyncFullSyncResult>;
 }
 
 /**
@@ -83,9 +111,9 @@ export const stateSyncApi: StateSyncApiInterface = {
      *
      * @returns Promise resolving to current sync status information
      */
-    getSyncStatus: createTypedInvoker<Site[]>("get-sync-status") satisfies (
-        ...args: unknown[]
-    ) => Promise<Site[]>,
+    getSyncStatus: createTypedInvoker<StateSyncStatusSummary>(
+        "get-sync-status"
+    ) satisfies (...args: unknown[]) => Promise<StateSyncStatusSummary>,
 
     /**
      * Subscribe to state synchronization events
@@ -97,7 +125,7 @@ export const stateSyncApi: StateSyncApiInterface = {
     onStateSyncEvent: (
         callback: (data: StateSyncEventData) => void
     ): (() => void) =>
-        createEventManager("state:sync").on((data: unknown) => {
+        createEventManager("state-sync-event").on((data: unknown) => {
             if (isStateSyncEventData(data)) {
                 // eslint-disable-next-line n/callback-return -- Callback Return not required here as we just invoke the callback
                 callback(data);
@@ -109,9 +137,9 @@ export const stateSyncApi: StateSyncApiInterface = {
      *
      * @returns Promise resolving to synchronized site data
      */
-    requestFullSync: createTypedInvoker<Site[]>("request-full-sync") satisfies (
-        ...args: unknown[]
-    ) => Promise<Site[]>,
+    requestFullSync: createTypedInvoker<StateSyncFullSyncResult>(
+        "request-full-sync"
+    ) satisfies (...args: unknown[]) => Promise<StateSyncFullSyncResult>,
 } as const;
 
 export type StateSyncApi = StateSyncApiInterface;

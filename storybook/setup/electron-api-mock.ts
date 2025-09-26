@@ -2,6 +2,11 @@
 /* eslint-disable @typescript-eslint/require-await, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-parameters, @typescript-eslint/no-unnecessary-condition, sonarjs/pseudo-random -- Disable Strict Rules */
 import type { Site } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type {
+    StateSyncFullSyncResult,
+    StateSyncStatusSummary,
+} from "@shared/types/stateSync";
+import type { StateSyncEventData } from "@shared/types/events";
 
 import type { ElectronAPI } from "../types/electron-api";
 
@@ -101,7 +106,6 @@ export const electronAPIMock: ElectronAPI = {
                 monitorTypes: mockState.monitorTypes,
                 sites: mockState.sites,
             }),
-        getHistoryLimit: async (): Promise<number> => mockState.historyLimit,
         importData: async (payload: string): Promise<boolean> => {
             try {
                 const parsed = JSON.parse(payload) as Partial<{
@@ -129,6 +133,7 @@ export const electronAPIMock: ElectronAPI = {
                 return false;
             }
         },
+        getHistoryLimit: async (): Promise<number> => mockState.historyLimit,
         resetSettings: async (): Promise<void> => {
             mockState.historyLimit = DEFAULT_HISTORY_LIMIT;
         },
@@ -146,6 +151,7 @@ export const electronAPIMock: ElectronAPI = {
         onMonitorUp: registerListener,
         onTestEvent: registerListener,
         onUpdateStatus: registerListener,
+        removeAllListeners: noop,
     },
     monitoring: {
         formatMonitorDetail: async (
@@ -159,13 +165,14 @@ export const electronAPIMock: ElectronAPI = {
         removeMonitor: async (
             siteIdentifier: string,
             monitorId: string
-        ): Promise<void> => {
+        ): Promise<boolean> => {
             applySiteMutation(siteIdentifier, (site) => ({
                 ...site,
                 monitors: site.monitors.filter(
                     (monitor) => monitor.id !== monitorId
                 ),
             }));
+            return true;
         },
         startMonitoring: async (): Promise<boolean> => {
             mockState.sites = mockState.sites.map((site) => ({
@@ -246,6 +253,13 @@ export const electronAPIMock: ElectronAPI = {
         getMonitorTypes: async (): Promise<MonitorTypeConfig[]> =>
             clone(mockState.monitorTypes),
     },
+    settings: {
+        getHistoryLimit: async (): Promise<number> => mockState.historyLimit,
+        updateHistoryLimit: async (limit: number): Promise<number> => {
+            mockState.historyLimit = normalizeLimit(limit);
+            return mockState.historyLimit;
+        },
+    },
     sites: {
         addSite: async (site: Site): Promise<Site> => {
             mockState.sites = [...mockState.sites, clone(site)];
@@ -274,7 +288,7 @@ export const electronAPIMock: ElectronAPI = {
         deleteAllSites: async (): Promise<number> =>
             mockState.sites.splice(0).length,
         getSites: async (): Promise<Site[]> => clone(mockState.sites),
-        removeSite: async (identifier: string): Promise<Site> => {
+        removeSite: async (identifier: string): Promise<boolean> => {
             const index = findSiteIndex(identifier);
             if (index < 0) {
                 throw new Error(
@@ -289,7 +303,7 @@ export const electronAPIMock: ElectronAPI = {
                 );
             }
 
-            return clone(removed);
+            return true;
         },
         startMonitoringForSite: async (siteIdentifier: string): Promise<Site> =>
             applySiteMutation(siteIdentifier, (site) => ({
@@ -322,13 +336,28 @@ export const electronAPIMock: ElectronAPI = {
             })),
     },
     stateSync: {
-        getSyncStatus: async (): Promise<Site[]> => clone(mockState.sites),
-        onStateSyncEvent: registerListener,
-        requestFullSync: async (): Promise<Site[]> => clone(mockState.sites),
+        getSyncStatus: async (): Promise<StateSyncStatusSummary> => ({
+            lastSyncAt: Date.now(),
+            siteCount: mockState.sites.length,
+            source: "frontend",
+            synchronized: true,
+        }),
+        onStateSyncEvent: registerListener<StateSyncEventData>,
+        requestFullSync: async (): Promise<StateSyncFullSyncResult> => {
+            const sites = clone(mockState.sites);
+            return {
+                completedAt: Date.now(),
+                siteCount: sites.length,
+                sites,
+                source: "frontend",
+                synchronized: true,
+            };
+        },
     },
     system: {
         openExternal: async (url: string): Promise<boolean> =>
             typeof url === "string" && url.length > 0,
+        quitAndInstall: noop,
     },
 };
 

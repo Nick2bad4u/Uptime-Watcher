@@ -25,11 +25,6 @@ function createIpcResponse<T>(data: T, success = true, error?: string) {
     return { success, data, error };
 }
 
-// Helper function to create void IPC response format
-function createVoidIpcResponse(success = true, error?: string) {
-    return { success, error };
-}
-
 describe("Monitoring Domain API", () => {
     let api: MonitoringApiInterface;
 
@@ -160,17 +155,18 @@ describe("Monitoring Domain API", () => {
 
     describe("removeMonitor", () => {
         it("should call IPC with correct channel for monitor removal", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const siteId = "site-123";
             const monitorId = "monitor-456";
-            await api.removeMonitor(siteId, monitorId);
+            const result = await api.removeMonitor(siteId, monitorId);
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 "remove-monitor",
                 siteId,
                 monitorId
             );
+            expect(result).toBe(true);
         });
 
         it("should handle removal errors", async () => {
@@ -183,7 +179,7 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle various ID formats", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const testCases = [
                 ["site-1", "monitor-1"],
@@ -196,13 +192,14 @@ describe("Monitoring Domain API", () => {
             ];
 
             for (const [siteId, monitorId] of testCases) {
-                await api.removeMonitor(siteId, monitorId);
+                const removed = await api.removeMonitor(siteId, monitorId);
 
                 expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                     "remove-monitor",
                     siteId,
                     monitorId
                 );
+                expect(removed).toBe(true);
             }
         });
     });
@@ -547,37 +544,36 @@ describe("Monitoring Domain API", () => {
                         const promises = operations.map((op) => {
                             if (typeof op === "string") {
                                 switch (op) {
-                                    case "start": {
+                                    case "start":
                                         return api.startMonitoring();
-                                    }
-                                    case "stop": {
+                                    case "stop":
                                         return api.stopMonitoring();
-                                    }
-                                    default: {
+                                    default:
                                         throw new Error(
                                             `Unknown operation: ${op}`
                                         );
-                                    }
-                                }
-                            } else {
-                                switch (op.type) {
-                                    case "startSite": {
-                                        return api.startMonitoringForSite(
-                                            op.siteId
-                                        );
-                                    }
-                                    case "stopSite": {
-                                        return api.stopMonitoringForSite(
-                                            op.siteId
-                                        );
-                                    }
-                                    default: {
-                                        throw new Error(
-                                            `Unknown operation type: ${(op as { type: string }).type}`
-                                        );
-                                    }
                                 }
                             }
+
+                            const typedOp = op as
+                                | { type: "startSite"; siteId: string }
+                                | { type: "stopSite"; siteId: string };
+
+                            if (typedOp.type === "startSite") {
+                                return api.startMonitoringForSite(
+                                    typedOp.siteId
+                                );
+                            }
+
+                            if (typedOp.type === "stopSite") {
+                                return api.stopMonitoringForSite(
+                                    typedOp.siteId
+                                );
+                            }
+
+                            throw new Error(
+                                `Unknown operation type: ${(typedOp as { type: string }).type}`
+                            );
                         });
 
                         const results = await Promise.all(promises);
@@ -624,7 +620,7 @@ describe("Monitoring Domain API", () => {
         });
 
         it("should handle monitor management workflow", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const monitorData = { type: "http", url: "https://example.com" };
 
@@ -656,9 +652,10 @@ describe("Monitoring Domain API", () => {
             expect(suffix).toBe(suffixResult);
 
             // Remove monitor
-            await api.removeMonitor("site-1", "monitor-1");
+            const removed = await api.removeMonitor("site-1", "monitor-1");
+            expect(removed).toBe(true);
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledTimes(4);
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledTimes(6);
         });
 
         it("should handle error recovery scenarios", async () => {
@@ -822,11 +819,26 @@ describe("Monitoring Domain API", () => {
             expect(typeof siteStartResult).toBe("boolean");
             expect(typeof siteStopResult).toBe("boolean");
 
-            // Void returning method
-            mockIpcRenderer.invoke.mockResolvedValue(createVoidIpcResponse());
+            // Removal should return boolean
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
             const removeResult = await api.removeMonitor("site", "monitor");
+            expect(removeResult).toBe(true);
 
-            expect(removeResult).toBeUndefined();
+            // Start operations should return boolean
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
+            const globalStartResult = await api.startMonitoring();
+            const siteStartResult2 = await api.startMonitoringForSite("site");
+
+            expect(globalStartResult).toBe(true);
+            expect(siteStartResult2).toBe(true);
+
+            // Stop operations should return boolean
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
+            const globalStopResult = await api.stopMonitoring();
+            const siteStopResult2 = await api.stopMonitoringForSite("site");
+
+            expect(globalStopResult).toBe(true);
+            expect(siteStopResult2).toBe(true);
 
             // Validation returns any structure
             const validationData = { valid: true, errors: [] };

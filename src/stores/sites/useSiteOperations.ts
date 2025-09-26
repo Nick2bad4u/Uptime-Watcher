@@ -65,8 +65,23 @@ export const createSiteOperationsActions = (
                 // Get the current site
                 const site = getSiteById(siteId, deps);
 
+                let normalizedMonitor: Monitor;
+                try {
+                    normalizedMonitor = normalizeMonitor(monitor);
+                } catch (error) {
+                    const safeError = ensureError(error);
+                    logger.error(
+                        "Failed to normalize monitor before adding to site",
+                        safeError
+                    );
+                    throw new Error(
+                        `Monitor normalization failed: ${getErrorMessage(safeError)}`,
+                        { cause: safeError }
+                    );
+                }
+
                 // Allow multiple monitors of the same type
-                const updatedMonitors = [...site.monitors, monitor];
+                const updatedMonitors = [...site.monitors, normalizedMonitor];
                 await SiteService.updateSite(siteId, {
                     monitors: updatedMonitors,
                 });

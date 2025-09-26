@@ -4,6 +4,7 @@
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 /**
  * Common site CRUD operations interface. Used by both SiteOperationsActions and
@@ -76,16 +77,7 @@ export interface BaseSiteSync {
     /** Full resync from backend */
     fullResyncSites: () => Promise<void>;
     /** Get sync status */
-    getSyncStatus: () => Promise<{
-        /** Timestamp of last successful sync operation */
-        lastSync: null | number | undefined;
-        /** Total number of sites currently managed */
-        siteCount: number;
-        /** Whether the sync status check completed successfully */
-        success: boolean;
-        /** Whether frontend and backend data are synchronized */
-        synchronized: boolean;
-    }>;
+    getSyncStatus: () => Promise<StateSyncStatusSummary>;
     /** Subscribe to sync events */
     subscribeToSyncEvents: () => () => void;
     /** Sync sites from backend */

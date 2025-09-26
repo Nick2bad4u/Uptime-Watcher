@@ -16,11 +16,11 @@
  */
 
 import type { Site, StatusUpdate } from "@shared/types";
+import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
 import { logger } from "../../services/logger";
-import { safeExtractIpcData } from "../../types/ipc";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 import { SiteService } from "./services/SiteService";
@@ -65,24 +65,12 @@ export interface SiteSyncActions {
      *
      * - Last synchronization timestamp
      * - Current site count
-     * - Overall synchronization status
-     * - Success/failure indicators
-     *
-     * Uses `extractIpcData` to handle IPC response with proper error
-     * propagation.
+     * - Origin of the synchronized data
+     * - Whether the renderer is in sync with the backend
      *
      * @returns Promise resolving to sync status information
      */
-    getSyncStatus: () => Promise<{
-        /** Timestamp of last successful sync, undefined if never synced */
-        lastSync: null | number | undefined;
-        /** Current number of sites in the backend */
-        siteCount: number;
-        /** Whether the status retrieval was successful */
-        success: boolean;
-        /** Whether frontend and backend are synchronized */
-        synchronized: boolean;
-    }>;
+    getSyncStatus: () => Promise<StateSyncStatusSummary>;
 
     /**
      * Establishes subscription to real-time status updates.
@@ -236,18 +224,13 @@ export const createSiteSyncActions = (
             try {
                 return await withErrorHandling(
                     async () => {
-                        const response =
-                            // eslint-disable-next-line n/no-sync -- Method name contains 'sync' but is not a synchronous file operation
+                        const status =
                             await window.electronAPI.stateSync.getSyncStatus();
-                        const status = safeExtractIpcData(response, {
-                            lastSync: undefined,
-                            siteCount: 0,
-                            success: false,
-                            synchronized: false,
-                        });
                         logStoreAction("SitesStore", "getSyncStatus", {
+                            lastSyncAt: status.lastSyncAt,
                             message: "Sync status retrieved",
                             siteCount: status.siteCount,
+                            source: status.source,
                             success: true,
                             synchronized: status.synchronized,
                         });
@@ -258,9 +241,9 @@ export const createSiteSyncActions = (
             } catch {
                 // Fallback for error case
                 return {
-                    lastSync: undefined,
+                    lastSyncAt: null,
                     siteCount: 0,
-                    success: false,
+                    source: "frontend" as const,
                     synchronized: false,
                 };
             }
@@ -299,13 +282,12 @@ export const createSiteSyncActions = (
         },
         subscribeToSyncEvents: (): (() => void) => {
             try {
-                // eslint-disable-next-line n/no-sync -- Method name contains 'sync' but refers to state synchronization, not file operations
                 return window.electronAPI.stateSync.onStateSyncEvent(
                     (event) => {
                         logStoreAction("SitesStore", "syncEventReceived", {
                             action: event.action,
                             message: `Received sync event: ${event.action}`,
-                            siteId: event.siteId,
+                            siteIdentifier: event.siteIdentifier,
                             sitesCount: event.sites?.length,
                             source: event.source,
                             timestamp: event.timestamp,
@@ -318,11 +300,8 @@ export const createSiteSyncActions = (
                                 }
                                 break;
                             }
-                            case "create":
                             case "delete":
                             case "update": {
-                                // For individual site updates/creates/deletes, trigger full resync
-                                // to ensure consistency
                                 void (async (): Promise<void> => {
                                     try {
                                         await actions.syncSites();

@@ -13,7 +13,7 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
-import { createTypedInvoker, createVoidInvoker } from "../core/bridgeFactory";
+import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
  * Interface defining the monitoring domain API operations
@@ -43,9 +43,9 @@ export interface MonitoringApiInterface {
      * @param siteId - ID of the site
      * @param monitorId - ID of the monitor to remove
      *
-     * @returns Promise that resolves when monitor is removed
+     * @returns Promise resolving to true when the monitor is removed
      */
-    removeMonitor: (...args: unknown[]) => Promise<void>;
+    removeMonitor: (...args: unknown[]) => Promise<boolean>;
 
     /**
      * Starts the global monitoring system
@@ -124,11 +124,11 @@ export const monitoringApi: MonitoringApiInterface = {
      * @param siteId - ID of the site
      * @param monitorId - ID of the monitor to remove
      *
-     * @returns Promise that resolves when monitor is removed
+     * @returns Promise resolving to true when the monitor is removed
      */
-    removeMonitor: createVoidInvoker("remove-monitor") satisfies (
+    removeMonitor: createTypedInvoker<boolean>("remove-monitor") satisfies (
         ...args: unknown[]
-    ) => Promise<void>,
+    ) => Promise<boolean>,
 
     /**
      * Starts the global monitoring system

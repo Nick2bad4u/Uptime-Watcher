@@ -20,10 +20,12 @@ const mockElectronAPI = {
     },
     data: {
         downloadSqliteBackup: vi.fn(),
-        getHistoryLimit: vi.fn().mockReturnValue(1000), // Required by waitForElectronAPI
+        getHistoryLimit: vi.fn().mockReturnValue(1000),
     },
     stateSync: {
         getSyncStatus: vi.fn(),
+        onStateSyncEvent: vi.fn(),
+        requestFullSync: vi.fn(),
     },
 };
 
@@ -71,13 +73,14 @@ describe("IPC Response Handling Regression Tests", () => {
         mockElectronAPI.sites.getSites.mockResolvedValue([]);
         mockElectronAPI.sites.addSite.mockResolvedValue(undefined);
         mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue({
-            success: true,
-            data: "backup-data",
+            buffer: new ArrayBuffer(0),
+            fileName: "backup-data.db",
         });
         mockElectronAPI.stateSync.getSyncStatus.mockResolvedValue({
-            success: true,
-            sites: { pending: false, lastUpdate: Date.now() },
-            events: { pending: false, lastUpdate: Date.now() },
+            lastSyncAt: Date.now(),
+            siteCount: 0,
+            source: "cache",
+            synchronized: true,
         });
     });
 

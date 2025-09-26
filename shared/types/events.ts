@@ -10,6 +10,7 @@
 
 import type { Monitor, Site } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
+import type { StateSyncAction, StateSyncSource } from "./stateSync";
 
 /**
  * Base interface for all event data payloads.
@@ -57,13 +58,13 @@ export interface BaseEventData {
  */
 export interface StateSyncEventData extends BaseEventData {
     /** The synchronization action being performed */
-    readonly action: "bulk-sync" | "create" | "delete" | "update";
-    /** Site ID for targeted operations (delete, update, create) */
-    readonly siteId?: string;
+    readonly action: StateSyncAction;
+    /** Site identifier for targeted operations (delete, update) */
+    readonly siteIdentifier?: string;
     /** Site data for bulk sync operations */
     readonly sites?: Site[];
     /** Source system that triggered the sync */
-    readonly source: "backend" | "cache" | "manual";
+    readonly source: StateSyncSource;
 }
 
 /**

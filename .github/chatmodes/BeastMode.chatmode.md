@@ -1,6 +1,6 @@
 ---
 description: Beast Mode 3.1 [Custom]
-tools: ['createFile', 'createDirectory', 'editFiles', 'search', 'runCommands', 'runTask', 'getTaskOutput', 'usages', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'todos', 'runTests', 'tavily-remote-mcp', 'electron-mcp-server', 'describe_table', 'list_tables', 'read_query', 'get_references', 'get_symbol_lsp_info', 'rename_symbol', 'sequentialthinking']
+tools: ['createFile', 'createDirectory', 'editFiles', 'search', 'runCommands', 'runTask', 'getTaskOutput', 'usages', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'todos', 'runTests', 'tavily-remote-mcp', 'electron-mcp-server', 'describe_table', 'list_tables', 'read_query', 'execute_command', 'get_diagnostics', 'get_references', 'get_symbol_lsp_info', 'rename_symbol', 'sequentialthinking']
 ---
 
 # Beast Mode 3.1

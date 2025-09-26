@@ -180,18 +180,9 @@ describe("Sites Domain API", () => {
     });
 
     describe("removeSite", () => {
-        it("should call IPC with site ID and return removed site", async () => {
+        it("should call IPC with site ID and return removal status", async () => {
             const siteId = "site-to-remove";
-            const mockRemovedSite = {
-                identifier: siteId,
-                name: "Removed Site",
-                monitoring: false,
-                monitors: [],
-            };
-
-            mockIpcRenderer.invoke.mockResolvedValue(
-                createIpcResponse(mockRemovedSite)
-            );
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
 
             const result = await api.removeSite(siteId);
 
@@ -199,7 +190,7 @@ describe("Sites Domain API", () => {
                 "remove-site",
                 siteId
             );
-            expect(result).toEqual(mockRemovedSite);
+            expect(result).toBe(true);
         });
 
         it("should handle removal of non-existent site", async () => {
@@ -507,10 +498,10 @@ describe("Sites Domain API", () => {
 
             // Remove site
             mockIpcRenderer.invoke.mockResolvedValueOnce(
-                createIpcResponse(mockStoppedSite)
+                createIpcResponse(true)
             );
             const removed = await api.removeSite(created.identifier);
-            expect(removed.identifier).toBe(created.identifier);
+            expect(removed).toBe(true);
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledTimes(6);
         });
@@ -686,12 +677,13 @@ describe("Sites Domain API", () => {
             const addResult = await api.addSite({});
             const checkResult = await api.checkSiteNow("site");
             const updateResult = await api.updateSite("site", {});
+            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
             const removeResult = await api.removeSite("site");
 
             expect(typeof addResult.identifier).toBe("string");
             expect(typeof checkResult.name).toBe("string");
             expect(typeof updateResult.monitoring).toBe("boolean");
-            expect(Array.isArray(removeResult.monitors)).toBeTruthy();
+            expect(removeResult).toBe(true);
 
             // Array operation should return array
             mockIpcRenderer.invoke.mockResolvedValue(

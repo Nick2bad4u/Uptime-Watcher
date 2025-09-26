@@ -134,6 +134,7 @@ const mockElectronAPI: {
     };
     monitorTypes: {
         formatMonitorDetail: Mock<(...args: any[]) => any>;
+        formatMonitorTitleSuffix: Mock<(...args: any[]) => any>;
         getMonitorTypes: Mock<(...args: any[]) => any>;
         validateMonitorData: Mock<(...args: any[]) => any>;
     };
@@ -154,6 +155,7 @@ const mockElectronAPI: {
         onStateSyncEvent: Mock<
             (_callback: any) => Mock<(...args: any[]) => any>
         >;
+        requestFullSync: Mock<(...args: any[]) => any>;
     };
     system: {
         openExternal: Mock<(...args: any[]) => any>;
@@ -218,112 +220,102 @@ const mockElectronAPI: {
         formatHttpStatus: vi.fn().mockReturnValue("up"),
     },
     monitorTypes: {
-        formatMonitorDetail: vi.fn().mockResolvedValue({
-            success: true,
-            data: "Mock formatted detail",
-        }),
-        getMonitorTypes: vi.fn().mockResolvedValue({
-            success: true,
-            data: [
-                {
-                    type: "http",
-                    fields: [
-                        {
-                            id: "url",
-                            label: "URL",
-                            type: "url",
-                            required: true,
-                            placeholder: "https://example.com",
-                        },
-                        {
-                            id: "port",
-                            label: "Port",
-                            type: "number",
-                            required: false,
-                            min: 1,
-                            max: 65_535,
-                        },
-                    ],
-                },
-                {
-                    type: "port",
-                    fields: [
-                        {
-                            id: "host",
-                            label: "Host",
-                            type: "text",
-                            required: true,
-                        },
-                        {
-                            id: "port",
-                            label: "Port",
-                            type: "number",
-                            required: true,
-                            min: 1,
-                            max: 65_535,
-                        },
-                    ],
-                },
-            ],
-        }),
+        formatMonitorDetail: vi.fn().mockResolvedValue("Mock formatted detail"),
+        formatMonitorTitleSuffix: vi
+            .fn()
+            .mockResolvedValue("Mock title suffix"),
+        getMonitorTypes: vi.fn().mockResolvedValue([
+            {
+                type: "http",
+                fields: [
+                    {
+                        id: "url",
+                        label: "URL",
+                        type: "url",
+                        required: true,
+                        placeholder: "https://example.com",
+                    },
+                    {
+                        id: "port",
+                        label: "Port",
+                        type: "number",
+                        required: false,
+                        min: 1,
+                        max: 65_535,
+                    },
+                ],
+            },
+            {
+                type: "port",
+                fields: [
+                    {
+                        id: "host",
+                        label: "Host",
+                        type: "text",
+                        required: true,
+                    },
+                    {
+                        id: "port",
+                        label: "Port",
+                        type: "number",
+                        required: true,
+                        min: 1,
+                        max: 65_535,
+                    },
+                ],
+            },
+        ]),
         validateMonitorData: vi.fn().mockResolvedValue({
-            success: true,
             errors: [],
+            isValid: true,
         }),
     },
     settings: {
-        getHistoryLimit: vi.fn().mockResolvedValue({
-            success: true,
-            data: 1000,
-        }),
-        updateHistoryLimit: vi.fn().mockResolvedValue({
-            success: true,
-            data: undefined,
-        }),
+        getHistoryLimit: vi.fn().mockResolvedValue(1000),
+        updateHistoryLimit: vi
+            .fn()
+            .mockImplementation(async (limit: number) => limit),
     },
     sites: {
         addSite: vi.fn().mockResolvedValue({
-            success: true,
-            data: {
-                identifier: "test-site",
-                monitors: [],
-                name: "Test Site",
-            },
+            identifier: "test-site",
+            monitoring: true,
+            monitors: [],
+            name: "Test Site",
         }),
         checkSiteNow: vi.fn().mockResolvedValue({
-            success: true,
-            data: {
-                monitorId: "test-monitor",
-                status: "up",
-                timestamp: Date.now(),
-            },
+            identifier: "test-site",
+            monitoring: true,
+            monitors: [],
+            name: "Test Site",
         }),
-        getSites: vi.fn().mockResolvedValue({
-            success: true,
-            data: [],
-        }),
-        removeMonitor: vi.fn().mockResolvedValue({
-            success: true,
-            data: true,
-        }),
+        getSites: vi.fn().mockResolvedValue([]),
+        removeMonitor: vi.fn().mockResolvedValue(true),
         removeSite: vi.fn().mockResolvedValue(true),
         updateSite: vi.fn().mockResolvedValue({
-            success: true,
-            data: undefined,
+            identifier: "test-site",
+            monitoring: true,
+            monitors: [],
+            name: "Test Site",
         }),
     },
     stateSync: {
         getSyncStatus: vi.fn().mockResolvedValue({
-            success: true,
+            lastSyncAt: null,
             siteCount: 0,
-            lastSync: undefined,
+            source: "cache",
             synchronized: false,
         }),
         onStateSyncEvent: vi.fn(
-            (_callback: any): Mock<(...args: any[]) => any> =>
-                // Mock implementation - return cleanup function
-                vi.fn() // Mock cleanup function
+            (_callback: any): Mock<(...args: any[]) => any> => vi.fn()
         ),
+        requestFullSync: vi.fn().mockResolvedValue({
+            completedAt: Date.now(),
+            siteCount: 0,
+            sites: [],
+            source: "cache",
+            synchronized: false,
+        }),
     },
     system: {
         openExternal: vi.fn().mockResolvedValue(undefined),

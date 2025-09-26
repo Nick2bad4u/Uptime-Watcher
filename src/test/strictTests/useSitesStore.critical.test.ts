@@ -51,11 +51,12 @@ describe("useSitesStore Function Coverage Tests", () => {
         mockElectronAPI.sites.getSites.mockResolvedValue([]);
         mockElectronAPI.sites.addSite.mockResolvedValue(undefined);
         mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
-        mockElectronAPI.sites.removeSite.mockResolvedValue(undefined);
+        mockElectronAPI.sites.removeSite.mockResolvedValue(true);
         mockElectronAPI.stateSync.getSyncStatus.mockResolvedValue({
-            success: true,
-            sites: { pending: false, lastUpdate: Date.now() },
-            events: { pending: false, lastUpdate: Date.now() },
+            lastSyncAt: Date.now(),
+            siteCount: 0,
+            source: "cache",
+            synchronized: true,
         });
 
         // Set up SiteService mocks
@@ -67,7 +68,7 @@ describe("useSitesStore Function Coverage Tests", () => {
         } as Site);
         vi.mocked(SiteService.getSites).mockResolvedValue([]);
         vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
-        vi.mocked(SiteService.removeSite).mockResolvedValue(undefined);
+        vi.mocked(SiteService.removeSite).mockResolvedValue(true);
         vi.mocked(SiteService.checkSiteNow).mockResolvedValue({} as Site);
         vi.mocked(SiteService.initialize).mockResolvedValue(undefined);
 
@@ -215,10 +216,10 @@ describe("useSitesStore Function Coverage Tests", () => {
         it("should exercise sync status functions", async () => {
             // Mock sync status response
             mockElectronAPI.stateSync.getSyncStatus.mockResolvedValueOnce({
-                success: true,
-                synchronized: true,
+                lastSyncAt: Date.now(),
                 siteCount: 2,
-                lastSync: Date.now(),
+                source: "database",
+                synchronized: true,
             });
 
             const store = useSitesStore.getState();
@@ -228,9 +229,13 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             // The function should return proper status object
             expect(syncStatus).toBeDefined();
-            expect(typeof syncStatus.success).toBe("boolean");
             expect(typeof syncStatus.synchronized).toBe("boolean");
             expect(typeof syncStatus.siteCount).toBe("number");
+            expect(
+                syncStatus.lastSyncAt === null ||
+                    typeof syncStatus.lastSyncAt === "number"
+            ).toBeTruthy();
+            expect(typeof syncStatus.source).toBe("string");
             expect(mockElectronAPI.stateSync.getSyncStatus).toHaveBeenCalled();
         });
 
@@ -305,7 +310,7 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             // Mock deletion responses
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
-                undefined
+                true
             );
             mockElectronAPI.sites.removeSite.mockResolvedValueOnce(true);
             mockElectronAPI.sites.getSites.mockResolvedValueOnce([]);
@@ -345,10 +350,10 @@ describe("useSitesStore Function Coverage Tests", () => {
             const syncStatus = await store.getSyncStatus();
 
             // Should return fallback values on error
-            expect(syncStatus.success).toBeFalsy();
             expect(syncStatus.synchronized).toBeFalsy();
             expect(syncStatus.siteCount).toBe(0);
-            expect(syncStatus.lastSync).toBeUndefined();
+            expect(syncStatus.lastSyncAt).toBeNull();
+            expect(syncStatus.source).toBe("frontend");
         });
 
         it("should handle operation errors gracefully", async () => {

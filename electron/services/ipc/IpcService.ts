@@ -981,6 +981,7 @@ export class IpcService {
             async () => {
                 // Get all sites and send to frontend
                 const sites = await this.uptimeOrchestrator.getSites();
+                const timestamp = Date.now();
 
                 // Emit proper typed sync event
                 await this.uptimeOrchestrator.emitTyped(
@@ -988,7 +989,7 @@ export class IpcService {
                     {
                         action: "bulk-sync",
                         source: "database",
-                        timestamp: Date.now(),
+                        timestamp,
                     }
                 );
 
@@ -996,16 +997,22 @@ export class IpcService {
                 for (const window of BrowserWindow.getAllWindows()) {
                     window.webContents.send("state-sync-event", {
                         action: "bulk-sync",
-                        sites: sites,
+                        sites,
                         source: "database",
-                        timestamp: Date.now(),
+                        timestamp,
                     });
                 }
 
                 logger.debug("[IpcService] Full sync completed", {
                     siteCount: sites.length,
                 });
-                return { siteCount: sites.length, success: true };
+                return {
+                    completedAt: timestamp,
+                    siteCount: sites.length,
+                    sites,
+                    source: "database" as const,
+                    synchronized: true,
+                };
             },
             StateSyncHandlerValidators.requestFullSync,
             this.registeredIpcHandlers
@@ -1016,10 +1023,11 @@ export class IpcService {
             "get-sync-status",
             async () => {
                 const sites = await this.uptimeOrchestrator.getSites();
+                const timestamp = Date.now();
                 return {
-                    lastSync: Date.now(),
+                    lastSyncAt: timestamp,
                     siteCount: sites.length,
-                    success: true,
+                    source: "database" as const,
                     synchronized: true,
                 };
             },

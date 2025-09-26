@@ -16,6 +16,12 @@ process.setMaxListeners(MAX_LISTENERS);
 
 import { vi } from "vitest";
 import fc from "fast-check";
+import type { Monitor, Site } from "../../shared/types";
+import type {
+    StateSyncFullSyncResult,
+    StateSyncStatusSummary,
+} from "../../shared/types/stateSync";
+import type { ElectronAPI } from "../types";
 
 // Configure fast-check for property-based testing
 const current = fc.readConfigureGlobal() ?? {};
@@ -64,173 +70,242 @@ fc.configureGlobal({
 });
 
 // Mock Electron APIs (not available in test environment) - matches new domain-based preload API structure
-const mockElectronAPI: any = {
-    // Data management operations (import/export, settings, backup)
-    data: {
-        // Settings operations
-        getHistoryLimit: vi.fn().mockResolvedValue(1000),
-        updateHistoryLimit: vi.fn().mockResolvedValue(30),
-        resetSettings: vi.fn().mockResolvedValue(undefined),
+const cloneMonitor = (monitor: Monitor): Monitor => ({
+    ...monitor,
+    ...(monitor.activeOperations !== undefined
+        ? { activeOperations: [...monitor.activeOperations] }
+        : {}),
+    history: monitor.history.map((entry) => ({ ...entry })),
+});
 
-        // Backup operations
-        downloadSqliteBackup: vi.fn().mockResolvedValue({
+const cloneSite = (site: Site): Site => ({
+    ...site,
+    monitors: site.monitors.map((monitor: Monitor) => cloneMonitor(monitor)),
+});
+
+const defaultMonitor: Monitor = {
+    activeOperations: [],
+    checkInterval: 60_000,
+    history: [],
+    id: "monitor-1",
+    monitoring: false,
+    responseTime: 0,
+    retryAttempts: 0,
+    status: "up",
+    timeout: 30_000,
+    type: "http",
+    url: "https://example.com",
+};
+
+const defaultSite: Site = {
+    identifier: "mock-site",
+    monitoring: false,
+    monitors: [cloneMonitor(defaultMonitor)],
+    name: "Mock Site",
+};
+
+const defaultStateSyncStatus: StateSyncStatusSummary = {
+    lastSyncAt: Date.now(),
+    siteCount: 1,
+    source: "frontend",
+    synchronized: true,
+};
+
+const defaultFullSyncResult: StateSyncFullSyncResult = {
+    completedAt: Date.now(),
+    siteCount: 1,
+    sites: [cloneSite(defaultSite)],
+    source: "frontend",
+    synchronized: true,
+};
+
+const mockElectronAPI: ElectronAPI = {
+    data: {
+        downloadSqliteBackup: vi.fn<
+            ElectronAPI["data"]["downloadSqliteBackup"]
+        >(async () => ({
             buffer: new ArrayBuffer(8),
             fileName: "backup.db",
-        }),
-
-        // Import/Export operations
-        importData: vi.fn().mockResolvedValue(true),
-        exportData: vi.fn().mockResolvedValue("{}"),
+        })),
+        exportData: vi.fn<ElectronAPI["data"]["exportData"]>(async () => "{}"),
+        getHistoryLimit: vi.fn<ElectronAPI["data"]["getHistoryLimit"]>(
+            async () => 1000
+        ),
+        importData: vi.fn<ElectronAPI["data"]["importData"]>(async () => true),
+        resetSettings: vi.fn<ElectronAPI["data"]["resetSettings"]>(
+            async () => undefined
+        ),
+        updateHistoryLimit: vi.fn<ElectronAPI["data"]["updateHistoryLimit"]>(
+            async (limit: number) => limit
+        ),
     },
 
-    // Event listener registration for various system events
     events: {
-        removeAllListeners: vi.fn().mockReturnValue(undefined),
-        on: vi.fn().mockReturnValue(undefined),
-        off: vi.fn().mockReturnValue(undefined),
+        onCacheInvalidated: vi.fn<ElectronAPI["events"]["onCacheInvalidated"]>(
+            (_callback) => () => undefined
+        ),
+        onMonitorDown: vi.fn<ElectronAPI["events"]["onMonitorDown"]>(
+            (_callback) => () => undefined
+        ),
+        onMonitoringStarted: vi.fn<
+            ElectronAPI["events"]["onMonitoringStarted"]
+        >((_callback) => () => undefined),
+        onMonitoringStopped: vi.fn<
+            ElectronAPI["events"]["onMonitoringStopped"]
+        >((_callback) => () => undefined),
+        onMonitorStatusChanged: vi.fn<
+            ElectronAPI["events"]["onMonitorStatusChanged"]
+        >((_callback) => () => undefined),
+        onMonitorUp: vi.fn<ElectronAPI["events"]["onMonitorUp"]>(
+            (_callback) => () => undefined
+        ),
+        onTestEvent: vi.fn<ElectronAPI["events"]["onTestEvent"]>(
+            (_callback) => () => undefined
+        ),
+        onUpdateStatus: vi.fn<ElectronAPI["events"]["onUpdateStatus"]>(
+            (_callback) => () => undefined
+        ),
+        removeAllListeners: vi.fn<ElectronAPI["events"]["removeAllListeners"]>(
+            () => undefined
+        ),
     },
 
-    // Monitoring control operations (start/stop, validation, formatting)
     monitoring: {
-        removeMonitor: vi.fn().mockResolvedValue(undefined),
-        startMonitor: vi.fn().mockResolvedValue(undefined),
-        stopMonitor: vi.fn().mockResolvedValue(undefined),
-        stopMonitoringForSite: vi.fn().mockResolvedValue(undefined),
-        validateMonitorConfig: vi.fn().mockResolvedValue(true),
-        formatHttpStatus: vi.fn().mockReturnValue("up"),
+        formatMonitorDetail: vi.fn<
+            ElectronAPI["monitoring"]["formatMonitorDetail"]
+        >(async (_monitorType, details) => details),
+        formatMonitorTitleSuffix: vi.fn<
+            ElectronAPI["monitoring"]["formatMonitorTitleSuffix"]
+        >(async (monitorType, monitor) => `${monitor.id}-${monitorType}`),
+        removeMonitor: vi.fn<ElectronAPI["monitoring"]["removeMonitor"]>(
+            async () => true
+        ),
+        startMonitoring: vi.fn<ElectronAPI["monitoring"]["startMonitoring"]>(
+            async () => true
+        ),
+        startMonitoringForSite: vi.fn<
+            ElectronAPI["monitoring"]["startMonitoringForSite"]
+        >(async () => true),
+        stopMonitoring: vi.fn<ElectronAPI["monitoring"]["stopMonitoring"]>(
+            async () => true
+        ),
+        stopMonitoringForSite: vi.fn<
+            ElectronAPI["monitoring"]["stopMonitoringForSite"]
+        >(async () => true),
+        validateMonitorData: vi.fn<
+            ElectronAPI["monitoring"]["validateMonitorData"]
+        >(async (_monitorType, monitorData) => ({
+            data: monitorData ?? {},
+            errors: [],
+            metadata: {},
+            success: true,
+            warnings: [],
+        })),
     },
 
-    // Monitor type registry operations
     monitorTypes: {
-        getAll: vi.fn().mockResolvedValue({
-            success: true,
-            data: [
-                { type: "http", name: "HTTP", fields: [] },
-                { type: "ping", name: "Ping", fields: [] },
-                { type: "port", name: "Port", fields: [] },
-                { type: "dns", name: "DNS", fields: [] },
-            ],
-        }),
-        getMonitorTypes: vi.fn().mockResolvedValue([
-            {
-                type: "http",
-                displayName: "HTTP",
-                description: "HTTP monitoring",
-                version: "1.0.0",
-                fields: [
-                    {
-                        name: "url",
-                        type: "url",
-                        required: true,
-                        label: "URL",
-                    },
-                ],
-            },
-            {
-                type: "port",
-                displayName: "Port",
-                description: "Port monitoring",
-                version: "1.0.0",
-                fields: [
-                    {
-                        name: "host",
-                        type: "text",
-                        required: true,
-                        label: "Host",
-                    },
-                    {
-                        name: "port",
-                        type: "number",
-                        required: true,
-                        label: "Port",
-                    },
-                ],
-            },
-            {
-                type: "ping",
-                displayName: "Ping",
-                description: "Ping monitoring",
-                version: "1.0.0",
-                fields: [
-                    {
-                        name: "host",
-                        type: "text",
-                        required: true,
-                        label: "Host",
-                    },
-                ],
-            },
-            {
-                type: "dns",
-                displayName: "DNS",
-                description: "DNS monitoring",
-                version: "1.0.0",
-                fields: [
-                    {
-                        name: "host",
-                        type: "text",
-                        required: true,
-                        label: "Host",
-                    },
-                ],
-            },
-        ]),
-        getByType: vi.fn().mockResolvedValue({
-            success: true,
-            data: { type: "http", name: "HTTP", fields: [] },
-        }),
-        validateMonitorData: vi.fn().mockResolvedValue({
-            success: true,
-            data: {
-                success: true,
-                errors: [],
-                warnings: [],
-                metadata: {},
-            },
-        }),
-        formatMonitorDetail: vi.fn().mockResolvedValue({
-            success: true,
-            data: "Formatted detail",
-        }),
-        formatMonitorTitleSuffix: vi.fn().mockResolvedValue({
-            success: true,
-            data: " (formatted)",
-        }),
+        getMonitorTypes: vi.fn<ElectronAPI["monitorTypes"]["getMonitorTypes"]>(
+            async () => []
+        ),
     },
 
-    // Settings management operations
     settings: {
-        getHistoryLimit: vi.fn().mockResolvedValue(1000),
-        updateHistoryLimit: vi.fn().mockResolvedValue(1000),
+        getHistoryLimit: vi.fn<ElectronAPI["settings"]["getHistoryLimit"]>(
+            async () => 1000
+        ),
+        updateHistoryLimit: vi.fn<
+            ElectronAPI["settings"]["updateHistoryLimit"]
+        >(async (limit: number) => limit),
     },
 
-    // Site management operations (CRUD, monitoring control)
     sites: {
-        getSites: vi.fn().mockResolvedValue([]),
-        addSite: vi.fn().mockResolvedValue(undefined),
-        updateSite: vi.fn().mockResolvedValue(undefined),
-        removeSite: vi.fn().mockResolvedValue(undefined),
-        removeMonitor: vi.fn().mockResolvedValue(undefined),
-        getAll: vi.fn().mockResolvedValue([]), // Legacy alias
-        create: vi.fn().mockResolvedValue({}), // Legacy alias
-        update: vi.fn().mockResolvedValue({}), // Legacy alias
-        delete: vi.fn().mockResolvedValue(true), // Legacy alias
-        getById: vi.fn().mockResolvedValue(null), // Legacy alias
+        addSite: vi.fn<ElectronAPI["sites"]["addSite"]>(async (site) =>
+            cloneSite(site)
+        ),
+        checkSiteNow: vi.fn<ElectronAPI["sites"]["checkSiteNow"]>(
+            async (siteId, monitorId) => {
+                const site = cloneSite(defaultSite);
+                site.identifier = siteId;
+                site.monitors = site.monitors.map((monitor) =>
+                    monitor.id === monitorId
+                        ? { ...monitor, lastChecked: new Date() }
+                        : monitor
+                );
+                return site;
+            }
+        ),
+        deleteAllSites: vi.fn<ElectronAPI["sites"]["deleteAllSites"]>(
+            async () => 0
+        ),
+        getSites: vi.fn<ElectronAPI["sites"]["getSites"]>(async () => [
+            cloneSite(defaultSite),
+        ]),
+        removeSite: vi.fn<ElectronAPI["sites"]["removeSite"]>(async () => true),
+        startMonitoringForSite: vi.fn<
+            ElectronAPI["sites"]["startMonitoringForSite"]
+        >(async (siteId) => {
+            const site = cloneSite(defaultSite);
+            site.identifier = siteId;
+            site.monitoring = true;
+            site.monitors = site.monitors.map((monitor) => ({
+                ...monitor,
+                monitoring: true,
+            }));
+            return site;
+        }),
+        stopMonitoringForSite: vi.fn<
+            ElectronAPI["sites"]["stopMonitoringForSite"]
+        >(async (siteId) => {
+            const site = cloneSite(defaultSite);
+            site.identifier = siteId;
+            site.monitoring = false;
+            site.monitors = site.monitors.map((monitor) => ({
+                ...monitor,
+                monitoring: false,
+            }));
+            return site;
+        }),
+        updateSite: vi.fn<ElectronAPI["sites"]["updateSite"]>(
+            async (siteId, updates) => {
+                const base = cloneSite(defaultSite);
+                return {
+                    ...base,
+                    ...updates,
+                    identifier: siteId,
+                    monitors: updates.monitors
+                        ? updates.monitors.map((monitor: Monitor) =>
+                              cloneMonitor(monitor)
+                          )
+                        : base.monitors,
+                };
+            }
+        ),
     },
 
-    // State synchronization operations
     stateSync: {
-        onStateSyncEvent: vi.fn().mockReturnValue(() => {}),
-        offStateSyncEvent: vi.fn().mockReturnValue(undefined),
+        getSyncStatus: vi.fn<ElectronAPI["stateSync"]["getSyncStatus"]>(
+            async () => ({ ...defaultStateSyncStatus })
+        ),
+        onStateSyncEvent: vi.fn<ElectronAPI["stateSync"]["onStateSyncEvent"]>(
+            (_callback) => () => undefined
+        ),
+        requestFullSync: vi.fn<ElectronAPI["stateSync"]["requestFullSync"]>(
+            async () => ({
+                ...defaultFullSyncResult,
+                sites: defaultFullSyncResult.sites.map((site: Site) =>
+                    cloneSite(site)
+                ),
+            })
+        ),
     },
 
-    // System-level operations (external links, etc.)
     system: {
-        openExternal: vi.fn().mockResolvedValue(undefined),
-        quitAndInstall: vi.fn().mockResolvedValue(undefined),
-        getVersion: vi.fn().mockReturnValue("1.0.0"),
-        getName: vi.fn().mockReturnValue("Uptime Watcher"),
-        quit: vi.fn().mockReturnValue(undefined),
+        openExternal: vi.fn<ElectronAPI["system"]["openExternal"]>(
+            async (url: string) => url.length > 0
+        ),
+        quitAndInstall: vi.fn<ElectronAPI["system"]["quitAndInstall"]>(
+            () => undefined
+        ),
     },
 };
 

@@ -7,6 +7,7 @@
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import type { Simplify } from "type-fest";
 
 /**
@@ -51,16 +52,7 @@ export interface SitesActions {
     /** Get the currently selected site */
     getSelectedSite: () => Site | undefined;
     /** Get sync status */
-    getSyncStatus: () => Promise<{
-        /** Timestamp of last successful sync operation */
-        lastSync: null | number | undefined;
-        /** Total number of sites currently managed */
-        siteCount: number;
-        /** Whether the sync status check completed successfully */
-        success: boolean;
-        /** Whether frontend and backend data are synchronized */
-        synchronized: boolean;
-    }>;
+    getSyncStatus: () => Promise<StateSyncStatusSummary>;
     /** Initialize sites data from backend */
     initializeSites: () => Promise<{
         /** Descriptive message about the initialization result */
