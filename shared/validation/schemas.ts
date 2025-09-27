@@ -19,6 +19,7 @@ import type {
     PingMonitorSchemaType,
     PortMonitorSchemaType,
     SiteSchemaType,
+    SslMonitorSchemaType,
 } from "@shared/types/schemaTypes";
 import type { ValidationResult } from "@shared/types/validation";
 import type { UnknownRecord } from "type-fest";
@@ -148,6 +149,7 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
             "port",
             "ping",
             "dns",
+            "ssl",
         ]),
     })
     .strict();
@@ -244,16 +246,39 @@ export const dnsMonitorSchema: DnsMonitorSchemaType = baseMonitorSchema
     .strict();
 
 /**
+ * Zod schema for SSL monitor fields.
+ *
+ * @remarks
+ * Extends {@link baseMonitorSchema} and adds SSL-specific fields for certificate
+ * monitoring.
+ */
+export const sslMonitorSchema: SslMonitorSchemaType = baseMonitorSchema
+    .extend({
+        certificateWarningDays: z
+            .number()
+            .int("Warning threshold must be an integer")
+            .min(1, "Warning threshold must be at least 1 day")
+            .max(365, "Warning threshold cannot exceed 365 days"),
+        host: hostValidationSchema,
+        port: z
+            .number()
+            .refine(isValidPort, "Must be a valid port number (1-65535)"),
+        type: z.literal("ssl"),
+    })
+    .strict();
+
+/**
  * Zod discriminated union schema for all monitor types.
  *
  * @remarks
- * Supports HTTP, port, ping, and DNS monitors.
+ * Supports HTTP, port, ping, DNS, and SSL monitors.
  */
 export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
     httpMonitorSchema,
     portMonitorSchema,
     pingMonitorSchema,
     dnsMonitorSchema,
+    sslMonitorSchema,
 ]);
 
 /**
@@ -287,6 +312,7 @@ export interface MonitorSchemas {
     readonly http: typeof httpMonitorSchema;
     readonly ping: typeof pingMonitorSchema;
     readonly port: typeof portMonitorSchema;
+    readonly ssl: typeof sslMonitorSchema;
 }
 
 /**
@@ -300,7 +326,8 @@ export const monitorSchemas: MonitorSchemas = {
     http: httpMonitorSchema,
     ping: pingMonitorSchema,
     port: portMonitorSchema,
-} as const;
+    ssl: sslMonitorSchema,
+};
 
 /**
  * Type representing a validated HTTP monitor.
@@ -317,7 +344,7 @@ export type HttpMonitor = z.infer<typeof httpMonitorSchema>;
 export type DnsMonitor = z.infer<typeof dnsMonitorSchema>;
 
 /**
- * Type representing a validated monitor (HTTP, port, ping, or DNS).
+ * Type representing a validated monitor (HTTP, port, ping, DNS, or SSL).
  *
  * @see {@link monitorSchema}
  */
@@ -336,6 +363,13 @@ export type PingMonitor = z.infer<typeof pingMonitorSchema>;
  * @see {@link portMonitorSchema}
  */
 export type PortMonitor = z.infer<typeof portMonitorSchema>;
+
+/**
+ * Type representing a validated SSL monitor.
+ *
+ * @see {@link sslMonitorSchema}
+ */
+export type SslMonitor = z.infer<typeof sslMonitorSchema>;
 
 /**
  * Type representing a validated site.

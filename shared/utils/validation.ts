@@ -32,7 +32,8 @@ export function validateMonitorType(type: unknown): type is MonitorType {
         (type === "http" ||
             type === "port" ||
             type === "ping" ||
-            type === "dns")
+            type === "dns" ||
+            type === "ssl")
     );
 }
 
@@ -231,6 +232,44 @@ function validateDnsMonitorFields(
 }
 
 /**
+ * Validates SSL monitor-specific fields.
+ *
+ * @remarks
+ * Ensures host, port, and certificate warning threshold are valid.
+ *
+ * @param monitor - Partial monitor object to validate.
+ * @param errors - Array to collect validation error messages.
+ *
+ * @internal
+ */
+function validateSslMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
+    if (!monitor.host || typeof monitor.host !== "string") {
+        errors.push("Host is required for SSL monitors");
+    }
+    if (
+        typeof monitor.port !== "number" ||
+        !Number.isFinite(monitor.port) ||
+        monitor.port < 1 ||
+        monitor.port > 65_535
+    ) {
+        errors.push("Valid port number (1-65535) is required for SSL monitors");
+    }
+    if (
+        typeof monitor.certificateWarningDays !== "number" ||
+        !Number.isFinite(monitor.certificateWarningDays) ||
+        monitor.certificateWarningDays < 1 ||
+        monitor.certificateWarningDays > 365
+    ) {
+        errors.push(
+            "Certificate warning threshold must be between 1 and 365 days for SSL monitors"
+        );
+    }
+}
+
+/**
  * Validates type-specific monitor fields by delegating to the appropriate field
  * validator.
  *
@@ -267,6 +306,10 @@ function validateTypeSpecificFields(
         }
         case "port": {
             validatePortMonitorFields(monitor, errors);
+            break;
+        }
+        case "ssl": {
+            validateSslMonitorFields(monitor, errors);
             break;
         }
         default: {

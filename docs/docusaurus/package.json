@@ -49,14 +49,14 @@
         ]
     },
     "dependencies": {
-        "@docusaurus/core": "3.9.0",
-        "@docusaurus/faster": "3.9.0",
-        "@docusaurus/plugin-content-docs": "3.9.0",
-        "@docusaurus/preset-classic": "3.9.0",
-        "@docusaurus/theme-live-codeblock": "3.9.0",
-        "@docusaurus/theme-mermaid": "3.9.0",
-        "@docusaurus/theme-search-algolia": "3.9.0",
-        "@docusaurus/types": "^3.9.0",
+        "@docusaurus/core": "3.9.1",
+        "@docusaurus/faster": "3.9.1",
+        "@docusaurus/plugin-content-docs": "3.9.1",
+        "@docusaurus/preset-classic": "3.9.1",
+        "@docusaurus/theme-live-codeblock": "3.9.1",
+        "@docusaurus/theme-mermaid": "3.9.1",
+        "@docusaurus/theme-search-algolia": "3.9.1",
+        "@docusaurus/types": "^3.9.1",
         "@easyops-cn/docusaurus-search-local": "^0.52.1",
         "@grnet/docusaurus-glossary-view": "^2.0.0-rc.2",
         "@grnet/docusaurus-term-preview": "^2.0.0-rc.2",
@@ -72,8 +72,8 @@
         "react-github-btn": "^1.4.0"
     },
     "devDependencies": {
-        "@docusaurus/module-type-aliases": "^3.9.0",
-        "@docusaurus/tsconfig": "^3.9.0",
+        "@docusaurus/module-type-aliases": "^3.9.1",
+        "@docusaurus/tsconfig": "^3.9.1",
         "typedoc": "^0.28.13",
         "typedoc-docusaurus-theme": "^1.4.2",
         "typedoc-plugin-markdown": "^4.9.0",

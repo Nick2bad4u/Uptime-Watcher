@@ -81,6 +81,7 @@ export const FALLBACK_MONITOR_TYPE_OPTIONS: readonly MonitorTypeOption[] = [
     { label: "Port (Host/Port)", value: "port" },
     { label: "Ping (Host)", value: "ping" },
     { label: "DNS (Domain Lookup)", value: "dns" },
+    { label: "SSL Certificate", value: "ssl" },
 ] as const;
 
 /**

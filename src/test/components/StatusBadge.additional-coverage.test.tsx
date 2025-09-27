@@ -40,7 +40,7 @@ describe("StatusBadge - Additional Coverage", () => {
                     label="Test"
                     status="up"
                     size={invalidSize}
-                    showIcon={true}
+                    showIcon
                 />
             );
         };
@@ -88,7 +88,7 @@ describe("StatusBadge - Additional Coverage", () => {
                         label={`Test-${size}`}
                         status="up"
                         size={size}
-                        showIcon={true}
+                        showIcon
                     />
                 </ThemeProvider>
             );
@@ -120,7 +120,7 @@ describe("StatusBadge - Additional Coverage", () => {
                 <StatusBadge
                     label="Test Undefined Size"
                     status="down"
-                    showIcon={true}
+                    showIcon
                 />
             </ThemeProvider>
         );
@@ -181,7 +181,7 @@ describe("StatusBadge - Additional Coverage", () => {
                         label={`Test-${index}`}
                         status="up"
                         size={size}
-                        showIcon={true}
+                        showIcon
                     />
                 </ThemeProvider>
             );

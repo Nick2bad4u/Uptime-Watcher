@@ -65,6 +65,7 @@ import { DnsMonitor } from "./DnsMonitor";
 import { HttpMonitor } from "./HttpMonitor";
 import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
+import { SslMonitor } from "./SslMonitor";
 
 /**
  * Configuration interface for enhanced monitor checking with comprehensive
@@ -263,6 +264,8 @@ export class EnhancedMonitorChecker {
     private readonly pingMonitor: PingMonitor;
 
     private readonly portMonitor: PortMonitor;
+
+    private readonly sslMonitor: SslMonitor;
 
     /**
      * Performs a comprehensive monitor status check with advanced operation
@@ -900,6 +903,13 @@ export class EnhancedMonitorChecker {
                     signal
                 );
             }
+            case "ssl": {
+                return this.performMonitorCheck(
+                    this.sslMonitor,
+                    monitor,
+                    signal
+                );
+            }
             default: {
                 logger.warn(
                     interpolateLogTemplate(
@@ -1053,6 +1063,7 @@ export class EnhancedMonitorChecker {
         this.httpMonitor = new HttpMonitor({});
         this.pingMonitor = new PingMonitor({});
         this.portMonitor = new PortMonitor({});
+        this.sslMonitor = new SslMonitor({});
     }
 
     /**

@@ -29,9 +29,9 @@
  *     title="Add New Site"
  *     icon={<PlusIcon />}
  *     iconColor="primary"
- *     clickable={true}
+ *     clickable
  *     onClick={handleAddSite}
- *     hoverable={true}
+ *     hoverable
  * >
  *     <p>Click to add a new monitoring site</p>
  * </ThemedCard>;
@@ -127,7 +127,7 @@ export interface ThemedCardProperties extends CoreComponentProperties {
  * <ThemedCard
  *     title="Monitor Status"
  *     icon={<StatusIcon />}
- *     clickable={true}
+ *     clickable
  *     onClick={viewDetails}
  * >
  *     <StatusContent />

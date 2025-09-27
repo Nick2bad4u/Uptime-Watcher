@@ -20,6 +20,7 @@ import type {
     MonitorFormData,
     PingFormData,
     PortFormData,
+    SslFormData,
 } from "../types/monitorFormData";
 
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
@@ -370,25 +371,48 @@ const validatePortMonitorFormData = (data: Partial<PortFormData>): string[] => {
     return errors;
 };
 
-/**
- * Validates ping monitor form data by checking required host field.
- *
- * @remarks
- * Ping monitors require a host field that must be a valid hostname, IP address,
- * or localhost. Uses shared validation to ensure consistency with backend
- * validation rules.
- *
- * @param data - Form data to validate
- *
- * @returns Array of validation error messages
- */
+const validateSslMonitorFormData = (data: Partial<SslFormData>): string[] => {
+    const errors: string[] = [];
+
+    if (!data.host || typeof data.host !== "string") {
+        errors.push("Host is required for SSL monitors");
+    } else {
+        const hostResult = sharedValidateMonitorField("ssl", "host", data.host);
+        errors.push(...hostResult.errors);
+    }
+
+    if (!data.port || typeof data.port !== "number") {
+        errors.push("Port is required for SSL monitors");
+    } else {
+        const portResult = sharedValidateMonitorField("ssl", "port", data.port);
+        errors.push(...portResult.errors);
+    }
+
+    if (
+        !data.certificateWarningDays ||
+        typeof data.certificateWarningDays !== "number"
+    ) {
+        errors.push(
+            "Certificate warning threshold is required for SSL monitors"
+        );
+    } else {
+        const warningResult = sharedValidateMonitorField(
+            "ssl",
+            "certificateWarningDays",
+            data.certificateWarningDays
+        );
+        errors.push(...warningResult.errors);
+    }
+
+    return errors;
+};
+
 const validatePingMonitorFormData = (data: Partial<PingFormData>): string[] => {
     const errors: string[] = [];
 
     if (!data.host || typeof data.host !== "string") {
         errors.push("Host is required for ping monitors");
     } else {
-        // Validate host field specifically
         const hostResult = sharedValidateMonitorField(
             "ping",
             "host",
@@ -433,9 +457,16 @@ const validateMonitorFormDataByType = (
             );
             break;
         }
-        default: {
-            errors.push(`Unsupported monitor type: ${String(type)}`);
+        case "ssl": {
+            errors.push(
+                ...validateSslMonitorFormData(data as Partial<SslFormData>)
+            );
             break;
+        }
+        default: {
+            throw new Error(
+                `Unsupported monitor type in validation: ${String(type)}`
+            );
         }
     }
     /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Turn on again after switch statement */

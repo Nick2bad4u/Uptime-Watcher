@@ -12,6 +12,7 @@ import {
     httpMonitorSchema,
     portMonitorSchema,
     pingMonitorSchema,
+    sslMonitorSchema,
     monitorSchema,
     siteSchema,
     baseMonitorSchema,
@@ -19,6 +20,7 @@ import {
     type HttpMonitor,
     type PortMonitor,
     type PingMonitor,
+    type SslMonitor,
     type Monitor,
     type Site,
 } from "../../validation/schemas";
@@ -1843,6 +1845,122 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 expect(result.success).toBeFalsy();
                 expect(result.errors.length).toBeGreaterThan(0);
             });
+        });
+    });
+
+    describe("sslMonitorSchema", () => {
+        it("should validate complete SSL monitor configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor: SslMonitor = {
+                id: "ssl-monitor",
+                type: "ssl",
+                host: "example.com",
+                port: 443,
+                certificateWarningDays: 30,
+                checkInterval: 30_000,
+                timeout: 10_000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending",
+                responseTime: -1,
+                history: [],
+            };
+
+            expect(() => sslMonitorSchema.parse(monitor)).not.toThrow();
+        });
+
+        it("should reject monitors without valid host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                id: "ssl-monitor",
+                type: "ssl",
+                host: " ",
+                port: 443,
+                certificateWarningDays: 30,
+                checkInterval: 30_000,
+                timeout: 10_000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending",
+                responseTime: -1,
+                history: [],
+            } satisfies SslMonitor;
+
+            expect(() => sslMonitorSchema.parse(monitor)).toThrow();
+        });
+
+        it("should reject monitors with invalid port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                id: "ssl-monitor",
+                type: "ssl",
+                host: "example.com",
+                port: 0,
+                certificateWarningDays: 30,
+                checkInterval: 30_000,
+                timeout: 10_000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending",
+                responseTime: -1,
+                history: [],
+            } satisfies SslMonitor;
+
+            expect(() => sslMonitorSchema.parse(monitor)).toThrow();
+        });
+
+        it("should enforce certificate warning day bounds", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const outOfLowerBound = {
+                id: "ssl-monitor",
+                type: "ssl",
+                host: "example.com",
+                port: 443,
+                certificateWarningDays: 0,
+                checkInterval: 30_000,
+                timeout: 10_000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending",
+                responseTime: -1,
+                history: [],
+            } satisfies SslMonitor;
+
+            const outOfUpperBound = {
+                ...outOfLowerBound,
+                certificateWarningDays: 400,
+            } satisfies SslMonitor;
+
+            expect(() => sslMonitorSchema.parse(outOfLowerBound)).toThrow();
+            expect(() => sslMonitorSchema.parse(outOfUpperBound)).toThrow();
         });
     });
 });

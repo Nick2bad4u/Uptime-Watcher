@@ -470,9 +470,7 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                 return <div>Condition is false</div>;
             };
 
-            const { rerender } = render(
-                <ConditionalComponent condition={true} />
-            );
+            const { rerender } = render(<ConditionalComponent condition />);
             expect(screen.getByText("Condition is true")).toBeInTheDocument();
 
             rerender(<ConditionalComponent condition={false} />);
@@ -497,7 +495,7 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                 <div>{show ? <span>Visible</span> : <span>Hidden</span>}</div>
             );
 
-            const { rerender } = render(<TernaryComponent show={true} />);
+            const { rerender } = render(<TernaryComponent show />);
             expect(screen.getByText("Visible")).toBeInTheDocument();
 
             rerender(<TernaryComponent show={false} />);

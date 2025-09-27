@@ -130,6 +130,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         const formState = useAddSiteForm();
         const {
             addMode,
+            certificateWarningDays,
             checkInterval,
             expectedValue,
             formError,
@@ -141,6 +142,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             resetForm,
             selectedExistingSite,
             setAddMode,
+            setCertificateWarningDays,
             setCheckInterval,
             setExpectedValue,
             setFormError,
@@ -191,6 +193,9 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         // Dynamic monitor field change handlers
         const handleDynamicFieldChange = useMemo(
             () => ({
+                certificateWarningDays: (value: number | string): void => {
+                    setCertificateWarningDays(String(value));
+                },
                 expectedValue: (value: number | string): void => {
                     setExpectedValue(String(value));
                 },
@@ -208,6 +213,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 },
             }),
             [
+                setCertificateWarningDays,
                 setExpectedValue,
                 setHost,
                 setPort,
@@ -219,13 +225,15 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         // Dynamic monitor field values
         const dynamicFieldValues = useMemo(
             () => ({
-                expectedValue: expectedValue,
-                host: host,
-                port: port,
-                recordType: recordType,
-                url: url,
+                certificateWarningDays,
+                expectedValue,
+                host,
+                port,
+                recordType,
+                url,
             }),
             [
+                certificateWarningDays,
                 expectedValue,
                 host,
                 port,
@@ -252,6 +260,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                     await handleSubmit(event, {
                         addMode,
                         addMonitorToSite,
+                        certificateWarningDays,
                         checkInterval,
                         clearError,
                         createSite,
@@ -282,6 +291,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             [
                 addMode,
                 addMonitorToSite,
+                certificateWarningDays,
                 checkInterval,
                 clearError,
                 createSite,
@@ -455,7 +465,6 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                     </ThemedButton>
 
                     {/* Error Message */}
-                    {/* eslint-disable-next-line @eslint-react/no-complex-conditional-rendering, @eslint-react/no-complicated-conditional-rendering -- error display requires fallback logic */}
                     {(lastError ?? formError) ? (
                         <ErrorAlert
                             message={formError ?? lastError ?? ""}

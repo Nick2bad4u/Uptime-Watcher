@@ -67,6 +67,8 @@ export interface AddSiteFormActions {
     resetForm: () => void;
     /** Set form operation mode */
     setAddMode: (value: FormMode) => void;
+    /** Set SSL certificate warning days */
+    setCertificateWarningDays: (value: string) => void;
     /** Set check interval */
     setCheckInterval: (value: number) => void;
     /** Set expected value field value */
@@ -104,6 +106,8 @@ export interface AddSiteFormActions {
 export interface AddSiteFormState {
     /** Form operation mode (new site vs existing site) */
     addMode: FormMode;
+    /** SSL certificate warning days */
+    certificateWarningDays: string;
     /** Check interval in milliseconds */
     checkInterval: number;
     /** Expected DNS record value field for DNS monitors */
@@ -145,6 +149,7 @@ export type UseAddSiteFormReturn = Simplify<
 const resetFieldsForMonitorType = (
     currentFieldNames: Set<string>,
     currentValues: {
+        certificateWarningDays: string;
         expectedValue: string;
         host: string;
         port: string;
@@ -152,6 +157,7 @@ const resetFieldsForMonitorType = (
         url: string;
     },
     setters: {
+        setCertificateWarningDays: (value: string) => void;
         setExpectedValue: (value: string) => void;
         setHost: (value: string) => void;
         setPort: (value: string) => void;
@@ -180,6 +186,12 @@ const resetFieldsForMonitorType = (
         currentValues.expectedValue !== ""
     ) {
         setters.setExpectedValue("");
+    }
+    if (
+        !currentFieldNames.has("certificateWarningDays") &&
+        currentValues.certificateWarningDays !== "30"
+    ) {
+        setters.setCertificateWarningDays("30");
     }
 };
 
@@ -223,6 +235,7 @@ const validateFormFields = (
     selectedExistingSite: string,
     monitorType: MonitorType,
     fieldValues: {
+        certificateWarningDays: string;
         expectedValue: string;
         host: string;
         port: string;
@@ -277,6 +290,7 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
     const [port, setPort] = useState("");
     const [recordType, setRecordType] = useState("A");
     const [expectedValue, setExpectedValue] = useState("");
+    const [certificateWarningDays, setCertificateWarningDays] = useState("30");
     const [name, setName] = useState("");
     const [monitorType, setMonitorType] = useState<MonitorType>("http");
     const [checkInterval, setCheckInterval] = useState(DEFAULT_CHECK_INTERVAL);
@@ -302,6 +316,7 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
             resetFieldsForMonitorType(
                 currentFieldNames,
                 {
+                    certificateWarningDays,
                     expectedValue,
                     host,
                     port,
@@ -309,6 +324,7 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
                     url,
                 },
                 {
+                    setCertificateWarningDays,
                     setExpectedValue,
                     setHost,
                     setPort,
@@ -318,12 +334,14 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
             );
         },
         [
+            certificateWarningDays,
             expectedValue,
             getFields,
             host,
             monitorType,
             port,
             recordType,
+            setCertificateWarningDays,
             setExpectedValue,
             setHost,
             setPort,
@@ -354,11 +372,19 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
                 name,
                 selectedExistingSite,
                 monitorType,
-                { expectedValue, host, port, recordType, url },
+                {
+                    certificateWarningDays,
+                    expectedValue,
+                    host,
+                    port,
+                    recordType,
+                    url,
+                },
                 getFields
             ),
         [
             addMode,
+            certificateWarningDays,
             expectedValue,
             getFields,
             host,
@@ -385,11 +411,13 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
         setAddMode("new");
         setSelectedExistingSite("");
         setFormError(undefined);
+        setCertificateWarningDays("30");
     }, []);
 
     return {
         // State
         addMode,
+        certificateWarningDays,
         checkInterval,
         expectedValue,
         formError,
@@ -402,6 +430,7 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
         resetForm,
         selectedExistingSite,
         setAddMode,
+        setCertificateWarningDays,
         setCheckInterval,
         setExpectedValue,
         setFormError,

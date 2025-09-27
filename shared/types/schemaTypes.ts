@@ -35,6 +35,7 @@ export type BaseMonitorSchemaType = z.ZodObject<{
         http: "http";
         ping: "ping";
         port: "port";
+        ssl: "ssl";
     }>;
 }>;
 
@@ -152,6 +153,25 @@ export type MonitorSchemaType = z.ZodDiscriminatedUnion<
             }>;
             timeout: z.ZodNumber;
             type: z.ZodLiteral<"dns">;
+        }>,
+        z.ZodObject<{
+            certificateWarningDays: z.ZodNumber;
+            checkInterval: z.ZodNumber;
+            host: z.ZodString;
+            id: z.ZodString;
+            lastChecked: z.ZodOptional<z.ZodDate>;
+            monitoring: z.ZodBoolean;
+            port: z.ZodNumber;
+            responseTime: z.ZodNumber;
+            retryAttempts: z.ZodNumber;
+            status: z.ZodEnum<{
+                down: "down";
+                paused: "paused";
+                pending: "pending";
+                up: "up";
+            }>;
+            timeout: z.ZodNumber;
+            type: z.ZodLiteral<"ssl">;
         }>,
     ]
 >;
@@ -338,8 +358,52 @@ export type SiteSchemaType = z.ZodObject<{
                     timeout: z.ZodNumber;
                     type: z.ZodLiteral<"dns">;
                 }>,
+                z.ZodObject<{
+                    certificateWarningDays: z.ZodNumber;
+                    checkInterval: z.ZodNumber;
+                    host: z.ZodString;
+                    id: z.ZodString;
+                    lastChecked: z.ZodOptional<z.ZodDate>;
+                    monitoring: z.ZodBoolean;
+                    port: z.ZodNumber;
+                    responseTime: z.ZodNumber;
+                    retryAttempts: z.ZodNumber;
+                    status: z.ZodEnum<{
+                        down: "down";
+                        paused: "paused";
+                        pending: "pending";
+                        up: "up";
+                    }>;
+                    timeout: z.ZodNumber;
+                    type: z.ZodLiteral<"ssl">;
+                }>,
             ]
         >
     >;
     name: z.ZodString;
+}>;
+
+/**
+ * Type definition for SSL monitor schema.
+ *
+ * @public
+ */
+export type SslMonitorSchemaType = z.ZodObject<{
+    certificateWarningDays: z.ZodNumber;
+    checkInterval: z.ZodNumber;
+    host: z.ZodString;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    monitoring: z.ZodBoolean;
+    port: z.ZodNumber;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: z.ZodEnum<{
+        down: "down";
+        paused: "paused";
+        pending: "pending";
+        up: "up";
+    }>;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"ssl">;
 }>;

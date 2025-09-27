@@ -1,0 +1,24 @@
+{
+    "$schema": "https://raw.githubusercontent.com/raineorshine/npm-check-updates/main/src/types/RunOptions.json",
+    "cache": true,
+    "cacheExpiration": 60,
+    "cacheFile": ".cache/.ncu-cache.json",
+    "color": true,
+    "concurrency": 8,
+    "configFileName": ".ncurc.json",
+    "configFilePath": "./",
+    "dep": [
+        "prod",
+        "dev",
+        "optional",
+        "packageManager"
+    ],
+    "enginesNode": false,
+    "install": "never",
+    "peer": false,
+    "pre": false,
+    "retry": 3,
+    "root": true,
+    "target": "latest",
+    "upgrade": true
+}

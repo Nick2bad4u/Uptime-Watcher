@@ -37,6 +37,7 @@ describe("Monitor Types Utility", () => {
 
             expect(types).toContain("http");
             expect(types).toContain("port");
+            expect(types).toContain("ssl");
         });
 
         it("should return a new array each time (not mutate original)", async ({
@@ -79,6 +80,7 @@ describe("Monitor Types Utility", () => {
                     "port",
                     "ping",
                     "dns",
+                    "ssl",
                 ]).toContain(type);
             }
         });
@@ -122,6 +124,7 @@ describe("Monitor Types Utility", () => {
 
             expect(isBaseMonitorType("http")).toBeTruthy();
             expect(isBaseMonitorType("port")).toBeTruthy();
+            expect(isBaseMonitorType("ssl")).toBeTruthy();
         });
 
         it("should return false for invalid monitor types", async ({

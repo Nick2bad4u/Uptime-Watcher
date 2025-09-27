@@ -214,6 +214,22 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
     string,
     (monitor: Monitor) => string | undefined
 >([
+    [
+        "dns",
+        (
+            monitor
+        ):
+            | string
+            | undefined => {
+            if (!monitor.host) {
+                return undefined;
+            }
+            const recordType = monitor.recordType
+                ? ` (${monitor.recordType})`
+                : "";
+            return `${monitor.host}${recordType}`;
+        },
+    ],
     ["http", (monitor): string | undefined => monitor.url ?? undefined],
     ["ping", (monitor): string | undefined => monitor.host ?? undefined],
     [
@@ -227,10 +243,20 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
                 ? `${monitor.host}:${monitor.port}`
                 : undefined,
     ],
-    // Add new monitor types here as they're implemented
-    // ["dns", (monitor) => `${monitor.domain} (${monitor.recordType})` ??
-    // undefined], ["ssl", (monitor) => monitor.host ?? undefined], ["api",
-    // (monitor) => monitor.endpoint ?? undefined],
+    [
+        "ssl",
+        (
+            monitor
+        ):
+            | string
+            | undefined => {
+            if (!monitor.host) {
+                return undefined;
+            }
+            const port = monitor.port ? `:${monitor.port}` : "";
+            return `${monitor.host}${port}`;
+        },
+    ],
 ]);
 
 /**
@@ -314,13 +340,11 @@ export function getMonitorDisplayIdentifier(
  * monitor types without code changes.
  */
 const MONITOR_TYPE_LABELS = new Map<string, string>([
+    ["dns", "DNS Monitor"],
     ["http", "Website URL"],
     ["ping", "Ping Monitor"],
     ["port", "Host & Port"],
-    // Add new monitor types here as they're implemented
-    // ["dns", "DNS Monitor"],
-    // ["ssl", "SSL Certificate"],
-    // ["api", "API Endpoint"],
+    ["ssl", "SSL Certificate"],
 ]);
 
 /**

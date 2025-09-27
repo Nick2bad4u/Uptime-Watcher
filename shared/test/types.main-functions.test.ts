@@ -738,9 +738,10 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Type: Validation", "type");
 
             expect(BASE_MONITOR_TYPES).toContain("http");
-            expect(BASE_MONITOR_TYPES).toContain("port");
             expect(BASE_MONITOR_TYPES).toContain("ping");
+            expect(BASE_MONITOR_TYPES).toContain("port");
             expect(BASE_MONITOR_TYPES).toContain("dns");
+            expect(BASE_MONITOR_TYPES).toContain("ssl");
         });
     });
 

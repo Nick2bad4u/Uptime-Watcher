@@ -33,6 +33,7 @@ import {
 } from "./MigrationSystem";
 import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
+import { SslMonitor } from "./SslMonitor";
 
 // Base monitor type definition
 /**
@@ -515,12 +516,86 @@ registerMonitorType({
     version: "1.0.0",
 });
 
+registerMonitorType({
+    description: "Monitors TLS certificates for validity and expiry windows",
+    displayName: "SSL Certificate",
+    fields: [
+        {
+            helpText: "Enter the host name that serves the certificate",
+            label: "Host",
+            name: "host",
+            placeholder: "example.com",
+            required: true,
+            type: "text",
+        },
+        {
+            helpText: "Port used for the TLS handshake (defaults to 443)",
+            label: "Port",
+            max: 65_535,
+            min: 1,
+            name: "port",
+            placeholder: "443",
+            required: true,
+            type: "number",
+        },
+        {
+            helpText:
+                "Days before expiry to warn and mark the monitor as degraded",
+            label: "Expiry Warning (days)",
+            max: 365,
+            min: 1,
+            name: "certificateWarningDays",
+            placeholder: "30",
+            required: true,
+            type: "number",
+        },
+    ],
+    serviceFactory: () => new SslMonitor(),
+    type: "ssl",
+    uiConfig: {
+        detailFormats: {
+            analyticsLabel: "SSL Handshake Time",
+            historyDetail: (details: string) => `Certificate: ${details}`,
+        },
+        display: {
+            showAdvancedMetrics: false,
+            showUrl: false,
+        },
+        formatDetail: (details: string) => `Certificate: ${details}`,
+        formatTitleSuffix: (monitor: Monitor) => {
+            if (monitor.type !== "ssl") {
+                return "";
+            }
+
+            const hostValue = monitor.host ?? "";
+            if (hostValue.trim().length === 0) {
+                return "";
+            }
+
+            const portSegment =
+                monitor.port === undefined ? "" : `:${monitor.port}`;
+            return ` (${hostValue}${portSegment})`;
+        },
+        helpTexts: {
+            primary:
+                "Provide the host and port of the TLS endpoint you want to monitor",
+            secondary:
+                "Set the warning threshold to receive degraded alerts before the certificate expires",
+        },
+        supportsAdvancedAnalytics: false,
+        supportsResponseTime: true,
+    },
+    validationSchema: monitorSchemas.ssl,
+    version: "1.0.0",
+});
+
 // Register example migrations for the migration system
 migrationRegistry.registerMigration("http", exampleMigrations.httpV1_0_to_1_1);
 migrationRegistry.registerMigration("port", exampleMigrations.portV1_0_to_1_1);
 
 // Set current versions for existing monitor types
 versionManager.setVersion("dns", "1.0.0");
+versionManager.setVersion("ssl", "1.0.0");
 versionManager.setVersion("http", "1.0.0");
 versionManager.setVersion("ping", "1.0.0");
 versionManager.setVersion("port", "1.0.0");

@@ -10,7 +10,6 @@
  */
 
 import {
-    Fragment,
     memo,
     type NamedExoticComponent,
     type ReactElement,
@@ -44,8 +43,7 @@ const ThemeProviderComponent = ({
     // Initialize theme system on mount to ensure theme context is available
     useTheme();
 
-    // eslint-disable-next-line react/jsx-no-useless-fragment -- Children passthrough pattern requires fragments
-    return <Fragment>{children}</Fragment>;
+    return <>{children}</>;
 };
 
 export const ThemeProvider: NamedExoticComponent<ThemeProviderProperties> =

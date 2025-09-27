@@ -216,7 +216,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
                 <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
-                    compact={true}
+                    compact
                 />
             );
 
@@ -247,7 +247,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
-                    allMonitorsRunning={true}
+                    allMonitorsRunning
                     compact={true}
                 />
             );
@@ -365,7 +365,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
-                    allMonitorsRunning={true}
+                    allMonitorsRunning
                     isLoading={true}
                 />
             );
@@ -464,7 +464,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
-                    allMonitorsRunning={true}
+                    allMonitorsRunning
                     onStopSiteMonitoring={mockStop}
                 />
             );
@@ -515,7 +515,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             rerender(
                 <SiteMonitoringButton
                     {...defaultProps}
-                    allMonitorsRunning={true}
+                    allMonitorsRunning
                     isLoading={true}
                     onStopSiteMonitoring={mockStop}
                 />
@@ -634,7 +634,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
                 <div onClick={mockParentClick}>
                     <SiteMonitoringButton
                         {...defaultProps}
-                        allMonitorsRunning={true}
+                        allMonitorsRunning
                         onStopSiteMonitoring={mockStop}
                     />
                 </div>
@@ -717,10 +717,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(screen.getByText("▶️")).toBeInTheDocument();
 
             rerender(
-                <SiteMonitoringButton
-                    {...defaultProps}
-                    allMonitorsRunning={true}
-                />
+                <SiteMonitoringButton {...defaultProps} allMonitorsRunning />
             );
 
             expect(screen.getByText("Stop All")).toBeInTheDocument();
@@ -762,7 +759,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             rerender(
                 <SiteMonitoringButton
                     {...defaultProps}
-                    allMonitorsRunning={true}
+                    allMonitorsRunning
                     className="custom-class"
                 />
             );
@@ -829,10 +826,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             renderWithTheme(
-                <SiteMonitoringButton
-                    {...defaultProps}
-                    allMonitorsRunning={true}
-                />
+                <SiteMonitoringButton {...defaultProps} allMonitorsRunning />
             );
 
             const button = screen.getByTestId("themed-button");
@@ -1059,7 +1053,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
                     {...defaultProps}
                     onStartSiteMonitoring={mockStart}
                     onStopSiteMonitoring={mockStop}
-                    allMonitorsRunning={true}
+                    allMonitorsRunning
                 />
             );
 
@@ -1181,7 +1175,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
-                    allMonitorsRunning={true}
+                    allMonitorsRunning
                     onStopSiteMonitoring={mockStop}
                 />
             );

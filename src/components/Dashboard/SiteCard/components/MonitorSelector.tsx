@@ -91,6 +91,15 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
                     case "port": {
                         return monitor.port ? `: ${monitor.port}` : "";
                     }
+                    case "ssl": {
+                        if (monitor.host) {
+                            const portDetail = monitor.port
+                                ? `:${monitor.port}`
+                                : "";
+                            return `: ${monitor.host}${portDetail}`;
+                        }
+                        return "";
+                    }
                     default: {
                         // Fallback to port or URL for unknown types
                         if (monitor.port) {

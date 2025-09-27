@@ -106,7 +106,7 @@ const arbitraries = {
                     retryAttempts: fc.integer({ min: 0, max: 5 }),
                     status: fc.constantFrom("down", "paused", "pending", "up"),
                     responseTime: fc.integer({ min: 0, max: 10_000 }),
-                    type: fc.constantFrom("http", "ping", "port", "dns"),
+                    type: fc.constantFrom("http", "ping", "port", "dns", "ssl"),
                     monitoring: fc.boolean(),
                     history: fc.array(
                         fc.oneof(
@@ -149,7 +149,7 @@ const arbitraries = {
                     retryAttempts: fc.integer({ min: 0, max: 5 }),
                     status: fc.constantFrom("down", "paused", "pending", "up"),
                     responseTime: fc.integer({ min: 0, max: 10_000 }),
-                    type: fc.constantFrom("http", "ping", "port", "dns"),
+                    type: fc.constantFrom("http", "ping", "port", "dns", "ssl"),
                     monitoring: fc.boolean(),
                     history: fc.array(
                         fc.oneof(

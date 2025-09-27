@@ -42,6 +42,7 @@ export const BASE_MONITOR_TYPES = [
     "port",
     "ping",
     "dns",
+    "ssl",
 ] as const;
 
 /**
@@ -123,6 +124,8 @@ export const DEFAULT_SITE_STATUS: SiteStatus = "unknown";
 export interface Monitor {
     /** Array of currently active operations for this monitor */
     activeOperations?: string[];
+    /** Certificate expiry warning threshold in days for SSL monitoring */
+    certificateWarningDays?: number;
     /** Interval between checks in milliseconds */
     checkInterval: number;
     /** Expected value for DNS record verification */
@@ -149,7 +152,7 @@ export interface Monitor {
     status: MonitorStatus;
     /** Timeout for monitor checks in milliseconds */
     timeout: number;
-    /** Type of monitoring performed (http, port, ping, dns) */
+    /** Type of monitoring performed (http, port, ping, dns, ssl) */
     type: MonitorType;
     /** URL to monitor for HTTP-based checks */
     url?: string;

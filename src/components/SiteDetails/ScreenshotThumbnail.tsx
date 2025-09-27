@@ -6,9 +6,14 @@
  * React portals for the overlay positioning.
  */
 
-import type { JSX, MouseEvent } from "react";
-
-import { Fragment, useCallback, useMemo, useRef, useState } from "react";
+import {
+    type JSX,
+    type MouseEvent,
+    useCallback,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { createPortal } from "react-dom";
 
 import { useMount } from "../../hooks/useMount";
@@ -202,7 +207,7 @@ export const ScreenshotThumbnail = ({
             : null;
 
     return (
-        <Fragment>
+        <>
             <a
                 aria-label={ariaLabel}
                 className="site-details-thumbnail-link"
@@ -235,6 +240,6 @@ export const ScreenshotThumbnail = ({
                 </span>
             </a>
             {portalJSX}
-        </Fragment>
+        </>
     );
 };

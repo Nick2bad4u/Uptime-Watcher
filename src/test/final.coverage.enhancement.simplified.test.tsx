@@ -679,7 +679,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 <div>{show ? <span>Visible</span> : <span>Hidden</span>}</div>
             );
 
-            const { rerender } = render(<ConditionalComponent show={true} />);
+            const { rerender } = render(<ConditionalComponent show />);
             expect(screen.getByText("Visible")).toBeInTheDocument();
 
             rerender(<ConditionalComponent show={false} />);

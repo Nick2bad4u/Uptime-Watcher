@@ -231,7 +231,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<ThemedButton {...defaultProps} disabled={true} />);
+            render(<ThemedButton {...defaultProps} disabled />);
             expect(screen.getByRole("button")).toBeDisabled();
         });
 
@@ -246,7 +246,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Data Loading", "type");
 
-            render(<ThemedButton {...defaultProps} loading={true} />);
+            render(<ThemedButton {...defaultProps} loading />);
             expect(screen.getByRole("button")).toBeInTheDocument();
         });
 
@@ -290,7 +290,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<ThemedButton {...defaultProps} fullWidth={true} />);
+            render(<ThemedButton {...defaultProps} fullWidth />);
             expect(screen.getByRole("button")).toBeInTheDocument();
         });
 
@@ -401,11 +401,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
 
             const onClick = vi.fn();
             render(
-                <ThemedCard
-                    {...defaultProps}
-                    clickable={true}
-                    onClick={onClick}
-                />
+                <ThemedCard {...defaultProps} clickable onClick={onClick} />
             );
 
             fireEvent.click(screen.getByText("Card Content"));
@@ -429,7 +425,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
             render(
                 <ThemedCard
                     {...defaultProps}
-                    hoverable={true}
+                    hoverable
                     onMouseEnter={onMouseEnter}
                     onMouseLeave={onMouseLeave}
                 />
@@ -519,7 +515,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<ThemedCheckbox {...defaultProps} checked={true} />);
+            render(<ThemedCheckbox {...defaultProps} checked />);
             expect(screen.getByRole("checkbox")).toBeChecked();
         });
 
@@ -534,7 +530,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<ThemedCheckbox {...defaultProps} disabled={true} />);
+            render(<ThemedCheckbox {...defaultProps} disabled />);
             expect(screen.getByRole("checkbox")).toBeDisabled();
         });
 
@@ -549,7 +545,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<ThemedCheckbox {...defaultProps} required={true} />);
+            render(<ThemedCheckbox {...defaultProps} required />);
             expect(screen.getByRole("checkbox")).toBeRequired();
         });
 
@@ -687,7 +683,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<ThemedIconButton {...defaultProps} disabled={true} />);
+            render(<ThemedIconButton {...defaultProps} disabled />);
             expect(screen.getByRole("button")).toBeDisabled();
         });
 
@@ -702,7 +698,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Data Loading", "type");
 
-            render(<ThemedIconButton {...defaultProps} loading={true} />);
+            render(<ThemedIconButton {...defaultProps} loading />);
             expect(screen.getByRole("button")).toBeInTheDocument();
         });
 

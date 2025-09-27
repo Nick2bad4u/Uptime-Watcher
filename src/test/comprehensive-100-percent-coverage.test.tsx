@@ -78,6 +78,7 @@ vi.mock("../hooks/useDelayedButtonLoading", () => ({
 vi.mock("../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: vi.fn(() => ({
         addMode: "new",
+        certificateWarningDays: "30",
         checkInterval: 60_000,
         expectedValue: "",
         formError: undefined,
@@ -89,6 +90,7 @@ vi.mock("../components/SiteDetails/useAddSiteForm", () => ({
         resetForm: vi.fn(),
         selectedExistingSite: "",
         setAddMode: vi.fn(),
+        setCertificateWarningDays: vi.fn(),
         setCheckInterval: vi.fn(),
         setExpectedValue: vi.fn(),
         setFormError: vi.fn(),
@@ -407,6 +409,7 @@ describe("100% Coverage Edge Cases", () => {
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm);
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "new",
+                certificateWarningDays: "30",
                 checkInterval: 60_000,
                 expectedValue: "",
                 formError: undefined,
@@ -418,6 +421,7 @@ describe("100% Coverage Edge Cases", () => {
                 resetForm: vi.fn(),
                 selectedExistingSite: "",
                 setAddMode: mockSetAddMode,
+                setCertificateWarningDays: vi.fn(),
                 setCheckInterval: vi.fn(),
                 setExpectedValue: vi.fn(),
                 setFormError: vi.fn(),
@@ -534,6 +538,7 @@ describe("100% Coverage Edge Cases", () => {
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "existing",
+                certificateWarningDays: "30",
                 checkInterval: 60_000,
                 expectedValue: "",
                 formError: undefined,
@@ -545,6 +550,7 @@ describe("100% Coverage Edge Cases", () => {
                 resetForm: vi.fn(),
                 selectedExistingSite: "",
                 setAddMode: vi.fn(),
+                setCertificateWarningDays: vi.fn(),
                 setCheckInterval: vi.fn(),
                 setExpectedValue: vi.fn(),
                 setFormError: vi.fn(),
@@ -584,6 +590,7 @@ describe("100% Coverage Edge Cases", () => {
             const setMonitorType = vi.fn();
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "new",
+                certificateWarningDays: "30",
                 checkInterval: 60_000,
                 expectedValue: "",
                 formError: undefined,
@@ -595,6 +602,7 @@ describe("100% Coverage Edge Cases", () => {
                 resetForm: vi.fn(),
                 selectedExistingSite: "",
                 setAddMode: vi.fn(),
+                setCertificateWarningDays: vi.fn(),
                 setCheckInterval: vi.fn(),
                 setExpectedValue: vi.fn(),
                 setFormError: vi.fn(),
@@ -634,6 +642,7 @@ describe("100% Coverage Edge Cases", () => {
             const setCheckInterval = vi.fn();
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "new",
+                certificateWarningDays: "30",
                 checkInterval: 60_000,
                 expectedValue: "",
                 formError: undefined,
@@ -645,6 +654,7 @@ describe("100% Coverage Edge Cases", () => {
                 resetForm: vi.fn(),
                 selectedExistingSite: "",
                 setAddMode: vi.fn(),
+                setCertificateWarningDays: vi.fn(),
                 setCheckInterval,
                 setExpectedValue: vi.fn(),
                 setFormError: vi.fn(),
@@ -682,6 +692,7 @@ describe("100% Coverage Edge Cases", () => {
             const setAddMode = vi.fn();
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "new",
+                certificateWarningDays: "30",
                 checkInterval: 60_000,
                 expectedValue: "",
                 formError: undefined,
@@ -693,6 +704,7 @@ describe("100% Coverage Edge Cases", () => {
                 resetForm: vi.fn(),
                 selectedExistingSite: "",
                 setAddMode,
+                setCertificateWarningDays: vi.fn(),
                 setCheckInterval: vi.fn(),
                 setExpectedValue: vi.fn(),
                 setFormError: vi.fn(),
@@ -776,6 +788,7 @@ describe("100% Coverage Edge Cases", () => {
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "new",
+                certificateWarningDays: "30",
                 checkInterval: 60_000,
                 expectedValue: "",
                 formError: "Form validation error",
@@ -787,6 +800,7 @@ describe("100% Coverage Edge Cases", () => {
                 resetForm: vi.fn(),
                 selectedExistingSite: "",
                 setAddMode: vi.fn(),
+                setCertificateWarningDays: vi.fn(),
                 setCheckInterval: vi.fn(),
                 setExpectedValue: vi.fn(),
                 setFormError: vi.fn(),
@@ -825,6 +839,7 @@ describe("100% Coverage Edge Cases", () => {
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "new",
+                certificateWarningDays: "30",
                 checkInterval: 60_000,
                 expectedValue: "",
                 formError: "Form error",
@@ -836,6 +851,7 @@ describe("100% Coverage Edge Cases", () => {
                 resetForm: vi.fn(),
                 selectedExistingSite: "",
                 setAddMode: vi.fn(),
+                setCertificateWarningDays: vi.fn(),
                 setCheckInterval: vi.fn(),
                 setExpectedValue: vi.fn(),
                 setFormError: vi.fn(),

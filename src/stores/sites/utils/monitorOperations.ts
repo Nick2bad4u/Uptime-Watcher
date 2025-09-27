@@ -46,6 +46,10 @@ const BASE_MONITOR_DEFAULTS = {
 
 const HTTP_SHARED_DEFAULTS = SHARED_MONITOR_CONFIG.http;
 
+function assertNeverType(value: never): never {
+    throw new Error(`Unsupported monitor type: ${String(value)}`);
+}
+
 function ensureNumberOrFallback(value: unknown, fallback: number): number {
     return typeof value === "number" && Number.isFinite(value)
         ? value
@@ -55,6 +59,15 @@ function ensureNumberOrFallback(value: unknown, fallback: number): number {
 function ensureBooleanOrFallback(value: unknown, fallback: boolean): boolean {
     return typeof value === "boolean" ? value : fallback;
 }
+
+const DEFAULT_SSL_WARNING_DAYS = ensureNumberOrFallback(
+    (
+        SHARED_MONITOR_CONFIG.ssl as
+            | undefined
+            | { certificateWarningDays?: number }
+    )?.certificateWarningDays,
+    30
+);
 
 const DEFAULT_SHARED_CHECK_INTERVAL = ensureNumberOrFallback(
     HTTP_SHARED_DEFAULTS.checkInterval,
@@ -203,9 +216,14 @@ function getAllowedFieldsForMonitorType(type: MonitorType): Set<string> {
             baseFields.add("port");
             break;
         }
-        default: {
-            // For unknown types, only allow base fields
+        case "ssl": {
+            baseFields.add("certificateWarningDays");
+            baseFields.add("host");
+            baseFields.add("port");
             break;
+        }
+        default: {
+            assertNeverType(type);
         }
     }
 
@@ -286,14 +304,40 @@ function applyPortMonitorDefaults(
 }
 
 /**
+ * Applies type-specific field requirements and defaults for SSL monitors.
+ */
+function applySslMonitorDefaults(
+    monitor: Monitor,
+    filteredData: UnknownRecord
+): void {
+    const {
+        certificateWarningDays: warningValue,
+        host: hostValue,
+        port: portValue,
+    } = filteredData as {
+        certificateWarningDays?: unknown;
+        host?: unknown;
+        port?: unknown;
+    };
+
+    monitor.host = isNonEmptyString(hostValue) ? hostValue : "example.com";
+    monitor.port = isValidPort(portValue) ? Number(portValue) : 443;
+
+    const numericWarning =
+        typeof warningValue === "number" && Number.isFinite(warningValue)
+            ? Math.trunc(warningValue)
+            : DEFAULT_SSL_WARNING_DAYS;
+    monitor.certificateWarningDays = Math.min(Math.max(numericWarning, 1), 365);
+}
+
+/**
  * Applies type-specific field requirements and defaults for ping monitors.
  */
 function applyPingMonitorDefaults(
     monitor: Monitor,
     filteredData: UnknownRecord
 ): void {
-    // Ping monitors require host
-    const hostValue = filteredData["host"];
+    const { host: hostValue } = filteredData as { host?: unknown };
     monitor.host = isNonEmptyString(hostValue) ? hostValue : "localhost";
 }
 
@@ -304,19 +348,28 @@ function applyDnsMonitorDefaults(
     monitor: Monitor,
     filteredData: UnknownRecord
 ): void {
-    // DNS monitors require host, recordType, and expectedValue
-    const hostValue = filteredData["host"];
-    const recordTypeValue = filteredData["recordType"];
-    const expectedValueValue = filteredData["expectedValue"];
+    const {
+        expectedValue,
+        host: hostValue,
+        recordType: recordTypeValue,
+    } = filteredData as {
+        expectedValue?: unknown;
+        host?: unknown;
+        recordType?: unknown;
+    };
+
+    const recordType: string =
+        typeof recordTypeValue === "string" && recordTypeValue
+            ? recordTypeValue
+            : "A";
 
     monitor.host = isNonEmptyString(hostValue) ? hostValue : "example.com";
-    monitor.recordType = isNonEmptyString(recordTypeValue)
-        ? recordTypeValue
-        : "A";
-    // Only set expectedValue if a non-empty value is provided
-    // Leave undefined for "accept any response" behavior
-    if (isNonEmptyString(expectedValueValue)) {
-        monitor.expectedValue = expectedValueValue;
+    monitor.recordType = recordType;
+
+    if (typeof expectedValue === "string" && expectedValue.trim()) {
+        monitor.expectedValue = expectedValue;
+    } else {
+        delete monitor.expectedValue;
     }
 }
 
@@ -344,9 +397,12 @@ function applyTypeSpecificDefaults(
             applyPortMonitorDefaults(monitor, filteredData);
             break;
         }
-        default: {
-            // No type-specific defaults for unknown types
+        case "ssl": {
+            applySslMonitorDefaults(monitor, filteredData);
             break;
+        }
+        default: {
+            assertNeverType(monitor.type);
         }
     }
 }

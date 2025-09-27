@@ -140,13 +140,26 @@ export interface PortMonitorFields extends BaseMonitorFields {
 }
 
 /**
+ * SSL monitor specific fields
+ */
+export interface SslMonitorFields extends BaseMonitorFields {
+    /** Days before expiry to trigger warnings */
+    certificateWarningDays: number;
+    /** Host to validate */
+    host: string;
+    /** Port for TLS handshake */
+    port: number;
+}
+
+/**
  * Union type for all monitor field types
  */
 export type MonitorFormFields =
     | DnsMonitorFields
     | HttpMonitorFields
     | PingMonitorFields
-    | PortMonitorFields;
+    | PortMonitorFields
+    | SslMonitorFields;
 
 /**
  * Helper to get default fields for a monitor type.
@@ -202,6 +215,14 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
                     useTls: false,
                 },
             } satisfies PortMonitorFields;
+        }
+        case "ssl": {
+            return {
+                ...baseFields,
+                certificateWarningDays: 30,
+                host: "",
+                port: 443,
+            } satisfies SslMonitorFields;
         }
         default: {
             // Fallback to HTTP fields for unknown types
@@ -272,5 +293,29 @@ export function isPortMonitorFields(
         "port" in fields &&
         typeof fields.host === "string" &&
         typeof fields.port === "number"
+    );
+}
+
+/**
+ * Type guard to check if fields are for SSL monitor.
+ *
+ * @remarks
+ * Validates presence of host, port, and certificate warning properties to
+ * ensure the fields are suitable for SSL monitoring.
+ *
+ * @param fields - Monitor form fields to check
+ *
+ * @returns True if fields contain valid SSL monitor properties
+ */
+export function isSslMonitorFields(
+    fields: MonitorFormFields
+): fields is SslMonitorFields {
+    return (
+        "host" in fields &&
+        "port" in fields &&
+        "certificateWarningDays" in fields &&
+        typeof fields.host === "string" &&
+        typeof fields.port === "number" &&
+        typeof fields.certificateWarningDays === "number"
     );
 }

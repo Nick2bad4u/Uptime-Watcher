@@ -53,6 +53,14 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                         { name: "checkInterval", required: false },
                     ];
                 }
+                case "ssl": {
+                    return [
+                        { name: "host", required: true },
+                        { name: "port", required: true },
+                        { name: "certificateWarningDays", required: true },
+                        { name: "checkInterval", required: false },
+                    ];
+                }
                 default: {
                     return [];
                 }
@@ -267,6 +275,25 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             });
 
             expect(result.current.formError).toBeUndefined();
+        });
+
+        it("should update certificate warning days correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useAddSiteForm", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Update", "type");
+
+            const { result } = renderHook(() => useAddSiteForm());
+
+            await act(async () => {
+                result.current.setMonitorType("ssl");
+                result.current.setCertificateWarningDays("45");
+            });
+
+            expect(result.current.certificateWarningDays).toBe("45");
         });
     });
 

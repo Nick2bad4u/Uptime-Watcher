@@ -102,6 +102,7 @@ export type FormSubmitProperties = Simplify<
  */
 function createMonitor(properties: FormSubmitProperties): Monitor {
     const {
+        certificateWarningDays,
         checkInterval,
         expectedValue,
         generateUuid,
@@ -114,6 +115,9 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
 
     // Convert form data to proper types for the shared utility
     const formData = {
+        certificateWarningDays: certificateWarningDays
+            ? Number.parseInt(certificateWarningDays, 10)
+            : undefined,
         checkInterval,
         expectedValue,
         host,
@@ -270,7 +274,8 @@ async function validateMonitorType(
     host: string,
     port: string,
     recordType: string,
-    expectedValue: string
+    expectedValue: string,
+    certificateWarningDays: string
 ): Promise<readonly string[]> {
     // Build form data object with only the relevant fields
     const formData: UnknownRecord = {
@@ -301,6 +306,12 @@ async function validateMonitorType(
         case "port": {
             formData["host"] = safeTrim(host);
             formData["port"] = Number(port);
+            break;
+        }
+        case "ssl": {
+            formData["host"] = safeTrim(host);
+            formData["port"] = Number(port);
+            formData["certificateWarningDays"] = Number(certificateWarningDays);
             break;
         }
         default: {
@@ -351,6 +362,7 @@ export async function handleSubmit(
 ): Promise<void> {
     const {
         addMode,
+        certificateWarningDays,
         checkInterval,
         clearError,
         expectedValue,
@@ -372,6 +384,7 @@ export async function handleSubmit(
     // Log submission start
     logger.debug("Form submission started", {
         addMode,
+        hasCertificateWarningDays: Boolean(safeTrim(certificateWarningDays)),
         hasHost: Boolean(safeTrim(host)),
         hasName: Boolean(safeTrim(name)),
         hasPort: Boolean(safeTrim(port)),
@@ -390,7 +403,8 @@ export async function handleSubmit(
             host,
             port,
             recordType,
-            expectedValue
+            expectedValue,
+            certificateWarningDays
         )),
         ...(await validateCheckInterval(checkInterval)),
     ];

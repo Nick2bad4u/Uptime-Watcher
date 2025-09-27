@@ -417,7 +417,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
         // Test validateMonitorType with various monitor types
         fcTest.prop([
             fc.oneof(
-                fc.constantFrom("http", "ping", "port", "dns"), // Valid types
+                fc.constantFrom("http", "ping", "port", "dns", "ssl"), // Valid types
                 fc.string(), // Random strings
                 fc.integer(),
                 fc.boolean(),

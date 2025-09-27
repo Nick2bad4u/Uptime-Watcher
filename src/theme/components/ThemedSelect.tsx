@@ -31,7 +31,7 @@
  *     id="protocol"
  *     value={protocol}
  *     onChange={handleProtocolChange}
- *     required={true}
+ *     required
  *     aria-describedby="protocol-error"
  *     disabled={isLoading}
  * >

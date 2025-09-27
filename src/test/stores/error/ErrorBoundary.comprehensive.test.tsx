@@ -113,7 +113,7 @@ describe(ErrorBoundary, () => {
 
             render(
                 <ErrorBoundary>
-                    <ThrowingComponent shouldThrow={true} />
+                    <ThrowingComponent shouldThrow />
                 </ErrorBoundary>
             );
 
@@ -141,7 +141,7 @@ describe(ErrorBoundary, () => {
 
             render(
                 <ErrorBoundary fallback={CustomFallback}>
-                    <ThrowingComponent shouldThrow={true} />
+                    <ThrowingComponent shouldThrow />
                 </ErrorBoundary>
             );
 
@@ -169,7 +169,7 @@ describe(ErrorBoundary, () => {
 
             render(
                 <ErrorBoundary onError={onError}>
-                    <ThrowingComponent shouldThrow={true} />
+                    <ThrowingComponent shouldThrow />
                 </ErrorBoundary>
             );
 
@@ -199,7 +199,7 @@ describe(ErrorBoundary, () => {
             expect(() => {
                 render(
                     <ErrorBoundary>
-                        <ThrowingComponent shouldThrow={true} />
+                        <ThrowingComponent shouldThrow />
                     </ErrorBoundary>
                 );
             }).not.toThrow();
@@ -435,7 +435,7 @@ describe("withErrorBoundary HOC", () => {
             CustomFallback
         );
 
-        render(<WrappedComponent shouldThrow={true} />);
+        render(<WrappedComponent shouldThrow />);
 
         expect(screen.getByTestId("custom-fallback")).toBeInTheDocument();
         expect(

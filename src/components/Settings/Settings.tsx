@@ -337,7 +337,6 @@ export const Settings = ({
                     />
                 ) : null}
                 {/* Sync Success Display */}
-                {/* eslint-disable-next-line @eslint-react/no-complex-conditional-rendering, @eslint-react/no-complicated-conditional-rendering -- success message should only show when no error present */}
                 {syncSuccess && !lastError ? (
                     <ThemedBox
                         className="success-alert"

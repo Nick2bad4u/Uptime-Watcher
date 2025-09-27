@@ -29,7 +29,7 @@
  *     variant="secondary"
  *     loading={isSubmitting}
  *     disabled={!isValid}
- *     fullWidth={true}
+ *     fullWidth
  *     onClick={handleSubmit}
  * >
  *     {isSubmitting ? "Submitting..." : "Submit Form"}
@@ -59,7 +59,6 @@ import type {
 
 import {
     type CSSProperties,
-    Fragment,
     isValidElement,
     type JSX,
     memo,
@@ -136,9 +135,14 @@ const ThemedButtonComponent = ({
     size = "md",
     style = DEFAULT_THEMED_BOX_STYLE,
     title,
-    type = "button",
+    type: providedType,
     variant = "primary",
 }: ThemedButtonProperties): JSX.Element => {
+    const overrideTypeProps =
+        providedType && providedType !== "button"
+            ? { type: providedType }
+            : undefined;
+
     const classNames = [
         CSS_CLASSES.THEMED_BUTTON,
         `themed-button--${variant}`,
@@ -182,15 +186,15 @@ const ThemedButtonComponent = ({
                 return iconElement;
             }
             return iconPosition === "left" ? (
-                <Fragment>
+                <>
                     {iconElement}
                     <span>{children}</span>
-                </Fragment>
+                </>
             ) : (
-                <Fragment>
+                <>
                     <span>{children}</span>
                     {iconElement}
-                </Fragment>
+                </>
             );
         }
         return children;
@@ -209,8 +213,8 @@ const ThemedButtonComponent = ({
             onClick={handleClick}
             style={style}
             title={title}
-            // eslint-disable-next-line react/button-has-type -- Type prop is properly typed with ButtonType union and has 'button' as default; ESLint cannot detect TypeScript type safety
-            type={type}
+            type="button"
+            {...overrideTypeProps}
         >
             {renderContent()}
         </button>

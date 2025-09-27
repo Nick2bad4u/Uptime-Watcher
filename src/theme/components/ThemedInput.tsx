@@ -18,7 +18,7 @@
  *     placeholder="Enter username"
  *     value={username}
  *     onChange={handleUsernameChange}
- *     required={true}
+ *     required
  * />;
  * ```
  *
@@ -47,7 +47,7 @@
  *     value={email}
  *     onChange={handleEmailChange}
  *     aria-describedby="email-error"
- *     required={true}
+ *     required
  * />;
  * ```
  *
@@ -116,7 +116,7 @@ export interface ThemedInputProperties
  *     placeholder="https://example.com"
  *     value={websiteUrl}
  *     onChange={handleUrlChange}
- *     required={true}
+ *     required
  * />;
  * ```
  *

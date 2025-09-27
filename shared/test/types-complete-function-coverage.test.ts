@@ -288,6 +288,7 @@ describe("Shared Types - Complete Function Coverage", () => {
             expect(typesModule.BASE_MONITOR_TYPES).toContain("port");
             expect(typesModule.BASE_MONITOR_TYPES).toContain("ping");
             expect(typesModule.BASE_MONITOR_TYPES).toContain("dns");
+            expect(typesModule.BASE_MONITOR_TYPES).toContain("ssl");
 
             // Test MONITOR_STATUS constant
             expect(typeof typesModule.MONITOR_STATUS).toBe("object");

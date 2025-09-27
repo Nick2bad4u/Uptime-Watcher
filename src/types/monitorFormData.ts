@@ -90,11 +90,24 @@ export interface DnsFormData extends BaseFormData {
 }
 
 /**
+ * Form data for SSL certificate monitors.
+ */
+export interface SslFormData extends BaseFormData {
+    /** Warning threshold in days before certificate expiry */
+    certificateWarningDays: number;
+    /** Target host serving the certificate */
+    host: string;
+    /** TLS port to connect to */
+    port: number;
+    type: "ssl";
+}
+
+/**
  * Union type for all supported monitor form data types. Simplified for better
  * IntelliSense display.
  */
 export type MonitorFormData = Simplify<
-    DnsFormData | HttpFormData | PingFormData | PortFormData
+    DnsFormData | HttpFormData | PingFormData | PortFormData | SslFormData
 >;
 
 /**
@@ -117,6 +130,9 @@ export function createDefaultFormData(
 export function createDefaultFormData(
     type: "port"
 ): SetOptional<PortFormData, "host" | "port">;
+export function createDefaultFormData(
+    type: "ssl"
+): SetOptional<SslFormData, "certificateWarningDays" | "host" | "port">;
 export function createDefaultFormData(
     type: string
 ): SetOptional<BaseFormData, never> {
@@ -204,6 +220,29 @@ export function isPortFormData(
 }
 
 /**
+ * Type guard to check if form data is for SSL monitor.
+ *
+ * @param data - Form data to check
+ *
+ * @returns True if data is SSL form data
+ */
+export function isSslFormData(
+    data: Partial<MonitorFormData>
+): data is SslFormData {
+    return (
+        data.type === "ssl" &&
+        typeof data.host === "string" &&
+        data.host.trim() !== "" &&
+        typeof data.port === "number" &&
+        data.port > 0 &&
+        data.port <= 65_535 &&
+        typeof data.certificateWarningDays === "number" &&
+        data.certificateWarningDays >= 1 &&
+        data.certificateWarningDays <= 365
+    );
+}
+
+/**
  * Registry of type-specific validation functions. Add new monitor types here to
  * enable dynamic validation.
  */
@@ -212,6 +251,7 @@ const FORM_DATA_VALIDATORS = {
     http: isHttpFormData,
     ping: isPingFormData,
     port: isPortFormData,
+    ssl: isSslFormData,
 } as const;
 
 /**

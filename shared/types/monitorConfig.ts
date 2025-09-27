@@ -249,6 +249,24 @@ export interface PortMonitorConfig extends BaseMonitorConfig {
 }
 
 /**
+ * Configuration interface for SSL certificate monitors.
+ *
+ * @remarks
+ * Used for monitors that check the status of SSL certificates.
+ *
+ * @public
+ */
+export interface SslMonitorConfig extends BaseMonitorConfig {
+    /** Days before expiry that should trigger degraded status */
+    certificateWarningDays: number;
+    /** Hostname to inspect for TLS certificate status */
+    host: string;
+    /** Target port for the TLS handshake (defaults to 443) */
+    port: number;
+    type: "ssl";
+}
+
+/**
  * Union type representing all possible monitor configurations.
  *
  * @remarks
@@ -259,7 +277,7 @@ export interface PortMonitorConfig extends BaseMonitorConfig {
  * @public
  */
 export type MonitorConfig = Simplify<
-    HttpMonitorConfig | PingMonitorConfig | PortMonitorConfig
+    HttpMonitorConfig | PingMonitorConfig | PortMonitorConfig | SslMonitorConfig
 >;
 
 /**
@@ -308,6 +326,21 @@ export function isPortMonitorConfig(
 }
 
 /**
+ * Type guard to check if configuration is for SSL monitors.
+ *
+ * @param config - The monitor configuration to check
+ *
+ * @returns True if the configuration is for an SSL monitor
+ *
+ * @public
+ */
+export function isSslMonitorConfig(
+    config: MonitorConfig | null | undefined
+): config is SslMonitorConfig {
+    return config !== null && config !== undefined && config.type === "ssl";
+}
+
+/**
  * Default monitor configuration values.
  *
  * @public
@@ -346,4 +379,15 @@ export const DEFAULT_MONITOR_CONFIG = {
         timeout: 30_000, // 30 seconds
         type: "port" as const,
     } as Partial<PortMonitorConfig>,
+
+    /** Default values for SSL certificate monitors */
+    ssl: {
+        certificateWarningDays: 30,
+        checkInterval: 300_000, // 5 minutes
+        enabled: true,
+        port: 443,
+        retryAttempts: 3,
+        timeout: 30_000, // 30 seconds
+        type: "ssl" as const,
+    } as Partial<SslMonitorConfig>,
 } as const;

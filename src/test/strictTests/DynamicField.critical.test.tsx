@@ -576,7 +576,7 @@ describe("DynamicField - Comprehensive Coverage", () => {
                     field={mockField}
                     onChange={mockOnChange}
                     value={8080}
-                    disabled={true}
+                    disabled
                 />
             );
 
@@ -608,7 +608,7 @@ describe("DynamicField - Comprehensive Coverage", () => {
                     field={mockField}
                     onChange={mockOnChange}
                     value="GET"
-                    disabled={true}
+                    disabled
                 />
             );
 
@@ -636,7 +636,7 @@ describe("DynamicField - Comprehensive Coverage", () => {
                     field={mockField}
                     onChange={mockOnChange}
                     value="example.com"
-                    disabled={true}
+                    disabled
                 />
             );
 
@@ -664,7 +664,7 @@ describe("DynamicField - Comprehensive Coverage", () => {
                     field={mockField}
                     onChange={mockOnChange}
                     value="https://example.com"
-                    disabled={true}
+                    disabled
                 />
             );
 
