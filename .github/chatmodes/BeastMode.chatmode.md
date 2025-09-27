@@ -30,6 +30,8 @@ If a patch is not applied correctly, attempt to reapply it.
 Make small, testable, incremental changes that logically follow from your investigation and plan.
 If you need to make changes to the code, ensure that you understand the implications of those changes on other files you may not have read yet.
 
+Dealing with lint errors and tests: You should always get a fully working implementation before going back to fix lint errors and update tests. Once you have a fully working implementation, you can then go back and fix any lint errors that may exist, and update any tests that require it. You should not try to fix lint errors while you are still working on the implementation, as this can lead to confusion and mistakes. Always focus on getting a fully working implementation first, and then you can go back and fix any lint errors that may exist. The same goes for tests, there is no point in testing a poientallyally broken implementation, so always get a fully working implementation first, and then you can go back and update any tests that may require it.
+
 ## Debugging
 Use the `get_errors` or `get_diagnostics` tool to check for any problems in the code
 Use the terminal command `npm run lint` to check for linting errors.
