@@ -288,11 +288,6 @@ export default [
     {
         name: "Global Settings Options **/**",
         settings: {
-            "react-x": {
-                version: "detect", // Specify the React version for semantic analysis (can be "detect" for auto-detection)
-                importSource: "react", // Customize the import source for the React module (defaults to "react")
-                polymorphicPropName: "as", // Define the prop name used for polymorphic components (e.g., <Component as="div">)
-            },
             "import-x/resolver": {
                 node: true,
             },
@@ -319,6 +314,11 @@ export default [
                 }),
             ],
             react: { version: "19" },
+            "react-x": {
+                importSource: "react", // Customize the import source for the React module (defaults to "react")
+                polymorphicPropName: "as", // Define the prop name used for polymorphic components (e.g., <Component as="div">)
+                version: "detect", // Specify the React version for semantic analysis (can be "detect" for auto-detection)
+            },
         },
     }, // ═══════════════════════════════════════════════════════════════════════════════
     // YAML/YML files
@@ -1218,6 +1218,7 @@ export default [
 
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
+            "@eslint-react/jsx-shorthand-boolean": "warn",
             "@eslint-react/jsx-shorthand-fragment": "warn",
             "@eslint-react/jsx-uses-react": "warn",
             "@eslint-react/jsx-uses-vars": "warn",
@@ -1231,19 +1232,18 @@ export default [
             "@eslint-react/no-class-component": "warn",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
-            "@eslint-react/no-unused-props": "warn",
 
 
 
             "@eslint-react/no-missing-context-display-name": "warn",
             "@eslint-react/no-nested-component-definitions": "warn",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
+            "@eslint-react/no-unused-props": "warn",
             "@eslint-react/no-useless-forward-ref": "warn",
             "@eslint-react/no-useless-fragment": "warn",
             "@eslint-react/prefer-destructuring-assignment": "warn",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
-            "@eslint-react/jsx-shorthand-boolean": "warn",
 
 
             "@jcoreio/implicit-dependencies/no-implicit": [
@@ -2585,6 +2585,7 @@ export default [
 
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
+            "@eslint-react/jsx-shorthand-boolean": "warn",
             "@eslint-react/jsx-shorthand-fragment": "warn",
             "@eslint-react/jsx-uses-react": "warn",
             "@eslint-react/jsx-uses-vars": "warn",
@@ -2598,19 +2599,18 @@ export default [
             "@eslint-react/no-class-component": "warn",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
-            "@eslint-react/no-unused-props": "warn",
 
 
 
             "@eslint-react/no-missing-context-display-name": "warn",
             "@eslint-react/no-nested-component-definitions": "warn",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
+            "@eslint-react/no-unused-props": "warn",
             "@eslint-react/no-useless-forward-ref": "warn",
             "@eslint-react/no-useless-fragment": "warn",
             "@eslint-react/prefer-destructuring-assignment": "warn",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
-            "@eslint-react/jsx-shorthand-boolean": "warn",
 
 
             "@jcoreio/implicit-dependencies/no-implicit": [
@@ -4126,6 +4126,7 @@ export default [
 
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
+            "@eslint-react/jsx-shorthand-boolean": "warn",
             "@eslint-react/jsx-shorthand-fragment": "warn",
             "@eslint-react/jsx-uses-react": "warn",
             "@eslint-react/jsx-uses-vars": "warn",
@@ -4139,19 +4140,18 @@ export default [
             "@eslint-react/no-class-component": "warn",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
-            "@eslint-react/no-unused-props": "warn",
 
 
 
             "@eslint-react/no-missing-context-display-name": "warn",
             "@eslint-react/no-nested-component-definitions": "warn",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
+            "@eslint-react/no-unused-props": "warn",
             "@eslint-react/no-useless-forward-ref": "warn",
             "@eslint-react/no-useless-fragment": "warn",
             "@eslint-react/prefer-destructuring-assignment": "warn",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
-            "@eslint-react/jsx-shorthand-boolean": "warn",
 
 
             "@jcoreio/implicit-dependencies/no-implicit": [
@@ -5495,6 +5495,7 @@ export default [
 
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
+            "@eslint-react/jsx-shorthand-boolean": "warn",
             "@eslint-react/jsx-shorthand-fragment": "warn",
             "@eslint-react/jsx-uses-react": "warn",
             "@eslint-react/jsx-uses-vars": "warn",
@@ -5508,19 +5509,18 @@ export default [
             "@eslint-react/no-class-component": "warn",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
-            "@eslint-react/no-unused-props": "warn",
 
 
 
             "@eslint-react/no-missing-context-display-name": "warn",
             "@eslint-react/no-nested-component-definitions": "warn",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
+            "@eslint-react/no-unused-props": "warn",
             "@eslint-react/no-useless-forward-ref": "warn",
             "@eslint-react/no-useless-fragment": "warn",
             "@eslint-react/prefer-destructuring-assignment": "warn",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
-            "@eslint-react/jsx-shorthand-boolean": "warn",
 
 
             "@jcoreio/implicit-dependencies/no-implicit": [
