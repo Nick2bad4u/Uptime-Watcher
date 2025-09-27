@@ -72,7 +72,11 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
                 vi.fn(),
             ];
 
-            function TestComponent({ setterIndex }: { setterIndex: number }) {
+            function TestComponent({
+                setterIndex,
+            }: {
+                setterIndex: 0 | 1 | 2;
+            }) {
                 const currentSetter = mockSetters[setterIndex];
 
                 const handleClick = React.useCallback(() => {

@@ -1233,8 +1233,6 @@ export default [
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
 
-
-
             "@eslint-react/no-missing-context-display-name": "warn",
             "@eslint-react/no-nested-component-definitions": "warn",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
@@ -1244,7 +1242,6 @@ export default [
             "@eslint-react/prefer-destructuring-assignment": "warn",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
-
 
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
@@ -2600,8 +2597,6 @@ export default [
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
 
-
-
             "@eslint-react/no-missing-context-display-name": "warn",
             "@eslint-react/no-nested-component-definitions": "warn",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
@@ -2611,7 +2606,6 @@ export default [
             "@eslint-react/prefer-destructuring-assignment": "warn",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
-
 
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
@@ -4141,8 +4135,6 @@ export default [
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
 
-
-
             "@eslint-react/no-missing-context-display-name": "warn",
             "@eslint-react/no-nested-component-definitions": "warn",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
@@ -4152,7 +4144,6 @@ export default [
             "@eslint-react/prefer-destructuring-assignment": "warn",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
-
 
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
@@ -5510,8 +5501,6 @@ export default [
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
 
-
-
             "@eslint-react/no-missing-context-display-name": "warn",
             "@eslint-react/no-nested-component-definitions": "warn",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
@@ -5521,7 +5510,6 @@ export default [
             "@eslint-react/prefer-destructuring-assignment": "warn",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
-
 
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",

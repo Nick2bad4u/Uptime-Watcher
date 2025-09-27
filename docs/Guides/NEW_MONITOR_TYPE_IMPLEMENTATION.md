@@ -1,315 +1,305 @@
-# Uptime Monitoring System — Implementation Guide
+# Uptime Monitoring System - New Monitor Type Implementation Guide
 
-## 2025-09 Update — SSL Certificate Monitor Implementation
+_Last reviewed: September 27, 2025_
 
-The guide now reflects the latest end-to-end monitor that was added to the platform: the **SSL Certificate monitor (`ssl`)**. This implementation provides a production-ready example of wiring a new monitor type through every layer of the stack.
-
-### Scope Covered by the SSL Implementation
-
-- **Shared layer**
-  - `shared/types.ts` — Added `"ssl"` to `BASE_MONITOR_TYPES` and introduced the `certificateWarningDays` field on the `Monitor` type.
-  - `shared/types/monitorConfig.ts` — Created `SslMonitorConfig`, updated monitor config defaults, and supplied a new type guard.
-  - `shared/types/schemaTypes.ts` & `shared/validation/schemas.ts` — Added `sslMonitorSchema` with strict Zod validation for host, port, and warning thresholds, and extended the discriminated unions.
-  - `shared/utils/validation.ts` — Introduced SSL-specific field validation with precise error messaging.
-
-- **Electron/backend layer**
-  - `electron/services/monitoring/SslMonitor.ts` — New monitor service that performs a TLS handshake, evaluates certificate validity/expiry, applies retry policies, and returns rich status details.
-  - `electron/services/monitoring/MonitorTypeRegistry.ts` — Registered the `ssl` monitor with form metadata, UI helpers, and version tracking.
-  - `electron/services/monitoring/EnhancedMonitorChecker.ts` — Routed `ssl` monitors to the new service.
-  - Tests: `electron/test/services/monitoring/SslMonitor.test.ts` exercises success, degradation, expiry, handshake failure, and authorization error paths.
-
-- **Frontend layer**
-  - `src/components/SiteDetails/useAddSiteForm.ts` and `src/components/AddSiteForm/AddSiteForm.tsx` — Added state management, defaults, and form wiring for `certificateWarningDays`.
-  - `src/types/monitorFormData.ts` & `src/types/monitor-forms.ts` — Extended form data unions and defaults for SSL monitors.
-  - `src/utils/monitorValidation.ts` & `src/stores/sites/utils/monitorOperations.ts` — Added normalization and validation logic for the new field.
-  - UI polish: `MonitorSelector` and fallback helpers now surface SSL-friendly labels.
-  - Tests: `src/test/hooks/useAddSiteForm.comprehensive.test.ts` covers the new form state, ensuring the warning threshold participates in resets and validation.
-
-- **Documentation & developer ergonomics**
-  - This guide now references the SSL implementation as the canonical example for future monitor types.
-
-### Key Implementation Notes
-
-1. **Certificate evaluation**: The backend clamps `certificateWarningDays` to 1–365 and classifies results as `up`, `degraded`, or `down` based on expiry proximity.
-2. **Retry & timeout integration**: `SslMonitor` participates in the enhanced monitoring retry system, respecting global defaults and per-monitor overrides.
-3. **Dynamic UI**: Because the registry metadata includes the new field, the renderer dynamically renders inputs without bespoke React components.
-4. **Testing strategy**: Unit tests mock TLS sockets to simulate authorization failures, expiry, and handshake errors without needing real certificates.
-5. **Existing guidance alignment**: The original six-phase process (foundation → core implementation → system integration → QA → UI → production validation) still holds. The SSL work follows each phase with concrete artifacts listed above.
-
-> **Tip:** Use the SSL monitor changeset as the definitive reference when introducing additional monitor types. It demonstrates how to propagate new configuration fields, validation rules, backend services, UI wiring, and automated tests in a consistent, type-safe manner.
+This guide walks you through every layer required to introduce a brand-new monitor type into the Uptime Monitoring System. It is written so that an engineer who has never touched this codebase can ship a production-ready monitor with confidence.
 
 ---
 
-## Table of Contents
+## 1. Who Should Use This Guide
 
-- [Uptime Monitoring System — Implementation Guide](#uptime-monitoring-system--implementation-guide)
-  - [2025-09 Update — SSL Certificate Monitor Implementation](#2025-09-update--ssl-certificate-monitor-implementation)
-  - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [System Architecture Overview](#system-architecture-overview)
-  - [Package Structure](#package-structure)
-  - [Key Concepts](#key-concepts)
-  - [Type Definitions](#type-definitions)
-  - [Monitor Type Registry](#monitor-type-registry)
-  - [Service Implementation](#service-implementation)
-  - [Configuration Management](#configuration-management)
-  - [Data Persistence](#data-persistence)
-  - [Monitoring and Logging](#monitoring-and-logging)
-  - [Testing Strategy](#testing-strategy)
-  - [Deployment Checklist](#deployment-checklist)
-  - [References](#references)
+- Primary audience: product and platform engineers adding first-party monitors (HTTP variants, DNS, TCP, certificate checks, etc.).
+- Secondary audience: QA, SRE, and technical writers validating that a monitor was wired end-to-end.
+- Prerequisites: working knowledge of TypeScript, Node.js, React, Zustand, and basic Electron concepts. Familiarity with SQLite and Zod helps but is not required; relevant snippets appear below.
 
 ---
 
-## Introduction
+## 2. End-to-End Flyover
 
-This document provides a comprehensive guide for implementing new monitor types in the Uptime Monitoring System. It covers the entire process from defining types and validation schemas to implementing backend services and frontend integration.
+1. Model the type - decide on the monitor identifier and configuration fields.
+2. Extend shared contracts - update shared types, Zod schemas, validation helpers, and defaults.
+3. Implement backend logic - build the monitoring service, register it, and make sure persistence paths understand the new metadata.
+4. Wire the renderer - teach the stores, forms, validation utilities, and display components how to collect and render the configuration.
+5. Test and release - cover the new monitor in unit, integration, fuzz, and end-to-end tests; update docs and deployment artifacts.
 
-The guide is structured around the recent addition of the SSL Certificate monitor, which serves as a detailed example of a complete monitor implementation.
-
----
-
-<a id="system-architecture-overview"></a>
-
-## System Architecture Overview
-
-The Uptime Monitoring System is built on a modular architecture that separates concerns across different layers:
-
-- **Shared Layer**: Contains common types, validation schemas, and utility functions used across the application.
-- **Electron/Backend Layer**: Implements the monitoring services, handles data persistence, and manages application logic.
-- **Frontend Layer**: Provides the user interface components and hooks for interacting with the monitoring system.
+Each phase below lists the concrete files that must be touched. Work through them in order; skipping a phase will surface runtime errors because every layer depends on shared metadata.
 
 ---
 
-<a id="package-structure"></a>
+## 3. Architecture Recap
 
-## Package Structure
-
-The project is organized into several packages, each responsible for a specific part of the system:
-
-- `shared`: Contains shared types, validation schemas, and utility functions.
-- `electron`: Implements the backend services, including monitoring services and data persistence.
-- `src`: Contains the frontend application code, including components, hooks, and types.
-
----
-
-<a id="key-concepts"></a>
-
-## Key Concepts
-
-- **Monitor Types**: Different types of monitors (e.g., HTTP, TCP, DNS, SSL) that check the availability and performance of resources.
-- **Validation Schemas**: Zod schemas that define the structure and constraints of monitor configurations.
-- **Service Implementation**: Classes that implement the monitoring logic for each monitor type.
-- **Configuration Management**: Mechanism to manage and validate monitor configuration settings.
-- **Data Persistence**: Storage and retrieval of monitor data, including status history and configuration.
-- **Monitoring and Logging**: Tools and practices for monitoring application performance and logging events.
-- **Testing Strategy**: Approach to testing the implementation, including unit tests, integration tests, and end-to-end tests.
-
----
-
-<a id="type-definitions"></a>
-
-## Type Definitions
-
-Type definitions are located in the `shared/types.ts` file. They define the structure of monitor objects and other related data types.
-
-### Monitor Type
-
-The `Monitor` type represents a single monitor configuration:
-
-```typescript
-export type Monitor = {
- id: string;
- type: MonitorType;
- checkInterval: number;
- retryAttempts: number;
- timeout: number;
- monitoring: boolean;
- status: MonitorStatus;
- responseTime: number;
- history: StatusHistory[];
- lastChecked?: Date;
- activeOperations?: string[];
- [key: string]: any; // Allow additional fields for specific monitor types
-};
 ```
+Shared Domain (TypeScript + Zod)
+  - shared/types.ts
+  - shared/types/monitorConfig.ts
+  - shared/validation/schemas.ts
+  - shared/utils/validation.ts
 
-### Monitor Type Registry Definition
+Electron Backend (monitor services, registry, persistence)
+  - electron/services/monitoring/**/*
+  - electron/services/database/**/*
 
-The monitor type registry maps monitor type strings to their corresponding service implementations and validation schemas.
-
-```typescript
-export type MonitorTypeRegistryEntry = {
- type: MonitorType;
- serviceFactory: () => IMonitorService;
- validationSchema: z.ZodSchema;
-};
+Renderer (React + Zustand)
+  - src/stores/**/*
+  - src/components/**/*
+  - src/utils/**/*
 ```
 
 ---
 
-<a id="monitor-type-registry"></a>
+## 4. File Impact Matrix
 
-## Monitor Type Registry
+| Layer | Responsibility | Touch These Files | Notes |
+| --- | --- | --- | --- |
+| Shared | Declare monitor type, config, validation | `shared/types.ts`, `shared/types/monitorConfig.ts`, `shared/types/monitorTypes.ts`, `shared/types/schemaTypes.ts`, `shared/validation/schemas.ts`, `shared/utils/validation.ts`, `shared/utils/logTemplates.ts` (if new log codes), `shared/test/validation/schemas.comprehensive.test.ts` | Update unions, defaults, schemas, and add tests for both happy and error paths. |
+| Electron backend | Service logic, registry metadata, retry policies | `electron/services/monitoring/<NewMonitor>.ts`, `electron/services/monitoring/MonitorTypeRegistry.ts`, `electron/services/monitoring/EnhancedMonitorChecker.ts`, `electron/services/monitoring/types.ts`, `electron/services/monitoring/shared/monitorServiceHelpers.ts`, logger templates if you emit new messages, unit tests in `electron/test/services/monitoring`, fuzz tests in `electron/test/fuzzing` | Make sure the new service is routed, retried, logged, and versioned. |
+| Persistence | Persist dynamic fields and history | `electron/services/database/utils/dynamicSchema.ts`, `electron/services/database/utils/monitorMapper.ts`, `electron/services/database/MonitorRepository.ts`, tests in `electron/test/fuzzing/databaseSchema.*.test.ts` | Dynamic schema generation reads registry fields; confirm snake_case column names and SQL types. |
+| Renderer | Collect config, validate, display | `src/types/monitorFormData.ts`, `src/types/monitor-forms.ts`, `src/utils/monitorValidation.ts`, `src/stores/sites/utils/monitorOperations.ts`, `src/stores/monitor/useMonitorTypesStore.ts`, `src/components/SiteDetails/useAddSiteForm.ts`, `src/components/AddSiteForm/AddSiteForm.tsx`, `src/components/AddSiteForm/DynamicMonitorFields.tsx`, `src/components/AddSiteForm/Submit.tsx`, `src/components/Dashboard/SiteCard/components/MonitorSelector.tsx`, `src/constants.ts`, `src/utils/fallbacks.ts`, renderer tests (`src/test/hooks/useAddSiteForm.comprehensive.test.ts`, `src/test/comprehensive-100-percent-coverage.test.tsx`, `src/test/fuzzing/monitor-operations.fuzz.test.ts`, `src/test/stores/sites/utils/monitorOperations.fast-check-comprehensive.test.ts`) | Maintain parity between shared schemas and client validation, and keep UI fallbacks working when IPC is offline. |
+| Tooling and docs | Keep documentation and changelog in sync | `docs/Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md`, `CHANGELOG.md`, release notes, runbooks | Record user-facing changes and rollout instructions. |
 
-The monitor type registry maps monitor type strings to their corresponding service implementations and validation schemas. It allows the system to dynamically resolve and instantiate the correct service for each monitor type.
+Use this table as a printable checklist before opening a pull request.
 
-### Registering a New Monitor Type
+---
 
-To register a new monitor type, call the `registerMonitorType` function with a configuration object:
+## 5. Step-by-Step Implementation
+
+### Step 0 - Specify the Monitor
+
+1. Pick a lowercase identifier (hyphen separated when necessary). Document it in your design doc.
+2. List every input field: name, type, min, max, default, and whether it is required.
+3. Capture protocol dependencies (TLS, ICMP, DNS, authentication) and security considerations.
+4. Decide how the monitor transitions between up, degraded, and down so that tests can assert the behaviour.
+
+Deliverable: a short spec that includes `type`, `required fields`, `optional fields`, and `status mapping`.
+
+---
+
+### Step 1 - Extend Shared Domain Contracts
+
+All shared types live under `shared/`. Updating them first unlocks both backend and renderer layers.
+
+1. Declare the monitor type and fields
+   - Append the identifier to `BASE_MONITOR_TYPES` in `shared/types.ts`.
+   - Add optional properties to the `Monitor` interface for new fields (for example `latencyWarningMs`).
+2. Update configuration contracts
+   - In `shared/types/monitorConfig.ts` add an interface such as `NewMonitorConfig` extending `BaseMonitorConfig`.
+   - Extend the `MonitorConfig` union and add a type guard `isNewMonitorConfig`.
+   - Provide defaults in `DEFAULT_MONITOR_CONFIG.<type>` that respect system-wide retry and timeout conventions.
+3. Update shared monitor metadata helpers as needed in `shared/types/monitorTypes.ts`.
+4. Add Zod schemas
+   - Define `newMonitorSchema` in `shared/validation/schemas.ts` and include it in the discriminated union `monitorSchema`.
+   - Export a typed alias in `shared/types/schemaTypes.ts` for IDE support and cross-package imports.
+5. Field-level validation
+   - Add a dedicated validator in `shared/utils/validation.ts` so error messages remain human readable.
+6. Shared tests
+   - Extend `shared/test/validation/schemas.comprehensive.test.ts` with happy and failure cases covering the new schema.
+
+Run the shared unit tests before moving on: `npm test -- --run tests/shared`.
+
+---
+
+### Step 2 - Implement and Register the Backend Service
+
+1. Create the service class
+   - Add `electron/services/monitoring/<NewMonitor>.ts` implementing `IMonitorService` from `electron/services/monitoring/types.ts`.
+   - Reuse helpers like `validateMonitorHostAndPort`, `extractMonitorConfig`, and `withOperationalHooks` from `electron/services/monitoring/shared/monitorServiceHelpers.ts` to match retry behaviour.
+2. Write unit tests
+   - Mirror `electron/test/services/monitoring/SslMonitor.test.ts`. Cover success, degraded thresholds, failure states, timeouts, and invalid configurations.
+3. Register the monitor type
+   - Update `electron/services/monitoring/MonitorTypeRegistry.ts`:
+     - Import the service and call `registerMonitorType({ ... })` with description, display name, `fields` metadata, `serviceFactory`, `uiConfig`, and `validationSchema` (the shared schema you added).
+     - Set the implementation version through `versionManager.setVersion(type, semver)`.
+   - Provide history and analytics formatters as needed through the `uiConfig` hooks.
+4. Route checks
+   - In `electron/services/monitoring/EnhancedMonitorChecker.ts`, add a class property for the new service and handle it inside the `switch (monitor.type)` block.
+5. IPC exports
+   - The preload bridge already exposes registry functionality. If you create new IPC endpoints, update the preload module to forward them safely.
+6. Logging templates
+   - Add new log codes to `@shared/utils/logTemplates.ts` when you introduce monitor-specific logging.
+
+Deliverable: service tests green, TypeScript build clean, and the monitor type appears in the registry at runtime.
+
+---
+
+### Step 3 - Guarantee Persistence and Data Pipelines
+
+Dynamic schema generation means most database updates are metadata driven, but you must confirm the new fields flow end-to-end.
+
+1. Dynamic schema definitions
+   - `generateDatabaseFieldDefinitions` in `electron/services/database/utils/dynamicSchema.ts` reads registry field metadata. Verify your field descriptors (name, type) map to the correct SQL type (INTEGER, TEXT, etc.).
+2. Row to object mapping
+   - `mapMonitorToRow` and `mapRowToMonitor` iterate over registry field definitions. Confirm the new fields appear in both directions and update tests if you need custom conversion logic.
+   - Adjust `electron/services/database/utils/monitorMapper.ts` tests when defaults or conversions change.
+3. Repository operations
+   - `MonitorRepository.createInternal` and `bulkCreate` rely on generated SQL. Run repository tests or add new ones if the monitor requires special handling (for example, cascading history writes).
+4. Database schema tests
+   - Update fuzz suites in `electron/test/fuzzing/databaseSchema.*.test.ts` so they include the new monitor fields. Failures here usually point to naming or type mismatches.
+
+Verification tip: start the Electron app after registering the monitor. The database bootstrap (`createDatabaseTables`) will throw immediately if metadata produces invalid SQL.
+
+---
+
+### Step 4 - Wire Up the Renderer
+
+1. Monitor types store
+   - `useMonitorTypesStore` in `src/stores/monitor/useMonitorTypesStore.ts` consumes backend metadata. Update tests if they assert the list of known types.
+2. Form data shapes
+   - Extend `src/types/monitorFormData.ts` and `src/types/monitor-forms.ts` with interfaces, type guards, and default factories for the new type.
+   - Ensure `createDefaultFormData` returns sensible defaults that match the shared defaults.
+3. Client-side validation
+   - In `src/utils/monitorValidation.ts`, add field-level validation and wire the new type into `validateMonitorFormDataByType`. Match error messages to the shared schema whenever possible.
+4. Monitor normalization
+   - Update `src/stores/sites/utils/monitorOperations.ts` so `filterMonitorFieldsByType`, type-specific default appliers, and `normalizeMonitor` understand the new fields.
+5. Form state management
+   - Extend `src/components/SiteDetails/useAddSiteForm.ts` to initialise state, reset values, and expose setters for the new fields.
+   - Update `src/components/AddSiteForm/AddSiteForm.tsx`, `DynamicMonitorFields.tsx`, and `Submit.tsx` so inputs render and submissions convert string fields into typed values.
+6. Fallback options and UI polish
+   - Add the human-friendly label to `FALLBACK_MONITOR_TYPE_OPTIONS` in `src/constants.ts`.
+   - Update helpers that print monitor labels, such as `src/utils/fallbacks.ts` and `src/components/Dashboard/SiteCard/components/MonitorSelector.tsx`.
+7. Renderer tests
+   - Expand `src/test/hooks/useAddSiteForm.comprehensive.test.ts` to cover state transitions, resetting, and submission success.
+   - Update regression and fuzz suites: `src/test/comprehensive-100-percent-coverage.test.tsx`, `src/test/fuzzing/monitor-operations.fuzz.test.ts`, and `src/test/stores/sites/utils/monitorOperations.fast-check-comprehensive.test.ts`.
+
+Goal: a user can add the monitor through the UI, validation responds correctly, and labels render without custom components.
+
+---
+
+### Step 5 - Validation, Testing, and Tooling
+
+Run these commands after finishing code changes:
+
+1. `npm run lint`
+2. `npm run type-check`
+3. `npm test -- --run tests/shared`
+4. `npm test -- --run tests/electron`
+5. `npm test -- --run tests/renderer`
+6. `npm test -- --project fuzz`
+7. Optional manual run: launch the Electron app, add the monitor, and tail logs to confirm details.
+
+Capture any additional scripts, environment variables, or fixtures required to exercise the monitor so QA can automate scenarios.
+
+---
+
+### Step 6 - Deployment and Release Checklist
+
+- [ ] All automated tests above pass locally and in CI.
+- [ ] Updated user docs, runbooks, and screenshots if the UI changed.
+- [ ] Updated `CHANGELOG.md` and release notes with the new monitor capability.
+- [ ] Completed security or privacy review if the monitor touches new protocols or credentials.
+- [ ] Verified dynamic schema output against staging or production snapshots when possible.
+- [ ] Finalized rollout plan (feature flag, staged release, or full launch).
+
+Once merged, monitor the first production checks closely. Add telemetry if the monitor depends on upstream services whose outages you want to isolate.
+
+---
+
+## 6. Troubleshooting and FAQ
+
+| Symptom | Likely Cause | Fix |
+| --- | --- | --- |
+| Monitor type missing from dropdowns | `registerMonitorType` not called, or the store still relies on fallback data | Verify the registry entry in `MonitorTypeRegistry.ts` and check the Electron main process logs for import failures. |
+| Validation errors differ between backend and frontend | Shared schema not updated or client-side validation diverged | Confirm `shared/validation/schemas.ts` and `src/utils/monitorValidation.ts` enforce identical rules. Add tests for both paths. |
+| Database errors on startup | Field metadata does not map cleanly to SQL column types | Inspect `generateDatabaseFieldDefinitions` output and ensure each field maps to the correct SQL type. |
+| Monitor never runs in production | `EnhancedMonitorChecker` missing a case or the service throws before returning | Look for `[EnhancedMonitorChecker]` warnings in logs and add unit tests that reproduce the failure. |
+| UI renders blank fields | `DynamicMonitorFields` did not receive field metadata | Confirm the registry `fields` array is correct and that `useMonitorTypesStore` loads without IPC errors. |
+
+---
+
+## 7. Appendix - Reference Snippets
+
+### Registry entry template (`electron/services/monitoring/MonitorTypeRegistry.ts`)
 
 ```typescript
 registerMonitorType({
- type: "ssl",
- serviceFactory: () => new SslMonitor(),
- validationSchema: sslMonitorSchema,
+    description: "Explain what this monitor checks",
+    displayName: "Human Name",
+    fields: [
+        {
+            label: "Host",
+            name: "host",
+            type: "text",
+            required: true,
+            placeholder: "example.com",
+            helpText: "Where should we connect?",
+        },
+        // Add more fields here
+    ],
+    serviceFactory: () => new NewMonitor(),
+    type: "new-monitor",
+    uiConfig: {
+        detailFormats: {
+            historyDetail: (details) => `Details: ${details}`,
+        },
+        supportsResponseTime: true,
+    },
+    validationSchema: monitorSchemas.newMonitor,
+    version: "1.0.0",
 });
 ```
 
-### Monitor Type Configuration
-
-The configuration object for each monitor type should include:
-
-- `type`: The monitor type string (e.g., `"ssl"`).
-- `serviceFactory`: A factory function that creates an instance of the monitor service.
-- `validationSchema`: The Zod schema used to validate the monitor configuration.
-
----
-
-<a id="service-implementation"></a>
-
-## Service Implementation
-
-Monitor services implement the `IMonitorService` interface and contain the logic for performing the actual monitoring checks.
-
-### Implementing a New Monitor Service
-
-To implement a new monitor service, create a class that implements the `IMonitorService` interface:
+### Service skeleton (`electron/services/monitoring/NewMonitor.ts`)
 
 ```typescript
-export class SslMonitor implements IMonitorService {
- async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
-  // Implement SSL monitoring logic
- }
+export class NewMonitor implements IMonitorService {
+    public constructor(private config: MonitorConfig = {}) {}
+
+    public getType(): MonitorType {
+        return "new-monitor";
+    }
+
+    public updateConfig(config: Partial<MonitorConfig>): void {
+        this.config = { ...this.config, ...config };
+    }
+
+    public async check(
+        monitor: Site["monitors"][0],
+        signal?: AbortSignal
+    ): Promise<MonitorCheckResult> {
+        if (monitor.type !== "new-monitor") {
+            throw new Error(`NewMonitor cannot handle type: ${monitor.type}`);
+        }
+
+        const validationError = validateMonitorHostAndPort(monitor);
+        if (validationError) {
+            return createMonitorErrorResult(validationError, 0);
+        }
+
+        const { retryAttempts, timeout } = extractMonitorConfig(
+            monitor,
+            this.config.timeout
+        );
+
+        return withOperationalHooks(
+            () => this.performCheckOnce(monitor, timeout, signal),
+            {
+                maxRetries: retryAttempts + 1,
+                operationName: `New monitor check for ${monitor.host}`,
+            }
+        );
+    }
+
+    private async performCheckOnce(
+        monitor: Site["monitors"][0],
+        timeout: number,
+        signal?: AbortSignal
+    ): Promise<MonitorCheckResult> {
+        const started = performance.now();
+        // TODO: Implement protocol-specific logic
+        return {
+            details: "Example details",
+            responseTime: performance.now() - started,
+            status: "up",
+        };
+    }
 }
 ```
 
-### Service Methods
-
-The service class must implement the following methods:
-
-- `check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult>`: Performs the monitoring check and returns the result.
-- `updateConfig(config: Partial<MonitorConfig>): void`: Updates the service configuration.
-- `getType(): Site["monitors"][0]["type"]`: Returns the monitor type.
+Replace the TODO block with real protocol logic. Keep exception handling defensive: return `createMonitorErrorResult` rather than throwing unless configuration is invalid.
 
 ---
 
-## Configuration Management
+## 8. Change Log for This Guide
 
-Configuration management handles the validation and normalization of monitor configuration settings.
+- September 27, 2025 - Rebuilt the guide to cover the complete, generic monitor workflow with file-by-file instructions, testing requirements, and troubleshooting guidance.
 
-### Monitor Configuration Schema
-
-Each monitor type should have a corresponding configuration schema that extends the base monitor schema:
-
-```typescript
-export const sslMonitorSchema = baseMonitorSchema.extend({
- type: z.literal("ssl"),
- hostname: hostValidationSchema,
- port: z.number().min(1).max(65535),
- certificateWarningDays: z.number().min(1).max(365),
-});
-```
-
-### Normalizing Configuration
-
-Configuration normalization ensures that configuration values are converted to their expected types and formats:
-
-```typescript
-export function normalizeMonitorConfig(config: any): MonitorConfig {
- return {
-  ...config,
-  timeout: Number(config.timeout) || DEFAULT_TIMEOUT,
-  retryAttempts: Number(config.retryAttempts) || DEFAULT_RETRY_ATTEMPTS,
- };
-}
-```
-
----
-
-## Data Persistence
-
-Data persistence is handled by the database layer, which stores and retrieves monitor data using a repository pattern.
-
-### Monitor Repository
-
-The monitor repository provides methods for saving, updating, and querying monitor data:
-
-```typescript
-export class MonitorRepository {
- async save(monitor: Monitor): Promise<void> {
-  // Save monitor to database
- }
-
- async findById(id: string): Promise<Monitor | null> {
-  // Find monitor by ID
- }
-}
-```
-
-### Dynamic Schema Generation
-
-The database layer uses dynamic schema generation to adapt to new monitor types automatically. When a new monitor type is registered, its schema is added to the database configuration, and the necessary tables and fields are created.
-
----
-
-## Monitoring and Logging
-
-The system uses monitoring and logging tools to track application performance and log important events.
-
-### Application Monitoring
-
-Application monitoring tracks the health and performance of the application. It can include metrics such as response times, error rates, and resource utilization.
-
-### Logging
-
-Logging records important events and errors in the application. Logs should include sufficient context to diagnose issues and understand system behavior.
-
----
-
-## Testing Strategy
-
-The testing strategy includes unit tests, integration tests, and end-to-end tests to ensure the correctness and reliability of the implementation.
-
-### Unit Tests
-
-Unit tests verify the behavior of individual functions and methods in isolation. They should cover all critical paths and edge cases.
-
-### Integration Tests
-
-Integration tests verify the interaction between different components and layers of the system. They ensure that the system works as a whole and that data flows correctly between components.
-
-### End-to-End Tests
-
-End-to-end tests verify the complete functionality of the system from the user's perspective. They simulate real user scenarios and ensure that the system behaves as expected.
-
----
-
-## Deployment Checklist
-
-Before deploying a new monitor type to production, ensure that the following steps are completed:
-
-- [ ] Implement the monitor service class and validation schema.
-- [ ] Register the monitor type in the monitor type registry.
-- [ ] Implement unit tests, integration tests, and end-to-end tests.
-- [ ] Update the documentation and guides.
-- [ ] Verify that all tests pass and that the implementation meets the quality standards.
-
----
-
-## References
-
-- [Zod Documentation](https://zod.dev/)
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-- [React Documentation](https://reactjs.org/docs/getting-started.html)
-- [Electron Documentation](https://www.electronjs.org/docs/latest)
+Happy shipping. If you discover additional integration steps, update this guide alongside your code change so the next engineer starts from a precise source of truth.

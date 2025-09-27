@@ -47,11 +47,13 @@ const checkUpdateOnly = process.argv.includes("--check-update");
 const noUpdate = process.argv.includes("--no-update");
 
 /**
- * @interface UpdateCheckResult
  * @property {boolean} hasUpdate - Indicates if an update is available.
  * @property {string} latestVersion - The latest version hash.
- * @property {string | null} currentVersion - The current version hash or null if unknown.
+ * @property {string | null} currentVersion - The current version hash or null
+ *   if unknown.
  * @property {string} [error] - Optional error message if checking failed.
+ *
+ * @interface UpdateCheckResult
  */
 
 /**
@@ -65,6 +67,7 @@ function failAndExit(message) {
 /**
  * @param {string} actualHash
  * @param {string | undefined} expectedHash
+ *
  * @returns {boolean}
  */
 function verifyHash(actualHash, expectedHash) {
@@ -175,7 +178,7 @@ function saveVersion(version) {
 }
 
 /**
- * @returns any
+ * @returns Any
  */
 async function checkForUpdates() {
     try {
@@ -223,7 +226,7 @@ async function checkForUpdates() {
 /**
  * @param {string} urlToFetch
  * @param {string} destPath
- * @param {number} [redirectCount=0]
+ * @param {number} [redirectCount=0] Default is `0`
  */
 function download(urlToFetch, destPath, redirectCount = 0) {
     if (redirectCount > MAX_REDIRECTS) {
@@ -278,7 +281,7 @@ function download(urlToFetch, destPath, redirectCount = 0) {
                 if (!verifyHash(actual, EXPECTED_SHA256)) {
                     try {
                         fs.unlinkSync(tempPath);
-                    } catch { }
+                    } catch {}
                     failAndExit("Hash verification failed");
                 }
                 fs.renameSync(tempPath, destPath);

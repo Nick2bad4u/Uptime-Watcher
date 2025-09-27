@@ -10,6 +10,7 @@
  */
 
 import {
+    isValidElement,
     memo,
     type NamedExoticComponent,
     type ReactElement,
@@ -28,6 +29,10 @@ export interface ThemeProviderProperties {
     readonly children: ReactNode;
 }
 
+function isReactNodeArray(value: ReactNode): value is ReactNode[] {
+    return Array.isArray(value);
+}
+
 /**
  * A theme provider component that initializes the theme system
  *
@@ -39,11 +44,37 @@ export interface ThemeProviderProperties {
  */
 const ThemeProviderComponent = ({
     children,
-}: ThemeProviderProperties): ReactElement => {
+}: ThemeProviderProperties): null | ReactElement => {
     // Initialize theme system on mount to ensure theme context is available
     useTheme();
 
-    return <>{children}</>;
+    const rawChildren: ReactNode[] = isReactNodeArray(children)
+        ? children
+        : [children];
+
+    const validChildren = rawChildren.filter((child): child is ReactElement =>
+        isValidElement(child)
+    );
+
+    if (validChildren.length === 0) {
+        return null;
+    }
+
+    let composite: null | ReactElement = null;
+    for (const child of validChildren) {
+        if (composite === null) {
+            composite = child;
+        } else {
+            composite = (
+                <>
+                    {composite}
+                    {child}
+                </>
+            );
+        }
+    }
+
+    return composite;
 };
 
 export const ThemeProvider: NamedExoticComponent<ThemeProviderProperties> =

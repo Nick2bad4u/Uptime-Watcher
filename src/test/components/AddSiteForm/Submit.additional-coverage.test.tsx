@@ -109,29 +109,31 @@ beforeEach(() => {
 describe("Submit.tsx - Additional Coverage Tests", () => {
     const createMockProperties = (
         overrides: Partial<FormSubmitProperties> = {}
-    ): FormSubmitProperties => ({
-        addMode: "new",
-        checkInterval: 300_000,
-        expectedValue: "",
-        formError: undefined,
-        host: "example.com",
-        monitorType: "http",
-        name: "Test Site",
-        port: "80",
-        recordType: "A",
-        selectedExistingSite: "",
-        siteId: "test-site-id",
-        url: "https://example.com",
+    ): FormSubmitProperties =>
+        ({
+            addMode: "new",
+            checkInterval: 300_000,
+            expectedValue: "",
+            formError: undefined,
+            host: "example.com",
+            monitorType: "http",
+            name: "Test Site",
+            port: "80",
+            recordType: "A",
+            selectedExistingSite: "",
+            siteId: "test-site-id",
+            url: "https://example.com",
 
-        setFormError: vi.fn(),
-        addMonitorToSite: vi.fn(),
-        clearError: vi.fn(),
-        createSite: vi.fn().mockResolvedValue(undefined),
-        generateUuid: vi.fn(() => "test-uuid"),
-        logger: createMockLogger(),
-        onSuccess: vi.fn(),
-        ...overrides,
-    });
+            setFormError: vi.fn(),
+            addMonitorToSite: vi.fn(),
+            clearError: vi.fn(),
+            createSite: vi.fn().mockResolvedValue(undefined),
+            generateUuid: vi.fn(() => "test-uuid"),
+            logger: createMockLogger(),
+            onSuccess: vi.fn(),
+            ...overrides,
+            certificateWarningDays: overrides.certificateWarningDays ?? "30",
+        }) as FormSubmitProperties;
 
     describe("Coverage for Lines 109-122 (ping and port monitor types)", () => {
         it("should handle ping monitor type submission (lines 109-114)", async ({

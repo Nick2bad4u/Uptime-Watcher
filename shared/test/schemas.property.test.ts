@@ -536,6 +536,14 @@ describe("Schema Property-Based Tests", () => {
                             expect(result.data).toHaveProperty("recordType");
                             break;
                         }
+                        case "ssl": {
+                            expect(result.data).toHaveProperty("host");
+                            expect(result.data).toHaveProperty("port");
+                            expect(result.data).toHaveProperty(
+                                "certificateWarningDays"
+                            );
+                            break;
+                        }
                         default: {
                             // This should never happen due to discriminated union, but TypeScript requires it
                             const exhaustiveCheck: never = result.data;

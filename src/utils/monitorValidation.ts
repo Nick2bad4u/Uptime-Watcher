@@ -464,9 +464,7 @@ const validateMonitorFormDataByType = (
             break;
         }
         default: {
-            throw new Error(
-                `Unsupported monitor type in validation: ${String(type)}`
-            );
+            errors.push(`Unsupported monitor type: ${String(type)}`);
         }
     }
     /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Turn on again after switch statement */

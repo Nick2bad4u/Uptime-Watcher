@@ -1,409 +1,129 @@
 /**
  * Zod schema type definitions for validation schemas.
- *
- * @remarks
- * These interfaces define the explicit types for Zod schemas used in
- * validation. They provide clean type annotations for isolated declarations
- * while keeping the schema definitions readable.
- *
- * @packageDocumentation
  */
-
 import type * as z from "zod";
 
-/**
- * Type definition for base monitor schema.
- *
- * @public
- */
-export type BaseMonitorSchemaType = z.ZodObject<{
+interface MonitorStatusEnumShape {
+    readonly degraded: "degraded";
+    readonly down: "down";
+    readonly paused: "paused";
+    readonly pending: "pending";
+    readonly up: "up";
+}
+
+interface MonitorTypeEnumShape {
+    readonly dns: "dns";
+    readonly http: "http";
+    readonly ping: "ping";
+    readonly port: "port";
+    readonly ssl: "ssl";
+}
+
+type MonitorStatusEnumType = z.ZodEnum<MonitorStatusEnumShape>;
+type MonitorTypeEnumType = z.ZodEnum<MonitorTypeEnumShape>;
+
+type MonitorHistoryStatusEnumShape = Pick<
+    MonitorStatusEnumShape,
+    "degraded" | "down" | "up"
+>;
+
+type MonitorHistoryEntrySchemaType = z.ZodObject<{
+    details: z.ZodOptional<z.ZodString>;
+    responseTime: z.ZodNumber;
+    status: z.ZodEnum<MonitorHistoryStatusEnumShape>;
+    timestamp: z.ZodNumber;
+}>;
+
+interface SharedMonitorShape<TypeField extends z.ZodType> {
+    activeOperations: z.ZodOptional<z.ZodArray<z.ZodString>>;
     checkInterval: z.ZodNumber;
+    history: z.ZodArray<MonitorHistoryEntrySchemaType>;
     id: z.ZodString;
     lastChecked: z.ZodOptional<z.ZodDate>;
     monitoring: z.ZodBoolean;
     responseTime: z.ZodNumber;
     retryAttempts: z.ZodNumber;
-    status: z.ZodEnum<{
-        down: "down";
-        paused: "paused";
-        pending: "pending";
-        up: "up";
-    }>;
+    status: MonitorStatusEnumType;
     timeout: z.ZodNumber;
-    type: z.ZodEnum<{
-        dns: "dns";
-        http: "http";
-        ping: "ping";
-        port: "port";
-        ssl: "ssl";
-    }>;
+    type: TypeField;
+}
+
+type DnsRecordTypeEnum = z.ZodEnum<{
+    readonly A: "A";
+    readonly AAAA: "AAAA";
+    readonly ANY: "ANY";
+    readonly CAA: "CAA";
+    readonly CNAME: "CNAME";
+    readonly MX: "MX";
+    readonly NAPTR: "NAPTR";
+    readonly NS: "NS";
+    readonly PTR: "PTR";
+    readonly SOA: "SOA";
+    readonly SRV: "SRV";
+    readonly TLSA: "TLSA";
+    readonly TXT: "TXT";
 }>;
 
-/**
- * Type definition for HTTP monitor schema.
- *
- * @public
- */
-export type HttpMonitorSchemaType = z.ZodObject<{
-    checkInterval: z.ZodNumber;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: z.ZodEnum<{
-        down: "down";
-        paused: "paused";
-        pending: "pending";
-        up: "up";
-    }>;
-    timeout: z.ZodNumber;
-    type: z.ZodLiteral<"http">;
-    url: z.ZodString;
-}>;
+export type BaseMonitorSchemaType = z.ZodObject<
+    SharedMonitorShape<MonitorTypeEnumType>
+>;
 
-/**
- * Type definition for monitor discriminated union schema.
- *
- * @public
- */
+export type HttpMonitorSchemaType = z.ZodObject<
+    SharedMonitorShape<z.ZodLiteral<"http">> & {
+        url: z.ZodString;
+    }
+>;
+
+export type PortMonitorSchemaType = z.ZodObject<
+    SharedMonitorShape<z.ZodLiteral<"port">> & {
+        host: z.ZodString;
+        port: z.ZodNumber;
+    }
+>;
+
+export type PingMonitorSchemaType = z.ZodObject<
+    SharedMonitorShape<z.ZodLiteral<"ping">> & {
+        host: z.ZodString;
+    }
+>;
+
+export type DnsMonitorSchemaType = z.ZodObject<
+    SharedMonitorShape<z.ZodLiteral<"dns">> & {
+        expectedValue: z.ZodOptional<z.ZodString>;
+        host: z.ZodString;
+        recordType: DnsRecordTypeEnum;
+    }
+>;
+
+export type SslMonitorSchemaType = z.ZodObject<
+    SharedMonitorShape<z.ZodLiteral<"ssl">> & {
+        certificateWarningDays: z.ZodNumber;
+        host: z.ZodString;
+        port: z.ZodNumber;
+    }
+>;
+
 export type MonitorSchemaType = z.ZodDiscriminatedUnion<
     [
-        z.ZodObject<{
-            checkInterval: z.ZodNumber;
-            id: z.ZodString;
-            lastChecked: z.ZodOptional<z.ZodDate>;
-            monitoring: z.ZodBoolean;
-            responseTime: z.ZodNumber;
-            retryAttempts: z.ZodNumber;
-            status: z.ZodEnum<{
-                down: "down";
-                paused: "paused";
-                pending: "pending";
-                up: "up";
-            }>;
-            timeout: z.ZodNumber;
-            type: z.ZodLiteral<"http">;
-            url: z.ZodString;
-        }>,
-        z.ZodObject<{
-            checkInterval: z.ZodNumber;
-            host: z.ZodString;
-            id: z.ZodString;
-            lastChecked: z.ZodOptional<z.ZodDate>;
-            monitoring: z.ZodBoolean;
-            port: z.ZodNumber;
-            responseTime: z.ZodNumber;
-            retryAttempts: z.ZodNumber;
-            status: z.ZodEnum<{
-                down: "down";
-                paused: "paused";
-                pending: "pending";
-                up: "up";
-            }>;
-            timeout: z.ZodNumber;
-            type: z.ZodLiteral<"port">;
-        }>,
-        z.ZodObject<{
-            checkInterval: z.ZodNumber;
-            host: z.ZodString;
-            id: z.ZodString;
-            lastChecked: z.ZodOptional<z.ZodDate>;
-            monitoring: z.ZodBoolean;
-            responseTime: z.ZodNumber;
-            retryAttempts: z.ZodNumber;
-            status: z.ZodEnum<{
-                down: "down";
-                paused: "paused";
-                pending: "pending";
-                up: "up";
-            }>;
-            timeout: z.ZodNumber;
-            type: z.ZodLiteral<"ping">;
-        }>,
-        z.ZodObject<{
-            checkInterval: z.ZodNumber;
-            expectedValue: z.ZodOptional<z.ZodString>;
-            host: z.ZodString;
-            id: z.ZodString;
-            lastChecked: z.ZodOptional<z.ZodDate>;
-            monitoring: z.ZodBoolean;
-            recordType: z.ZodEnum<{
-                A: "A";
-                AAAA: "AAAA";
-                ANY: "ANY";
-                CAA: "CAA";
-                CNAME: "CNAME";
-                MX: "MX";
-                NAPTR: "NAPTR";
-                NS: "NS";
-                PTR: "PTR";
-                SOA: "SOA";
-                SRV: "SRV";
-                TLSA: "TLSA";
-                TXT: "TXT";
-            }>;
-            responseTime: z.ZodNumber;
-            retryAttempts: z.ZodNumber;
-            status: z.ZodEnum<{
-                down: "down";
-                paused: "paused";
-                pending: "pending";
-                up: "up";
-            }>;
-            timeout: z.ZodNumber;
-            type: z.ZodLiteral<"dns">;
-        }>,
-        z.ZodObject<{
-            certificateWarningDays: z.ZodNumber;
-            checkInterval: z.ZodNumber;
-            host: z.ZodString;
-            id: z.ZodString;
-            lastChecked: z.ZodOptional<z.ZodDate>;
-            monitoring: z.ZodBoolean;
-            port: z.ZodNumber;
-            responseTime: z.ZodNumber;
-            retryAttempts: z.ZodNumber;
-            status: z.ZodEnum<{
-                down: "down";
-                paused: "paused";
-                pending: "pending";
-                up: "up";
-            }>;
-            timeout: z.ZodNumber;
-            type: z.ZodLiteral<"ssl">;
-        }>,
+        HttpMonitorSchemaType,
+        PortMonitorSchemaType,
+        PingMonitorSchemaType,
+        DnsMonitorSchemaType,
+        SslMonitorSchemaType,
     ]
 >;
 
-/**
- * Type definition for ping monitor schema.
- *
- * @public
- */
-export type PingMonitorSchemaType = z.ZodObject<{
-    checkInterval: z.ZodNumber;
-    host: z.ZodString;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: z.ZodEnum<{
-        down: "down";
-        paused: "paused";
-        pending: "pending";
-        up: "up";
-    }>;
-    timeout: z.ZodNumber;
-    type: z.ZodLiteral<"ping">;
-}>;
-
-/**
- * Type definition for DNS monitor schema.
- *
- * @public
- */
-export type DnsMonitorSchemaType = z.ZodObject<{
-    checkInterval: z.ZodNumber;
-    expectedValue: z.ZodOptional<z.ZodString>;
-    host: z.ZodString;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
-    recordType: z.ZodEnum<{
-        A: "A";
-        AAAA: "AAAA";
-        ANY: "ANY";
-        CAA: "CAA";
-        CNAME: "CNAME";
-        MX: "MX";
-        NAPTR: "NAPTR";
-        NS: "NS";
-        PTR: "PTR";
-        SOA: "SOA";
-        SRV: "SRV";
-        TLSA: "TLSA";
-        TXT: "TXT";
-    }>;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: z.ZodEnum<{
-        down: "down";
-        paused: "paused";
-        pending: "pending";
-        up: "up";
-    }>;
-    timeout: z.ZodNumber;
-    type: z.ZodLiteral<"dns">;
-}>;
-
-/**
- * Type definition for port monitor schema.
- *
- * @public
- */
-export type PortMonitorSchemaType = z.ZodObject<{
-    checkInterval: z.ZodNumber;
-    host: z.ZodString;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
-    port: z.ZodNumber;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: z.ZodEnum<{
-        down: "down";
-        paused: "paused";
-        pending: "pending";
-        up: "up";
-    }>;
-    timeout: z.ZodNumber;
-    type: z.ZodLiteral<"port">;
-}>;
-
-/**
- * Type definition for site schema.
- *
- * @public
- */
 export type SiteSchemaType = z.ZodObject<{
     identifier: z.ZodString;
     monitoring: z.ZodBoolean;
-    monitors: z.ZodArray<
-        z.ZodDiscriminatedUnion<
-            [
-                z.ZodObject<{
-                    checkInterval: z.ZodNumber;
-                    id: z.ZodString;
-                    lastChecked: z.ZodOptional<z.ZodDate>;
-                    monitoring: z.ZodBoolean;
-                    responseTime: z.ZodNumber;
-                    retryAttempts: z.ZodNumber;
-                    status: z.ZodEnum<{
-                        down: "down";
-                        paused: "paused";
-                        pending: "pending";
-                        up: "up";
-                    }>;
-                    timeout: z.ZodNumber;
-                    type: z.ZodLiteral<"http">;
-                    url: z.ZodString;
-                }>,
-                z.ZodObject<{
-                    checkInterval: z.ZodNumber;
-                    host: z.ZodString;
-                    id: z.ZodString;
-                    lastChecked: z.ZodOptional<z.ZodDate>;
-                    monitoring: z.ZodBoolean;
-                    port: z.ZodNumber;
-                    responseTime: z.ZodNumber;
-                    retryAttempts: z.ZodNumber;
-                    status: z.ZodEnum<{
-                        down: "down";
-                        paused: "paused";
-                        pending: "pending";
-                        up: "up";
-                    }>;
-                    timeout: z.ZodNumber;
-                    type: z.ZodLiteral<"port">;
-                }>,
-                z.ZodObject<{
-                    checkInterval: z.ZodNumber;
-                    host: z.ZodString;
-                    id: z.ZodString;
-                    lastChecked: z.ZodOptional<z.ZodDate>;
-                    monitoring: z.ZodBoolean;
-                    responseTime: z.ZodNumber;
-                    retryAttempts: z.ZodNumber;
-                    status: z.ZodEnum<{
-                        down: "down";
-                        paused: "paused";
-                        pending: "pending";
-                        up: "up";
-                    }>;
-                    timeout: z.ZodNumber;
-                    type: z.ZodLiteral<"ping">;
-                }>,
-                z.ZodObject<{
-                    checkInterval: z.ZodNumber;
-                    expectedValue: z.ZodOptional<z.ZodString>;
-                    host: z.ZodString;
-                    id: z.ZodString;
-                    lastChecked: z.ZodOptional<z.ZodDate>;
-                    monitoring: z.ZodBoolean;
-                    recordType: z.ZodEnum<{
-                        A: "A";
-                        AAAA: "AAAA";
-                        ANY: "ANY";
-                        CAA: "CAA";
-                        CNAME: "CNAME";
-                        MX: "MX";
-                        NAPTR: "NAPTR";
-                        NS: "NS";
-                        PTR: "PTR";
-                        SOA: "SOA";
-                        SRV: "SRV";
-                        TLSA: "TLSA";
-                        TXT: "TXT";
-                    }>;
-                    responseTime: z.ZodNumber;
-                    retryAttempts: z.ZodNumber;
-                    status: z.ZodEnum<{
-                        down: "down";
-                        paused: "paused";
-                        pending: "pending";
-                        up: "up";
-                    }>;
-                    timeout: z.ZodNumber;
-                    type: z.ZodLiteral<"dns">;
-                }>,
-                z.ZodObject<{
-                    certificateWarningDays: z.ZodNumber;
-                    checkInterval: z.ZodNumber;
-                    host: z.ZodString;
-                    id: z.ZodString;
-                    lastChecked: z.ZodOptional<z.ZodDate>;
-                    monitoring: z.ZodBoolean;
-                    port: z.ZodNumber;
-                    responseTime: z.ZodNumber;
-                    retryAttempts: z.ZodNumber;
-                    status: z.ZodEnum<{
-                        down: "down";
-                        paused: "paused";
-                        pending: "pending";
-                        up: "up";
-                    }>;
-                    timeout: z.ZodNumber;
-                    type: z.ZodLiteral<"ssl">;
-                }>,
-            ]
-        >
-    >;
+    monitors: z.ZodArray<MonitorSchemaType>;
     name: z.ZodString;
 }>;
 
-/**
- * Type definition for SSL monitor schema.
- *
- * @public
- */
-export type SslMonitorSchemaType = z.ZodObject<{
-    certificateWarningDays: z.ZodNumber;
-    checkInterval: z.ZodNumber;
-    host: z.ZodString;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
-    port: z.ZodNumber;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: z.ZodEnum<{
-        down: "down";
-        paused: "paused";
-        pending: "pending";
-        up: "up";
-    }>;
-    timeout: z.ZodNumber;
-    type: z.ZodLiteral<"ssl">;
-}>;
+export interface MonitorSchemas {
+    readonly dns: DnsMonitorSchemaType;
+    readonly http: HttpMonitorSchemaType;
+    readonly ping: PingMonitorSchemaType;
+    readonly port: PortMonitorSchemaType;
+    readonly ssl: SslMonitorSchemaType;
+}

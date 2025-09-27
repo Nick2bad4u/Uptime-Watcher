@@ -213,23 +213,25 @@ export class SslMonitor implements IMonitorService {
             const onSecureConnect = (): void => {
                 if (!socket.authorized) {
                     const { authorizationError } = socket;
+                    let details: string | undefined = undefined;
                     if (authorizationError instanceof Error) {
-                        handleFailure(authorizationError, abortListener);
-                        return;
+                        details = authorizationError.message;
+                    } else if (typeof authorizationError === "string") {
+                        details = authorizationError;
                     }
 
-                    if (typeof authorizationError === "string") {
-                        handleFailure(
-                            new Error(authorizationError),
-                            abortListener
-                        );
-                        return;
-                    }
+                    const errorMessage = details
+                        ? `TLS authorization failed: ${details}`
+                        : "TLS authorization failed";
 
-                    handleFailure(
-                        new Error("TLS authorization failed"),
-                        abortListener
-                    );
+                    const error =
+                        authorizationError instanceof Error
+                            ? new Error(errorMessage, {
+                                  cause: authorizationError,
+                              })
+                            : new Error(errorMessage);
+
+                    handleFailure(error, abortListener);
                     return;
                 }
 

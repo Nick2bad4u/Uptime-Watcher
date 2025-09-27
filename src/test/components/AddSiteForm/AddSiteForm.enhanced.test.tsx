@@ -135,37 +135,40 @@ const mockMonitorTypes = [
 // Helper function to create consistent mock return values
 const createMockFormState = (
     overrides: Partial<ReturnType<typeof useAddSiteForm>> = {}
-) => ({
-    // State
-    addMode: "new" as const,
-    checkInterval: 60_000,
-    expectedValue: "",
-    formError: undefined,
-    host: "",
-    monitorType: "http" as const,
-    name: "",
-    port: "",
-    recordType: "A",
-    selectedExistingSite: "",
-    siteId: "test-id",
-    url: "",
-    // Actions
-    isFormValid: vi.fn(() => true),
-    resetForm: vi.fn(),
-    setAddMode: vi.fn(),
-    setCheckInterval: vi.fn(),
-    setExpectedValue: vi.fn(),
-    setFormError: vi.fn(),
-    setHost: vi.fn(),
-    setMonitorType: vi.fn(),
-    setName: vi.fn(),
-    setPort: vi.fn(),
-    setRecordType: vi.fn(),
-    setSelectedExistingSite: vi.fn(),
-    setSiteId: vi.fn(),
-    setUrl: vi.fn(),
-    ...overrides,
-});
+): ReturnType<typeof useAddSiteForm> =>
+    ({
+        // State
+        addMode: "new" as const,
+        certificateWarningDays: "30",
+        checkInterval: 60_000,
+        expectedValue: "",
+        formError: undefined,
+        host: "",
+        monitorType: "http" as const,
+        name: "",
+        port: "",
+        recordType: "A",
+        selectedExistingSite: "",
+        siteId: "test-id",
+        url: "",
+        // Actions
+        isFormValid: vi.fn(() => true),
+        resetForm: vi.fn(),
+        setAddMode: vi.fn(),
+        setCertificateWarningDays: vi.fn(),
+        setCheckInterval: vi.fn(),
+        setExpectedValue: vi.fn(),
+        setFormError: vi.fn(),
+        setHost: vi.fn(),
+        setMonitorType: vi.fn(),
+        setName: vi.fn(),
+        setPort: vi.fn(),
+        setRecordType: vi.fn(),
+        setSelectedExistingSite: vi.fn(),
+        setSiteId: vi.fn(),
+        setUrl: vi.fn(),
+        ...overrides,
+    }) as ReturnType<typeof useAddSiteForm>;
 
 const mockSites = [
     { id: "site1", name: "Test Site 1", url: "https://example1.com" },

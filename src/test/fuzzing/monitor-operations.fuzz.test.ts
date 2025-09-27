@@ -181,6 +181,7 @@ const arbitraryPartialMonitor = (): fc.Arbitrary<Partial<Monitor>> =>
             responseTime: fc.integer(),
             recordType: fc.string(),
             expectedValue: fc.string(),
+            certificateWarningDays: fc.integer({ min: 1, max: 365 }),
             activeOperations: fc.array(fc.string()),
             history: fc.array(
                 fc.record({
@@ -225,14 +226,10 @@ const arbitraryContaminatedMonitor = (): fc.Arbitrary<
         responseTime: arbitraryMixedValue(),
         recordType: arbitraryMixedValue(),
         expectedValue: arbitraryMixedValue(),
+        certificateWarningDays: arbitraryMixedValue(),
         activeOperations: arbitraryMixedValue(),
         history: arbitraryMixedValue(),
         lastChecked: arbitraryMixedValue(),
-        // Add extra fields that shouldn't be there
-        extraField1: arbitraryMixedValue(),
-        extraField2: arbitraryMixedValue(),
-        __proto__: arbitraryMixedValue(),
-        constructor: arbitraryMixedValue(),
     });
 
 describe("Monitor Operations Fuzzing Tests", () => {

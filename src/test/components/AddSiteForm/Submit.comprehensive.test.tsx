@@ -111,28 +111,31 @@ beforeEach(() => {
 describe("Submit.tsx - Comprehensive Coverage", () => {
     const createMockProperties = (
         overrides: Partial<FormSubmitProperties> = {}
-    ): FormSubmitProperties => ({
-        addMode: "new",
-        checkInterval: 30_000,
-        expectedValue: "",
-        formError: undefined,
-        clearError: vi.fn(),
-        generateUuid: vi.fn(() => "test-uuid"),
-        host: "",
-        logger: createMockLogger(),
-        monitorType: "http",
-        name: "Test Site",
-        port: "",
-        recordType: "A",
-        selectedExistingSite: "",
-        setFormError: vi.fn(),
-        siteId: "test-site-id",
-        url: "https://example.com",
-        addMonitorToSite: vi.fn(),
-        createSite: vi.fn(),
-        onSuccess: vi.fn(),
-        ...overrides,
-    });
+    ): FormSubmitProperties =>
+        ({
+            addMode: "new",
+            checkInterval: 300_000,
+            expectedValue: "",
+            formError: undefined,
+            host: "example.com",
+            monitorType: "http",
+            name: "Test Site",
+            port: "80",
+            recordType: "A",
+            selectedExistingSite: "",
+            siteId: "test-site-id",
+            url: "https://example.com",
+
+            setFormError: vi.fn(),
+            addMonitorToSite: vi.fn(),
+            clearError: vi.fn(),
+            createSite: vi.fn().mockResolvedValue(undefined),
+            generateUuid: vi.fn(() => "test-uuid"),
+            logger: createMockLogger(),
+            onSuccess: vi.fn(),
+            ...overrides,
+            certificateWarningDays: overrides.certificateWarningDays ?? "30",
+        }) as FormSubmitProperties;
 
     describe("handleSubmit - New Site Creation", () => {
         it("should handle successful new site submission with HTTP monitor", async ({

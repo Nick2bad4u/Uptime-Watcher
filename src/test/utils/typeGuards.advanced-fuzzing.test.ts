@@ -433,6 +433,7 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
                     "ping",
                     "port",
                     "dns",
+                    "ssl",
                 ];
                 const expectedResult = validTypes.includes(
                     monitorType as string
