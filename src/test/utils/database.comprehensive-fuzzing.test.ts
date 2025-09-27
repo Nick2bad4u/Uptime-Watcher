@@ -1608,7 +1608,7 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                     const errors: string[] = [];
 
                     // Sort migrations by target version for proper sequencing
-                    const sortedMigrations = [...scenarios].toSorted(
+                    const sortedMigrations = Array.from(scenarios).toSorted(
                         (a, b) => a.toVersion - b.toVersion
                     );
 

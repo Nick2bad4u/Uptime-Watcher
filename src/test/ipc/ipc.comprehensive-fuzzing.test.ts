@@ -221,7 +221,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             mockIpcMain.handle.mockClear();
             registeredHandlers.clear();
 
-            const uniqueChannels = [...new Set(channels)]; // Remove duplicates
+            const uniqueChannels = Array.from(new Set(channels)); // Remove duplicates
 
             for (const channel of uniqueChannels) {
                 const handler = vi.fn(() => Promise.resolve());
@@ -536,7 +536,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             mockIpcMain.handle.mockClear();
             registeredHandlers.clear();
 
-            const uniqueChannels = [...new Set(channels)];
+            const uniqueChannels = Array.from(new Set(channels));
 
             // Register many handlers
             for (const channel of uniqueChannels) {

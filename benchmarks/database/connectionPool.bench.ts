@@ -224,7 +224,7 @@ class MockConnectionPool {
             totalQueries,
             avgQueriesPerConnection: totalQueries / this.connections.size || 0,
             oldestConnectionAge: Math.max(
-                ...Array.from(this.connections.values()).map((c) => c.getAge())
+                ...Array.from(this.connections.values(), (c) => c.getAge())
             ),
         };
     }

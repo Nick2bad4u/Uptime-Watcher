@@ -1364,6 +1364,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             // Test that types are correctly inferred
             const httpMonitor: HttpMonitor = {
                 checkInterval: 30_000,
+                history: [],
                 id: "http-test",
                 monitoring: true,
                 responseTime: 200,
@@ -1376,6 +1377,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
             const portMonitor: PortMonitor = {
                 checkInterval: 60_000,
+                history: [],
                 host: "example.com",
                 id: "port-test",
                 monitoring: true,

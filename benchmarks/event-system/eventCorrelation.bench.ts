@@ -111,7 +111,7 @@ class MockEventCorrelator {
 
     getEventsByCorrelation(correlationId: string): CorrelatedEvent[] {
         const chain = this.correlationChains.get(correlationId);
-        return chain ? [...chain.events] : [];
+        return chain ? Array.from(chain.events) : [];
     }
 
     getCorrelationsByEventType(eventType: string): string[] {

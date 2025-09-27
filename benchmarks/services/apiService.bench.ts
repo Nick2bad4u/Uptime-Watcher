@@ -710,7 +710,7 @@ class MockApiService {
     }
 
     async getRoutes(): Promise<Route[]> {
-        return Array.from(this.routes.values()).map((route) => ({ ...route }));
+        return Array.from(this.routes.values(), (route) => ({ ...route }));
     }
 
     async createUser(userData: Partial<User>): Promise<User> {

@@ -3,105 +3,146 @@
  */
 import type * as z from "zod";
 
-interface MonitorStatusEnumShape {
-    readonly degraded: "degraded";
-    readonly down: "down";
-    readonly paused: "paused";
-    readonly pending: "pending";
-    readonly up: "up";
-}
+type ActiveOperationsArray = z.ZodOptional<z.ZodArray<z.ZodString>>;
 
-interface MonitorTypeEnumShape {
-    readonly dns: "dns";
-    readonly http: "http";
-    readonly ping: "ping";
-    readonly port: "port";
-    readonly ssl: "ssl";
-}
-
-type MonitorStatusEnumType = z.ZodEnum<MonitorStatusEnumShape>;
-type MonitorTypeEnumType = z.ZodEnum<MonitorTypeEnumShape>;
-
-type MonitorHistoryStatusEnumShape = Pick<
-    MonitorStatusEnumShape,
-    "degraded" | "down" | "up"
->;
-
-type MonitorHistoryEntrySchemaType = z.ZodObject<{
+type HistoryEntrySchema = z.ZodObject<{
     details: z.ZodOptional<z.ZodString>;
     responseTime: z.ZodNumber;
-    status: z.ZodEnum<MonitorHistoryStatusEnumShape>;
+    status: z.ZodEnum<{
+        degraded: "degraded";
+        down: "down";
+        up: "up";
+    }>;
     timestamp: z.ZodNumber;
 }>;
 
-interface SharedMonitorShape<TypeField extends z.ZodType> {
-    activeOperations: z.ZodOptional<z.ZodArray<z.ZodString>>;
+type HistoryArray = z.ZodArray<HistoryEntrySchema>;
+
+type MonitorStatusEnum = z.ZodEnum<{
+    degraded: "degraded";
+    down: "down";
+    paused: "paused";
+    pending: "pending";
+    up: "up";
+}>;
+
+type MonitorTypeEnum = z.ZodEnum<{
+    dns: "dns";
+    http: "http";
+    ping: "ping";
+    port: "port";
+    ssl: "ssl";
+}>;
+
+type DnsRecordEnum = z.ZodEnum<{
+    A: "A";
+    AAAA: "AAAA";
+    ANY: "ANY";
+    CAA: "CAA";
+    CNAME: "CNAME";
+    MX: "MX";
+    NAPTR: "NAPTR";
+    NS: "NS";
+    PTR: "PTR";
+    SOA: "SOA";
+    SRV: "SRV";
+    TLSA: "TLSA";
+    TXT: "TXT";
+}>;
+
+export type BaseMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
-    history: z.ZodArray<MonitorHistoryEntrySchemaType>;
+    history: HistoryArray;
     id: z.ZodString;
     lastChecked: z.ZodOptional<z.ZodDate>;
     monitoring: z.ZodBoolean;
     responseTime: z.ZodNumber;
     retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnumType;
+    status: MonitorStatusEnum;
     timeout: z.ZodNumber;
-    type: TypeField;
-}
-
-type DnsRecordTypeEnum = z.ZodEnum<{
-    readonly A: "A";
-    readonly AAAA: "AAAA";
-    readonly ANY: "ANY";
-    readonly CAA: "CAA";
-    readonly CNAME: "CNAME";
-    readonly MX: "MX";
-    readonly NAPTR: "NAPTR";
-    readonly NS: "NS";
-    readonly PTR: "PTR";
-    readonly SOA: "SOA";
-    readonly SRV: "SRV";
-    readonly TLSA: "TLSA";
-    readonly TXT: "TXT";
+    type: MonitorTypeEnum;
 }>;
 
-export type BaseMonitorSchemaType = z.ZodObject<
-    SharedMonitorShape<MonitorTypeEnumType>
->;
+export type HttpMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    checkInterval: z.ZodNumber;
+    history: HistoryArray;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    monitoring: z.ZodBoolean;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"http">;
+    url: z.ZodString;
+}>;
 
-export type HttpMonitorSchemaType = z.ZodObject<
-    SharedMonitorShape<z.ZodLiteral<"http">> & {
-        url: z.ZodString;
-    }
->;
+export type PortMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    checkInterval: z.ZodNumber;
+    history: HistoryArray;
+    host: z.ZodString;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    monitoring: z.ZodBoolean;
+    port: z.ZodNumber;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"port">;
+}>;
 
-export type PortMonitorSchemaType = z.ZodObject<
-    SharedMonitorShape<z.ZodLiteral<"port">> & {
-        host: z.ZodString;
-        port: z.ZodNumber;
-    }
->;
+export type PingMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    checkInterval: z.ZodNumber;
+    history: HistoryArray;
+    host: z.ZodString;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    monitoring: z.ZodBoolean;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"ping">;
+}>;
 
-export type PingMonitorSchemaType = z.ZodObject<
-    SharedMonitorShape<z.ZodLiteral<"ping">> & {
-        host: z.ZodString;
-    }
->;
+export type DnsMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    checkInterval: z.ZodNumber;
+    expectedValue: z.ZodOptional<z.ZodString>;
+    history: HistoryArray;
+    host: z.ZodString;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    monitoring: z.ZodBoolean;
+    recordType: DnsRecordEnum;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"dns">;
+}>;
 
-export type DnsMonitorSchemaType = z.ZodObject<
-    SharedMonitorShape<z.ZodLiteral<"dns">> & {
-        expectedValue: z.ZodOptional<z.ZodString>;
-        host: z.ZodString;
-        recordType: DnsRecordTypeEnum;
-    }
->;
-
-export type SslMonitorSchemaType = z.ZodObject<
-    SharedMonitorShape<z.ZodLiteral<"ssl">> & {
-        certificateWarningDays: z.ZodNumber;
-        host: z.ZodString;
-        port: z.ZodNumber;
-    }
->;
+export type SslMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    certificateWarningDays: z.ZodNumber;
+    checkInterval: z.ZodNumber;
+    history: HistoryArray;
+    host: z.ZodString;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    monitoring: z.ZodBoolean;
+    port: z.ZodNumber;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"ssl">;
+}>;
 
 export type MonitorSchemaType = z.ZodDiscriminatedUnion<
     [

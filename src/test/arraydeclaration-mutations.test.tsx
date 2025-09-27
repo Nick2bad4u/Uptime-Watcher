@@ -70,7 +70,7 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
                 vi.fn(),
                 vi.fn(),
                 vi.fn(),
-            ];
+            ] as const;
 
             function TestComponent({
                 setterIndex,

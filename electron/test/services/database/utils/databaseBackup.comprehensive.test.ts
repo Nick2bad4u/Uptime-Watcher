@@ -194,7 +194,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             const result = await createDatabaseBackup(testDbPath);
 
             expect(result.buffer).toStrictEqual(binaryData);
-            expect([...result.buffer]).toEqual([
+            expect(Array.from(result.buffer)).toEqual([
                 0x00,
                 0xff,
                 0xab,

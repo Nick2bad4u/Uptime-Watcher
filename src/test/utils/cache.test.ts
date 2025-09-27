@@ -886,7 +886,7 @@ describe("Cache Utilities", () => {
                 "should handle multiple key-value pairs correctly",
                 (keyValuePairs) => {
                     const cache = new TypedCache<string, string>();
-                    const uniquePairs = [...new Map(keyValuePairs)];
+                    const uniquePairs = Array.from(new Map(keyValuePairs));
 
                     // Set all values
                     for (const [key, value] of uniquePairs) {
@@ -1031,8 +1031,7 @@ describe("Cache Utilities", () => {
                 ),
             ])("should handle cleanup of expired entries", (entries) => {
                 const cache = new TypedCache<string, string>();
-                const uniqueEntries = [
-                    ...new Map(
+                const uniqueEntries = Array.from(new Map(
                         entries.map(
                             ([
                                 k,
@@ -1040,8 +1039,7 @@ describe("Cache Utilities", () => {
                                 t,
                             ]) => [k, [v, t] as const]
                         )
-                    ),
-                ];
+                    ));
 
                 // Set entries at time 1000
                 mockNow.mockReturnValue(1000);

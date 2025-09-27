@@ -180,7 +180,7 @@ class MockReactListRenderer {
         context.config = config;
 
         // Apply operations in sequence
-        let processedItems = [...items];
+        let processedItems = Array.from(items);
 
         // 1. Filtering
         if (config.filterCriteria && config.filterCriteria.length > 0) {
@@ -504,7 +504,7 @@ class MockReactListRenderer {
         this.cache.set(cacheKey, {
             elements: elements.map((el) => ({ ...el })), // Deep copy
             timestamp: Date.now(),
-            dependencies: [...dependencies],
+            dependencies: Array.from(dependencies),
         });
 
         return elements;
@@ -809,7 +809,7 @@ class MockListElementFactory {
         return {
             type,
             props: { ...props },
-            children: [...children],
+            children: Array.from(children),
             key: this.elementId++,
             size: this.calculateElementSize(type, props, children),
             depth: this.calculateDepth(children),

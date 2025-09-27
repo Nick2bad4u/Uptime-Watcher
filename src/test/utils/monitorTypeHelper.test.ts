@@ -565,7 +565,7 @@ describe("monitorTypeHelper", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            const reversedTypes = [...mockMonitorTypes].toReversed();
+            const reversedTypes = Array.from(mockMonitorTypes).toReversed();
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
                 reversedTypes
             );

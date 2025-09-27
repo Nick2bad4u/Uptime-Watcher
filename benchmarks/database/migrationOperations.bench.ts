@@ -602,7 +602,7 @@ describe("Database Migration Operations Benchmarks", () => {
 
         const currentState: MigrationState = {
             currentVersion: "2.0.50",
-            appliedMigrations: [...appliedMigrations],
+            appliedMigrations: Array.from(appliedMigrations),
             pendingMigrations: [],
             lastMigrationTime: Date.now() - 86_400_000, // 1 day ago
             migrationLockActive: false,
@@ -944,7 +944,7 @@ describe("Database Migration Operations Benchmarks", () => {
             }
 
             while (queue.length > 0) {
-                const currentGroup: string[] = [...queue];
+                const currentGroup: string[] = Array.from(queue);
                 executionGroups.push(currentGroup);
                 parallelGroups.push(currentGroup);
                 queue.length = 0;

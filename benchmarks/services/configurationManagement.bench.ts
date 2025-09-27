@@ -117,7 +117,7 @@ class MockConfigurationRepository {
     }
 
     async getAll(): Promise<ConfigurationValue[]> {
-        return Array.from(this.configurations.values()).map((config) => ({
+        return Array.from(this.configurations.values(), (config) => ({
             ...config,
         }));
     }
@@ -162,7 +162,7 @@ class MockConfigurationRepository {
         key?: string,
         limit?: number
     ): Promise<ConfigChangeEvent[]> {
-        let history = [...this.changeHistory];
+        let history = Array.from(this.changeHistory);
 
         if (key) {
             history = history.filter((event) => event.key === key);
@@ -217,7 +217,7 @@ class MockConfigurationRepository {
     }
 
     async getBackups(): Promise<ConfigBackup[]> {
-        return Array.from(this.backups.values()).map((backup) => ({
+        return Array.from(this.backups.values(), (backup) => ({
             ...backup,
         }));
     }

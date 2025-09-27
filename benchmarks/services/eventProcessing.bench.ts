@@ -369,7 +369,7 @@ class MockTypedEventBus {
     }
 
     getEventHistory(limit?: number): BaseEvent[] {
-        return limit ? this.eventHistory.slice(-limit) : [...this.eventHistory];
+        return limit ? this.eventHistory.slice(-limit) : Array.from(this.eventHistory);
     }
 
     getActiveSubscriptions(): Map<string, number> {

@@ -57,7 +57,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            const unique = (arr: any[]): any[] => [...new Set(arr)];
+            const unique = (arr: any[]): any[] => Array.from(new Set(arr));
             const chunk = (arr: any[], size: number): any[][] => {
                 const result: any[][] = [];
                 for (let i = 0; i < arr.length; i += size) {

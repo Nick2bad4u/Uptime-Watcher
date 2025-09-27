@@ -500,7 +500,7 @@ describe("Database Transaction Management Benchmarks", () => {
             }
 
             // Create deadlock graph
-            const nodes = [...involvedTransactions];
+            const nodes = Array.from(involvedTransactions);
             const edges: { from: string; to: string; resource: string }[] = [];
             const resourcesInvolved: string[] = [];
 

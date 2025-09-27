@@ -194,9 +194,12 @@ export default [
     }), // Global Configs and Rules
     importX.flatConfigs.typescript,
     progress.configs.recommended,
-    noBarrelFiles.flat, // @ts-expect-error: nitpick.configs.recommended may not have correct types, but runtime usage is verified and safe
+    noBarrelFiles.flat,
+    // @ts-expect-error: nitpick.configs.recommended may not have correct types, but runtime usage is verified and safe
     nitpick.configs.recommended,
     pluginComments.recommended,
+    // @ts-expect-error: pluginCompat.configs.recommended may not have correct types, but runtime usage is verified and safe
+    arrayFunc.configs.all,
     ...storybook.configs["flat/recommended"],
     // ═══════════════════════════════════════════════════════════════════════════════
     // Global Ignore Patterns
@@ -1158,7 +1161,7 @@ export default [
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
             ...importX.flatConfigs.electron.rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -1174,13 +1177,12 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
-            // @ts-expect-error
-            ...arrayFunc.configs.all.rules,
-            // @ts-expect-error
+
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginMicrosoftSdl.configs.required.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
@@ -2517,7 +2519,7 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -2534,13 +2536,12 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
-            // @ts-expect-error
-            ...arrayFunc.configs.all.rules,
-            // @ts-expect-error
+
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginMicrosoftSdl.configs.required.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
@@ -4063,7 +4064,7 @@ export default [
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
             ...importX.flatConfigs.electron.rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -4080,13 +4081,12 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
-            // @ts-expect-error
-            ...arrayFunc.configs.all.rules,
-            // @ts-expect-error
+
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginMicrosoftSdl.configs.required.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
@@ -5423,7 +5423,7 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -5440,13 +5440,11 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
-            // @ts-expect-error
-            ...arrayFunc.configs.all.rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginMicrosoftSdl.configs.required.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
@@ -5460,7 +5458,7 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...etc.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "warn",
             "@arthurgeron/react-usememo/require-usememo": "error",
@@ -7800,7 +7798,7 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...jsxA11y.flatConfigs.strict.rules,
@@ -7813,8 +7811,7 @@ export default [
             ...css.configs.recommended.rules,
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
-            // @ts-expect-error
-            ...arrayFunc.configs.all.rules,
+
             "@typescript-eslint/array-type": [
                 "error",
                 { default: "array-simple" },
@@ -8499,7 +8496,7 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
-            // @ts-expect-error
+            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -9000,6 +8997,7 @@ export default [
             // Unicorn (deprecated / replaced rules)
             "unicorn/no-instanceof-array": "off",
             "unicorn/no-length-as-slice-end": "off",
+            "unicorn/prefer-spread": "off", // Prefer Array.from
             "write-good-comments/write-good-comments": "off", // Too strict
         },
     }, // eslint-config-prettier MUST be last to override conflicting rules

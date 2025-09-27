@@ -325,7 +325,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             vi.advanceTimersByTime(600);
 
-            const entries = [...cache.entries()];
+            const entries = Array.from(cache.entries());
             expect(entries).toHaveLength(1);
             expect(entries[0]).toEqual(["key2", "value2"]);
         });
@@ -1092,7 +1092,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.set("key2", "value2");
             cache.set("key3", "value3");
 
-            const entries = [...cache.entries()];
+            const entries = Array.from(cache.entries());
             expect(entries).toHaveLength(3);
             expect(entries).toContainEqual(["key1", "value1"]);
             expect(entries).toContainEqual(["key2", "value2"]);
@@ -1113,7 +1113,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             vi.advanceTimersByTime(1000);
 
-            const entries = [...cache.entries()];
+            const entries = Array.from(cache.entries());
             expect(entries).toHaveLength(1);
             expect(entries[0]).toEqual(["key2", "value2"]);
         });
@@ -1157,7 +1157,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
-            expect([...cache.entries()]).toHaveLength(0);
+            expect(Array.from(cache.entries())).toHaveLength(0);
             expect(cache.keys()).toHaveLength(0);
             expect(cache.getAll()).toHaveLength(0);
         });

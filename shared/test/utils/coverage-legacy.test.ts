@@ -148,7 +148,7 @@ describe("Shared Utils Coverage", () => {
                 clear: (pattern?: string) => {
                     if (!pattern) {
                         // Use splice-like behavior to capture count before clear
-                        const keys = [...mockCache.keys()];
+                        const keys = Array.from(mockCache.keys());
                         mockCache.clear();
                         return keys.length;
                     }

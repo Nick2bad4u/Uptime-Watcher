@@ -180,7 +180,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             fc.array(arbitraryEventType, { minLength: 1, maxLength: 5 }),
         ])("should handle multiple event types", async (eventTypes) => {
             const listeners = new Map();
-            const uniqueEventTypes = [...new Set(eventTypes)];
+            const uniqueEventTypes = Array.from(new Set(eventTypes));
 
             // Register listeners for each unique event type
             for (const eventType of uniqueEventTypes) {
@@ -536,7 +536,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 const listeners = new Map();
 
                 // Register listeners for all event types
-                const eventTypes = [...new Set(events.map((e) => e.type))];
+                const eventTypes = Array.from(new Set(events.map((e) => e.type)));
                 for (const eventType of eventTypes) {
                     const listener = vi.fn();
                     listeners.set(eventType, listener);

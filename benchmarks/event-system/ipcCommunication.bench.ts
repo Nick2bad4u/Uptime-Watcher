@@ -188,7 +188,7 @@ class MockIpcService {
     }
 
     getMessageHistory(): IpcMessage[] {
-        return [...this.messageHistory];
+        return Array.from(this.messageHistory);
     }
 
     getPendingRequestsCount(): number {

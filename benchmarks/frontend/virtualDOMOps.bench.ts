@@ -545,7 +545,7 @@ describe("Virtual DOM Operations Performance", () => {
             vdom.render(createSiteList(sites));
 
             // Reverse the order
-            const reorderedSites = [...sites].toReversed();
+            const reorderedSites = Array.from(sites).toReversed();
             vdom.reconcile(createSiteList(reorderedSites));
         },
         { warmupIterations: 10, iterations: 500 }

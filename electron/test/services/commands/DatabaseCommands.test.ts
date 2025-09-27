@@ -40,7 +40,7 @@ const createMockCache = () => {
         delete: vi.fn((key: string) => cache.delete(key)),
         entries: vi.fn(() => cache.entries()),
         get: vi.fn((key: string) => cache.get(key)),
-        getAll: vi.fn(() => [...cache.values()]),
+        getAll: vi.fn(() => Array.from(cache.values())),
         has: vi.fn((key: string) => cache.has(key)),
         set: vi.fn((key: string, value: Site) => {
             cache.set(key, value);

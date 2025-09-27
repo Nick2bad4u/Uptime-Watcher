@@ -428,7 +428,7 @@ class MockWorkerPool {
     }
 
     getAllWorkers(): Worker[] {
-        return Array.from(this.workers.values()).map((worker) => ({
+        return Array.from(this.workers.values(), (worker) => ({
             ...worker,
         }));
     }
@@ -549,7 +549,7 @@ class MockScheduler {
     }
 
     getAllJobs(): ScheduledJob[] {
-        return Array.from(this.jobs.values()).map((job) => ({ ...job }));
+        return Array.from(this.jobs.values(), (job) => ({ ...job }));
     }
 
     clear(): void {

@@ -213,7 +213,7 @@ class MockReactHooks {
 
             if (depsChanged) {
                 hook.hasChanged = true;
-                hook.dependencies = dependencies ? [...dependencies] : [];
+                hook.dependencies = dependencies ? Array.from(dependencies) : [];
                 context.hookDependencyChanges++;
             } else {
                 hook.hasChanged = false;
@@ -225,7 +225,7 @@ class MockReactHooks {
                 id: `useEffect-${this.globalHookIndex++}`,
                 type: "useEffect",
                 value: effect,
-                dependencies: dependencies ? [...dependencies] : [],
+                dependencies: dependencies ? Array.from(dependencies) : [],
                 hasChanged: true,
                 executionCount: 0,
                 totalExecutionTime: 0,
@@ -284,7 +284,7 @@ class MockReactHooks {
                     performance.now() - computationStartTime;
 
                 hook.value = newValue;
-                hook.dependencies = [...dependencies];
+                hook.dependencies = Array.from(dependencies);
                 hook.hasChanged = true;
                 hook.cacheMisses++;
                 hook.computationTime += computationTime;
@@ -305,7 +305,7 @@ class MockReactHooks {
                 id: `useMemo-${this.globalHookIndex++}`,
                 type: "useMemo",
                 value,
-                dependencies: [...dependencies],
+                dependencies: Array.from(dependencies),
                 computationFunction,
                 hasChanged: true,
                 executionCount: 0,
@@ -351,7 +351,7 @@ class MockReactHooks {
             if (depsChanged) {
                 // Create new callback
                 hook.value = callback;
-                hook.dependencies = [...dependencies];
+                hook.dependencies = Array.from(dependencies);
                 hook.hasChanged = true;
                 hook.originalFunction = callback;
                 context.hookDependencyChanges++;
@@ -366,7 +366,7 @@ class MockReactHooks {
                 id: `useCallback-${this.globalHookIndex++}`,
                 type: "useCallback",
                 value: callback,
-                dependencies: [...dependencies],
+                dependencies: Array.from(dependencies),
                 originalFunction: callback,
                 hasChanged: true,
                 executionCount: 0,

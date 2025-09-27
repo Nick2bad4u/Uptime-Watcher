@@ -443,7 +443,7 @@ class MockChannelProvider {
     }
 
     getAllChannels(): NotificationChannel[] {
-        return Array.from(this.channels.values()).map((channel) => ({
+        return Array.from(this.channels.values(), (channel) => ({
             ...channel,
         }));
     }

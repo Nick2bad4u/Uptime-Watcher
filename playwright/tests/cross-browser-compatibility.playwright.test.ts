@@ -34,7 +34,7 @@ test.describe("cross-Browser Compatibility", () => {
                             2,
                             3,
                         ];
-                        return [...arr].length === 3;
+                        return Array.from(arr).length === 3;
                     })(),
                     map: typeof Map !== "undefined",
                     set: typeof Set !== "undefined",

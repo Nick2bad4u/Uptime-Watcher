@@ -172,7 +172,7 @@ class MockSiteListComponent {
         const [loading, setLoading] = this.hookManager.useState(false);
 
         const filteredSites = this.hookManager.useMemo(() => {
-            let filtered = [...this.props.sites];
+            let filtered = Array.from(this.props.sites);
 
             if (this.props.filters?.status) {
                 filtered = filtered.filter((site) =>

@@ -182,7 +182,7 @@ class MockFileSystem {
     }
 
     async searchFiles(options: FileSearchOptions): Promise<FileMetadata[]> {
-        let results = Array.from(this.files.values()).map((f) => ({
+        let results = Array.from(this.files.values(), (f) => ({
             ...f.metadata,
         }));
 
@@ -419,7 +419,7 @@ class MockBackupService {
     }
 
     async listBackups(): Promise<BackupInfo[]> {
-        return Array.from(this.backups.values()).map((backup) => ({
+        return Array.from(this.backups.values(), (backup) => ({
             ...backup,
         }));
     }

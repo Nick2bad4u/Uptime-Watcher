@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Monitor, MonitorType } from "../../../shared/types";
+import type { Monitor } from "../../../shared/types";
 import type { MonitorTypeConfig } from "../../../shared/types/monitorTypes";
 import { CacheKeys } from "../../../shared/utils/cacheKeys";
 
@@ -115,17 +115,17 @@ const createConfig = (
     type: string,
     overrides: Partial<MonitorTypeConfig> = {}
 ): MonitorTypeConfig => {
+    const baseConfig = {
+        type: overrides.type ?? type,
+        displayName:
+            overrides.displayName ?? `${String(type).toUpperCase()} Monitor`,
+        description: overrides.description ?? "Monitor configuration",
+        fields: overrides.fields ?? [],
+        version: overrides.version ?? "1.0.0",
+    } satisfies Omit<MonitorTypeConfig, "uiConfig">;
+
     if (overrides.uiConfig === null) {
-        return {
-            type: overrides.type ?? type,
-            displayName:
-                overrides.displayName ??
-                `${String(type).toUpperCase()} Monitor`,
-            description: overrides.description ?? "Monitor configuration",
-            fields: overrides.fields ?? [],
-            version: overrides.version ?? "1.0.0",
-            uiConfig: undefined,
-        };
+        return baseConfig;
     }
 
     const detailFormats = overrides.uiConfig?.detailFormats ?? {};
@@ -137,12 +137,7 @@ const createConfig = (
     const { primary, secondary, ...helpTextsRest } = helpTexts;
 
     return {
-        type: overrides.type ?? type,
-        displayName:
-            overrides.displayName ?? `${String(type).toUpperCase()} Monitor`,
-        description: overrides.description ?? "Monitor configuration",
-        fields: overrides.fields ?? [],
-        version: overrides.version ?? "1.0.0",
+        ...baseConfig,
         uiConfig: {
             detailFormats: {
                 ...detailFormatsRest,
@@ -164,7 +159,7 @@ const createConfig = (
             supportsResponseTime:
                 overrides.uiConfig?.supportsResponseTime ?? false,
         },
-    };
+    } satisfies MonitorTypeConfig;
 };
 
 const storeConfig = (

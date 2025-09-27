@@ -4,6 +4,11 @@
 
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Mocked } from "vitest";
+import type { Monitor, Site, StatusUpdate } from "../../../shared/types";
+import type { StateSyncStatusSummary } from "../../../shared/types/stateSync";
+import type { SitesStore } from "../../stores/sites/types";
+import type { UIStore } from "../../stores/ui/types";
+import type { ChartTimeRange } from "../../stores/types";
 
 let useSelectedSite: typeof import("../../hooks/useSelectedSite").useSelectedSite;
 let renderHook: typeof import("@testing-library/react").renderHook;
@@ -22,10 +27,107 @@ type UiModule = typeof import("../../stores/ui/useUiStore");
 let mockUseSitesStore: Mocked<SitesModule>["useSitesStore"];
 let mockUseUIStore: Mocked<UiModule>["useUIStore"];
 
-const mockSites = [
-    { identifier: "site-1", name: "Test Site 1" },
-    { identifier: "site-2", name: "Test Site 2" },
-    { identifier: "site-3", name: "Test Site 3" },
+const defaultChartTimeRange: ChartTimeRange = "24h";
+
+const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
+    activeSiteDetailsTab: "overview",
+    openExternal: (_url: string, _context?: { siteName?: string }) => {},
+    selectedSiteId: undefined,
+    selectSite: (_site: Site | undefined) => {},
+    setActiveSiteDetailsTab: (_tab: string) => {},
+    setShowAddSiteModal: (_show: boolean) => {},
+    setShowAdvancedMetrics: (_show: boolean) => {},
+    setShowSettings: (_show: boolean) => {},
+    setShowSiteDetails: (_show: boolean) => {},
+    setSiteDetailsChartTimeRange: (_range: ChartTimeRange) => {},
+    showAddSiteModal: false,
+    showAdvancedMetrics: false,
+    showSettings: false,
+    showSiteDetails: false,
+    siteDetailsChartTimeRange: defaultChartTimeRange,
+    ...overrides,
+});
+
+const createMockSitesStore = (
+    overrides: Partial<SitesStore> = {}
+): SitesStore => ({
+    addMonitorToSite: async (_siteId: string, _monitor: Monitor) => {},
+    addSite: (_site: Site) => {},
+    checkSiteNow: async () => {},
+    createSite: async () => {},
+    deleteSite: async () => {},
+    downloadSqliteBackup: async () => {},
+    fullResyncSites: async () => {},
+    getSelectedMonitorId: (_siteId: string) => undefined,
+    getSelectedSite: () => undefined,
+    getSyncStatus: async (): Promise<StateSyncStatusSummary> => ({
+        lastSyncAt: null,
+        siteCount: 0,
+        source: "frontend",
+        synchronized: true,
+    }),
+    initializeSites: async () => ({
+        message: "",
+        sitesLoaded: 0,
+        success: true,
+    }),
+    modifySite: async () => {},
+    removeMonitorFromSite: async () => {},
+    removeSite: (_identifier: string) => {},
+    selectSite: (_site: Site | undefined) => {},
+    setSelectedMonitorId: (_siteId: string, _monitorId: string) => {},
+    setSites: (_sites: Site[]) => {},
+    startSiteMonitoring: async () => {},
+    startSiteMonitorMonitoring: async () => {},
+    stopSiteMonitoring: async () => {},
+    stopSiteMonitorMonitoring: async () => {},
+    subscribeToStatusUpdates: (_callback: (update: StatusUpdate) => void) => {},
+    subscribeToSyncEvents: () => () => {},
+    syncSites: async () => {},
+    unsubscribeFromStatusUpdates: () => {},
+    updateMonitorRetryAttempts: async () => {},
+    updateMonitorTimeout: async () => {},
+    updateSiteCheckInterval: async () => {},
+    selectedMonitorIds: {},
+    selectedSiteId: undefined,
+    sites: [],
+    ...overrides,
+});
+
+const baselineMonitor: Monitor = {
+    activeOperations: [],
+    certificateWarningDays: 30,
+    checkInterval: 60_000,
+    history: [],
+    id: "monitor-base",
+    monitoring: true,
+    responseTime: 0,
+    retryAttempts: 0,
+    status: "up",
+    timeout: 30_000,
+    type: "http",
+    url: "https://example.com",
+};
+
+const mockSites: Site[] = [
+    {
+        identifier: "site-1",
+        monitoring: true,
+        monitors: [{ ...baselineMonitor, id: "monitor-1" }],
+        name: "Test Site 1",
+    },
+    {
+        identifier: "site-2",
+        monitoring: true,
+        monitors: [{ ...baselineMonitor, id: "monitor-2" }],
+        name: "Test Site 2",
+    },
+    {
+        identifier: "site-3",
+        monitoring: true,
+        monitors: [{ ...baselineMonitor, id: "monitor-3" }],
+        name: "Test Site 3",
+    },
 ];
 
 beforeAll(async () => {
@@ -82,7 +184,9 @@ describe("useSelectedSite", () => {
 
             expect(mockUseUIStore).toHaveBeenCalledWith(expect.any(Function));
             const selector = mockUseUIStore.mock.calls[0]?.[0];
-            const selection = selector?.({ selectedSiteId: "abc" });
+            const selection = selector?.(
+                createMockUiStore({ selectedSiteId: "abc" })
+            );
             expect(selection).toBe("abc");
         });
 
@@ -96,7 +200,9 @@ describe("useSelectedSite", () => {
                 expect.any(Function)
             );
             const selector = mockUseSitesStore.mock.calls[0]?.[0];
-            const sites = selector?.({ sites: mockSites });
+            const sites = selector?.(
+                createMockSitesStore({ sites: mockSites })
+            );
             expect(sites).toEqual(mockSites);
         });
     });
@@ -142,7 +248,7 @@ describe("useSelectedSite", () => {
             const { rerender } = renderHook(() => useSelectedSite());
 
             findSpy.mockClear();
-            mockUseSitesStore.mockReturnValue([...mockSites]);
+            mockUseSitesStore.mockReturnValue(Array.from(mockSites));
             rerender();
 
             expect(findSpy).toHaveBeenCalledTimes(1);

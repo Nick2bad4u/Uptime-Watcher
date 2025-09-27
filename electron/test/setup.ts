@@ -279,7 +279,7 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
             return this.intervals.size;
         }),
         getActiveMonitors: vi.fn(function (this: any) {
-            return [...this.intervals.keys()];
+            return Array.from(this.intervals.keys());
         }),
     })),
 }));

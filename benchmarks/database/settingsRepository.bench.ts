@@ -321,7 +321,7 @@ class MockSettingsRepository {
 
     getCategories() {
         const settings = this.getAll();
-        return [...new Set(settings.map((s: any) => s.category))];
+        return Array.from(new Set(settings.map((s: any) => s.category)));
     }
 }
 

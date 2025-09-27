@@ -470,7 +470,7 @@ describe("Comprehensive State Management Fuzzing", () => {
                     },
 
                     getState: () => ({
-                        monitors: [...bulkMonitors.values()],
+                        monitors: Array.from(bulkMonitors.values()),
                         count: bulkMonitors.size,
                     }),
                 };

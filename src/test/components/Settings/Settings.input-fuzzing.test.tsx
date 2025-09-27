@@ -70,8 +70,6 @@
  *       expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
  * ```
  *
- * ```
- *
  * - Error handling and recovery
  *
  * Focus areas:
@@ -82,19 +80,9 @@
  * - Error handling and user feedback
  * - Performance with large configuration changes
  * - Accessibility and keyboard navigation
- * ```
  */
 
-import {
-    afterEach,
-    beforeEach,
-    beforeAll,
-    afterAll,
-    describe,
-    expect,
-    it,
-    vi,
-} from "vitest";
+import { afterEach, beforeEach, describe, expect, vi } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 

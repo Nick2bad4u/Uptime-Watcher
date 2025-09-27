@@ -888,7 +888,7 @@ describe("React Virtual DOM Performance", () => {
             const oldTree = vdom.createElement("div", {}, ...oldChildren);
 
             // Create reordered list
-            const newChildren = [...oldChildren];
+            const newChildren = Array.from(oldChildren);
             // Shuffle array
             for (let i = newChildren.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));

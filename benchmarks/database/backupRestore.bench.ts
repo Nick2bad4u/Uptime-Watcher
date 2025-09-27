@@ -936,7 +936,7 @@ describe("Database Backup and Restore Benchmarks", () => {
         // Recovery method effectiveness
         const recoveryMethodAnalysis = Array.from(
             new Set(recoveryScenarios.map((s) => s.recoveryMethod))
-        ).map((method) => {
+        , (method) => {
             const methodScenarios = recoveryScenarios.filter(
                 (s) => s.recoveryMethod === method
             );

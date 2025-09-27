@@ -268,7 +268,7 @@ describe("siteStatus Property-based Tests", () => {
             "should return single status when all monitors have same status",
             (status, count) => {
                 const site: SiteForStatus = {
-                    monitors: Array.from({ length: count }).map(() => ({
+                    monitors: Array.from({ length: count }, () => ({
                         monitoring: true,
                         status,
                     })),
@@ -307,9 +307,7 @@ describe("siteStatus Property-based Tests", () => {
                 const result = calculateSiteStatus(site);
 
                 // Check if we actually have mixed statuses
-                const uniqueStatuses = [
-                    ...new Set(mixedMonitors.map((m) => m.status)),
-                ];
+                const uniqueStatuses = Array.from(new Set(mixedMonitors.map((m) => m.status)));
                 if (uniqueStatuses.length > 1) {
                     expect(result).toBe("mixed");
                 }
@@ -406,7 +404,7 @@ describe("siteStatus Property-based Tests", () => {
             "should include monitor count in description",
             (status, count) => {
                 const site: SiteForStatus = {
-                    monitors: Array.from({ length: count }).map(() => ({
+                    monitors: Array.from({ length: count }, () => ({
                         monitoring: true,
                         status,
                     })),

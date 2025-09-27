@@ -123,7 +123,7 @@ class MockReactElementFactory {
         const element: ReactElement = {
             type,
             props: { ...props },
-            children: [...children],
+            children: Array.from(children),
             key: props.key,
             ref: props.ref,
             size: this.calculateElementSize(type, props, children),

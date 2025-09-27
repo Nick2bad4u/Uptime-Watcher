@@ -189,9 +189,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
                 const site = { monitors: mixedMonitors };
                 const result = calculateSiteStatus(site as SiteForStatus);
 
-                const statuses = [
-                    ...new Set(mixedMonitors.map((m) => m.status)),
-                ];
+                const statuses = Array.from(new Set(mixedMonitors.map((m) => m.status)));
                 if (statuses.length === 1) {
                     expect(result).toBe(statuses[0]);
                 } else {

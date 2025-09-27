@@ -28,7 +28,7 @@ Each phase below lists the concrete files that must be touched. Work through the
 
 ## 3. Architecture Recap
 
-```
+```text
 Shared Domain (TypeScript + Zod)
   - shared/types.ts
   - shared/types/monitorConfig.ts
@@ -49,13 +49,13 @@ Renderer (React + Zustand)
 
 ## 4. File Impact Matrix
 
-| Layer | Responsibility | Touch These Files | Notes |
-| --- | --- | --- | --- |
-| Shared | Declare monitor type, config, validation | `shared/types.ts`, `shared/types/monitorConfig.ts`, `shared/types/monitorTypes.ts`, `shared/types/schemaTypes.ts`, `shared/validation/schemas.ts`, `shared/utils/validation.ts`, `shared/utils/logTemplates.ts` (if new log codes), `shared/test/validation/schemas.comprehensive.test.ts` | Update unions, defaults, schemas, and add tests for both happy and error paths. |
-| Electron backend | Service logic, registry metadata, retry policies | `electron/services/monitoring/<NewMonitor>.ts`, `electron/services/monitoring/MonitorTypeRegistry.ts`, `electron/services/monitoring/EnhancedMonitorChecker.ts`, `electron/services/monitoring/types.ts`, `electron/services/monitoring/shared/monitorServiceHelpers.ts`, logger templates if you emit new messages, unit tests in `electron/test/services/monitoring`, fuzz tests in `electron/test/fuzzing` | Make sure the new service is routed, retried, logged, and versioned. |
-| Persistence | Persist dynamic fields and history | `electron/services/database/utils/dynamicSchema.ts`, `electron/services/database/utils/monitorMapper.ts`, `electron/services/database/MonitorRepository.ts`, tests in `electron/test/fuzzing/databaseSchema.*.test.ts` | Dynamic schema generation reads registry fields; confirm snake_case column names and SQL types. |
-| Renderer | Collect config, validate, display | `src/types/monitorFormData.ts`, `src/types/monitor-forms.ts`, `src/utils/monitorValidation.ts`, `src/stores/sites/utils/monitorOperations.ts`, `src/stores/monitor/useMonitorTypesStore.ts`, `src/components/SiteDetails/useAddSiteForm.ts`, `src/components/AddSiteForm/AddSiteForm.tsx`, `src/components/AddSiteForm/DynamicMonitorFields.tsx`, `src/components/AddSiteForm/Submit.tsx`, `src/components/Dashboard/SiteCard/components/MonitorSelector.tsx`, `src/constants.ts`, `src/utils/fallbacks.ts`, renderer tests (`src/test/hooks/useAddSiteForm.comprehensive.test.ts`, `src/test/comprehensive-100-percent-coverage.test.tsx`, `src/test/fuzzing/monitor-operations.fuzz.test.ts`, `src/test/stores/sites/utils/monitorOperations.fast-check-comprehensive.test.ts`) | Maintain parity between shared schemas and client validation, and keep UI fallbacks working when IPC is offline. |
-| Tooling and docs | Keep documentation and changelog in sync | `docs/Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md`, `CHANGELOG.md`, release notes, runbooks | Record user-facing changes and rollout instructions. |
+| Layer            | Responsibility                                   | Touch These Files                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Notes                                                                                                            |
+| ---------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Shared           | Declare monitor type, config, validation         | `shared/types.ts`, `shared/types/monitorConfig.ts`, `shared/types/monitorTypes.ts`, `shared/types/schemaTypes.ts`, `shared/validation/schemas.ts`, `shared/utils/validation.ts`, `shared/utils/logTemplates.ts` (if new log codes), `shared/test/validation/schemas.comprehensive.test.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Update unions, defaults, schemas, and add tests for both happy and error paths.                                  |
+| Electron backend | Service logic, registry metadata, retry policies | `electron/services/monitoring/<NewMonitor>.ts`, `electron/services/monitoring/MonitorTypeRegistry.ts`, `electron/services/monitoring/EnhancedMonitorChecker.ts`, `electron/services/monitoring/types.ts`, `electron/services/monitoring/shared/monitorServiceHelpers.ts`, logger templates if you emit new messages, unit tests in `electron/test/services/monitoring`, fuzz tests in `electron/test/fuzzing`                                                                                                                                                                                                                                                                                                                                                                     | Make sure the new service is routed, retried, logged, and versioned.                                             |
+| Persistence      | Persist dynamic fields and history               | `electron/services/database/utils/dynamicSchema.ts`, `electron/services/database/utils/monitorMapper.ts`, `electron/services/database/MonitorRepository.ts`, tests in `electron/test/fuzzing/databaseSchema.*.test.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Dynamic schema generation reads registry fields; confirm snake_case column names and SQL types.                  |
+| Renderer         | Collect config, validate, display                | `src/types/monitorFormData.ts`, `src/types/monitor-forms.ts`, `src/utils/monitorValidation.ts`, `src/stores/sites/utils/monitorOperations.ts`, `src/stores/monitor/useMonitorTypesStore.ts`, `src/components/SiteDetails/useAddSiteForm.ts`, `src/components/AddSiteForm/AddSiteForm.tsx`, `src/components/AddSiteForm/DynamicMonitorFields.tsx`, `src/components/AddSiteForm/Submit.tsx`, `src/components/Dashboard/SiteCard/components/MonitorSelector.tsx`, `src/constants.ts`, `src/utils/fallbacks.ts`, renderer tests (`src/test/hooks/useAddSiteForm.comprehensive.test.ts`, `src/test/comprehensive-100-percent-coverage.test.tsx`, `src/test/fuzzing/monitor-operations.fuzz.test.ts`, `src/test/stores/sites/utils/monitorOperations.fast-check-comprehensive.test.ts`) | Maintain parity between shared schemas and client validation, and keep UI fallbacks working when IPC is offline. |
+| Tooling and docs | Keep documentation and changelog in sync         | `docs/Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md`, `CHANGELOG.md`, release notes, runbooks                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Record user-facing changes and rollout instructions.                                                             |
 
 Use this table as a printable checklist before opening a pull request.
 
@@ -195,13 +195,13 @@ Once merged, monitor the first production checks closely. Add telemetry if the m
 
 ## 6. Troubleshooting and FAQ
 
-| Symptom | Likely Cause | Fix |
-| --- | --- | --- |
-| Monitor type missing from dropdowns | `registerMonitorType` not called, or the store still relies on fallback data | Verify the registry entry in `MonitorTypeRegistry.ts` and check the Electron main process logs for import failures. |
-| Validation errors differ between backend and frontend | Shared schema not updated or client-side validation diverged | Confirm `shared/validation/schemas.ts` and `src/utils/monitorValidation.ts` enforce identical rules. Add tests for both paths. |
-| Database errors on startup | Field metadata does not map cleanly to SQL column types | Inspect `generateDatabaseFieldDefinitions` output and ensure each field maps to the correct SQL type. |
-| Monitor never runs in production | `EnhancedMonitorChecker` missing a case or the service throws before returning | Look for `[EnhancedMonitorChecker]` warnings in logs and add unit tests that reproduce the failure. |
-| UI renders blank fields | `DynamicMonitorFields` did not receive field metadata | Confirm the registry `fields` array is correct and that `useMonitorTypesStore` loads without IPC errors. |
+| Symptom                                               | Likely Cause                                                                   | Fix                                                                                                                            |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Monitor type missing from dropdowns                   | `registerMonitorType` not called, or the store still relies on fallback data   | Verify the registry entry in `MonitorTypeRegistry.ts` and check the Electron main process logs for import failures.            |
+| Validation errors differ between backend and frontend | Shared schema not updated or client-side validation diverged                   | Confirm `shared/validation/schemas.ts` and `src/utils/monitorValidation.ts` enforce identical rules. Add tests for both paths. |
+| Database errors on startup                            | Field metadata does not map cleanly to SQL column types                        | Inspect `generateDatabaseFieldDefinitions` output and ensure each field maps to the correct SQL type.                          |
+| Monitor never runs in production                      | `EnhancedMonitorChecker` missing a case or the service throws before returning | Look for `[EnhancedMonitorChecker]` warnings in logs and add unit tests that reproduce the failure.                            |
+| UI renders blank fields                               | `DynamicMonitorFields` did not receive field metadata                          | Confirm the registry `fields` array is correct and that `useMonitorTypesStore` loads without IPC errors.                       |
 
 ---
 
@@ -211,29 +211,29 @@ Once merged, monitor the first production checks closely. Add telemetry if the m
 
 ```typescript
 registerMonitorType({
-    description: "Explain what this monitor checks",
-    displayName: "Human Name",
-    fields: [
-        {
-            label: "Host",
-            name: "host",
-            type: "text",
-            required: true,
-            placeholder: "example.com",
-            helpText: "Where should we connect?",
-        },
-        // Add more fields here
-    ],
-    serviceFactory: () => new NewMonitor(),
-    type: "new-monitor",
-    uiConfig: {
-        detailFormats: {
-            historyDetail: (details) => `Details: ${details}`,
-        },
-        supportsResponseTime: true,
-    },
-    validationSchema: monitorSchemas.newMonitor,
-    version: "1.0.0",
+ description: "Explain what this monitor checks",
+ displayName: "Human Name",
+ fields: [
+  {
+   label: "Host",
+   name: "host",
+   type: "text",
+   required: true,
+   placeholder: "example.com",
+   helpText: "Where should we connect?",
+  },
+  // Add more fields here
+ ],
+ serviceFactory: () => new NewMonitor(),
+ type: "new-monitor",
+ uiConfig: {
+  detailFormats: {
+   historyDetail: (details) => `Details: ${details}`,
+  },
+  supportsResponseTime: true,
+ },
+ validationSchema: monitorSchemas.newMonitor,
+ version: "1.0.0",
 });
 ```
 
@@ -241,56 +241,56 @@ registerMonitorType({
 
 ```typescript
 export class NewMonitor implements IMonitorService {
-    public constructor(private config: MonitorConfig = {}) {}
+ public constructor(private config: MonitorConfig = {}) {}
 
-    public getType(): MonitorType {
-        return "new-monitor";
-    }
+ public getType(): MonitorType {
+  return "new-monitor";
+ }
 
-    public updateConfig(config: Partial<MonitorConfig>): void {
-        this.config = { ...this.config, ...config };
-    }
+ public updateConfig(config: Partial<MonitorConfig>): void {
+  this.config = { ...this.config, ...config };
+ }
 
-    public async check(
-        monitor: Site["monitors"][0],
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
-        if (monitor.type !== "new-monitor") {
-            throw new Error(`NewMonitor cannot handle type: ${monitor.type}`);
-        }
+ public async check(
+  monitor: Site["monitors"][0],
+  signal?: AbortSignal
+ ): Promise<MonitorCheckResult> {
+  if (monitor.type !== "new-monitor") {
+   throw new Error(`NewMonitor cannot handle type: ${monitor.type}`);
+  }
 
-        const validationError = validateMonitorHostAndPort(monitor);
-        if (validationError) {
-            return createMonitorErrorResult(validationError, 0);
-        }
+  const validationError = validateMonitorHostAndPort(monitor);
+  if (validationError) {
+   return createMonitorErrorResult(validationError, 0);
+  }
 
-        const { retryAttempts, timeout } = extractMonitorConfig(
-            monitor,
-            this.config.timeout
-        );
+  const { retryAttempts, timeout } = extractMonitorConfig(
+   monitor,
+   this.config.timeout
+  );
 
-        return withOperationalHooks(
-            () => this.performCheckOnce(monitor, timeout, signal),
-            {
-                maxRetries: retryAttempts + 1,
-                operationName: `New monitor check for ${monitor.host}`,
-            }
-        );
-    }
+  return withOperationalHooks(
+   () => this.performCheckOnce(monitor, timeout, signal),
+   {
+    maxRetries: retryAttempts + 1,
+    operationName: `New monitor check for ${monitor.host}`,
+   }
+  );
+ }
 
-    private async performCheckOnce(
-        monitor: Site["monitors"][0],
-        timeout: number,
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
-        const started = performance.now();
-        // TODO: Implement protocol-specific logic
-        return {
-            details: "Example details",
-            responseTime: performance.now() - started,
-            status: "up",
-        };
-    }
+ private async performCheckOnce(
+  monitor: Site["monitors"][0],
+  timeout: number,
+  signal?: AbortSignal
+ ): Promise<MonitorCheckResult> {
+  const started = performance.now();
+  // TODO: Implement protocol-specific logic
+  return {
+   details: "Example details",
+   responseTime: performance.now() - started,
+   status: "up",
+  };
+ }
 }
 ```
 
