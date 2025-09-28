@@ -73,10 +73,10 @@ export interface AddSiteFormActions {
     setCertificateWarningDays: (value: string) => void;
     /** Set check interval */
     setCheckInterval: (value: number) => void;
-    /** Set expected value field value */
-    setExpectedValue: (value: string) => void;
     /** Set expected HTTP status code */
     setExpectedStatusCode: (value: string) => void;
+    /** Set expected value field value */
+    setExpectedValue: (value: string) => void;
     /** Set form error message */
     setFormError: (error: string | undefined) => void;
     /** Set host field value */
@@ -116,10 +116,10 @@ export interface AddSiteFormState {
     certificateWarningDays: string;
     /** Check interval in milliseconds */
     checkInterval: number;
-    /** Expected DNS record value field for DNS monitors */
-    expectedValue: string;
     /** Expected HTTP status code for HTTP status monitors */
     expectedStatusCode: string;
+    /** Expected DNS record value field for DNS monitors */
+    expectedValue: string;
     /** Current form validation error */
     formError: string | undefined;
     /** Host/IP field for port and DNS monitors */
@@ -159,8 +159,8 @@ const resetFieldsForMonitorType = (
     currentValues: {
         bodyKeyword: string;
         certificateWarningDays: string;
-        expectedValue: string;
         expectedStatusCode: string;
+        expectedValue: string;
         host: string;
         port: string;
         recordType: string;
@@ -169,8 +169,8 @@ const resetFieldsForMonitorType = (
     setters: {
         setBodyKeyword: (value: string) => void;
         setCertificateWarningDays: (value: string) => void;
-        setExpectedValue: (value: string) => void;
         setExpectedStatusCode: (value: string) => void;
+        setExpectedValue: (value: string) => void;
         setHost: (value: string) => void;
         setPort: (value: string) => void;
         setRecordType: (value: string) => void;
@@ -261,8 +261,8 @@ const validateFormFields = (
     fieldValues: {
         bodyKeyword: string;
         certificateWarningDays: string;
-        expectedValue: string;
         expectedStatusCode: string;
+        expectedValue: string;
         host: string;
         port: string;
         recordType: string;
@@ -346,8 +346,8 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
                 {
                     bodyKeyword,
                     certificateWarningDays,
-                    expectedValue,
                     expectedStatusCode,
+                    expectedValue,
                     host,
                     port,
                     recordType,
@@ -356,8 +356,8 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
                 {
                     setBodyKeyword,
                     setCertificateWarningDays,
-                    setExpectedValue,
                     setExpectedStatusCode,
+                    setExpectedValue,
                     setHost,
                     setPort,
                     setRecordType,
@@ -366,8 +366,9 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
             );
         },
         [
-            certificateWarningDays,
             bodyKeyword,
+            certificateWarningDays,
+            expectedStatusCode,
             expectedValue,
             getFields,
             host,
@@ -376,13 +377,12 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
             recordType,
             setBodyKeyword,
             setCertificateWarningDays,
+            setExpectedStatusCode,
             setExpectedValue,
             setHost,
             setPort,
             setRecordType,
-            setExpectedStatusCode,
             setUrl,
-            expectedStatusCode,
             url,
         ]
     );
@@ -393,16 +393,12 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
             resetFieldsForModeChange(addMode, { setName, setSiteId });
         },
         [
-                    bodyKeyword,
             addMode,
             setName,
             setSiteId,
         ]
     );
 
-            bodyKeyword,
-    // Simple validation function without logging - only used for submit button
-    // state
     const isFormValid = useCallback(
         () =>
             validateFormFields(
@@ -410,89 +406,102 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
                 name,
                 selectedExistingSite,
                 monitorType,
-            expectedStatusCode,
                 {
-                    {
-                        bodyKeyword,
-                        certificateWarningDays,
-                        expectedValue,
-                        expectedStatusCode,
-                        host,
-                        port,
-                        recordType,
-                        url,
-                    },
-                    getFields
-                ),
-                [
-                    addMode,
                     bodyKeyword,
                     certificateWarningDays,
+                    expectedStatusCode,
                     expectedValue,
-                    getFields,
                     host,
-                    monitorType,
-                    name,
                     port,
                     recordType,
-                    selectedExistingSite,
-                    expectedStatusCode,
                     url,
-                ]
-            );
+                },
+                getFields
+            ),
+        [
+            addMode,
+            bodyKeyword,
+            certificateWarningDays,
+            expectedStatusCode,
+            expectedValue,
+            getFields,
+            host,
+            monitorType,
+            name,
+            port,
+            recordType,
+            selectedExistingSite,
+            url,
+        ]
+    );
 
-            // Reset form to initial state
-            const resetForm = useCallback(() => {
-                setUrl("");
-                setHost("");
-                setPort("");
-                setRecordType("A");
-                setExpectedValue("");
-                setBodyKeyword("");
-                setExpectedStatusCode("200");
-                setCertificateWarningDays("30");
-                setName("");
-                setMonitorType("http");
-                setCheckInterval(DEFAULT_CHECK_INTERVAL);
-                setSiteId(generateUuid());
-                setAddMode("new");
-                setSelectedExistingSite("");
-                setFormError(undefined);
-            }, []);
+    const resetForm = useCallback(() => {
+        setUrl("");
+        setHost("");
+        setPort("");
+        setRecordType("A");
+        setExpectedValue("");
+        setBodyKeyword("");
+        setExpectedStatusCode("200");
+        setCertificateWarningDays("30");
+        setName("");
+        setMonitorType("http");
+        setCheckInterval(DEFAULT_CHECK_INTERVAL);
+        setSiteId(generateUuid());
+        setAddMode("new");
+        setSelectedExistingSite("");
+        setFormError(undefined);
+    }, [
+        setAddMode,
+        setBodyKeyword,
+        setCertificateWarningDays,
+        setCheckInterval,
+        setExpectedStatusCode,
+        setExpectedValue,
+        setFormError,
+        setHost,
+        setMonitorType,
+        setName,
+        setPort,
+        setRecordType,
+        setSelectedExistingSite,
+        setSiteId,
+        setUrl,
+    ]);
 
-            return {
-                // State
-                addMode,
-                bodyKeyword,
-                certificateWarningDays,
-                checkInterval,
-                expectedStatusCode,
-                expectedValue,
-                formError,
-                host,
-                isFormValid,
-                monitorType,
-                name,
-                port,
-                recordType,
-                resetForm,
-                selectedExistingSite,
-                setAddMode,
-                setBodyKeyword,
-                setCertificateWarningDays,
-                setCheckInterval,
-                setExpectedStatusCode,
-                setExpectedValue,
-                setFormError,
-                setHost,
-                setMonitorType,
-                setName,
-                setPort,
-                setRecordType,
-                setSelectedExistingSite,
-                setSiteId,
-                setUrl,
-                siteId,
-                url,
-            };
+    return {
+        // State
+        addMode,
+        bodyKeyword,
+        certificateWarningDays,
+        checkInterval,
+        expectedStatusCode,
+        expectedValue,
+        formError,
+        host,
+        isFormValid,
+        monitorType,
+        name,
+        port,
+        recordType,
+        resetForm,
+        selectedExistingSite,
+        setAddMode,
+        setBodyKeyword,
+        setCertificateWarningDays,
+        setCheckInterval,
+        setExpectedStatusCode,
+        setExpectedValue,
+        setFormError,
+        setHost,
+        setMonitorType,
+        setName,
+        setPort,
+        setRecordType,
+        setSelectedExistingSite,
+        setSiteId,
+        setUrl,
+        siteId,
+        url,
+    };
 }

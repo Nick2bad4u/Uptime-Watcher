@@ -1,12 +1,5 @@
 /**
  * Form submission handling utilities for the AddSiteForm component.
- *
- * @remarks
- * Provides validation and submission logic for creating new sites or adding
- * monitors to existing sites. Supports HTTP and port monitor types with
- * comprehensive validation and error handling.
- *
- * @packageDocumentation
  */
 
 import type { Monitor, MonitorType } from "@shared/types";
@@ -38,9 +31,7 @@ function safeTrim(value: unknown): string {
 /**
  * Store actions interface for form submission operations.
  *
- * @remarks
- * Defines the required store methods needed for form submission. This interface
- * decouples the submission logic from specific store implementations, making
+ * Decouples the submission logic from specific store implementations, making
  * the code more testable and flexible.
  *
  * @public
@@ -81,22 +72,6 @@ export type FormSubmitProperties = Simplify<
 >;
 
 /**
- * Builds monitor data object dynamically based on monitor type configuration.
- *
- * @param monitorType - Type of monitor
- * @param formData - Form data containing field values
- *
- * @returns Monitor data object with type-specific fields
- */
-/**
- * Builds monitor data object with type-specific fields.
- *
- * @param monitorType - Type of monitor
- * @param formData - Form data containing field values
- *
- * @returns Monitor data object with type-specific fields
- */
-/**
  * Creates a monitor object based on the form data using the shared utility.
  * This ensures consistent monitor defaults and validation across the app.
  */
@@ -115,7 +90,6 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
         url,
     } = properties;
 
-    // Convert form data to proper types for the shared utility
     const formData = {
         bodyKeyword: safeTrim(bodyKeyword) || undefined,
         certificateWarningDays: certificateWarningDays
@@ -132,14 +106,12 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
         url,
     };
 
-    // Use shared monitor creation utility for consistency
     const baseMonitor = createMonitorObject(monitorType, formData);
 
-    // Add required fields that aren't included in MonitorCreationData
     return {
         ...baseMonitor,
         activeOperations: [],
-        checkInterval, // Add back the checkInterval from form data
+        checkInterval,
         id: generateUuid(),
     };
 }
@@ -443,7 +415,9 @@ export async function handleSubmit(
             formData: {
                 addMode,
                 checkInterval,
+                bodyKeyword: truncateForLogging(bodyKeyword),
                 expectedValue: truncateForLogging(expectedValue),
+                expectedStatusCode: truncateForLogging(expectedStatusCode),
                 host: truncateForLogging(host),
                 monitorType,
                 name: truncateForLogging(name),

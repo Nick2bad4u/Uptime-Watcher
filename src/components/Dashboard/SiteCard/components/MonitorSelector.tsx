@@ -85,6 +85,28 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
                     case "http": {
                         return monitor.url ? `: ${monitor.url}` : "";
                     }
+                    case "http-keyword": {
+                        const details = [
+                            monitor.url,
+                            monitor.bodyKeyword
+                                ? `keyword="${monitor.bodyKeyword}"`
+                                : undefined,
+                        ].filter(Boolean);
+                        return details.length > 0
+                            ? `: ${details.join(" | ")}`
+                            : "";
+                    }
+                    case "http-status": {
+                        const details = [
+                            monitor.url,
+                            typeof monitor.expectedStatusCode === "number"
+                                ? `status=${monitor.expectedStatusCode}`
+                                : undefined,
+                        ].filter(Boolean);
+                        return details.length > 0
+                            ? `: ${details.join(" | ")}`
+                            : "";
+                    }
                     case "ping": {
                         return monitor.host ? `: ${monitor.host}` : "";
                     }

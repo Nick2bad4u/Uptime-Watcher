@@ -52,7 +52,6 @@ export interface AddSiteFormProperties {
     /** Optional callback to execute on successful form submission */
     readonly onSuccess?: () => void;
 }
-
 /**
  * Supported add modes for the form.
  *
@@ -126,15 +125,14 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             options: monitorTypeOptions,
         } = useMonitorTypes();
 
-        // Use our custom hook for form state management
         const formState = useAddSiteForm();
         const {
             addMode,
             bodyKeyword,
             certificateWarningDays,
             checkInterval,
-            expectedValue,
             expectedStatusCode,
+            expectedValue,
             formError,
             host,
             monitorType,
@@ -147,8 +145,8 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             setBodyKeyword,
             setCertificateWarningDays,
             setCheckInterval,
-            setExpectedValue,
             setExpectedStatusCode,
+            setExpectedValue,
             setFormError,
             setHost,
             setMonitorType,
@@ -197,17 +195,17 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         // Dynamic monitor field change handlers
         const handleDynamicFieldChange = useMemo(
             () => ({
-                certificateWarningDays: (value: number | string): void => {
-                    setCertificateWarningDays(String(value));
-                },
                 bodyKeyword: (value: number | string): void => {
                     setBodyKeyword(String(value));
                 },
-                expectedValue: (value: number | string): void => {
-                    setExpectedValue(String(value));
+                certificateWarningDays: (value: number | string): void => {
+                    setCertificateWarningDays(String(value));
                 },
                 expectedStatusCode: (value: number | string): void => {
                     setExpectedStatusCode(String(value));
+                },
+                expectedValue: (value: number | string): void => {
+                    setExpectedValue(String(value));
                 },
                 host: (value: number | string): void => {
                     setHost(String(value));
@@ -223,7 +221,9 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 },
             }),
             [
+                setBodyKeyword,
                 setCertificateWarningDays,
+                setExpectedStatusCode,
                 setExpectedValue,
                 setHost,
                 setPort,
@@ -235,17 +235,19 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         // Dynamic monitor field values
         const dynamicFieldValues = useMemo(
             () => ({
-                certificateWarningDays,
                 bodyKeyword,
-                expectedValue,
+                certificateWarningDays,
                 expectedStatusCode,
+                expectedValue,
                 host,
                 port,
                 recordType,
                 url,
             }),
             [
+                bodyKeyword,
                 certificateWarningDays,
+                expectedStatusCode,
                 expectedValue,
                 host,
                 port,
@@ -277,8 +279,8 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                         checkInterval,
                         clearError,
                         createSite,
-                        expectedValue,
                         expectedStatusCode,
+                        expectedValue,
                         formError,
                         generateUuid,
                         host,
@@ -305,10 +307,12 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             [
                 addMode,
                 addMonitorToSite,
+                bodyKeyword,
                 certificateWarningDays,
                 checkInterval,
                 clearError,
                 createSite,
+                expectedStatusCode,
                 expectedValue,
                 formError,
                 handleSuccess,

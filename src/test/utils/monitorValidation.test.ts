@@ -1033,6 +1033,173 @@ describe("Monitor Validation Utilities", () => {
             });
         });
 
+        describe("HTTP keyword monitor form validation", () => {
+            it("should validate HTTP keyword monitor with required fields", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
+
+                const result = await validateMonitorFormData("http-keyword", {
+                    bodyKeyword: "status: ok",
+                    url: "https://example.com",
+                });
+
+                expect(result.success).toBeTruthy();
+                expect(result.errors).toEqual([]);
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith(
+                    "http-keyword",
+                    "url",
+                    "https://example.com"
+                );
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith(
+                    "http-keyword",
+                    "bodyKeyword",
+                    "status: ok"
+                );
+            });
+
+            it("should require keyword for HTTP keyword monitors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const result = await validateMonitorFormData("http-keyword", {
+                    url: "https://example.com",
+                });
+
+                expect(result).toEqual({
+                    errors: [
+                        "URL is required for HTTP keyword monitors",
+                        "Keyword is required for HTTP keyword monitors",
+                    ],
+                    success: false,
+                    warnings: [],
+                });
+            });
+
+            it("should include keyword validation errors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
+
+                vi.mocked(sharedValidateMonitorField)
+                    .mockReturnValueOnce({
+                        errors: ["URL format is invalid"],
+                        success: false,
+                        warnings: [],
+                        metadata: {},
+                    })
+                    .mockReturnValueOnce({
+                        errors: ["Keyword length must be at least 1"],
+                        success: false,
+                        warnings: [],
+                        metadata: {},
+                    });
+
+                const result = await validateMonitorFormData("http-keyword", {
+                    bodyKeyword: "",
+                    url: "invalid",
+                });
+
+                expect(result).toEqual({
+                    errors: [
+                        "URL format is invalid",
+                        "Keyword length must be at least 1",
+                    ],
+                    success: false,
+                    warnings: [],
+                });
+            });
+        });
+
+        describe("HTTP status monitor form validation", () => {
+            it("should validate HTTP status monitor with required fields", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
+
+                const result = await validateMonitorFormData("http-status", {
+                    expectedStatusCode: 204,
+                    url: "https://example.com/status",
+                });
+
+                expect(result.success).toBeTruthy();
+                expect(result.errors).toEqual([]);
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith(
+                    "http-status",
+                    "url",
+                    "https://example.com/status"
+                );
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith(
+                    "http-status",
+                    "expectedStatusCode",
+                    204
+                );
+            });
+
+            it("should require expected status code for HTTP status monitors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const result = await validateMonitorFormData("http-status", {
+                    url: "https://example.com/status",
+                });
+
+                expect(result).toEqual({
+                    errors: [
+                        "URL is required for HTTP status monitors",
+                        "Expected status code is required for HTTP status monitors",
+                    ],
+                    success: false,
+                    warnings: [],
+                });
+            });
+
+            it("should validate status code types", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
+
+                const result = await validateMonitorFormData("http-status", {
+                    expectedStatusCode: "not-a-code" as unknown as number,
+                    url: "https://example.com/status",
+                });
+
+                expect(result).toEqual({
+                    errors: [
+                        "Expected status code is required for HTTP status monitors",
+                    ],
+                    success: false,
+                    warnings: [],
+                });
+            });
+        });
+
         describe("Port monitor form validation", () => {
             it("should validate port monitor with valid host and port", async ({
                 task,

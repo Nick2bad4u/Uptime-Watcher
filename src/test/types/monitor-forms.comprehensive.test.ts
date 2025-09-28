@@ -4,21 +4,22 @@
  * @file Src/test/types/monitor-forms.comprehensive.test.ts
  */
 
+import type { MonitorType } from "../../../shared/types";
+
 import {
     getDefaultMonitorFields,
     isHttpMonitorFields,
     isPingMonitorFields,
     isPortMonitorFields,
+    type HttpKeywordMonitorFields,
     type HttpMonitorFields,
+    type HttpStatusMonitorFields,
+    type MonitorFormFields,
     type PingMonitorFields,
     type PortMonitorFields,
-    type MonitorFormFields,
 } from "../../types/monitor-forms";
 
 import { describe, expect, it } from "vitest";
-
-// Import MonitorType from shared types
-type MonitorType = "http" | "ping" | "port";
 
 describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
     describe(getDefaultMonitorFields, () => {
@@ -37,10 +38,49 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
                 checkInterval: 300_000,
                 retryAttempts: 3,
                 timeout: 10_000,
-                expectedStatusCode: 200,
                 followRedirects: true,
                 headers: {},
                 method: "GET",
+                url: "",
+            });
+        });
+
+        it("should return default HTTP keyword monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const fields = getDefaultMonitorFields("http-keyword");
+
+            expect(fields).toMatchObject({
+                bodyKeyword: "",
+                checkInterval: 300_000,
+                retryAttempts: 3,
+                timeout: 10_000,
+                url: "",
+            });
+        });
+
+        it("should return default HTTP status monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const fields = getDefaultMonitorFields("http-status");
+
+            expect(fields).toMatchObject({
+                checkInterval: 300_000,
+                expectedStatusCode: 200,
+                retryAttempts: 3,
+                timeout: 10_000,
                 url: "",
             });
         });
@@ -170,6 +210,46 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             };
 
             expect(isHttpMonitorFields(httpFields)).toBeTruthy();
+        });
+
+        it("should return true for HTTP keyword monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const keywordFields: HttpKeywordMonitorFields = {
+                bodyKeyword: "status: ok",
+                checkInterval: 300_000,
+                retryAttempts: 3,
+                timeout: 10_000,
+                url: "https://example.com",
+            };
+
+            expect(isHttpMonitorFields(keywordFields)).toBeTruthy();
+        });
+
+        it("should return true for HTTP status monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const statusFields: HttpStatusMonitorFields = {
+                checkInterval: 300_000,
+                expectedStatusCode: 204,
+                retryAttempts: 3,
+                timeout: 10_000,
+                url: "https://example.com/status",
+            };
+
+            expect(isHttpMonitorFields(statusFields)).toBeTruthy();
         });
 
         it("should return false for ping monitor fields", async ({

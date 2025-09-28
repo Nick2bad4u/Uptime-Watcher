@@ -158,10 +158,8 @@ describe("HttpKeywordMonitor", () => {
     });
 
     it("returns error result when keyword configuration is invalid", async () => {
-        const invalidMonitor = {
-            ...monitor,
-            bodyKeyword: undefined,
-        } as Site["monitors"][0];
+        const invalidMonitor = { ...monitor } as Site["monitors"][0];
+        Reflect.deleteProperty(invalidMonitor, "bodyKeyword");
 
         const result = await monitorService.check(invalidMonitor);
 

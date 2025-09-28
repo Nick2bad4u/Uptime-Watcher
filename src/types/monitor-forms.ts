@@ -24,6 +24,8 @@ export interface BaseMonitorFields {
  * HTTP monitor specific fields
  */
 export interface HttpMonitorFields extends BaseMonitorFields {
+    /** Expected status code for primary checks */
+    expectedStatusCode?: number;
     /** Follow redirects */
     followRedirects?: boolean;
     /** Request headers */
@@ -212,6 +214,7 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
         case "http": {
             return {
                 ...baseFields,
+                expectedStatusCode: 200,
                 followRedirects: true,
                 headers: {},
                 method: "GET",
