@@ -17,7 +17,10 @@ import {
 import type {
     DnsFormData,
     HttpFormData,
+    HttpHeaderFormData,
+    HttpJsonFormData,
     HttpKeywordFormData,
+    HttpLatencyFormData,
     HttpStatusFormData,
     MonitorFormData,
     PingFormData,
@@ -274,21 +277,49 @@ export async function validateMonitorFieldClientSide(
     );
 }
 
-// Helper functions for monitor form validation (reduces complexity by
-// composition)
-const validateHttpMonitorFormData = (data: Partial<HttpFormData>): string[] => {
-    const errors: string[] = [];
+const validateRequiredStringField = (
+    type: MonitorType,
+    fieldName: string,
+    value: unknown,
+    missingMessage: string
+): string[] => {
+    if (typeof value !== "string") {
+        return [missingMessage];
+    }
 
-    if (!data.url || typeof data.url !== "string") {
-        errors.push("URL is required for HTTP monitors");
-    } else {
-        // Validate URL field specifically
-        const urlResult = sharedValidateMonitorField("http", "url", data.url);
-        errors.push(...urlResult.errors);
+    const result = sharedValidateMonitorField(type, fieldName, value);
+    const errors = Array.from(result.errors);
+
+    if (value.trim().length === 0 && errors.length === 0) {
+        errors.push(missingMessage);
     }
 
     return errors;
 };
+
+const validateRequiredNumberField = (
+    type: MonitorType,
+    fieldName: string,
+    value: unknown,
+    missingMessage: string
+): string[] => {
+    if (typeof value !== "number" || Number.isNaN(value)) {
+        return [missingMessage];
+    }
+
+    const result = sharedValidateMonitorField(type, fieldName, value);
+    return Array.from(result.errors);
+};
+
+// Helper functions for monitor form validation (reduces complexity by
+// composition)
+const validateHttpMonitorFormData = (data: Partial<HttpFormData>): string[] =>
+    validateRequiredStringField(
+        "http",
+        "url",
+        data.url,
+        "URL is required for HTTP monitors"
+    );
 
 const validateHttpKeywordMonitorFormData = (
     data: Partial<HttpKeywordFormData>
@@ -319,6 +350,52 @@ const validateHttpKeywordMonitorFormData = (
 
     return errors;
 };
+
+const validateHttpHeaderMonitorFormData = (
+    data: Partial<HttpHeaderFormData>
+): string[] => [
+    ...validateRequiredStringField(
+        "http-header",
+        "url",
+        data.url,
+        "URL is required for HTTP header monitors"
+    ),
+    ...validateRequiredStringField(
+        "http-header",
+        "headerName",
+        data.headerName,
+        "Header name is required for HTTP header monitors"
+    ),
+    ...validateRequiredStringField(
+        "http-header",
+        "expectedHeaderValue",
+        data.expectedHeaderValue,
+        "Expected header value is required for HTTP header monitors"
+    ),
+];
+
+const validateHttpJsonMonitorFormData = (
+    data: Partial<HttpJsonFormData>
+): string[] => [
+    ...validateRequiredStringField(
+        "http-json",
+        "url",
+        data.url,
+        "URL is required for HTTP JSON monitors"
+    ),
+    ...validateRequiredStringField(
+        "http-json",
+        "jsonPath",
+        data.jsonPath,
+        "JSON path is required for HTTP JSON monitors"
+    ),
+    ...validateRequiredStringField(
+        "http-json",
+        "expectedJsonValue",
+        data.expectedJsonValue,
+        "Expected JSON value is required for HTTP JSON monitors"
+    ),
+];
 
 const validateHttpStatusMonitorFormData = (
     data: Partial<HttpStatusFormData>
@@ -354,6 +431,23 @@ const validateHttpStatusMonitorFormData = (
 
     return errors;
 };
+
+const validateHttpLatencyMonitorFormData = (
+    data: Partial<HttpLatencyFormData>
+): string[] => [
+    ...validateRequiredStringField(
+        "http-latency",
+        "url",
+        data.url,
+        "URL is required for HTTP latency monitors"
+    ),
+    ...validateRequiredNumberField(
+        "http-latency",
+        "maxResponseTime",
+        data.maxResponseTime,
+        "Maximum response time is required for HTTP latency monitors"
+    ),
+];
 
 /**
  * Validates DNS monitor form data by checking required host and recordType
@@ -496,6 +590,7 @@ const validateMonitorFormDataByType = (
     data: Partial<MonitorFormData>
 ): string[] => {
     const errors: string[] = [];
+    const monitorTypeValue = type as string;
 
     // Validate type-specific required fields only
     /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe type narrowing within switch statement, each case guarantees the correct form data type */
@@ -512,10 +607,34 @@ const validateMonitorFormDataByType = (
             );
             break;
         }
+        case "http-header": {
+            errors.push(
+                ...validateHttpHeaderMonitorFormData(
+                    data as Partial<HttpHeaderFormData>
+                )
+            );
+            break;
+        }
+        case "http-json": {
+            errors.push(
+                ...validateHttpJsonMonitorFormData(
+                    data as Partial<HttpJsonFormData>
+                )
+            );
+            break;
+        }
         case "http-keyword": {
             errors.push(
                 ...validateHttpKeywordMonitorFormData(
                     data as Partial<HttpKeywordFormData>
+                )
+            );
+            break;
+        }
+        case "http-latency": {
+            errors.push(
+                ...validateHttpLatencyMonitorFormData(
+                    data as Partial<HttpLatencyFormData>
                 )
             );
             break;
@@ -547,7 +666,7 @@ const validateMonitorFormDataByType = (
             break;
         }
         default: {
-            errors.push(`Unsupported monitor type: ${String(type)}`);
+            errors.push(`Unsupported monitor type: ${monitorTypeValue}`);
         }
     }
     /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Turn on again after switch statement */

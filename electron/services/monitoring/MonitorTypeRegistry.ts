@@ -461,7 +461,7 @@ registerMonitorType({
         supportsResponseTime: true,
     },
 
-    validationSchema: httpKeywordMonitorSchema,
+    validationSchema: toZodType(httpKeywordMonitorSchema),
     version: "1.0.0",
 });
 
@@ -574,7 +574,7 @@ registerMonitorType({
         supportsResponseTime: true,
     },
 
-    validationSchema: httpStatusMonitorSchema,
+    validationSchema: toZodType(httpStatusMonitorSchema),
     version: "1.0.0",
 });
 

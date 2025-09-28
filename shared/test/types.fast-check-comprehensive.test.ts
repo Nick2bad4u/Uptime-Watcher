@@ -502,13 +502,18 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
         it("should export BASE_MONITOR_TYPES correctly", () => {
             expect(BASE_MONITOR_TYPES).toEqual([
                 "http",
+                "http-keyword",
+                "http-status",
+                "http-header",
+                "http-json",
+                "http-latency",
                 "port",
                 "ping",
                 "dns",
                 "ssl",
             ]);
             expect(Array.isArray(BASE_MONITOR_TYPES)).toBeTruthy();
-            expect(BASE_MONITOR_TYPES).toHaveLength(5);
+            expect(BASE_MONITOR_TYPES).toHaveLength(10);
         });
 
         it("should export MONITOR_STATUS constants correctly", () => {

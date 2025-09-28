@@ -80,15 +80,31 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
         bodyKeyword,
         certificateWarningDays,
         checkInterval,
+        expectedHeaderValue,
+        expectedJsonValue,
         expectedStatusCode,
         expectedValue,
         generateUuid,
+        headerName,
         host,
+        jsonPath,
+        maxResponseTime,
         monitorType,
         port,
         recordType,
         url,
     } = properties;
+
+    const trimmedHeaderName = safeTrim(headerName);
+    const trimmedExpectedHeaderValue = safeTrim(expectedHeaderValue);
+    const trimmedJsonPath = safeTrim(jsonPath);
+    const trimmedExpectedJsonValue = safeTrim(expectedJsonValue);
+    const trimmedMaxResponseTime = safeTrim(maxResponseTime);
+
+    const parsedMaxResponseTime = Number.parseInt(trimmedMaxResponseTime, 10);
+    const maxResponseTimeValue = Number.isNaN(parsedMaxResponseTime)
+        ? undefined
+        : parsedMaxResponseTime;
 
     const formData = {
         bodyKeyword: safeTrim(bodyKeyword) || undefined,
@@ -96,11 +112,23 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
             ? Number.parseInt(certificateWarningDays, 10)
             : undefined,
         checkInterval,
+        expectedHeaderValue:
+            trimmedExpectedHeaderValue.length > 0
+                ? trimmedExpectedHeaderValue
+                : undefined,
+        expectedJsonValue:
+            trimmedExpectedJsonValue.length > 0
+                ? trimmedExpectedJsonValue
+                : undefined,
         expectedStatusCode: expectedStatusCode
             ? Number.parseInt(expectedStatusCode, 10)
             : undefined,
         expectedValue,
+        headerName:
+            trimmedHeaderName.length > 0 ? trimmedHeaderName : undefined,
         host,
+        jsonPath: trimmedJsonPath.length > 0 ? trimmedJsonPath : undefined,
+        maxResponseTime: maxResponseTimeValue,
         port: port ? Number.parseInt(port, 10) : undefined,
         recordType,
         url,
@@ -237,26 +265,44 @@ async function validateCheckInterval(
  * Validates monitor type-specific configuration using form validation.
  *
  * @param monitorType - Type of monitor
- * @param url - URL for HTTP monitors
- * @param host - Hostname for monitors
- * @param port - Port for port monitors
- * @param hostname - Hostname for DNS monitors
- * @param recordType - Record type for DNS monitors
- * @param expectedValue - Expected value for DNS monitors
+ * @param fields - Raw form field values required for validation
  *
  * @returns Promise resolving to array of validation error messages
  */
 async function validateMonitorType(
     monitorType: MonitorType,
-    url: string,
-    host: string,
-    port: string,
-    recordType: string,
-    expectedValue: string,
-    bodyKeyword: string,
-    expectedStatusCode: string,
-    certificateWarningDays: string
+    fields: {
+        bodyKeyword: string;
+        certificateWarningDays: string;
+        expectedHeaderValue: string;
+        expectedJsonValue: string;
+        expectedStatusCode: string;
+        expectedValue: string;
+        headerName: string;
+        host: string;
+        jsonPath: string;
+        maxResponseTime: string;
+        port: string;
+        recordType: string;
+        url: string;
+    }
 ): Promise<readonly string[]> {
+    const {
+        bodyKeyword,
+        certificateWarningDays,
+        expectedHeaderValue,
+        expectedJsonValue,
+        expectedStatusCode,
+        expectedValue,
+        headerName,
+        host,
+        jsonPath,
+        maxResponseTime,
+        port,
+        recordType,
+        url,
+    } = fields;
+
     // Build form data object with only the relevant fields
     const formData: UnknownRecord = {
         type: monitorType,
@@ -279,9 +325,29 @@ async function validateMonitorType(
             formData["url"] = safeTrim(url);
             break;
         }
+        case "http-header": {
+            formData["url"] = safeTrim(url);
+            formData["headerName"] = safeTrim(headerName);
+            formData["expectedHeaderValue"] = safeTrim(expectedHeaderValue);
+            break;
+        }
+        case "http-json": {
+            formData["url"] = safeTrim(url);
+            formData["jsonPath"] = safeTrim(jsonPath);
+            formData["expectedJsonValue"] = safeTrim(expectedJsonValue);
+            break;
+        }
         case "http-keyword": {
             formData["url"] = safeTrim(url);
             formData["bodyKeyword"] = safeTrim(bodyKeyword);
+            break;
+        }
+        case "http-latency": {
+            formData["url"] = safeTrim(url);
+            formData["maxResponseTime"] = Number.parseInt(
+                safeTrim(maxResponseTime) || "NaN",
+                10
+            );
             break;
         }
         case "http-status": {
@@ -359,10 +425,15 @@ export async function handleSubmit(
         certificateWarningDays,
         checkInterval,
         clearError,
+        expectedHeaderValue,
+        expectedJsonValue,
         expectedStatusCode,
         expectedValue,
+        headerName,
         host,
+        jsonPath,
         logger,
+        maxResponseTime,
         monitorType,
         name,
         onSuccess,
@@ -381,8 +452,13 @@ export async function handleSubmit(
         addMode,
         hasBodyKeyword: Boolean(safeTrim(bodyKeyword)),
         hasCertificateWarningDays: Boolean(safeTrim(certificateWarningDays)),
+        hasExpectedHeaderValue: Boolean(safeTrim(expectedHeaderValue)),
+        hasExpectedJsonValue: Boolean(safeTrim(expectedJsonValue)),
         hasExpectedStatusCode: Boolean(safeTrim(expectedStatusCode)),
+        hasHeaderName: Boolean(safeTrim(headerName)),
         hasHost: Boolean(safeTrim(host)),
+        hasJsonPath: Boolean(safeTrim(jsonPath)),
+        hasMaxResponseTime: Boolean(safeTrim(maxResponseTime)),
         hasName: Boolean(safeTrim(name)),
         hasPort: Boolean(safeTrim(port)),
         hasRecordType: Boolean(safeTrim(recordType)),
@@ -394,17 +470,21 @@ export async function handleSubmit(
     // Collect all validation errors
     const validationErrors: string[] = [
         ...validateAddMode(addMode, name, selectedExistingSite),
-        ...(await validateMonitorType(
-            monitorType,
-            url,
+        ...(await validateMonitorType(monitorType, {
+            bodyKeyword,
+            certificateWarningDays,
+            expectedHeaderValue,
+            expectedJsonValue,
+            expectedStatusCode,
+            expectedValue,
+            headerName,
             host,
+            jsonPath,
+            maxResponseTime,
             port,
             recordType,
-            expectedValue,
-            bodyKeyword,
-            expectedStatusCode,
-            certificateWarningDays
-        )),
+            url,
+        })),
         ...(await validateCheckInterval(checkInterval)),
     ];
 
@@ -416,9 +496,14 @@ export async function handleSubmit(
                 addMode,
                 bodyKeyword: truncateForLogging(bodyKeyword),
                 checkInterval,
+                expectedHeaderValue: truncateForLogging(expectedHeaderValue),
+                expectedJsonValue: truncateForLogging(expectedJsonValue),
                 expectedStatusCode: truncateForLogging(expectedStatusCode),
                 expectedValue: truncateForLogging(expectedValue),
+                headerName: truncateForLogging(headerName),
                 host: truncateForLogging(host),
+                jsonPath: truncateForLogging(jsonPath),
+                maxResponseTime: truncateForLogging(maxResponseTime),
                 monitorType,
                 name: truncateForLogging(name),
                 port,

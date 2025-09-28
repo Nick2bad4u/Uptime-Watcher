@@ -1076,10 +1076,7 @@ describe("Monitor Validation Utilities", () => {
                 });
 
                 expect(result).toEqual({
-                    errors: [
-                        "URL is required for HTTP keyword monitors",
-                        "Keyword is required for HTTP keyword monitors",
-                    ],
+                    errors: ["Keyword is required for HTTP keyword monitors"],
                     success: false,
                     warnings: [],
                 });
@@ -1094,19 +1091,12 @@ describe("Monitor Validation Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Error Handling", "type");
 
-                vi.mocked(sharedValidateMonitorField)
-                    .mockReturnValueOnce({
-                        errors: ["URL format is invalid"],
-                        success: false,
-                        warnings: [],
-                        metadata: {},
-                    })
-                    .mockReturnValueOnce({
-                        errors: ["Keyword length must be at least 1"],
-                        success: false,
-                        warnings: [],
-                        metadata: {},
-                    });
+                vi.mocked(sharedValidateMonitorField).mockReturnValueOnce({
+                    errors: ["URL format is invalid"],
+                    success: false,
+                    warnings: [],
+                    metadata: {},
+                });
 
                 const result = await validateMonitorFormData("http-keyword", {
                     bodyKeyword: "",
@@ -1116,7 +1106,7 @@ describe("Monitor Validation Utilities", () => {
                 expect(result).toEqual({
                     errors: [
                         "URL format is invalid",
-                        "Keyword length must be at least 1",
+                        "Keyword is required for HTTP keyword monitors",
                     ],
                     success: false,
                     warnings: [],
@@ -1168,7 +1158,6 @@ describe("Monitor Validation Utilities", () => {
 
                 expect(result).toEqual({
                     errors: [
-                        "URL is required for HTTP status monitors",
                         "Expected status code is required for HTTP status monitors",
                     ],
                     success: false,

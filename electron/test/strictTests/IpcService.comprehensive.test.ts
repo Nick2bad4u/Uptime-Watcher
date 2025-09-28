@@ -107,7 +107,10 @@ vi.mock("@shared/validation/schemas", () => {
     });
 
     return {
+        httpHeaderMonitorSchema: createSchemaMock(),
+        httpJsonMonitorSchema: createSchemaMock(),
         httpKeywordMonitorSchema: createSchemaMock(),
+        httpLatencyMonitorSchema: createSchemaMock(),
         httpStatusMonitorSchema: createSchemaMock(),
         validateMonitorData: vi.fn((type: string, _data: unknown) => ({
             success: type !== "invalid",
@@ -119,7 +122,10 @@ vi.mock("@shared/validation/schemas", () => {
         monitorSchemas: {
             dns: createSchemaMock(),
             http: createSchemaMock(),
+            "http-header": createSchemaMock(),
+            "http-json": createSchemaMock(),
             "http-keyword": createSchemaMock(),
+            "http-latency": createSchemaMock(),
             "http-status": createSchemaMock(),
             ping: createSchemaMock(),
             port: createSchemaMock(),
@@ -650,7 +656,24 @@ describe("IpcService - Comprehensive Coverage", () => {
 
             expect(result.success).toBeTruthy();
             expect(Array.isArray(result.data)).toBeTruthy();
-            expect(result.data).toHaveLength(5); // Http, ping, port, dns, ssl
+            expect(result.data).toHaveLength(10);
+
+            // Ensure a few representative monitor configurations exist
+            const monitorTypes = result.data.map((config: any) => config.type);
+            expect(monitorTypes).toEqual(
+                expect.arrayContaining([
+                    "http",
+                    "http-keyword",
+                    "http-header",
+                    "http-json",
+                    "http-latency",
+                    "http-status",
+                    "port",
+                    "ping",
+                    "dns",
+                    "ssl",
+                ])
+            );
 
             // Check serialized config structure
             const httpConfig = result.data.find(

@@ -27,6 +27,54 @@ import { useMonitorTypes } from "../hooks/useMonitorTypes";
 import { useDynamicHelpText } from "../hooks/useDynamicHelpText";
 import { useAddSiteForm } from "../components/SiteDetails/useAddSiteForm";
 
+const buildAddSiteFormState = (
+    overrides: Partial<ReturnType<typeof useAddSiteForm>> = {}
+): ReturnType<typeof useAddSiteForm> => ({
+    addMode: "new",
+    bodyKeyword: "",
+    certificateWarningDays: "30",
+    checkInterval: 60_000,
+    expectedHeaderValue: "",
+    expectedJsonValue: "",
+    expectedStatusCode: "200",
+    expectedValue: "",
+    formError: undefined,
+    headerName: "",
+    host: "",
+    isFormValid: vi.fn(() => true),
+    jsonPath: "",
+    maxResponseTime: "2000",
+    monitorType: "http",
+    name: "",
+    port: "",
+    recordType: "",
+    resetForm: vi.fn(),
+    selectedExistingSite: "",
+    setAddMode: vi.fn(),
+    setBodyKeyword: vi.fn(),
+    setCertificateWarningDays: vi.fn(),
+    setCheckInterval: vi.fn(),
+    setExpectedHeaderValue: vi.fn(),
+    setExpectedJsonValue: vi.fn(),
+    setExpectedStatusCode: vi.fn(),
+    setExpectedValue: vi.fn(),
+    setFormError: vi.fn(),
+    setHeaderName: vi.fn(),
+    setHost: vi.fn(),
+    setJsonPath: vi.fn(),
+    setMaxResponseTime: vi.fn(),
+    setMonitorType: vi.fn(),
+    setName: vi.fn(),
+    setPort: vi.fn(),
+    setRecordType: vi.fn(),
+    setSelectedExistingSite: vi.fn(),
+    setSiteId: vi.fn(),
+    setUrl: vi.fn(),
+    siteId: "test-site-id",
+    url: "",
+    ...overrides,
+});
+
 // Mock all external dependencies
 vi.mock("../services/logger", () => ({
     logger: {
@@ -76,34 +124,7 @@ vi.mock("../hooks/useDelayedButtonLoading", () => ({
 }));
 
 vi.mock("../components/SiteDetails/useAddSiteForm", () => ({
-    useAddSiteForm: vi.fn(() => ({
-        addMode: "new",
-        certificateWarningDays: "30",
-        checkInterval: 60_000,
-        expectedValue: "",
-        formError: undefined,
-        host: "",
-        monitorType: "http",
-        name: "",
-        port: "",
-        recordType: "",
-        resetForm: vi.fn(),
-        selectedExistingSite: "",
-        setAddMode: vi.fn(),
-        setCertificateWarningDays: vi.fn(),
-        setCheckInterval: vi.fn(),
-        setExpectedValue: vi.fn(),
-        setFormError: vi.fn(),
-        setHost: vi.fn(),
-        setMonitorType: vi.fn(),
-        setName: vi.fn(),
-        setPort: vi.fn(),
-        setRecordType: vi.fn(),
-        setSelectedExistingSite: vi.fn(),
-        setUrl: vi.fn(),
-        siteId: "test-site-id",
-        url: "",
-    })),
+    useAddSiteForm: vi.fn(() => buildAddSiteFormState()),
 }));
 
 vi.mock("../constants", () => ({
@@ -407,40 +428,11 @@ describe("100% Coverage Edge Cases", () => {
         it("should handle radio group changes", () => {
             const mockSetAddMode = vi.fn();
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm);
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "new",
-                bodyKeyword: "",
-                certificateWarningDays: "30",
-                checkInterval: 60_000,
-                expectedStatusCode: "200",
-                expectedValue: "",
-                formError: undefined,
-                host: "",
-                monitorType: "http",
-                name: "",
-                port: "",
-                recordType: "",
-                resetForm: vi.fn(),
-                selectedExistingSite: "",
-                setAddMode: mockSetAddMode,
-                setBodyKeyword: vi.fn(),
-                setCertificateWarningDays: vi.fn(),
-                setCheckInterval: vi.fn(),
-                setExpectedStatusCode: vi.fn(),
-                setExpectedValue: vi.fn(),
-                setFormError: vi.fn(),
-                setHost: vi.fn(),
-                setMonitorType: vi.fn(),
-                setName: vi.fn(),
-                setPort: vi.fn(),
-                setRecordType: vi.fn(),
-                setSelectedExistingSite: vi.fn(),
-                setUrl: vi.fn(),
-                siteId: "test-site-id",
-                url: "",
-                isFormValid: () => true,
-                setSiteId: vi.fn(),
-            });
+            mockUseAddSiteForm.mockReturnValue(
+                buildAddSiteFormState({
+                    setAddMode: mockSetAddMode,
+                })
+            );
 
             render(<AddSiteForm />);
             const radioButton = screen.getByTestId("radio-new");
@@ -540,44 +532,11 @@ describe("100% Coverage Edge Cases", () => {
     describe("Dynamic Content Edge Cases", () => {
         it("should render existing site mode", () => {
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "existing",
-                bodyKeyword: "",
-                certificateWarningDays: "30",
-                checkInterval: 60_000,
-                expectedStatusCode: "200",
-                expectedValue: "",
-                formError: undefined,
-                host: "",
-                monitorType: "http",
-                name: "",
-                port: "",
-                recordType: "",
-                resetForm: vi.fn(),
-                selectedExistingSite: "",
-                setAddMode: vi.fn(),
-                setBodyKeyword: vi.fn(),
-                setCertificateWarningDays: vi.fn(),
-                setCheckInterval: vi.fn(),
-                setExpectedStatusCode: vi.fn(),
-                setExpectedValue: vi.fn(),
-                setFormError: vi.fn(),
-                setHost: vi.fn(),
-                setMonitorType: vi.fn(),
-                setName: vi.fn(),
-                setPort: vi.fn(),
-                setRecordType: vi.fn(),
-                setSelectedExistingSite: vi.fn(),
-                setUrl: vi.fn(),
-                siteId: "test-site-id",
-                url: "",
-                isFormValid: function (): boolean {
-                    throw new Error("Function not implemented.");
-                },
-                setSiteId: function (_value: string): void {
-                    throw new Error("Function not implemented.");
-                },
-            });
+            mockUseAddSiteForm.mockReturnValue(
+                buildAddSiteFormState({
+                    addMode: "existing",
+                })
+            );
 
             const mockUseSitesStore = vi.mocked(useSitesStore); // Updated: Removed require() and used direct import
             mockUseSitesStore.mockReturnValue({
@@ -596,44 +555,11 @@ describe("100% Coverage Edge Cases", () => {
         it("should handle monitor type validation", () => {
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             const setMonitorType = vi.fn();
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "new",
-                bodyKeyword: "",
-                certificateWarningDays: "30",
-                checkInterval: 60_000,
-                expectedStatusCode: "200",
-                expectedValue: "",
-                formError: undefined,
-                host: "",
-                monitorType: "http",
-                name: "",
-                port: "",
-                recordType: "",
-                resetForm: vi.fn(),
-                selectedExistingSite: "",
-                setAddMode: vi.fn(),
-                setBodyKeyword: vi.fn(),
-                setCertificateWarningDays: vi.fn(),
-                setCheckInterval: vi.fn(),
-                setExpectedStatusCode: vi.fn(),
-                setExpectedValue: vi.fn(),
-                setFormError: vi.fn(),
-                setHost: vi.fn(),
-                setMonitorType,
-                setName: vi.fn(),
-                setPort: vi.fn(),
-                setRecordType: vi.fn(),
-                setSelectedExistingSite: vi.fn(),
-                setUrl: vi.fn(),
-                siteId: "test-site-id",
-                url: "",
-                isFormValid: function (): boolean {
-                    throw new Error("Function not implemented.");
-                },
-                setSiteId: function (_value: string): void {
-                    throw new Error("Function not implemented.");
-                },
-            });
+            mockUseAddSiteForm.mockReturnValue(
+                buildAddSiteFormState({
+                    setMonitorType,
+                })
+            );
 
             render(<AddSiteForm />);
             const select = screen.getByTestId("monitorType");
@@ -652,44 +578,11 @@ describe("100% Coverage Edge Cases", () => {
         it("should handle check interval validation", () => {
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             const setCheckInterval = vi.fn();
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "new",
-                bodyKeyword: "",
-                certificateWarningDays: "30",
-                checkInterval: 60_000,
-                expectedStatusCode: "200",
-                expectedValue: "",
-                formError: undefined,
-                host: "",
-                monitorType: "http",
-                name: "",
-                port: "",
-                recordType: "",
-                resetForm: vi.fn(),
-                selectedExistingSite: "",
-                setAddMode: vi.fn(),
-                setBodyKeyword: vi.fn(),
-                setCertificateWarningDays: vi.fn(),
-                setCheckInterval,
-                setExpectedStatusCode: vi.fn(),
-                setExpectedValue: vi.fn(),
-                setFormError: vi.fn(),
-                setHost: vi.fn(),
-                setMonitorType: vi.fn(),
-                setName: vi.fn(),
-                setPort: vi.fn(),
-                setRecordType: vi.fn(),
-                setSelectedExistingSite: vi.fn(),
-                setUrl: vi.fn(),
-                siteId: "test-site-id",
-                url: "",
-                isFormValid: function (): boolean {
-                    throw new Error("Function not implemented.");
-                },
-                setSiteId: function (_value: string): void {
-                    throw new Error("Function not implemented.");
-                },
-            });
+            mockUseAddSiteForm.mockReturnValue(
+                buildAddSiteFormState({
+                    setCheckInterval,
+                })
+            );
 
             render(<AddSiteForm />);
             const select = screen.getByTestId("checkInterval");
@@ -706,44 +599,11 @@ describe("100% Coverage Edge Cases", () => {
         it("should handle add mode validation", () => {
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             const setAddMode = vi.fn();
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "new",
-                bodyKeyword: "",
-                certificateWarningDays: "30",
-                checkInterval: 60_000,
-                expectedStatusCode: "200",
-                expectedValue: "",
-                formError: undefined,
-                host: "",
-                monitorType: "http",
-                name: "",
-                port: "",
-                recordType: "",
-                resetForm: vi.fn(),
-                selectedExistingSite: "",
-                setAddMode,
-                setBodyKeyword: vi.fn(),
-                setCertificateWarningDays: vi.fn(),
-                setCheckInterval: vi.fn(),
-                setExpectedStatusCode: vi.fn(),
-                setExpectedValue: vi.fn(),
-                setFormError: vi.fn(),
-                setHost: vi.fn(),
-                setMonitorType: vi.fn(),
-                setName: vi.fn(),
-                setPort: vi.fn(),
-                setRecordType: vi.fn(),
-                setSelectedExistingSite: vi.fn(),
-                setUrl: vi.fn(),
-                siteId: "test-site-id",
-                url: "",
-                isFormValid: function (): boolean {
-                    throw new Error("Function not implemented.");
-                },
-                setSiteId: function (_value: string): void {
-                    throw new Error("Function not implemented.");
-                },
-            });
+            mockUseAddSiteForm.mockReturnValue(
+                buildAddSiteFormState({
+                    setAddMode,
+                })
+            );
 
             render(<AddSiteForm />);
             const radioButton = screen.getByTestId("radio-existing");
@@ -806,44 +666,11 @@ describe("100% Coverage Edge Cases", () => {
     describe("Form Error Edge Cases", () => {
         it("should display form error when present", () => {
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "new",
-                bodyKeyword: "",
-                certificateWarningDays: "30",
-                checkInterval: 60_000,
-                expectedStatusCode: "200",
-                expectedValue: "",
-                formError: "Form validation error",
-                host: "",
-                monitorType: "http",
-                name: "",
-                port: "",
-                recordType: "",
-                resetForm: vi.fn(),
-                selectedExistingSite: "",
-                setAddMode: vi.fn(),
-                setBodyKeyword: vi.fn(),
-                setCertificateWarningDays: vi.fn(),
-                setCheckInterval: vi.fn(),
-                setExpectedStatusCode: vi.fn(),
-                setExpectedValue: vi.fn(),
-                setFormError: vi.fn(),
-                setHost: vi.fn(),
-                setMonitorType: vi.fn(),
-                setName: vi.fn(),
-                setPort: vi.fn(),
-                setRecordType: vi.fn(),
-                setSelectedExistingSite: vi.fn(),
-                setUrl: vi.fn(),
-                siteId: "test-site-id",
-                url: "",
-                isFormValid: function (): boolean {
-                    throw new Error("Function not implemented.");
-                },
-                setSiteId: function (_value: string): void {
-                    throw new Error("Function not implemented.");
-                },
-            });
+            mockUseAddSiteForm.mockReturnValue(
+                buildAddSiteFormState({
+                    formError: "Form validation error",
+                })
+            );
 
             render(<AddSiteForm />);
             expect(
@@ -861,44 +688,11 @@ describe("100% Coverage Edge Cases", () => {
             });
 
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
-            mockUseAddSiteForm.mockReturnValue({
-                addMode: "new",
-                bodyKeyword: "",
-                certificateWarningDays: "30",
-                checkInterval: 60_000,
-                expectedStatusCode: "200",
-                expectedValue: "",
-                formError: "Form error",
-                host: "",
-                monitorType: "http",
-                name: "",
-                port: "",
-                recordType: "",
-                resetForm: vi.fn(),
-                selectedExistingSite: "",
-                setAddMode: vi.fn(),
-                setBodyKeyword: vi.fn(),
-                setCertificateWarningDays: vi.fn(),
-                setCheckInterval: vi.fn(),
-                setExpectedStatusCode: vi.fn(),
-                setExpectedValue: vi.fn(),
-                setFormError: vi.fn(),
-                setHost: vi.fn(),
-                setMonitorType: vi.fn(),
-                setName: vi.fn(),
-                setPort: vi.fn(),
-                setRecordType: vi.fn(),
-                setSelectedExistingSite: vi.fn(),
-                setUrl: vi.fn(),
-                siteId: "test-site-id",
-                url: "",
-                isFormValid: function (): boolean {
-                    throw new Error("Function not implemented.");
-                },
-                setSiteId: function (_value: string): void {
-                    throw new Error("Function not implemented.");
-                },
-            });
+            mockUseAddSiteForm.mockReturnValue(
+                buildAddSiteFormState({
+                    formError: "Form error",
+                })
+            );
 
             render(<AddSiteForm />);
             expect(screen.getByText("Form error")).toBeInTheDocument();

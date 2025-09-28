@@ -81,6 +81,9 @@ describe("Monitor Types Utility", () => {
                     "http",
                     "http-keyword",
                     "http-status",
+                    "http-header",
+                    "http-json",
+                    "http-latency",
                     "port",
                     "ping",
                     "dns",
@@ -131,6 +134,9 @@ describe("Monitor Types Utility", () => {
             expect(isBaseMonitorType("ssl")).toBeTruthy();
             expect(isBaseMonitorType("http-keyword")).toBeTruthy();
             expect(isBaseMonitorType("http-status")).toBeTruthy();
+            expect(isBaseMonitorType("http-header")).toBeTruthy();
+            expect(isBaseMonitorType("http-json")).toBeTruthy();
+            expect(isBaseMonitorType("http-latency")).toBeTruthy();
         });
 
         it("should return false for invalid monitor types", async ({

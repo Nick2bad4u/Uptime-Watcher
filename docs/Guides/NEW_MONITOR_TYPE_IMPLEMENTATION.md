@@ -99,8 +99,7 @@ All shared types live under `shared/`. Updating them first unlocks both backend 
    - Define `newMonitorSchema` in `shared/validation/schemas.ts` and include it in the discriminated union `monitorSchema`.
    - Export a typed alias in `shared/types/schemaTypes.ts` for IDE support and cross-package imports.
 5. Field-level validation
-   - Update `validateMonitorType` in `shared/utils/validation.ts` to include the new identifier before you add type-specific rules.
-   - Add a dedicated validator in `shared/utils/validation.ts` so error messages remain human readable.
+   - Add a dedicated validator in `shared/utils/validation.ts` so error messages remain human readable. The shared `validateMonitorType` helper already tracks `BASE_MONITOR_TYPES`, so you only need to plug in your type-specific logic.
 6. Shared tests
    - Extend `shared/test/validation/schemas.comprehensive.test.ts` with happy and failure cases covering the new schema.
    - Update `shared/test/types.fast-check-comprehensive.test.ts` (and any other tests that hard-code `BASE_MONITOR_TYPES`) so the new identifier participates in the assertions and property-based generators.
@@ -113,13 +112,13 @@ Run the shared unit tests before moving on: `npm run test:shared`.
 
 1. Create the service class
    - Add `electron/services/monitoring/<NewMonitor>.ts` implementing `IMonitorService` from `electron/services/monitoring/types.ts`.
-   - Reuse helpers like `validateMonitorHostAndPort`, `extractMonitorConfig`, and `withOperationalHooks` from `electron/services/monitoring/shared/monitorServiceHelpers.ts` to match retry behaviour.
+   - Reuse helpers like `validateMonitorHostAndPort` and `extractMonitorConfig` from `electron/services/monitoring/shared/monitorServiceHelpers.ts`, and wrap retries with `withOperationalHooks` from `electron/utils/operationalHooks.ts` to match shared behaviour.
 2. Write unit tests
    - Mirror `electron/test/services/monitoring/SslMonitor.test.ts`. Cover success, degraded thresholds, failure states, timeouts, and invalid configurations.
 3. Register the monitor type
    - Update `electron/services/monitoring/MonitorTypeRegistry.ts`:
      - Import the service and call `registerMonitorType({ ... })` with description, display name, `fields` metadata, `serviceFactory`, `uiConfig`, and `validationSchema` (the shared schema you added).
-     - Set the implementation version through `versionManager.setVersion(type, semver)`.
+     - Set the implementation version through `versionManager.setVersion(type, semver)` in the version block near the end of `MonitorTypeRegistry.ts` so telemetry and migrations stay aligned.
    - Provide history and analytics formatters as needed through the `uiConfig` hooks.
 4. Route checks
    - In `electron/services/monitoring/EnhancedMonitorChecker.ts`, add a class property for the new service and handle it inside the `switch (monitor.type)` block.
@@ -157,7 +156,7 @@ Verification tip: start the Electron app after registering the monitor. The data
 ### Step 4 - Wire Up the Renderer
 
 0. Frontend metadata helpers
-   - Verify `src/utils/monitorTypeHelper.ts`, `src/utils/monitorUiHelpers.ts`, and `src/hooks/useMonitorTypes.ts` cache the new type, and update mocks/tests that export monitor types (including Storybook setup).
+   - Verify `src/utils/monitorTypeHelper.ts`, `src/utils/monitorUiHelpers.ts`, and `src/hooks/useMonitorTypes.ts` cache the new type, and update mocks/tests that export monitor types (including Storybook setup). Make sure to refresh `src/test/hooks/useMonitorTypes.test.ts`, which asserts the fallback options list.
 
 1. Monitor types store
    - `useMonitorTypesStore` in `src/stores/monitor/useMonitorTypesStore.ts` consumes backend metadata. Update tests if they assert the list of known types.
@@ -173,12 +172,13 @@ Verification tip: start the Electron app after registering the monitor. The data
    - Update `src/components/AddSiteForm/AddSiteForm.tsx`, `DynamicMonitorFields.tsx`, and `Submit.tsx` so inputs render and submissions convert string fields into typed values.
 6. Fallback options and UI polish
    - Add the human-friendly label to `FALLBACK_MONITOR_TYPE_OPTIONS` in `src/constants.ts`.
-   - Update helpers that print monitor labels, such as `src/utils/fallbacks.ts` and `src/components/Dashboard/SiteCard/components/MonitorSelector.tsx`.
+   - Extend the label/identifier helpers in `src/utils/fallbacks.ts` (for example, the `MONITOR_TYPE_LABELS` and `MONITOR_IDENTIFIER_GENERATORS` maps) and any UI that renders them, such as `src/components/Dashboard/SiteCard/components/MonitorSelector.tsx`.
    - Keep the history/title fallbacks in sync by updating `src/utils/monitorTitleFormatters.ts`, `src/components/SiteDetails/MonitoringStatusDisplay.tsx`, and the coverage safety net in `src/test/branch-coverage-optimization.test.tsx` so the new type renders readable suffixes and connection details.
 7. Renderer tests
    - Expand `src/test/hooks/useAddSiteForm.comprehensive.test.ts` to cover state transitions, resetting, and submission success.
    - Update regression and fuzz suites: `src/test/comprehensive-100-percent-coverage.test.tsx`, `src/test/fuzzing/monitor-operations.fuzz.test.ts`, and `src/test/stores/sites/utils/monitorOperations.fast-check-comprehensive.test.ts`.
    - Extend constants-focused suites (`src/test/constants.test.ts`, `src/test/constants-theme-100-coverage.test.ts`) and any AddSiteForm test doubles that hard-code `FALLBACK_MONITOR_TYPE_OPTIONS` so they include the new label/value pair.
+   - Update shared and renderer form-data suites (`shared/test/types/formData.comprehensive.test.ts`, `src/test/types/monitorFormData.comprehensive.test.ts`, `src/test/types/monitor-forms.comprehensive.test.ts`, and their 100% coverage variants) so the new type participates in every assertion.
 
 Goal: a user can add the monitor through the UI, validation responds correctly, and labels render without custom components.
 
@@ -256,8 +256,15 @@ registerMonitorType({
  type: "new-monitor",
  uiConfig: {
   detailFormats: {
+   analyticsLabel: "New Monitor Response Time",
    historyDetail: (details) => `Details: ${details}`,
   },
+  display: {
+   showAdvancedMetrics: true,
+   showUrl: false,
+  },
+  formatDetail: (details) => `Details: ${details}`,
+  formatTitleSuffix: (monitor) => monitor.host ? ` (${monitor.host})` : "",
   supportsResponseTime: true,
  },
  validationSchema: monitorSchemas.newMonitor,

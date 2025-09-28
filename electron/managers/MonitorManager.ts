@@ -689,38 +689,35 @@ export class MonitorManager {
 
         const sites = config.sites.getAll();
 
-        // Process all sites in parallel to avoid sequential await-in-loop
-        const sitePromises = sites.map(async (site) => {
+        for (const site of sites) {
             try {
-                // Start monitoring for all monitors in this site using enhanced services
-                const monitorPromises = site.monitors
-                    .filter((monitor) => monitor.id && monitor.checkInterval)
-                    .map(async (monitor) => {
-                        const started =
-                            await this.enhancedMonitoringServices.checker.startMonitoring(
-                                site.identifier,
-                                monitor.id
-                            );
+                const monitorsToStart = site.monitors.filter(
+                    (monitor): monitor is Monitor & { id: string } =>
+                        Boolean(monitor.id && monitor.checkInterval)
+                );
 
-                        if (started) {
-                            // Update cached monitor state and emit events
-                            await this.applyMonitorState(
-                                site,
-                                monitor,
-                                {
-                                    activeOperations: [],
-                                    monitoring: true,
-                                    status: MONITOR_STATUS.PENDING,
-                                },
-                                MONITOR_STATUS.PENDING
-                            );
-                        }
-                    });
+                // Process sequentially to avoid overlapping SQLite transactions
+                for (const monitor of monitorsToStart) {
+                    const started =
+                        await this.enhancedMonitoringServices.checker.startMonitoring(
+                            site.identifier,
+                            monitor.id
+                        );
 
-                // Wait for all monitors in this site to be processed
-                await Promise.all(monitorPromises);
+                    if (started) {
+                        await this.applyMonitorState(
+                            site,
+                            monitor,
+                            {
+                                activeOperations: [],
+                                monitoring: true,
+                                status: MONITOR_STATUS.PENDING,
+                            },
+                            MONITOR_STATUS.PENDING
+                        );
+                    }
+                }
 
-                // Start the site in the scheduler
                 config.monitorScheduler.startSite(site);
             } catch (error) {
                 config.logger.error(
@@ -728,10 +725,7 @@ export class MonitorManager {
                     error
                 );
             }
-        });
-
-        // Wait for all sites to be processed
-        await Promise.all(sitePromises);
+        }
 
         config.logger.info("Started all monitoring operations (enhanced)");
         return true;
@@ -766,46 +760,41 @@ export class MonitorManager {
 
         const sites = config.sites.getAll();
 
-        // Process all sites in parallel to avoid sequential await-in-loop
-        const sitePromises = sites.map(async (site) => {
+        for (const site of sites) {
             try {
-                // Stop monitoring for all monitors in this site using enhanced services
-                const monitorPromises = site.monitors
-                    .filter((monitor) => monitor.id && monitor.monitoring)
-                    .map(async (monitor) => {
-                        const stopped =
-                            await this.enhancedMonitoringServices.checker.stopMonitoring(
-                                site.identifier,
-                                monitor.id
-                            );
+                const monitorsToStop = site.monitors.filter(
+                    (monitor): monitor is Monitor & { id: string } =>
+                        Boolean(monitor.id && monitor.monitoring)
+                );
 
-                        if (stopped) {
-                            // Update cached monitor state and emit events
-                            await this.applyMonitorState(
-                                site,
-                                monitor,
-                                {
-                                    activeOperations: [],
-                                    monitoring: false,
-                                    status: MONITOR_STATUS.PAUSED,
-                                },
-                                MONITOR_STATUS.PAUSED
-                            );
-                        }
-                    });
+                // Process sequentially to avoid overlapping SQLite transactions
+                for (const monitor of monitorsToStop) {
+                    const stopped =
+                        await this.enhancedMonitoringServices.checker.stopMonitoring(
+                            site.identifier,
+                            monitor.id
+                        );
 
-                // Wait for all monitors in this site to be processed
-                await Promise.all(monitorPromises);
+                    if (stopped) {
+                        await this.applyMonitorState(
+                            site,
+                            monitor,
+                            {
+                                activeOperations: [],
+                                monitoring: false,
+                                status: MONITOR_STATUS.PAUSED,
+                            },
+                            MONITOR_STATUS.PAUSED
+                        );
+                    }
+                }
             } catch (error) {
                 config.logger.error(
                     `Failed to stop monitoring for site ${site.identifier}`,
                     error
                 );
             }
-        });
-
-        // Wait for all sites to be processed
-        await Promise.all(sitePromises);
+        }
 
         // Stop all scheduled operations after state updates are complete
         config.monitorScheduler.stopAll();
@@ -876,7 +865,6 @@ export class MonitorManager {
                     );
 
                 if (result) {
-                    // Update cached monitor state and emit events
                     await this.applyMonitorState(
                         site,
                         monitor,
@@ -888,7 +876,6 @@ export class MonitorManager {
                         MONITOR_STATUS.PENDING
                     );
 
-                    // Start monitor in scheduler and return result
                     config.logger.debug(
                         `Started monitoring for ${identifier}:${monitorId} (enhanced)`
                     );
@@ -907,35 +894,36 @@ export class MonitorManager {
             }
         }
 
-        // Start all monitors in site - optimistic logic (succeed if ANY monitor starts)
-        // Filter monitors that have IDs and process them in parallel
-        const validMonitors = site.monitors.filter((monitor) => monitor.id);
+        // Start all monitors in site sequentially - succeed if any monitor starts
+        const validMonitors = site.monitors.filter(
+            (monitor): monitor is Monitor & { id: string } =>
+                Boolean(monitor.id)
+        );
 
-        const results = await Promise.allSettled(
-            validMonitors.map(async (monitor) => {
-                try {
-                    // Initialize result based on callback availability
-                    return callback
-                        ? await callback(identifier, monitor.id)
-                        : await this.startMonitoringForSiteEnhanced(
-                              config,
-                              identifier,
-                              monitor.id
-                          );
-                } catch (error) {
-                    config.logger.error(
-                        `Enhanced start failed for ${identifier}:${monitor.id}`,
-                        error
-                    );
-                    return false;
+        let hasSuccessfulStart = false;
+
+        for (const monitor of validMonitors) {
+            try {
+                const result = callback
+                    ? await callback(identifier, monitor.id)
+                    : await this.startMonitoringForSiteEnhanced(
+                          config,
+                          identifier,
+                          monitor.id
+                      );
+
+                if (result) {
+                    hasSuccessfulStart = true;
                 }
-            })
-        );
+            } catch (error) {
+                config.logger.error(
+                    `Enhanced start failed for ${identifier}:${monitor.id}`,
+                    error
+                );
+            }
+        }
 
-        // Check if any monitor started successfully and return directly
-        return results.some(
-            (result) => result.status === "fulfilled" && result.value
-        );
+        return hasSuccessfulStart;
     }
 
     /**
@@ -993,7 +981,6 @@ export class MonitorManager {
                     );
 
                 if (result) {
-                    // Update cached monitor state and emit events
                     await this.applyMonitorState(
                         site,
                         monitor,
@@ -1005,7 +992,6 @@ export class MonitorManager {
                         MONITOR_STATUS.PAUSED
                     );
 
-                    // Stop monitor in scheduler and return result
                     config.logger.debug(
                         `Stopped monitoring for ${identifier}:${monitorId} (enhanced)`
                     );
@@ -1024,37 +1010,37 @@ export class MonitorManager {
             }
         }
 
-        // Stop all monitors in site - pessimistic logic (fail if ANY monitor fails to stop)
-        // Filter monitors that have IDs and are monitoring, then process them in parallel
+        // Stop all monitors in site sequentially - fail if any monitor fails to stop
         const validMonitors = site.monitors.filter(
-            (monitor) => monitor.id && monitor.monitoring
+            (monitor): monitor is Monitor & { id: string } =>
+                Boolean(monitor.id && monitor.monitoring)
         );
 
-        const results = await Promise.allSettled(
-            validMonitors.map(async (monitor) => {
-                try {
-                    // Initialize result based on callback availability
-                    return callback
-                        ? await callback(identifier, monitor.id)
-                        : await this.stopMonitoringForSiteEnhanced(
-                              config,
-                              identifier,
-                              monitor.id
-                          );
-                } catch (error) {
-                    config.logger.error(
-                        `Enhanced stop failed for ${identifier}:${monitor.id}`,
-                        error
-                    );
-                    return false;
+        let allStoppedSuccessfully = true;
+
+        for (const monitor of validMonitors) {
+            try {
+                const result = callback
+                    ? await callback(identifier, monitor.id)
+                    : await this.stopMonitoringForSiteEnhanced(
+                          config,
+                          identifier,
+                          monitor.id
+                      );
+
+                if (!result) {
+                    allStoppedSuccessfully = false;
                 }
-            })
-        );
+            } catch (error) {
+                config.logger.error(
+                    `Enhanced stop failed for ${identifier}:${monitor.id}`,
+                    error
+                );
+                allStoppedSuccessfully = false;
+            }
+        }
 
-        // Check if all monitors stopped successfully and return directly
-        return results.every(
-            (result) => result.status === "fulfilled" && result.value
-        );
+        return allStoppedSuccessfully;
     }
 
     /**

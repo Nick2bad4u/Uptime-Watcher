@@ -19,6 +19,7 @@ import {
     validateMonitorData,
     validateSiteData,
 } from "../validation/schemas";
+import { BASE_MONITOR_TYPES } from "../types";
 
 // Custom arbitraries for monitor data generation that match schema constraints
 const baseMonitorArbitrary = fc.record({
@@ -27,7 +28,10 @@ const baseMonitorArbitrary = fc.record({
         .filter((s) => s.trim().length > 0),
     type: fc.constantFrom(
         "http",
+        "http-header",
+        "http-json",
         "http-keyword",
+        "http-latency",
         "http-status",
         "port",
         "ping",
@@ -126,6 +130,81 @@ const validHostArbitrary = fc
         return host === "localhost";
     });
 
+const HEADER_SYMBOLS = [
+    "!",
+    "#",
+    "$",
+    "%",
+    "&",
+    "'",
+    "*",
+    "+",
+    "-",
+    ".",
+    "^",
+    "_",
+    "`",
+    "|",
+    "~",
+] as const;
+
+const DIGIT_CHARS = Array.from({ length: 10 }, (_, index) =>
+    String.fromCharCode(48 + index)
+);
+const LOWER_ALPHA_CHARS = Array.from({ length: 26 }, (_, index) =>
+    String.fromCharCode(97 + index)
+);
+const UPPER_ALPHA_CHARS = Array.from({ length: 26 }, (_, index) =>
+    String.fromCharCode(65 + index)
+);
+
+const HEADER_TOKEN_CHAR_SET = [
+    ...DIGIT_CHARS,
+    ...LOWER_ALPHA_CHARS,
+    ...UPPER_ALPHA_CHARS,
+    ...HEADER_SYMBOLS,
+] as const;
+
+const headerNameArbitrary = fc
+    .array(fc.constantFrom(...HEADER_TOKEN_CHAR_SET), {
+        minLength: 1,
+        maxLength: 64,
+    })
+    .map((chars) => chars.join(""))
+    .filter((name) => name.trim().length > 0);
+
+const createTrimmedStringArbitrary = (constraints: fc.StringConstraints) =>
+    fc.string(constraints).filter((value) => value.trim().length > 0);
+
+const expectedHeaderValueArbitrary = createTrimmedStringArbitrary({
+    minLength: 1,
+    maxLength: 512,
+});
+
+const expectedJsonValueArbitrary = createTrimmedStringArbitrary({
+    minLength: 1,
+    maxLength: 512,
+});
+
+const JSON_PATH_SEGMENT_CHARS = [
+    ...DIGIT_CHARS,
+    ...LOWER_ALPHA_CHARS,
+    ...UPPER_ALPHA_CHARS,
+    "_",
+] as const;
+
+const jsonPathSegmentArbitrary = fc
+    .array(fc.constantFrom(...JSON_PATH_SEGMENT_CHARS), {
+        minLength: 1,
+        maxLength: 32,
+    })
+    .map((chars) => chars.join(""));
+
+const jsonPathArbitrary = fc
+    .array(jsonPathSegmentArbitrary, { minLength: 1, maxLength: 5 })
+    .map((segments) => segments.join("."))
+    .filter((path) => path.length <= 512);
+
 // More efficient arbitraries that don't use fc.sample
 const httpMonitorBaseFields = {
     id: fc
@@ -178,25 +257,21 @@ const httpKeywordMonitorArbitrary = fc.record({
 
 const httpHeaderMonitorArbitrary = fc.record({
     ...httpMonitorBaseFields,
-    headerName: fc
-        .string({ minLength: 1, maxLength: 256 })
-        .filter((name) => name.trim().length > 0),
-    expectedHeaderValue: fc.string({ maxLength: 256 }),
+    headerName: headerNameArbitrary,
+    expectedHeaderValue: expectedHeaderValueArbitrary,
     type: fc.constant("http-header" as const),
 });
 
 const httpJsonMonitorArbitrary = fc.record({
     ...httpMonitorBaseFields,
-    jsonPath: fc
-        .string({ minLength: 1, maxLength: 256 })
-        .filter((path) => path.trim().length > 0),
-    expectedJsonValue: fc.string({ maxLength: 256 }),
+    jsonPath: jsonPathArbitrary,
+    expectedJsonValue: expectedJsonValueArbitrary,
     type: fc.constant("http-json" as const),
 });
 
 const httpLatencyMonitorArbitrary = fc.record({
     ...httpMonitorBaseFields,
-    maxResponseTime: fc.integer({ min: 0, max: 300_000 }),
+    maxResponseTime: fc.integer({ min: 1, max: 300_000 }),
     type: fc.constant("http-latency" as const),
 });
 
@@ -407,15 +482,9 @@ describe("Schema Property-Based Tests", () => {
                 if (result.success) {
                     expect(result.data).toEqual(monitorData);
                     expect(result.data.id).toBeDefined();
-                    expect(result.data.type).toBeOneOf([
-                        "http",
-                        "http-keyword",
-                        "http-status",
-                        "port",
-                        "ping",
-                        "dns",
-                        "ssl",
-                    ]);
+                    expect(result.data.type).toBeOneOf(
+                        Array.from(BASE_MONITOR_TYPES)
+                    );
                     expect(result.data.status).toBeOneOf([
                         "up",
                         "down",
@@ -606,12 +675,7 @@ describe("Schema Property-Based Tests", () => {
                 expect(result.success).toBeTruthy();
 
                 if (result.success) {
-                    expect([
-                        "http",
-                        "port",
-                        "ping",
-                        "dns",
-                    ]).toContain(result.data.type);
+                    expect(BASE_MONITOR_TYPES).toContain(result.data.type);
 
                     // Type-specific validation
                     switch (result.data.type) {

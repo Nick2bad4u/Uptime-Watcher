@@ -131,10 +131,15 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             bodyKeyword,
             certificateWarningDays,
             checkInterval,
+            expectedHeaderValue,
+            expectedJsonValue,
             expectedStatusCode,
             expectedValue,
             formError,
+            headerName,
             host,
+            jsonPath,
+            maxResponseTime,
             monitorType,
             name,
             port,
@@ -145,10 +150,15 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             setBodyKeyword,
             setCertificateWarningDays,
             setCheckInterval,
+            setExpectedHeaderValue,
+            setExpectedJsonValue,
             setExpectedStatusCode,
             setExpectedValue,
             setFormError,
+            setHeaderName,
             setHost,
+            setJsonPath,
+            setMaxResponseTime,
             setMonitorType,
             setName,
             setPort,
@@ -201,14 +211,29 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 certificateWarningDays: (value: number | string): void => {
                     setCertificateWarningDays(String(value));
                 },
+                expectedHeaderValue: (value: number | string): void => {
+                    setExpectedHeaderValue(String(value));
+                },
+                expectedJsonValue: (value: number | string): void => {
+                    setExpectedJsonValue(String(value));
+                },
                 expectedStatusCode: (value: number | string): void => {
                     setExpectedStatusCode(String(value));
                 },
                 expectedValue: (value: number | string): void => {
                     setExpectedValue(String(value));
                 },
+                headerName: (value: number | string): void => {
+                    setHeaderName(String(value));
+                },
                 host: (value: number | string): void => {
                     setHost(String(value));
+                },
+                jsonPath: (value: number | string): void => {
+                    setJsonPath(String(value));
+                },
+                maxResponseTime: (value: number | string): void => {
+                    setMaxResponseTime(String(value));
                 },
                 port: (value: number | string): void => {
                     setPort(String(value));
@@ -223,9 +248,14 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             [
                 setBodyKeyword,
                 setCertificateWarningDays,
+                setExpectedHeaderValue,
+                setExpectedJsonValue,
                 setExpectedStatusCode,
                 setExpectedValue,
+                setHeaderName,
                 setHost,
+                setJsonPath,
+                setMaxResponseTime,
                 setPort,
                 setRecordType,
                 setUrl,
@@ -237,9 +267,14 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             () => ({
                 bodyKeyword,
                 certificateWarningDays,
+                expectedHeaderValue,
+                expectedJsonValue,
                 expectedStatusCode,
                 expectedValue,
+                headerName,
                 host,
+                jsonPath,
+                maxResponseTime,
                 port,
                 recordType,
                 url,
@@ -247,9 +282,14 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             [
                 bodyKeyword,
                 certificateWarningDays,
+                expectedHeaderValue,
+                expectedJsonValue,
                 expectedStatusCode,
                 expectedValue,
+                headerName,
                 host,
+                jsonPath,
+                maxResponseTime,
                 port,
                 recordType,
                 url,
@@ -279,12 +319,17 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                         checkInterval,
                         clearError,
                         createSite,
+                        expectedHeaderValue,
+                        expectedJsonValue,
                         expectedStatusCode,
                         expectedValue,
                         formError,
                         generateUuid,
+                        headerName,
                         host,
+                        jsonPath,
                         logger,
+                        maxResponseTime,
                         monitorType,
                         name,
                         onSuccess: handleSuccess,
@@ -312,11 +357,16 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 checkInterval,
                 clearError,
                 createSite,
+                expectedHeaderValue,
+                expectedJsonValue,
                 expectedStatusCode,
                 expectedValue,
                 formError,
                 handleSuccess,
+                headerName,
                 host,
+                jsonPath,
+                maxResponseTime,
                 monitorType,
                 name,
                 port,

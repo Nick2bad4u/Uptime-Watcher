@@ -285,6 +285,10 @@ export function isValidUrl(
         return false;
     }
 
+    if (value.includes("'") || value.includes("`")) {
+        return false;
+    }
+
     // Default options to allow localhost and restrict to HTTP/HTTPS
     const urlOptions = {
         allow_protocol_relative_urls: false,

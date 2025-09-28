@@ -243,7 +243,10 @@ const httpHeaderNameSchema = z
 const httpHeaderValueSchema = z
     .string()
     .min(1, "Expected header value is required")
-    .max(2048, "Expected header value must be 2048 characters or fewer");
+    .max(2048, "Expected header value must be 2048 characters or fewer")
+    .refine((value) => value.trim().length > 0, {
+        message: "Expected header value is required",
+    });
 const isValidJsonPath = (value: string): boolean => {
     const trimmed = value.trim();
 
@@ -310,7 +313,10 @@ export const httpKeywordMonitorSchema: HttpKeywordMonitorSchemaType =
             bodyKeyword: z
                 .string()
                 .min(1, "Keyword is required")
-                .max(1024, "Keyword must be 1024 characters or fewer"),
+                .max(1024, "Keyword must be 1024 characters or fewer")
+                .refine((keyword) => keyword.trim().length > 0, {
+                    message: "Keyword is required",
+                }),
             type: z.literal("http-keyword"),
             url: httpUrlSchema,
         })
@@ -332,7 +338,10 @@ export const httpJsonMonitorSchema: HttpJsonMonitorSchemaType =
                 .max(
                     2048,
                     "Expected JSON value must be 2048 characters or fewer"
-                ),
+                )
+                .refine((value) => value.trim().length > 0, {
+                    message: "Expected JSON value is required",
+                }),
             jsonPath: jsonPathSchema,
             type: z.literal("http-json"),
             url: httpUrlSchema,

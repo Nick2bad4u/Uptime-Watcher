@@ -9,16 +9,38 @@ import type { MonitorCheckResult } from "../../../services/monitoring/types";
 
 import { HttpHeaderMonitor } from "../../../services/monitoring/HttpHeaderMonitor";
 
-const scheduleMock = vi.fn(
-    async (_url: string, operation: () => Promise<MonitorCheckResult>) =>
+const {
+    axiosGetMock,
+    createMonitorErrorResultMock,
+    extractMonitorConfigMock,
+    handleCheckErrorMock,
+    scheduleMock,
+    validateMonitorUrlMock,
+    withOperationalHooksMock,
+} = vi.hoisted(() => {
+    const schedule = vi.fn(
+        async (_url: string, operation: () => Promise<MonitorCheckResult>) =>
+            operation()
+    );
+    const createMonitorErrorResult = vi.fn();
+    const extractMonitorConfig = vi.fn();
+    const validateMonitorUrl = vi.fn();
+    const handleCheckError = vi.fn();
+    const axiosGet = vi.fn();
+    const withOperationalHooks = vi.fn(async <T>(operation: () => Promise<T>) =>
         operation()
-);
-const createMonitorErrorResultMock = vi.fn();
-const extractMonitorConfigMock = vi.fn();
-const validateMonitorUrlMock = vi.fn();
-let withOperationalHooksMock: ReturnType<typeof vi.fn>;
-const handleCheckErrorMock = vi.fn();
-const axiosGetMock = vi.fn();
+    );
+
+    return {
+        axiosGetMock: axiosGet,
+        createMonitorErrorResultMock: createMonitorErrorResult,
+        extractMonitorConfigMock: extractMonitorConfig,
+        handleCheckErrorMock: handleCheckError,
+        scheduleMock: schedule,
+        validateMonitorUrlMock: validateMonitorUrl,
+        withOperationalHooksMock: withOperationalHooks,
+    };
+});
 
 vi.mock("../../../constants", () => ({
     DEFAULT_REQUEST_TIMEOUT: 5000,
@@ -39,15 +61,9 @@ vi.mock("../../../utils/logger", () => ({
     },
 }));
 
-vi.mock("../../../utils/operationalHooks", () => {
-    withOperationalHooksMock = vi.fn(
-        async (operation: () => Promise<MonitorCheckResult>) => operation()
-    );
-
-    return {
-        withOperationalHooks: withOperationalHooksMock,
-    };
-});
+vi.mock("../../../utils/operationalHooks", () => ({
+    withOperationalHooks: withOperationalHooksMock,
+}));
 
 vi.mock("../../../services/monitoring/shared/monitorServiceHelpers", () => ({
     createMonitorErrorResult: createMonitorErrorResultMock,
@@ -100,7 +116,7 @@ describe(HttpHeaderMonitor, () => {
         });
         validateMonitorUrlMock.mockReturnValue(null);
         withOperationalHooksMock.mockImplementation(
-            async (operation: () => Promise<MonitorCheckResult>) => operation()
+            async <T>(operation: () => Promise<T>) => operation()
         );
         handleCheckErrorMock.mockReturnValue({
             details: "request error",
