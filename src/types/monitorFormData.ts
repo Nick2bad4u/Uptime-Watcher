@@ -203,13 +203,12 @@ export function isHttpFormData(
 export function isHttpKeywordFormData(
     data: Partial<MonitorFormData>
 ): data is HttpKeywordFormData {
-    const formData = data as Partial<HttpKeywordFormData>;
     return (
-        formData.type === "http-keyword" &&
-        typeof formData.url === "string" &&
-        formData.url.trim() !== "" &&
-        typeof formData.bodyKeyword === "string" &&
-        formData.bodyKeyword.trim() !== ""
+        data.type === "http-keyword" &&
+        typeof data.url === "string" &&
+        data.url.trim() !== "" &&
+        typeof data.bodyKeyword === "string" &&
+        data.bodyKeyword.trim() !== ""
     );
 }
 
@@ -219,15 +218,14 @@ export function isHttpKeywordFormData(
 export function isHttpStatusFormData(
     data: Partial<MonitorFormData>
 ): data is HttpStatusFormData {
-    const formData = data as Partial<HttpStatusFormData>;
     return (
-        formData.type === "http-status" &&
-        typeof formData.url === "string" &&
-        formData.url.trim() !== "" &&
-        typeof formData.expectedStatusCode === "number" &&
-        Number.isInteger(formData.expectedStatusCode) &&
-        formData.expectedStatusCode >= 100 &&
-        formData.expectedStatusCode <= 599
+        data.type === "http-status" &&
+        typeof data.url === "string" &&
+        data.url.trim() !== "" &&
+        typeof data.expectedStatusCode === "number" &&
+        Number.isInteger(data.expectedStatusCode) &&
+        data.expectedStatusCode >= 100 &&
+        data.expectedStatusCode <= 599
     );
 }
 

@@ -181,6 +181,8 @@ const arbitraryPartialMonitor = (): fc.Arbitrary<Partial<Monitor>> =>
             responseTime: fc.integer(),
             recordType: fc.string(),
             expectedValue: fc.string(),
+            bodyKeyword: fc.string(),
+            expectedStatusCode: fc.integer({ min: 100, max: 599 }),
             certificateWarningDays: fc.integer({ min: 1, max: 365 }),
             activeOperations: fc.array(fc.string()),
             history: fc.array(
@@ -226,6 +228,8 @@ const arbitraryContaminatedMonitor = (): fc.Arbitrary<
         responseTime: arbitraryMixedValue(),
         recordType: arbitraryMixedValue(),
         expectedValue: arbitraryMixedValue(),
+        bodyKeyword: arbitraryMixedValue(),
+        expectedStatusCode: arbitraryMixedValue(),
         certificateWarningDays: arbitraryMixedValue(),
         activeOperations: arbitraryMixedValue(),
         history: arbitraryMixedValue(),

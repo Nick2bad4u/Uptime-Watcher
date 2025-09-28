@@ -5,7 +5,7 @@
  */
 
 import { test, fc } from "@fast-check/vitest";
-import { expect } from "vitest";
+import { describe, expect } from "vitest";
 import validator from "validator";
 
 import {
@@ -25,7 +25,15 @@ const baseMonitorArbitrary = fc.record({
     id: fc
         .string({ minLength: 1, maxLength: 100 })
         .filter((s) => s.trim().length > 0),
-    type: fc.constantFrom("http", "port", "ping", "dns"),
+    type: fc.constantFrom(
+        "http",
+        "http-keyword",
+        "http-status",
+        "port",
+        "ping",
+        "dns",
+        "ssl"
+    ),
     monitoring: fc.boolean(),
     status: fc.constantFrom("up", "down", "pending", "paused"),
     checkInterval: fc.oneof(fc.integer({ min: 5000, max: 2_592_000_000 })),
@@ -119,11 +127,10 @@ const validHostArbitrary = fc
     });
 
 // More efficient arbitraries that don't use fc.sample
-const httpMonitorArbitrary = fc.record({
+const httpMonitorBaseFields = {
     id: fc
         .string({ minLength: 1, maxLength: 100 })
         .filter((s) => s.trim().length > 0),
-    type: fc.constant("http" as const),
     monitoring: fc.boolean(),
     status: fc.constantFrom("up", "down", "pending", "paused"),
     checkInterval: fc.integer({ min: 5000, max: 2_592_000_000 }),
@@ -154,6 +161,25 @@ const httpMonitorArbitrary = fc.record({
         nil: undefined,
     }),
     url: validUrlArbitrary,
+} as const;
+
+const httpMonitorArbitrary = fc.record({
+    ...httpMonitorBaseFields,
+    type: fc.constant("http" as const),
+});
+
+const httpKeywordMonitorArbitrary = fc.record({
+    ...httpMonitorBaseFields,
+    bodyKeyword: fc
+        .string({ minLength: 1, maxLength: 256 })
+        .filter((keyword) => keyword.trim().length > 0),
+    type: fc.constant("http-keyword" as const),
+});
+
+const httpStatusMonitorArbitrary = fc.record({
+    ...httpMonitorBaseFields,
+    expectedStatusCode: fc.integer({ min: 100, max: 599 }),
+    type: fc.constant("http-status" as const),
 });
 
 const portMonitorArbitrary = fc.record({
@@ -190,6 +216,45 @@ const portMonitorArbitrary = fc.record({
     activeOperations: fc.option(fc.array(fc.string(), { maxLength: 50 }), {
         nil: undefined,
     }),
+    host: validHostArbitrary,
+    port: fc.integer({ min: 1, max: 65_535 }),
+});
+
+const sslMonitorArbitrary = fc.record({
+    id: fc
+        .string({ minLength: 1, maxLength: 100 })
+        .filter((s) => s.trim().length > 0),
+    type: fc.constant("ssl" as const),
+    monitoring: fc.boolean(),
+    status: fc.constantFrom("up", "down", "pending", "paused"),
+    checkInterval: fc.integer({ min: 5000, max: 2_592_000_000 }),
+    timeout: fc.integer({ min: 1000, max: 300_000 }),
+    retryAttempts: fc.integer({ min: 0, max: 10 }),
+    responseTime: fc.integer({ min: -1, max: 999_999 }),
+    history: fc.array(
+        fc.record({
+            status: fc.constantFrom("up", "down"),
+            responseTime: fc.integer({ min: 0, max: 999_999 }),
+            timestamp: fc.integer({ min: 0, max: Date.now() + 86_400_000 }),
+            details: fc.option(fc.string({ maxLength: 500 }), {
+                nil: undefined,
+            }),
+        }),
+        { maxLength: 100 }
+    ),
+    lastChecked: fc.option(
+        fc
+            .integer({
+                min: Date.parse("2020-01-01"),
+                max: Date.parse("2030-01-01"),
+            })
+            .map((timestamp) => new Date(timestamp)),
+        { nil: undefined }
+    ),
+    activeOperations: fc.option(fc.array(fc.string(), { maxLength: 50 }), {
+        nil: undefined,
+    }),
+    certificateWarningDays: fc.integer({ min: 1, max: 365 }),
     host: validHostArbitrary,
     port: fc.integer({ min: 1, max: 65_535 }),
 });
@@ -285,9 +350,12 @@ const dnsMonitorArbitrary = fc.record({
 
 const monitorArbitrary = fc.oneof(
     httpMonitorArbitrary,
+    httpKeywordMonitorArbitrary,
+    httpStatusMonitorArbitrary,
     portMonitorArbitrary,
     pingMonitorArbitrary,
-    dnsMonitorArbitrary
+    dnsMonitorArbitrary,
+    sslMonitorArbitrary
 );
 
 const siteArbitrary = fc.record({
@@ -314,9 +382,12 @@ describe("Schema Property-Based Tests", () => {
                     expect(result.data.id).toBeDefined();
                     expect(result.data.type).toBeOneOf([
                         "http",
+                        "http-keyword",
+                        "http-status",
                         "port",
                         "ping",
                         "dns",
+                        "ssl",
                     ]);
                     expect(result.data.status).toBeOneOf([
                         "up",
@@ -521,6 +592,18 @@ describe("Schema Property-Based Tests", () => {
                             expect(result.data).toHaveProperty("url");
                             break;
                         }
+                        case "http-keyword": {
+                            expect(result.data).toHaveProperty("url");
+                            expect(result.data).toHaveProperty("bodyKeyword");
+                            break;
+                        }
+                        case "http-status": {
+                            expect(result.data).toHaveProperty("url");
+                            expect(result.data).toHaveProperty(
+                                "expectedStatusCode"
+                            );
+                            break;
+                        }
                         case "port": {
                             expect(result.data).toHaveProperty("host");
                             expect(result.data).toHaveProperty("port");
@@ -639,15 +722,22 @@ describe("Schema Property-Based Tests", () => {
                 expect(result.success).toBeFalsy();
             });
 
-            test.prop([fc.constantFrom("http", "port", "ping", "dns")])(
-                "should handle completely invalid data gracefully",
-                (type) => {
-                    const invalidData = null;
+            test.prop([
+                fc.constantFrom(
+                    "http",
+                    "http-keyword",
+                    "http-status",
+                    "port",
+                    "ping",
+                    "dns",
+                    "ssl"
+                ),
+            ])("should handle completely invalid data gracefully", (type) => {
+                const invalidData = null;
 
-                    const result = validateMonitorData(type, invalidData);
-                    expect(result.success).toBeFalsy();
-                }
-            );
+                const result = validateMonitorData(type, invalidData);
+                expect(result.success).toBeFalsy();
+            });
         });
 
         describe(validateSiteData, () => {

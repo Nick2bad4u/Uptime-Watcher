@@ -16,9 +16,7 @@ const scheduleMock = vi.fn(
 const createMonitorErrorResultMock = vi.fn();
 const extractMonitorConfigMock = vi.fn();
 const validateMonitorUrlMock = vi.fn();
-const withOperationalHooksMock = vi.fn(
-    async (operation: () => Promise<MonitorCheckResult>) => operation()
-);
+let withOperationalHooksMock: ReturnType<typeof vi.fn>;
 const handleCheckErrorMock = vi.fn();
 const axiosGetMock = vi.fn();
 
@@ -41,9 +39,15 @@ vi.mock("../../../utils/logger", () => ({
     },
 }));
 
-vi.mock("../../../utils/operationalHooks", () => ({
-    withOperationalHooks: withOperationalHooksMock,
-}));
+vi.mock("../../../utils/operationalHooks", () => {
+    withOperationalHooksMock = vi.fn(
+        async (operation: () => Promise<MonitorCheckResult>) => operation()
+    );
+
+    return {
+        withOperationalHooks: withOperationalHooksMock,
+    };
+});
 
 vi.mock("../../../services/monitoring/shared/monitorServiceHelpers", () => ({
     createMonitorErrorResult: createMonitorErrorResultMock,
@@ -78,7 +82,7 @@ vi.mock("../../../../shared/utils/logTemplates", () => ({
     },
 }));
 
-describe("HttpKeywordMonitor", () => {
+describe(HttpKeywordMonitor, () => {
     let monitorService: HttpKeywordMonitor;
     let monitor: Site["monitors"][0];
 

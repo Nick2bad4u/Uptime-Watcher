@@ -100,28 +100,33 @@ vi.mock("../../electron/services/monitoring/MonitorTypeRegistry", () => ({
 }));
 
 // Mock shared validation
-vi.mock("@shared/validation/schemas", () => ({
-    validateMonitorData: vi.fn((type: string, _data: unknown) => ({
-        success: type !== "invalid",
-        errors: type === "invalid" ? ["Unsupported monitor type: invalid"] : [],
-        warnings: type === "warning" ? ["Warning message"] : [],
-        metadata: { validated: true },
-    })),
-    monitorSchemas: {
-        http: {
-            parse: vi.fn((data: unknown) => data),
-            safeParse: vi.fn((data: unknown) => ({ success: true, data })),
+vi.mock("@shared/validation/schemas", () => {
+    const createSchemaMock = () => ({
+        parse: vi.fn((data: unknown) => data),
+        safeParse: vi.fn((data: unknown) => ({ success: true, data })),
+    });
+
+    return {
+        httpKeywordMonitorSchema: createSchemaMock(),
+        httpStatusMonitorSchema: createSchemaMock(),
+        validateMonitorData: vi.fn((type: string, _data: unknown) => ({
+            success: type !== "invalid",
+            errors:
+                type === "invalid" ? ["Unsupported monitor type: invalid"] : [],
+            warnings: type === "warning" ? ["Warning message"] : [],
+            metadata: { validated: true },
+        })),
+        monitorSchemas: {
+            dns: createSchemaMock(),
+            http: createSchemaMock(),
+            "http-keyword": createSchemaMock(),
+            "http-status": createSchemaMock(),
+            ping: createSchemaMock(),
+            port: createSchemaMock(),
+            ssl: createSchemaMock(),
         },
-        port: {
-            parse: vi.fn((data: unknown) => data),
-            safeParse: vi.fn((data: unknown) => ({ success: true, data })),
-        },
-        ping: {
-            parse: vi.fn((data: unknown) => data),
-            safeParse: vi.fn((data: unknown) => ({ success: true, data })),
-        },
-    },
-}));
+    };
+});
 
 describe("IpcService - Comprehensive Coverage", () => {
     let ipcService: IpcService;

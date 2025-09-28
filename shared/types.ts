@@ -158,8 +158,10 @@ export interface Monitor {
     status: MonitorStatus;
     /** Timeout for monitor checks in milliseconds */
     timeout: number;
-    /** Type of monitoring performed (http, http-keyword, http-status, port,
-ping, dns, ssl) */
+    /**
+     * Type of monitoring performed (http, http-keyword, http-status, port,
+     * ping, dns, ssl)
+     */
     type: MonitorType;
     /** URL to monitor for HTTP-based checks */
     url?: string;

@@ -78,13 +78,15 @@ describe("Constants and Configuration 100% Coverage", () => {
                 (option) => option.value
             );
 
-            // Should contain the five monitor types available by default
+            // Should contain the seven monitor types available by default
             expect(values).toContain("http");
+            expect(values).toContain("http-keyword");
+            expect(values).toContain("http-status");
             expect(values).toContain("port");
             expect(values).toContain("ping");
             expect(values).toContain("dns");
             expect(values).toContain("ssl");
-            expect(values).toHaveLength(5);
+            expect(values).toHaveLength(7);
         });
 
         it("should have unique values", () => {
@@ -222,7 +224,7 @@ describe("Constants and Configuration 100% Coverage", () => {
                 })
             );
 
-            expect(selectOptions).toHaveLength(5);
+            expect(selectOptions).toHaveLength(7);
             expect(selectOptions.some((opt) => opt.selected)).toBeTruthy();
         });
 
@@ -385,8 +387,8 @@ describe("Constants and Configuration 100% Coverage", () => {
                 (o) => o.label
             );
 
-            expect(monitorKeys).toHaveLength(5);
-            expect(monitorLabels).toHaveLength(5);
+            expect(monitorKeys).toHaveLength(7);
+            expect(monitorLabels).toHaveLength(7);
 
             // Test intervals
             const intervalValues = CHECK_INTERVALS.map((i) => i.value);
