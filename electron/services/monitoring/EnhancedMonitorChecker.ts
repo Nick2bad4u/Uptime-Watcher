@@ -62,7 +62,10 @@ import {
     SECONDS_TO_MS_MULTIPLIER,
 } from "./constants";
 import { DnsMonitor } from "./DnsMonitor";
+import { HttpHeaderMonitor } from "./HttpHeaderMonitor";
+import { HttpJsonMonitor } from "./HttpJsonMonitor";
 import { HttpKeywordMonitor } from "./HttpKeywordMonitor";
+import { HttpLatencyMonitor } from "./HttpLatencyMonitor";
 import { HttpMonitor } from "./HttpMonitor";
 import { HttpStatusMonitor } from "./HttpStatusMonitor";
 import { PingMonitor } from "./PingMonitor";
@@ -262,8 +265,16 @@ export class EnhancedMonitorChecker {
     private readonly dnsMonitor: DnsMonitor;
 
     private readonly httpMonitor: HttpMonitor;
+
+    private readonly httpHeaderMonitor: HttpHeaderMonitor;
+
     private readonly httpKeywordMonitor: HttpKeywordMonitor;
+
+    private readonly httpJsonMonitor: HttpJsonMonitor;
+
     private readonly httpStatusMonitor: HttpStatusMonitor;
+
+    private readonly httpLatencyMonitor: HttpLatencyMonitor;
 
     private readonly pingMonitor: PingMonitor;
 
@@ -893,9 +904,30 @@ export class EnhancedMonitorChecker {
                     signal
                 );
             }
+            case "http-header": {
+                return this.performMonitorCheck(
+                    this.httpHeaderMonitor,
+                    monitor,
+                    signal
+                );
+            }
+            case "http-json": {
+                return this.performMonitorCheck(
+                    this.httpJsonMonitor,
+                    monitor,
+                    signal
+                );
+            }
             case "http-keyword": {
                 return this.performMonitorCheck(
                     this.httpKeywordMonitor,
+                    monitor,
+                    signal
+                );
+            }
+            case "http-latency": {
+                return this.performMonitorCheck(
+                    this.httpLatencyMonitor,
                     monitor,
                     signal
                 );
@@ -1079,8 +1111,11 @@ export class EnhancedMonitorChecker {
         // Initialize monitor services
         this.dnsMonitor = new DnsMonitor({});
         this.httpMonitor = new HttpMonitor({});
+        this.httpHeaderMonitor = new HttpHeaderMonitor({});
         this.httpKeywordMonitor = new HttpKeywordMonitor({});
+        this.httpJsonMonitor = new HttpJsonMonitor({});
         this.httpStatusMonitor = new HttpStatusMonitor({});
+        this.httpLatencyMonitor = new HttpLatencyMonitor({});
         this.pingMonitor = new PingMonitor({});
         this.portMonitor = new PortMonitor({});
         this.sslMonitor = new SslMonitor({});

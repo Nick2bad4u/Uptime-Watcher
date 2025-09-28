@@ -9,6 +9,7 @@
  */
 
 import {
+    BASE_MONITOR_TYPES,
     isMonitorStatus,
     type Monitor,
     type MonitorType,
@@ -29,11 +30,7 @@ import {
 export function validateMonitorType(type: unknown): type is MonitorType {
     return (
         typeof type === "string" &&
-        (type === "http" ||
-            type === "port" ||
-            type === "ping" ||
-            type === "dns" ||
-            type === "ssl")
+        (BASE_MONITOR_TYPES as readonly string[]).includes(type)
     );
 }
 
@@ -158,6 +155,33 @@ function validateHttpKeywordMonitorFields(
 }
 
 /**
+ * Validates HTTP header monitor-specific fields.
+ */
+function validateHttpHeaderMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
+    validateHttpMonitorFields(monitor, errors);
+
+    if (!monitor.headerName || typeof monitor.headerName !== "string") {
+        errors.push("Header name is required for HTTP header monitors");
+    } else if (monitor.headerName.trim().length === 0) {
+        errors.push("Header name must not be empty");
+    }
+
+    if (
+        !monitor.expectedHeaderValue ||
+        typeof monitor.expectedHeaderValue !== "string"
+    ) {
+        errors.push(
+            "Expected header value is required for HTTP header monitors"
+        );
+    } else if (monitor.expectedHeaderValue.trim().length === 0) {
+        errors.push("Expected header value must not be empty");
+    }
+}
+
+/**
  * Validates HTTP status monitor-specific fields.
  *
  * @remarks
@@ -185,6 +209,57 @@ function validateHttpStatusMonitorFields(
         monitor.expectedStatusCode > 599
     ) {
         errors.push("Expected status code must be between 100 and 599");
+    }
+}
+
+/**
+ * Validates HTTP JSON monitor-specific fields.
+ */
+function validateHttpJsonMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
+    validateHttpMonitorFields(monitor, errors);
+
+    if (!monitor.jsonPath || typeof monitor.jsonPath !== "string") {
+        errors.push("JSON path is required for HTTP JSON monitors");
+    } else if (monitor.jsonPath.trim().length === 0) {
+        errors.push("JSON path must not be empty");
+    }
+
+    if (
+        !monitor.expectedJsonValue ||
+        typeof monitor.expectedJsonValue !== "string"
+    ) {
+        errors.push("Expected JSON value is required for HTTP JSON monitors");
+    } else if (monitor.expectedJsonValue.trim().length === 0) {
+        errors.push("Expected JSON value must not be empty");
+    }
+}
+
+/**
+ * Validates HTTP latency monitor-specific fields.
+ */
+function validateHttpLatencyMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
+    validateHttpMonitorFields(monitor, errors);
+
+    if (typeof monitor.maxResponseTime !== "number") {
+        errors.push(
+            "Maximum response time is required for HTTP latency monitors"
+        );
+        return;
+    }
+
+    if (
+        !Number.isFinite(monitor.maxResponseTime) ||
+        monitor.maxResponseTime <= 0
+    ) {
+        errors.push(
+            "Maximum response time must be a positive number for HTTP latency monitors"
+        );
     }
 }
 
@@ -358,8 +433,20 @@ function validateTypeSpecificFields(
             validateHttpMonitorFields(monitor, errors);
             break;
         }
+        case "http-header": {
+            validateHttpHeaderMonitorFields(monitor, errors);
+            break;
+        }
+        case "http-json": {
+            validateHttpJsonMonitorFields(monitor, errors);
+            break;
+        }
         case "http-keyword": {
             validateHttpKeywordMonitorFields(monitor, errors);
+            break;
+        }
+        case "http-latency": {
+            validateHttpLatencyMonitorFields(monitor, errors);
             break;
         }
         case "http-status": {

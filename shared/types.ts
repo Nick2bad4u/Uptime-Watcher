@@ -41,6 +41,9 @@ export const BASE_MONITOR_TYPES = [
     "http",
     "http-keyword",
     "http-status",
+    "http-header",
+    "http-json",
+    "http-latency",
     "port",
     "ping",
     "dns",
@@ -132,18 +135,28 @@ export interface Monitor {
     certificateWarningDays?: number;
     /** Interval between checks in milliseconds */
     checkInterval: number;
+    /** Expected value for HTTP header verification */
+    expectedHeaderValue?: string;
+    /** Expected value within a JSON payload */
+    expectedJsonValue?: string;
     /** Expected HTTP status code for status-based HTTP monitors */
     expectedStatusCode?: number;
     /** Expected value for DNS record verification */
     expectedValue?: string; // Added for DNS monitoring
+    /** HTTP header name to inspect */
+    headerName?: string;
     /** Historical status data for analytics and trends */
     history: StatusHistory[];
     /** Hostname or IP address to monitor */
     host?: string;
     /** Unique identifier for the monitor */
     id: string;
+    /** JSON path expression used for HTTP JSON monitors */
+    jsonPath?: string;
     /** Timestamp of the last check performed */
     lastChecked?: Date;
+    /** Maximum allowed response time for latency monitors */
+    maxResponseTime?: number;
     /** Whether monitoring is currently active for this monitor */
     monitoring: boolean;
     /** Port number for port-based monitoring */
@@ -159,8 +172,8 @@ export interface Monitor {
     /** Timeout for monitor checks in milliseconds */
     timeout: number;
     /**
-     * Type of monitoring performed (http, http-keyword, http-status, port,
-     * ping, dns, ssl)
+     * Type of monitoring performed (http, http-keyword, http-status,
+     * http-header, http-json, http-latency, port, ping, dns, ssl)
      */
     type: MonitorType;
     /** URL to monitor for HTTP-based checks */

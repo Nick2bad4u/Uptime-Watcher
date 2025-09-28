@@ -68,12 +68,49 @@ export interface HttpKeywordFormData extends BaseFormData {
 }
 
 /**
+ * Form data for HTTP header monitors.
+ */
+export interface HttpHeaderFormData extends BaseFormData {
+    /** Expected value for the specified response header */
+    expectedHeaderValue: string;
+    /** Header name to inspect */
+    headerName: string;
+    type: "http-header";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
+ * Form data for HTTP JSON monitors.
+ */
+export interface HttpJsonFormData extends BaseFormData {
+    /** Expected value at the JSON path */
+    expectedJsonValue: string;
+    /** JSON path to evaluate in the response body */
+    jsonPath: string;
+    type: "http-json";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
  * Form data for HTTP status monitors.
  */
 export interface HttpStatusFormData extends BaseFormData {
     /** Expected HTTP status code */
     expectedStatusCode: number;
     type: "http-status";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
+ * Form data for HTTP latency monitors.
+ */
+export interface HttpLatencyFormData extends BaseFormData {
+    /** Maximum acceptable response time in milliseconds */
+    maxResponseTime: number;
+    type: "http-latency";
     /** Target URL to monitor */
     url: string;
 }
@@ -131,12 +168,20 @@ export interface SslFormData extends BaseFormData {
 export type MonitorFormData = Simplify<
     | DnsFormData
     | HttpFormData
+    | HttpHeaderFormData
+    | HttpJsonFormData
     | HttpKeywordFormData
+    | HttpLatencyFormData
     | HttpStatusFormData
     | PingFormData
     | PortFormData
     | SslFormData
 >;
+
+// Optional key definitions for default form data creation
+type HttpHeaderOptionalKeys = "expectedHeaderValue" | "headerName" | "url";
+type HttpJsonOptionalKeys = "expectedJsonValue" | "jsonPath" | "url";
+type HttpLatencyOptionalKeys = "maxResponseTime" | "url";
 
 /**
  * Create default form data for a specific monitor type.
@@ -150,11 +195,20 @@ export function createDefaultFormData(
     type: "dns"
 ): SetOptional<DnsFormData, "host" | "recordType">;
 export function createDefaultFormData(
+    type: "http-header"
+): SetOptional<HttpHeaderFormData, HttpHeaderOptionalKeys>;
+export function createDefaultFormData(
+    type: "http-json"
+): SetOptional<HttpJsonFormData, HttpJsonOptionalKeys>;
+export function createDefaultFormData(
     type: "http"
 ): SetOptional<HttpFormData, "url">;
 export function createDefaultFormData(
     type: "http-keyword"
 ): SetOptional<HttpKeywordFormData, "bodyKeyword" | "url">;
+export function createDefaultFormData(
+    type: "http-latency"
+): SetOptional<HttpLatencyFormData, HttpLatencyOptionalKeys>;
 export function createDefaultFormData(
     type: "http-status"
 ): SetOptional<HttpStatusFormData, "expectedStatusCode" | "url">;
@@ -198,6 +252,40 @@ export function isHttpFormData(
 }
 
 /**
+ * Type guard to check if form data is for HTTP header monitor.
+ */
+export function isHttpHeaderFormData(
+    data: Partial<MonitorFormData>
+): data is HttpHeaderFormData {
+    return (
+        data.type === "http-header" &&
+        typeof data.url === "string" &&
+        data.url.trim() !== "" &&
+        typeof data.headerName === "string" &&
+        data.headerName.trim() !== "" &&
+        typeof data.expectedHeaderValue === "string" &&
+        data.expectedHeaderValue.trim() !== ""
+    );
+}
+
+/**
+ * Type guard to check if form data is for HTTP JSON monitor.
+ */
+export function isHttpJsonFormData(
+    data: Partial<MonitorFormData>
+): data is HttpJsonFormData {
+    return (
+        data.type === "http-json" &&
+        typeof data.url === "string" &&
+        data.url.trim() !== "" &&
+        typeof data.jsonPath === "string" &&
+        data.jsonPath.trim() !== "" &&
+        typeof data.expectedJsonValue === "string" &&
+        data.expectedJsonValue.trim() !== ""
+    );
+}
+
+/**
  * Type guard to check if form data is for HTTP keyword monitor.
  */
 export function isHttpKeywordFormData(
@@ -226,6 +314,22 @@ export function isHttpStatusFormData(
         Number.isInteger(data.expectedStatusCode) &&
         data.expectedStatusCode >= 100 &&
         data.expectedStatusCode <= 599
+    );
+}
+
+/**
+ * Type guard to check if form data is for HTTP latency monitor.
+ */
+export function isHttpLatencyFormData(
+    data: Partial<MonitorFormData>
+): data is HttpLatencyFormData {
+    return (
+        data.type === "http-latency" &&
+        typeof data.url === "string" &&
+        data.url.trim() !== "" &&
+        typeof data.maxResponseTime === "number" &&
+        Number.isFinite(data.maxResponseTime) &&
+        data.maxResponseTime > 0
     );
 }
 
@@ -315,7 +419,10 @@ export function isSslFormData(
 const FORM_DATA_VALIDATORS = {
     dns: isDnsFormData,
     http: isHttpFormData,
+    "http-header": isHttpHeaderFormData,
+    "http-json": isHttpJsonFormData,
     "http-keyword": isHttpKeywordFormData,
+    "http-latency": isHttpLatencyFormData,
     "http-status": isHttpStatusFormData,
     ping: isPingFormData,
     port: isPortFormData,

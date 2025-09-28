@@ -88,9 +88,7 @@ function getSanitizedBodyKeyword(value: unknown): string | undefined {
  *
  * @returns The sanitized expectedStatusCode value, or undefined if invalid.
  */
-function getSanitizedExpectedStatusCode(
-    value: unknown
-): number | undefined {
+function getSanitizedExpectedStatusCode(value: unknown): number | undefined {
     if (typeof value !== "number" || Number.isNaN(value)) {
         return undefined;
     }

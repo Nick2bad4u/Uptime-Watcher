@@ -29,7 +29,10 @@ type MonitorStatusEnum = z.ZodEnum<{
 type MonitorTypeEnum = z.ZodEnum<{
     dns: "dns";
     http: "http";
+    "http-header": "http-header";
+    "http-json": "http-json";
     "http-keyword": "http-keyword";
+    "http-latency": "http-latency";
     "http-status": "http-status";
     ping: "ping";
     port: "port";
@@ -81,6 +84,40 @@ export type HttpMonitorSchemaType = z.ZodObject<{
     url: z.ZodString;
 }>;
 
+export type HttpHeaderMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    checkInterval: z.ZodNumber;
+    expectedHeaderValue: z.ZodString;
+    headerName: z.ZodString;
+    history: HistoryArray;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    monitoring: z.ZodBoolean;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"http-header">;
+    url: z.ZodString;
+}>;
+
+export type HttpJsonMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    checkInterval: z.ZodNumber;
+    expectedJsonValue: z.ZodString;
+    history: HistoryArray;
+    id: z.ZodString;
+    jsonPath: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    monitoring: z.ZodBoolean;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"http-json">;
+    url: z.ZodString;
+}>;
+
 export type HttpKeywordMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     bodyKeyword: z.ZodString;
@@ -94,6 +131,22 @@ export type HttpKeywordMonitorSchemaType = z.ZodObject<{
     status: MonitorStatusEnum;
     timeout: z.ZodNumber;
     type: z.ZodLiteral<"http-keyword">;
+    url: z.ZodString;
+}>;
+
+export type HttpLatencyMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    checkInterval: z.ZodNumber;
+    history: HistoryArray;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    maxResponseTime: z.ZodNumber;
+    monitoring: z.ZodBoolean;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"http-latency">;
     url: z.ZodString;
 }>;
 
@@ -181,7 +234,10 @@ export type SslMonitorSchemaType = z.ZodObject<{
 export type MonitorSchemaType = z.ZodDiscriminatedUnion<
     [
         HttpMonitorSchemaType,
+        HttpHeaderMonitorSchemaType,
+        HttpJsonMonitorSchemaType,
         HttpKeywordMonitorSchemaType,
+        HttpLatencyMonitorSchemaType,
         HttpStatusMonitorSchemaType,
         PortMonitorSchemaType,
         PingMonitorSchemaType,
@@ -200,7 +256,10 @@ export type SiteSchemaType = z.ZodObject<{
 export interface MonitorSchemas {
     readonly dns: DnsMonitorSchemaType;
     readonly http: HttpMonitorSchemaType;
+    readonly "http-header": HttpHeaderMonitorSchemaType;
+    readonly "http-json": HttpJsonMonitorSchemaType;
     readonly "http-keyword": HttpKeywordMonitorSchemaType;
+    readonly "http-latency": HttpLatencyMonitorSchemaType;
     readonly "http-status": HttpStatusMonitorSchemaType;
     readonly ping: PingMonitorSchemaType;
     readonly port: PortMonitorSchemaType;

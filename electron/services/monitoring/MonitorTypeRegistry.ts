@@ -19,7 +19,10 @@ import { MONITOR_STATUS } from "@shared/types";
 // Import shared validation schemas
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import {
+    httpHeaderMonitorSchema,
+    httpJsonMonitorSchema,
     httpKeywordMonitorSchema,
+    httpLatencyMonitorSchema,
     httpStatusMonitorSchema,
     monitorSchemas,
 } from "@shared/validation/schemas";
@@ -28,7 +31,10 @@ import type { IMonitorService } from "./types";
 
 import { logger } from "../../utils/logger";
 import { DnsMonitor } from "./DnsMonitor";
+import { HttpHeaderMonitor } from "./HttpHeaderMonitor";
+import { HttpJsonMonitor } from "./HttpJsonMonitor";
 import { HttpKeywordMonitor } from "./HttpKeywordMonitor";
+import { HttpLatencyMonitor } from "./HttpLatencyMonitor";
 import { HttpMonitor } from "./HttpMonitor";
 import { HttpStatusMonitor } from "./HttpStatusMonitor";
 import {
@@ -147,6 +153,10 @@ export interface MonitorUIConfig {
  * @internal
  */
 const monitorTypes = new Map<string, BaseMonitorConfig>();
+
+function toZodType(schema: z.ZodType): z.ZodType {
+    return schema;
+}
 
 /**
  * Gets the configuration object for a given monitor type.
@@ -345,6 +355,64 @@ registerMonitorType({
 
 registerMonitorType({
     description:
+        "Validates that an HTTP/HTTPS response includes a specific header value.",
+    displayName: "HTTP Header Match",
+    fields: [
+        {
+            helpText: "Enter the full URL including http:// or https://",
+            label: "Website URL",
+            name: "url",
+            placeholder: "https://example.com",
+            required: true,
+            type: "url",
+        },
+        {
+            helpText:
+                "Header to inspect in the HTTP response (case-insensitive).",
+            label: "Header Name",
+            name: "headerName",
+            placeholder: "x-powered-by",
+            required: true,
+            type: "text",
+        },
+        {
+            helpText:
+                "Expected value for the header after trimming whitespace.",
+            label: "Expected Header Value",
+            name: "expectedHeaderValue",
+            placeholder: "Express",
+            required: true,
+            type: "text",
+        },
+    ],
+    serviceFactory: () => new HttpHeaderMonitor(),
+    type: "http-header",
+    uiConfig: {
+        detailFormats: {
+            historyDetail: (details: string) => details,
+        },
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: true,
+        },
+        formatDetail: (details: string) => details,
+        formatTitleSuffix: (monitor: Monitor) =>
+            monitor.url ? ` (${monitor.url})` : "",
+        helpTexts: {
+            primary:
+                "Provide the response header name and expected value to monitor.",
+            secondary:
+                "Comparison is case-sensitive after trimming whitespace from both values.",
+        },
+        supportsResponseTime: true,
+    },
+
+    validationSchema: toZodType(httpHeaderMonitorSchema),
+    version: "1.0.0",
+});
+
+registerMonitorType({
+    description:
         "Monitors HTTP/HTTPS endpoints and ensures the response body contains a required keyword.",
     displayName: "HTTP Keyword Match",
     fields: [
@@ -392,8 +460,66 @@ registerMonitorType({
         supportsAdvancedAnalytics: true,
         supportsResponseTime: true,
     },
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Zod schemas expose internal any types; safe for runtime validation.
+
     validationSchema: httpKeywordMonitorSchema,
+    version: "1.0.0",
+});
+
+registerMonitorType({
+    description:
+        "Validates JSON responses from HTTP/HTTPS endpoints by comparing values at specific paths.",
+    displayName: "HTTP JSON Match",
+    fields: [
+        {
+            helpText: "Enter the full URL including http:// or https://",
+            label: "Website URL",
+            name: "url",
+            placeholder: "https://api.example.com/status",
+            required: true,
+            type: "url",
+        },
+        {
+            helpText:
+                "Use dot notation with optional indexes (e.g., data.items[0].status).",
+            label: "JSON Path",
+            name: "jsonPath",
+            placeholder: "data.status",
+            required: true,
+            type: "text",
+        },
+        {
+            helpText:
+                "Expected value at the specified JSON path after trimming whitespace.",
+            label: "Expected Value",
+            name: "expectedJsonValue",
+            placeholder: "ok",
+            required: true,
+            type: "text",
+        },
+    ],
+    serviceFactory: () => new HttpJsonMonitor(),
+    type: "http-json",
+    uiConfig: {
+        detailFormats: {
+            historyDetail: (details: string) => details,
+        },
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: true,
+        },
+        formatDetail: (details: string) => details,
+        formatTitleSuffix: (monitor: Monitor) =>
+            monitor.url ? ` (${monitor.url})` : "",
+        helpTexts: {
+            primary:
+                "Provide the JSON path and expected value to validate in the response body.",
+            secondary:
+                "Paths support nested properties and numeric indexes such as metadata.servers[0].status.",
+        },
+        supportsResponseTime: true,
+    },
+
+    validationSchema: toZodType(httpJsonMonitorSchema),
     version: "1.0.0",
 });
 
@@ -447,8 +573,57 @@ registerMonitorType({
         supportsAdvancedAnalytics: true,
         supportsResponseTime: true,
     },
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Zod schemas expose internal any types; safe for runtime validation.
+
     validationSchema: httpStatusMonitorSchema,
+    version: "1.0.0",
+});
+
+registerMonitorType({
+    description:
+        "Tracks HTTP/HTTPS response times and warns when latency exceeds a configurable threshold.",
+    displayName: "HTTP Latency Threshold",
+    fields: [
+        {
+            helpText: "Enter the full URL including http:// or https://",
+            label: "Website URL",
+            name: "url",
+            placeholder: "https://status.example.com",
+            required: true,
+            type: "url",
+        },
+        {
+            helpText:
+                "Maximum allowable response time in milliseconds before the monitor is marked degraded.",
+            label: "Max Response Time (ms)",
+            name: "maxResponseTime",
+            placeholder: "1500",
+            required: true,
+            type: "number",
+        },
+    ],
+    serviceFactory: () => new HttpLatencyMonitor(),
+    type: "http-latency",
+    uiConfig: {
+        detailFormats: {
+            historyDetail: (details: string) => details,
+        },
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: true,
+        },
+        formatDetail: (details: string) => details,
+        formatTitleSuffix: (monitor: Monitor) =>
+            monitor.url ? ` (${monitor.url})` : "",
+        helpTexts: {
+            primary:
+                "Set the response time threshold that should trigger a degraded status.",
+            secondary:
+                "Response times at or below the threshold report as healthy; higher values are degraded.",
+        },
+        supportsResponseTime: true,
+    },
+
+    validationSchema: toZodType(httpLatencyMonitorSchema),
     version: "1.0.0",
 });
 
@@ -712,7 +887,10 @@ migrationRegistry.registerMigration("port", exampleMigrations.portV1_0_to_1_1);
 versionManager.setVersion("dns", "1.0.0");
 versionManager.setVersion("ssl", "1.0.0");
 versionManager.setVersion("http", "1.0.0");
+versionManager.setVersion("http-header", "1.0.0");
+versionManager.setVersion("http-json", "1.0.0");
 versionManager.setVersion("http-keyword", "1.0.0");
+versionManager.setVersion("http-latency", "1.0.0");
 versionManager.setVersion("http-status", "1.0.0");
 versionManager.setVersion("ping", "1.0.0");
 versionManager.setVersion("port", "1.0.0");

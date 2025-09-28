@@ -176,6 +176,30 @@ const httpKeywordMonitorArbitrary = fc.record({
     type: fc.constant("http-keyword" as const),
 });
 
+const httpHeaderMonitorArbitrary = fc.record({
+    ...httpMonitorBaseFields,
+    headerName: fc
+        .string({ minLength: 1, maxLength: 256 })
+        .filter((name) => name.trim().length > 0),
+    expectedHeaderValue: fc.string({ maxLength: 256 }),
+    type: fc.constant("http-header" as const),
+});
+
+const httpJsonMonitorArbitrary = fc.record({
+    ...httpMonitorBaseFields,
+    jsonPath: fc
+        .string({ minLength: 1, maxLength: 256 })
+        .filter((path) => path.trim().length > 0),
+    expectedJsonValue: fc.string({ maxLength: 256 }),
+    type: fc.constant("http-json" as const),
+});
+
+const httpLatencyMonitorArbitrary = fc.record({
+    ...httpMonitorBaseFields,
+    maxResponseTime: fc.integer({ min: 0, max: 300_000 }),
+    type: fc.constant("http-latency" as const),
+});
+
 const httpStatusMonitorArbitrary = fc.record({
     ...httpMonitorBaseFields,
     expectedStatusCode: fc.integer({ min: 100, max: 599 }),
@@ -351,6 +375,9 @@ const dnsMonitorArbitrary = fc.record({
 const monitorArbitrary = fc.oneof(
     httpMonitorArbitrary,
     httpKeywordMonitorArbitrary,
+    httpHeaderMonitorArbitrary,
+    httpJsonMonitorArbitrary,
+    httpLatencyMonitorArbitrary,
     httpStatusMonitorArbitrary,
     portMonitorArbitrary,
     pingMonitorArbitrary,
@@ -595,6 +622,29 @@ describe("Schema Property-Based Tests", () => {
                         case "http-keyword": {
                             expect(result.data).toHaveProperty("url");
                             expect(result.data).toHaveProperty("bodyKeyword");
+                            break;
+                        }
+                        case "http-header": {
+                            expect(result.data).toHaveProperty("url");
+                            expect(result.data).toHaveProperty("headerName");
+                            expect(result.data).toHaveProperty(
+                                "expectedHeaderValue"
+                            );
+                            break;
+                        }
+                        case "http-json": {
+                            expect(result.data).toHaveProperty("url");
+                            expect(result.data).toHaveProperty("jsonPath");
+                            expect(result.data).toHaveProperty(
+                                "expectedJsonValue"
+                            );
+                            break;
+                        }
+                        case "http-latency": {
+                            expect(result.data).toHaveProperty("url");
+                            expect(result.data).toHaveProperty(
+                                "maxResponseTime"
+                            );
                             break;
                         }
                         case "http-status": {

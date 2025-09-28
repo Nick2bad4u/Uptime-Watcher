@@ -60,6 +60,35 @@ function ensureBooleanOrFallback(value: unknown, fallback: boolean): boolean {
     return typeof value === "boolean" ? value : fallback;
 }
 
+function ensureTrimmedStringOrFallback(
+    value: unknown,
+    fallback: string
+): string {
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (trimmed.length > 0) {
+            return trimmed;
+        }
+    }
+    return fallback;
+}
+
+function hasSharedMonitorDefaults(
+    type: MonitorType
+): type is keyof typeof SHARED_MONITOR_CONFIG {
+    return Object.hasOwn(SHARED_MONITOR_CONFIG, type);
+}
+
+function getSharedMonitorDefaults<T extends keyof typeof SHARED_MONITOR_CONFIG>(
+    type: T
+): (typeof SHARED_MONITOR_CONFIG)[T] | undefined {
+    if (Object.hasOwn(SHARED_MONITOR_CONFIG, type)) {
+        return SHARED_MONITOR_CONFIG[type];
+    }
+
+    return undefined;
+}
+
 const DEFAULT_SSL_WARNING_DAYS = ensureNumberOrFallback(
     (
         SHARED_MONITOR_CONFIG.ssl as
@@ -86,17 +115,35 @@ const DEFAULT_SHARED_ENABLED = ensureBooleanOrFallback(
     true
 );
 
+const HTTP_HEADER_SHARED_DEFAULTS = getSharedMonitorDefaults("http-header");
+const HTTP_HEADER_DEFAULT_HEADER_NAME = ensureTrimmedStringOrFallback(
+    HTTP_HEADER_SHARED_DEFAULTS?.headerName,
+    "content-type"
+);
+const HTTP_HEADER_DEFAULT_EXPECTED_VALUE = ensureTrimmedStringOrFallback(
+    HTTP_HEADER_SHARED_DEFAULTS?.expectedHeaderValue,
+    "application/json"
+);
+const HTTP_JSON_SHARED_DEFAULTS = getSharedMonitorDefaults("http-json");
+const HTTP_JSON_DEFAULT_PATH = ensureTrimmedStringOrFallback(
+    HTTP_JSON_SHARED_DEFAULTS?.jsonPath,
+    "status"
+);
+const HTTP_JSON_DEFAULT_EXPECTED_VALUE = ensureTrimmedStringOrFallback(
+    HTTP_JSON_SHARED_DEFAULTS?.expectedJsonValue,
+    "ok"
+);
+const HTTP_LATENCY_SHARED_DEFAULTS = getSharedMonitorDefaults("http-latency");
+const HTTP_LATENCY_DEFAULT_MAX_RESPONSE_MS = ensureNumberOrFallback(
+    HTTP_LATENCY_SHARED_DEFAULTS?.maxResponseTime,
+    2000
+);
+
 interface MonitorTypeDefaults {
     checkInterval: number;
     enabled: boolean;
     retryAttempts: number;
     timeout: number;
-}
-
-function hasSharedMonitorDefaults(
-    type: MonitorType
-): type is keyof typeof SHARED_MONITOR_CONFIG {
-    return Object.hasOwn(SHARED_MONITOR_CONFIG, type);
 }
 
 function getMonitorTypeDefaults(type: MonitorType): MonitorTypeDefaults {
@@ -207,8 +254,25 @@ function getAllowedFieldsForMonitorType(type: MonitorType): Set<string> {
             baseFields.add("url");
             break;
         }
+        case "http-header": {
+            baseFields.add("expectedHeaderValue");
+            baseFields.add("headerName");
+            baseFields.add("url");
+            break;
+        }
+        case "http-json": {
+            baseFields.add("expectedJsonValue");
+            baseFields.add("jsonPath");
+            baseFields.add("url");
+            break;
+        }
         case "http-keyword": {
             baseFields.add("bodyKeyword");
+            baseFields.add("url");
+            break;
+        }
+        case "http-latency": {
+            baseFields.add("maxResponseTime");
             baseFields.add("url");
             break;
         }
@@ -413,6 +477,85 @@ function applyDnsMonitorDefaults(
 }
 
 /**
+ * Applies type-specific field requirements and defaults for HTTP header
+ * monitors.
+ */
+function applyHttpHeaderMonitorDefaults(
+    monitor: Monitor,
+    filteredData: UnknownRecord
+): void {
+    applyHttpMonitorDefaults(monitor, filteredData);
+
+    const { expectedHeaderValue, headerName } = filteredData as {
+        expectedHeaderValue?: unknown;
+        headerName?: unknown;
+    };
+
+    monitor.expectedHeaderValue = ensureTrimmedStringOrFallback(
+        expectedHeaderValue,
+        HTTP_HEADER_DEFAULT_EXPECTED_VALUE
+    );
+    monitor.headerName = ensureTrimmedStringOrFallback(
+        headerName,
+        HTTP_HEADER_DEFAULT_HEADER_NAME
+    );
+}
+
+/**
+ * Applies type-specific field requirements and defaults for HTTP JSON monitors.
+ */
+function applyHttpJsonMonitorDefaults(
+    monitor: Monitor,
+    filteredData: UnknownRecord
+): void {
+    applyHttpMonitorDefaults(monitor, filteredData);
+
+    const { expectedJsonValue, jsonPath } = filteredData as {
+        expectedJsonValue?: unknown;
+        jsonPath?: unknown;
+    };
+
+    monitor.expectedJsonValue = ensureTrimmedStringOrFallback(
+        expectedJsonValue,
+        HTTP_JSON_DEFAULT_EXPECTED_VALUE
+    );
+    monitor.jsonPath = ensureTrimmedStringOrFallback(
+        jsonPath,
+        HTTP_JSON_DEFAULT_PATH
+    );
+}
+
+/**
+ * Applies type-specific field requirements and defaults for HTTP latency
+ * monitors.
+ */
+function applyHttpLatencyMonitorDefaults(
+    monitor: Monitor,
+    filteredData: UnknownRecord
+): void {
+    applyHttpMonitorDefaults(monitor, filteredData);
+
+    const { maxResponseTime } = filteredData as {
+        maxResponseTime?: unknown;
+    };
+
+    let numericLatency = HTTP_LATENCY_DEFAULT_MAX_RESPONSE_MS;
+    if (
+        typeof maxResponseTime === "number" &&
+        Number.isFinite(maxResponseTime)
+    ) {
+        numericLatency = Math.trunc(maxResponseTime);
+    } else if (typeof maxResponseTime === "string") {
+        const parsed = Number.parseFloat(maxResponseTime);
+        if (Number.isFinite(parsed)) {
+            numericLatency = Math.trunc(parsed);
+        }
+    }
+
+    monitor.maxResponseTime = Math.max(1, numericLatency);
+}
+
+/**
  * Applies type-specific field requirements and defaults based on monitor type.
  */
 function applyTypeSpecificDefaults(
@@ -428,8 +571,20 @@ function applyTypeSpecificDefaults(
             applyHttpMonitorDefaults(monitor, filteredData);
             break;
         }
+        case "http-header": {
+            applyHttpHeaderMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "http-json": {
+            applyHttpJsonMonitorDefaults(monitor, filteredData);
+            break;
+        }
         case "http-keyword": {
             applyHttpKeywordMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "http-latency": {
+            applyHttpLatencyMonitorDefaults(monitor, filteredData);
             break;
         }
         case "http-status": {

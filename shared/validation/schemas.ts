@@ -14,7 +14,10 @@
 import type {
     BaseMonitorSchemaType,
     DnsMonitorSchemaType,
+    HttpHeaderMonitorSchemaType,
+    HttpJsonMonitorSchemaType,
     HttpKeywordMonitorSchemaType,
+    HttpLatencyMonitorSchemaType,
     HttpMonitorSchemaType,
     HttpStatusMonitorSchemaType,
     MonitorSchemaType,
@@ -148,7 +151,10 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
             ),
         type: z.enum([
             "http",
+            "http-header",
             "http-keyword",
+            "http-json",
+            "http-latency",
             "http-status",
             "port",
             "ping",
@@ -178,6 +184,87 @@ const httpUrlSchema = z.string().refine(
     "Must be a valid HTTP or HTTPS URL"
 );
 
+const ALLOWED_HEADER_SYMBOLS = new Set<string>([
+    "!",
+    "#",
+    "$",
+    "%",
+    "&",
+    "'",
+    "*",
+    "+",
+    "-",
+    ".",
+    "^",
+    "_",
+    "`",
+    "|",
+    "~",
+]);
+
+const isValidHeaderName = (value: string): boolean => {
+    if (value.length === 0 || value.length > 256) {
+        return false;
+    }
+
+    if (value.includes(":") || value.includes(" ")) {
+        return false;
+    }
+
+    return Array.from(value).every((char) => {
+        const codePoint = char.codePointAt(0);
+
+        if (codePoint === undefined) {
+            return false;
+        }
+
+        const isDigit = codePoint >= 48 && codePoint <= 57;
+        const isUppercase = codePoint >= 65 && codePoint <= 90;
+        const isLowercase = codePoint >= 97 && codePoint <= 122;
+
+        return (
+            isDigit ||
+            isUppercase ||
+            isLowercase ||
+            ALLOWED_HEADER_SYMBOLS.has(char)
+        );
+    });
+};
+
+const httpHeaderNameSchema = z
+    .string()
+    .min(1, "Header name is required")
+    .max(256, "Header name must be 256 characters or fewer")
+    .refine(isValidHeaderName, {
+        message:
+            "Header name must use valid HTTP token characters (letters, digits, and !#$%&'*+.^_`|~-)",
+    });
+
+const httpHeaderValueSchema = z
+    .string()
+    .min(1, "Expected header value is required")
+    .max(2048, "Expected header value must be 2048 characters or fewer");
+const isValidJsonPath = (value: string): boolean => {
+    const trimmed = value.trim();
+
+    if (trimmed.length === 0 || trimmed.includes("..")) {
+        return false;
+    }
+
+    return trimmed
+        .split(".")
+        .every((segment) => segment.length > 0 && !segment.includes(" "));
+};
+
+const jsonPathSchema = z
+    .string()
+    .min(1, "JSON path is required")
+    .max(512, "JSON path must be 512 characters or fewer")
+    .refine(isValidJsonPath, {
+        message:
+            "JSON path must use dot notation without spaces or empty segments",
+    });
+
 /**
  * Zod schema for HTTP monitor fields.
  *
@@ -192,6 +279,23 @@ export const httpMonitorSchema: HttpMonitorSchemaType = baseMonitorSchema
         url: httpUrlSchema,
     })
     .strict();
+
+/**
+ * Zod schema for HTTP header monitor fields.
+ *
+ * @remarks
+ * Extends {@link baseMonitorSchema} and validates header name/value pairs for
+ * response inspection.
+ */
+export const httpHeaderMonitorSchema: HttpHeaderMonitorSchemaType =
+    baseMonitorSchema
+        .extend({
+            expectedHeaderValue: httpHeaderValueSchema,
+            headerName: httpHeaderNameSchema,
+            type: z.literal("http-header"),
+            url: httpUrlSchema,
+        })
+        .strict();
 
 /**
  * Zod schema for HTTP keyword monitor fields.
@@ -213,6 +317,29 @@ export const httpKeywordMonitorSchema: HttpKeywordMonitorSchemaType =
         .strict();
 
 /**
+ * Zod schema for HTTP JSON monitor fields.
+ *
+ * @remarks
+ * Validates dot-notation JSON paths and expected values for structured content
+ * checks.
+ */
+export const httpJsonMonitorSchema: HttpJsonMonitorSchemaType =
+    baseMonitorSchema
+        .extend({
+            expectedJsonValue: z
+                .string()
+                .min(1, "Expected JSON value is required")
+                .max(
+                    2048,
+                    "Expected JSON value must be 2048 characters or fewer"
+                ),
+            jsonPath: jsonPathSchema,
+            type: z.literal("http-json"),
+            url: httpUrlSchema,
+        })
+        .strict();
+
+/**
  * Zod schema for HTTP status monitor fields.
  *
  * @remarks
@@ -228,6 +355,27 @@ export const httpStatusMonitorSchema: HttpStatusMonitorSchemaType =
                 .min(100, "Status code must be between 100 and 599")
                 .max(599, "Status code must be between 100 and 599"),
             type: z.literal("http-status"),
+            url: httpUrlSchema,
+        })
+        .strict();
+
+/**
+ * Zod schema for HTTP latency monitor fields.
+ *
+ * @remarks
+ * Ensures latency thresholds are positive and within sensible limits.
+ */
+export const httpLatencyMonitorSchema: HttpLatencyMonitorSchemaType =
+    baseMonitorSchema
+        .extend({
+            maxResponseTime: z
+                .number()
+                .min(1, "Maximum response time must be at least 1 millisecond")
+                .max(
+                    VALIDATION_CONSTRAINTS.TIMEOUT.MAX,
+                    "Maximum response time cannot exceed 300 seconds"
+                ),
+            type: z.literal("http-latency"),
             url: httpUrlSchema,
         })
         .strict();
@@ -323,7 +471,10 @@ export const sslMonitorSchema: SslMonitorSchemaType = baseMonitorSchema
  */
 export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
     httpMonitorSchema,
+    httpHeaderMonitorSchema,
+    httpJsonMonitorSchema,
     httpKeywordMonitorSchema,
+    httpLatencyMonitorSchema,
     httpStatusMonitorSchema,
     portMonitorSchema,
     pingMonitorSchema,
@@ -360,7 +511,10 @@ export const siteSchema: SiteSchemaType = z
 export interface MonitorSchemas {
     readonly dns: typeof dnsMonitorSchema;
     readonly http: typeof httpMonitorSchema;
+    readonly "http-header": typeof httpHeaderMonitorSchema;
+    readonly "http-json": typeof httpJsonMonitorSchema;
     readonly "http-keyword": typeof httpKeywordMonitorSchema;
+    readonly "http-latency": typeof httpLatencyMonitorSchema;
     readonly "http-status": typeof httpStatusMonitorSchema;
     readonly ping: typeof pingMonitorSchema;
     readonly port: typeof portMonitorSchema;
@@ -376,7 +530,10 @@ export interface MonitorSchemas {
 export const monitorSchemas: MonitorSchemas = {
     dns: dnsMonitorSchema,
     http: httpMonitorSchema,
+    "http-header": httpHeaderMonitorSchema,
+    "http-json": httpJsonMonitorSchema,
     "http-keyword": httpKeywordMonitorSchema,
+    "http-latency": httpLatencyMonitorSchema,
     "http-status": httpStatusMonitorSchema,
     ping: pingMonitorSchema,
     port: portMonitorSchema,
@@ -391,6 +548,13 @@ export const monitorSchemas: MonitorSchemas = {
 export type HttpMonitor = z.infer<typeof httpMonitorSchema>;
 
 /**
+ * Type representing a validated HTTP header monitor.
+ *
+ * @see {@link httpHeaderMonitorSchema}
+ */
+export type HttpHeaderMonitor = z.infer<typeof httpHeaderMonitorSchema>;
+
+/**
  * Type representing a validated HTTP keyword monitor.
  *
  * @see {@link httpKeywordMonitorSchema}
@@ -398,11 +562,25 @@ export type HttpMonitor = z.infer<typeof httpMonitorSchema>;
 export type HttpKeywordMonitor = z.infer<typeof httpKeywordMonitorSchema>;
 
 /**
+ * Type representing a validated HTTP JSON monitor.
+ *
+ * @see {@link httpJsonMonitorSchema}
+ */
+export type HttpJsonMonitor = z.infer<typeof httpJsonMonitorSchema>;
+
+/**
  * Type representing a validated HTTP status monitor.
  *
  * @see {@link httpStatusMonitorSchema}
  */
 export type HttpStatusMonitor = z.infer<typeof httpStatusMonitorSchema>;
+
+/**
+ * Type representing a validated HTTP latency monitor.
+ *
+ * @see {@link httpLatencyMonitorSchema}
+ */
+export type HttpLatencyMonitor = z.infer<typeof httpLatencyMonitorSchema>;
 
 /**
  * Type representing a validated DNS monitor.

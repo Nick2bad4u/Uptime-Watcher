@@ -284,6 +284,25 @@ export interface HttpKeywordMonitorConfig extends BaseMonitorConfig {
 }
 
 /**
+ * Configuration interface for HTTP header monitors.
+ *
+ * @remarks
+ * Used for monitors that ensure specific HTTP headers are returned by the
+ * target endpoint.
+ *
+ * @public
+ */
+export interface HttpHeaderMonitorConfig extends BaseMonitorConfig {
+    /** Expected value for the specified HTTP header */
+    expectedHeaderValue: string;
+    /** Header name to inspect */
+    headerName: string;
+    type: "http-header";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
  * Configuration interface for HTTP status monitors.
  *
  * @remarks
@@ -300,6 +319,40 @@ export interface HttpStatusMonitorConfig extends BaseMonitorConfig {
 }
 
 /**
+ * Configuration interface for HTTP JSON content monitors.
+ *
+ * @remarks
+ * Used for monitors that validate JSON responses against expected values.
+ *
+ * @public
+ */
+export interface HttpJsonMonitorConfig extends BaseMonitorConfig {
+    /** Expected value found at the JSON path */
+    expectedJsonValue: string;
+    /** Dot-notation JSON path to inspect */
+    jsonPath: string;
+    type: "http-json";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
+ * Configuration interface for HTTP latency monitors.
+ *
+ * @remarks
+ * Used for monitors that enforce response time thresholds.
+ *
+ * @public
+ */
+export interface HttpLatencyMonitorConfig extends BaseMonitorConfig {
+    /** Maximum acceptable response time in milliseconds */
+    maxResponseTime: number;
+    type: "http-latency";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
  * Union type representing all possible monitor configurations.
  *
  * @remarks
@@ -310,7 +363,10 @@ export interface HttpStatusMonitorConfig extends BaseMonitorConfig {
  * @public
  */
 export type MonitorConfig = Simplify<
+    | HttpHeaderMonitorConfig
+    | HttpJsonMonitorConfig
     | HttpKeywordMonitorConfig
+    | HttpLatencyMonitorConfig
     | HttpMonitorConfig
     | HttpStatusMonitorConfig
     | PingMonitorConfig
@@ -404,6 +460,24 @@ export function isHttpKeywordMonitorConfig(
 }
 
 /**
+ * Type guard to check if configuration is for HTTP header monitors.
+ *
+ * @param config - The monitor configuration to check
+ *
+ * @returns True if the configuration is for an HTTP header monitor
+ *
+ * @public
+ */
+export function isHttpHeaderMonitorConfig(
+    config: MonitorConfig | null | undefined
+): config is HttpHeaderMonitorConfig {
+    return isMonitorConfigOfType<HttpHeaderMonitorConfig>(
+        config,
+        "http-header"
+    );
+}
+
+/**
  * Type guard to check if configuration is for HTTP status monitors.
  *
  * @param config - The monitor configuration to check
@@ -418,6 +492,39 @@ export function isHttpStatusMonitorConfig(
     return isMonitorConfigOfType<HttpStatusMonitorConfig>(
         config,
         "http-status"
+    );
+}
+
+/**
+ * Type guard to check if configuration is for HTTP JSON monitors.
+ *
+ * @param config - The monitor configuration to check
+ *
+ * @returns True if the configuration is for an HTTP JSON monitor
+ *
+ * @public
+ */
+export function isHttpJsonMonitorConfig(
+    config: MonitorConfig | null | undefined
+): config is HttpJsonMonitorConfig {
+    return isMonitorConfigOfType<HttpJsonMonitorConfig>(config, "http-json");
+}
+
+/**
+ * Type guard to check if configuration is for HTTP latency monitors.
+ *
+ * @param config - The monitor configuration to check
+ *
+ * @returns True if the configuration is for an HTTP latency monitor
+ *
+ * @public
+ */
+export function isHttpLatencyMonitorConfig(
+    config: MonitorConfig | null | undefined
+): config is HttpLatencyMonitorConfig {
+    return isMonitorConfigOfType<HttpLatencyMonitorConfig>(
+        config,
+        "http-latency"
     );
 }
 
@@ -439,6 +546,28 @@ export const DEFAULT_MONITOR_CONFIG = {
         type: "http" as const,
     } as Partial<HttpMonitorConfig>,
 
+    /** Default values for HTTP header monitors */
+    "http-header": {
+        checkInterval: 300_000, // 5 minutes
+        enabled: true,
+        expectedHeaderValue: "",
+        headerName: "",
+        retryAttempts: 3,
+        timeout: 30_000, // 30 seconds
+        type: "http-header" as const,
+    } as Partial<HttpHeaderMonitorConfig>,
+
+    /** Default values for HTTP JSON monitors */
+    "http-json": {
+        checkInterval: 300_000, // 5 minutes
+        enabled: true,
+        expectedJsonValue: "",
+        jsonPath: "",
+        retryAttempts: 3,
+        timeout: 30_000, // 30 seconds
+        type: "http-json" as const,
+    } as Partial<HttpJsonMonitorConfig>,
+
     /** Default values for HTTP keyword monitors */
     "http-keyword": {
         bodyKeyword: "",
@@ -448,6 +577,16 @@ export const DEFAULT_MONITOR_CONFIG = {
         timeout: 30_000, // 30 seconds
         type: "http-keyword" as const,
     } as Partial<HttpKeywordMonitorConfig>,
+
+    /** Default values for HTTP latency monitors */
+    "http-latency": {
+        checkInterval: 300_000, // 5 minutes
+        enabled: true,
+        maxResponseTime: 2000,
+        retryAttempts: 3,
+        timeout: 30_000, // 30 seconds
+        type: "http-latency" as const,
+    } as Partial<HttpLatencyMonitorConfig>,
 
     /** Default values for HTTP status monitors */
     "http-status": {
