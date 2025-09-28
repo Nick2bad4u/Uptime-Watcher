@@ -62,7 +62,9 @@ import {
     SECONDS_TO_MS_MULTIPLIER,
 } from "./constants";
 import { DnsMonitor } from "./DnsMonitor";
+import { HttpKeywordMonitor } from "./HttpKeywordMonitor";
 import { HttpMonitor } from "./HttpMonitor";
+import { HttpStatusMonitor } from "./HttpStatusMonitor";
 import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
 import { SslMonitor } from "./SslMonitor";
@@ -260,6 +262,8 @@ export class EnhancedMonitorChecker {
     private readonly dnsMonitor: DnsMonitor;
 
     private readonly httpMonitor: HttpMonitor;
+    private readonly httpKeywordMonitor: HttpKeywordMonitor;
+    private readonly httpStatusMonitor: HttpStatusMonitor;
 
     private readonly pingMonitor: PingMonitor;
 
@@ -889,6 +893,20 @@ export class EnhancedMonitorChecker {
                     signal
                 );
             }
+            case "http-keyword": {
+                return this.performMonitorCheck(
+                    this.httpKeywordMonitor,
+                    monitor,
+                    signal
+                );
+            }
+            case "http-status": {
+                return this.performMonitorCheck(
+                    this.httpStatusMonitor,
+                    monitor,
+                    signal
+                );
+            }
             case "ping": {
                 return this.performMonitorCheck(
                     this.pingMonitor,
@@ -1061,6 +1079,8 @@ export class EnhancedMonitorChecker {
         // Initialize monitor services
         this.dnsMonitor = new DnsMonitor({});
         this.httpMonitor = new HttpMonitor({});
+        this.httpKeywordMonitor = new HttpKeywordMonitor({});
+        this.httpStatusMonitor = new HttpStatusMonitor({});
         this.pingMonitor = new PingMonitor({});
         this.portMonitor = new PortMonitor({});
         this.sslMonitor = new SslMonitor({});

@@ -24,14 +24,32 @@ export interface BaseMonitorFields {
  * HTTP monitor specific fields
  */
 export interface HttpMonitorFields extends BaseMonitorFields {
-    /** Expected status code */
-    expectedStatusCode?: number;
     /** Follow redirects */
     followRedirects?: boolean;
     /** Request headers */
     headers?: Record<string, string>;
     /** HTTP method */
     method?: HttpMethod;
+    /** URL to monitor */
+    url: string;
+}
+
+/**
+ * HTTP keyword monitor specific fields
+ */
+export interface HttpKeywordMonitorFields extends BaseMonitorFields {
+    /** Keyword that must appear in the response body */
+    bodyKeyword: string;
+    /** URL to monitor */
+    url: string;
+}
+
+/**
+ * HTTP status monitor specific fields
+ */
+export interface HttpStatusMonitorFields extends BaseMonitorFields {
+    /** Expected HTTP status code */
+    expectedStatusCode: number;
     /** URL to monitor */
     url: string;
 }
@@ -156,7 +174,9 @@ export interface SslMonitorFields extends BaseMonitorFields {
  */
 export type MonitorFormFields =
     | DnsMonitorFields
+    | HttpKeywordMonitorFields
     | HttpMonitorFields
+    | HttpStatusMonitorFields
     | PingMonitorFields
     | PortMonitorFields
     | SslMonitorFields;
@@ -192,12 +212,25 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
         case "http": {
             return {
                 ...baseFields,
-                expectedStatusCode: 200,
                 followRedirects: true,
                 headers: {},
                 method: "GET",
                 url: "",
             } satisfies HttpMonitorFields;
+        }
+        case "http-keyword": {
+            return {
+                ...baseFields,
+                bodyKeyword: "",
+                url: "",
+            } satisfies HttpKeywordMonitorFields;
+        }
+        case "http-status": {
+            return {
+                ...baseFields,
+                expectedStatusCode: 200,
+                url: "",
+            } satisfies HttpStatusMonitorFields;
         }
         case "ping": {
             return {

@@ -75,6 +75,8 @@
     "check:storybook": "tsc --project storybook/tsconfig.json --noEmit",
     "check:shared:test": "tsc --build config/testing/tsconfig.shared.test.json",
     "clean": "rimraf dist coverage cache .cache .vite .turbo",
+    "clean:app": "rimraf %appdata%\\uptime-watcher",
+    "clean:database": "rimraf %appdata%\\uptime-watcher\\uptime-watcher.sqlite",
     "postclean": "npm run copy-wasm",
     "cognitive-complexity": "cognitive-complexity-ts --threshold 10",
     "commit": "git-cz",

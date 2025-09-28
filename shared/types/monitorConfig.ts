@@ -267,6 +267,39 @@ export interface SslMonitorConfig extends BaseMonitorConfig {
 }
 
 /**
+ * Configuration interface for HTTP keyword monitors.
+ *
+ * @remarks
+ * Used for monitors that check HTTP/HTTPS endpoints for specific keywords in
+ * the response body.
+ *
+ * @public
+ */
+export interface HttpKeywordMonitorConfig extends BaseMonitorConfig {
+    /** Keyword that must appear in the HTTP response body */
+    bodyKeyword: string;
+    type: "http-keyword";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
+ * Configuration interface for HTTP status monitors.
+ *
+ * @remarks
+ * Used for monitors that check HTTP/HTTPS endpoints for specific status codes.
+ *
+ * @public
+ */
+export interface HttpStatusMonitorConfig extends BaseMonitorConfig {
+    /** Expected HTTP status code that indicates success */
+    expectedStatusCode: number;
+    type: "http-status";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
  * Union type representing all possible monitor configurations.
  *
  * @remarks
@@ -277,8 +310,20 @@ export interface SslMonitorConfig extends BaseMonitorConfig {
  * @public
  */
 export type MonitorConfig = Simplify<
-    HttpMonitorConfig | PingMonitorConfig | PortMonitorConfig | SslMonitorConfig
+    | HttpKeywordMonitorConfig
+    | HttpMonitorConfig
+    | HttpStatusMonitorConfig
+    | PingMonitorConfig
+    | PortMonitorConfig
+    | SslMonitorConfig
 >;
+
+function isMonitorConfigOfType<T extends MonitorConfig>(
+    config: MonitorConfig | null | undefined,
+    type: T["type"]
+): config is T {
+    return config !== null && config !== undefined && config.type === type;
+}
 
 /**
  * Type guard to check if configuration is for HTTP monitors.
@@ -341,6 +386,42 @@ export function isSslMonitorConfig(
 }
 
 /**
+ * Type guard to check if configuration is for HTTP keyword monitors.
+ *
+ * @param config - The monitor configuration to check
+ *
+ * @returns True if the configuration is for an HTTP keyword monitor
+ *
+ * @public
+ */
+export function isHttpKeywordMonitorConfig(
+    config: MonitorConfig | null | undefined
+): config is HttpKeywordMonitorConfig {
+    return isMonitorConfigOfType<HttpKeywordMonitorConfig>(
+        config,
+        "http-keyword"
+    );
+}
+
+/**
+ * Type guard to check if configuration is for HTTP status monitors.
+ *
+ * @param config - The monitor configuration to check
+ *
+ * @returns True if the configuration is for an HTTP status monitor
+ *
+ * @public
+ */
+export function isHttpStatusMonitorConfig(
+    config: MonitorConfig | null | undefined
+): config is HttpStatusMonitorConfig {
+    return isMonitorConfigOfType<HttpStatusMonitorConfig>(
+        config,
+        "http-status"
+    );
+}
+
+/**
  * Default monitor configuration values.
  *
  * @public
@@ -357,6 +438,26 @@ export const DEFAULT_MONITOR_CONFIG = {
         timeout: 30_000, // 30 seconds
         type: "http" as const,
     } as Partial<HttpMonitorConfig>,
+
+    /** Default values for HTTP keyword monitors */
+    "http-keyword": {
+        bodyKeyword: "",
+        checkInterval: 300_000, // 5 minutes
+        enabled: true,
+        retryAttempts: 3,
+        timeout: 30_000, // 30 seconds
+        type: "http-keyword" as const,
+    } as Partial<HttpKeywordMonitorConfig>,
+
+    /** Default values for HTTP status monitors */
+    "http-status": {
+        checkInterval: 300_000, // 5 minutes
+        enabled: true,
+        expectedStatusCode: 200,
+        retryAttempts: 3,
+        timeout: 30_000, // 30 seconds
+        type: "http-status" as const,
+    } as Partial<HttpStatusMonitorConfig>,
 
     /** Default values for ping monitors */
     ping: {

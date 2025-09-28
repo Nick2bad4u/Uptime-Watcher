@@ -14,7 +14,9 @@
 import type {
     BaseMonitorSchemaType,
     DnsMonitorSchemaType,
+    HttpKeywordMonitorSchemaType,
     HttpMonitorSchemaType,
+    HttpStatusMonitorSchemaType,
     MonitorSchemaType,
     PingMonitorSchemaType,
     PortMonitorSchemaType,
@@ -146,6 +148,8 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
             ),
         type: z.enum([
             "http",
+            "http-keyword",
+            "http-status",
             "port",
             "ping",
             "dns",
@@ -153,6 +157,26 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
         ]),
     })
     .strict();
+
+/**
+ * Reusable HTTP URL validation schema for multiple monitor types.
+ */
+const httpUrlSchema = z.string().refine(
+    (val) =>
+        // Use validator.js for robust URL validation
+        validator.isURL(val, {
+            allow_protocol_relative_urls: false,
+            allow_trailing_dot: false,
+            allow_underscores: false,
+            disallow_auth: false,
+            protocols: ["http", "https"],
+            require_host: true,
+            require_protocol: true,
+            require_tld: true,
+            validate_length: true,
+        }),
+    "Must be a valid HTTP or HTTPS URL"
+);
 
 /**
  * Zod schema for HTTP monitor fields.
@@ -165,24 +189,48 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
 export const httpMonitorSchema: HttpMonitorSchemaType = baseMonitorSchema
     .extend({
         type: z.literal("http"),
-        url: z.string().refine(
-            (val) =>
-                // Use validator.js for robust URL validation
-                validator.isURL(val, {
-                    allow_protocol_relative_urls: false,
-                    allow_trailing_dot: false,
-                    allow_underscores: false,
-                    disallow_auth: false,
-                    protocols: ["http", "https"],
-                    require_host: true,
-                    require_protocol: true,
-                    require_tld: true,
-                    validate_length: true,
-                }),
-            "Must be a valid HTTP or HTTPS URL"
-        ),
+        url: httpUrlSchema,
     })
     .strict();
+
+/**
+ * Zod schema for HTTP keyword monitor fields.
+ *
+ * @remarks
+ * Extends {@link baseMonitorSchema} and adds `bodyKeyword` for response content
+ * validation alongside the shared URL validation.
+ */
+export const httpKeywordMonitorSchema: HttpKeywordMonitorSchemaType =
+    baseMonitorSchema
+        .extend({
+            bodyKeyword: z
+                .string()
+                .min(1, "Keyword is required")
+                .max(1024, "Keyword must be 1024 characters or fewer"),
+            type: z.literal("http-keyword"),
+            url: httpUrlSchema,
+        })
+        .strict();
+
+/**
+ * Zod schema for HTTP status monitor fields.
+ *
+ * @remarks
+ * Extends {@link baseMonitorSchema} and adds `expectedStatusCode` for response
+ * status validation alongside the shared URL validation.
+ */
+export const httpStatusMonitorSchema: HttpStatusMonitorSchemaType =
+    baseMonitorSchema
+        .extend({
+            expectedStatusCode: z
+                .number()
+                .int("Status code must be an integer")
+                .min(100, "Status code must be between 100 and 599")
+                .max(599, "Status code must be between 100 and 599"),
+            type: z.literal("http-status"),
+            url: httpUrlSchema,
+        })
+        .strict();
 
 /**
  * Zod schema for port monitor fields.
@@ -275,6 +323,8 @@ export const sslMonitorSchema: SslMonitorSchemaType = baseMonitorSchema
  */
 export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
     httpMonitorSchema,
+    httpKeywordMonitorSchema,
+    httpStatusMonitorSchema,
     portMonitorSchema,
     pingMonitorSchema,
     dnsMonitorSchema,
@@ -310,6 +360,8 @@ export const siteSchema: SiteSchemaType = z
 export interface MonitorSchemas {
     readonly dns: typeof dnsMonitorSchema;
     readonly http: typeof httpMonitorSchema;
+    readonly "http-keyword": typeof httpKeywordMonitorSchema;
+    readonly "http-status": typeof httpStatusMonitorSchema;
     readonly ping: typeof pingMonitorSchema;
     readonly port: typeof portMonitorSchema;
     readonly ssl: typeof sslMonitorSchema;
@@ -324,6 +376,8 @@ export interface MonitorSchemas {
 export const monitorSchemas: MonitorSchemas = {
     dns: dnsMonitorSchema,
     http: httpMonitorSchema,
+    "http-keyword": httpKeywordMonitorSchema,
+    "http-status": httpStatusMonitorSchema,
     ping: pingMonitorSchema,
     port: portMonitorSchema,
     ssl: sslMonitorSchema,
@@ -337,6 +391,20 @@ export const monitorSchemas: MonitorSchemas = {
 export type HttpMonitor = z.infer<typeof httpMonitorSchema>;
 
 /**
+ * Type representing a validated HTTP keyword monitor.
+ *
+ * @see {@link httpKeywordMonitorSchema}
+ */
+export type HttpKeywordMonitor = z.infer<typeof httpKeywordMonitorSchema>;
+
+/**
+ * Type representing a validated HTTP status monitor.
+ *
+ * @see {@link httpStatusMonitorSchema}
+ */
+export type HttpStatusMonitor = z.infer<typeof httpStatusMonitorSchema>;
+
+/**
  * Type representing a validated DNS monitor.
  *
  * @see {@link dnsMonitorSchema}
@@ -344,7 +412,8 @@ export type HttpMonitor = z.infer<typeof httpMonitorSchema>;
 export type DnsMonitor = z.infer<typeof dnsMonitorSchema>;
 
 /**
- * Type representing a validated monitor (HTTP, port, ping, DNS, or SSL).
+ * Type representing a validated monitor (HTTP, HTTP keyword, HTTP status, port,
+ * ping, DNS, or SSL).
  *
  * @see {@link monitorSchema}
  */

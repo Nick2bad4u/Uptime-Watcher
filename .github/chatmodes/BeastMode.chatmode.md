@@ -1,6 +1,6 @@
 ---
 description: Beast Mode 3.1 [Custom]
-tools: ['createFile', 'createDirectory', 'editFiles', 'search', 'runCommands', 'runTask', 'getTaskOutput', 'usages', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'todos', 'runTests', 'electron-mcp-server', 'describe_table', 'list_tables', 'read_query', 'execute_command', 'get_diagnostics', 'get_references', 'get_symbol_lsp_info', 'rename_symbol']
+tools: ['runCommands', 'runTask', 'getTaskOutput', 'createFile', 'createDirectory', 'editFiles', 'search', 'usages', 'think', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'todos', 'runTests', 'electron-mcp-server', 'describe_table', 'list_tables', 'read_query', 'execute_command', 'get_diagnostics', 'get_references', 'get_symbol_lsp_info', 'rename_symbol', 'deepwiki']
 ---
 
 # Beast Mode 3.1

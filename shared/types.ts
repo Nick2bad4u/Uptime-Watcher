@@ -39,6 +39,8 @@ export type HttpMethod = "DELETE" | "GET" | "HEAD" | "POST" | "PUT";
  */
 export const BASE_MONITOR_TYPES = [
     "http",
+    "http-keyword",
+    "http-status",
     "port",
     "ping",
     "dns",
@@ -124,10 +126,14 @@ export const DEFAULT_SITE_STATUS: SiteStatus = "unknown";
 export interface Monitor {
     /** Array of currently active operations for this monitor */
     activeOperations?: string[];
+    /** Keyword that must be present in HTTP response bodies */
+    bodyKeyword?: string;
     /** Certificate expiry warning threshold in days for SSL monitoring */
     certificateWarningDays?: number;
     /** Interval between checks in milliseconds */
     checkInterval: number;
+    /** Expected HTTP status code for status-based HTTP monitors */
+    expectedStatusCode?: number;
     /** Expected value for DNS record verification */
     expectedValue?: string; // Added for DNS monitoring
     /** Historical status data for analytics and trends */
@@ -152,11 +158,13 @@ export interface Monitor {
     status: MonitorStatus;
     /** Timeout for monitor checks in milliseconds */
     timeout: number;
-    /** Type of monitoring performed (http, port, ping, dns, ssl) */
+    /** Type of monitoring performed (http, http-keyword, http-status, port,
+ping, dns, ssl) */
     type: MonitorType;
     /** URL to monitor for HTTP-based checks */
     url?: string;
 }
+
 /**
  * Field definition for dynamic form generation.
  *

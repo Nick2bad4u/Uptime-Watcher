@@ -57,6 +57,28 @@ export interface HttpFormData extends BaseFormData {
 }
 
 /**
+ * Form data for HTTP keyword monitors.
+ */
+export interface HttpKeywordFormData extends BaseFormData {
+    /** Keyword that must appear in the response body */
+    bodyKeyword: string;
+    type: "http-keyword";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
+ * Form data for HTTP status monitors.
+ */
+export interface HttpStatusFormData extends BaseFormData {
+    /** Expected HTTP status code */
+    expectedStatusCode: number;
+    type: "http-status";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
  * Form data for ping monitors.
  */
 export interface PingFormData extends BaseFormData {
@@ -107,7 +129,13 @@ export interface SslFormData extends BaseFormData {
  * IntelliSense display.
  */
 export type MonitorFormData = Simplify<
-    DnsFormData | HttpFormData | PingFormData | PortFormData | SslFormData
+    | DnsFormData
+    | HttpFormData
+    | HttpKeywordFormData
+    | HttpStatusFormData
+    | PingFormData
+    | PortFormData
+    | SslFormData
 >;
 
 /**
@@ -124,6 +152,12 @@ export function createDefaultFormData(
 export function createDefaultFormData(
     type: "http"
 ): SetOptional<HttpFormData, "url">;
+export function createDefaultFormData(
+    type: "http-keyword"
+): SetOptional<HttpKeywordFormData, "bodyKeyword" | "url">;
+export function createDefaultFormData(
+    type: "http-status"
+): SetOptional<HttpStatusFormData, "expectedStatusCode" | "url">;
 export function createDefaultFormData(
     type: "ping"
 ): SetOptional<PingFormData, "host">;
@@ -160,6 +194,40 @@ export function isHttpFormData(
         data.type === "http" &&
         typeof data.url === "string" &&
         data.url.trim() !== ""
+    );
+}
+
+/**
+ * Type guard to check if form data is for HTTP keyword monitor.
+ */
+export function isHttpKeywordFormData(
+    data: Partial<MonitorFormData>
+): data is HttpKeywordFormData {
+    const formData = data as Partial<HttpKeywordFormData>;
+    return (
+        formData.type === "http-keyword" &&
+        typeof formData.url === "string" &&
+        formData.url.trim() !== "" &&
+        typeof formData.bodyKeyword === "string" &&
+        formData.bodyKeyword.trim() !== ""
+    );
+}
+
+/**
+ * Type guard to check if form data is for HTTP status monitor.
+ */
+export function isHttpStatusFormData(
+    data: Partial<MonitorFormData>
+): data is HttpStatusFormData {
+    const formData = data as Partial<HttpStatusFormData>;
+    return (
+        formData.type === "http-status" &&
+        typeof formData.url === "string" &&
+        formData.url.trim() !== "" &&
+        typeof formData.expectedStatusCode === "number" &&
+        Number.isInteger(formData.expectedStatusCode) &&
+        formData.expectedStatusCode >= 100 &&
+        formData.expectedStatusCode <= 599
     );
 }
 
@@ -249,6 +317,8 @@ export function isSslFormData(
 const FORM_DATA_VALIDATORS = {
     dns: isDnsFormData,
     http: isHttpFormData,
+    "http-keyword": isHttpKeywordFormData,
+    "http-status": isHttpStatusFormData,
     ping: isPingFormData,
     port: isPortFormData,
     ssl: isSslFormData,

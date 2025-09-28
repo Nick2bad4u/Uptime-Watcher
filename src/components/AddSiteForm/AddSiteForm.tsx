@@ -130,9 +130,11 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         const formState = useAddSiteForm();
         const {
             addMode,
+            bodyKeyword,
             certificateWarningDays,
             checkInterval,
             expectedValue,
+            expectedStatusCode,
             formError,
             host,
             monitorType,
@@ -142,9 +144,11 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             resetForm,
             selectedExistingSite,
             setAddMode,
+            setBodyKeyword,
             setCertificateWarningDays,
             setCheckInterval,
             setExpectedValue,
+            setExpectedStatusCode,
             setFormError,
             setHost,
             setMonitorType,
@@ -196,8 +200,14 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 certificateWarningDays: (value: number | string): void => {
                     setCertificateWarningDays(String(value));
                 },
+                bodyKeyword: (value: number | string): void => {
+                    setBodyKeyword(String(value));
+                },
                 expectedValue: (value: number | string): void => {
                     setExpectedValue(String(value));
+                },
+                expectedStatusCode: (value: number | string): void => {
+                    setExpectedStatusCode(String(value));
                 },
                 host: (value: number | string): void => {
                     setHost(String(value));
@@ -226,7 +236,9 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         const dynamicFieldValues = useMemo(
             () => ({
                 certificateWarningDays,
+                bodyKeyword,
                 expectedValue,
+                expectedStatusCode,
                 host,
                 port,
                 recordType,
@@ -260,11 +272,13 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                     await handleSubmit(event, {
                         addMode,
                         addMonitorToSite,
+                        bodyKeyword,
                         certificateWarningDays,
                         checkInterval,
                         clearError,
                         createSite,
                         expectedValue,
+                        expectedStatusCode,
                         formError,
                         generateUuid,
                         host,

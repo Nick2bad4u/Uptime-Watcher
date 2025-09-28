@@ -7,6 +7,8 @@ import { describe, it, expect } from "vitest";
 import {
     baseMonitorSchema,
     httpMonitorSchema,
+    httpKeywordMonitorSchema,
+    httpStatusMonitorSchema,
     portMonitorSchema,
     monitorSchema,
     siteSchema,
@@ -952,6 +954,10 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(monitorSchemas.http).toBe(httpMonitorSchema);
+            expect(monitorSchemas["http-keyword"]).toBe(
+                httpKeywordMonitorSchema
+            );
+            expect(monitorSchemas["http-status"]).toBe(httpStatusMonitorSchema);
             expect(monitorSchemas.port).toBe(portMonitorSchema);
         });
     });
@@ -1017,6 +1023,62 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.errors).toHaveLength(0);
             expect(result.data).toEqual(portData);
             expect(result.metadata!["monitorType"]).toBe("port");
+        });
+
+        it("should validate HTTP keyword monitor data successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const data = {
+                checkInterval: 30_000,
+                history: [],
+                id: "http-keyword-test",
+                monitoring: true,
+                responseTime: 200,
+                retryAttempts: 3,
+                status: "up",
+                timeout: 5000,
+                type: "http-keyword" as const,
+                url: "https://example.com",
+                bodyKeyword: "ready",
+            };
+
+            const result = validateMonitorData("http-keyword", data);
+            expect(result.success).toBeTruthy();
+            expect(result.errors).toHaveLength(0);
+        });
+
+        it("should validate HTTP status monitor data successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const data = {
+                checkInterval: 30_000,
+                history: [],
+                id: "http-status-test",
+                monitoring: true,
+                responseTime: 200,
+                retryAttempts: 3,
+                status: "up",
+                timeout: 5000,
+                type: "http-status" as const,
+                url: "https://example.com",
+                expectedStatusCode: 200,
+            };
+
+            const result = validateMonitorData("http-status", data);
+            expect(result.success).toBeTruthy();
+            expect(result.errors).toHaveLength(0);
         });
 
         it("should handle unknown monitor type", async ({ task, annotate }) => {
@@ -1638,6 +1700,108 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.errors[0]).toContain(
                 "Unknown monitor type: invalidType"
             );
+        });
+    });
+
+    describe("httpKeywordMonitorSchema", () => {
+        it("should validate monitor with keyword", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                checkInterval: 30_000,
+                history: [],
+                id: "keyword-monitor",
+                monitoring: true,
+                responseTime: 200,
+                retryAttempts: 3,
+                status: "up" as const,
+                timeout: 5000,
+                type: "http-keyword" as const,
+                url: "https://example.com",
+                bodyKeyword: "ready",
+            };
+
+            expect(() => httpKeywordMonitorSchema.parse(monitor)).not.toThrow();
+        });
+
+        it("should reject empty keyword", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                checkInterval: 30_000,
+                history: [],
+                id: "keyword-monitor",
+                monitoring: true,
+                responseTime: 200,
+                retryAttempts: 3,
+                status: "up" as const,
+                timeout: 5000,
+                type: "http-keyword" as const,
+                url: "https://example.com",
+                bodyKeyword: " ",
+            };
+
+            expect(() => httpKeywordMonitorSchema.parse(monitor)).toThrow();
+        });
+    });
+
+    describe("httpStatusMonitorSchema", () => {
+        it("should validate monitor with expected status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                checkInterval: 30_000,
+                history: [],
+                id: "status-monitor",
+                monitoring: true,
+                responseTime: 200,
+                retryAttempts: 3,
+                status: "up" as const,
+                timeout: 5000,
+                type: "http-status" as const,
+                url: "https://example.com",
+                expectedStatusCode: 204,
+            };
+
+            expect(() => httpStatusMonitorSchema.parse(monitor)).not.toThrow();
+        });
+
+        it("should reject invalid status code", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                checkInterval: 30_000,
+                history: [],
+                id: "status-monitor",
+                monitoring: true,
+                responseTime: 200,
+                retryAttempts: 3,
+                status: "up" as const,
+                timeout: 5000,
+                type: "http-status" as const,
+                url: "https://example.com",
+                expectedStatusCode: 99,
+            };
+
+            expect(() => httpStatusMonitorSchema.parse(monitor)).toThrow();
         });
     });
 });

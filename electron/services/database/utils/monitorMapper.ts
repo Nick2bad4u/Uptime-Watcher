@@ -71,6 +71,34 @@ function copyDynamicFields(
 }
 
 /**
+ * Sanitizes the bodyKeyword field value for safe mapping.
+ *
+ * @param value - The value to sanitize.
+ *
+ * @returns The sanitized bodyKeyword value, or undefined if invalid.
+ */
+function getSanitizedBodyKeyword(value: unknown): string | undefined {
+    return typeof value === "string" ? value : undefined;
+}
+
+/**
+ * Sanitizes the expectedStatusCode field value for safe mapping.
+ *
+ * @param value - The value to sanitize.
+ *
+ * @returns The sanitized expectedStatusCode value, or undefined if invalid.
+ */
+function getSanitizedExpectedStatusCode(
+    value: unknown
+): number | undefined {
+    if (typeof value !== "number" || Number.isNaN(value)) {
+        return undefined;
+    }
+
+    return safeInteger(value, value, 100, 599);
+}
+
+/**
  * Creates base monitor object from dynamic monitor data using safe validation.
  *
  * @remarks
@@ -86,6 +114,11 @@ function copyDynamicFields(
  * @see {@link safeInteger} - Safe integer conversion utility
  */
 function createBaseMonitor(dynamicMonitor: Monitor): Site["monitors"][0] {
+    const bodyKeyword = getSanitizedBodyKeyword(dynamicMonitor.bodyKeyword);
+    const expectedStatusCode = getSanitizedExpectedStatusCode(
+        dynamicMonitor.expectedStatusCode
+    );
+
     return {
         activeOperations: dynamicMonitor.activeOperations ?? [],
         checkInterval: safeInteger(dynamicMonitor.checkInterval, 300_000, 5000),
@@ -98,6 +131,8 @@ function createBaseMonitor(dynamicMonitor: Monitor): Site["monitors"][0] {
         timeout: safeInteger(dynamicMonitor.timeout, 5000, 1000, 300_000),
         type: dynamicMonitor.type,
         // Include optional fields if present
+        ...(bodyKeyword !== undefined && { bodyKeyword }),
+        ...(expectedStatusCode !== undefined && { expectedStatusCode }),
         ...(dynamicMonitor.host && { host: dynamicMonitor.host }),
         ...(dynamicMonitor.port && { port: dynamicMonitor.port }),
         ...(dynamicMonitor.url && { url: dynamicMonitor.url }),

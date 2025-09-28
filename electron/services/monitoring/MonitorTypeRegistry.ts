@@ -18,13 +18,19 @@ import type * as z from "zod";
 import { MONITOR_STATUS } from "@shared/types";
 // Import shared validation schemas
 import { withErrorHandling } from "@shared/utils/errorHandling";
-import { monitorSchemas } from "@shared/validation/schemas";
+import {
+    httpKeywordMonitorSchema,
+    httpStatusMonitorSchema,
+    monitorSchemas,
+} from "@shared/validation/schemas";
 
 import type { IMonitorService } from "./types";
 
 import { logger } from "../../utils/logger";
 import { DnsMonitor } from "./DnsMonitor";
+import { HttpKeywordMonitor } from "./HttpKeywordMonitor";
 import { HttpMonitor } from "./HttpMonitor";
+import { HttpStatusMonitor } from "./HttpStatusMonitor";
 import {
     createMigrationOrchestrator,
     exampleMigrations,
@@ -338,6 +344,115 @@ registerMonitorType({
 });
 
 registerMonitorType({
+    description:
+        "Monitors HTTP/HTTPS endpoints and ensures the response body contains a required keyword.",
+    displayName: "HTTP Keyword Match",
+    fields: [
+        {
+            helpText: "Enter the full URL including http:// or https://",
+            label: "Website URL",
+            name: "url",
+            placeholder: "example.com or 192.168.1.1",
+            required: true,
+            type: "url",
+        },
+        {
+            helpText:
+                "Enter the keyword that must appear in the response body (case-insensitive)",
+            label: "Keyword",
+            name: "bodyKeyword",
+            placeholder: "status: ok",
+            required: true,
+            type: "text",
+        },
+    ],
+    serviceFactory: () => new HttpKeywordMonitor(),
+    type: "http-keyword",
+    uiConfig: {
+        detailFormats: {
+            analyticsLabel: "HTTP Keyword Response Time",
+            historyDetail: (details: string) => `Keyword Check: ${details}`,
+        },
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: true,
+        },
+        formatDetail: (details: string) => details,
+        formatTitleSuffix: (monitor: Monitor) => {
+            if (monitor.type === "http-keyword") {
+                return monitor.url ? ` (${monitor.url})` : "";
+            }
+            return "";
+        },
+        helpTexts: {
+            primary: "Enter the keyword to look for in the response body",
+            secondary:
+                "The response body is searched case-insensitively for the provided keyword.",
+        },
+        supportsAdvancedAnalytics: true,
+        supportsResponseTime: true,
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Zod schemas expose internal any types; safe for runtime validation.
+    validationSchema: httpKeywordMonitorSchema,
+    version: "1.0.0",
+});
+
+registerMonitorType({
+    description:
+        "Monitors HTTP/HTTPS endpoints and verifies the response status code matches the expected value.",
+    displayName: "HTTP Status Code",
+    fields: [
+        {
+            helpText: "Enter the full URL including http:// or https://",
+            label: "Website URL",
+            name: "url",
+            placeholder: "example.com or 192.168.1.1",
+            required: true,
+            type: "url",
+        },
+        {
+            helpText: "Enter the expected HTTP status code (100-599)",
+            label: "Expected Status Code",
+            max: 599,
+            min: 100,
+            name: "expectedStatusCode",
+            placeholder: "200",
+            required: true,
+            type: "number",
+        },
+    ],
+    serviceFactory: () => new HttpStatusMonitor(),
+    type: "http-status",
+    uiConfig: {
+        detailFormats: {
+            analyticsLabel: "HTTP Status Response Time",
+            historyDetail: (details: string) => `Status Check: ${details}`,
+        },
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: true,
+        },
+        formatDetail: (details: string) => details,
+        formatTitleSuffix: (monitor: Monitor) => {
+            if (monitor.type === "http-status") {
+                return monitor.url ? ` (${monitor.url})` : "";
+            }
+            return "";
+        },
+        helpTexts: {
+            primary: "Enter the expected HTTP status code for this endpoint",
+            secondary:
+                "The monitor compares the response status with the expected status each run.",
+        },
+        supportsAdvancedAnalytics: true,
+        supportsResponseTime: true,
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Zod schemas expose internal any types; safe for runtime validation.
+    validationSchema: httpStatusMonitorSchema,
+    version: "1.0.0",
+});
+
+registerMonitorType({
     description: "Monitors TCP port connectivity",
     displayName: "Port (Host/Port)",
     fields: [
@@ -597,6 +712,8 @@ migrationRegistry.registerMigration("port", exampleMigrations.portV1_0_to_1_1);
 versionManager.setVersion("dns", "1.0.0");
 versionManager.setVersion("ssl", "1.0.0");
 versionManager.setVersion("http", "1.0.0");
+versionManager.setVersion("http-keyword", "1.0.0");
+versionManager.setVersion("http-status", "1.0.0");
 versionManager.setVersion("ping", "1.0.0");
 versionManager.setVersion("port", "1.0.0");
 

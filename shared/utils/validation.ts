@@ -133,6 +133,62 @@ function validateHttpMonitorFields(
 }
 
 /**
+ * Validates HTTP keyword monitor-specific fields.
+ *
+ * @remarks
+ * Checks that the url and bodyKeyword fields are present and valid. The
+ * bodyKeyword field must be a non-empty string. Adds error messages for any
+ * missing or invalid fields.
+ *
+ * @param monitor - Partial monitor object to validate.
+ * @param errors - Array to collect validation error messages.
+ *
+ * @internal
+ */
+function validateHttpKeywordMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
+    validateHttpMonitorFields(monitor, errors);
+    if (!monitor.bodyKeyword || typeof monitor.bodyKeyword !== "string") {
+        errors.push("Keyword is required for HTTP keyword monitors");
+    } else if (monitor.bodyKeyword.trim().length === 0) {
+        errors.push("Keyword must not be empty");
+    }
+}
+
+/**
+ * Validates HTTP status monitor-specific fields.
+ *
+ * @remarks
+ * Checks that the url field is present and a string, and that the
+ * expectedStatusCode is a number between 100 and 599. Adds error messages for
+ * any missing or invalid fields.
+ *
+ * @param monitor - Partial monitor object to validate.
+ * @param errors - Array to collect validation error messages.
+ *
+ * @internal
+ */
+function validateHttpStatusMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
+    validateHttpMonitorFields(monitor, errors);
+    if (typeof monitor.expectedStatusCode !== "number") {
+        errors.push(
+            "Expected status code is required for HTTP status monitors"
+        );
+    } else if (
+        !Number.isInteger(monitor.expectedStatusCode) ||
+        monitor.expectedStatusCode < 100 ||
+        monitor.expectedStatusCode > 599
+    ) {
+        errors.push("Expected status code must be between 100 and 599");
+    }
+}
+
+/**
  * Validates ping monitor-specific fields.
  *
  * @remarks
@@ -225,7 +281,9 @@ function validateDnsMonitorFields(
         ];
         if (!validRecordTypes.includes(monitor.recordType.toUpperCase())) {
             errors.push(
-                `Invalid record type: ${monitor.recordType}. Valid types are: ${validRecordTypes.join(", ")}`
+                `Invalid record type: ${monitor.recordType}. Valid types are: ${validRecordTypes.join(
+                    ", "
+                )}`
             );
         }
     }
@@ -298,6 +356,14 @@ function validateTypeSpecificFields(
         }
         case "http": {
             validateHttpMonitorFields(monitor, errors);
+            break;
+        }
+        case "http-keyword": {
+            validateHttpKeywordMonitorFields(monitor, errors);
+            break;
+        }
+        case "http-status": {
+            validateHttpStatusMonitorFields(monitor, errors);
             break;
         }
         case "ping": {

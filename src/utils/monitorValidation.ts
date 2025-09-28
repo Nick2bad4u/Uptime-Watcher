@@ -17,6 +17,8 @@ import {
 import type {
     DnsFormData,
     HttpFormData,
+    HttpKeywordFormData,
+    HttpStatusFormData,
     MonitorFormData,
     PingFormData,
     PortFormData,
@@ -288,6 +290,71 @@ const validateHttpMonitorFormData = (data: Partial<HttpFormData>): string[] => {
     return errors;
 };
 
+const validateHttpKeywordMonitorFormData = (
+    data: Partial<HttpKeywordFormData>
+): string[] => {
+    const errors: string[] = [];
+
+    if (!data.url || typeof data.url !== "string") {
+        errors.push("URL is required for HTTP keyword monitors");
+    } else {
+        const urlResult = sharedValidateMonitorField(
+            "http-keyword",
+            "url",
+            data.url
+        );
+        errors.push(...urlResult.errors);
+    }
+
+    if (!data.bodyKeyword || typeof data.bodyKeyword !== "string") {
+        errors.push("Keyword is required for HTTP keyword monitors");
+    } else {
+        const keywordResult = sharedValidateMonitorField(
+            "http-keyword",
+            "bodyKeyword",
+            data.bodyKeyword
+        );
+        errors.push(...keywordResult.errors);
+    }
+
+    return errors;
+};
+
+const validateHttpStatusMonitorFormData = (
+    data: Partial<HttpStatusFormData>
+): string[] => {
+    const errors: string[] = [];
+
+    if (!data.url || typeof data.url !== "string") {
+        errors.push("URL is required for HTTP status monitors");
+    } else {
+        const urlResult = sharedValidateMonitorField(
+            "http-status",
+            "url",
+            data.url
+        );
+        errors.push(...urlResult.errors);
+    }
+
+    if (
+        !Number.isInteger(data.expectedStatusCode) ||
+        typeof data.expectedStatusCode !== "number"
+    ) {
+        errors.push(
+            "Expected status code is required for HTTP status monitors"
+        );
+    } else {
+        const statusResult = sharedValidateMonitorField(
+            "http-status",
+            "expectedStatusCode",
+            data.expectedStatusCode
+        );
+        errors.push(...statusResult.errors);
+    }
+
+    return errors;
+};
+
 /**
  * Validates DNS monitor form data by checking required host and recordType
  * fields, with optional expectedValue field.
@@ -442,6 +509,22 @@ const validateMonitorFormDataByType = (
         case "http": {
             errors.push(
                 ...validateHttpMonitorFormData(data as Partial<HttpFormData>)
+            );
+            break;
+        }
+        case "http-keyword": {
+            errors.push(
+                ...validateHttpKeywordMonitorFormData(
+                    data as Partial<HttpKeywordFormData>
+                )
+            );
+            break;
+        }
+        case "http-status": {
+            errors.push(
+                ...validateHttpStatusMonitorFormData(
+                    data as Partial<HttpStatusFormData>
+                )
             );
             break;
         }

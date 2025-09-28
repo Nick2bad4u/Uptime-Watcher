@@ -102,8 +102,10 @@ export type FormSubmitProperties = Simplify<
  */
 function createMonitor(properties: FormSubmitProperties): Monitor {
     const {
+        bodyKeyword,
         certificateWarningDays,
         checkInterval,
+        expectedStatusCode,
         expectedValue,
         generateUuid,
         host,
@@ -115,10 +117,14 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
 
     // Convert form data to proper types for the shared utility
     const formData = {
+        bodyKeyword: safeTrim(bodyKeyword) || undefined,
         certificateWarningDays: certificateWarningDays
             ? Number.parseInt(certificateWarningDays, 10)
             : undefined,
         checkInterval,
+        expectedStatusCode: expectedStatusCode
+            ? Number.parseInt(expectedStatusCode, 10)
+            : undefined,
         expectedValue,
         host,
         port: port ? Number.parseInt(port, 10) : undefined,
@@ -275,6 +281,8 @@ async function validateMonitorType(
     port: string,
     recordType: string,
     expectedValue: string,
+    bodyKeyword: string,
+    expectedStatusCode: string,
     certificateWarningDays: string
 ): Promise<readonly string[]> {
     // Build form data object with only the relevant fields
@@ -297,6 +305,19 @@ async function validateMonitorType(
         }
         case "http": {
             formData["url"] = safeTrim(url);
+            break;
+        }
+        case "http-keyword": {
+            formData["url"] = safeTrim(url);
+            formData["bodyKeyword"] = safeTrim(bodyKeyword);
+            break;
+        }
+        case "http-status": {
+            formData["url"] = safeTrim(url);
+            formData["expectedStatusCode"] = Number.parseInt(
+                safeTrim(expectedStatusCode) || "NaN",
+                10
+            );
             break;
         }
         case "ping": {
@@ -362,10 +383,12 @@ export async function handleSubmit(
 ): Promise<void> {
     const {
         addMode,
+        bodyKeyword,
         certificateWarningDays,
         checkInterval,
         clearError,
         expectedValue,
+        expectedStatusCode,
         host,
         logger,
         monitorType,
@@ -390,6 +413,8 @@ export async function handleSubmit(
         hasPort: Boolean(safeTrim(port)),
         hasRecordType: Boolean(safeTrim(recordType)),
         hasUrl: Boolean(safeTrim(url)),
+        hasBodyKeyword: Boolean(safeTrim(bodyKeyword)),
+        hasExpectedStatusCode: Boolean(safeTrim(expectedStatusCode)),
         monitorType,
         selectedExistingSite: Boolean(selectedExistingSite),
     });
@@ -404,6 +429,8 @@ export async function handleSubmit(
             port,
             recordType,
             expectedValue,
+            bodyKeyword,
+            expectedStatusCode,
             certificateWarningDays
         )),
         ...(await validateCheckInterval(checkInterval)),

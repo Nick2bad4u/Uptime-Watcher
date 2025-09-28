@@ -771,6 +771,30 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             expect(validateMonitorType("ping")).toBeTruthy();
         });
 
+        it("should return true for valid http keyword type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(validateMonitorType("http-keyword")).toBeTruthy();
+        });
+
+        it("should return true for valid http status type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(validateMonitorType("http-status")).toBeTruthy();
+        });
+
         it("should return false for invalid string type", async ({
             task,
             annotate,

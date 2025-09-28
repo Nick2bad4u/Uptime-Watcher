@@ -66,6 +66,10 @@ export interface MonitorRow extends BaseRow {
      */
     active_operations?: string;
     /**
+     * Keyword required to be present in HTTP responses.
+     */
+    body_keyword?: string;
+    /**
      * Interval between checks, in seconds.
      */
     check_interval?: number;
@@ -77,6 +81,10 @@ export interface MonitorRow extends BaseRow {
      * Whether the monitor is enabled (1) or disabled (0).
      */
     enabled?: number;
+    /**
+     * Expected HTTP status code for status monitors.
+     */
+    expected_status_code?: number;
     /**
      * Hostname or IP address being monitored.
      */

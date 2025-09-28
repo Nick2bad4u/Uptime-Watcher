@@ -61,88 +61,8 @@ import {
 } from "./shared/monitorServiceHelpers";
 import { handleCheckError, isCancellationError } from "./utils/errorHandling";
 import { createHttpClient } from "./utils/httpClient";
+import { getSharedHttpRateLimiter } from "./utils/httpRateLimiter";
 import { determineMonitorStatus } from "./utils/httpStatusUtils";
-
-/**
- * Lightweight in-memory rate limiter for HTTP monitor requests.
- *
- * @remarks
- * Provides coarse-grained protection against flooding a single host with
- * requests. Not persisted; resets per process start. Intentionally simple to
- * avoid introducing heavy dependencies.
- */
-class SimpleRateLimiter {
-    private readonly lastInvocation = new Map<string, number>();
-
-    private active = 0;
-
-    private readonly maxConcurrent: number;
-
-    private readonly minIntervalMs: number;
-
-    private readonly maxWaitMs: number;
-
-    public async schedule<T>(url: string, fn: () => Promise<T>): Promise<T> {
-        const key = this.getKey(url);
-        const sleep = async (ms: number): Promise<void> =>
-            new Promise((resolve) => {
-                // Timer will complete when Promise resolves, cleanup not needed
-                // eslint-disable-next-line clean-timer/assign-timer-id -- Timer completes with Promise resolution
-                setTimeout(resolve, ms);
-            });
-
-        const startTime = Date.now();
-        let shouldContinue = true;
-        while (shouldContinue) {
-            const now = Date.now();
-
-            // Prevent infinite waiting - max wait time safety check
-            if (now - startTime > this.maxWaitMs) {
-                logger.warn(
-                    `[SimpleRateLimiter] Max wait time exceeded for ${url}, proceeding anyway`
-                );
-                shouldContinue = false;
-            } else {
-                const last = this.lastInvocation.get(key) ?? 0;
-                const since = now - last;
-                const needDelay = since < this.minIntervalMs;
-                if (this.active < this.maxConcurrent && !needDelay) {
-                    shouldContinue = false;
-                } else {
-                    const waitFor = needDelay ? this.minIntervalMs - since : 25;
-                    // eslint-disable-next-line no-await-in-loop -- Rate limiting requires sequential delays in monitoring loop
-                    await sleep(waitFor);
-                }
-            }
-        }
-        this.active += 1;
-        this.lastInvocation.set(key, Date.now());
-        try {
-            return await fn();
-        } finally {
-            this.active -= 1;
-        }
-    }
-
-    public constructor(
-        maxConcurrent: number,
-        minIntervalMs: number,
-        maxWaitMs = 30_000
-    ) {
-        this.maxConcurrent = maxConcurrent;
-        this.minIntervalMs = minIntervalMs;
-        this.maxWaitMs = maxWaitMs;
-    }
-
-    private getKey(url: string): string {
-        try {
-            const u = new URL(url);
-            return `${u.protocol}//${u.host}`;
-        } catch {
-            return "global";
-        }
-    }
-}
 
 /**
  * Extends Axios types to support timing metadata for monitoring.
@@ -210,34 +130,11 @@ declare module "axios" {
  * @public
  */
 export class HttpMonitor implements IMonitorService {
-    private static readonly rateLimiter = new SimpleRateLimiter(
-        Number.parseInt(
-            HttpMonitor.getEnv("UW_HTTP_MAX_CONCURRENT", "8"),
-            10
-        ) || 8,
-        Number.parseInt(
-            HttpMonitor.getEnv("UW_HTTP_MIN_INTERVAL_MS", "200"),
-            10
-        ) || 200
-    );
+    private static readonly rateLimiter = getSharedHttpRateLimiter();
 
     private axiosInstance: AxiosInstance;
 
     private config: MonitorConfig;
-
-    private static getEnv(name: string, fallback: string): string {
-        try {
-            // Use safe process.env access pattern from shared utilities
-            if (typeof process === "undefined") {
-                return fallback;
-            }
-            // eslint-disable-next-line n/no-process-env -- Controlled environment access following shared patterns
-            const val = process.env[name];
-            return val === undefined || val === "" ? fallback : val;
-        } catch {
-            return fallback;
-        }
-    }
     /**
      * Axios instance configured for monitoring.
      *

@@ -18,6 +18,7 @@ import {
     baseMonitorSchema,
     monitorSchemas,
     type HttpMonitor,
+    type HttpStatusMonitor,
     type PortMonitor,
     type PingMonitor,
     type SslMonitor,
@@ -606,6 +607,63 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.type).toBe("ping");
             expect("host" in result && !("port" in result)).toBeTruthy();
         });
+
+        it("should correctly discriminate HTTP keyword monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const monitor = {
+                id: "keyword-test",
+                type: "http-keyword" as const,
+                url: "https://example.com",
+                bodyKeyword: "ready",
+                checkInterval: 30_000,
+                timeout: 5000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            const result = monitorSchema.parse(monitor);
+            expect(result.type).toBe("http-keyword");
+            expect("bodyKeyword" in result).toBeTruthy();
+        });
+
+        it("should correctly discriminate HTTP status monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const monitor = {
+                id: "status-test",
+                type: "http-status" as const,
+                url: "https://example.com",
+                expectedStatusCode: 202,
+                checkInterval: 30_000,
+                timeout: 5000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            const result = monitorSchema.parse(monitor);
+            expect(result.type).toBe("http-status");
+            const typedResult = result as HttpStatusMonitor;
+            expect(typedResult.expectedStatusCode).toBe(202);
+        });
     });
 
     describe("siteSchema", () => {
@@ -1082,6 +1140,36 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             });
             expect(httpResult.success).toBeTruthy();
 
+            const httpKeywordResult = validateMonitorData("http-keyword", {
+                id: "test-keyword",
+                type: "http-keyword",
+                url: "https://example.com",
+                bodyKeyword: "ready",
+                checkInterval: 30_000,
+                timeout: 5000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending",
+                responseTime: -1,
+                history: [],
+            });
+            expect(httpKeywordResult.success).toBeTruthy();
+
+            const httpStatusResult = validateMonitorData("http-status", {
+                id: "test-status",
+                type: "http-status",
+                url: "https://example.com",
+                expectedStatusCode: 200,
+                checkInterval: 30_000,
+                timeout: 5000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending",
+                responseTime: -1,
+                history: [],
+            });
+            expect(httpStatusResult.success).toBeTruthy();
+
             const portResult = validateMonitorData("port", {
                 id: "test",
                 type: "port",
@@ -1110,6 +1198,37 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 history: [],
             });
             expect(pingResult.success).toBeTruthy();
+
+            const dnsResult = validateMonitorData("dns", {
+                id: "dns-test",
+                type: "dns",
+                host: "example.com",
+                recordType: "A",
+                checkInterval: 30_000,
+                timeout: 5000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending",
+                responseTime: -1,
+                history: [],
+            });
+            expect(dnsResult.success).toBeTruthy();
+
+            const sslResult = validateMonitorData("ssl", {
+                id: "ssl-test",
+                type: "ssl",
+                host: "example.com",
+                port: 443,
+                certificateWarningDays: 30,
+                checkInterval: 30_000,
+                timeout: 5000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending",
+                responseTime: -1,
+                history: [],
+            });
+            expect(sslResult.success).toBeTruthy();
         });
     });
 
@@ -1191,8 +1310,12 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             expect(monitorSchemas.http).toBeDefined();
+            expect(monitorSchemas["http-keyword"]).toBeDefined();
+            expect(monitorSchemas["http-status"]).toBeDefined();
             expect(monitorSchemas.port).toBeDefined();
             expect(monitorSchemas.ping).toBeDefined();
+            expect(monitorSchemas.dns).toBeDefined();
+            expect(monitorSchemas.ssl).toBeDefined();
         });
 
         it("should return undefined for unknown types", async ({
@@ -1966,6 +2089,177 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
             expect(() => sslMonitorSchema.parse(outOfLowerBound)).toThrow();
             expect(() => sslMonitorSchema.parse(outOfUpperBound)).toThrow();
+        });
+    });
+
+    describe("httpKeywordMonitorSchema", () => {
+        it("should validate HTTP keyword monitor with keyword", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const httpKeywordMonitor = {
+                id: "http-keyword-test",
+                type: "http-keyword" as const,
+                url: "https://example.com",
+                bodyKeyword: "success",
+                checkInterval: 30_000,
+                timeout: 5000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            expect(() =>
+                monitorSchemas["http-keyword"].parse(httpKeywordMonitor)
+            ).not.toThrow();
+        });
+
+        it("should reject empty keyword values", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const invalidMonitor = {
+                id: "http-keyword-test",
+                type: "http-keyword" as const,
+                url: "https://example.com",
+                bodyKeyword: " ",
+                checkInterval: 30_000,
+                timeout: 5000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            expect(() =>
+                monitorSchemas["http-keyword"].parse(invalidMonitor)
+            ).toThrow();
+        });
+
+        it("should reject missing keyword field", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const invalidMonitor = {
+                id: "http-keyword-test",
+                type: "http-keyword" as const,
+                url: "https://example.com",
+                checkInterval: 30_000,
+                timeout: 5000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            } as const;
+
+            expect(() =>
+                monitorSchemas["http-keyword"].parse(invalidMonitor)
+            ).toThrow();
+        });
+    });
+
+    describe("httpStatusMonitorSchema", () => {
+        it("should validate HTTP status monitor with expected code", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const httpStatusMonitor = {
+                id: "http-status-test",
+                type: "http-status" as const,
+                url: "https://example.com",
+                expectedStatusCode: 204,
+                checkInterval: 30_000,
+                timeout: 5000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            expect(() =>
+                monitorSchemas["http-status"].parse(httpStatusMonitor)
+            ).not.toThrow();
+        });
+
+        it("should reject non-integer status codes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const invalidMonitor = {
+                id: "http-status-test",
+                type: "http-status" as const,
+                url: "https://example.com",
+                expectedStatusCode: 200.5,
+                checkInterval: 30_000,
+                timeout: 5000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            expect(() =>
+                monitorSchemas["http-status"].parse(invalidMonitor)
+            ).toThrow();
+        });
+
+        it("should reject out-of-range status codes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const outOfRangeCodes = [99, 600];
+            for (const code of outOfRangeCodes) {
+                const invalidMonitor = {
+                    id: "http-status-test",
+                    type: "http-status" as const,
+                    url: "https://example.com",
+                    expectedStatusCode: code,
+                    checkInterval: 30_000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    monitoring: true,
+                    status: "pending" as const,
+                    responseTime: -1,
+                    history: [],
+                };
+
+                expect(() =>
+                    monitorSchemas["http-status"].parse(invalidMonitor)
+                ).toThrow();
+            }
         });
     });
 });

@@ -38,14 +38,18 @@
 <a href="https://github.com/Nick2bad4u/Uptime-Watcher/network/members">
   <img src="https://img.shields.io/github/forks/Nick2bad4u/Uptime-Watcher?style=social" alt="GitHub Forks">
 </a>
+<a href="https://deepwiki.com/Nick2bad4u/Uptime-Watcher">
+  <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
+</a>
 
 <strong>A Electron desktop application for uptime monitoring</strong>
 <em>Track multiple services simultaneously with real-time updates, response time analytics, and historical data visualization</em>
 
-<!-- Application screenshots will be added here once available -->
-</div>
+<comment> Application screenshots will be added here once available </comment></div>
 
-## <img src="./assets/UptimeWatcherMascot.png" alt="Uptime Watcher Mascot">
+<div align="center">
+  <img src="./assets/UptimeWatcherMascot.png" alt="Uptime Watcher Mascot" width="50%">
+</div>
 
 ## What is Uptime Watcher?
 
@@ -160,16 +164,14 @@ npm run electron-dev
 
 ## Screenshots & demo
 
-<div align="center">
-
-_Application screenshots and demo videos will be added in future releases._
+<div align="center"><em>Application screenshots and demo videos will be added in future releases.</em>
 
 ### Key interface components:
 
-- 📊 **Main Dashboard**: Real-time monitoring overview with service status
-- ⚙️ **Monitor Configuration**: Easy setup for HTTP, TCP, DNS, and ping monitoring
-- 📈 **Historical Analytics**: Response time graphs and uptime statistics
-- 🔔 **Notification System**: Customizable desktop alerts for status changes
+- 📊 <strong>Main Dashboard</strong>: Real-time monitoring overview with service status
+- ⚙️ <strong>Monitor Configuration</strong>: Easy setup for HTTP, TCP, DNS, and ping monitoring
+- 📈 <strong>Historical Analytics</strong>: Response time graphs and uptime statistics
+- 🔔 <strong>Notification System</strong>: Customizable desktop alerts for status changes
 
 </div>
 
@@ -220,13 +222,13 @@ For practical guidance on configuring monitors and writing tests, see our compre
 
 For running and tuning our fast-check based fuzzing suites, see:
 
-- Fast-Check Fuzzing Coverage Guide → <a href="./docs/Testing/FAST-CHECK-FUZZING-GUIDE.md">docs/Testing/FAST-CHECK-FUZZING-GUIDE.md</a>
+- Fast-Check Fuzzing Coverage Guide → [docs/Testing/FAST-CHECK-FUZZING-GUIDE.md](./docs/Testing/FAST-CHECK-FUZZING-GUIDE.md)
 
 ### End-to-end testing with Playwright
 
 For comprehensive testing with Playwright, including setup, configuration, and troubleshooting common issues:
 
-- Playwright Testing Guide → <a href="./docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md">docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md</a>
+- Playwright Testing Guide → [docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md](./docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md)
 
 ## Architectural principles
 
@@ -236,12 +238,12 @@ The application follows a **service-oriented architecture** with clear separatio
 
 ```mermaid
 flowchart LR
-    classDef persona fill:#fffbeb,stroke:#f97316,color:#9a3412,font-weight:bold;
-    classDef main fill:#fdf2f8,stroke:#db2777,color:#831843;
-    classDef renderer fill:#ecfeff,stroke:#0ea5e9,color:#0f172a;
-    classDef data fill:#ecfdf5,stroke:#10b981,color:#064e3b;
-    classDef service fill:#ede9fe,stroke:#7c3aed,color:#312e81;
-    classDef infra fill:#fef3c7,stroke:#f59e0b,color:#92400e;
+    classDef persona fill:#1f2937,stroke:#fbbf24,color:#f9fafb,font-weight:bold;
+    classDef main fill:#1e1b4b,stroke:#ec4899,color:#fce7f3;
+    classDef renderer fill:#0f172a,stroke:#06b6d4,color:#cffafe;
+    classDef data fill:#064e3b,stroke:#10b981,color:#d1fae5;
+    classDef service fill:#312e81,stroke:#8b5cf6,color:#e9d5ff;
+    classDef infra fill:#451a03,stroke:#f59e0b,color:#fef3c7;
     linkStyle default stroke-width:2px;
 
     User((👩‍💻 Operator)):::persona
@@ -290,15 +292,14 @@ HTTP/TCP/DNS/Ping']
     Alerts --> User
 
     class Services,IPC,Scheduler,EventBus,Monitors,Alerts service;
-    class SQLite,Cache,Backups data;
     class UI,Store,Telemetry renderer;
     class Integrations infra;
 
-    click Services 'docs/Architecture/README.md' 'Open architecture documentation'
-    click Store 'docs/Architecture/ADRs/ADR-004-Frontend-State-Management.md' 'Read ADR-004'
-    click IPC 'docs/Architecture/ADRs/ADR-005-IPC-Communication-Protocol.md' 'Read IPC protocol'
-    click EventBus 'docs/Architecture/ADRs/ADR-002-Event-Driven-Architecture.md' 'Read event-driven architecture'
-    click SQLite 'docs/Architecture/ADRs/ADR-001-Repository-Pattern.md' 'Review repository pattern'
+    click Services "docs/Architecture/README.md" "Open architecture documentation"
+    click Store "docs/Architecture/ADRs/ADR-004-Frontend-State-Management.md" "Read ADR-004"
+    click IPC "docs/Architecture/ADRs/ADR-005-IPC-Communication-Protocol.md" "Read IPC protocol"
+    click EventBus "docs/Architecture/ADRs/ADR-002-Event-Driven-Architecture.md" "Read event-driven architecture"
+    click SQLite "docs/Architecture/ADRs/ADR-001-Repository-Pattern.md" "Review repository pattern"
 ```
 
 ### **🔧 Core components**
@@ -357,8 +358,6 @@ We welcome contributions from the community! Here's how you can help:
 [![GitHub Issues](https://img.shields.io/badge/Issues-GitHub-blue?logo=github)](https://github.com/Nick2bad4u/Uptime-Watcher/issues) [![Documentation](https://img.shields.io/badge/Docs-Available-brightgreen)](./docs/)
 
 ---
-
-<img src="./assets/UptimeWatcherMascotServer.png" alt="Uptime Watcher Mascot Server">
 
 <div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 

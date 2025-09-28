@@ -38,6 +38,8 @@ describe("Monitor Types Utility", () => {
             expect(types).toContain("http");
             expect(types).toContain("port");
             expect(types).toContain("ssl");
+            expect(types).toContain("http-keyword");
+            expect(types).toContain("http-status");
         });
 
         it("should return a new array each time (not mutate original)", async ({
@@ -77,6 +79,8 @@ describe("Monitor Types Utility", () => {
             for (const type of types) {
                 expect([
                     "http",
+                    "http-keyword",
+                    "http-status",
                     "port",
                     "ping",
                     "dns",
@@ -125,6 +129,8 @@ describe("Monitor Types Utility", () => {
             expect(isBaseMonitorType("http")).toBeTruthy();
             expect(isBaseMonitorType("port")).toBeTruthy();
             expect(isBaseMonitorType("ssl")).toBeTruthy();
+            expect(isBaseMonitorType("http-keyword")).toBeTruthy();
+            expect(isBaseMonitorType("http-status")).toBeTruthy();
         });
 
         it("should return false for invalid monitor types", async ({
@@ -478,8 +484,15 @@ describe("Monitor Types Utility", () => {
             await annotate("Type: Business Logic", "type");
 
             // Example from JSDoc
-            const baseTypes = getBaseMonitorTypes(); // ["http", "port"]
-            expect(baseTypes).toEqual(expect.arrayContaining(["http", "port"]));
+            const baseTypes = getBaseMonitorTypes(); // Includes http, http-keyword, http-status, port, ping, dns, ssl
+            expect(baseTypes).toEqual(
+                expect.arrayContaining([
+                    "http",
+                    "http-keyword",
+                    "http-status",
+                    "port",
+                ])
+            );
 
             // Type guard example
             if (isBaseMonitorType("http")) {

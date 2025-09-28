@@ -207,6 +207,16 @@ function getAllowedFieldsForMonitorType(type: MonitorType): Set<string> {
             baseFields.add("url");
             break;
         }
+        case "http-keyword": {
+            baseFields.add("bodyKeyword");
+            baseFields.add("url");
+            break;
+        }
+        case "http-status": {
+            baseFields.add("expectedStatusCode");
+            baseFields.add("url");
+            break;
+        }
         case "ping": {
             baseFields.add("host");
             break;
@@ -286,6 +296,35 @@ function applyHttpMonitorDefaults(
     // HTTP monitors require a URL - provide default if missing or invalid
     const urlValue = filteredData["url"];
     monitor.url = isValidUrl(urlValue) ? urlValue : "https://example.com";
+}
+
+function applyHttpKeywordMonitorDefaults(
+    monitor: Monitor,
+    filteredData: UnknownRecord
+): void {
+    applyHttpMonitorDefaults(monitor, filteredData);
+
+    const keywordValue = filteredData["bodyKeyword"];
+    if (typeof keywordValue === "string" && keywordValue.trim()) {
+        monitor.bodyKeyword = keywordValue.trim();
+    } else {
+        monitor.bodyKeyword = "status: ok";
+    }
+}
+
+function applyHttpStatusMonitorDefaults(
+    monitor: Monitor,
+    filteredData: UnknownRecord
+): void {
+    applyHttpMonitorDefaults(monitor, filteredData);
+
+    const statusValue = filteredData["expectedStatusCode"];
+    if (typeof statusValue === "number" && Number.isFinite(statusValue)) {
+        const clamped = Math.trunc(statusValue);
+        monitor.expectedStatusCode = Math.min(599, Math.max(100, clamped));
+    } else {
+        monitor.expectedStatusCode = 200;
+    }
 }
 
 /**
@@ -387,6 +426,14 @@ function applyTypeSpecificDefaults(
         }
         case "http": {
             applyHttpMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "http-keyword": {
+            applyHttpKeywordMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "http-status": {
+            applyHttpStatusMonitorDefaults(monitor, filteredData);
             break;
         }
         case "ping": {

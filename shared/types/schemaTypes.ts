@@ -29,6 +29,8 @@ type MonitorStatusEnum = z.ZodEnum<{
 type MonitorTypeEnum = z.ZodEnum<{
     dns: "dns";
     http: "http";
+    "http-keyword": "http-keyword";
+    "http-status": "http-status";
     ping: "ping";
     port: "port";
     ssl: "ssl";
@@ -76,6 +78,38 @@ export type HttpMonitorSchemaType = z.ZodObject<{
     status: MonitorStatusEnum;
     timeout: z.ZodNumber;
     type: z.ZodLiteral<"http">;
+    url: z.ZodString;
+}>;
+
+export type HttpKeywordMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    bodyKeyword: z.ZodString;
+    checkInterval: z.ZodNumber;
+    history: HistoryArray;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    monitoring: z.ZodBoolean;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"http-keyword">;
+    url: z.ZodString;
+}>;
+
+export type HttpStatusMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    checkInterval: z.ZodNumber;
+    expectedStatusCode: z.ZodNumber;
+    history: HistoryArray;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    monitoring: z.ZodBoolean;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"http-status">;
     url: z.ZodString;
 }>;
 
@@ -147,6 +181,8 @@ export type SslMonitorSchemaType = z.ZodObject<{
 export type MonitorSchemaType = z.ZodDiscriminatedUnion<
     [
         HttpMonitorSchemaType,
+        HttpKeywordMonitorSchemaType,
+        HttpStatusMonitorSchemaType,
         PortMonitorSchemaType,
         PingMonitorSchemaType,
         DnsMonitorSchemaType,
@@ -164,6 +200,8 @@ export type SiteSchemaType = z.ZodObject<{
 export interface MonitorSchemas {
     readonly dns: DnsMonitorSchemaType;
     readonly http: HttpMonitorSchemaType;
+    readonly "http-keyword": HttpKeywordMonitorSchemaType;
+    readonly "http-status": HttpStatusMonitorSchemaType;
     readonly ping: PingMonitorSchemaType;
     readonly port: PortMonitorSchemaType;
     readonly ssl: SslMonitorSchemaType;

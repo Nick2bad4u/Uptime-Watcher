@@ -53,7 +53,7 @@ Renderer (React + Zustand)
 | --- | --- | --- | --- |
 | Shared | Declare monitor type, config, validation | `shared/types.ts`<br>`shared/types/monitorConfig.ts`<br>`shared/types/monitorTypes.ts`<br>`shared/types/schemaTypes.ts`<br>`shared/validation/schemas.ts`<br>`shared/utils/validation.ts`<br>`shared/utils/logTemplates.ts` (if new log codes)<br>`shared/test/validation/schemas.comprehensive.test.ts` | Update unions, defaults, schemas, and add tests for both happy and error paths. |
 | Electron backend | Service logic, registry metadata, retry policies | `electron/services/monitoring/<NewMonitor>.ts`<br>`electron/services/monitoring/MonitorTypeRegistry.ts`<br>`electron/services/monitoring/EnhancedMonitorChecker.ts`<br>`electron/services/monitoring/types.ts`<br>`electron/services/monitoring/shared/monitorServiceHelpers.ts`<br>`electron/test/services/monitoring/*`<br>`electron/test/fuzzing/*` | Ensure the service is routed, participates in retries, emits structured logs, and carries a version. |
-| Persistence | Persist dynamic fields and history | `electron/services/database/utils/dynamicSchema.ts`<br>`electron/services/database/utils/monitorMapper.ts`<br>`electron/services/database/MonitorRepository.ts`<br>`electron/test/fuzzing/databaseSchema.*.test.ts` | Confirm dynamic columns map to snake_case SQL fields and round-trip correctly. |
+| Persistence | Persist dynamic fields and history | `electron/services/database/utils/dynamicSchema.ts`<br>`electron/services/database/utils/monitorMapper.ts`<br>`electron/services/database/MonitorRepository.ts`<br>`shared/types/database.ts`<br>`electron/test/fuzzing/databaseSchema.*.test.ts` | Confirm dynamic columns map to snake_case SQL fields, round-trip correctly, and keep TypeScript facades/mappers in sync. |
 | Renderer | Collect config, validate, display | `src/types/monitorFormData.ts`<br>`src/types/monitor-forms.ts`<br>`src/utils/monitorValidation.ts`<br>`src/stores/sites/utils/monitorOperations.ts`<br>`src/stores/monitor/useMonitorTypesStore.ts`<br>`src/components/SiteDetails/useAddSiteForm.ts`<br>`src/components/AddSiteForm/AddSiteForm.tsx`<br>`src/components/AddSiteForm/DynamicMonitorFields.tsx`<br>`src/components/AddSiteForm/Submit.tsx`<br>`src/components/Dashboard/SiteCard/components/MonitorSelector.tsx`<br>`src/constants.ts`<br>`src/utils/fallbacks.ts`<br>`src/test/*` (renderer suites and fuzzers) | Keep client defaults, validation, and UI fallbacks aligned with shared schemas and registry metadata. |
 
 
@@ -85,16 +85,17 @@ All shared types live under `shared/`. Updating them first unlocks both backend 
    - In `shared/types/monitorConfig.ts` add an interface such as `NewMonitorConfig` extending `BaseMonitorConfig`.
    - Extend the `MonitorConfig` union and add a type guard `isNewMonitorConfig`.
    - Provide defaults in `DEFAULT_MONITOR_CONFIG.<type>` that respect system-wide retry and timeout conventions.
-3. Update shared monitor metadata helpers as needed in `shared/types/monitorTypes.ts`.
+3. Review shared monitor metadata interfaces in `shared/types/monitorTypes.ts`; they already model extensible fields, so you typically only touch this file when introducing brand-new shared flags.
 4. Add Zod schemas
    - Define `newMonitorSchema` in `shared/validation/schemas.ts` and include it in the discriminated union `monitorSchema`.
    - Export a typed alias in `shared/types/schemaTypes.ts` for IDE support and cross-package imports.
 5. Field-level validation
+   - Update `validateMonitorType` in `shared/utils/validation.ts` to include the new identifier before you add type-specific rules.
    - Add a dedicated validator in `shared/utils/validation.ts` so error messages remain human readable.
 6. Shared tests
    - Extend `shared/test/validation/schemas.comprehensive.test.ts` with happy and failure cases covering the new schema.
 
-Run the shared unit tests before moving on: `npm test -- --run tests/shared`.
+Run the shared unit tests before moving on: `npm run test:shared`.
 
 ---
 
@@ -127,9 +128,13 @@ Dynamic schema generation means most database updates are metadata driven, but y
 
 1. Dynamic schema definitions
    - `generateDatabaseFieldDefinitions` in `electron/services/database/utils/dynamicSchema.ts` reads registry field metadata. Verify your field descriptors (name, type) map to the correct SQL type (INTEGER, TEXT, etc.).
+   - You do not manually edit `shared/types/database.ts`; monitor-specific columns are generated from the registry metadata. Confirm your field descriptor shows up when you inspect `generateDatabaseFieldDefinitions` output.
+
 2. Row to object mapping
    - `mapMonitorToRow` and `mapRowToMonitor` iterate over registry field definitions. Confirm the new fields appear in both directions and update tests if you need custom conversion logic.
    - Adjust `electron/services/database/utils/monitorMapper.ts` tests when defaults or conversions change.
+   - Update `electron/services/database/utils/monitorMapper.ts` so row->monitor conversions include the new fields.
+
 3. Repository operations
    - `MonitorRepository.createInternal` and `bulkCreate` rely on generated SQL. Run repository tests or add new ones if the monitor requires special handling (for example, cascading history writes).
 4. Database schema tests
@@ -140,6 +145,9 @@ Verification tip: start the Electron app after registering the monitor. The data
 ---
 
 ### Step 4 - Wire Up the Renderer
+
+0. Frontend metadata helpers
+   - Verify `src/utils/monitorTypeHelper.ts`, `src/utils/monitorUiHelpers.ts`, and `src/hooks/useMonitorTypes.ts` cache the new type, and update mocks/tests that export monitor types (including Storybook setup).
 
 1. Monitor types store
    - `useMonitorTypesStore` in `src/stores/monitor/useMonitorTypesStore.ts` consumes backend metadata. Update tests if they assert the list of known types.
@@ -170,10 +178,10 @@ Run these commands after finishing code changes:
 
 1. `npm run lint`
 2. `npm run type-check`
-3. `npm test -- --run tests/shared`
-4. `npm test -- --run tests/electron`
-5. `npm test -- --run tests/renderer`
-6. `npm test -- --project fuzz`
+3. `npm run test:shared`
+4. `npm run test:electron`
+5. `npm run test:frontend`
+6. `npm run fuzz`
 7. Optional manual run: launch the Electron app, add the monitor, and tail logs to confirm details.
 
 Capture any additional scripts, environment variables, or fixtures required to exercise the monitor so QA can automate scenarios.
@@ -301,10 +309,4 @@ Replace the TODO block with real protocol logic. Keep exception handling defensi
 - September 27, 2025 - Rebuilt the guide to cover the complete, generic monitor workflow with file-by-file instructions, testing requirements, and troubleshooting guidance.
 
 Happy shipping. If you discover additional integration steps, update this guide alongside your code change so the next engineer starts from a precise source of truth.
-
-
-
-
-
-
 
