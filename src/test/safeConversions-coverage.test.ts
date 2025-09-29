@@ -22,6 +22,10 @@ describe("safeConversions Direct Function Coverage", () => {
     it("should call safeNumberConversion function", () => {
         expect(safeNumberConversion("123")).toBe(123);
         expect(safeNumberConversion("invalid")).toBe(0);
+        const defaultNaN = Number.NaN;
+        expect(
+            Number.isNaN(safeNumberConversion("invalid", defaultNaN))
+        ).toBeTruthy();
     });
 
     it("should call safeParseCheckInterval function", () => {

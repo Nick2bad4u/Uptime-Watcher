@@ -149,13 +149,13 @@ const HEADER_SYMBOLS = [
 ] as const;
 
 const DIGIT_CHARS = Array.from({ length: 10 }, (_, index) =>
-    String.fromCharCode(48 + index)
+    String.fromCodePoint(48 + index)
 );
 const LOWER_ALPHA_CHARS = Array.from({ length: 26 }, (_, index) =>
-    String.fromCharCode(97 + index)
+    String.fromCodePoint(97 + index)
 );
 const UPPER_ALPHA_CHARS = Array.from({ length: 26 }, (_, index) =>
-    String.fromCharCode(65 + index)
+    String.fromCodePoint(65 + index)
 );
 
 const HEADER_TOKEN_CHAR_SET = [
@@ -741,12 +741,51 @@ describe("Schema Property-Based Tests", () => {
                             );
                             break;
                         }
-                        default: {
-                            // This should never happen due to discriminated union, but TypeScript requires it
-                            const exhaustiveCheck: never = result.data;
-                            throw new Error(
-                                `Unknown monitor type: ${(exhaustiveCheck as { type: string }).type}`
+                        case "cdn-edge-consistency": {
+                            expect(result.data).toHaveProperty("baselineUrl");
+                            expect(result.data).toHaveProperty("edgeLocations");
+                            break;
+                        }
+                        case "replication": {
+                            expect(result.data).toHaveProperty(
+                                "primaryStatusUrl"
                             );
+                            expect(result.data).toHaveProperty(
+                                "replicaStatusUrl"
+                            );
+                            expect(result.data).toHaveProperty(
+                                "replicationTimestampField"
+                            );
+                            expect(result.data).toHaveProperty(
+                                "maxReplicationLagSeconds"
+                            );
+                            break;
+                        }
+                        case "server-heartbeat": {
+                            expect(result.data).toHaveProperty(
+                                "heartbeatExpectedStatus"
+                            );
+                            expect(result.data).toHaveProperty(
+                                "heartbeatMaxDriftSeconds"
+                            );
+                            expect(result.data).toHaveProperty(
+                                "heartbeatStatusField"
+                            );
+                            expect(result.data).toHaveProperty(
+                                "heartbeatTimestampField"
+                            );
+                            expect(result.data).toHaveProperty("url");
+                            break;
+                        }
+                        case "websocket-keepalive": {
+                            expect(result.data).toHaveProperty("url");
+                            expect(result.data).toHaveProperty(
+                                "maxPongDelayMs"
+                            );
+                            break;
+                        }
+                        default: {
+                            throw new Error("Unknown monitor type encountered");
                         }
                     }
                 }

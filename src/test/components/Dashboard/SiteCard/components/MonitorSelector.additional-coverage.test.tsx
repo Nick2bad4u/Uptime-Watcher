@@ -58,10 +58,11 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
 
             // Create a valid monitor and then override its type to unknown
             const baseMonitor = createValidMonitor({
-                id: "unknown-monitor",
-                type: "port",
-                port: 8080,
                 host: "example.com",
+                id: "unknown-monitor",
+                port: 8080,
+                type: "port",
+                url: undefined,
             });
             const unknownMonitor = {
                 ...baseMonitor,
@@ -75,7 +76,9 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
 
             // Should display the unknown type with port
             expect(
-                screen.getByDisplayValue("CUSTOM-UNKNOWN-TYPE: 8080")
+                screen.getByDisplayValue(
+                    "Custom Unknown Type Monitor: example.com:8080"
+                )
             ).toBeInTheDocument();
         });
 
@@ -104,7 +107,7 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
                 activeOperations: [],
                 checkInterval: 30_000,
                 history: [],
-                host: "example.com",
+                host: undefined,
                 id: "unknown-monitor-url",
                 lastChecked: new Date(),
                 monitoring: true,
@@ -124,7 +127,9 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
 
             // Should display the unknown type with URL
             expect(
-                screen.getByDisplayValue("WEIRD-TYPE: https://example.com")
+                screen.getByDisplayValue(
+                    "Weird Type Monitor: https://example.com"
+                )
             ).toBeInTheDocument();
         });
 
@@ -167,7 +172,9 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
 
             // Should display just the type name with no additional details
             expect(
-                screen.getByDisplayValue("MYSTERY-TYPE")
+                screen.getByDisplayValue(
+                    "Mystery Type Monitor: unknown-monitor-empty"
+                )
             ).toBeInTheDocument();
         });
 
@@ -195,11 +202,11 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             const unknownMonitorBoth = {
                 ...createValidMonitor({
                     id: "unknown-monitor-both",
-                    type: "port",
                     port: 3000,
+                    type: "port",
+                    url: undefined,
                 }),
                 type: "dual-type" as any, // Type assertion for unknown type
-                url: "https://example.com",
             } as any;
 
             renderWithTheme({
@@ -209,7 +216,7 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
 
             // Should display the port, not the URL (port has priority)
             expect(
-                screen.getByDisplayValue("DUAL-TYPE: 3000")
+                screen.getByDisplayValue("Dual Type Monitor: example.com:3000")
             ).toBeInTheDocument();
         });
 
@@ -256,7 +263,7 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
                     activeOperations: [],
                     checkInterval: 30_000,
                     history: [],
-                    host: "test.com",
+                    host: undefined,
                     id: "unknown-2",
                     lastChecked: new Date(),
                     monitoring: true,
@@ -294,13 +301,19 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
 
             // Check all options are present with correct formatting
             expect(
-                screen.getByRole("option", { name: "TYPE-A: 1234" })
+                screen.getByRole("option", {
+                    name: "Type A Monitor: example.com:1234",
+                })
             ).toBeInTheDocument();
             expect(
-                screen.getByRole("option", { name: "TYPE-B: https://test.com" })
+                screen.getByRole("option", {
+                    name: "Type B Monitor: https://test.com",
+                })
             ).toBeInTheDocument();
             expect(
-                screen.getByRole("option", { name: "TYPE-C" })
+                screen.getByRole("option", {
+                    name: "Type C Monitor: ping-host.com",
+                })
             ).toBeInTheDocument();
         });
     });

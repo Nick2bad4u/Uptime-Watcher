@@ -26,9 +26,9 @@ import type {
     MonitorFormData,
     PingFormData,
     PortFormData,
-    SslFormData,
     ReplicationFormData,
     ServerHeartbeatFormData,
+    SslFormData,
     WebsocketKeepaliveFormData,
 } from "../types/monitorFormData";
 
@@ -64,7 +64,8 @@ export interface MonitorCreationData
             | "timeout"
             | "type"
         >,
-        UnknownRecord {} /**
+        UnknownRecord {}
+/**
  * Create monitor object with proper field mapping and type safety.
  *
  * @param type - Monitor type

@@ -10,6 +10,23 @@ import {
 } from "../../../services/monitoring/monitorTypes";
 import type { MonitorType } from "../../../../shared/types.js";
 
+const EXPECTED_BASE_TYPES: MonitorType[] = [
+    "http",
+    "http-keyword",
+    "http-status",
+    "http-header",
+    "http-json",
+    "http-latency",
+    "port",
+    "ping",
+    "dns",
+    "ssl",
+    "websocket-keepalive",
+    "server-heartbeat",
+    "replication",
+    "cdn-edge-consistency",
+];
+
 describe("Monitor Types Utility", () => {
     describe(getBaseMonitorTypes, () => {
         it("should return array of base monitor types", async ({
@@ -27,7 +44,10 @@ describe("Monitor Types Utility", () => {
             expect(types.length).toBeGreaterThan(0);
         });
 
-        it("should include http and port types", async ({ task, annotate }) => {
+        it("should include expected base monitor types", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypes", "component");
             await annotate("Category: Service", "category");
@@ -35,11 +55,9 @@ describe("Monitor Types Utility", () => {
 
             const types = getBaseMonitorTypes();
 
-            expect(types).toContain("http");
-            expect(types).toContain("port");
-            expect(types).toContain("ssl");
-            expect(types).toContain("http-keyword");
-            expect(types).toContain("http-status");
+            for (const expectedType of EXPECTED_BASE_TYPES) {
+                expect(types).toContain(expectedType);
+            }
         });
 
         it("should return a new array each time (not mutate original)", async ({
@@ -77,18 +95,7 @@ describe("Monitor Types Utility", () => {
 
             // Should only contain known base types
             for (const type of types) {
-                expect([
-                    "http",
-                    "http-keyword",
-                    "http-status",
-                    "http-header",
-                    "http-json",
-                    "http-latency",
-                    "port",
-                    "ping",
-                    "dns",
-                    "ssl",
-                ]).toContain(type);
+                expect(EXPECTED_BASE_TYPES).toContain(type);
             }
         });
 
@@ -129,14 +136,9 @@ describe("Monitor Types Utility", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            expect(isBaseMonitorType("http")).toBeTruthy();
-            expect(isBaseMonitorType("port")).toBeTruthy();
-            expect(isBaseMonitorType("ssl")).toBeTruthy();
-            expect(isBaseMonitorType("http-keyword")).toBeTruthy();
-            expect(isBaseMonitorType("http-status")).toBeTruthy();
-            expect(isBaseMonitorType("http-header")).toBeTruthy();
-            expect(isBaseMonitorType("http-json")).toBeTruthy();
-            expect(isBaseMonitorType("http-latency")).toBeTruthy();
+            for (const type of EXPECTED_BASE_TYPES) {
+                expect(isBaseMonitorType(type)).toBeTruthy();
+            }
         });
 
         it("should return false for invalid monitor types", async ({

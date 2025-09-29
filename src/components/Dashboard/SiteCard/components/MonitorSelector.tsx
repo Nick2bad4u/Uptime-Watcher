@@ -13,6 +13,11 @@ import {
     useCallback,
 } from "react";
 
+import {
+    getMonitorDisplayIdentifier,
+    getMonitorTypeDisplayLabel,
+} from "../../../../utils/fallbacks";
+import { formatTitleSuffix } from "../../../../utils/monitorTitleFormatters";
 import { ThemedSelect } from "../../../../theme/components/ThemedSelect";
 
 /**
@@ -75,66 +80,23 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
 
         // Memoize the option formatting to avoid recalculation
         const formatMonitorOption = useCallback((monitor: Monitor): string => {
-            const monitorLabel = monitor.type.toUpperCase();
-            const getDetail = (): string => {
-                // Show details based on monitor type
-                switch (monitor.type) {
-                    case "dns": {
-                        return monitor.host ? `: ${monitor.host}` : "";
-                    }
-                    case "http": {
-                        return monitor.url ? `: ${monitor.url}` : "";
-                    }
-                    case "http-keyword": {
-                        const details = [
-                            monitor.url,
-                            monitor.bodyKeyword
-                                ? `keyword="${monitor.bodyKeyword}"`
-                                : undefined,
-                        ].filter(Boolean);
-                        return details.length > 0
-                            ? `: ${details.join(" | ")}`
-                            : "";
-                    }
-                    case "http-status": {
-                        const details = [
-                            monitor.url,
-                            typeof monitor.expectedStatusCode === "number"
-                                ? `status=${monitor.expectedStatusCode}`
-                                : undefined,
-                        ].filter(Boolean);
-                        return details.length > 0
-                            ? `: ${details.join(" | ")}`
-                            : "";
-                    }
-                    case "ping": {
-                        return monitor.host ? `: ${monitor.host}` : "";
-                    }
-                    case "port": {
-                        return monitor.port ? `: ${monitor.port}` : "";
-                    }
-                    case "ssl": {
-                        if (monitor.host) {
-                            const portDetail = monitor.port
-                                ? `:${monitor.port}`
-                                : "";
-                            return `: ${monitor.host}${portDetail}`;
-                        }
-                        return "";
-                    }
-                    default: {
-                        // Fallback to port or URL for unknown types
-                        if (monitor.port) {
-                            return `: ${monitor.port}`;
-                        }
-                        if (monitor.url) {
-                            return `: ${monitor.url}`;
-                        }
-                        return "";
-                    }
-                }
-            };
-            return `${monitorLabel}${getDetail()}`;
+            const monitorTypeLabel = getMonitorTypeDisplayLabel(monitor.type);
+            const fallbackIdentifier = monitor.id;
+
+            const rawSuffix = formatTitleSuffix(monitor).trim();
+            const normalizedSuffix =
+                rawSuffix.startsWith("(") && rawSuffix.endsWith(")")
+                    ? rawSuffix.slice(1, -1)
+                    : rawSuffix;
+
+            const identifier =
+                normalizedSuffix.length > 0
+                    ? normalizedSuffix
+                    : getMonitorDisplayIdentifier(monitor, fallbackIdentifier);
+
+            return identifier
+                ? `${monitorTypeLabel}: ${identifier}`
+                : monitorTypeLabel;
         }, []);
 
         return (

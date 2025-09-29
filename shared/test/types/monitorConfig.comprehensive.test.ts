@@ -714,56 +714,55 @@ describe("Monitor Configuration Types", () => {
         const websocketConfig: WebsocketKeepaliveMonitorConfig = {
             checkInterval: 60_000,
             enabled: true,
-            heartbeatExpectedStatus: "", // placeholder for type compatibility
-            heartbeatMaxDriftSeconds: 0,
-            heartbeatStatusField: "",
-            heartbeatTimestampField: "",
-            heartbeat: {
-                url: "wss://ws.example.com/socket",
-                maxPongDelayMs: 1500,
-            },
-        };
-
-        const heartbeatConfig: MonitorConfig = {
-            checkInterval: 60_000,
-            enabled: true,
-            id: "heartbeat-1",
-            name: "Heartbeat",
+            id: "ws-1",
+            maxPongDelayMs: 1500,
+            name: "WebSocket Keepalive",
             retryAttempts: 3,
             timeout: 30_000,
-            type: "server-heartbeat",
-            url: "https://api.example.com/heartbeat",
-            heartbeatExpectedStatus: "ok",
-            heartbeatStatusField: "status",
-            heartbeatTimestampField: "timestamp",
-            heartbeatMaxDriftSeconds: 60,
+            type: "websocket-keepalive",
+            url: "wss://ws.example.com/socket",
         };
 
-        const replicationConfig: MonitorConfig = {
+        const heartbeatConfig: ServerHeartbeatMonitorConfig = {
             checkInterval: 120_000,
             enabled: true,
-            id: "replication-1",
-            name: "Replication",
-            retryAttempts: 3,
+            heartbeatExpectedStatus: "ok",
+            heartbeatMaxDriftSeconds: 300,
+            heartbeatStatusField: "status",
+            heartbeatTimestampField: "timestamp",
+            id: "heartbeat-1",
+            name: "Heartbeat Monitor",
+            retryAttempts: 2,
             timeout: 30_000,
-            type: "replication",
-            primaryStatusUrl: "https://primary.example.com/status",
-            replicaStatusUrl: "https://replica.example.com/status",
-            replicationTimestampField: "status.lastApplied",
-            maxReplicationLagSeconds: 30,
+            type: "server-heartbeat",
+            url: "https://status.example.com/heartbeat",
         };
 
-        const cdnConfig: MonitorConfig = {
+        const replicationConfig: ReplicationMonitorConfig = {
+            checkInterval: 180_000,
+            enabled: true,
+            id: "replication-1",
+            maxReplicationLagSeconds: 45,
+            name: "Replication Monitor",
+            primaryStatusUrl: "https://primary/status",
+            replicaStatusUrl: "https://replica/status",
+            replicationTimestampField: "lastApplied",
+            retryAttempts: 2,
+            timeout: 30_000,
+            type: "replication",
+        };
+
+        const cdnConfig: CdnEdgeConsistencyMonitorConfig = {
+            baselineUrl: "https://origin.example.com",
             checkInterval: 300_000,
+            edgeLocations:
+                "https://edge1.example.com,https://edge2.example.com",
             enabled: true,
             id: "cdn-1",
-            name: "CDN Consistency",
+            name: "CDN Consistency Monitor",
             retryAttempts: 3,
             timeout: 30_000,
             type: "cdn-edge-consistency",
-            baselineUrl: "https://origin.example.com",
-            edgeLocations:
-                "https://edge-a.example.com\nhttps://edge-b.example.com",
         };
 
         it("should correctly identify HTTP configurations", async ({

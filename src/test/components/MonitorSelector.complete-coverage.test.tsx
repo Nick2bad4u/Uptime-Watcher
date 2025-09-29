@@ -36,10 +36,10 @@ vi.mock("../../theme/components/ThemedSelect", () => ({
 
 const createMockMonitor = (
     id: string,
-    type: "http" | "port" | "ping",
-    options: { url?: string; port?: number; host?: string } = {}
-): Monitor =>
-    createValidMonitor({
+    type: Monitor["type"],
+    options: Partial<Monitor> = {}
+): Monitor => {
+    const monitor = createValidMonitor({
         id,
         type,
         status: "pending",
@@ -47,6 +47,13 @@ const createMockMonitor = (
         responseTime: 0,
         ...options,
     });
+
+    if (type === "port" || type === "ping") {
+        monitor.url = undefined;
+    }
+
+    return monitor;
+};
 
 const defaultProps = {
     monitors: [
@@ -188,7 +195,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             renderMonitorSelector();
 
-            const option = screen.getByText("HTTP: https://example.com");
+            const option = screen.getByText("Website URL: https://example.com");
             expect(option).toBeInTheDocument();
         });
 
@@ -214,7 +221,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             renderMonitorSelector();
 
-            const option = screen.getByText("PORT: 8080");
+            const option = screen.getByText("Host & Port: example.com:8080");
             expect(option).toBeInTheDocument();
         });
 
@@ -240,7 +247,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             renderMonitorSelector();
 
-            const option = screen.getByText("PING: example.com");
+            const option = screen.getByText("Ping Monitor: example.com");
             expect(option).toBeInTheDocument();
         });
 
@@ -270,7 +277,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             renderMonitorSelector({ monitors });
 
-            const option = screen.getByText("HTTP: https://example.com");
+            const option = screen.getByText("Website URL: https://example.com");
             expect(option).toBeInTheDocument();
         });
 
@@ -300,8 +307,10 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             renderMonitorSelector({ monitors });
 
-            // For non-standard types, component falls back to port then URL
-            const option = screen.getByText("HTTP: 80");
+            // For non-standard types, component falls back to generated label and URL identifier
+            const option = screen.getByText(
+                "Http Monitor: https://example.com"
+            );
             expect(option).toBeInTheDocument();
         });
 
@@ -334,7 +343,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             renderMonitorSelector({ monitors });
 
-            const option = screen.getByText("HTTP: https://example.com");
+            const option = screen.getByText("Website URL: https://example.com");
             expect(option).toBeInTheDocument();
         });
     });
@@ -590,7 +599,9 @@ describe("MonitorSelector - Complete Coverage", () => {
             const newOptions = screen.getAllByRole("option");
             expect(newOptions).toHaveLength(1);
             expect(newOptions[0]).toHaveValue("new-monitor");
-            expect(newOptions[0]).toHaveTextContent("HTTP: https://new.com");
+            expect(newOptions[0]).toHaveTextContent(
+                "Website URL: https://new.com"
+            );
         });
     });
 
@@ -643,7 +654,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             const options = screen.getAllByRole("option");
             expect(options).toHaveLength(1);
-            expect(options[0]).toHaveTextContent("PING");
+            expect(options[0]).toHaveTextContent("Ping Monitor");
         });
 
         it("should handle monitors with special characters in URL", ({
@@ -675,7 +686,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             renderMonitorSelector({ monitors });
 
             const option = screen.getByText(
-                "HTTP: https://example.com/path?param=value&other=test"
+                "Website URL: https://example.com/path?param=value&other=test"
             );
             expect(option).toBeInTheDocument();
         });
@@ -706,7 +717,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             renderMonitorSelector({ monitors });
 
-            const option = screen.getByText("PORT: 65535");
+            const option = screen.getByText("Host & Port: example.com:65535");
             expect(option).toBeInTheDocument();
         });
 
@@ -736,9 +747,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             renderMonitorSelector({ monitors });
 
-            // Note: port 0 is falsy in JS, so the component shows just "PORT"
-            // This might be unexpected behavior - port 0 is a valid port number
-            const option = screen.getByText("PORT");
+            const option = screen.getByText("Host & Port: example.com");
             expect(option).toBeInTheDocument();
         });
 
@@ -836,10 +845,73 @@ describe("MonitorSelector - Complete Coverage", () => {
             renderMonitorSelector({ monitors: allTypes });
 
             expect(
-                screen.getByText("HTTP: https://test.com")
+                screen.getByText("Website URL: https://test.com")
             ).toBeInTheDocument();
-            expect(screen.getByText("PORT: 443")).toBeInTheDocument();
-            expect(screen.getByText("PING: example.com")).toBeInTheDocument();
+            expect(
+                screen.getByText("Host & Port: example.com:443")
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText("Ping Monitor: example.com")
+            ).toBeInTheDocument();
+        });
+
+        it("should format advanced monitor types with descriptive labels", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            const monitors = [
+                createMockMonitor("cdn-monitor", "cdn-edge-consistency", {
+                    baselineUrl: "https://origin.example.com/status",
+                    edgeLocations: "https://edge.example.com/status",
+                    url: undefined,
+                }),
+                createMockMonitor("heartbeat-monitor", "server-heartbeat", {
+                    heartbeatExpectedStatus: "ok",
+                    heartbeatStatusField: "status",
+                    heartbeatTimestampField: "timestamp",
+                    url: "https://api.example.com/heartbeat",
+                }),
+                createMockMonitor("replication-monitor", "replication", {
+                    primaryStatusUrl: "https://primary.example.com/status",
+                    replicaStatusUrl: "https://replica.example.com/status",
+                    replicationTimestampField: "timestamp",
+                    url: undefined,
+                }),
+            ];
+
+            renderMonitorSelector({ monitors });
+
+            expect(
+                screen.getByText(
+                    "CDN Edge Consistency: https://origin.example.com/status"
+                )
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText(
+                    "Server Heartbeat: https://api.example.com/heartbeat"
+                )
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText(
+                    "Replication Lag: https://primary.example.com/status"
+                )
+            ).toBeInTheDocument();
         });
 
         it("should format monitor options consistently", ({
@@ -875,9 +947,9 @@ describe("MonitorSelector - Complete Coverage", () => {
             const options = screen.getAllByRole("option");
 
             // Check that each option has expected format
-            expect(options[0]).toHaveTextContent(/^HTTP:/);
-            expect(options[1]).toHaveTextContent(/^PORT:/);
-            expect(options[2]).toHaveTextContent(/^PING:/);
+            expect(options[0]).toHaveTextContent(/^Website URL:/);
+            expect(options[1]).toHaveTextContent(/^Host & Port:/);
+            expect(options[2]).toHaveTextContent(/^Ping Monitor:/);
         });
     });
 

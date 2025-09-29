@@ -87,27 +87,22 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
         expectedStatusCode,
         expectedValue,
         generateUuid,
+        headerName,
         heartbeatExpectedStatus,
         heartbeatMaxDriftSeconds,
         heartbeatStatusField,
         heartbeatTimestampField,
-        headerName,
         host,
         jsonPath,
         maxPongDelayMs,
         maxReplicationLagSeconds,
         maxResponseTime,
         monitorType,
-        name,
+        port,
         primaryStatusUrl,
+        recordType,
         replicaStatusUrl,
         replicationTimestampField,
-        port,
-        recordType,
-        selectedExistingSite,
-        setFormError,
-        siteId,
-        url,
     } = properties;
 
     const trimmedHeaderName = safeTrim(headerName);
@@ -182,25 +177,11 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
         expectedValue,
         headerName:
             trimmedHeaderName.length > 0 ? trimmedHeaderName : undefined,
-        host,
-        jsonPath: trimmedJsonPath.length > 0 ? trimmedJsonPath : undefined,
-        maxPongDelayMs: maxPongDelayMsValue,
-        maxReplicationLagSeconds: maxReplicationLagSecondsValue,
-        maxResponseTime: maxResponseTimeValue,
-        primaryStatusUrl:
-            trimmedPrimaryStatusUrl.length > 0
-                ? trimmedPrimaryStatusUrl
+        heartbeatExpectedStatus:
+            trimmedHeartbeatExpectedStatus.length > 0
+                ? trimmedHeartbeatExpectedStatus
                 : undefined,
-        port: port ? Number.parseInt(port, 10) : undefined,
-        replicaStatusUrl:
-            trimmedReplicaStatusUrl.length > 0
-                ? trimmedReplicaStatusUrl
-                : undefined,
-        replicationTimestampField:
-            trimmedReplicationTimestampField.length > 0
-                ? trimmedReplicationTimestampField
-                : undefined,
-        recordType,
+        heartbeatMaxDriftSeconds: heartbeatMaxDriftSecondsValue,
         heartbeatStatusField:
             trimmedHeartbeatStatusField.length > 0
                 ? trimmedHeartbeatStatusField
@@ -209,11 +190,25 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
             trimmedHeartbeatTimestampField.length > 0
                 ? trimmedHeartbeatTimestampField
                 : undefined,
-        heartbeatExpectedStatus:
-            trimmedHeartbeatExpectedStatus.length > 0
-                ? trimmedHeartbeatExpectedStatus
+        host,
+        jsonPath: trimmedJsonPath.length > 0 ? trimmedJsonPath : undefined,
+        maxPongDelayMs: maxPongDelayMsValue,
+        maxReplicationLagSeconds: maxReplicationLagSecondsValue,
+        maxResponseTime: maxResponseTimeValue,
+        port: port ? Number.parseInt(port, 10) : undefined,
+        primaryStatusUrl:
+            trimmedPrimaryStatusUrl.length > 0
+                ? trimmedPrimaryStatusUrl
                 : undefined,
-        heartbeatMaxDriftSeconds: heartbeatMaxDriftSecondsValue,
+        recordType,
+        replicaStatusUrl:
+            trimmedReplicaStatusUrl.length > 0
+                ? trimmedReplicaStatusUrl
+                : undefined,
+        replicationTimestampField:
+            trimmedReplicationTimestampField.length > 0
+                ? trimmedReplicationTimestampField
+                : undefined,
     };
 
     const baseMonitor = createMonitorObject(monitorType, formData);
@@ -362,11 +357,11 @@ async function validateMonitorType(
         expectedJsonValue: string;
         expectedStatusCode: string;
         expectedValue: string;
+        headerName: string;
         heartbeatExpectedStatus: string;
         heartbeatMaxDriftSeconds: string;
         heartbeatStatusField: string;
         heartbeatTimestampField: string;
-        headerName: string;
         host: string;
         jsonPath: string;
         maxPongDelayMs: string;
@@ -389,11 +384,11 @@ async function validateMonitorType(
         expectedJsonValue,
         expectedStatusCode,
         expectedValue,
+        headerName,
         heartbeatExpectedStatus,
         heartbeatMaxDriftSeconds,
         heartbeatStatusField,
         heartbeatTimestampField,
-        headerName,
         host,
         jsonPath,
         maxPongDelayMs,
@@ -414,6 +409,11 @@ async function validateMonitorType(
 
     // Add type-specific fields
     switch (monitorType) {
+        case "cdn-edge-consistency": {
+            formData["baselineUrl"] = safeTrim(baselineUrl);
+            formData["edgeLocations"] = safeTrim(edgeLocations);
+            break;
+        }
         case "dns": {
             formData["host"] = safeTrim(host);
             formData["recordType"] = safeTrim(recordType);
@@ -423,11 +423,6 @@ async function validateMonitorType(
             ) {
                 formData["expectedValue"] = safeTrim(expectedValue);
             }
-            break;
-        }
-        case "cdn-edge-consistency": {
-            formData["baselineUrl"] = safeTrim(baselineUrl);
-            formData["edgeLocations"] = safeTrim(edgeLocations);
             break;
         }
         case "http": {
@@ -575,11 +570,11 @@ export async function handleSubmit(
         expectedJsonValue,
         expectedStatusCode,
         expectedValue,
+        headerName,
         heartbeatExpectedStatus,
         heartbeatMaxDriftSeconds,
         heartbeatStatusField,
         heartbeatTimestampField,
-        headerName,
         host,
         jsonPath,
         logger,
@@ -613,19 +608,19 @@ export async function handleSubmit(
         hasExpectedJsonValue: Boolean(safeTrim(expectedJsonValue)),
         hasExpectedStatusCode: Boolean(safeTrim(expectedStatusCode)),
         hasHeaderName: Boolean(safeTrim(headerName)),
-        hasHost: Boolean(safeTrim(host)),
-        hasJsonPath: Boolean(safeTrim(jsonPath)),
         hasHeartbeatExpectedStatus: Boolean(safeTrim(heartbeatExpectedStatus)),
         hasHeartbeatMaxDriftSeconds: Boolean(
             safeTrim(heartbeatMaxDriftSeconds)
         ),
         hasHeartbeatStatusField: Boolean(safeTrim(heartbeatStatusField)),
         hasHeartbeatTimestampField: Boolean(safeTrim(heartbeatTimestampField)),
-        hasMaxResponseTime: Boolean(safeTrim(maxResponseTime)),
+        hasHost: Boolean(safeTrim(host)),
+        hasJsonPath: Boolean(safeTrim(jsonPath)),
         hasMaxPongDelayMs: Boolean(safeTrim(maxPongDelayMs)),
         hasMaxReplicationLagSeconds: Boolean(
             safeTrim(maxReplicationLagSeconds)
         ),
+        hasMaxResponseTime: Boolean(safeTrim(maxResponseTime)),
         hasName: Boolean(safeTrim(name)),
         hasPort: Boolean(safeTrim(port)),
         hasPrimaryStatusUrl: Boolean(safeTrim(primaryStatusUrl)),
@@ -651,11 +646,11 @@ export async function handleSubmit(
             expectedJsonValue,
             expectedStatusCode,
             expectedValue,
+            headerName,
             heartbeatExpectedStatus,
             heartbeatMaxDriftSeconds,
             heartbeatStatusField,
             heartbeatTimestampField,
-            headerName,
             host,
             jsonPath,
             maxPongDelayMs,
@@ -679,7 +674,11 @@ export async function handleSubmit(
                 addMode,
                 baselineUrl: truncateForLogging(baselineUrl),
                 bodyKeyword: truncateForLogging(bodyKeyword),
+                certificateWarningDays: truncateForLogging(
+                    certificateWarningDays
+                ),
                 checkInterval,
+                edgeLocations: truncateForLogging(edgeLocations),
                 expectedHeaderValue: truncateForLogging(expectedHeaderValue),
                 expectedJsonValue: truncateForLogging(expectedJsonValue),
                 expectedStatusCode: truncateForLogging(expectedStatusCode),
@@ -694,10 +693,6 @@ export async function handleSubmit(
                 primaryStatusUrl: truncateForLogging(primaryStatusUrl),
                 recordType: truncateForLogging(recordType),
                 url: truncateForLogging(url),
-                edgeLocations: truncateForLogging(edgeLocations),
-                certificateWarningDays: truncateForLogging(
-                    certificateWarningDays
-                ),
             },
         });
 

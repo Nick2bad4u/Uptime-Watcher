@@ -611,6 +611,7 @@
     "@shared/utils": "file:./shared/utils",
     "@shared/validation": "file:./shared/validation",
     "axios": "^1.12.2",
+    "bufferutil": "^4.0.9",
     "chart.js": "^4.5.0",
     "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-plugin-zoom": "^2.2.0",
@@ -648,7 +649,7 @@
     "@dword-design/eslint-plugin-import-alias": "^6.0.3",
     "@electron/notarize": "^3.1.0",
     "@eslint-community/eslint-plugin-eslint-comments": "^4.5.0",
-    "@eslint-react/eslint-plugin": "^2.0.1",
+    "@eslint-react/eslint-plugin": "^2.0.2",
     "@eslint/compat": "^1.4.0",
     "@eslint/css": "^0.11.1",
     "@eslint/eslintrc": "^3.3.1",
@@ -836,19 +837,19 @@
     "eslint-plugin-putout": "^28.0.5",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-compiler": "^19.1.0-rc.2",
-    "eslint-plugin-react-dom": "^2.0.1",
+    "eslint-plugin-react-dom": "^2.0.2",
     "eslint-plugin-react-form-fields": "^1.2.22",
     "eslint-plugin-react-hook-form": "^0.3.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-hooks-addons": "^0.5.0",
-    "eslint-plugin-react-hooks-extra": "^2.0.1",
-    "eslint-plugin-react-naming-convention": "^2.0.1",
+    "eslint-plugin-react-hooks-extra": "^2.0.2",
+    "eslint-plugin-react-naming-convention": "^2.0.2",
     "eslint-plugin-react-perf": "^3.3.3",
     "eslint-plugin-react-prefer-function-component": "^4.0.1",
     "eslint-plugin-react-refresh": "^0.4.22",
     "eslint-plugin-react-require-testid": "^1.0.4",
     "eslint-plugin-react-useeffect": "^1.0.12",
-    "eslint-plugin-react-web-api": "^2.0.1",
+    "eslint-plugin-react-web-api": "^2.0.2",
     "eslint-plugin-redos": "^4.5.0",
     "eslint-plugin-regexp": "^2.10.0",
     "eslint-plugin-require-jsdoc": "^1.0.4",
@@ -865,7 +866,7 @@
     "eslint-plugin-styled-components-a11y": "^2.2.1",
     "eslint-plugin-switch-case": "^3.0.1",
     "eslint-plugin-tailwindcss": "^4.0.0-beta.0",
-    "eslint-plugin-testing-library": "^7.10.0",
+    "eslint-plugin-testing-library": "^7.11.0",
     "eslint-plugin-toml": "^0.12.0",
     "eslint-plugin-toplevel": "^1.2.0",
     "eslint-plugin-total-functions": "^7.1.0",
@@ -1026,7 +1027,7 @@
     "vite-bundle-analyzer": "^1.2.3",
     "vite-bundle-visualizer": "^1.2.1",
     "vite-css-modules": "^1.10.0",
-    "vite-plugin-checker": "^0.10.3",
+    "vite-plugin-checker": "^0.11.0",
     "vite-plugin-devtools-json": "^1.0.0",
     "vite-plugin-electron": "^0.29.0",
     "vite-plugin-istanbul": "^7.2.0",
@@ -1245,5 +1246,8 @@
     "workerDirectory": [
       "public"
     ]
+  },
+  "optionalDependencies": {
+    "utf-8-validate": "^6.0.5"
   }
 }

@@ -57,6 +57,11 @@ vi.mock("../../services/monitoring/MonitorTypeRegistry", () => ({
         "port",
         "ping",
         "dns",
+        "ssl",
+        "websocket-keepalive",
+        "server-heartbeat",
+        "replication",
+        "cdn-edge-consistency",
     ]),
 }));
 

@@ -43,7 +43,11 @@ describe("safeConversions comprehensive fuzzing tests", () => {
             (input, defaultValue) => {
                 const result = safeNumberConversion(input, defaultValue);
                 expect(typeof result).toBe("number");
-                expect(Number.isNaN(result)).toBeFalsy();
+                if (Number.isNaN(defaultValue)) {
+                    expect(Number.isNaN(result)).toBeTruthy();
+                } else {
+                    expect(Number.isNaN(result)).toBeFalsy();
+                }
                 // Infinity/-Infinity are allowed for number and string inputs
             }
         );
@@ -61,16 +65,15 @@ describe("safeConversions comprehensive fuzzing tests", () => {
             (stringInput, defaultValue) => {
                 const result = safeNumberConversion(stringInput, defaultValue);
 
-                // The function sanitizes NaN default values to 0
-                const sanitizedDefault = Number.isNaN(defaultValue)
-                    ? 0
-                    : defaultValue;
-
                 if (
                     stringInput.trim() === "" ||
                     Number.isNaN(Number(stringInput))
                 ) {
-                    expect(result).toBe(sanitizedDefault);
+                    if (Number.isNaN(defaultValue)) {
+                        expect(Number.isNaN(result)).toBeTruthy();
+                    } else {
+                        expect(result).toBe(defaultValue);
+                    }
                 } else {
                     const expected = Number(stringInput);
                     // For string inputs, preserve valid numeric results including infinities

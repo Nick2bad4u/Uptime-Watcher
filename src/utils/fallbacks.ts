@@ -215,6 +215,14 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
     (monitor: Monitor) => string | undefined
 >([
     [
+        "cdn-edge-consistency",
+        (
+            monitor
+        ):
+            | string
+            | undefined => monitor.baselineUrl ?? undefined,
+    ],
+    [
         "dns",
         (
             monitor
@@ -249,6 +257,23 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
                 : undefined,
     ],
     [
+        "replication",
+        (
+            monitor
+        ):
+            | string
+            | undefined =>
+            monitor.primaryStatusUrl ?? monitor.replicaStatusUrl ?? undefined,
+    ],
+    [
+        "server-heartbeat",
+        (
+            monitor
+        ):
+            | string
+            | undefined => monitor.url ?? undefined,
+    ],
+    [
         "ssl",
         (
             monitor
@@ -269,31 +294,6 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
         ):
             | string
             | undefined => monitor.url ?? undefined,
-    ],
-    [
-        "server-heartbeat",
-        (
-            monitor
-        ):
-            | string
-            | undefined => monitor.url ?? undefined,
-    ],
-    [
-        "replication",
-        (
-            monitor
-        ):
-            | string
-            | undefined =>
-            monitor.primaryStatusUrl ?? monitor.replicaStatusUrl ?? undefined,
-    ],
-    [
-        "cdn-edge-consistency",
-        (
-            monitor
-        ):
-            | string
-            | undefined => monitor.baselineUrl ?? undefined,
     ],
 ]);
 

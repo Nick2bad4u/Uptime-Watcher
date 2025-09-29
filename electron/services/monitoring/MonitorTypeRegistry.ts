@@ -30,6 +30,7 @@ import {
 import type { IMonitorService } from "./types";
 
 import { logger } from "../../utils/logger";
+import { CdnEdgeConsistencyMonitor } from "./CdnEdgeConsistencyMonitor";
 import { DnsMonitor } from "./DnsMonitor";
 import { HttpHeaderMonitor } from "./HttpHeaderMonitor";
 import { HttpJsonMonitor } from "./HttpJsonMonitor";
@@ -45,10 +46,9 @@ import {
 } from "./MigrationSystem";
 import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
-import { SslMonitor } from "./SslMonitor";
-import { CdnEdgeConsistencyMonitor } from "./CdnEdgeConsistencyMonitor";
 import { ReplicationMonitor } from "./ReplicationMonitor";
 import { ServerHeartbeatMonitor } from "./ServerHeartbeatMonitor";
+import { SslMonitor } from "./SslMonitor";
 import { WebsocketKeepaliveMonitor } from "./WebsocketKeepaliveMonitor";
 
 // Base monitor type definition

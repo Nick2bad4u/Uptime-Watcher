@@ -17,7 +17,11 @@ import { memo, type NamedExoticComponent } from "react";
 import { ThemedBadge } from "../../theme/components/ThemedBadge";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedText } from "../../theme/components/ThemedText";
-import { safeGetHostname } from "../../utils/monitoring/dataValidation";
+import {
+    getMonitorDisplayIdentifier,
+    getMonitorTypeDisplayLabel,
+} from "../../utils/fallbacks";
+import { formatTitleSuffix } from "../../utils/monitorTitleFormatters";
 
 /**
  * Props for the MonitoringStatusDisplay component.
@@ -89,56 +93,73 @@ export const MonitoringStatusDisplay: NamedExoticComponent<MonitoringStatusDispl
                         </ThemedBadge>
                     </div>
                     <div className="flex max-h-32 flex-col gap-1 overflow-y-auto">
-                        {monitors.map((monitor) => (
-                            <div
-                                className="flex items-center gap-2"
-                                data-testid={`monitor-status-${monitor.id}`}
-                                key={monitor.id}
-                            >
-                                <ThemedBadge
-                                    size="xs"
-                                    variant={
-                                        monitor.monitoring
-                                            ? "success"
-                                            : "secondary"
-                                    }
+                        {monitors.map((monitor) => {
+                            const monitorTypeLabel = getMonitorTypeDisplayLabel(
+                                monitor.type
+                            );
+                            const fallbackIdentifier = monitor.id;
+                            const suffix = formatTitleSuffix(monitor).trim();
+                            const normalizedSuffix =
+                                suffix.startsWith("(") && suffix.endsWith(")")
+                                    ? suffix.slice(1, -1)
+                                    : suffix;
+                            const connectionInfo =
+                                normalizedSuffix.length > 0
+                                    ? normalizedSuffix
+                                    : getMonitorDisplayIdentifier(
+                                          monitor,
+                                          fallbackIdentifier
+                                      );
+
+                            return (
+                                <div
+                                    className="flex items-center gap-2"
+                                    data-testid={`monitor-status-${monitor.id}`}
+                                    key={monitor.id}
                                 >
-                                    <div className="flex items-center gap-1">
-                                        <div
-                                            className={`h-2 w-2 rounded-full ${
-                                                monitor.monitoring
-                                                    ? "themed-status-up"
-                                                    : "themed-status-paused"
-                                            }`}
-                                            title={`${monitor.type.toUpperCase()}: ${monitor.monitoring ? "Running" : "Stopped"}`}
-                                        />
-                                        <ThemedText size="xs" weight="medium">
-                                            {monitor.type.toUpperCase()}
-                                        </ThemedText>
-                                    </div>
-                                </ThemedBadge>
-                                <ThemedText
-                                    className="min-w-0 flex-1"
-                                    size="xs"
-                                    variant="secondary"
-                                >
-                                    {/* Display appropriate connection info based on monitor type */}
-                                    {monitor.type === "http" && monitor.url ? (
-                                        <span className="block truncate">
-                                            {safeGetHostname(monitor.url) ||
-                                                monitor.url}
-                                        </span>
-                                    ) : null}
-                                    {monitor.type === "port" &&
-                                    monitor.host &&
-                                    monitor.port ? (
-                                        <span className="block truncate">
-                                            {monitor.host}:{monitor.port}
-                                        </span>
-                                    ) : null}
-                                </ThemedText>
-                            </div>
-                        ))}
+                                    <ThemedBadge
+                                        size="xs"
+                                        variant={
+                                            monitor.monitoring
+                                                ? "success"
+                                                : "secondary"
+                                        }
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            <div
+                                                className={`h-2 w-2 rounded-full ${
+                                                    monitor.monitoring
+                                                        ? "themed-status-up"
+                                                        : "themed-status-paused"
+                                                }`}
+                                                title={`${monitorTypeLabel}: ${
+                                                    monitor.monitoring
+                                                        ? "Running"
+                                                        : "Stopped"
+                                                }`}
+                                            />
+                                            <ThemedText
+                                                size="xs"
+                                                weight="medium"
+                                            >
+                                                {monitorTypeLabel}
+                                            </ThemedText>
+                                        </div>
+                                    </ThemedBadge>
+                                    <ThemedText
+                                        className="min-w-0 flex-1"
+                                        size="xs"
+                                        variant="secondary"
+                                    >
+                                        {connectionInfo ? (
+                                            <span className="block truncate">
+                                                {connectionInfo}
+                                            </span>
+                                        ) : null}
+                                    </ThemedText>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </ThemedBox>

@@ -13,7 +13,11 @@ import type { IpcMainInvokeEvent, IpcMainEvent } from "electron";
 import { IpcService } from "../../../electron/services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../../electron/UptimeOrchestrator";
 import type { AutoUpdaterService } from "../../../electron/services/updater/AutoUpdaterService";
-import type { Site, Monitor } from "../../../shared/types";
+import {
+    type Site,
+    type Monitor,
+    BASE_MONITOR_TYPES,
+} from "../../../shared/types";
 
 // Mock Electron modules
 vi.mock("electron", () => ({
@@ -656,23 +660,12 @@ describe("IpcService - Comprehensive Coverage", () => {
 
             expect(result.success).toBeTruthy();
             expect(Array.isArray(result.data)).toBeTruthy();
-            expect(result.data).toHaveLength(10);
+            expect(result.data).toHaveLength(BASE_MONITOR_TYPES.length);
 
-            // Ensure a few representative monitor configurations exist
+            // Ensure representative monitor configurations exist
             const monitorTypes = result.data.map((config: any) => config.type);
             expect(monitorTypes).toEqual(
-                expect.arrayContaining([
-                    "http",
-                    "http-keyword",
-                    "http-header",
-                    "http-json",
-                    "http-latency",
-                    "http-status",
-                    "port",
-                    "ping",
-                    "dns",
-                    "ssl",
-                ])
+                expect.arrayContaining(Array.from(BASE_MONITOR_TYPES))
             );
 
             // Check serialized config structure

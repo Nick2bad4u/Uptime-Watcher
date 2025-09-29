@@ -91,6 +91,40 @@
             "type": "npm"
         },
         {
+            "args": [
+                "install",
+                "--force"
+            ],
+            "command": "npm",
+            "detail": "Installs npm dependencies forcefully",
+            "group": "build",
+            "icon": {
+                "color": "terminal.ansiYellow",
+                "id": "package"
+            },
+            "label": "Install Dependencies (Force)",
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "presentation": {
+                "clear": false,
+                "close": true,
+                "echo": true,
+                "focus": false,
+                "group": "build",
+                "panel": "shared",
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+            "promptOnClose": false,
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "type": "shell"
+        },
+        {
             "detail": "Lints all source files using ESLint.",
             "group": "test",
             "icon": {

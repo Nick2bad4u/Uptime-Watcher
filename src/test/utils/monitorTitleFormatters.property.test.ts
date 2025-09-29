@@ -284,7 +284,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
 
         describe("Ping monitors", () => {
             test.prop([fc.option(hostArbitrary, { nil: undefined })])(
-                "should return empty string for ping monitors (no built-in formatter)",
+                "should include host suffix when available",
                 (host) => {
                     // Only include defined properties to satisfy exactOptionalPropertyTypes
                     const monitorData: Partial<Monitor> = { type: "ping" };
@@ -292,7 +292,11 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
 
                     const monitor = createBaseMonitor(monitorData);
                     const result = formatTitleSuffix(monitor);
-                    expect(result).toBe("");
+                    if (host) {
+                        expect(result).toBe(` (${host})`);
+                    } else {
+                        expect(result).toBe("");
+                    }
                 }
             );
         });

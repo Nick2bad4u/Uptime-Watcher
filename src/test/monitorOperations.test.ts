@@ -672,6 +672,65 @@ describe("monitorOperations", () => {
                 type: "port",
             });
         });
+
+        it("should provide default replication monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorOperations", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const result = normalizeMonitor({ type: "replication" });
+
+            expect(result).toMatchObject({
+                maxReplicationLagSeconds: 10,
+                primaryStatusUrl: "https://primary.example.com/status",
+                replicaStatusUrl: "https://replica.example.com/status",
+                replicationTimestampField: "lastAppliedTimestamp",
+                type: "replication",
+            });
+        });
+
+        it("should provide default server heartbeat fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorOperations", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const result = normalizeMonitor({ type: "server-heartbeat" });
+
+            expect(result).toMatchObject({
+                heartbeatExpectedStatus: "ok",
+                heartbeatMaxDriftSeconds: 60,
+                heartbeatStatusField: "status",
+                heartbeatTimestampField: "timestamp",
+                type: "server-heartbeat",
+                url: "https://example.com/heartbeat",
+            });
+        });
+
+        it("should provide default WebSocket keepalive fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorOperations", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const result = normalizeMonitor({ type: "websocket-keepalive" });
+
+            expect(result).toMatchObject({
+                maxPongDelayMs: 1500,
+                type: "websocket-keepalive",
+                url: "wss://example.com/socket",
+            });
+        });
     });
 
     describe(findMonitorInSite, () => {

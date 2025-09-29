@@ -18,6 +18,7 @@ import {
     type MonitorTypeOption,
     type IntervalOption,
 } from "../constants";
+import { BASE_MONITOR_TYPES } from "../../shared/types";
 
 // Mock any external dependencies
 vi.mock("../services/logger", () => ({
@@ -78,15 +79,11 @@ describe("Constants and Configuration 100% Coverage", () => {
                 (option) => option.value
             );
 
-            // Should contain the seven monitor types available by default
-            expect(values).toContain("http");
-            expect(values).toContain("http-keyword");
-            expect(values).toContain("http-status");
-            expect(values).toContain("port");
-            expect(values).toContain("ping");
-            expect(values).toContain("dns");
-            expect(values).toContain("ssl");
-            expect(values).toHaveLength(7);
+            for (const type of BASE_MONITOR_TYPES) {
+                expect(values).toContain(type);
+            }
+
+            expect(values).toHaveLength(BASE_MONITOR_TYPES.length);
         });
 
         it("should have unique values", () => {
@@ -224,7 +221,9 @@ describe("Constants and Configuration 100% Coverage", () => {
                 })
             );
 
-            expect(selectOptions).toHaveLength(7);
+            expect(selectOptions).toHaveLength(
+                FALLBACK_MONITOR_TYPE_OPTIONS.length
+            );
             expect(selectOptions.some((opt) => opt.selected)).toBeTruthy();
         });
 
@@ -387,8 +386,12 @@ describe("Constants and Configuration 100% Coverage", () => {
                 (o) => o.label
             );
 
-            expect(monitorKeys).toHaveLength(7);
-            expect(monitorLabels).toHaveLength(7);
+            expect(monitorKeys).toHaveLength(
+                FALLBACK_MONITOR_TYPE_OPTIONS.length
+            );
+            expect(monitorLabels).toHaveLength(
+                FALLBACK_MONITOR_TYPE_OPTIONS.length
+            );
 
             // Test intervals
             const intervalValues = CHECK_INTERVALS.map((i) => i.value);

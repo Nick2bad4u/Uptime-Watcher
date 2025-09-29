@@ -33,7 +33,7 @@ import { isBoolean, isNumber, isString } from "./typeGuards";
  * @returns Valid number or the default value
  */
 export function safeNumberConversion(value: unknown, defaultValue = 0): number {
-    const fallback = Number.isNaN(defaultValue) ? 0 : defaultValue;
+    const fallback = defaultValue;
     // Numbers: preserve value (including ±Infinity), only exclude NaN
     if (isNumber(value)) {
         return value;

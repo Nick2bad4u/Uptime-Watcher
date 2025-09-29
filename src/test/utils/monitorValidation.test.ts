@@ -1937,4 +1937,185 @@ describe("Monitor Validation Utilities", () => {
             });
         });
     });
+
+    // New monitor types tests
+    describe("New monitor types validation", () => {
+        describe("Replication monitor validation", () => {
+            it("should validate replication monitors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
+
+                vi.mocked(sharedValidateMonitorField).mockClear();
+
+                const result = await validateMonitorFormData("replication", {
+                    maxReplicationLagSeconds: 15,
+                    primaryStatusUrl: "https://primary/status",
+                    replicaStatusUrl: "https://replica/status",
+                    replicationTimestampField: "lastAppliedTimestamp",
+                });
+
+                expect(result.success).toBeTruthy();
+                expect(result.errors).toHaveLength(0);
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith(
+                    "replication",
+                    "primaryStatusUrl",
+                    "https://primary/status"
+                );
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith(
+                    "replication",
+                    "replicationTimestampField",
+                    "lastAppliedTimestamp"
+                );
+            });
+
+            it("should require replication monitor fields", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
+
+                const result = await validateMonitorFormData("replication", {});
+
+                expect(result.success).toBeFalsy();
+                expect(result.errors).toEqual(
+                    expect.arrayContaining([
+                        "Primary status URL is required for replication monitors",
+                        "Replica status URL is required for replication monitors",
+                        "Replication timestamp field is required for replication monitors",
+                        "Maximum replication lag is required for replication monitors",
+                    ])
+                );
+            });
+        });
+
+        describe("Server heartbeat monitor validation", () => {
+            it("should validate server heartbeat monitors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
+
+                vi.mocked(sharedValidateMonitorField).mockClear();
+
+                const result = await validateMonitorFormData(
+                    "server-heartbeat",
+                    {
+                        heartbeatExpectedStatus: "ok",
+                        heartbeatMaxDriftSeconds: 45,
+                        heartbeatStatusField: "status",
+                        heartbeatTimestampField: "timestamp",
+                        url: "https://status.example.com/heartbeat",
+                    }
+                );
+
+                expect(result.success).toBeTruthy();
+                expect(result.errors).toHaveLength(0);
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith(
+                    "server-heartbeat",
+                    "heartbeatStatusField",
+                    "status"
+                );
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith(
+                    "server-heartbeat",
+                    "url",
+                    "https://status.example.com/heartbeat"
+                );
+            });
+
+            it("should require server heartbeat fields", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
+
+                const result = await validateMonitorFormData(
+                    "server-heartbeat",
+                    {}
+                );
+
+                expect(result.success).toBeFalsy();
+                expect(result.errors).toEqual(
+                    expect.arrayContaining([
+                        "Heartbeat URL is required for server heartbeat monitors",
+                        "Heartbeat status field is required for server heartbeat monitors",
+                        "Heartbeat timestamp field is required for server heartbeat monitors",
+                        "Expected heartbeat status is required for server heartbeat monitors",
+                        "Heartbeat drift tolerance is required for server heartbeat monitors",
+                    ])
+                );
+            });
+        });
+
+        describe("WebSocket keepalive monitor validation", () => {
+            it("should validate WebSocket keepalive monitors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
+
+                vi.mocked(sharedValidateMonitorField).mockClear();
+
+                const result = await validateMonitorFormData(
+                    "websocket-keepalive",
+                    {
+                        maxPongDelayMs: 1200,
+                        url: "wss://example.com/socket",
+                    }
+                );
+
+                expect(result.success).toBeTruthy();
+                expect(result.errors).toHaveLength(0);
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith(
+                    "websocket-keepalive",
+                    "maxPongDelayMs",
+                    1200
+                );
+                expect(sharedValidateMonitorField).toHaveBeenCalledWith(
+                    "websocket-keepalive",
+                    "url",
+                    "wss://example.com/socket"
+                );
+            });
+
+            it("should require WebSocket keepalive fields", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
+
+                const result = await validateMonitorFormData(
+                    "websocket-keepalive",
+                    {}
+                );
+
+                expect(result.success).toBeFalsy();
+                expect(result.errors).toEqual(
+                    expect.arrayContaining([
+                        "WebSocket URL is required for keepalive monitors",
+                        "Maximum pong delay is required for WebSocket keepalive monitors",
+                    ])
+                );
+            });
+        });
+    });
 });

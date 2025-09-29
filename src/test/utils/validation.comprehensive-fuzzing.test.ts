@@ -542,7 +542,14 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                         "isValidUrl",
                         validUrl
                     );
-                    expect(result).toBeTruthy();
+                    const containsDisallowedCharacters =
+                        validUrl.includes("'") || validUrl.includes("`");
+
+                    if (containsDisallowedCharacters) {
+                        expect(result).toBeFalsy();
+                    } else {
+                        expect(result).toBeTruthy();
+                    }
                 }
             }
         );

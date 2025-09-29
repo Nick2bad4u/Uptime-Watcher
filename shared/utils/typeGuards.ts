@@ -215,7 +215,7 @@ export function isFunction(
  * @returns True if `value` is a non-negative number; otherwise, false.
  */
 export function isNonNegativeNumber(value: unknown): value is number {
-    return isNumber(value) && value >= 0;
+    return isNumber(value) && !Number.isNaN(value) && value >= 0;
 }
 
 /**
@@ -237,7 +237,7 @@ export function isNonNullObject(value: unknown): value is UnknownRecord {
  * @returns True if `value` is a positive number; otherwise, false.
  */
 export function isPositiveNumber(value: unknown): value is number {
-    return isNumber(value) && value > 0;
+    return isNumber(value) && !Number.isNaN(value) && value > 0;
 }
 
 /**

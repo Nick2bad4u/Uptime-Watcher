@@ -46,6 +46,114 @@ import {
     DEFAULT_SITE_STATUS,
 } from "../types";
 
+const createMonitorSample = (
+    overrides: Partial<Monitor> & Pick<Monitor, "id" | "type">
+): Monitor =>
+    ({
+        activeOperations: [],
+        checkInterval: 60 * 1000,
+        history: [],
+        monitoring: true,
+        responseTime: 0,
+        retryAttempts: 2,
+        status: "up",
+        timeout: 5 * 1000,
+        ...overrides,
+    }) as Monitor;
+
+const VALID_MONITOR_SAMPLES: readonly Monitor[] = [
+    createMonitorSample({
+        id: "monitor-http",
+        type: "http",
+        url: "https://example.com",
+    }),
+    createMonitorSample({
+        bodyKeyword: "healthy",
+        id: "monitor-http-keyword",
+        type: "http-keyword",
+        url: "https://example.com/search",
+    }),
+    createMonitorSample({
+        expectedStatusCode: 200,
+        id: "monitor-http-status",
+        type: "http-status",
+        url: "https://example.com/status",
+    }),
+    createMonitorSample({
+        expectedHeaderValue: "application/json",
+        headerName: "content-type",
+        id: "monitor-http-header",
+        type: "http-header",
+        url: "https://example.com/data",
+    }),
+    createMonitorSample({
+        expectedJsonValue: "ok",
+        id: "monitor-http-json",
+        jsonPath: "$.status",
+        type: "http-json",
+        url: "https://example.com/api",
+    }),
+    createMonitorSample({
+        id: "monitor-http-latency",
+        maxResponseTime: 15 * 100,
+        type: "http-latency",
+        url: "https://example.com/perf",
+    }),
+    createMonitorSample({
+        host: "services.internal",
+        id: "monitor-port",
+        port: 443,
+        type: "port",
+    }),
+    createMonitorSample({
+        host: "services.internal",
+        id: "monitor-ping",
+        type: "ping",
+    }),
+    createMonitorSample({
+        host: "example.com",
+        id: "monitor-dns",
+        recordType: "A",
+        type: "dns",
+    }),
+    createMonitorSample({
+        certificateWarningDays: 30,
+        host: "secure.example.com",
+        id: "monitor-ssl",
+        port: 443,
+        type: "ssl",
+    }),
+    createMonitorSample({
+        id: "monitor-websocket",
+        maxPongDelayMs: 15 * 100,
+        type: "websocket-keepalive",
+        url: "wss://example.com/socket",
+    }),
+    createMonitorSample({
+        heartbeatExpectedStatus: "ok",
+        heartbeatMaxDriftSeconds: 120,
+        heartbeatStatusField: "status",
+        heartbeatTimestampField: "timestamp",
+        id: "monitor-heartbeat",
+        type: "server-heartbeat",
+        url: "https://example.com/heartbeat",
+    }),
+    createMonitorSample({
+        id: "monitor-replication",
+        maxReplicationLagSeconds: 15,
+        primaryStatusUrl: "https://primary.example.com/status",
+        replicaStatusUrl: "https://replica.example.com/status",
+        replicationTimestampField: "lastApplied",
+        type: "replication",
+    }),
+    createMonitorSample({
+        baselineUrl: "https://origin.example.com",
+        edgeLocations: "https://edge1.example.com\nhttps://edge2.example.com",
+        id: "monitor-cdn",
+        type: "cdn-edge-consistency",
+    }),
+];
+
 describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => {
     describe("isComputedSiteStatus property-based tests", () => {
         test.prop([fc.string()])(
@@ -187,86 +295,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
 
     describe("validateMonitor property-based tests", () => {
         // Generator for valid Monitor objects
-        const validMonitorArbitrary = fc.record({
-            id: fc.string({ minLength: 1, maxLength: 100 }),
-            type: fc.constantFrom(...BASE_MONITOR_TYPES),
-            status: fc.constantFrom("down", "paused", "pending", "up"),
-            monitoring: fc.boolean(),
-            responseTime: fc.nat({ max: 30_000 }),
-            checkInterval: fc.integer({ min: 1000, max: 300_000 }),
-            timeout: fc.integer({ min: 1000, max: 30_000 }),
-            retryAttempts: fc.nat({ max: 10 }),
-            history: fc.array(
-                fc.record({
-                    status: fc.constantFrom("down", "up"),
-                    responseTime: fc.nat({ max: 30_000 }),
-                    timestamp: fc.nat(),
-                })
-            ),
-            activeOperations: fc.option(
-                fc.array(fc.string({ minLength: 1, maxLength: 50 }), {
-                    minLength: 1,
-                    maxLength: 5,
-                })
-            ),
-            url: fc.option(fc.webUrl()),
-            host: fc.option(fc.string({ minLength: 1, maxLength: 255 })),
-            port: fc.option(fc.nat({ max: 65_535 })),
-            expectedStatusCode: fc.option(fc.integer({ min: 100, max: 599 })),
-            jsonPath: fc.option(fc.string({ minLength: 1, maxLength: 255 })),
-            expectedJsonValue: fc.option(
-                fc.string({ minLength: 1, maxLength: 255 })
-            ),
-            bodyKeyword: fc.option(fc.string({ minLength: 1, maxLength: 255 })),
-            maxResponseTime: fc.option(fc.integer({ min: 1, max: 300_000 })),
-            expectedHeaderValue: fc.option(
-                fc.string({ minLength: 1, maxLength: 255 })
-            ),
-            headerName: fc.option(fc.string({ minLength: 1, maxLength: 255 })),
-            certificateWarningDays: fc.option(fc.integer({ min: 1, max: 365 })),
-            baselineUrl: fc.option(fc.webUrl()),
-            edgeLocations: fc.option(
-                fc
-                    .array(fc.webUrl(), { minLength: 1, maxLength: 4 })
-                    .map((urls) => urls.join("\n"))
-            ),
-            heartbeatExpectedStatus: fc.option(
-                fc.string({ minLength: 1, maxLength: 64 })
-            ),
-            heartbeatStatusField: fc.option(
-                fc
-                    .array(fc.string({ minLength: 1, maxLength: 32 }), {
-                        minLength: 1,
-                        maxLength: 4,
-                    })
-                    .map((segments) => segments.join("."))
-            ),
-            heartbeatTimestampField: fc.option(
-                fc
-                    .array(fc.string({ minLength: 1, maxLength: 32 }), {
-                        minLength: 1,
-                        maxLength: 4,
-                    })
-                    .map((segments) => segments.join("."))
-            ),
-            heartbeatMaxDriftSeconds: fc.option(
-                fc.integer({ min: 0, max: 86_400 })
-            ),
-            primaryStatusUrl: fc.option(fc.webUrl()),
-            replicaStatusUrl: fc.option(fc.webUrl()),
-            replicationTimestampField: fc.option(
-                fc
-                    .array(fc.string({ minLength: 1, maxLength: 32 }), {
-                        minLength: 1,
-                        maxLength: 4,
-                    })
-                    .map((segments) => segments.join("."))
-            ),
-            maxReplicationLagSeconds: fc.option(
-                fc.integer({ min: 0, max: 86_400 })
-            ),
-            maxPongDelayMs: fc.option(fc.integer({ min: 1, max: 60_000 })),
-        }) as fc.Arbitrary<Monitor>;
+        const validMonitorArbitrary = fc.constantFrom(...VALID_MONITOR_SAMPLES);
 
         test.prop([validMonitorArbitrary])(
             "should return true for valid Monitor objects",

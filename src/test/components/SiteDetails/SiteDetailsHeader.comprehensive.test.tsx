@@ -796,7 +796,8 @@ describe(SiteDetailsHeader, () => {
                     isCollapsed={false}
                 />
             );
-            expect(screen.getByText("HTTP")).toBeInTheDocument();
+            expect(screen.getByText("Website URL")).toBeInTheDocument();
+            expect(screen.getByText("https://example.com")).toBeInTheDocument();
         });
 
         it("should show port monitor with host:port", ({ task, annotate }) => {
@@ -820,7 +821,7 @@ describe(SiteDetailsHeader, () => {
                     isCollapsed={false}
                 />
             );
-            expect(screen.getByText("PORT")).toBeInTheDocument();
+            expect(screen.getByText("Host & Port")).toBeInTheDocument();
             expect(screen.getByText("example.com:80")).toBeInTheDocument();
         });
     });
@@ -909,7 +910,7 @@ describe(SiteDetailsHeader, () => {
                     isCollapsed={false}
                 />
             );
-            expect(screen.getByText("PORT")).toBeInTheDocument();
+            expect(screen.getByText("Host & Port")).toBeInTheDocument();
         });
     });
 

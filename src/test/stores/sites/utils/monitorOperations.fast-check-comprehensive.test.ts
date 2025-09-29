@@ -546,19 +546,16 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                             targetMonitor!.id
                         );
 
-                        expect(updatedSite.monitors).toHaveLength(
-                            site.monitors.length - 1
-                        );
-                        expect(updatedSite.monitors).not.toContain(
-                            targetMonitor
+                        const expectedMonitors = site.monitors.filter(
+                            (monitor) => monitor.id !== targetMonitor!.id
                         );
 
-                        // Other monitors should remain
-                        for (let i = 1; i < site.monitors.length; i++) {
-                            expect(updatedSite.monitors).toContain(
-                                site.monitors[i]
-                            );
-                        }
+                        expect(updatedSite.monitors).toHaveLength(
+                            expectedMonitors.length
+                        );
+                        expect(updatedSite.monitors).toStrictEqual(
+                            expectedMonitors
+                        );
                     }
                 )
             );

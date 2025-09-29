@@ -21,7 +21,7 @@ import {
 } from "../validation/validatorUtils";
 
 describe("Validation Utils Property-Based Tests", () => {
-    describe("isNonEmptyString", () => {
+    describe(isNonEmptyString, () => {
         test.prop([fc.string({ minLength: 1 })])(
             "should accept non-empty strings",
             (str) => {
@@ -47,7 +47,7 @@ describe("Validation Utils Property-Based Tests", () => {
         );
     });
 
-    describe("isValidFQDN", () => {
+    describe(isValidFQDN, () => {
         test.prop([fc.domain()])(
             "should accept valid domain names",
             (domain) => {
@@ -75,7 +75,7 @@ describe("Validation Utils Property-Based Tests", () => {
         );
     });
 
-    describe("isValidIdentifier", () => {
+    describe(isValidIdentifier, () => {
         test.prop([
             // Generate identifiers that must have at least one alphanumeric character
             fc
@@ -101,7 +101,7 @@ describe("Validation Utils Property-Based Tests", () => {
         });
     });
 
-    describe("isValidIdentifierArray", () => {
+    describe(isValidIdentifierArray, () => {
         test.prop([
             fc.array(
                 // Generate identifiers that must have at least one alphanumeric character
@@ -137,7 +137,7 @@ describe("Validation Utils Property-Based Tests", () => {
         );
     });
 
-    describe("isValidInteger", () => {
+    describe(isValidInteger, () => {
         test.prop([fc.integer().map(String)])(
             "should accept valid integer strings",
             (intStr) => {
@@ -159,7 +159,7 @@ describe("Validation Utils Property-Based Tests", () => {
         });
     });
 
-    describe("isValidNumeric", () => {
+    describe(isValidNumeric, () => {
         test.prop([fc.float().map(String)])(
             "should accept valid numeric strings",
             (numStr) => {
@@ -178,7 +178,7 @@ describe("Validation Utils Property-Based Tests", () => {
         );
     });
 
-    describe("isValidHost", () => {
+    describe(isValidHost, () => {
         test.prop([fc.ipV4()])("should accept valid IPv4 addresses", (ipv4) => {
             expect(isValidHost(ipv4)).toBeTruthy();
         });
@@ -211,7 +211,7 @@ describe("Validation Utils Property-Based Tests", () => {
         });
     });
 
-    describe("isValidPort", () => {
+    describe(isValidPort, () => {
         test.prop([fc.integer({ min: 1, max: 65_535 })])(
             "should accept valid port numbers",
             (port) => {
@@ -241,7 +241,7 @@ describe("Validation Utils Property-Based Tests", () => {
         );
     });
 
-    describe("isValidUrl", () => {
+    describe(isValidUrl, () => {
         test.prop([
             fc
                 .webUrl()
@@ -274,7 +274,7 @@ describe("Validation Utils Property-Based Tests", () => {
         );
     });
 
-    describe("safeInteger", () => {
+    describe(safeInteger, () => {
         test.prop([
             fc.integer(),
             fc.integer(),

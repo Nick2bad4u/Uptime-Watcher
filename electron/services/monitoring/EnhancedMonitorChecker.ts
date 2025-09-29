@@ -56,12 +56,12 @@ import type {
 } from "./types";
 
 import { monitorLogger as logger } from "../../utils/logger";
+import { CdnEdgeConsistencyMonitor } from "./CdnEdgeConsistencyMonitor";
 import {
     DEFAULT_MONITOR_TIMEOUT_SECONDS,
     MONITOR_TIMEOUT_BUFFER_MS,
     SECONDS_TO_MS_MULTIPLIER,
 } from "./constants";
-import { CdnEdgeConsistencyMonitor } from "./CdnEdgeConsistencyMonitor";
 import { DnsMonitor } from "./DnsMonitor";
 import { HttpHeaderMonitor } from "./HttpHeaderMonitor";
 import { HttpJsonMonitor } from "./HttpJsonMonitor";
@@ -958,27 +958,6 @@ export class EnhancedMonitorChecker {
                     signal
                 );
             }
-            case "replication": {
-                return this.performMonitorCheck(
-                    this.replicationMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "server-heartbeat": {
-                return this.performMonitorCheck(
-                    this.serverHeartbeatMonitor,
-                    monitor,
-                    signal
-                );
-            }
-            case "websocket-keepalive": {
-                return this.performMonitorCheck(
-                    this.websocketKeepaliveMonitor,
-                    monitor,
-                    signal
-                );
-            }
             case "ping": {
                 return this.performMonitorCheck(
                     this.pingMonitor,
@@ -993,9 +972,30 @@ export class EnhancedMonitorChecker {
                     signal
                 );
             }
+            case "replication": {
+                return this.performMonitorCheck(
+                    this.replicationMonitor,
+                    monitor,
+                    signal
+                );
+            }
+            case "server-heartbeat": {
+                return this.performMonitorCheck(
+                    this.serverHeartbeatMonitor,
+                    monitor,
+                    signal
+                );
+            }
             case "ssl": {
                 return this.performMonitorCheck(
                     this.sslMonitor,
+                    monitor,
+                    signal
+                );
+            }
+            case "websocket-keepalive": {
+                return this.performMonitorCheck(
+                    this.websocketKeepaliveMonitor,
                     monitor,
                     signal
                 );
