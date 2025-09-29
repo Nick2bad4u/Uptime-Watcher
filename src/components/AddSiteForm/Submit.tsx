@@ -71,6 +71,153 @@ export type FormSubmitProperties = Simplify<
         }
 >;
 
+const toOptionalString = (value?: string): string | undefined => {
+    const trimmedValue = safeTrim(value);
+    return trimmedValue.length > 0 ? trimmedValue : undefined;
+};
+
+const parseOptionalInteger = (value?: string): number | undefined => {
+    const trimmedValue = safeTrim(value);
+    if (trimmedValue.length === 0) {
+        return undefined;
+    }
+
+    const parsed = Number.parseInt(trimmedValue, 10);
+    return Number.isNaN(parsed) ? undefined : parsed;
+};
+
+interface MonitorValidationFields {
+    baselineUrl: string;
+    bodyKeyword: string;
+    certificateWarningDays: string;
+    edgeLocations: string;
+    expectedHeaderValue: string;
+    expectedJsonValue: string;
+    expectedStatusCode: string;
+    expectedValue: string;
+    headerName: string;
+    heartbeatExpectedStatus: string;
+    heartbeatMaxDriftSeconds: string;
+    heartbeatStatusField: string;
+    heartbeatTimestampField: string;
+    host: string;
+    jsonPath: string;
+    maxPongDelayMs: string;
+    maxReplicationLagSeconds: string;
+    maxResponseTime: string;
+    port: string;
+    primaryStatusUrl: string;
+    recordType: string;
+    replicaStatusUrl: string;
+    replicationTimestampField: string;
+    url: string;
+}
+
+const monitorValidationBuilders: Record<
+    MonitorType,
+    (fields: MonitorValidationFields) => UnknownRecord
+> = {
+    "cdn-edge-consistency": ({
+        baselineUrl,
+        edgeLocations,
+    }): UnknownRecord => ({
+        baselineUrl: toOptionalString(baselineUrl),
+        edgeLocations: toOptionalString(edgeLocations),
+    }),
+    dns: ({ expectedValue, host, recordType }): UnknownRecord => {
+        const trimmedRecordType = safeTrim(recordType);
+        const payload: UnknownRecord = {};
+
+        payload["host"] = toOptionalString(host);
+
+        const candidate = toOptionalString(expectedValue);
+        if (
+            trimmedRecordType.length > 0 &&
+            trimmedRecordType.toUpperCase() !== "ANY" &&
+            candidate
+        ) {
+            payload["expectedValue"] = candidate;
+        }
+
+        payload["recordType"] = trimmedRecordType || undefined;
+
+        return payload;
+    },
+    http: ({ url }): UnknownRecord => ({
+        url: toOptionalString(url),
+    }),
+    "http-header": ({
+        expectedHeaderValue,
+        headerName,
+        url,
+    }): UnknownRecord => ({
+        expectedHeaderValue: toOptionalString(expectedHeaderValue),
+        headerName: toOptionalString(headerName),
+        url: toOptionalString(url),
+    }),
+    "http-json": ({ expectedJsonValue, jsonPath, url }): UnknownRecord => ({
+        expectedJsonValue: toOptionalString(expectedJsonValue),
+        jsonPath: toOptionalString(jsonPath),
+        url: toOptionalString(url),
+    }),
+    "http-keyword": ({ bodyKeyword, url }): UnknownRecord => ({
+        bodyKeyword: toOptionalString(bodyKeyword),
+        url: toOptionalString(url),
+    }),
+    "http-latency": ({ maxResponseTime, url }): UnknownRecord => ({
+        maxResponseTime: parseOptionalInteger(maxResponseTime),
+        url: toOptionalString(url),
+    }),
+    "http-status": ({ expectedStatusCode, url }): UnknownRecord => ({
+        expectedStatusCode: parseOptionalInteger(expectedStatusCode),
+        url: toOptionalString(url),
+    }),
+    ping: ({ host }): UnknownRecord => ({
+        host: toOptionalString(host),
+    }),
+    port: ({ host, port }): UnknownRecord => ({
+        host: toOptionalString(host),
+        port: parseOptionalInteger(port),
+    }),
+    replication: ({
+        maxReplicationLagSeconds,
+        primaryStatusUrl,
+        replicaStatusUrl,
+        replicationTimestampField,
+    }): UnknownRecord => ({
+        maxReplicationLagSeconds: parseOptionalInteger(
+            maxReplicationLagSeconds
+        ),
+        primaryStatusUrl: toOptionalString(primaryStatusUrl),
+        replicaStatusUrl: toOptionalString(replicaStatusUrl),
+        replicationTimestampField: toOptionalString(replicationTimestampField),
+    }),
+    "server-heartbeat": ({
+        heartbeatExpectedStatus,
+        heartbeatMaxDriftSeconds,
+        heartbeatStatusField,
+        heartbeatTimestampField,
+        url,
+    }): UnknownRecord => ({
+        heartbeatExpectedStatus: toOptionalString(heartbeatExpectedStatus),
+        heartbeatMaxDriftSeconds: parseOptionalInteger(
+            heartbeatMaxDriftSeconds
+        ),
+        heartbeatStatusField: toOptionalString(heartbeatStatusField),
+        heartbeatTimestampField: toOptionalString(heartbeatTimestampField),
+        url: toOptionalString(url),
+    }),
+    ssl: ({ certificateWarningDays, host, port }): UnknownRecord => ({
+        certificateWarningDays: parseOptionalInteger(certificateWarningDays),
+        host: toOptionalString(host),
+        port: parseOptionalInteger(port),
+    }),
+    "websocket-keepalive": ({ maxPongDelayMs, url }): UnknownRecord => ({
+        maxPongDelayMs: parseOptionalInteger(maxPongDelayMs),
+        url: toOptionalString(url),
+    }),
+};
+
 /**
  * Creates a monitor object based on the form data using the shared utility.
  * This ensures consistent monitor defaults and validation across the app.
@@ -105,111 +252,48 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
         replicationTimestampField,
     } = properties;
 
-    const trimmedHeaderName = safeTrim(headerName);
-    const trimmedBaselineUrl = safeTrim(baselineUrl);
-    const trimmedEdgeLocations = safeTrim(edgeLocations);
-    const trimmedExpectedHeaderValue = safeTrim(expectedHeaderValue);
-    const trimmedJsonPath = safeTrim(jsonPath);
-    const trimmedExpectedJsonValue = safeTrim(expectedJsonValue);
-    const trimmedMaxResponseTime = safeTrim(maxResponseTime);
-    const trimmedPrimaryStatusUrl = safeTrim(primaryStatusUrl);
-    const trimmedReplicaStatusUrl = safeTrim(replicaStatusUrl);
-    const trimmedReplicationTimestampField = safeTrim(
-        replicationTimestampField
-    );
-    const trimmedMaxReplicationLagSeconds = safeTrim(maxReplicationLagSeconds);
-    const trimmedMaxPongDelayMs = safeTrim(maxPongDelayMs);
-    const trimmedHeartbeatStatusField = safeTrim(heartbeatStatusField);
-    const trimmedHeartbeatTimestampField = safeTrim(heartbeatTimestampField);
-    const trimmedHeartbeatExpectedStatus = safeTrim(heartbeatExpectedStatus);
-    const trimmedHeartbeatMaxDriftSeconds = safeTrim(heartbeatMaxDriftSeconds);
+    const trimmedRecordType = safeTrim(recordType);
+    const optionalExpectedValue = toOptionalString(expectedValue);
+    const expectedValueForDns =
+        trimmedRecordType.length > 0 &&
+        trimmedRecordType.toUpperCase() !== "ANY"
+            ? optionalExpectedValue
+            : undefined;
 
-    const parsedMaxResponseTime = Number.parseInt(trimmedMaxResponseTime, 10);
-    const maxResponseTimeValue = Number.isNaN(parsedMaxResponseTime)
-        ? undefined
-        : parsedMaxResponseTime;
-    const parsedMaxReplicationLagSeconds = Number.parseInt(
-        trimmedMaxReplicationLagSeconds || "NaN",
-        10
-    );
-    const maxReplicationLagSecondsValue = Number.isNaN(
-        parsedMaxReplicationLagSeconds
-    )
-        ? undefined
-        : parsedMaxReplicationLagSeconds;
-
-    const parsedMaxPongDelayMs = Number.parseInt(
-        trimmedMaxPongDelayMs || "NaN",
-        10
-    );
-    const maxPongDelayMsValue = Number.isNaN(parsedMaxPongDelayMs)
-        ? undefined
-        : parsedMaxPongDelayMs;
-    const parsedHeartbeatMaxDriftSeconds = Number.parseInt(
-        trimmedHeartbeatMaxDriftSeconds || "NaN",
-        10
-    );
-    const heartbeatMaxDriftSecondsValue = Number.isNaN(
-        parsedHeartbeatMaxDriftSeconds
-    )
-        ? undefined
-        : parsedHeartbeatMaxDriftSeconds;
-
-    const formData = {
-        baselineUrl: trimmedBaselineUrl || undefined,
-        bodyKeyword: safeTrim(bodyKeyword) || undefined,
-        certificateWarningDays: certificateWarningDays
-            ? Number.parseInt(certificateWarningDays, 10)
-            : undefined,
+    const formData: UnknownRecord = {
+        baselineUrl: toOptionalString(baselineUrl),
+        bodyKeyword: toOptionalString(bodyKeyword),
+        certificateWarningDays: parseOptionalInteger(certificateWarningDays),
         checkInterval,
-        edgeLocations: trimmedEdgeLocations || undefined,
-        expectedHeaderValue:
-            trimmedExpectedHeaderValue.length > 0
-                ? trimmedExpectedHeaderValue
-                : undefined,
-        expectedJsonValue:
-            trimmedExpectedJsonValue.length > 0
-                ? trimmedExpectedJsonValue
-                : undefined,
-        expectedStatusCode: expectedStatusCode
-            ? Number.parseInt(expectedStatusCode, 10)
-            : undefined,
-        expectedValue,
-        headerName:
-            trimmedHeaderName.length > 0 ? trimmedHeaderName : undefined,
-        heartbeatExpectedStatus:
-            trimmedHeartbeatExpectedStatus.length > 0
-                ? trimmedHeartbeatExpectedStatus
-                : undefined,
-        heartbeatMaxDriftSeconds: heartbeatMaxDriftSecondsValue,
-        heartbeatStatusField:
-            trimmedHeartbeatStatusField.length > 0
-                ? trimmedHeartbeatStatusField
-                : undefined,
-        heartbeatTimestampField:
-            trimmedHeartbeatTimestampField.length > 0
-                ? trimmedHeartbeatTimestampField
-                : undefined,
-        host,
-        jsonPath: trimmedJsonPath.length > 0 ? trimmedJsonPath : undefined,
-        maxPongDelayMs: maxPongDelayMsValue,
-        maxReplicationLagSeconds: maxReplicationLagSecondsValue,
-        maxResponseTime: maxResponseTimeValue,
-        port: port ? Number.parseInt(port, 10) : undefined,
-        primaryStatusUrl:
-            trimmedPrimaryStatusUrl.length > 0
-                ? trimmedPrimaryStatusUrl
-                : undefined,
-        recordType,
-        replicaStatusUrl:
-            trimmedReplicaStatusUrl.length > 0
-                ? trimmedReplicaStatusUrl
-                : undefined,
-        replicationTimestampField:
-            trimmedReplicationTimestampField.length > 0
-                ? trimmedReplicationTimestampField
-                : undefined,
+        edgeLocations: toOptionalString(edgeLocations),
+        expectedHeaderValue: toOptionalString(expectedHeaderValue),
+        expectedJsonValue: toOptionalString(expectedJsonValue),
+        expectedStatusCode: parseOptionalInteger(expectedStatusCode),
+        expectedValue: expectedValueForDns,
+        headerName: toOptionalString(headerName),
+        heartbeatExpectedStatus: toOptionalString(heartbeatExpectedStatus),
+        heartbeatMaxDriftSeconds: parseOptionalInteger(
+            heartbeatMaxDriftSeconds
+        ),
+        heartbeatStatusField: toOptionalString(heartbeatStatusField),
+        heartbeatTimestampField: toOptionalString(heartbeatTimestampField),
+        host: toOptionalString(host),
+        jsonPath: toOptionalString(jsonPath),
+        maxPongDelayMs: parseOptionalInteger(maxPongDelayMs),
+        maxReplicationLagSeconds: parseOptionalInteger(
+            maxReplicationLagSeconds
+        ),
+        maxResponseTime: parseOptionalInteger(maxResponseTime),
+        port: parseOptionalInteger(port),
+        primaryStatusUrl: toOptionalString(primaryStatusUrl),
+        recordType: trimmedRecordType || undefined,
+        replicaStatusUrl: toOptionalString(replicaStatusUrl),
+        replicationTimestampField: toOptionalString(replicationTimestampField),
     };
+
+    if (formData["expectedValue"] === undefined) {
+        delete formData["expectedValue"];
+    }
 
     const baseMonitor = createMonitorObject(monitorType, formData);
 
@@ -348,178 +432,13 @@ async function validateCheckInterval(
  */
 async function validateMonitorType(
     monitorType: MonitorType,
-    fields: {
-        baselineUrl: string;
-        bodyKeyword: string;
-        certificateWarningDays: string;
-        edgeLocations: string;
-        expectedHeaderValue: string;
-        expectedJsonValue: string;
-        expectedStatusCode: string;
-        expectedValue: string;
-        headerName: string;
-        heartbeatExpectedStatus: string;
-        heartbeatMaxDriftSeconds: string;
-        heartbeatStatusField: string;
-        heartbeatTimestampField: string;
-        host: string;
-        jsonPath: string;
-        maxPongDelayMs: string;
-        maxReplicationLagSeconds: string;
-        maxResponseTime: string;
-        port: string;
-        primaryStatusUrl: string;
-        recordType: string;
-        replicaStatusUrl: string;
-        replicationTimestampField: string;
-        url: string;
-    }
+    fields: MonitorValidationFields
 ): Promise<readonly string[]> {
-    const {
-        baselineUrl,
-        bodyKeyword,
-        certificateWarningDays,
-        edgeLocations,
-        expectedHeaderValue,
-        expectedJsonValue,
-        expectedStatusCode,
-        expectedValue,
-        headerName,
-        heartbeatExpectedStatus,
-        heartbeatMaxDriftSeconds,
-        heartbeatStatusField,
-        heartbeatTimestampField,
-        host,
-        jsonPath,
-        maxPongDelayMs,
-        maxReplicationLagSeconds,
-        maxResponseTime,
-        port,
-        primaryStatusUrl,
-        recordType,
-        replicaStatusUrl,
-        replicationTimestampField,
-        url,
-    } = fields;
-
-    // Build form data object with only the relevant fields
     const formData: UnknownRecord = {
         type: monitorType,
+        ...monitorValidationBuilders[monitorType](fields),
     };
 
-    // Add type-specific fields
-    switch (monitorType) {
-        case "cdn-edge-consistency": {
-            formData["baselineUrl"] = safeTrim(baselineUrl);
-            formData["edgeLocations"] = safeTrim(edgeLocations);
-            break;
-        }
-        case "dns": {
-            formData["host"] = safeTrim(host);
-            formData["recordType"] = safeTrim(recordType);
-            if (
-                safeTrim(recordType).toUpperCase() !== "ANY" &&
-                safeTrim(expectedValue)
-            ) {
-                formData["expectedValue"] = safeTrim(expectedValue);
-            }
-            break;
-        }
-        case "http": {
-            formData["url"] = safeTrim(url);
-            break;
-        }
-        case "http-header": {
-            formData["url"] = safeTrim(url);
-            formData["headerName"] = safeTrim(headerName);
-            formData["expectedHeaderValue"] = safeTrim(expectedHeaderValue);
-            break;
-        }
-        case "http-json": {
-            formData["url"] = safeTrim(url);
-            formData["jsonPath"] = safeTrim(jsonPath);
-            formData["expectedJsonValue"] = safeTrim(expectedJsonValue);
-            break;
-        }
-        case "http-keyword": {
-            formData["url"] = safeTrim(url);
-            formData["bodyKeyword"] = safeTrim(bodyKeyword);
-            break;
-        }
-        case "http-latency": {
-            formData["url"] = safeTrim(url);
-            formData["maxResponseTime"] = Number.parseInt(
-                safeTrim(maxResponseTime) || "NaN",
-                10
-            );
-            break;
-        }
-        case "http-status": {
-            formData["url"] = safeTrim(url);
-            formData["expectedStatusCode"] = Number.parseInt(
-                safeTrim(expectedStatusCode) || "NaN",
-                10
-            );
-            break;
-        }
-        case "ping": {
-            formData["host"] = safeTrim(host);
-            break;
-        }
-        case "port": {
-            formData["host"] = safeTrim(host);
-            formData["port"] = Number(port);
-            break;
-        }
-        case "replication": {
-            formData["primaryStatusUrl"] = safeTrim(primaryStatusUrl);
-            formData["replicaStatusUrl"] = safeTrim(replicaStatusUrl);
-            formData["replicationTimestampField"] = safeTrim(
-                replicationTimestampField
-            );
-            formData["maxReplicationLagSeconds"] = Number.parseInt(
-                safeTrim(maxReplicationLagSeconds) || "NaN",
-                10
-            );
-            break;
-        }
-        case "server-heartbeat": {
-            formData["url"] = safeTrim(url);
-            formData["heartbeatStatusField"] = safeTrim(heartbeatStatusField);
-            formData["heartbeatTimestampField"] = safeTrim(
-                heartbeatTimestampField
-            );
-            formData["heartbeatExpectedStatus"] = safeTrim(
-                heartbeatExpectedStatus
-            );
-            formData["heartbeatMaxDriftSeconds"] = Number.parseInt(
-                safeTrim(heartbeatMaxDriftSeconds) || "NaN",
-                10
-            );
-            break;
-        }
-        case "ssl": {
-            formData["host"] = safeTrim(host);
-            formData["port"] = Number(port);
-            formData["certificateWarningDays"] = Number(certificateWarningDays);
-            break;
-        }
-        case "websocket-keepalive": {
-            formData["url"] = safeTrim(url);
-            formData["maxPongDelayMs"] = Number.parseInt(
-                safeTrim(maxPongDelayMs) || "NaN",
-                10
-            );
-            break;
-        }
-        default: {
-            throw new Error(
-                `Unsupported monitor type: ${monitorType as string}`
-            );
-        }
-    }
-
-    // Use form validation that only validates provided fields
     const result = await validateMonitorFormData(monitorType, formData);
     return result.errors;
 }

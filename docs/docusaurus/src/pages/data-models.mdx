@@ -6,6 +6,8 @@ description: Database schema and data models for Uptime Watcher
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
 
+{/* eslint-enable no-unused-vars */}
+
 export default function DataModels() {
     return (
         <Layout
@@ -151,6 +153,33 @@ export default function DataModels() {
         +basicAuth?: BasicAuth
     }
 
+    class HttpStatusMonitorConfig {
+        +url: string
+        +expectedStatusCode: number
+    }
+
+    class HttpHeaderMonitorConfig {
+        +url: string
+        +headerName: string
+        +expectedHeaderValue: string
+    }
+
+    class HttpKeywordMonitorConfig {
+        +url: string
+        +bodyKeyword: string
+    }
+
+    class HttpJsonMonitorConfig {
+        +url: string
+        +jsonPath: string
+        +expectedJsonValue: string
+    }
+
+    class HttpLatencyMonitorConfig {
+        +url: string
+        +maxResponseTime: number
+    }
+
     class DnsMonitorConfig {
         +hostname: string
         +recordType: DnsRecordType
@@ -164,6 +193,7 @@ export default function DataModels() {
         +packetCount: number
         +packetSize: number
         +ipVersion: 4 | 6
+        +maxPacketLoss: number
     }
 
     class PortMonitorConfig {
@@ -172,6 +202,38 @@ export default function DataModels() {
         +protocol: 'tcp' | 'udp'
         +banner?: string
         +expectBanner?: boolean
+        +connectionTimeout: number
+    }
+
+    class SslMonitorConfig {
+        +host: string
+        +port: number
+        +certificateWarningDays: number
+    }
+
+    class CdnEdgeConsistencyMonitorConfig {
+        +baselineUrl: string
+        +edgeLocations: string
+    }
+
+    class ReplicationMonitorConfig {
+        +primaryStatusUrl: string
+        +replicaStatusUrl: string
+        +replicationTimestampField: string
+        +maxReplicationLagSeconds: number
+    }
+
+    class ServerHeartbeatMonitorConfig {
+        +url: string
+        +heartbeatStatusField: string
+        +heartbeatExpectedStatus: string
+        +heartbeatTimestampField: string
+        +heartbeatMaxDriftSeconds: number
+    }
+
+    class WebsocketKeepaliveMonitorConfig {
+        +url: string
+        +maxPongDelayMs: number
     }
 
     class BasicAuth {
@@ -189,9 +251,19 @@ export default function DataModels() {
     }
 
     MonitorConfig <|-- HttpMonitorConfig
+    MonitorConfig <|-- HttpStatusMonitorConfig
+    MonitorConfig <|-- HttpHeaderMonitorConfig
+    MonitorConfig <|-- HttpKeywordMonitorConfig
+    MonitorConfig <|-- HttpJsonMonitorConfig
+    MonitorConfig <|-- HttpLatencyMonitorConfig
     MonitorConfig <|-- DnsMonitorConfig
     MonitorConfig <|-- PingMonitorConfig
     MonitorConfig <|-- PortMonitorConfig
+    MonitorConfig <|-- SslMonitorConfig
+    MonitorConfig <|-- CdnEdgeConsistencyMonitorConfig
+    MonitorConfig <|-- ReplicationMonitorConfig
+    MonitorConfig <|-- ServerHeartbeatMonitorConfig
+    MonitorConfig <|-- WebsocketKeepaliveMonitorConfig
 
     HttpMonitorConfig *-- BasicAuth : contains
     MonitorConfig ..> MonitorResult : produces

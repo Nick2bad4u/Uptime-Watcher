@@ -6,6 +6,8 @@ description: Deployment architecture and infrastructure diagrams for Uptime Watc
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
 
+{/* eslint-enable no-unused-vars */}
+
 export default function DeploymentInfrastructure() {
   return (
     <Layout
@@ -42,6 +44,11 @@ This diagram shows the overall deployment architecture and components:
         APIs[API Endpoints]
         Servers[Servers & Services]
         DNSServices[DNS Services]
+        SSLCerts[SSL Certificates]
+        CDNEdges[CDN Edge Nodes]
+        Databases[Database Replicas]
+        Heartbeats[Heartbeat Endpoints]
+        WebSockets[WebSocket Connections]
     end
 
     subgraph "Distribution"
@@ -60,6 +67,11 @@ This diagram shows the overall deployment architecture and components:
     Desktop --> APIs
     Desktop --> Servers
     Desktop --> DNSServices
+    Desktop --> SSLCerts
+    Desktop --> CDNEdges
+    Desktop --> Databases
+    Desktop --> Heartbeats
+    Desktop --> WebSockets
 
     Desktop --> AutoUpdater
     AutoUpdater --> GitHub
@@ -73,7 +85,7 @@ This diagram shows the overall deployment architecture and components:
 
     class Desktop,LocalDB,Config client
     class CloudSync,BackupStorage,Analytics cloud
-    class WebSites,APIs,Servers,DNSServices monitored
+    class WebSites,APIs,Servers,DNSServices,SSLCerts,CDNEdges,Databases,Heartbeats,WebSockets monitored
     class GitHub,AutoUpdater,CDN distribution`} />
 
 ## Build and Release Pipeline
@@ -186,6 +198,11 @@ This diagram shows how Uptime Watcher can be integrated into a larger monitoring
         Databases[Databases]
         LoadBalancers[Load Balancers]
         CDNs[CDN Services]
+        SSLEndpoints[SSL/TLS Endpoints]
+        DNSServers[DNS Servers]
+        ReplicationSources[Replication Sources]
+        HeartbeatServices[Heartbeat Services]
+        WebSocketServers[WebSocket Servers]
     end
 
     subgraph "Alerting & Notifications"
@@ -217,6 +234,11 @@ This diagram shows how Uptime Watcher can be integrated into a larger monitoring
     UW --> Databases
     UW --> LoadBalancers
     UW --> CDNs
+    UW --> SSLEndpoints
+    UW --> DNSServers
+    UW --> ReplicationSources
+    UW --> HeartbeatServices
+    UW --> WebSocketServers
 
     WebServers --> NodeExporter
     Databases --> AppMetrics
@@ -238,7 +260,7 @@ This diagram shows how Uptime Watcher can be integrated into a larger monitoring
     class UW,UWDB,UWConfig uptimeWatcher
     class Prometheus,Grafana,AlertManager,NodeExporter,AppMetrics,CustomMetrics monitoring
     class LogAggregator,ElasticSearch,Kibana logging
-    class WebServers,Databases,LoadBalancers,CDNs infrastructure
+    class WebServers,Databases,LoadBalancers,CDNs,SSLEndpoints,DNSServers,ReplicationSources,HeartbeatServices,WebSocketServers infrastructure
     class Email,Slack,PagerDuty,Webhooks alerting`} />
 
 ## Security Architecture

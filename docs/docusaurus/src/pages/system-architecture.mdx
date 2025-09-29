@@ -6,6 +6,8 @@ description: Comprehensive system architecture and component relationships
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
 
+{/* eslint-enable no-unused-vars */}
+
 export default function SystemArchitecture() {
     return (
         <Layout
@@ -37,7 +39,7 @@ export default function SystemArchitecture() {
     Services[Service Container<br/>Dependency Injection]
 
     %% Core Services
-    Monitor[Monitor Manager<br/>HTTP/DNS/Ping/Port]
+    Monitor[Monitor Manager<br/>Dynamic Registry (HTTP • DNS • SSL • Ping • Port • CDN • Replication • Heartbeat • WebSocket)]
     Site[Site Manager<br/>CRUD Operations]
     Config[Configuration Manager<br/>Settings & Preferences]
     DB[Database Manager<br/>SQLite Operations]
@@ -132,68 +134,64 @@ export default function SystemArchitecture() {
                         This diagram shows the different types of monitors and their relationships:
 
                         <Mermaid value={`classDiagram
-    class BaseMonitor {
-        <<abstract>>
-        +id: string
-        +name: string
-        +url: string
-        +interval: number
-        +timeout: number
-        +monitor(): Promise~MonitorResult~
-        +validate(): boolean
+    class MonitorTypeRegistry {
+        +registerMonitorType(config: BaseMonitorConfig): void
+        +getMonitorServiceFactory(type: string): () => IMonitorService
+        +getAllMonitorTypeConfigs(): BaseMonitorConfig[]
     }
 
-    class HttpMonitor {
-        +method: HttpMethod
-        +headers: Record~string, string~
-        +expectedStatus: number[]
-        +followRedirects: boolean
-        +monitor(): Promise~MonitorResult~
+    class BaseMonitorConfig {
+        +type: string
+        +displayName: string
+        +fields: MonitorFieldDefinition[]
+        +serviceFactory(): IMonitorService
     }
 
-    class DnsMonitor {
-        +recordType: DnsRecordType
-        +expectedValue: string
-        +dnsServer: string
-        +monitor(): Promise~MonitorResult~
+    class IMonitorService {
+        <<interface>>
+        +getType(): MonitorType
+        +updateConfig(config: Partial<MonitorConfig>): void
+        +check(monitor: Monitor, signal?: AbortSignal): Promise<MonitorCheckResult>
     }
 
-    class PingMonitor {
-        +packetCount: number
-        +packetSize: number
-        +monitor(): Promise~MonitorResult~
+    class MonitorManager {
+        +performMonitorCheck(monitor: Monitor): Promise<void>
+        +executeMonitorCheck(monitor: Monitor): Promise<MonitorCheckResult>
     }
 
-    class PortMonitor {
-        +port: number
-        +protocol: 'tcp' | 'udp'
-        +monitor(): Promise~MonitorResult~
-    }
+    class HttpMonitor
+    class HttpHeaderMonitor
+    class HttpKeywordMonitor
+    class HttpJsonMonitor
+    class HttpStatusMonitor
+    class HttpLatencyMonitor
+    class PingMonitor
+    class PortMonitor
+    class DnsMonitor
+    class SslMonitor
+    class CdnEdgeConsistencyMonitor
+    class ReplicationMonitor
+    class ServerHeartbeatMonitor
+    class WebsocketKeepaliveMonitor
 
-    class MonitorResult {
-        +status: 'up' | 'down'
-        +responseTime: number
-        +timestamp: Date
-        +details: string
-        +error?: Error
-    }
+    IMonitorService <|.. HttpMonitor
+    IMonitorService <|.. HttpHeaderMonitor
+    IMonitorService <|.. HttpKeywordMonitor
+    IMonitorService <|.. HttpJsonMonitor
+    IMonitorService <|.. HttpStatusMonitor
+    IMonitorService <|.. HttpLatencyMonitor
+    IMonitorService <|.. PingMonitor
+    IMonitorService <|.. PortMonitor
+    IMonitorService <|.. DnsMonitor
+    IMonitorService <|.. SslMonitor
+    IMonitorService <|.. CdnEdgeConsistencyMonitor
+    IMonitorService <|.. ReplicationMonitor
+    IMonitorService <|.. ServerHeartbeatMonitor
+    IMonitorService <|.. WebsocketKeepaliveMonitor
 
-    BaseMonitor <|-- HttpMonitor
-    BaseMonitor <|-- DnsMonitor
-    BaseMonitor <|-- PingMonitor
-    BaseMonitor <|-- PortMonitor
-
-    HttpMonitor ..> MonitorResult : returns
-    DnsMonitor ..> MonitorResult : returns
-    PingMonitor ..> MonitorResult : returns
-    PortMonitor ..> MonitorResult : returns
-
-    class MonitorFactory {
-        +createMonitor(type, config): BaseMonitor
-        +getAvailableTypes(): string[]
-    }
-
-    MonitorFactory ..> BaseMonitor : creates`} />
+    MonitorTypeRegistry --> BaseMonitorConfig
+    MonitorTypeRegistry --> IMonitorService
+    MonitorManager --> MonitorTypeRegistry`} />
 
                         ## State Management Architecture
 
@@ -356,7 +354,7 @@ export default function SystemArchitecture() {
 
                         The React shell in `src/App.tsx` wraps the application with error handling and theme context before rendering the header, dashboard, overlays, and modal surfaces. The diagram below maps the concrete components sourced from `src/components/**` so new contributors can trace the composition quickly.
 
-                        
+
 <Mermaid value={`flowchart LR
     %% Application shell composition
     subgraph Shell["App.tsx Composition"]
@@ -453,7 +451,7 @@ export default function SystemArchitecture() {
 
                         UI components consume shared Zustand stores and renderer services instead of talking to Electron directly. This view shows which surfaces subscribe to each store and which services bridge to `electronAPI` IPC channels, based on hooks in `src/hooks/site` and the store modules under `src/stores/**`.
 
-                        
+
 <Mermaid value={`flowchart LR
     subgraph UI["UI Components"]
         Header[Header]

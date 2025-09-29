@@ -112,7 +112,7 @@ Run the shared unit tests before moving on: `npm run test:shared`.
 
 1. Create the service class
    - Add `electron/services/monitoring/<NewMonitor>.ts` implementing `IMonitorService` from `electron/services/monitoring/types.ts`.
-   - Reuse helpers like `validateMonitorHostAndPort` and `extractMonitorConfig` from `electron/services/monitoring/shared/monitorServiceHelpers.ts`, and wrap retries with `withOperationalHooks` from `electron/utils/operationalHooks.ts` to match shared behaviour.
+   - Reuse helpers like `validateMonitorHostAndPort` and `extractMonitorConfig` from `electron/services/monitoring/shared/monitorServiceHelpers.ts`, and wrap retries with `withOperationalHooks` from `electron/utils/operationalHooks.ts` to match shared behaviour. When you do, pick an explicit `failureLogLevel` that reflects whether failures are expected to represent external downtime (`warn` is usually right) or internal faults (keep the default `error`).
 2. Write unit tests
    - Mirror `electron/test/services/monitoring/SslMonitor.test.ts`. Cover success, degraded thresholds, failure states, timeouts, and invalid configurations.
 3. Register the monitor type
@@ -264,7 +264,7 @@ registerMonitorType({
    showUrl: false,
   },
   formatDetail: (details) => `Details: ${details}`,
-  formatTitleSuffix: (monitor) => monitor.host ? ` (${monitor.host})` : "",
+  formatTitleSuffix: (monitor) => (monitor.host ? ` (${monitor.host})` : ""),
   supportsResponseTime: true,
  },
  validationSchema: monitorSchemas.newMonitor,

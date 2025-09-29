@@ -6,6 +6,8 @@ description: Detailed monitoring workflows and processes for Uptime Watcher
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
 
+{/* eslint-enable no-unused-vars */}
+
 export default function MonitoringWorkflows() {
   return (
     <Layout
@@ -70,38 +72,52 @@ This flowchart shows the complete lifecycle of monitoring a site from creation t
 This diagram helps users choose the appropriate monitor type for their needs:
 
 <Mermaid value={`flowchart TD
-    Start([What do you want to monitor?]) --> Type{Type of Resource}
+    Start([What do you want to monitor?]) --> Target{Primary target}
 
-    Type -->|Website/API| Web[Web Resource]
-    Type -->|Server/Service| Server[Server Resource]
-    Type -->|Domain/DNS| DNS[DNS Resource]
+    Target -->|Website or API| Web[Web Property]
+    Target -->|Network / Infrastructure| Infra[Infrastructure Service]
+    Target -->|Domains & Edge| Domain[Domain / CDN]
+    Target -->|Data Pipelines| Data[Data Pipeline]
+    Target -->|Realtime Channel| Realtime[Realtime Channel]
 
-    Web --> WebType{What aspect?}
-    WebType -->|Availability| HTTP[HTTP Monitor]
-    WebType -->|Response Content| HTTPContent[HTTP with Content Check]
-    WebType -->|API Endpoints| API[API Monitor]
+    Web --> WebAspect{Key signal}
+    WebAspect -->|Availability & latency| HttpGeneral[HTTP (Website/API)]
+    WebAspect -->|Exact status code| HttpStatus[HTTP Status Code]
+    WebAspect -->|Header value| HttpHeader[HTTP Header Match]
+    WebAspect -->|Body keyword| HttpKeyword[HTTP Keyword Match]
+    WebAspect -->|JSON field| HttpJson[HTTP JSON Match]
+    WebAspect -->|Latency budget| HttpLatency[HTTP Latency Threshold]
+    WebAspect -->|Heartbeat payload| Heartbeat[Server Heartbeat]
 
-    Server --> ServerType{What service?}
-    ServerType -->|Network Connectivity| Ping[Ping Monitor]
-    ServerType -->|Specific Port| Port[Port Monitor]
-    ServerType -->|Multiple Services| Multi[Multiple Monitors]
+    Infra --> InfraAspect{Protocol}
+    InfraAspect -->|ICMP reachability| Ping[Ping (Host)]
+    InfraAspect -->|TCP connectivity| Port[Port (Host/Port)]
+    InfraAspect -->|TLS certificate| Ssl[SSL Certificate]
 
-    DNS --> DNSType{What to check?}
-    DNSType -->|Domain Resolution| DNSBasic[Basic DNS Monitor]
-    DNSType -->|Specific Records| DNSRecord[DNS Record Monitor]
-    DNSType -->|DNS Server| DNSServer[DNS Server Monitor]
+    Domain --> DomainAspect{Focus}
+    DomainAspect -->|DNS resolution| Dns[DNS (Domain Resolution)]
+    DomainAspect -->|Edge drift| Cdn[CDN Edge Consistency]
 
-    HTTP --> HTTPConfig[Configure:<br/>• URL<br/>• Method<br/>• Expected Status<br/>• Headers]
-    HTTPContent --> ContentConfig[Configure:<br/>• URL<br/>• Expected Content<br/>• Regex Patterns<br/>• Response Validation]
-    API --> APIConfig[Configure:<br/>• Endpoint<br/>• Authentication<br/>• Payload<br/>• Response Schema]
+    Data --> DataAspect{Concern}
+    DataAspect -->|Replication freshness| Replication[Replication Lag]
 
-    Ping --> PingConfig[Configure:<br/>• Host/IP<br/>• Packet Count<br/>• Timeout<br/>• Interval]
-    Port --> PortConfig[Configure:<br/>• Host/IP<br/>• Port Number<br/>• Protocol (TCP/UDP)<br/>• Timeout]
-    Multi --> MultiConfig[Configure:<br/>• Multiple Monitor Types<br/>• Dependency Rules<br/>• Grouping Logic]
+    Realtime --> RealtimeAspect{Channel}
+    RealtimeAspect -->|WebSocket keepalive| Websocket[WebSocket Keepalive]
 
-    DNSBasic --> DNSBasicConfig[Configure:<br/>• Domain Name<br/>• Expected IP<br/>• DNS Server<br/>• Timeout]
-    DNSRecord --> DNSRecordConfig[Configure:<br/>• Domain<br/>• Record Type<br/>• Expected Value<br/>• DNS Server]
-    DNSServer --> DNSServerConfig[Configure:<br/>• DNS Server IP<br/>• Test Queries<br/>• Response Time<br/>• Uptime Threshold]
+    HttpGeneral --> HttpGeneralConfig[Configure:<br/>• URL<br/>• Method<br/>• Retry policy]
+    HttpStatus --> HttpStatusConfig[Configure:<br/>• URL<br/>• Expected status]
+    HttpHeader --> HttpHeaderConfig[Configure:<br/>• URL<br/>• Header name<br/>• Expected value]
+    HttpKeyword --> HttpKeywordConfig[Configure:<br/>• URL<br/>• Keyword]
+    HttpJson --> HttpJsonConfig[Configure:<br/>• URL<br/>• JSON path<br/>• Expected value]
+    HttpLatency --> HttpLatencyConfig[Configure:<br/>• URL<br/>• Max response time]
+    Heartbeat --> HeartbeatConfig[Configure:<br/>• URL<br/>• Status path<br/>• Timestamp path<br/>• Expected status]
+    Ping --> PingConfig[Configure:<br/>• Host/IP<br/>• Packet count<br/>• Thresholds]
+    Port --> PortConfig[Configure:<br/>• Host/IP<br/>• Port<br/>• TLS option]
+    Ssl --> SslConfig[Configure:<br/>• Host<br/>• Port<br/>• Warning window]
+    Dns --> DnsConfig[Configure:<br/>• Domain<br/>• Record type<br/>• Expected value]
+    Cdn --> CdnConfig[Configure:<br/>• Baseline URL<br/>• Edge URLs]
+    Replication --> ReplicationConfig[Configure:<br/>• Primary URL<br/>• Replica URL<br/>• Timestamp field<br/>• Max lag]
+    Websocket --> WebsocketConfig[Configure:<br/>• ws:// or wss:// URL<br/>• Max pong delay]
 
     %% Styling
     classDef startNode fill:#e1f5fe,stroke:#0277bd,color:#000000
@@ -110,9 +126,9 @@ This diagram helps users choose the appropriate monitor type for their needs:
     classDef config fill:#f3e5f5,stroke:#7b1fa2,color:#000000
 
     class Start startNode
-    class Type,WebType,ServerType,DNSType decision
-    class Web,Server,DNS,HTTP,HTTPContent,API,Ping,Port,Multi,DNSBasic,DNSRecord,DNSServer monitorType
-    class HTTPConfig,ContentConfig,APIConfig,PingConfig,PortConfig,MultiConfig,DNSBasicConfig,DNSRecordConfig,DNSServerConfig config`} />
+    class Target,WebAspect,InfraAspect,DomainAspect,DataAspect,RealtimeAspect decision
+    class Web,Infra,Domain,Data,Realtime,HttpGeneral,HttpStatus,HttpHeader,HttpKeyword,HttpJson,HttpLatency,Heartbeat,Ping,Port,Ssl,Dns,Cdn,Replication,Websocket monitorType
+    class HttpGeneralConfig,HttpStatusConfig,HttpHeaderConfig,HttpKeywordConfig,HttpJsonConfig,HttpLatencyConfig,HeartbeatConfig,PingConfig,PortConfig,SslConfig,DnsConfig,CdnConfig,ReplicationConfig,WebsocketConfig config`} />
 
 ## Error Handling and Recovery Flow
 

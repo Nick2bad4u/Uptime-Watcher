@@ -13,12 +13,12 @@ import {
     useCallback,
 } from "react";
 
+import { ThemedSelect } from "../../../../theme/components/ThemedSelect";
 import {
     getMonitorDisplayIdentifier,
     getMonitorTypeDisplayLabel,
 } from "../../../../utils/fallbacks";
 import { formatTitleSuffix } from "../../../../utils/monitorTitleFormatters";
-import { ThemedSelect } from "../../../../theme/components/ThemedSelect";
 
 /**
  * Props for the MonitorSelector component.

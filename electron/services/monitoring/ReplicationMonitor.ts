@@ -187,7 +187,7 @@ export class ReplicationMonitor implements IMonitorService {
                         const normalizedParseError = ensureError(parseError);
                         throw new Error(
                             `Invalid JSON response from ${url}: ${normalizedParseError.message}`,
-                            { cause: normalizedParseError }
+                            { cause: parseError }
                         );
                     }
                 }
@@ -201,7 +201,7 @@ export class ReplicationMonitor implements IMonitorService {
             const normalizedFetchError = ensureError(fetchError);
             throw new Error(
                 `Failed to fetch ${url}: ${normalizedFetchError.message}`,
-                { cause: normalizedFetchError }
+                { cause: fetchError }
             );
         }
     }
@@ -248,7 +248,10 @@ export class ReplicationMonitor implements IMonitorService {
     }
 
     private resolveLagThreshold(monitor: Site["monitors"][0]): number {
-        const monitorValue = Reflect.get(monitor, "maxReplicationLagSeconds");
+        const monitorValue = Reflect.get(
+            monitor,
+            "maxReplicationLagSeconds"
+        ) as unknown;
         if (
             typeof monitorValue === "number" &&
             Number.isFinite(monitorValue) &&
@@ -261,7 +264,7 @@ export class ReplicationMonitor implements IMonitorService {
             const candidate = Reflect.get(
                 this.config,
                 "maxReplicationLagSeconds"
-            );
+            ) as unknown;
             if (
                 typeof candidate === "number" &&
                 Number.isFinite(candidate) &&

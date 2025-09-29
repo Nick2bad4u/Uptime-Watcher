@@ -59,18 +59,18 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 
 <div align="center">
 
-| 🌐 <strong>Multi-Protocol Monitoring</strong> | 📊 <strong>Real-Time Analytics</strong> | 🔔 <strong>Smart Notifications</strong> |
-| --------------------------------------------- | --------------------------------------- | --------------------------------------- |
-| HTTP/HTTPS websites &amp; APIs                | Live status updates                     | Desktop alerts for outages              |
-| TCP port connectivity                         | Response time tracking                  | Sound notifications                     |
-| ICMP ping monitoring                          | Historical data visualization           | Custom alert thresholds                 |
-| DNS record validation                         | Performance metrics                     | Status change detection                 |
+| 🌐 <strong>Multi-Protocol Monitoring</strong>          | 📊 <strong>Real-Time Analytics</strong> | 🔔 <strong>Smart Notifications</strong> |
+| ------------------------------------------------------ | --------------------------------------- | --------------------------------------- |
+| 14 monitor types: HTTP family (6 variants)             | Live status updates                     | Desktop alerts for outages              |
+| Transport: TCP ports, ICMP ping                        | Response time tracking                  | Sound notifications                     |
+| Network services: DNS resolution, SSL certificates     | Historical data visualization           | Custom alert thresholds                 |
+| Advanced: CDN drift, replication lag, WebSocket health | Performance metrics                     | Status change detection                 |
 
 </div>
 
 ## Core capabilities
 
-- **🎯 Multi-Service Monitoring**: Supports HTTP/HTTPS, TCP ports, ICMP ping, and DNS monitoring
+- **🎯 Multi-Service Monitoring**: Fourteen built-in monitor types covering HTTP variants (status, headers, JSON fields, keywords, latency), DNS, SSL certificates, TCP ports, ICMP ping, CDN edge drift, replication lag, heartbeat endpoints, and WebSocket keepalive health
 - **⚡ Real-Time Updates**: Live status changes with sub-second responsiveness
 - **📈 Performance Analytics**: Response time tracking with trend analysis
 - **📜 Historical Data**: Comprehensive uptime history with SQLite storage
@@ -79,12 +79,22 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 
 ## Monitor types
 
-| Type           | Purpose                   | Features                                                                              |
-| -------------- | ------------------------- | ------------------------------------------------------------------------------------- |
-| **HTTP/HTTPS** | Website & API monitoring  | Status codes, redirects, custom headers, SSL validation                               |
-| **TCP Port**   | Port connectivity testing | Socket connection validation, timeout handling                                        |
-| **ICMP Ping**  | Network reachability      | Packet loss monitoring, latency measurement                                           |
-| **DNS**        | DNS resolution monitoring | Support for A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR, NAPTR, SOA, TLSA, ANY records |
+| Category           | Monitor                     | Primary objective                              | Highlights                                                                 |
+| ------------------ | --------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------- |
+| HTTP Availability  | **HTTP (Website/API)**      | Measure general availability and response time | Handles redirects, captures response code, records latency                 |
+| HTTP Validation    | **HTTP Status Code**        | Enforce an exact response status               | Marks monitor degraded/down when status deviates from expectation          |
+| HTTP Content       | **HTTP Header Match**       | Validate specific response headers             | Case-insensitive comparisons with retry-aware checks                       |
+| HTTP Content       | **HTTP Keyword Match**      | Ensure body contains a keyword                 | Case-insensitive substring search for rapid regressions                    |
+| HTTP Content       | **HTTP JSON Match**         | Inspect JSON payload fields                    | JSON path extraction with typed comparison                                 |
+| HTTP Performance   | **HTTP Latency Threshold**  | Detect slow responses                          | Flags degraded when latency exceeds configured threshold                   |
+| Transport          | **Port (Host/Port)**        | Verify TCP connectivity                        | Connection handshake timing with configurable ports                        |
+| Transport          | **Ping (Host)**             | Check reachability                             | ICMP ping with latency sampling and packet loss handling                   |
+| Network Services   | **DNS (Domain Resolution)** | Resolve DNS records                            | Supports A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR, NAPTR, SOA, TLSA, ANY |
+| Security           | **SSL Certificate**         | Track TLS validity                             | Warns on expiry windows and handshake anomalies                            |
+| Edge Delivery      | **CDN Edge Consistency**    | Compare edge vs origin responses               | Detects drift in status/content across edge nodes                          |
+| Data Platforms     | **Replication Lag**         | Monitor replica freshness                      | Compares timestamps between primary and replica endpoints                  |
+| Application Health | **Server Heartbeat**        | Validate custom heartbeat payloads             | Status/timestamp drift analysis with JSON path extraction                  |
+| Realtime Channels  | **WebSocket Keepalive**     | Ensure WebSocket responsiveness                | Ping/pong watchdog for stalled connections                                 |
 
 ## 🛠️ Technology stack
 
@@ -168,10 +178,10 @@ npm run electron-dev
 
 ### Key interface components:
 
-- 📊 <strong>Main Dashboard</strong>: Real-time monitoring overview with service status
-- ⚙️ <strong>Monitor Configuration</strong>: Easy setup for HTTP, TCP, DNS, and ping monitoring
-- 📈 <strong>Historical Analytics</strong>: Response time graphs and uptime statistics
-- 🔔 <strong>Notification System</strong>: Customizable desktop alerts for status changes
+- 📊 <strong>Main Dashboard</strong>: Real-time monitoring overview with service status across all 14 monitor types
+- ⚙️ <strong>Monitor Configuration</strong>: Easy setup for HTTP variants, TCP ports, DNS, ping, SSL certificates, CDN edge checks, replication lag, heartbeat validation, and WebSocket keepalive
+- 📈 <strong>Historical Analytics</strong>: Response time graphs and uptime statistics for every monitored endpoint
+- 🔔 <strong>Notification System</strong>: Customizable desktop alerts for status changes across all monitor types
 
 </div>
 
@@ -208,7 +218,7 @@ npm run dist
 | <strong>npm</strong>     | 11.5.2+ (included with Node.js) | <a href="https://www.npmjs.com/">Docs</a>   |
 | <strong>Git</strong>     | Latest version                  | <a href="https://git-scm.com/">Download</a> |
 
-&gt; <strong>💡 Tip</strong>: Check out the <a href="./docs/Guides/DEVELOPER-QUICK-START.md">Developer Quick Start Guide</a> for detailed setup instructions and architecture overview.
+&gt; <strong>💡 Tip</strong>: Check out the <a href="./docs/Guides/DEVELOPER_QUICK_START.md">Developer Quick Start Guide</a> for detailed setup instructions and architecture overview.
 
 </div>
 
@@ -222,7 +232,7 @@ For practical guidance on configuring monitors and writing tests, see our compre
 
 For running and tuning our fast-check based fuzzing suites, see:
 
-- Fast-Check Fuzzing Coverage Guide → [docs/Testing/FAST-CHECK-FUZZING-GUIDE.md](./docs/Testing/FAST-CHECK-FUZZING-GUIDE.md)
+- Fast-Check Fuzzing Coverage Guide → [docs/Testing/FAST_CHECK_FUZZING_GUIDE.md](./docs/Testing/FAST_CHECK_FUZZING_GUIDE.md)
 
 ### End-to-end testing with Playwright
 
@@ -268,8 +278,8 @@ flowchart LR
     end
     subgraph Integrations['Infrastructure & Services']
         direction TB
-        Monitors['Protocol Workers
-HTTP/TCP/DNS/Ping']
+  Monitors['Protocol Workers
+HTTP Family • DNS • SSL • Ping • Port • CDN • Replication • Heartbeat • WebSocket']
         Alerts['Notification Engine']
     end
 

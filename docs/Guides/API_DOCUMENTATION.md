@@ -676,37 +676,44 @@ interface HistoryEntry {
 
 ### Monitor Type Configurations
 
-#### HTTP Monitor
+Every monitor configuration extends `BaseMonitorConfig` and adds type-specific fields. The full set of interfaces lives in [`shared/types/monitorConfig.ts`](../../shared/types/monitorConfig.ts) and is surfaced to both the Electron backend and the renderer through IPC.
 
 ```typescript
-interface HttpMonitorConfig {
- method: "GET" | "POST" | "PUT" | "DELETE" | "HEAD";
- headers?: Record<string, string>;
- body?: string;
- expectedStatusCode?: number;
- expectedContent?: string;
- followRedirects: boolean;
- sslCheck: boolean;
-}
+type MonitorConfig =
+ | HttpMonitorConfig
+ | HttpStatusMonitorConfig
+ | HttpHeaderMonitorConfig
+ | HttpKeywordMonitorConfig
+ | HttpJsonMonitorConfig
+ | HttpLatencyMonitorConfig
+ | PingMonitorConfig
+ | PortMonitorConfig
+ | DnsMonitorConfig
+ | SslMonitorConfig
+ | CdnEdgeConsistencyMonitorConfig
+ | ReplicationMonitorConfig
+ | ServerHeartbeatMonitorConfig
+ | WebsocketKeepaliveMonitorConfig;
 ```
 
-#### Port Monitor
+| Monitor type (`type` field) | Configuration interface           | Key fields                                                                                                      |
+| --------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `http`                      | `HttpMonitorConfig`               | `url`, `method`, `expectedStatusCodes`, optional `auth`/`headers`/`requestBody`                                 |
+| `http-status`               | `HttpStatusMonitorConfig`         | `url`, `expectedStatusCode`                                                                                     |
+| `http-header`               | `HttpHeaderMonitorConfig`         | `url`, `headerName`, `expectedHeaderValue`                                                                      |
+| `http-keyword`              | `HttpKeywordMonitorConfig`        | `url`, `bodyKeyword`                                                                                            |
+| `http-json`                 | `HttpJsonMonitorConfig`           | `url`, `jsonPath`, `expectedJsonValue`                                                                          |
+| `http-latency`              | `HttpLatencyMonitorConfig`        | `url`, `maxResponseTime`                                                                                        |
+| `ping`                      | `PingMonitorConfig`               | `host`, `packetCount`, `packetSize`, optional `maxPacketLoss`                                                   |
+| `port`                      | `PortMonitorConfig`               | `host`, `port`, optional `protocol.expectedResponse`/`useTls`                                                   |
+| `dns`                       | `Monitor` domain fields           | `host`, `recordType`, optional `expectedValue`                                                                  |
+| `ssl`                       | `SslMonitorConfig`                | `host`, `port`, `certificateWarningDays`                                                                        |
+| `cdn-edge-consistency`      | `CdnEdgeConsistencyMonitorConfig` | `baselineUrl`, `edgeLocations` (newline or comma separated list)                                                |
+| `replication`               | `ReplicationMonitorConfig`        | `primaryStatusUrl`, `replicaStatusUrl`, `replicationTimestampField`, `maxReplicationLagSeconds`                 |
+| `server-heartbeat`          | `ServerHeartbeatMonitorConfig`    | `url`, `heartbeatStatusField`, `heartbeatExpectedStatus`, `heartbeatTimestampField`, `heartbeatMaxDriftSeconds` |
+| `websocket-keepalive`       | `WebsocketKeepaliveMonitorConfig` | `url`, `maxPongDelayMs`                                                                                         |
 
-```typescript
-interface PortMonitorConfig {
- port: number;
- host?: string; // defaults to site URL hostname
-}
-```
-
-#### Ping Monitor
-
-```typescript
-interface PingMonitorConfig {
- packetSize: number;
- packetCount: number;
-}
-```
+All configuration interfaces also inherit scheduling, retry, and timeout controls from `BaseMonitorConfig`, ensuring consistent behaviour across the monitoring pipeline.
 
 ## 🛠️ Error Handling
 

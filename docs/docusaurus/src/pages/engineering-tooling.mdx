@@ -1,13 +1,12 @@
-***
-
+---
 title: Engineering Tooling Pipelines
-description: Detailed diagrams for linting, type-checking, documentation, and site builds
------------------------------------------------------------------------------------------
-
+description: Diagrams for linting, type-checking, documentation, and site builds
+---
 {/* eslint-disable no-unused-vars -- JSX imports used in components */}
-
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
+
+{/* eslint-enable no-unused-vars */}
 
 export default function EngineeringTooling() {
   return (
@@ -123,11 +122,9 @@ This topology shows how `package.json` scripts fan out into ESLint, Stylelint, P
     class lint,lintAll,lintCI,lintQuick,lintPrettier,lintPrettierFix,lintCSS,lintCSSDocs,lintRemark,lintRemarkFix,lintMadge,lintAction,lintCommit,lintComplexity,lintKnip,lintDepcheck cli
     class ESLintRunner,StylelintRunner,PrettierRunner,RemarkRunner,Madge,Actionlint,Commitlint,Complexity,Knip,Depcheck,Yamllint,Grype runner
     class ESLintConfig,ESLintCache,StylelintConfig,StylelintDocsConfig,StylelintCache,PrettierConfig,PrettierCache,RemarkConfig config
-`} />
+` } />
 
-## Type-Checking Project Map
-
-Type-checking scripts run multiple `tsc --build` projects in `config/testing`, ensuring each layer (frontend, Electron, shared, Playwright, Storybook) compiles with its own `tsconfig`. The diagram shows how meta-scripts chain them, and which caches/assets are produced.
+With these diagrams you can quickly trace the exact scripts and configuration files responsible for quality gates, documentation output, and the Docusaurus website lifecycle. Keep them handy when extending tooling or triaging CI issues.
 
 <Mermaid value={`graph TD
     subgraph Scripts["Type-check scripts"]

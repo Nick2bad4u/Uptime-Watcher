@@ -14,7 +14,64 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { HttpMonitor } from "../../../services/monitoring/HttpMonitor";
 import type { Site } from "../../../../shared/types";
 
-describe("HTTP Monitor - httpbin.org Integration Tests", () => {
+const HTTPBIN_PROBE_URL = "https://httpbin.org/status/204";
+const HTTPBIN_PROBE_TIMEOUT_MS = 4000;
+
+let httpbinAvailable = true;
+let httpbinProbeError: unknown;
+
+if (typeof fetch === "function") {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(
+        () => controller.abort(),
+        HTTPBIN_PROBE_TIMEOUT_MS
+    );
+
+    try {
+        await fetch(HTTPBIN_PROBE_URL, {
+            method: "GET",
+            redirect: "manual",
+            signal: controller.signal,
+        });
+    } catch (probeError) {
+        httpbinAvailable = false;
+        httpbinProbeError = probeError;
+    } finally {
+        clearTimeout(timeoutId);
+    }
+} else {
+    httpbinAvailable = false;
+    httpbinProbeError = new Error("global fetch API is unavailable");
+}
+
+if (!httpbinAvailable) {
+    const reason =
+        httpbinProbeError instanceof Error
+            ? httpbinProbeError.message
+            : "unknown probe failure";
+    console.warn(`[httpbin] Skipping httpbin.org integration tests: ${reason}`);
+}
+
+const describeHttpbin = httpbinAvailable ? describe : describe.skip;
+
+const createHttpMonitor = (
+    url: string,
+    overrides: Partial<Site["monitors"][0]> = {}
+): Site["monitors"][0] => ({
+    checkInterval: 60_000,
+    history: [],
+    id: `test-${Math.random().toString(36).slice(2)}`,
+    monitoring: true,
+    responseTime: 0,
+    retryAttempts: 0,
+    status: "pending",
+    timeout: 10_000,
+    type: "http",
+    url,
+    ...overrides,
+});
+
+describeHttpbin("HTTP Monitor - httpbin.org Integration Tests", () => {
     let httpMonitor: HttpMonitor;
 
     // Some runs against httpbin.org can be impacted by upstream/CDN outages.
@@ -121,18 +178,7 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                 await annotate("Category: Integration", "category");
                 await annotate("Type: HTTP Monitoring", "type");
 
-                const monitor: Site["monitors"][0] = {
-                    id: `test-${Date.now()}`,
-                    type: "http",
-                    url,
-                    status: "pending",
-                    checkInterval: 60_000,
-                    history: [],
-                    monitoring: true,
-                    responseTime: 0,
-                    retryAttempts: 3,
-                    timeout: 10_000,
-                };
+                const monitor = createHttpMonitor(url);
 
                 const result = await checkWithTransientRetry(
                     monitor,
@@ -162,18 +208,7 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
             await annotate("Category: Integration", "category");
             await annotate("Type: Content Negotiation", "type");
 
-            const monitor: Site["monitors"][0] = {
-                id: `test-image-${Date.now()}`,
-                type: "http",
-                url: "https://httpbin.org/image",
-                status: "pending",
-                checkInterval: 60_000,
-                history: [],
-                monitoring: true,
-                responseTime: 0,
-                retryAttempts: 3,
-                timeout: 10_000,
-            };
+            const monitor = createHttpMonitor("https://httpbin.org/image");
 
             const result = await checkWithTransientRetry(monitor, "/image", 2);
 
@@ -198,18 +233,7 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
             await annotate("Category: Integration", "category");
             await annotate("Type: Content Negotiation", "type");
 
-            const monitor: Site["monitors"][0] = {
-                id: `test-png-${Date.now()}`,
-                type: "http",
-                url: "https://httpbin.org/image/png",
-                status: "pending",
-                checkInterval: 60_000,
-                history: [],
-                monitoring: true,
-                responseTime: 0,
-                retryAttempts: 3,
-                timeout: 10_000,
-            };
+            const monitor = createHttpMonitor("https://httpbin.org/image/png");
 
             const result = await checkWithTransientRetry(
                 monitor,
@@ -259,19 +283,9 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                 await annotate("Category: Integration", "category");
                 await annotate("Type: Status Code Handling", "type");
 
-                const monitor: Site["monitors"][0] = {
-                    id: `test-${code}-${Date.now()}`,
-                    type: "http",
-                    url: `https://httpbin.org/status/${code}`,
-                    status: "pending",
-                    checkInterval: 60_000,
-                    history: [],
-                    monitoring: true,
-                    responseTime: 0,
-                    // Disable retries to keep tests fast and avoid backoff delays
-                    retryAttempts: 0,
-                    timeout: 10_000,
-                };
+                const monitor = createHttpMonitor(
+                    `https://httpbin.org/status/${code}`
+                );
 
                 const result = await checkWithTransientRetry(
                     monitor,
@@ -304,18 +318,12 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
             await annotate("Category: Integration", "category");
             await annotate("Type: Redirect Handling", "type");
 
-            const monitor: Site["monitors"][0] = {
-                id: `test-redirect-${Date.now()}`,
-                type: "http",
-                url: "https://httpbin.org/redirect/1", // Redirects to /get
-                status: "pending",
-                checkInterval: 60_000,
-                history: [],
-                monitoring: true,
-                responseTime: 0,
-                retryAttempts: 3,
-                timeout: 15_000, // Increased timeout for redirects
-            };
+            const monitor = createHttpMonitor(
+                "https://httpbin.org/redirect/1",
+                {
+                    timeout: 15_000,
+                }
+            );
 
             const result = await checkWithTransientRetry(
                 monitor,
@@ -340,18 +348,7 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
             await annotate("Category: Integration", "category");
             await annotate("Type: Delay Handling", "type");
 
-            const monitor: Site["monitors"][0] = {
-                id: `test-delay-${Date.now()}`,
-                type: "http",
-                url: "https://httpbin.org/delay/2", // 2 second delay
-                status: "pending",
-                checkInterval: 60_000,
-                history: [],
-                monitoring: true,
-                responseTime: 0,
-                retryAttempts: 3,
-                timeout: 10_000,
-            };
+            const monitor = createHttpMonitor("https://httpbin.org/delay/2");
 
             const result = await checkWithTransientRetry(monitor, "delay/2", 2);
             console.log(`Delay result:`, result);
@@ -397,18 +394,7 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                 await annotate("Category: Integration", "category");
                 await annotate("Type: Content Type Handling", "type");
 
-                const monitor: Site["monitors"][0] = {
-                    id: `test-content-${Date.now()}`,
-                    type: "http",
-                    url: `https://httpbin.org${path}`,
-                    status: "pending",
-                    checkInterval: 60_000,
-                    history: [],
-                    monitoring: true,
-                    responseTime: 0,
-                    retryAttempts: 3,
-                    timeout: 10_000,
-                };
+                const monitor = createHttpMonitor(`https://httpbin.org${path}`);
 
                 const result = await checkWithTransientRetry(
                     monitor,

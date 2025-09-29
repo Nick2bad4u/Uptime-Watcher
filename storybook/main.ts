@@ -95,8 +95,10 @@ const coverageOptions: AddonOptionsVite = {
 
 const config: StorybookConfig = {
     addons: [
+        "@storybook/addon-essentials",
         "@storybook/addon-a11y",
         "@storybook/addon-docs",
+        "@storybook/addon-themes",
         {
             name: "@storybook/addon-coverage",
             options: coverageOptions,

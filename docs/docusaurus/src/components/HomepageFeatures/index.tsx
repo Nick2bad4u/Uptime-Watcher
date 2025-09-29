@@ -94,9 +94,9 @@ const FeatureList: FeatureItem[] = [
     {
         description: (
             <>
-                MIT licensed, actually open source. Fork it, modify it, sell it
-                (please don&apos;t). Built by developers who got tired of
-                overpriced monitoring services.
+                UnLicense licensed, actually open source. Fork it, modify it,
+                sell it (please don&apos;t). Built by developers who got tired
+                of overpriced monitoring services.
             </>
         ),
         icon: "🛠️",

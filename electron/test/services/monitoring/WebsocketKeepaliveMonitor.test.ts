@@ -28,15 +28,15 @@ vi.mock("ws", async () => {
     const { EventEmitter } = await import("node:events");
 
     class LocalWebSocket extends EventEmitter {
-        public static readonly CONNECTING = socketReadyState.CONNECTING;
+        public static readonly CONNECTING = 0;
 
-        public static readonly OPEN = socketReadyState.OPEN;
+        public static readonly OPEN = 1;
 
-        public static readonly CLOSING = socketReadyState.CLOSING;
+        public static readonly CLOSING = 2;
 
-        public static readonly CLOSED = socketReadyState.CLOSED;
+        public static readonly CLOSED = 3;
 
-        public readyState: number = socketReadyState.CONNECTING;
+        public readyState: number = LocalWebSocket.CONNECTING;
 
         public constructor(public readonly url: string) {
             super();
@@ -45,11 +45,11 @@ vi.mock("ws", async () => {
         public readonly ping = vi.fn();
 
         public readonly close = vi.fn(() => {
-            this.readyState = socketReadyState.CLOSING;
+            this.readyState = LocalWebSocket.CLOSING;
         });
 
         public readonly terminate = vi.fn(() => {
-            this.readyState = socketReadyState.CLOSED;
+            this.readyState = LocalWebSocket.CLOSED;
         });
     }
 

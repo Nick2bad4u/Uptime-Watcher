@@ -206,12 +206,17 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
                       .join("; ")
                 : undefined;
 
-        return {
+        const degradedResult: MonitorCheckResult = {
             details: detailSegments.join("; "),
             responseTime,
             status: "degraded",
-            ...(failureSummary && { error: failureSummary }),
         };
+
+        if (failureSummary) {
+            degradedResult.error = failureSummary;
+        }
+
+        return degradedResult;
     }
 
     private async fetchEndpoint(
@@ -286,9 +291,10 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
             return "At least one edge endpoint is required";
         }
 
-        const invalidEdge = edges.find((edge) => !isValidUrl(edge));
-        if (invalidEdge) {
-            return `Invalid edge endpoint URL: ${invalidEdge}`;
+        for (const edge of edges) {
+            if (!isValidUrl(edge)) {
+                return `Invalid edge endpoint URL: ${String(edge)}`;
+            }
         }
 
         return undefined;

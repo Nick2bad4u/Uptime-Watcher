@@ -416,6 +416,7 @@ export default [
             "html/no-positive-tabindex": "warn",
             "html/no-restricted-attr-values": "warn",
             "html/no-restricted-attrs": "warn",
+            "html/no-restricted-tags": "warn",
             "html/no-script-style-type": "warn",
             "html/no-skip-heading-levels": "warn",
             "html/no-target-blank": "warn",
@@ -677,6 +678,7 @@ export default [
             "markdown/no-missing-label-refs": "warn",
             "markdown/no-missing-link-fragments": "warn",
             "markdown/no-multiple-h1": "warn",
+            "markdown/no-reference-like-urls": "warn",
             "markdown/no-reversed-media-syntax": "warn",
             "markdown/no-space-in-emphasis": "warn",
             "markdown/no-unused-definitions": "warn",
@@ -1215,15 +1217,14 @@ export default [
             /* Hooks extra subplugin */
             "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
                 "warn",
-            "@eslint-react/hooks-extra/no-unnecessary-use-callback": "off",
-            "@eslint-react/hooks-extra/no-unnecessary-use-memo": "off",
-
+            "@eslint-react/jsx-key-before-spread": "warn",
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
             "@eslint-react/jsx-shorthand-boolean": "warn",
             "@eslint-react/jsx-shorthand-fragment": "warn",
             "@eslint-react/jsx-uses-react": "warn",
             "@eslint-react/jsx-uses-vars": "warn",
+
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
             /* Naming convention subplugin */
@@ -1232,16 +1233,22 @@ export default [
             "@eslint-react/naming-convention/use-state": "warn",
             "@eslint-react/no-children-prop": "warn",
             "@eslint-react/no-class-component": "warn",
+            "@eslint-react/no-forbidden-props": "off",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
-
             "@eslint-react/no-missing-context-display-name": "warn",
+            "@eslint-react/no-misused-capture-owner-stack": "warn",
             "@eslint-react/no-nested-component-definitions": "warn",
+            "@eslint-react/no-unnecessary-key": "warn",
+            "@eslint-react/no-unnecessary-use-callback": "off",
+
+            "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
             "@eslint-react/no-unused-props": "warn",
             "@eslint-react/no-useless-forward-ref": "warn",
             "@eslint-react/no-useless-fragment": "warn",
             "@eslint-react/prefer-destructuring-assignment": "warn",
+            "@eslint-react/prefer-namespace-import": "off",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
 
@@ -2578,15 +2585,14 @@ export default [
             /* Hooks extra subplugin */
             "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
                 "warn",
-            "@eslint-react/hooks-extra/no-unnecessary-use-callback": "off",
-            "@eslint-react/hooks-extra/no-unnecessary-use-memo": "off",
-
+            "@eslint-react/jsx-key-before-spread": "warn",
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
             "@eslint-react/jsx-shorthand-boolean": "warn",
             "@eslint-react/jsx-shorthand-fragment": "warn",
             "@eslint-react/jsx-uses-react": "warn",
             "@eslint-react/jsx-uses-vars": "warn",
+
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
             /* Naming convention subplugin */
@@ -2595,16 +2601,22 @@ export default [
             "@eslint-react/naming-convention/use-state": "warn",
             "@eslint-react/no-children-prop": "warn",
             "@eslint-react/no-class-component": "warn",
+            "@eslint-react/no-forbidden-props": "off",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
-
             "@eslint-react/no-missing-context-display-name": "warn",
+            "@eslint-react/no-misused-capture-owner-stack": "warn",
             "@eslint-react/no-nested-component-definitions": "warn",
+            "@eslint-react/no-unnecessary-key": "warn",
+            "@eslint-react/no-unnecessary-use-callback": "off",
+
+            "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
             "@eslint-react/no-unused-props": "warn",
             "@eslint-react/no-useless-forward-ref": "warn",
             "@eslint-react/no-useless-fragment": "warn",
             "@eslint-react/prefer-destructuring-assignment": "warn",
+            "@eslint-react/prefer-namespace-import": "off",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
 
@@ -4115,15 +4127,13 @@ export default [
             /* Hooks extra subplugin */
             "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
                 "warn",
-            "@eslint-react/hooks-extra/no-unnecessary-use-callback": "off",
-            "@eslint-react/hooks-extra/no-unnecessary-use-memo": "off",
-
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
             "@eslint-react/jsx-shorthand-boolean": "warn",
             "@eslint-react/jsx-shorthand-fragment": "warn",
             "@eslint-react/jsx-uses-react": "warn",
             "@eslint-react/jsx-uses-vars": "warn",
+
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
             /* Naming convention subplugin */
@@ -4132,16 +4142,22 @@ export default [
             "@eslint-react/naming-convention/use-state": "warn",
             "@eslint-react/no-children-prop": "warn",
             "@eslint-react/no-class-component": "warn",
+            "@eslint-react/no-forbidden-props": "off",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
-
             "@eslint-react/no-missing-context-display-name": "warn",
+            "@eslint-react/no-misused-capture-owner-stack": "warn",
             "@eslint-react/no-nested-component-definitions": "warn",
+            "@eslint-react/no-unnecessary-key": "warn",
+            "@eslint-react/no-unnecessary-use-callback": "off",
+
+            "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
             "@eslint-react/no-unused-props": "warn",
             "@eslint-react/no-useless-forward-ref": "warn",
             "@eslint-react/no-useless-fragment": "warn",
             "@eslint-react/prefer-destructuring-assignment": "warn",
+            "@eslint-react/prefer-namespace-import": "off",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
 
@@ -5479,15 +5495,14 @@ export default [
             /* Hooks extra subplugin */
             "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
                 "warn",
-            "@eslint-react/hooks-extra/no-unnecessary-use-callback": "off",
-            "@eslint-react/hooks-extra/no-unnecessary-use-memo": "off",
-
+            "@eslint-react/jsx-key-before-spread": "warn",
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
             "@eslint-react/jsx-shorthand-boolean": "warn",
             "@eslint-react/jsx-shorthand-fragment": "warn",
             "@eslint-react/jsx-uses-react": "warn",
             "@eslint-react/jsx-uses-vars": "warn",
+
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
             /* Naming convention subplugin */
@@ -5496,16 +5511,22 @@ export default [
             "@eslint-react/naming-convention/use-state": "warn",
             "@eslint-react/no-children-prop": "warn",
             "@eslint-react/no-class-component": "warn",
+            "@eslint-react/no-forbidden-props": "off",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
-
             "@eslint-react/no-missing-context-display-name": "warn",
+            "@eslint-react/no-misused-capture-owner-stack": "warn",
             "@eslint-react/no-nested-component-definitions": "warn",
+            "@eslint-react/no-unnecessary-key": "warn",
+            "@eslint-react/no-unnecessary-use-callback": "off",
+
+            "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
             "@eslint-react/no-unused-props": "warn",
             "@eslint-react/no-useless-forward-ref": "warn",
             "@eslint-react/no-useless-fragment": "warn",
             "@eslint-react/prefer-destructuring-assignment": "warn",
+            "@eslint-react/prefer-namespace-import": "off",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
 
@@ -8802,6 +8823,9 @@ export default [
             },
         },
     }, // Theme components override - disable react-perf rule for inline styling
+    ...storybook.configs['flat/recommended'],
+    ...storybook.configs['flat/csf-strict'],
+    ...storybook.configs['flat/addon-interactions'],
     {
         files: [
             ".storybook/**/*.{ts,tsx,mts,cts}",
@@ -8871,7 +8895,12 @@ export default [
             "sonarjs/no-hardcoded-ip": "off",
             "sonarjs/pseudo-random": "off",
             "sonarjs/void-use": "off",
-            "storyboard/no-renderer-packages": "off",
+            "storybook/csf-component": "warn",
+            "storybook/meta-inline-properties": "warn",
+            "storybook/meta-satisfies-type": "warn",
+            "storybook/no-renderer-packages": "warn",
+            "storybook/no-stories-of": "warn",
+            "storybook/no-title-property-in-meta": "warn",
         },
     },
     {
@@ -8928,6 +8957,13 @@ export default [
             "@eslint-react/debug/is-from-react": "off", // Debugging not needed
             "@eslint-react/debug/jsx": "off", // Debugging not needed
             "@eslint-react/debug/react-hooks": "off", // Debugging not needed
+            "@typescript-eslint/no-empty-interface": "off", // Deprecated
+            "@typescript-eslint/no-loss-of-precision": "off", // Deprecated
+            "@typescript-eslint/no-type-aliases": "off", // Deprecated
+            "@typescript-eslint/no-var-requires": "off", // Allow require for dynamic imports
+            "@typescript-eslint/prefer-ts-expect-error": "off", // Deprecated
+            "@typescript-eslint/sort-type-constituents": "off", // Deprecated
+            "@typescript-eslint/typedef": "off", // Deprecated
             // Better-tailwindcss
             "better-tailwindcss/multiline": "off",
             "better-tailwindcss/sort-classes": "off",

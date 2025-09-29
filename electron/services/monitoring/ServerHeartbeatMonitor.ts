@@ -196,7 +196,7 @@ export class ServerHeartbeatMonitor implements IMonitorService {
                         const normalizedParseError = ensureError(parseError);
                         throw new Error(
                             `Invalid JSON response from ${url}: ${normalizedParseError.message}`,
-                            { cause: normalizedParseError }
+                            { cause: parseError }
                         );
                     }
                 }
@@ -210,7 +210,7 @@ export class ServerHeartbeatMonitor implements IMonitorService {
             const normalizedFetchError = ensureError(fetchError);
             throw new Error(
                 `Failed to fetch heartbeat from ${url}: ${normalizedFetchError.message}`,
-                { cause: normalizedFetchError }
+                { cause: fetchError }
             );
         }
     }
@@ -265,7 +265,10 @@ export class ServerHeartbeatMonitor implements IMonitorService {
     }
 
     private resolveMaxDriftSeconds(monitor: Site["monitors"][0]): number {
-        const monitorValue = Reflect.get(monitor, "heartbeatMaxDriftSeconds");
+        const monitorValue = Reflect.get(
+            monitor,
+            "heartbeatMaxDriftSeconds"
+        ) as unknown;
         if (
             typeof monitorValue === "number" &&
             Number.isFinite(monitorValue) &&
@@ -278,7 +281,7 @@ export class ServerHeartbeatMonitor implements IMonitorService {
             const candidate = Reflect.get(
                 this.config,
                 "heartbeatMaxDriftSeconds"
-            );
+            ) as unknown;
             if (
                 typeof candidate === "number" &&
                 Number.isFinite(candidate) &&

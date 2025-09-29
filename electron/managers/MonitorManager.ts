@@ -696,7 +696,7 @@ export class MonitorManager {
                         Boolean(monitor.id && monitor.checkInterval)
                 );
 
-                // Process sequentially to avoid overlapping SQLite transactions
+                /* eslint-disable no-await-in-loop -- Sequential processing prevents overlapping SQLite transactions */
                 for (const monitor of monitorsToStart) {
                     const started =
                         await this.enhancedMonitoringServices.checker.startMonitoring(
@@ -717,6 +717,7 @@ export class MonitorManager {
                         );
                     }
                 }
+                /* eslint-enable no-await-in-loop -- Restore default await-in-loop enforcement */
 
                 config.monitorScheduler.startSite(site);
             } catch (error) {
@@ -768,6 +769,7 @@ export class MonitorManager {
                 );
 
                 // Process sequentially to avoid overlapping SQLite transactions
+                /* eslint-disable no-await-in-loop -- Sequential processing prevents overlapping SQLite transactions */
                 for (const monitor of monitorsToStop) {
                     const stopped =
                         await this.enhancedMonitoringServices.checker.stopMonitoring(
@@ -788,6 +790,7 @@ export class MonitorManager {
                         );
                     }
                 }
+                /* eslint-enable no-await-in-loop -- Restore default await-in-loop enforcement */
             } catch (error) {
                 config.logger.error(
                     `Failed to stop monitoring for site ${site.identifier}`,
@@ -810,7 +813,7 @@ export class MonitorManager {
      * @param config - Configuration object with required dependencies
      * @param identifier - Site identifier
      * @param monitorId - Optional monitor ID
-     * @param callback - Optional callback for recursive calls
+     * @param monitorAction - Optional recursive handler for nested starts
      *
      * @returns Promise<boolean> - True if operation succeeded
      *
@@ -832,7 +835,10 @@ export class MonitorManager {
         },
         identifier: string,
         monitorId?: string,
-        callback?: (identifier: string, monitorId?: string) => Promise<boolean>
+        monitorAction?: (
+            identifier: string,
+            monitorId?: string
+        ) => Promise<boolean>
     ): Promise<boolean> {
         const site = config.sites.get(identifier);
         if (!site) {
@@ -902,10 +908,11 @@ export class MonitorManager {
 
         let hasSuccessfulStart = false;
 
+        /* eslint-disable no-await-in-loop -- Sequential recursion maintains deterministic monitor start ordering */
         for (const monitor of validMonitors) {
             try {
-                const result = callback
-                    ? await callback(identifier, monitor.id)
+                const result = monitorAction
+                    ? await monitorAction(identifier, monitor.id)
                     : await this.startMonitoringForSiteEnhanced(
                           config,
                           identifier,
@@ -923,6 +930,8 @@ export class MonitorManager {
             }
         }
 
+        /* eslint-enable no-await-in-loop -- Restore default await-in-loop enforcement */
+
         return hasSuccessfulStart;
     }
 
@@ -933,7 +942,7 @@ export class MonitorManager {
      * @param config - Configuration object with required dependencies
      * @param identifier - Site identifier
      * @param monitorId - Optional monitor ID
-     * @param callback - Optional callback for recursive calls
+     * @param monitorAction - Optional recursive handler for nested stops
      *
      * @returns Promise<boolean> - True if operation succeeded
      *
@@ -955,7 +964,10 @@ export class MonitorManager {
         },
         identifier: string,
         monitorId?: string,
-        callback?: (identifier: string, monitorId?: string) => Promise<boolean>
+        monitorAction?: (
+            identifier: string,
+            monitorId?: string
+        ) => Promise<boolean>
     ): Promise<boolean> {
         const site = config.sites.get(identifier);
         if (!site) {
@@ -1018,10 +1030,11 @@ export class MonitorManager {
 
         let allStoppedSuccessfully = true;
 
+        /* eslint-disable no-await-in-loop -- Sequential recursion ensures monitors stop in a deterministic order */
         for (const monitor of validMonitors) {
             try {
-                const result = callback
-                    ? await callback(identifier, monitor.id)
+                const result = monitorAction
+                    ? await monitorAction(identifier, monitor.id)
                     : await this.stopMonitoringForSiteEnhanced(
                           config,
                           identifier,
@@ -1039,6 +1052,7 @@ export class MonitorManager {
                 allStoppedSuccessfully = false;
             }
         }
+        /* eslint-enable no-await-in-loop -- Restore default await-in-loop enforcement */
 
         return allStoppedSuccessfully;
     }

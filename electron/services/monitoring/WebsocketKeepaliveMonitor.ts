@@ -14,7 +14,7 @@ import type { MonitorType, Site } from "@shared/types";
 import { ensureError } from "@shared/utils/errorHandling";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { performance } from "node:perf_hooks";
-import WebSocket from "ws";
+import { WebSocket as NodeWebSocket } from "ws";
 
 import type {
     IMonitorService,
@@ -101,29 +101,37 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
         const started = performance.now();
 
         return new Promise<MonitorCheckResult>((resolve, reject) => {
-            const socket = new WebSocket(url, {
+            const socket = new NodeWebSocket(url, {
                 handshakeTimeout: timeout,
             });
 
-            let handshakeTimer: NodeJS.Timeout | undefined;
-            let pongTimer: NodeJS.Timeout | undefined;
+            let handshakeTimer: NodeJS.Timeout | null = null;
+            let pongTimer: NodeJS.Timeout | null = null;
             let settled = false;
 
             const cleanupCallbacks: Array<() => void> = [];
 
-            const cleanup = (): void => {
-                if (handshakeTimer) {
+            const clearHandshakeTimer = (): void => {
+                if (handshakeTimer !== null) {
                     clearTimeout(handshakeTimer);
-                    handshakeTimer = undefined;
+                    handshakeTimer = null;
                 }
-                if (pongTimer) {
+            };
+
+            const clearPongTimer = (): void => {
+                if (pongTimer !== null) {
                     clearTimeout(pongTimer);
-                    pongTimer = undefined;
+                    pongTimer = null;
                 }
+            };
+
+            const cleanup = (): void => {
+                clearHandshakeTimer();
+                clearPongTimer();
                 while (cleanupCallbacks.length > 0) {
-                    const callback = cleanupCallbacks.pop();
+                    const cleanupStep = cleanupCallbacks.pop();
                     try {
-                        callback?.();
+                        cleanupStep?.();
                     } catch {
                         // Swallow cleanup errors to avoid masking primary results
                     }
@@ -144,6 +152,80 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                     cleanup();
                     reject(error);
                 }
+            };
+
+            const resolveSuccess = (details: string): void => {
+                clearPongTimer();
+                resolveOnce({
+                    details,
+                    responseTime: Math.round(performance.now() - started),
+                    status: "up",
+                });
+            };
+
+            const resolveDegraded = (
+                details: string,
+                errorMessage: string
+            ): void => {
+                clearPongTimer();
+                resolveOnce({
+                    details,
+                    error: errorMessage,
+                    responseTime: Math.round(performance.now() - started),
+                    status: "degraded",
+                });
+            };
+
+            const scheduleMissingPong = (): void => {
+                clearPongTimer();
+                pongTimer = setTimeout(() => {
+                    resolveDegraded(
+                        "No pong received within allowed interval",
+                        `No pong within ${maxPongDelay}ms`
+                    );
+                }, maxPongDelay);
+            };
+
+            const sendPingSafely = (): void => {
+                try {
+                    socket.ping();
+                } catch (error) {
+                    rejectOnce(ensureError(error));
+                    return;
+                }
+
+                scheduleMissingPong();
+            };
+
+            const handleOpen = (): void => {
+                clearHandshakeTimer();
+                sendPingSafely();
+            };
+
+            const handlePong = (): void => {
+                resolveSuccess("WebSocket responded to ping");
+            };
+
+            const handleMessage = (): void => {
+                resolveSuccess("WebSocket responded with message");
+            };
+
+            const handleClose = (code: number, reason: Buffer): void => {
+                const reasonText =
+                    reason.length > 0 ? reason.toString("utf8") : "";
+                const reasonSuffix =
+                    reasonText.length > 0 ? `, reason: ${reasonText}` : "";
+                const details = `Connection closed (code ${code}${reasonSuffix})`;
+                resolveOnce({
+                    details,
+                    error: details,
+                    responseTime: Math.round(performance.now() - started),
+                    status: "down",
+                });
+            };
+
+            const handleError = (socketError: Error): void => {
+                rejectOnce(ensureError(socketError));
             };
 
             handshakeTimer = setTimeout(() => {
@@ -168,77 +250,23 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
 
             cleanupCallbacks.push(() => {
                 socket.removeAllListeners();
-                if (socket.readyState === WebSocket.OPEN) {
+                if (socket.readyState === NodeWebSocket.OPEN) {
                     socket.close();
-                } else if (socket.readyState === WebSocket.CONNECTING) {
+                } else if (socket.readyState === NodeWebSocket.CONNECTING) {
                     socket.terminate();
                 }
             });
 
-            socket.once("open", () => {
-                if (handshakeTimer) {
-                    clearTimeout(handshakeTimer);
-                    handshakeTimer = undefined;
-                }
-
-                const startPing = (): void => {
-                    try {
-                        socket.ping();
-                    } catch (error) {
-                        rejectOnce(ensureError(error));
-                        return;
-                    }
-
-                    pongTimer = setTimeout(() => {
-                        resolveOnce({
-                            details: "No pong received within allowed interval",
-                            error: `No pong within ${maxPongDelay}ms`,
-                            responseTime: Math.round(
-                                performance.now() - started
-                            ),
-                            status: "degraded",
-                        });
-                    }, maxPongDelay);
-                };
-
-                socket.once("pong", () => {
-                    resolveOnce({
-                        details: "WebSocket responded to ping",
-                        responseTime: Math.round(performance.now() - started),
-                        status: "up",
-                    });
-                });
-
-                socket.once("message", () => {
-                    resolveOnce({
-                        details: "WebSocket responded with message",
-                        responseTime: Math.round(performance.now() - started),
-                        status: "up",
-                    });
-                });
-
-                socket.once("close", (code: number, reason: Buffer) => {
-                    const reasonText =
-                        reason.length > 0 ? reason.toString("utf8") : "";
-                    resolveOnce({
-                        details: `Connection closed (code ${code}${reasonText ? `, reason: ${reasonText}` : ""})`,
-                        error: `Connection closed (code ${code})`,
-                        responseTime: Math.round(performance.now() - started),
-                        status: "down",
-                    });
-                });
-
-                startPing();
-            });
-
-            socket.once("error", (socketError: Error) => {
-                rejectOnce(ensureError(socketError));
-            });
+            socket.once("open", handleOpen);
+            socket.once("pong", handlePong);
+            socket.once("message", handleMessage);
+            socket.once("close", handleClose);
+            socket.once("error", handleError);
         });
     }
 
     private resolveMaxPongDelay(monitor: Site["monitors"][0]): number {
-        const monitorValue = Reflect.get(monitor, "maxPongDelayMs");
+        const monitorValue = Reflect.get(monitor, "maxPongDelayMs") as unknown;
         if (
             typeof monitorValue === "number" &&
             Number.isFinite(monitorValue) &&
@@ -248,7 +276,10 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
         }
 
         if (Object.hasOwn(this.config, "maxPongDelayMs")) {
-            const candidate = Reflect.get(this.config, "maxPongDelayMs");
+            const candidate = Reflect.get(
+                this.config,
+                "maxPongDelayMs"
+            ) as unknown;
             if (
                 typeof candidate === "number" &&
                 Number.isFinite(candidate) &&

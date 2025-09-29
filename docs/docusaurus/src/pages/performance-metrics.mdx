@@ -6,6 +6,8 @@ description: Performance analysis and optimization strategies for Uptime Watcher
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
 
+{/* eslint-enable no-unused-vars */}
+
 export default function PerformanceMetrics() {
   return (
     <Layout
@@ -41,9 +43,10 @@ This diagram shows key performance metrics and their relationships:
 
     subgraph "Monitoring Performance"
         MonitorInterval[Monitor Intervals]
-        ConcurrentChecks[Concurrent Checks]
+        ConcurrentChecks[Concurrent Checks - 14 monitor types]
         ResponseTime[Response Times]
         ThroughputRate[Throughput Rate]
+        MonitorTypeOptimization[Monitor-specific Optimization]
     end
 
     subgraph "System Resources"
@@ -64,6 +67,7 @@ This diagram shows key performance metrics and their relationships:
     MonitorInterval --> ConcurrentChecks
     ConcurrentChecks --> ThroughputRate
     NetworkRequests --> ResponseTime
+    ResponseTime --> MonitorTypeOptimization
 
     CPUUtilization --> ProcessThreads
     MemoryUsage --> RAMConsumption
@@ -75,6 +79,7 @@ This diagram shows key performance metrics and their relationships:
     ResponseTime -.->|Improve| NetworkRequests
     UIResponsiveness -.->|Cache| StateUpdates
     CPUUtilization -.->|Pool| ProcessThreads
+    MonitorTypeOptimization -.->|Adaptive| MonitorInterval
 
     %% Styling
     classDef frontend fill:#3b82f6,stroke:#1e40af,color:#ffffff
@@ -84,7 +89,7 @@ This diagram shows key performance metrics and their relationships:
 
     class ReactRender,StateUpdates,UIResponsiveness,MemoryUsage frontend
     class IPCLatency,DatabaseOps,NetworkRequests,CPUUtilization backend
-    class MonitorInterval,ConcurrentChecks,ResponseTime,ThroughputRate monitoring
+    class MonitorInterval,ConcurrentChecks,ResponseTime,ThroughputRate,MonitorTypeOptimization monitoring
     class RAMConsumption,DiskUsage,NetworkBandwidth,ProcessThreads resources`} />
 
 ## Performance Optimization Flow
