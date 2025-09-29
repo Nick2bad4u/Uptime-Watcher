@@ -61,6 +61,7 @@ import {
     MONITOR_TIMEOUT_BUFFER_MS,
     SECONDS_TO_MS_MULTIPLIER,
 } from "./constants";
+import { CdnEdgeConsistencyMonitor } from "./CdnEdgeConsistencyMonitor";
 import { DnsMonitor } from "./DnsMonitor";
 import { HttpHeaderMonitor } from "./HttpHeaderMonitor";
 import { HttpJsonMonitor } from "./HttpJsonMonitor";
@@ -70,7 +71,10 @@ import { HttpMonitor } from "./HttpMonitor";
 import { HttpStatusMonitor } from "./HttpStatusMonitor";
 import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
+import { ReplicationMonitor } from "./ReplicationMonitor";
+import { ServerHeartbeatMonitor } from "./ServerHeartbeatMonitor";
 import { SslMonitor } from "./SslMonitor";
+import { WebsocketKeepaliveMonitor } from "./WebsocketKeepaliveMonitor";
 
 /**
  * Configuration interface for enhanced monitor checking with comprehensive
@@ -281,6 +285,14 @@ export class EnhancedMonitorChecker {
     private readonly portMonitor: PortMonitor;
 
     private readonly sslMonitor: SslMonitor;
+
+    private readonly cdnEdgeConsistencyMonitor: CdnEdgeConsistencyMonitor;
+
+    private readonly replicationMonitor: ReplicationMonitor;
+
+    private readonly serverHeartbeatMonitor: ServerHeartbeatMonitor;
+
+    private readonly websocketKeepaliveMonitor: WebsocketKeepaliveMonitor;
 
     /**
      * Performs a comprehensive monitor status check with advanced operation
@@ -890,6 +902,13 @@ export class EnhancedMonitorChecker {
         signal?: AbortSignal
     ): Promise<ServiceMonitorCheckResult> {
         switch (monitor.type) {
+            case "cdn-edge-consistency": {
+                return this.performMonitorCheck(
+                    this.cdnEdgeConsistencyMonitor,
+                    monitor,
+                    signal
+                );
+            }
             case "dns": {
                 return this.performMonitorCheck(
                     this.dnsMonitor,
@@ -935,6 +954,27 @@ export class EnhancedMonitorChecker {
             case "http-status": {
                 return this.performMonitorCheck(
                     this.httpStatusMonitor,
+                    monitor,
+                    signal
+                );
+            }
+            case "replication": {
+                return this.performMonitorCheck(
+                    this.replicationMonitor,
+                    monitor,
+                    signal
+                );
+            }
+            case "server-heartbeat": {
+                return this.performMonitorCheck(
+                    this.serverHeartbeatMonitor,
+                    monitor,
+                    signal
+                );
+            }
+            case "websocket-keepalive": {
+                return this.performMonitorCheck(
+                    this.websocketKeepaliveMonitor,
                     monitor,
                     signal
                 );
@@ -1109,6 +1149,7 @@ export class EnhancedMonitorChecker {
     public constructor(config: EnhancedMonitorCheckConfig) {
         this.config = config;
         // Initialize monitor services
+        this.cdnEdgeConsistencyMonitor = new CdnEdgeConsistencyMonitor({});
         this.dnsMonitor = new DnsMonitor({});
         this.httpMonitor = new HttpMonitor({});
         this.httpHeaderMonitor = new HttpHeaderMonitor({});
@@ -1119,6 +1160,9 @@ export class EnhancedMonitorChecker {
         this.pingMonitor = new PingMonitor({});
         this.portMonitor = new PortMonitor({});
         this.sslMonitor = new SslMonitor({});
+        this.replicationMonitor = new ReplicationMonitor({});
+        this.serverHeartbeatMonitor = new ServerHeartbeatMonitor({});
+        this.websocketKeepaliveMonitor = new WebsocketKeepaliveMonitor({});
     }
 
     /**

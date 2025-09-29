@@ -289,6 +289,16 @@ describe("Shared Types - Complete Function Coverage", () => {
             expect(typesModule.BASE_MONITOR_TYPES).toContain("ping");
             expect(typesModule.BASE_MONITOR_TYPES).toContain("dns");
             expect(typesModule.BASE_MONITOR_TYPES).toContain("ssl");
+            expect(typesModule.BASE_MONITOR_TYPES).toContain(
+                "websocket-keepalive"
+            );
+            expect(typesModule.BASE_MONITOR_TYPES).toContain(
+                "server-heartbeat"
+            );
+            expect(typesModule.BASE_MONITOR_TYPES).toContain("replication");
+            expect(typesModule.BASE_MONITOR_TYPES).toContain(
+                "cdn-edge-consistency"
+            );
 
             // Test MONITOR_STATUS constant
             expect(typeof typesModule.MONITOR_STATUS).toBe("object");

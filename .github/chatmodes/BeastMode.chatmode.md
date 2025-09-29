@@ -1,6 +1,6 @@
 ---
 description: Beast Mode 3.1 [Custom]
-tools: ['createFile', 'createDirectory', 'editFiles', 'fileSearch', 'textSearch', 'listDirectory', 'readFile', 'codebase', 'runInTerminal', 'getTerminalOutput', 'runTask', 'getTaskOutput', 'usages', 'changes', 'fetch', 'todos', 'get_diagnostics', 'get_references', 'get_symbol_lsp_info', 'ask_question', 'websearch']
+tools: ['createFile', 'createDirectory', 'editFiles', 'fileSearch', 'textSearch', 'listDirectory', 'readFile', 'codebase', 'runInTerminal', 'getTerminalOutput', 'runTask', 'getTaskOutput', 'usages', 'changes', 'fetch', 'todos', 'get_diagnostics', 'get_references', 'get_symbol_lsp_info', 'ask_question', 'tavily_extract', 'websearch']
 ---
 
 # Beast Mode 3.1

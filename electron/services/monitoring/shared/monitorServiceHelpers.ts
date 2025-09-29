@@ -117,3 +117,85 @@ export function validateMonitorUrl(monitor: Monitor): null | string {
     }
     return null;
 }
+
+export function withFallback<T>(value: null | T | undefined, fallback: T): T {
+    return value ?? fallback;
+}
+
+const URL_LIST_SEPARATOR = /\r?\n|,/v;
+
+export function parseMonitorUrlList(value: string): string[] {
+    if (typeof value !== "string" || value.trim().length === 0) {
+        return [];
+    }
+
+    return value
+        .split(URL_LIST_SEPARATOR)
+        .map((entry) => entry.trim())
+        .filter((entry) => entry.length > 0);
+}
+
+export function extractNestedFieldValue(
+    source: unknown,
+    path: string
+): unknown {
+    if (typeof path !== "string" || path.trim().length === 0) {
+        return undefined;
+    }
+
+    const segments = path
+        .split(".")
+        .map((segment) => segment.trim())
+        .filter((segment) => segment.length > 0);
+
+    let current: unknown = source;
+
+    for (const segment of segments) {
+        if (
+            current !== null &&
+            typeof current === "object" &&
+            Object.hasOwn(current, segment)
+        ) {
+            current = Reflect.get(current, segment);
+        } else {
+            return undefined;
+        }
+    }
+
+    return current;
+}
+
+const UNIX_SECONDS_THRESHOLD = 10_000_000_000;
+
+export function normalizeTimestampValue(value: unknown): number | undefined {
+    if (value instanceof Date) {
+        return value.getTime();
+    }
+
+    if (typeof value === "number" && Number.isFinite(value)) {
+        return value > UNIX_SECONDS_THRESHOLD
+            ? Math.trunc(value)
+            : Math.trunc(value * 1000);
+    }
+
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (trimmed.length === 0) {
+            return undefined;
+        }
+
+        const numeric = Number(trimmed);
+        if (!Number.isNaN(numeric) && Number.isFinite(numeric)) {
+            return numeric > UNIX_SECONDS_THRESHOLD
+                ? Math.trunc(numeric)
+                : Math.trunc(numeric * 1000);
+        }
+
+        const parsed = Date.parse(trimmed);
+        if (!Number.isNaN(parsed)) {
+            return parsed;
+        }
+    }
+
+    return undefined;
+}

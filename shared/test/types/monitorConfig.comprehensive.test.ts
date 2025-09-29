@@ -12,6 +12,10 @@ import {
     isHttpMonitorConfig,
     isPingMonitorConfig,
     isPortMonitorConfig,
+    isCdnEdgeConsistencyMonitorConfig,
+    isReplicationMonitorConfig,
+    isServerHeartbeatMonitorConfig,
+    isWebsocketKeepaliveMonitorConfig,
     type AdvancedMonitorConfig,
     type BaseMonitorConfig,
     type HttpMonitorConfig,
@@ -19,6 +23,10 @@ import {
     type MonitorConfigTemplate,
     type PingMonitorConfig,
     type PortMonitorConfig,
+    type CdnEdgeConsistencyMonitorConfig,
+    type ReplicationMonitorConfig,
+    type ServerHeartbeatMonitorConfig,
+    type WebsocketKeepaliveMonitorConfig,
 } from "../../types/monitorConfig";
 
 describe("Monitor Configuration Types", () => {
@@ -703,6 +711,61 @@ describe("Monitor Configuration Types", () => {
             connectionTimeout: 10_000,
         };
 
+        const websocketConfig: WebsocketKeepaliveMonitorConfig = {
+            checkInterval: 60_000,
+            enabled: true,
+            heartbeatExpectedStatus: "", // placeholder for type compatibility
+            heartbeatMaxDriftSeconds: 0,
+            heartbeatStatusField: "",
+            heartbeatTimestampField: "",
+            heartbeat: {
+                url: "wss://ws.example.com/socket",
+                maxPongDelayMs: 1500,
+            },
+        };
+
+        const heartbeatConfig: MonitorConfig = {
+            checkInterval: 60_000,
+            enabled: true,
+            id: "heartbeat-1",
+            name: "Heartbeat",
+            retryAttempts: 3,
+            timeout: 30_000,
+            type: "server-heartbeat",
+            url: "https://api.example.com/heartbeat",
+            heartbeatExpectedStatus: "ok",
+            heartbeatStatusField: "status",
+            heartbeatTimestampField: "timestamp",
+            heartbeatMaxDriftSeconds: 60,
+        };
+
+        const replicationConfig: MonitorConfig = {
+            checkInterval: 120_000,
+            enabled: true,
+            id: "replication-1",
+            name: "Replication",
+            retryAttempts: 3,
+            timeout: 30_000,
+            type: "replication",
+            primaryStatusUrl: "https://primary.example.com/status",
+            replicaStatusUrl: "https://replica.example.com/status",
+            replicationTimestampField: "status.lastApplied",
+            maxReplicationLagSeconds: 30,
+        };
+
+        const cdnConfig: MonitorConfig = {
+            checkInterval: 300_000,
+            enabled: true,
+            id: "cdn-1",
+            name: "CDN Consistency",
+            retryAttempts: 3,
+            timeout: 30_000,
+            type: "cdn-edge-consistency",
+            baselineUrl: "https://origin.example.com",
+            edgeLocations:
+                "https://edge-a.example.com\nhttps://edge-b.example.com",
+        };
+
         it("should correctly identify HTTP configurations", async ({
             task,
             annotate,
@@ -745,6 +808,66 @@ describe("Monitor Configuration Types", () => {
             expect(isPortMonitorConfig(pingConfig)).toBeFalsy();
         });
 
+        it("should correctly identify WebSocket keepalive configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(
+                isWebsocketKeepaliveMonitorConfig(websocketConfig)
+            ).toBeTruthy();
+            expect(isWebsocketKeepaliveMonitorConfig(httpConfig)).toBeFalsy();
+            expect(isWebsocketKeepaliveMonitorConfig(portConfig)).toBeFalsy();
+        });
+
+        it("should correctly identify server heartbeat configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(
+                isServerHeartbeatMonitorConfig(heartbeatConfig)
+            ).toBeTruthy();
+            expect(isServerHeartbeatMonitorConfig(httpConfig)).toBeFalsy();
+            expect(isServerHeartbeatMonitorConfig(pingConfig)).toBeFalsy();
+        });
+
+        it("should correctly identify replication configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(isReplicationMonitorConfig(replicationConfig)).toBeTruthy();
+            expect(isReplicationMonitorConfig(httpConfig)).toBeFalsy();
+            expect(isReplicationMonitorConfig(pingConfig)).toBeFalsy();
+        });
+
+        it("should correctly identify CDN consistency configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(isCdnEdgeConsistencyMonitorConfig(cdnConfig)).toBeTruthy();
+            expect(isCdnEdgeConsistencyMonitorConfig(httpConfig)).toBeFalsy();
+            expect(isCdnEdgeConsistencyMonitorConfig(portConfig)).toBeFalsy();
+        });
+
         it("should provide type narrowing", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig", "component");
@@ -767,6 +890,28 @@ describe("Monitor Configuration Types", () => {
                 // TypeScript should now know this is PortMonitorConfig
                 expect(portConfig.host).toBeDefined();
                 expect(portConfig.port).toBeDefined();
+            }
+
+            if (isWebsocketKeepaliveMonitorConfig(websocketConfig)) {
+                expect(websocketConfig.url).toBeDefined();
+                expect(websocketConfig.maxPongDelayMs).toBeDefined();
+            }
+
+            if (isServerHeartbeatMonitorConfig(heartbeatConfig)) {
+                expect(heartbeatConfig.heartbeatExpectedStatus).toBeDefined();
+                expect(heartbeatConfig.heartbeatTimestampField).toBeDefined();
+            }
+
+            if (isReplicationMonitorConfig(replicationConfig)) {
+                expect(replicationConfig.primaryStatusUrl).toBeDefined();
+                expect(
+                    replicationConfig.replicationTimestampField
+                ).toBeDefined();
+            }
+
+            if (isCdnEdgeConsistencyMonitorConfig(cdnConfig)) {
+                expect(cdnConfig.baselineUrl).toBeDefined();
+                expect(cdnConfig.edgeLocations).toBeDefined();
             }
         });
     });
@@ -822,6 +967,80 @@ describe("Monitor Configuration Types", () => {
             expect(defaults.enabled).toBeTruthy();
             expect(defaults.retryAttempts).toBe(3);
             expect(defaults.timeout).toBe(30_000);
+        });
+
+        it("should provide WebSocket keepalive defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const defaults = DEFAULT_MONITOR_CONFIG["websocket-keepalive"];
+
+            expect(defaults?.type).toBe("websocket-keepalive");
+            expect(defaults?.checkInterval).toBe(60_000);
+            expect(defaults?.maxPongDelayMs).toBe(1500);
+            expect(defaults?.retryAttempts).toBe(3);
+            expect(defaults?.timeout).toBe(30_000);
+        });
+
+        it("should provide server heartbeat defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const defaults = DEFAULT_MONITOR_CONFIG["server-heartbeat"];
+
+            expect(defaults?.type).toBe("server-heartbeat");
+            expect(defaults?.heartbeatExpectedStatus).toBe("ok");
+            expect(defaults?.heartbeatStatusField).toBe("status");
+            expect(defaults?.heartbeatTimestampField).toBe("timestamp");
+            expect(defaults?.heartbeatMaxDriftSeconds).toBe(60);
+        });
+
+        it("should provide replication defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const defaults = DEFAULT_MONITOR_CONFIG.replication;
+
+            expect(defaults?.type).toBe("replication");
+            expect(defaults?.maxReplicationLagSeconds).toBe(10);
+            expect(defaults?.primaryStatusUrl).toBe("");
+            expect(defaults?.replicaStatusUrl).toBe("");
+            expect(defaults?.replicationTimestampField).toBe(
+                "lastAppliedTimestamp"
+            );
+        });
+
+        it("should provide CDN consistency defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const defaults = DEFAULT_MONITOR_CONFIG["cdn-edge-consistency"];
+
+            expect(defaults?.type).toBe("cdn-edge-consistency");
+            expect(defaults?.baselineUrl).toBe("");
+            expect(defaults?.edgeLocations).toBe("");
+            expect(defaults?.checkInterval).toBe(300_000);
+            expect(defaults?.retryAttempts).toBe(3);
         });
 
         it("should have consistent default intervals across types", async ({

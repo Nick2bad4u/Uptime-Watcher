@@ -742,6 +742,10 @@ describe("shared/types.ts function coverage", () => {
             expect(BASE_MONITOR_TYPES).toContain("port");
             expect(BASE_MONITOR_TYPES).toContain("dns");
             expect(BASE_MONITOR_TYPES).toContain("ssl");
+            expect(BASE_MONITOR_TYPES).toContain("websocket-keepalive");
+            expect(BASE_MONITOR_TYPES).toContain("server-heartbeat");
+            expect(BASE_MONITOR_TYPES).toContain("replication");
+            expect(BASE_MONITOR_TYPES).toContain("cdn-edge-consistency");
         });
     });
 

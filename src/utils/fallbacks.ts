@@ -231,6 +231,11 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
         },
     ],
     ["http", (monitor): string | undefined => monitor.url ?? undefined],
+    ["http-header", (monitor): string | undefined => monitor.url ?? undefined],
+    ["http-json", (monitor): string | undefined => monitor.url ?? undefined],
+    ["http-keyword", (monitor): string | undefined => monitor.url ?? undefined],
+    ["http-latency", (monitor): string | undefined => monitor.url ?? undefined],
+    ["http-status", (monitor): string | undefined => monitor.url ?? undefined],
     ["ping", (monitor): string | undefined => monitor.host ?? undefined],
     [
         "port",
@@ -256,6 +261,39 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
             const port = monitor.port ? `:${monitor.port}` : "";
             return `${monitor.host}${port}`;
         },
+    ],
+    [
+        "websocket-keepalive",
+        (
+            monitor
+        ):
+            | string
+            | undefined => monitor.url ?? undefined,
+    ],
+    [
+        "server-heartbeat",
+        (
+            monitor
+        ):
+            | string
+            | undefined => monitor.url ?? undefined,
+    ],
+    [
+        "replication",
+        (
+            monitor
+        ):
+            | string
+            | undefined =>
+            monitor.primaryStatusUrl ?? monitor.replicaStatusUrl ?? undefined,
+    ],
+    [
+        "cdn-edge-consistency",
+        (
+            monitor
+        ):
+            | string
+            | undefined => monitor.baselineUrl ?? undefined,
     ],
 ]);
 
@@ -340,11 +378,20 @@ export function getMonitorDisplayIdentifier(
  * monitor types without code changes.
  */
 const MONITOR_TYPE_LABELS = new Map<string, string>([
+    ["cdn-edge-consistency", "CDN Edge Consistency"],
     ["dns", "DNS Monitor"],
     ["http", "Website URL"],
+    ["http-header", "HTTP Header"],
+    ["http-json", "HTTP JSON"],
+    ["http-keyword", "HTTP Keyword"],
+    ["http-latency", "HTTP Latency"],
+    ["http-status", "HTTP Status"],
     ["ping", "Ping Monitor"],
     ["port", "Host & Port"],
+    ["replication", "Replication Lag"],
+    ["server-heartbeat", "Server Heartbeat"],
     ["ssl", "SSL Certificate"],
+    ["websocket-keepalive", "WebSocket Keepalive"],
 ]);
 
 /**

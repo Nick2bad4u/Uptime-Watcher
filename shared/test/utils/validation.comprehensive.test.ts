@@ -661,6 +661,294 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
         });
 
+        describe("WebSocket keepalive monitor validation", () => {
+            it("should return error for missing URL", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const monitor: Partial<Monitor> = {
+                    id: "ws-monitor",
+                    type: "websocket-keepalive",
+                    maxPongDelayMs: 1500,
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toContain(
+                    "WebSocket URL is required for keepalive monitors"
+                );
+            });
+
+            it("should return error for non-positive pong delay", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const monitor: Partial<Monitor> = {
+                    id: "ws-monitor",
+                    type: "websocket-keepalive",
+                    url: "wss://ws.example.com/socket",
+                    maxPongDelayMs: 0,
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toContain(
+                    "Maximum pong delay must be a positive number for WebSocket keepalive monitors"
+                );
+            });
+
+            it("should return no errors for valid configuration", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const monitor: Partial<Monitor> = {
+                    id: "ws-monitor",
+                    type: "websocket-keepalive",
+                    url: "wss://ws.example.com/socket",
+                    maxPongDelayMs: 1500,
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toEqual([]);
+            });
+        });
+
+        describe("Server heartbeat monitor validation", () => {
+            it("should return error for missing status field", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const monitor: Partial<Monitor> = {
+                    id: "heartbeat-monitor",
+                    type: "server-heartbeat",
+                    url: "https://status.example.com/heartbeat",
+                    heartbeatExpectedStatus: "ok",
+                    heartbeatTimestampField: "timestamp",
+                    heartbeatMaxDriftSeconds: 60,
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toContain(
+                    "Heartbeat status field is required for server heartbeat monitors"
+                );
+            });
+
+            it("should return error for negative drift", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const monitor: Partial<Monitor> = {
+                    id: "heartbeat-monitor",
+                    type: "server-heartbeat",
+                    url: "https://status.example.com/heartbeat",
+                    heartbeatExpectedStatus: "ok",
+                    heartbeatStatusField: "status",
+                    heartbeatTimestampField: "timestamp",
+                    heartbeatMaxDriftSeconds: -1,
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toContain(
+                    "Heartbeat drift tolerance must be a non-negative number"
+                );
+            });
+
+            it("should return no errors for valid configuration", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const monitor: Partial<Monitor> = {
+                    id: "heartbeat-monitor",
+                    type: "server-heartbeat",
+                    url: "https://status.example.com/heartbeat",
+                    heartbeatExpectedStatus: "ok",
+                    heartbeatStatusField: "status",
+                    heartbeatTimestampField: "timestamp",
+                    heartbeatMaxDriftSeconds: 60,
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toEqual([]);
+            });
+        });
+
+        describe("Replication monitor validation", () => {
+            it("should return error for missing replica URL", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const monitor: Partial<Monitor> = {
+                    id: "replication-monitor",
+                    type: "replication",
+                    primaryStatusUrl: "https://primary.example.com/status",
+                    replicationTimestampField: "status.lastApplied",
+                    maxReplicationLagSeconds: 30,
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toContain(
+                    "Replica status URL is required for replication monitors"
+                );
+            });
+
+            it("should return error for missing timestamp field", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const monitor: Partial<Monitor> = {
+                    id: "replication-monitor",
+                    type: "replication",
+                    primaryStatusUrl: "https://primary.example.com/status",
+                    replicaStatusUrl: "https://replica.example.com/status",
+                    maxReplicationLagSeconds: 30,
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toContain(
+                    "Replication timestamp field is required for replication monitors"
+                );
+            });
+
+            it("should return no errors for valid configuration", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const monitor: Partial<Monitor> = {
+                    id: "replication-monitor",
+                    type: "replication",
+                    primaryStatusUrl: "https://primary.example.com/status",
+                    replicaStatusUrl: "https://replica.example.com/status",
+                    replicationTimestampField: "status.lastApplied",
+                    maxReplicationLagSeconds: 30,
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toEqual([]);
+            });
+        });
+
+        describe("CDN consistency monitor validation", () => {
+            it("should return error for missing baseline URL", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const monitor: Partial<Monitor> = {
+                    id: "cdn-monitor",
+                    type: "cdn-edge-consistency",
+                    edgeLocations:
+                        "https://edge-a.example.com\nhttps://edge-b.example.com",
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toContain(
+                    "Baseline URL is required for CDN edge consistency monitors"
+                );
+            });
+
+            it("should return error for invalid edge locations", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const monitor: Partial<Monitor> = {
+                    id: "cdn-monitor",
+                    type: "cdn-edge-consistency",
+                    baselineUrl: "https://origin.example.com",
+                    edgeLocations: "not-a-url",
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toContain(
+                    "Invalid edge endpoint URL: not-a-url"
+                );
+            });
+
+            it("should return no errors for valid configuration", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const monitor: Partial<Monitor> = {
+                    id: "cdn-monitor",
+                    type: "cdn-edge-consistency",
+                    baselineUrl: "https://origin.example.com",
+                    edgeLocations:
+                        "https://edge-a.example.com\nhttps://edge-b.example.com",
+                    status: "pending",
+                };
+
+                const errors = getMonitorValidationErrors(monitor);
+                expect(errors).toEqual([]);
+            });
+        });
+
         describe("Multiple errors", () => {
             it("should return multiple errors when multiple fields are invalid", async ({
                 task,

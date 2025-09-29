@@ -16,6 +16,7 @@ import {
     type Site,
     validateMonitor,
 } from "@shared/types";
+import validator from "validator";
 
 /**
  * Validates monitor type.
@@ -403,28 +404,190 @@ function validateSslMonitorFields(
 }
 
 /**
- * Validates type-specific monitor fields by delegating to the appropriate field
- * validator.
+ * Validates CDN edge consistency monitor fields.
  *
- * @remarks
- * Calls the correct field validation function based on the monitor type
- * ("http", "port", or "ping"). Adds error messages to the provided errors array
- * for any missing or invalid fields.
- *
- * @param monitor - Partial monitor object to validate.
- * @param errors - Array to collect validation error messages.
- *
- * @internal
+ * Adds error messages for missing baseline URL or invalid edge locations.
  */
+function validateCdnEdgeConsistencyMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
+    if (!monitor.baselineUrl || typeof monitor.baselineUrl !== "string") {
+        errors.push(
+            "Baseline URL is required for CDN edge consistency monitors"
+        );
+    }
+
+    if (!monitor.edgeLocations || typeof monitor.edgeLocations !== "string") {
+        errors.push(
+            "Edge locations are required for CDN edge consistency monitors"
+        );
+        return;
+    }
+
+    const entries = monitor.edgeLocations
+        .split(/\r?\n|,/v)
+        .map((entry) => entry.trim())
+        .filter((entry) => entry.length > 0);
+
+    if (entries.length === 0) {
+        errors.push("At least one edge endpoint must be provided");
+        return;
+    }
+
+    for (const entry of entries) {
+        const isValid = validator.isURL(entry, {
+            allow_protocol_relative_urls: false,
+            allow_trailing_dot: false,
+            allow_underscores: false,
+            disallow_auth: false,
+            protocols: ["http", "https"],
+            require_host: true,
+            require_protocol: true,
+            require_tld: true,
+            validate_length: true,
+        });
+
+        if (!isValid) {
+            errors.push(`Invalid edge endpoint URL: ${entry}`);
+            break;
+        }
+    }
+}
+
+/**
+ * Validates replication monitor fields.
+ *
+ * Ensures both endpoints, timestamp field, and lag threshold are present.
+ */
+function validateReplicationMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
+    if (
+        !monitor.primaryStatusUrl ||
+        typeof monitor.primaryStatusUrl !== "string"
+    ) {
+        errors.push("Primary status URL is required for replication monitors");
+    }
+
+    if (
+        !monitor.replicaStatusUrl ||
+        typeof monitor.replicaStatusUrl !== "string"
+    ) {
+        errors.push("Replica status URL is required for replication monitors");
+    }
+
+    if (
+        typeof monitor.maxReplicationLagSeconds !== "number" ||
+        !Number.isFinite(monitor.maxReplicationLagSeconds) ||
+        monitor.maxReplicationLagSeconds < 0
+    ) {
+        errors.push(
+            "Maximum replication lag seconds must be a non-negative number"
+        );
+    }
+
+    if (
+        !monitor.replicationTimestampField ||
+        typeof monitor.replicationTimestampField !== "string" ||
+        monitor.replicationTimestampField.trim().length === 0
+    ) {
+        errors.push(
+            "Replication timestamp field is required for replication monitors"
+        );
+    }
+}
+
+/**
+ * Validates server heartbeat monitor fields.
+ *
+ * Checks expected status, drift tolerance, and JSON path fields.
+ */
+function validateServerHeartbeatMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
+    if (!monitor.url || typeof monitor.url !== "string") {
+        errors.push("Heartbeat URL is required for server heartbeat monitors");
+    }
+
+    if (
+        !monitor.heartbeatExpectedStatus ||
+        typeof monitor.heartbeatExpectedStatus !== "string" ||
+        monitor.heartbeatExpectedStatus.trim().length === 0
+    ) {
+        errors.push(
+            "Expected status is required for server heartbeat monitors"
+        );
+    }
+
+    if (
+        typeof monitor.heartbeatMaxDriftSeconds !== "number" ||
+        !Number.isFinite(monitor.heartbeatMaxDriftSeconds) ||
+        monitor.heartbeatMaxDriftSeconds < 0
+    ) {
+        errors.push("Heartbeat drift tolerance must be a non-negative number");
+    }
+
+    if (
+        !monitor.heartbeatStatusField ||
+        typeof monitor.heartbeatStatusField !== "string" ||
+        monitor.heartbeatStatusField.trim().length === 0
+    ) {
+        errors.push(
+            "Heartbeat status field is required for server heartbeat monitors"
+        );
+    }
+
+    if (
+        !monitor.heartbeatTimestampField ||
+        typeof monitor.heartbeatTimestampField !== "string" ||
+        monitor.heartbeatTimestampField.trim().length === 0
+    ) {
+        errors.push(
+            "Heartbeat timestamp field is required for server heartbeat monitors"
+        );
+    }
+}
+
+/**
+ * Validates WebSocket keepalive monitor fields.
+ *
+ * Confirms URL presence and positive pong delay threshold.
+ */
+function validateWebsocketKeepaliveMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
+    if (!monitor.url || typeof monitor.url !== "string") {
+        errors.push("WebSocket URL is required for keepalive monitors");
+    }
+
+    if (
+        typeof monitor.maxPongDelayMs !== "number" ||
+        !Number.isFinite(monitor.maxPongDelayMs) ||
+        monitor.maxPongDelayMs <= 0
+    ) {
+        errors.push(
+            "Maximum pong delay must be a positive number for WebSocket keepalive monitors"
+        );
+    }
+}
+
 function validateTypeSpecificFields(
     monitor: Partial<Monitor>,
     errors: string[]
 ): void {
     if (!monitor.type) {
-        return; // Type validation is handled separately in validateBasicMonitorFields
+        return; // Type validation handled separately
     }
 
     switch (monitor.type) {
+        case "cdn-edge-consistency": {
+            validateCdnEdgeConsistencyMonitorFields(monitor, errors);
+            break;
+        }
         case "dns": {
             validateDnsMonitorFields(monitor, errors);
             break;
@@ -461,8 +624,20 @@ function validateTypeSpecificFields(
             validatePortMonitorFields(monitor, errors);
             break;
         }
+        case "replication": {
+            validateReplicationMonitorFields(monitor, errors);
+            break;
+        }
+        case "server-heartbeat": {
+            validateServerHeartbeatMonitorFields(monitor, errors);
+            break;
+        }
         case "ssl": {
             validateSslMonitorFields(monitor, errors);
+            break;
+        }
+        case "websocket-keepalive": {
+            validateWebsocketKeepaliveMonitorFields(monitor, errors);
             break;
         }
         default: {

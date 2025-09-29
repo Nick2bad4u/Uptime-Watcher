@@ -48,6 +48,10 @@ export const BASE_MONITOR_TYPES = [
     "ping",
     "dns",
     "ssl",
+    "websocket-keepalive",
+    "server-heartbeat",
+    "replication",
+    "cdn-edge-consistency",
 ] as const;
 
 /**
@@ -129,12 +133,16 @@ export const DEFAULT_SITE_STATUS: SiteStatus = "unknown";
 export interface Monitor {
     /** Array of currently active operations for this monitor */
     activeOperations?: string[];
+    /** Baseline origin URL when comparing CDN edge consistency */
+    baselineUrl?: string;
     /** Keyword that must be present in HTTP response bodies */
     bodyKeyword?: string;
     /** Certificate expiry warning threshold in days for SSL monitoring */
     certificateWarningDays?: number;
     /** Interval between checks in milliseconds */
     checkInterval: number;
+    /** Optional list of encoded CDN edge endpoints (comma or newline separated) */
+    edgeLocations?: string;
     /** Expected value for HTTP header verification */
     expectedHeaderValue?: string;
     /** Expected value within a JSON payload */
@@ -145,6 +153,14 @@ export interface Monitor {
     expectedValue?: string; // Added for DNS monitoring
     /** HTTP header name to inspect */
     headerName?: string;
+    /** Expected status string returned by heartbeat endpoints */
+    heartbeatExpectedStatus?: string;
+    /** Maximum tolerated heartbeat staleness in seconds */
+    heartbeatMaxDriftSeconds?: number;
+    /** Field name (dot notation supported) that exposes heartbeat status */
+    heartbeatStatusField?: string;
+    /** Field name (dot notation supported) that exposes heartbeat timestamp */
+    heartbeatTimestampField?: string;
     /** Historical status data for analytics and trends */
     history: StatusHistory[];
     /** Hostname or IP address to monitor */
@@ -155,14 +171,24 @@ export interface Monitor {
     jsonPath?: string;
     /** Timestamp of the last check performed */
     lastChecked?: Date;
+    /** Maximum acceptable delay before a WebSocket pong response (milliseconds) */
+    maxPongDelayMs?: number;
+    /** Maximum allowable replication lag in seconds */
+    maxReplicationLagSeconds?: number;
     /** Maximum allowed response time for latency monitors */
     maxResponseTime?: number;
     /** Whether monitoring is currently active for this monitor */
     monitoring: boolean;
     /** Port number for port-based monitoring */
     port?: number;
+    /** Primary node status endpoint used for replication comparisons */
+    primaryStatusUrl?: string;
     /** DNS record type to query (A, AAAA, CNAME, etc.) */
     recordType?: string; // Added for DNS monitoring
+    /** Replica node status endpoint used for replication comparisons */
+    replicaStatusUrl?: string;
+    /** JSON field (dot notation supported) containing replication timestamps */
+    replicationTimestampField?: string;
     /** Latest response time measurement in milliseconds */
     responseTime: number;
     /** Number of retry attempts when a check fails */
@@ -172,8 +198,7 @@ export interface Monitor {
     /** Timeout for monitor checks in milliseconds */
     timeout: number;
     /**
-     * Type of monitoring performed (http, http-keyword, http-status,
-     * http-header, http-json, http-latency, port, ping, dns, ssl)
+     * Type of monitoring performed (see {@link BASE_MONITOR_TYPES}).
      */
     type: MonitorType;
     /** URL to monitor for HTTP-based checks */

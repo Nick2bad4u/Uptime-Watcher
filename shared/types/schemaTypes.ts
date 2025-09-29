@@ -27,6 +27,7 @@ type MonitorStatusEnum = z.ZodEnum<{
 }>;
 
 type MonitorTypeEnum = z.ZodEnum<{
+    "cdn-edge-consistency": "cdn-edge-consistency";
     dns: "dns";
     http: "http";
     "http-header": "http-header";
@@ -36,7 +37,10 @@ type MonitorTypeEnum = z.ZodEnum<{
     "http-status": "http-status";
     ping: "ping";
     port: "port";
+    replication: "replication";
+    "server-heartbeat": "server-heartbeat";
     ssl: "ssl";
+    "websocket-keepalive": "websocket-keepalive";
 }>;
 
 type DnsRecordEnum = z.ZodEnum<{
@@ -182,6 +186,24 @@ export type PortMonitorSchemaType = z.ZodObject<{
     type: z.ZodLiteral<"port">;
 }>;
 
+export type ReplicationMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    checkInterval: z.ZodNumber;
+    history: HistoryArray;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    maxReplicationLagSeconds: z.ZodNumber;
+    monitoring: z.ZodBoolean;
+    primaryStatusUrl: z.ZodString;
+    replicaStatusUrl: z.ZodString;
+    replicationTimestampField: z.ZodString;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"replication">;
+}>;
+
 export type PingMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
@@ -231,6 +253,57 @@ export type SslMonitorSchemaType = z.ZodObject<{
     type: z.ZodLiteral<"ssl">;
 }>;
 
+export type CdnEdgeConsistencyMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    baselineUrl: z.ZodString;
+    checkInterval: z.ZodNumber;
+    edgeLocations: z.ZodString;
+    history: HistoryArray;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    monitoring: z.ZodBoolean;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"cdn-edge-consistency">;
+}>;
+
+export type ServerHeartbeatMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    checkInterval: z.ZodNumber;
+    heartbeatExpectedStatus: z.ZodString;
+    heartbeatMaxDriftSeconds: z.ZodNumber;
+    heartbeatStatusField: z.ZodString;
+    heartbeatTimestampField: z.ZodString;
+    history: HistoryArray;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    monitoring: z.ZodBoolean;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"server-heartbeat">;
+    url: z.ZodString;
+}>;
+
+export type WebsocketKeepaliveMonitorSchemaType = z.ZodObject<{
+    activeOperations: ActiveOperationsArray;
+    checkInterval: z.ZodNumber;
+    history: HistoryArray;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    maxPongDelayMs: z.ZodNumber;
+    monitoring: z.ZodBoolean;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: MonitorStatusEnum;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"websocket-keepalive">;
+    url: z.ZodString;
+}>;
+
 export type MonitorSchemaType = z.ZodDiscriminatedUnion<
     [
         HttpMonitorSchemaType,
@@ -243,6 +316,10 @@ export type MonitorSchemaType = z.ZodDiscriminatedUnion<
         PingMonitorSchemaType,
         DnsMonitorSchemaType,
         SslMonitorSchemaType,
+        CdnEdgeConsistencyMonitorSchemaType,
+        ReplicationMonitorSchemaType,
+        ServerHeartbeatMonitorSchemaType,
+        WebsocketKeepaliveMonitorSchemaType,
     ]
 >;
 
@@ -254,6 +331,7 @@ export type SiteSchemaType = z.ZodObject<{
 }>;
 
 export interface MonitorSchemas {
+    readonly "cdn-edge-consistency": CdnEdgeConsistencyMonitorSchemaType;
     readonly dns: DnsMonitorSchemaType;
     readonly http: HttpMonitorSchemaType;
     readonly "http-header": HttpHeaderMonitorSchemaType;
@@ -263,5 +341,8 @@ export interface MonitorSchemas {
     readonly "http-status": HttpStatusMonitorSchemaType;
     readonly ping: PingMonitorSchemaType;
     readonly port: PortMonitorSchemaType;
+    readonly replication: ReplicationMonitorSchemaType;
+    readonly "server-heartbeat": ServerHeartbeatMonitorSchemaType;
     readonly ssl: SslMonitorSchemaType;
+    readonly "websocket-keepalive": WebsocketKeepaliveMonitorSchemaType;
 }

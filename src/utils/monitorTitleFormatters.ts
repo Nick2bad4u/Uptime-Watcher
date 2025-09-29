@@ -24,6 +24,10 @@ export type TitleSuffixFormatter = (monitor: Monitor) => string;
  * @internal
  */
 const titleSuffixFormatters: Record<string, TitleSuffixFormatter> = {
+    "cdn-edge-consistency": (monitor: Monitor) => {
+        const { baselineUrl } = monitor;
+        return baselineUrl ? ` (${baselineUrl})` : "";
+    },
     dns: (monitor: Monitor) => {
         const { host, recordType } = monitor;
         return host && recordType ? ` (${recordType} ${host})` : "";
@@ -32,11 +36,43 @@ const titleSuffixFormatters: Record<string, TitleSuffixFormatter> = {
         const { url } = monitor;
         return url ? ` (${url})` : "";
     },
+    "http-header": (monitor: Monitor) =>
+        monitor.url ? ` (${monitor.url})` : "",
+    "http-json": (monitor: Monitor) => (monitor.url ? ` (${monitor.url})` : ""),
+    "http-keyword": (monitor: Monitor) =>
+        monitor.url ? ` (${monitor.url})` : "",
+    "http-latency": (monitor: Monitor) =>
+        monitor.url ? ` (${monitor.url})` : "",
+    "http-status": (monitor: Monitor) =>
+        monitor.url ? ` (${monitor.url})` : "",
+    ping: (monitor: Monitor) => (monitor.host ? ` (${monitor.host})` : ""),
     port: (monitor: Monitor) => {
         const { host } = monitor;
         const { port } = monitor;
         return host && port ? ` (${host}:${port})` : "";
     },
+    replication: (monitor: Monitor) => {
+        const { primaryStatusUrl, replicaStatusUrl } = monitor;
+        if (primaryStatusUrl) {
+            return ` (${primaryStatusUrl})`;
+        }
+        if (replicaStatusUrl) {
+            return ` (${replicaStatusUrl})`;
+        }
+        return "";
+    },
+    "server-heartbeat": (monitor: Monitor) =>
+        monitor.url ? ` (${monitor.url})` : "",
+    ssl: (monitor: Monitor) => {
+        const { host, port } = monitor;
+        if (!host) {
+            return "";
+        }
+        const portSuffix = port ? `:${port}` : "";
+        return ` (${host}${portSuffix})`;
+    },
+    "websocket-keepalive": (monitor: Monitor) =>
+        monitor.url ? ` (${monitor.url})` : "",
 };
 
 /**

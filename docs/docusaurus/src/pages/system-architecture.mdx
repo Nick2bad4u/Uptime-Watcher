@@ -352,6 +352,183 @@ export default function SystemArchitecture() {
     class WindowSvc,EventsAPI,SiteStore frontend
 `} />
 
+                        ## UI Component Composition
+
+                        The React shell in `src/App.tsx` wraps the application with error handling and theme context before rendering the header, dashboard, overlays, and modal surfaces. The diagram below maps the concrete components sourced from `src/components/**` so new contributors can trace the composition quickly.
+
+                        
+<Mermaid value={`flowchart LR
+    %% Application shell composition
+    subgraph Shell["App.tsx Composition"]
+        ErrorBoundary[ErrorBoundary
+(stores/error)]
+        ThemeProvider[ThemeProvider
+(theme/components)]
+        AppRoot[App.tsx]
+        ErrorBoundary --> ThemeProvider
+        ThemeProvider --> AppRoot
+    end
+
+    subgraph HeaderStack["Header/"]
+        Header[Header]
+        StatusSummary[StatusSummary]
+        HeaderControls[HeaderControls]
+        Header --> StatusSummary
+        Header --> HeaderControls
+    end
+
+    subgraph Dashboard["Dashboard/SiteList"]
+        SiteList[SiteList]
+        subgraph SiteCardStack["SiteCard/"]
+            SiteCard[SiteCard]
+            SiteCardHeader[SiteCardHeader]
+            SiteCardStatus[SiteCardStatus]
+            SiteCardMetrics[SiteCardMetrics]
+            SiteCardHistory[SiteCardHistory]
+            SiteCardFooter[SiteCardFooter]
+            SiteCard --> SiteCardHeader
+            SiteCard --> SiteCardStatus
+            SiteCard --> SiteCardMetrics
+            SiteCard --> SiteCardHistory
+            SiteCard --> SiteCardFooter
+        end
+        SiteList --> SiteCard
+    end
+
+    subgraph ModalLayer["Modal Surfaces"]
+        AddSiteModal[AddSiteModal]
+        SettingsModal[Settings]
+        SiteDetailsModal[SiteDetails]
+        subgraph AddSiteFormStack["AddSiteForm/"]
+            AddSiteForm[AddSiteForm]
+            DynamicMonitorFields[DynamicMonitorFields]
+            FormField[FormField/TextField/SelectField]
+            SubmitControls[Submit]
+            AddSiteForm --> DynamicMonitorFields
+            AddSiteForm --> FormField
+            AddSiteForm --> SubmitControls
+        end
+        subgraph SiteDetailsStack["SiteDetails tabs"]
+            SiteDetailsHeader[SiteDetailsHeader]
+            SiteDetailsNav[SiteDetailsNavigation]
+            SiteOverviewTab[SiteOverviewTab]
+            OverviewTab[OverviewTab]
+            HistoryTab[HistoryTab]
+            AnalyticsTab[AnalyticsTab]
+            SettingsTab[SettingsTab]
+            SiteDetailsModal --> SiteDetailsHeader
+            SiteDetailsModal --> SiteDetailsNav
+            SiteDetailsModal --> SiteOverviewTab
+            SiteDetailsModal --> OverviewTab
+            SiteDetailsModal --> HistoryTab
+            SiteDetailsModal --> AnalyticsTab
+            SiteDetailsModal --> SettingsTab
+        end
+    end
+
+    subgraph Overlays["Global Overlays"]
+        LoadingOverlay[Loading overlay]
+        ErrorAlert[ErrorAlert]
+        UpdateNotice[Update notification]
+    end
+
+    AppRoot --> Header
+    AppRoot --> Dashboard
+    AppRoot --> Overlays
+    AppRoot --> AddSiteModal
+    AppRoot --> SettingsModal
+    AppRoot --> SiteDetailsModal
+
+    classDef root fill:#0ea5e9,stroke:#0369a1,color:#ffffff
+    classDef section fill:#312e81,stroke:#1e1b4b,color:#ffffff
+    classDef component fill:#1f2937,stroke:#111827,color:#f1f5f9
+
+    class AppRoot root
+    class ErrorBoundary,ThemeProvider,Header,SiteList,AddSiteModal,SettingsModal,SiteDetailsModal,LoadingOverlay,ErrorAlert,UpdateNotice component
+    class HeaderStack,Dashboard,ModalLayer,Overlays,Shell,SiteCardStack,AddSiteFormStack,SiteDetailsStack section
+`} />
+
+
+                        ## UI-State Integration Map
+
+                        UI components consume shared Zustand stores and renderer services instead of talking to Electron directly. This view shows which surfaces subscribe to each store and which services bridge to `electronAPI` IPC channels, based on hooks in `src/hooks/site` and the store modules under `src/stores/**`.
+
+                        
+<Mermaid value={`flowchart LR
+    subgraph UI["UI Components"]
+        Header[Header]
+        SiteList[SiteList]
+        SiteCard[SiteCard]
+        AddSiteModal[AddSiteModal]
+        SettingsPanel[Settings]
+        SiteDetailsView[SiteDetails]
+        UpdateNotice[Update notification]
+        ErrorBanner[ErrorAlert]
+    end
+
+    subgraph HooksStores["Hooks & Zustand Stores"]
+        SitesStore[useSitesStore]
+        UIStore[useUIStore]
+        SettingsStore[useSettingsStore]
+        ErrorStore[useErrorStore]
+        UpdatesStore[useUpdatesStore]
+        ThemeHook[useTheme / useAvailabilityColors]
+        SiteHook[useSite]
+        SiteDetailsHook[useSiteDetails]
+    end
+
+    subgraph Services["Renderer Services"]
+        SiteSvc[SiteService
+(electronAPI.sites)]
+        MonitoringSvc[MonitoringService
+(monitoring IPC)]
+        EventsSvc[EventsService
+(electronAPI.events)]
+        ChartConfigSvc[ChartConfigService]
+    end
+
+    Header --> SitesStore
+    Header --> UIStore
+    Header --> ThemeHook
+
+    SiteList --> SitesStore
+
+    SiteCard --> SiteHook
+    SiteHook --> SitesStore
+    SiteHook --> ErrorStore
+
+    AddSiteModal --> SitesStore
+    AddSiteModal --> UIStore
+    AddSiteModal --> SiteSvc
+
+    SettingsPanel --> SettingsStore
+    SettingsPanel --> ThemeHook
+    SettingsPanel --> SitesStore
+    SettingsPanel --> ErrorStore
+
+    SiteDetailsView --> SiteDetailsHook
+    SiteDetailsHook --> SitesStore
+    SiteDetailsHook --> UIStore
+    SiteDetailsHook --> MonitoringSvc
+    SiteDetailsHook --> ChartConfigSvc
+
+    UpdateNotice --> UpdatesStore
+    ErrorBanner --> ErrorStore
+
+    SitesStore --> SiteSvc
+    SitesStore --> MonitoringSvc
+    SitesStore --> EventsSvc
+
+    classDef ui fill:#0ea5e9,stroke:#0369a1,color:#ffffff
+    classDef store fill:#312e81,stroke:#1e1b4b,color:#ffffff
+    classDef service fill:#1f2937,stroke:#111827,color:#f1f5f9
+
+    class Header,SiteList,SiteCard,AddSiteModal,SettingsPanel,SiteDetailsView,UpdateNotice,ErrorBanner ui
+    class SitesStore,UIStore,SettingsStore,ErrorStore,UpdatesStore,ThemeHook,SiteHook,SiteDetailsHook store
+    class SiteSvc,MonitoringSvc,EventsSvc,ChartConfigSvc service
+`} />
+
+
                         ---
 
                         The diagrams above illustrate the core architecture and component interactions of Uptime Watcher. For deeper insights into each module, see the [API documentation](../api/overview.md) and [code references](../../src) for implementation details and maintainability guidelines.

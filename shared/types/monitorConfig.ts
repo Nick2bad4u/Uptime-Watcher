@@ -210,16 +210,6 @@ export interface PingMonitorConfig extends BaseMonitorConfig {
 }
 
 /**
- * Monitor configuration validation result.
- *
- * @remarks
- * Used to return validation results for monitor configurations. Import directly
- * from "./validation" for MonitorConfigValidationResult if needed.
- *
- * @public
- */
-
-/**
  * Configuration interface for port monitors.
  *
  * @remarks
@@ -353,6 +343,83 @@ export interface HttpLatencyMonitorConfig extends BaseMonitorConfig {
 }
 
 /**
+ * Configuration interface for WebSocket keepalive monitors.
+ *
+ * @remarks
+ * Ensures WebSocket endpoints respond to ping/pong frames within a configurable
+ * latency budget.
+ *
+ * @public
+ */
+export interface WebsocketKeepaliveMonitorConfig extends BaseMonitorConfig {
+    /** Maximum acceptable time in milliseconds for a pong response */
+    maxPongDelayMs: number;
+    type: "websocket-keepalive";
+    /** WebSocket endpoint to monitor */
+    url: string;
+}
+
+/**
+ * Configuration interface for server heartbeat monitors.
+ *
+ * @remarks
+ * Polls JSON heartbeat endpoints and validates status plus timestamp recency.
+ *
+ * @public
+ */
+export interface ServerHeartbeatMonitorConfig extends BaseMonitorConfig {
+    /** Expected status value returned by the heartbeat endpoint */
+    heartbeatExpectedStatus: string;
+    /** Maximum allowed heartbeat staleness in seconds */
+    heartbeatMaxDriftSeconds: number;
+    /** Field name (dot notation supported) containing the status value */
+    heartbeatStatusField: string;
+    /** Field name (dot notation supported) containing the timestamp */
+    heartbeatTimestampField: string;
+    type: "server-heartbeat";
+    /** Heartbeat endpoint URL */
+    url: string;
+}
+
+/**
+ * Configuration interface for replication monitors.
+ *
+ * @remarks
+ * Compares timestamps from primary and replica status endpoints to determine
+ * replication lag.
+ *
+ * @public
+ */
+export interface ReplicationMonitorConfig extends BaseMonitorConfig {
+    /** Maximum tolerated replication lag in seconds */
+    maxReplicationLagSeconds: number;
+    /** Primary node status URL */
+    primaryStatusUrl: string;
+    /** Replica node status URL */
+    replicaStatusUrl: string;
+    /** Field name (dot notation supported) containing replication timestamp */
+    replicationTimestampField: string;
+    type: "replication";
+}
+
+/**
+ * Configuration interface for CDN edge consistency monitors.
+ *
+ * @remarks
+ * Compares responses from multiple edge endpoints against an origin baseline to
+ * detect drift between CDN nodes.
+ *
+ * @public
+ */
+export interface CdnEdgeConsistencyMonitorConfig extends BaseMonitorConfig {
+    /** Baseline origin URL used for comparison */
+    baselineUrl: string;
+    /** List of edge URLs encoded as comma or newline separated string */
+    edgeLocations: string;
+    type: "cdn-edge-consistency";
+}
+
+/**
  * Union type representing all possible monitor configurations.
  *
  * @remarks
@@ -363,6 +430,7 @@ export interface HttpLatencyMonitorConfig extends BaseMonitorConfig {
  * @public
  */
 export type MonitorConfig = Simplify<
+    | CdnEdgeConsistencyMonitorConfig
     | HttpHeaderMonitorConfig
     | HttpJsonMonitorConfig
     | HttpKeywordMonitorConfig
@@ -371,7 +439,10 @@ export type MonitorConfig = Simplify<
     | HttpStatusMonitorConfig
     | PingMonitorConfig
     | PortMonitorConfig
+    | ReplicationMonitorConfig
+    | ServerHeartbeatMonitorConfig
     | SslMonitorConfig
+    | WebsocketKeepaliveMonitorConfig
 >;
 
 function isMonitorConfigOfType<T extends MonitorConfig>(
@@ -529,11 +600,70 @@ export function isHttpLatencyMonitorConfig(
 }
 
 /**
+ * Type guard to check if configuration is for CDN edge consistency monitors.
+ */
+export function isCdnEdgeConsistencyMonitorConfig(
+    config: MonitorConfig | null | undefined
+): config is CdnEdgeConsistencyMonitorConfig {
+    return isMonitorConfigOfType<CdnEdgeConsistencyMonitorConfig>(
+        config,
+        "cdn-edge-consistency"
+    );
+}
+
+/**
+ * Type guard to check if configuration is for replication monitors.
+ */
+export function isReplicationMonitorConfig(
+    config: MonitorConfig | null | undefined
+): config is ReplicationMonitorConfig {
+    return isMonitorConfigOfType<ReplicationMonitorConfig>(
+        config,
+        "replication"
+    );
+}
+
+/**
+ * Type guard to check if configuration is for server heartbeat monitors.
+ */
+export function isServerHeartbeatMonitorConfig(
+    config: MonitorConfig | null | undefined
+): config is ServerHeartbeatMonitorConfig {
+    return isMonitorConfigOfType<ServerHeartbeatMonitorConfig>(
+        config,
+        "server-heartbeat"
+    );
+}
+
+/**
+ * Type guard to check if configuration is for WebSocket keepalive monitors.
+ */
+export function isWebsocketKeepaliveMonitorConfig(
+    config: MonitorConfig | null | undefined
+): config is WebsocketKeepaliveMonitorConfig {
+    return isMonitorConfigOfType<WebsocketKeepaliveMonitorConfig>(
+        config,
+        "websocket-keepalive"
+    );
+}
+
+/**
  * Default monitor configuration values.
  *
  * @public
  */
 export const DEFAULT_MONITOR_CONFIG = {
+    /** Default values for CDN edge consistency monitors */
+    "cdn-edge-consistency": {
+        baselineUrl: "",
+        checkInterval: 300_000,
+        edgeLocations: "",
+        enabled: true,
+        retryAttempts: 3,
+        timeout: 30_000,
+        type: "cdn-edge-consistency" as const,
+    } as Partial<CdnEdgeConsistencyMonitorConfig>,
+
     /** Default values for HTTP monitors */
     http: {
         checkInterval: 300_000, // 5 minutes
@@ -620,6 +750,32 @@ export const DEFAULT_MONITOR_CONFIG = {
         type: "port" as const,
     } as Partial<PortMonitorConfig>,
 
+    /** Default values for replication monitors */
+    replication: {
+        checkInterval: 120_000,
+        enabled: true,
+        maxReplicationLagSeconds: 10,
+        primaryStatusUrl: "",
+        replicaStatusUrl: "",
+        replicationTimestampField: "lastAppliedTimestamp",
+        retryAttempts: 3,
+        timeout: 30_000,
+        type: "replication" as const,
+    } as Partial<ReplicationMonitorConfig>,
+
+    /** Default values for server heartbeat monitors */
+    "server-heartbeat": {
+        checkInterval: 60_000,
+        enabled: true,
+        heartbeatExpectedStatus: "ok",
+        heartbeatMaxDriftSeconds: 60,
+        heartbeatStatusField: "status",
+        heartbeatTimestampField: "timestamp",
+        retryAttempts: 3,
+        timeout: 30_000,
+        type: "server-heartbeat" as const,
+    } as Partial<ServerHeartbeatMonitorConfig>,
+
     /** Default values for SSL certificate monitors */
     ssl: {
         certificateWarningDays: 30,
@@ -630,4 +786,28 @@ export const DEFAULT_MONITOR_CONFIG = {
         timeout: 30_000, // 30 seconds
         type: "ssl" as const,
     } as Partial<SslMonitorConfig>,
+
+    /** Default values for WebSocket keepalive monitors */
+    "websocket-keepalive": {
+        checkInterval: 60_000,
+        enabled: true,
+        maxPongDelayMs: 1500,
+        retryAttempts: 3,
+        timeout: 30_000,
+        type: "websocket-keepalive" as const,
+    } as Partial<WebsocketKeepaliveMonitorConfig>,
 } as const;
+
+/**
+ * Monitor configuration validation result.
+ *
+ * @remarks
+ * Used to return validation results for monitor configurations. Import directly
+ * from "./validation" for MonitorConfigValidationResult if needed.
+ *
+ * @public
+ */
+
+/**
+ * Configuration interface for port monitors.
+ */

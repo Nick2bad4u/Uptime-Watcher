@@ -17,6 +17,10 @@ import {
     siteSchema,
     baseMonitorSchema,
     monitorSchemas,
+    cdnEdgeConsistencyMonitorSchema,
+    replicationMonitorSchema,
+    serverHeartbeatMonitorSchema,
+    websocketKeepaliveMonitorSchema,
     type HttpMonitor,
     type HttpStatusMonitor,
     type PortMonitor,
@@ -26,6 +30,7 @@ import {
     type Site,
 } from "../../validation/schemas";
 
+// eslint-disable-next-line max-lines-per-function -- Comprehensive tests for validation schemas
 describe("Validation Schemas - Comprehensive Coverage", () => {
     describe("baseMonitorSchema", () => {
         it("should validate basic monitor properties", async ({
@@ -1316,6 +1321,10 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(monitorSchemas.ping).toBeDefined();
             expect(monitorSchemas.dns).toBeDefined();
             expect(monitorSchemas.ssl).toBeDefined();
+            expect(monitorSchemas["cdn-edge-consistency"]).toBeDefined();
+            expect(monitorSchemas.replication).toBeDefined();
+            expect(monitorSchemas["server-heartbeat"]).toBeDefined();
+            expect(monitorSchemas["websocket-keepalive"]).toBeDefined();
         });
 
         it("should return undefined for unknown types", async ({
@@ -1470,12 +1479,12 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const monitor = {
-                id: "a", // Minimum length
+                id: "a",
                 type: "http" as const,
-                url: "https://short.co", // Minimum valid URL with HTTPS
-                checkInterval: 5000, // Minimum allowed
-                timeout: 1000, // Minimum allowed
-                retryAttempts: 0, // Minimum allowed
+                url: "https://short.co",
+                checkInterval: 5000,
+                timeout: 1000,
+                retryAttempts: 0,
                 monitoring: true,
                 status: "pending" as const,
                 responseTime: -1,
@@ -1492,15 +1501,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const monitor = {
-                id: "a".repeat(50), // Reasonable length
+                id: "a".repeat(50),
                 type: "http" as const,
                 url: "https://example.com",
-                checkInterval: 2_592_000_000, // Maximum allowed (30 days)
-                timeout: 300_000, // Maximum allowed (5 minutes)
-                retryAttempts: 10, // Maximum allowed
+                checkInterval: 2_592_000_000,
+                timeout: 300_000,
+                retryAttempts: 10,
                 monitoring: true,
                 status: "pending" as const,
-                responseTime: 999_999, // Large response time
+                responseTime: 999_999,
                 history: [],
             };
 
@@ -1588,7 +1597,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 await annotate("Category: Validation", "category");
                 await annotate("Type: Business Logic", "type");
 
-                // This test targets the optional field warning branch in validateMonitorData (line 312)
                 const incompleteData = {
                     id: "test",
                     type: "http",
@@ -1600,15 +1608,11 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     status: "pending",
                     responseTime: -1,
                     history: [],
-                    // LastChecked is intentionally missing (optional field)
                 };
 
                 const result = validateMonitorData("http", incompleteData);
-
-                // The validation should succeed because lastChecked is optional
                 expect(result.success).toBeTruthy();
                 expect(result.errors).toHaveLength(0);
-                // No warnings expected since lastChecked is truly optional and Zod handles it correctly
             });
 
             it("should handle undefined optional fields in Zod validation", async ({
@@ -1620,7 +1624,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 await annotate("Category: Validation", "category");
                 await annotate("Type: Validation", "type");
 
-                // Create data that has undefined optional fields to trigger the optional field detection
                 const dataWithUndefinedOptional = {
                     id: "test",
                     type: "http",
@@ -1632,7 +1635,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     status: "pending",
                     responseTime: -1,
                     history: [],
-                    lastChecked: undefined, // Explicitly undefined to test the optional field branch
+                    lastChecked: undefined,
                 };
 
                 const result = validateMonitorData(
@@ -1653,8 +1656,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 await annotate("Category: Validation", "category");
                 await annotate("Type: Business Logic", "type");
 
-                // This test targets line 484 - fallback to base schema for common fields
-                // We'll test a field that exists in base schema but might not be directly accessible in type-specific schema shape
                 try {
                     const result = validateMonitorField(
                         "http",
@@ -1664,8 +1665,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     expect(result.success).toBeTruthy();
                     expect(result.data).toHaveProperty("responseTime", 100);
                 } catch (error) {
-                    // If responseTime is not in the specific schema shape, it should fall back to base schema
-                    // This exercises the fallback logic
                     expect(error).toBeDefined();
                 }
             });
@@ -1679,7 +1678,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 await annotate("Category: Validation", "category");
                 await annotate("Type: Error Handling", "type");
 
-                // This tests the final throw for unknown fields
                 expect(() => {
                     validateMonitorField("http", "nonExistentField", "value");
                 }).toThrow("Unknown field: nonExistentField");
@@ -1694,7 +1692,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 await annotate("Category: Validation", "category");
                 await annotate("Type: Business Logic", "type");
 
-                // Test that URL field works for HTTP monitors (exists in httpMonitorSchema.shape)
                 const result = validateMonitorField(
                     "http",
                     "url",
@@ -1736,7 +1733,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     return validValues[fieldName] || "default-value";
                 }
 
-                // Test base schema fields work for all monitor types
                 const types = [
                     "http",
                     "port",
@@ -1763,7 +1759,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                             );
                             expect(result.success).toBeTruthy();
                         } catch (error) {
-                            // Some combinations might be invalid, that's OK for this test
                             console.log(
                                 `Field ${fieldName} for type ${monitorType} threw:`,
                                 error
@@ -1820,7 +1815,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 await annotate("Category: Validation", "category");
                 await annotate("Type: Error Handling", "type");
 
-                // Try to create a scenario that might trigger non-ZodError paths
                 const result = validateMonitorData("http", null);
                 expect(result.success).toBeFalsy();
                 expect(result.errors.length).toBeGreaterThan(0);
@@ -1835,7 +1829,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 await annotate("Category: Validation", "category");
                 await annotate("Type: Error Handling", "type");
 
-                // Test various error scenarios
                 const testCases = [
                     { type: "http", field: "url", value: "invalid-url" },
                     { type: "port", field: "port", value: "not-a-number" },
@@ -1858,11 +1851,10 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 await annotate("Category: Validation", "category");
                 await annotate("Type: Error Handling", "type");
 
-                // Mock scenario to trigger non-Error handling (line 422)
                 vi.spyOn(monitorSchemas, "http", "get").mockReturnValue({
                     ...monitorSchemas.http,
                     parse: vi.fn().mockImplementation(() => {
-                        throw new Error("String error object"); // Non-Error object
+                        throw new Error("String error object");
                     }),
                 });
 
@@ -1894,10 +1886,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 await annotate("Category: Validation", "category");
                 await annotate("Type: Error Handling", "type");
 
-                // Mock scenario to trigger non-Error handling (line 540)
                 const originalParse = siteSchema.parse;
                 vi.spyOn(siteSchema, "parse").mockImplementation(() => {
-                    throw new Error("Site validation string error"); // Non-Error object
+                    throw new Error("Site validation string error");
                 });
 
                 const result = validateSiteData({
@@ -1936,11 +1927,9 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 await annotate("Category: Validation", "category");
                 await annotate("Type: Business Logic", "type");
 
-                // Test the fallback path for common field validation (line 330)
-                // This should use base schema when specific schema doesn't have the field
                 const result = validateMonitorField(
                     "http",
-                    "checkInterval", // Common field that should exist in base schema
+                    "checkInterval",
                     30_000
                 );
 
@@ -1956,9 +1945,8 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 await annotate("Category: Validation", "category");
                 await annotate("Type: Error Handling", "type");
 
-                // Test that errors are categorized correctly (line 408 - else case)
                 const result = validateMonitorData("http", {
-                    id: "", // Empty ID - should be required error, not warning
+                    id: "",
                     type: "http" as const,
                     url: "https://example.com",
                     checkInterval: 30_000,
@@ -2260,6 +2248,243 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     monitorSchemas["http-status"].parse(invalidMonitor)
                 ).toThrow();
             }
+        });
+    });
+
+    describe("cdnEdgeConsistencyMonitorSchema", () => {
+        it("should validate CDN edge consistency monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                id: "cdn-monitor",
+                type: "cdn-edge-consistency" as const,
+                baselineUrl: "https://origin.example.com",
+                edgeLocations:
+                    "https://edge-a.example.com\nhttps://edge-b.example.com",
+                checkInterval: 300_000,
+                timeout: 30_000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            expect(() =>
+                cdnEdgeConsistencyMonitorSchema.parse(monitor)
+            ).not.toThrow();
+        });
+
+        it("should reject invalid edge endpoint list", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                id: "cdn-monitor",
+                type: "cdn-edge-consistency" as const,
+                baselineUrl: "https://origin.example.com",
+                edgeLocations: "invalid-entry",
+                checkInterval: 300_000,
+                timeout: 30_000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            expect(() =>
+                cdnEdgeConsistencyMonitorSchema.parse(monitor)
+            ).toThrow();
+        });
+    });
+
+    describe("replicationMonitorSchema", () => {
+        it("should validate replication monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                id: "replication-monitor",
+                type: "replication" as const,
+                primaryStatusUrl: "https://primary.example.com/status",
+                replicaStatusUrl: "https://replica.example.com/status",
+                replicationTimestampField: "status.lastApplied",
+                maxReplicationLagSeconds: 30,
+                checkInterval: 120_000,
+                timeout: 30_000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            expect(() => replicationMonitorSchema.parse(monitor)).not.toThrow();
+        });
+
+        it("should reject replication monitor with missing timestamp field", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                id: "replication-monitor",
+                type: "replication" as const,
+                primaryStatusUrl: "https://primary.example.com/status",
+                replicaStatusUrl: "https://replica.example.com/status",
+                replicationTimestampField: " ",
+                maxReplicationLagSeconds: 30,
+                checkInterval: 120_000,
+                timeout: 30_000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            expect(() => replicationMonitorSchema.parse(monitor)).toThrow();
+        });
+    });
+
+    describe("serverHeartbeatMonitorSchema", () => {
+        it("should validate server heartbeat monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                id: "heartbeat-monitor",
+                type: "server-heartbeat" as const,
+                url: "https://status.example.com/heartbeat",
+                heartbeatExpectedStatus: "ok",
+                heartbeatStatusField: "status",
+                heartbeatTimestampField: "timestamp",
+                heartbeatMaxDriftSeconds: 60,
+                checkInterval: 60_000,
+                timeout: 30_000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            expect(() =>
+                serverHeartbeatMonitorSchema.parse(monitor)
+            ).not.toThrow();
+        });
+
+        it("should reject heartbeat monitor with negative drift", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                id: "heartbeat-monitor",
+                type: "server-heartbeat" as const,
+                url: "https://status.example.com/heartbeat",
+                heartbeatExpectedStatus: "ok",
+                heartbeatStatusField: "status",
+                heartbeatTimestampField: "timestamp",
+                heartbeatMaxDriftSeconds: -1,
+                checkInterval: 60_000,
+                timeout: 30_000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            expect(() => serverHeartbeatMonitorSchema.parse(monitor)).toThrow();
+        });
+    });
+
+    describe("websocketKeepaliveMonitorSchema", () => {
+        it("should validate WebSocket keepalive monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                id: "ws-monitor",
+                type: "websocket-keepalive" as const,
+                url: "wss://ws.example.com/socket",
+                maxPongDelayMs: 1500,
+                checkInterval: 60_000,
+                timeout: 20_000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            expect(() =>
+                websocketKeepaliveMonitorSchema.parse(monitor)
+            ).not.toThrow();
+        });
+
+        it("should reject keepalive monitor with invalid URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
+            const monitor = {
+                id: "ws-monitor",
+                type: "websocket-keepalive" as const,
+                url: "https://example.com",
+                maxPongDelayMs: 1500,
+                checkInterval: 60_000,
+                timeout: 20_000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "pending" as const,
+                responseTime: -1,
+                history: [],
+            };
+
+            expect(() =>
+                websocketKeepaliveMonitorSchema.parse(monitor)
+            ).toThrow();
         });
     });
 });

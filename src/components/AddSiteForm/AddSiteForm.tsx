@@ -128,40 +128,62 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         const formState = useAddSiteForm();
         const {
             addMode,
+            baselineUrl,
             bodyKeyword,
             certificateWarningDays,
             checkInterval,
+            edgeLocations,
             expectedHeaderValue,
             expectedJsonValue,
             expectedStatusCode,
             expectedValue,
             formError,
+            heartbeatExpectedStatus,
+            heartbeatMaxDriftSeconds,
+            heartbeatStatusField,
+            heartbeatTimestampField,
             headerName,
             host,
             jsonPath,
+            maxPongDelayMs,
+            maxReplicationLagSeconds,
             maxResponseTime,
             monitorType,
             name,
             port,
+            primaryStatusUrl,
             recordType,
+            replicaStatusUrl,
+            replicationTimestampField,
             resetForm,
             selectedExistingSite,
             setAddMode,
+            setBaselineUrl,
             setBodyKeyword,
             setCertificateWarningDays,
             setCheckInterval,
+            setEdgeLocations,
             setExpectedHeaderValue,
             setExpectedJsonValue,
             setExpectedStatusCode,
             setExpectedValue,
             setFormError,
+            setHeartbeatExpectedStatus,
+            setHeartbeatMaxDriftSeconds,
+            setHeartbeatStatusField,
+            setHeartbeatTimestampField,
             setHeaderName,
             setHost,
             setJsonPath,
+            setMaxPongDelayMs,
+            setMaxReplicationLagSeconds,
             setMaxResponseTime,
             setMonitorType,
             setName,
+            setPrimaryStatusUrl,
             setPort,
+            setReplicaStatusUrl,
+            setReplicationTimestampField,
             setRecordType,
             setSelectedExistingSite,
             setUrl,
@@ -205,11 +227,17 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         // Dynamic monitor field change handlers
         const handleDynamicFieldChange = useMemo(
             () => ({
+                baselineUrl: (value: number | string): void => {
+                    setBaselineUrl(String(value));
+                },
                 bodyKeyword: (value: number | string): void => {
                     setBodyKeyword(String(value));
                 },
                 certificateWarningDays: (value: number | string): void => {
                     setCertificateWarningDays(String(value));
+                },
+                edgeLocations: (value: number | string): void => {
+                    setEdgeLocations(String(value));
                 },
                 expectedHeaderValue: (value: number | string): void => {
                     setExpectedHeaderValue(String(value));
@@ -223,6 +251,18 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 expectedValue: (value: number | string): void => {
                     setExpectedValue(String(value));
                 },
+                heartbeatExpectedStatus: (value: number | string): void => {
+                    setHeartbeatExpectedStatus(String(value));
+                },
+                heartbeatMaxDriftSeconds: (value: number | string): void => {
+                    setHeartbeatMaxDriftSeconds(String(value));
+                },
+                heartbeatStatusField: (value: number | string): void => {
+                    setHeartbeatStatusField(String(value));
+                },
+                heartbeatTimestampField: (value: number | string): void => {
+                    setHeartbeatTimestampField(String(value));
+                },
                 headerName: (value: number | string): void => {
                     setHeaderName(String(value));
                 },
@@ -232,32 +272,58 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 jsonPath: (value: number | string): void => {
                     setJsonPath(String(value));
                 },
+                maxPongDelayMs: (value: number | string): void => {
+                    setMaxPongDelayMs(String(value));
+                },
+                maxReplicationLagSeconds: (value: number | string): void => {
+                    setMaxReplicationLagSeconds(String(value));
+                },
                 maxResponseTime: (value: number | string): void => {
                     setMaxResponseTime(String(value));
                 },
                 port: (value: number | string): void => {
                     setPort(String(value));
                 },
+                primaryStatusUrl: (value: number | string): void => {
+                    setPrimaryStatusUrl(String(value));
+                },
                 recordType: (value: number | string): void => {
                     setRecordType(String(value));
+                },
+                replicaStatusUrl: (value: number | string): void => {
+                    setReplicaStatusUrl(String(value));
+                },
+                replicationTimestampField: (value: number | string): void => {
+                    setReplicationTimestampField(String(value));
                 },
                 url: (value: number | string): void => {
                     setUrl(String(value));
                 },
             }),
             [
+                setBaselineUrl,
                 setBodyKeyword,
                 setCertificateWarningDays,
+                setEdgeLocations,
                 setExpectedHeaderValue,
                 setExpectedJsonValue,
                 setExpectedStatusCode,
                 setExpectedValue,
+                setHeartbeatExpectedStatus,
+                setHeartbeatMaxDriftSeconds,
+                setHeartbeatStatusField,
+                setHeartbeatTimestampField,
                 setHeaderName,
                 setHost,
                 setJsonPath,
+                setMaxPongDelayMs,
+                setMaxReplicationLagSeconds,
                 setMaxResponseTime,
                 setPort,
+                setPrimaryStatusUrl,
                 setRecordType,
+                setReplicaStatusUrl,
+                setReplicationTimestampField,
                 setUrl,
             ]
         );
@@ -265,33 +331,55 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         // Dynamic monitor field values
         const dynamicFieldValues = useMemo(
             () => ({
+                baselineUrl,
                 bodyKeyword,
                 certificateWarningDays,
+                edgeLocations,
                 expectedHeaderValue,
                 expectedJsonValue,
                 expectedStatusCode,
                 expectedValue,
+                heartbeatExpectedStatus,
+                heartbeatMaxDriftSeconds,
+                heartbeatStatusField,
+                heartbeatTimestampField,
                 headerName,
                 host,
                 jsonPath,
+                maxPongDelayMs,
+                maxReplicationLagSeconds,
                 maxResponseTime,
                 port,
+                primaryStatusUrl,
                 recordType,
+                replicaStatusUrl,
+                replicationTimestampField,
                 url,
             }),
             [
+                baselineUrl,
                 bodyKeyword,
                 certificateWarningDays,
+                edgeLocations,
                 expectedHeaderValue,
                 expectedJsonValue,
                 expectedStatusCode,
                 expectedValue,
+                heartbeatExpectedStatus,
+                heartbeatMaxDriftSeconds,
+                heartbeatStatusField,
+                heartbeatTimestampField,
                 headerName,
                 host,
                 jsonPath,
+                maxPongDelayMs,
+                maxReplicationLagSeconds,
                 maxResponseTime,
                 port,
+                primaryStatusUrl,
                 recordType,
+                replicaStatusUrl,
+                replicationTimestampField,
                 url,
             ]
         );
@@ -314,27 +402,38 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                     await handleSubmit(event, {
                         addMode,
                         addMonitorToSite,
+                        baselineUrl,
                         bodyKeyword,
                         certificateWarningDays,
                         checkInterval,
                         clearError,
                         createSite,
+                        edgeLocations,
                         expectedHeaderValue,
                         expectedJsonValue,
                         expectedStatusCode,
                         expectedValue,
                         formError,
                         generateUuid,
+                        heartbeatExpectedStatus,
+                        heartbeatMaxDriftSeconds,
+                        heartbeatStatusField,
+                        heartbeatTimestampField,
                         headerName,
                         host,
                         jsonPath,
                         logger,
+                        maxPongDelayMs,
+                        maxReplicationLagSeconds,
                         maxResponseTime,
                         monitorType,
                         name,
                         onSuccess: handleSuccess,
                         port,
+                        primaryStatusUrl,
                         recordType,
+                        replicaStatusUrl,
+                        replicationTimestampField,
                         selectedExistingSite,
                         setFormError,
                         siteId,
@@ -352,11 +451,13 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             [
                 addMode,
                 addMonitorToSite,
+                baselineUrl,
                 bodyKeyword,
                 certificateWarningDays,
                 checkInterval,
                 clearError,
                 createSite,
+                edgeLocations,
                 expectedHeaderValue,
                 expectedJsonValue,
                 expectedStatusCode,
@@ -366,11 +467,15 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 headerName,
                 host,
                 jsonPath,
+                maxPongDelayMs,
+                maxReplicationLagSeconds,
                 maxResponseTime,
                 monitorType,
                 name,
                 port,
                 recordType,
+                replicaStatusUrl,
+                replicationTimestampField,
                 selectedExistingSite,
                 setFormError,
                 siteId,

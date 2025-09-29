@@ -37,6 +37,40 @@ export interface HttpMonitorFields extends BaseMonitorFields {
 }
 
 /**
+ * HTTP header monitor specific fields
+ */
+export interface HttpHeaderMonitorFields extends BaseMonitorFields {
+    /** Expected header value to compare against */
+    expectedHeaderValue: string;
+    /** Header name to inspect */
+    headerName: string;
+    /** URL to monitor */
+    url: string;
+}
+
+/**
+ * HTTP JSON monitor specific fields
+ */
+export interface HttpJsonMonitorFields extends BaseMonitorFields {
+    /** Expected value for the JSON path */
+    expectedJsonValue: string;
+    /** JSON path to evaluate */
+    jsonPath: string;
+    /** URL to monitor */
+    url: string;
+}
+
+/**
+ * HTTP latency monitor specific fields
+ */
+export interface HttpLatencyMonitorFields extends BaseMonitorFields {
+    /** Maximum acceptable response time in milliseconds */
+    maxResponseTime: number;
+    /** URL to monitor */
+    url: string;
+}
+
+/**
  * HTTP keyword monitor specific fields
  */
 export interface HttpKeywordMonitorFields extends BaseMonitorFields {
@@ -172,16 +206,73 @@ export interface SslMonitorFields extends BaseMonitorFields {
 }
 
 /**
+ * CDN edge consistency monitor specific fields.
+ */
+export interface CdnEdgeConsistencyMonitorFields extends BaseMonitorFields {
+    /** Origin baseline URL that edge endpoints should match */
+    baselineUrl: string;
+    /** Comma or newline separated list of edge endpoints */
+    edgeLocations: string;
+}
+
+/**
+ * Replication monitor specific fields.
+ */
+export interface ReplicationMonitorFields extends BaseMonitorFields {
+    /** Maximum allowed replication lag in seconds */
+    maxReplicationLagSeconds: number;
+    /** Primary status endpoint URL */
+    primaryStatusUrl: string;
+    /** Replica status endpoint URL */
+    replicaStatusUrl: string;
+    /** JSON path to the replication timestamp field */
+    replicationTimestampField: string;
+}
+
+/**
+ * Server heartbeat monitor specific fields.
+ */
+export interface ServerHeartbeatMonitorFields extends BaseMonitorFields {
+    /** Expected heartbeat status value */
+    heartbeatExpectedStatus: string;
+    /** Maximum allowed heartbeat drift in seconds */
+    heartbeatMaxDriftSeconds: number;
+    /** JSON path to the heartbeat status field */
+    heartbeatStatusField: string;
+    /** JSON path to the heartbeat timestamp field */
+    heartbeatTimestampField: string;
+    /** Heartbeat endpoint URL */
+    url: string;
+}
+
+/**
+ * WebSocket keepalive monitor specific fields.
+ */
+export interface WebsocketKeepaliveMonitorFields extends BaseMonitorFields {
+    /** Maximum delay allowed before pong is considered missing */
+    maxPongDelayMs: number;
+    /** WebSocket endpoint URL */
+    url: string;
+}
+
+/**
  * Union type for all monitor field types
  */
 export type MonitorFormFields =
+    | CdnEdgeConsistencyMonitorFields
     | DnsMonitorFields
+    | HttpHeaderMonitorFields
+    | HttpJsonMonitorFields
     | HttpKeywordMonitorFields
+    | HttpLatencyMonitorFields
     | HttpMonitorFields
     | HttpStatusMonitorFields
     | PingMonitorFields
     | PortMonitorFields
-    | SslMonitorFields;
+    | ReplicationMonitorFields
+    | ServerHeartbeatMonitorFields
+    | SslMonitorFields
+    | WebsocketKeepaliveMonitorFields;
 
 /**
  * Helper to get default fields for a monitor type.
@@ -203,6 +294,13 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
     };
 
     switch (type) {
+        case "cdn-edge-consistency": {
+            return {
+                ...baseFields,
+                baselineUrl: "",
+                edgeLocations: "",
+            } satisfies CdnEdgeConsistencyMonitorFields;
+        }
         case "dns": {
             return {
                 ...baseFields,
@@ -221,12 +319,35 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
                 url: "",
             } satisfies HttpMonitorFields;
         }
+        case "http-header": {
+            return {
+                ...baseFields,
+                expectedHeaderValue: "",
+                headerName: "",
+                url: "",
+            } satisfies HttpHeaderMonitorFields;
+        }
+        case "http-json": {
+            return {
+                ...baseFields,
+                expectedJsonValue: "",
+                jsonPath: "",
+                url: "",
+            } satisfies HttpJsonMonitorFields;
+        }
         case "http-keyword": {
             return {
                 ...baseFields,
                 bodyKeyword: "",
                 url: "",
             } satisfies HttpKeywordMonitorFields;
+        }
+        case "http-latency": {
+            return {
+                ...baseFields,
+                maxResponseTime: 2000,
+                url: "",
+            } satisfies HttpLatencyMonitorFields;
         }
         case "http-status": {
             return {
@@ -252,6 +373,25 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
                 },
             } satisfies PortMonitorFields;
         }
+        case "replication": {
+            return {
+                ...baseFields,
+                maxReplicationLagSeconds: 10,
+                primaryStatusUrl: "",
+                replicaStatusUrl: "",
+                replicationTimestampField: "lastAppliedTimestamp",
+            } satisfies ReplicationMonitorFields;
+        }
+        case "server-heartbeat": {
+            return {
+                ...baseFields,
+                heartbeatExpectedStatus: "ok",
+                heartbeatMaxDriftSeconds: 60,
+                heartbeatStatusField: "status",
+                heartbeatTimestampField: "timestamp",
+                url: "",
+            } satisfies ServerHeartbeatMonitorFields;
+        }
         case "ssl": {
             return {
                 ...baseFields,
@@ -259,6 +399,13 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
                 host: "",
                 port: 443,
             } satisfies SslMonitorFields;
+        }
+        case "websocket-keepalive": {
+            return {
+                ...baseFields,
+                maxPongDelayMs: 1500,
+                url: "",
+            } satisfies WebsocketKeepaliveMonitorFields;
         }
         default: {
             // Fallback to HTTP fields for unknown types
@@ -353,5 +500,93 @@ export function isSslMonitorFields(
         typeof fields.host === "string" &&
         typeof fields.port === "number" &&
         typeof fields.certificateWarningDays === "number"
+    );
+}
+
+/**
+ * Type guard to check if fields are for CDN edge consistency monitor.
+ *
+ * @remarks
+ * Checks for presence of required CDN properties and absence of
+ * port/ping-specific ones to provide more robust type detection and prevent
+ * false positives.
+ *
+ * @param fields - Monitor form fields to check
+ *
+ * @returns True if fields contain CDN edge consistency monitor properties
+ */
+export function isCdnEdgeConsistencyMonitorFields(
+    fields: MonitorFormFields
+): fields is CdnEdgeConsistencyMonitorFields {
+    return "baselineUrl" in fields && "edgeLocations" in fields;
+}
+
+/**
+ * Type guard to check if fields are for Replication monitor.
+ *
+ * @remarks
+ * Validates both presence and types of required properties to ensure runtime
+ * type safety and prevent incorrect type assumptions.
+ *
+ * @param fields - Monitor form fields to check
+ *
+ * @returns True if fields contain valid Replication monitor properties
+ */
+export function isReplicationMonitorFields(
+    fields: MonitorFormFields
+): fields is ReplicationMonitorFields {
+    return (
+        "primaryStatusUrl" in fields &&
+        "replicaStatusUrl" in fields &&
+        "replicationTimestampField" in fields &&
+        typeof fields.primaryStatusUrl === "string" &&
+        typeof fields.replicaStatusUrl === "string" &&
+        typeof fields.replicationTimestampField === "string"
+    );
+}
+
+/**
+ * Type guard to check if fields are for Server Heartbeat monitor.
+ *
+ * @remarks
+ * Validates presence of URL, heartbeat status, and timestamp fields, ensuring
+ * they are suitable for server heartbeat monitoring.
+ *
+ * @param fields - Monitor form fields to check
+ *
+ * @returns True if fields contain valid Server Heartbeat monitor properties
+ */
+export function isServerHeartbeatMonitorFields(
+    fields: MonitorFormFields
+): fields is ServerHeartbeatMonitorFields {
+    return (
+        "url" in fields &&
+        "heartbeatStatusField" in fields &&
+        "heartbeatTimestampField" in fields &&
+        typeof fields.url === "string" &&
+        typeof fields.heartbeatStatusField === "string" &&
+        typeof fields.heartbeatTimestampField === "string"
+    );
+}
+
+/**
+ * Type guard to check if fields are for WebSocket Keepalive monitor.
+ *
+ * @remarks
+ * Checks for the presence of the URL and max pong delay properties to ensure
+ * the fields are suitable for WebSocket keepalive monitoring.
+ *
+ * @param fields - Monitor form fields to check
+ *
+ * @returns True if fields contain valid WebSocket Keepalive monitor properties
+ */
+export function isWebsocketKeepaliveMonitorFields(
+    fields: MonitorFormFields
+): fields is WebsocketKeepaliveMonitorFields {
+    return (
+        "url" in fields &&
+        "maxPongDelayMs" in fields &&
+        typeof fields.url === "string" &&
+        typeof fields.maxPongDelayMs === "number"
     );
 }

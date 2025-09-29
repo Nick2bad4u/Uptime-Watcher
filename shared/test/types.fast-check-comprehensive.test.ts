@@ -199,31 +199,73 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             history: fc.array(
                 fc.record({
                     status: fc.constantFrom("down", "up"),
-                    timestamp: fc.nat(),
                     responseTime: fc.nat({ max: 30_000 }),
-                    details: fc.option(fc.string(), { nil: undefined }),
-                }),
-                { maxLength: 100 }
+                    timestamp: fc.nat(),
+                })
             ),
             activeOperations: fc.option(
-                fc.array(
-                    fc
-                        .string({ minLength: 1, maxLength: 50 })
-                        .filter((s) => s.trim().length > 0),
-                    { maxLength: 10 }
-                ),
-                { nil: undefined }
+                fc.array(fc.string({ minLength: 1, maxLength: 50 }), {
+                    minLength: 1,
+                    maxLength: 5,
+                })
             ),
-            url: fc.option(fc.webUrl(), { nil: undefined }),
-            host: fc.option(fc.string({ minLength: 1, maxLength: 255 }), {
-                nil: undefined,
-            }),
-            port: fc.option(fc.integer({ min: 1, max: 65_535 }), {
-                nil: undefined,
-            }),
-            lastChecked: fc.option(fc.date(), { nil: undefined }),
-            expectedValue: fc.option(fc.string(), { nil: undefined }),
-            recordType: fc.option(fc.string(), { nil: undefined }),
+            url: fc.option(fc.webUrl()),
+            host: fc.option(fc.string({ minLength: 1, maxLength: 255 })),
+            port: fc.option(fc.nat({ max: 65_535 })),
+            expectedStatusCode: fc.option(fc.integer({ min: 100, max: 599 })),
+            jsonPath: fc.option(fc.string({ minLength: 1, maxLength: 255 })),
+            expectedJsonValue: fc.option(
+                fc.string({ minLength: 1, maxLength: 255 })
+            ),
+            bodyKeyword: fc.option(fc.string({ minLength: 1, maxLength: 255 })),
+            maxResponseTime: fc.option(fc.integer({ min: 1, max: 300_000 })),
+            expectedHeaderValue: fc.option(
+                fc.string({ minLength: 1, maxLength: 255 })
+            ),
+            headerName: fc.option(fc.string({ minLength: 1, maxLength: 255 })),
+            certificateWarningDays: fc.option(fc.integer({ min: 1, max: 365 })),
+            baselineUrl: fc.option(fc.webUrl()),
+            edgeLocations: fc.option(
+                fc
+                    .array(fc.webUrl(), { minLength: 1, maxLength: 4 })
+                    .map((urls) => urls.join("\n"))
+            ),
+            heartbeatExpectedStatus: fc.option(
+                fc.string({ minLength: 1, maxLength: 64 })
+            ),
+            heartbeatStatusField: fc.option(
+                fc
+                    .array(fc.string({ minLength: 1, maxLength: 32 }), {
+                        minLength: 1,
+                        maxLength: 4,
+                    })
+                    .map((segments) => segments.join("."))
+            ),
+            heartbeatTimestampField: fc.option(
+                fc
+                    .array(fc.string({ minLength: 1, maxLength: 32 }), {
+                        minLength: 1,
+                        maxLength: 4,
+                    })
+                    .map((segments) => segments.join("."))
+            ),
+            heartbeatMaxDriftSeconds: fc.option(
+                fc.integer({ min: 0, max: 86_400 })
+            ),
+            primaryStatusUrl: fc.option(fc.webUrl()),
+            replicaStatusUrl: fc.option(fc.webUrl()),
+            replicationTimestampField: fc.option(
+                fc
+                    .array(fc.string({ minLength: 1, maxLength: 32 }), {
+                        minLength: 1,
+                        maxLength: 4,
+                    })
+                    .map((segments) => segments.join("."))
+            ),
+            maxReplicationLagSeconds: fc.option(
+                fc.integer({ min: 0, max: 86_400 })
+            ),
+            maxPongDelayMs: fc.option(fc.integer({ min: 1, max: 60_000 })),
         }) as fc.Arbitrary<Monitor>;
 
         test.prop([validMonitorArbitrary])(
@@ -511,9 +553,13 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 "ping",
                 "dns",
                 "ssl",
+                "websocket-keepalive",
+                "server-heartbeat",
+                "replication",
+                "cdn-edge-consistency",
             ]);
             expect(Array.isArray(BASE_MONITOR_TYPES)).toBeTruthy();
-            expect(BASE_MONITOR_TYPES).toHaveLength(10);
+            expect(BASE_MONITOR_TYPES).toHaveLength(14);
         });
 
         it("should export MONITOR_STATUS constants correctly", () => {

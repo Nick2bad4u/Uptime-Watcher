@@ -162,10 +162,65 @@ export interface SslFormData extends BaseFormData {
 }
 
 /**
+ * Form data for CDN edge consistency monitors.
+ */
+export interface CdnEdgeConsistencyFormData extends BaseFormData {
+    /** Origin baseline URL used for comparison */
+    baselineUrl: string;
+    /** Comma or newline separated list of edge URLs */
+    edgeLocations: string;
+    type: "cdn-edge-consistency";
+}
+
+/**
+ * Form data for replication monitors.
+ */
+export interface ReplicationFormData extends BaseFormData {
+    /** Maximum acceptable replication lag in seconds */
+    maxReplicationLagSeconds: number;
+    /** Primary status endpoint URL */
+    primaryStatusUrl: string;
+    /** Replica status endpoint URL */
+    replicaStatusUrl: string;
+    /** JSON path to replication timestamp value */
+    replicationTimestampField: string;
+    type: "replication";
+}
+
+/**
+ * Form data for server heartbeat monitors.
+ */
+export interface ServerHeartbeatFormData extends BaseFormData {
+    /** Expected status string reported by the heartbeat */
+    heartbeatExpectedStatus: string;
+    /** Maximum allowed drift in seconds */
+    heartbeatMaxDriftSeconds: number;
+    /** JSON path to the heartbeat status field */
+    heartbeatStatusField: string;
+    /** JSON path to the heartbeat timestamp field */
+    heartbeatTimestampField: string;
+    type: "server-heartbeat";
+    /** Heartbeat endpoint URL */
+    url: string;
+}
+
+/**
+ * Form data for WebSocket keepalive monitors.
+ */
+export interface WebsocketKeepaliveFormData extends BaseFormData {
+    /** Maximum allowed pong delay in milliseconds */
+    maxPongDelayMs: number;
+    type: "websocket-keepalive";
+    /** WebSocket endpoint URL */
+    url: string;
+}
+
+/**
  * Union type for all supported monitor form data types. Simplified for better
  * IntelliSense display.
  */
 export type MonitorFormData = Simplify<
+    | CdnEdgeConsistencyFormData
     | DnsFormData
     | HttpFormData
     | HttpHeaderFormData
@@ -175,13 +230,29 @@ export type MonitorFormData = Simplify<
     | HttpStatusFormData
     | PingFormData
     | PortFormData
+    | ReplicationFormData
+    | ServerHeartbeatFormData
     | SslFormData
+    | WebsocketKeepaliveFormData
 >;
 
 // Optional key definitions for default form data creation
+type CdnEdgeConsistencyOptionalKeys = "baselineUrl" | "edgeLocations";
 type HttpHeaderOptionalKeys = "expectedHeaderValue" | "headerName" | "url";
 type HttpJsonOptionalKeys = "expectedJsonValue" | "jsonPath" | "url";
 type HttpLatencyOptionalKeys = "maxResponseTime" | "url";
+type ReplicationOptionalKeys =
+    | "maxReplicationLagSeconds"
+    | "primaryStatusUrl"
+    | "replicaStatusUrl"
+    | "replicationTimestampField";
+type ServerHeartbeatOptionalKeys =
+    | "heartbeatExpectedStatus"
+    | "heartbeatMaxDriftSeconds"
+    | "heartbeatStatusField"
+    | "heartbeatTimestampField"
+    | "url";
+type WebsocketKeepaliveOptionalKeys = "maxPongDelayMs" | "url";
 
 /**
  * Create default form data for a specific monitor type.
@@ -191,6 +262,9 @@ type HttpLatencyOptionalKeys = "maxResponseTime" | "url";
  * @returns Default form data for the specified type
  */
 /* eslint-disable no-redeclare -- Function overloads are legitimate TypeScript pattern */
+export function createDefaultFormData(
+    type: "cdn-edge-consistency"
+): SetOptional<CdnEdgeConsistencyFormData, CdnEdgeConsistencyOptionalKeys>;
 export function createDefaultFormData(
     type: "dns"
 ): SetOptional<DnsFormData, "host" | "recordType">;
@@ -219,8 +293,17 @@ export function createDefaultFormData(
     type: "port"
 ): SetOptional<PortFormData, "host" | "port">;
 export function createDefaultFormData(
+    type: "replication"
+): SetOptional<ReplicationFormData, ReplicationOptionalKeys>;
+export function createDefaultFormData(
+    type: "server-heartbeat"
+): SetOptional<ServerHeartbeatFormData, ServerHeartbeatOptionalKeys>;
+export function createDefaultFormData(
     type: "ssl"
 ): SetOptional<SslFormData, "certificateWarningDays" | "host" | "port">;
+export function createDefaultFormData(
+    type: "websocket-keepalive"
+): SetOptional<WebsocketKeepaliveFormData, WebsocketKeepaliveOptionalKeys>;
 export function createDefaultFormData(
     type: string
 ): SetOptional<BaseFormData, never> {
@@ -413,10 +496,81 @@ export function isSslFormData(
 }
 
 /**
+ * Type guard to check if form data is for CDN edge consistency monitor.
+ */
+export function isCdnEdgeConsistencyFormData(
+    data: Partial<MonitorFormData>
+): data is CdnEdgeConsistencyFormData {
+    return (
+        data.type === "cdn-edge-consistency" &&
+        typeof data.baselineUrl === "string" &&
+        data.baselineUrl.trim() !== "" &&
+        typeof data.edgeLocations === "string" &&
+        data.edgeLocations.trim() !== ""
+    );
+}
+
+/**
+ * Type guard to check if form data is for replication monitor.
+ */
+export function isReplicationFormData(
+    data: Partial<MonitorFormData>
+): data is ReplicationFormData {
+    return (
+        data.type === "replication" &&
+        typeof data.primaryStatusUrl === "string" &&
+        data.primaryStatusUrl.trim() !== "" &&
+        typeof data.replicaStatusUrl === "string" &&
+        data.replicaStatusUrl.trim() !== "" &&
+        typeof data.replicationTimestampField === "string" &&
+        data.replicationTimestampField.trim() !== "" &&
+        typeof data.maxReplicationLagSeconds === "number" &&
+        Number.isFinite(data.maxReplicationLagSeconds)
+    );
+}
+
+/**
+ * Type guard to check if form data is for server heartbeat monitor.
+ */
+export function isServerHeartbeatFormData(
+    data: Partial<MonitorFormData>
+): data is ServerHeartbeatFormData {
+    return (
+        data.type === "server-heartbeat" &&
+        typeof data.url === "string" &&
+        data.url.trim() !== "" &&
+        typeof data.heartbeatStatusField === "string" &&
+        data.heartbeatStatusField.trim() !== "" &&
+        typeof data.heartbeatTimestampField === "string" &&
+        data.heartbeatTimestampField.trim() !== "" &&
+        typeof data.heartbeatExpectedStatus === "string" &&
+        data.heartbeatExpectedStatus.trim() !== "" &&
+        typeof data.heartbeatMaxDriftSeconds === "number" &&
+        Number.isFinite(data.heartbeatMaxDriftSeconds)
+    );
+}
+
+/**
+ * Type guard to check if form data is for WebSocket keepalive monitor.
+ */
+export function isWebsocketKeepaliveFormData(
+    data: Partial<MonitorFormData>
+): data is WebsocketKeepaliveFormData {
+    return (
+        data.type === "websocket-keepalive" &&
+        typeof data.url === "string" &&
+        data.url.trim() !== "" &&
+        typeof data.maxPongDelayMs === "number" &&
+        Number.isFinite(data.maxPongDelayMs)
+    );
+}
+
+/**
  * Registry of type-specific validation functions. Add new monitor types here to
  * enable dynamic validation.
  */
 const FORM_DATA_VALIDATORS = {
+    "cdn-edge-consistency": isCdnEdgeConsistencyFormData,
     dns: isDnsFormData,
     http: isHttpFormData,
     "http-header": isHttpHeaderFormData,
@@ -426,7 +580,10 @@ const FORM_DATA_VALIDATORS = {
     "http-status": isHttpStatusFormData,
     ping: isPingFormData,
     port: isPortFormData,
+    replication: isReplicationFormData,
+    "server-heartbeat": isServerHeartbeatFormData,
     ssl: isSslFormData,
+    "websocket-keepalive": isWebsocketKeepaliveFormData,
 } as const;
 
 /**

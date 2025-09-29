@@ -46,10 +46,6 @@ const BASE_MONITOR_DEFAULTS = {
 
 const HTTP_SHARED_DEFAULTS = SHARED_MONITOR_CONFIG.http;
 
-function assertNeverType(value: never): never {
-    throw new Error(`Unsupported monitor type: ${String(value)}`);
-}
-
 function ensureNumberOrFallback(value: unknown, fallback: number): number {
     return typeof value === "number" && Number.isFinite(value)
         ? value
@@ -137,6 +133,67 @@ const HTTP_LATENCY_SHARED_DEFAULTS = getSharedMonitorDefaults("http-latency");
 const HTTP_LATENCY_DEFAULT_MAX_RESPONSE_MS = ensureNumberOrFallback(
     HTTP_LATENCY_SHARED_DEFAULTS?.maxResponseTime,
     2000
+);
+const WEBSOCKET_KEEPALIVE_SHARED_DEFAULTS = getSharedMonitorDefaults(
+    "websocket-keepalive"
+);
+const WEBSOCKET_KEEPALIVE_DEFAULT_MAX_PONG_MS = ensureNumberOrFallback(
+    WEBSOCKET_KEEPALIVE_SHARED_DEFAULTS?.maxPongDelayMs,
+    1500
+);
+const WEBSOCKET_KEEPALIVE_DEFAULT_URL = ensureTrimmedStringOrFallback(
+    undefined,
+    "wss://example.com/socket"
+);
+const SERVER_HEARTBEAT_SHARED_DEFAULTS =
+    getSharedMonitorDefaults("server-heartbeat");
+const SERVER_HEARTBEAT_DEFAULT_URL = ensureTrimmedStringOrFallback(
+    undefined,
+    "https://example.com/heartbeat"
+);
+const SERVER_HEARTBEAT_DEFAULT_STATUS_FIELD = ensureTrimmedStringOrFallback(
+    SERVER_HEARTBEAT_SHARED_DEFAULTS?.heartbeatStatusField,
+    "status"
+);
+const SERVER_HEARTBEAT_DEFAULT_EXPECTED_STATUS = ensureTrimmedStringOrFallback(
+    SERVER_HEARTBEAT_SHARED_DEFAULTS?.heartbeatExpectedStatus,
+    "ok"
+);
+const SERVER_HEARTBEAT_DEFAULT_TIMESTAMP_FIELD = ensureTrimmedStringOrFallback(
+    SERVER_HEARTBEAT_SHARED_DEFAULTS?.heartbeatTimestampField,
+    "timestamp"
+);
+const SERVER_HEARTBEAT_DEFAULT_MAX_DRIFT_SECONDS = ensureNumberOrFallback(
+    SERVER_HEARTBEAT_SHARED_DEFAULTS?.heartbeatMaxDriftSeconds,
+    60
+);
+const REPLICATION_SHARED_DEFAULTS = getSharedMonitorDefaults("replication");
+const REPLICATION_DEFAULT_PRIMARY_URL = ensureTrimmedStringOrFallback(
+    REPLICATION_SHARED_DEFAULTS?.primaryStatusUrl,
+    "https://primary.example.com/status"
+);
+const REPLICATION_DEFAULT_REPLICA_URL = ensureTrimmedStringOrFallback(
+    REPLICATION_SHARED_DEFAULTS?.replicaStatusUrl,
+    "https://replica.example.com/status"
+);
+const REPLICATION_DEFAULT_TIMESTAMP_FIELD = ensureTrimmedStringOrFallback(
+    REPLICATION_SHARED_DEFAULTS?.replicationTimestampField,
+    "lastAppliedTimestamp"
+);
+const REPLICATION_DEFAULT_MAX_LAG_SECONDS = ensureNumberOrFallback(
+    REPLICATION_SHARED_DEFAULTS?.maxReplicationLagSeconds,
+    10
+);
+const CDN_EDGE_SHARED_DEFAULTS = getSharedMonitorDefaults(
+    "cdn-edge-consistency"
+);
+const CDN_EDGE_DEFAULT_BASELINE_URL = ensureTrimmedStringOrFallback(
+    CDN_EDGE_SHARED_DEFAULTS?.baselineUrl,
+    "https://origin.example.com/health"
+);
+const CDN_EDGE_DEFAULT_EDGE_LOCATIONS = ensureTrimmedStringOrFallback(
+    CDN_EDGE_SHARED_DEFAULTS?.edgeLocations,
+    "https://edge-1.example.com,https://edge-2.example.com"
 );
 
 interface MonitorTypeDefaults {
@@ -244,6 +301,11 @@ function getAllowedFieldsForMonitorType(type: MonitorType): Set<string> {
 
     // Add type-specific fields based on monitor type registry
     switch (type) {
+        case "cdn-edge-consistency": {
+            baseFields.add("baselineUrl");
+            baseFields.add("edgeLocations");
+            break;
+        }
         case "dns": {
             baseFields.add("expectedValue");
             baseFields.add("host");
@@ -290,14 +352,34 @@ function getAllowedFieldsForMonitorType(type: MonitorType): Set<string> {
             baseFields.add("port");
             break;
         }
+        case "replication": {
+            baseFields.add("primaryStatusUrl");
+            baseFields.add("replicaStatusUrl");
+            baseFields.add("replicationTimestampField");
+            baseFields.add("maxReplicationLagSeconds");
+            break;
+        }
+        case "server-heartbeat": {
+            baseFields.add("url");
+            baseFields.add("heartbeatStatusField");
+            baseFields.add("heartbeatTimestampField");
+            baseFields.add("heartbeatExpectedStatus");
+            baseFields.add("heartbeatMaxDriftSeconds");
+            break;
+        }
         case "ssl": {
             baseFields.add("certificateWarningDays");
             baseFields.add("host");
             baseFields.add("port");
             break;
         }
+        case "websocket-keepalive": {
+            baseFields.add("url");
+            baseFields.add("maxPongDelayMs");
+            break;
+        }
         default: {
-            assertNeverType(type);
+            throw new Error(`Unsupported monitor type: ${String(type)}`);
         }
     }
 
@@ -556,6 +638,134 @@ function applyHttpLatencyMonitorDefaults(
 }
 
 /**
+ * Applies type-specific field requirements and defaults for WebSocket keepalive
+ * monitors.
+ */
+function applyWebsocketKeepaliveMonitorDefaults(
+    monitor: Monitor,
+    filteredData: UnknownRecord
+): void {
+    monitor.url = ensureTrimmedStringOrFallback(
+        filteredData["url"],
+        WEBSOCKET_KEEPALIVE_DEFAULT_URL
+    );
+
+    const maxPongDelayValue = filteredData["maxPongDelayMs"];
+    let maxPongDelay = WEBSOCKET_KEEPALIVE_DEFAULT_MAX_PONG_MS;
+    if (
+        typeof maxPongDelayValue === "number" &&
+        Number.isFinite(maxPongDelayValue)
+    ) {
+        maxPongDelay = Math.trunc(maxPongDelayValue);
+    } else if (typeof maxPongDelayValue === "string") {
+        const parsed = Number.parseInt(maxPongDelayValue, 10);
+        if (Number.isFinite(parsed)) {
+            maxPongDelay = parsed;
+        }
+    }
+
+    monitor.maxPongDelayMs = Math.min(Math.max(maxPongDelay, 10), 60_000);
+}
+
+/**
+ * Applies type-specific field requirements and defaults for server heartbeat
+ * monitors.
+ */
+function applyServerHeartbeatMonitorDefaults(
+    monitor: Monitor,
+    filteredData: UnknownRecord
+): void {
+    monitor.url = ensureTrimmedStringOrFallback(
+        filteredData["url"],
+        SERVER_HEARTBEAT_DEFAULT_URL
+    );
+    monitor.heartbeatStatusField = ensureTrimmedStringOrFallback(
+        filteredData["heartbeatStatusField"],
+        SERVER_HEARTBEAT_DEFAULT_STATUS_FIELD
+    );
+    monitor.heartbeatTimestampField = ensureTrimmedStringOrFallback(
+        filteredData["heartbeatTimestampField"],
+        SERVER_HEARTBEAT_DEFAULT_TIMESTAMP_FIELD
+    );
+    monitor.heartbeatExpectedStatus = ensureTrimmedStringOrFallback(
+        filteredData["heartbeatExpectedStatus"],
+        SERVER_HEARTBEAT_DEFAULT_EXPECTED_STATUS
+    );
+
+    const maxDriftValue = filteredData["heartbeatMaxDriftSeconds"];
+    let maxDrift = SERVER_HEARTBEAT_DEFAULT_MAX_DRIFT_SECONDS;
+    if (typeof maxDriftValue === "number" && Number.isFinite(maxDriftValue)) {
+        maxDrift = Math.trunc(maxDriftValue);
+    } else if (typeof maxDriftValue === "string") {
+        const parsed = Number.parseInt(maxDriftValue, 10);
+        if (Number.isFinite(parsed)) {
+            maxDrift = parsed;
+        }
+    }
+
+    monitor.heartbeatMaxDriftSeconds = Math.min(
+        Math.max(Math.trunc(maxDrift), 1),
+        3600
+    );
+}
+
+/**
+ * Applies type-specific field requirements and defaults for replication
+ * monitors.
+ */
+function applyReplicationMonitorDefaults(
+    monitor: Monitor,
+    filteredData: UnknownRecord
+): void {
+    monitor.primaryStatusUrl = ensureTrimmedStringOrFallback(
+        filteredData["primaryStatusUrl"],
+        REPLICATION_DEFAULT_PRIMARY_URL
+    );
+    monitor.replicaStatusUrl = ensureTrimmedStringOrFallback(
+        filteredData["replicaStatusUrl"],
+        REPLICATION_DEFAULT_REPLICA_URL
+    );
+    monitor.replicationTimestampField = ensureTrimmedStringOrFallback(
+        filteredData["replicationTimestampField"],
+        REPLICATION_DEFAULT_TIMESTAMP_FIELD
+    );
+
+    const maxLagValue = filteredData["maxReplicationLagSeconds"];
+    let maxLagSeconds = REPLICATION_DEFAULT_MAX_LAG_SECONDS;
+    if (typeof maxLagValue === "number" && Number.isFinite(maxLagValue)) {
+        maxLagSeconds = Math.trunc(maxLagValue);
+    } else if (typeof maxLagValue === "string") {
+        const parsed = Number.parseInt(maxLagValue, 10);
+        if (Number.isFinite(parsed)) {
+            maxLagSeconds = parsed;
+        }
+    }
+
+    monitor.maxReplicationLagSeconds = Math.min(
+        Math.max(maxLagSeconds, 0),
+        86_400
+    );
+}
+
+/**
+ * Applies type-specific field requirements and defaults for CDN edge
+ * consistency monitors.
+ */
+function applyCdnEdgeConsistencyMonitorDefaults(
+    monitor: Monitor,
+    filteredData: UnknownRecord
+): void {
+    monitor.baselineUrl = ensureTrimmedStringOrFallback(
+        filteredData["baselineUrl"],
+        CDN_EDGE_DEFAULT_BASELINE_URL
+    );
+    monitor.edgeLocations = ensureTrimmedStringOrFallback(
+        filteredData["edgeLocations"],
+        CDN_EDGE_DEFAULT_EDGE_LOCATIONS
+    );
+}
+
+/**
  * Applies type-specific field requirements and defaults based on monitor type.
  */
 function applyTypeSpecificDefaults(
@@ -563,6 +773,10 @@ function applyTypeSpecificDefaults(
     filteredData: UnknownRecord
 ): void {
     switch (monitor.type) {
+        case "cdn-edge-consistency": {
+            applyCdnEdgeConsistencyMonitorDefaults(monitor, filteredData);
+            break;
+        }
         case "dns": {
             applyDnsMonitorDefaults(monitor, filteredData);
             break;
@@ -599,12 +813,26 @@ function applyTypeSpecificDefaults(
             applyPortMonitorDefaults(monitor, filteredData);
             break;
         }
+        case "replication": {
+            applyReplicationMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "server-heartbeat": {
+            applyServerHeartbeatMonitorDefaults(monitor, filteredData);
+            break;
+        }
         case "ssl": {
             applySslMonitorDefaults(monitor, filteredData);
             break;
         }
+        case "websocket-keepalive": {
+            applyWebsocketKeepaliveMonitorDefaults(monitor, filteredData);
+            break;
+        }
         default: {
-            assertNeverType(monitor.type);
+            throw new Error(
+                `Unsupported monitor type: ${String(monitor.type)}`
+            );
         }
     }
 }

@@ -45,7 +45,10 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
         }
 
         const urlCandidate = Reflect.get(monitor, "url");
-        if (typeof urlCandidate !== "string" || !isValidUrl(urlCandidate)) {
+        if (
+            typeof urlCandidate !== "string" ||
+            !isValidUrl(urlCandidate, { protocols: ["ws", "wss"] })
+        ) {
             return createMonitorErrorResult(
                 "WebSocket keepalive monitor requires a valid ws:// or wss:// URL",
                 0

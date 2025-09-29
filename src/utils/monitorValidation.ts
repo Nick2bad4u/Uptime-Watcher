@@ -15,6 +15,7 @@ import {
 } from "@shared/validation/schemas";
 
 import type {
+    CdnEdgeConsistencyFormData,
     DnsFormData,
     HttpFormData,
     HttpHeaderFormData,
@@ -26,6 +27,9 @@ import type {
     PingFormData,
     PortFormData,
     SslFormData,
+    ReplicationFormData,
+    ServerHeartbeatFormData,
+    WebsocketKeepaliveFormData,
 } from "../types/monitorFormData";
 
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
@@ -568,6 +572,118 @@ const validateSslMonitorFormData = (data: Partial<SslFormData>): string[] => {
     return errors;
 };
 
+const validateCdnEdgeConsistencyMonitorFormData = (
+    data: Partial<CdnEdgeConsistencyFormData>
+): string[] => [
+    ...validateRequiredStringField(
+        "cdn-edge-consistency",
+        "baselineUrl",
+        data.baselineUrl,
+        "Baseline URL is required for CDN edge consistency monitors"
+    ),
+    ...validateRequiredStringField(
+        "cdn-edge-consistency",
+        "edgeLocations",
+        data.edgeLocations,
+        "Edge endpoints are required for CDN edge consistency monitors"
+    ),
+];
+
+const validateReplicationMonitorFormData = (
+    data: Partial<ReplicationFormData>
+): string[] => {
+    const errors: string[] = [
+        ...validateRequiredStringField(
+            "replication",
+            "primaryStatusUrl",
+            data.primaryStatusUrl,
+            "Primary status URL is required for replication monitors"
+        ),
+        ...validateRequiredStringField(
+            "replication",
+            "replicaStatusUrl",
+            data.replicaStatusUrl,
+            "Replica status URL is required for replication monitors"
+        ),
+        ...validateRequiredStringField(
+            "replication",
+            "replicationTimestampField",
+            data.replicationTimestampField,
+            "Replication timestamp field is required for replication monitors"
+        ),
+    ];
+
+    errors.push(
+        ...validateRequiredNumberField(
+            "replication",
+            "maxReplicationLagSeconds",
+            data.maxReplicationLagSeconds,
+            "Maximum replication lag is required for replication monitors"
+        )
+    );
+
+    return errors;
+};
+
+const validateServerHeartbeatMonitorFormData = (
+    data: Partial<ServerHeartbeatFormData>
+): string[] => {
+    const errors: string[] = [
+        ...validateRequiredStringField(
+            "server-heartbeat",
+            "url",
+            data.url,
+            "Heartbeat URL is required for server heartbeat monitors"
+        ),
+        ...validateRequiredStringField(
+            "server-heartbeat",
+            "heartbeatStatusField",
+            data.heartbeatStatusField,
+            "Heartbeat status field is required for server heartbeat monitors"
+        ),
+        ...validateRequiredStringField(
+            "server-heartbeat",
+            "heartbeatTimestampField",
+            data.heartbeatTimestampField,
+            "Heartbeat timestamp field is required for server heartbeat monitors"
+        ),
+        ...validateRequiredStringField(
+            "server-heartbeat",
+            "heartbeatExpectedStatus",
+            data.heartbeatExpectedStatus,
+            "Expected heartbeat status is required for server heartbeat monitors"
+        ),
+    ];
+
+    errors.push(
+        ...validateRequiredNumberField(
+            "server-heartbeat",
+            "heartbeatMaxDriftSeconds",
+            data.heartbeatMaxDriftSeconds,
+            "Heartbeat drift tolerance is required for server heartbeat monitors"
+        )
+    );
+
+    return errors;
+};
+
+const validateWebsocketKeepaliveMonitorFormData = (
+    data: Partial<WebsocketKeepaliveFormData>
+): string[] => [
+    ...validateRequiredStringField(
+        "websocket-keepalive",
+        "url",
+        data.url,
+        "WebSocket URL is required for keepalive monitors"
+    ),
+    ...validateRequiredNumberField(
+        "websocket-keepalive",
+        "maxPongDelayMs",
+        data.maxPongDelayMs,
+        "Maximum pong delay is required for WebSocket keepalive monitors"
+    ),
+];
+
 const validatePingMonitorFormData = (data: Partial<PingFormData>): string[] => {
     const errors: string[] = [];
 
@@ -595,6 +711,14 @@ const validateMonitorFormDataByType = (
     // Validate type-specific required fields only
     /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe type narrowing within switch statement, each case guarantees the correct form data type */
     switch (type) {
+        case "cdn-edge-consistency": {
+            errors.push(
+                ...validateCdnEdgeConsistencyMonitorFormData(
+                    data as Partial<CdnEdgeConsistencyFormData>
+                )
+            );
+            break;
+        }
         case "dns": {
             errors.push(
                 ...validateDnsMonitorFormData(data as Partial<DnsFormData>)
@@ -659,9 +783,33 @@ const validateMonitorFormDataByType = (
             );
             break;
         }
+        case "replication": {
+            errors.push(
+                ...validateReplicationMonitorFormData(
+                    data as Partial<ReplicationFormData>
+                )
+            );
+            break;
+        }
+        case "server-heartbeat": {
+            errors.push(
+                ...validateServerHeartbeatMonitorFormData(
+                    data as Partial<ServerHeartbeatFormData>
+                )
+            );
+            break;
+        }
         case "ssl": {
             errors.push(
                 ...validateSslMonitorFormData(data as Partial<SslFormData>)
+            );
+            break;
+        }
+        case "websocket-keepalive": {
+            errors.push(
+                ...validateWebsocketKeepaliveMonitorFormData(
+                    data as Partial<WebsocketKeepaliveFormData>
+                )
             );
             break;
         }
@@ -704,4 +852,18 @@ export async function validateMonitorFormData(
             warnings: [],
         }
     );
+}
+
+/**
+ * Type guard to check if form data is valid and complete.
+ *
+ * @param data - Form data to validate
+ *
+ * @returns True if form data is valid and complete, false otherwise
+ */
+export function isMonitorFormData(data: unknown): data is MonitorFormData {
+    // Perform runtime validation using shared schemas
+    const result = sharedValidateMonitorData("http", data);
+
+    return result.success;
 }

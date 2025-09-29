@@ -77,41 +77,97 @@ export type FormSubmitProperties = Simplify<
  */
 function createMonitor(properties: FormSubmitProperties): Monitor {
     const {
+        baselineUrl,
         bodyKeyword,
         certificateWarningDays,
         checkInterval,
+        edgeLocations,
         expectedHeaderValue,
         expectedJsonValue,
         expectedStatusCode,
         expectedValue,
         generateUuid,
+        heartbeatExpectedStatus,
+        heartbeatMaxDriftSeconds,
+        heartbeatStatusField,
+        heartbeatTimestampField,
         headerName,
         host,
         jsonPath,
+        maxPongDelayMs,
+        maxReplicationLagSeconds,
         maxResponseTime,
         monitorType,
+        name,
+        primaryStatusUrl,
+        replicaStatusUrl,
+        replicationTimestampField,
         port,
         recordType,
+        selectedExistingSite,
+        setFormError,
+        siteId,
         url,
     } = properties;
 
     const trimmedHeaderName = safeTrim(headerName);
+    const trimmedBaselineUrl = safeTrim(baselineUrl);
+    const trimmedEdgeLocations = safeTrim(edgeLocations);
     const trimmedExpectedHeaderValue = safeTrim(expectedHeaderValue);
     const trimmedJsonPath = safeTrim(jsonPath);
     const trimmedExpectedJsonValue = safeTrim(expectedJsonValue);
     const trimmedMaxResponseTime = safeTrim(maxResponseTime);
+    const trimmedPrimaryStatusUrl = safeTrim(primaryStatusUrl);
+    const trimmedReplicaStatusUrl = safeTrim(replicaStatusUrl);
+    const trimmedReplicationTimestampField = safeTrim(
+        replicationTimestampField
+    );
+    const trimmedMaxReplicationLagSeconds = safeTrim(maxReplicationLagSeconds);
+    const trimmedMaxPongDelayMs = safeTrim(maxPongDelayMs);
+    const trimmedHeartbeatStatusField = safeTrim(heartbeatStatusField);
+    const trimmedHeartbeatTimestampField = safeTrim(heartbeatTimestampField);
+    const trimmedHeartbeatExpectedStatus = safeTrim(heartbeatExpectedStatus);
+    const trimmedHeartbeatMaxDriftSeconds = safeTrim(heartbeatMaxDriftSeconds);
 
     const parsedMaxResponseTime = Number.parseInt(trimmedMaxResponseTime, 10);
     const maxResponseTimeValue = Number.isNaN(parsedMaxResponseTime)
         ? undefined
         : parsedMaxResponseTime;
+    const parsedMaxReplicationLagSeconds = Number.parseInt(
+        trimmedMaxReplicationLagSeconds || "NaN",
+        10
+    );
+    const maxReplicationLagSecondsValue = Number.isNaN(
+        parsedMaxReplicationLagSeconds
+    )
+        ? undefined
+        : parsedMaxReplicationLagSeconds;
+
+    const parsedMaxPongDelayMs = Number.parseInt(
+        trimmedMaxPongDelayMs || "NaN",
+        10
+    );
+    const maxPongDelayMsValue = Number.isNaN(parsedMaxPongDelayMs)
+        ? undefined
+        : parsedMaxPongDelayMs;
+    const parsedHeartbeatMaxDriftSeconds = Number.parseInt(
+        trimmedHeartbeatMaxDriftSeconds || "NaN",
+        10
+    );
+    const heartbeatMaxDriftSecondsValue = Number.isNaN(
+        parsedHeartbeatMaxDriftSeconds
+    )
+        ? undefined
+        : parsedHeartbeatMaxDriftSeconds;
 
     const formData = {
+        baselineUrl: trimmedBaselineUrl || undefined,
         bodyKeyword: safeTrim(bodyKeyword) || undefined,
         certificateWarningDays: certificateWarningDays
             ? Number.parseInt(certificateWarningDays, 10)
             : undefined,
         checkInterval,
+        edgeLocations: trimmedEdgeLocations || undefined,
         expectedHeaderValue:
             trimmedExpectedHeaderValue.length > 0
                 ? trimmedExpectedHeaderValue
@@ -128,10 +184,36 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
             trimmedHeaderName.length > 0 ? trimmedHeaderName : undefined,
         host,
         jsonPath: trimmedJsonPath.length > 0 ? trimmedJsonPath : undefined,
+        maxPongDelayMs: maxPongDelayMsValue,
+        maxReplicationLagSeconds: maxReplicationLagSecondsValue,
         maxResponseTime: maxResponseTimeValue,
+        primaryStatusUrl:
+            trimmedPrimaryStatusUrl.length > 0
+                ? trimmedPrimaryStatusUrl
+                : undefined,
         port: port ? Number.parseInt(port, 10) : undefined,
+        replicaStatusUrl:
+            trimmedReplicaStatusUrl.length > 0
+                ? trimmedReplicaStatusUrl
+                : undefined,
+        replicationTimestampField:
+            trimmedReplicationTimestampField.length > 0
+                ? trimmedReplicationTimestampField
+                : undefined,
         recordType,
-        url,
+        heartbeatStatusField:
+            trimmedHeartbeatStatusField.length > 0
+                ? trimmedHeartbeatStatusField
+                : undefined,
+        heartbeatTimestampField:
+            trimmedHeartbeatTimestampField.length > 0
+                ? trimmedHeartbeatTimestampField
+                : undefined,
+        heartbeatExpectedStatus:
+            trimmedHeartbeatExpectedStatus.length > 0
+                ? trimmedHeartbeatExpectedStatus
+                : undefined,
+        heartbeatMaxDriftSeconds: heartbeatMaxDriftSecondsValue,
     };
 
     const baseMonitor = createMonitorObject(monitorType, formData);
@@ -272,34 +354,56 @@ async function validateCheckInterval(
 async function validateMonitorType(
     monitorType: MonitorType,
     fields: {
+        baselineUrl: string;
         bodyKeyword: string;
         certificateWarningDays: string;
+        edgeLocations: string;
         expectedHeaderValue: string;
         expectedJsonValue: string;
         expectedStatusCode: string;
         expectedValue: string;
+        heartbeatExpectedStatus: string;
+        heartbeatMaxDriftSeconds: string;
+        heartbeatStatusField: string;
+        heartbeatTimestampField: string;
         headerName: string;
         host: string;
         jsonPath: string;
+        maxPongDelayMs: string;
+        maxReplicationLagSeconds: string;
         maxResponseTime: string;
         port: string;
+        primaryStatusUrl: string;
         recordType: string;
+        replicaStatusUrl: string;
+        replicationTimestampField: string;
         url: string;
     }
 ): Promise<readonly string[]> {
     const {
+        baselineUrl,
         bodyKeyword,
         certificateWarningDays,
+        edgeLocations,
         expectedHeaderValue,
         expectedJsonValue,
         expectedStatusCode,
         expectedValue,
+        heartbeatExpectedStatus,
+        heartbeatMaxDriftSeconds,
+        heartbeatStatusField,
+        heartbeatTimestampField,
         headerName,
         host,
         jsonPath,
+        maxPongDelayMs,
+        maxReplicationLagSeconds,
         maxResponseTime,
         port,
+        primaryStatusUrl,
         recordType,
+        replicaStatusUrl,
+        replicationTimestampField,
         url,
     } = fields;
 
@@ -319,6 +423,11 @@ async function validateMonitorType(
             ) {
                 formData["expectedValue"] = safeTrim(expectedValue);
             }
+            break;
+        }
+        case "cdn-edge-consistency": {
+            formData["baselineUrl"] = safeTrim(baselineUrl);
+            formData["edgeLocations"] = safeTrim(edgeLocations);
             break;
         }
         case "http": {
@@ -367,10 +476,45 @@ async function validateMonitorType(
             formData["port"] = Number(port);
             break;
         }
+        case "replication": {
+            formData["primaryStatusUrl"] = safeTrim(primaryStatusUrl);
+            formData["replicaStatusUrl"] = safeTrim(replicaStatusUrl);
+            formData["replicationTimestampField"] = safeTrim(
+                replicationTimestampField
+            );
+            formData["maxReplicationLagSeconds"] = Number.parseInt(
+                safeTrim(maxReplicationLagSeconds) || "NaN",
+                10
+            );
+            break;
+        }
+        case "server-heartbeat": {
+            formData["url"] = safeTrim(url);
+            formData["heartbeatStatusField"] = safeTrim(heartbeatStatusField);
+            formData["heartbeatTimestampField"] = safeTrim(
+                heartbeatTimestampField
+            );
+            formData["heartbeatExpectedStatus"] = safeTrim(
+                heartbeatExpectedStatus
+            );
+            formData["heartbeatMaxDriftSeconds"] = Number.parseInt(
+                safeTrim(heartbeatMaxDriftSeconds) || "NaN",
+                10
+            );
+            break;
+        }
         case "ssl": {
             formData["host"] = safeTrim(host);
             formData["port"] = Number(port);
             formData["certificateWarningDays"] = Number(certificateWarningDays);
+            break;
+        }
+        case "websocket-keepalive": {
+            formData["url"] = safeTrim(url);
+            formData["maxPongDelayMs"] = Number.parseInt(
+                safeTrim(maxPongDelayMs) || "NaN",
+                10
+            );
             break;
         }
         default: {
@@ -421,24 +565,35 @@ export async function handleSubmit(
 ): Promise<void> {
     const {
         addMode,
+        baselineUrl,
         bodyKeyword,
         certificateWarningDays,
         checkInterval,
         clearError,
+        edgeLocations,
         expectedHeaderValue,
         expectedJsonValue,
         expectedStatusCode,
         expectedValue,
+        heartbeatExpectedStatus,
+        heartbeatMaxDriftSeconds,
+        heartbeatStatusField,
+        heartbeatTimestampField,
         headerName,
         host,
         jsonPath,
         logger,
+        maxPongDelayMs,
+        maxReplicationLagSeconds,
         maxResponseTime,
         monitorType,
         name,
         onSuccess,
         port,
+        primaryStatusUrl,
         recordType,
+        replicaStatusUrl,
+        replicationTimestampField,
         selectedExistingSite,
         setFormError,
         url,
@@ -450,18 +605,35 @@ export async function handleSubmit(
     // Log submission start
     logger.debug("Form submission started", {
         addMode,
+        hasBaselineUrl: Boolean(safeTrim(baselineUrl)),
         hasBodyKeyword: Boolean(safeTrim(bodyKeyword)),
         hasCertificateWarningDays: Boolean(safeTrim(certificateWarningDays)),
+        hasEdgeLocations: Boolean(safeTrim(edgeLocations)),
         hasExpectedHeaderValue: Boolean(safeTrim(expectedHeaderValue)),
         hasExpectedJsonValue: Boolean(safeTrim(expectedJsonValue)),
         hasExpectedStatusCode: Boolean(safeTrim(expectedStatusCode)),
         hasHeaderName: Boolean(safeTrim(headerName)),
         hasHost: Boolean(safeTrim(host)),
         hasJsonPath: Boolean(safeTrim(jsonPath)),
+        hasHeartbeatExpectedStatus: Boolean(safeTrim(heartbeatExpectedStatus)),
+        hasHeartbeatMaxDriftSeconds: Boolean(
+            safeTrim(heartbeatMaxDriftSeconds)
+        ),
+        hasHeartbeatStatusField: Boolean(safeTrim(heartbeatStatusField)),
+        hasHeartbeatTimestampField: Boolean(safeTrim(heartbeatTimestampField)),
         hasMaxResponseTime: Boolean(safeTrim(maxResponseTime)),
+        hasMaxPongDelayMs: Boolean(safeTrim(maxPongDelayMs)),
+        hasMaxReplicationLagSeconds: Boolean(
+            safeTrim(maxReplicationLagSeconds)
+        ),
         hasName: Boolean(safeTrim(name)),
         hasPort: Boolean(safeTrim(port)),
+        hasPrimaryStatusUrl: Boolean(safeTrim(primaryStatusUrl)),
         hasRecordType: Boolean(safeTrim(recordType)),
+        hasReplicaStatusUrl: Boolean(safeTrim(replicaStatusUrl)),
+        hasReplicationTimestampField: Boolean(
+            safeTrim(replicationTimestampField)
+        ),
         hasUrl: Boolean(safeTrim(url)),
         monitorType,
         selectedExistingSite: Boolean(selectedExistingSite),
@@ -471,18 +643,29 @@ export async function handleSubmit(
     const validationErrors: string[] = [
         ...validateAddMode(addMode, name, selectedExistingSite),
         ...(await validateMonitorType(monitorType, {
+            baselineUrl,
             bodyKeyword,
             certificateWarningDays,
+            edgeLocations,
             expectedHeaderValue,
             expectedJsonValue,
             expectedStatusCode,
             expectedValue,
+            heartbeatExpectedStatus,
+            heartbeatMaxDriftSeconds,
+            heartbeatStatusField,
+            heartbeatTimestampField,
             headerName,
             host,
             jsonPath,
+            maxPongDelayMs,
+            maxReplicationLagSeconds,
             maxResponseTime,
             port,
+            primaryStatusUrl,
             recordType,
+            replicaStatusUrl,
+            replicationTimestampField,
             url,
         })),
         ...(await validateCheckInterval(checkInterval)),
@@ -494,6 +677,7 @@ export async function handleSubmit(
             errors: validationErrors,
             formData: {
                 addMode,
+                baselineUrl: truncateForLogging(baselineUrl),
                 bodyKeyword: truncateForLogging(bodyKeyword),
                 checkInterval,
                 expectedHeaderValue: truncateForLogging(expectedHeaderValue),
@@ -507,8 +691,13 @@ export async function handleSubmit(
                 monitorType,
                 name: truncateForLogging(name),
                 port,
+                primaryStatusUrl: truncateForLogging(primaryStatusUrl),
                 recordType: truncateForLogging(recordType),
                 url: truncateForLogging(url),
+                edgeLocations: truncateForLogging(edgeLocations),
+                certificateWarningDays: truncateForLogging(
+                    certificateWarningDays
+                ),
             },
         });
 

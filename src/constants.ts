@@ -80,10 +80,17 @@ export const FALLBACK_MONITOR_TYPE_OPTIONS: readonly MonitorTypeOption[] = [
     { label: "HTTP (Website/API)", value: "http" },
     { label: "HTTP Keyword Match", value: "http-keyword" },
     { label: "HTTP Status Code", value: "http-status" },
+    { label: "HTTP Header Value", value: "http-header" },
+    { label: "HTTP JSON Path", value: "http-json" },
+    { label: "HTTP Latency", value: "http-latency" },
     { label: "Port (Host/Port)", value: "port" },
     { label: "Ping (Host)", value: "ping" },
     { label: "DNS (Domain Lookup)", value: "dns" },
     { label: "SSL Certificate", value: "ssl" },
+    { label: "WebSocket Keepalive", value: "websocket-keepalive" },
+    { label: "Server Heartbeat", value: "server-heartbeat" },
+    { label: "Replication Lag", value: "replication" },
+    { label: "CDN Edge Consistency", value: "cdn-edge-consistency" },
 ] as const;
 
 /**

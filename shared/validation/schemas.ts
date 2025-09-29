@@ -13,6 +13,7 @@
 
 import type {
     BaseMonitorSchemaType,
+    CdnEdgeConsistencyMonitorSchemaType,
     DnsMonitorSchemaType,
     HttpHeaderMonitorSchemaType,
     HttpJsonMonitorSchemaType,
@@ -23,8 +24,11 @@ import type {
     MonitorSchemaType,
     PingMonitorSchemaType,
     PortMonitorSchemaType,
+    ReplicationMonitorSchemaType,
+    ServerHeartbeatMonitorSchemaType,
     SiteSchemaType,
     SslMonitorSchemaType,
+    WebsocketKeepaliveMonitorSchemaType,
 } from "@shared/types/schemaTypes";
 import type { ValidationResult } from "@shared/types/validation";
 import type { UnknownRecord } from "type-fest";
@@ -160,6 +164,10 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
             "ping",
             "dns",
             "ssl",
+            "cdn-edge-consistency",
+            "replication",
+            "server-heartbeat",
+            "websocket-keepalive",
         ]),
     })
     .strict();
@@ -182,6 +190,25 @@ const httpUrlSchema = z.string().refine(
             validate_length: true,
         }),
     "Must be a valid HTTP or HTTPS URL"
+);
+
+/**
+ * Reusable WebSocket URL validation schema for multiple monitor types.
+ */
+const websocketUrlSchema = z.string().refine(
+    (val) =>
+        validator.isURL(val, {
+            allow_protocol_relative_urls: false,
+            allow_trailing_dot: false,
+            allow_underscores: false,
+            disallow_auth: false,
+            protocols: ["ws", "wss"],
+            require_host: true,
+            require_protocol: true,
+            require_tld: true,
+            validate_length: true,
+        }),
+    "Must be a valid WebSocket URL (ws:// or wss://)"
 );
 
 const ALLOWED_HEADER_SYMBOLS = new Set<string>([
@@ -267,6 +294,52 @@ const jsonPathSchema = z
         message:
             "JSON path must use dot notation without spaces or empty segments",
     });
+
+const isValidDotPath = (value: string): boolean => {
+    const trimmed = value.trim();
+    if (trimmed.length === 0 || trimmed.includes("..")) {
+        return false;
+    }
+
+    return trimmed.split(".").every((segment) => segment.length > 0);
+};
+
+const createDotPathSchema = (fieldLabel: string): z.ZodString =>
+    z
+        .string()
+        .min(1, `${fieldLabel} is required`)
+        .max(256, `${fieldLabel} must be 256 characters or fewer`)
+        .refine(isValidDotPath, {
+            message: `${fieldLabel} must use dot notation without spaces or empty segments`,
+        });
+
+const edgeLocationListSchema = z
+    .string()
+    .min(1, "At least one edge endpoint is required")
+    .refine((value) => {
+        const entries = value
+            .split(/[\r\n,]+/v)
+            .map((entry) => entry.trim())
+            .filter((entry) => entry.length > 0);
+
+        if (entries.length === 0) {
+            return false;
+        }
+
+        return entries.every((entry) =>
+            validator.isURL(entry, {
+                allow_protocol_relative_urls: false,
+                allow_trailing_dot: false,
+                allow_underscores: false,
+                disallow_auth: false,
+                protocols: ["http", "https"],
+                require_host: true,
+                require_protocol: true,
+                require_tld: true,
+                validate_length: true,
+            })
+        );
+    }, "Edge endpoints must be valid HTTP or HTTPS URLs separated by commas or new lines");
 
 /**
  * Zod schema for HTTP monitor fields.
@@ -461,9 +534,8 @@ export const sslMonitorSchema: SslMonitorSchemaType = baseMonitorSchema
     .extend({
         certificateWarningDays: z
             .number()
-            .int("Warning threshold must be an integer")
-            .min(1, "Warning threshold must be at least 1 day")
-            .max(365, "Warning threshold cannot exceed 365 days"),
+            .min(1, "Certificate warning threshold must be at least 1 day")
+            .max(365, "Certificate warning threshold cannot exceed 365 days"),
         host: hostValidationSchema,
         port: z
             .number()
@@ -473,10 +545,84 @@ export const sslMonitorSchema: SslMonitorSchemaType = baseMonitorSchema
     .strict();
 
 /**
+ * Zod schema for CDN edge consistency monitor fields.
+ */
+export const cdnEdgeConsistencyMonitorSchema: CdnEdgeConsistencyMonitorSchemaType =
+    baseMonitorSchema
+        .extend({
+            baselineUrl: httpUrlSchema,
+            edgeLocations: edgeLocationListSchema,
+            type: z.literal("cdn-edge-consistency"),
+        })
+        .strict();
+
+/**
+ * Zod schema for replication monitor fields.
+ */
+export const replicationMonitorSchema: ReplicationMonitorSchemaType =
+    baseMonitorSchema
+        .extend({
+            maxReplicationLagSeconds: z
+                .number()
+                .min(0, "Replication lag threshold must be zero or greater"),
+            primaryStatusUrl: httpUrlSchema,
+            replicaStatusUrl: httpUrlSchema,
+            replicationTimestampField: createDotPathSchema(
+                "Replication timestamp field"
+            ),
+            type: z.literal("replication"),
+        })
+        .strict();
+
+/**
+ * Zod schema for server heartbeat monitor fields.
+ */
+export const serverHeartbeatMonitorSchema: ServerHeartbeatMonitorSchemaType =
+    baseMonitorSchema
+        .extend({
+            heartbeatExpectedStatus: z
+                .string()
+                .min(1, "Expected status is required")
+                .max(128, "Expected status must be 128 characters or fewer")
+                .refine((value) => value.trim().length > 0, {
+                    message: "Expected status is required",
+                }),
+            heartbeatMaxDriftSeconds: z
+                .number()
+                .min(0, "Heartbeat drift tolerance must be zero or greater")
+                .max(
+                    86_400,
+                    "Heartbeat drift tolerance cannot exceed 24 hours"
+                ),
+            heartbeatStatusField: createDotPathSchema("Heartbeat status field"),
+            heartbeatTimestampField: createDotPathSchema(
+                "Heartbeat timestamp field"
+            ),
+            type: z.literal("server-heartbeat"),
+            url: httpUrlSchema,
+        })
+        .strict();
+
+/**
+ * Zod schema for WebSocket keepalive monitor fields.
+ */
+export const websocketKeepaliveMonitorSchema: WebsocketKeepaliveMonitorSchemaType =
+    baseMonitorSchema
+        .extend({
+            maxPongDelayMs: z
+                .number()
+                .min(10, "Maximum pong delay must be at least 10 milliseconds")
+                .max(60_000, "Maximum pong delay cannot exceed 60 seconds"),
+            type: z.literal("websocket-keepalive"),
+            url: websocketUrlSchema,
+        })
+        .strict();
+
+/**
  * Zod discriminated union schema for all monitor types.
  *
  * @remarks
- * Supports HTTP, port, ping, DNS, and SSL monitors.
+ * Supports the full set of monitor types declared in the shared domain.
  */
 export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
     httpMonitorSchema,
@@ -489,6 +635,10 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
     pingMonitorSchema,
     dnsMonitorSchema,
     sslMonitorSchema,
+    cdnEdgeConsistencyMonitorSchema,
+    replicationMonitorSchema,
+    serverHeartbeatMonitorSchema,
+    websocketKeepaliveMonitorSchema,
 ]);
 
 /**
@@ -518,6 +668,7 @@ export const siteSchema: SiteSchemaType = z
  * Interface for monitor schemas by type.
  */
 export interface MonitorSchemas {
+    readonly "cdn-edge-consistency": typeof cdnEdgeConsistencyMonitorSchema;
     readonly dns: typeof dnsMonitorSchema;
     readonly http: typeof httpMonitorSchema;
     readonly "http-header": typeof httpHeaderMonitorSchema;
@@ -527,7 +678,10 @@ export interface MonitorSchemas {
     readonly "http-status": typeof httpStatusMonitorSchema;
     readonly ping: typeof pingMonitorSchema;
     readonly port: typeof portMonitorSchema;
+    readonly replication: typeof replicationMonitorSchema;
+    readonly "server-heartbeat": typeof serverHeartbeatMonitorSchema;
     readonly ssl: typeof sslMonitorSchema;
+    readonly "websocket-keepalive": typeof websocketKeepaliveMonitorSchema;
 }
 
 /**
@@ -537,6 +691,7 @@ export interface MonitorSchemas {
  * Useful for dynamic schema selection.
  */
 export const monitorSchemas: MonitorSchemas = {
+    "cdn-edge-consistency": cdnEdgeConsistencyMonitorSchema,
     dns: dnsMonitorSchema,
     http: httpMonitorSchema,
     "http-header": httpHeaderMonitorSchema,
@@ -546,7 +701,10 @@ export const monitorSchemas: MonitorSchemas = {
     "http-status": httpStatusMonitorSchema,
     ping: pingMonitorSchema,
     port: portMonitorSchema,
+    replication: replicationMonitorSchema,
+    "server-heartbeat": serverHeartbeatMonitorSchema,
     ssl: sslMonitorSchema,
+    "websocket-keepalive": websocketKeepaliveMonitorSchema,
 };
 
 /**
@@ -590,6 +748,32 @@ export type HttpStatusMonitor = z.infer<typeof httpStatusMonitorSchema>;
  * @see {@link httpLatencyMonitorSchema}
  */
 export type HttpLatencyMonitor = z.infer<typeof httpLatencyMonitorSchema>;
+
+/**
+ * Type representing a validated CDN edge consistency monitor.
+ */
+export type CdnEdgeConsistencyMonitor = z.infer<
+    typeof cdnEdgeConsistencyMonitorSchema
+>;
+
+/**
+ * Type representing a validated replication monitor.
+ */
+export type ReplicationMonitor = z.infer<typeof replicationMonitorSchema>;
+
+/**
+ * Type representing a validated server heartbeat monitor.
+ */
+export type ServerHeartbeatMonitor = z.infer<
+    typeof serverHeartbeatMonitorSchema
+>;
+
+/**
+ * Type representing a validated WebSocket keepalive monitor.
+ */
+export type WebsocketKeepaliveMonitor = z.infer<
+    typeof websocketKeepaliveMonitorSchema
+>;
 
 /**
  * Type representing a validated DNS monitor.

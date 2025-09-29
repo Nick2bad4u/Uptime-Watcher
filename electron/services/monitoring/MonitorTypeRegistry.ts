@@ -46,6 +46,10 @@ import {
 import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
 import { SslMonitor } from "./SslMonitor";
+import { CdnEdgeConsistencyMonitor } from "./CdnEdgeConsistencyMonitor";
+import { ReplicationMonitor } from "./ReplicationMonitor";
+import { ServerHeartbeatMonitor } from "./ServerHeartbeatMonitor";
+import { WebsocketKeepaliveMonitor } from "./WebsocketKeepaliveMonitor";
 
 // Base monitor type definition
 /**
@@ -879,6 +883,265 @@ registerMonitorType({
     version: "1.0.0",
 });
 
+registerMonitorType({
+    description:
+        "Compares CDN edge responses against an origin baseline to detect drift in status codes or content.",
+    displayName: "CDN Edge Consistency",
+    fields: [
+        {
+            helpText:
+                "Enter the origin baseline URL that every edge should match.",
+            label: "Baseline URL",
+            name: "baselineUrl",
+            placeholder: "https://origin.example.com/status",
+            required: true,
+            type: "url",
+        },
+        {
+            helpText:
+                "Provide one or more edge endpoint URLs separated by commas or new lines.",
+            label: "Edge Endpoints",
+            name: "edgeLocations",
+            placeholder: "https://edge1.example.com\nhttps://edge2.example.com",
+            required: true,
+            type: "text",
+        },
+    ],
+    serviceFactory: () => new CdnEdgeConsistencyMonitor(),
+    type: "cdn-edge-consistency",
+    uiConfig: {
+        detailFormats: {
+            analyticsLabel: "CDN Consistency Response Time",
+            historyDetail: (details: string) => details,
+        },
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: false,
+        },
+        formatDetail: (details: string) => details,
+        formatTitleSuffix: (monitor: Monitor) =>
+            monitor.type === "cdn-edge-consistency" && monitor.baselineUrl
+                ? ` (${monitor.baselineUrl})`
+                : "",
+        helpTexts: {
+            primary:
+                "Compare CDN edge responses against your origin baseline URL.",
+            secondary:
+                "List every edge URL on a new line or separated by commas to include it in the check.",
+        },
+        supportsAdvancedAnalytics: true,
+        supportsResponseTime: true,
+    },
+    validationSchema: monitorSchemas["cdn-edge-consistency"],
+    version: "1.0.0",
+});
+
+registerMonitorType({
+    description:
+        "Tracks replication endpoints and raises alerts when lag exceeds the configured threshold.",
+    displayName: "Replication Lag",
+    fields: [
+        {
+            helpText:
+                "Primary database status endpoint returning replication metadata.",
+            label: "Primary Status URL",
+            name: "primaryStatusUrl",
+            placeholder: "https://primary.example.com/status",
+            required: true,
+            type: "url",
+        },
+        {
+            helpText: "Replica database status endpoint used for comparison.",
+            label: "Replica Status URL",
+            name: "replicaStatusUrl",
+            placeholder: "https://replica.example.com/status",
+            required: true,
+            type: "url",
+        },
+        {
+            helpText:
+                "JSON path to the replication timestamp within the status payload (e.g., data.metrics.lastApplied).",
+            label: "Timestamp Field",
+            name: "replicationTimestampField",
+            placeholder: "data.lastAppliedTimestamp",
+            required: true,
+            type: "text",
+        },
+        {
+            helpText:
+                "Maximum acceptable replication lag before reporting a degraded status.",
+            label: "Max Replication Lag (seconds)",
+            min: 0,
+            name: "maxReplicationLagSeconds",
+            placeholder: "10",
+            required: true,
+            type: "number",
+        },
+    ],
+    serviceFactory: () => new ReplicationMonitor(),
+    type: "replication",
+    uiConfig: {
+        detailFormats: {
+            analyticsLabel: "Replication Check Response Time",
+            historyDetail: (details: string) => details,
+        },
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: true,
+        },
+        formatDetail: (details: string) => details,
+        formatTitleSuffix: (monitor: Monitor) =>
+            monitor.type === "replication" && monitor.primaryStatusUrl
+                ? ` (${monitor.primaryStatusUrl})`
+                : "",
+        helpTexts: {
+            primary:
+                "Provide primary and replica status endpoints along with the JSON path of the replication timestamp.",
+            secondary:
+                "Set the maximum replication lag to receive early warnings about replica staleness.",
+        },
+        supportsAdvancedAnalytics: true,
+        supportsResponseTime: true,
+    },
+    validationSchema: monitorSchemas.replication,
+    version: "1.0.0",
+});
+
+registerMonitorType({
+    description:
+        "Validates heartbeat endpoints by checking expected status values and timestamp drift.",
+    displayName: "Server Heartbeat",
+    fields: [
+        {
+            helpText:
+                "Heartbeat endpoint that returns server status information.",
+            label: "Heartbeat URL",
+            name: "url",
+            placeholder: "https://api.example.com/heartbeat",
+            required: true,
+            type: "url",
+        },
+        {
+            helpText:
+                "JSON path to the status field within the heartbeat payload (e.g., data.status).",
+            label: "Status Field",
+            name: "heartbeatStatusField",
+            placeholder: "data.status",
+            required: true,
+            type: "text",
+        },
+        {
+            helpText: "Expected heartbeat status value (e.g., ok, healthy).",
+            label: "Expected Status",
+            name: "heartbeatExpectedStatus",
+            placeholder: "ok",
+            required: true,
+            type: "text",
+        },
+        {
+            helpText:
+                "JSON path to the timestamp field used to measure drift (e.g., data.timestamp).",
+            label: "Timestamp Field",
+            name: "heartbeatTimestampField",
+            placeholder: "data.timestamp",
+            required: true,
+            type: "text",
+        },
+        {
+            helpText:
+                "Maximum allowed heartbeat drift in seconds before the monitor is marked degraded.",
+            label: "Max Drift (seconds)",
+            min: 0,
+            name: "heartbeatMaxDriftSeconds",
+            placeholder: "60",
+            required: true,
+            type: "number",
+        },
+    ],
+    serviceFactory: () => new ServerHeartbeatMonitor(),
+    type: "server-heartbeat",
+    uiConfig: {
+        detailFormats: {
+            analyticsLabel: "Heartbeat Response Time",
+            historyDetail: (details: string) => details,
+        },
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: true,
+        },
+        formatDetail: (details: string) => details,
+        formatTitleSuffix: (monitor: Monitor) =>
+            monitor.type === "server-heartbeat" && monitor.url
+                ? ` (${monitor.url})`
+                : "",
+        helpTexts: {
+            primary:
+                "Heartbeat monitors ensure the endpoint reports an expected status within the allowed drift window.",
+            secondary:
+                "Provide the JSON paths to the status and timestamp fields returned by the heartbeat endpoint.",
+        },
+        supportsAdvancedAnalytics: true,
+        supportsResponseTime: true,
+    },
+    validationSchema: monitorSchemas["server-heartbeat"],
+    version: "1.0.0",
+});
+
+registerMonitorType({
+    description:
+        "Confirms WebSocket endpoints respond to ping frames within the expected delay.",
+    displayName: "WebSocket Keepalive",
+    fields: [
+        {
+            helpText:
+                "Enter the ws:// or wss:// URL for the WebSocket endpoint.",
+            label: "WebSocket URL",
+            name: "url",
+            placeholder: "wss://example.com/socket",
+            required: true,
+            type: "text",
+        },
+        {
+            helpText:
+                "Maximum time in milliseconds to wait for a pong or message response.",
+            label: "Max Pong Delay (ms)",
+            max: 60_000,
+            min: 10,
+            name: "maxPongDelayMs",
+            placeholder: "1500",
+            required: true,
+            type: "number",
+        },
+    ],
+    serviceFactory: () => new WebsocketKeepaliveMonitor(),
+    type: "websocket-keepalive",
+    uiConfig: {
+        detailFormats: {
+            analyticsLabel: "WebSocket Keepalive Response Time",
+            historyDetail: (details: string) => details,
+        },
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: true,
+        },
+        formatDetail: (details: string) => details,
+        formatTitleSuffix: (monitor: Monitor) =>
+            monitor.type === "websocket-keepalive" && monitor.url
+                ? ` (${monitor.url})`
+                : "",
+        helpTexts: {
+            primary:
+                "Monitor WebSocket endpoints by ensuring they answer ping frames within the configured delay.",
+            secondary:
+                "Set a strict pong delay in milliseconds to detect slow or stalled connections quickly.",
+        },
+        supportsAdvancedAnalytics: true,
+        supportsResponseTime: true,
+    },
+    validationSchema: monitorSchemas["websocket-keepalive"],
+    version: "1.0.0",
+});
+
 // Register example migrations for the migration system
 migrationRegistry.registerMigration("http", exampleMigrations.httpV1_0_to_1_1);
 migrationRegistry.registerMigration("port", exampleMigrations.portV1_0_to_1_1);
@@ -894,6 +1157,10 @@ versionManager.setVersion("http-latency", "1.0.0");
 versionManager.setVersion("http-status", "1.0.0");
 versionManager.setVersion("ping", "1.0.0");
 versionManager.setVersion("port", "1.0.0");
+versionManager.setVersion("cdn-edge-consistency", "1.0.0");
+versionManager.setVersion("replication", "1.0.0");
+versionManager.setVersion("server-heartbeat", "1.0.0");
+versionManager.setVersion("websocket-keepalive", "1.0.0");
 
 /**
  * Create monitor object with runtime type validation.

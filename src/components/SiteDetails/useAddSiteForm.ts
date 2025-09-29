@@ -69,10 +69,14 @@ export interface AddSiteFormActions {
     setAddMode: (value: FormMode) => void;
     /** Set response body keyword */
     setBodyKeyword: (value: string) => void;
+    /** Set baseline URL for CDN edge consistency monitors */
+    setBaselineUrl: (value: string) => void;
     /** Set SSL certificate warning days */
     setCertificateWarningDays: (value: string) => void;
     /** Set check interval */
     setCheckInterval: (value: number) => void;
+    /** Set CDN edge endpoint list */
+    setEdgeLocations: (value: string) => void;
     /** Set expected header value */
     setExpectedHeaderValue: (value: string) => void;
     /** Set expected JSON value */
@@ -83,12 +87,24 @@ export interface AddSiteFormActions {
     setExpectedValue: (value: string) => void;
     /** Set form error message */
     setFormError: (error: string | undefined) => void;
+    /** Set heartbeat expected status */
+    setHeartbeatExpectedStatus: (value: string) => void;
+    /** Set heartbeat max drift */
+    setHeartbeatMaxDriftSeconds: (value: string) => void;
+    /** Set heartbeat status field */
+    setHeartbeatStatusField: (value: string) => void;
+    /** Set heartbeat timestamp field */
+    setHeartbeatTimestampField: (value: string) => void;
     /** Set HTTP header name */
     setHeaderName: (value: string) => void;
     /** Set host field value */
     setHost: (value: string) => void;
     /** Set JSON path */
     setJsonPath: (value: string) => void;
+    /** Set max pong delay for WebSocket monitors */
+    setMaxPongDelayMs: (value: string) => void;
+    /** Set max replication lag */
+    setMaxReplicationLagSeconds: (value: string) => void;
     /** Set latency max response time */
     setMaxResponseTime: (value: string) => void;
     /** Set monitor type */
@@ -97,8 +113,14 @@ export interface AddSiteFormActions {
     setName: (value: string) => void;
     /** Set port field value */
     setPort: (value: string) => void;
+    /** Set primary replication status URL */
+    setPrimaryStatusUrl: (value: string) => void;
     /** Set DNS record type field value */
     setRecordType: (value: string) => void;
+    /** Set replica status URL */
+    setReplicaStatusUrl: (value: string) => void;
+    /** Set replication timestamp field */
+    setReplicationTimestampField: (value: string) => void;
     /** Set selected existing site */
     setSelectedExistingSite: (value: string) => void;
     /** Set site ID */
@@ -122,10 +144,14 @@ export interface AddSiteFormState {
     addMode: FormMode;
     /** Keyword to match for HTTP keyword monitors */
     bodyKeyword: string;
+    /** Baseline URL for CDN edge consistency monitors */
+    baselineUrl: string;
     /** SSL certificate warning days */
     certificateWarningDays: string;
     /** Check interval in milliseconds */
     checkInterval: number;
+    /** Edge endpoint list for CDN edge consistency monitors */
+    edgeLocations: string;
     /** Expected HTTP header value for header monitors */
     expectedHeaderValue: string;
     /** Expected JSON value for JSON monitors */
@@ -136,12 +162,24 @@ export interface AddSiteFormState {
     expectedValue: string;
     /** Current form validation error */
     formError: string | undefined;
+    /** Expected heartbeat status field */
+    heartbeatExpectedStatus: string;
+    /** Heartbeat drift tolerance */
+    heartbeatMaxDriftSeconds: string;
+    /** Heartbeat status field path */
+    heartbeatStatusField: string;
+    /** Heartbeat timestamp field path */
+    heartbeatTimestampField: string;
     /** Header name for HTTP header monitors */
     headerName: string;
     /** Host/IP field for port and DNS monitors */
     host: string;
     /** JSON path for HTTP JSON monitors */
     jsonPath: string;
+    /** Maximum pong delay for WebSocket monitors */
+    maxPongDelayMs: string;
+    /** Maximum replication lag in seconds */
+    maxReplicationLagSeconds: string;
     /** Maximum response time for latency monitors */
     maxResponseTime: string;
     /** Selected monitor type */
@@ -150,8 +188,14 @@ export interface AddSiteFormState {
     name: string;
     /** Port number field for port monitors */
     port: string;
+    /** Primary replication status URL */
+    primaryStatusUrl: string;
     /** DNS record type field for DNS monitors */
     recordType: string;
+    /** Replica status URL */
+    replicaStatusUrl: string;
+    /** Replication timestamp field */
+    replicationTimestampField: string;
     /** Selected existing site ID when adding to existing */
     selectedExistingSite: string;
     /** Generated site identifier */
@@ -177,33 +221,55 @@ export type UseAddSiteFormReturn = Simplify<
 const resetFieldsForMonitorType = (
     currentFieldNames: Set<string>,
     currentValues: {
+        baselineUrl: string;
         bodyKeyword: string;
         certificateWarningDays: string;
+        edgeLocations: string;
         expectedHeaderValue: string;
         expectedJsonValue: string;
         expectedStatusCode: string;
         expectedValue: string;
+        heartbeatExpectedStatus: string;
+        heartbeatMaxDriftSeconds: string;
+        heartbeatStatusField: string;
+        heartbeatTimestampField: string;
         headerName: string;
         host: string;
         jsonPath: string;
+        maxPongDelayMs: string;
+        maxReplicationLagSeconds: string;
         maxResponseTime: string;
         port: string;
+        primaryStatusUrl: string;
         recordType: string;
+        replicaStatusUrl: string;
+        replicationTimestampField: string;
         url: string;
     },
     setters: {
+        setBaselineUrl: (value: string) => void;
         setBodyKeyword: (value: string) => void;
         setCertificateWarningDays: (value: string) => void;
+        setEdgeLocations: (value: string) => void;
         setExpectedHeaderValue: (value: string) => void;
         setExpectedJsonValue: (value: string) => void;
         setExpectedStatusCode: (value: string) => void;
         setExpectedValue: (value: string) => void;
+        setHeartbeatExpectedStatus: (value: string) => void;
+        setHeartbeatMaxDriftSeconds: (value: string) => void;
+        setHeartbeatStatusField: (value: string) => void;
+        setHeartbeatTimestampField: (value: string) => void;
         setHeaderName: (value: string) => void;
         setHost: (value: string) => void;
         setJsonPath: (value: string) => void;
+        setMaxPongDelayMs: (value: string) => void;
+        setMaxReplicationLagSeconds: (value: string) => void;
         setMaxResponseTime: (value: string) => void;
         setPort: (value: string) => void;
+        setPrimaryStatusUrl: (value: string) => void;
         setRecordType: (value: string) => void;
+        setReplicaStatusUrl: (value: string) => void;
+        setReplicationTimestampField: (value: string) => void;
         setUrl: (value: string) => void;
     }
 ): void => {
@@ -213,6 +279,12 @@ const resetFieldsForMonitorType = (
         setter: (value: string) => void;
         value: string;
     }> = [
+        {
+            defaultValue: "",
+            name: "baselineUrl",
+            setter: setters.setBaselineUrl,
+            value: currentValues.baselineUrl,
+        },
         {
             defaultValue: "",
             name: "url",
@@ -248,6 +320,12 @@ const resetFieldsForMonitorType = (
             name: "certificateWarningDays",
             setter: setters.setCertificateWarningDays,
             value: currentValues.certificateWarningDays,
+        },
+        {
+            defaultValue: "",
+            name: "edgeLocations",
+            setter: setters.setEdgeLocations,
+            value: currentValues.edgeLocations,
         },
         {
             defaultValue: "",
@@ -290,6 +368,60 @@ const resetFieldsForMonitorType = (
             name: "maxResponseTime",
             setter: setters.setMaxResponseTime,
             value: currentValues.maxResponseTime,
+        },
+        {
+            defaultValue: "1500",
+            name: "maxPongDelayMs",
+            setter: setters.setMaxPongDelayMs,
+            value: currentValues.maxPongDelayMs,
+        },
+        {
+            defaultValue: "10",
+            name: "maxReplicationLagSeconds",
+            setter: setters.setMaxReplicationLagSeconds,
+            value: currentValues.maxReplicationLagSeconds,
+        },
+        {
+            defaultValue: "",
+            name: "primaryStatusUrl",
+            setter: setters.setPrimaryStatusUrl,
+            value: currentValues.primaryStatusUrl,
+        },
+        {
+            defaultValue: "",
+            name: "replicaStatusUrl",
+            setter: setters.setReplicaStatusUrl,
+            value: currentValues.replicaStatusUrl,
+        },
+        {
+            defaultValue: "lastAppliedTimestamp",
+            name: "replicationTimestampField",
+            setter: setters.setReplicationTimestampField,
+            value: currentValues.replicationTimestampField,
+        },
+        {
+            defaultValue: "status",
+            name: "heartbeatStatusField",
+            setter: setters.setHeartbeatStatusField,
+            value: currentValues.heartbeatStatusField,
+        },
+        {
+            defaultValue: "timestamp",
+            name: "heartbeatTimestampField",
+            setter: setters.setHeartbeatTimestampField,
+            value: currentValues.heartbeatTimestampField,
+        },
+        {
+            defaultValue: "ok",
+            name: "heartbeatExpectedStatus",
+            setter: setters.setHeartbeatExpectedStatus,
+            value: currentValues.heartbeatExpectedStatus,
+        },
+        {
+            defaultValue: "60",
+            name: "heartbeatMaxDriftSeconds",
+            setter: setters.setHeartbeatMaxDriftSeconds,
+            value: currentValues.heartbeatMaxDriftSeconds,
         },
     ];
 
@@ -343,6 +475,7 @@ const validateFormFields = (
     selectedExistingSite: string,
     monitorType: MonitorType,
     fieldValues: {
+        baselineUrl: string;
         bodyKeyword: string;
         certificateWarningDays: string;
         expectedHeaderValue: string;
@@ -401,10 +534,12 @@ const validateFormFields = (
 export function useAddSiteForm(): UseAddSiteFormReturn {
     // Form field state
     const [url, setUrl] = useState("");
+    const [baselineUrl, setBaselineUrl] = useState("");
     const [host, setHost] = useState("");
     const [port, setPort] = useState("");
     const [recordType, setRecordType] = useState("A");
     const [expectedValue, setExpectedValue] = useState("");
+    const [edgeLocations, setEdgeLocations] = useState("");
     const [bodyKeyword, setBodyKeyword] = useState("");
     const [expectedStatusCode, setExpectedStatusCode] = useState("200");
     const [expectedHeaderValue, setExpectedHeaderValue] = useState("");
@@ -412,7 +547,22 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
     const [headerName, setHeaderName] = useState("");
     const [jsonPath, setJsonPath] = useState("");
     const [maxResponseTime, setMaxResponseTime] = useState("2000");
+    const [maxPongDelayMs, setMaxPongDelayMs] = useState("1500");
+    const [maxReplicationLagSeconds, setMaxReplicationLagSeconds] =
+        useState("10");
     const [certificateWarningDays, setCertificateWarningDays] = useState("30");
+    const [primaryStatusUrl, setPrimaryStatusUrl] = useState("");
+    const [replicaStatusUrl, setReplicaStatusUrl] = useState("");
+    const [replicationTimestampField, setReplicationTimestampField] = useState(
+        "lastAppliedTimestamp"
+    );
+    const [heartbeatStatusField, setHeartbeatStatusField] = useState("status");
+    const [heartbeatTimestampField, setHeartbeatTimestampField] =
+        useState("timestamp");
+    const [heartbeatExpectedStatus, setHeartbeatExpectedStatus] =
+        useState("ok");
+    const [heartbeatMaxDriftSeconds, setHeartbeatMaxDriftSeconds] =
+        useState("60");
     const [name, setName] = useState("");
     const [monitorType, setMonitorType] = useState<MonitorType>("http");
     const [checkInterval, setCheckInterval] = useState(DEFAULT_CHECK_INTERVAL);
@@ -420,33 +570,55 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
 
     const monitorFieldValues = useMemo(
         () => ({
+            baselineUrl,
             bodyKeyword,
             certificateWarningDays,
+            edgeLocations,
             expectedHeaderValue,
             expectedJsonValue,
             expectedStatusCode,
             expectedValue,
+            heartbeatExpectedStatus,
+            heartbeatMaxDriftSeconds,
+            heartbeatStatusField,
+            heartbeatTimestampField,
             headerName,
             host,
             jsonPath,
+            maxPongDelayMs,
+            maxReplicationLagSeconds,
             maxResponseTime,
             port,
+            primaryStatusUrl,
             recordType,
+            replicaStatusUrl,
+            replicationTimestampField,
             url,
         }),
         [
+            baselineUrl,
             bodyKeyword,
             certificateWarningDays,
+            edgeLocations,
             expectedHeaderValue,
             expectedJsonValue,
             expectedStatusCode,
             expectedValue,
+            heartbeatExpectedStatus,
+            heartbeatMaxDriftSeconds,
+            heartbeatStatusField,
+            heartbeatTimestampField,
             headerName,
             host,
             jsonPath,
+            maxPongDelayMs,
+            maxReplicationLagSeconds,
             maxResponseTime,
             port,
+            primaryStatusUrl,
             recordType,
+            replicaStatusUrl,
+            replicationTimestampField,
             url,
         ]
     );
@@ -469,15 +641,22 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
                 fieldDefinitions.map((field) => field.name)
             );
             resetFieldsForMonitorType(currentFieldNames, monitorFieldValues, {
+                setBaselineUrl,
                 setBodyKeyword,
                 setCertificateWarningDays,
+                setEdgeLocations,
                 setExpectedHeaderValue,
                 setExpectedJsonValue,
                 setExpectedStatusCode,
                 setExpectedValue,
+                setHeartbeatExpectedStatus,
+                setHeartbeatMaxDriftSeconds,
+                setHeartbeatStatusField,
+                setHeartbeatTimestampField,
                 setHeaderName,
                 setHost,
                 setJsonPath,
+                setMaxPongDelayMs,
                 setMaxResponseTime,
                 setPort,
                 setRecordType,
@@ -488,15 +667,22 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
             getFields,
             monitorFieldValues,
             monitorType,
+            setBaselineUrl,
             setBodyKeyword,
             setCertificateWarningDays,
+            setEdgeLocations,
             setExpectedHeaderValue,
             setExpectedJsonValue,
             setExpectedStatusCode,
             setExpectedValue,
+            setHeartbeatExpectedStatus,
+            setHeartbeatMaxDriftSeconds,
+            setHeartbeatStatusField,
+            setHeartbeatTimestampField,
             setHeaderName,
             setHost,
             setJsonPath,
+            setMaxPongDelayMs,
             setMaxResponseTime,
             setPort,
             setRecordType,
@@ -537,19 +723,30 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
     );
 
     const resetForm = useCallback(() => {
+        setBaselineUrl("");
         setUrl("");
         setHost("");
         setPort("");
         setRecordType("A");
         setExpectedValue("");
+        setEdgeLocations("");
         setBodyKeyword("");
         setExpectedStatusCode("200");
         setExpectedHeaderValue("");
         setExpectedJsonValue("");
         setHeaderName("");
         setJsonPath("");
+        setMaxPongDelayMs("1500");
+        setMaxReplicationLagSeconds("10");
         setMaxResponseTime("2000");
         setCertificateWarningDays("30");
+        setPrimaryStatusUrl("");
+        setReplicaStatusUrl("");
+        setReplicationTimestampField("lastAppliedTimestamp");
+        setHeartbeatStatusField("status");
+        setHeartbeatTimestampField("timestamp");
+        setHeartbeatExpectedStatus("ok");
+        setHeartbeatMaxDriftSeconds("60");
         setName("");
         setMonitorType("http");
         setCheckInterval(DEFAULT_CHECK_INTERVAL);
@@ -562,14 +759,21 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
         setBodyKeyword,
         setCertificateWarningDays,
         setCheckInterval,
+        setEdgeLocations,
         setExpectedHeaderValue,
         setExpectedJsonValue,
         setExpectedStatusCode,
         setExpectedValue,
         setFormError,
+        setHeartbeatExpectedStatus,
+        setHeartbeatMaxDriftSeconds,
+        setHeartbeatStatusField,
+        setHeartbeatTimestampField,
         setHeaderName,
         setHost,
         setJsonPath,
+        setMaxPongDelayMs,
+        setMaxReplicationLagSeconds,
         setMaxResponseTime,
         setMonitorType,
         setName,
@@ -583,42 +787,63 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
     return {
         // State
         addMode,
+        baselineUrl,
         bodyKeyword,
         certificateWarningDays,
         checkInterval,
+        edgeLocations,
         expectedHeaderValue,
         expectedJsonValue,
         expectedStatusCode,
         expectedValue,
         formError,
+        heartbeatExpectedStatus,
+        heartbeatMaxDriftSeconds,
+        heartbeatStatusField,
+        heartbeatTimestampField,
         headerName,
         host,
         isFormValid,
         jsonPath,
+        maxPongDelayMs,
+        maxReplicationLagSeconds,
         maxResponseTime,
         monitorType,
         name,
         port,
         recordType,
         resetForm,
+        replicaStatusUrl,
+        replicationTimestampField,
         selectedExistingSite,
         setAddMode,
+        setBaselineUrl,
         setBodyKeyword,
         setCertificateWarningDays,
         setCheckInterval,
+        setEdgeLocations,
         setExpectedHeaderValue,
         setExpectedJsonValue,
         setExpectedStatusCode,
         setExpectedValue,
         setFormError,
+        setHeartbeatExpectedStatus,
+        setHeartbeatMaxDriftSeconds,
+        setHeartbeatStatusField,
+        setHeartbeatTimestampField,
         setHeaderName,
         setHost,
         setJsonPath,
+        setMaxPongDelayMs,
+        setMaxReplicationLagSeconds,
         setMaxResponseTime,
         setMonitorType,
         setName,
         setPort,
+        setPrimaryStatusUrl,
         setRecordType,
+        setReplicaStatusUrl,
+        setReplicationTimestampField,
         setSelectedExistingSite,
         setSiteId,
         setUrl,
