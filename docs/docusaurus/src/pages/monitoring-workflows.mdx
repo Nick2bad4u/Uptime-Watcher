@@ -257,6 +257,70 @@ This diagram illustrates how data flows through the system and caching strategie
     class Repository,Database database
     class Network external`} />
 
+## Scheduled Monitor Check Lifecycle
+
+This sequence illustrates how a scheduled monitor run traverses the enhanced monitoring stack, from the interval scheduler, through operation correlation, to the renderer update and desktop notifications.
+
+<Mermaid value={`sequenceDiagram
+    autonumber
+    participant Sched as MonitorScheduler
+    participant Mgr as MonitorManager
+    participant Checker as EnhancedMonitorChecker
+    participant Ops as MonitorOperationRegistry
+    participant Timeout as OperationTimeoutManager
+    participant StatusSvc as MonitorStatusUpdateService
+    participant HistRepo as HistoryRepository
+    participant MonRepo as MonitorRepository
+    participant Cache as Sites Cache
+    participant Bus as TypedEventBus<UptimeEvents>
+    participant AppSvc as ApplicationService
+    participant Notify as NotificationService
+    participant WinSvc as WindowService
+    participant Renderer as Renderer EventsService
+    participant Stores as Zustand Stores & UI
+
+    Sched->>Mgr: handleScheduledCheck(siteId, monitorId)
+    Mgr->>Mgr: Lookup site in cache
+    Mgr->>Checker: checkMonitor(site, monitorId, false)
+
+    Checker->>Ops: initiateCheck(monitorId)
+    Ops-->>Checker: operationId + AbortSignal
+    Checker->>Timeout: scheduleTimeout(operationId, timeoutMs)
+    Note right of Checker: Combined AbortSignal protects against hung probes.
+
+    Checker->>Checker: executeMonitorCheck (type-specific service)
+    Checker->>HistRepo: saveHistoryEntry(result)
+    Checker->>StatusSvc: updateMonitorStatus(result)
+
+    StatusSvc->>Ops: validateOperation(operationId)
+    alt Operation cancelled or monitor paused
+        StatusSvc-->>Checker: ignore result
+    else Operation active
+        StatusSvc->>MonRepo: persist status & responseTime
+        StatusSvc->>Cache: refresh StandardizedCache
+        StatusSvc->>Ops: completeOperation(operationId)
+        StatusSvc->>Timeout: clearTimeout(operationId)
+        StatusSvc-->>Checker: update applied
+    end
+
+    opt Update applied
+        Checker->>Bus: emit monitor:status-changed
+        alt Result == "down"
+            Checker->>Bus: emit monitor:down
+        else Result == "up"
+            Checker->>Bus: emit monitor:up
+        end
+    end
+
+    Bus->>AppSvc: typed event handler invoked
+    AppSvc->>Notify: notifyMonitorDown/Up(site, monitorId)
+    AppSvc->>WinSvc: sendToRenderer(channel, payload)
+
+    WinSvc->>Renderer: ipcRenderer.emit(channel, payload)
+    Renderer->>Stores: apply status update & append history
+    Stores->>UI: Re-render dashboards
+`} />
+
 ---
 
 These workflow diagrams provide detailed insights into how Uptime Watcher processes monitoring tasks, handles errors, and manages data flow throughout the system.

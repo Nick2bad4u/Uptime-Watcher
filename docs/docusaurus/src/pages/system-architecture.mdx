@@ -273,6 +273,85 @@ export default function SystemArchitecture() {
     class ServiceContainer,SiteManager,MonitorManager,ConfigManager backendLayer
     class Repositories,Database dataLayer`} />
 
+                        ## Site Provisioning Control Plane
+
+                        This flow diagrams the real add-site control plane, from the React form through ServiceContainer-managed managers, database transactions, automatic monitor bootstrapping, and finally the renderer state hydration.
+
+                        <Mermaid value={`flowchart LR
+    %% Domains
+    subgraph Renderer["Renderer Process"]
+        UI[AddSiteForm]
+        SitesSvc[SiteService\n(waitForElectronAPI)]
+    end
+
+    subgraph Preload["Preload Bridge"]
+        SitesAPI[electronAPI.sites.addSite]
+    end
+
+    subgraph MainProcess["Electron Main Process"]
+        Ipc[IpcService\nregisterStandardizedIpcHandler]
+        subgraph Managers["ServiceContainer Managers"]
+            Orchestrator[UptimeOrchestrator.addSite]
+            SiteMgr[SiteManager.addSite]
+            MonitorMgr[MonitorManager.setupSiteForMonitoring]
+            AppSvc[ApplicationService]
+            Notify[NotificationService]
+        end
+        subgraph Persistence["Persistence & Scheduling"]
+            Writer[SiteWriterService.createSite]
+            DbTx[DatabaseService.executeTransaction]
+            Repos[Site/Monitor Repositories]
+            Scheduler[MonitorScheduler.startSite]
+            CheckerStart[EnhancedMonitorChecker.startMonitoring]
+        end
+    end
+
+    subgraph Events["Cache & Event Bus"]
+        SitesCache[StandardizedCache&lt;Site&gt;]
+        EventBus[TypedEventBus&lt;UptimeEvents&gt;]
+    end
+
+    subgraph FrontendSync["Renderer Sync"]
+        WindowSvc[WindowService.sendToRenderer]
+        EventsAPI[electronAPI.events.on...]
+        SiteStore[useSiteSync & sites store]
+    end
+
+    UI -->|submit site config| SitesSvc
+    SitesSvc -->|invoke| SitesAPI
+    SitesAPI -->|ipc invoke "add-site"| Ipc
+    Ipc --> Orchestrator
+    Orchestrator --> SiteMgr
+    SiteMgr -->|validate & persist| Writer
+    Writer --> DbTx --> Repos --> SiteMgr
+    SiteMgr -->|cache set| SitesCache
+    SiteMgr -->|emit "site:added"| EventBus
+    Orchestrator -->|auto setup| MonitorMgr
+    MonitorMgr --> Scheduler --> CheckerStart
+    CheckerStart -->|start monitoring events| EventBus
+    EventBus --> AppSvc
+    AppSvc --> Notify
+    AppSvc --> WindowSvc
+    SitesCache -->|cache-updated| EventBus
+    WindowSvc -->|ipcRenderer.send| EventsAPI
+    EventsAPI -->|dispatch cache/monitor events| SiteStore
+    SiteStore -->|hydrate state| UI
+
+    classDef renderer fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef preload fill:#ea580c,stroke:#c2410c,color:#ffffff
+    classDef main fill:#059669,stroke:#047857,color:#ffffff
+    classDef persistence fill:#0f766e,stroke:#115e59,color:#ffffff
+    classDef events fill:#7c3aed,stroke:#5b21b6,color:#ffffff
+    classDef frontend fill:#1f2937,stroke:#111827,color:#ffffff
+
+    class UI,SitesSvc renderer
+    class SitesAPI preload
+    class Ipc,Orchestrator,SiteMgr,MonitorMgr,AppSvc,Notify main
+    class Writer,DbTx,Repos,Scheduler,CheckerStart persistence
+    class SitesCache,EventBus events
+    class WindowSvc,EventsAPI,SiteStore frontend
+`} />
+
                         ---
 
                         The diagrams above illustrate the core architecture and component interactions of Uptime Watcher. For deeper insights into each module, see the [API documentation](../api/overview.md) and [code references](../../src) for implementation details and maintainability guidelines.
