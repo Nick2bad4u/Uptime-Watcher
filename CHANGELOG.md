@@ -7,14 +7,333 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[7b9bfbb](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b9bfbbc7019da3603ee4de7ca547b73b9e751bc)...
+[f1fdd24](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f1fdd245fdabc2e1a4e2e0591e400de78ee432e3)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7b9bfbbc7019da3603ee4de7ca547b73b9e751bc...f1fdd245fdabc2e1a4e2e0591e400de78ee432e3))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 16.0.0 [`(7b9bfbb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b9bfbbc7019da3603ee4de7ca547b73b9e751bc)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies and fix documentation
+
+This commit updates various development dependencies and resolves issues within the documentation files.
+
+*   📝 [docs] Fixes invalid comment syntax in multiple MDX files by converting JavaScript-style block comments to JSX-style comments (`{/* ... */}`). This ensures correct parsing and rendering of the documentation pages.
+*   📝 [docs] Removes the obsolete `docsearch-verify.md` file, as it is no longer required for Algolia site verification.
+*   🔧 [build] [dependency] Updates several development dependencies to their latest versions, including:
+    *   `@html-eslint/eslint-plugin` and `@html-eslint/parser`
+    *   `@types/react`
+    *   `electron`
+    *   `typedoc-plugin-dt-links`
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f1fdd24)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f1fdd245fdabc2e1a4e2e0591e400de78ee432e3)
+
+
+
+
+
+
+## [16.0.0] - 2025-09-28
+
+
 [[d8d0cc0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d8d0cc09a37fc0ccf26cada256db5d6bdca87bf8)...
-[d8d0cc0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d8d0cc09a37fc0ccf26cada256db5d6bdca87bf8)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d8d0cc09a37fc0ccf26cada256db5d6bdca87bf8...d8d0cc09a37fc0ccf26cada256db5d6bdca87bf8))
+[6173ed2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6173ed2fc3369b6522bb338ac84f42715b11e684)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d8d0cc09a37fc0ccf26cada256db5d6bdca87bf8...6173ed2fc3369b6522bb338ac84f42715b11e684))
+
+
+### ✨ Features
+
+- ✨ [feat] Add HTTP Header, JSON, and Latency monitor types
+
+This introduces three new HTTP-based monitor types: `http-header`, `http-json`, and `http-latency`, expanding the application's monitoring capabilities.
+
+### ✨ Source Code Changes
+*   **New Monitor Types**:
+    *   Adds schemas, validation, and UI form state for the new monitor types (`http-header`, `http-json`, `http-latency`).
+    *   Integrates the new fields (`headerName`, `jsonPath`, `maxResponseTime`, etc.) into the `AddSiteForm` and its submission logic.
+    *   Updates the `useAddSiteForm` hook to manage state for the new fields and reset them correctly when the monitor type changes.
+*   **Backend Stability**:
+    *   🚜 [refactor] Refactors the `MonitorManager` to start and stop monitors sequentially instead of in parallel. This prevents race conditions and overlapping SQLite transactions during bulk operations.
+*   **Validation Improvements**:
+    *   🛠️ [fix] Strengthens validation for string-based schema fields (`bodyKeyword`, `expectedHeaderValue`, `expectedJsonValue`) to reject values that are only whitespace.
+    *   🛠️ [fix] Enhances the URL validator to reject URLs containing single or backtick quotes, preventing potential issues.
+
+### 🧪 Test and Documentation Changes
+*   **Testing**:
+    *   Expands property-based, comprehensive, and unit tests to cover the new monitor types, ensuring their schemas, form data, and UI interactions are correctly handled.
+    *   Refactors monitor service unit tests to use `vi.hoisted` for a cleaner and more robust mocking strategy.
+*   **Documentation**:
+    *   📝 [docs] Updates the `NEW_MONITOR_TYPE_IMPLEMENTATION.md` guide with more accurate instructions, corrected paths, and expanded templates to reflect recent refactoring and the addition of new UI configuration options.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6173ed2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6173ed2fc3369b6522bb338ac84f42715b11e684)
+
+
+- ✨ [feat] Add HTTP Header, JSON, and Latency monitors
+
+This commit introduces three new advanced HTTP monitor types, expanding the application's monitoring capabilities.
+
+### ✨ New Monitor Types
+- **HTTP Header Match:** Verifies that a specific header exists in an HTTP response and matches an expected value. This is useful for checking `Content-Type`, caching headers, or custom application headers.
+- **HTTP JSON Match:** Fetches a JSON response and validates the value at a specified dot-notation path (e.g., `data.items[0].status`). This allows for deep inspection of API health and data integrity.
+- **HTTP Latency Threshold:** Measures the response time of an endpoint and flags it as "degraded" if it exceeds a configured threshold in milliseconds. This helps in tracking and enforcing performance SLOs.
+
+### 🛠️ Backend Implementation
+- Adds three new monitor service classes (`HttpHeaderMonitor`, `HttpJsonMonitor`, `HttpLatencyMonitor`) to encapsulate the checking logic for each new type.
+- Updates the `EnhancedMonitorChecker` to route check requests for the new monitor types to their respective services.
+- Registers the new monitor types in the `MonitorTypeRegistry`, defining their metadata, UI configuration, validation schemas, and service factories.
+
+### 🎨 Frontend & Shared Code
+- Extends the shared `Monitor` type and Zod validation schemas to include the new configuration fields (`headerName`, `expectedHeaderValue`, `jsonPath`, `expectedJsonValue`, `maxResponseTime`).
+- Updates the `monitorOperations` utility in the renderer to correctly handle default values and data mapping for the new monitor types when creating or editing them.
+
+### 🧪 Testing & 📝 Documentation
+- Adds comprehensive unit tests for each new monitor service, covering success, failure, and edge cases.
+- Expands property-based tests to ensure the new monitor schemas are robust and handle arbitrary data correctly.
+- Updates the `NEW_MONITOR_TYPE_IMPLEMENTATION.md` guide to reflect the latest file structures and testing requirements, keeping developer documentation current.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3a3b145)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a3b14559eeb0bc366b742bf76c403b7463b6b58)
+
+
+- ✨ [feat] Enhance HTTP monitor details and form logic
+
+This refactors and enhances HTTP monitoring by improving UI display, form state management, and adding more detailed tests.
+
+✨ [feat]
+- Displays specific details for `http-keyword` and `http-status` monitors in the `MonitorSelector` dropdown, showing the URL along with the keyword or expected status code. 📜
+- Adds logging for `bodyKeyword` and `expectedStatusCode` on form submission for better debugging. 🪵
+
+🚜 [refactor]
+- Reorders state, setters, and dependencies in the `AddSiteForm` and `useAddSiteForm` hook for improved readability and consistency.
+- Removes redundant JSDoc and inline comments in form submission logic.
+
+📝 [docs]
+- Updates the `BeastMode` agent prompt with enhanced capabilities and debugging instructions.
+
+🧪 [test]
+- Adds comprehensive tests for `http-keyword` and `http-status` monitor form validation.
+- Adds tests to verify default field generation for new HTTP monitor types.
+- Improves a test for invalid monitor configuration to use `Reflect.deleteProperty` for a more accurate scenario.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(aed7952)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aed7952e3e57df354fe4f43ad2155e5ab6063843)
+
+
+- ✨ [feat] Add HTTP Keyword and Status Code monitors
+
+This change introduces two new monitor types, enhancing the application's HTTP monitoring capabilities. Users can now create monitors that assert the presence of a specific keyword in an HTTP response body or verify that an endpoint returns a specific HTTP status code.
+
+*   ✨ [feat] Implement `http-keyword` and `http-status` monitor types.
+    *   Adds `HttpKeywordMonitor` service to check for a case-insensitive keyword in an HTTP response body.
+    *   Adds `HttpStatusMonitor` service to verify an endpoint's response matches an expected status code (e.g., 200, 404).
+    *   Integrates the new monitor services into the main `EnhancedMonitorChecker` to dispatch checks based on monitor type.
+*   🚜 [refactor] Centralize HTTP rate limiting.
+    *   Extracts the `SimpleRateLimiter` from `HttpMonitor` into a shared `httpRateLimiter` utility.
+    *   Ensures all HTTP-based monitors (`http`, `http-keyword`, `http-status`) use the same singleton rate limiter to coordinate requests and prevent flooding hosts.
+*   🛠️ [fix] Improve database-to-object mapping.
+    *   Updates the `monitorMapper` to correctly hydrate `bodyKeyword` and `expectedStatusCode` fields when loading monitors from the database, ensuring type safety.
+*   ✨ [feat] Expose new monitor types in the UI and backend.
+    *   Registers the `http-keyword` and `http-status` types in the `MonitorTypeRegistry`, defining their display names, form fields, and validation schemas.
+    *   Updates the "Add Site" form to include state and input fields for `bodyKeyword` and `expectedStatusCode`.
+    *   Adds the new monitor types to the monitor type dropdown in the UI.
+*   📝 [docs] Update documentation and guides.
+    *   Refreshes the `README.md` with a new DeepWiki badge, updated diagram styles, and improved formatting.
+    *   Updates the `NEW_MONITOR_TYPE_IMPLEMENTATION.md` guide to reflect the latest development process, including changes to testing commands and file impacts.
+*   🧪 [test] Add comprehensive tests for new features.
+    *   Introduces unit tests for `HttpKeywordMonitor` and `HttpStatusMonitor` services.
+    *   Expands shared Zod schema validation tests to cover the new monitor types and their specific fields (`bodyKeyword`, `expectedStatusCode`).
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(14e9efa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/14e9efa30dd20a1f4753c7bef40f29509b3e22c1)
+
+
+- ✨ [feat] Add SSL certificate monitor
+
+This commit introduces a new monitor type for checking SSL/TLS certificate validity and expiry. It serves as a complete, end-to-end implementation, providing a new capability to the platform and establishing a clear pattern for future monitor development.
+
+### ✨ New Features
+-   **SSL Certificate Monitor**: Adds a new `ssl` monitor type that:
+    -   Performs a TLS handshake to verify connectivity and certificate authenticity.
+    -   Evaluates certificate validity, marking monitors as `degraded` if the certificate is within a configurable warning period and `down` if it has expired.
+    -   Integrates with the existing retry and timeout system.
+-   **Dynamic UI Configuration**: The frontend now dynamically renders form fields for the SSL monitor (`host`, `port`, `certificateWarningDays`) based on the new registry configuration.
+
+### 🚜 Refactoring & System Integration
+-   **Backend**: The `SslMonitor` service is integrated into the `EnhancedMonitorChecker` and registered in the `MonitorTypeRegistry`, enabling the system to route and process SSL checks.
+-   **Shared**: New types and Zod validation schemas (`sslMonitorSchema`) are added to ensure type safety and strict validation for SSL monitor configurations across the entire application.
+-   **Frontend**: UI logic is updated to handle the new `certificateWarningDays` field in forms and state management.
+
+### 📝 Documentation
+-   The developer guide for implementing new monitor types has been completely rewritten. It now uses the concrete SSL monitor implementation as its primary, real-world example, replacing the previous theoretical guide.
+
+### 🧹 Chores & Maintenance
+-   Updates various development dependencies, including `@docusaurus`, `@eslint-react`, and `knip`.
+-   Adds a configuration file for `npm-check-updates` to standardize dependency management.
+-   Refines ESLint rules and configurations for improved code quality and consistency with React 19 practices.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ed0c299)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ed0c299366a490f816682a88d69eafac9ad3d680)
+
+
+
+### 🛠️ Bug Fixes
+
+- Import Layout in Docusaurus custom pages (#77) [`(4e433f6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e433f69bd16929edca5f0323b50edda20b303d8)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 15.9.0 [`(d8d0cc0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d8d0cc09a37fc0ccf26cada256db5d6bdca87bf8)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Refactor monitor schemas and improve test coverage
+
+This commit introduces several refactoring and testing improvements across the application, primarily focused on enhancing the monitor type definitions and their associated tests.
+
+### Source Code Changes
+*   **🎨 [style] `AddSiteForm/Submit.tsx`**: Reorganizes function parameters and logging object properties into alphabetical order for improved readability and consistency.
+*   **📝 [docs] `shared/types.ts`**: Updates the comment for the `Monitor.type` property to use a multi-line JSDoc format for better documentation.
+
+### Testing and Development Changes
+*   **🧪 [test] `shared/test/schemas.property.test.ts`**:
+    *   Expands property-based tests to include arbitraries for `http-keyword`, `http-status`, and `ssl` monitor types.
+    *   Refactors HTTP monitor arbitraries to use a shared `httpMonitorBaseFields` object, reducing code duplication.
+    *   Updates validation tests to recognize and correctly handle the newly added monitor types.
+*   **🧪 [test] Monitor Service Tests**:
+    *   Refactors `HttpKeywordMonitor.test.ts` and `HttpStatusMonitor.test.ts` to address mock hoisting issues by initializing the `withOperationalHooksMock` within the `vi.mock` factory.
+    *   Improves test descriptions by using the class name directly (e.g., `describe(HttpStatusMonitor)`) instead of a string literal.
+    *   Updates a test in `HttpStatusMonitor.test.ts` to use `Reflect.deleteProperty` for a more precise test of a missing property.
+*   **🧪 [test] `IpcService.comprehensive.test.ts`**: Enhances the `monitorSchemas` mock to be more comprehensive, dynamically creating mocks for all available monitor types, including the new HTTP variants.
+*   **🧪 [test] Comprehensive & Fuzzing Tests**: Updates various UI, fuzzing, and coverage-focused tests to include new form fields (`bodyKeyword`, `expectedStatusCode`) and monitor types, ensuring continued high test coverage.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(20b0bd1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/20b0bd1698aa7af9336ad390ef47d5479a528621)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Overhaul new monitor implementation guide
+
+This commit completely rewrites the guide for implementing new monitor types, transforming it from an SSL-specific example into a comprehensive, step-by-step manual for engineers.
+
+✨ [feat]
+*   Replaces the SSL-centric document with a generic, layered guide covering the entire process from specification to deployment.
+*   Introduces a "File Impact Matrix" as a checklist for developers to ensure all necessary files across shared, backend, persistence, and renderer layers are updated.
+*   Adds detailed sections for each implementation phase, including troubleshooting FAQs and reference code snippets for a new service and registry entry.
+
+🛠️ [fix]
+*   Improves error handling in the `SslMonitor` for TLS authorization failures.
+    -   It now consistently captures the error details, whether it's an `Error` object or a string, and creates a new, more informative `Error` that includes the original error as its `cause`.
+
+🧪 [test]
+*   Updates IPC service tests to assert that the `ssl` monitor type is correctly included in the list of available monitors, increasing the expected count from 4 to 5.
+*   Adds `ssl`-specific checks to property-based schema tests.
+*   Refactors and cleans up various test files, including form mocks and fuzzing tests, to account for SSL-related fields like `certificateWarningDays`.
+*   Updates constants tests to reflect the addition of the `ssl` monitor type in fallback options.
+
+🚜 [refactor]
+*   Simplifies and improves the clarity of Zod schema type definitions in `shared/types/schemaTypes.ts` by using shared shapes and reducing verbose repetition.
+*   Enhances the `ThemeProvider` component to filter out non-valid React elements from its children, preventing potential rendering errors.
+
+🎨 [style]
+*   Removes extraneous newlines from the ESLint configuration.
+*   Improves JSDoc comments and formatting in the `download-sqlite3-wasm.mjs` script.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(214b70d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/214b70d326e4e4fb96f2998e596af965bdac47e9)
+
+
+- 📝 [docs] Update BeastMode guide with linting and test workflow
+
+📝 [docs] Adds new guidance to the `BeastMode.chatmode.md` document.
+ - Introduces a new paragraph under the "Making Code Changes" section.
+ - This new section advises prioritizing a fully working implementation before addressing linting errors or updating tests.
+ - The goal is to streamline development by preventing work on potentially broken or incomplete code, thus improving focus and efficiency.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0670b4c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0670b4cd2318b359e2191bc11e9a24577875ef12)
+
+
+- 📝 [docs] Clarify workflow for handling lint errors
+
+- Adds guidance to prioritize completing a working implementation before addressing lint errors.
+- Aims to reduce confusion and mistakes during development by separating implementation and linting steps.
+- Improves workflow documentation to help users focus on functionality first, then code quality.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a1a36e3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a1a36e3c012feb9987f894fe5b1f76b7957a4603)
+
+
+
+### ⚡ Performance
+
+- ⚡ [perf] Standardize array creation with Array.from for improved performance
+
+This commit refactors the codebase to consistently use `Array.from()` instead of the spread syntax (`...`) for creating new arrays from iterables like Sets, other arrays, and Maps. This change is motivated by performance benefits, as `Array.from()` is generally more optimized, especially for large iterables.
+
+Additionally, this update leverages the optional mapping function in `Array.from(iterable, mapFn)` to combine the creation and mapping of new arrays into a single, more efficient operation.
+
+Key changes include:
+
+*   ⚡ **Performance & Style:**
+    *   Replaces all instances of array spread syntax (`[...iterable]`) with `Array.from(iterable)`. This applies to creating shallow copies of arrays and converting Sets, Maps, and other iterables into arrays.
+    *   Consolidates `.map()` calls that immediately follow an array creation into the second argument of `Array.from()`, reducing intermediate array allocations.
+    *   Disables the `unicorn/prefer-spread` ESLint rule to enforce this new convention.
+*   🚜 **Refactor Zod Schemas:**
+    *   The Zod schema type definitions in `shared/types/schemaTypes.ts` are refactored for better clarity and organization.
+    *   Moves away from generic shapes to explicit, flattened type definitions for each monitor type (`HttpMonitorSchemaType`, `PortMonitorSchemaType`, etc.), improving readability.
+*   🧪 **Test Updates:**
+    *   Updates numerous test files across benchmarks, unit tests, and fuzzing tests to align with the new `Array.from()` convention.
+    *   Adds missing `history: []` properties to monitor objects in validation schema tests to ensure they conform to the updated schema.
+    *   Cleans up test file documentation and imports for better maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(693472e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/693472e37ea2570e1ca4ceba949a577776e89c9a)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Update Knip config and reformat docs
+
+This commit introduces several maintenance changes to improve dependency management and documentation clarity.
+
+🧹 [chore] Updates the Knip configuration to manage dependency tracking more accurately.
+- Removes `msw` and `react-icons` from the ignore list, as they are now correctly tracked or no longer dependencies.
+- Adds several new Storybook, Babel, and Vitest-related packages to the ignore list to prevent them from being incorrectly flagged as unused dependencies.
+
+📝 [docs] Refreshes the `NEW_MONITOR_TYPE_IMPLEMENTATION.md` guide.
+- Improves readability by reformatting the `File Impact Matrix` and `Troubleshooting` tables using `<br>` tags for multi-line cells.
+- Standardizes code block formatting for code snippets and fixes minor typographical issues throughout the document.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a47ddab)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a47ddab23ca7ab88e46dade8cfec4cfe8581dc90)
+
+
+- 🧹 [chore] Refine development environment configurations
+
+🧹 [chore] Reorganizes and cleans up the ESLint configuration for improved readability and maintainability.
+ - Moves the `react-x` settings block to colocate it with other React-specific configurations.
+ - Sorts the `@eslint-react/jsx-shorthand-boolean` and `@eslint-react/no-unused-props` rules alphabetically across all relevant configuration blocks to ensure consistency.
+
+🧹 [chore] Updates the recommended VS Code extensions.
+ - Removes the `visualstudioexptteam.vscodeintellicode` extension, as it is redundant with the `vscodeintellicode-completions` extension already listed.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(061905e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/061905e37f3893f2467e68a6d44ba279c596c0ba)
+
+
+- 🧹 [chore] Refine Beast Mode toolset
+
+Removes deprecated or unnecessary tools from the Beast Mode chatmode configuration.
+
+- Removes the `tavily-remote-mcp` tool.
+- Removes the `sequentialthinking` tool.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(07fc705)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/07fc7051b929d8a1389f6cfefa90e34dc780df7d)
+
+
+- Update changelogs for v15.9.0 [skip ci] [`(0cdf02a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0cdf02a939a8dc889ce6e60a2fb37e9c90657061)
 
 
 
