@@ -16,7 +16,7 @@
     "author": "Nick2bad4u",
     "scripts": {
         "build": "npm run generate-docs && cd ../../ && npm run build:eslint-inspector && cd docs/docusaurus && docusaurus build",
-        "build:fast": "docusaurus build",
+        "build:fast": "cross-env DOCUSAURUS_ENABLE_EXPERIMENTAL=true docusaurus build",
         "build:local": "npm run generate-docs:local && cd ../../ && npm run build:eslint-inspector && cd docs/docusaurus && docusaurus build",
         "clear": "docusaurus clear",
         "deploy": "docusaurus deploy",
@@ -74,6 +74,7 @@
     "devDependencies": {
         "@docusaurus/module-type-aliases": "^3.9.1",
         "@docusaurus/tsconfig": "^3.9.1",
+        "cross-env": "^10.1.0",
         "typedoc": "^0.28.13",
         "typedoc-docusaurus-theme": "^1.4.2",
         "typedoc-plugin-markdown": "^4.9.0",

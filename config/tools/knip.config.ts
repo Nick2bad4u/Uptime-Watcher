@@ -55,6 +55,10 @@ const knipConfig: KnipConfig = {
         "config/tools/knip.config.ts",
     ],
     ignoreDependencies: [
+        "bufferutil",
+        "ws",
+        "@storybook/types",
+        "@types/ws",
         "@shared/types",
         "@shared/utils",
         "@shared/validation",

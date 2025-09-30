@@ -1,3 +1,5 @@
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- We want to disable this rule for the whole file
+/* eslint-disable n/no-process-env -- Needed for Github Action builds */
 import type * as Preset from "@docusaurus/preset-classic";
 import type { Config } from "@docusaurus/types";
 
@@ -5,31 +7,44 @@ import { themes as prismThemes } from "prism-react-renderer";
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
+const siteUrl =
+    process.env["DOCUSAURUS_SITE_URL"] ?? "https://nick2bad4u.github.io";
+const baseUrl = process.env["DOCUSAURUS_BASE_URL"] ?? "/Uptime-Watcher/";
+const enableExperimentalFaster =
+    process.env["DOCUSAURUS_ENABLE_EXPERIMENTAL"] === "true";
+
+const futureConfig = {
+    ...(enableExperimentalFaster
+        ? {
+              experimental_faster: {
+                  mdxCrossCompilerCache: true,
+                  rspackBundler: true,
+                  rspackPersistentCache: true,
+                  ssgWorkerThreads: true,
+              },
+          }
+        : {}),
+    v4: {
+        removeLegacyPostBuildHeadAttribute: true,
+        useCssCascadeLayers: true,
+    },
+} satisfies Config["future"];
+
+const socialCardImage = new URL(
+    "img/uptime-watcher-social-card.jpg",
+    `${siteUrl}${baseUrl}`
+).toString();
+
 const config: Config = {
     // Set the /<baseUrl>/ pathname under which your site is served
-    baseUrl: "/Uptime-Watcher/",
+    baseUrl,
     clientModules: [require.resolve("./src/js/modernEnhancements.ts")],
 
     deploymentBranch: "gh-pages",
 
     favicon: "img/favicon.ico",
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
-    future: {
-        experimental_faster: {
-            mdxCrossCompilerCache: true,
-            rspackBundler: true,
-            rspackPersistentCache: true,
-            ssgWorkerThreads: true,
-        },
-        // experimental_storage: {
-        //     namespace: true,
-        //     type: "localStorage",
-        // },
-        v4: {
-            removeLegacyPostBuildHeadAttribute: true,
-            useCssCascadeLayers: true,
-        },
-    },
+    future: futureConfig,
     i18n: {
         defaultLocale: "en",
         locales: ["en"],
@@ -40,6 +55,10 @@ const config: Config = {
             maintainCase: true,
         },
         format: "detect",
+        hooks: {
+            onBrokenMarkdownImages: "warn",
+            onBrokenMarkdownLinks: "warn",
+        },
         mdx1Compat: {
             admonitions: true,
             comments: true,
@@ -49,45 +68,54 @@ const config: Config = {
     },
     onBrokenAnchors: "warn",
     onBrokenLinks: "warn",
-    onBrokenMarkdownLinks: "warn",
     onDuplicateRoutes: "warn",
     organizationName: "Nick2bad4u",
 
     // TypeDoc documentation is generated via standalone TypeDoc (npm run docs:typedoc)
     // This uses our custom typedoc.config.json configuration for better docs
     plugins: [
-        "@docusaurus/theme-live-codeblock",
-        "@docusaurus/theme-mermaid",
         "docusaurus-plugin-image-zoom",
         [
             "docusaurus-plugin-copy-page-button",
             {
-                /*  CustomStyles: {
+                customStyles: {
                     button: {
-                        className: "my-custom-button",
+                        className: "button button--primary button--sm",
                         style: {
-                            backgroundColor: "#4CAF50",
-                            borderRadius: "8px",
-                            color: "white",
+                            borderRadius: "999px",
+                            boxShadow: "none",
+                            fontWeight: 600,
+                            letterSpacing: "0.01em",
+                            padding: "0.35rem 0.85rem",
+                            textTransform: "none",
+                            zIndex: 99_999,
                         },
                     },
                     container: {
-                        className: "my-button-container",
+                        className: "copy-page-button__container",
                     },
                     dropdown: {
-                        className: "my-custom-dropdown",
                         style: {
-                            backgroundColor: "#f8f9fa",
-                            border: "2px solid #4CAF50",
+                            backgroundColor:
+                                "var(--ifm-background-surface-color)",
+                            border: "1px solid var(--ifm-color-emphasis-200)",
+                            borderRadius: "0.5rem",
+                            boxShadow:
+                                "0 10px 30px rgba(15, 23, 42, 0.15), 0 1px 3px rgba(15, 23, 42, 0.08)",
+                            minWidth: "13rem",
+                            padding: "0.35rem 0",
                         },
                     },
                     dropdownItem: {
+                        className: "menu__link",
                         style: {
-                            fontSize: "16px",
-                            padding: "12px 20px",
+                            borderRadius: "0.35rem",
+                            fontWeight: 500,
+                            margin: "0 0.35rem",
+                            padding: "0.45rem 0.75rem",
                         },
                     },
-                }, */
+                },
             },
         ],
         // [
@@ -104,26 +132,6 @@ const config: Config = {
         //         // termPreviewComponentPath: "relative/path/to/your/term-preview-component",
         //     },
         // ],
-        [
-            "@easyops-cn/docusaurus-search-local",
-            {
-                // Whether to index blog pages
-                blogDir: "blog",
-                // Whether to index docs pages
-                docsRouteBasePath: "docs",
-                // Language of your documentation, support "en", "zh", "ja", "ko", "ru"
-                hashed: true,
-                // For Docs-only mode, remove/set to false if you have blog
-                indexBlog: true,
-                indexDocs: true,
-                indexPages: false,
-                language: ["en"],
-                // Set to true if you have a multi-language site
-                removeDefaultStopWordFilter: false,
-                // Set to true for better Chinese search
-                useAllContextsWithNoSearchContext: false,
-            },
-        ],
         [
             "docusaurus-plugin-llms",
             {
@@ -150,6 +158,15 @@ const config: Config = {
                 title: "Uptime Watcher Documentation",
             },
         ],
+        // Broken with Docusaurs v3/v4
+        // [
+        //     "@grnet/docusaurus-terminology",
+        //     {
+        //         docsDir: "./docs",
+        //         glossaryFilepath: "./docs/glossary.md",
+        //         termsDir: "./docs/terms",
+        //     },
+        // ],
         // [
         //     "docusaurus-plugin-typedoc",
         //     {
@@ -361,7 +378,7 @@ const config: Config = {
             ],
             style: "dark",
         },
-        image: "img/uptime-watcher-social-card.jpg",
+        image: socialCardImage,
 
         liveCodeBlock: {
             /**
@@ -387,6 +404,31 @@ const config: Config = {
                 content:
                     "Uptime Watcher - Cross-platform desktop application for monitoring website uptime and server availability",
                 name: "description",
+            },
+            {
+                content: "Uptime Watcher",
+                property: "og:site_name",
+            },
+            {
+                content: "website",
+                property: "og:type",
+            },
+            {
+                content: socialCardImage,
+                property: "og:image",
+            },
+            {
+                content: `${siteUrl}${baseUrl}`,
+                property: "og:url",
+            },
+            {
+                content:
+                    "Uptime Watcher - Cross-platform desktop application for monitoring website uptime and server availability",
+                property: "og:description",
+            },
+            {
+                content: "Uptime Watcher | Cross-platform monitoring dashboard",
+                property: "og:title",
             },
         ],
         navbar: {
@@ -455,6 +497,28 @@ const config: Config = {
             selector: ".markdown > img",
         },
     } satisfies Preset.ThemeConfig,
+    themes: [
+        // eslint-disable-next-line n/no-missing-require -- False Positive since CI has it installed
+        require.resolve("@docusaurus/theme-live-codeblock"),
+        // eslint-disable-next-line n/no-missing-require -- False Positive since CI has it installed
+        require.resolve("@docusaurus/theme-mermaid"),
+        [
+            require.resolve("@easyops-cn/docusaurus-search-local"),
+            {
+                blogDir: "blog",
+                blogRouteBasePath: "blog",
+                docsDir: "docs",
+                docsRouteBasePath: "docs",
+                hashed: true,
+                indexBlog: true,
+                indexDocs: true,
+                indexPages: false,
+                language: ["en"],
+                removeDefaultStopWordFilter: false,
+                useAllContextsWithNoSearchContext: false,
+            },
+        ],
+    ],
 
     // eslint-disable-next-line storybook/no-title-property-in-meta -- Docusaurus site configuration requires a title field
     title: "Uptime Watcher",
@@ -462,7 +526,7 @@ const config: Config = {
     trailingSlash: false,
 
     // Set the production url of your site here
-    url: "https://nick2bad4u.github.io",
+    url: siteUrl,
 };
 
 export default config;
