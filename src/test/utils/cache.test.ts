@@ -1031,7 +1031,8 @@ describe("Cache Utilities", () => {
                 ),
             ])("should handle cleanup of expired entries", (entries) => {
                 const cache = new TypedCache<string, string>();
-                const uniqueEntries = Array.from(new Map(
+                const uniqueEntries = Array.from(
+                    new Map(
                         entries.map(
                             ([
                                 k,
@@ -1039,7 +1040,8 @@ describe("Cache Utilities", () => {
                                 t,
                             ]) => [k, [v, t] as const]
                         )
-                    ));
+                    )
+                );
 
                 // Set entries at time 1000
                 mockNow.mockReturnValue(1000);

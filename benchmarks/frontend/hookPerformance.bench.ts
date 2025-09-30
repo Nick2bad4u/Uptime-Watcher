@@ -213,7 +213,9 @@ class MockReactHooks {
 
             if (depsChanged) {
                 hook.hasChanged = true;
-                hook.dependencies = dependencies ? Array.from(dependencies) : [];
+                hook.dependencies = dependencies
+                    ? Array.from(dependencies)
+                    : [];
                 context.hookDependencyChanges++;
             } else {
                 hook.hasChanged = false;

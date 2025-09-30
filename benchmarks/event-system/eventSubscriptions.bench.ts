@@ -243,11 +243,12 @@ class MockEventSubscriptionManager {
         return {
             ...this.metrics,
             subscriptionsByType: Array.from(
-                this.subscriptionsByType.entries()
-            , ([type, subs]) => ({
-                eventType: type,
-                count: subs.size,
-            })),
+                this.subscriptionsByType.entries(),
+                ([type, subs]) => ({
+                    eventType: type,
+                    count: subs.size,
+                })
+            ),
             groups: this.subscriptionGroups.size,
         };
     }

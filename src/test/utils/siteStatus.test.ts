@@ -307,7 +307,9 @@ describe("siteStatus Property-based Tests", () => {
                 const result = calculateSiteStatus(site);
 
                 // Check if we actually have mixed statuses
-                const uniqueStatuses = Array.from(new Set(mixedMonitors.map((m) => m.status)));
+                const uniqueStatuses = Array.from(
+                    new Set(mixedMonitors.map((m) => m.status))
+                );
                 if (uniqueStatuses.length > 1) {
                     expect(result).toBe("mixed");
                 }

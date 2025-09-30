@@ -8829,9 +8829,9 @@ export default [
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Storybook
     // ═══════════════════════════════════════════════════════════════════════════════
-    ...storybook.configs['flat/recommended'],
-    ...storybook.configs['flat/csf-strict'],
-    ...storybook.configs['flat/addon-interactions'],
+    ...storybook.configs["flat/recommended"],
+    ...storybook.configs["flat/csf-strict"],
+    ...storybook.configs["flat/addon-interactions"],
     {
         files: [
             ".storybook/**/*.{ts,tsx,mts,cts}",

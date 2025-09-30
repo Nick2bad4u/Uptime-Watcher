@@ -249,11 +249,7 @@ describe("Validator Utils Property-Based Tests", () => {
     });
 
     describe(isValidUrl, () => {
-        test.prop([
-            fc
-                .webUrl()
-                .filter((url) => !url.includes("'"))
-        ])(
+        test.prop([fc.webUrl().filter((url) => !url.includes("'"))])(
             "should return true for fast-check generated URLs",
             (url) => {
                 const result = isValidUrl(url);

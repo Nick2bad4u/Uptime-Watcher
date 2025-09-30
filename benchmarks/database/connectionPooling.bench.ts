@@ -1060,7 +1060,8 @@ describe("Database Connection Pooling Benchmarks", () => {
 
             // Process sessions concurrently
             const activeSessions: ConcurrentSession[] = [];
-            const waitingSessions: ConcurrentSession[] = Array.from(sessionBatch);
+            const waitingSessions: ConcurrentSession[] =
+                Array.from(sessionBatch);
 
             const batchStartTime = currentTime;
             let batchCurrentTime = batchStartTime;

@@ -662,7 +662,9 @@ class MockMonitorServiceManager {
     }
 
     getCheckHistory(limit?: number): MonitorCheckResult[] {
-        return limit ? this.checkHistory.slice(-limit) : Array.from(this.checkHistory);
+        return limit
+            ? this.checkHistory.slice(-limit)
+            : Array.from(this.checkHistory);
     }
 
     clearHistory(): void {

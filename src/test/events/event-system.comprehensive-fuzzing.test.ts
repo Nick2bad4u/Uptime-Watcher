@@ -536,7 +536,9 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 const listeners = new Map();
 
                 // Register listeners for all event types
-                const eventTypes = Array.from(new Set(events.map((e) => e.type)));
+                const eventTypes = Array.from(
+                    new Set(events.map((e) => e.type))
+                );
                 for (const eventType of eventTypes) {
                     const listener = vi.fn();
                     listeners.set(eventType, listener);

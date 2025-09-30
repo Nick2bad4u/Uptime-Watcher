@@ -177,7 +177,9 @@ describe("useMonitorTypes Hook", () => {
                 expect(result.current.isLoading).toBeFalsy();
             });
 
-            expect(result.current.options).toEqual(Array.from(FALLBACK_MONITOR_TYPE_OPTIONS));
+            expect(result.current.options).toEqual(
+                Array.from(FALLBACK_MONITOR_TYPE_OPTIONS)
+            );
             expect(result.current.error).toBe(
                 "Monitor types loading failed: Network connection failed. Using fallback options."
             );
@@ -202,7 +204,9 @@ describe("useMonitorTypes Hook", () => {
                 expect(result.current.isLoading).toBeFalsy();
             });
 
-            expect(result.current.options).toEqual(Array.from(FALLBACK_MONITOR_TYPE_OPTIONS));
+            expect(result.current.options).toEqual(
+                Array.from(FALLBACK_MONITOR_TYPE_OPTIONS)
+            );
             expect(result.current.error).toBe(
                 "Monitor types loading failed: Failed to load monitor types. Using fallback options."
             );
@@ -229,7 +233,9 @@ describe("useMonitorTypes Hook", () => {
                 expect(result.current.isLoading).toBeFalsy();
             });
 
-            expect(result.current.options).toEqual(Array.from(FALLBACK_MONITOR_TYPE_OPTIONS));
+            expect(result.current.options).toEqual(
+                Array.from(FALLBACK_MONITOR_TYPE_OPTIONS)
+            );
             expect(result.current.error).toBe(
                 "Monitor types loading failed: Failed to load monitor types. Using fallback options."
             );
@@ -257,7 +263,9 @@ describe("useMonitorTypes Hook", () => {
                 expect(result.current.isLoading).toBeFalsy();
             });
 
-            expect(result.current.options).toEqual(Array.from(FALLBACK_MONITOR_TYPE_OPTIONS));
+            expect(result.current.options).toEqual(
+                Array.from(FALLBACK_MONITOR_TYPE_OPTIONS)
+            );
             expect(result.current.error).toBe(
                 "Monitor types loading failed: Failed to load monitor types. Using fallback options."
             );
@@ -290,7 +298,9 @@ describe("useMonitorTypes Hook", () => {
                 expect(result.current.isLoading).toBeFalsy();
             });
             expect(result.current.error).toBeDefined();
-            expect(result.current.options).toEqual(Array.from(FALLBACK_MONITOR_TYPE_OPTIONS));
+            expect(result.current.options).toEqual(
+                Array.from(FALLBACK_MONITOR_TYPE_OPTIONS)
+            );
 
             // Refresh successfully
             act(() => {
@@ -339,7 +349,9 @@ describe("useMonitorTypes Hook", () => {
             expect(result.current.error).toBe(
                 "Monitor types loading failed: Refresh failed. Using fallback options."
             );
-            expect(result.current.options).toEqual(Array.from(FALLBACK_MONITOR_TYPE_OPTIONS));
+            expect(result.current.options).toEqual(
+                Array.from(FALLBACK_MONITOR_TYPE_OPTIONS)
+            );
         });
     });
 
@@ -482,7 +494,9 @@ describe("useMonitorTypes Hook", () => {
                 expect(result.current.isLoading).toBeFalsy();
             });
 
-            expect(result.current.options).toEqual(Array.from(FALLBACK_MONITOR_TYPE_OPTIONS));
+            expect(result.current.options).toEqual(
+                Array.from(FALLBACK_MONITOR_TYPE_OPTIONS)
+            );
             expect(result.current.options.length).toBeGreaterThan(0);
         });
 
@@ -495,7 +509,9 @@ describe("useMonitorTypes Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Business Logic", "type");
 
-            const originalFallbackOptions = Array.from(FALLBACK_MONITOR_TYPE_OPTIONS);
+            const originalFallbackOptions = Array.from(
+                FALLBACK_MONITOR_TYPE_OPTIONS
+            );
             mockGetMonitorTypeOptions.mockRejectedValue(
                 new Error("Test error")
             );

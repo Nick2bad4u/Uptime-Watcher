@@ -935,52 +935,59 @@ describe("Database Backup and Restore Benchmarks", () => {
 
         // Recovery method effectiveness
         const recoveryMethodAnalysis = Array.from(
-            new Set(recoveryScenarios.map((s) => s.recoveryMethod))
-        , (method) => {
-            const methodScenarios = recoveryScenarios.filter(
-                (s) => s.recoveryMethod === method
-            );
-            const successfulMethodRecoveries = methodScenarios.filter(
-                (s) => s.recoverySuccess
-            );
+            new Set(recoveryScenarios.map((s) => s.recoveryMethod)),
+            (method) => {
+                const methodScenarios = recoveryScenarios.filter(
+                    (s) => s.recoveryMethod === method
+                );
+                const successfulMethodRecoveries = methodScenarios.filter(
+                    (s) => s.recoverySuccess
+                );
 
-            return {
-                method,
-                usageCount: methodScenarios.length,
-                successRate:
-                    methodScenarios.length > 0
-                        ? successfulMethodRecoveries.length /
-                          methodScenarios.length
-                        : 0,
-                averageDowntime:
-                    methodScenarios.reduce((sum, s) => sum + s.downtime, 0) /
-                        methodScenarios.length || 0,
-                averageDataLoss:
-                    methodScenarios.reduce((sum, s) => sum + s.dataLoss, 0) /
-                        methodScenarios.length || 0,
-                effectivenessScore: (() => {
-                    if (methodScenarios.length === 0) return 0;
-                    const successRate =
-                        successfulMethodRecoveries.length /
-                        methodScenarios.length;
-                    const avgDowntime =
+                return {
+                    method,
+                    usageCount: methodScenarios.length,
+                    successRate:
+                        methodScenarios.length > 0
+                            ? successfulMethodRecoveries.length /
+                              methodScenarios.length
+                            : 0,
+                    averageDowntime:
                         methodScenarios.reduce(
                             (sum, s) => sum + s.downtime,
                             0
-                        ) / methodScenarios.length;
-                    const avgDataLoss =
+                        ) / methodScenarios.length || 0,
+                    averageDataLoss:
                         methodScenarios.reduce(
                             (sum, s) => sum + s.dataLoss,
                             0
-                        ) / methodScenarios.length;
+                        ) / methodScenarios.length || 0,
+                    effectivenessScore: (() => {
+                        if (methodScenarios.length === 0) return 0;
+                        const successRate =
+                            successfulMethodRecoveries.length /
+                            methodScenarios.length;
+                        const avgDowntime =
+                            methodScenarios.reduce(
+                                (sum, s) => sum + s.downtime,
+                                0
+                            ) / methodScenarios.length;
+                        const avgDataLoss =
+                            methodScenarios.reduce(
+                                (sum, s) => sum + s.dataLoss,
+                                0
+                            ) / methodScenarios.length;
 
-                    // Higher score = better method (high success rate, low downtime, low data loss)
-                    return (
-                        successRate * 100 - avgDowntime * 5 - avgDataLoss * 100
-                    );
-                })(),
-            };
-        });
+                        // Higher score = better method (high success rate, low downtime, low data loss)
+                        return (
+                            successRate * 100 -
+                            avgDowntime * 5 -
+                            avgDataLoss * 100
+                        );
+                    })(),
+                };
+            }
+        );
 
         // Sort by effectiveness
         recoveryMethodAnalysis.sort(

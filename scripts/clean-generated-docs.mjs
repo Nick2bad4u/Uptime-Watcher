@@ -14,6 +14,7 @@ const typedocConfigFiles = [
 
 /**
  * @param {string} candidate Path to verify.
+ *
  * @returns {Promise<boolean>} Resolves to true when the path exists.
  */
 const pathExists = async (candidate) => {
@@ -69,7 +70,8 @@ const loadTypedocOutputPaths = async () => {
 
 /**
  * @param {Map<string, string>} targets Paths mapped to logging reasons.
- * @returns {Promise<Array<{ targetPath: string; reason: string }>>}
+ *
+ * @returns {Promise<{ targetPath: string; reason: string }[]>}
  */
 const removeGeneratedTargets = async (targets) => {
     const removed = [];
@@ -131,7 +133,9 @@ const main = async () => {
     const removed = await removeGeneratedTargets(removalTargets);
 
     if (removed.length === 0) {
-        console.log("No generated documentation artifacts were found to remove.");
+        console.log(
+            "No generated documentation artifacts were found to remove."
+        );
     } else {
         removed.forEach((entry) => {
             console.log(entry.reason);

@@ -682,7 +682,9 @@ describe("Updater Service Benchmarks", () => {
                     !lastProgress.error && lastProgress.progress >= 0.95;
                 const totalDuration =
                     lastProgress.currentTime - progressList[0].startTime;
-                const phases = Array.from(new Set(progressList.map((p) => p.phase)));
+                const phases = Array.from(
+                    new Set(progressList.map((p) => p.phase))
+                );
 
                 return {
                     installId: lastProgress.installId,
