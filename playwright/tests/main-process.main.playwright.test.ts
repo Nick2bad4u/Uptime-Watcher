@@ -37,6 +37,13 @@ test.describe(
             async () => {
                 const electronApp = await launchElectronApp();
 
+                await electronApp.firstWindow();
+                await electronApp.evaluate(async ({ app }) => {
+                    if (!app.isReady()) {
+                        await app.whenReady();
+                    }
+                });
+
                 // Test app module
                 const appPath = await electronApp.evaluate(async ({ app }) => {
                     return app.getAppPath();

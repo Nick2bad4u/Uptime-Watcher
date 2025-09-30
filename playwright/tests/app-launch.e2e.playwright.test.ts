@@ -155,8 +155,13 @@ test.describe(
             async () => {
                 const electronApp = await launchElectronApp();
 
+                await electronApp.firstWindow();
                 // Check if app is ready
                 const isReady = await electronApp.evaluate(async ({ app }) => {
+                    if (!app.isReady()) {
+                        await app.whenReady();
+                    }
+
                     return app.isReady();
                 });
 
