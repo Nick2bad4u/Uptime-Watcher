@@ -18,8 +18,7 @@ const meta: Meta<typeof SaveButton> = {
         layout: "centered",
     },
     tags: ["autodocs"],
-    title: "Components/Shared/SaveButton",
-};
+} satisfies Meta<typeof SaveButton>;
 
 export default meta;
 

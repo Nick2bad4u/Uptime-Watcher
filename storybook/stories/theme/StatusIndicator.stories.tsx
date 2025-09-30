@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { StatusIndicator } from "@app/theme/components/StatusIndicator";
 
 const meta: Meta<typeof StatusIndicator> = {
-    title: "Theme/StatusIndicator",
     component: StatusIndicator,
     args: {
         status: "up",
@@ -13,7 +12,8 @@ const meta: Meta<typeof StatusIndicator> = {
     parameters: {
         layout: "centered",
     },
-};
+    tags: ["autodocs"],
+} satisfies Meta<typeof StatusIndicator>;
 
 export default meta;
 

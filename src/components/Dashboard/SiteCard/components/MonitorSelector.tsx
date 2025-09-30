@@ -20,6 +20,39 @@ import {
 } from "../../../../utils/fallbacks";
 import { formatTitleSuffix } from "../../../../utils/monitorTitleFormatters";
 
+const DEFAULT_PORT_VALUES = new Set<number>([80, 443]);
+
+const preferHostPortIdentifier = (
+    monitor: Monitor,
+    identifier: string,
+    fallbackIdentifier: string
+): string => {
+    if (!identifier) {
+        return fallbackIdentifier;
+    }
+
+    if (
+        typeof monitor.url === "string" &&
+        identifier === monitor.url &&
+        typeof monitor.port === "number" &&
+        monitor.port > 0 &&
+        !DEFAULT_PORT_VALUES.has(monitor.port) &&
+        monitor.host
+    ) {
+        try {
+            const parsedUrl = new URL(monitor.url);
+
+            if (parsedUrl.hostname === monitor.host && parsedUrl.port === "") {
+                return `${monitor.host}:${monitor.port}`;
+            }
+        } catch {
+            return `${monitor.host}:${monitor.port}`;
+        }
+    }
+
+    return identifier;
+};
+
 /**
  * Props for the MonitorSelector component.
  *
@@ -92,7 +125,14 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
             const identifier =
                 normalizedSuffix.length > 0
                     ? normalizedSuffix
-                    : getMonitorDisplayIdentifier(monitor, fallbackIdentifier);
+                    : preferHostPortIdentifier(
+                          monitor,
+                          getMonitorDisplayIdentifier(
+                              monitor,
+                              fallbackIdentifier
+                          ),
+                          fallbackIdentifier
+                      );
 
             return identifier
                 ? `${monitorTypeLabel}: ${identifier}`

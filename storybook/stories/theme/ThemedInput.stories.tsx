@@ -6,7 +6,6 @@ import { ThemedText } from "@app/theme/components/ThemedText";
 import { useState } from "react";
 
 const meta: Meta<typeof ThemedInput> = {
-    title: "Theme/ThemedInput",
     component: ThemedInput,
     args: {
         type: "text",
@@ -19,7 +18,8 @@ const meta: Meta<typeof ThemedInput> = {
     parameters: {
         layout: "padded",
     },
-};
+    tags: ["autodocs"],
+} satisfies Meta<typeof ThemedInput>;
 
 export default meta;
 

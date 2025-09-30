@@ -30,8 +30,7 @@ const meta: Meta<typeof StatusBadge> = {
         layout: "centered",
     },
     tags: ["autodocs"],
-    title: "Components/Common/StatusBadge",
-};
+} satisfies Meta<typeof StatusBadge>;
 
 export default meta;
 

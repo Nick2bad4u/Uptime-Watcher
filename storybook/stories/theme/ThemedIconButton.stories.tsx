@@ -4,7 +4,6 @@ import { ThemedIconButton } from "@app/theme/components/ThemedIconButton";
 import { FiEdit, FiSettings, FiTrash2 } from "react-icons/fi";
 
 const meta: Meta<typeof ThemedIconButton> = {
-    title: "Theme/ThemedIconButton",
     component: ThemedIconButton,
     args: {
         icon: <FiSettings />,
@@ -16,7 +15,8 @@ const meta: Meta<typeof ThemedIconButton> = {
     parameters: {
         layout: "centered",
     },
-};
+    tags: ["autodocs"],
+} satisfies Meta<typeof ThemedIconButton>;
 
 export default meta;
 

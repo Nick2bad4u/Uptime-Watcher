@@ -6,7 +6,6 @@ import { ThemedText } from "@app/theme/components/ThemedText";
 import { useState } from "react";
 
 const meta: Meta<typeof ThemedSelect> = {
-    title: "Theme/ThemedSelect",
     component: ThemedSelect,
     args: {
         "aria-label": "Select monitor type",
@@ -17,7 +16,8 @@ const meta: Meta<typeof ThemedSelect> = {
     parameters: {
         layout: "padded",
     },
-};
+    tags: ["autodocs"],
+} satisfies Meta<typeof ThemedSelect>;
 
 export default meta;
 

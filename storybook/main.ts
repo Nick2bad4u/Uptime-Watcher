@@ -95,10 +95,10 @@ const coverageOptions: AddonOptionsVite = {
 
 const config: StorybookConfig = {
     addons: [
-        "@storybook/addon-essentials",
         "@storybook/addon-a11y",
         "@storybook/addon-docs",
         "@storybook/addon-themes",
+        "storybook-dark-mode",
         {
             name: "@storybook/addon-coverage",
             options: coverageOptions,
@@ -106,6 +106,10 @@ const config: StorybookConfig = {
         "@storybook/addon-vitest",
         "msw-storybook-addon",
     ],
+    docs: {
+        // 👇 See the table below for the list of supported options
+        defaultName: "Documentation",
+    },
     framework: {
         name: "@storybook/react-vite",
         options: {},
@@ -180,11 +184,13 @@ const config: StorybookConfig = {
                     include: [
                         "@storybook/addon-a11y",
                         "@storybook/addon-docs",
+                        "@storybook/addon-themes",
                         "@storybook/addon-coverage",
                         "@storybook/addon-vitest",
                         "msw-storybook-addon",
                         "react",
                         "react-dom",
+                        "storybook-dark-mode",
                     ],
                 },
                 resolve: {
@@ -192,6 +198,10 @@ const config: StorybookConfig = {
                         "@app": path.resolve(dirname, "../src"),
                         "@electron": path.resolve(dirname, "../electron"),
                         "@shared": path.resolve(dirname, "../shared"),
+                        "@storybook/preview-api": path.resolve(
+                            dirname,
+                            "./shims/preview-api.ts"
+                        ),
                     },
                 },
             }

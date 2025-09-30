@@ -1,6 +1,6 @@
 # Uptime Monitoring System - New Monitor Type Implementation Guide
 
-`Last reviewed: September 27, 2025`
+`Last reviewed: September 30, 2025`
 
 This guide walks you through every layer required to introduce a brand-new monitor type into the Uptime Monitoring System. It is written so that an engineer who has never touched this codebase can ship a production-ready monitor with confidence.
 
@@ -93,10 +93,10 @@ All shared types live under `shared/`. Updating them first unlocks both backend 
 2. Update configuration contracts
    - In `shared/types/monitorConfig.ts` add an interface such as `NewMonitorConfig` extending `BaseMonitorConfig`.
    - Extend the `MonitorConfig` union and add a type guard `isNewMonitorConfig`.
-   - Provide defaults in `DEFAULT_MONITOR_CONFIG.<type>` that respect system-wide retry and timeout conventions.
+   - Provide defaults in `DEFAULT_MONITOR_CONFIG["<type>"]` that respect system-wide retry and timeout conventions.
 3. Review shared monitor metadata interfaces in `shared/types/monitorTypes.ts`; they already model extensible fields, so you typically only touch this file when introducing brand-new shared flags.
 4. Add Zod schemas
-   - Define `newMonitorSchema` in `shared/validation/schemas.ts` and include it in the discriminated union `monitorSchema`.
+   - Define `newMonitorSchema` in `shared/validation/schemas.ts` and include it in the discriminated union `monitorSchema`. Reference the schema via bracket notation (for example, `monitorSchemas["new-monitor"]`) when wiring it into registries.
    - Export a typed alias in `shared/types/schemaTypes.ts` for IDE support and cross-package imports.
 5. Field-level validation
    - Add a dedicated validator in `shared/utils/validation.ts` so error messages remain human readable. The shared `validateMonitorType` helper already tracks `BASE_MONITOR_TYPES`, so you only need to plug in your type-specific logic.
@@ -169,7 +169,7 @@ Verification tip: start the Electron app after registering the monitor. The data
    - Update `src/stores/sites/utils/monitorOperations.ts` so `filterMonitorFieldsByType`, type-specific default appliers, and `normalizeMonitor` understand the new fields.
 5. Form state management
    - Extend `src/components/SiteDetails/useAddSiteForm.ts` to initialise state, reset values, and expose setters for the new fields.
-   - Update `src/components/AddSiteForm/AddSiteForm.tsx`, `DynamicMonitorFields.tsx`, and `Submit.tsx` so inputs render and submissions convert string fields into typed values.
+   - Update `src/components/AddSiteForm/AddSiteForm.tsx`, `DynamicMonitorFields.tsx`, and `Submit.tsx` so inputs render and submissions convert string fields into typed values. Extend the `monitorValidationBuilders` map in `Submit.tsx` so the new type serialises correctly before IPC calls.
 6. Fallback options and UI polish
    - Add the human-friendly label to `FALLBACK_MONITOR_TYPE_OPTIONS` in `src/constants.ts`.
    - Extend the label/identifier helpers in `src/utils/fallbacks.ts` (for example, the `MONITOR_TYPE_LABELS` and `MONITOR_IDENTIFIER_GENERATORS` maps) and any UI that renders them, such as `src/components/Dashboard/SiteCard/components/MonitorSelector.tsx`.
@@ -267,7 +267,7 @@ registerMonitorType({
   formatTitleSuffix: (monitor) => (monitor.host ? ` (${monitor.host})` : ""),
   supportsResponseTime: true,
  },
- validationSchema: monitorSchemas.newMonitor,
+ validationSchema: monitorSchemas["new-monitor"],
  version: "1.0.0",
 });
 ```
@@ -335,6 +335,7 @@ Replace the TODO block with real protocol logic. Keep exception handling defensi
 
 ## 8. Change Log for This Guide
 
+- September 30, 2025 - Clarified shared-schema bracket access, expanded renderer normalization guidance, and refreshed validation builder notes.
 - September 27, 2025 - Rebuilt the guide to cover the complete, generic monitor workflow with file-by-file instructions, testing requirements, and troubleshooting guidance.
 
 Happy shipping. If you discover additional integration steps, update this guide alongside your code change so the next engineer starts from a precise source of truth.

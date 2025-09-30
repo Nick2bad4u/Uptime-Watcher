@@ -218,83 +218,98 @@ const monitorValidationBuilders: Record<
     }),
 };
 
-/**
- * Creates a monitor object based on the form data using the shared utility.
- * This ensures consistent monitor defaults and validation across the app.
- */
-function createMonitor(properties: FormSubmitProperties): Monitor {
-    const {
-        baselineUrl,
-        bodyKeyword,
-        certificateWarningDays,
-        checkInterval,
-        edgeLocations,
-        expectedHeaderValue,
-        expectedJsonValue,
-        expectedStatusCode,
-        expectedValue,
-        generateUuid,
-        headerName,
-        heartbeatExpectedStatus,
-        heartbeatMaxDriftSeconds,
-        heartbeatStatusField,
-        heartbeatTimestampField,
-        host,
-        jsonPath,
-        maxPongDelayMs,
-        maxReplicationLagSeconds,
-        maxResponseTime,
-        monitorType,
-        port,
-        primaryStatusUrl,
-        recordType,
-        replicaStatusUrl,
-        replicationTimestampField,
-    } = properties;
+const monitorValidationBuilderLookup: Record<
+    string,
+    (fields: MonitorValidationFields) => UnknownRecord
+> = monitorValidationBuilders;
 
-    const trimmedRecordType = safeTrim(recordType);
-    const optionalExpectedValue = toOptionalString(expectedValue);
-    const expectedValueForDns =
-        trimmedRecordType.length > 0 &&
-        trimmedRecordType.toUpperCase() !== "ANY"
-            ? optionalExpectedValue
-            : undefined;
+const resolveMonitorValidationBuilder = (
+    monitorType: MonitorType
+): ((fields: MonitorValidationFields) => UnknownRecord) => {
+    const candidate = monitorValidationBuilderLookup[monitorType];
 
+    if (typeof candidate !== "function") {
+        throw new TypeError(`Unsupported monitor type: ${monitorType}`);
+    }
+
+    return candidate;
+};
+
+const determineDnsExpectedValue = (
+    trimmedRecordType: string,
+    expectedValue?: string
+): string | undefined => {
+    if (trimmedRecordType.length === 0) {
+        return undefined;
+    }
+
+    if (trimmedRecordType.toUpperCase() === "ANY") {
+        return undefined;
+    }
+
+    return toOptionalString(expectedValue);
+};
+
+const buildMonitorFormData = (
+    properties: FormSubmitProperties
+): UnknownRecord => {
+    const trimmedRecordType = safeTrim(properties.recordType);
     const formData: UnknownRecord = {
-        baselineUrl: toOptionalString(baselineUrl),
-        bodyKeyword: toOptionalString(bodyKeyword),
-        certificateWarningDays: parseOptionalInteger(certificateWarningDays),
-        checkInterval,
-        edgeLocations: toOptionalString(edgeLocations),
-        expectedHeaderValue: toOptionalString(expectedHeaderValue),
-        expectedJsonValue: toOptionalString(expectedJsonValue),
-        expectedStatusCode: parseOptionalInteger(expectedStatusCode),
-        expectedValue: expectedValueForDns,
-        headerName: toOptionalString(headerName),
-        heartbeatExpectedStatus: toOptionalString(heartbeatExpectedStatus),
+        baselineUrl: toOptionalString(properties.baselineUrl),
+        bodyKeyword: toOptionalString(properties.bodyKeyword),
+        certificateWarningDays: parseOptionalInteger(
+            properties.certificateWarningDays
+        ),
+        checkInterval: properties.checkInterval,
+        edgeLocations: toOptionalString(properties.edgeLocations),
+        expectedHeaderValue: toOptionalString(properties.expectedHeaderValue),
+        expectedJsonValue: toOptionalString(properties.expectedJsonValue),
+        expectedStatusCode: parseOptionalInteger(properties.expectedStatusCode),
+        expectedValue: determineDnsExpectedValue(
+            trimmedRecordType,
+            properties.expectedValue
+        ),
+        headerName: toOptionalString(properties.headerName),
+        heartbeatExpectedStatus: toOptionalString(
+            properties.heartbeatExpectedStatus
+        ),
         heartbeatMaxDriftSeconds: parseOptionalInteger(
-            heartbeatMaxDriftSeconds
+            properties.heartbeatMaxDriftSeconds
         ),
-        heartbeatStatusField: toOptionalString(heartbeatStatusField),
-        heartbeatTimestampField: toOptionalString(heartbeatTimestampField),
-        host: toOptionalString(host),
-        jsonPath: toOptionalString(jsonPath),
-        maxPongDelayMs: parseOptionalInteger(maxPongDelayMs),
+        heartbeatStatusField: toOptionalString(properties.heartbeatStatusField),
+        heartbeatTimestampField: toOptionalString(
+            properties.heartbeatTimestampField
+        ),
+        host: toOptionalString(properties.host),
+        jsonPath: toOptionalString(properties.jsonPath),
+        maxPongDelayMs: parseOptionalInteger(properties.maxPongDelayMs),
         maxReplicationLagSeconds: parseOptionalInteger(
-            maxReplicationLagSeconds
+            properties.maxReplicationLagSeconds
         ),
-        maxResponseTime: parseOptionalInteger(maxResponseTime),
-        port: parseOptionalInteger(port),
-        primaryStatusUrl: toOptionalString(primaryStatusUrl),
+        maxResponseTime: parseOptionalInteger(properties.maxResponseTime),
+        port: parseOptionalInteger(properties.port),
+        primaryStatusUrl: toOptionalString(properties.primaryStatusUrl),
         recordType: trimmedRecordType || undefined,
-        replicaStatusUrl: toOptionalString(replicaStatusUrl),
-        replicationTimestampField: toOptionalString(replicationTimestampField),
+        replicaStatusUrl: toOptionalString(properties.replicaStatusUrl),
+        replicationTimestampField: toOptionalString(
+            properties.replicationTimestampField
+        ),
     };
 
     if (formData["expectedValue"] === undefined) {
         delete formData["expectedValue"];
     }
 
+    return formData;
+};
+
+/**
+ * Creates a monitor object based on the form data using the shared utility.
+ * This ensures consistent monitor defaults and validation across the app.
+ */
+function createMonitor(properties: FormSubmitProperties): Monitor {
+    const { checkInterval, generateUuid, monitorType } = properties;
+    const formData = buildMonitorFormData(properties);
     const baseMonitor = createMonitorObject(monitorType, formData);
 
     return {
@@ -434,9 +449,11 @@ async function validateMonitorType(
     monitorType: MonitorType,
     fields: MonitorValidationFields
 ): Promise<readonly string[]> {
+    const builderCandidate = resolveMonitorValidationBuilder(monitorType);
+
     const formData: UnknownRecord = {
         type: monitorType,
-        ...monitorValidationBuilders[monitorType](fields),
+        ...builderCandidate(fields),
     };
 
     const result = await validateMonitorFormData(monitorType, formData);

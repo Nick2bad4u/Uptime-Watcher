@@ -6,7 +6,6 @@ import { ThemedText } from "@app/theme/components/ThemedText";
 import { useState } from "react";
 
 const meta: Meta<typeof ThemedCheckbox> = {
-    title: "Theme/ThemedCheckbox",
     component: ThemedCheckbox,
     args: {
         checked: false,
@@ -18,7 +17,8 @@ const meta: Meta<typeof ThemedCheckbox> = {
     parameters: {
         layout: "centered",
     },
-};
+    tags: ["autodocs"],
+} satisfies Meta<typeof ThemedCheckbox>;
 
 export default meta;
 

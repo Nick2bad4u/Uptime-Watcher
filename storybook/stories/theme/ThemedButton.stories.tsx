@@ -4,7 +4,6 @@ import { ThemedButton } from "@app/theme/components/ThemedButton";
 import { FiAlertTriangle, FiCheck, FiDownload, FiPlus } from "react-icons/fi";
 
 const meta: Meta<typeof ThemedButton> = {
-    title: "Theme/ThemedButton",
     component: ThemedButton,
     args: {
         children: "Primary Action",
@@ -17,7 +16,8 @@ const meta: Meta<typeof ThemedButton> = {
     parameters: {
         layout: "centered",
     },
-};
+    tags: ["autodocs"],
+} satisfies Meta<typeof ThemedButton>;
 
 export default meta;
 

@@ -652,6 +652,19 @@ export class MonitorManager {
     }
 
     /**
+     * Execute asynchronous tasks sequentially while preserving order.
+     */
+    private async runSequentially<TItem>(
+        items: readonly TItem[],
+        task: (item: TItem) => Promise<void>
+    ): Promise<void> {
+        for (const item of items) {
+            // eslint-disable-next-line no-await-in-loop -- Sequential execution prevents overlapping datastore operations
+            await task(item);
+        }
+    }
+
+    /**
      * Enhanced start all monitoring - replaces legacy startAllMonitoring
      * function.
      *
@@ -689,35 +702,36 @@ export class MonitorManager {
 
         const sites = config.sites.getAll();
 
-        for (const site of sites) {
+        await this.runSequentially(sites, async (site) => {
             try {
                 const monitorsToStart = site.monitors.filter(
                     (monitor): monitor is Monitor & { id: string } =>
                         Boolean(monitor.id && monitor.checkInterval)
                 );
 
-                /* eslint-disable no-await-in-loop -- Sequential processing prevents overlapping SQLite transactions */
-                for (const monitor of monitorsToStart) {
-                    const started =
-                        await this.enhancedMonitoringServices.checker.startMonitoring(
-                            site.identifier,
-                            monitor.id
-                        );
+                await this.runSequentially(
+                    monitorsToStart,
+                    async (monitorWithId) => {
+                        const started =
+                            await this.enhancedMonitoringServices.checker.startMonitoring(
+                                site.identifier,
+                                monitorWithId.id
+                            );
 
-                    if (started) {
-                        await this.applyMonitorState(
-                            site,
-                            monitor,
-                            {
-                                activeOperations: [],
-                                monitoring: true,
-                                status: MONITOR_STATUS.PENDING,
-                            },
-                            MONITOR_STATUS.PENDING
-                        );
+                        if (started) {
+                            await this.applyMonitorState(
+                                site,
+                                monitorWithId,
+                                {
+                                    activeOperations: [],
+                                    monitoring: true,
+                                    status: MONITOR_STATUS.PENDING,
+                                },
+                                MONITOR_STATUS.PENDING
+                            );
+                        }
                     }
-                }
-                /* eslint-enable no-await-in-loop -- Restore default await-in-loop enforcement */
+                );
 
                 config.monitorScheduler.startSite(site);
             } catch (error) {
@@ -726,7 +740,7 @@ export class MonitorManager {
                     error
                 );
             }
-        }
+        });
 
         config.logger.info("Started all monitoring operations (enhanced)");
         return true;
@@ -761,43 +775,43 @@ export class MonitorManager {
 
         const sites = config.sites.getAll();
 
-        for (const site of sites) {
+        await this.runSequentially(sites, async (site) => {
             try {
                 const monitorsToStop = site.monitors.filter(
                     (monitor): monitor is Monitor & { id: string } =>
                         Boolean(monitor.id && monitor.monitoring)
                 );
 
-                // Process sequentially to avoid overlapping SQLite transactions
-                /* eslint-disable no-await-in-loop -- Sequential processing prevents overlapping SQLite transactions */
-                for (const monitor of monitorsToStop) {
-                    const stopped =
-                        await this.enhancedMonitoringServices.checker.stopMonitoring(
-                            site.identifier,
-                            monitor.id
-                        );
+                await this.runSequentially(
+                    monitorsToStop,
+                    async (monitorWithId) => {
+                        const stopped =
+                            await this.enhancedMonitoringServices.checker.stopMonitoring(
+                                site.identifier,
+                                monitorWithId.id
+                            );
 
-                    if (stopped) {
-                        await this.applyMonitorState(
-                            site,
-                            monitor,
-                            {
-                                activeOperations: [],
-                                monitoring: false,
-                                status: MONITOR_STATUS.PAUSED,
-                            },
-                            MONITOR_STATUS.PAUSED
-                        );
+                        if (stopped) {
+                            await this.applyMonitorState(
+                                site,
+                                monitorWithId,
+                                {
+                                    activeOperations: [],
+                                    monitoring: false,
+                                    status: MONITOR_STATUS.PAUSED,
+                                },
+                                MONITOR_STATUS.PAUSED
+                            );
+                        }
                     }
-                }
-                /* eslint-enable no-await-in-loop -- Restore default await-in-loop enforcement */
+                );
             } catch (error) {
                 config.logger.error(
                     `Failed to stop monitoring for site ${site.identifier}`,
                     error
                 );
             }
-        }
+        });
 
         // Stop all scheduled operations after state updates are complete
         config.monitorScheduler.stopAll();
@@ -908,15 +922,14 @@ export class MonitorManager {
 
         let hasSuccessfulStart = false;
 
-        /* eslint-disable no-await-in-loop -- Sequential recursion maintains deterministic monitor start ordering */
-        for (const monitor of validMonitors) {
+        await this.runSequentially(validMonitors, async (monitorWithId) => {
             try {
                 const result = monitorAction
-                    ? await monitorAction(identifier, monitor.id)
+                    ? await monitorAction(identifier, monitorWithId.id)
                     : await this.startMonitoringForSiteEnhanced(
                           config,
                           identifier,
-                          monitor.id
+                          monitorWithId.id
                       );
 
                 if (result) {
@@ -924,13 +937,11 @@ export class MonitorManager {
                 }
             } catch (error) {
                 config.logger.error(
-                    `Enhanced start failed for ${identifier}:${monitor.id}`,
+                    `Enhanced start failed for ${identifier}:${monitorWithId.id}`,
                     error
                 );
             }
-        }
-
-        /* eslint-enable no-await-in-loop -- Restore default await-in-loop enforcement */
+        });
 
         return hasSuccessfulStart;
     }
@@ -1030,15 +1041,14 @@ export class MonitorManager {
 
         let allStoppedSuccessfully = true;
 
-        /* eslint-disable no-await-in-loop -- Sequential recursion ensures monitors stop in a deterministic order */
-        for (const monitor of validMonitors) {
+        await this.runSequentially(validMonitors, async (monitorWithId) => {
             try {
                 const result = monitorAction
-                    ? await monitorAction(identifier, monitor.id)
+                    ? await monitorAction(identifier, monitorWithId.id)
                     : await this.stopMonitoringForSiteEnhanced(
                           config,
                           identifier,
-                          monitor.id
+                          monitorWithId.id
                       );
 
                 if (!result) {
@@ -1046,13 +1056,12 @@ export class MonitorManager {
                 }
             } catch (error) {
                 config.logger.error(
-                    `Enhanced stop failed for ${identifier}:${monitor.id}`,
+                    `Enhanced stop failed for ${identifier}:${monitorWithId.id}`,
                     error
                 );
                 allStoppedSuccessfully = false;
             }
-        }
-        /* eslint-enable no-await-in-loop -- Restore default await-in-loop enforcement */
+        });
 
         return allStoppedSuccessfully;
     }

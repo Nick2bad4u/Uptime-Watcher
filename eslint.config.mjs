@@ -12,7 +12,6 @@
  */
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- Eslint doesn't use default */
 /* eslint-disable n/no-unpublished-import, import-x/no-named-as-default-member -- Rule wants packages not in dev, doesn't apply, eslint doesnt use default import */
-
 import pluginUseMemo2 from "@arthurgeron/eslint-plugin-react-usememo";
 import pluginDocusaurus from "@docusaurus/eslint-plugin";
 import pluginComments from "@eslint-community/eslint-plugin-eslint-comments/configs";
@@ -150,7 +149,6 @@ import jsoncEslintParser from "jsonc-eslint-parser";
 import path from "node:path";
 import tomlEslintParser from "toml-eslint-parser";
 import yamlEslintParser from "yaml-eslint-parser";
-
 // Unused and Uninstalled Plugins:
 // import putout from "eslint-plugin-putout";
 // import pluginPii from "eslint-plugin-pii"; - broken
@@ -181,17 +179,14 @@ import yamlEslintParser from "yaml-eslint-parser";
 // Don't use
 // eslint-plugin-import -- Replaced by import-x
 // Schema: https://www.schemastore.org/eslintrc.json
-
 // const __filename = fileURLToPath(import.meta.url);
 // const gitignorePath = path.resolve(__dirname, ".gitignore");
-
 const ROOT_DIR = import.meta.dirname;
-
 export default [
     gitignore({
         name: "Global .gitignore Rules",
         root: true,
-    }), // Global Configs and Rules
+    }), // MARK: Global Configs and Rules
     importX.flatConfigs.typescript,
     progress.configs.recommended,
     noBarrelFiles.flat,
@@ -202,7 +197,7 @@ export default [
     arrayFunc.configs.all,
     ...storybook.configs["flat/recommended"],
     // ═══════════════════════════════════════════════════════════════════════════════
-    // Global Ignore Patterns
+    // MARK: Global Ignore Patterns
     // Add patterns here to ignore files and directories globally
     // ═══════════════════════════════════════════════════════════════════════════════
     {
@@ -255,8 +250,9 @@ export default [
             // "vitest.config.ts", // Ignore vitest config due to parsing issues
         ],
         name: "Global Ignore Patterns **/**",
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // Global Language Options
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Global Language Options
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         languageOptions: {
@@ -285,8 +281,9 @@ export default [
             },
         },
         name: "Global Language Options **/**",
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // Global Settings
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Global Settings
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         name: "Global Settings Options **/**",
@@ -323,8 +320,9 @@ export default [
                 version: "detect", // Specify the React version for semantic analysis (can be "detect" for auto-detection)
             },
         },
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // YAML/YML files
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: YAML/YML files
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.{yaml,yml}"],
@@ -372,8 +370,9 @@ export default [
             "yml/spaced-comment": "warn",
             "yml/vue-custom-block/no-parsing-error": "warn",
         },
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // HTML files
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: HTML files
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.{html,htm,xhtml}"],
@@ -450,8 +449,9 @@ export default [
                 },
             ],
         },
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // HTML in JS/TS files (HTML Literals)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: HTML in JS/TS files (HTML Literals)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
@@ -487,10 +487,10 @@ export default [
                 },
             ],
         },
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // Package.json Linting (PubLint)
+    },
     // ═══════════════════════════════════════════════════════════════════════════════
-
+    // MARK: Package.json Linting (PubLint)
+    // ═══════════════════════════════════════════════════════════════════════════════
     // {
     //     name: "Package - **/Package.json - Publint",
     //     files: ["**/package.json"],
@@ -517,7 +517,7 @@ export default [
     //     },
     // },
     // ═══════════════════════════════════════════════════════════════════════════════
-    // Package.json Linting
+    // MARK: Package.json Linting
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/package.json"],
@@ -573,8 +573,9 @@ export default [
             "package-json/valid-type": "warn",
             "package-json/valid-version": "warn",
         },
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // MDX Eslint Rules (mdx/*)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: MDX Eslint Rules (mdx/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     // Main MDX Configuration - for MDX files with comprehensive remark linting
     {
@@ -624,7 +625,10 @@ export default [
                 remarkConfigPath: ".remarkrc.mjs",
             }),
         },
-    }, // MDX Code Blocks Configuration - for JavaScript/TypeScript code within MDX
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: MDX CodeBlocks
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.mdx"],
         languageOptions: {
@@ -646,8 +650,9 @@ export default [
             "no-var": "error",
             "prefer-const": "error",
         },
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // MD Eslint Rules (md/*, markdown/*, markup/*, atom/*, rss/*)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Markdown (md/*, markdown/*, markup/*, atom/*, rss/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.{md,markup,atom,rss,markdown}"],
@@ -664,7 +669,6 @@ export default [
         rules: {
             // Markdown Plugin Eslint Rules (markdown/*)
             "markdown/fenced-code-language": "warn",
-
             "markdown/heading-increment": "warn",
             "markdown/no-bare-urls": "warn",
             "markdown/no-duplicate-definitions": "warn",
@@ -697,8 +701,9 @@ export default [
                 remarkConfigPath: ".remarkrc.mjs",
             }),
         },
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // CSS Eslint Rules (css/*)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: CSS (css/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.css"],
@@ -725,8 +730,9 @@ export default [
             "css/use-baseline": "off",
             "css/use-layers": "off",
         },
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // JSONC Eslint Rules (jsonc/*)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: JSONC (jsonc/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
@@ -841,8 +847,9 @@ export default [
                 },
             ],
         },
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // JSON Eslint Rules (json/*)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: JSON (json/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.json"],
@@ -865,8 +872,9 @@ export default [
                 },
             ],
         },
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // JSON5 Eslint Rules (json5/*)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: JSON5 (json5/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.json5"],
@@ -887,8 +895,9 @@ export default [
                 },
             ],
         },
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // TOML Eslint Rules (toml/*)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: TOML (toml/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.toml"],
@@ -924,8 +933,9 @@ export default [
             "toml/tables-order": "warn",
             "toml/vue-custom-block/no-parsing-error": "warn",
         },
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // TSX/JSX Eslint Rules (tsx/*, jsx/*)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: TSX/JSX (tsx/*, jsx/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.{tsx,jsx}"],
@@ -1026,8 +1036,9 @@ export default [
                 cssFiles: ["./src/index.css"],
             },
         },
-    }, // ═══════════════════════════════════════════════════════════════════════════════
-    // Docusaurus Eslint Rules (docusaurus/*)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Docusaurus (docusaurus/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["docs/docusaurus/**/*.{ts,tsx,mjs,cjs,js,jsx,mts,cts}"],
@@ -1179,7 +1190,6 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
-
             // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             // @ts-expect-error  -- Wrong types but runtime usage is working
@@ -1213,7 +1223,6 @@ export default [
                 "off",
             "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
                 "off",
-
             /* Hooks extra subplugin */
             "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
                 "warn",
@@ -1224,7 +1233,6 @@ export default [
             "@eslint-react/jsx-shorthand-fragment": "warn",
             "@eslint-react/jsx-uses-react": "warn",
             "@eslint-react/jsx-uses-vars": "warn",
-
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
             /* Naming convention subplugin */
@@ -1241,7 +1249,6 @@ export default [
             "@eslint-react/no-nested-component-definitions": "warn",
             "@eslint-react/no-unnecessary-key": "warn",
             "@eslint-react/no-unnecessary-use-callback": "off",
-
             "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
             "@eslint-react/no-unused-props": "warn",
@@ -1251,7 +1258,6 @@ export default [
             "@eslint-react/prefer-namespace-import": "off",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
-
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
                 {
@@ -1316,7 +1322,6 @@ export default [
             "@microsoft/sdl/no-insecure-url": "warn",
             "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
-
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@rushstack/security/no-unsafe-regexp": "warn",
@@ -1647,7 +1652,6 @@ export default [
             "canonical/export-specifier-newline": "off",
             "canonical/filename-match-exported": "off",
             // Core quality rules
-
             "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
             "canonical/filename-no-index": "off",
             "canonical/import-specifier-newline": "off",
@@ -2322,7 +2326,10 @@ export default [
                 },
             },
         },
-    }, // Docusaurus CSS
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Docusaurus CSS (docs/docusaurus/**/*.css)
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["docs/docusaurus/**/*.css"],
         ignores: [
@@ -2370,7 +2377,10 @@ export default [
             // ],
         },
         settings: {},
-    }, // TypeScript frontend files (React + Zustand)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: TypeScript Frontend (src/**/*)
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
             "src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -2543,7 +2553,6 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
-
             // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             // @ts-expect-error  -- Wrong types but runtime usage is working
@@ -2581,7 +2590,6 @@ export default [
                 "off",
             "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
                 "off",
-
             /* Hooks extra subplugin */
             "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
                 "warn",
@@ -2592,7 +2600,6 @@ export default [
             "@eslint-react/jsx-shorthand-fragment": "warn",
             "@eslint-react/jsx-uses-react": "warn",
             "@eslint-react/jsx-uses-vars": "warn",
-
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
             /* Naming convention subplugin */
@@ -2609,7 +2616,6 @@ export default [
             "@eslint-react/no-nested-component-definitions": "warn",
             "@eslint-react/no-unnecessary-key": "warn",
             "@eslint-react/no-unnecessary-use-callback": "off",
-
             "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
             "@eslint-react/no-unused-props": "warn",
@@ -2619,7 +2625,6 @@ export default [
             "@eslint-react/prefer-namespace-import": "off",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
-
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
                 {
@@ -2696,7 +2701,6 @@ export default [
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
-
             "@rushstack/security/no-unsafe-regexp": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
             "@typescript-eslint/array-type": [
@@ -3935,7 +3939,10 @@ export default [
                 cssFiles: ["./src/index.css"],
             },
         },
-    }, // Electron backend files
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Electron Backend - (electron/**/*)
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["electron/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: [
@@ -3995,7 +4002,6 @@ export default [
             depend: depend,
             // @ts-expect-error -- TS Error from fixupPluginRules
             deprecation: fixupPluginRules(pluginDeprecation),
-
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
             // @ts-expect-error -- TS Error from fixupPluginRules
@@ -4093,7 +4099,6 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
-
             // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             // @ts-expect-error  -- Wrong types but runtime usage is working
@@ -4123,7 +4128,6 @@ export default [
                 "off",
             "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
                 "off",
-
             /* Hooks extra subplugin */
             "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
                 "warn",
@@ -4133,7 +4137,6 @@ export default [
             "@eslint-react/jsx-shorthand-fragment": "warn",
             "@eslint-react/jsx-uses-react": "warn",
             "@eslint-react/jsx-uses-vars": "warn",
-
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
             /* Naming convention subplugin */
@@ -4150,7 +4153,6 @@ export default [
             "@eslint-react/no-nested-component-definitions": "warn",
             "@eslint-react/no-unnecessary-key": "warn",
             "@eslint-react/no-unnecessary-use-callback": "off",
-
             "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
             "@eslint-react/no-unused-props": "warn",
@@ -4160,7 +4162,6 @@ export default [
             "@eslint-react/prefer-namespace-import": "off",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
-
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
                 {
@@ -4833,7 +4834,6 @@ export default [
             "n/no-mixed-requires": "warn",
             "n/no-new-require": "warn",
             "n/no-path-concat": "warn",
-
             "n/no-process-env": [
                 "error",
                 {
@@ -5290,7 +5290,10 @@ export default [
             },
             react: { version: "19" },
         },
-    }, // TypeScript Shared (React and non-React)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: TypeScript Shared - shared/**/*
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["shared/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: [
@@ -5491,7 +5494,6 @@ export default [
                 "off",
             "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
                 "off",
-
             /* Hooks extra subplugin */
             "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
                 "warn",
@@ -5502,7 +5504,6 @@ export default [
             "@eslint-react/jsx-shorthand-fragment": "warn",
             "@eslint-react/jsx-uses-react": "warn",
             "@eslint-react/jsx-uses-vars": "warn",
-
             "@eslint-react/naming-convention/component-name": "warn",
             "@eslint-react/naming-convention/context-name": "warn",
             /* Naming convention subplugin */
@@ -5519,7 +5520,6 @@ export default [
             "@eslint-react/no-nested-component-definitions": "warn",
             "@eslint-react/no-unnecessary-key": "warn",
             "@eslint-react/no-unnecessary-use-callback": "off",
-
             "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
             "@eslint-react/no-unused-props": "warn",
@@ -5529,7 +5529,6 @@ export default [
             "@eslint-react/prefer-namespace-import": "off",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
-
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
                 {
@@ -5606,7 +5605,6 @@ export default [
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
-
             "@rushstack/security/no-unsafe-regexp": "warn",
             "@typescript-eslint/adjacent-overload-signatures": "warn",
             "@typescript-eslint/array-type": [
@@ -6878,7 +6876,10 @@ export default [
                 cssFiles: ["./src/index.css"],
             },
         },
-    }, // Test files (Frontend)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Tests (Frontend)
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
             "src/**/*.{spec,test}.*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -6920,7 +6921,6 @@ export default [
         name: "Tests (Frontend) - src/**/*.{spec,test}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
-
             "import-x": importX,
             "loadable-imports": pluginLoadableImports,
             n: nodePlugin,
@@ -6946,7 +6946,6 @@ export default [
             ...pluginUnicorn.configs.all.rules,
             // Relaxed function rules for tests (explicit for clarity)
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
-
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "@typescript-eslint/no-non-null-assertion": "off",
@@ -6991,7 +6990,6 @@ export default [
             "max-params": "off",
             "max-statements": "off",
             "new-cap": "off", // Allow new-cap for class constructors
-
             "nitpick/no-redundant-vars": "off", // Allow redundant vars in tests
             "no-await-in-loop": "off", // Allow await in loops for sequential operations
             "no-console": "off",
@@ -7106,7 +7104,10 @@ export default [
                 typecheck: true,
             },
         },
-    }, // Test files (Backend)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Tests (Backend)
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
             "electron/**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -7166,7 +7167,6 @@ export default [
             ...pluginUnicorn.configs.all.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
-
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "@typescript-eslint/no-non-null-assertion": "off",
@@ -7212,13 +7212,11 @@ export default [
             "max-params": "off",
             "max-statements": "off",
             "new-cap": "off", // Allow new-cap for class constructors
-
             "no-await-in-loop": "off", // Allow await in loops for sequential operations
             "no-console": "off",
             "no-duplicate-imports": "off", // Allow duplicate imports for test setups
             "no-inline-comments": "off",
             "no-loop-func": "off", // Allow functions in loops for test setups
-
             "no-magic-numbers": "off",
             "no-new": "off", // Allow new for class constructors
             // No Only Tests
@@ -7327,7 +7325,10 @@ export default [
                 typecheck: true,
             },
         },
-    }, // Shared Test Files
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Tests (Shared)
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
             "shared/**/*.{spec,test}.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
@@ -7365,7 +7366,6 @@ export default [
         name: "Tests (Shared) - shared/**/*.{spec,test}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
-
             "import-x": importX,
             "loadable-imports": pluginLoadableImports,
             n: nodePlugin,
@@ -7390,7 +7390,6 @@ export default [
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
-
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
@@ -7435,7 +7434,6 @@ export default [
             "no-undefined": "off",
             "no-void": "off",
             // Relaxed function rules for tests (explicit for clarity)
-
             "object-shorthand": "off",
             "one-var": "off",
             "prefer-arrow-callback": [
@@ -7527,7 +7525,10 @@ export default [
                 typecheck: true,
             },
         },
-    }, // Benchmark files
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Benchmarks
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
             "benchmarks/**/*.bench.*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -7567,7 +7568,6 @@ export default [
         name: "Benchmarks - benchmarks/**/*.{bench}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
-
             "import-x": importX,
             n: nodePlugin,
             react: pluginReact,
@@ -7578,7 +7578,6 @@ export default [
         },
         rules: {
             // Benchmark Files Rules
-
             ...js.configs.all.rules,
             ...tseslint.configs.recommendedTypeChecked,
             ...tseslint.configs.recommended.rules,
@@ -7639,7 +7638,6 @@ export default [
             "max-statements": "off",
             "new-cap": "off", // Allow new-cap for class constructors
             "nitpick/no-redundant-vars": "off", // Allow redundant vars in benchmarks
-
             "no-await-in-loop": "off", // Allow await in loops for sequential operations
             "no-console": "off",
             "no-continue": "off",
@@ -7728,7 +7726,10 @@ export default [
                 typecheck: true,
             },
         },
-    }, // TypeScript Config files using Electron Test TSConfig
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: TypeScript Config files
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
             "**/*.config.{ts,tsx,mts,cts}", // Configuration files
@@ -7805,7 +7806,6 @@ export default [
         },
         rules: {
             // TypeScript Config Files Rules
-
             // TypeScript backend rules
             ...js.configs.all.rules,
             ...tseslint.configs.recommendedTypeChecked,
@@ -7832,7 +7832,6 @@ export default [
             ...css.configs.recommended.rules,
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
-
             "@typescript-eslint/array-type": [
                 "error",
                 { default: "array-simple" },
@@ -8244,7 +8243,6 @@ export default [
             "unicorn/prefer-module": "off", // CommonJS required for Electron
             "unicorn/prefer-node-protocol": "error", // Enforce for backend
             "unicorn/prefer-spread": "off", // Prefer Array.From for readability
-
             "unicorn/prefer-top-level-await": "off", // Not suitable for Electron main
             "unicorn/prevent-abbreviations": "off", // Too many false positives
             // Import management
@@ -8285,7 +8283,10 @@ export default [
             },
             react: { version: "19" },
         },
-    }, // Script files
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Scripts
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
             "scripts/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
@@ -8315,7 +8316,6 @@ export default [
         name: "Scripts - scripts/**/*.{TS,TSX,CTS,MTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@typescript-eslint": tseslint,
-
             "import-x": importX,
             n: nodePlugin,
             react: pluginReact,
@@ -8326,7 +8326,6 @@ export default [
         },
         rules: {
             // Scripts Files Rules
-
             ...js.configs.all.rules,
             ...vitest.configs.recommended.rules,
             ...pluginComments.recommended.rules,
@@ -8382,7 +8381,6 @@ export default [
             "new-cap": "off", // Allow new-cap for class constructors
             "nitpick/no-redundant-vars": "off", // Allow redundant vars in benchmarks
             "no-await-in-loop": "off", // Allow await in loops for sequential operations
-
             "no-console": "off",
             "no-continue": "off",
             "no-div-regex": "off", // Allow division regex in benchmarks
@@ -8464,7 +8462,10 @@ export default [
             },
             react: { version: "19" },
         },
-    }, // JS/MJS Configuration files
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: JS/MJS Configuration files
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
             "**/*.config.{js,mjs,cts,cjs}",
@@ -8644,7 +8645,10 @@ export default [
             },
             react: { version: "19" },
         },
-    }, // Playwright End-to-End Test Configuration
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Tests (Playwright)
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
             "playwright/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -8689,7 +8693,6 @@ export default [
         rules: {
             ...playwright.configs["flat/recommended"].rules,
             ...pluginTestingLibrary.configs["flat/dom"].rules,
-
             // TypeScript and testing-specific overrides for Playwright
             "@typescript-eslint/no-unused-vars": [
                 "error",
@@ -8713,7 +8716,6 @@ export default [
                 "error",
                 { max: 4 },
             ],
-
             "playwright/missing-playwright-await": "error",
             "playwright/no-commented-out-tests": "warn",
             // Conditional logic in tests is usually an indication that a test is attempting to cover too much, and not testing the logic it intends to. Each branch of code executing within a conditional statement will usually be better served by a test devoted to it.
@@ -8765,9 +8767,7 @@ export default [
             "playwright/valid-expect": "error",
             "playwright/valid-title": "error",
             "prefer-arrow-callback": "off", // Test functions don't need arrow syntax
-
             "testing-library/prefer-screen-queries": "off", // Allow destructuring from render result
-
             "unicorn/consistent-function-scoping": "off", // Test helpers
             "unicorn/no-await-expression-member": "off", // Common in Playwright
         },
@@ -8790,7 +8790,10 @@ export default [
                 ],
             },
         },
-    }, // Strict Test files
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Tests (Strict)
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
             "shared/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -8822,7 +8825,10 @@ export default [
                 typecheck: true,
             },
         },
-    }, // Theme components override - disable react-perf rule for inline styling
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Storybook
+    // ═══════════════════════════════════════════════════════════════════════════════
     ...storybook.configs['flat/recommended'],
     ...storybook.configs['flat/csf-strict'],
     ...storybook.configs['flat/addon-interactions'],
@@ -8843,6 +8849,9 @@ export default [
             "unicorn/prefer-import-meta-properties": "off",
         },
     },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Storybook Stories
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["storybook/**/*.stories.tsx"],
         name: "Storybook Stories - storybook/**/*.stories.tsx",
@@ -8903,6 +8912,9 @@ export default [
             "storybook/no-title-property-in-meta": "warn",
         },
     },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Theme Components Override
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["src/theme/**/*.{ts,tsx,cts,mts}"],
         name: "Theme Components Override - src/theme/**/*.{TS,TSX,CTS,MTS}",
@@ -8913,7 +8925,10 @@ export default [
             // Theme components legitimately need inline styles for dynamic theming
             "react-perf/jsx-no-new-object-as-prop": "warn",
         },
-    }, // YAML/YML disable empty key for github workflows (false positive)
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Github Workflows YAML/YML
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
             "**/.github/workflows/**/*.{yaml,yml}",
@@ -8929,7 +8944,10 @@ export default [
             "yml/no-empty-mapping-value": "off",
             "yml/sort-keys": "off",
         },
-    }, // Disable JSON Sort-keys for specific files
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Disable JSON Sort-keys
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
             "**/package.json",
@@ -8946,7 +8964,10 @@ export default [
         rules: {
             "jsonc/array-bracket-newline": "off",
         },
-    }, // Global Disables
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: Global Overrides
+    // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/**"],
         name: "Globals",
@@ -8967,11 +8988,9 @@ export default [
             // Better-tailwindcss
             "better-tailwindcss/multiline": "off",
             "better-tailwindcss/sort-classes": "off",
-
             "callback-return": "off",
             "canonical/destructuring-property-newline": "off",
             // Deprecated rules - to be removed in future
-
             "functional/no-promise-reject": "off",
             "functional/no-this-expressions": "off",
             "functional/no-try-statements": "off",

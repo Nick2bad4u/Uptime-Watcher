@@ -17,8 +17,7 @@ const meta: Meta<typeof DefaultErrorFallback> = {
         layout: "centered",
     },
     tags: ["autodocs"],
-    title: "Components/Error/DefaultErrorFallback",
-};
+} satisfies Meta<typeof DefaultErrorFallback>;
 
 export default meta;
 

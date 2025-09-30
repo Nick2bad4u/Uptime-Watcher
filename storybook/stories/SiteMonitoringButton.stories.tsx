@@ -17,8 +17,7 @@ const meta: Meta<typeof SiteMonitoringButton> = {
         layout: "centered",
     },
     tags: ["autodocs"],
-    title: "Components/Common/SiteMonitoringButton",
-};
+} satisfies Meta<typeof SiteMonitoringButton>;
 
 export default meta;
 

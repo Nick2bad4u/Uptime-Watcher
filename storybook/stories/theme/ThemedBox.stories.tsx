@@ -4,7 +4,6 @@ import { ThemedBox } from "@app/theme/components/ThemedBox";
 import { ThemedText } from "@app/theme/components/ThemedText";
 
 const meta: Meta<typeof ThemedBox> = {
-    title: "Theme/ThemedBox",
     component: ThemedBox,
     args: {
         padding: "lg",
@@ -25,7 +24,8 @@ const meta: Meta<typeof ThemedBox> = {
     parameters: {
         layout: "padded",
     },
-};
+    tags: ["autodocs"],
+} satisfies Meta<typeof ThemedBox>;
 
 export default meta;
 

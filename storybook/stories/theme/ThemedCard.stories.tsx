@@ -6,7 +6,6 @@ import { ThemedText } from "@app/theme/components/ThemedText";
 import { FiBarChart2, FiServer, FiTrendingUp } from "react-icons/fi";
 
 const meta: Meta<typeof ThemedCard> = {
-    title: "Theme/ThemedCard",
     component: ThemedCard,
     args: {
         title: "Site Availability",
@@ -27,7 +26,8 @@ const meta: Meta<typeof ThemedCard> = {
     parameters: {
         layout: "padded",
     },
-};
+    tags: ["autodocs"],
+} satisfies Meta<typeof ThemedCard>;
 
 export default meta;
 

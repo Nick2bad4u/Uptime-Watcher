@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ThemedProgress } from "@app/theme/components/ThemedProgress";
 
 const meta: Meta<typeof ThemedProgress> = {
-    title: "Theme/ThemedProgress",
     component: ThemedProgress,
     args: {
         value: 45,
@@ -14,7 +13,8 @@ const meta: Meta<typeof ThemedProgress> = {
     parameters: {
         layout: "padded",
     },
-};
+    tags: ["autodocs"],
+} satisfies Meta<typeof ThemedProgress>;
 
 export default meta;
 

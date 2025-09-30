@@ -4,7 +4,6 @@ import { ThemedBadge } from "@app/theme/components/ThemedBadge";
 import { FiAlertTriangle, FiCheckCircle, FiInfo } from "react-icons/fi";
 
 const meta: Meta<typeof ThemedBadge> = {
-    title: "Theme/ThemedBadge",
     component: ThemedBadge,
     args: {
         children: "Badge",
@@ -13,7 +12,8 @@ const meta: Meta<typeof ThemedBadge> = {
     parameters: {
         layout: "centered",
     },
-};
+    tags: ["autodocs"],
+} satisfies Meta<typeof ThemedBadge>;
 
 export default meta;
 

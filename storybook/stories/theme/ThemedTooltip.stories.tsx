@@ -4,7 +4,6 @@ import { ThemedButton } from "@app/theme/components/ThemedButton";
 import { ThemedTooltip } from "@app/theme/components/ThemedTooltip";
 
 const meta: Meta<typeof ThemedTooltip> = {
-    title: "Theme/ThemedTooltip",
     component: ThemedTooltip,
     args: {
         content: "Opens the monitor configuration dialog",
@@ -12,7 +11,8 @@ const meta: Meta<typeof ThemedTooltip> = {
     parameters: {
         layout: "centered",
     },
-};
+    tags: ["autodocs"],
+} satisfies Meta<typeof ThemedTooltip>;
 
 export default meta;
 

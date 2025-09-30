@@ -5,7 +5,6 @@ import type { JSX } from "react";
 import { MiniChartBar } from "@app/theme/components/MiniChartBar";
 
 const meta: Meta<typeof MiniChartBar> = {
-    title: "Theme/MiniChartBar",
     component: MiniChartBar,
     args: {
         status: "up",
@@ -15,7 +14,8 @@ const meta: Meta<typeof MiniChartBar> = {
     parameters: {
         layout: "centered",
     },
-};
+    tags: ["autodocs"],
+} satisfies Meta<typeof MiniChartBar>;
 
 export default meta;
 

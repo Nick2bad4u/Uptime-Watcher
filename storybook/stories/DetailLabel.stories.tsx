@@ -27,8 +27,7 @@ const meta: Meta<typeof DetailLabel> = {
         layout: "centered",
     },
     tags: ["autodocs"],
-    title: "Components/Common/DetailLabel",
-};
+} satisfies Meta<typeof DetailLabel>;
 
 export default meta;
 

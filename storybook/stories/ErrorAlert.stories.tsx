@@ -27,8 +27,7 @@ const meta: Meta<typeof ErrorAlert> = {
         layout: "centered",
     },
     tags: ["autodocs"],
-    title: "Components/Common/ErrorAlert",
-};
+} satisfies Meta<typeof ErrorAlert>;
 
 export default meta;
 

@@ -8,7 +8,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MonitorSelector } from "../../components/Dashboard/SiteCard/components/MonitorSelector";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
-import type { Monitor } from "../../../shared/types";
+import type { Monitor, MonitorType } from "../../../shared/types";
 import { createValidMonitor } from "../../../shared/test/testHelpers";
 
 // Mock ThemedSelect
@@ -36,20 +36,27 @@ vi.mock("../../theme/components/ThemedSelect", () => ({
 
 const createMockMonitor = (
     id: string,
-    type: Monitor["type"],
+    type: MonitorType,
     options: Partial<Monitor> = {}
 ): Monitor => {
+    const hasUrlOverride = Object.hasOwn(options, "url");
+    const { url: overrideUrl, ...restOptions } = options;
     const monitor = createValidMonitor({
         id,
         type,
         status: "pending",
         monitoring: false,
         responseTime: 0,
-        ...options,
+        ...restOptions,
+        ...(overrideUrl === undefined ? {} : { url: overrideUrl }),
     });
 
+    if (hasUrlOverride && overrideUrl === undefined) {
+        Reflect.deleteProperty(monitor, "url");
+    }
+
     if (type === "port" || type === "ping") {
-        monitor.url = undefined;
+        Reflect.deleteProperty(monitor, "url");
     }
 
     return monitor;
@@ -879,7 +886,6 @@ describe("MonitorSelector - Complete Coverage", () => {
                 createMockMonitor("cdn-monitor", "cdn-edge-consistency", {
                     baselineUrl: "https://origin.example.com/status",
                     edgeLocations: "https://edge.example.com/status",
-                    url: undefined,
                 }),
                 createMockMonitor("heartbeat-monitor", "server-heartbeat", {
                     heartbeatExpectedStatus: "ok",
@@ -891,7 +897,6 @@ describe("MonitorSelector - Complete Coverage", () => {
                     primaryStatusUrl: "https://primary.example.com/status",
                     replicaStatusUrl: "https://replica.example.com/status",
                     replicationTimestampField: "timestamp",
-                    url: undefined,
                 }),
             ];
 

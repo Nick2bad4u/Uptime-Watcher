@@ -38,8 +38,7 @@ const meta: Meta<typeof HistoryChart> = {
         layout: "fullscreen",
     },
     tags: ["autodocs"],
-    title: "Components/Common/HistoryChart",
-};
+} satisfies Meta<typeof HistoryChart>;
 
 export default meta;
 

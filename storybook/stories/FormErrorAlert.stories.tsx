@@ -18,8 +18,7 @@ const meta: Meta<typeof FormErrorAlert> = {
         layout: "centered",
     },
     tags: ["autodocs"],
-    title: "Components/Shared/FormErrorAlert",
-};
+} satisfies Meta<typeof FormErrorAlert>;
 
 export default meta;
 

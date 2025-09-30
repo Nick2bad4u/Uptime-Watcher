@@ -63,7 +63,20 @@ let settingsSyncTimer: null | ReturnType<typeof setTimeout> = null;
 const syncSettingsAfterRehydration = (
     state: SettingsStore | undefined
 ): void => {
-    if (state) {
+    if (state?.settings) {
+        const { settings } = state;
+        const matchesDefaults =
+            settings.autoStart === defaultSettings.autoStart &&
+            settings.historyLimit === defaultSettings.historyLimit &&
+            settings.minimizeToTray === defaultSettings.minimizeToTray &&
+            settings.notifications === defaultSettings.notifications &&
+            settings.soundAlerts === defaultSettings.soundAlerts &&
+            settings.theme === defaultSettings.theme;
+
+        if (matchesDefaults) {
+            return;
+        }
+
         // Clear any existing timer
         if (settingsSyncTimer) {
             clearTimeout(settingsSyncTimer);

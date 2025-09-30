@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ThemedText } from "@app/theme/components/ThemedText";
 
 const meta: Meta<typeof ThemedText> = {
-    title: "Theme/ThemedText",
     component: ThemedText,
     args: {
         children: "Themed text demonstrates consistent typography.",
@@ -13,7 +12,8 @@ const meta: Meta<typeof ThemedText> = {
     parameters: {
         layout: "padded",
     },
-};
+    tags: ["autodocs"],
+} satisfies Meta<typeof ThemedText>;
 
 export default meta;
 

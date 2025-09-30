@@ -185,10 +185,8 @@ export class ReplicationMonitor implements IMonitorService {
                         parsed = JSON.parse(rawData);
                     } catch (parseError) {
                         const normalizedParseError = ensureError(parseError);
-                        throw new Error(
-                            `Invalid JSON response from ${url}: ${normalizedParseError.message}`,
-                            { cause: parseError }
-                        );
+                        normalizedParseError.message = `Invalid JSON response from ${url}: ${normalizedParseError.message}`;
+                        throw normalizedParseError;
                     }
                 }
             }
@@ -199,10 +197,8 @@ export class ReplicationMonitor implements IMonitorService {
             };
         } catch (fetchError) {
             const normalizedFetchError = ensureError(fetchError);
-            throw new Error(
-                `Failed to fetch ${url}: ${normalizedFetchError.message}`,
-                { cause: fetchError }
-            );
+            normalizedFetchError.message = `Failed to fetch ${url}: ${normalizedFetchError.message}`;
+            throw normalizedFetchError;
         }
     }
 

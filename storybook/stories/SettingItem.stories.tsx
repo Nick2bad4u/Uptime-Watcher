@@ -27,8 +27,7 @@ const meta: Meta<typeof SettingItem> = {
         layout: "centered",
     },
     tags: ["autodocs"],
-    title: "Components/Shared/SettingItem",
-};
+} satisfies Meta<typeof SettingItem>;
 
 export default meta;
 

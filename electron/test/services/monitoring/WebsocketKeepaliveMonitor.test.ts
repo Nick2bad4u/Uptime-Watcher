@@ -53,14 +53,17 @@ vi.mock("ws", async () => {
         });
     }
 
+    class CapturingWebSocket extends LocalWebSocket {
+        public constructor(url: string, _options?: unknown) {
+            super(url);
+            socketInstances.push(this as CapturedWebSocket);
+        }
+    }
+
     return {
         __esModule: true as const,
-        default: class extends LocalWebSocket {
-            public constructor(url: string, _options?: unknown) {
-                super(url);
-                socketInstances.push(this as CapturedWebSocket);
-            }
-        },
+        default: CapturingWebSocket,
+        WebSocket: CapturingWebSocket,
     };
 });
 

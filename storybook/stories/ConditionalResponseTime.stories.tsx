@@ -35,8 +35,7 @@ const meta: Meta<typeof ConditionalResponseTime> = {
         </ConditionalResponseTime>
     ),
     tags: ["autodocs"],
-    title: "Components/Common/ConditionalResponseTime",
-};
+} satisfies Meta<typeof ConditionalResponseTime>;
 
 export default meta;
 

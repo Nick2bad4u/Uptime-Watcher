@@ -771,7 +771,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             annotate("Type: Business Logic", "type");
 
             mockFormHook.name = undefined;
-            mockFormHook.url = undefined;
+            Reflect.deleteProperty(mockFormHook, "url");
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
             render(<AddSiteForm />);
@@ -800,7 +800,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             annotate("Type: Business Logic", "type");
 
             mockFormHook.setName = undefined;
-            mockFormHook.setUrl = undefined;
+            Reflect.deleteProperty(mockFormHook, "setUrl");
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
             expect(() => render(<AddSiteForm />)).not.toThrow();

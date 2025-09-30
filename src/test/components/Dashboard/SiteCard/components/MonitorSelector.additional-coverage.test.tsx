@@ -62,8 +62,8 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
                 id: "unknown-monitor",
                 port: 8080,
                 type: "port",
-                url: undefined,
             });
+            Reflect.deleteProperty(baseMonitor, "url");
             const unknownMonitor = {
                 ...baseMonitor,
                 type: "custom-unknown-type" as any, // Type assertion for unknown type
@@ -154,15 +154,16 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             annotate("Type: Monitoring", "type");
 
             // Create a valid monitor and then override to unknown type without port/url
+            const basePingMonitor = createValidMonitor({
+                id: "unknown-monitor-empty",
+                type: "ping",
+            });
+            Reflect.deleteProperty(basePingMonitor, "port");
+            Reflect.deleteProperty(basePingMonitor, "url");
+            Reflect.deleteProperty(basePingMonitor, "host");
             const unknownMonitorEmpty = {
-                ...createValidMonitor({
-                    id: "unknown-monitor-empty",
-                    type: "ping",
-                }),
-                type: "mystery-type" as any, // Type assertion for unknown type
-                port: undefined,
-                url: undefined,
-                host: undefined,
+                ...basePingMonitor,
+                type: "mystery-type" as any,
             } as any;
 
             renderWithTheme({
@@ -204,9 +205,9 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
                     id: "unknown-monitor-both",
                     port: 3000,
                     type: "port",
-                    url: undefined,
+                    url: "https://example.com",
                 }),
-                type: "dual-type" as any, // Type assertion for unknown type
+                type: "dual-type" as any,
             } as any;
 
             renderWithTheme({
